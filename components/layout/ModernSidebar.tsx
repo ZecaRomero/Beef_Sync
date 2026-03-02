@@ -25,7 +25,8 @@ import {
   TruckIcon,
   ScaleIcon,
   EyeIcon,
-  ArrowPathIcon
+  ArrowPathIcon,
+  ArrowUpTrayIcon
 } from '@heroicons/react/24/outline'
 import { cn } from '../../lib/utils'
 import NetworkStatusIndicator from '../ui/NetworkStatusIndicator'
@@ -33,6 +34,15 @@ import { SidebarProps, NavigationItem } from '../../types/layout'
 import { usePermissions } from '../../hooks/usePermissions'
 
 const navigation: NavigationItem[] = [
+  {
+    name: 'Importações',
+    icon: ArrowUpTrayIcon,
+    color: 'text-blue-600 dark:text-blue-400',
+    children: [
+      { name: 'Central de Importações', href: '/importacoes', description: 'IA, Nascimentos, TE, iABCZ, DECA, IQG, Pt IQG, Localização, Piquetes, Óbitos, Observações, Pesagens' },
+      { name: 'Excel Universal', href: '/importacao-excel', description: 'Animais, IA, FIV, Nascimentos, DG, Notas Fiscais' }
+    ]
+  },
   {
     name: 'Animais',
     icon: UserGroupIcon,

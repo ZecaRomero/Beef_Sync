@@ -14,7 +14,23 @@ export const config = {
  */
 function normalizarNumero(val) {
   if (val === null || val === undefined) return null;
-  const s = String(val).trim();
+  
+  let s = '';
+  if (typeof val === 'object') {
+    if (val.richText) {
+      s = val.richText.map(t => t.text).join('');
+    } else if (val.text) {
+      s = val.text;
+    } else if (val.result !== undefined) {
+      s = String(val.result);
+    } else {
+      s = String(val);
+    }
+  } else {
+    s = String(val);
+  }
+  
+  s = s.trim();
   if (!s) return null;
   const num = parseFloat(s.replace(',', '.').replace(/\s/g, ''));
   return isNaN(num) ? null : s.replace(',', '.');
@@ -25,7 +41,30 @@ function normalizarNumero(val) {
  */
 function normalizarTexto(val) {
   if (val === null || val === undefined) return '';
+  
+  if (typeof val === 'object') {
+    if (val.richText) {
+      return val.richText.map(t => t.text).join('').trim();
+    }
+    if (val.text) {
+      return val.text.trim();
+    }
+    if (val.result !== undefined) {
+      return String(val.result).trim();
+    }
+  }
+  
   return String(val).trim();
+}
+
+/**
+ * Normaliza RG: remove zeros à esquerda quando for numérico (ex: 017328 -> 17328)
+ * para garantir matching com o banco
+ */
+function normalizarRG(val) {
+  const s = normalizarTexto(val);
+  if (!s) return '';
+  return /^\d+$/.test(s) ? String(parseInt(s, 10)) : s;
 }
 
 /**
@@ -112,6 +151,10 @@ export default async function handler(req, res) {
 
     // Formato Série|RGN|Status (3 colunas) - ex: SERIE, RGN, Status
     const formatoStatusAbcz = cellC1.includes('STATUS');
+    // Formato Série|RG|IQG|Pt IQG (4 colunas) - col 3 e 4 vão para genetica_2 e decile_2
+    const cellD1 = (primeiraLinha.getCell(4).value ?? '').toString().toUpperCase();
+    const formatoIQG = (cellC1.includes('IQG') || cellD1.includes('PT') || cellD1.includes('IQG')) &&
+      !cellC1.includes('IABCZ') && !cellC1.includes('DECA');
 
     const rows = [];
     for (let i = startRow; i <= worksheet.rowCount; i++) {
@@ -129,6 +172,9 @@ export default async function handler(req, res) {
 
       if (formatoStatusAbcz) {
         situacaoAbcz = normalizarTexto(row.getCell(3).value) || null;
+      } else if (formatoIQG) {
+        genetica2 = normalizarNumero(row.getCell(3).value) || normalizarTexto(row.getCell(3).value) || null;
+        decile2 = normalizarTexto(row.getCell(4).value) || null;
       } else {
         iABCZ = normalizarNumero(row.getCell(3).value);
         deca = normalizarTexto(row.getCell(4).value);
@@ -165,82 +211,175 @@ async function processarLinhas(rows) {
     erros: [],
   };
 
+  // Normalizar e filtrar linhas (RG sem zeros à esquerda para matching)
+  const dados = [];
   for (let i = 0; i < rows.length; i++) {
     const r = rows[i];
-    const serie = normalizarTexto(r.serie || r.Série || r.SERIE);
-    const rg = normalizarTexto(r.rg || r.RG || r.RGN);
-    const iABCZ = normalizarNumero(r.iABCZ ?? r.iabcz ?? r.abczg);
-    const deca = normalizarTexto(r.deca ?? r.Deca ?? r.DECA);
-    const situacaoAbcz = normalizarTexto(r.situacaoAbcz ?? r.situacao_abcz ?? r['Situação ABCZ'] ?? r.Status) || null;
-    const genetica2 = normalizarNumero(r.genetica_2 ?? r.genetica2 ?? r['Avaliação 2'] ?? r['Genética 2']) ?? normalizarTexto(r.genetica_2 ?? r.genetica2);
-    const decile2 = normalizarTexto(r.decile_2 ?? r.decile2 ?? r['Decile 2']) || null;
-
+    let serie = normalizarTexto(r.serie || r.Série || r.SERIE);
+    let rg = normalizarRG(r.rg || r.RG || r.RGN);
+    
+    // Se RG contém hífen, pode estar no formato "CJCJ-16310" (série-rg junto)
+    if (rg && rg.includes('-')) {
+      const partes = rg.split('-');
+      if (partes.length === 2) {
+        // Se série está vazia, usar a primeira parte como série
+        if (!serie) {
+          serie = partes[0].trim();
+        }
+        rg = normalizarRG(partes[1]);
+      }
+    }
+    
     if (!serie && !rg) continue;
+    dados.push({
+      linha: i + 1,
+      serie,
+      rg,
+      abczg: normalizarNumero(r.iABCZ ?? r.iabcz ?? r.abczg) != null ? String(normalizarNumero(r.iABCZ ?? r.iabcz ?? r.abczg)) : null,
+      deca: normalizarTexto(r.deca ?? r.Deca ?? r.DECA) || null,
+      situacaoAbcz: normalizarTexto(r.situacaoAbcz ?? r.situacao_abcz ?? r['Situação ABCZ'] ?? r.Status) || null,
+      genetica2: normalizarNumero(r.genetica_2 ?? r.genetica2 ?? r['IQG'] ?? r['Genética 2']) != null ? String(normalizarNumero(r.genetica_2 ?? r.genetica2 ?? r['IQG'] ?? r['Genética 2'])) : null,
+      decile2: normalizarTexto(r.decile_2 ?? r.decile2 ?? r['Pt IQG']) || null,
+    });
+  }
+
+  if (dados.length === 0) return resultados;
+
+  // Buscar animais em lotes (evita query muito grande) - RG normalizado no banco (sem zeros à esquerda)
+  const mapaAnimais = new Map();
+  const BATCH_SELECT = 500;
+
+  for (let b = 0; b < dados.length; b += BATCH_SELECT) {
+    const batch = dados.slice(b, b + BATCH_SELECT);
+    const pares = batch.map(d => [d.serie, d.rg]);
+    const flatParams = pares.flat();
+
+    // 1) Busca por serie + rg (RG normalizado: sem zeros à esquerda no banco)
+    const animaisRes = await query(
+      `SELECT id, serie, rg, situacao FROM animais a
+       WHERE (UPPER(COALESCE(TRIM(a.serie), '')), COALESCE(NULLIF(REGEXP_REPLACE(TRIM(a.rg::text), '^0+', ''), ''), '0')) IN (
+         ${pares.map((_, i) => `(UPPER($${i * 2 + 1}), $${i * 2 + 2})`).join(', ')}
+       )`,
+      flatParams
+    );
+
+    for (const a of animaisRes.rows) {
+      const rgNorm = /^\d+$/.test(String(a.rg || '').trim()) ? String(parseInt(String(a.rg).trim(), 10)) : String(a.rg || '').trim();
+      const key = `${(a.serie || '').toUpperCase().trim()}|${rgNorm}`;
+      mapaAnimais.set(key, a);
+    }
+
+    // 2) Fallback: buscar por tatuagem (serie-rg, serie+rg) para os que não foram encontrados
+    const naoEncontradosNoBatch = batch.filter(d => !mapaAnimais.has(`${(d.serie || '').toUpperCase().trim()}|${d.rg}`));
+    const tatuagens = [...new Set(naoEncontradosNoBatch.flatMap(d => [
+      `${(d.serie || '').trim()}-${d.rg}`.replace(/\s/g, '').toUpperCase(),
+      `${(d.serie || '').trim()}${d.rg}`.replace(/\s/g, '').toUpperCase()
+    ]).filter(Boolean))];
+    if (tatuagens.length > 0) {
+      try {
+        const tatRes = await query(
+          `SELECT id, serie, rg, situacao, tatuagem FROM animais a
+           WHERE TRIM(COALESCE(a.tatuagem, '')) != ''
+             AND REPLACE(UPPER(TRIM(a.tatuagem)), ' ', '') IN (SELECT unnest($1::text[]))`,
+          [tatuagens]
+        );
+        for (const d of naoEncontradosNoBatch) {
+          const key = `${(d.serie || '').toUpperCase().trim()}|${d.rg}`;
+          const dTat = `${(d.serie || '').trim()}${d.rg}`.replace(/\s/g, '').toUpperCase();
+          const dTat2 = `${(d.serie || '').trim()}-${d.rg}`.replace(/\s/g, '').toUpperCase();
+          const animal = tatRes.rows.find(a => {
+            const tat = (a.tatuagem || '').replace(/\s/g, '').toUpperCase();
+            return tat === dTat || tat === dTat2;
+          });
+          if (animal) mapaAnimais.set(key, animal);
+        }
+      } catch (_) {}
+    }
+  }
+
+  // Atualizar em lotes (1 UPDATE por lote em vez de 1 por linha)
+  const BATCH = 50;
+  let temColGenetica2 = true;
+
+  for (let b = 0; b < dados.length; b += BATCH) {
+    const batch = dados.slice(b, b + BATCH);
+    const updates = [];
+
+    for (const d of batch) {
+      const key = `${(d.serie || '').toUpperCase().trim()}|${d.rg}`;
+      const animal = mapaAnimais.get(key);
+      if (!animal) {
+        resultados.naoEncontrados.push({ linha: d.linha, serie: d.serie, rg: d.rg });
+        continue;
+      }
+      if (String(animal.situacao || '').trim() === 'Inativo') {
+        resultados.ignoradosInativos.push({ linha: d.linha, serie: d.serie, rg: d.rg });
+        continue;
+      }
+      updates.push({
+        id: animal.id,
+        serie: d.serie,
+        rg: d.rg,
+        abczg: d.abczg,
+        deca: d.deca,
+        situacaoAbcz: d.situacaoAbcz,
+        genetica2: d.genetica2,
+        decile2: d.decile2,
+      });
+    }
+
+    if (updates.length === 0) continue;
+
+    const runBatchUpdate = async (comGenetica2) => {
+      const cols = comGenetica2
+        ? 'abczg, deca, situacao_abcz, genetica_2, decile_2'
+        : 'abczg, deca, situacao_abcz';
+      const nCols = comGenetica2 ? 6 : 4;
+      const vals = updates.map((u, i) => {
+        const off = i * nCols;
+        const params = comGenetica2
+          ? `($${off + 1}::int, $${off + 2}, $${off + 3}, $${off + 4}, $${off + 5}, $${off + 6})`
+          : `($${off + 1}::int, $${off + 2}, $${off + 3}, $${off + 4})`;
+        return params;
+      }).join(', ');
+      const flat = updates.flatMap(u =>
+        comGenetica2 ? [u.id, u.abczg, u.deca, u.situacaoAbcz, u.genetica2, u.decile2] : [u.id, u.abczg, u.deca, u.situacaoAbcz]
+      );
+      const setClause = comGenetica2
+        ? 'a.abczg = COALESCE(v.abczg, a.abczg), a.deca = COALESCE(v.deca, a.deca), a.situacao_abcz = COALESCE(v.situacao_abcz, a.situacao_abcz), a.genetica_2 = COALESCE(v.genetica_2, a.genetica_2), a.decile_2 = COALESCE(v.decile_2, a.decile_2)'
+        : 'a.abczg = COALESCE(v.abczg, a.abczg), a.deca = COALESCE(v.deca, a.deca), a.situacao_abcz = COALESCE(v.situacao_abcz, a.situacao_abcz)';
+      const vCols = comGenetica2 ? 'id, abczg, deca, situacao_abcz, genetica_2, decile_2' : 'id, abczg, deca, situacao_abcz';
+      await query(
+        `UPDATE animais a SET ${setClause}, a.updated_at = CURRENT_TIMESTAMP
+         FROM (VALUES ${vals}) AS v(${vCols}) WHERE a.id = v.id`,
+        flat
+      );
+    };
 
     try {
-      const animalResult = await query(
-        'SELECT id, serie, rg, situacao FROM animais WHERE UPPER(COALESCE(TRIM(serie), \'\')) = UPPER($1) AND TRIM(rg::text) = $2',
-        [serie, String(rg)]
-      );
-
-      if (animalResult.rows.length === 0) {
-        resultados.naoEncontrados.push({ linha: i + 1, serie, rg });
-        continue;
+      if (temColGenetica2) {
+        await runBatchUpdate(true);
+        resultados.animaisAtualizados += updates.length;
+      } else {
+        await runBatchUpdate(false);
+        resultados.animaisAtualizados += updates.length;
       }
-
-      const animal = animalResult.rows[0];
-      if (String(animal.situacao || '').trim() === 'Inativo') {
-        resultados.ignoradosInativos.push({ linha: i + 1, serie, rg });
-        continue;
-      }
-      const abczgVal = iABCZ != null ? String(iABCZ) : null;
-      const decaVal = deca || null;
-      const genetica2Val = genetica2 != null ? String(genetica2) : null;
-      const decile2Val = decile2 || null;
-
-      try {
-        await query(
-          `UPDATE animais 
-           SET abczg = COALESCE($1, abczg), 
-               deca = COALESCE($2, deca),
-               situacao_abcz = COALESCE($3, situacao_abcz),
-               genetica_2 = COALESCE($4, genetica_2),
-               decile_2 = COALESCE($5, decile_2),
-               updated_at = CURRENT_TIMESTAMP
-           WHERE id = $6`,
-          [abczgVal, decaVal, situacaoAbcz, genetica2Val, decile2Val, animal.id]
-        );
-      } catch (colErr) {
-        if (/column.*does not exist/i.test(colErr?.message || '')) {
-          await query(
-            `UPDATE animais 
-             SET abczg = COALESCE($1, abczg), 
-                 deca = COALESCE($2, deca),
-                 situacao_abcz = COALESCE($3, situacao_abcz),
-                 updated_at = CURRENT_TIMESTAMP
-             WHERE id = $4`,
-            [abczgVal, decaVal, situacaoAbcz, animal.id]
-          );
-          if (genetica2Val != null || decile2Val != null) {
-            try {
-              await query(
-                `UPDATE animais SET genetica_2 = COALESCE($1, genetica_2), decile_2 = COALESCE($2, decile_2), updated_at = CURRENT_TIMESTAMP WHERE id = $3`,
-                [genetica2Val, decile2Val, animal.id]
-              );
-            } catch (_) {}
+    } catch (colErr) {
+      if (/column.*does not exist/i.test(colErr?.message || '')) {
+        temColGenetica2 = false;
+        try {
+          await runBatchUpdate(false);
+          resultados.animaisAtualizados += updates.length;
+        } catch (e) {
+          for (const u of updates) {
+            resultados.erros.push({ linha: 0, serie: u.serie, rg: u.rg, erro: e.message });
           }
-        } else throw colErr;
+        }
+      } else {
+        for (const u of updates) {
+          resultados.erros.push({ linha: 0, serie: u.serie, rg: u.rg, erro: colErr.message });
+        }
       }
-
-      resultados.animaisAtualizados++;
-    } catch (rowError) {
-      console.error(`Erro linha ${i + 1}:`, rowError);
-      resultados.erros.push({
-        linha: i + 1,
-        serie,
-        rg,
-        erro: rowError.message,
-      });
     }
   }
 

@@ -1,11 +1,14 @@
 import { useState, useEffect, Fragment } from 'react'
 import Head from 'next/head'
 import ModernLayout from '../../components/layout/ModernLayout'
-import { DocumentTextIcon, ArrowDownTrayIcon, PlusIcon } from '@heroicons/react/24/outline'
+import { DocumentTextIcon, ArrowDownTrayIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline'
 
 export default function BoletimDefesa() {
   const [fazendas, setFazendas] = useState([])
+  const [historico, setHistorico] = useState([])
   const [loading, setLoading] = useState(true)
+  const [currentUser, setCurrentUser] = useState(null)
+  const [deletandoId, setDeletandoId] = useState(null)
   const [editingCell, setEditingCell] = useState(null)
   const [pendingChange, setPendingChange] = useState(null)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
@@ -14,11 +17,25 @@ export default function BoletimDefesa() {
     carregarDados()
   }, [])
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const id = localStorage.getItem('beef_usuario_identificado')
+      if (id) {
+        const parsed = JSON.parse(id)
+        setCurrentUser(parsed?.nome || null)
+      } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        setCurrentUser('Zeca')
+      }
+    } catch (_) {}
+  }, [])
+
   const carregarDados = async () => {
     try {
       const response = await fetch('/api/boletim-defesa')
       const data = await response.json()
       setFazendas(data.fazendas || [])
+      setHistorico(data.historico || [])
     } catch (error) {
       console.error('Erro ao carregar dados:', error)
     } finally {
@@ -86,11 +103,30 @@ export default function BoletimDefesa() {
 
     // Salvar no banco
     try {
+      let usuario = null
+      if (typeof window !== 'undefined') {
+        try {
+          const id = localStorage.getItem('beef_usuario_identificado')
+          if (id) {
+            const parsed = JSON.parse(id)
+            usuario = parsed?.nome || null
+          }
+        } catch (_) {}
+      }
       await fetch('/api/boletim-defesa', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fazendaId, faixa, sexo, valor: valorNovo })
+        body: JSON.stringify({
+          fazendaId,
+          faixa,
+          sexo,
+          valor: valorNovo,
+          valorAntigo,
+          fazendaNome: pendingChange.fazendaNome,
+          usuario
+        })
       })
+      carregarDados()
     } catch (error) {
       console.error('Erro ao salvar:', error)
       alert('❌ Erro ao salvar alteração')
@@ -122,6 +158,34 @@ export default function BoletimDefesa() {
     setPendingChange(null)
     // Recarregar dados para reverter a mudança visual
     carregarDados()
+  }
+
+  const podeExcluirRegistro = (h) => {
+    if (!currentUser) return false
+    const regUser = (h.usuario || '').trim()
+    return regUser === '' || regUser === '-' || regUser === currentUser || currentUser === 'Zeca'
+  }
+
+  const excluirHistorico = async (id) => {
+    if (!currentUser) return
+    setDeletandoId(id)
+    try {
+      const res = await fetch('/api/boletim-defesa', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, usuario: currentUser })
+      })
+      const data = await res.json()
+      if (data.success) {
+        setHistorico(prev => prev.filter(h => h.id !== id))
+      } else {
+        alert(data.message || 'Não foi possível excluir')
+      }
+    } catch (err) {
+      alert('Erro ao excluir')
+    } finally {
+      setDeletandoId(null)
+    }
   }
 
   const calcularSubtotais = (quantidades) => {
@@ -745,6 +809,80 @@ export default function BoletimDefesa() {
                         </tr>
                       </>
                     )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Histórico de alterações */}
+          {historico.length > 0 && (
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+              <h3 className="px-4 py-3 bg-gray-100 dark:bg-gray-900 font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <svg className="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Histórico de alterações
+              </h3>
+              <div className="max-h-64 overflow-y-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 dark:bg-gray-900 sticky top-0">
+                    <tr>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Data/Hora</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Fazenda</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Campo alterado</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">De → Para</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Usuário</th>
+                      {currentUser && <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase w-12">Excluir</th>}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                    {historico.map((h) => (
+                      <tr key={h.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                        <td className="px-3 py-2 text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                          {new Date(h.created_at).toLocaleString('pt-BR', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </td>
+                        <td className="px-3 py-2 font-medium text-gray-900 dark:text-white">{h.fazenda_nome}</td>
+                        <td className="px-3 py-2">
+                          <span className="text-gray-700 dark:text-gray-300">{h.faixa_label}</span>
+                          <span className={`ml-1 px-1.5 py-0.5 rounded text-xs font-bold ${h.sexo === 'M' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400'}`}>
+                            {h.sexo_label}
+                          </span>
+                        </td>
+                        <td className="px-3 py-2">
+                          <span className="text-red-600 dark:text-red-400 font-medium">{h.valor_anterior}</span>
+                          <span className="mx-1 text-gray-400">→</span>
+                          <span className="text-green-600 dark:text-green-400 font-medium">{h.valor_novo}</span>
+                        </td>
+                        <td className="px-3 py-2 text-gray-500 dark:text-gray-400 text-xs">{h.usuario || '-'}</td>
+                        {currentUser && (
+                          <td className="px-2 py-2 text-center">
+                            {podeExcluirRegistro(h) ? (
+                              <button
+                                onClick={() => excluirHistorico(h.id)}
+                                disabled={deletandoId === h.id}
+                                className="p-1.5 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-50"
+                                title="Excluir este registro"
+                              >
+                                {deletandoId === h.id ? (
+                                  <span className="inline-block w-3 h-3 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+                                ) : (
+                                  <TrashIcon className="w-4 h-4" />
+                                )}
+                              </button>
+                            ) : (
+                              <span className="text-gray-300 dark:text-gray-600" title="Somente o autor pode excluir">—</span>
+                            )}
+                          </td>
+                        )}
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>

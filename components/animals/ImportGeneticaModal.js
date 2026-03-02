@@ -1,6 +1,84 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { XMarkIcon, TrashIcon } from '@heroicons/react/24/outline'
 import Modal from '../ui/Modal'
+
+const parsearTextoImport = (texto) => {
+  const linhas = texto.trim().split(/\r?\n/).filter(Boolean)
+  if (linhas.length === 0) return []
+  // Tab, vírgula (se não houver números com vírgula decimal) ou espaço
+  const primeira = linhas[0]
+  let sep = '\t'
+  if (primeira.includes('\t')) {
+    sep = '\t'
+  } else if (primeira.includes(',') && !/\d,\d/.test(primeira)) {
+    sep = ','
+  } else {
+    sep = /\s+/
+  }
+  const dados = []
+  const splitLinha = (linha) => linha.split(sep).map(c => c.trim()).filter(Boolean)
+  const header = linhas[0].toUpperCase()
+  const skipHeader = header.includes('SÉRIE') || header.includes('SERIE') || header.includes('SERII') || header.includes('RG') || header.includes('RGN')
+  const primeiraLinhaDados = skipHeader ? linhas[1] : linhas[0]
+  const primeiraCols = primeiraLinhaDados ? splitLinha(primeiraLinhaDados) : []
+  const col3 = primeiraCols[2]
+  const col4 = primeiraCols[3]
+  const col3EhNumero = col3 != null && col3 !== '' && !isNaN(parseFloat(String(col3).replace(',', '.')))
+  const col4EhNumeroOuDecil = col4 != null && col4 !== '' && (/^[\d,.\s]+$/.test(String(col4)) || col4.length <= 3)
+  const formatoStatus = header.includes('STATUS') || (col3 != null && col3 !== '' && !col3EhNumero)
+  // Formato: Série, RG, IQG, Pt IQG (4 cols) -> vai para genetica_2 e decile_2
+  const headerCols = splitLinha(linhas[0])
+  const formatoIQGPeloHeader = headerCols.length >= 4 && headerCols.length <= 5 &&
+    (header.includes('IQG') || (header.includes('PT') && header.includes('IQG'))) &&
+    !header.includes('IABCZ') && !header.includes('DECA')
+  // Sem header: detectar por dados (4 cols, col3 e col4 numéricos = IQG)
+  const formatoIQGPelosDados = !skipHeader && primeiraCols.length === 4 && col3EhNumero && col4EhNumeroOuDecil && !header.includes('IABCZ') && !header.includes('DECA')
+  const formatoIQG = formatoIQGPeloHeader || formatoIQGPelosDados
+  const start = skipHeader ? 1 : 0
+  for (let i = start; i < linhas.length; i++) {
+    const cols = splitLinha(linhas[i])
+    if (cols.length >= 2) {
+      let serie = cols[0] || ''
+      let rg = cols[1] || ''
+      
+      // Se RG contém hífen, pode estar no formato "CJCJ-16310" (série-rg junto)
+      if (rg && rg.includes('-')) {
+        const partes = rg.split('-')
+        if (partes.length === 2) {
+          if (!serie || serie === rg) {
+            serie = partes[0].trim()
+          }
+          rg = partes[1].trim()
+        }
+      }
+      
+      if (formatoStatus && cols.length >= 3) {
+        dados.push({ serie, rg, situacaoAbcz: cols[2] || null })
+      } else if (formatoIQG && cols.length >= 4 && cols.length <= 5) {
+        dados.push({
+          serie,
+          rg,
+          iABCZ: null,
+          deca: null,
+          situacaoAbcz: null,
+          genetica_2: cols[2] || null,
+          decile_2: cols[3] || null
+        })
+      } else {
+        dados.push({
+          serie,
+          rg,
+          iABCZ: cols[2] || null,
+          deca: cols[3] || null,
+          situacaoAbcz: cols[4] || null,
+          genetica_2: cols[5] || null,
+          decile_2: cols[6] || null
+        })
+      }
+    }
+  }
+  return dados
+}
 
 export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
   const [importMode, setImportMode] = useState('texto')
@@ -10,47 +88,35 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
   const [limpando, setLimpando] = useState(false)
   const [resultadoImport, setResultadoImport] = useState(null)
 
-  const parsearTextoImport = (texto) => {
-    const linhas = texto.trim().split(/\r?\n/).filter(Boolean)
-    if (linhas.length === 0) return []
-    const sep = linhas[0].includes('\t') ? '\t' : ','
-    const dados = []
-    const header = linhas[0].toUpperCase()
-    const skipHeader = header.includes('SÉRIE') || header.includes('SERIE') || header.includes('SERII') || header.includes('RG') || header.includes('RGN')
-    const primeiraLinhaDados = skipHeader ? linhas[1] : linhas[0]
-    const col3 = primeiraLinhaDados ? primeiraLinhaDados.split(sep).map(c => c.trim())[2] : null
-    const col3EhNumero = col3 != null && col3 !== '' && !isNaN(parseFloat(String(col3).replace(',', '.')))
-    const formatoStatus = header.includes('STATUS') || (col3 != null && col3 !== '' && !col3EhNumero)
-    const start = skipHeader ? 1 : 0
-    for (let i = start; i < linhas.length; i++) {
-      const cols = linhas[i].split(sep).map(c => c.trim())
-      if (cols.length >= 2) {
-        if (formatoStatus && cols.length >= 3) {
-          dados.push({ serie: cols[0] || '', rg: cols[1] || '', situacaoAbcz: cols[2] || null })
-        } else {
-          dados.push({
-            serie: cols[0] || '',
-            rg: cols[1] || '',
-            iABCZ: cols[2] || null,
-            deca: cols[3] || null,
-            situacaoAbcz: cols[4] || null,
-            genetica_2: cols[5] || null,
-            decile_2: cols[6] || null
-          })
-        }
-      }
+  const previewDados = useMemo(() => {
+    if (!importTexto.trim()) return []
+    return parsearTextoImport(importTexto).slice(0, 5)
+  }, [importTexto])
+
+  const formatarResultadoImport = (r) => {
+    const n = r.animaisAtualizados ?? 0
+    const ignorados = (r.naoEncontrados?.length || 0) + (r.ignoradosInativos?.length || 0)
+    let msg = `Importação concluída! ${n} animal(is) atualizado(s).`
+    if (ignorados > 0) {
+      msg += ` Os demais (${ignorados}) foram ignorados (não estão no cadastro ou estão inativos).`
     }
-    return dados
+    if (n === 0 && (r.naoEncontrados?.length || 0) > 50) {
+      const amostra = (r.naoEncontrados || []).slice(0, 3).map(x => `${x.serie}-${x.rg}`).join(', ')
+      msg += `\n\nExemplos não encontrados: ${amostra}. Verifique se Série e RG existem no cadastro.`
+    }
+    return msg
   }
+
 
   const handleImportar = async () => {
     setImportando(true)
     setResultadoImport(null)
     try {
+      console.log('[Import Genética] Iniciando...')
       if (importMode === 'texto') {
         const dados = parsearTextoImport(importTexto)
         if (dados.length === 0) {
-          setResultadoImport({ erro: 'Nenhum dado válido. Use formato: Série, RG, iABCZ, Deca (separados por tab ou vírgula)' })
+          setResultadoImport({ erro: 'Nenhum dado válido. Use tab ou espaço entre colunas. Ex: Série RG iABCZ Deca ou Série RG IQG Pt' })
           return
         }
         const res = await fetch('/api/import/excel-genetica', {
@@ -59,12 +125,15 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
           body: JSON.stringify({ data: dados })
         })
         const json = await res.json()
+        console.log('[Import Genética] Resposta:', res.status, json)
         if (res.ok) {
           setResultadoImport(json)
           setImportTexto('')
           onSuccess?.()
+          alert(formatarResultadoImport(json.resultados || {}))
         } else {
           setResultadoImport({ erro: json.error || json.details || 'Erro na importação' })
+          alert(`❌ Erro: ${json.error || json.details || 'Erro na importação'}`)
         }
       } else {
         if (!importFile) {
@@ -78,16 +147,21 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
           body: formData
         })
         const json = await res.json()
+        console.log('[Import Genética] Resposta Excel:', res.status, json)
         if (res.ok) {
           setResultadoImport(json)
           setImportFile(null)
           onSuccess?.()
+          alert(formatarResultadoImport(json.resultados || {}))
         } else {
           setResultadoImport({ erro: json.error || json.details || 'Erro na importação' })
+          alert(`❌ Erro: ${json.error || json.details || 'Erro na importação'}`)
         }
       }
     } catch (err) {
+      console.error('[Import Genética] Erro:', err)
       setResultadoImport({ erro: err.message || 'Erro ao importar' })
+      alert(`❌ Erro: ${err.message || 'Verifique a conexão e tente novamente.'}`)
     } finally {
       setImportando(false)
     }
@@ -139,18 +213,18 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
         </div>
         {importMode === 'texto' ? (
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Cole os dados. Formato: Série, RG, iABCZ, Deca [, Avaliação 2, Decile 2] (ou Série, RGN, Status para Situação ABCZ)</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Cole os dados. Formatos aceitos: Série, RG, iABCZ, Deca [, IQG, Pt IQG] — ou apenas Série, RG, IQG, Pt IQG (4 cols) — ou Série, RGN, Status (Situação ABCZ)</p>
             <textarea
               value={importTexto}
               onChange={(e) => setImportTexto(e.target.value)}
-              placeholder="SÉRIE	RG	iABCZ	DECA	Aval2	Dec2&#10;CJCJ	16974	47,71	1	29,32	1&#10;CJCJ	17037	43,25	1	25,1	2&#10;&#10;Ou: Série	RGN	Status&#10;CJCJ	16974	Ok para RGN"
+              placeholder="SÉRIE	RG	iABCZ	DECA	IQG	Pt IQG&#10;CJCJ	16974	47,71	1	29,32	1&#10;&#10;Ou só IQG: Série	RG	IQG	Pt IQG&#10;CJCJ	17037	61,548	1&#10;&#10;Ou: Série	RGN	Status&#10;CJCJ	16974	Ok para RGN"
               className="w-full h-40 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-gray-700 dark:text-white text-sm font-mono"
               rows={6}
             />
           </div>
         ) : (
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Excel: Série, RG, iABCZ, Deca [, Avaliação 2, Decile 2] (ou Série, RGN, Status). Animais não encontrados e inativos são ignorados.</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Excel: Série, RG, iABCZ, Deca [, IQG, Pt IQG] (ou Série, RGN, Status). Animais não encontrados e inativos são ignorados.</p>
             <input
               type="file"
               accept=".xlsx,.xls,.csv"
@@ -198,7 +272,7 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
               disabled={importando || (importMode === 'texto' ? !importTexto.trim() : !importFile)}
               className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold"
             >
-              {importando ? 'Importando...' : 'Importar'}
+              {importando ? 'Importando... (aguarde)' : 'Importar'}
             </button>
           </div>
         </div>

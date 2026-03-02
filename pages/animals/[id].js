@@ -14,7 +14,6 @@ import {
   CurrencyDollarIcon,
   CalendarIcon,
   UserIcon,
-  DocumentArrowUpIcon,
   PlusCircleIcon,
   DocumentArrowDownIcon,
   MapPinIcon,
@@ -27,8 +26,6 @@ import {
   SparklesIcon
 } from '@heroicons/react/24/outline'
 import logger from '../../utils/logger'
-import AnimalExcelUpdater from '../../components/animals/AnimalExcelUpdater'
-import ImportGeneticaModal from '../../components/animals/ImportGeneticaModal'
 import RankingIABCZCard from '../../components/animals/RankingIABCZCard'
 import QuickOccurrenceForm from '../../components/animals/QuickOccurrenceForm'
 import BatchOccurrenceForm from '../../components/animals/BatchOccurrenceForm'
@@ -167,8 +164,6 @@ export default function AnimalDetail() {
   const [avoMaterno, setAvoMaterno] = useState(null)
   const [maeSerieRg, setMaeSerieRg] = useState(null)
   const [localizacaoAtual, setLocalizacaoAtual] = useState(null)
-  const [showExcelUpdater, setShowExcelUpdater] = useState(false)
-  const [showImportGenetica, setShowImportGenetica] = useState(false)
   const [showQuickOccurrence, setShowQuickOccurrence] = useState(false)
   const [showBatchOccurrence, setShowBatchOccurrence] = useState(false)
   const [examesAndrologicos, setExamesAndrologicos] = useState([])
@@ -1349,19 +1344,6 @@ export default function AnimalDetail() {
     }
   }
 
-  // Extrair série e RG de uma string (formato: "Série RG" ou "Série/RG")
-  const extrairSerieRG = (valor) => {
-    if (!valor) return { serie: null, rg: null }
-    
-    // Tentar formatos: "Série RG", "Série/RG", "Série-RG"
-    const match = valor.match(/([A-Za-z]+)[\s\/\-]*(\d+)/)
-    if (match) {
-      return { serie: match[1], rg: match[2] }
-    }
-    
-    // Se não conseguir extrair, retornar o valor completo como RG
-    return { serie: null, rg: valor }
-  }
 
   // Buscar série e RG da mãe quando não estão no cadastro (por nome no sistema)
   const buscarSerieRgMae = async () => {
@@ -2430,24 +2412,6 @@ export default function AnimalDetail() {
         <div className="h-8 w-px bg-gray-200 dark:bg-gray-600 hidden sm:block" />
         <div className="flex flex-wrap items-center gap-2">
           <Button 
-            variant="secondary"
-            modern
-            onClick={() => setShowImportGenetica(true)}
-            className="flex items-center gap-2"
-          >
-            <DocumentArrowUpIcon className="h-4 w-4" />
-            Importar Genética (Série, RG, iABCZ, Deca)
-          </Button>
-          <Button 
-            variant="secondary"
-            modern
-            onClick={() => setShowExcelUpdater(true)}
-            className="flex items-center gap-2"
-          >
-            <DocumentArrowUpIcon className="h-4 w-4" />
-            Importar Excel
-          </Button>
-          <Button 
             variant="danger"
             modern
             onClick={handleGeneratePDF}
@@ -2550,14 +2514,6 @@ export default function AnimalDetail() {
         {/* Items */}
         {fabOpen && (
           <div className="flex flex-col items-end gap-3 mb-3 animate-slide-in-left">
-            <button
-              onClick={() => { setShowImportGenetica(true); setFabOpen(false) }}
-              title="Importar Genética (Série, RG, iABCZ, Deca)"
-              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-600 text-white shadow-lg hover:shadow-2xl hover:bg-emerald-500 transition-all"
-            >
-              <DocumentArrowUpIcon className="h-5 w-5" />
-              <span className="text-sm font-semibold">Importar Genética</span>
-            </button>
             <button
               onClick={() => { setShowQuickOccurrence(true); setFabOpen(false) }}
               title="Lançar Ocorrência (O)"
@@ -4099,7 +4055,7 @@ export default function AnimalDetail() {
 
                 <div>
                   <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">
-                    Avaliação 2
+                    IQG
                   </label>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
                     {animal.genetica_2 || '-'}
@@ -4108,7 +4064,7 @@ export default function AnimalDetail() {
 
                 <div>
                   <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">
-                    Decile 2
+                    Pt IQG
                   </label>
                   <p className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
                     <span>{animal.decile_2 || '-'}</span>
@@ -5174,14 +5130,6 @@ export default function AnimalDetail() {
               Observações
             </h2>
             <div className="flex flex-wrap items-center gap-3">
-              <button
-                onClick={() => setShowImportGenetica(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700 transition-colors"
-                title="Importar Série, RG, Status (Excel ou texto)"
-              >
-                <DocumentArrowUpIcon className="h-4 w-4" />
-                Importar Excel/texto
-              </button>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Situação ABCZ</span>
                 {editingField === 'situacao_abcz' ? (
@@ -5337,29 +5285,6 @@ export default function AnimalDetail() {
           </div>
         </div>
       )}
-
-      {/* Modal de Importação Genética (Série, RG, iABCZ, Deca) */}
-      <ImportGeneticaModal
-        isOpen={showImportGenetica}
-        onClose={() => setShowImportGenetica(false)}
-        onSuccess={() => {
-          loadAnimal()
-        }}
-      />
-
-      {/* Modal de Importação Excel */}
-      <AnimalExcelUpdater
-        isOpen={showExcelUpdater}
-        onClose={() => setShowExcelUpdater(false)}
-        animalId={id}
-        currentAnimal={animal}
-        onUpdate={(updatedData) => {
-          // Atualizar o estado do animal após importação
-          setAnimal(prev => ({ ...prev, ...updatedData }))
-          // Recarregar o animal completo para garantir sincronização
-          loadAnimal()
-        }}
-      />
 
       {/* Modal de Edição do Card DG */}
       {editCardModal.open && editCardModal.field === 'dg' && (

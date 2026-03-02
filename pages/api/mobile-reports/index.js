@@ -1612,7 +1612,7 @@ export default async function handler(req, res) {
           }
 
           const genetica2Rows = (rankingGenetica2?.rows || []).map((row, i) => ({
-            ranking: 'Avaliação 2',
+            ranking: 'IQG',
             posicao: i + 1,
             animal_id: row.id,
             animal: `${row.serie || ''} ${row.rg || ''}`.trim() || row.nome,
@@ -1657,7 +1657,7 @@ export default async function handler(req, res) {
               piquete: piqueteOuNaoInformado(row.piquete) || '-'
             })),
             ...(genetica2Rows.length > 0 ? [
-              { _resumo: true, tipo: 'genetica2', titulo: 'Top 10 Avaliação 2', descricao: 'Maior valor = melhor animal' },
+              { _resumo: true, tipo: 'genetica2', titulo: 'Top 10 IQG', descricao: 'Maior valor = melhor animal' },
               ...genetica2Rows
             ] : [])
           ]

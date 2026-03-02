@@ -557,7 +557,7 @@ export default function ModernAnimalForm({
             </div>
           </div>
 
-          {/* Campos ABCZg, DECA, Avaliação 2 e Decile 2 */}
+          {/* Campos ABCZg, DECA, IQG e Pt IQG */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
               label="iABCZg"
@@ -572,16 +572,16 @@ export default function ModernAnimalForm({
               placeholder="DECA"
             />
             <Input
-              label="Avaliação 2"
+              label="IQG"
               value={formData.genetica_2 || ''}
               onChange={(e) => setFormData({ ...formData, genetica_2: e.target.value })}
-              placeholder="Avaliação 2"
+              placeholder="IQG"
             />
             <Input
-              label="Decile 2"
+              label="Pt IQG"
               value={formData.decile_2 || ''}
               onChange={(e) => setFormData({ ...formData, decile_2: e.target.value })}
-              placeholder="Decile 2"
+              placeholder="Pt IQG"
             />
           </div>
 

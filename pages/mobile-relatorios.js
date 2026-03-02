@@ -381,7 +381,9 @@ export default function MobileRelatorios() {
     sexo: 'Sexo',
     piquete: 'Piquete',
     iABCZ: 'iABCZ',
-    deca: 'DECA'
+    deca: 'DECA',
+    genetica_2: 'IQG',
+    decile_2: 'Pt IQG'
   }
 
   const filteredData = reportData?.data?.filter(d => {

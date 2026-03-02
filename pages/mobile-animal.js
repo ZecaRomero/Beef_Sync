@@ -8,7 +8,6 @@ import {
   DocumentArrowDownIcon,
   PencilIcon,
   DocumentArrowUpIcon,
-  XMarkIcon,
   TrophyIcon,
   ChatBubbleLeftRightIcon,
   ArrowPathIcon
@@ -23,13 +22,8 @@ export default function MobileAnimal() {
   const [error, setError] = useState('')
   const [allAnimals, setAllAnimals] = useState([])
   const [currentIndex, setCurrentIndex] = useState(-1)
-  const [showImportModal, setShowImportModal] = useState(false)
-  const [importMode, setImportMode] = useState('texto') // 'texto' | 'excel'
-  const [importTexto, setImportTexto] = useState('')
-  const [importFile, setImportFile] = useState(null)
-  const [importando, setImportando] = useState(false)
-  const [resultadoImport, setResultadoImport] = useState(null)
   const [ranking, setRanking] = useState([])
+  const [rankingIQG, setRankingIQG] = useState([])
   const [rankingPeso, setRankingPeso] = useState([])
   const [rankingCE, setRankingCE] = useState([])
   const [sincronizandoNascimento, setSincronizandoNascimento] = useState(false)
@@ -102,6 +96,15 @@ export default function MobileAnimal() {
         }
       })
       .catch(err => console.error('Erro ao carregar ranking:', err))
+
+    fetch('/api/animals/ranking-genetica-2?limit=10')
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && data.data) {
+          setRankingIQG(data.data)
+        }
+      })
+      .catch(err => console.error('Erro ao carregar ranking IQG:', err))
   }, [])
 
   const buscarAnimal = async (e, overrideSerie, overrideRg) => {
@@ -167,79 +170,6 @@ export default function MobileAnimal() {
     setCurrentIndex(-1)
   }
 
-  // Parsear texto colado (Série\tRG\tiABCZ\tDeca\tSituação ABCZ ou Série,RG,iABCZ,Deca,Situação ABCZ)
-  const parsearTextoImport = (texto) => {
-    const linhas = texto.trim().split(/\r?\n/).filter(Boolean)
-    const sep = linhas[0].includes('\t') ? '\t' : ','
-    const dados = []
-    const header = linhas[0].toUpperCase()
-    const skipHeader = header.includes('SÉRIE') || header.includes('SERIE') || header.includes('RG')
-    const start = skipHeader ? 1 : 0
-    for (let i = start; i < linhas.length; i++) {
-      const cols = linhas[i].split(sep).map(c => c.trim())
-      if (cols.length >= 2) {
-        dados.push({
-          serie: cols[0] || '',
-          rg: cols[1] || '',
-          iABCZ: cols[2] || null,
-          deca: cols[3] || null,
-          situacaoAbcz: cols[4] || null
-        })
-      }
-    }
-    return dados
-  }
-
-  const handleImportar = async () => {
-    setImportando(true)
-    setResultadoImport(null)
-    try {
-      if (importMode === 'texto') {
-        const dados = parsearTextoImport(importTexto)
-        if (dados.length === 0) {
-          setResultadoImport({ erro: 'Nenhum dado válido. Use formato: Série, RG, iABCZ, Deca (separados por tab ou vírgula)' })
-          return
-        }
-        const res = await fetch('/api/import/excel-genetica', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ data: dados })
-        })
-        const json = await res.json()
-        if (res.ok) {
-          setResultadoImport(json)
-          setImportTexto('')
-          fetch('/api/animals/ranking-iabcz?limit=10').then(r => r.json()).then(d => d.success && setRanking(d.data))
-        } else {
-          setResultadoImport({ erro: json.error || json.details || 'Erro na importação' })
-        }
-      } else {
-        if (!importFile) {
-          setResultadoImport({ erro: 'Selecione um arquivo Excel' })
-          return
-        }
-        const formData = new FormData()
-        formData.append('file', importFile)
-        const res = await fetch('/api/import/excel-genetica', {
-          method: 'POST',
-          body: formData
-        })
-        const json = await res.json()
-        if (res.ok) {
-          setResultadoImport(json)
-          setImportFile(null)
-          fetch('/api/animals/ranking-iabcz?limit=10').then(r => r.json()).then(d => d.success && setRanking(d.data))
-        } else {
-          setResultadoImport({ erro: json.error || json.details || 'Erro na importação' })
-        }
-      }
-    } catch (err) {
-      setResultadoImport({ erro: err.message || 'Erro ao importar' })
-    } finally {
-      setImportando(false)
-    }
-  }
-
   return (
     <>
       <Head>
@@ -274,9 +204,9 @@ export default function MobileAnimal() {
               <ChatBubbleLeftRightIcon className="h-5 w-5" />
             </button>
             <button
-              onClick={() => { setShowImportModal(true); setResultadoImport(null); setImportTexto(''); setImportFile(null); }}
+              onClick={() => router.push('/importacoes')}
               className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white"
-              title="Importar Série, RG, iABCZ, Deca"
+              title="Central de Importações"
             >
               <DocumentArrowUpIcon className="h-5 w-5" />
             </button>
@@ -289,81 +219,6 @@ export default function MobileAnimal() {
             toastSync.tipo === 'ok' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
           }`}>
             {toastSync.msg}
-          </div>
-        )}
-
-        {/* Modal Importação */}
-        {showImportModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
-              <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Importar Série, RG, iABCZ, Deca</h3>
-                <button onClick={() => setShowImportModal(false)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                  <XMarkIcon className="h-5 w-5" />
-                </button>
-              </div>
-              <div className="p-4 space-y-4 overflow-y-auto flex-1">
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setImportMode('texto')}
-                    className={`flex-1 py-2 rounded-lg font-medium ${importMode === 'texto' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'}`}
-                  >
-                    Colar texto
-                  </button>
-                  <button
-                    onClick={() => setImportMode('excel')}
-                    className={`flex-1 py-2 rounded-lg font-medium ${importMode === 'excel' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'}`}
-                  >
-                    Excel
-                  </button>
-                </div>
-                {importMode === 'texto' ? (
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Cole os dados (Série, RG, iABCZ, Deca) separados por tab ou vírgula:</p>
-                    <textarea
-                      value={importTexto}
-                      onChange={(e) => setImportTexto(e.target.value)}
-                      placeholder="SÉRIE	RG	iABCZ	DECA&#10;CJCJ	16974	47,71	1&#10;CJCJ	17037	43,25	1"
-                      className="w-full h-40 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-gray-700 dark:text-white text-sm font-mono"
-                      rows={6}
-                    />
-                  </div>
-                ) : (
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Arquivo Excel com colunas: Série, RG, iABCZ, Deca</p>
-                    <input
-                      type="file"
-                      accept=".xlsx,.xls,.csv"
-                      onChange={(e) => setImportFile(e.target.files?.[0] || null)}
-                      className="w-full text-sm text-gray-600 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-100 file:text-blue-700 dark:file:bg-blue-900 dark:file:text-blue-300"
-                    />
-                    {importFile && <p className="text-sm text-green-600 mt-1">✓ {importFile.name}</p>}
-                  </div>
-                )}
-                {resultadoImport?.erro && (
-                  <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg text-sm text-red-600 dark:text-red-400">
-                    {resultadoImport.erro}
-                  </div>
-                )}
-                {resultadoImport?.success && (
-                  <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg text-sm text-green-700 dark:text-green-300">
-                    ✅ {resultadoImport.message}
-                    {resultadoImport.resultados?.naoEncontrados?.length > 0 && (
-                      <p className="mt-1">Não encontrados: {resultadoImport.resultados.naoEncontrados.length}</p>
-                    )}
-                  </div>
-                )}
-              </div>
-              <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                <button
-                  onClick={handleImportar}
-                  disabled={importando || (importMode === 'texto' ? !importTexto.trim() : !importFile)}
-                  className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold rounded-xl"
-                >
-                  {importando ? 'Importando...' : 'Importar'}
-                </button>
-              </div>
-            </div>
           </div>
         )}
 
@@ -394,6 +249,39 @@ export default function MobileAnimal() {
                     <span className="font-medium text-gray-900 dark:text-white">{r.identificacao}</span>
                   </div>
                   <span className="font-bold text-blue-600 dark:text-blue-400">{r.abczg}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Ranking Top 10 IQG */}
+        {rankingIQG.length > 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 mb-4">
+            <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-3">
+              <TrophyIcon className="h-5 w-5 text-emerald-500" />
+              Ranking IQG (Top 10)
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Quanto maior o IQG, melhor o animal</p>
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {rankingIQG.map((r) => (
+                <div
+                  key={r.id}
+                  onClick={() => buscarAnimal(null, r.serie, r.rg)}
+                  className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                      r.posicao === 1 ? 'bg-amber-500 text-white' :
+                      r.posicao === 2 ? 'bg-gray-400 text-white' :
+                      r.posicao === 3 ? 'bg-amber-700 text-white' :
+                      'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
+                    }`}>
+                      {r.posicao === 1 ? '🥇' : r.posicao === 2 ? '🥈' : r.posicao === 3 ? '🥉' : r.posicao}
+                    </span>
+                    <span className="font-medium text-gray-900 dark:text-white">{r.identificacao}</span>
+                  </div>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400">{r.genetica_2}</span>
                 </div>
               ))}
             </div>
@@ -742,23 +630,19 @@ export default function MobileAnimal() {
                     </div>
                   )}
 
-                  {(animal.genetica_2 || animal.genetica_2 === 0) && (
-                    <div>
-                      <p className="text-gray-500 dark:text-gray-400 text-xs">Avaliação 2</p>
-                      <p className="font-bold text-emerald-600 dark:text-emerald-400">
-                        {animal.genetica_2}
-                      </p>
-                    </div>
-                  )}
+                  <div>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs">IQG</p>
+                    <p className={`font-semibold ${(animal.genetica_2 || animal.genetica_2 === 0) ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-900 dark:text-white'}`}>
+                      {animal.genetica_2 || animal.genetica_2 === 0 ? animal.genetica_2 : '-'}
+                    </p>
+                  </div>
 
-                  {(animal.decile_2 || animal.decile_2 === 0) && (
-                    <div>
-                      <p className="text-gray-500 dark:text-gray-400 text-xs">Decile 2</p>
-                      <p className="font-semibold text-gray-900 dark:text-white">
-                        {animal.decile_2}
-                      </p>
-                    </div>
-                  )}
+                  <div>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs">Pt IQG</p>
+                    <p className="font-semibold text-gray-900 dark:text-white">
+                      {animal.decile_2 || animal.decile_2 === 0 ? animal.decile_2 : '-'}
+                    </p>
+                  </div>
 
                   {animal.pai && (
                     <div className="col-span-2">

@@ -45,7 +45,7 @@ export default function Layout({ children, darkMode, toggleDarkMode }: LayoutPro
       </div>
       
       {/* Busca global */}
-      <GlobalSearch />
+      {/* <GlobalSearch /> */}
       
       {/* Botão de sincronização de rede */}
       <NetworkSyncButton />

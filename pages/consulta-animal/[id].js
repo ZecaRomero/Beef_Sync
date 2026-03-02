@@ -113,8 +113,8 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
       (animal.data_nascimento ? `Idade: ${Math.floor((new Date() - new Date(animal.data_nascimento)) / (1000 * 60 * 60 * 24 * 30.44))} meses` : null),
       animal.peso ? `Peso: ${animal.peso} kg` : null,
       (animal.abczg || animal.abczg === 0) ? `iABCZ: ${animal.abczg}${filhoTopRanking ? ' • Mãe do 1º do ranking' : rankingPosicao ? ` • ${rankingPosicao}º no ranking` : ''}` : null,
-      (animal.genetica_2 || animal.genetica_2 === 0) ? `Avaliação 2: ${animal.genetica_2}${rankingPosicaoGenetica2 ? ` • ${rankingPosicaoGenetica2}º no ranking` : ''}` : null,
-      (animal.decile_2 || animal.decile_2 === 0) ? `Decile 2: ${animal.decile_2}` : null,
+      (animal.genetica_2 || animal.genetica_2 === 0) ? `IQG: ${animal.genetica_2}${rankingPosicaoGenetica2 ? ` • ${rankingPosicaoGenetica2}º no ranking` : ''}` : null,
+      (animal.decile_2 || animal.decile_2 === 0) ? `Pt IQG: ${animal.decile_2}` : null,
       locFiltrada ? `Localização: ${locFiltrada}` : null
     ].filter(Boolean).join('\n')
     const url = `https://wa.me/?text=${encodeURIComponent(texto)}`
@@ -193,6 +193,22 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
       })
       .catch(() => {})
   }, [animal?.id, animal?.rg, animal?.serie, animal?.filhos])
+
+  // Buscar posição no ranking IQG (Genética 2)
+  useEffect(() => {
+    if (!animal?.id || !(animal.genetica_2 || animal.genetica_2 === 0)) return
+    fetch('/api/animals/ranking-genetica-2?limit=50')
+      .then(r => r.json())
+      .then(d => {
+        if (d.success && d.data?.length) {
+          const idx = d.data.findIndex(r =>
+            r.id === animal.id || (String(r.rg) === String(animal.rg) && String(r.serie || '').toUpperCase() === String(animal.serie || '').toUpperCase())
+          )
+          if (idx >= 0) setRankingPosicaoGenetica2(idx + 1)
+        }
+      })
+      .catch(() => {})
+  }, [animal?.id, animal?.rg, animal?.serie, animal?.genetica_2])
 
   // Buscar C.E - prioridade: pesagens > ocorrências > exames andrológicos
   useEffect(() => {
@@ -516,6 +532,8 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
         `🏆 AVALIAÇÃO GENÉTICA`,
         (animal.abczg || animal.abczg === 0) ? `iABCZ: ${animal.abczg}${filhoTopRanking ? ' • Mãe do 1º do ranking' : rankingPosicao ? ` • ${rankingPosicao}º no ranking` : ''}` : null,
         (animal.deca || animal.deca === 0) ? `DECA: ${animal.deca}` : null,
+        (animal.genetica_2 || animal.genetica_2 === 0) ? `IQG: ${animal.genetica_2}${rankingPosicaoGenetica2 ? ` • ${rankingPosicaoGenetica2}º no ranking` : ''}` : null,
+        (animal.decile_2 || animal.decile_2 === 0) ? `Pt IQG: ${animal.decile_2}` : null,
         ``,
         `📍 LOCALIZAÇÃO`,
         locAtual ? `Atual: ${locAtual}` : null,
@@ -767,6 +785,47 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
               <div className="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 text-center">
                 <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{animal.deca}</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">DECA</p>
+              </div>
+            )}
+            {(animal.genetica_2 || animal.genetica_2 === 0) && (
+              <div className={`rounded-xl p-3 border text-center ${
+                rankingPosicaoGenetica2 === 1
+                  ? 'bg-gradient-to-br from-amber-100 to-yellow-100 dark:from-amber-900/40 dark:to-yellow-900/40 border-2 border-amber-400 dark:border-amber-500'
+                  : rankingPosicaoGenetica2 === 2
+                  ? 'bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800/50 dark:to-slate-700/50 border-2 border-slate-400 dark:border-slate-500'
+                  : rankingPosicaoGenetica2 === 3
+                  ? 'bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900/30 dark:to-amber-800/30 border-2 border-amber-600 dark:border-amber-700'
+                  : rankingPosicaoGenetica2 && rankingPosicaoGenetica2 <= 10
+                  ? 'bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-300 dark:border-blue-700'
+                  : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+              }`}>
+                <p className={`text-2xl font-bold ${
+                  rankingPosicaoGenetica2 === 1 ? 'text-amber-600 dark:text-amber-400' :
+                  rankingPosicaoGenetica2 === 2 ? 'text-slate-600 dark:text-slate-300' :
+                  rankingPosicaoGenetica2 === 3 ? 'text-amber-700 dark:text-amber-300' :
+                  rankingPosicaoGenetica2 && rankingPosicaoGenetica2 <= 10 ? 'text-blue-600 dark:text-blue-400' :
+                  'text-emerald-600 dark:text-emerald-400'
+                }`}>
+                  {animal.genetica_2}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">IQG</p>
+                {rankingPosicaoGenetica2 && rankingPosicaoGenetica2 <= 10 && (
+                  <p className={`text-xs font-bold mt-0.5 ${
+                    rankingPosicaoGenetica2 === 1 ? 'text-amber-600 dark:text-amber-400' :
+                    rankingPosicaoGenetica2 === 2 ? 'text-slate-600 dark:text-slate-400' :
+                    rankingPosicaoGenetica2 === 3 ? 'text-amber-700 dark:text-amber-400' :
+                    'text-blue-600 dark:text-blue-400'
+                  }`}>
+                    {rankingPosicaoGenetica2 === 1 ? '🥇' : rankingPosicaoGenetica2 === 2 ? '🥈' : rankingPosicaoGenetica2 === 3 ? '🥉' : ''} {rankingPosicaoGenetica2}º ranking
+                  </p>
+                )}
+              </div>
+            )}
+            {(animal.decile_2 || animal.decile_2 === 0) && (
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 text-center">
+                <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">{animal.decile_2}</p>
+                <p className="text-xs text-gray-500 white
+                :text-gray-400">Pt IQG</p>
               </div>
             )}
             {mesesIdade != null && (
@@ -1240,6 +1299,12 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
               {(animal.deca || animal.deca === 0) && (
                 <InfoRow label="DECA" value={animal.deca} />
               )}
+              {(animal.genetica_2 || animal.genetica_2 === 0) && (
+                <InfoRow label="IQG" value={`${animal.genetica_2}${rankingPosicaoGenetica2 ? ` • ${rankingPosicaoGenetica2}º no ranking` : ''}`} />
+              )}
+              {(animal.decile_2 || animal.decile_2 === 0) && (
+                <InfoRow label="Pt IQG" value={animal.decile_2} />
+              )}
               <InfoRow label="Brinco" value={animal.brinco} />
               <InfoRow label="Tatuagem" value={animal.tatuagem} />
               {(animal.valor_venda || animal.valorVenda) && (
@@ -1666,6 +1731,8 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
                           {mesesFilho != null && <span className="font-medium text-amber-600 dark:text-amber-400">{mesesFilho}m</span>}
                           {(f.abczg != null && f.abczg !== '') && <span className="font-medium text-blue-600 dark:text-blue-400">iABCZ: {f.abczg}</span>}
                           {(f.deca != null && f.deca !== '') && <span className="font-medium text-emerald-600 dark:text-emerald-400">DECA: {f.deca}</span>}
+                          {(f.genetica_2 != null && f.genetica_2 !== '') && <span className="font-medium text-purple-600 dark:text-purple-400">Aval2: {f.genetica_2}</span>}
+                          {(f.decile_2 != null && f.decile_2 !== '') && <span className="font-medium text-amber-600 dark:text-amber-400">Dec2: {f.decile_2}</span>}
                         </div>
                       </div>
                       {f.id && <ArrowTopRightOnSquareIcon className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />}

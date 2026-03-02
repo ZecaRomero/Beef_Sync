@@ -53,7 +53,7 @@ export default function RankingIABCZCard({ onSelectAnimal }) {
           Ranking iABCZ (Top 10)
         </h3>
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          Nenhum animal com iABCZ cadastrado. Use &quot;Importar Genética&quot; para importar Série, RG, iABCZ e Deca do Excel.
+          Nenhum animal com iABCZ cadastrado. Use a Central de Importações (sidebar) para importar Série, RG, iABCZ e Deca do Excel.
         </p>
       </div>
     )
