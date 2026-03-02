@@ -84,6 +84,21 @@ export default function LocalizacaoAnimais() {
   const [itemCorrigindo, setItemCorrigindo] = useState(null)
   const [correcaoDados, setCorrecaoDados] = useState({ serie: '', rg: '', local: '' })
   const [corrigindo, setCorrigindo] = useState(false)
+  const [itensFalhaSelecionados, setItensFalhaSelecionados] = useState(new Set())
+  const [cadastrandoEmLote, setCadastrandoEmLote] = useState(false)
+  const [itensCorrecaoRestantes, setItensCorrecaoRestantes] = useState([])
+  const fecharOuProximoCorrecao = useCallback(() => {
+    setItensCorrecaoRestantes(prev => {
+      if (prev.length > 0) {
+        const [prox, ...rest] = prev
+        setItemCorrigindo(prox)
+        setCorrecaoDados({ serie: prox.serie || '', rg: prox.rg || '', local: prox.local || '' })
+        return rest
+      }
+      setItemCorrigindo(null)
+      return []
+    })
+  }, [])
   const [selectedFields, setSelectedFields] = useState({
     'Série': true,
     'RG': true,
@@ -3542,6 +3557,22 @@ EAGB      6058     PIQUETE 1
                       <table className="w-full text-sm">
                         <thead className="bg-yellow-100 dark:bg-yellow-900/40">
                           <tr>
+                            <th className="px-2 py-3 text-center w-10">
+                              <input
+                                type="checkbox"
+                                checked={errosImportacao.naoEncontrados.every((_, i) => itensFalhaSelecionados.has(`nao-${i}`))}
+                                onChange={(e) => {
+                                  const sel = new Set(itensFalhaSelecionados)
+                                  if (e.target.checked) {
+                                    errosImportacao.naoEncontrados.forEach((_, i) => sel.add(`nao-${i}`))
+                                  } else {
+                                    errosImportacao.naoEncontrados.forEach((_, i) => sel.delete(`nao-${i}`))
+                                  }
+                                  setItensFalhaSelecionados(sel)
+                                }}
+                                className="rounded"
+                              />
+                            </th>
                             <th className="px-4 py-3 text-left font-semibold text-yellow-900 dark:text-yellow-100">Linha</th>
                             <th className="px-4 py-3 text-left font-semibold text-yellow-900 dark:text-yellow-100">Série</th>
                             <th className="px-4 py-3 text-left font-semibold text-yellow-900 dark:text-yellow-100">RG</th>
@@ -3553,6 +3584,19 @@ EAGB      6058     PIQUETE 1
                         <tbody className="divide-y divide-yellow-200 dark:divide-yellow-800">
                           {errosImportacao.naoEncontrados.map((item, idx) => (
                             <tr key={idx} className="hover:bg-yellow-100/50 dark:hover:bg-yellow-900/20">
+                              <td className="px-2 py-3 text-center">
+                                <input
+                                  type="checkbox"
+                                  checked={itensFalhaSelecionados.has(`nao-${idx}`)}
+                                  onChange={(e) => {
+                                    const sel = new Set(itensFalhaSelecionados)
+                                    if (e.target.checked) sel.add(`nao-${idx}`)
+                                    else sel.delete(`nao-${idx}`)
+                                    setItensFalhaSelecionados(sel)
+                                  }}
+                                  className="rounded"
+                                />
+                              </td>
                               <td className="px-4 py-3 text-yellow-900 dark:text-yellow-100 font-mono">{item.linha}</td>
                               <td className="px-4 py-3 text-yellow-900 dark:text-yellow-100 font-semibold">{item.serie}</td>
                               <td className="px-4 py-3 text-yellow-900 dark:text-yellow-100 font-semibold">{item.rg}</td>
@@ -3596,6 +3640,22 @@ EAGB      6058     PIQUETE 1
                       <table className="w-full text-sm">
                         <thead className="bg-red-100 dark:bg-red-900/40">
                           <tr>
+                            <th className="px-2 py-3 text-center w-10">
+                              <input
+                                type="checkbox"
+                                checked={errosImportacao.erros.every((_, i) => itensFalhaSelecionados.has(`erro-${i}`))}
+                                onChange={(e) => {
+                                  const sel = new Set(itensFalhaSelecionados)
+                                  if (e.target.checked) {
+                                    errosImportacao.erros.forEach((_, i) => sel.add(`erro-${i}`))
+                                  } else {
+                                    errosImportacao.erros.forEach((_, i) => sel.delete(`erro-${i}`))
+                                  }
+                                  setItensFalhaSelecionados(sel)
+                                }}
+                                className="rounded"
+                              />
+                            </th>
                             <th className="px-4 py-3 text-left font-semibold text-red-900 dark:text-red-100">Linha</th>
                             <th className="px-4 py-3 text-left font-semibold text-red-900 dark:text-red-100">Série</th>
                             <th className="px-4 py-3 text-left font-semibold text-red-900 dark:text-red-100">RG</th>
@@ -3607,6 +3667,19 @@ EAGB      6058     PIQUETE 1
                         <tbody className="divide-y divide-red-200 dark:divide-red-800">
                           {errosImportacao.erros.map((item, idx) => (
                             <tr key={idx} className="hover:bg-red-100/50 dark:hover:bg-red-900/20">
+                              <td className="px-2 py-3 text-center">
+                                <input
+                                  type="checkbox"
+                                  checked={itensFalhaSelecionados.has(`erro-${idx}`)}
+                                  onChange={(e) => {
+                                    const sel = new Set(itensFalhaSelecionados)
+                                    if (e.target.checked) sel.add(`erro-${idx}`)
+                                    else sel.delete(`erro-${idx}`)
+                                    setItensFalhaSelecionados(sel)
+                                  }}
+                                  className="rounded"
+                                />
+                              </td>
                               <td className="px-4 py-3 text-red-900 dark:text-red-100 font-mono">{item.linha}</td>
                               <td className="px-4 py-3 text-red-900 dark:text-red-100 font-semibold">{item.serie}</td>
                               <td className="px-4 py-3 text-red-900 dark:text-red-100 font-semibold">{item.rg}</td>
@@ -3633,28 +3706,170 @@ EAGB      6058     PIQUETE 1
                 </div>
               )}
 
-              {/* Botão para copiar TODOS os que falharam */}
+              {/* Ações em lote e copiar */}
               {(errosImportacao.naoEncontrados?.length || 0) + (errosImportacao.erros?.length || 0) > 0 && (
-                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800">
-                  <p className="text-sm font-semibold text-amber-900 dark:text-amber-100 mb-2">
-                    📥 Exportar lista completa dos que falharam
+                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800 space-y-3">
+                  <p className="text-sm font-semibold text-amber-900 dark:text-amber-100">
+                    Ações em lote ({itensFalhaSelecionados.size} selecionado(s))
                   </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const todos = [
-                        ...(errosImportacao.naoEncontrados || []).map(i => ({ ...i, tipo: 'Não encontrado' })),
-                        ...(errosImportacao.erros || []).map(i => ({ ...i, tipo: 'Erro' }))
-                      ].sort((a, b) => (a.linha || 0) - (b.linha || 0))
-                      const texto = 'LINHA\tSÉRIE\tRG\tLOCAL\tMOTIVO\n' + todos.map(i => `${i.linha}\t${i.serie}\t${i.rg}\t${i.local}\t${(i.motivo || i.tipo || '').replace(/\t/g, ' ')}`).join('\n')
-                      navigator.clipboard.writeText(texto).then(() => {
-                        alert(`✅ ${todos.length} registro(s) copiado(s)! Cole no Excel para ver exatamente quais linhas do seu arquivo falharam.`)
-                      }).catch(() => alert('Erro ao copiar.'))
-                    }}
-                    className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-medium"
-                  >
-                    📋 Copiar todos os {((errosImportacao.naoEncontrados?.length || 0) + (errosImportacao.erros?.length || 0))} que falharam
-                  </button>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      disabled={cadastrandoEmLote || itensFalhaSelecionados.size === 0}
+                      onClick={() => {
+                        const itens = []
+                        itensFalhaSelecionados.forEach(k => {
+                          const [tipo, idx] = k.split('-')
+                          const arr = tipo === 'nao' ? errosImportacao.naoEncontrados : errosImportacao.erros
+                          if (arr && arr[parseInt(idx, 10)]) itens.push(arr[parseInt(idx, 10)])
+                        })
+                        if (itens.length === 0) return
+                        setItemCorrigindo(itens[0])
+                        setCorrecaoDados({ serie: itens[0].serie || '', rg: itens[0].rg || '', local: itens[0].local || '' })
+                        setItensCorrecaoRestantes(itens.slice(1))
+                        setItensFalhaSelecionados(new Set())
+                      }}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg text-sm font-medium"
+                    >
+                      ✏️ Corrigir selecionados
+                    </button>
+                    <button
+                      type="button"
+                      disabled={cadastrandoEmLote || itensFalhaSelecionados.size === 0}
+                      onClick={async () => {
+                        const itens = []
+                        itensFalhaSelecionados.forEach(k => {
+                          const [tipo, idx] = k.split('-')
+                          const arr = tipo === 'nao' ? errosImportacao.naoEncontrados : errosImportacao.erros
+                          if (arr && arr[parseInt(idx, 10)]) itens.push(arr[parseInt(idx, 10)])
+                        })
+                        if (itens.length === 0) return
+                        setCadastrandoEmLote(true)
+                        const chave = (i) => `${(i.serie||'').trim()}|${(i.rg||'').trim()}|${i.linha}`
+                        const sucesso = new Set()
+                        let ok = 0, err = 0
+                        for (const item of itens) {
+                          try {
+                            const res = await fetch('/api/animals', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                preRegistro: true,
+                                serie: (item.serie || '').trim(),
+                                rg: (item.rg || '').trim(),
+                                pasto_atual: (item.local || '').trim() || undefined
+                              })
+                            })
+                            if (res.ok) {
+                              const local = (item.local || '').trim()
+                              if (local) {
+                                const locRes = await fetch('/api/import/text-localizacao', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({
+                                    dados: [{ serie: (item.serie || '').trim(), rg: (item.rg || '').trim(), local, observacoes: '' }]
+                                  })
+                                })
+                                if (locRes.ok) { ok++; sucesso.add(chave(item)) }
+                                else err++
+                              } else {
+                                ok++
+                                sucesso.add(chave(item))
+                              }
+                            } else err++
+                          } catch (_) { err++ }
+                        }
+                        setCadastrandoEmLote(false)
+                        setItensFalhaSelecionados(new Set())
+                        alert(`✅ ${ok} cadastrado(s) e importado(s). ${err > 0 ? `❌ ${err} erro(s).` : ''}`)
+                        setErrosImportacao(prev => ({
+                          ...prev,
+                          animaisAtualizados: (prev?.animaisAtualizados || 0) + ok,
+                          naoEncontrados: (prev?.naoEncontrados || []).filter(i => !sucesso.has(chave(i))),
+                          erros: (prev?.erros || []).filter(i => !sucesso.has(chave(i)))
+                        }))
+                        await carregarDados()
+                        await carregarLocais()
+                      }}
+                      className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg text-sm font-medium"
+                    >
+                      {cadastrandoEmLote ? '⏳ Cadastrando...' : `➕ Cadastrar selecionados (Série + RG)`}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={cadastrandoEmLote}
+                      onClick={async () => {
+                        const todos = [
+                          ...(errosImportacao.naoEncontrados || []),
+                          ...(errosImportacao.erros || [])
+                        ]
+                        if (todos.length === 0) return
+                        setCadastrandoEmLote(true)
+                        let ok = 0, err = 0
+                        for (const item of todos) {
+                          try {
+                            const res = await fetch('/api/animals', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                preRegistro: true,
+                                serie: (item.serie || '').trim(),
+                                rg: (item.rg || '').trim(),
+                                pasto_atual: (item.local || '').trim() || undefined
+                              })
+                            })
+                            if (res.ok) {
+                              const local = (item.local || '').trim()
+                              if (local) {
+                                const locRes = await fetch('/api/import/text-localizacao', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({
+                                    dados: [{ serie: (item.serie || '').trim(), rg: (item.rg || '').trim(), local, observacoes: '' }]
+                                  })
+                                })
+                                if (locRes.ok) ok++
+                                else err++
+                              } else ok++
+                            } else err++
+                          } catch (_) { err++ }
+                        }
+                        setCadastrandoEmLote(false)
+                        setItensFalhaSelecionados(new Set())
+                        alert(`✅ ${ok} cadastrado(s) e importado(s). ${err > 0 ? `❌ ${err} erro(s).` : ''}`)
+                        setErrosImportacao(prev => ({
+                          ...prev,
+                          animaisAtualizados: (prev?.animaisAtualizados || 0) + ok,
+                          naoEncontrados: [],
+                          erros: []
+                        }))
+                        await carregarDados()
+                        await carregarLocais()
+                      }}
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white rounded-lg text-sm font-medium"
+                    >
+                      {cadastrandoEmLote ? '⏳ Adicionando...' : '➕ Adicionar todos os que faltam'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const todos = [
+                          ...(errosImportacao.naoEncontrados || []).map(i => ({ ...i, tipo: 'Não encontrado' })),
+                          ...(errosImportacao.erros || []).map(i => ({ ...i, tipo: 'Erro' }))
+                        ].sort((a, b) => (a.linha || 0) - (b.linha || 0))
+                        const texto = 'LINHA\tSÉRIE\tRG\tLOCAL\tMOTIVO\n' + todos.map(i => `${i.linha}\t${i.serie}\t${i.rg}\t${i.local}\t${(i.motivo || i.tipo || '').replace(/\t/g, ' ')}`).join('\n')
+                        navigator.clipboard.writeText(texto).then(() => {
+                          alert(`✅ ${todos.length} registro(s) copiado(s)!`)
+                        }).catch(() => alert('Erro ao copiar.'))
+                      }}
+                      className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-medium"
+                    >
+                      📋 Copiar lista
+                    </button>
+                  </div>
+                  <p className="text-xs text-amber-700 dark:text-amber-300">
+                    Cadastrar cria o animal com Série e RG. Complemente os dados depois na tela de Animais.
+                  </p>
                 </div>
               )}
 
@@ -3687,6 +3902,7 @@ EAGB      6058     PIQUETE 1
                   setShowImportTextModal(false)
                   setImportText('')
                   setItemCorrigindo(null)
+                  setItensCorrecaoRestantes([])
                 }}
                 className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl font-medium transition-all duration-200 transform hover:scale-105"
               >
@@ -3760,7 +3976,7 @@ EAGB      6058     PIQUETE 1
                         naoEncontrados: prev?.naoEncontrados?.filter(i => i.linha !== itemCorrigindo.linha) || [],
                         erros: prev?.erros?.filter(i => i.linha !== itemCorrigindo.linha) || []
                       }))
-                      setItemCorrigindo(null)
+                      fecharOuProximoCorrecao()
                       await carregarDados()
                       await carregarLocais()
                     } else {
@@ -3779,7 +3995,7 @@ EAGB      6058     PIQUETE 1
               </button>
               <button
                 type="button"
-                disabled={corrigindo || !correcaoDados.serie?.trim() || !correcaoDados.rg?.trim() || !correcaoDados.local?.trim()}
+                disabled={corrigindo || !correcaoDados.serie?.trim() || !correcaoDados.rg?.trim()}
                 onClick={async () => {
                   setCorrigindo(true)
                   try {
@@ -3787,13 +4003,10 @@ EAGB      6058     PIQUETE 1
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
+                        preRegistro: true,
                         serie: correcaoDados.serie.trim(),
                         rg: correcaoDados.rg.trim(),
-                        sexo: 'Fêmea',
-                        raca: 'Mestiça',
-                        boletim: 'Importação localização',
-                        pasto_atual: correcaoDados.local.trim(),
-                        situacao: 'Ativo'
+                        pasto_atual: correcaoDados.local?.trim() || undefined
                       })
                     })
                     const dataAnimal = await resAnimal.json()
@@ -3801,32 +4014,30 @@ EAGB      6058     PIQUETE 1
                       throw new Error(dataAnimal.message || dataAnimal.error || 'Erro ao cadastrar')
                     }
                     const animal = dataAnimal.data || dataAnimal
-                    const resLoc = await fetch('/api/import/text-localizacao', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        dados: [{ serie: correcaoDados.serie.trim(), rg: correcaoDados.rg.trim(), local: correcaoDados.local.trim(), observacoes: '' }]
+                    const temLocal = correcaoDados.local?.trim()
+                    let importouLoc = false
+                    if (temLocal) {
+                      const resLoc = await fetch('/api/import/text-localizacao', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          dados: [{ serie: correcaoDados.serie.trim(), rg: correcaoDados.rg.trim(), local: temLocal, observacoes: '' }]
+                        })
                       })
-                    })
-                    const dataLoc = await resLoc.json()
-                    const r = dataLoc.data?.resultados || dataLoc.resultados || {}
-                    if (r.animaisAtualizados > 0 || animal?.id) {
-                      alert('✅ Animal cadastrado e localização importada com sucesso!')
-                      setErrosImportacao(prev => ({
-                        ...prev,
-                        animaisAtualizados: (prev?.animaisAtualizados || 0) + 1,
-                        naoEncontrados: prev?.naoEncontrados?.filter(i => i.linha !== itemCorrigindo.linha) || [],
-                        erros: prev?.erros?.filter(i => i.linha !== itemCorrigindo.linha) || []
-                      }))
-                      setItemCorrigindo(null)
-                      await carregarDados()
-                      await carregarLocais()
-                    } else {
-                      alert('✅ Animal cadastrado! Recarregue a página para ver a localização.')
-                      setItemCorrigindo(null)
-                      await carregarDados()
-                      await carregarLocais()
+                      const dataLoc = await resLoc.json()
+                      const r = dataLoc.data?.resultados || dataLoc.resultados || {}
+                      importouLoc = (r.animaisAtualizados || 0) > 0
                     }
+                    alert(temLocal && importouLoc ? '✅ Animal cadastrado e localização importada com sucesso!' : '✅ Animal cadastrado com sucesso! Complemente os dados na tela de Animais.')
+                    setErrosImportacao(prev => ({
+                      ...prev,
+                      animaisAtualizados: (prev?.animaisAtualizados || 0) + 1,
+                      naoEncontrados: prev?.naoEncontrados?.filter(i => i.linha !== itemCorrigindo.linha) || [],
+                      erros: prev?.erros?.filter(i => i.linha !== itemCorrigindo.linha) || []
+                    }))
+                    fecharOuProximoCorrecao()
+                    await carregarDados()
+                    await carregarLocais()
                   } catch (e) {
                     alert('Erro: ' + (e?.message || 'Erro ao cadastrar'))
                   } finally {
@@ -3847,7 +4058,7 @@ EAGB      6058     PIQUETE 1
               </a>
               <button
                 type="button"
-                onClick={() => setItemCorrigindo(null)}
+                onClick={fecharOuProximoCorrecao}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 Cancelar

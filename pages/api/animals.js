@@ -147,24 +147,36 @@ async function animaisHandler(req, res) {
     return sendSuccess(res, animaisComIdentificacao, 'Animais recuperados com sucesso')
     
   } else if (req.method === 'POST') {
-    // Validar dados obrigatórios
-    const { serie, rg, sexo, raca, boletim, pasto_atual } = req.body
+    const { serie, rg, sexo, raca, boletim, pasto_atual, preRegistro } = req.body
     
-    if (!serie || !rg || !sexo || !raca || !boletim || !pasto_atual) {
-      return sendValidationError(res, 'Dados obrigatórios não fornecidos', {
-        required: ['serie', 'rg', 'sexo', 'raca', 'boletim', 'pasto_atual'],
-        provided: { serie: !!serie, rg: !!rg, sexo: !!sexo, raca: !!raca, boletim: !!boletim, pasto_atual: !!pasto_atual }
-      })
+    // Pré-cadastro: só Série e RG obrigatórios; demais campos opcionais
+    const isPreRegistro = preRegistro === true || preRegistro === 'true'
+    if (isPreRegistro) {
+      if (!serie?.trim() || !rg?.trim()) {
+        return sendValidationError(res, 'Pré-cadastro exige Série e RG', {
+          required: ['serie', 'rg'],
+          provided: { serie: !!serie?.trim(), rg: !!rg?.trim() }
+        })
+      }
+    } else {
+      // Cadastro completo: validação normal
+      if (!serie || !rg || !sexo || !raca || !boletim || !pasto_atual) {
+        return sendValidationError(res, 'Dados obrigatórios não fornecidos', {
+          required: ['serie', 'rg', 'sexo', 'raca', 'boletim', 'pasto_atual'],
+          provided: { serie: !!serie, rg: !!rg, sexo: !!sexo, raca: !!raca, boletim: !!boletim, pasto_atual: !!pasto_atual }
+        })
+      }
     }
     
     // Mapear dados do formulário para o formato do banco
+    const defaults = isPreRegistro ? { sexo: 'Não informado', raca: 'Não informada', boletim: 'Pré-cadastro', pasto_atual: req.body.pasto_atual || req.body.piquete_atual || null } : {}
     const animalData = {
       nome: req.body.nome || null,
-      serie: req.body.serie,
-      rg: req.body.rg,
+      serie: (req.body.serie || '').trim(),
+      rg: (req.body.rg || '').trim(),
       tatuagem: req.body.tatuagem || null,
-      sexo: req.body.sexo,
-      raca: req.body.raca,
+      sexo: req.body.sexo || defaults.sexo,
+      raca: req.body.raca || defaults.raca,
       data_nascimento: req.body.dataNascimento || req.body.data_nascimento || null,
       data_chegada: req.body.dataChegada || req.body.data_chegada || null,
       hora_nascimento: req.body.horaNascimento || req.body.hora_nascimento || null,
@@ -190,9 +202,9 @@ async function animaisHandler(req, res) {
       abczg: req.body.abczg || null,
       deca: req.body.deca || null,
       observacoes: req.body.observacoes || null,
-      boletim: req.body.boletim || null,
+      boletim: req.body.boletim || defaults.boletim || null,
       local_nascimento: req.body.local_nascimento || null,
-      pasto_atual: req.body.pasto_atual || null
+      pasto_atual: req.body.pasto_atual || req.body.piquete_atual || defaults.pasto_atual || null
     }
     
     try {

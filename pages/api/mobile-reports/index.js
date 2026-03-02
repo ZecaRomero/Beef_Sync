@@ -706,12 +706,13 @@ export default async function handler(req, res) {
           if (!isNaN(cv) && cv > 0) porPiquete[p].ces.push(cv)
         })
 
+        const piquetesValidos = Object.keys(porPiquete).filter(p => !/^(não informado|nao informado|-|vazio)$/i.test(String(p).trim()))
         resumo = {
           'Total de pesagens': rows.length,
           'Animais únicos': ultimasPesagens.length,
           'Machos': machos.length,
           'Fêmeas': femeas.length,
-          'Piquetes': Object.keys(porPiquete).length,
+          'Piquetes': piquetesValidos.length,
           'Peso médio geral (kg)': pesos.length ? (pesos.reduce((a, b) => a + b, 0) / pesos.length).toFixed(1) : '-',
           'Média por animal (kg)': mediaPorAnimal,
           'Peso mínimo (kg)': pesos.length ? Math.min(...pesos).toFixed(1) : '-',
@@ -719,23 +720,26 @@ export default async function handler(req, res) {
           'CE média (cm)': ces.length ? (ces.reduce((a, b) => a + b, 0) / ces.length).toFixed(1) : '-'
         }
 
-        data = Object.keys(porPiquete).sort().map(p => {
-          const s = porPiquete[p]
-          const mediaPeso = s.pesos.length ? (s.pesos.reduce((a, b) => a + b, 0) / s.pesos.length).toFixed(1) : '-'
-          const pesoMinP = s.pesos.length ? Math.min(...s.pesos).toFixed(1) : '-'
-          const pesoMaxP = s.pesos.length ? Math.max(...s.pesos).toFixed(1) : '-'
-          const mediaCE = s.ces.length ? (s.ces.reduce((a, b) => a + b, 0) / s.ces.length).toFixed(1) : '-'
-          return {
-            Piquete: p,
-            Animais: s.total,
-            Machos: s.machos,
-            Fêmeas: s.femeas,
-            'Média Peso (kg)': mediaPeso,
-            'Peso Min (kg)': pesoMinP,
-            'Peso Max (kg)': pesoMaxP,
-            'Média CE (cm)': mediaCE
-          }
-        })
+        data = Object.keys(porPiquete)
+          .filter(p => !/^(não informado|nao informado|-|vazio)$/i.test(String(p).trim()))
+          .sort()
+          .map(p => {
+            const s = porPiquete[p]
+            const mediaPeso = s.pesos.length ? (s.pesos.reduce((a, b) => a + b, 0) / s.pesos.length).toFixed(1) : '-'
+            const pesoMinP = s.pesos.length ? Math.min(...s.pesos).toFixed(1) : '-'
+            const pesoMaxP = s.pesos.length ? Math.max(...s.pesos).toFixed(1) : '-'
+            const mediaCE = s.ces.length ? (s.ces.reduce((a, b) => a + b, 0) / s.ces.length).toFixed(1) : '-'
+            return {
+              Piquete: p,
+              Animais: s.total,
+              Machos: s.machos,
+              Fêmeas: s.femeas,
+              'Média Peso (kg)': mediaPeso,
+              'Peso Min (kg)': pesoMinP,
+              'Peso Max (kg)': pesoMaxP,
+              'Média CE (cm)': mediaCE
+            }
+          })
         break
       }
 
@@ -1279,54 +1283,24 @@ export default async function handler(req, res) {
 
       case 'animais_piquetes': {
         try {
-          // Inclui animais de localizacoes_animais OU com piquete_atual/pasto_atual no cadastro (igual ao desktop)
-          let r
-          try {
-            r = await query(`
-              SELECT
-                COALESCE(l.piquete, a.piquete_atual, a.pasto_atual) as piquete,
-                COALESCE(l.data_entrada, a.data_entrada_piquete, a.created_at)::date as data_entrada,
-                a.id as animal_id,
-                a.serie, a.rg, a.nome as animal_nome,
-                a.sexo, a.data_nascimento, a.raca,
-                a.pai, a.avo_materno, a.abczg as iabcz, a.deca
-              FROM animais a
-              LEFT JOIN LATERAL (
-                SELECT l2.piquete, l2.data_entrada FROM localizacoes_animais l2
-                WHERE l2.animal_id = a.id AND l2.data_saida IS NULL
-                ORDER BY l2.data_entrada DESC LIMIT 1
-              ) l ON TRUE
-              WHERE a.situacao = 'Ativo'
-                AND COALESCE(l.piquete, a.piquete_atual, a.pasto_atual) IS NOT NULL
-                AND TRIM(COALESCE(l.piquete, a.piquete_atual, a.pasto_atual)) != ''
-              ORDER BY piquete, a.serie, a.rg
-              LIMIT 1000
-            `)
-          } catch (colErr) {
-            // Fallback se piquete_atual/data_entrada_piquete não existirem (bancos antigos)
-            if (/column.*does not exist/i.test(colErr?.message || '')) {
-              r = await query(`
-                SELECT
-                  COALESCE(l.piquete, a.pasto_atual) as piquete,
-                  COALESCE(l.data_entrada, a.created_at)::date as data_entrada,
-                  a.id as animal_id,
-                  a.serie, a.rg, a.nome as animal_nome,
-                  a.sexo, a.data_nascimento, a.raca,
-                  a.pai, a.avo_materno, a.abczg as iabcz, a.deca
-                FROM animais a
-                LEFT JOIN LATERAL (
-                  SELECT l2.piquete, l2.data_entrada FROM localizacoes_animais l2
-                  WHERE l2.animal_id = a.id AND l2.data_saida IS NULL
-                  ORDER BY l2.data_entrada DESC LIMIT 1
-                ) l ON TRUE
-                WHERE a.situacao = 'Ativo'
-                  AND COALESCE(l.piquete, a.pasto_atual) IS NOT NULL
-                  AND TRIM(COALESCE(l.piquete, a.pasto_atual)) != ''
-                ORDER BY piquete, a.serie, a.rg
-                LIMIT 1000
-              `)
-            } else throw colErr
-          }
+          // Usar APENAS localizacoes_animais (mesma fonte do app Histórico de Movimentações) para manter app e mobile sincronizados
+          const r = await query(`
+            SELECT
+              l.piquete,
+              l.data_entrada::date as data_entrada,
+              a.id as animal_id,
+              a.serie, a.rg, a.nome as animal_nome,
+              a.sexo, a.data_nascimento, a.raca,
+              a.pai, a.avo_materno, a.abczg as iabcz, a.deca
+            FROM localizacoes_animais l
+            JOIN animais a ON l.animal_id = a.id
+            WHERE a.situacao = 'Ativo'
+              AND l.data_saida IS NULL
+              AND l.piquete IS NOT NULL
+              AND TRIM(l.piquete) != ''
+            ORDER BY l.piquete, a.serie, a.rg
+            LIMIT 1000
+          `)
 
           // Buscar última pesagem (peso e CE) de cada animal
           const animalIds = r.rows.map(row => row.animal_id).filter(Boolean)
@@ -1350,10 +1324,11 @@ export default async function handler(req, res) {
             }
           }
 
-          // Agrupar por piquete
+          // Agrupar por piquete (apenas piquetes válidos - igual ao app)
           const porPiquete = {}
           r.rows.forEach(row => {
-            const piq = piqueteOuNaoInformado(row.piquete)
+            if (!ehPiqueteValido(row.piquete)) return // Ignorar piquetes inválidos para manter sync com app
+            const piq = row.piquete.trim()
             if (!porPiquete[piq]) {
               porPiquete[piq] = {
                 piquete: piq,
@@ -1400,22 +1375,25 @@ export default async function handler(req, res) {
             })
           })
 
-          // Calcular médias e montar resultado
-          data = Object.keys(porPiquete).sort().map(piq => {
-            const info = porPiquete[piq]
-            const mediaPeso = info.pesos.length > 0
-              ? (info.pesos.reduce((a, b) => a + b, 0) / info.pesos.length).toFixed(1)
-              : '-'
-            
-            return {
-              piquete: piq,
-              total_animais: info.total,
-              machos: info.machos,
-              femeas: info.femeas,
-              media_peso: mediaPeso,
-              animais: info.animais
-            }
-          })
+          // Calcular médias e montar resultado (excluir "Não informado")
+          data = Object.keys(porPiquete)
+            .filter(piq => !/^(não informado|nao informado|-|vazio)$/i.test(piq.trim()))
+            .sort()
+            .map(piq => {
+              const info = porPiquete[piq]
+              const mediaPeso = info.pesos.length > 0
+                ? (info.pesos.reduce((a, b) => a + b, 0) / info.pesos.length).toFixed(1)
+                : '-'
+              
+              return {
+                piquete: piq,
+                total_animais: info.total,
+                machos: info.machos,
+                femeas: info.femeas,
+                media_peso: mediaPeso,
+                animais: info.animais
+              }
+            })
 
           // Calcular resumo geral
           const totalAnimais = Object.values(porPiquete).reduce((sum, p) => sum + p.total, 0)
