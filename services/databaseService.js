@@ -616,7 +616,7 @@ class DatabaseService {
       nome, serie, rg, tatuagem, sexo, raca, data_nascimento, hora_nascimento,
       peso, cor, tipo_nascimento, dificuldade_parto, meses, situacao,
       pai, mae, avo_materno, receptora, is_fiv, custo_total, valor_venda, valor_real,
-      veterinario, abczg, deca, observacoes, boletim, local_nascimento, pasto_atual,
+      veterinario, abczg, deca, genetica_2, decile_2, observacoes, boletim, local_nascimento, pasto_atual,
       serie_pai, rg_pai, serie_mae, rg_mae
     } = animalData;
 
@@ -626,16 +626,16 @@ class DatabaseService {
           nome, serie, rg, tatuagem, sexo, raca, data_nascimento, hora_nascimento,
           peso, cor, tipo_nascimento, dificuldade_parto, meses, situacao,
           pai, mae, avo_materno, receptora, is_fiv, custo_total, valor_venda, valor_real,
-          veterinario, abczg, deca, observacoes, boletim, local_nascimento, pasto_atual,
+          veterinario, abczg, deca, genetica_2, decile_2, observacoes, boletim, local_nascimento, pasto_atual,
           serie_pai, rg_pai, serie_mae, rg_mae
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35
         ) RETURNING *
       `, [
         nome, serie, rg, tatuagem, sexo, raca, data_nascimento, hora_nascimento,
         peso, cor, tipo_nascimento, dificuldade_parto, meses, situacao,
         pai, mae, avo_materno, receptora, is_fiv, custo_total, valor_venda, valor_real,
-        veterinario, abczg, deca, observacoes, boletim, local_nascimento, pasto_atual,
+        veterinario, abczg, deca, genetica_2 ?? null, decile_2 ?? null, observacoes, boletim, local_nascimento, pasto_atual,
         serie_pai, rg_pai, serie_mae, rg_mae
       ]);
 
@@ -1219,6 +1219,8 @@ class DatabaseService {
       await query(`ALTER TABLE animais ADD COLUMN IF NOT EXISTS pasto_atual VARCHAR(100)`)
       await query(`ALTER TABLE animais ADD COLUMN IF NOT EXISTS piquete_atual VARCHAR(200)`)
       await query(`ALTER TABLE animais ADD COLUMN IF NOT EXISTS situacao_abcz VARCHAR(100)`)
+      await query(`ALTER TABLE animais ADD COLUMN IF NOT EXISTS genetica_2 VARCHAR(50)`)
+      await query(`ALTER TABLE animais ADD COLUMN IF NOT EXISTS decile_2 VARCHAR(50)`)
     } catch (e) {
       if (!e.message?.includes('already exists')) logger?.warn?.('Migração colunas:', e.message)
     }

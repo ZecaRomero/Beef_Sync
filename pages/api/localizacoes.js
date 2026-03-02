@@ -63,6 +63,8 @@ async function handleGet(req, res) {
         a.sexo
       FROM localizacoes_animais l
       JOIN animais a ON l.animal_id = a.id
+      WHERE a.situacao = 'Ativo'
+        AND COALESCE(LOWER(a.raca), '') NOT LIKE '%receptora%'
     `
     const params = []
     const conditions = []
@@ -73,10 +75,10 @@ async function handleGet(req, res) {
       params.push(animal_id)
     }
 
-    // Filtrar por piquete
+    // Filtrar por piquete (match exato para evitar PIQUETE 11 pegar 110, 111, etc.)
     if (piquete) {
-      conditions.push(`l.piquete ILIKE $${params.length + 1}`)
-      params.push(`%${piquete}%`)
+      conditions.push(`LOWER(TRIM(l.piquete)) = LOWER(TRIM($${params.length + 1}))`)
+      params.push(String(piquete).trim())
     }
 
     // Filtrar por período
@@ -96,7 +98,7 @@ async function handleGet(req, res) {
     }
 
     if (conditions.length > 0) {
-      queryText += ` WHERE ${conditions.join(' AND ')}`
+      queryText += ` AND ${conditions.join(' AND ')}`
     }
 
     queryText += ` ORDER BY l.data_entrada DESC, l.created_at DESC`

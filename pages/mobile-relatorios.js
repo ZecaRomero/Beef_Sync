@@ -267,6 +267,12 @@ export default function MobileRelatorios() {
       return
     }
     
+    // piquete_animais: lista já foi setada no click handler (originalRow.animais)
+    if (cardFilterModal.dataType === 'piquete_animais') {
+      setCardListLoading(false)
+      return
+    }
+    
     setCardListLoading(true)
     
     // Se o filtro tem piquete, usar a API de localizações para buscar animais
@@ -1178,7 +1184,7 @@ export default function MobileRelatorios() {
                               </div>
                               
                               {/* Genealogia e índices */}
-                              {(a.pai || a.avo_materno || a.iabcz || a.deca) && (
+                              {(a.pai || a.avo_materno || a.iabcz || a.deca || a.genetica_2 || a.decile_2) && (
                                 <div className="pt-2 border-t border-gray-200 dark:border-gray-700 space-y-1.5">
                                   {a.pai && (
                                     <div className="flex items-start gap-1.5 text-xs">
@@ -1206,6 +1212,18 @@ export default function MobileRelatorios() {
                                       <div className="flex items-center gap-1">
                                         <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400">DECA:</span>
                                         <span className="text-xs font-bold text-gray-900 dark:text-white">{a.deca}</span>
+                                      </div>
+                                    )}
+                                    {a.genetica_2 && (
+                                      <div className="flex items-center gap-1">
+                                        <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Aval2:</span>
+                                        <span className="text-xs font-bold text-gray-900 dark:text-white">{a.genetica_2}</span>
+                                      </div>
+                                    )}
+                                    {a.decile_2 && (
+                                      <div className="flex items-center gap-1">
+                                        <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">Dec2:</span>
+                                        <span className="text-xs font-bold text-gray-900 dark:text-white">{a.decile_2}</span>
                                       </div>
                                     )}
                                   </div>

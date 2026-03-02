@@ -276,6 +276,29 @@ export default function AnimalDetail() {
     carregarUltimaIA()
   }, [animal?.id])
 
+  // Buscar posição nos rankings (iABCZ e Genética 2) para exibir troféus
+  useEffect(() => {
+    if (!animal?.id) return
+    const matchAnimal = (r) => r.id === animal.id || (String(r.rg) === String(animal.rg) && String(r.serie || '').toUpperCase() === String(animal.serie || '').toUpperCase())
+    Promise.all([
+      fetch('/api/animals/ranking-iabcz?limit=50').then(r => r.json()),
+      fetch('/api/animals/ranking-genetica-2?limit=50').then(r => r.json())
+    ]).then(([d1, d2]) => {
+      let updates = {}
+      if (d1.success && d1.data?.length) {
+        const idx = d1.data.findIndex(matchAnimal)
+        if (idx >= 0) updates.ranking_iabcz = idx + 1
+      }
+      if (d2.success && d2.data?.length) {
+        const idx = d2.data.findIndex(matchAnimal)
+        if (idx >= 0) updates.ranking_genetica_2 = idx + 1
+      }
+      if (Object.keys(updates).length > 0) {
+        setAnimal(prev => prev ? { ...prev, ...updates } : prev)
+      }
+    }).catch(() => {})
+  }, [animal?.id, animal?.rg, animal?.serie])
+
   // Calcular último serviço (IA, DG, Coleta FIV, TE, Exame Andrológico, ocorrências) - sempre o mais recente
   useEffect(() => {
     if (!animal) {
@@ -4069,6 +4092,33 @@ export default function AnimalDetail() {
                         {animal.ranking_iabcz === 3 && <span className="text-xl">🥉</span>}
                         {animal.ranking_iabcz > 3 && <span className="text-amber-600">🏆</span>}
                         <span className="text-xs text-gray-500 dark:text-gray-400">#{animal.ranking_iabcz}</span>
+                      </span>
+                    )}
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">
+                    Avaliação 2
+                  </label>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    {animal.genetica_2 || '-'}
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">
+                    Decile 2
+                  </label>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                    <span>{animal.decile_2 || '-'}</span>
+                    {animal.ranking_genetica_2 && (
+                      <span className="flex items-center gap-1">
+                        {animal.ranking_genetica_2 === 1 && <span className="text-xl">🥇</span>}
+                        {animal.ranking_genetica_2 === 2 && <span className="text-xl">🥈</span>}
+                        {animal.ranking_genetica_2 === 3 && <span className="text-xl">🥉</span>}
+                        {animal.ranking_genetica_2 > 3 && <span className="text-amber-600">🏆</span>}
+                        <span className="text-xs text-gray-500 dark:text-gray-400">#{animal.ranking_genetica_2}</span>
                       </span>
                     )}
                   </p>

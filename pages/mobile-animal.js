@@ -742,6 +742,24 @@ export default function MobileAnimal() {
                     </div>
                   )}
 
+                  {(animal.genetica_2 || animal.genetica_2 === 0) && (
+                    <div>
+                      <p className="text-gray-500 dark:text-gray-400 text-xs">Avaliação 2</p>
+                      <p className="font-bold text-emerald-600 dark:text-emerald-400">
+                        {animal.genetica_2}
+                      </p>
+                    </div>
+                  )}
+
+                  {(animal.decile_2 || animal.decile_2 === 0) && (
+                    <div>
+                      <p className="text-gray-500 dark:text-gray-400 text-xs">Decile 2</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">
+                        {animal.decile_2}
+                      </p>
+                    </div>
+                  )}
+
                   {animal.pai && (
                     <div className="col-span-2">
                       <p className="text-gray-500 dark:text-gray-400 text-xs">Pai</p>

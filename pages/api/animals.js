@@ -201,6 +201,8 @@ async function animaisHandler(req, res) {
       veterinario: req.body.veterinario || null,
       abczg: req.body.abczg || null,
       deca: req.body.deca || null,
+      genetica_2: req.body.genetica_2 || null,
+      decile_2: req.body.decile_2 || null,
       observacoes: req.body.observacoes || null,
       boletim: req.body.boletim || defaults.boletim || null,
       local_nascimento: req.body.local_nascimento || null,

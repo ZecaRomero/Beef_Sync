@@ -47,6 +47,8 @@ export default function ModernAnimalForm({
     valorVenda: '',
     abczg: '',
     deca: '',
+    genetica_2: '',
+    decile_2: '',
     observacoes: '',
     boletim: '',
     localNascimento: '',
@@ -71,6 +73,8 @@ export default function ModernAnimalForm({
         observacoes: animal.observacoes || '',
         abczg: animal.abczg || '',
         deca: animal.deca || '',
+        genetica_2: animal.genetica_2 || '',
+        decile_2: animal.decile_2 || '',
         boletim: animal.boletim || '',
         localNascimento: animal.localNascimento || animal.local_nascimento || '',
         pastoAtual: animal.pastoAtual || animal.pasto_atual || ''
@@ -95,6 +99,8 @@ export default function ModernAnimalForm({
         isFiv: false,
         abczg: '',
         deca: '',
+        genetica_2: '',
+        decile_2: '',
         observacoes: '',
         boletim: '',
         localNascimento: '',
@@ -551,19 +557,31 @@ export default function ModernAnimalForm({
             </div>
           </div>
 
-          {/* Campos ABCZg e DECA */}
+          {/* Campos ABCZg, DECA, Avaliação 2 e Decile 2 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
-              label="¡ABCZg"
+              label="iABCZg"
               value={formData.abczg || ''}
               onChange={(e) => setFormData({ ...formData, abczg: e.target.value })}
-              placeholder="ABCZg"
+              placeholder="iABCZg"
             />
             <Input
               label="DECA"
               value={formData.deca || ''}
               onChange={(e) => setFormData({ ...formData, deca: e.target.value })}
               placeholder="DECA"
+            />
+            <Input
+              label="Avaliação 2"
+              value={formData.genetica_2 || ''}
+              onChange={(e) => setFormData({ ...formData, genetica_2: e.target.value })}
+              placeholder="Avaliação 2"
+            />
+            <Input
+              label="Decile 2"
+              value={formData.decile_2 || ''}
+              onChange={(e) => setFormData({ ...formData, decile_2: e.target.value })}
+              placeholder="Decile 2"
             />
           </div>
 

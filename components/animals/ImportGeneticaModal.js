@@ -33,7 +33,9 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
             rg: cols[1] || '',
             iABCZ: cols[2] || null,
             deca: cols[3] || null,
-            situacaoAbcz: cols[4] || null
+            situacaoAbcz: cols[4] || null,
+            genetica_2: cols[5] || null,
+            decile_2: cols[6] || null
           })
         }
       }
@@ -137,18 +139,18 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
         </div>
         {importMode === 'texto' ? (
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Cole os dados. Formatos aceitos: Série, RG, iABCZ, Deca (ou Série, RGN, Status para Situação ABCZ)</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Cole os dados. Formato: Série, RG, iABCZ, Deca [, Avaliação 2, Decile 2] (ou Série, RGN, Status para Situação ABCZ)</p>
             <textarea
               value={importTexto}
               onChange={(e) => setImportTexto(e.target.value)}
-              placeholder="SÉRIE	RG	iABCZ	DECA&#10;CJCJ	16974	47,71	1&#10;CJCJ	17037	43,25	1&#10;&#10;Ou: Série	RGN	Status&#10;CJCJ	16974	Ok para RGN"
+              placeholder="SÉRIE	RG	iABCZ	DECA	Aval2	Dec2&#10;CJCJ	16974	47,71	1	29,32	1&#10;CJCJ	17037	43,25	1	25,1	2&#10;&#10;Ou: Série	RGN	Status&#10;CJCJ	16974	Ok para RGN"
               className="w-full h-40 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-gray-700 dark:text-white text-sm font-mono"
               rows={6}
             />
           </div>
         ) : (
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Excel: Série, RG, iABCZ, Deca (ou Série, RGN, Status para Situação ABCZ). Animais não encontrados e inativos são ignorados.</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Excel: Série, RG, iABCZ, Deca [, Avaliação 2, Decile 2] (ou Série, RGN, Status). Animais não encontrados e inativos são ignorados.</p>
             <input
               type="file"
               accept=".xlsx,.xls,.csv"

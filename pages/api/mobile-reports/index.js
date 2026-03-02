@@ -226,18 +226,25 @@ export default async function handler(req, res) {
              mortesTotal = parseInt(qMortes.rows[0]?.total || 0)
           } catch (e) { console.log('Sem tabela mortes ou erro', e.message) }
 
-          // 8. Top Piquetes (Ocupação Atual)
+          // 8. Top Piquetes (Ocupação Atual) - usar localizacoes_animais (igual ao app)
           let topPiquetes = []
           try {
             const qPiquetes = await query(`
-              SELECT piquete_atual, COUNT(*) as qtd 
-              FROM animais 
-              WHERE situacao = 'Ativo' AND piquete_atual IS NOT NULL 
-              GROUP BY piquete_atual 
+              SELECT l.piquete, COUNT(*) as qtd 
+              FROM localizacoes_animais l
+              JOIN animais a ON l.animal_id = a.id
+              WHERE a.situacao = 'Ativo' 
+                AND l.data_saida IS NULL 
+                AND l.piquete IS NOT NULL 
+                AND TRIM(l.piquete) != ''
+                AND COALESCE(LOWER(a.raca), '') NOT LIKE '%receptora%'
+              GROUP BY l.piquete 
               ORDER BY qtd DESC 
               LIMIT 5
             `)
-            topPiquetes = qPiquetes.rows.map(r => ({ label: r.piquete_atual, valor: parseInt(r.qtd) }))
+            topPiquetes = qPiquetes.rows
+              .filter(r => ehPiqueteValido(r.piquete))
+              .map(r => ({ label: r.piquete.trim(), valor: parseInt(r.qtd) }))
           } catch (e) { console.log('Erro top piquetes', e.message) }
 
           // 9. Previsão de Partos (Próximos 30 dias)
@@ -1291,15 +1298,16 @@ export default async function handler(req, res) {
               a.id as animal_id,
               a.serie, a.rg, a.nome as animal_nome,
               a.sexo, a.data_nascimento, a.raca,
-              a.pai, a.avo_materno, a.abczg as iabcz, a.deca
+              a.pai, a.avo_materno, a.abczg as iabcz, a.deca, a.genetica_2, a.decile_2
             FROM localizacoes_animais l
             JOIN animais a ON l.animal_id = a.id
             WHERE a.situacao = 'Ativo'
               AND l.data_saida IS NULL
               AND l.piquete IS NOT NULL
               AND TRIM(l.piquete) != ''
+              AND COALESCE(LOWER(a.raca), '') NOT LIKE '%receptora%'
             ORDER BY l.piquete, a.serie, a.rg
-            LIMIT 1000
+            LIMIT 10000
           `)
 
           // Buscar última pesagem (peso e CE) de cada animal
@@ -1371,6 +1379,8 @@ export default async function handler(req, res) {
               avo_materno: row.avo_materno,
               iabcz: row.iabcz,
               deca: row.deca,
+              genetica_2: row.genetica_2,
+              decile_2: row.decile_2,
               data_entrada: toDateStr(row.data_entrada)
             })
           })
@@ -1513,7 +1523,7 @@ export default async function handler(req, res) {
               ORDER BY l2.data_entrada DESC LIMIT 1
             ) l ON TRUE
           `
-          let rankingIABCZ, rankingPeso, rankingCE
+          let rankingIABCZ, rankingPeso, rankingCE, rankingGenetica2
           try {
             rankingIABCZ = await query(`
               SELECT a.id, a.serie, a.rg, a.nome, a.abczg, a.raca, a.sexo, ${sqlPiquete}
@@ -1548,6 +1558,18 @@ export default async function handler(req, res) {
               ORDER BY p.ce DESC
               LIMIT 10
             `)
+            try {
+              rankingGenetica2 = await query(`
+                SELECT a.id, a.serie, a.rg, a.nome, a.genetica_2, a.decile_2, a.raca, a.sexo, ${sqlPiquete}
+                FROM animais a ${joinLateral}
+                WHERE a.situacao = 'Ativo' AND a.genetica_2 IS NOT NULL AND TRIM(a.genetica_2) != ''
+                ORDER BY
+                  CASE WHEN a.genetica_2 ~ '^[0-9]+[.,]?[0-9]*$'
+                  THEN (REPLACE(REPLACE(TRIM(a.genetica_2), ',', '.'), ' ', '')::numeric)
+                  ELSE NULL END DESC NULLS LAST
+                LIMIT 10
+              `)
+            } catch (_) { rankingGenetica2 = { rows: [] } }
           } catch (colErr) {
             if (/column.*does not exist/i.test(colErr?.message || '')) {
               const sqlPiqueteAlt = `COALESCE(l.piquete, a.pasto_atual) as piquete`
@@ -1576,8 +1598,29 @@ export default async function handler(req, res) {
                 WHERE a.situacao = 'Ativo' AND (a.sexo ILIKE 'M%' OR a.sexo = 'M')
                 ORDER BY p.ce DESC LIMIT 10
               `)
+              try {
+                rankingGenetica2 = await query(`
+                  SELECT a.id, a.serie, a.rg, a.nome, a.genetica_2, a.decile_2, a.raca, a.sexo, ${sqlPiqueteAlt}
+                  FROM animais a ${joinLateral}
+                  WHERE a.situacao = 'Ativo' AND a.genetica_2 IS NOT NULL AND TRIM(a.genetica_2) != ''
+                  ORDER BY CASE WHEN a.genetica_2 ~ '^[0-9]+[.,]?[0-9]*$'
+                  THEN (REPLACE(REPLACE(TRIM(a.genetica_2), ',', '.'), ' ', '')::numeric) ELSE NULL END DESC NULLS LAST
+                  LIMIT 10
+                `)
+              } catch (_) { rankingGenetica2 = { rows: [] } }
             } else throw colErr
           }
+
+          const genetica2Rows = (rankingGenetica2?.rows || []).map((row, i) => ({
+            ranking: 'Avaliação 2',
+            posicao: i + 1,
+            animal_id: row.id,
+            animal: `${row.serie || ''} ${row.rg || ''}`.trim() || row.nome,
+            valor: row.genetica_2,
+            raca: row.raca,
+            sexo: formatarSexo(row.sexo),
+            piquete: piqueteOuNaoInformado(row.piquete) || '-'
+          }))
 
           data = [
             { _resumo: true, tipo: 'iABCZ', titulo: 'Top 10 iABCZ', descricao: 'Quanto maior o iABCZ, melhor o animal' },
@@ -1612,7 +1655,11 @@ export default async function handler(req, res) {
               raca: row.raca,
               sexo: formatarSexo(row.sexo),
               piquete: piqueteOuNaoInformado(row.piquete) || '-'
-            }))
+            })),
+            ...(genetica2Rows.length > 0 ? [
+              { _resumo: true, tipo: 'genetica2', titulo: 'Top 10 Avaliação 2', descricao: 'Maior valor = melhor animal' },
+              ...genetica2Rows
+            ] : [])
           ]
         } catch (e) {
           console.error('Erro ao buscar ranking PMGZ:', e)

@@ -124,15 +124,20 @@ export default async function handler(req, res) {
       let deca = null;
       let situacaoAbcz = null;
 
+      let genetica2 = null;
+      let decile2 = null;
+
       if (formatoStatusAbcz) {
         situacaoAbcz = normalizarTexto(row.getCell(3).value) || null;
       } else {
         iABCZ = normalizarNumero(row.getCell(3).value);
         deca = normalizarTexto(row.getCell(4).value);
         situacaoAbcz = normalizarTexto(row.getCell(5).value) || null;
+        genetica2 = normalizarNumero(row.getCell(6).value) || normalizarTexto(row.getCell(6).value) || null;
+        decile2 = normalizarTexto(row.getCell(7).value) || null;
       }
 
-      rows.push({ serie, rg, iABCZ, deca, situacaoAbcz });
+      rows.push({ serie, rg, iABCZ, deca, situacaoAbcz, genetica_2: genetica2, decile_2: decile2 });
     }
 
     try { fs.unlinkSync(filepath); } catch (e) { /* ignorar */ }
@@ -167,6 +172,8 @@ async function processarLinhas(rows) {
     const iABCZ = normalizarNumero(r.iABCZ ?? r.iabcz ?? r.abczg);
     const deca = normalizarTexto(r.deca ?? r.Deca ?? r.DECA);
     const situacaoAbcz = normalizarTexto(r.situacaoAbcz ?? r.situacao_abcz ?? r['Situação ABCZ'] ?? r.Status) || null;
+    const genetica2 = normalizarNumero(r.genetica_2 ?? r.genetica2 ?? r['Avaliação 2'] ?? r['Genética 2']) ?? normalizarTexto(r.genetica_2 ?? r.genetica2);
+    const decile2 = normalizarTexto(r.decile_2 ?? r.decile2 ?? r['Decile 2']) || null;
 
     if (!serie && !rg) continue;
 
@@ -188,6 +195,8 @@ async function processarLinhas(rows) {
       }
       const abczgVal = iABCZ != null ? String(iABCZ) : null;
       const decaVal = deca || null;
+      const genetica2Val = genetica2 != null ? String(genetica2) : null;
+      const decile2Val = decile2 || null;
 
       try {
         await query(
@@ -195,9 +204,11 @@ async function processarLinhas(rows) {
            SET abczg = COALESCE($1, abczg), 
                deca = COALESCE($2, deca),
                situacao_abcz = COALESCE($3, situacao_abcz),
+               genetica_2 = COALESCE($4, genetica_2),
+               decile_2 = COALESCE($5, decile_2),
                updated_at = CURRENT_TIMESTAMP
-           WHERE id = $4`,
-          [abczgVal, decaVal, situacaoAbcz, animal.id]
+           WHERE id = $6`,
+          [abczgVal, decaVal, situacaoAbcz, genetica2Val, decile2Val, animal.id]
         );
       } catch (colErr) {
         if (/column.*does not exist/i.test(colErr?.message || '')) {
@@ -205,10 +216,19 @@ async function processarLinhas(rows) {
             `UPDATE animais 
              SET abczg = COALESCE($1, abczg), 
                  deca = COALESCE($2, deca),
+                 situacao_abcz = COALESCE($3, situacao_abcz),
                  updated_at = CURRENT_TIMESTAMP
-             WHERE id = $3`,
-            [abczgVal, decaVal, animal.id]
+             WHERE id = $4`,
+            [abczgVal, decaVal, situacaoAbcz, animal.id]
           );
+          if (genetica2Val != null || decile2Val != null) {
+            try {
+              await query(
+                `UPDATE animais SET genetica_2 = COALESCE($1, genetica_2), decile_2 = COALESCE($2, decile_2), updated_at = CURRENT_TIMESTAMP WHERE id = $3`,
+                [genetica2Val, decile2Val, animal.id]
+              );
+            } catch (_) {}
+          }
         } else throw colErr;
       }
 

@@ -36,12 +36,9 @@ export default function HistoricoMovimentacoes() {
     }
   }, [mounted, filtroAvancado])
 
-  // Considerar ativo: sem data_saida OU datas inconsistentes (data_saida < data_entrada, ex: erro de importação)
+  // Considerar ativo: sem data_saida (mesma lógica do app mobile)
   const ehLocalizacaoAtiva = (m) => {
-    if (!m.data_saida) return true
-    const de = m.data_entrada ? new Date(m.data_entrada) : null
-    const ds = new Date(m.data_saida)
-    return de && !isNaN(ds.getTime()) && ds < de
+    return !m.data_saida
   }
 
   // Calcular resumo por piquete (localizações ativas)
