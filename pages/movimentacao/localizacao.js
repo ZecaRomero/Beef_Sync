@@ -940,6 +940,50 @@ export default function LocalizacaoAnimais() {
     abrirModalExportacao('geral')
   }
 
+  // Limpar todas as localizações
+  const limparTodasLocalizacoes = async () => {
+    const confirmacao = window.confirm(
+      '⚠️ ATENÇÃO!\n\n' +
+      'Esta ação irá REMOVER TODAS as localizações de animais do sistema.\n\n' +
+      'Você poderá reimportar as localizações corretas do Excel após limpar.\n\n' +
+      'Deseja continuar?'
+    )
+    
+    if (!confirmacao) return
+
+    // Segunda confirmação para segurança
+    const segundaConfirmacao = window.confirm(
+      '🚨 ÚLTIMA CONFIRMAÇÃO!\n\n' +
+      'Tem certeza absoluta que deseja limpar TODAS as localizações?\n\n' +
+      'Esta ação NÃO pode ser desfeita!'
+    )
+    
+    if (!segundaConfirmacao) return
+
+    setLoading(true)
+    
+    try {
+      const response = await fetch('/api/localizacoes/limpar-todas', {
+        method: 'DELETE'
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok && data.success) {
+        alert(`✅ ${data.data.message}\n\nAgora você pode importar as localizações corretas do Excel.`)
+        await carregarDados()
+        await carregarLocais()
+      } else {
+        alert(`❌ Erro: ${data.error || 'Falha ao limpar localizações'}`)
+      }
+    } catch (err) {
+      console.error('Erro ao limpar localizações:', err)
+      alert('❌ Erro ao limpar localizações. Verifique a conexão.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // Importar localizações do Excel (Série, RGN, LOCAL, OBSERVAÇÕES)
   const handleImportarExcel = async (e) => {
     const file = e?.target?.files?.[0]
@@ -1081,6 +1125,15 @@ export default function LocalizacaoAnimais() {
                     </>
                   )}
                 </label>
+                <button
+                  onClick={limparTodasLocalizacoes}
+                  disabled={loading}
+                  className="group bg-red-500/80 backdrop-blur-sm hover:bg-red-600/90 text-white px-6 py-3 rounded-2xl transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Limpar todas as localizações para reimportar do Excel"
+                >
+                  <TrashIcon className="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
+                  <span className="font-medium">🗑️ Limpar Todas</span>
+                </button>
               </div>
             </div>
           </div>
