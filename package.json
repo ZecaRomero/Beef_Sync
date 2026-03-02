@@ -51,6 +51,7 @@
   "dependencies": {
     "@headlessui/react": "^2.2.9",
     "@heroicons/react": "^2.2.0",
+    "@supabase/supabase-js": "^2.98.0",
     "@types/pg": "^8.15.5",
     "autoprefixer": "^10.4.21",
     "chart.js": "^4.5.1",
