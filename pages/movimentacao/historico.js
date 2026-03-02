@@ -2,6 +2,15 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { ClockIcon, MapPinIcon, MagnifyingGlassIcon, FunnelIcon, ArrowPathIcon, DocumentArrowDownIcon, XMarkIcon, TrashIcon } from '../../components/ui/Icons'
 
+// Ícone de cerca/porteira
+const FenceIcon = ({ className = "w-6 h-6" }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M3 8V20M7 8V20M11 8V20M15 8V20M19 8V20" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+    <path d="M2 12H20M2 16H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+    <path d="M3 8L5 4L7 8M11 8L13 4L15 8M19 8L21 4L23 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+
 export default function HistoricoMovimentacoes() {
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
@@ -54,7 +63,12 @@ export default function HistoricoMovimentacoes() {
     })
     return Object.entries(porPiquete)
       .map(([nome, dados]) => ({ piquete: nome, ...dados }))
-      .sort((a, b) => b.total - a.total)
+      .sort((a, b) => {
+        // Extrair números dos nomes dos piquetes
+        const numA = parseInt(a.piquete.match(/\d+/)?.[0] || '999999')
+        const numB = parseInt(b.piquete.match(/\d+/)?.[0] || '999999')
+        return numA - numB
+      })
   }, [movimentacoes])
 
   const totais = React.useMemo(() => {
@@ -351,15 +365,20 @@ export default function HistoricoMovimentacoes() {
             {resumoPorPiquete.slice(0, 11).map((item) => (
               <div
                 key={item.piquete}
-                className="relative bg-white dark:bg-gray-800 rounded-xl p-4 border-2 border-gray-200 dark:border-gray-700 shadow hover:shadow-lg hover:border-purple-400 dark:hover:border-purple-500 transition-all group"
+                className="relative bg-white dark:bg-gray-800 rounded-xl p-4 border-2 border-gray-200 dark:border-gray-700 shadow hover:shadow-lg hover:border-purple-400 dark:hover:border-purple-500 transition-all group overflow-hidden"
               >
+                {/* Cerca de fundo */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-5 dark:opacity-10 pointer-events-none">
+                  <FenceIcon className="w-32 h-32 text-gray-600" />
+                </div>
+                
                 <button
                   type="button"
                   onClick={() => setPiqueteModal(item.piquete)}
-                  className="text-left w-full"
+                  className="text-left w-full relative z-10"
                 >
                   <div className="flex items-center gap-2 mb-2">
-                    <MapPinIcon className="w-4 h-4 text-purple-600 group-hover:scale-110 transition-transform" />
+                    <FenceIcon className="w-5 h-5 text-purple-600 group-hover:scale-110 transition-transform" />
                     <span className="font-semibold text-gray-900 dark:text-white truncate" title={item.piquete}>
                       {item.piquete}
                     </span>
@@ -379,7 +398,7 @@ export default function HistoricoMovimentacoes() {
                     e.stopPropagation()
                     limparLocalizacoesPorPiquete(item.piquete)
                   }}
-                  className="absolute top-2 right-2 p-1.5 bg-red-500/10 hover:bg-red-500 text-red-600 hover:text-white rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                  className="absolute top-2 right-2 p-1.5 bg-red-500/10 hover:bg-red-500 text-red-600 hover:text-white rounded-lg transition-all opacity-0 group-hover:opacity-100 z-20"
                   title={`Limpar localizações do ${item.piquete}`}
                 >
                   <TrashIcon className="w-4 h-4" />
