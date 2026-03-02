@@ -56,7 +56,13 @@ export default async function handler(req, res) {
             touroNome = touroRg
           }
           const { semen_nome_touro, ...rest } = row
-          return { ...rest, touro_nome: touroNome || rest.touro_nome, serie_touro: serieTouro || null, rg_touro: rgTouro || null }
+          return {
+            ...rest,
+            data_inseminacao: rest.data_ia || rest.data_inseminacao,
+            touro_nome: touroNome || rest.touro_nome,
+            serie_touro: serieTouro || null,
+            rg_touro: rgTouro || null
+          }
         })
 
         return res.status(200).json({
@@ -84,7 +90,12 @@ export default async function handler(req, res) {
           } else if (!rgTouro && touroRg) {
             rgTouro = touroRg
           }
-          return { ...row, serie_touro: serieTouro || null, rg_touro: rgTouro || null }
+          return {
+            ...row,
+            data_inseminacao: row.data_ia || row.data_inseminacao,
+            serie_touro: serieTouro || null,
+            rg_touro: rgTouro || null
+          }
         })
         return res.status(200).json({
           success: true,
@@ -119,6 +130,16 @@ export default async function handler(req, res) {
         });
       }
 
+      // Garantir coluna valida existe e invalidar IAs anteriores da mesma fêmea
+      await query('ALTER TABLE inseminacoes ADD COLUMN IF NOT EXISTS valida BOOLEAN DEFAULT true').catch(() => {})
+      await query(`
+        UPDATE inseminacoes 
+        SET valida = false, status_gestacao = 'Vazia', 
+            resultado_dg = COALESCE(NULLIF(TRIM(resultado_dg), ''), 'Vazia'),
+            updated_at = CURRENT_TIMESTAMP
+        WHERE animal_id = $1
+      `, [parseInt(animalId, 10)])
+
       // Adicionar serie_touro se a coluna existir (compatibilidade)
       let result;
       try {
@@ -126,9 +147,9 @@ export default async function handler(req, res) {
           INSERT INTO inseminacoes (
             animal_id, numero_ia, data_ia, data_dg, resultado_dg,
             touro_nome, touro_rg, serie_touro, tecnico, protocolo,
-            status_gestacao, observacoes, custo_dose,
+            status_gestacao, observacoes, custo_dose, valida,
             created_at, updated_at
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
           RETURNING *
         `, [
           animalId,
@@ -151,9 +172,9 @@ export default async function handler(req, res) {
             INSERT INTO inseminacoes (
               animal_id, numero_ia, data_ia, data_dg, resultado_dg,
               touro_nome, touro_rg, tecnico, protocolo,
-              status_gestacao, observacoes, custo_dose,
+              status_gestacao, observacoes, custo_dose, valida,
               created_at, updated_at
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
             RETURNING *
           `, [
             animalId,

@@ -31,19 +31,33 @@ export default function ConsultaRapida() {
   const [identificado, setIdentificado] = useState(null)
   const [nomeIdent, setNomeIdent] = useState('')
   const [telefoneIdent, setTelefoneIdent] = useState('')
+  const [isDarkMode, setIsDarkMode] = useState(false)
   const serieRef = useRef(null)
   const autoSearchDone = useRef(false)
   const inactivityTimerRef = useRef(null)
+  
+  // Estados para busca por nome
+  const [nomeAnimal, setNomeAnimal] = useState('')
+  const [sugestoes, setSugestoes] = useState([])
+  const [loadingSugestoes, setLoadingSugestoes] = useState(false)
+  const [showSugestoes, setShowSugestoes] = useState(false)
+  const searchTimeoutRef = useRef(null)
 
   // Verificar se já está identificado (localStorage) - localhost pula
   useEffect(() => {
     if (typeof window === 'undefined') return
     
-    // Carregar tema
-    const savedTheme = localStorage.getItem('theme')
+    // Carregar tema - usar a mesma chave que _app.js
+    const savedDarkMode = localStorage.getItem('darkMode')
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+    const shouldBeDark = savedDarkMode === 'true' || (!savedDarkMode && prefersDark)
+    
+    if (shouldBeDark) {
       document.documentElement.classList.add('dark')
+      setIsDarkMode(true)
+    } else {
+      document.documentElement.classList.remove('dark')
+      setIsDarkMode(false)
     }
     
     // Verificar identificação
@@ -151,6 +165,70 @@ export default function ConsultaRapida() {
   useEffect(() => {
     serieRef.current?.focus()
   }, [])
+
+  // Buscar sugestões de animais por nome
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current)
+    }
+
+    const nome = nomeAnimal.trim()
+    if (nome.length < 2) {
+      setSugestoes([])
+      setShowSugestoes(false)
+      return
+    }
+
+    setLoadingSugestoes(true)
+    searchTimeoutRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/animals/buscar-por-nome?nome=${encodeURIComponent(nome)}`)
+        const data = await res.json()
+        
+        if (data.success && Array.isArray(data.data)) {
+          setSugestoes(data.data)
+          setShowSugestoes(data.data.length > 0)
+        } else {
+          setSugestoes([])
+          setShowSugestoes(false)
+        }
+      } catch (err) {
+        console.error('Erro ao buscar sugestões:', err)
+        setSugestoes([])
+        setShowSugestoes(false)
+      } finally {
+        setLoadingSugestoes(false)
+      }
+    }, 300) // Debounce de 300ms
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current)
+      }
+    }
+  }, [nomeAnimal])
+
+  // Fechar sugestões ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showSugestoes && !event.target.closest('.sugestoes-container')) {
+        setShowSugestoes(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showSugestoes])
+
+  // Selecionar animal da lista de sugestões
+  const selecionarAnimal = (animal) => {
+    setSerie(animal.serie || '')
+    setRg(animal.rg || '')
+    setNomeAnimal(animal.nome || '')
+    setShowSugestoes(false)
+    setTouched({ serie: true, rg: true })
+    setError('')
+  }
 
   const handleIdentificacaoSubmit = (e) => {
     e.preventDefault()
@@ -370,19 +448,33 @@ export default function ConsultaRapida() {
                 {/* Toggle Tema Escuro */}
                 <button
                   onClick={() => {
-                    const isDark = document.documentElement.classList.contains('dark')
-                    if (isDark) {
-                      document.documentElement.classList.remove('dark')
-                      localStorage.setItem('theme', 'light')
+                    const newDarkMode = !isDarkMode
+                    
+                    // Atualizar estado
+                    setIsDarkMode(newDarkMode)
+                    
+                    // Salvar no localStorage
+                    localStorage.setItem('darkMode', newDarkMode.toString())
+                    
+                    // Atualizar classe no HTML
+                    const html = document.documentElement
+                    if (newDarkMode) {
+                      html.classList.add('dark')
                     } else {
-                      document.documentElement.classList.add('dark')
-                      localStorage.setItem('theme', 'dark')
+                      html.classList.remove('dark')
                     }
+                    
+                    // Forçar re-render da página inteira
+                    window.location.reload()
                   }}
                   className="bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200 dark:hover:bg-amber-900/50 p-2 rounded-lg transition-all"
-                  title="Alternar Tema"
+                  title={isDarkMode ? "Modo Claro" : "Modo Escuro"}
                 >
-                  <span className="text-xl">🌙</span>
+                  {isDarkMode ? (
+                    <span className="text-xl">☀️</span>
+                  ) : (
+                    <span className="text-xl">🌙</span>
+                  )}
                 </button>
               </div>
             </div>
@@ -421,6 +513,72 @@ export default function ConsultaRapida() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Campo de Busca por Nome */}
+              <div className="relative sugestoes-container">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Buscar por Nome do Animal
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={nomeAnimal}
+                    onChange={(e) => {
+                      setNomeAnimal(e.target.value)
+                      setError('')
+                    }}
+                    onFocus={() => {
+                      if (sugestoes.length > 0) setShowSugestoes(true)
+                    }}
+                    placeholder="Digite o nome do animal..."
+                    className="w-full px-4 py-4 text-lg rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:border-amber-500 focus:ring-amber-500"
+                    autoComplete="off"
+                    disabled={loading}
+                  />
+                  {loadingSugestoes && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <span className="animate-spin rounded-full h-5 w-5 border-2 border-amber-500 border-t-transparent" />
+                    </div>
+                  )}
+                </div>
+                
+                {/* Lista de Sugestões */}
+                {showSugestoes && sugestoes.length > 0 && (
+                  <div className="absolute z-10 w-full mt-2 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-xl max-h-60 overflow-y-auto">
+                    {sugestoes.map((animal, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => selecionarAnimal(animal)}
+                        className="w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-gray-700 transition-colors border-b border-gray-200 dark:border-gray-700 last:border-b-0"
+                      >
+                        <div className="font-semibold text-gray-900 dark:text-white">
+                          {animal.nome}
+                        </div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          Série: <span className="font-medium text-amber-600 dark:text-amber-500">{animal.serie}</span> • RG: <span className="font-medium text-amber-600 dark:text-amber-500">{animal.rg}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                
+                {nomeAnimal.length >= 2 && !loadingSugestoes && sugestoes.length === 0 && (
+                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    Nenhum animal encontrado com esse nome
+                  </p>
+                )}
+              </div>
+
+              {/* Divisor */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">ou busque por Série e RG</span>
+                </div>
+              </div>
+
               {/* Campo Série */}
               <div className="relative">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

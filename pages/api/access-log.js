@@ -4,7 +4,8 @@ import { sendSuccess, sendError, sendMethodNotAllowed, asyncHandler } from '../.
 function isMobileUserAgent(ua) {
   if (!ua || typeof ua !== 'string') return false
   const u = ua.toLowerCase()
-  return /mobile|android|iphone|ipad|ipod|webos|blackberry|iemobile|opera mini|tablet|kindle|silk|fennec|mobile safari/i.test(u)
+  // Detecção mais abrangente de dispositivos mobile
+  return /mobile|android|iphone|ipad|ipod|webos|blackberry|iemobile|opera mini|tablet|kindle|silk|fennec|mobile safari|windows phone|symbian|palm|nokia|samsung|lg|htc|motorola|xiaomi|huawei|oppo|vivo|realme|oneplus/i.test(u)
 }
 
 function parseUserAgent(ua) {
@@ -151,9 +152,18 @@ async function handler(req, res) {
 
       const rows = result.rows.map(r => {
         const parsed = parseUserAgent(r.user_agent)
+        const isMob = isMobileUserAgent(r.user_agent)
+        // Log para debug: registrar todos os user agents para análise
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Access log:', {
+            user: r.user_name,
+            isMobile: isMob,
+            ua: r.user_agent?.substring(0, 100)
+          })
+        }
         return {
           ...r,
-          is_mobile: isMobileUserAgent(r.user_agent),
+          is_mobile: isMob,
           browser: parsed.browser,
           os: parsed.os,
           device: parsed.device

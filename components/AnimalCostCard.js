@@ -25,15 +25,15 @@ export default function AnimalCostCard({ animal, onUpdateCosts }) {
     try {
       const { default: costManager } = await import('../services/costManager')
       
-      const custosAnimal = costManager.getCustosAnimal(animal.id)
-      const total = costManager.getCustoTotal(animal.id)
+      const custosAnimal = await costManager.getCustosAnimal(animal.id)
+      const arr = Array.isArray(custosAnimal) ? custosAnimal : []
+      const total = arr.reduce((sum, custo) => sum + (parseFloat(custo.valor || 0) || 0), 0)
       
-      setCustos(custosAnimal)
+      setCustos(arr)
       setCustoTotal(total)
       
-      // Verificar status dos protocolos
-      const temProtocolo = custosAnimal.some(c => c.tipo === 'Protocolo Sanitário')
-      const temDNA = custosAnimal.some(c => c.tipo === 'DNA')
+      const temProtocolo = arr.some(c => c.tipo === 'Protocolo Sanitário')
+      const temDNA = arr.some(c => c.tipo === 'DNA')
       
       setProtocoloStatus(temProtocolo ? 'completo' : 'pendente')
       setDnaStatus(temDNA ? 'completo' : 'pendente')
@@ -52,7 +52,7 @@ export default function AnimalCostCard({ animal, onUpdateCosts }) {
     try {
       const { default: costManager } = await import('../services/costManager')
       
-      const resultado = costManager.aplicarProtocolo(animal.id, animal, 'Aplicação automática via card')
+      const resultado = await costManager.aplicarProtocolo(animal.id, animal, 'Aplicação automática via card')
       
       if (resultado) {
         loadCustos()
@@ -72,9 +72,9 @@ export default function AnimalCostCard({ animal, onUpdateCosts }) {
     try {
       const { default: costManager } = await import('../services/costManager')
       
-      const custosDNA = costManager.adicionarCustoDNA(animal.id, animal)
+      const custosDNA = await costManager.adicionarCustoDNA(animal.id, animal)
       
-      if (custosDNA.length > 0) {
+      if (Array.isArray(custosDNA) && custosDNA.length > 0) {
         loadCustos()
         const total = custosDNA.reduce((sum, c) => sum + c.valor, 0)
         const tipos = custosDNA.map(c => c.subtipo).join(', ')

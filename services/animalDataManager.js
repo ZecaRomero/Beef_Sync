@@ -180,7 +180,7 @@ class AnimalDataManager {
           'tipo_nascimento', 'dificuldade_parto', 'meses', 'situacao', 
           'pai', 'mae', 'avo_materno', 'receptora', 'is_fiv', 
           'custo_total', 'valor_venda', 'valor_real', 'veterinario', 
-          'abczg', 'deca', 'situacao_abcz', 'observacoes', 'boletim', 'local_nascimento', 'pasto_atual',
+          'abczg', 'deca', 'situacao_abcz', 'observacoes', 'boletim', 'local_nascimento', 'pasto_atual', 'piquete_atual',
           'serie_pai', 'rg_pai', 'serie_mae', 'rg_mae'
         ]
 
@@ -189,9 +189,33 @@ class AnimalDataManager {
           const campoBanco = this.mapearCampoFrontendParaBanco(key)
           // Apenas incluir se for uma coluna válida
           if (campoBanco && validColumns.includes(campoBanco)) {
-            dadosParaAtualizar[campoBanco] = dadosAtualizados[key]
+            let valor = dadosAtualizados[key]
+            // Normalizar data vazia para null (evita erro no PostgreSQL DATE)
+            if (campoBanco === 'data_nascimento' && (valor === '' || valor === undefined)) {
+              valor = null
+            }
+            dadosParaAtualizar[campoBanco] = valor
           }
         })
+        // Garantir que pasto_atual e piquete_atual fiquem sincronizados
+        if (dadosParaAtualizar.pasto_atual !== undefined) {
+          dadosParaAtualizar.piquete_atual = dadosParaAtualizar.pasto_atual
+        }
+
+        // Garantir envio explícito de campos que costumam falhar ao salvar
+        const dataNasc = dadosAtualizados.dataNascimento ?? dadosAtualizados.data_nascimento
+        const pasto = dadosAtualizados.pastoAtual ?? dadosAtualizados.pasto_atual
+        const situacaoAbcz = dadosAtualizados.situacaoAbcz ?? dadosAtualizados.situacao_abcz
+        if (dataNasc !== undefined && dataNasc !== null && dataNasc !== '') {
+          dadosParaAtualizar.data_nascimento = String(dataNasc).substring(0, 10)
+        }
+        if (pasto !== undefined && pasto !== null && pasto !== '') {
+          dadosParaAtualizar.pasto_atual = String(pasto).trim()
+          dadosParaAtualizar.piquete_atual = dadosParaAtualizar.pasto_atual
+        }
+        if (situacaoAbcz !== undefined && situacaoAbcz !== null) {
+          dadosParaAtualizar.situacao_abcz = String(situacaoAbcz).trim() || null
+        }
         
         const response = await fetch(`/api/animals/${id}`, {
           method: 'PUT',

@@ -276,13 +276,16 @@ async function handleGet(req, res, id) {
 }
 
 async function handlePut(req, res, id) {
-  console.log(`📝 Recebido PUT para animal ${id}:`, req.body);
+  const dataNasc = req.body.dataNascimento ?? req.body.data_nascimento
+  const pasto = req.body.pastoAtual ?? req.body.pasto_atual
+  console.log(`📝 PUT animal ${id} | data_nascimento:`, dataNasc, '| pasto_atual:', pasto)
+  
   const animal = await databaseService.atualizarAnimal(id, req.body)
   
-  // Se não retornou registro, evitar acessar propriedades indefinidas
   if (!animal) {
     return sendNotFound(res, 'Animal não encontrado para atualização')
   }
+  console.log(`✅ Animal ${id} atualizado | data_nascimento:`, animal.data_nascimento, '| pasto_atual:', animal.pasto_atual)
   
   // DESABILITADO: Não criar nota fiscal de saída automaticamente
   // A NF deve ser criada manualmente através do módulo de Notas Fiscais

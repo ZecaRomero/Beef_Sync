@@ -34,6 +34,19 @@ const AnimalCard = memo(({ animal, onView, onEdit, onDelete }) => {
   }, [])
 
   const badgeVariant = useMemo(() => getSituationBadge(animal.situacao), [animal.situacao, getSituationBadge])
+  
+  // Calcular idade em meses
+  const idadeMeses = useMemo(() => {
+    if (!animal.data_nascimento) return null
+    const nascimento = new Date(animal.data_nascimento)
+    const hoje = new Date()
+    const diffTime = Math.abs(hoje - nascimento)
+    const diffMonths = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 30.44))
+    return diffMonths
+  }, [animal.data_nascimento])
+  
+  // Pegar localização
+  const localizacao = animal.pasto_atual || animal.piquete_atual || animal.pastoAtual || animal.piqueteAtual
 
   return (
     <Card className="hover:shadow-md transition-shadow">
@@ -49,14 +62,38 @@ const AnimalCard = memo(({ animal, onView, onEdit, onDelete }) => {
               </Badge>
             </div>
             
+            {animal.nome && (
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {animal.nome}
+              </p>
+            )}
+            
             <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
-              <p><span className="font-medium">Sexo:</span> {animal.sexo}</p>
-              <p><span className="font-medium">Raça:</span> {animal.raca}</p>
+              <div className="flex items-center gap-4">
+                <p><span className="font-medium">Sexo:</span> {animal.sexo}</p>
+                <p><span className="font-medium">Raça:</span> {animal.raca}</p>
+              </div>
+              
+              {idadeMeses !== null && (
+                <p><span className="font-medium">Idade:</span> {idadeMeses} meses</p>
+              )}
+              
               {animal.peso && (
                 <p><span className="font-medium">Peso:</span> {animal.peso}kg</p>
               )}
-              {animal.data_nascimento && (
-                <p><span className="font-medium">Nascimento:</span> {new Date(animal.data_nascimento).toLocaleDateString()}</p>
+              
+              {localizacao && (
+                <p className="flex items-center gap-1">
+                  <span className="font-medium">📍 Local:</span> 
+                  <span className="text-amber-600 dark:text-amber-400 font-semibold">{localizacao}</span>
+                </p>
+              )}
+              
+              {(animal.abczg || animal.abczg === 0) && (
+                <p className="flex items-center gap-1">
+                  <span className="font-medium">🏆 iABCZ:</span> 
+                  <span className="text-blue-600 dark:text-blue-400 font-bold">{animal.abczg}</span>
+                </p>
               )}
             </div>
           </div>

@@ -13,29 +13,6 @@ import DevLiveReload from "../components/DevLiveReload";
 import logger from "../utils/logger";
 
 
-// Debug para interceptar erros de total_tokens
-if (typeof window !== 'undefined') {
-  // Interceptar erros globais
-  window.addEventListener('error', (event) => {
-    if (event.error && event.error.message && event.error.message.includes('total_tokens')) {
-      console.error('🚨 Erro total_tokens capturado:', {
-        message: event.error.message,
-        stack: event.error.stack,
-        filename: event.filename,
-        lineno: event.lineno,
-        colno: event.colno
-      });
-    }
-  });
-  
-  // Interceptar erros de promise rejeitadas
-  window.addEventListener('unhandledrejection', (event) => {
-    if (event.reason && event.reason.message && event.reason.message.includes('total_tokens')) {
-      console.error('🚨 Promise rejection total_tokens capturada:', event.reason);
-    }
-  });
-}
-
 export default function App({ Component, pageProps }) {
   const router = useRouter();
   const [darkMode, setDarkMode] = useState(false);
@@ -58,6 +35,8 @@ export default function App({ Component, pageProps }) {
             if (tel) telefone = tel
           }
         } catch (_) {}
+        // Usuários externos sem identificação: não registrar aqui - o overlay/página identificar fará quando tiverem nome
+        if (userType === 'external' && userName === 'Usuário Externo') return
         fetch('/api/access-log', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -83,20 +62,20 @@ export default function App({ Component, pageProps }) {
               value.includes('usage') ||
               value.includes('completion')
             )) {
-              console.warn(`Removendo dados corrompidos: ${key}`);
+              logger.warn('Removendo dados corrompidos do localStorage', { key });
               localStorage.removeItem(key);
             }
           } catch (e) {
-            console.error(`Erro ao verificar localStorage[${key}]:`, e);
+            logger.error('Erro ao verificar localStorage', { key, error: e?.message });
             try {
               localStorage.removeItem(key);
             } catch (removeError) {
-              console.error(`Erro ao remover localStorage[${key}]:`, removeError);
+              logger.error('Erro ao remover item do localStorage', { key, error: removeError?.message });
             }
           }
         });
       } catch (error) {
-        console.error('Erro na limpeza preventiva:', error);
+        logger.error('Erro na limpeza preventiva do localStorage', { error: error?.message });
       }
       
       const isDark = localStorage.getItem("darkMode") === "true";

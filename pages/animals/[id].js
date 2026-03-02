@@ -260,9 +260,11 @@ export default function AnimalDetail() {
             const r = String(ia.resultado_dg || ia.status_gestacao || '').toLowerCase()
             return r.includes('prenha') || r.includes('pren') || r.includes('positivo') || r.trim() === 'p'
           }
-          const iaPrenha = ordenada.find(ehPrenha)
-          const naoVazias = ordenada.filter(ia => !ehVazia(ia))
-          const iaParaExibir = iaPrenha || naoVazias[0] || ordenada[0]
+          const validas = ordenada.filter(ia => ia.valida !== false)
+          const listaParaEscolher = validas.length > 0 ? validas : ordenada
+          const iaPrenha = listaParaEscolher.find(ehPrenha)
+          const naoVazias = listaParaEscolher.filter(ia => !ehVazia(ia))
+          const iaParaExibir = iaPrenha || naoVazias[0] || listaParaEscolher[0] || ordenada[0]
           setUltimaIA(iaParaExibir)
         } else {
           setUltimaIA(null)
@@ -288,8 +290,8 @@ export default function AnimalDetail() {
       animal.sexo.toLowerCase().includes('macho')
     )
     const eventos = []
-    // IA
-    if (ultimaIA?.data_inseminacao || ultimaIA?.data) {
+    // IA (API retorna data_ia; aceitar data_inseminacao e data para compatibilidade)
+    if (ultimaIA?.data_ia || ultimaIA?.data_inseminacao || ultimaIA?.data) {
       const d = ultimaIA.data_ia || ultimaIA.data_inseminacao || ultimaIA.data
       eventos.push({
         data: d,

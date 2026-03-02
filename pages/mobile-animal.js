@@ -10,7 +10,8 @@ import {
   DocumentArrowUpIcon,
   XMarkIcon,
   TrophyIcon,
-  ChatBubbleLeftRightIcon
+  ChatBubbleLeftRightIcon,
+  ArrowPathIcon
 } from '@heroicons/react/24/outline'
 
 export default function MobileAnimal() {
@@ -31,6 +32,32 @@ export default function MobileAnimal() {
   const [ranking, setRanking] = useState([])
   const [rankingPeso, setRankingPeso] = useState([])
   const [rankingCE, setRankingCE] = useState([])
+  const [sincronizandoNascimento, setSincronizandoNascimento] = useState(false)
+  const [toastSync, setToastSync] = useState(null)
+
+  const sincronizarNascimentos = async () => {
+    setSincronizandoNascimento(true)
+    setToastSync(null)
+    try {
+      const res = await fetch('/api/animals/sync-nascimento', { method: 'POST' })
+      const data = await res.json()
+      if (data.success && data.data) {
+        setToastSync({ tipo: 'ok', msg: data.data.mensagem || `${data.data.atualizados} animal(is) atualizado(s)` })
+        if (data.data.atualizados > 0) {
+          const r = await fetch('/api/animals?orderBy=created_at')
+          const d = await r.json()
+          if (d.success && d.data) setAllAnimals(d.data)
+        }
+      } else {
+        setToastSync({ tipo: 'erro', msg: data.message || 'Erro ao sincronizar' })
+      }
+    } catch (e) {
+      setToastSync({ tipo: 'erro', msg: 'Erro de conexão' })
+    } finally {
+      setSincronizandoNascimento(false)
+      setTimeout(() => setToastSync(null), 4000)
+    }
+  }
 
   // Carregar todos os animais e ranking
   useEffect(() => {
@@ -232,6 +259,14 @@ export default function MobileAnimal() {
           <h1 className="text-xl font-bold text-white">Beef-Sync Mobile</h1>
           <div className="flex gap-2">
             <button
+              onClick={sincronizarNascimentos}
+              disabled={sincronizandoNascimento}
+              className="p-2 rounded-lg bg-amber-500/80 hover:bg-amber-500 disabled:opacity-50 text-white"
+              title="Sincronizar data de nascimento (nascimentos → animais)"
+            >
+              <ArrowPathIcon className={`h-5 w-5 ${sincronizandoNascimento ? 'animate-spin' : ''}`} />
+            </button>
+            <button
               onClick={() => router.push('/mobile-feedback')}
               className="p-2 rounded-lg bg-green-600 hover:bg-green-700 text-white"
               title="Enviar Feedback"
@@ -247,6 +282,15 @@ export default function MobileAnimal() {
             </button>
           </div>
         </div>
+
+        {/* Toast sincronização nascimentos */}
+        {toastSync && (
+          <div className={`fixed top-20 left-4 right-4 z-50 p-4 rounded-xl shadow-lg ${
+            toastSync.tipo === 'ok' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+          }`}>
+            {toastSync.msg}
+          </div>
+        )}
 
         {/* Modal Importação */}
         {showImportModal && (

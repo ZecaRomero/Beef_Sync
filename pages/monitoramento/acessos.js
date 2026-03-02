@@ -75,6 +75,7 @@ export default function AcessosSistema() {
     { key: 'receptoras_faltam_parir', label: 'Receptoras que Faltam Parir' },
     { key: 'receptoras_faltam_diagnostico', label: 'Receptoras que Faltam Diagnóstico' },
     { key: 'calendario_reprodutivo', label: '📅 Calendário Reprodutivo' },
+    { key: 'agenda_atividades', label: '📋 Agenda de Atividades' },
     { key: 'mortes', label: 'Mortes' },
     { key: 'vacinacoes', label: 'Vacinações' },
     { key: 'ocorrencias', label: 'Ocorrências' },
@@ -540,6 +541,74 @@ export default function AcessosSistema() {
                       <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{log.os || '-'}</td>
                       <td className="px-4 py-2 text-gray-600 dark:text-gray-400" title={log.user_agent}>
                         {log.device || '-'}
+                      </td>
+                      <td className="px-4 py-2 text-gray-500 dark:text-gray-500 whitespace-nowrap">
+                        {log.access_time ? new Date(log.access_time).toLocaleString('pt-BR') : '-'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+
+        {/* Debug: Acessos mobile com detalhes completos */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-amber-200 dark:border-amber-700 overflow-hidden">
+          <div className="p-4 border-b border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20">
+            <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <WrenchScrewdriverIcon className="h-5 w-5 text-amber-600" />
+              Debug: Acessos Mobile Completos
+            </h2>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+              Mostra TODOS os celulares detectados com informações completas do User-Agent
+            </p>
+          </div>
+          <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
+            {logs.filter(log => log.is_mobile).length === 0 ? (
+              <div className="p-8 text-center">
+                <DevicePhoneMobileIcon className="h-16 w-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
+                <p className="text-gray-500 dark:text-gray-400 font-medium">Nenhum acesso mobile detectado</p>
+              </div>
+            ) : (
+              <table className="w-full text-sm min-w-[900px]">
+                <thead className="bg-amber-50 dark:bg-amber-900/20 sticky top-0">
+                  <tr>
+                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">Usuário</th>
+                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">Telefone</th>
+                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">IP/Host</th>
+                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">Browser</th>
+                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">Sistema</th>
+                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">Aparelho</th>
+                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">User-Agent</th>
+                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">Data/Hora</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {logs.filter(log => log.is_mobile).map((log) => (
+                    <tr key={`debug-${log.id}`} className="border-t border-amber-100 dark:border-amber-800 hover:bg-amber-50 dark:hover:bg-amber-900/10">
+                      <td className="px-4 py-2 font-medium text-gray-900 dark:text-white">{log.user_name}</td>
+                      <td className="px-4 py-2">
+                        {log.telefone ? (
+                          <a href={`tel:${log.telefone}`} className="text-emerald-600 dark:text-emerald-400 hover:underline font-mono">
+                            {log.telefone.length === 11
+                              ? log.telefone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
+                              : log.telefone.length === 10
+                              ? log.telefone.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3')
+                              : log.telefone}
+                          </a>
+                        ) : (
+                          <span className="text-gray-400">-</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400 font-mono text-xs">
+                        {log.ip_address || log.hostname || '-'}
+                      </td>
+                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{log.browser || '-'}</td>
+                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{log.os || '-'}</td>
+                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{log.device || '-'}</td>
+                      <td className="px-4 py-2 text-gray-500 dark:text-gray-500 text-xs max-w-xs truncate" title={log.user_agent}>
+                        {log.user_agent || '-'}
                       </td>
                       <td className="px-4 py-2 text-gray-500 dark:text-gray-500 whitespace-nowrap">
                         {log.access_time ? new Date(log.access_time).toLocaleString('pt-BR') : '-'}

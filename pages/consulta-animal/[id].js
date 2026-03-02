@@ -122,7 +122,18 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
     if (!id) return
     setLoading(true)
     setError(null)
+    // Limpar TODOS os estados ao trocar de animal
+    setAnimal(null)
     setExamesAndrologicos([])
+    setOcorrencias([])
+    setTransferencias([])
+    setUltimoCE(null)
+    setUltimaIA(null)
+    setInseminacoesFetch(null)
+    setPrevisaoPartoIA(null)
+    setRankingPosicao(null)
+    setFilhoTopRanking(null)
+    
     fetch(`/api/animals/${id}?history=true`)
       .then((r) => r.json())
       .then((data) => {
@@ -353,6 +364,22 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
   const dataChegada = animal.data_chegada || animal.dataChegada
   const diasNaFazenda = dataChegada ? Math.floor((new Date() - new Date(dataChegada)) / (1000 * 60 * 60 * 24)) : null
 
+  // Macho ou Fêmea (declarar antes de elegivelBrucelose/precisaBrucelose)
+  const isMacho = animal.sexo && (String(animal.sexo).toLowerCase().includes('macho') || animal.sexo === 'M')
+  const isFemea = animal.sexo && (String(animal.sexo).toLowerCase().includes('fêmea') || String(animal.sexo).toLowerCase().includes('femea') || animal.sexo === 'F')
+
+  // Idade em dias (para regras Brucelose e DGT)
+  const idadeDias = animal.data_nascimento ? Math.floor((new Date() - new Date(animal.data_nascimento)) / (1000 * 60 * 60 * 24)) : null
+  const temBrucelose = custosArray.some(c => {
+    const t = String(c.tipo || '').toLowerCase()
+    const s = String(c.subtipo || '').toLowerCase()
+    const o = String(c.observacoes || '').toLowerCase()
+    return (t.includes('vacina') || t.includes('vacinação')) && (s.includes('brucelose') || o.includes('brucelose'))
+  })
+  const elegivelBrucelose = isFemea && idadeDias != null && idadeDias >= 90 && idadeDias <= 240 && !temBrucelose
+  const precisaBrucelose = isFemea && idadeDias != null && idadeDias <= 240 && !temBrucelose
+  const elegivelDGT = idadeDias != null && idadeDias >= 330 && idadeDias <= 640
+
   // Gestação: dias de gestação e countdown
   const dataTE = animal.data_te || animal.dataTE
   const inseminacoesParaExibir = inseminacoesFetch ?? animal.inseminacoes ?? []
@@ -392,9 +419,6 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
     ? (totalOocitos / animal.fivs.length).toFixed(1)
     : null
 
-  // Macho ou Fêmea
-  const isMacho = animal.sexo && (String(animal.sexo).toLowerCase().includes('macho') || animal.sexo === 'M')
-  const isFemea = animal.sexo && (String(animal.sexo).toLowerCase().includes('fêmea') || String(animal.sexo).toLowerCase().includes('femea') || animal.sexo === 'F')
   const aptaReproducao = isFemea && mesesIdade >= 15 && !isPrenha && !(animal.data_te || animal.dataTE)
 
   // Taxa de sucesso reprodutivo (fêmeas)
@@ -419,9 +443,14 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
     ? Math.floor((dataProximoExame - new Date()) / (1000 * 60 * 60 * 24))
     : null
 
-  // Linha do tempo: eventos recentes (SEM peso e CE para evitar repetição)
+  // Linha do tempo: eventos recentes (preferir IAs válidas; incluir data_ia/data_inseminacao)
   const eventos = []
-  inseminacoesParaExibir?.slice(0, 3).forEach(ia => eventos.push({ data: ia.data_ia || ia.data, tipo: 'IA', label: `Inseminação - ${ia.touro_nome || ia.touro}` }))
+  const iasValidas = (inseminacoesParaExibir || []).filter(ia => ia.valida !== false)
+  const iasParaTimeline = iasValidas.length > 0 ? iasValidas : (inseminacoesParaExibir || [])
+  iasParaTimeline.slice(0, 3).forEach(ia => {
+    const d = ia.data_ia || ia.data_inseminacao || ia.data
+    if (d) eventos.push({ data: d, tipo: 'IA', label: `Inseminação - ${ia.touro_nome || ia.touro}` })
+  })
   animal.fivs?.slice(0, 2).forEach(f => eventos.push({ data: f.data_fiv, tipo: 'FIV', label: `Coleta - ${f.quantidade_oocitos} oócitos` }))
   // Removido pesagens da timeline para evitar repetição com a seção Pesagens
   examesAndrologicos.slice(0, 2).forEach(ex => eventos.push({ data: ex.data_exame, tipo: 'Andrológico', label: ex.resultado }))
@@ -886,6 +915,56 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
             )}
           </div>
 
+          {/* Planejamento: Brucelose e DGT */}
+          {(elegivelBrucelose || elegivelDGT || temBrucelose) && (
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-5 border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-2 mb-3">
+                <ShieldCheckIcon className="h-6 w-6 text-amber-500" />
+                <h3 className="font-bold text-gray-900 dark:text-white">Planejamento / Obrigações</h3>
+              </div>
+              <div className="space-y-3 text-sm">
+                {isFemea && (
+                  <div className={`p-3 rounded-xl border ${
+                    elegivelBrucelose ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-300 dark:border-amber-700' :
+                    temBrucelose ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700' :
+                    precisaBrucelose ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-600' : ''
+                  }`}>
+                    <p className="font-semibold text-gray-900 dark:text-white">Vacina Brucelose (obrigatório fêmeas 3-8 meses)</p>
+                    {temBrucelose ? (
+                      <p className="text-green-600 dark:text-green-400 mt-1">✓ Já vacinada</p>
+                    ) : elegivelBrucelose ? (
+                      <p className="text-amber-600 dark:text-amber-400 mt-1">⚠️ Elegível agora ({idadeDias} dias) – agendar vacinação</p>
+                    ) : precisaBrucelose ? (
+                      <p className="text-gray-600 dark:text-gray-400 mt-1">
+                        {idadeDias < 90 ? `Aguardar até 90 dias (atual: ${idadeDias}d)` : `Janela encerrada (${idadeDias}d > 240d)`}
+                      </p>
+                    ) : null}
+                  </div>
+                )}
+                <div className={`p-3 rounded-xl border ${
+                  elegivelDGT ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-300 dark:border-emerald-700' :
+                  'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-600'
+                }`}>
+                  <p className="font-semibold text-gray-900 dark:text-white">Avaliação DGT (330-640 dias)</p>
+                  {elegivelDGT ? (
+                    <p className="text-emerald-600 dark:text-emerald-400 mt-1">✓ Elegível para avaliação ({idadeDias} dias)</p>
+                  ) : idadeDias != null ? (
+                    <p className="text-gray-600 dark:text-gray-400 mt-1">
+                      {idadeDias < 330 ? `Aguardar até 330 dias (atual: ${idadeDias}d)` : `Fora da janela (${idadeDias}d > 640d)`}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+              <Link
+                href="/planejamento/agenda"
+                className="inline-flex items-center gap-2 mt-3 text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium"
+              >
+                Ver agenda de planejamento
+                <ArrowTopRightOnSquareIcon className="h-4 w-4" />
+              </Link>
+            </div>
+          )}
+
           {/* Countdown próximo exame andrológico - INAPTOS */}
           {isInapto && dataProximoExame && (
             <div className="bg-gradient-to-r from-red-500 to-rose-600 rounded-2xl shadow-lg p-5 text-white">
@@ -1339,8 +1418,14 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
               </button>
               <div className={`overflow-hidden transition-all ${secoesExpandidas.inseminacoes ? 'max-h-[999px]' : 'max-h-0'}`}>
               <div className="divide-y divide-gray-100 dark:divide-gray-700">
-                {inseminacoesParaExibir.map((ia, i) => (
-                  <div key={ia.id || i} className="px-4 py-3 flex justify-between items-start">
+                {inseminacoesParaExibir.map((ia, i) => {
+                  const dataIA = ia.data_ia || ia.data_inseminacao || ia.data
+                  const diasDesdeIA = dataIA ? Math.floor((new Date() - new Date(dataIA)) / (1000 * 60 * 60 * 24)) : 0
+                  const ehPrenha = /pren/i.test(String(ia.resultado_dg || ia.status_gestacao || ''))
+                  const maisDe4Meses = diasDesdeIA > 120
+                  const invalida = ia.valida === false || (maisDe4Meses && !ehPrenha)
+                  return (
+                  <div key={ia.id || i} className={`px-4 py-3 flex justify-between items-start ${invalida ? 'opacity-75' : ''}`}>
                     <div>
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
                         {formatDate(ia.data_ia || ia.data)}
@@ -1348,15 +1433,22 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
                       <p className="text-xs text-gray-500 dark:text-gray-400">
                         {ia.touro_nome || ia.touro || '-'}
                       </p>
-                      {ia.resultado_dg && (
-                        <span className={`inline-block mt-1 px-2 py-0.5 rounded text-xs font-medium ${
-                          String(ia.resultado_dg).toLowerCase().includes('prenha') ? 'bg-green-100 text-green-800 dark:bg-green-900/40' :
-                          String(ia.resultado_dg).toLowerCase().includes('vazia') ? 'bg-gray-100 text-gray-700 dark:bg-gray-700' :
-                          'bg-amber-100 text-amber-800 dark:bg-amber-900/40'
-                        }`}>
-                          DG: {ia.resultado_dg}
-                        </span>
-                      )}
+                      <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                        {ia.resultado_dg && (
+                          <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
+                            String(ia.resultado_dg).toLowerCase().includes('prenha') ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200' :
+                            String(ia.resultado_dg).toLowerCase().includes('vazia') ? 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200' :
+                            'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200'
+                          }`}>
+                            DG: {ia.resultado_dg}
+                          </span>
+                        )}
+                        {invalida && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 font-medium">
+                            Inválida
+                          </span>
+                        )}
+                      </div>
                     </div>
                     {ia.tipo === 'TE' && (
                       <span className="px-2 py-0.5 rounded text-xs font-medium bg-pink-100 text-pink-800 dark:bg-pink-900/40 shrink-0">
@@ -1364,7 +1456,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
                       </span>
                     )}
                   </div>
-                ))}
+                )})}
               </div>
               </div>
             </div>

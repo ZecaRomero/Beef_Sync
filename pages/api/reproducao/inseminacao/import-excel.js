@@ -64,9 +64,18 @@ export default asyncHandler(async function handler(req, res) {
         // Processar até 3 inseminações
         const inseminacoes = []
 
+        await client.query('ALTER TABLE inseminacoes ADD COLUMN IF NOT EXISTS valida BOOLEAN DEFAULT true').catch(() => {})
+
         for (let i = 1; i <= 3; i++) {
           const dataIA = converterData(item[`data_ia${i}`] || item[`dataIA${i}`])
           if (!dataIA) continue
+
+          await client.query(`
+            UPDATE inseminacoes SET valida = false, status_gestacao = 'Vazia',
+              resultado_dg = COALESCE(NULLIF(TRIM(resultado_dg), ''), 'Vazia'),
+              updated_at = CURRENT_TIMESTAMP
+            WHERE animal_id = $1
+          `, [animal.id])
 
           const touro = item[`touro${i}`] || item[`touro_${i}`] || null
           const serieTouro = item[`serie_touro${i}`] || item[`serieTouro${i}`] || null

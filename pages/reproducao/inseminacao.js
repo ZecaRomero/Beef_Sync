@@ -1780,6 +1780,9 @@ export default function InseminacaoArtificial() {
                     Data
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Custo
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -1788,14 +1791,27 @@ export default function InseminacaoArtificial() {
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {inseminacoes.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                {inseminacoes.map((item) => {
+                  const dataIA = item.data_ia || item.data_inseminacao || item.data
+                  const diasDesdeIA = dataIA ? Math.floor((new Date() - new Date(dataIA)) / (1000 * 60 * 60 * 24)) : 0
+                  const ehPrenha = /pren/i.test(item.status_gestacao || item.resultado_dg || '')
+                  const maisDe4Meses = diasDesdeIA > 120
+                  const invalida = item.valida === false || (maisDe4Meses && !ehPrenha)
+                  return (
+                  <tr key={item.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700 ${invalida ? 'opacity-60 bg-gray-50 dark:bg-gray-800/50' : ''}`}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <HeartIcon className="h-5 w-5 text-pink-500 mr-2" />
                         <div>
-                          <div className="text-sm font-medium text-gray-900 dark:text-white">
-                            {`${(item.animal_serie || item.serie || '')} ${(item.animal_rg || item.rg || '')}`.trim() || '-'}
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-gray-900 dark:text-white">
+                              {`${(item.animal_serie || item.serie || '')} ${(item.animal_rg || item.rg || '')}`.trim() || '-'}
+                            </span>
+                            {invalida && (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                                Inválida
+                              </span>
+                            )}
                           </div>
                           <div className="text-xs text-gray-500 dark:text-gray-400">
                             {item.animal_nome || item.animal_tatuagem || item.animal || '-'}
@@ -1832,6 +1848,15 @@ export default function InseminacaoArtificial() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`text-xs font-medium px-2 py-1 rounded ${
+                        /pren/i.test(item.status_gestacao || item.resultado_dg || '') ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' :
+                        /vazia/i.test(item.status_gestacao || item.resultado_dg || '') ? 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300' :
+                        'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300'
+                      }`}>
+                        {item.status_gestacao || item.resultado_dg || 'Pendente'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-semibold text-gray-900 dark:text-white">
                         R$ {(item.custo_dose || item.custo_valor || 18.00).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </div>
@@ -1854,7 +1879,7 @@ export default function InseminacaoArtificial() {
                       </div>
                     </td>
                   </tr>
-                ))}
+                )})}
               </tbody>
             </table>
           </div>

@@ -179,6 +179,7 @@ const navigation: NavigationItem[] = [
     color: 'text-rose-600 dark:text-rose-400',
     children: [
       { name: 'Agenda de Atividades', href: '/planejamento/agenda', description: 'Cronograma de atividades' },
+      { name: 'Envio de Relatórios', href: '/relatorios-envio', description: 'Enviar relatórios por email e WhatsApp' },
       { name: 'Metas e Objetivos', href: '/planejamento/metas', description: 'Definir metas' },
       { name: 'Orçamento', href: '/planejamento/orcamento', description: 'Planejamento financeiro' },
       { name: 'Projeções', href: '/planejamento/projecoes', description: 'Projeções futuras' }
@@ -199,8 +200,7 @@ const navigation: NavigationItem[] = [
       { name: 'Gerador de Relatórios', href: '/reports-manager', description: 'Criar relatórios' },
       { name: 'Relatórios de Ocorrências', href: '/relatorios-ocorrencias', description: 'Análise de eventos' },
       { name: 'Histórico de Lançamentos', href: '/relatorios-lotes', description: 'Rastreamento de operações' },
-      { name: 'Relatórios Personalizados', href: '/relatorios-personalizados', description: 'Relatórios customizados' },
-      { name: 'Envio de Relatórios', href: '/relatorios-envio', description: 'Enviar relatórios por email e WhatsApp' }
+      { name: 'Relatórios Personalizados', href: '/relatorios-personalizados', description: 'Relatórios customizados' }
     ]
   },
   {

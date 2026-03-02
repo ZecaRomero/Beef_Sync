@@ -8,6 +8,9 @@ import { sendSuccess, sendError, sendMethodNotAllowed } from '../../../utils/api
 
 const TIPOS_RELATORIOS = [
   { key: 'resumo_geral', label: '📊 Visão Geral', category: 'Gestão' },
+  { key: 'agenda_atividades', label: 'Agenda de Atividades', category: 'Gestão' },
+  { key: 'femeas_brucelose', label: '💉 Fêmeas para Brucelose', category: 'Sanidade' },
+  { key: 'animais_dgt', label: '📋 Animais para DGT', category: 'Sanidade' },
   { key: 'pesagens', label: 'Pesagens', category: 'Manejo' },
   { key: 'resumo_pesagens', label: 'Resumo de Pesagens', category: 'Manejo' },
   { key: 'inseminacoes', label: 'Inseminações', category: 'Reprodução' },
@@ -22,7 +25,7 @@ const TIPOS_RELATORIOS = [
   { key: 'receptoras_chegaram', label: 'Receptoras que Chegaram', category: 'Reprodução' },
   { key: 'receptoras_faltam_parir', label: 'Receptoras que Faltam Parir', category: 'Reprodução' },
   { key: 'receptoras_faltam_diagnostico', label: 'Receptoras que Faltam Diagnóstico', category: 'Reprodução' },
-  { key: 'calendario_reprodutivo', label: '📅 Calendário Reprodutivo', category: 'Reprodução' },
+  { key: 'calendario_reprodutivo', label: 'Calendário Reprodutivo', category: 'Reprodução' },
   { key: 'mortes', label: 'Mortes', category: 'Sanidade' },
   { key: 'vacinacoes', label: 'Vacinações', category: 'Sanidade' },
   { key: 'ocorrencias', label: 'Ocorrências', category: 'Sanidade' },
@@ -389,6 +392,203 @@ export default async function handler(req, res) {
         break
       }
 
+      case 'agenda_atividades': {
+        try {
+          // Buscar eventos de Brucelose e DGT usando a mesma lógica da API agenda-eventos
+          const hoje = new Date()
+          const mesAtual = hoje.getMonth() + 1
+          const anoAtual = hoje.getFullYear()
+          
+          // Brucelose: Fêmeas entre 3 e 8 meses (90-240 dias) sem vacina prévia
+          const bruceloseQuery = await query(`
+            SELECT 
+              a.id, a.serie, a.rg, a.sexo, a.raca, a.data_nascimento,
+              EXTRACT(DAY FROM (CURRENT_DATE - a.data_nascimento)) as idade_dias,
+              COALESCE(l.piquete, a.piquete_atual, a.pasto_atual) as piquete,
+              p.peso
+            FROM animais a
+            LEFT JOIN LATERAL (
+              SELECT piquete FROM localizacoes_animais 
+              WHERE animal_id = a.id AND data_saida IS NULL 
+              ORDER BY data_entrada DESC LIMIT 1
+            ) l ON TRUE
+            LEFT JOIN LATERAL (
+              SELECT peso FROM pesagens 
+              WHERE animal_id = a.id 
+              ORDER BY data DESC LIMIT 1
+            ) p ON TRUE
+            WHERE a.situacao = 'Ativo'
+              AND a.sexo = 'Fêmea'
+              AND EXTRACT(DAY FROM (CURRENT_DATE - a.data_nascimento)) BETWEEN 90 AND 240
+              AND NOT EXISTS (
+                SELECT 1 FROM historia_ocorrencias h
+                WHERE h.animal_id = a.id 
+                AND (LOWER(h.tipo) LIKE '%brucelose%' OR LOWER(h.descricao) LIKE '%brucelose%')
+              )
+            ORDER BY a.data_nascimento DESC
+          `)
+
+          // DGT: Animais entre 330 e 640 dias
+          const dgtQuery = await query(`
+            SELECT 
+              a.id, a.serie, a.rg, a.sexo, a.raca, a.data_nascimento,
+              EXTRACT(DAY FROM (CURRENT_DATE - a.data_nascimento)) as idade_dias,
+              COALESCE(l.piquete, a.piquete_atual, a.pasto_atual) as piquete,
+              p.peso
+            FROM animais a
+            LEFT JOIN LATERAL (
+              SELECT piquete FROM localizacoes_animais 
+              WHERE animal_id = a.id AND data_saida IS NULL 
+              ORDER BY data_entrada DESC LIMIT 1
+            ) l ON TRUE
+            LEFT JOIN LATERAL (
+              SELECT peso FROM pesagens 
+              WHERE animal_id = a.id 
+              ORDER BY data DESC LIMIT 1
+            ) p ON TRUE
+            WHERE a.situacao = 'Ativo'
+              AND EXTRACT(DAY FROM (CURRENT_DATE - a.data_nascimento)) BETWEEN 330 AND 640
+            ORDER BY a.data_nascimento DESC
+          `)
+
+          const brucelose = bruceloseQuery.rows.map(r => ({
+            ...r,
+            tipo: 'Vacina Brucelose',
+            categoria: 'brucelose',
+            idade_meses: Math.floor((r.idade_dias || 0) / 30.44)
+          }))
+
+          const dgt = dgtQuery.rows.map(r => ({
+            ...r,
+            tipo: 'Avaliação DGT',
+            categoria: 'dgt',
+            idade_meses: Math.floor((r.idade_dias || 0) / 30.44)
+          }))
+
+          // Combinar todos os eventos
+          data = [...brucelose, ...dgt]
+
+          resumo = {
+            total: data.length,
+            brucelose: brucelose.length,
+            dgt: dgt.length,
+            periodo: `${mesAtual}/${anoAtual}`
+          }
+
+        } catch (e) {
+          console.error('Erro na Agenda de Atividades:', e)
+          data = []
+          resumo = { erro: 'Falha ao carregar agenda' }
+        }
+        break
+      }
+
+      case 'femeas_brucelose': {
+        try {
+          // Fêmeas entre 3 e 8 meses (90-240 dias) sem vacina prévia
+          const bruceloseQuery = await query(`
+            SELECT 
+              a.id, a.serie, a.rg, a.sexo, a.raca, a.data_nascimento,
+              EXTRACT(DAY FROM (CURRENT_DATE - a.data_nascimento)) as idade_dias,
+              COALESCE(l.piquete, a.piquete_atual, a.pasto_atual) as piquete,
+              p.peso
+            FROM animais a
+            LEFT JOIN LATERAL (
+              SELECT piquete FROM localizacoes_animais 
+              WHERE animal_id = a.id AND data_saida IS NULL 
+              ORDER BY data_entrada DESC LIMIT 1
+            ) l ON TRUE
+            LEFT JOIN LATERAL (
+              SELECT peso FROM pesagens 
+              WHERE animal_id = a.id 
+              ORDER BY data DESC LIMIT 1
+            ) p ON TRUE
+            WHERE a.situacao = 'Ativo'
+              AND a.sexo = 'Fêmea'
+              AND EXTRACT(DAY FROM (CURRENT_DATE - a.data_nascimento)) BETWEEN 90 AND 240
+              AND NOT EXISTS (
+                SELECT 1 FROM historia_ocorrencias h
+                WHERE h.animal_id = a.id 
+                AND (LOWER(h.tipo) LIKE '%brucelose%' OR LOWER(h.descricao) LIKE '%brucelose%')
+              )
+            ORDER BY a.data_nascimento DESC
+          `)
+
+          data = bruceloseQuery.rows.map(r => ({
+            animal: `${r.serie || ''} ${r.rg || ''}`.trim(),
+            sexo: r.sexo,
+            raca: r.raca,
+            idade_dias: r.idade_dias,
+            idade_meses: Math.floor((r.idade_dias || 0) / 30.44),
+            piquete: r.piquete || 'Não informado',
+            peso: r.peso ? `${r.peso} kg` : '-',
+            data_nascimento: toDateStr(r.data_nascimento)
+          }))
+
+          resumo = {
+            'Total de fêmeas': data.length,
+            'Idade': '3-8 meses (90-240 dias)',
+            'Status': 'Sem vacina de brucelose'
+          }
+
+        } catch (e) {
+          console.error('Erro ao buscar fêmeas para brucelose:', e)
+          data = []
+          resumo = { erro: 'Falha ao carregar dados' }
+        }
+        break
+      }
+
+      case 'animais_dgt': {
+        try {
+          // Animais entre 330 e 640 dias
+          const dgtQuery = await query(`
+            SELECT 
+              a.id, a.serie, a.rg, a.sexo, a.raca, a.data_nascimento,
+              EXTRACT(DAY FROM (CURRENT_DATE - a.data_nascimento)) as idade_dias,
+              COALESCE(l.piquete, a.piquete_atual, a.pasto_atual) as piquete,
+              p.peso
+            FROM animais a
+            LEFT JOIN LATERAL (
+              SELECT piquete FROM localizacoes_animais 
+              WHERE animal_id = a.id AND data_saida IS NULL 
+              ORDER BY data_entrada DESC LIMIT 1
+            ) l ON TRUE
+            LEFT JOIN LATERAL (
+              SELECT peso FROM pesagens 
+              WHERE animal_id = a.id 
+              ORDER BY data DESC LIMIT 1
+            ) p ON TRUE
+            WHERE a.situacao = 'Ativo'
+              AND EXTRACT(DAY FROM (CURRENT_DATE - a.data_nascimento)) BETWEEN 330 AND 640
+            ORDER BY a.data_nascimento DESC
+          `)
+
+          data = dgtQuery.rows.map(r => ({
+            animal: `${r.serie || ''} ${r.rg || ''}`.trim(),
+            sexo: r.sexo,
+            raca: r.raca,
+            idade_dias: r.idade_dias,
+            idade_meses: Math.floor((r.idade_dias || 0) / 30.44),
+            piquete: r.piquete || 'Não informado',
+            peso: r.peso ? `${r.peso} kg` : '-',
+            data_nascimento: toDateStr(r.data_nascimento)
+          }))
+
+          resumo = {
+            'Total de animais': data.length,
+            'Idade': '11-21 meses (330-640 dias)',
+            'Tipo': 'Elegíveis para avaliação DGT'
+          }
+
+        } catch (e) {
+          console.error('Erro ao buscar animais para DGT:', e)
+          data = []
+          resumo = { erro: 'Falha ao carregar dados' }
+        }
+        break
+      }
+
       case 'pesagens': {
         const r = await query(`
           SELECT p.id, p.animal_id, p.peso, p.ce, p.data, p.observacoes,
@@ -646,17 +846,23 @@ export default async function handler(req, res) {
           const orderCol = temDataGestacao ? 'COALESCE(g.data_cobertura, g.data_gestacao)' : 'g.data_cobertura'
 
           const r = await query(`
-            SELECT g.*
+            SELECT g.*, a.id as animal_id, a.serie, a.rg, a.nome as animal_nome
             FROM gestacoes g
+            LEFT JOIN animais a ON (
+              (g.receptora_serie IS NOT NULL AND g.receptora_rg IS NOT NULL AND a.serie = g.receptora_serie AND a.rg = g.receptora_rg)
+              OR (g.mae_serie IS NOT NULL AND g.mae_rg IS NOT NULL AND a.serie = g.mae_serie AND a.rg = g.mae_rg)
+            )
             WHERE (g.data_cobertura >= $1 AND g.data_cobertura <= $2)${whereExtra}
             ORDER BY ${orderCol} DESC
             LIMIT 1000
           `, [start, end])
           data = (r.rows || []).map(row => ({
-            animal: row.receptora_nome || `${row.receptora_serie || ''} ${row.receptora_rg || ''}`.trim() || `${row.mae_serie || ''} ${row.mae_rg || ''}`.trim(),
+            animal: row.animal_nome || row.receptora_nome || `${row.receptora_serie || row.mae_serie || ''} ${row.receptora_rg || row.mae_rg || ''}`.trim(),
+            rg: row.rg || row.receptora_rg || row.mae_rg || '-',
             data: toDateStr(row.data_cobertura || row.data_gestacao),
             situacao: row.situacao,
-            origem: 'TE'
+            origem: 'TE',
+            animal_id: row.animal_id
           }))
 
           // Incluir inseminações prenhas (IA) quando tabela gestacoes vazia ou para complementar
@@ -675,7 +881,7 @@ export default async function handler(req, res) {
               temSg && "(TRIM(COALESCE(i.status_gestacao,'')) = 'P' OR LOWER(COALESCE(i.status_gestacao,'')) LIKE '%pren%' OR LOWER(COALESCE(i.status_gestacao,'')) LIKE '%positivo%')"
             ].filter(Boolean).join(' OR ')
             const ri = await query(`
-              SELECT i.${dateColIA} as data_gest, a.serie, a.rg, a.nome
+              SELECT i.${dateColIA} as data_gest, a.id as animal_id, a.serie, a.rg, a.nome
               FROM inseminacoes i
               JOIN animais a ON a.id = i.animal_id
               WHERE i.${dateColIA} >= $1 AND i.${dateColIA} <= $2
@@ -686,9 +892,11 @@ export default async function handler(req, res) {
             ;(ri.rows || []).forEach(row => {
               data.push({
                 animal: row.nome || `${row.serie || ''} ${row.rg || ''}`.trim(),
+                rg: row.rg || '-',
                 data: toDateStr(row.data_gest),
                 situacao: 'Prenha',
-                origem: 'IA'
+                origem: 'IA',
+                animal_id: row.animal_id
               })
             })
             data.sort((a, b) => (b.data || '').localeCompare(a.data || ''))
@@ -965,6 +1173,78 @@ export default async function handler(req, res) {
             fornecedor: row.fornecedor,
             data_te: row.data_te ? toDateStr(row.data_te) : null
           }))
+
+          // Incluir Brucelose e DGT - consulta direta ao banco (evita fetch que falha em serverless)
+          try {
+            const bruceloseResult = await query(`
+              SELECT a.id, a.serie, a.rg, a.nome, a.data_nascimento,
+                COALESCE((SELECT l2.piquete FROM localizacoes_animais l2 WHERE l2.animal_id = a.id AND l2.data_saida IS NULL ORDER BY l2.data_entrada DESC LIMIT 1), a.piquete_atual, a.pasto_atual) as piquete,
+                (CURRENT_DATE - a.data_nascimento::date)::int as idade_dias
+              FROM animais a
+              WHERE a.situacao = 'Ativo' AND a.sexo = 'Fêmea' AND a.data_nascimento IS NOT NULL
+                AND (CURRENT_DATE - a.data_nascimento::date) BETWEEN 90 AND 240
+                AND NOT EXISTS (
+                  SELECT 1 FROM custos c WHERE c.animal_id = a.id AND (c.tipo ILIKE '%brucelose%' OR c.subtipo ILIKE '%brucelose%' OR c.observacoes ILIKE '%brucelose%')
+                )
+                AND NOT EXISTS (
+                  SELECT 1 FROM historia_ocorrencias h WHERE h.animal_id = a.id AND (LOWER(h.tipo) LIKE '%brucelose%' OR LOWER(h.descricao) LIKE '%brucelose%')
+                )
+            `)
+            const dgtResult = await query(`
+              SELECT a.id, a.serie, a.rg, a.nome, a.data_nascimento,
+                COALESCE((SELECT l2.piquete FROM localizacoes_animais l2 WHERE l2.animal_id = a.id AND l2.data_saida IS NULL ORDER BY l2.data_entrada DESC LIMIT 1), a.piquete_atual, a.pasto_atual) as piquete,
+                (CURRENT_DATE - a.data_nascimento::date)::int as idade_dias
+              FROM animais a
+              WHERE a.situacao = 'Ativo' AND a.data_nascimento IS NOT NULL
+                AND (CURRENT_DATE - a.data_nascimento::date) BETWEEN 330 AND 640
+            `)
+            const eventosBruceloseDgt = []
+            const addEvento = (a, tipo, dataEv, descBase) => {
+              const piquete = a.piquete || 'Não informado'
+              const ident = `${a.serie || ''} ${a.rg || ''}`.trim() || a.nome || '-'
+              eventosBruceloseDgt.push({
+                animal_id: a.id,
+                animal: ident,
+                data: dataEv,
+                tipo,
+                titulo: `${tipo} - ${ident}`,
+                descricao: `${descBase} • Piquete: ${piquete}` + (a.idade_dias ? (tipo === 'Brucelose' ? ` • ${Math.floor(a.idade_dias / 30)} meses` : ` • ${a.idade_dias} dias`) : ''),
+                status: 'Agendado',
+                origem: 'agenda'
+              })
+            }
+            bruceloseResult.rows.forEach(a => {
+              const dataNasc = a.data_nascimento ? new Date(a.data_nascimento) : null
+              if (!dataNasc || isNaN(dataNasc.getTime())) return
+              const di = new Date(dataNasc)
+              di.setDate(di.getDate() + 90)
+              const df = new Date(dataNasc)
+              df.setDate(df.getDate() + 240)
+              const dataInicio = di.toISOString().split('T')[0]
+              const dataFim = df.toISOString().split('T')[0]
+              const entraNoPeriodo = dataInicio >= start && dataInicio <= end
+              const jaNaJanela = dataInicio < start && dataFim >= start
+              if (entraNoPeriodo) addEvento(a, 'Brucelose', dataInicio, 'Fêmea na janela 3-8 meses')
+              else if (jaNaJanela) addEvento(a, 'Brucelose', start, 'Fêmea na janela 3-8 meses')
+            })
+            dgtResult.rows.forEach(a => {
+              const dataNasc = a.data_nascimento ? new Date(a.data_nascimento) : null
+              if (!dataNasc || isNaN(dataNasc.getTime())) return
+              const di = new Date(dataNasc)
+              di.setDate(di.getDate() + 330)
+              const df = new Date(dataNasc)
+              df.setDate(df.getDate() + 640)
+              const dataInicio = di.toISOString().split('T')[0]
+              const dataFim = df.toISOString().split('T')[0]
+              const entraNoPeriodo = dataInicio >= start && dataInicio <= end
+              const jaNaJanela = dataInicio < start && dataFim >= start
+              if (entraNoPeriodo) addEvento(a, 'DGT', dataInicio, 'Animal na janela 330-640 dias')
+              else if (jaNaJanela) addEvento(a, 'DGT', start, 'Animal na janela 330-640 dias')
+            })
+            data = [...data, ...eventosBruceloseDgt].sort((a, b) => (a.data || '').localeCompare(b.data || ''))
+          } catch (eAgenda) {
+            console.error('Erro ao buscar Brucelose/DGT para calendário:', eAgenda)
+          }
         } catch (e) {
           console.error('Erro ao buscar calendário reprodutivo:', e)
           data = []
@@ -1006,17 +1286,20 @@ export default async function handler(req, res) {
               SELECT
                 COALESCE(l.piquete, a.piquete_atual, a.pasto_atual) as piquete,
                 COALESCE(l.data_entrada, a.data_entrada_piquete, a.created_at)::date as data_entrada,
-                a.serie, a.rg, a.nome as animal_nome
+                a.id as animal_id,
+                a.serie, a.rg, a.nome as animal_nome,
+                a.sexo
               FROM animais a
               LEFT JOIN LATERAL (
                 SELECT l2.piquete, l2.data_entrada FROM localizacoes_animais l2
                 WHERE l2.animal_id = a.id AND l2.data_saida IS NULL
                 ORDER BY l2.data_entrada DESC LIMIT 1
               ) l ON TRUE
-              WHERE COALESCE(l.piquete, a.piquete_atual, a.pasto_atual) IS NOT NULL
+              WHERE a.situacao = 'Ativo'
+                AND COALESCE(l.piquete, a.piquete_atual, a.pasto_atual) IS NOT NULL
                 AND TRIM(COALESCE(l.piquete, a.piquete_atual, a.pasto_atual)) != ''
               ORDER BY piquete, a.serie, a.rg
-              LIMIT 500
+              LIMIT 1000
             `)
           } catch (colErr) {
             // Fallback se piquete_atual/data_entrada_piquete não existirem (bancos antigos)
@@ -1025,26 +1308,108 @@ export default async function handler(req, res) {
                 SELECT
                   COALESCE(l.piquete, a.pasto_atual) as piquete,
                   COALESCE(l.data_entrada, a.created_at)::date as data_entrada,
-                  a.serie, a.rg, a.nome as animal_nome
+                  a.id as animal_id,
+                  a.serie, a.rg, a.nome as animal_nome,
+                  a.sexo
                 FROM animais a
                 LEFT JOIN LATERAL (
                   SELECT l2.piquete, l2.data_entrada FROM localizacoes_animais l2
                   WHERE l2.animal_id = a.id AND l2.data_saida IS NULL
                   ORDER BY l2.data_entrada DESC LIMIT 1
                 ) l ON TRUE
-                WHERE COALESCE(l.piquete, a.pasto_atual) IS NOT NULL
+                WHERE a.situacao = 'Ativo'
+                  AND COALESCE(l.piquete, a.pasto_atual) IS NOT NULL
                   AND TRIM(COALESCE(l.piquete, a.pasto_atual)) != ''
                 ORDER BY piquete, a.serie, a.rg
-                LIMIT 500
+                LIMIT 1000
               `)
             } else throw colErr
           }
-          data = (r.rows || []).map(row => ({
-            piquete: piqueteOuNaoInformado(row.piquete),
-            animal: `${row.serie || ''} ${row.rg || ''}`.trim() || row.animal_nome,
-            data_entrada: toDateStr(row.data_entrada)
-          }))
+
+          // Buscar última pesagem de cada animal
+          const animalIds = r.rows.map(row => row.animal_id).filter(Boolean)
+          let pesosMap = {}
+          if (animalIds.length > 0) {
+            try {
+              const pesagensResult = await query(`
+                SELECT DISTINCT ON (animal_id) animal_id, peso
+                FROM pesagens
+                WHERE animal_id = ANY($1::int[])
+                ORDER BY animal_id, data DESC, created_at DESC
+              `, [animalIds])
+              pesagensResult.rows.forEach(p => {
+                pesosMap[p.animal_id] = parseFloat(p.peso) || 0
+              })
+            } catch (e) {
+              console.log('Erro ao buscar pesagens:', e.message)
+            }
+          }
+
+          // Agrupar por piquete
+          const porPiquete = {}
+          r.rows.forEach(row => {
+            const piq = piqueteOuNaoInformado(row.piquete)
+            if (!porPiquete[piq]) {
+              porPiquete[piq] = {
+                piquete: piq,
+                total: 0,
+                machos: 0,
+                femeas: 0,
+                pesos: [],
+                animais: []
+              }
+            }
+            porPiquete[piq].total++
+            const sexo = (row.sexo || '').toLowerCase()
+            if (sexo.startsWith('m')) porPiquete[piq].machos++
+            else if (sexo.startsWith('f')) porPiquete[piq].femeas++
+            
+            const peso = pesosMap[row.animal_id]
+            if (peso && peso > 0) porPiquete[piq].pesos.push(peso)
+            
+            porPiquete[piq].animais.push({
+              animal: `${row.serie || ''} ${row.rg || ''}`.trim() || row.animal_nome,
+              sexo: formatarSexo(row.sexo),
+              peso: peso ? `${peso.toFixed(1)} kg` : '-',
+              data_entrada: toDateStr(row.data_entrada)
+            })
+          })
+
+          // Calcular médias e montar resultado
+          data = Object.keys(porPiquete).sort().map(piq => {
+            const info = porPiquete[piq]
+            const mediaPeso = info.pesos.length > 0
+              ? (info.pesos.reduce((a, b) => a + b, 0) / info.pesos.length).toFixed(1)
+              : '-'
+            
+            return {
+              piquete: piq,
+              total_animais: info.total,
+              machos: info.machos,
+              femeas: info.femeas,
+              media_peso: mediaPeso,
+              animais: info.animais
+            }
+          })
+
+          // Calcular resumo geral
+          const totalAnimais = Object.values(porPiquete).reduce((sum, p) => sum + p.total, 0)
+          const totalMachos = Object.values(porPiquete).reduce((sum, p) => sum + p.machos, 0)
+          const totalFemeas = Object.values(porPiquete).reduce((sum, p) => sum + p.femeas, 0)
+          const todosPesos = Object.values(porPiquete).flatMap(p => p.pesos)
+          const mediaPesoGeral = todosPesos.length > 0
+            ? (todosPesos.reduce((a, b) => a + b, 0) / todosPesos.length).toFixed(1)
+            : '-'
+
+          resumo = {
+            'Total de animais': totalAnimais,
+            'Total de machos': totalMachos,
+            'Total de fêmeas': totalFemeas,
+            'Piquetes ocupados': Object.keys(porPiquete).length,
+            'Média de peso geral': mediaPesoGeral + (mediaPesoGeral !== '-' ? ' kg' : '')
+          }
         } catch (e) {
+          console.error('Erro em animais_piquetes:', e)
           data = []
         }
         break

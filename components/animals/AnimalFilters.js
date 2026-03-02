@@ -1,7 +1,8 @@
 const AnimalFilters = ({ filters, onFilterChange, animals, onClearFilters }) => {
-  const racas = [...new Set(animals.map(a => a.raca))].sort()
-  const eras = [...new Set(animals.map(a => a.era))].sort()
-  const situacoes = [...new Set(animals.map(a => a.situacao))].sort()
+  const filtrar = (v) => v != null && String(v).trim() !== ''
+  const racas = [...new Set(animals.map(a => a.raca).filter(filtrar))].sort()
+  const eras = [...new Set(animals.map(a => a.era).filter(filtrar))].sort()
+  const situacoes = [...new Set(animals.map(a => a.situacao).filter(filtrar))].sort()
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
@@ -36,7 +37,7 @@ const AnimalFilters = ({ filters, onFilterChange, animals, onClearFilters }) => 
           >
             <option value="">Todas as raças</option>
             {racas.map(raca => (
-              <option key={raca} value={raca}>{raca}</option>
+              <option key={`raca-${raca}`} value={raca}>{raca}</option>
             ))}
           </select>
         </div>
@@ -53,7 +54,7 @@ const AnimalFilters = ({ filters, onFilterChange, animals, onClearFilters }) => 
           >
             <option value="">Todas as situações</option>
             {situacoes.map(situacao => (
-              <option key={situacao} value={situacao}>{situacao}</option>
+              <option key={`situacao-${situacao}`} value={situacao}>{situacao}</option>
             ))}
           </select>
         </div>
@@ -70,7 +71,7 @@ const AnimalFilters = ({ filters, onFilterChange, animals, onClearFilters }) => 
           >
             <option value="">Todas as ERAs</option>
             {eras.map(era => (
-              <option key={era} value={era}>{era}</option>
+              <option key={`era-${era}`} value={era}>{era}</option>
             ))}
           </select>
         </div>

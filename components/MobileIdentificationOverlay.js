@@ -47,10 +47,12 @@ export default function MobileIdentificationOverlay() {
     const hostname = window.location.hostname
     if (hostname === 'localhost' || hostname === '127.0.0.1') return
 
-    const skipPaths = ['/login', '/identificar']
+    const skipPaths = ['/login', '/identificar', '/monitoramento']
     if (skipPaths.includes(router.pathname)) return
 
-    if (!isMobile()) return
+    // Mostrar para mobile OU para usuários externos (ngrok, etc) em qualquer dispositivo
+    const isExternal = !hostname.startsWith('192.168.') && !hostname.startsWith('10.') && !hostname.startsWith('172.')
+    if (!isMobile() && !isExternal) return
 
     try {
       const stored = localStorage.getItem(STORAGE_KEY)

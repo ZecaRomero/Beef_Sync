@@ -184,14 +184,18 @@ export default function AnimalTimeline({ isOpen, onClose, animal }) {
       });
     }
 
-    // 7. Inseminações
-    if (dadosAnimal.inseminacoes && dadosAnimal.inseminacoes.length > 0) {
-      dadosAnimal.inseminacoes.forEach((ins) => {
+    // 7. Inseminações (preferir válidas; data_ia é o nome da coluna no banco)
+    const inseminacoesValidas = (dadosAnimal.inseminacoes || []).filter(ins => ins.valida !== false)
+    const inseminacoesParaTimeline = inseminacoesValidas.length > 0 ? inseminacoesValidas : (dadosAnimal.inseminacoes || [])
+    if (inseminacoesParaTimeline.length > 0) {
+      inseminacoesParaTimeline.forEach((ins) => {
+        const dataIA = ins.data_ia || ins.data_inseminacao || ins.data
+        if (!dataIA) return
         eventos.push({
           tipo: 'inseminacao',
-          data: ins.data_inseminacao,
+          data: dataIA,
           titulo: '🧬 Inseminação (IA)',
-          descricao: `Touro: ${ins.touro || 'N/A'}`,
+          descricao: `Touro: ${ins.touro_nome || ins.touro || 'N/A'}`,
           detalhes: [
             ins.inseminador ? `Inseminador: ${ins.inseminador}` : null,
             ins.observacoes

@@ -14,6 +14,26 @@ import {
 
 export default asyncHandler(async function handler(req, res) {
   if (req.method === 'GET') {
+    // Garantir que a tabela existe
+    try {
+      await query(`
+        CREATE TABLE IF NOT EXISTS tipos_servicos (
+          id SERIAL PRIMARY KEY,
+          nome VARCHAR(200) NOT NULL,
+          categoria VARCHAR(100) NOT NULL,
+          valor_padrao DECIMAL(12,2) NOT NULL DEFAULT 0,
+          aplicavel_macho BOOLEAN DEFAULT true,
+          aplicavel_femea BOOLEAN DEFAULT true,
+          descricao TEXT,
+          ativo BOOLEAN DEFAULT true,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `)
+    } catch (createErr) {
+      logger.warn('Tabela tipos_servicos:', createErr.message)
+    }
+
     // Buscar todos os serviços
     const { categoria, ativo, aplicavel } = req.query
     let queryText = 'SELECT * FROM tipos_servicos WHERE 1=1'

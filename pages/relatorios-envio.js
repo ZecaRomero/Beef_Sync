@@ -88,7 +88,8 @@ export default function RelatoriosEnvio() {
     vacinacoes: false,
     genealogia: false,
     pesagens: false,
-    resumo_pesagens: false
+    resumo_pesagens: false,
+    agenda_atividades: false
   })
   const [period, setPeriod] = useState({
     startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
@@ -424,6 +425,14 @@ export default function RelatoriosEnvio() {
       category: 'Resumos',
       icon: BeakerIcon,
       color: 'cyan'
+    },
+    { 
+      key: 'agenda_atividades', 
+      label: 'Agenda de Atividades', 
+      description: 'Brucelose (fêmeas 3-8 meses) e DGT (330-640 dias) em Excel', 
+      category: 'Resumos',
+      icon: CalendarIcon,
+      color: 'amber'
     }
   ]
 

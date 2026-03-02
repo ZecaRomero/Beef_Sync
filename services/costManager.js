@@ -311,7 +311,7 @@ class CostManager {
   async saveCost(animalId, custo) {
     try {
       if (!this.useLocalStorage) {
-        const response = await fetch('/api/costs', {
+        const response = await fetch(`/api/animals/${animalId}/custos`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -341,7 +341,7 @@ class CostManager {
   async getCustosAnimal(animalId) {
     try {
       if (!this.useLocalStorage) {
-        const response = await fetch(`/api/costs?animalId=${animalId}`)
+        const response = await fetch(`/api/animals/${animalId}/custos`)
         
         if (!response.ok) {
           throw new Error('Erro ao buscar custos')

@@ -3,8 +3,6 @@ const { query, testConnection, getPoolInfo } = require('../lib/database');
 const loggerModule = require('../utils/logger');
 const logger = loggerModule.default || loggerModule;
 
-console.log('LOADING databaseService.js from', __filename);
-
 class DatabaseService {
   
   // Testar conexão
@@ -22,10 +20,16 @@ class DatabaseService {
     return getPoolInfo()
   }
 
-  // Contar registros em uma tabela
+  // Contar registros em uma tabela (whitelist para evitar SQL injection)
+  static ALLOWED_TABLES = ['animais', 'nascimentos', 'custos', 'estoque_semen', 'inseminacoes', 'gestacoes', 'mortes', 'pesagens', 'localizacoes_animais', 'notas_fiscais', 'servicos', 'notificacoes'];
+
   async getTableCount(tableName) {
-    const result = await query(`SELECT COUNT(*) as count FROM ${tableName}`);
-    return parseInt(result.rows[0].count);
+    const safeName = String(tableName || '').trim().toLowerCase();
+    if (!DatabaseService.ALLOWED_TABLES.includes(safeName)) {
+      throw new Error(`Tabela inválida: ${tableName}`);
+    }
+    const result = await query(`SELECT COUNT(*) as count FROM ${safeName}`);
+    return parseInt(result.rows[0].count, 10);
   }
 
   // Obter estatísticas do sistema
@@ -169,12 +173,7 @@ class DatabaseService {
         animal_id, tipo, subtipo, valor, data, observacoes, detalhes, created_at
       ]);
 
-      logger.debug('Saída de sêmen registrada com sucesso:', {
-        saidaId: result.rows[0].id,
-        entradaId,
-        quantidadeSaida,
-        novasDosesDisponiveis
-      });
+      logger.debug('Custo registrado com sucesso:', { custoId: result.rows[0].id });
 
       return result.rows[0];
     } catch (error) {
@@ -1211,6 +1210,15 @@ class DatabaseService {
       // Ignorar erro na verificação; continuar com ID original
     }
 
+    // Garantir que colunas existam (migração automática)
+    try {
+      await query(`ALTER TABLE animais ADD COLUMN IF NOT EXISTS pasto_atual VARCHAR(100)`)
+      await query(`ALTER TABLE animais ADD COLUMN IF NOT EXISTS piquete_atual VARCHAR(200)`)
+      await query(`ALTER TABLE animais ADD COLUMN IF NOT EXISTS situacao_abcz VARCHAR(100)`)
+    } catch (e) {
+      if (!e.message?.includes('already exists')) logger?.warn?.('Migração colunas:', e.message)
+    }
+
     // Buscar colunas válidas da tabela para filtrar o payload
     const colsRes = await query(`
       SELECT column_name 
@@ -1229,7 +1237,11 @@ class DatabaseService {
       dataChegada: 'data_chegada',
       precoVenda: 'valor_venda',
       status: 'situacao',
-      situacaoAbcz: 'situacao_abcz'
+      situacaoAbcz: 'situacao_abcz',
+      dataNascimento: 'data_nascimento',
+      pastoAtual: 'pasto_atual',
+      piqueteAtual: 'piquete_atual',
+      localNascimento: 'local_nascimento'
     }
 
     const campos = []
@@ -1237,13 +1249,20 @@ class DatabaseService {
     let paramCount = 0
 
     for (const [campoOriginal, valor] of Object.entries(dadosAtualizados || {})) {
-      if (campoOriginal === 'id' || valor === undefined) continue
+      if (campoOriginal === 'id') continue
+      // Converter string vazia em null para data_nascimento (PostgreSQL DATE)
+      let valorFinal = valor
+      if ((campoOriginal === 'data_nascimento' || campoOriginal === 'dataNascimento') && (valor === '' || valor === undefined)) {
+        valorFinal = null
+      } else if (valor === undefined) {
+        continue
+      }
       const coluna = aliasMap[campoOriginal] || campoOriginal
       // Não permitir sobrescrever chaves internas
       if (coluna === 'created_at' || coluna === 'updated_at') continue
       if (colSet.has(coluna)) {
         campos.push(`${coluna} = $${++paramCount}`)
-        valores.push(valor)
+        valores.push(valorFinal)
       }
     }
 

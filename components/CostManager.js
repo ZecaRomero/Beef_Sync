@@ -106,9 +106,14 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
     }
   }
 
-  const loadRelatorioGeral = () => {
-    const relatorio = costManager.getRelatorioGeral()
-    setRelatorioGeral(relatorio)
+  const loadRelatorioGeral = async () => {
+    try {
+      const relatorio = await costManager.getRelatorioGeral()
+      setRelatorioGeral(relatorio)
+    } catch (e) {
+      console.error('Erro ao carregar relatório geral:', e)
+      setRelatorioGeral(null)
+    }
   }
 
   const loadServicosCadastrados = async () => {
@@ -123,10 +128,14 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
       const response = await fetch(url)
       if (response.ok) {
         const data = await response.json()
-        setServicosCadastrados(data)
+        const lista = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : [])
+        setServicosCadastrados(lista)
+      } else {
+        setServicosCadastrados([])
       }
     } catch (error) {
       console.error('Erro ao carregar serviços:', error)
+      setServicosCadastrados([])
     }
   }
 
@@ -336,15 +345,16 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
   }
 
   const getCustoTotal = (animalId) => {
-    const total = costManager.getCustoTotal(animalId)
-    // Garantir que sempre retorne um número
-    return typeof total === 'number' ? total : 0
+    const custos = costManager.getCustosAnimal(animalId)
+    const arr = Array.isArray(custos) ? custos : []
+    return arr.reduce((total, custo) => total + (parseFloat(custo.valor || 0) || 0), 0)
   }
 
   const getStatusCusto = (animal) => {
     const custos = costManager.getCustosAnimal(animal.id)
-    const temProtocolo = custos.some(c => c.tipo === 'Protocolo Sanitário')
-    const temDNA = custos.some(c => c.tipo === 'DNA')
+    const arr = Array.isArray(custos) ? custos : []
+    const temProtocolo = arr.some(c => c.tipo === 'Protocolo Sanitário')
+    const temDNA = arr.some(c => c.tipo === 'DNA')
     
     if (temProtocolo && temDNA) return 'completo'
     if (temProtocolo || temDNA) return 'parcial'
@@ -1246,7 +1256,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                             R$ {(custoTotal || 0).toFixed(2)}
                           </div>
                           <div className="text-xs text-gray-500">
-                            {costManager.getCustosAnimal(animal.id).length} custos
+                            {(() => { const c = costManager.getCustosAnimal(animal.id); return (Array.isArray(c) ? c : []).length; })()} custos
                           </div>
                         </div>
                       </div>
@@ -1266,7 +1276,8 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
         const custosPorTipo = {}
         animals.forEach(animal => {
           const custosAnimal = costManager.getCustosAnimal(animal.id)
-          custosAnimal.forEach(custo => {
+          const arrCustos = Array.isArray(custosAnimal) ? custosAnimal : []
+          arrCustos.forEach(custo => {
             custosPorTipo[custo.tipo] = (custosPorTipo[custo.tipo] || 0) + custo.valor
           })
         })

@@ -639,7 +639,7 @@ export default function BoletimDefesa() {
                       ))}
                       <th className="px-1 py-2 border border-gray-200 dark:border-gray-700 bg-yellow-50 dark:bg-yellow-900/20 text-blue-600 dark:text-blue-400 font-bold w-[7%]">M</th>
                       <th className="px-1 py-2 border border-gray-200 dark:border-gray-700 bg-yellow-50 dark:bg-yellow-900/20 text-pink-600 dark:text-pink-400 font-bold w-[7%]">F</th>
-                      <th className="px-1 py-2 border border-gray-200 dark:border-gray-700 bg-red-50 :bg-red-900/20 w-[14%]">TOTAL</th>
+                      <th className="px-1 py-2 border border-gray-200 dark:border-gray-700 bg-red-50 dark:bg-red-900/20 w-[14%]">TOTAL</th>
                     </tr>
                   </thead>
                   <tbody>

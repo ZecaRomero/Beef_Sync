@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-
-;
+import { fetchAvailableLocations } from '../utils/piqueteUtils'
 import { XMarkIcon, PlusIcon, TrashIcon, CheckIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
 
 export default function BatchReceptoraForm({ isOpen, onClose, onSave }) {
@@ -23,79 +22,11 @@ export default function BatchReceptoraForm({ isOpen, onClose, onSave }) {
   const [receptoras, setReceptoras] = useState([]);
   const [availableLocations, setAvailableLocations] = useState([]);
 
-  // Fetch locations
+  // Fetch locations (usa utilitário que filtra nomes de touros cadastrados por engano como piquete)
   useEffect(() => {
-    const fetchLocations = async () => {
-      try {
-        const piquetesUsados = new Set()
-        const piquetesList = []
-
-        // 1. Buscar piquetes já usados nas localizações da API
-        try {
-          const localizacoesResponse = await fetch('/api/localizacoes')
-          if (localizacoesResponse.ok) {
-            const localizacoesData = await localizacoesResponse.json()
-            const localizacoesApi = localizacoesData.data || []
-            
-            localizacoesApi.forEach(loc => {
-              if (loc.piquete && !piquetesUsados.has(loc.piquete)) {
-                piquetesUsados.add(loc.piquete)
-                piquetesList.push(loc.piquete)
-              }
-            })
-          }
-        } catch (error) {
-          console.warn('Erro ao buscar localizações da API:', error)
-        }
-
-        // 2. Buscar piquetes cadastrados em "Gestão de Piquetes" para complementar
-        try {
-          const piquetesResponse = await fetch('/api/piquetes')
-          if (piquetesResponse.ok) {
-            const piquetesData = await piquetesResponse.json()
-            const piquetesArray = piquetesData.piquetes || piquetesData.data?.piquetes || piquetesData.data || []
-            
-            if (Array.isArray(piquetesArray) && piquetesArray.length > 0) {
-              piquetesArray.forEach(piquete => {
-                const nome = typeof piquete === 'object' ? piquete.nome : piquete
-                if (nome && !piquetesUsados.has(nome)) {
-                  piquetesUsados.add(nome)
-                  piquetesList.push(nome)
-                }
-              })
-            }
-          }
-        } catch (error) {
-          console.warn('Erro ao buscar piquetes cadastrados:', error)
-        }
-
-        // 3. Fallback: buscar da API de locais (se existir)
-        try {
-          const response = await fetch('/api/locais')
-          if (response.ok) {
-            const data = await response.json()
-            if (data.data && data.data.length > 0) {
-              data.data.forEach(local => {
-                if (!piquetesUsados.has(local.nome)) {
-                  piquetesUsados.add(local.nome)
-                  piquetesList.push(local.nome)
-                }
-              })
-            }
-          }
-        } catch (error) {
-          console.warn('Erro ao carregar locais da API:', error)
-        }
-
-        // Ordenar por nome
-        piquetesList.sort((a, b) => a.localeCompare(b))
-        setAvailableLocations(piquetesList)
-      } catch (error) {
-        console.error('Erro ao carregar locais:', error)
-      }
-    }
-
-    fetchLocations()
+    fetchAvailableLocations()
+      .then(setAvailableLocations)
+      .catch((err) => console.error('Erro ao carregar locais:', err))
   }, [])
   
   // RG atual sendo digitado

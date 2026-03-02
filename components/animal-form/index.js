@@ -29,7 +29,7 @@ export default function AnimalForm({ isOpen, onClose, animal, onSave }) {
     naturezasOperacao,
     setNaturezasOperacao,
     availableLocations
-  } = useAnimalForm(animal, isOpen, onClose);
+  } = useAnimalForm(animal, isOpen, onClose, onSave);
 
   const [showImportModal, setShowImportModal] = useState(false);
   const [showNFModal, setShowNFModal] = useState(false);

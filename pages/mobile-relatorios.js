@@ -5,6 +5,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js'
 import { Bar, Doughnut, Line } from 'react-chartjs-2'
@@ -27,8 +28,24 @@ import {
   FunnelIcon,
   SparklesIcon,
   LightBulbIcon,
-  BanknotesIcon
+  BanknotesIcon,
+  StarIcon,
+  ClockIcon,
+  XMarkIcon,
+  ChevronUpIcon,
+  ChatBubbleLeftRightIcon,
+  HomeIcon,
+  Cog6ToothIcon,
+  ListBulletIcon,
+  ArrowRightOnRectangleIcon,
+  MoonIcon,
+  BellIcon
 } from '@heroicons/react/24/outline'
+import { 
+  StarIcon as StarIconSolid,
+  HomeIcon as HomeIconSolid,
+  ChartBarIcon as ChartBarIconSolid
+} from '@heroicons/react/24/solid'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Filler, Tooltip, Legend)
 
@@ -69,7 +86,26 @@ const ICONE_POR_CATEGORIA = {
   Outros: ChartBarIcon
 }
 
+const DESCRICOES_ACESSO_RAPIDO = {
+  resumo_geral: 'Resumo completo do rebanho',
+  previsoes_parto: 'Datas previstas de partos',
+  calendario_reprodutivo: 'Eventos e cronograma',
+  ranking_pmgz: 'Top animais por desempenho'
+}
+
 export default function MobileRelatorios() {
+  const router = useRouter()
+  const [currentTab, setCurrentTab] = useState('home')
+  const [showMenu, setShowMenu] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(false)
+  
+  const getGreeting = () => {
+    const h = new Date().getHours()
+    if (h < 12) return 'Bom dia'
+    if (h < 18) return 'Boa tarde'
+    return 'Boa noite'
+  }
+
   const [config, setConfig] = useState(null)
   const [loading, setLoading] = useState(true)
   const [selectedTipo, setSelectedTipo] = useState(null)
@@ -104,6 +140,20 @@ export default function MobileRelatorios() {
       return s ? JSON.parse(s) : []
     } catch { return [] }
   })
+  const [searchReports, setSearchReports] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('')
+  const [favorites, setFavorites] = useState(() => {
+    try {
+      const s = typeof window !== 'undefined' ? localStorage.getItem('mobile-relatorios-favorites') : null
+      return s ? JSON.parse(s) : []
+    } catch { return [] }
+  })
+  const [collapsedCats, setCollapsedCats] = useState({})
+  const [toast, setToast] = useState(null)
+  const [showScrollTop, setShowScrollTop] = useState(false)
+  const [cardFilterModal, setCardFilterModal] = useState({ open: false, title: '', filter: null, dataType: 'animais' })
+  const [cardAnimalsList, setCardAnimalsList] = useState([])
+  const [cardListLoading, setCardListLoading] = useState(false)
 
   useEffect(() => {
     fetch('/api/mobile-reports')
@@ -111,12 +161,26 @@ export default function MobileRelatorios() {
       .then(d => {
         if (d.success && d.data) {
           setConfig(d.data)
+          // Debug: verificar configuração
+          console.log('📅 Config recebida:', d.data)
+          console.log('📅 Relatórios habilitados:', d.data.enabled)
+          console.log('📅 Calendário está habilitado?', d.data.enabled?.includes('calendario_reprodutivo'))
         } else if (d.enabled && d.allTypes) {
           setConfig({ enabled: d.enabled, allTypes: d.allTypes })
+          console.log('📅 Config alternativa:', { enabled: d.enabled, allTypes: d.allTypes })
         }
       })
       .catch(() => {})
       .finally(() => setLoading(false))
+  }, [])
+
+  // Inicializar tema
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const savedDarkMode = localStorage.getItem('darkMode')
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const shouldBeDark = savedDarkMode === 'true' || (!savedDarkMode && prefersDark)
+    setIsDarkMode(shouldBeDark)
   }, [])
 
   // Carregar dashboard (resumo geral) na entrada
@@ -166,15 +230,140 @@ export default function MobileRelatorios() {
     }
   }, [selectedTipo])
 
+  // Ao navegar o calendário, buscar dados do mês exibido
+  useEffect(() => {
+    if (selectedTipo === 'calendario_reprodutivo' && viewMode === 'calendar' && calendarMonth) {
+      const start = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), 1)
+      const end = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 0)
+      const startStr = start.toISOString().split('T')[0]
+      const endStr = end.toISOString().split('T')[0]
+      setPeriod(prev => {
+        if (prev.startDate === startStr && prev.endDate === endStr) return prev
+        return { startDate: startStr, endDate: endStr }
+      })
+    }
+  }, [selectedTipo, viewMode, calendarMonth?.getFullYear?.(), calendarMonth?.getMonth?.()])
+
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 300)
+    window.addEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    if (!toast) return
+    const t = setTimeout(() => setToast(null), 2500)
+    return () => clearTimeout(t)
+  }, [toast])
+
+  useEffect(() => {
+    if (!cardFilterModal.open || !cardFilterModal.filter) return
+    
+    // Se está mostrando a lista de piquetes (resumo)
+    if (cardFilterModal.dataType === 'piquetes') {
+      const rows = reportData?.data || []
+      setCardAnimalsList(rows.filter(r => r.Piquete != null && !r._resumo))
+      setCardListLoading(false)
+      return
+    }
+    
+    setCardListLoading(true)
+    
+    // Se o filtro tem piquete, usar a API de localizações para buscar animais
+    if (cardFilterModal.filter.piquete) {
+      const piqueteNome = cardFilterModal.filter.piquete
+      console.log('Buscando animais do piquete:', piqueteNome)
+      fetch(`/api/localizacoes?piquete=${encodeURIComponent(piqueteNome)}&atual=true`)
+        .then(r => r.json())
+        .then(d => {
+          console.log('Dados recebidos da API de localizações:', d)
+          if (d.success && Array.isArray(d.data)) {
+            // Transformar dados de localização em formato de animal
+            const animais = d.data.map(loc => {
+              const animal = {
+                id: loc.animal_id,
+                serie: loc.serie || '',
+                rg: loc.rg || '',
+                sexo: loc.sexo || '',
+                raca: loc.raca || '',
+                identificacao: `${loc.serie || ''}-${loc.rg || ''}`,
+                piquete: loc.piquete || ''
+              }
+              console.log('Animal transformado:', animal)
+              return animal
+            })
+            console.log('Total de animais encontrados:', animais.length)
+            setCardAnimalsList(animais)
+          } else {
+            console.log('Nenhum animal encontrado ou resposta inválida')
+            setCardAnimalsList([])
+          }
+        })
+        .catch(err => {
+          console.error('Erro ao buscar animais do piquete:', err)
+          setCardAnimalsList([])
+        })
+        .finally(() => setCardListLoading(false))
+      return
+    }
+    
+    // Caso contrário, usar a API de animais normal
+    const params = new URLSearchParams(cardFilterModal.filter)
+    fetch(`/api/animals?${params}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.success && Array.isArray(d.data)) setCardAnimalsList(d.data)
+        else setCardAnimalsList([])
+      })
+      .catch(() => setCardAnimalsList([]))
+      .finally(() => setCardListLoading(false))
+  }, [cardFilterModal.open, cardFilterModal.filter, cardFilterModal.dataType, reportData?.data])
+
+  const handleCardClick = useCallback((k, v) => {
+    const key = String(k).toLowerCase()
+    if (/machos?\b/i.test(k)) {
+      setCardFilterModal({ open: true, title: `Machos (${v})`, filter: { sexo: 'Macho' }, dataType: 'animais' })
+      return
+    }
+    if (/fêmeas?|femeas?/i.test(k)) {
+      setCardFilterModal({ open: true, title: `Fêmeas (${v})`, filter: { sexo: 'Fêmea' }, dataType: 'animais' })
+      return
+    }
+    if (/animais únicos?/i.test(k)) {
+      setCardFilterModal({ open: true, title: `Animais únicos (${v})`, filter: {}, dataType: 'animais' })
+      return
+    }
+    if (/total de pesagens?/i.test(k)) {
+      setSelectedTipo('pesagens')
+      setViewMode('table')
+      return
+    }
+    if (/piquetes?/i.test(k)) {
+      setCardFilterModal({ open: true, title: `Piquetes (${v})`, filter: {}, dataType: 'piquetes' })
+      return
+    }
+    if (/peso médio|peso medio/i.test(k)) return
+    setCardFilterModal({ open: true, title: k, filter: {}, dataType: 'animais' })
+  }, [])
+
   const enabledReports = config?.enabled || []
   const allTypes = config?.allTypes || []
   const tiposHabilitados = allTypes.filter(t => enabledReports.includes(t.key))
+  const ACESSO_RAPIDO_KEYS = ['resumo_geral', 'previsoes_parto', 'calendario_reprodutivo', 'ranking_pmgz']
   const porCategoria = tiposHabilitados.reduce((acc, t) => {
     const cat = t.category || 'Outros'
     if (!acc[cat]) acc[cat] = []
     acc[cat].push(t)
     return acc
   }, {})
+  const categoriasComRelatorios = Object.entries(porCategoria)
+    .map(([cat, tipos]) => ({ cat, tipos }))
+    .filter(({ tipos }) => tipos.length > 0)
+  const matchSearch = (label, key) => {
+    if (!searchReports.trim()) return true
+    const q = searchReports.trim().toLowerCase()
+    return (label || '').toLowerCase().includes(q) || (key || '').toLowerCase().includes(q)
+  }
   const showRanking = enabledReports.includes('ranking_animais_avaliados') || enabledReports.includes('ranking_pmgz')
   const ehRanking = selectedTipo === 'ranking_pmgz' || selectedTipo === 'ranking_animais_avaliados'
   const LABELS_RANKING = {
@@ -211,10 +400,23 @@ export default function MobileRelatorios() {
   const saveRecent = useCallback((id) => {
     if (!id) return
     setRecentIds(prev => {
-      const next = [id, ...prev.filter(x => x !== id)].slice(0, 2)
+      const next = [id, ...prev.filter(x => x !== id)].slice(0, 5)
       try { localStorage.setItem('mobile-relatorios-recent', JSON.stringify(next)) } catch {}
       return next
     })
+  }, [])
+
+  const toggleFavorite = useCallback((id) => {
+    if (!id) return
+    setFavorites(prev => {
+      const next = prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+      try { localStorage.setItem('mobile-relatorios-favorites', JSON.stringify(next)) } catch {}
+      return next
+    })
+  }, [])
+
+  const toggleCollapse = useCallback((cat) => {
+    setCollapsedCats(prev => ({ ...prev, [cat]: !prev[cat] }))
   }, [])
 
   // Dados para gráficos (resumo_pesagens)
@@ -477,6 +679,8 @@ export default function MobileRelatorios() {
     dg: filteredBySexo.filter(r => (r.tipo || '') === 'Diagnóstico de Gestação').length,
     partos: filteredBySexo.filter(r => (r.tipo || '') === 'Parto Previsto').length,
     andrologico: filteredBySexo.filter(r => (r.tipo || '') === 'Refazer Exame Andrológico').length,
+    brucelose: filteredBySexo.filter(r => (r.tipo || '') === 'Brucelose').length,
+    dgt: filteredBySexo.filter(r => (r.tipo || '') === 'DGT').length,
     total: filteredBySexo.length
   } : null
 
@@ -595,8 +799,12 @@ export default function MobileRelatorios() {
       })
       const top = Object.entries(porTipo).sort(([, a], [, b]) => b - a)[0]
       const partos = porTipo['Parto Previsto'] || contagemTiposCalendario?.partos || 0
+      const brucelose = porTipo['Brucelose'] || contagemTiposCalendario?.brucelose || 0
+      const dgt = porTipo['DGT'] || contagemTiposCalendario?.dgt || 0
       list.push({ icon: '📅', text: `${dados.length} evento(s) no calendário` })
       if (partos > 0) list.push({ icon: '🐄', text: `${partos} parto(s) previsto(s) no período` })
+      if (brucelose > 0) list.push({ icon: '💉', text: `${brucelose} fêmea(s) para Brucelose` })
+      if (dgt > 0) list.push({ icon: '📋', text: `${dgt} animal(is) para DGT` })
       if (Object.keys(porMes).length > 0) {
         const mesesComEventos = Object.keys(porMes).length
         list.push({ icon: '📆', text: `${mesesComEventos} mês(es) com eventos` })
@@ -612,6 +820,37 @@ export default function MobileRelatorios() {
       if (porTouro && porTouro !== '-') list.push({ icon: '🐂', text: `Por touro: ${String(porTouro).substring(0, 80)}${String(porTouro).length > 80 ? '...' : ''}` })
     }
 
+    if (selectedTipo === 'femeas_brucelose' && dados.length > 0) {
+      const total = dados.length
+      list.push({ icon: '💉', text: `${total} fêmea(s) precisam de vacina de brucelose` })
+      const porPiquete = {}
+      dados.forEach(r => {
+        const p = r.piquete || 'Não informado'
+        porPiquete[p] = (porPiquete[p] || 0) + 1
+      })
+      const piquetes = Object.keys(porPiquete).length
+      if (piquetes > 1) list.push({ icon: '📍', text: `Distribuídas em ${piquetes} piquete(s)` })
+      const idadeMedia = dados.reduce((s, r) => s + (r.idade_meses || 0), 0) / total
+      if (idadeMedia > 0) list.push({ icon: '📊', text: `Idade média: ${idadeMedia.toFixed(1)} meses` })
+    }
+
+    if (selectedTipo === 'animais_dgt' && dados.length > 0) {
+      const total = dados.length
+      const machos = dados.filter(r => (r.sexo || '').toUpperCase().startsWith('M')).length
+      const femeas = dados.filter(r => (r.sexo || '').toUpperCase().startsWith('F')).length
+      list.push({ icon: '📋', text: `${total} animal(is) elegível(is) para DGT` })
+      if (machos > 0 && femeas > 0) {
+        list.push({ icon: '🐄', text: `${machos} machos e ${femeas} fêmeas` })
+      }
+      const porPiquete = {}
+      dados.forEach(r => {
+        const p = r.piquete || 'Não informado'
+        porPiquete[p] = (porPiquete[p] || 0) + 1
+      })
+      const piquetes = Object.keys(porPiquete).length
+      if (piquetes > 1) list.push({ icon: '📍', text: `Distribuídos em ${piquetes} piquete(s)` })
+    }
+
     return list
   })()
 
@@ -625,7 +864,9 @@ export default function MobileRelatorios() {
     gestacoes: 'Acompanhe gestações atrasadas para intervenções.',
     previsoes_parto: 'Resumo por touro: quantas prenhas cada touro gerou. Ajuste as datas para ver partos previstos no período.',
     mortes: 'Analise causas para prevenir futuras perdas.',
-    calendario_reprodutivo: 'Eventos manuais, receptoras, partos previstos e refazer andrológico. Veja meses com eventos e quantidade de parições.'
+    calendario_reprodutivo: 'Eventos manuais, receptoras, partos previstos e refazer andrológico. Veja meses com eventos e quantidade de parições.',
+    femeas_brucelose: 'Fêmeas entre 3 e 8 meses (90-240 dias) que precisam receber a vacina de brucelose obrigatória.',
+    animais_dgt: 'Animais entre 11 e 21 meses (330-640 dias) elegíveis para avaliação de desempenho DGT.'
   }
   const dicaAtual = selectedTipo ? DICAS_POR_TIPO[selectedTipo] : null
 
@@ -644,15 +885,47 @@ export default function MobileRelatorios() {
       ].filter(Boolean).join('\n')
       if (navigator.share) {
         await navigator.share({ title: titulo, text: texto })
+        setToast({ type: 'success', msg: 'Compartilhado!' })
       } else {
         await navigator.clipboard.writeText(texto)
-        alert('Resumo copiado')
+        setToast({ type: 'success', msg: 'Resumo copiado!' })
       }
     } catch (e) {
+      setToast({ type: 'error', msg: 'Não foi possível compartilhar' })
     } finally {
       setSharing(false)
     }
   }
+  const PERIOD_PRESETS = {
+    '7d': () => {
+      const end = new Date()
+      const start = new Date(end); start.setDate(start.getDate() - 7)
+      return { startDate: start.toISOString().split('T')[0], endDate: end.toISOString().split('T')[0] }
+    },
+    '30d': () => {
+      const end = new Date()
+      const start = new Date(end); start.setDate(start.getDate() - 30)
+      return { startDate: start.toISOString().split('T')[0], endDate: end.toISOString().split('T')[0] }
+    },
+    'mes': () => {
+      const d = new Date()
+      const start = new Date(d.getFullYear(), d.getMonth(), 1)
+      const end = new Date(d.getFullYear(), d.getMonth() + 1, 0)
+      return { startDate: start.toISOString().split('T')[0], endDate: end.toISOString().split('T')[0] }
+    },
+    'ano': () => {
+      const d = new Date()
+      const start = new Date(d.getFullYear(), 0, 1)
+      const end = new Date(d.getFullYear(), 11, 31)
+      return { startDate: start.toISOString().split('T')[0], endDate: end.toISOString().split('T')[0] }
+    }
+  }
+
+  const applyPeriod = (key) => {
+    const fn = PERIOD_PRESETS[key]
+    if (fn) setPeriod(fn())
+  }
+
   const exportCSV = () => {
     const rows = dadosParaExibir
     if (!rows.length) return
@@ -674,6 +947,7 @@ export default function MobileRelatorios() {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
+    setToast({ type: 'success', msg: 'CSV exportado com sucesso!' })
   }
 
   return (
@@ -682,6 +956,195 @@ export default function MobileRelatorios() {
         <title>Relatórios | Beef-Sync</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
       </Head>
+      {/* Toast */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-24 left-4 right-4 z-50 max-w-lg mx-auto"
+          >
+            <div className={`px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 ${
+              toast.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'
+            }`}>
+              <span className="text-xl">{toast.type === 'success' ? '✓' : '⚠'}</span>
+              <span className="font-semibold flex-1">{toast.msg}</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      {/* Botão voltar ao topo */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="fixed bottom-28 right-4 z-30 p-3 rounded-full bg-amber-500 text-white shadow-lg hover:bg-amber-600 active:scale-95 transition-all"
+          >
+            <ChevronUpIcon className="h-6 w-6" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+      {/* Modal lista de animais ao clicar nos cards */}
+      <AnimatePresence>
+        {cardFilterModal.open && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setCardFilterModal(m => ({ ...m, open: false }))}
+            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              onClick={e => e.stopPropagation()}
+              className="absolute bottom-0 left-0 right-0 max-h-[85vh] rounded-t-2xl bg-white dark:bg-gray-900 shadow-2xl flex flex-col"
+            >
+              <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{cardFilterModal.title}</h3>
+                <button
+                  onClick={() => setCardFilterModal(m => ({ ...m, open: false }))}
+                  className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <XMarkIcon className="h-6 w-6 text-gray-500" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto overscroll-contain">
+                {cardListLoading ? (
+                  <div className="flex items-center justify-center py-16">
+                    <ArrowPathIcon className="h-10 w-10 text-amber-500 animate-spin" />
+                  </div>
+                ) : cardFilterModal.dataType === 'piquetes' ? (
+                  <div className="p-4 space-y-3">
+                    {cardAnimalsList.map((row, idx) => {
+                      const piqueteNome = (row.Piquete || row.piquete || '-').replace(/PROJETO\s*/i, 'PROJETO ')
+                      const totalAnimais = row.Animais ?? row.total ?? 0
+                      const machos = row.Machos ?? row.machos ?? 0
+                      const femeas = row.Fêmeas ?? row.femeas ?? row.Femeas ?? 0
+                      const mediaPeso = row['Média Peso (kg)'] ?? row.mediaPeso ?? row.media_peso
+                      const cor = CORES_PIQUETE[idx % CORES_PIQUETE.length]
+                      
+                      return (
+                        <motion.button
+                          key={idx}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: idx * 0.05 }}
+                          whileHover={{ scale: 1.02, y: -2 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => {
+                            // Buscar animais deste piquete
+                            setCardFilterModal({
+                              open: true,
+                              title: `Animais em ${piqueteNome}`,
+                              filter: { piquete: piqueteNome },
+                              dataType: 'animais'
+                            })
+                          }}
+                          className="w-full p-4 rounded-xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-800/50 border-2 border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-amber-400 dark:hover:border-amber-600 transition-all text-left"
+                        >
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              <div 
+                                className="w-3 h-3 rounded-full shadow-sm"
+                                style={{ backgroundColor: cor }}
+                              />
+                              <h4 className="font-bold text-gray-900 dark:text-white text-lg">
+                                {piqueteNome}
+                              </h4>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 text-sm font-bold">
+                                {totalAnimais} 🐄
+                              </span>
+                              <ChevronRightIcon className="h-5 w-5 text-gray-400" />
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-3">
+                            {machos > 0 && (
+                              <div className="flex items-center gap-2 p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20">
+                                <div className="w-8 h-8 rounded-full bg-blue-200 dark:bg-blue-800 flex items-center justify-center">
+                                  <span className="text-blue-700 dark:text-blue-300 font-bold text-sm">M</span>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">Machos</p>
+                                  <p className="text-lg font-bold text-blue-900 dark:text-blue-100">{machos}</p>
+                                </div>
+                              </div>
+                            )}
+                            
+                            {femeas > 0 && (
+                              <div className="flex items-center gap-2 p-2 rounded-lg bg-pink-50 dark:bg-pink-900/20">
+                                <div className="w-8 h-8 rounded-full bg-pink-200 dark:bg-pink-800 flex items-center justify-center">
+                                  <span className="text-pink-700 dark:text-pink-300 font-bold text-sm">F</span>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-pink-600 dark:text-pink-400 font-medium">Fêmeas</p>
+                                  <p className="text-lg font-bold text-pink-900 dark:text-pink-100">{femeas}</p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {mediaPeso && (
+                            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs text-gray-600 dark:text-gray-400 font-medium">Média de Peso</span>
+                                <span className="text-sm font-bold text-amber-600 dark:text-amber-400">
+                                  {typeof mediaPeso === 'number' ? mediaPeso.toFixed(1) : mediaPeso} kg
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Indicador de clicável */}
+                          <div className="mt-3 pt-2 border-t border-gray-200 dark:border-gray-700">
+                            <p className="text-xs text-center text-gray-500 dark:text-gray-400 font-medium">
+                              Toque para ver os animais
+                            </p>
+                          </div>
+                        </motion.button>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                    {cardAnimalsList.map((a, idx) => {
+                      const sexo = a.sexo || 'Não informado'
+                      const raca = a.raca || 'Não informado'
+                      const info = [sexo, raca].filter(Boolean).join(' · ')
+                      
+                      return (
+                        <Link
+                          key={a.id || idx}
+                          href={`/animals/${a.id}`}
+                          onClick={() => setCardFilterModal(m => ({ ...m, open: false }))}
+                          className="flex items-center justify-between px-4 py-3 hover:bg-amber-50 dark:hover:bg-gray-800"
+                        >
+                          <span className="font-medium text-gray-900 dark:text-white">
+                            {a.identificacao || `${a.serie || ''}-${a.rg || ''}`.trim() || a.nome || '—'}
+                          </span>
+                          <span className="text-sm text-gray-500 dark:text-gray-400">{info}</span>
+                        </Link>
+                      )
+                    })}
+                  </div>
+                )}
+                {!cardListLoading && cardAnimalsList.length === 0 && (
+                  <div className="py-12 text-center text-gray-500 dark:text-gray-400">Nenhum registro encontrado.</div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="min-h-screen bg-gradient-to-b from-amber-50/80 via-gray-50 to-gray-100 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950 pb-24">
         <div className="sticky top-0 z-10 bg-white/98 dark:bg-gray-900/98 backdrop-blur-md border-b border-gray-200/80 dark:border-gray-700 shadow-sm px-4 py-3">
           <div className="max-w-lg mx-auto flex items-center justify-between">
@@ -719,26 +1182,36 @@ export default function MobileRelatorios() {
         <div className="max-w-lg mx-auto px-4 py-6">
           {loading ? (
             <div className="space-y-3">
-              {[1, 2, 3, 4, 5].map(i => (
-                <div key={i} className="h-16 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse" />
+              {[1, 2, 3, 4, 5, 6].map((i, idx) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0.5 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ repeat: Infinity, repeatType: 'reverse', duration: 0.8, delay: idx * 0.1 }}
+                  className="h-16 rounded-2xl bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700"
+                />
               ))}
             </div>
           ) : !selectedTipo ? (
-            <div className="space-y-4">
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-center py-2"
-              >
-                <p className="text-2xl font-bold bg-gradient-to-r from-amber-600 via-amber-500 to-amber-400 bg-clip-text text-transparent">
-                  Beef-Sync Relatórios
-                </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  Gestão completa do rebanho na palma da mão
-                </p>
-              </motion.div>
+            <div className="pb-24 space-y-4 relative">
+              {currentTab === 'home' && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="space-y-6"
+                >
+                  <div className="px-1 pt-2">
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                      {getGreeting()},
+                      <span className="text-amber-500">Fazendeiro</span>
+                    </h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      Aqui está o resumo da sua fazenda hoje.
+                    </p>
+                  </div>
 
-              {/* Dashboard / Visão Geral - KPIs rápidos */}
+              {/* Dashboard / Visão Geral - KPIs rápidos MELHORADOS */}
               {dashboardData?.data?.length > 0 && (
                 <motion.div
                   initial={{ opacity: 0, y: 12 }}
@@ -747,38 +1220,142 @@ export default function MobileRelatorios() {
                   className="mb-6"
                 >
                   <div className="flex items-center justify-between mb-3 px-1">
-                    <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Visão Geral</span>
+                    <div className="flex items-center gap-2">
+                      <SparklesIcon className="h-4 w-4 text-amber-500" />
+                      <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Visão Geral</span>
+                    </div>
                     <button
                       onClick={() => setSelectedTipo('resumo_geral')}
-                      className="text-xs font-semibold text-amber-600 dark:text-amber-400 hover:underline"
+                      className="flex items-center gap-1 text-xs font-semibold text-amber-600 dark:text-amber-400 hover:underline active:scale-95"
                     >
-                      Ver completo →
+                      Ver completo
+                      <ChevronRightIcon className="h-3 w-3" />
                     </button>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                    {dashboardData.data.slice(0, 4).map((mod, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.05 * i }}
-                        onClick={() => setSelectedTipo('resumo_geral')}
-                        className="p-4 rounded-2xl bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-amber-300 dark:hover:border-amber-600 transition-all active:scale-[0.98] cursor-pointer"
-                      >
-                        <p className="text-[10px] font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">{mod.modulo}</p>
-                        <div className="space-y-1">
-                          {Object.entries(mod.dados || {}).slice(0, 2).map(([k, v]) => (
-                            <div key={k} className="flex justify-between items-baseline gap-2">
-                              <span className="text-xs text-gray-600 dark:text-gray-400 truncate">{k}</span>
-                              <span className="text-sm font-bold text-gray-900 dark:text-white truncate">{String(v)}</span>
+                    {dashboardData.data.slice(0, 4).map((mod, i) => {
+                      const modConfig = {
+                        Rebanho: { 
+                          gradient: 'from-blue-50 via-blue-100/70 to-blue-50 dark:from-blue-900/30 dark:via-blue-800/20 dark:to-blue-900/30',
+                          border: 'border-blue-300 dark:border-blue-700',
+                          icon: '🐄',
+                          iconBg: 'bg-blue-200/50 dark:bg-blue-800/50',
+                          textColor: 'text-blue-700 dark:text-blue-300'
+                        },
+                        Reprodução: { 
+                          gradient: 'from-pink-50 via-pink-100/70 to-pink-50 dark:from-pink-900/30 dark:via-pink-800/20 dark:to-pink-900/30',
+                          border: 'border-pink-300 dark:border-pink-700',
+                          icon: '💕',
+                          iconBg: 'bg-pink-200/50 dark:bg-pink-800/50',
+                          textColor: 'text-pink-700 dark:text-pink-300'
+                        },
+                        Peso: { 
+                          gradient: 'from-amber-50 via-amber-100/70 to-amber-50 dark:from-amber-900/30 dark:via-amber-800/20 dark:to-amber-900/30',
+                          border: 'border-amber-300 dark:border-amber-700',
+                          icon: '⚖️',
+                          iconBg: 'bg-amber-200/50 dark:bg-amber-800/50',
+                          textColor: 'text-amber-700 dark:text-amber-300'
+                        },
+                        Financeiro: { 
+                          gradient: 'from-emerald-50 via-emerald-100/70 to-emerald-50 dark:from-emerald-900/30 dark:via-emerald-800/20 dark:to-emerald-900/30',
+                          border: 'border-emerald-300 dark:border-emerald-700',
+                          icon: '💰',
+                          iconBg: 'bg-emerald-200/50 dark:bg-emerald-800/50',
+                          textColor: 'text-emerald-700 dark:text-emerald-300'
+                        }
+                      }
+                      const config = modConfig[mod.modulo] || {
+                        gradient: 'from-gray-50 to-gray-100/50 dark:from-gray-900/20 dark:to-gray-900/10',
+                        border: 'border-gray-200 dark:border-gray-700',
+                        icon: '📊',
+                        iconBg: 'bg-gray-200/50 dark:bg-gray-700/50',
+                        textColor: 'text-gray-700 dark:text-gray-300'
+                      }
+                      return (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          transition={{ delay: 0.05 * i, type: 'spring', stiffness: 200 }}
+                          whileHover={{ scale: 1.05, y: -4 }}
+                          whileTap={{ scale: 0.97 }}
+                          onClick={() => setSelectedTipo('resumo_geral')}
+                          className={`relative p-4 rounded-2xl bg-gradient-to-br border-2 shadow-md hover:shadow-xl transition-all cursor-pointer overflow-hidden group ${config.gradient} ${config.border}`}
+                        >
+                          {/* Ícone decorativo no canto */}
+                          <div className={`absolute -top-2 -right-2 w-16 h-16 rounded-full ${config.iconBg} opacity-20 blur-xl`} />
+                          
+                          {/* Indicador de clicável */}
+                          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <ChevronRightIcon className="h-4 w-4 text-gray-400" />
+                          </div>
+                          
+                          <div className="relative z-10">
+                            <div className="flex items-center justify-between mb-2">
+                              <p className="text-[10px] font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">{mod.modulo}</p>
+                              <span className="text-2xl">{config.icon}</span>
                             </div>
-                          ))}
-                        </div>
-                      </motion.div>
-                    ))}
+                            <div className="space-y-1.5">
+                              {Object.entries(mod.dados || {}).slice(0, 2).map(([k, v]) => (
+                                <div key={k} className="flex justify-between items-baseline gap-2">
+                                  <span className="text-xs text-gray-600 dark:text-gray-400 truncate">{k}</span>
+                                  <span className={`text-base font-bold truncate ${config.textColor}`}>{String(v)}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          
+                          {/* Barra de progresso decorativa */}
+                          <motion.div 
+                            initial={{ width: 0 }}
+                            animate={{ width: '100%' }}
+                            transition={{ delay: 0.2 + (i * 0.1), duration: 0.6 }}
+                            className={`absolute bottom-0 left-0 h-1 ${config.iconBg} opacity-50`}
+                          />
+                        </motion.div>
+                      )
+                    })}
                   </div>
+                  
+                  {/* Estatísticas rápidas adicionais */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="mt-3 grid grid-cols-3 gap-2"
+                  >
+                    <motion.div 
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="p-2 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100/50 dark:from-purple-900/20 dark:to-purple-900/10 border border-purple-200 dark:border-purple-800 cursor-default"
+                    >
+                      <p className="text-[9px] font-semibold text-purple-600 dark:text-purple-400 uppercase">Hoje</p>
+                      <p className="text-sm font-bold text-purple-900 dark:text-purple-100">{new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</p>
+                    </motion.div>
+                    <motion.button
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setCurrentTab('reports')}
+                      className="p-2 rounded-xl bg-gradient-to-br from-teal-50 to-teal-100/50 dark:from-teal-900/20 dark:to-teal-900/10 border border-teal-200 dark:border-teal-800 hover:border-teal-400 dark:hover:border-teal-600 transition-all cursor-pointer"
+                    >
+                      <p className="text-[9px] font-semibold text-teal-600 dark:text-teal-400 uppercase">Relatórios</p>
+                      <p className="text-sm font-bold text-teal-900 dark:text-teal-100">{enabledReports.length}</p>
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setCurrentTab('reports')}
+                      className="p-2 rounded-xl bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-900/20 dark:to-orange-900/10 border border-orange-200 dark:border-orange-800 hover:border-orange-400 dark:hover:border-orange-600 transition-all cursor-pointer"
+                    >
+                      <p className="text-[9px] font-semibold text-orange-600 dark:text-orange-400 uppercase">Favoritos</p>
+                      <p className="text-sm font-bold text-orange-900 dark:text-orange-100">{favorites.length}</p>
+                    </motion.button>
+                  </motion.div>
                 </motion.div>
               )}
+              </motion.div>
+              )}
+
               {tiposHabilitados.length === 0 ? (
                 <div className="p-6 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-center">
                   <p className="text-amber-800 dark:text-amber-200">
@@ -786,7 +1363,83 @@ export default function MobileRelatorios() {
                   </p>
                 </div>
               ) : (
-                <div className="space-y-6">
+                <>
+                  {currentTab === 'reports' && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="space-y-6"
+                    >
+                      {/* Busca de relatórios */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="relative"
+                  >
+                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <input
+                      type="text"
+                      value={searchReports}
+                      onChange={e => setSearchReports(e.target.value)}
+                      placeholder="Buscar relatórios..."
+                      className="w-full pl-10 pr-10 py-3 rounded-2xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all"
+                    />
+                    {searchReports && (
+                      <button
+                        onClick={() => setSearchReports('')}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"
+                      >
+                        <XMarkIcon className="h-5 w-5 text-gray-500" />
+                      </button>
+                    )}
+                  </motion.div>
+
+                  {/* Filtro por categoria */}
+                  {categoriasComRelatorios.length > 1 && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex flex-wrap gap-2"
+                    >
+                      <button
+                        onClick={() => setCategoryFilter('')}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                          !categoryFilter
+                            ? 'bg-amber-500 text-white shadow-md'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        Todas
+                      </button>
+                      {categoriasComRelatorios.map(({ cat }) => {
+                        const CatIcon = ICONE_POR_CATEGORIA[cat] || ChartBarIcon
+                        const ativo = categoryFilter === cat
+                        return (
+                          <button
+                            key={cat}
+                            onClick={() => setCategoryFilter(ativo ? '' : cat)}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                              ativo ? 'bg-amber-500 text-white shadow-md' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                            }`}
+                          >
+                            <CatIcon className="h-3.5 w-3.5" />
+                            {cat}
+                          </button>
+                        )
+                      })}
+                    </motion.div>
+                  )}
+                    </motion.div>
+                  )}
+
+                  {currentTab === 'home' && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="space-y-6"
+                    >
                   {/* Acesso Rápido - Relatórios mais usados */}
                   <div>
                     <div className="flex items-center gap-2 mb-2 px-1">
@@ -794,10 +1447,11 @@ export default function MobileRelatorios() {
                       <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Acesso Rápido</span>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
-                      {['resumo_geral', 'previsoes_parto', 'calendario_reprodutivo', 'ranking_pmgz'].filter(k => enabledReports.includes(k)).map((id, i) => {
+                      {ACESSO_RAPIDO_KEYS.filter(k => enabledReports.includes(k)).map((id, i) => {
                         const tipo = allTypes.find(t => t.key === id)
                         if (!tipo) return null
                         const Icon = ICONE_POR_CATEGORIA[tipo.category] || ChartBarIcon
+                        const desc = DESCRICOES_ACESSO_RAPIDO[id]
                         return (
                           <motion.button
                             key={id}
@@ -805,13 +1459,17 @@ export default function MobileRelatorios() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.05 * i }}
                             whileTap={{ scale: 0.97 }}
+                            whileHover={{ scale: 1.02 }}
                             onClick={() => setSelectedTipo(id)}
-                            className="flex items-center gap-2 p-3 rounded-xl bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/30 dark:to-amber-900/10 border-2 border-amber-200 dark:border-amber-800 hover:border-amber-400 dark:hover:border-amber-600 shadow-sm hover:shadow-md transition-all text-left"
+                            className="flex flex-col items-start gap-1 p-3 rounded-xl bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/30 dark:to-amber-900/10 border-2 border-amber-200 dark:border-amber-800 hover:border-amber-400 dark:hover:border-amber-600 shadow-sm hover:shadow-md transition-all text-left"
                           >
-                            <div className="p-2 rounded-lg bg-amber-200/50 dark:bg-amber-800/50">
-                              <Icon className="h-5 w-5 text-amber-700 dark:text-amber-300" />
+                            <div className="flex items-center gap-2 w-full">
+                              <div className="p-2 rounded-lg bg-amber-200/50 dark:bg-amber-800/50 flex-shrink-0">
+                                <Icon className="h-5 w-5 text-amber-700 dark:text-amber-300" />
+                              </div>
+                              <span className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate flex-1">{tipo.label.replace(/^[📊📅🏆]\s*/, '')}</span>
                             </div>
-                            <span className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">{tipo.label.replace(/^[📊📅🏆]\s*/, '')}</span>
+                            {desc && <span className="text-[10px] text-gray-500 dark:text-gray-400 pl-1 line-clamp-1">{desc}</span>}
                           </motion.button>
                         )
                       })}
@@ -821,18 +1479,41 @@ export default function MobileRelatorios() {
                   {/* Card especial para Boletim Defesa */}
                   <Link href="/boletim-defesa/mobile">
                     <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="p-4 rounded-2xl bg-gradient-to-br from-teal-500 via-teal-600 to-emerald-600 dark:from-teal-600 dark:to-teal-800 border-2 border-teal-400 dark:border-teal-500 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="relative p-5 rounded-2xl bg-gradient-to-br from-teal-500 via-teal-600 to-emerald-600 dark:from-teal-600 dark:to-teal-800 border-2 border-teal-400 dark:border-teal-500 shadow-xl hover:shadow-2xl transition-all overflow-hidden"
                     >
-                      <div className="flex items-center justify-between">
+                      {/* Efeito de brilho animado */}
+                      <motion.div
+                        animate={{
+                          x: ['-100%', '200%'],
+                        }}
+                        transition={{
+                          duration: 3,
+                          repeat: Infinity,
+                          repeatDelay: 2,
+                          ease: 'easeInOut'
+                        }}
+                        className="absolute inset-0 w-1/3 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
+                      />
+                      
+                      <div className="relative z-10 flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="p-3 rounded-xl bg-white/20 backdrop-blur shadow-inner">
+                          <motion.div 
+                            whileHover={{ rotate: 360 }}
+                            transition={{ duration: 0.5 }}
+                            className="p-3 rounded-xl bg-white/20 backdrop-blur shadow-inner"
+                          >
                             <DocumentTextIcon className="h-7 w-7 text-white" />
-                          </div>
+                          </motion.div>
                           <div>
-                            <p className="font-bold text-white text-lg">Boletim Defesa</p>
-                            <p className="text-teal-100 text-sm">Quantidades de gado por faixa etária</p>
+                            <p className="font-bold text-white text-lg flex items-center gap-2">
+                              Boletim Defesa
+                              <span className="px-2 py-0.5 rounded-full bg-white/20 text-xs font-medium">Novo</span>
+                            </p>
+                            <p className="text-teal-100 text-sm">Quantidades por faixa etária</p>
                           </div>
                         </div>
                         <ChevronRightIcon className="h-6 w-6 text-white opacity-90" />
@@ -840,74 +1521,276 @@ export default function MobileRelatorios() {
                     </motion.div>
                   </Link>
 
-                  {recentIds.filter(id => !['resumo_geral', 'previsoes_parto', 'calendario_reprodutivo', 'ranking_pmgz'].includes(id)).length > 0 && (
+                  {/* Ações Rápidas - NOVO */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <div className="flex items-center gap-2 mb-3 px-1">
+                      <LightBulbIcon className="h-4 w-4 text-amber-500" />
+                      <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Ações Rápidas</span>
+                      <div className="flex-1 h-px bg-gradient-to-r from-amber-200 to-transparent dark:from-amber-800" />
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <Link href="/a">
+                        <motion.div
+                          whileHover={{ scale: 1.05, y: -2 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="p-3 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/10 border border-blue-200 dark:border-blue-800 hover:border-blue-400 dark:hover:border-blue-600 shadow-sm hover:shadow-md transition-all cursor-pointer"
+                        >
+                          <div className="flex flex-col items-center gap-1.5 text-center">
+                            <div className="p-2 rounded-lg bg-blue-200/50 dark:bg-blue-800/50">
+                              <MagnifyingGlassIcon className="h-5 w-5 text-blue-700 dark:text-blue-300" />
+                            </div>
+                            <span className="text-xs font-semibold text-blue-900 dark:text-blue-100">Consultar Animal</span>
+                          </div>
+                        </motion.div>
+                      </Link>
+                      
+                      <Link href="/mobile-feedback">
+                        <motion.div
+                          whileHover={{ scale: 1.05, y: -2 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="p-3 rounded-xl bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-900/20 dark:to-green-900/10 border border-green-200 dark:border-green-800 hover:border-green-400 dark:hover:border-green-600 shadow-sm hover:shadow-md transition-all cursor-pointer"
+                        >
+                          <div className="flex flex-col items-center gap-1.5 text-center">
+                            <div className="p-2 rounded-lg bg-green-200/50 dark:bg-green-800/50">
+                              <ChatBubbleLeftRightIcon className="h-5 w-5 text-green-700 dark:text-green-300" />
+                            </div>
+                            <span className="text-xs font-semibold text-green-900 dark:text-green-100">Enviar Feedback</span>
+                          </div>
+                        </motion.div>
+                      </Link>
+                      
+                      <motion.div
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => {
+                          const today = new Date()
+                          const start = new Date(today)
+                          start.setMonth(start.getMonth() - 1)
+                          setPeriod({
+                            startDate: start.toISOString().split('T')[0],
+                            endDate: today.toISOString().split('T')[0]
+                          })
+                        }}
+                        className="p-3 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100/50 dark:from-purple-900/20 dark:to-purple-900/10 border border-purple-200 dark:border-purple-800 hover:border-purple-400 dark:hover:border-purple-600 shadow-sm hover:shadow-md transition-all cursor-pointer"
+                      >
+                        <div className="flex flex-col items-center gap-1.5 text-center">
+                          <div className="p-2 rounded-lg bg-purple-200/50 dark:bg-purple-800/50">
+                            <CalendarIcon className="h-5 w-5 text-purple-700 dark:text-purple-300" />
+                          </div>
+                          <span className="text-xs font-semibold text-purple-900 dark:text-purple-100">Último Mês</span>
+                        </div>
+                      </motion.div>
+                    </div>
+                  </motion.div>
+
+                  {/* Favoritos */}
+                  {favorites.filter(id => enabledReports.includes(id)).length > 0 && (
                     <div>
                       <div className="flex items-center gap-2 mb-2 px-1">
+                        <StarIconSolid className="h-4 w-4 text-amber-500" />
+                        <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">Seus Favoritos</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {favorites.filter(id => enabledReports.includes(id)).map(id => {
+                          const tipo = allTypes.find(t => t.key === id)
+                          if (!tipo) return null
+                          const Icon = ICONE_POR_CATEGORIA[tipo.category] || DocumentTextIcon
+                          return (
+                            <motion.div
+                              key={id}
+                              whileTap={{ scale: 0.97 }}
+                              className="flex items-center gap-1 group"
+                            >
+                              <button
+                                onClick={() => setSelectedTipo(id)}
+                                className="flex items-center gap-2 px-3 py-2 rounded-xl bg-amber-100 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-sm font-medium hover:bg-amber-200 dark:hover:bg-amber-900/50"
+                              >
+                                <Icon className="h-4 w-4" />
+                                {tipo.label.replace(/^[📊📅🏆]\s*/, '')}
+                              </button>
+                              <button
+                                onClick={e => { e.stopPropagation(); toggleFavorite(id) }}
+                                className="p-1.5 rounded-lg text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/30"
+                              >
+                                <StarIconSolid className="h-4 w-4" />
+                              </button>
+                            </motion.div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Você pode gostar - sugestões */}
+                  {(() => {
+                    const excluidos = new Set([...ACESSO_RAPIDO_KEYS, ...recentIds, ...favorites])
+                    const sugestoes = []
+                    for (const { tipos } of categoriasComRelatorios) {
+                      for (const t of tipos) {
+                        if (!excluidos.has(t.key) && sugestoes.length < 3) {
+                          sugestoes.push(t)
+                          excluidos.add(t.key)
+                        }
+                      }
+                    }
+                    return sugestoes.length > 0 ? (
+                      <div>
+                        <div className="flex items-center gap-2 mb-2 px-1">
+                          <LightBulbIcon className="h-4 w-4 text-amber-500" />
+                          <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">Você pode gostar</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {sugestoes.map(tipo => {
+                            const Icon = ICONE_POR_CATEGORIA[tipo.category] || ChartBarIcon
+                            return (
+                              <motion.button
+                                key={tipo.key}
+                                whileTap={{ scale: 0.97 }}
+                                onClick={() => setSelectedTipo(tipo.key)}
+                                className="flex items-center gap-2 px-3 py-2 rounded-xl bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 text-violet-700 dark:text-violet-300 text-sm font-medium hover:bg-violet-100 dark:hover:bg-violet-900/30 transition-colors"
+                              >
+                                <Icon className="h-4 w-4" />
+                                {tipo.label.replace(/^[📊📅🏆]\s*/, '')}
+                              </motion.button>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    ) : null
+                  })()}
+
+                  {recentIds.filter(id => !ACESSO_RAPIDO_KEYS.includes(id)).length > 0 && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-2 px-1">
+                        <ClockIcon className="h-4 w-4 text-amber-500" />
                         <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">Acessados recentemente</span>
                       </div>
                       <div className="flex flex-wrap gap-2">
-                        {recentIds.filter(id => !['resumo_geral', 'previsoes_parto', 'calendario_reprodutivo', 'ranking_pmgz'].includes(id)).map(id => {
+                        {recentIds.filter(id => !ACESSO_RAPIDO_KEYS.includes(id)).filter(id => enabledReports.includes(id)).slice(0, 5).map(id => {
                           const tipo = allTypes.find(t => t.key === id)
-                          if (!tipo || !enabledReports.includes(id)) return null
+                          if (!tipo) return null
                           const Icon = ICONE_POR_CATEGORIA[tipo.category] || DocumentTextIcon
                           return (
                             <motion.button
                               key={id}
                               whileTap={{ scale: 0.97 }}
                               onClick={() => setSelectedTipo(id)}
-                              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-amber-100 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-sm font-medium"
+                              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600/50 transition-colors"
                             >
                               <Icon className="h-4 w-4" />
-                              {tipo.label}
+                              {tipo.label.replace(/^[📊📅🏆]\s*/, '')}
                             </motion.button>
                           )
                         })}
                       </div>
                     </div>
                   )}
+                    </motion.div>
+                  )}
+
+                  {currentTab === 'reports' && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="space-y-6"
+                    >
                   <div>
                     <div className="flex items-center gap-2 mb-3 px-1">
                       <ChartBarIcon className="h-4 w-4 text-amber-500" />
                       <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Todos os Relatórios</span>
                     </div>
-                  {Object.entries(porCategoria).map(([cat, tipos]) => {
-                    const CatIcon = ICONE_POR_CATEGORIA[cat] || DocumentTextIcon
-                    const ACESSO_RAPIDO_KEYS = ['resumo_geral', 'previsoes_parto', 'calendario_reprodutivo', 'ranking_pmgz']
-                    const tiposFiltrados = tipos.filter(t => !ACESSO_RAPIDO_KEYS.includes(t.key))
-                    if (tiposFiltrados.length === 0) return null
-                    return (
-                      <div key={cat} className="mb-6">
-                        <div className="flex items-center gap-2 mb-2 px-1">
-                          <CatIcon className="h-4 w-4 text-amber-500" />
-                          <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">{cat}</span>
-                        </div>
-                        <div className="space-y-2">
-                          {tiposFiltrados.map((tipo, i) => {
-                            const Icon = ICONE_POR_CATEGORIA[tipo.category] || DocumentTextIcon
-                            return (
-                              <motion.button
-                                key={tipo.key}
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: i * 0.03 }}
-                                whileTap={{ scale: 0.99 }}
-                                onClick={() => setSelectedTipo(tipo.key)}
-                                className="w-full flex items-center justify-between p-4 rounded-2xl bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 hover:border-amber-400 dark:hover:border-amber-600 hover:shadow-lg shadow-sm transition-all text-left group"
+                    <div className="space-y-4">
+                      {categoriasComRelatorios
+                        .filter(({ cat }) => !categoryFilter || categoryFilter === cat)
+                        .map(({ cat, tipos: tiposNaCat }) => {
+                          const tiposFiltrados = tiposNaCat.filter(t => matchSearch(t.label, t.key))
+                          if (tiposFiltrados.length === 0) return null
+                          const CatIcon = ICONE_POR_CATEGORIA[cat] || DocumentTextIcon
+                          const isCollapsed = collapsedCats[cat]
+                          return (
+                            <motion.div
+                              key={cat}
+                              initial={{ opacity: 0, y: 4 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="rounded-2xl bg-gray-50/50 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-700 overflow-hidden"
+                            >
+                              <button
+                                onClick={() => toggleCollapse(cat)}
+                                className="w-full flex items-center justify-between p-3 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
                               >
-                                <div className="flex items-center gap-3">
-                                  <div className="p-2.5 rounded-xl bg-amber-100 dark:bg-amber-900/30 group-hover:bg-amber-200 dark:group-hover:bg-amber-900/50 transition-colors">
-                                    <Icon className="h-6 w-6 text-amber-600 dark:text-amber-400" />
-                                  </div>
-                                  <p className="font-semibold text-gray-900 dark:text-white">{tipo.label}</p>
+                                <div className="flex items-center gap-2">
+                                  <CatIcon className="h-4 w-4 text-amber-500" />
+                                  <span className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">{cat}</span>
+                                  <span className="text-xs text-gray-400 dark:text-gray-500">({tiposFiltrados.length})</span>
                                 </div>
-                                <ChevronRightIcon className="h-5 w-5 text-gray-400 group-hover:text-amber-500 transition-colors" />
-                              </motion.button>
-                            )
-                          })}
+                                <ChevronRightIcon className={`h-5 w-5 text-gray-400 transition-transform ${!isCollapsed ? 'rotate-90' : ''}`} />
+                              </button>
+                              <AnimatePresence>
+                                {!isCollapsed && (
+                                  <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="overflow-hidden"
+                                  >
+                                    <div className="p-2 pt-0 space-y-2">
+                                      {tiposFiltrados.map((tipo, i) => {
+                                        const Icon = ICONE_POR_CATEGORIA[tipo.category] || DocumentTextIcon
+                                        const isFav = favorites.includes(tipo.key)
+                                        return (
+                                          <motion.div
+                                            key={tipo.key}
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: i * 0.02 }}
+                                            className="flex items-center gap-2"
+                                          >
+                                            <button
+                                              onClick={() => setSelectedTipo(tipo.key)}
+                                              className="flex-1 flex items-center justify-between p-4 rounded-xl bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 hover:border-amber-400 dark:hover:border-amber-600 hover:shadow-md shadow-sm transition-all text-left group"
+                                            >
+                                              <div className="flex items-center gap-3">
+                                                <div className="p-2.5 rounded-xl bg-amber-100 dark:bg-amber-900/30 group-hover:bg-amber-200 dark:group-hover:bg-amber-900/50 transition-colors">
+                                                  <Icon className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                                                </div>
+                                                <p className="font-semibold text-gray-900 dark:text-white">{tipo.label}</p>
+                                              </div>
+                                              <ChevronRightIcon className="h-5 w-5 text-gray-400 group-hover:text-amber-500 transition-colors flex-shrink-0" />
+                                            </button>
+                                            <button
+                                              onClick={e => { e.stopPropagation(); toggleFavorite(tipo.key) }}
+                                              className="p-2.5 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-900/30 text-amber-500 transition-colors flex-shrink-0"
+                                            >
+                                              {isFav ? <StarIconSolid className="h-5 w-5" /> : <StarIcon className="h-5 w-5" />}
+                                            </button>
+                                          </motion.div>
+                                        )
+                                      })}
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </motion.div>
+                          )
+                        })}
+                      {(searchReports.trim() || categoryFilter) && categoriasComRelatorios.filter(({ cat }) => !categoryFilter || categoryFilter === cat).every(({ tipos }) => tipos.filter(t => matchSearch(t.label, t.key)).length === 0) && (
+                        <div className="p-6 text-center text-gray-500 dark:text-gray-400">
+                          <p className="font-medium">Nenhum relatório encontrado</p>
+                          <button
+                            onClick={() => { setSearchReports(''); setCategoryFilter('') }}
+                            className="mt-2 text-sm text-amber-600 dark:text-amber-400 font-semibold"
+                          >
+                            Limpar filtros
+                          </button>
                         </div>
-                      </div>
-                    )
-                  })}
+                      )}
+                    </div>
                   </div>
 
                   {/* Rodapé */}
@@ -924,8 +1807,180 @@ export default function MobileRelatorios() {
                       Exporte relatórios em CSV ou compartilhe com sua equipe
                     </p>
                   </motion.div>
-                </div>
+                  </motion.div>
+                )}
+              </>
               )}
+
+              {currentTab === 'settings' && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="space-y-6 pt-2"
+                >
+                  <div className="px-1">
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Menu</h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      Configurações e informações
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-4">
+                     {/* Card do Usuário */}
+                     <motion.div 
+                       initial={{ opacity: 0, y: 10 }}
+                       animate={{ opacity: 1, y: 0 }}
+                       className="p-4 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-2 border-amber-200 dark:border-amber-800 shadow-md"
+                     >
+                        <div className="flex items-center gap-3 mb-3">
+                           <div className="h-12 w-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                             FA
+                           </div>
+                           <div className="flex-1">
+                             <p className="font-bold text-gray-900 dark:text-white text-lg">Fazendeiro</p>
+                             <p className="text-xs text-gray-600 dark:text-gray-400">admin@beefsync.com</p>
+                           </div>
+                        </div>
+                        <button className="w-full py-2.5 px-4 rounded-xl bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-sm border border-gray-200 dark:border-gray-700 flex items-center justify-center gap-2">
+                           <ArrowRightOnRectangleIcon className="h-4 w-4" />
+                           Sair da Conta
+                        </button>
+                     </motion.div>
+    
+                     {/* Seção Geral */}
+                     <div className="space-y-2">
+                        <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2">Preferências</p>
+                        
+                        {/* Aparência com Toggle */}
+                        <motion.button 
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => {
+                            const newDarkMode = !isDarkMode
+                            setIsDarkMode(newDarkMode)
+                            localStorage.setItem('darkMode', newDarkMode.toString())
+                            
+                            if (newDarkMode) {
+                              document.documentElement.classList.add('dark')
+                            } else {
+                              document.documentElement.classList.remove('dark')
+                            }
+                          }}
+                          className="w-full p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all"
+                        >
+                           <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                 <div className="p-2 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-600 dark:text-blue-400">
+                                    {isDarkMode ? <MoonIcon className="h-5 w-5" /> : <span className="text-xl">☀️</span>}
+                                 </div>
+                                 <div className="text-left">
+                                    <span className="font-semibold text-gray-900 dark:text-white block">Aparência</span>
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">{isDarkMode ? 'Modo Escuro' : 'Modo Claro'}</span>
+                                 </div>
+                              </div>
+                              <div className={`w-12 h-6 rounded-full transition-all ${isDarkMode ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                                 <div className={`w-5 h-5 rounded-full bg-white shadow-md transform transition-transform ${isDarkMode ? 'translate-x-6' : 'translate-x-0.5'} mt-0.5`} />
+                              </div>
+                           </div>
+                        </motion.button>
+                        
+                        {/* Notificações */}
+                        <motion.button 
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="w-full p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all"
+                        >
+                           <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                 <div className="p-2 rounded-lg bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 text-green-600 dark:text-green-400">
+                                    <BellIcon className="h-5 w-5" />
+                                 </div>
+                                 <div className="text-left">
+                                    <span className="font-semibold text-gray-900 dark:text-white block">Notificações</span>
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">Alertas e avisos</span>
+                                 </div>
+                              </div>
+                              <ChevronRightIcon className="h-5 w-5 text-gray-400" />
+                           </div>
+                        </motion.button>
+                     </div>
+
+                     {/* Seção Sobre */}
+                     <div className="space-y-2">
+                        <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2">Sobre</p>
+                        
+                        <div className="p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm">
+                           <div className="flex items-center gap-3 mb-3">
+                              <div className="p-2 rounded-lg bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/30">
+                                 <span className="text-2xl">🐄</span>
+                              </div>
+                              <div>
+                                 <p className="font-bold text-gray-900 dark:text-white">Beef-Sync</p>
+                                 <p className="text-xs text-gray-500 dark:text-gray-400">Versão 2.0.0</p>
+                              </div>
+                           </div>
+                           <div className="space-y-2 text-xs text-gray-600 dark:text-gray-400">
+                              <p>Sistema de gestão pecuária</p>
+                              <p className="text-[10px] text-gray-500 dark:text-gray-500">© 2024 Beef-Sync. Todos os direitos reservados.</p>
+                           </div>
+                        </div>
+                     </div>
+
+                     {/* Estatísticas Rápidas */}
+                     <div className="space-y-2">
+                        <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2">Estatísticas</p>
+                        
+                        <div className="grid grid-cols-2 gap-2">
+                           <div className="p-3 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/10 border border-blue-200 dark:border-blue-800">
+                              <p className="text-xs text-blue-600 dark:text-blue-400 font-semibold">Relatórios</p>
+                              <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{enabledReports.length}</p>
+                           </div>
+                           <div className="p-3 rounded-xl bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-900/10 border border-amber-200 dark:border-amber-800">
+                              <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold">Favoritos</p>
+                              <p className="text-2xl font-bold text-amber-900 dark:text-amber-100">{favorites.length}</p>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                </motion.div>
+              )}
+
+              <div className="fixed bottom-4 left-4 right-4 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg border border-gray-200 dark:border-gray-700 shadow-lg rounded-2xl p-1.5 flex items-center justify-around z-50">
+                <button
+                  onClick={() => setCurrentTab('home')}
+                  className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-xl transition-all ${
+                    currentTab === 'home'
+                      ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400'
+                      : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                  }`}
+                >
+                  {currentTab === 'home' ? <HomeIconSolid className="h-6 w-6" /> : <HomeIcon className="h-6 w-6" />}
+                  <span className="text-[10px] font-medium">Início</span>
+                </button>
+                <button
+                  onClick={() => setCurrentTab('reports')}
+                  className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-xl transition-all ${
+                    currentTab === 'reports'
+                      ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400'
+                      : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                  }`}
+                >
+                  {currentTab === 'reports' ? <ChartBarIconSolid className="h-6 w-6" /> : <ChartBarIcon className="h-6 w-6" />}
+                  <span className="text-[10px] font-medium">Relatórios</span>
+                </button>
+                <button
+                  onClick={() => setCurrentTab('settings')}
+                  className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-xl transition-all ${
+                    currentTab === 'settings'
+                      ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400'
+                      : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                  }`}
+                >
+                  {currentTab === 'settings' ? <ListBulletIcon className="h-6 w-6" /> : <ListBulletIcon className="h-6 w-6" />}
+                  <span className="text-[10px] font-medium">Menu</span>
+                </button>
+              </div>
             </div>
           ) : (
             <motion.div
@@ -959,6 +2014,26 @@ export default function MobileRelatorios() {
                 </div>
               </div>
 
+              {/* Seletor rápido de período */}
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(PERIOD_PRESETS).map(([key, fn]) => {
+                  const p = fn()
+                  const isActive = period.startDate === p.startDate && period.endDate === p.endDate
+                  const labels = { '7d': '7 dias', '30d': '30 dias', 'mes': 'Mês', 'ano': 'Ano' }
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => applyPeriod(key)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                        isActive ? 'bg-amber-500 text-white shadow-md' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      }`}
+                    >
+                      {labels[key]}
+                    </button>
+                  )
+                })}
+              </div>
+
               {hasSexo && (
                 <div className="flex items-center gap-2">
                   <span className="px-2 py-1 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center gap-1">
@@ -987,7 +2062,11 @@ export default function MobileRelatorios() {
 
               {loadingData && (
                 <div className="space-y-4">
-                  <div className="h-24 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-2 gap-3">
+                    {[1, 2, 3, 4].map(i => (
+                      <div key={i} className="h-20 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                    ))}
+                  </motion.div>
                   <div className="h-48 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse" />
                   <div className="h-64 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse" />
                 </div>
@@ -1061,12 +2140,12 @@ export default function MobileRelatorios() {
                                  <div key={j} className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
                                    <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wide mb-1">{label}</p>
                                    <p className="text-lg font-bold text-gray-900 dark:text-white truncate">{val}</p>
-                       </div>
-                     ))}
-                   </div>
-                 </motion.div>
-               )
-            })}
+                                 </div>
+                               ))}
+                             </div>
+                           </motion.div>
+                         )
+                       })}
             
             {(chartResumoIdade || chartResumoSexo) && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
@@ -1133,12 +2212,14 @@ export default function MobileRelatorios() {
                         <option value="Diagnóstico de Gestação">DG Agendado</option>
                         <option value="Parto Previsto">Parto Previsto</option>
                         <option value="Refazer Exame Andrológico">Refazer Andrológico</option>
+                        <option value="Brucelose">Brucelose</option>
+                        <option value="DGT">DGT</option>
                       </select>
                     </div>
                   )}
 
                   {temCalendario && contagemTiposCalendario && (
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
                       <button
                         onClick={() => {
                           setTipoFiltroCalendario(tipoFiltroCalendario === 'Chegada de Receptora' ? '' : 'Chegada de Receptora')
@@ -1194,6 +2275,34 @@ export default function MobileRelatorios() {
                       >
                         <p className="text-[10px] text-orange-600 dark:text-orange-400 font-medium">Refazer Andrológico</p>
                         <p className="text-lg font-bold text-orange-900 dark:text-orange-100">{contagemTiposCalendario.andrologico}</p>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setTipoFiltroCalendario(tipoFiltroCalendario === 'Brucelose' ? '' : 'Brucelose')
+                          setViewMode('table')
+                        }}
+                        className={`p-3 rounded-xl border transition-all active:scale-95 ${
+                          tipoFiltroCalendario === 'Brucelose'
+                            ? 'bg-rose-100 dark:bg-rose-800/40 border-rose-400 dark:border-rose-600 ring-2 ring-rose-400'
+                            : 'bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800 hover:bg-rose-100 dark:hover:bg-rose-800/30'
+                        }`}
+                      >
+                        <p className="text-[10px] text-rose-600 dark:text-rose-400 font-medium">Brucelose</p>
+                        <p className="text-lg font-bold text-rose-900 dark:text-rose-100">{contagemTiposCalendario.brucelose}</p>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setTipoFiltroCalendario(tipoFiltroCalendario === 'DGT' ? '' : 'DGT')
+                          setViewMode('table')
+                        }}
+                        className={`p-3 rounded-xl border transition-all active:scale-95 ${
+                          tipoFiltroCalendario === 'DGT'
+                            ? 'bg-indigo-100 dark:bg-indigo-800/40 border-indigo-400 dark:border-indigo-600 ring-2 ring-indigo-400'
+                            : 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-800/30'
+                        }`}
+                      >
+                        <p className="text-[10px] text-indigo-600 dark:text-indigo-400 font-medium">DGT</p>
+                        <p className="text-lg font-bold text-indigo-900 dark:text-indigo-100">{contagemTiposCalendario.dgt}</p>
                       </button>
                       <button
                         onClick={() => setTipoFiltroCalendario('')}
@@ -1254,6 +2363,7 @@ export default function MobileRelatorios() {
                           const isPeso = /peso|kg/i.test(k)
                           const isAnimais = /animais|machos|fêmeas|total|piquetes/i.test(k)
                           const isTaxa = /taxa|prenhez/i.test(k)
+                          const isClicavel = /machos?|fêmeas?|femeas?|animais únicos?|total de pesagens?|piquetes?|entradas?|saídas?|total nfs?|nf|notas?/i.test(k) && !/peso médio|peso medio/i.test(k)
                           const cardCls = isPeso ? 'bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-900/10 border-amber-200 dark:border-amber-800' :
                             isAnimais ? 'bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/10 border-blue-200 dark:border-blue-800' :
                             isTaxa ? 'bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-900/20 dark:to-green-900/10 border-green-200 dark:border-green-800' :
@@ -1271,8 +2381,19 @@ export default function MobileRelatorios() {
                               initial={{ opacity: 0, scale: 0.9 }}
                               animate={{ opacity: 1, scale: 1 }}
                               transition={{ delay: i * 0.05 }}
-                              className={`p-4 rounded-xl border-2 shadow-sm relative overflow-hidden ${cardCls}`}
+                              role={isClicavel ? 'button' : undefined}
+                              tabIndex={isClicavel ? 0 : undefined}
+                              onClick={isClicavel ? () => handleCardClick(k, v) : undefined}
+                              onKeyDown={isClicavel ? (e) => { if (e.key === 'Enter' || e.key === ' ') handleCardClick(k, v) } : undefined}
+                              whileHover={isClicavel ? { scale: 1.05, y: -2 } : {}}
+                              whileTap={isClicavel ? { scale: 0.98 } : {}}
+                              className={`p-4 rounded-xl border-2 shadow-sm relative overflow-hidden group ${cardCls} ${isClicavel ? 'cursor-pointer hover:shadow-md transition-all' : ''}`}
                             >
+                              {isClicavel && (
+                                <div className="absolute top-2 right-2 opacity-50 group-hover:opacity-100 transition-opacity">
+                                  <ChevronRightIcon className="h-4 w-4 text-gray-400" />
+                                </div>
+                              )}
                               {isDestaque && (
                                 <span className="absolute top-1 right-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-green-500/20 text-green-700 dark:text-green-400">
                                   ✓ Destaque
@@ -1283,6 +2404,11 @@ export default function MobileRelatorios() {
                                 <span className="text-base ml-1">{icon}</span>
                               </div>
                               <p className={`text-xl font-bold truncate ${valCls}`}>{String(v)}</p>
+                              {isClicavel && (
+                                <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-1 opacity-70">
+                                  Toque para ver detalhes
+                                </p>
+                              )}
                               {taxaNum != null && (
                                 <div className="mt-2 h-1.5 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
                                   <motion.div

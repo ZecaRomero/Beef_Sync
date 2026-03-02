@@ -41,7 +41,7 @@ export default function Identificar() {
     setTelefone(formatPhone(v))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const telDigits = telefone.replace(/\D/g, '')
     if (!nome.trim()) {
@@ -53,10 +53,27 @@ export default function Identificar() {
       return
     }
     try {
+      const nomeTrim = nome.trim()
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        nome: nome.trim(),
+        nome: nomeTrim,
         telefone: telDigits
       }))
+      // Registrar acesso com nome e telefone para aparecer no monitoramento
+      try {
+        await fetch('/api/access-log', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userName: nomeTrim,
+            userType: 'externo',
+            ipAddress: typeof window !== 'undefined' ? window.location.hostname : 'N/A',
+            hostname: typeof window !== 'undefined' ? window.location.hostname : '',
+            userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+            telefone: telDigits,
+            action: 'Identificação registrada'
+          })
+        })
+      } catch (_) {}
       setSalvo(true)
       setTimeout(() => {
         const from = router.query.from || '/a'

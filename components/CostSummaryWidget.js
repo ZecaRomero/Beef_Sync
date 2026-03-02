@@ -24,26 +24,25 @@ export default function CostSummaryWidget() {
       const { default: costManager } = await import('../services/costManager')
       const { default: animalDataManager } = await import('../services/animalDataManager')
       
-      const relatorioGeral = costManager.getRelatorioGeral()
+      const relatorioGeral = await costManager.getRelatorioGeral()
       const animals = animalDataManager.getAllAnimals()
       
       // Calcular estatísticas adicionais
-      const animaisComProtocolo = animals.filter(animal => {
-        const custos = costManager.getCustosAnimal(animal.id)
-        return custos.some(c => c.tipo === 'Protocolo Sanitário')
-      }).length
+      let animaisComProtocolo = 0
+      let animaisComDNA = 0
+      for (const animal of animals) {
+        const custos = await costManager.getCustosAnimal(animal.id)
+        const arr = Array.isArray(custos) ? custos : []
+        if (arr.some(c => c.tipo === 'Protocolo Sanitário')) animaisComProtocolo++
+        if (arr.some(c => c.tipo === 'DNA')) animaisComDNA++
+      }
 
-      const animaisComDNA = animals.filter(animal => {
-        const custos = costManager.getCustosAnimal(animal.id)
-        return custos.some(c => c.tipo === 'DNA')
-      }).length
-
-      const animaisPendentes = animals.length - relatorioGeral.animaisComCustos
+      const animaisPendentes = animals.length - (relatorioGeral?.animaisComCustos || 0)
 
       // Custos por tipo
       const custosPorTipo = {}
-      relatorioGeral.custoPorAnimal.forEach(({ custos }) => {
-        custos.forEach(custo => {
+      ;(relatorioGeral?.custoPorAnimal || []).forEach(({ custos }) => {
+        ;(custos || []).forEach(custo => {
           if (!custosPorTipo[custo.tipo]) {
             custosPorTipo[custo.tipo] = 0
           }
@@ -58,7 +57,7 @@ export default function CostSummaryWidget() {
         animaisComDNA,
         animaisPendentes,
         custosPorTipo,
-        percentualComCustos: animals.length > 0 ? (relatorioGeral.animaisComCustos / animals.length * 100) : 0
+        percentualComCustos: animals.length > 0 ? ((relatorioGeral?.animaisComCustos || 0) / animals.length * 100) : 0
       })
     } catch (error) {
       console.error('Erro ao carregar resumo de custos:', error)

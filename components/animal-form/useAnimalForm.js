@@ -2,8 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import costManager from '../../services/costManager';
 import animalDataManager from '../../services/animalDataManager';
 import { racasPorSerie } from '../../services/mockData';
+import { fetchAvailableLocations } from '../../utils/piqueteUtils';
 
-export default function useAnimalForm(animal, isOpen, onClose) {
+export default function useAnimalForm(animal, isOpen, onClose, onSave) {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [nfsCadastradas, setNfsCadastradas] = useState([]);
@@ -51,79 +52,11 @@ export default function useAnimalForm(animal, isOpen, onClose) {
   const [formData, setFormData] = useState(initialFormState);
   const [availableLocations, setAvailableLocations] = useState([]);
 
-  // Load locations
+  // Load locations (usa utilitário que filtra nomes de touros cadastrados por engano como piquete)
   useEffect(() => {
-    const fetchLocations = async () => {
-      try {
-        const piquetesUsados = new Set()
-        const piquetesList = []
-
-        // 1. Buscar piquetes já usados nas localizações da API
-        try {
-          const localizacoesResponse = await fetch('/api/localizacoes')
-          if (localizacoesResponse.ok) {
-            const localizacoesData = await localizacoesResponse.json()
-            const localizacoesApi = localizacoesData.data || []
-            
-            localizacoesApi.forEach(loc => {
-              if (loc.piquete && !piquetesUsados.has(loc.piquete)) {
-                piquetesUsados.add(loc.piquete)
-                piquetesList.push(loc.piquete)
-              }
-            })
-          }
-        } catch (error) {
-          console.warn('Erro ao buscar localizações da API:', error)
-        }
-
-        // 2. Buscar piquetes cadastrados em "Gestão de Piquetes" para complementar
-        try {
-          const piquetesResponse = await fetch('/api/piquetes')
-          if (piquetesResponse.ok) {
-            const piquetesData = await piquetesResponse.json()
-            const piquetesArray = piquetesData.piquetes || piquetesData.data?.piquetes || piquetesData.data || []
-            
-            if (Array.isArray(piquetesArray) && piquetesArray.length > 0) {
-              piquetesArray.forEach(piquete => {
-                const nome = typeof piquete === 'object' ? piquete.nome : piquete
-                if (nome && !piquetesUsados.has(nome)) {
-                  piquetesUsados.add(nome)
-                  piquetesList.push(nome)
-                }
-              })
-            }
-          }
-        } catch (error) {
-          console.warn('Erro ao buscar piquetes cadastrados:', error)
-        }
-
-        // 3. Fallback: buscar da API de locais (se existir)
-        try {
-          const response = await fetch('/api/locais')
-          if (response.ok) {
-            const data = await response.json()
-            if (data.data && data.data.length > 0) {
-              data.data.forEach(local => {
-                if (!piquetesUsados.has(local.nome)) {
-                  piquetesUsados.add(local.nome)
-                  piquetesList.push(local.nome)
-                }
-              })
-            }
-          }
-        } catch (error) {
-          console.warn('Erro ao carregar locais da API:', error)
-        }
-
-        // Ordenar por nome
-        piquetesList.sort((a, b) => a.localeCompare(b))
-        setAvailableLocations(piquetesList)
-      } catch (error) {
-        console.error('Erro ao carregar locais:', error)
-      }
-    }
-
-    fetchLocations()
+    fetchAvailableLocations()
+      .then(setAvailableLocations)
+      .catch((err) => console.error('Erro ao carregar locais:', err))
   }, [])
 
   // Load NFs
@@ -186,16 +119,27 @@ export default function useAnimalForm(animal, isOpen, onClose) {
     loadNotasFiscais();
   }, [loadNotasFiscais]);
 
+  // Normalizar data para input type="date" (YYYY-MM-DD)
+  const toDateInputValue = (val) => {
+    if (!val) return '';
+    const str = typeof val === 'string' ? val : (val instanceof Date ? val.toISOString() : String(val));
+    const match = str.match(/^\d{4}-\d{2}-\d{2}/);
+    return match ? match[0] : '';
+  };
+
   // Reset/Initialize form when opening
   useEffect(() => {
     if (isOpen) {
       if (animal) {
+        const rawNascimento = animal.dataNascimento ?? animal.data_nascimento;
+        const piquete = animal.pastoAtual ?? animal.pasto_atual ?? animal.piqueteAtual ?? animal.piquete_atual ?? '';
         setFormData({
           ...initialFormState,
           ...animal,
           nome: animal.nome || '',
-          dataNascimento: animal.dataNascimento || animal.data_nascimento || '',
-          dataChegada: animal.dataChegada || animal.data_chegada || '',
+          dataNascimento: toDateInputValue(rawNascimento),
+          dataChegada: toDateInputValue(animal.dataChegada ?? animal.data_chegada),
+          pastoAtual: piquete,
           observacoes: animal.observacoes || '',
           abczg: animal.abczg || '',
           deca: animal.deca || '',
@@ -399,6 +343,10 @@ export default function useAnimalForm(animal, isOpen, onClose) {
       }
 
       alert(`✅ Sucesso! ${animal ? "Animal atualizado com sucesso!" : "Novo animal adicionado ao rebanho!"}`);
+      if (onSave) {
+        const dataToNotify = savedAnimal || (animal?.id ? { ...formData, id: animal.id } : formData);
+        await Promise.resolve(onSave(dataToNotify));
+      }
       onClose();
     } catch (error) {
       console.error('Erro ao salvar:', error);

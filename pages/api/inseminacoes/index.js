@@ -122,7 +122,11 @@ export default async function handler(req, res) {
           touroExibir = semenNome
         }
         const { semen_nome_touro, ...rest } = row
-        return { ...rest, touro_nome: touroExibir || touroAtual || null }
+        return {
+          ...rest,
+          data_inseminacao: rest.data_ia || rest.data_inseminacao,
+          touro_nome: touroExibir || touroAtual || null
+        }
       })
 
       return res.status(200).json({
@@ -216,6 +220,16 @@ export default async function handler(req, res) {
         })
       }
 
+      // Garantir coluna valida e invalidar IAs anteriores da mesma fêmea
+      await query('ALTER TABLE inseminacoes ADD COLUMN IF NOT EXISTS valida BOOLEAN DEFAULT true').catch(() => {})
+      await query(`
+        UPDATE inseminacoes 
+        SET valida = false, status_gestacao = 'Vazia', 
+            resultado_dg = COALESCE(NULLIF(TRIM(resultado_dg), ''), 'Vazia'),
+            updated_at = CURRENT_TIMESTAMP
+        WHERE animal_id = $1
+      `, [parseInt(animal_id)])
+
       // Inserir inseminação
       let result
       try {
@@ -231,8 +245,9 @@ export default async function handler(req, res) {
             custo_dose,
             numero_ia,
             touro_rg,
-            data_dg
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+            data_dg,
+            valida
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, true)
           RETURNING *
         `, [
           parseInt(animal_id),

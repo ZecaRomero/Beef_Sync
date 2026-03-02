@@ -226,8 +226,8 @@ export default function Animals() {
   console.log('🔍 Debug - Total de animais:', animals.length)
   console.log('🔍 Debug - Filtros ativos:', filters)
   console.log('🔍 Debug - Animais filtrados:', filteredAnimals.length)
-  if (animals.length > 0) {
-    console.log('🔍 Debug - Primeiro animal:', animals[0])
+  if (filteredAnimals.length > 0) {
+    console.log('🔍 Debug - Primeiro animal filtrado:', filteredAnimals[0])
   }
 
   // Paginação
@@ -481,14 +481,56 @@ export default function Animals() {
 
   const handleSaveAnimal = async (animalData) => {
     try {
-      if (selectedAnimal) {
-        // Editar animal existente
-        const updatedAnimals = animals.map(animal =>
-          animal.id === selectedAnimal.id ? { ...animal, ...animalData } : animal
-        )
+      // Form já salvou via animalDataManager - atualizar estado e recarregar lista
+      const savedId = animalData?.id ?? selectedAnimal?.id
+      if (savedId) {
+        const updatedAnimals = selectedAnimal
+          ? animals.map(a => a.id === savedId ? { ...a, ...animalData, id: savedId } : a)
+          : [...animals, { ...animalData, id: savedId }]
         setAnimals(updatedAnimals)
-        localStorage.setItem('animals', JSON.stringify(updatedAnimals))
-        alert('✅ Animal atualizado com sucesso!')
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('animals', JSON.stringify(updatedAnimals))
+        }
+        setSelectedAnimal(null)
+        setShowForm(false)
+        await loadAnimals()
+        return
+      }
+
+      if (selectedAnimal) {
+        // Editar animal existente - persistir na API PostgreSQL
+        try {
+          const response = await fetch(`/api/animals/${selectedAnimal.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(animalData),
+          })
+          if (!response.ok) {
+            const err = await response.json()
+            throw new Error(err.message || 'Erro ao atualizar animal')
+          }
+          const savedAnimal = await response.json()
+          const data = savedAnimal.data || savedAnimal
+          const updatedAnimals = animals.map(animal =>
+            animal.id === selectedAnimal.id ? { ...animal, ...data } : animal
+          )
+          setAnimals(updatedAnimals)
+          if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('animals', JSON.stringify(updatedAnimals))
+          }
+          alert('✅ Animal atualizado com sucesso!')
+        } catch (apiError) {
+          console.error('Erro ao atualizar na API:', apiError)
+          // Fallback: atualizar só localmente
+          const updatedAnimals = animals.map(animal =>
+            animal.id === selectedAnimal.id ? { ...animal, ...animalData } : animal
+          )
+          setAnimals(updatedAnimals)
+          if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('animals', JSON.stringify(updatedAnimals))
+          }
+          alert('⚠️ Animal atualizado localmente (API indisponível)')
+        }
       } else {
         // Adicionar novo animal via API PostgreSQL
         try {
@@ -506,10 +548,11 @@ export default function Animals() {
           }
 
           const savedAnimal = await response.json();
-          console.log('✅ Animal cadastrado na API:', savedAnimal);
+          const newAnimalData = savedAnimal.data || savedAnimal;
+          console.log('✅ Animal cadastrado na API:', newAnimalData);
           
           // Atualizar lista local
-          const updatedAnimals = [...animals, savedAnimal];
+          const updatedAnimals = [...animals, newAnimalData];
           setAnimals(updatedAnimals);
           localStorage.setItem('animals', JSON.stringify(updatedAnimals));
           
