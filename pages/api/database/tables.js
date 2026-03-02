@@ -1,4 +1,5 @@
 import { query } from '../../../lib/database';
+import logger from '../../../utils/logger';
 
 export default async function handler(req, res) {
   if (req.method === 'GET') {
@@ -29,12 +30,14 @@ export default async function handler(req, res) {
           rowCount: 0
         };
         
-        // Contar registros na tabela
+        // Contar registros na tabela (validar nome para evitar SQL injection)
         try {
-          const countResult = await query(`SELECT COUNT(*) as count FROM ${tableName}`);
-          tablesInfo[tableName].rowCount = parseInt(countResult.rows[0].count);
+          if (/^[a-zA-Z0-9_]+$/.test(tableName)) {
+            const countResult = await query(`SELECT COUNT(*) as count FROM ${tableName}`);
+            tablesInfo[tableName].rowCount = parseInt(countResult.rows[0].count, 10);
+          }
         } catch (error) {
-          console.error(`Erro ao contar registros da tabela ${tableName}:`, error);
+          // Ignorar erros de contagem, manter rowCount 0
         }
       }
 
@@ -43,7 +46,7 @@ export default async function handler(req, res) {
         tablesInfo
       });
     } catch (error) {
-      console.error('Erro ao listar tabelas:', error);
+      logger.error('Erro ao listar tabelas', { error: error?.message });
       res.status(500).json({ 
         message: 'Erro ao listar tabelas do banco de dados', 
         error: error.message 
