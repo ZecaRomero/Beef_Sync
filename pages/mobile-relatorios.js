@@ -1118,20 +1118,103 @@ export default function MobileRelatorios() {
                   <div className="divide-y divide-gray-200 dark:divide-gray-700">
                     {cardAnimalsList.map((a, idx) => {
                       const sexo = a.sexo || 'Não informado'
-                      const raca = a.raca || 'Não informado'
-                      const info = [sexo, raca].filter(Boolean).join(' · ')
+                      const ehMacho = sexo.toLowerCase().includes('macho')
                       
                       return (
                         <Link
-                          key={a.id || idx}
-                          href={`/animals/${a.id}`}
+                          key={a.animal_id || a.id || idx}
+                          href={`/animals/${a.animal_id || a.id}`}
                           onClick={() => setCardFilterModal(m => ({ ...m, open: false }))}
-                          className="flex items-center justify-between px-4 py-3 hover:bg-amber-50 dark:hover:bg-gray-800"
+                          className="block px-4 py-4 hover:bg-amber-50 dark:hover:bg-gray-800 transition-colors"
                         >
-                          <span className="font-medium text-gray-900 dark:text-white">
-                            {a.identificacao || `${a.serie || ''}-${a.rg || ''}`.trim() || a.nome || '—'}
-                          </span>
-                          <span className="text-sm text-gray-500 dark:text-gray-400">{info}</span>
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              {/* Cabeçalho com nome e sexo */}
+                              <div className="flex items-center gap-2 mb-2">
+                                <span className="font-bold text-gray-900 dark:text-white text-base">
+                                  {a.identificacao || a.animal || `${a.serie || ''}-${a.rg || ''}`.trim() || a.nome || '—'}
+                                </span>
+                                <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                                  ehMacho 
+                                    ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                                    : 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300'
+                                }`}>
+                                  {sexo}
+                                </span>
+                              </div>
+                              
+                              {/* Informações principais em grid */}
+                              <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mb-3">
+                                {a.peso && a.peso !== '-' && (
+                                  <div className="flex items-center gap-1.5">
+                                    <ScaleIcon className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                                    <span className="text-gray-600 dark:text-gray-400">Peso:</span>
+                                    <span className="font-semibold text-gray-900 dark:text-white">{a.peso}</span>
+                                  </div>
+                                )}
+                                
+                                {ehMacho && a.ce && (
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-amber-500 font-bold text-xs">CE</span>
+                                    <span className="text-gray-600 dark:text-gray-400">:</span>
+                                    <span className="font-semibold text-gray-900 dark:text-white">{a.ce} cm</span>
+                                  </div>
+                                )}
+                                
+                                {a.idade_meses !== null && a.idade_meses !== undefined && (
+                                  <div className="flex items-center gap-1.5">
+                                    <ClockIcon className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                                    <span className="text-gray-600 dark:text-gray-400">Idade:</span>
+                                    <span className="font-semibold text-gray-900 dark:text-white">{a.idade_meses}m</span>
+                                  </div>
+                                )}
+                                
+                                {a.raca && (
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-gray-600 dark:text-gray-400">Raça:</span>
+                                    <span className="font-medium text-gray-900 dark:text-white truncate">{a.raca}</span>
+                                  </div>
+                                )}
+                              </div>
+                              
+                              {/* Genealogia e índices */}
+                              {(a.pai || a.avo_materno || a.iabcz || a.deca) && (
+                                <div className="pt-2 border-t border-gray-200 dark:border-gray-700 space-y-1.5">
+                                  {a.pai && (
+                                    <div className="flex items-start gap-1.5 text-xs">
+                                      <span className="text-gray-500 dark:text-gray-400 font-medium min-w-[60px]">Pai:</span>
+                                      <span className="text-gray-900 dark:text-white font-medium">{a.pai}</span>
+                                    </div>
+                                  )}
+                                  
+                                  {a.avo_materno && (
+                                    <div className="flex items-start gap-1.5 text-xs">
+                                      <span className="text-gray-500 dark:text-gray-400 font-medium min-w-[60px]">Avô Mat:</span>
+                                      <span className="text-gray-900 dark:text-white font-medium">{a.avo_materno}</span>
+                                    </div>
+                                  )}
+                                  
+                                  <div className="flex items-center gap-3 mt-2">
+                                    {a.iabcz && (
+                                      <div className="flex items-center gap-1">
+                                        <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400">iABCZ:</span>
+                                        <span className="text-xs font-bold text-gray-900 dark:text-white">{a.iabcz}</span>
+                                      </div>
+                                    )}
+                                    
+                                    {a.deca && (
+                                      <div className="flex items-center gap-1">
+                                        <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400">DECA:</span>
+                                        <span className="text-xs font-bold text-gray-900 dark:text-white">{a.deca}</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                            
+                            <ChevronRightIcon className="h-5 w-5 text-gray-400 flex-shrink-0 mt-1" />
+                          </div>
                         </Link>
                       )
                     })}
@@ -2698,11 +2781,21 @@ export default function MobileRelatorios() {
                       className="rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm"
                     >
                       <div className="overflow-x-auto max-h-[55vh] overflow-y-auto">
-                        {dadosParaExibir.length > 0 ? (
+                        {dadosParaExibir.length > 0 ? (() => {
+                          const firstRow = reportData.data?.find(d => !d._resumo)
+                          const columns = firstRow ? Object.keys(firstRow).filter(c => {
+                            if (c === '_resumo' || c === 'animal_id') return false
+                            const val = firstRow[c]
+                            // Ocultar colunas com objetos/arrays (como a lista de animais)
+                            if (typeof val === 'object' && val !== null) return false
+                            return true
+                          }) : []
+                          
+                          return (
                           <table className="w-full text-sm">
                             <thead className="sticky top-0 bg-gray-100 dark:bg-gray-700 z-10">
                               <tr>
-                                {reportData.data?.find(d => !d._resumo) && Object.keys(reportData.data.find(d => !d._resumo)).filter(c => c !== '_resumo' && c !== 'animal_id').map(col => (
+                                {columns.map(col => (
                                   <th key={col} className="px-3 py-2.5 text-left text-gray-600 dark:text-gray-400 font-medium">
                                     {ehRanking ? (LABELS_RANKING[col] || col) : col}
                                   </th>
@@ -2710,17 +2803,42 @@ export default function MobileRelatorios() {
                               </tr>
                             </thead>
                             <tbody>
-                              {dadosParaExibir.map((row, i) => (
+                              {dadosParaExibir.map((row, i) => {
+                                // Buscar a linha original completa do reportData para ter acesso ao campo animais
+                                const originalRow = reportData.data?.find(d => 
+                                  d.piquete === row.piquete || 
+                                  (d.animal_id && d.animal_id === row.animal_id)
+                                ) || row
+                                
+                                return (
                                 <tr 
                                   key={i} 
                                   onClick={() => {
+                                    // Se for o relatorio de animais por piquete e tiver a lista de animais
+                                    if (selectedTipo === 'animais_piquetes' && originalRow.animais && Array.isArray(originalRow.animais)) {
+                                      setCardFilterModal({
+                                        open: true,
+                                        title: `Animais em ${originalRow.piquete || 'Piquete'}`,
+                                        filter: { piquete: originalRow.piquete },
+                                        dataType: 'piquete_animais'
+                                      })
+                                      // Preservar todos os campos dos animais
+                                      setCardAnimalsList(originalRow.animais.map(a => ({
+                                        ...a,
+                                        id: a.animal_id,
+                                        identificacao: a.animal || `${a.serie || ''} ${a.rg || ''}`.trim()
+                                      })))
+                                      return
+                                    }
+                                    // Comportamento padrao: navegar para detalhes do animal
                                     if (row.animal_id) {
                                       router.push(`/animals/${row.animal_id}`)
                                     }
                                   }}
-                                  className={`border-t border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 ${row.animal_id ? 'cursor-pointer' : ''}`}
+                                  className={`border-t border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 ${(row.animal_id || (selectedTipo === 'animais_piquetes' && originalRow.animais)) ? 'cursor-pointer' : ''}`}
                                 >
-                                  {Object.entries(row).filter(([k]) => k !== '_resumo' && k !== 'animal_id').map(([k, v]) => {
+                                  {columns.map(k => {
+                                    const v = row[k]
                                     let display = k.toLowerCase().includes('data') && v ? formatDate(v) : String(v ?? '-')
                                     if (ehRanking && k === 'posicao' && [1, 2, 3].includes(Number(v))) {
                                       const trofeus = { 1: '🥇', 2: '🥈', 3: '🥉' }
@@ -2733,10 +2851,12 @@ export default function MobileRelatorios() {
                                     )
                                   })}
                                 </tr>
-                              ))}
+                                )
+                              })}
                             </tbody>
                           </table>
-                        ) : (
+                          )
+                        })() : (
                           <div className="p-12 text-center">
                             <motion.div
                               initial={{ scale: 0.8, opacity: 0 }}

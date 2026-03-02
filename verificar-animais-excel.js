@@ -1,0 +1,90 @@
+/**
+ * Script para verificar quais animais do Excel existem no banco de dados
+ */
+const { query } = require('./lib/database')
+
+const animaisExcel = [
+  { serie: 'CJCJ', rg: '15521' },
+  { serie: 'CJCJ', rg: '15524' },
+  { serie: 'CJCJ', rg: '15540' },
+  { serie: 'CJCJ', rg: '15542' },
+  { serie: 'CJCJ', rg: '15563' },
+  { serie: 'CJCJ', rg: '15639' },
+  { serie: 'CJCJ', rg: '15921' },
+  { serie: 'CJCJ', rg: '15930' },
+  { serie: 'CJCJ', rg: '15959' },
+  { serie: 'CJCJ', rg: '16984' },
+  { serie: 'CJCJ', rg: '16990' },
+  { serie: 'CJCJ', rg: '16998' },
+  { serie: 'CJCJ', rg: '17078' },
+  { serie: 'CJCJ', rg: '17207' },
+  { serie: 'CJCJ', rg: '17215' },
+  { serie: 'CJCJ', rg: '17217' },
+  { serie: 'CJCJ', rg: '17228' },
+  { serie: 'CJCJ', rg: '17231' },
+  { serie: 'CJCJ', rg: '17232' },
+  { serie: 'CJCJ', rg: '17259' },
+  { serie: 'CJCJ', rg: '17414' },
+  { serie: 'CJCJ', rg: '17436' },
+  { serie: 'CJCJ', rg: '17476' },
+  { serie: 'EAOB', rg: '6684' },
+  { serie: 'MFBN', rg: '9851' }
+]
+
+async function verificarAnimais() {
+  console.log('🔍 Verificando animais do Excel no banco de dados...\n')
+  
+  let encontrados = 0
+  let naoEncontrados = []
+  
+  for (const animal of animaisExcel) {
+    try {
+      const result = await query(
+        `SELECT id, serie, rg, piquete_atual 
+         FROM animais 
+         WHERE UPPER(TRIM(serie)) = UPPER(TRIM($1)) 
+         AND UPPER(TRIM(rg)) = UPPER(TRIM($2))
+         LIMIT 1`,
+        [animal.serie, animal.rg]
+      )
+      
+      if (result.rows.length > 0) {
+        encontrados++
+        const animalDb = result.rows[0]
+        console.log(`✅ ${animal.serie} ${animal.rg} - ID: ${animalDb.id}, Piquete: ${animalDb.piquete_atual || '(sem piquete)'}`)
+      } else {
+        naoEncontrados.push(animal)
+        console.log(`❌ ${animal.serie} ${animal.rg} - NÃO ENCONTRADO`)
+      }
+    } catch (error) {
+      console.error(`⚠️ Erro ao buscar ${animal.serie} ${animal.rg}:`, error.message)
+    }
+  }
+  
+  console.log('\n' + '='.repeat(60))
+  console.log(`📊 RESUMO:`)
+  console.log(`   Total no Excel: ${animaisExcel.length}`)
+  console.log(`   Encontrados: ${encontrados}`)
+  console.log(`   Não encontrados: ${naoEncontrados.length}`)
+  
+  if (naoEncontrados.length > 0) {
+    console.log('\n❌ ANIMAIS NÃO ENCONTRADOS NO BANCO:')
+    naoEncontrados.forEach(a => {
+      console.log(`   • ${a.serie} ${a.rg}`)
+    })
+    
+    console.log('\n💡 POSSÍVEIS CAUSAS:')
+    console.log('   1. Animal não foi cadastrado no sistema')
+    console.log('   2. Série ou RG está diferente no banco (espaços, maiúsculas/minúsculas)')
+    console.log('   3. Animal foi excluído do banco de dados')
+  }
+  
+  console.log('='.repeat(60))
+  
+  process.exit(0)
+}
+
+verificarAnimais().catch(error => {
+  console.error('❌ Erro fatal:', error)
+  process.exit(1)
+})

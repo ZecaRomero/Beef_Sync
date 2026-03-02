@@ -1288,7 +1288,8 @@ export default async function handler(req, res) {
                 COALESCE(l.data_entrada, a.data_entrada_piquete, a.created_at)::date as data_entrada,
                 a.id as animal_id,
                 a.serie, a.rg, a.nome as animal_nome,
-                a.sexo
+                a.sexo, a.data_nascimento, a.raca,
+                a.pai, a.avo_materno, a.abczg as iabcz, a.deca
               FROM animais a
               LEFT JOIN LATERAL (
                 SELECT l2.piquete, l2.data_entrada FROM localizacoes_animais l2
@@ -1310,7 +1311,8 @@ export default async function handler(req, res) {
                   COALESCE(l.data_entrada, a.created_at)::date as data_entrada,
                   a.id as animal_id,
                   a.serie, a.rg, a.nome as animal_nome,
-                  a.sexo
+                  a.sexo, a.data_nascimento, a.raca,
+                  a.pai, a.avo_materno, a.abczg as iabcz, a.deca
                 FROM animais a
                 LEFT JOIN LATERAL (
                   SELECT l2.piquete, l2.data_entrada FROM localizacoes_animais l2
@@ -1326,19 +1328,22 @@ export default async function handler(req, res) {
             } else throw colErr
           }
 
-          // Buscar última pesagem de cada animal
+          // Buscar última pesagem (peso e CE) de cada animal
           const animalIds = r.rows.map(row => row.animal_id).filter(Boolean)
-          let pesosMap = {}
+          let pesagensMap = {}
           if (animalIds.length > 0) {
             try {
               const pesagensResult = await query(`
-                SELECT DISTINCT ON (animal_id) animal_id, peso
+                SELECT DISTINCT ON (animal_id) animal_id, peso, ce
                 FROM pesagens
                 WHERE animal_id = ANY($1::int[])
                 ORDER BY animal_id, data DESC, created_at DESC
               `, [animalIds])
               pesagensResult.rows.forEach(p => {
-                pesosMap[p.animal_id] = parseFloat(p.peso) || 0
+                pesagensMap[p.animal_id] = {
+                  peso: parseFloat(p.peso) || 0,
+                  ce: p.ce ? parseFloat(p.ce) : null
+                }
               })
             } catch (e) {
               console.log('Erro ao buscar pesagens:', e.message)
@@ -1361,16 +1366,36 @@ export default async function handler(req, res) {
             }
             porPiquete[piq].total++
             const sexo = (row.sexo || '').toLowerCase()
-            if (sexo.startsWith('m')) porPiquete[piq].machos++
+            const ehMacho = sexo.startsWith('m')
+            if (ehMacho) porPiquete[piq].machos++
             else if (sexo.startsWith('f')) porPiquete[piq].femeas++
             
-            const peso = pesosMap[row.animal_id]
-            if (peso && peso > 0) porPiquete[piq].pesos.push(peso)
+            const pesagem = pesagensMap[row.animal_id] || {}
+            const peso = pesagem.peso || 0
+            if (peso > 0) porPiquete[piq].pesos.push(peso)
+            
+            // Calcular idade em meses
+            let idadeMeses = null
+            if (row.data_nascimento) {
+              const nascimento = new Date(row.data_nascimento)
+              const hoje = new Date()
+              const diffMs = hoje - nascimento
+              const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+              idadeMeses = Math.floor(diffDias / 30.44)
+            }
             
             porPiquete[piq].animais.push({
+              animal_id: row.animal_id,
               animal: `${row.serie || ''} ${row.rg || ''}`.trim() || row.animal_nome,
               sexo: formatarSexo(row.sexo),
-              peso: peso ? `${peso.toFixed(1)} kg` : '-',
+              raca: row.raca,
+              peso: peso > 0 ? `${peso.toFixed(1)} kg` : '-',
+              ce: (ehMacho && pesagem.ce) ? pesagem.ce.toFixed(1) : null,
+              idade_meses: idadeMeses,
+              pai: row.pai,
+              avo_materno: row.avo_materno,
+              iabcz: row.iabcz,
+              deca: row.deca,
               data_entrada: toDateStr(row.data_entrada)
             })
           })

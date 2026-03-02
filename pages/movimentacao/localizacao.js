@@ -76,6 +76,14 @@ export default function LocalizacaoAnimais() {
   const [exportFormat, setExportFormat] = useState('excel') // 'excel' ou 'pdf'
   const [importandoExcel, setImportandoExcel] = useState(false)
   const [resultadoImportacao, setResultadoImportacao] = useState(null)
+  const [showImportTextModal, setShowImportTextModal] = useState(false)
+  const [importText, setImportText] = useState('')
+  const [importandoTexto, setImportandoTexto] = useState(false)
+  const [showErrosImportacao, setShowErrosImportacao] = useState(false)
+  const [errosImportacao, setErrosImportacao] = useState(null)
+  const [itemCorrigindo, setItemCorrigindo] = useState(null)
+  const [correcaoDados, setCorrecaoDados] = useState({ serie: '', rg: '', local: '' })
+  const [corrigindo, setCorrigindo] = useState(false)
   const [selectedFields, setSelectedFields] = useState({
     'Série': true,
     'RG': true,
@@ -1025,6 +1033,143 @@ export default function LocalizacaoAnimais() {
     }
   }
 
+  // Importar localizações via texto colado (Série RG LOCAL)
+  const handleImportarTexto = async () => {
+    if (!importText.trim()) {
+      alert('⚠️ Cole os dados no campo de texto!')
+      return
+    }
+
+    setImportandoTexto(true)
+    setResultadoImportacao(null)
+
+    try {
+      // Processar texto linha por linha
+      const linhas = importText.trim().split('\n').filter(l => l.trim())
+      const dados = []
+
+      for (const linha of linhas) {
+        // Tentar diferentes separadores: tabulação, múltiplos espaços, ou espaço único
+        let partes = linha.trim().split(/\t+/).filter(p => p.trim())
+        
+        // Se não encontrou tabulação, tentar múltiplos espaços
+        if (partes.length < 3) {
+          partes = linha.trim().split(/\s{2,}/).filter(p => p.trim())
+        }
+        
+        // Se ainda não encontrou, tentar espaço único (assumindo que série e RG não têm espaços)
+        if (partes.length < 3) {
+          partes = linha.trim().split(/\s+/).filter(p => p.trim())
+        }
+        
+        if (partes.length >= 3) {
+          // Formato esperado: SÉRIE RG LOCAL [OBSERVAÇÕES]
+          // LOCAL pode ter espaço: "PIQUETE 10" → quando partes[2]=="PIQUETE" e partes[3] é número
+          let local = partes[2].trim()
+          let observacoes = partes.slice(3).join(' ').trim() || ''
+          if (partes.length >= 4 && /^\d+$/.test(partes[3]) && (/^(PIQUETE|PTO|P|PASTO|PTOUFTF)$/i.test(partes[2]) || /^[A-Za-z]+$/.test(partes[2]))) {
+            local = `${partes[2].trim()} ${partes[3].trim()}`
+            observacoes = partes.slice(4).join(' ').trim() || ''
+          }
+          dados.push({
+            serie: partes[0].trim(),
+            rg: partes[1].trim(),
+            local,
+            observacoes
+          })
+        } else if (partes.length >= 1) {
+          // Linha com dados incompletos - adicionar mesmo assim para mostrar erro
+          dados.push({
+            serie: partes[0]?.trim() || '',
+            rg: partes[1]?.trim() || '',
+            local: partes[2]?.trim() || '',
+            observacoes: ''
+          })
+        }
+      }
+
+      if (dados.length === 0) {
+        alert('⚠️ Nenhum dado válido encontrado. Formato esperado:\nSÉRIE RG LOCAL [OBSERVAÇÕES]')
+        setImportandoTexto(false)
+        return
+      }
+
+      console.log('Enviando dados para importação:', dados.length, 'linhas')
+
+      // Criar timeout de 60 segundos
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 60000)
+
+      try {
+        // Enviar para API
+        const response = await fetch('/api/import/text-localizacao', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ dados }),
+          signal: controller.signal
+        })
+
+        clearTimeout(timeoutId)
+
+        const data = await response.json()
+        console.log('Resposta da API:', data)
+
+        if (response.ok && data.success) {
+          setResultadoImportacao(data)
+          // sendSuccess coloca o payload em data.data; resultados pode estar em data.data.resultados ou data.resultados
+          const r = data.data?.resultados || data.resultados || {}
+          const totalProblemas = (r.naoEncontrados?.length || 0) + (r.erros?.length || 0)
+          
+          // Guardar erros para mostrar no modal
+          if (totalProblemas > 0 || r.animaisAtualizados === 0) {
+            setErrosImportacao(r)
+            setShowErrosImportacao(true) // Abrir modal automaticamente
+          }
+          
+          // Recarregar dados ANTES de mostrar mensagem
+          await carregarDados()
+          await carregarLocais()
+          
+          // Montar mensagem de resultado
+          let msg = `${r.animaisAtualizados > 0 ? '✅' : '⚠️'} Importação concluída!\n\n`
+          msg += `• Total de linhas: ${r.totalLinhas || 0}\n`
+          msg += `• Animais atualizados: ${r.animaisAtualizados || 0}\n`
+          msg += `• Localizações registradas: ${r.localizacoesRegistradas || 0}\n`
+          
+          if (totalProblemas > 0) {
+            msg += `\n⚠️ Problemas encontrados: ${totalProblemas}\n`
+            msg += `• Não encontrados: ${r.naoEncontrados?.length || 0}\n`
+            msg += `• Erros: ${r.erros?.length || 0}\n\n`
+            msg += `Um modal com os detalhes será exibido.`
+          }
+          
+          // Sempre mostrar mensagem
+          alert(msg)
+          
+          // Fechar modal se tudo OK
+          if (totalProblemas === 0 && r.animaisAtualizados > 0) {
+            setShowImportTextModal(false)
+            setImportText('')
+          }
+        } else {
+          const detalhes = data.details ? `\n\nDetalhes: ${data.details}` : ''
+          alert(`❌ Erro: ${data.error || 'Falha na importação'}${detalhes}`)
+        }
+      } catch (fetchError) {
+        if (fetchError.name === 'AbortError') {
+          alert('⏱️ Tempo limite excedido (60s). A importação pode estar demorando muito. Tente com menos linhas por vez.')
+        } else {
+          throw fetchError
+        }
+      }
+    } catch (err) {
+      console.error('Erro ao importar texto:', err)
+      alert(`❌ Erro ao importar: ${err.message || 'Verifique a conexão.'}`)
+    } finally {
+      setImportandoTexto(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-900/20 dark:to-indigo-900/20">
       <div className="container mx-auto p-6 space-y-8">
@@ -1125,6 +1270,14 @@ export default function LocalizacaoAnimais() {
                     </>
                   )}
                 </label>
+                <button
+                  onClick={() => setShowImportTextModal(true)}
+                  disabled={loading}
+                  className="group bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-6 py-3 rounded-2xl transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <DocumentTextIcon className="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
+                  <span className="font-medium">📝 Importar Texto</span>
+                </button>
                 <button
                   onClick={limparTodasLocalizacoes}
                   disabled={loading}
@@ -3143,6 +3296,561 @@ export default function LocalizacaoAnimais() {
                     <span>Cadastrar Piquete</span>
                   </>
                 )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Importação de Texto */}
+      {showImportTextModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="p-3 bg-white/20 backdrop-blur-sm rounded-2xl">
+                    <DocumentTextIcon className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white">Importar Localizações via Texto</h3>
+                    <p className="text-green-100 text-sm mt-1">Cole os dados copiados do Excel</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowImportTextModal(false)
+                    setImportText('')
+                  }}
+                  className="p-2 hover:bg-white/20 rounded-xl transition-colors duration-200"
+                  disabled={importandoTexto}
+                >
+                  <XMarkIcon className="h-6 w-6 text-white" />
+                </button>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              {/* Instruções */}
+              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                <div className="flex items-start space-x-2 text-blue-800 dark:text-blue-200 text-sm">
+                  <span className="text-lg">ℹ️</span>
+                  <div>
+                    <p className="font-semibold mb-2">Como usar:</p>
+                    <ol className="list-decimal list-inside space-y-1">
+                      <li>Selecione as colunas no Excel: SÉRIE, RG, LOCAL (e opcionalmente OBSERVAÇÕES)</li>
+                      <li>Copie os dados selecionados (Ctrl+C)</li>
+                      <li>Cole no campo abaixo (Ctrl+V)</li>
+                      <li>Clique em "Importar"</li>
+                    </ol>
+                    <p className="mt-2 font-medium">Formato esperado por linha:</p>
+                    <code className="block mt-1 p-2 bg-white dark:bg-gray-800 rounded">SÉRIE    RG    LOCAL    [OBSERVAÇÕES]</code>
+                  </div>
+                </div>
+              </div>
+
+              {/* Campo de texto */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Cole os dados aqui:
+                </label>
+                <textarea
+                  value={importText}
+                  onChange={(e) => setImportText(e.target.value)}
+                  placeholder="Cole aqui os dados copiados do Excel...&#10;&#10;Exemplo:&#10;NACION    15397    PIQUETE 1&#10;NERO    DO MORRO    PIQUETE 2    Animal em observação"
+                  rows={12}
+                  className="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 font-mono text-sm resize-none"
+                  disabled={importandoTexto}
+                  autoFocus
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  {importText.trim() ? `${importText.trim().split('\n').length} linha(s) detectada(s)` : 'Aguardando dados...'}
+                </p>
+              </div>
+
+              {/* Exemplo visual */}
+              <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-700">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Exemplo de dados válidos (copie do Excel):</p>
+                <pre className="text-xs text-gray-600 dark:text-gray-400 font-mono overflow-x-auto">
+CJCJ 1    17207    PIQUETE 1
+CJCJ 2    17215    PIQUETE 1
+EAGB      6058     PIQUETE 1
+                </pre>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  💡 Dica: Selecione as 3 colunas no Excel (SÉRIE, RG, LOCAL) e cole aqui com Ctrl+V
+                </p>
+              </div>
+
+              {/* Debug: mostrar como os dados serão parseados */}
+              {importText.trim() && (
+                <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-200 dark:border-purple-800">
+                  <p className="text-sm font-medium text-purple-700 dark:text-purple-300 mb-2">Preview do que será importado:</p>
+                  <div className="max-h-40 overflow-y-auto">
+                    <table className="w-full text-xs">
+                      <thead className="bg-purple-100 dark:bg-purple-900/40 sticky top-0">
+                        <tr>
+                          <th className="px-2 py-1 text-left text-purple-900 dark:text-purple-100">Linha</th>
+                          <th className="px-2 py-1 text-left text-purple-900 dark:text-purple-100">Série</th>
+                          <th className="px-2 py-1 text-left text-purple-900 dark:text-purple-100">RG</th>
+                          <th className="px-2 py-1 text-left text-purple-900 dark:text-purple-100">Local</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-purple-200 dark:divide-purple-800">
+                        {importText.trim().split('\n').filter(l => l.trim()).slice(0, 10).map((linha, idx) => {
+                          let partes = linha.trim().split(/\t+/).filter(p => p.trim())
+                          if (partes.length < 3) partes = linha.trim().split(/\s{2,}/).filter(p => p.trim())
+                          if (partes.length < 3) partes = linha.trim().split(/\s+/).filter(p => p.trim())
+                          let localPreview = partes[2] || '❌'
+                          if (partes.length >= 4 && /^\d+$/.test(partes[3]) && (/^(PIQUETE|PTO|P|PASTO|PTOUFTF)$/i.test(partes[2]) || /^[A-Za-z]+$/.test(partes[2]))) {
+                            localPreview = `${partes[2]} ${partes[3]}`
+                          }
+                          return (
+                            <tr key={idx} className={partes.length < 3 ? 'bg-red-50 dark:bg-red-900/20' : ''}>
+                              <td className="px-2 py-1 text-purple-900 dark:text-purple-100">{idx + 1}</td>
+                              <td className="px-2 py-1 text-purple-900 dark:text-purple-100 font-semibold">{partes[0] || '❌'}</td>
+                              <td className="px-2 py-1 text-purple-900 dark:text-purple-100 font-semibold">{partes[1] || '❌'}</td>
+                              <td className="px-2 py-1 text-purple-900 dark:text-purple-100">{localPreview}</td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                    {importText.trim().split('\n').filter(l => l.trim()).length > 10 && (
+                      <p className="text-xs text-purple-600 dark:text-purple-400 mt-2 text-center">
+                        ... e mais {importText.trim().split('\n').filter(l => l.trim()).length - 10} linhas
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end space-x-3 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+              {errosImportacao && (
+                <button
+                  onClick={() => setShowErrosImportacao(true)}
+                  className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium transition-all duration-200 transform hover:scale-105 flex items-center space-x-2"
+                >
+                  <DocumentTextIcon className="h-5 w-5" />
+                  <span>Ver Detalhes dos Erros</span>
+                </button>
+              )}
+              <button
+                onClick={() => {
+                  setShowImportTextModal(false)
+                  setImportText('')
+                  setErrosImportacao(null)
+                }}
+                className="px-6 py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-medium transition-all duration-200"
+                disabled={importandoTexto}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleImportarTexto}
+                disabled={!importText.trim() || importandoTexto}
+                className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl font-medium transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center space-x-2"
+              >
+                {importandoTexto ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Importando...</span>
+                  </>
+                ) : (
+                  <>
+                    <DocumentTextIcon className="h-5 w-5" />
+                    <span>Importar</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Erros de Importação */}
+      {showErrosImportacao && errosImportacao && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-orange-600 to-red-600 p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="p-3 bg-white/20 backdrop-blur-sm rounded-2xl">
+                    <DocumentTextIcon className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white">Detalhes da Importação</h3>
+                    <p className="text-orange-100 text-sm mt-1">
+                      {errosImportacao.animaisAtualizados} importados, {(errosImportacao.naoEncontrados?.length || 0) + (errosImportacao.erros?.length || 0)} com problemas
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowErrosImportacao(false)
+                    setErrosImportacao(null)
+                    setShowImportTextModal(false)
+                    setImportText('')
+                  }}
+                  className="p-2 hover:bg-white/20 rounded-xl transition-colors duration-200"
+                >
+                  <XMarkIcon className="h-6 w-6 text-white" />
+                </button>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              {/* Resumo */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
+                  <div className="text-green-600 dark:text-green-400 text-sm font-medium">Total de Linhas</div>
+                  <div className="text-3xl font-bold text-green-700 dark:text-green-300 mt-1">
+                    {errosImportacao.totalLinhas || 0}
+                  </div>
+                </div>
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                  <div className="text-blue-600 dark:text-blue-400 text-sm font-medium">Importados com Sucesso</div>
+                  <div className="text-3xl font-bold text-blue-700 dark:text-blue-300 mt-1">
+                    {errosImportacao.animaisAtualizados || 0}
+                  </div>
+                </div>
+                <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800">
+                  <div className="text-red-600 dark:text-red-400 text-sm font-medium">Com Problemas</div>
+                  <div className="text-3xl font-bold text-red-700 dark:text-red-300 mt-1">
+                    {(errosImportacao.naoEncontrados?.length || 0) + (errosImportacao.erros?.length || 0)}
+                  </div>
+                </div>
+              </div>
+
+              {/* Animais não encontrados */}
+              {errosImportacao.naoEncontrados && errosImportacao.naoEncontrados.length > 0 && (
+                <div className="space-y-3">
+                  <h4 className="text-lg font-bold text-gray-900 dark:text-white flex items-center space-x-2">
+                    <span>🔍</span>
+                    <span>Animais Não Encontrados ({errosImportacao.naoEncontrados.length})</span>
+                  </h4>
+                  <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl border border-yellow-200 dark:border-yellow-800 overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="bg-yellow-100 dark:bg-yellow-900/40">
+                          <tr>
+                            <th className="px-4 py-3 text-left font-semibold text-yellow-900 dark:text-yellow-100">Linha</th>
+                            <th className="px-4 py-3 text-left font-semibold text-yellow-900 dark:text-yellow-100">Série</th>
+                            <th className="px-4 py-3 text-left font-semibold text-yellow-900 dark:text-yellow-100">RG</th>
+                            <th className="px-4 py-3 text-left font-semibold text-yellow-900 dark:text-yellow-100">Local</th>
+                            <th className="px-4 py-3 text-left font-semibold text-yellow-900 dark:text-yellow-100">Motivo</th>
+                            <th className="px-4 py-3 text-center font-semibold text-yellow-900 dark:text-yellow-100 w-24">Ação</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-yellow-200 dark:divide-yellow-800">
+                          {errosImportacao.naoEncontrados.map((item, idx) => (
+                            <tr key={idx} className="hover:bg-yellow-100/50 dark:hover:bg-yellow-900/20">
+                              <td className="px-4 py-3 text-yellow-900 dark:text-yellow-100 font-mono">{item.linha}</td>
+                              <td className="px-4 py-3 text-yellow-900 dark:text-yellow-100 font-semibold">{item.serie}</td>
+                              <td className="px-4 py-3 text-yellow-900 dark:text-yellow-100 font-semibold">{item.rg}</td>
+                              <td className="px-4 py-3 text-yellow-900 dark:text-yellow-100">{item.local}</td>
+                              <td className="px-4 py-3 text-yellow-700 dark:text-yellow-300">{item.motivo}</td>
+                              <td className="px-4 py-3 text-center">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setItemCorrigindo(item)
+                                    setCorrecaoDados({ serie: item.serie || '', rg: item.rg || '', local: item.local || '' })
+                                  }}
+                                  className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-medium"
+                                >
+                                  ✏️ Corrigir
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <p className="text-sm text-blue-800 dark:text-blue-200">
+                      💡 <strong>Dica:</strong> Verifique se a Série e RG estão corretos no banco de dados. A busca é case-insensitive.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Erros de processamento */}
+              {errosImportacao.erros && errosImportacao.erros.length > 0 && (
+                <div className="space-y-3">
+                  <h4 className="text-lg font-bold text-gray-900 dark:text-white flex items-center space-x-2">
+                    <span>❌</span>
+                    <span>Erros de Processamento ({errosImportacao.erros.length})</span>
+                  </h4>
+                  <div className="bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800 overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="bg-red-100 dark:bg-red-900/40">
+                          <tr>
+                            <th className="px-4 py-3 text-left font-semibold text-red-900 dark:text-red-100">Linha</th>
+                            <th className="px-4 py-3 text-left font-semibold text-red-900 dark:text-red-100">Série</th>
+                            <th className="px-4 py-3 text-left font-semibold text-red-900 dark:text-red-100">RG</th>
+                            <th className="px-4 py-3 text-left font-semibold text-red-900 dark:text-red-100">Local</th>
+                            <th className="px-4 py-3 text-left font-semibold text-red-900 dark:text-red-100">Motivo</th>
+                            <th className="px-4 py-3 text-center font-semibold text-red-900 dark:text-red-100 w-24">Ação</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-red-200 dark:divide-red-800">
+                          {errosImportacao.erros.map((item, idx) => (
+                            <tr key={idx} className="hover:bg-red-100/50 dark:hover:bg-red-900/20">
+                              <td className="px-4 py-3 text-red-900 dark:text-red-100 font-mono">{item.linha}</td>
+                              <td className="px-4 py-3 text-red-900 dark:text-red-100 font-semibold">{item.serie}</td>
+                              <td className="px-4 py-3 text-red-900 dark:text-red-100 font-semibold">{item.rg}</td>
+                              <td className="px-4 py-3 text-red-900 dark:text-red-100">{item.local}</td>
+                              <td className="px-4 py-3 text-red-700 dark:text-red-300 text-xs">{item.motivo}</td>
+                              <td className="px-4 py-3 text-center">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setItemCorrigindo(item)
+                                    setCorrecaoDados({ serie: item.serie || '', rg: item.rg || '', local: item.local || '' })
+                                  }}
+                                  className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-medium"
+                                >
+                                  ✏️ Corrigir
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Botão para copiar TODOS os que falharam */}
+              {(errosImportacao.naoEncontrados?.length || 0) + (errosImportacao.erros?.length || 0) > 0 && (
+                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800">
+                  <p className="text-sm font-semibold text-amber-900 dark:text-amber-100 mb-2">
+                    📥 Exportar lista completa dos que falharam
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const todos = [
+                        ...(errosImportacao.naoEncontrados || []).map(i => ({ ...i, tipo: 'Não encontrado' })),
+                        ...(errosImportacao.erros || []).map(i => ({ ...i, tipo: 'Erro' }))
+                      ].sort((a, b) => (a.linha || 0) - (b.linha || 0))
+                      const texto = 'LINHA\tSÉRIE\tRG\tLOCAL\tMOTIVO\n' + todos.map(i => `${i.linha}\t${i.serie}\t${i.rg}\t${i.local}\t${(i.motivo || i.tipo || '').replace(/\t/g, ' ')}`).join('\n')
+                      navigator.clipboard.writeText(texto).then(() => {
+                        alert(`✅ ${todos.length} registro(s) copiado(s)! Cole no Excel para ver exatamente quais linhas do seu arquivo falharam.`)
+                      }).catch(() => alert('Erro ao copiar.'))
+                    }}
+                    className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-medium"
+                  >
+                    📋 Copiar todos os {((errosImportacao.naoEncontrados?.length || 0) + (errosImportacao.erros?.length || 0))} que falharam
+                  </button>
+                </div>
+              )}
+
+              {/* Mensagem de sucesso se não houver erros */}
+              {(!errosImportacao.naoEncontrados || errosImportacao.naoEncontrados.length === 0) && 
+               (!errosImportacao.erros || errosImportacao.erros.length === 0) && (
+                <div className="p-6 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800 text-center">
+                  <div className="text-6xl mb-4">✅</div>
+                  <h4 className="text-xl font-bold text-green-900 dark:text-green-100 mb-2">
+                    Importação 100% Concluída!
+                  </h4>
+                  <p className="text-green-700 dark:text-green-300">
+                    Todos os {errosImportacao.totalLinhas} animais foram importados com sucesso.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-between p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                {errosImportacao.animaisAtualizados > 0 && (
+                  <span>✅ {errosImportacao.animaisAtualizados} animais foram atualizados com sucesso</span>
+                )}
+              </div>
+              <button
+                onClick={() => {
+                  setShowErrosImportacao(false)
+                  setErrosImportacao(null)
+                  setShowImportTextModal(false)
+                  setImportText('')
+                  setItemCorrigindo(null)
+                }}
+                className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl font-medium transition-all duration-200 transform hover:scale-105"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Corrigir item não importado */}
+      {itemCorrigindo && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">✏️ Corrigir e importar</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Ajuste os dados ou cadastre o animal que não foi encontrado.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Série</label>
+                <input
+                  type="text"
+                  value={correcaoDados.serie}
+                  onChange={(e) => setCorrecaoDados(prev => ({ ...prev, serie: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  placeholder="Ex: CJCJ"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">RG</label>
+                <input
+                  type="text"
+                  value={correcaoDados.rg}
+                  onChange={(e) => setCorrecaoDados(prev => ({ ...prev, rg: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  placeholder="Ex: 16941"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Local (piquete)</label>
+                <input
+                  type="text"
+                  value={correcaoDados.local}
+                  readOnly
+                  className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+                />
+              </div>
+            </div>
+            <div className="flex flex-col gap-2 mt-6">
+              <button
+                type="button"
+                disabled={corrigindo || !correcaoDados.serie?.trim() || !correcaoDados.rg?.trim() || !correcaoDados.local?.trim()}
+                onClick={async () => {
+                  setCorrigindo(true)
+                  try {
+                    const res = await fetch('/api/import/text-localizacao', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        dados: [{ serie: correcaoDados.serie.trim(), rg: correcaoDados.rg.trim(), local: correcaoDados.local.trim(), observacoes: '' }]
+                      })
+                    })
+                    const data = await res.json()
+                    const r = data.data?.resultados || data.resultados || {}
+                    if (r.animaisAtualizados > 0) {
+                      alert('✅ Importado com sucesso!')
+                      setErrosImportacao(prev => ({
+                        ...prev,
+                        animaisAtualizados: (prev?.animaisAtualizados || 0) + 1,
+                        naoEncontrados: prev?.naoEncontrados?.filter(i => i.linha !== itemCorrigindo.linha) || [],
+                        erros: prev?.erros?.filter(i => i.linha !== itemCorrigindo.linha) || []
+                      }))
+                      setItemCorrigindo(null)
+                      await carregarDados()
+                      await carregarLocais()
+                    } else {
+                      const motivo = r.naoEncontrados?.[0]?.motivo || r.erros?.[0]?.motivo || 'Animal não encontrado'
+                      alert(`❌ Não foi possível importar: ${motivo}\n\nTente "Cadastrar animal" se ele ainda não existir no sistema.`)
+                    }
+                  } catch (e) {
+                    alert('Erro ao importar: ' + (e?.message || 'Erro de conexão'))
+                  } finally {
+                    setCorrigindo(false)
+                  }
+                }}
+                className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-xl font-medium"
+              >
+                {corrigindo ? '⏳ Importando...' : '🔄 Tentar importar com dados corrigidos'}
+              </button>
+              <button
+                type="button"
+                disabled={corrigindo || !correcaoDados.serie?.trim() || !correcaoDados.rg?.trim() || !correcaoDados.local?.trim()}
+                onClick={async () => {
+                  setCorrigindo(true)
+                  try {
+                    const resAnimal = await fetch('/api/animals', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        serie: correcaoDados.serie.trim(),
+                        rg: correcaoDados.rg.trim(),
+                        sexo: 'Fêmea',
+                        raca: 'Mestiça',
+                        boletim: 'Importação localização',
+                        pasto_atual: correcaoDados.local.trim(),
+                        situacao: 'Ativo'
+                      })
+                    })
+                    const dataAnimal = await resAnimal.json()
+                    if (!resAnimal.ok) {
+                      throw new Error(dataAnimal.message || dataAnimal.error || 'Erro ao cadastrar')
+                    }
+                    const animal = dataAnimal.data || dataAnimal
+                    const resLoc = await fetch('/api/import/text-localizacao', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        dados: [{ serie: correcaoDados.serie.trim(), rg: correcaoDados.rg.trim(), local: correcaoDados.local.trim(), observacoes: '' }]
+                      })
+                    })
+                    const dataLoc = await resLoc.json()
+                    const r = dataLoc.data?.resultados || dataLoc.resultados || {}
+                    if (r.animaisAtualizados > 0 || animal?.id) {
+                      alert('✅ Animal cadastrado e localização importada com sucesso!')
+                      setErrosImportacao(prev => ({
+                        ...prev,
+                        animaisAtualizados: (prev?.animaisAtualizados || 0) + 1,
+                        naoEncontrados: prev?.naoEncontrados?.filter(i => i.linha !== itemCorrigindo.linha) || [],
+                        erros: prev?.erros?.filter(i => i.linha !== itemCorrigindo.linha) || []
+                      }))
+                      setItemCorrigindo(null)
+                      await carregarDados()
+                      await carregarLocais()
+                    } else {
+                      alert('✅ Animal cadastrado! Recarregue a página para ver a localização.')
+                      setItemCorrigindo(null)
+                      await carregarDados()
+                      await carregarLocais()
+                    }
+                  } catch (e) {
+                    alert('Erro: ' + (e?.message || 'Erro ao cadastrar'))
+                  } finally {
+                    setCorrigindo(false)
+                  }
+                }}
+                className="w-full px-4 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-xl font-medium"
+              >
+                {corrigindo ? '⏳ Cadastrando...' : '➕ Cadastrar animal e importar localização'}
+              </button>
+              <a
+                href={`/animals?action=new`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full px-4 py-2 text-center border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                📋 Abrir cadastro completo (nova aba)
+              </a>
+              <button
+                type="button"
+                onClick={() => setItemCorrigindo(null)}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                Cancelar
               </button>
             </div>
           </div>

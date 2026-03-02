@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { ClockIcon, MapPinIcon, MagnifyingGlassIcon, FunnelIcon, ArrowPathIcon, DocumentArrowDownIcon, XMarkIcon } from '../../components/ui/Icons'
+import { ClockIcon, MapPinIcon, MagnifyingGlassIcon, FunnelIcon, ArrowPathIcon, DocumentArrowDownIcon, XMarkIcon, TrashIcon } from '../../components/ui/Icons'
 
 export default function HistoricoMovimentacoes() {
   const router = useRouter()
@@ -184,6 +184,37 @@ export default function HistoricoMovimentacoes() {
     }
   }
 
+  const limparLocalizacoesPorPiquete = async (piquete) => {
+    // Primeira confirmação
+    if (!confirm(`⚠️ ATENÇÃO!\n\nVocê está prestes a excluir TODAS as localizações do piquete "${piquete}".\n\nEsta ação NÃO pode ser desfeita.\n\nDeseja continuar?`)) {
+      return
+    }
+
+    // Segunda confirmação
+    if (!confirm(`🔴 CONFIRMAÇÃO FINAL\n\nTem CERTEZA ABSOLUTA que deseja excluir todas as localizações do piquete "${piquete}"?\n\nEsta é sua última chance de cancelar!`)) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/localizacoes/limpar-por-piquete?piquete=${encodeURIComponent(piquete)}`, {
+        method: 'DELETE'
+      })
+
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        alert(`✅ ${data.message}\n\n• Localizações removidas: ${data.deleted}\n• Animais afetados: ${data.animais_afetados}`)
+        // Recarregar dados
+        await carregarMovimentacoes()
+      } else {
+        alert(`❌ Erro: ${data.error || 'Falha ao limpar localizações'}`)
+      }
+    } catch (error) {
+      console.error('Erro ao limpar localizações do piquete:', error)
+      alert('❌ Erro ao limpar localizações. Verifique a conexão.')
+    }
+  }
+
   if (!mounted) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -318,26 +349,42 @@ export default function HistoricoMovimentacoes() {
             </button>
             {/* Cards por piquete - clicáveis */}
             {resumoPorPiquete.slice(0, 11).map((item) => (
-              <button
+              <div
                 key={item.piquete}
-                type="button"
-                onClick={() => setPiqueteModal(item.piquete)}
-                className="text-left bg-white dark:bg-gray-800 rounded-xl p-4 border-2 border-gray-200 dark:border-gray-700 shadow hover:shadow-lg hover:border-purple-400 dark:hover:border-purple-500 transition-all cursor-pointer group"
+                className="relative bg-white dark:bg-gray-800 rounded-xl p-4 border-2 border-gray-200 dark:border-gray-700 shadow hover:shadow-lg hover:border-purple-400 dark:hover:border-purple-500 transition-all group"
               >
-                <div className="flex items-center gap-2 mb-2">
-                  <MapPinIcon className="w-4 h-4 text-purple-600 group-hover:scale-110 transition-transform" />
-                  <span className="font-semibold text-gray-900 dark:text-white truncate" title={item.piquete}>
-                    {item.piquete}
-                  </span>
-                </div>
-                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{item.total}</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  🐂 {item.machos} machos • 🐄 {item.femeas} fêmeas
-                </div>
-                <div className="text-xs text-purple-500 dark:text-purple-400 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  Clique para ver animais →
-                </div>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setPiqueteModal(item.piquete)}
+                  className="text-left w-full"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <MapPinIcon className="w-4 h-4 text-purple-600 group-hover:scale-110 transition-transform" />
+                    <span className="font-semibold text-gray-900 dark:text-white truncate" title={item.piquete}>
+                      {item.piquete}
+                    </span>
+                  </div>
+                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{item.total}</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    🐂 {item.machos} machos • 🐄 {item.femeas} fêmeas
+                  </div>
+                  <div className="text-xs text-purple-500 dark:text-purple-400 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    Clique para ver animais →
+                  </div>
+                </button>
+                {/* Botão de excluir localizações do piquete */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    limparLocalizacoesPorPiquete(item.piquete)
+                  }}
+                  className="absolute top-2 right-2 p-1.5 bg-red-500/10 hover:bg-red-500 text-red-600 hover:text-white rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                  title={`Limpar localizações do ${item.piquete}`}
+                >
+                  <TrashIcon className="w-4 h-4" />
+                </button>
+              </div>
             ))}
           </div>
           {resumoPorPiquete.length > 12 && (
