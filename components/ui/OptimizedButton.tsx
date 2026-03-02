@@ -1,9 +1,8 @@
 /**
  * Componente Button otimizado com variants e estados
  */
-import React, { ButtonHTMLAttributes, ReactNode, memo } from 'react'
+import { ButtonHTMLAttributes, ReactNode, memo } from 'react'
 
-;
 import { cn } from '@/utils/cn';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

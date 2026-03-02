@@ -1,9 +1,8 @@
 /**
  * Componente Card otimizado com React.memo e composition pattern
  */
-import React, { ReactNode, memo } from 'react'
+import { ReactNode, memo } from 'react'
 
-;
 import { cn } from '@/utils/cn';
 
 interface CardProps {

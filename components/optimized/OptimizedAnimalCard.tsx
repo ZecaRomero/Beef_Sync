@@ -1,9 +1,8 @@
 /**
  * Card de Animal otimizado com React.memo e composition
  */
-import React, { memo, useCallback } from 'react'
+import { memo, useCallback } from 'react'
 
-;
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../ui/OptimizedCard';
 import { Button } from '../ui/OptimizedButton';
 import { Animal } from '@/types';

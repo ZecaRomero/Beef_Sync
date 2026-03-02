@@ -1,9 +1,8 @@
 import { query } from '../../../lib/database'
 import ExcelJS from 'exceljs'
+import logger from '../../../utils/logger'
 
 export default async function handler(req, res) {
-  console.log('🚀 API /api/relatorios-personalizados/generate chamada', req.method)
-  
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' })
   }
@@ -11,21 +10,15 @@ export default async function handler(req, res) {
   try {
     const { relatorioId, formato = 'xlsx' } = req.body
 
-    console.log('📊 Gerando relatório:', { relatorioId, formato })
-
     if (!relatorioId) {
       return res.status(400).json({ message: 'ID do relatório é obrigatório' })
     }
 
     // Buscar configuração do relatório
-    console.log('🔍 Buscando relatório no banco...')
     const relatorioResult = await query(
       'SELECT * FROM relatorios_personalizados WHERE id = $1',
       [relatorioId]
     )
-    
-    console.log('📋 Relatório encontrado:', relatorioResult.rows.length > 0 ? 'Sim' : 'Não')
-
     if (relatorioResult.rows.length === 0) {
       return res.status(404).json({ message: 'Relatório não encontrado' })
     }
@@ -41,7 +34,7 @@ export default async function handler(req, res) {
         camposExibicao = relatorio.campos_exibicao
       }
     } catch (e) {
-      console.error('Erro ao fazer parse de campos_exibicao:', e)
+      logger.error('Erro ao fazer parse de campos_exibicao', { error: e?.message })
       camposExibicao = []
     }
 
@@ -58,13 +51,11 @@ export default async function handler(req, res) {
     }
 
     const tipo = relatorio.tipo
-    console.log('📊 Tipo de relatório:', tipo, 'Campos:', camposExibicao.length)
 
     // Buscar dados baseado no tipo de relatório
     let dados = []
     let headers = []
 
-    console.log('🔄 Buscando dados...')
     switch (tipo) {
       case 'animais':
         dados = await buscarDadosAnimais(camposExibicao, filtros)
@@ -288,8 +279,7 @@ export default async function handler(req, res) {
       })
     }
   } catch (error) {
-    console.error('❌ Erro ao gerar relatório:', error)
-    console.error('❌ Stack:', error.stack)
+    logger.error('Erro ao gerar relatório', { error: error?.message, stack: error?.stack })
     
     // Se a resposta já foi enviada, não tente enviar novamente
     if (!res.headersSent) {

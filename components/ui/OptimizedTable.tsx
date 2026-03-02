@@ -1,9 +1,8 @@
 /**
  * Componente Table otimizado com virtualização e paginação
  */
-import React, { ReactNode, memo, useMemo } from 'react'
+import { ReactNode, memo, useMemo } from 'react'
 
-;
 import { cn } from '@/utils/cn';
 
 interface Column<T> {

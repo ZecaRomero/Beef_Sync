@@ -735,9 +735,13 @@ class DatabaseService {
       queryText += ` ORDER BY a.data_nascimento DESC, a.created_at DESC`;
     }
 
-    // Limite
+    // Limite (usar parâmetro para evitar SQL injection)
     if (filtros.limit) {
-      queryText += ` LIMIT ${parseInt(filtros.limit)}`;
+      const limitVal = Math.min(Math.max(parseInt(filtros.limit, 10) || 0, 1), 10000);
+      if (limitVal > 0) {
+        params.push(limitVal);
+        queryText += ` LIMIT $${params.length}`;
+      }
     }
 
     const result = await query(queryText, params);

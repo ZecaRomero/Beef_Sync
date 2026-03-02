@@ -1,9 +1,8 @@
 /**
  * Error Boundary aprimorado com melhor UX e logging
  */
-import React, { Component, ErrorInfo, ReactNode } from 'react'
+import { Component, ErrorInfo, ReactNode } from 'react'
 
-;
 import { ExclamationTriangleIcon, ArrowPathIcon } from '../ui/Icons';
 
 interface Props {

@@ -1,5 +1,4 @@
-
-import React, { ReactNode, useEffect, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 
 import ModernSidebar from './layout/ModernSidebar'
 import ModernHeader from './layout/ModernHeader'
