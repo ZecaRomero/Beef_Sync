@@ -84,6 +84,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
     ocorrencias: true, transferencias: true
   })
   const [rankingPosicao, setRankingPosicao] = useState(null) // 1 = primeiro do ranking
+  const [rankingPosicaoGenetica2, setRankingPosicaoGenetica2] = useState(null)
   const [filhoTopRanking, setFilhoTopRanking] = useState(null) // { serie, rg, nome } quando esta fêmea é mãe do 1º do ranking
   const [showIABCZInfo, setShowIABCZInfo] = useState(false)
   const [sharing, setSharing] = useState(false)
@@ -112,11 +113,13 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
       (animal.data_nascimento ? `Idade: ${Math.floor((new Date() - new Date(animal.data_nascimento)) / (1000 * 60 * 60 * 24 * 30.44))} meses` : null),
       animal.peso ? `Peso: ${animal.peso} kg` : null,
       (animal.abczg || animal.abczg === 0) ? `iABCZ: ${animal.abczg}${filhoTopRanking ? ' • Mãe do 1º do ranking' : rankingPosicao ? ` • ${rankingPosicao}º no ranking` : ''}` : null,
+      (animal.genetica_2 || animal.genetica_2 === 0) ? `Avaliação 2: ${animal.genetica_2}${rankingPosicaoGenetica2 ? ` • ${rankingPosicaoGenetica2}º no ranking` : ''}` : null,
+      (animal.decile_2 || animal.decile_2 === 0) ? `Decile 2: ${animal.decile_2}` : null,
       locFiltrada ? `Localização: ${locFiltrada}` : null
     ].filter(Boolean).join('\n')
     const url = `https://wa.me/?text=${encodeURIComponent(texto)}`
     window.open(url, '_blank')
-  }, [animal, rankingPosicao, filhoTopRanking])
+  }, [animal, rankingPosicao, rankingPosicaoGenetica2, filhoTopRanking])
 
   useEffect(() => {
     if (!id) return
@@ -132,6 +135,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
     setInseminacoesFetch(null)
     setPrevisaoPartoIA(null)
     setRankingPosicao(null)
+    setRankingPosicaoGenetica2(null)
     setFilhoTopRanking(null)
     
     fetch(`/api/animals/${id}?history=true`)
