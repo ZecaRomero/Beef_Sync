@@ -43,6 +43,34 @@ export default function ConsultaRapida() {
   const [showSugestoes, setShowSugestoes] = useState(false)
   const searchTimeoutRef = useRef(null)
 
+  // Verificar autenticação mobile
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    
+    // Verificar se está autenticado
+    const authData = localStorage.getItem('mobile-auth')
+    if (!authData) {
+      // Não autenticado, redirecionar para página de autenticação
+      router.push('/mobile-auth')
+      return
+    }
+    
+    try {
+      const data = JSON.parse(authData)
+      if (!data.nome || !data.telefone) {
+        router.push('/mobile-auth')
+        return
+      }
+      // Usuário autenticado
+      setIdentificado(true)
+      setNomeIdent(data.nome)
+      setTelefoneIdent(data.telefone)
+    } catch (e) {
+      console.error('Erro ao verificar autenticação:', e)
+      router.push('/mobile-auth')
+    }
+  }, [router])
+
   // Verificar se já está identificado (localStorage) - localhost pula
   useEffect(() => {
     if (typeof window === 'undefined') return
