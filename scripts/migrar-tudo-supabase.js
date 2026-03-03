@@ -47,7 +47,10 @@ async function main() {
     process.exit(1)
   }
 
-  const databaseUrl = `postgresql://postgres.${projectRef}:${SENHA_SUPABASE}@aws-0-${REGIAO_PADRAO}.pooler.supabase.com:6543/postgres?pgbouncer=true`
+  // Porta 5432 = modo sessão (mais estável para migração/restore)
+  // Porta 6543 = modo transação (melhor para app em produção)
+  const databaseUrlSession = `postgresql://postgres.${projectRef}:${SENHA_SUPABASE}@aws-0-${REGIAO_PADRAO}.pooler.supabase.com:5432/postgres`
+  const databaseUrlTransaction = `postgresql://postgres.${projectRef}:${SENHA_SUPABASE}@aws-0-${REGIAO_PADRAO}.pooler.supabase.com:6543/postgres?pgbouncer=true`
   const envPath = path.join(process.cwd(), '.env')
   let envContent = fs.existsSync(envPath) ? fs.readFileSync(envPath, 'utf8') : ''
 
@@ -73,11 +76,11 @@ async function main() {
     backupFile = files[0]?.name
   }
 
-  // 2. Configurar .env para Supabase
+  // 2. Configurar .env para Supabase (porta 5432 para migração - mais estável)
   console.log('\n⚙️  Passo 2: Configurando .env...')
   envContent = envContent.replace(/^DATABASE_URL=.*$/m, '')
   envContent = envContent.replace(/^# DATABASE_URL=.*$/m, '')
-  envContent = `DATABASE_URL=${databaseUrl}\n` + envContent.trim() + '\n'
+  envContent = `DATABASE_URL=${databaseUrlSession}\n` + envContent.trim() + '\n'
   fs.writeFileSync(envPath, envContent)
 
   // 3. Inicializar schema no Supabase
@@ -86,7 +89,7 @@ async function main() {
     console.log('\n⚠️  db:init falhou - o schema pode já existir. Continuando...')
   }
 
-  // 4. Restaurar backup
+  // 4. Restaurar backup (usa porta 5432 - conexão mais estável para bulk)
   if (backupFile) {
     const backupPath = path.join(backupsDir, backupFile)
     console.log(`\n📥 Passo 4: Restaurando ${backupFile}...`)
@@ -98,6 +101,12 @@ async function main() {
     console.log('\n⚠️  Nenhum backup encontrado. Restaure manualmente:')
     console.log('   node scripts/restore-database.js backups/backup_completo_XXXX.json --force')
   }
+
+  // 5. Trocar para porta 6543 (modo transação) para o app em produção
+  console.log('\n⚙️  Passo 5: Configurando .env para produção (porta 6543)...')
+  envContent = fs.readFileSync(envPath, 'utf8')
+  envContent = envContent.replace(/^DATABASE_URL=.*$/m, `DATABASE_URL=${databaseUrlTransaction}`)
+  fs.writeFileSync(envPath, envContent)
 
   console.log('\n═══════════════════════════════════════════')
   console.log('  ✅ Migração concluída!')

@@ -151,9 +151,9 @@ export default async function handler(req, res) {
 
     // Formato Série|RGN|Status (3 colunas) - ex: SERIE, RGN, Status
     const formatoStatusAbcz = cellC1.includes('STATUS');
-    // Formato Série|RG|IQG|Pt IQG (4 colunas) - col 3 e 4 vão para genetica_2 e decile_2
+    // Formato Série|RG|IQG/IQGg|Pt (4+ colunas) - col 3 e 4 vão para genetica_2 e decile_2 (IQG e Pt IQG)
     const cellD1 = (primeiraLinha.getCell(4).value ?? '').toString().toUpperCase();
-    const formatoIQG = (cellC1.includes('IQG') || cellD1.includes('PT') || cellD1.includes('IQG')) &&
+    const formatoIQG = (cellC1.includes('IQG') || cellC1.includes('IQGG') || cellD1.includes('PT') || cellD1.includes('IQG')) &&
       !cellC1.includes('IABCZ') && !cellC1.includes('DECA');
 
     const rows = [];
@@ -196,9 +196,13 @@ export default async function handler(req, res) {
     });
   } catch (error) {
     console.error('❌ Erro ao importar genética:', error);
+    let details = error?.message || String(error);
+    if (error?.name === 'AggregateError' && Array.isArray(error?.errors) && error.errors.length > 0) {
+      details = error.errors.map(e => e?.message || String(e)).join('; ') || details;
+    }
     return res.status(500).json({
       error: 'Erro ao processar importação',
-      details: String(error?.message || error),
+      details,
     });
   }
 }
@@ -247,7 +251,7 @@ async function processarLinhas(rows) {
 
   // Buscar animais em lotes (evita query muito grande) - RG normalizado no banco (sem zeros à esquerda)
   const mapaAnimais = new Map();
-  const BATCH_SELECT = 500;
+  const BATCH_SELECT = 100;
 
   for (let b = 0; b < dados.length; b += BATCH_SELECT) {
     const batch = dados.slice(b, b + BATCH_SELECT);
@@ -269,29 +273,82 @@ async function processarLinhas(rows) {
       mapaAnimais.set(key, a);
     }
 
-    // 2) Fallback: buscar por tatuagem (serie-rg, serie+rg) para os que não foram encontrados
+    // 2) Fallback: buscar por tatuagem (serie-rg, serie+rg, serie+espaço+rg) para os que não foram encontrados
     const naoEncontradosNoBatch = batch.filter(d => !mapaAnimais.has(`${(d.serie || '').toUpperCase().trim()}|${d.rg}`));
-    const tatuagens = [...new Set(naoEncontradosNoBatch.flatMap(d => [
-      `${(d.serie || '').trim()}-${d.rg}`.replace(/\s/g, '').toUpperCase(),
-      `${(d.serie || '').trim()}${d.rg}`.replace(/\s/g, '').toUpperCase()
-    ]).filter(Boolean))];
+    const tatuagens = [...new Set(naoEncontradosNoBatch.flatMap(d => {
+      const s = (d.serie || '').trim().toUpperCase();
+      const r = String(d.rg || '').trim();
+      if (!s && !r) return [];
+      return [
+        `${s}-${r}`.replace(/\s/g, ''),
+        `${s}${r}`.replace(/\s/g, ''),
+        `${s} ${r}`.replace(/\s+/g, ' ').trim()
+      ].filter(Boolean);
+    }))];
     if (tatuagens.length > 0) {
       try {
+        const tatNorm = tatuagens.map(t => t.replace(/\s/g, '').toUpperCase());
         const tatRes = await query(
           `SELECT id, serie, rg, situacao, tatuagem FROM animais a
            WHERE TRIM(COALESCE(a.tatuagem, '')) != ''
-             AND REPLACE(UPPER(TRIM(a.tatuagem)), ' ', '') IN (SELECT unnest($1::text[]))`,
-          [tatuagens]
+             AND REPLACE(UPPER(TRIM(a.tatuagem)), ' ', '') = ANY($1::text[])`,
+          [tatNorm]
         );
         for (const d of naoEncontradosNoBatch) {
           const key = `${(d.serie || '').toUpperCase().trim()}|${d.rg}`;
           const dTat = `${(d.serie || '').trim()}${d.rg}`.replace(/\s/g, '').toUpperCase();
           const dTat2 = `${(d.serie || '').trim()}-${d.rg}`.replace(/\s/g, '').toUpperCase();
+          const dTat3 = `${(d.serie || '').trim()} ${d.rg}`.replace(/\s+/g, ' ').trim().toUpperCase();
           const animal = tatRes.rows.find(a => {
             const tat = (a.tatuagem || '').replace(/\s/g, '').toUpperCase();
-            return tat === dTat || tat === dTat2;
+            const tat2 = (a.tatuagem || '').trim().toUpperCase();
+            return tat === dTat || tat === dTat2 || tat2 === dTat3;
           });
           if (animal) mapaAnimais.set(key, animal);
+        }
+      } catch (tatErr) {
+        console.warn('[excel-genetica] Fallback tatuagem:', tatErr?.message);
+      }
+    }
+
+    // 3) Fallback: buscar por nome (ex: "CJCJ 17267")
+    let aindaNaoEncontrados = naoEncontradosNoBatch.filter(d => !mapaAnimais.has(`${(d.serie || '').toUpperCase().trim()}|${d.rg}`));
+    for (const d of aindaNaoEncontrados) {
+      try {
+        const nomeBusca = `${(d.serie || '').trim()} ${d.rg}`.replace(/\s+/g, ' ').trim();
+        const nomeBusca2 = `${(d.serie || '').trim()}-${d.rg}`;
+        const nomeRes = await query(
+          `SELECT id, serie, rg, situacao FROM animais a
+           WHERE (UPPER(TRIM(COALESCE(a.nome, ''))) = UPPER($1)
+             OR UPPER(TRIM(COALESCE(a.nome, ''))) = UPPER($2)
+             OR REPLACE(UPPER(TRIM(COALESCE(a.nome, ''))), ' ', '') = REPLACE(UPPER($1), ' ', ''))
+           LIMIT 1`,
+          [nomeBusca, nomeBusca2]
+        );
+        if (nomeRes.rows.length > 0) {
+          const a = nomeRes.rows[0];
+          const key = `${(d.serie || '').toUpperCase().trim()}|${d.rg}`;
+          mapaAnimais.set(key, a);
+        }
+      } catch (_) {}
+    }
+
+    // 4) Fallback: busca individual por serie+rg (evita problemas com query em lote)
+    aindaNaoEncontrados = batch.filter(d => !mapaAnimais.has(`${(d.serie || '').toUpperCase().trim()}|${d.rg}`));
+    for (const d of aindaNaoEncontrados) {
+      try {
+        const indRes = await query(
+          `SELECT id, serie, rg, situacao FROM animais a
+           WHERE UPPER(TRIM(COALESCE(a.serie, ''))) = UPPER($1)
+             AND COALESCE(NULLIF(REGEXP_REPLACE(TRIM(a.rg::text), '^0+', ''), ''), '0') = $2
+           LIMIT 1`,
+          [(d.serie || '').trim(), d.rg]
+        );
+        if (indRes.rows.length > 0) {
+          const a = indRes.rows[0];
+          const rgNorm = /^\d+$/.test(String(a.rg || '').trim()) ? String(parseInt(String(a.rg).trim(), 10)) : String(a.rg || '').trim();
+          const key = `${(d.serie || '').toUpperCase().trim()}|${d.rg}`;
+          mapaAnimais.set(key, a);
         }
       } catch (_) {}
     }

@@ -9,6 +9,7 @@
  *   --dry-run: Simula a restauração sem executar
  */
 
+require('dotenv').config()
 const { query, pool } = require('../lib/database')
 const fs = require('fs')
 const path = require('path')
@@ -249,17 +250,37 @@ async function main() {
   // Resolver caminho do arquivo
   let filePath = backupFile
   if (!path.isAbsolute(filePath)) {
-    // Tentar na pasta backups primeiro
-    const backupsPath = path.join(process.cwd(), 'backups', backupFile)
-    if (fs.existsSync(backupsPath)) {
-      filePath = backupsPath
-    } else {
-      filePath = path.resolve(filePath)
+    // Remover prefixo backups/ se o usuário passou
+    const baseName = backupFile.replace(/^backups[/\\]/, '')
+    const backupsDir = path.join(process.cwd(), 'backups')
+    const candidates = [
+      path.join(backupsDir, baseName),
+      path.join(backupsDir, baseName + (baseName.endsWith('.json') ? '' : '.json')),
+      path.resolve(backupFile),
+      path.resolve(backupFile + (backupFile.endsWith('.json') ? '' : '.json'))
+    ]
+    for (const p of candidates) {
+      if (fs.existsSync(p)) {
+        filePath = p
+        break
+      }
+    }
+    if (!fs.existsSync(filePath)) {
+      filePath = path.join(backupsDir, baseName)
     }
   }
 
   log(`\n1. 📁 VALIDANDO ARQUIVO DE BACKUP`, 'bold')
   if (!(await validateBackupFile(filePath))) {
+    const backupsDir = path.join(process.cwd(), 'backups')
+    if (fs.existsSync(backupsDir)) {
+      const files = fs.readdirSync(backupsDir).filter(f => f.endsWith('.json') && f.includes('completo'))
+      if (files.length > 0) {
+        log('\n💡 Backups disponíveis:', 'yellow')
+        files.slice(-5).forEach(f => log(`   ${f}`, 'blue'))
+        log('\n   Use: node scripts/restore-database.js backups/NOME_DO_ARQUIVO.json --force', 'yellow')
+      }
+    }
     process.exit(1)
   }
 

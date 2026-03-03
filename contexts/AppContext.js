@@ -48,13 +48,16 @@ export function AppProvider({ children }) {
       setLoading(true)
       setError(null)
 
+      // Timeout de 15s por requisição para não travar o app
+      const fetchOpts = { timeout: 15000 }
+
       // Carregar dados em paralelo para melhor performance
       const [animalsRes, birthsRes, costsRes, semenRes, nfsRes] = await Promise.allSettled([
-        apiClient.get('/api/animals'),
-        apiClient.get('/api/births'),
-        apiClient.get('/api/custos'),
-        apiClient.get('/api/semen'),
-        apiClient.get('/api/notas-fiscais'),
+        apiClient.get('/api/animals', fetchOpts),
+        apiClient.get('/api/births', fetchOpts),
+        apiClient.get('/api/custos', fetchOpts),
+        apiClient.get('/api/semen', fetchOpts),
+        apiClient.get('/api/notas-fiscais', fetchOpts),
       ])
 
       // Processar resultados
@@ -88,7 +91,6 @@ export function AppProvider({ children }) {
         logger.warn('Erro ao carregar notas fiscais:', nfsRes.reason)
       }
 
-      setInitialized(true)
       logger.info('Dados do contexto carregados do PostgreSQL')
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
@@ -96,6 +98,7 @@ export function AppProvider({ children }) {
       logger.error('Erro ao carregar dados do contexto:', err)
     } finally {
       setLoading(false)
+      setInitialized(true)
     }
   }, [])
 
@@ -159,9 +162,10 @@ export function AppProvider({ children }) {
     }
   }, [])
 
-  // Carregar dados na inicialização
+  // Carregar dados na inicialização (não bloqueia - UI abre imediatamente)
   useEffect(() => {
     if (!initialized) {
+      setInitialized(true)
       loadAllData()
     }
   }, [initialized, loadAllData])

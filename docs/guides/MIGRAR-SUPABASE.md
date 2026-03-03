@@ -169,10 +169,16 @@ Se o PC ficar ligado, você pode acessar pelo celular na mesma rede:
 
 ## Solução de problemas
 
+**Erro ETIMEDOUT / Connection timeout**
+- **Projeto pausado**: Projetos free tier pausam após inatividade. No Dashboard, clique em "Restore project"
+- **Firewall/rede**: Portas 5432 e 6543 podem estar bloqueadas. Tente outra rede (ex: celular como hotspot)
+- **Porta 5432**: Para migração/restore, use `:5432` em vez de `:6543` (conexão mais estável)
+- **Região**: Confirme que a região na URL (`sa-east-1`, etc.) é a do seu projeto
+
 **Erro de conexão**
 - Confirme que a senha na connection string está correta
-- Use a string com `pooler.supabase.com:6543` (porta 6543)
-- Adicione `?pgbouncer=true` no final
+- Use a string com `pooler.supabase.com:6543` (porta 6543) para o app
+- Para restore: use `:5432` (sem `?pgbouncer=true`)
 
 **Tabelas não existem**
 - Execute `npm run db:init` com DATABASE_URL apontando para o Supabase

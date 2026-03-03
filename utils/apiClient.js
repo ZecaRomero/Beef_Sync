@@ -28,6 +28,7 @@ class ApiClient {
       body,
       headers = {},
       cache = 'no-cache',
+      timeout = 20000,
       ...fetchOptions
     } = options
 
@@ -40,13 +41,18 @@ class ApiClient {
     try {
       logger.debug(`API Request: ${method} ${url}`, { body, headers: requestHeaders })
 
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), timeout)
+
       const response = await fetch(url, {
         method,
         headers: requestHeaders,
         body: body ? JSON.stringify(body) : undefined,
         cache,
+        signal: controller.signal,
         ...fetchOptions,
       })
+      clearTimeout(timeoutId)
 
       // Tentar fazer parse do JSON
       let data
@@ -98,6 +104,10 @@ class ApiClient {
     } catch (error) {
       if (error instanceof ApiError) {
         throw error
+      }
+      if (error?.name === 'AbortError') {
+        logger.warn('Requisição cancelada por timeout', { url, method })
+        throw new ApiError('Tempo limite excedido. Tente novamente.', 408, null, error)
       }
 
       logger.error('Erro na requisição HTTP', {

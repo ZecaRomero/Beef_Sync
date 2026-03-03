@@ -4,9 +4,13 @@ import { sendHealthCheck, sendError, asyncHandler } from '../../utils/apiRespons
 const handler = async (req, res) => {
   try {
     const startTime = Date.now()
-    
-    // Testar conexão com banco
-    const dbStatus = await testConnection()
+    const timeoutMs = 8000
+
+    // Testar conexão com banco (com timeout para não travar)
+    const dbStatus = await Promise.race([
+      testConnection(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), timeoutMs))
+    ]).catch(err => ({ success: false, error: err?.message || 'Conexão lenta' }))
     const poolInfo = getPoolInfo()
     const responseTime = Date.now() - startTime
     

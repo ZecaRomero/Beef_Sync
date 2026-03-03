@@ -28,11 +28,14 @@ const parsearTextoImport = (texto) => {
   const formatoStatus = header.includes('STATUS') || (col3 != null && col3 !== '' && !col3EhNumero)
   // Formato: Série, RG, IQG, Pt IQG (4 cols) -> vai para genetica_2 e decile_2
   const headerCols = splitLinha(linhas[0])
-  const formatoIQGPeloHeader = headerCols.length >= 4 && headerCols.length <= 5 &&
-    (header.includes('IQG') || (header.includes('PT') && header.includes('IQG'))) &&
+  const formatoIQGPeloHeader = headerCols.length >= 4 && headerCols.length <= 6 &&
+    (header.includes('IQG') || header.includes('IQGG') || (header.includes('PT') && header.includes('IQG'))) &&
     !header.includes('IABCZ') && !header.includes('DECA')
-  // Sem header: detectar por dados (4 cols, col3 e col4 numéricos = IQG)
-  const formatoIQGPelosDados = !skipHeader && primeiraCols.length === 4 && col3EhNumero && col4EhNumeroOuDecil && !header.includes('IABCZ') && !header.includes('DECA')
+  // Sem header: detectar por dados (4 cols, col3 e col4 numéricos = IQG) ou 3 cols com serie+rg em col0
+  const col1EhNumero = primeiraCols[1] != null && !isNaN(parseFloat(String(primeiraCols[1]).replace(',', '.')))
+  const col2EhNumero = primeiraCols[2] != null && (/^[\d,.\s]+$/.test(String(primeiraCols[2])) || String(primeiraCols[2]).length <= 3)
+  const formatoIQG3Cols = !skipHeader && primeiraCols.length === 3 && col1EhNumero && col2EhNumero && /^\S+\s+\d+$/.test(String(primeiraCols[0] || ''))
+  const formatoIQGPelosDados = (!skipHeader && primeiraCols.length === 4 && col3EhNumero && col4EhNumeroOuDecil) || formatoIQG3Cols
   const formatoIQG = formatoIQGPeloHeader || formatoIQGPelosDados
   const start = skipHeader ? 1 : 0
   for (let i = start; i < linhas.length; i++) {
@@ -40,7 +43,18 @@ const parsearTextoImport = (texto) => {
     if (cols.length >= 2) {
       let serie = cols[0] || ''
       let rg = cols[1] || ''
+      let offsetCols = 0 // 0 = cols normais, 1 = col0 tinha serie+rg junto
       
+      // Se col0 parece "SÉRIE RG" (ex: "CJCJ 17267") e col1 é numérico (iABCZ/IQG), extrair da col0
+      const col1Num = cols[1] != null && !isNaN(parseFloat(String(cols[1]).replace(',', '.')))
+      if (col1Num && serie && /\s+\d+$/.test(serie)) {
+        const m = serie.match(/^(.+?)\s+(\d+)$/)
+        if (m) {
+          serie = m[1].trim()
+          rg = m[2]
+          offsetCols = 1 // iABCZ em cols[1], deca em cols[2]
+        }
+      }
       // Se RG contém hífen, pode estar no formato "CJCJ-16310" (série-rg junto)
       if (rg && rg.includes('-')) {
         const partes = rg.split('-')
@@ -52,27 +66,30 @@ const parsearTextoImport = (texto) => {
         }
       }
       
-      if (formatoStatus && cols.length >= 3) {
-        dados.push({ serie, rg, situacaoAbcz: cols[2] || null })
-      } else if (formatoIQG && cols.length >= 4 && cols.length <= 5) {
+      const dataStart = offsetCols === 0 ? 2 : 1
+      const c = (idx) => cols[dataStart + idx - 2]
+      
+      if (formatoStatus && cols.length >= 2 + offsetCols) {
+        dados.push({ serie, rg, situacaoAbcz: c(2) || null })
+      } else if (formatoIQG && cols.length >= (offsetCols ? 3 : 4) && cols.length <= 5) {
         dados.push({
           serie,
           rg,
           iABCZ: null,
           deca: null,
           situacaoAbcz: null,
-          genetica_2: cols[2] || null,
-          decile_2: cols[3] || null
+          genetica_2: c(2) || null,
+          decile_2: c(3) || null
         })
       } else {
         dados.push({
           serie,
           rg,
-          iABCZ: cols[2] || null,
-          deca: cols[3] || null,
-          situacaoAbcz: cols[4] || null,
-          genetica_2: cols[5] || null,
-          decile_2: cols[6] || null
+          iABCZ: c(2) || null,
+          deca: c(3) || null,
+          situacaoAbcz: c(4) || null,
+          genetica_2: c(5) || null,
+          decile_2: c(6) || null
         })
       }
     }
@@ -100,9 +117,9 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
     if (ignorados > 0) {
       msg += ` Os demais (${ignorados}) foram ignorados (não estão no cadastro ou estão inativos).`
     }
-    if (n === 0 && (r.naoEncontrados?.length || 0) > 50) {
-      const amostra = (r.naoEncontrados || []).slice(0, 3).map(x => `${x.serie}-${x.rg}`).join(', ')
-      msg += `\n\nExemplos não encontrados: ${amostra}. Verifique se Série e RG existem no cadastro.`
+    if (n === 0 && (r.naoEncontrados?.length || 0) > 0) {
+      const amostra = (r.naoEncontrados || []).slice(0, 5).map(x => `${x.serie || '?'} ${x.rg || '?'}`.trim()).join(', ')
+      msg += `\n\nExemplos não encontrados: ${amostra}. Verifique se Série e RG existem no cadastro (ex: CJCJ 17267).`
     }
     return msg
   }
@@ -213,7 +230,7 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
         </div>
         {importMode === 'texto' ? (
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Cole os dados. Formatos aceitos: Série, RG, iABCZ, Deca [, IQG, Pt IQG] — ou apenas Série, RG, IQG, Pt IQG (4 cols) — ou Série, RGN, Status (Situação ABCZ)</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Cole os dados. Formatos aceitos: Série, RG, iABCZ, Deca — ou Série, RG, IQG/IQGg, Pt (IQG e Pt IQG) — ou Série, RGN, Status (Situação ABCZ). Excel: mesma lógica (Série, RG, IQGg, Pt).</p>
             <textarea
               value={importTexto}
               onChange={(e) => setImportTexto(e.target.value)}
@@ -224,7 +241,7 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
           </div>
         ) : (
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Excel: Série, RG, iABCZ, Deca [, IQG, Pt IQG] (ou Série, RGN, Status). Animais não encontrados e inativos são ignorados.</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Excel: Série, RG, iABCZ, Deca — ou Série, RG, IQGg, Pt (IQG e Pt IQG). Mesma lógica do iABCZ/DECA. Animais não encontrados e inativos são ignorados.</p>
             <input
               type="file"
               accept=".xlsx,.xls,.csv"

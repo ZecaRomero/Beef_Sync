@@ -400,9 +400,12 @@ export default function Dashboard() {
         setLoading(true)
         setError(null)
 
-        // Carregar estatísticas da API
+        // Carregar estatísticas da API (timeout 12s para não travar)
         try {
-          const statsResponse = await fetch('/api/statistics')
+          const controller = new AbortController()
+          const timeoutId = setTimeout(() => controller.abort(), 12000)
+          const statsResponse = await fetch('/api/statistics', { signal: controller.signal })
+          clearTimeout(timeoutId)
           if (statsResponse.ok) {
             const statsData = await statsResponse.json()
             if (statsData.success && statsData.data) {
@@ -419,9 +422,12 @@ export default function Dashboard() {
         } catch (apiError) {
           console.warn('API de estatísticas indisponível, usando dados básicos:', apiError)
           
-          // Fallback: tentar carregar animais diretamente
+          // Fallback: tentar carregar animais diretamente (timeout 12s)
           try {
-            const animalsResponse = await fetch('/api/animals')
+            const ctrl = new AbortController()
+            const t = setTimeout(() => ctrl.abort(), 12000)
+            const animalsResponse = await fetch('/api/animals', { signal: ctrl.signal })
+            clearTimeout(t)
             if (animalsResponse.ok) {
               const animalsData = await animalsResponse.json()
               const animals = Array.isArray(animalsData.data) ? animalsData.data : []
