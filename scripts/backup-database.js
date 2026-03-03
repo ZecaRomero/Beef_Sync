@@ -1,11 +1,18 @@
 #!/usr/bin/env node
 /**
  * Script para fazer backup do banco de dados PostgreSQL
- * Uso: node scripts/backup-database.js [tipo] [formato]
+ * Uso: node scripts/backup-database.js [tipo] [formato] [--local]
  * 
  * Tipos: completo, animais, reprodutivo, comercial, financeiro
  * Formatos: json, sql
+ * --local: força uso do PostgreSQL local (ignora DATABASE_URL/Supabase)
  */
+
+require('dotenv').config()
+if (process.argv.includes('--local')) {
+  delete process.env.DATABASE_URL
+  console.log('📌 Modo local: usando PostgreSQL local (localhost)\n')
+}
 
 const { query } = require('../lib/database')
 const fs = require('fs')
