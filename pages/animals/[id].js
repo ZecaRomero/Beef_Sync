@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Image from 'next/image'
+import Link from 'next/link'
 import { Card, CardBody, CardHeader } from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
@@ -2096,7 +2097,16 @@ export default function AnimalDetail() {
                 {animal.mae && (
                   <div className="flex justify-between py-2 border-b border-gray-700">
                     <span className="text-gray-400">Mãe</span>
-                    <span className="font-semibold text-white">{animal.mae}</span>
+                    {((animal.serie_mae && animal.rg_mae) || (maeSerieRg?.serie && maeSerieRg?.rg)) ? (
+                      <Link
+                        href={`/consulta-animal/${animal.serie_mae || maeSerieRg.serie}-${animal.rg_mae || maeSerieRg.rg}`}
+                        className="font-semibold text-blue-400 hover:text-blue-300 hover:underline"
+                      >
+                        {animal.serie_mae || maeSerieRg.serie} {animal.rg_mae || maeSerieRg.rg}
+                      </Link>
+                    ) : (
+                      <span className="font-semibold text-white">{animal.mae}</span>
+                    )}
                   </div>
                 )}
 
@@ -3958,28 +3968,27 @@ export default function AnimalDetail() {
                   <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">
                     Mãe
                   </label>
-                  {maeId ? (
-                    <button
-                      onClick={() => router.push(`/animals/${maeId}`)}
-                      className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 truncate flex items-center gap-1 group hover:underline"
-                      title={`Ver ficha da mãe`}
-                    >
-                      {(() => {
-                        if (!animal.mae) return '-'
-                        const { serie, rg } = extrairSerieRG(animal.mae)
-                        return serie && rg ? `${serie}/${rg}` : animal.mae
-                      })()}
-                      <ArrowTopRightOnSquareIcon className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
-                    </button>
-                  ) : (
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate" title={animal.mae}>
-                      {(() => {
-                        if (!animal.mae) return '-'
-                        const { serie, rg } = extrairSerieRG(animal.mae)
-                        return serie && rg ? `${serie}/${rg}` : animal.mae
-                      })()}
-                    </p>
-                  )}
+                  {(() => {
+                    const s = animal.serie_mae || maeSerieRg?.serie
+                    const r = animal.rg_mae || maeSerieRg?.rg
+                    if (s && r) {
+                      return (
+                        <Link
+                          href={`/consulta-animal/${s}-${r}`}
+                          className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 truncate flex items-center gap-1 group hover:underline"
+                          title="Ver ficha da mãe"
+                        >
+                          {s} {r}
+                          <ArrowTopRightOnSquareIcon className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                        </Link>
+                      )
+                    }
+                    return (
+                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate" title={animal.mae}>
+                        {animal.mae || '-'}
+                      </p>
+                    )
+                  })()}
                 </div>
 
                 {/* Informações de Genealogia e Genética para outros animais */}
@@ -3987,11 +3996,16 @@ export default function AnimalDetail() {
                   <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">
                     Mãe (Série/RG)
                   </label>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {(animal.serie_mae || maeSerieRg?.serie) 
-                      ? `${animal.serie_mae || maeSerieRg.serie}/${animal.rg_mae || maeSerieRg?.rg || '-'}` 
-                      : '-'}
-                  </p>
+                  {(animal.serie_mae || maeSerieRg?.serie) && (animal.rg_mae || maeSerieRg?.rg) ? (
+                    <Link
+                      href={`/consulta-animal/${animal.serie_mae || maeSerieRg.serie}-${animal.rg_mae || maeSerieRg.rg}`}
+                      className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      {animal.serie_mae || maeSerieRg.serie} {animal.rg_mae || maeSerieRg.rg}
+                    </Link>
+                  ) : (
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">-</p>
+                  )}
                 </div>
 
                 <div>

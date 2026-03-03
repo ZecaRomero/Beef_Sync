@@ -89,6 +89,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
   const [filhoTopRankingIQG, setFilhoTopRankingIQG] = useState(null) // { serie, rg, nome, iqg } quando esta fêmea é mãe do 1º do ranking IQG
   const [showIABCZInfo, setShowIABCZInfo] = useState(false)
   const [sharing, setSharing] = useState(false)
+  const [maeLink, setMaeLink] = useState(null) // { serie, rg } quando mãe pode ser linkada
   const toggleSecao = useCallback((key) => {
     setSecoesExpandidas(prev => ({ ...prev, [key]: !prev[key] }))
   }, [])
@@ -163,18 +164,53 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
       .finally(() => setLoading(false))
   }, [id])
 
-  // Buscar posição no ranking iABCZ (filtrado por série) e verificar se é mãe do 1º
+  // Extrair série e RG da mãe para link (ex: "CJCJ 15959" ou "CJCJ-15959")
+  const extrairSerieRG = (texto) => {
+    if (!texto) return { serie: '', rg: '' }
+    const t = String(texto).trim()
+    const matchTraco = t.match(/^([A-Za-z]+)-(\d+)$/)
+    if (matchTraco) return { serie: matchTraco[1], rg: matchTraco[2] }
+    const matchEspaco = t.match(/^([A-Za-z]+)\s+(\d+)$/)
+    if (matchEspaco) return { serie: matchEspaco[1], rg: matchEspaco[2] }
+    return { serie: '', rg: '' }
+  }
+
+  // Buscar serie/rg da mãe quando não vier do backend (animais, gestações, nascimentos)
+  useEffect(() => {
+    if (!animal?.mae || (animal.serie_mae && animal.rg_mae)) {
+      setMaeLink(null)
+      return
+    }
+    const { serie, rg } = extrairSerieRG(animal.mae)
+    if (serie && rg) {
+      setMaeLink({ serie, rg })
+      return
+    }
+    const params = new URLSearchParams({ mae: animal.mae.trim() })
+    if (animal.serie) params.set('animalSerie', animal.serie)
+    if (animal.rg) params.set('animalRg', animal.rg)
+    fetch(`/api/animals/buscar-mae?${params}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.success && d.serie && d.rg) setMaeLink({ serie: d.serie, rg: d.rg })
+        else setMaeLink(null)
+      })
+      .catch(() => setMaeLink(null))
+  }, [animal?.mae, animal?.serie, animal?.rg, animal?.serie_mae, animal?.rg_mae])
+
+  // Buscar posição no ranking iABCZ (global: quanto maior o iABCZ, melhor o animal)
   useEffect(() => {
     if (!animal?.id) return
     setFilhoTopRanking(null)
-    fetch(`/api/animals/ranking-iabcz?limit=50${animal.serie ? `&serie=${encodeURIComponent(animal.serie)}` : ''}`)
+    fetch('/api/animals/ranking-iabcz?limit=50')
       .then(r => r.json())
       .then(d => {
         if (d.success && d.data?.length) {
           const ranking = d.data
           const primeiroRanking = ranking[0]
+          const serieMatch = String(animal?.serie || '').toUpperCase()
           const idx = ranking.findIndex(r =>
-            r.id === animal.id || (String(r.rg) === String(animal.rg) && String(r.serie || '').toUpperCase() === String(animal.serie || '').toUpperCase())
+            r.id === animal.id || (String(r.rg) === String(animal.rg) && String(r.serie || '').toUpperCase() === serieMatch)
           )
           if (idx >= 0) setRankingPosicao(idx + 1)
           // Verificar se esta fêmea é mãe do 1º do ranking (filho mais bem avaliado)
@@ -195,21 +231,20 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
       .catch(() => {})
   }, [animal?.id, animal?.rg, animal?.serie, animal?.filhos])
 
-  // Buscar posição no ranking IQG e verificar se é mãe do 1º do ranking e verificar se é mãe do 1º do ranking
+  // Buscar posição no ranking IQG (global: quanto maior o IQG, melhor o animal)
   useEffect(() => {
     if (!animal?.id) return
     setFilhoTopRankingIQG(null)
     setRankingPosicaoGenetica2(null)
-    
-    fetch(`/api/animals/ranking-iqg?limit=50${animal.serie ? `&serie=${encodeURIComponent(animal.serie)}` : ''}`)
+    fetch('/api/animals/ranking-iqg?limit=50')
       .then(r => r.json())
       .then(d => {
         if (d.success && d.data?.length) {
           const ranking = d.data
           const primeiroRanking = ranking[0]
-          
+          const serieMatch = String(animal?.serie || '').toUpperCase()
           const idx = ranking.findIndex(r =>
-            r.id === animal.id || (String(r.rg) === String(animal.rg) && String(r.serie || '').toUpperCase() === String(animal.serie || '').toUpperCase())
+            r.id === animal.id || (String(r.rg) === String(animal.rg) && String(r.serie || '').toUpperCase() === serieMatch)
           )
           if (idx >= 0) setRankingPosicaoGenetica2(idx + 1)
           
@@ -649,6 +684,10 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
                 className={`px-2.5 py-1 rounded-full text-xs font-bold border ${
                   rankingPosicao === 1
                     ? 'bg-amber-100 border-amber-400 text-amber-700 dark:bg-amber-900/20 dark:border-amber-700 dark:text-amber-200'
+                    : rankingPosicao === 2
+                    ? 'bg-slate-100 border-slate-400 text-slate-700 dark:bg-slate-800/40 dark:border-slate-500 dark:text-slate-200'
+                    : rankingPosicao === 3
+                    ? 'bg-amber-50 border-amber-500 text-amber-800 dark:bg-amber-900/30 dark:border-amber-600 dark:text-amber-300'
                     : rankingPosicao && rankingPosicao <= 10
                     ? 'bg-blue-100 border-blue-400 text-blue-700 dark:bg-blue-900/20 dark:border-blue-700 dark:text-blue-200'
                     : 'bg-white border-gray-300 text-gray-800 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200'
@@ -767,14 +806,23 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
             </div>
           )}
 
-          {/* Badge posição 2 ou 3 no ranking */}
+          {/* Destaque: 2º do Ranking iABCZ (PMGZ) - troféu prata */}
           {rankingPosicao === 2 && (
-            <div className="bg-gradient-to-r from-slate-400 to-slate-600 rounded-2xl shadow-lg p-4 text-white">
-              <div className="flex items-center gap-3">
-                <TrophyIcon className="h-10 w-10 text-slate-200" />
-                <div>
-                  <p className="font-bold">2º no Ranking iABCZ</p>
-                  <p className="text-sm opacity-90">Excelente avaliação genética</p>
+            <div className="bg-gradient-to-r from-slate-400 via-slate-500 to-slate-600 rounded-2xl shadow-xl p-6 text-white border-2 border-slate-300/50 ring-4 ring-slate-400/30">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-2xl bg-white/20 backdrop-blur">
+                  <TrophyIcon className="h-12 w-12 text-slate-100" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold tracking-wider opacity-90">🥈 2º LUGAR NO RANKING iABCZ (PMGZ)</p>
+                  <p className="text-2xl font-bold mt-0.5">Segunda melhor avaliação genética</p>
+                  <p className="text-sm mt-1 opacity-90 flex items-center gap-1">
+                    <SparklesIcon className="h-4 w-4" />
+                    iABCZ: {animal.abczg || '-'} • Excelente avaliação genética
+                  </p>
+                </div>
+                <div className="hidden sm:flex w-16 h-16 rounded-full bg-white/20 items-center justify-center text-3xl font-black">
+                  2º
                 </div>
               </div>
             </div>
@@ -1335,15 +1383,28 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
                 <div className="px-6 py-3 flex justify-between items-center">
                   <span className="text-sm text-gray-500 dark:text-gray-400">Mãe</span>
                   <div className="text-right">
-                    {animal.mae && (
-                      <span className="text-sm font-medium text-gray-900 dark:text-white block">
+                    {(() => {
+                      const serie = animal.serie_mae || maeLink?.serie
+                      const rg = animal.rg_mae || maeLink?.rg
+                      const ident = serie && rg ? `${serie} ${rg}` : null
+                      if (ident) {
+                        return (
+                          <Link href={`/consulta-animal/${serie}-${rg}`} className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center justify-end gap-1">
+                            {ident}
+                            <ArrowTopRightOnSquareIcon className="h-3.5 w-3.5 flex-shrink-0" />
+                          </Link>
+                        )
+                      }
+                      return (
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          {animal.mae || '-'}
+                        </span>
+                      )
+                    })()}
+                    {animal.mae && (animal.serie_mae || maeLink) && (
+                      <span className="text-xs text-gray-500 dark:text-gray-400 block mt-0.5">
                         {animal.mae}
                       </span>
-                    )}
-                    {(animal.serie_mae || animal.rg_mae) && (
-                      <Link href={`/consulta-animal/${animal.serie_mae}-${animal.rg_mae}`} className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-semibold">
-                        {[animal.serie_mae, animal.rg_mae].filter(Boolean).join(' ')}
-                      </Link>
                     )}
                   </div>
                 </div>

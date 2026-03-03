@@ -220,17 +220,64 @@ async function handleGet(req, res, id) {
   if (animal.mae && !(animal.serie_mae || animal.rg_mae)) {
     try {
       const { query: dbQuery } = require('../../../lib/database')
+      const maeNome = String(animal.mae).trim()
+      // 1. Buscar em animais por nome (exato ou LIKE)
       let maeResult = await dbQuery(
-        `SELECT id, serie, rg, nome FROM animais WHERE UPPER(TRIM(nome)) = UPPER(TRIM($1)) LIMIT 1`,
-        [animal.mae]
+        `SELECT id, serie, rg, nome FROM animais 
+         WHERE UPPER(TRIM(COALESCE(nome,''))) = UPPER(TRIM($1)) 
+         LIMIT 1`,
+        [maeNome]
       )
       if (maeResult.rows.length === 0) {
         maeResult = await dbQuery(
-          `SELECT id, serie, rg, nome FROM animais WHERE UPPER(nome) LIKE UPPER($1) LIMIT 1`,
-          [`%${String(animal.mae).trim()}%`]
+          `SELECT id, serie, rg, nome FROM animais 
+           WHERE UPPER(TRIM(COALESCE(nome,''))) LIKE UPPER($1) 
+           LIMIT 1`,
+          [`%${maeNome}%`]
         )
       }
-      if (maeResult.rows.length > 0) {
+      // 2. Se não achou em animais, buscar em gestações (receptora_nome = mãe)
+      if (maeResult.rows.length === 0) {
+        let gestMae = await dbQuery(
+          `SELECT receptora_serie as serie, receptora_rg as rg 
+           FROM gestacoes 
+           WHERE UPPER(TRIM(COALESCE(receptora_nome,''))) = UPPER(TRIM($1))
+             AND receptora_serie IS NOT NULL AND receptora_rg IS NOT NULL
+           LIMIT 1`,
+          [maeNome]
+        )
+        if (gestMae.rows.length === 0) {
+          gestMae = await dbQuery(
+            `SELECT receptora_serie as serie, receptora_rg as rg 
+             FROM gestacoes 
+             WHERE UPPER(TRIM(COALESCE(receptora_nome,''))) LIKE UPPER($1)
+               AND receptora_serie IS NOT NULL AND receptora_rg IS NOT NULL
+             LIMIT 1`,
+            [`%${maeNome}%`]
+          )
+        }
+        if (gestMae.rows.length > 0) {
+          animal.serie_mae = gestMae.rows[0].serie
+          animal.rg_mae = gestMae.rows[0].rg
+        }
+      }
+      // 3. Se ainda não achou, buscar via nascimentos: gestação onde este animal nasceu
+      if (!animal.serie_mae && !animal.rg_mae && animal.serie && animal.rg) {
+        const nascMae = await dbQuery(
+          `SELECT g.receptora_serie as serie, g.receptora_rg as rg 
+           FROM gestacoes g
+           JOIN nascimentos n ON n.gestacao_id = g.id
+           WHERE TRIM(n.serie) = TRIM($1) AND TRIM(n.rg::text) = TRIM($2)
+             AND g.receptora_serie IS NOT NULL AND g.receptora_rg IS NOT NULL
+           LIMIT 1`,
+          [String(animal.serie).trim(), String(animal.rg).trim()]
+        )
+        if (nascMae.rows.length > 0) {
+          animal.serie_mae = nascMae.rows[0].serie
+          animal.rg_mae = nascMae.rows[0].rg
+        }
+      }
+      if (maeResult.rows.length > 0 && !animal.serie_mae) {
         const mae = maeResult.rows[0]
         animal.serie_mae = mae.serie
         animal.rg_mae = mae.rg

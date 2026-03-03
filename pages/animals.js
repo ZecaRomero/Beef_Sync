@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { useRouter } from "next/router";
+import { useRouter } from "next/router"
+import Link from "next/link"
 import AnimalForm from "../components/AnimalForm";
 import CostManager from "../components/CostManager";
 import AnimalImporter from "../components/AnimalImporter";
@@ -2249,8 +2250,18 @@ export default function Animals() {
                         <p className="text-sm font-medium text-gray-900 dark:text-white truncate" title={animalToView.pai}>{animalToView.pai || '-'}</p>
                       </div>
                       <div>
-                         <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Mãe</label>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate" title={animalToView.mae}>{animalToView.mae || '-'}</p>
+                        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Mãe</label>
+                        {(animalToView.serie_mae && animalToView.rg_mae) ? (
+                          <Link
+                            href={`/consulta-animal/${animalToView.serie_mae}-${animalToView.rg_mae}`}
+                            className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline truncate block"
+                            title={animalToView.mae}
+                          >
+                            {animalToView.serie_mae} {animalToView.rg_mae}
+                          </Link>
+                        ) : (
+                          <p className="text-sm font-medium text-gray-900 dark:text-white truncate" title={animalToView.mae}>{animalToView.mae || '-'}</p>
+                        )}
                       </div>
                     </div>
                   </div>

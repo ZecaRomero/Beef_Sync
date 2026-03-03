@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
+import Link from 'next/link'
 import { 
   ArrowLeftIcon,
   MagnifyingGlassIcon,
@@ -28,6 +29,7 @@ export default function MobileAnimal() {
   const [rankingCE, setRankingCE] = useState([])
   const [sincronizandoNascimento, setSincronizandoNascimento] = useState(false)
   const [toastSync, setToastSync] = useState(null)
+  const [maeLink, setMaeLink] = useState(null) // { serie, rg } quando mãe pode ser linkada
 
   const sincronizarNascimentos = async () => {
     setSincronizandoNascimento(true)
@@ -169,6 +171,40 @@ export default function MobileAnimal() {
     setError('')
     setCurrentIndex(-1)
   }
+
+  // Extrair série e RG da mãe para link
+  const extrairSerieRG = (texto) => {
+    if (!texto) return { serie: '', rg: '' }
+    const t = String(texto).trim()
+    const matchTraco = t.match(/^([A-Za-z]+)-(\d+)$/)
+    if (matchTraco) return { serie: matchTraco[1], rg: matchTraco[2] }
+    const matchEspaco = t.match(/^([A-Za-z]+)\s+(\d+)$/)
+    if (matchEspaco) return { serie: matchEspaco[1], rg: matchEspaco[2] }
+    return { serie: '', rg: '' }
+  }
+
+  // Buscar serie/rg da mãe quando não vier do backend
+  useEffect(() => {
+    if (!animal?.mae || (animal.serie_mae && animal.rg_mae)) {
+      setMaeLink(null)
+      return
+    }
+    const { serie, rg } = extrairSerieRG(animal.mae)
+    if (serie && rg) {
+      setMaeLink({ serie, rg })
+      return
+    }
+    const params = new URLSearchParams({ mae: animal.mae.trim() })
+    if (animal.serie) params.set('animalSerie', animal.serie)
+    if (animal.rg) params.set('animalRg', animal.rg)
+    fetch(`/api/animals/buscar-mae?${params}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.success && d.serie && d.rg) setMaeLink({ serie: d.serie, rg: d.rg })
+        else setMaeLink(null)
+      })
+      .catch(() => setMaeLink(null))
+  }, [animal?.mae, animal?.serie, animal?.rg, animal?.serie_mae, animal?.rg_mae])
 
   return (
     <>
@@ -656,9 +692,22 @@ export default function MobileAnimal() {
                   {animal.mae && (
                     <div className="col-span-2">
                       <p className="text-gray-500 dark:text-gray-400 text-xs">Mãe</p>
-                      <p className="font-semibold text-gray-900 dark:text-white">
-                        {animal.mae}
-                      </p>
+                      {(() => {
+                        const s = animal.serie_mae || maeLink?.serie
+                        const r = animal.rg_mae || maeLink?.rg
+                        if (s && r) {
+                          return (
+                            <Link href={`/consulta-animal/${s}-${r}`} className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+                              {s} {r}
+                            </Link>
+                          )
+                        }
+                        return (
+                          <p className="font-semibold text-gray-900 dark:text-white">
+                            {animal.mae}
+                          </p>
+                        )
+                      })()}
                     </div>
                   )}
 
