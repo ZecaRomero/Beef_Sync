@@ -101,16 +101,16 @@ const AnimalCard = memo(({ animal, onView, onEdit, onDelete }) => {
                   <span className="text-emerald-600 dark:text-emerald-400 font-bold">{animal.deca}</span>
                 </p>
               )}
-              {(animal.genetica_2 || animal.genetica_2 === 0) && (
+              {((animal.iqg ?? animal.genetica_2) || (animal.iqg ?? animal.genetica_2) === 0) && (
                 <p className="flex items-center gap-1">
-                  <span className="font-medium">Aval2:</span> 
-                  <span className="text-purple-600 dark:text-purple-400 font-bold">{animal.genetica_2}</span>
+                  <span className="font-medium">IQG:</span> 
+                  <span className="text-purple-600 dark:text-purple-400 font-bold">{(animal.iqg ?? animal.genetica_2)}</span>
                 </p>
               )}
-              {(animal.decile_2 || animal.decile_2 === 0) && (
+              {((animal.pt_iqg ?? animal.decile_2) || (animal.pt_iqg ?? animal.decile_2) === 0) && (
                 <p className="flex items-center gap-1">
-                  <span className="font-medium">Dec2:</span> 
-                  <span className="text-amber-600 dark:text-amber-400 font-bold">{animal.decile_2}</span>
+                  <span className="font-medium">Pt IQG:</span> 
+                  <span className="text-amber-600 dark:text-amber-400 font-bold">{(animal.pt_iqg ?? animal.decile_2)}</span>
                 </p>
               )}
             </div>

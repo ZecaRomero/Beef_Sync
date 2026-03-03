@@ -95,14 +95,14 @@ export default async function handler(req, res) {
         req.on('error', reject);
       });
 
-      const { data: rows = [] } = body;
+      const { data: rows = [], criarNaoEncontrados = false } = body;
       if (!Array.isArray(rows) || rows.length === 0) {
         return res.status(400).json({
           error: 'Envie um array "data" com objetos { serie, rg, iABCZ, deca, situacaoAbcz? }',
         });
       }
 
-      const resultados = await processarLinhas(rows);
+      const resultados = await processarLinhas(rows, criarNaoEncontrados);
       return res.status(200).json({
         success: true,
         message: `Importação concluída: ${resultados.animaisAtualizados} animais atualizados`,
@@ -151,16 +151,36 @@ export default async function handler(req, res) {
 
     // Formato Série|RGN|Status (3 colunas) - ex: SERIE, RGN, Status
     const formatoStatusAbcz = cellC1.includes('STATUS');
-    // Formato Série|RG|IQG/IQGg|Pt (4+ colunas) - col 3 e 4 vão para genetica_2 e decile_2 (IQG e Pt IQG)
     const cellD1 = (primeiraLinha.getCell(4).value ?? '').toString().toUpperCase();
-    const formatoIQG = (cellC1.includes('IQG') || cellC1.includes('IQGG') || cellD1.includes('PT') || cellD1.includes('IQG')) &&
+    const cellE1 = (primeiraLinha.getCell(5).value ?? '').toString().toUpperCase();
+    const cellF1 = (primeiraLinha.getCell(6).value ?? '').toString().toUpperCase();
+    // Formato completo 6 colunas: SÉRIE | RG | iABCZg | DECA | IQG | Pt IQG
+    const formatoCompleto6Cols = cellC1.includes('IABCZ') && cellD1.includes('DECA') &&
+      (cellE1.includes('IQG') || cellE1.includes('IQGG')) &&
+      (cellF1.includes('PT') || cellF1.includes('PL') || cellF1.includes('IQG'));
+    // Sem header: 6 cols com col3-6 numéricos = iABCZ, DECA, IQG, Pt IQG (não situacaoAbcz)
+    const valE1 = row1.getCell(5).value;
+    const valF1 = row1.getCell(6).value;
+    const col5Num = valE1 != null && !isNaN(parseFloat(String(valE1).replace(',', '.')));
+    const col6Num = valF1 != null && !isNaN(parseFloat(String(valF1).replace(',', '.')));
+    const formatoCompleto6ColsPelosDados = startRow === 1 && col3Num && col4Num && col5Num && col6Num;
+    // Formato Série|RG|IQG/IQGg|Pt (4 colunas) - col 3 e 4 vão para IQG e Pt IQG (não iABCZ/DECA)
+    const formatoIQGPeloHeader = (cellC1.includes('IQG') || cellC1.includes('IQGG') || cellD1.includes('PT') || cellD1.includes('PL') || cellD1.includes('IQG')) &&
       !cellC1.includes('IABCZ') && !cellC1.includes('DECA');
+    // Sem header: 4 cols com col3 e col4 numéricos = IQG (não confundir com iABCZ/DECA)
+    const row1 = worksheet.getRow(startRow);
+    const valC1 = row1.getCell(3).value;
+    const valD1 = row1.getCell(4).value;
+    const col3Num = valC1 != null && !isNaN(parseFloat(String(valC1).replace(',', '.')));
+    const col4Num = valD1 != null && (/^[\d,.\s]+$/.test(String(valD1)) || String(valD1).length <= 3);
+    const formatoIQGPelosDados = startRow === 1 && col3Num && col4Num;
+    const formatoIQG = formatoIQGPeloHeader || formatoIQGPelosDados;
 
     const rows = [];
     for (let i = startRow; i <= worksheet.rowCount; i++) {
       const row = worksheet.getRow(i);
       const serie = normalizarTexto(row.getCell(1).value);
-      const rg = normalizarTexto(row.getCell(2).value);
+      const rg = normalizarRG(row.getCell(2).value); // RG normalizado (sem zeros à esquerda) para matching
       if (!serie && !rg) continue;
 
       let iABCZ = null;
@@ -172,6 +192,12 @@ export default async function handler(req, res) {
 
       if (formatoStatusAbcz) {
         situacaoAbcz = normalizarTexto(row.getCell(3).value) || null;
+      } else if (formatoCompleto6Cols || formatoCompleto6ColsPelosDados) {
+        // Série, RG, iABCZg, DECA, IQG, Pt IQG (6 colunas - sem confusão)
+        iABCZ = normalizarNumero(row.getCell(3).value);
+        deca = normalizarTexto(row.getCell(4).value);
+        genetica2 = normalizarNumero(row.getCell(5).value) || normalizarTexto(row.getCell(5).value) || null;
+        decile2 = normalizarTexto(row.getCell(6).value) || null;
       } else if (formatoIQG) {
         genetica2 = normalizarNumero(row.getCell(3).value) || normalizarTexto(row.getCell(3).value) || null;
         decile2 = normalizarTexto(row.getCell(4).value) || null;
@@ -183,12 +209,16 @@ export default async function handler(req, res) {
         decile2 = normalizarTexto(row.getCell(7).value) || null;
       }
 
-      rows.push({ serie, rg, iABCZ, deca, situacaoAbcz, genetica_2: genetica2, decile_2: decile2 });
+      rows.push({ serie, rg, iABCZ, deca, situacaoAbcz, iqg: genetica2, pt_iqg: decile2 });
     }
 
     try { fs.unlinkSync(filepath); } catch (e) { /* ignorar */ }
 
-    const resultados = await processarLinhas(rows);
+    // Formidable v3: fields pode ser objeto ou Map; valor pode ser string ou array
+    const raw = typeof fields?.get === 'function' ? fields.get('criarNaoEncontrados') : fields?.criarNaoEncontrados;
+    const val = Array.isArray(raw) ? raw[0] : raw;
+    const criarNaoEncontrados = !!(val === 'true' || val === true);
+    const resultados = await processarLinhas(rows, criarNaoEncontrados);
     return res.status(200).json({
       success: true,
       message: `Importação concluída: ${resultados.animaisAtualizados} animais atualizados`,
@@ -207,9 +237,47 @@ export default async function handler(req, res) {
   }
 }
 
-async function processarLinhas(rows) {
+/** Tenta INSERT com iqg/pt_iqg; se coluna não existir, usa genetica_2/decile_2 */
+async function insertOuUpdateAnimal(nome, serie, rg, tatuagem, abczg, deca, situacaoAbcz, genetica2, decile2) {
+  const params = [nome, serie, rg, tatuagem, abczg, deca, situacaoAbcz, genetica2, decile2];
+  try {
+    return await query(
+      `INSERT INTO animais (nome, serie, rg, tatuagem, sexo, raca, situacao, abczg, deca, situacao_abcz, iqg, pt_iqg)
+       VALUES ($1, $2, $3, $4, 'Não informado', 'Não informada', 'Ativo', $5, $6, $7, NULLIF(TRIM(REPLACE($8::text, ',', '.')), '')::numeric, NULLIF(TRIM(REPLACE($9::text, ',', '.')), '')::numeric)
+       ON CONFLICT (serie, rg) DO UPDATE SET
+         iqg = COALESCE(NULLIF(TRIM(REPLACE(EXCLUDED.iqg::text, ',', '.')), '')::numeric, animais.iqg),
+         pt_iqg = COALESCE(NULLIF(TRIM(REPLACE(EXCLUDED.pt_iqg::text, ',', '.')), '')::numeric, animais.pt_iqg),
+         abczg = COALESCE(EXCLUDED.abczg::text, animais.abczg::text),
+         deca = COALESCE(EXCLUDED.deca::text, animais.deca::text),
+         situacao_abcz = COALESCE(EXCLUDED.situacao_abcz::text, animais.situacao_abcz::text),
+         updated_at = CURRENT_TIMESTAMP
+       RETURNING id, serie, rg, situacao`,
+      params
+    );
+  } catch (e) {
+    if (/column.*does not exist/i.test(e?.message || '')) {
+      return await query(
+        `INSERT INTO animais (nome, serie, rg, tatuagem, sexo, raca, situacao, abczg, deca, situacao_abcz, genetica_2, decile_2)
+         VALUES ($1, $2, $3, $4, 'Não informado', 'Não informada', 'Ativo', $5, $6, $7, NULLIF(TRIM(REPLACE($8::text, ',', '.')), '')::numeric, $9::text)
+         ON CONFLICT (serie, rg) DO UPDATE SET
+           genetica_2 = COALESCE(NULLIF(TRIM(REPLACE(EXCLUDED.genetica_2::text, ',', '.')), '')::numeric, animais.genetica_2),
+           decile_2 = COALESCE(EXCLUDED.decile_2::text, animais.decile_2::text),
+           abczg = COALESCE(EXCLUDED.abczg::text, animais.abczg::text),
+           deca = COALESCE(EXCLUDED.deca::text, animais.deca::text),
+           situacao_abcz = COALESCE(EXCLUDED.situacao_abcz::text, animais.situacao_abcz::text),
+           updated_at = CURRENT_TIMESTAMP
+         RETURNING id, serie, rg, situacao`,
+        params
+      );
+    }
+    throw e;
+  }
+}
+
+async function processarLinhas(rows, criarNaoEncontrados = false) {
   const resultados = {
     animaisAtualizados: 0,
+    animaisCriados: 0,
     naoEncontrados: [],
     ignoradosInativos: [],
     erros: [],
@@ -242,8 +310,8 @@ async function processarLinhas(rows) {
       abczg: normalizarNumero(r.iABCZ ?? r.iabcz ?? r.abczg) != null ? String(normalizarNumero(r.iABCZ ?? r.iabcz ?? r.abczg)) : null,
       deca: normalizarTexto(r.deca ?? r.Deca ?? r.DECA) || null,
       situacaoAbcz: normalizarTexto(r.situacaoAbcz ?? r.situacao_abcz ?? r['Situação ABCZ'] ?? r.Status) || null,
-      genetica2: normalizarNumero(r.genetica_2 ?? r.genetica2 ?? r['IQG'] ?? r['Genética 2']) != null ? String(normalizarNumero(r.genetica_2 ?? r.genetica2 ?? r['IQG'] ?? r['Genética 2'])) : null,
-      decile2: normalizarTexto(r.decile_2 ?? r.decile2 ?? r['Pt IQG']) || null,
+      genetica2: normalizarNumero(r.iqg ?? r.genetica_2 ?? r.genetica2 ?? r['IQG'] ?? r['Genética 2']) != null ? String(normalizarNumero(r.iqg ?? r.genetica_2 ?? r.genetica2 ?? r['IQG'] ?? r['Genética 2'])) : null,
+      decile2: normalizarTexto(r.pt_iqg ?? r.decile_2 ?? r.decile2 ?? r['Pt IQG'] ?? r['Pt'] ?? r['PL']) || null,
     });
   }
 
@@ -255,7 +323,7 @@ async function processarLinhas(rows) {
 
   for (let b = 0; b < dados.length; b += BATCH_SELECT) {
     const batch = dados.slice(b, b + BATCH_SELECT);
-    const pares = batch.map(d => [d.serie, d.rg]);
+    const pares = batch.map(d => [(d.serie || '').trim(), String(d.rg || '').trim()]);
     const flatParams = pares.flat();
 
     // 1) Busca por serie + rg (RG normalizado: sem zeros à esquerda no banco)
@@ -364,7 +432,27 @@ async function processarLinhas(rows) {
 
     for (const d of batch) {
       const key = `${(d.serie || '').toUpperCase().trim()}|${d.rg}`;
-      const animal = mapaAnimais.get(key);
+      let animal = mapaAnimais.get(key);
+      if (!animal && criarNaoEncontrados) {
+        try {
+          const nome = `${(d.serie || '').trim()} ${d.rg}`.replace(/\s+/g, ' ').trim();
+          const tatuagem = `${(d.serie || '').trim()}-${d.rg}`;
+          const ins = await insertOuUpdateAnimal(
+            nome, (d.serie || '').trim(), d.rg, tatuagem, d.abczg, d.deca, d.situacaoAbcz, d.genetica2, d.decile2
+          );
+          if (ins.rows.length > 0) {
+            animal = ins.rows[0];
+            mapaAnimais.set(key, animal);
+            resultados.animaisCriados++;
+            resultados.animaisAtualizados++;
+            continue;
+          }
+        } catch (insErr) {
+          resultados.naoEncontrados.push({ linha: d.linha, serie: d.serie, rg: d.rg });
+          resultados.erros.push({ linha: d.linha, serie: d.serie, rg: d.rg, erro: insErr?.message || String(insErr) });
+          continue;
+        }
+      }
       if (!animal) {
         resultados.naoEncontrados.push({ linha: d.linha, serie: d.serie, rg: d.rg });
         continue;
@@ -387,9 +475,9 @@ async function processarLinhas(rows) {
 
     if (updates.length === 0) continue;
 
-    const runBatchUpdate = async (comGenetica2) => {
+    const runBatchUpdate = async (comGenetica2, useOldCols = false) => {
       const cols = comGenetica2
-        ? 'abczg, deca, situacao_abcz, genetica_2, decile_2'
+        ? (useOldCols ? 'abczg, deca, situacao_abcz, genetica_2, decile_2' : 'abczg, deca, situacao_abcz, iqg, pt_iqg')
         : 'abczg, deca, situacao_abcz';
       const nCols = comGenetica2 ? 6 : 4;
       const vals = updates.map((u, i) => {
@@ -403,33 +491,47 @@ async function processarLinhas(rows) {
         comGenetica2 ? [u.id, u.abczg, u.deca, u.situacaoAbcz, u.genetica2, u.decile2] : [u.id, u.abczg, u.deca, u.situacaoAbcz]
       );
       const setClause = comGenetica2
-        ? 'a.abczg = COALESCE(v.abczg, a.abczg), a.deca = COALESCE(v.deca, a.deca), a.situacao_abcz = COALESCE(v.situacao_abcz, a.situacao_abcz), a.genetica_2 = COALESCE(v.genetica_2, a.genetica_2), a.decile_2 = COALESCE(v.decile_2, a.decile_2)'
-        : 'a.abczg = COALESCE(v.abczg, a.abczg), a.deca = COALESCE(v.deca, a.deca), a.situacao_abcz = COALESCE(v.situacao_abcz, a.situacao_abcz)';
-      const vCols = comGenetica2 ? 'id, abczg, deca, situacao_abcz, genetica_2, decile_2' : 'id, abczg, deca, situacao_abcz';
+        ? (useOldCols
+          ? 'abczg = COALESCE(v.abczg::text, animais.abczg::text), deca = COALESCE(v.deca::text, animais.deca::text), situacao_abcz = CASE WHEN v.situacao_abcz IS NOT NULL AND TRIM(v.situacao_abcz::text) != \'\' THEN v.situacao_abcz::text ELSE NULL END, genetica_2 = COALESCE(NULLIF(TRIM(REPLACE(v.genetica_2::text, \',\', \'.\')), \'\')::numeric, animais.genetica_2), decile_2 = COALESCE(v.decile_2::text, animais.decile_2::text)'
+          : 'abczg = COALESCE(v.abczg::text, animais.abczg::text), deca = COALESCE(v.deca::text, animais.deca::text), situacao_abcz = CASE WHEN v.situacao_abcz IS NOT NULL AND TRIM(v.situacao_abcz::text) != \'\' THEN v.situacao_abcz::text ELSE NULL END, iqg = COALESCE(NULLIF(TRIM(REPLACE(v.iqg::text, \',\', \'.\')), \'\')::numeric, animais.iqg), pt_iqg = COALESCE(NULLIF(TRIM(REPLACE(v.pt_iqg::text, \',\', \'.\')), \'\')::numeric, animais.pt_iqg)')
+        : 'abczg = COALESCE(v.abczg::text, animais.abczg::text), deca = COALESCE(v.deca::text, animais.deca::text), situacao_abcz = CASE WHEN v.situacao_abcz IS NOT NULL AND TRIM(v.situacao_abcz::text) != \'\' THEN v.situacao_abcz::text ELSE NULL END';
+      const vCols = comGenetica2 ? `id, ${cols}` : 'id, abczg, deca, situacao_abcz';
       await query(
-        `UPDATE animais a SET ${setClause}, a.updated_at = CURRENT_TIMESTAMP
-         FROM (VALUES ${vals}) AS v(${vCols}) WHERE a.id = v.id`,
+        `UPDATE animais SET ${setClause}, updated_at = CURRENT_TIMESTAMP
+         FROM (VALUES ${vals}) AS v(${vCols}) WHERE animais.id = v.id`,
         flat
       );
     };
 
     try {
       if (temColGenetica2) {
-        await runBatchUpdate(true);
+        try {
+          await runBatchUpdate(true, false);
+        } catch (e) {
+          if (/column.*does not exist|coluna.*não existe/i.test(e?.message || '')) {
+            temColGenetica2 = false;
+            await runBatchUpdate(true, true); // fallback: genetica_2, decile_2
+          } else throw e;
+        }
         resultados.animaisAtualizados += updates.length;
       } else {
         await runBatchUpdate(false);
         resultados.animaisAtualizados += updates.length;
       }
     } catch (colErr) {
-      if (/column.*does not exist/i.test(colErr?.message || '')) {
+      if (/column.*does not exist|coluna.*não existe/i.test(colErr?.message || '')) {
         temColGenetica2 = false;
         try {
-          await runBatchUpdate(false);
+          await runBatchUpdate(true, true);
           resultados.animaisAtualizados += updates.length;
         } catch (e) {
-          for (const u of updates) {
-            resultados.erros.push({ linha: 0, serie: u.serie, rg: u.rg, erro: e.message });
+          try {
+            await runBatchUpdate(false);
+            resultados.animaisAtualizados += updates.length;
+          } catch (e2) {
+            for (const u of updates) {
+              resultados.erros.push({ linha: 0, serie: u.serie, rg: u.rg, erro: e2.message });
+            }
           }
         }
       } else {

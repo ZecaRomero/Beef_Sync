@@ -1,0 +1,67 @@
+ERRO: "coluna a não existe"
+
+PASSOS PARA RESOLVER:
+
+1. ABRIR O CONSOLE DO NAVEGADOR (F12)
+   - Pressione F12
+   - Vá na aba "Console"
+   - Limpe o console
+   - Tente importar novamente
+   - COPIE TODAS as mensagens que aparecerem
+
+2. VERIFICAR O TERMINAL DO SERVIDOR
+   - Veja o terminal onde está rodando "npm run dev"
+   - Procure por mensagens de erro em vermelho
+   - COPIE as mensagens de erro
+
+3. EXECUTAR TESTE SIMPLES
+   - No terminal, execute: node testar-insert-simples.js
+   - Isso vai testar se consegue inserir um animal com o RG problemático
+   - COPIE o resultado
+
+4. VERIFICAR O EXCEL
+   - Abra o arquivo Excel que está tentando importar
+   - Verifique se há:
+     * Colunas vazias
+     * Colunas com nome "a" ou "A"
+     * Células mescladas
+     * Formatação estranha
+   
+   - SOLUÇÃO RÁPIDA:
+     a) Copie apenas as colunas com dados
+     b) Cole em um novo arquivo Excel
+     c) Salve e tente importar novamente
+
+5. TESTAR COM ARQUIVO PEQUENO
+   - Crie um novo Excel com apenas:
+     * Cabeçalho (Serie, RG, Nome, Sexo, Raça)
+     * 1 linha de dados
+   - Tente importar este arquivo pequeno
+   - Se funcionar, o problema está nos dados do Excel grande
+
+6. USAR MODO "COPIAR E COLAR"
+   - Na tela de importação, clique em "Copiar e Colar"
+   - No Excel, selecione os dados (incluindo cabeçalho)
+   - Ctrl+C
+   - Cole no campo de texto
+   - Clique em "Processar Dados Colados"
+
+INFORMAÇÕES QUE PRECISO:
+
+Para eu poder ajudar melhor, me envie:
+
+1. Screenshot do Console do navegador (F12)
+2. Mensagens do terminal do servidor
+3. Resultado do comando: node testar-insert-simples.js
+4. Nomes das colunas do seu Excel (primeira linha)
+5. Uma linha de dados de exemplo (pode mascarar informações)
+
+POSSÍVEL CAUSA:
+
+O erro "coluna a não existe" geralmente acontece quando:
+- O Excel tem uma coluna vazia ou mal formatada
+- Há um alias "a" sendo usado incorretamente em uma query SQL
+- Os dados do Excel não estão sendo mapeados corretamente
+
+O código foi atualizado para mostrar mais logs, então agora você verá
+exatamente o que está sendo enviado para o banco de dados.

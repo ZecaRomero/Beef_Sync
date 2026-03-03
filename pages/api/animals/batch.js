@@ -24,16 +24,74 @@ export default asyncHandler(async function handler(req, res) {
     return sendValidationError(res, 'Lista de animais é obrigatória e deve conter pelo menos um animal')
   }
 
-  // Validar cada animal - Série e RG são sempre obrigatórios
+  // Função auxiliar para sanitizar RG
+  const sanitizarRG = (rg) => {
+    if (!rg) return null
+    
+    // Converter para string e remover espaços extras
+    let rgLimpo = String(rg).trim()
+    
+    // Remover espaços múltiplos (manter apenas espaços simples)
+    rgLimpo = rgLimpo.replace(/\s+/g, ' ')
+    
+    // Limitar tamanho máximo a 20 caracteres
+    if (rgLimpo.length > 20) {
+      console.warn(`⚠️ RG muito longo (${rgLimpo.length} caracteres), truncando para 20: ${rgLimpo}`)
+      rgLimpo = rgLimpo.substring(0, 20)
+    }
+    
+    return rgLimpo
+  }
+
+  // Função auxiliar para sanitizar Série
+  const sanitizarSerie = (serie) => {
+    if (!serie) return null
+    
+    // Converter para string e remover espaços extras
+    let serieLimpa = String(serie).trim()
+    
+    // Remover espaços múltiplos
+    serieLimpa = serieLimpa.replace(/\s+/g, ' ')
+    
+    // Limitar tamanho máximo a 10 caracteres
+    if (serieLimpa.length > 10) {
+      console.warn(`⚠️ Série muito longa (${serieLimpa.length} caracteres), truncando para 10: ${serieLimpa}`)
+      serieLimpa = serieLimpa.substring(0, 10)
+    }
+    
+    return serieLimpa
+  }
+
+  // Validar e sanitizar cada animal - Série e RG são sempre obrigatórios
   // Sexo e raça são obrigatórios apenas para animais novos (não para atualizações parciais)
   for (let i = 0; i < animais.length; i++) {
     const animal = animais[i]
+    
+    // Sanitizar série e RG
+    animal.serie = sanitizarSerie(animal.serie)
+    animal.rg = sanitizarRG(animal.rg)
+    
+    // Validar que série e RG existem e não são vazios
     if (!animal.serie || !animal.rg) {
+      console.error(`❌ Animal ${i + 1} inválido:`, animal)
       return sendValidationError(res, `Animal ${i + 1}: Série e RG são obrigatórios`, {
+        required: ['serie', 'rg'],
+        animal_index: i + 1,
+        animal_recebido: animal
+      })
+    }
+    
+    // Validar que série e RG não contêm apenas espaços
+    if (animal.serie.trim() === '' || animal.rg.trim() === '') {
+      console.error(`❌ Animal ${i + 1} com série ou RG vazio:`, animal)
+      return sendValidationError(res, `Animal ${i + 1}: Série e RG não podem ser vazios`, {
         required: ['serie', 'rg'],
         animal_index: i + 1
       })
     }
+    
+    // Log do animal sanitizado
+    console.log(`✅ Animal ${i + 1} validado: ${animal.serie}-${animal.rg}`)
   }
 
   let lote = null
@@ -438,6 +496,10 @@ export default asyncHandler(async function handler(req, res) {
           data_nascimento: dadosAnimal.data_nascimento
         }))
         
+        // Log da query e valores para debug
+        console.log(`📝 Query INSERT com ${values.length} valores`)
+        console.log(`🔍 Valores: [${values.slice(0, 5).map(v => JSON.stringify(v)).join(', ')}...]`)
+        
         // Executar INSERT
         console.log(`📝 Executando INSERT para ${animalData.serie}-${animalData.rg}...`)
         const result = await client.query(query, values)
@@ -491,11 +553,23 @@ export default asyncHandler(async function handler(req, res) {
           index: i + 1,
           brinco: `${animalData.serie}-${animalData.rg}`,
           erro: error.message,
-          codigo_erro: error.code || 'UNKNOWN'
+          codigo_erro: error.code || 'UNKNOWN',
+          detalhes: {
+            position: error.position,
+            detail: error.detail,
+            hint: error.hint,
+            where: error.where
+          }
         })
         resultados.total_erros++
 
-        console.error(`❌ Erro no animal ${i + 1}/${animais.length} (${animalData.serie}-${animalData.rg}): ${error.message}`)
+        console.error(`❌ Erro no animal ${i + 1}/${animais.length} (${animalData.serie}-${animalData.rg}):`)
+        console.error(`   Mensagem: ${error.message}`)
+        console.error(`   Código: ${error.code}`)
+        console.error(`   Posição: ${error.position}`)
+        console.error(`   Detalhe: ${error.detail}`)
+        console.error(`   Dica: ${error.hint}`)
+        console.error(`   Stack: ${error.stack}`)
       }
     }
 

@@ -339,7 +339,9 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
     
     // Obter todas as chaves disponíveis no primeiro registro para debug
     const availableKeys = Object.keys(data[0] || {})
-    console.log('📋 Colunas encontradas:', availableKeys)
+    console.log('📋 Colunas encontradas no Excel:', availableKeys)
+    console.log('📊 Total de registros:', data.length)
+    console.log('🔍 Primeiro registro completo:', data[0])
     
     return data.map((row, idx) => {
       const getVal = (keys) => {
@@ -417,6 +419,11 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
       setLoading(true)
       setError(null)
 
+      console.log('🚀 Iniciando importação...')
+      console.log('📊 Tipo detectado:', preview.type)
+      console.log('📦 Total de registros:', preview.all.length)
+      console.log('🔍 Primeiro registro a ser enviado:', preview.all[0])
+
       let response
       switch (preview.type) {
         case 'inseminacao':
@@ -465,6 +472,8 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
 
       const result = await response.json()
 
+      console.log('📥 Resposta da API:', result)
+
       if (response.ok && result.success) {
         setSuccess({
           message: `✅ ${preview.total} registros importados com sucesso!`,
@@ -480,9 +489,29 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
           handleClose()
         }, 3000)
       } else {
-        setError(result.message || 'Erro ao importar dados')
+        // Mostrar erro detalhado
+        const errorMessage = result.message || 'Erro ao importar dados'
+        const errorDetails = result.data?.resultados?.erros || []
+        
+        console.error('❌ Erro na importação:', errorMessage)
+        console.error('📋 Detalhes dos erros:', errorDetails)
+        
+        // Montar mensagem de erro detalhada
+        let fullErrorMessage = errorMessage
+        if (errorDetails.length > 0) {
+          fullErrorMessage += '\n\nDetalhes:\n'
+          errorDetails.slice(0, 5).forEach(err => {
+            fullErrorMessage += `\n• ${err.brinco || 'Animal'}: ${err.erro}`
+          })
+          if (errorDetails.length > 5) {
+            fullErrorMessage += `\n\n... e mais ${errorDetails.length - 5} erros`
+          }
+        }
+        
+        setError(fullErrorMessage)
       }
     } catch (err) {
+      console.error('❌ Erro ao importar:', err)
       setError(`Erro ao importar: ${err.message}`)
     } finally {
       setLoading(false)

@@ -1291,24 +1291,49 @@ export default async function handler(req, res) {
       case 'animais_piquetes': {
         try {
           // Usar APENAS localizacoes_animais (mesma fonte do app Histórico de Movimentações) para manter app e mobile sincronizados
-          const r = await query(`
-            SELECT
-              l.piquete,
-              l.data_entrada::date as data_entrada,
-              a.id as animal_id,
-              a.serie, a.rg, a.nome as animal_nome,
-              a.sexo, a.data_nascimento, a.raca,
-              a.pai, a.avo_materno, a.abczg as iabcz, a.deca, a.genetica_2, a.decile_2
-            FROM localizacoes_animais l
-            JOIN animais a ON l.animal_id = a.id
-            WHERE a.situacao = 'Ativo'
-              AND l.data_saida IS NULL
-              AND l.piquete IS NOT NULL
-              AND TRIM(l.piquete) != ''
-              AND COALESCE(LOWER(a.raca), '') NOT LIKE '%receptora%'
-            ORDER BY l.piquete, a.serie, a.rg
-            LIMIT 10000
-          `)
+          // Tenta iqg/pt_iqg; se colunas não existirem, usa genetica_2/decile_2
+          let r
+          try {
+            r = await query(`
+              SELECT
+                l.piquete,
+                l.data_entrada::date as data_entrada,
+                a.id as animal_id,
+                a.serie, a.rg, a.nome as animal_nome,
+                a.sexo, a.data_nascimento, a.raca,
+                a.pai, a.avo_materno, a.abczg as iabcz, a.deca, a.iqg, a.pt_iqg
+              FROM localizacoes_animais l
+              JOIN animais a ON l.animal_id = a.id
+              WHERE a.situacao = 'Ativo'
+                AND l.data_saida IS NULL
+                AND l.piquete IS NOT NULL
+                AND TRIM(l.piquete) != ''
+                AND COALESCE(LOWER(a.raca), '') NOT LIKE '%receptora%'
+              ORDER BY l.piquete, a.serie, a.rg
+              LIMIT 10000
+            `)
+          } catch (colErr) {
+            if (/column.*does not exist|coluna.*não existe/i.test(colErr?.message || '')) {
+              r = await query(`
+                SELECT
+                  l.piquete,
+                  l.data_entrada::date as data_entrada,
+                  a.id as animal_id,
+                  a.serie, a.rg, a.nome as animal_nome,
+                  a.sexo, a.data_nascimento, a.raca,
+                  a.pai, a.avo_materno, a.abczg as iabcz, a.deca, a.genetica_2 as iqg, a.decile_2 as pt_iqg
+                FROM localizacoes_animais l
+                JOIN animais a ON l.animal_id = a.id
+                WHERE a.situacao = 'Ativo'
+                  AND l.data_saida IS NULL
+                  AND l.piquete IS NOT NULL
+                  AND TRIM(l.piquete) != ''
+                  AND COALESCE(LOWER(a.raca), '') NOT LIKE '%receptora%'
+                ORDER BY l.piquete, a.serie, a.rg
+                LIMIT 10000
+              `)
+            } else throw colErr
+          }
 
           // Buscar última pesagem (peso e CE) de cada animal
           const animalIds = r.rows.map(row => row.animal_id).filter(Boolean)
@@ -1379,8 +1404,8 @@ export default async function handler(req, res) {
               avo_materno: row.avo_materno,
               iabcz: row.iabcz,
               deca: row.deca,
-              genetica_2: row.genetica_2,
-              decile_2: row.decile_2,
+              iqg: row.iqg,
+              pt_iqg: row.pt_iqg,
               data_entrada: toDateStr(row.data_entrada)
             })
           })
@@ -1560,12 +1585,12 @@ export default async function handler(req, res) {
             `)
             try {
               rankingGenetica2 = await query(`
-                SELECT a.id, a.serie, a.rg, a.nome, a.genetica_2, a.decile_2, a.raca, a.sexo, ${sqlPiquete}
+                SELECT a.id, a.serie, a.rg, a.nome, a.iqg, a.pt_iqg, a.raca, a.sexo, ${sqlPiquete}
                 FROM animais a ${joinLateral}
-                WHERE a.situacao = 'Ativo' AND a.genetica_2 IS NOT NULL AND TRIM(a.genetica_2) != ''
+                WHERE a.situacao = 'Ativo' AND a.iqg IS NOT NULL AND TRIM(a.iqg) != ''
                 ORDER BY
-                  CASE WHEN a.genetica_2 ~ '^[0-9]+[.,]?[0-9]*$'
-                  THEN (REPLACE(REPLACE(TRIM(a.genetica_2), ',', '.'), ' ', '')::numeric)
+                  CASE WHEN a.iqg ~ '^[0-9]+[.,]?[0-9]*$'
+                  THEN (REPLACE(REPLACE(TRIM(a.iqg), ',', '.'), ' ', '')::numeric)
                   ELSE NULL END DESC NULLS LAST
                 LIMIT 10
               `)
@@ -1600,11 +1625,11 @@ export default async function handler(req, res) {
               `)
               try {
                 rankingGenetica2 = await query(`
-                  SELECT a.id, a.serie, a.rg, a.nome, a.genetica_2, a.decile_2, a.raca, a.sexo, ${sqlPiqueteAlt}
+                  SELECT a.id, a.serie, a.rg, a.nome, a.iqg, a.pt_iqg, a.raca, a.sexo, ${sqlPiqueteAlt}
                   FROM animais a ${joinLateral}
-                  WHERE a.situacao = 'Ativo' AND a.genetica_2 IS NOT NULL AND TRIM(a.genetica_2) != ''
-                  ORDER BY CASE WHEN a.genetica_2 ~ '^[0-9]+[.,]?[0-9]*$'
-                  THEN (REPLACE(REPLACE(TRIM(a.genetica_2), ',', '.'), ' ', '')::numeric) ELSE NULL END DESC NULLS LAST
+                  WHERE a.situacao = 'Ativo' AND a.iqg IS NOT NULL AND TRIM(a.iqg) != ''
+                  ORDER BY CASE WHEN a.iqg ~ '^[0-9]+[.,]?[0-9]*$'
+                  THEN (REPLACE(REPLACE(TRIM(a.iqg), ',', '.'), ' ', '')::numeric) ELSE NULL END DESC NULLS LAST
                   LIMIT 10
                 `)
               } catch (_) { rankingGenetica2 = { rows: [] } }
@@ -1616,7 +1641,7 @@ export default async function handler(req, res) {
             posicao: i + 1,
             animal_id: row.id,
             animal: `${row.serie || ''} ${row.rg || ''}`.trim() || row.nome,
-            valor: row.genetica_2,
+            valor: row.iqg,
             raca: row.raca,
             sexo: formatarSexo(row.sexo),
             piquete: piqueteOuNaoInformado(row.piquete) || '-'

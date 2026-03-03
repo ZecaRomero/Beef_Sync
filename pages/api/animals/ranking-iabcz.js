@@ -24,8 +24,10 @@ export default async function handler(req, res) {
 
   try {
     const limit = Math.min(parseInt(req.query.limit) || 10, 50);
+    const serie = (req.query.serie || '').trim().toUpperCase();
 
     // Ordenar por abczg como número (maior primeiro), NULLS LAST
+    // Se serie informada, filtra por série (ex: ranking só dos CJCJ)
     // Incluir dados úteis para o ranking (último peso/CE, local e nascimento)
     // Fallback: localizacoes_animais -> piquete_atual -> pasto_atual (igual ao desktop)
     let result
@@ -57,6 +59,7 @@ export default async function handler(req, res) {
        WHERE a.situacao = 'Ativo' 
          AND a.abczg IS NOT NULL 
          AND TRIM(a.abczg) != ''
+         ${serie ? 'AND UPPER(TRIM(COALESCE(a.serie, \'\'))) = $2' : ''}
        ORDER BY 
          CASE 
            WHEN a.abczg ~ '^[0-9]+[.,]?[0-9]*$' 
@@ -65,7 +68,7 @@ export default async function handler(req, res) {
         END DESC NULLS LAST,
         a.rg DESC
       LIMIT $1`,
-        [limit]
+        serie ? [limit, serie] : [limit]
       )
     } catch (colErr) {
       if (/column.*does not exist/i.test(colErr?.message || '')) {
@@ -96,6 +99,7 @@ export default async function handler(req, res) {
            WHERE a.situacao = 'Ativo' 
              AND a.abczg IS NOT NULL 
              AND TRIM(a.abczg) != ''
+             ${serie ? 'AND UPPER(TRIM(COALESCE(a.serie, \'\'))) = $2' : ''}
            ORDER BY 
              CASE 
                WHEN a.abczg ~ '^[0-9]+[.,]?[0-9]*$' 
@@ -104,7 +108,7 @@ export default async function handler(req, res) {
             END DESC NULLS LAST,
             a.rg DESC
           LIMIT $1`,
-          [limit]
+          serie ? [limit, serie] : [limit]
         )
       } else throw colErr
     }

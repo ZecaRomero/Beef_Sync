@@ -135,8 +135,8 @@ class AnimalDataManager {
             veterinario: novoAnimal.veterinario,
             abczg: novoAnimal.abczg,
             deca: novoAnimal.deca,
-            genetica_2: novoAnimal.genetica_2,
-            decile_2: novoAnimal.decile_2,
+            iqg: novoAnimal.iqg,
+            pt_iqg: novoAnimal.pt_iqg,
             serie_pai: novoAnimal.paiSerie,
             rg_pai: novoAnimal.paiRg,
             serie_mae: novoAnimal.maeSerie,
@@ -182,7 +182,7 @@ class AnimalDataManager {
           'tipo_nascimento', 'dificuldade_parto', 'meses', 'situacao', 
           'pai', 'mae', 'avo_materno', 'receptora', 'is_fiv', 
           'custo_total', 'valor_venda', 'valor_real', 'veterinario', 
-          'abczg', 'deca', 'genetica_2', 'decile_2', 'situacao_abcz', 'observacoes', 'boletim', 'local_nascimento', 'pasto_atual', 'piquete_atual',
+          'abczg', 'deca', 'iqg', 'pt_iqg', 'situacao_abcz', 'observacoes', 'boletim', 'local_nascimento', 'pasto_atual', 'piquete_atual',
           'serie_pai', 'rg_pai', 'serie_mae', 'rg_mae'
         ]
 

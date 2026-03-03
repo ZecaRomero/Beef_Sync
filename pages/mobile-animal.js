@@ -281,7 +281,7 @@ export default function MobileAnimal() {
                     </span>
                     <span className="font-medium text-gray-900 dark:text-white">{r.identificacao}</span>
                   </div>
-                  <span className="font-bold text-emerald-600 dark:text-emerald-400">{r.genetica_2}</span>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400">{(r.iqg ?? r.genetica_2)}</span>
                 </div>
               ))}
             </div>
@@ -632,15 +632,15 @@ export default function MobileAnimal() {
 
                   <div>
                     <p className="text-gray-500 dark:text-gray-400 text-xs">IQG</p>
-                    <p className={`font-semibold ${(animal.genetica_2 || animal.genetica_2 === 0) ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-900 dark:text-white'}`}>
-                      {animal.genetica_2 || animal.genetica_2 === 0 ? animal.genetica_2 : '-'}
+                    <p className={`font-semibold ${((animal.iqg ?? animal.genetica_2) || (animal.iqg ?? animal.genetica_2) === 0) ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-900 dark:text-white'}`}>
+                      {(animal.iqg ?? animal.genetica_2) || (animal.iqg ?? animal.genetica_2) === 0 ? (animal.iqg ?? animal.genetica_2) : '-'}
                     </p>
                   </div>
 
                   <div>
                     <p className="text-gray-500 dark:text-gray-400 text-xs">Pt IQG</p>
                     <p className="font-semibold text-gray-900 dark:text-white">
-                      {animal.decile_2 || animal.decile_2 === 0 ? animal.decile_2 : '-'}
+                      {(animal.pt_iqg ?? animal.decile_2) || (animal.pt_iqg ?? animal.decile_2) === 0 ? (animal.pt_iqg ?? animal.decile_2) : '-'}
                     </p>
                   </div>
 

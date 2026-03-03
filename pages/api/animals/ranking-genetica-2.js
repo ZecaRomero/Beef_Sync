@@ -28,7 +28,7 @@ export default async function handler(req, res) {
     try {
       result = await query(
       `SELECT 
-         a.id, a.serie, a.rg, a.nome, a.genetica_2, a.decile_2, a.raca, a.sexo, a.situacao,
+         a.id, a.serie, a.rg, a.nome, a.iqg, a.pt_iqg, a.raca, a.sexo, a.situacao,
          a.data_nascimento, a.pasto_atual, a.piquete_atual,
          p_ult.peso AS ultimo_peso,
          p_ult.ce   AS ultimo_ce,
@@ -51,12 +51,12 @@ export default async function handler(req, res) {
          LIMIT 1
        ) la ON TRUE
        WHERE a.situacao = 'Ativo' 
-         AND a.genetica_2 IS NOT NULL 
-         AND TRIM(a.genetica_2) != ''
+AND a.iqg IS NOT NULL
+         AND TRIM(a.iqg) != ''
        ORDER BY 
          CASE 
-           WHEN a.genetica_2 ~ '^[0-9]+[.,]?[0-9]*$' 
-           THEN (REPLACE(REPLACE(TRIM(a.genetica_2), ',', '.'), ' ', '')::numeric)
+           WHEN a.iqg ~ '^[0-9]+[.,]?[0-9]*$' 
+           THEN (REPLACE(REPLACE(TRIM(a.iqg), ',', '.'), ' ', '')::numeric)
           ELSE NULL
         END DESC NULLS LAST,
         a.rg DESC
@@ -78,8 +78,8 @@ export default async function handler(req, res) {
       rg: r.rg,
       identificacao: `${r.serie || ''}-${r.rg || ''}`.replace(/^-|-$/g, ''),
       nome: r.nome,
-      genetica_2: r.genetica_2,
-      decile_2: r.decile_2,
+      iqg: r.iqg,
+      pt_iqg: r.pt_iqg,
       raca: r.raca,
       sexo: r.sexo,
       data_nascimento: r.data_nascimento,
@@ -94,7 +94,7 @@ export default async function handler(req, res) {
       data: ranking,
     });
   } catch (error) {
-    console.error('Erro ao buscar ranking Genética 2:', error);
+    console.error('Erro ao buscar ranking IQG:', error);
     return res.status(500).json({
       success: false,
       error: 'Erro ao buscar ranking',

@@ -382,8 +382,8 @@ export default function MobileRelatorios() {
     piquete: 'Piquete',
     iABCZ: 'iABCZ',
     deca: 'DECA',
-    genetica_2: 'IQG',
-    decile_2: 'Pt IQG'
+    iqg: 'IQG',
+    pt_iqg: 'Pt IQG'
   }
 
   const filteredData = reportData?.data?.filter(d => {
@@ -1186,7 +1186,7 @@ export default function MobileRelatorios() {
                               </div>
                               
                               {/* Genealogia e índices */}
-                              {(a.pai || a.avo_materno || a.iabcz || a.deca || a.genetica_2 || a.decile_2) && (
+                              {(a.pai || a.avo_materno || a.iabcz || a.deca || (a.iqg ?? a.genetica_2) || (a.pt_iqg ?? a.decile_2)) && (
                                 <div className="pt-2 border-t border-gray-200 dark:border-gray-700 space-y-1.5">
                                   {a.pai && (
                                     <div className="flex items-start gap-1.5 text-xs">
@@ -1216,16 +1216,16 @@ export default function MobileRelatorios() {
                                         <span className="text-xs font-bold text-gray-900 dark:text-white">{a.deca}</span>
                                       </div>
                                     )}
-                                    {a.genetica_2 && (
+                                    {(a.iqg ?? a.genetica_2) && (
                                       <div className="flex items-center gap-1">
-                                        <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Aval2:</span>
-                                        <span className="text-xs font-bold text-gray-900 dark:text-white">{a.genetica_2}</span>
+                                        <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">IQG:</span>
+                                        <span className="text-xs font-bold text-gray-900 dark:text-white">{(a.iqg ?? a.genetica_2)}</span>
                                       </div>
                                     )}
-                                    {a.decile_2 && (
+                                    {(a.pt_iqg ?? a.decile_2) && (
                                       <div className="flex items-center gap-1">
-                                        <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">Dec2:</span>
-                                        <span className="text-xs font-bold text-gray-900 dark:text-white">{a.decile_2}</span>
+                                        <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">Pt IQG:</span>
+                                        <span className="text-xs font-bold text-gray-900 dark:text-white">{(a.pt_iqg ?? a.decile_2)}</span>
                                       </div>
                                     )}
                                   </div>

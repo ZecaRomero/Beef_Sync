@@ -47,8 +47,8 @@ export default function ModernAnimalForm({
     valorVenda: '',
     abczg: '',
     deca: '',
-    genetica_2: '',
-    decile_2: '',
+    iqg: '',
+    pt_iqg: '',
     observacoes: '',
     boletim: '',
     localNascimento: '',
@@ -73,8 +73,8 @@ export default function ModernAnimalForm({
         observacoes: animal.observacoes || '',
         abczg: animal.abczg || '',
         deca: animal.deca || '',
-        genetica_2: animal.genetica_2 || '',
-        decile_2: animal.decile_2 || '',
+        iqg: animal.iqg || '',
+        pt_iqg: animal.pt_iqg || '',
         boletim: animal.boletim || '',
         localNascimento: animal.localNascimento || animal.local_nascimento || '',
         pastoAtual: animal.pastoAtual || animal.pasto_atual || ''
@@ -99,8 +99,8 @@ export default function ModernAnimalForm({
         isFiv: false,
         abczg: '',
         deca: '',
-        genetica_2: '',
-        decile_2: '',
+        iqg: '',
+        pt_iqg: '',
         observacoes: '',
         boletim: '',
         localNascimento: '',
@@ -573,14 +573,14 @@ export default function ModernAnimalForm({
             />
             <Input
               label="IQG"
-              value={formData.genetica_2 || ''}
-              onChange={(e) => setFormData({ ...formData, genetica_2: e.target.value })}
+              value={formData.iqg || ''}
+              onChange={(e) => setFormData({ ...formData, iqg: e.target.value })}
               placeholder="IQG"
             />
             <Input
               label="Pt IQG"
-              value={formData.decile_2 || ''}
-              onChange={(e) => setFormData({ ...formData, decile_2: e.target.value })}
+              value={formData.pt_iqg || ''}
+              onChange={(e) => setFormData({ ...formData, pt_iqg: e.target.value })}
               placeholder="Pt IQG"
             />
           </div>

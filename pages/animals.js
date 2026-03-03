@@ -1046,8 +1046,8 @@ export default function Animals() {
           custoTotal: isModoAtualizacao ? undefined : custoTotalSanitizado,
           abczg: isModoAtualizacao ? undefined : (animalSemId.abczg || null),
           deca: isModoAtualizacao ? undefined : (animalSemId.deca || null),
-          genetica_2: isModoAtualizacao ? undefined : (animalSemId.genetica_2 || null),
-          decile_2: isModoAtualizacao ? undefined : (animalSemId.decile_2 || null),
+          iqg: isModoAtualizacao ? undefined : (animalSemId.iqg || null),
+          pt_iqg: isModoAtualizacao ? undefined : (animalSemId.pt_iqg || null),
           observacoes: isModoAtualizacao ? undefined : (animalSemId.observacoes || null),
           atualizarApenasVazios: animalSemId.atualizarApenasVazios || isModoAtualizacao // Garantir que a flag seja enviada
         }

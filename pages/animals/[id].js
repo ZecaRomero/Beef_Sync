@@ -271,7 +271,7 @@ export default function AnimalDetail() {
     carregarUltimaIA()
   }, [animal?.id])
 
-  // Buscar posição nos rankings (iABCZ e Genética 2) para exibir troféus
+  // Buscar posição nos rankings (iABCZ e IQG) para exibir troféus
   useEffect(() => {
     if (!animal?.id) return
     const matchAnimal = (r) => r.id === animal.id || (String(r.rg) === String(animal.rg) && String(r.serie || '').toUpperCase() === String(animal.serie || '').toUpperCase())
@@ -286,7 +286,7 @@ export default function AnimalDetail() {
       }
       if (d2.success && d2.data?.length) {
         const idx = d2.data.findIndex(matchAnimal)
-        if (idx >= 0) updates.ranking_genetica_2 = idx + 1
+        if (idx >= 0) updates.ranking_iqg = idx + 1
       }
       if (Object.keys(updates).length > 0) {
         setAnimal(prev => prev ? { ...prev, ...updates } : prev)
@@ -4058,7 +4058,7 @@ export default function AnimalDetail() {
                     IQG
                   </label>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {animal.genetica_2 || '-'}
+                    {(animal.iqg ?? animal.genetica_2) || '-'}
                   </p>
                 </div>
 
@@ -4067,14 +4067,14 @@ export default function AnimalDetail() {
                     Pt IQG
                   </label>
                   <p className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
-                    <span>{animal.decile_2 || '-'}</span>
-                    {animal.ranking_genetica_2 && (
+                    <span>{(animal.pt_iqg ?? animal.decile_2) || '-'}</span>
+                    {animal.ranking_iqg && (
                       <span className="flex items-center gap-1">
-                        {animal.ranking_genetica_2 === 1 && <span className="text-xl">🥇</span>}
-                        {animal.ranking_genetica_2 === 2 && <span className="text-xl">🥈</span>}
-                        {animal.ranking_genetica_2 === 3 && <span className="text-xl">🥉</span>}
-                        {animal.ranking_genetica_2 > 3 && <span className="text-amber-600">🏆</span>}
-                        <span className="text-xs text-gray-500 dark:text-gray-400">#{animal.ranking_genetica_2}</span>
+                        {animal.ranking_iqg === 1 && <span className="text-xl">🥇</span>}
+                        {animal.ranking_iqg === 2 && <span className="text-xl">🥈</span>}
+                        {animal.ranking_iqg === 3 && <span className="text-xl">🥉</span>}
+                        {animal.ranking_iqg > 3 && <span className="text-amber-600">🏆</span>}
+                        <span className="text-xs text-gray-500 dark:text-gray-400">#{animal.ranking_iqg}</span>
                       </span>
                     )}
                   </p>
