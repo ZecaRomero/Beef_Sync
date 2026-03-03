@@ -29,8 +29,11 @@ import {
   SparklesIcon,
   MoonIcon,
   SunIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  PencilIcon
 } from '@heroicons/react/24/outline'
+
+import EditGeneticaModal from '../../components/animals/EditGeneticaModal'
 
 function formatDate(d) {
   if (!d) return '-'
@@ -88,6 +91,12 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
   const [filhoTopRanking, setFilhoTopRanking] = useState(null) // { serie, rg, nome } quando esta fêmea é mãe do 1º do ranking
   const [filhoTopRankingIQG, setFilhoTopRankingIQG] = useState(null) // { serie, rg, nome, iqg } quando esta fêmea é mãe do 1º do ranking IQG
   const [showIABCZInfo, setShowIABCZInfo] = useState(false)
+  const [isEditGeneticaModalOpen, setIsEditGeneticaModalOpen] = useState(false)
+
+  const handleSaveGenetica = useCallback((updatedAnimal) => {
+    setAnimal(prev => ({ ...prev, ...updatedAnimal }))
+    setIsEditGeneticaModalOpen(false)
+  }, [])
   const [sharing, setSharing] = useState(false)
   const [maeLink, setMaeLink] = useState(null) // { serie, rg } quando mãe pode ser linkada
   const toggleSecao = useCallback((key) => {
@@ -207,12 +216,16 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
       .then(d => {
         if (d.success && d.data?.length) {
           const ranking = d.data
+          console.log('🏆 Ranking iABCZ (Top 10):', ranking.slice(0, 10).map((r, i) => `${i+1}º: ${r.serie} ${r.rg} - iABCZ: ${r.abczg}`))
           const primeiroRanking = ranking[0]
           const serieMatch = String(animal?.serie || '').toUpperCase()
           const idx = ranking.findIndex(r =>
             r.id === animal.id || (String(r.rg) === String(animal.rg) && String(r.serie || '').toUpperCase() === serieMatch)
           )
-          if (idx >= 0) setRankingPosicao(idx + 1)
+          if (idx >= 0) {
+            setRankingPosicao(idx + 1)
+            console.log(`📍 Animal atual (${animal.serie} ${animal.rg}) está na posição ${idx + 1} do ranking iABCZ`)
+          }
           // Verificar se esta fêmea é mãe do 1º do ranking (filho mais bem avaliado)
           const filhos = animal.filhos || []
           const filhoEhPrimeiro = filhos.some(f =>
@@ -241,12 +254,16 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
       .then(d => {
         if (d.success && d.data?.length) {
           const ranking = d.data
+          console.log('🏆 Ranking IQG (Top 10):', ranking.slice(0, 10).map((r, i) => `${i+1}º: ${r.serie} ${r.rg} - IQG: ${r.iqg}`))
           const primeiroRanking = ranking[0]
           const serieMatch = String(animal?.serie || '').toUpperCase()
           const idx = ranking.findIndex(r =>
             r.id === animal.id || (String(r.rg) === String(animal.rg) && String(r.serie || '').toUpperCase() === serieMatch)
           )
-          if (idx >= 0) setRankingPosicaoGenetica2(idx + 1)
+          if (idx >= 0) {
+            setRankingPosicaoGenetica2(idx + 1)
+            console.log(`📍 Animal atual (${animal.serie} ${animal.rg}) está na posição ${idx + 1} do ranking IQG`)
+          }
           
           // Verificar se esta fêmea é mãe do 1º do ranking (filho mais bem avaliado)
           const filhos = animal.filhos || []
@@ -827,13 +844,23 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
               </div>
             </div>
           )}
+          {/* Destaque: 3º do Ranking iABCZ (PMGZ) - troféu bronze */}
           {rankingPosicao === 3 && (
-            <div className="bg-gradient-to-r from-amber-700 to-amber-800 rounded-2xl shadow-lg p-4 text-white">
-              <div className="flex items-center gap-3">
-                <TrophyIcon className="h-10 w-10 text-amber-200" />
-                <div>
-                  <p className="font-bold">3º no Ranking iABCZ</p>
-                  <p className="text-sm opacity-90">Ótima avaliação genética</p>
+            <div className="bg-gradient-to-r from-amber-600 via-amber-700 to-amber-800 rounded-2xl shadow-xl p-6 text-white border-2 border-amber-500/50 ring-4 ring-amber-500/30">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-2xl bg-white/20 backdrop-blur">
+                  <TrophyIcon className="h-12 w-12 text-amber-100" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold tracking-wider opacity-90">🥉 3º LUGAR NO RANKING iABCZ (PMGZ)</p>
+                  <p className="text-2xl font-bold mt-0.5">Terceira melhor avaliação genética</p>
+                  <p className="text-sm mt-1 opacity-90 flex items-center gap-1">
+                    <SparklesIcon className="h-4 w-4" />
+                    iABCZ: {animal.abczg || '-'} • Ótima avaliação genética
+                  </p>
+                </div>
+                <div className="hidden sm:flex w-16 h-16 rounded-full bg-white/20 items-center justify-center text-3xl font-black">
+                  3º
                 </div>
               </div>
             </div>
@@ -880,25 +907,44 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
             </div>
           )}
 
-          {/* Badge posição 2 ou 3 no ranking IQG */}
+          {/* Destaque: 2º do Ranking IQG - troféu prata */}
           {rankingPosicaoGenetica2 === 2 && (
-            <div className="bg-gradient-to-r from-slate-400 to-slate-600 rounded-2xl shadow-lg p-4 text-white">
-              <div className="flex items-center gap-3">
-                <TrophyIcon className="h-10 w-10 text-slate-200" />
-                <div>
-                  <p className="font-bold">2º no Ranking IQG</p>
-                  <p className="text-sm opacity-90">Excelente avaliação genética</p>
+            <div className="bg-gradient-to-r from-slate-400 via-slate-500 to-slate-600 rounded-2xl shadow-xl p-6 text-white border-2 border-slate-300/50 ring-4 ring-slate-400/30">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-2xl bg-white/20 backdrop-blur">
+                  <TrophyIcon className="h-12 w-12 text-slate-100" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold tracking-wider opacity-90">🥈 2º LUGAR NO RANKING IQG</p>
+                  <p className="text-2xl font-bold mt-0.5">Segunda melhor avaliação genética IQG</p>
+                  <p className="text-sm mt-1 opacity-90 flex items-center gap-1">
+                    <SparklesIcon className="h-4 w-4" />
+                    IQG: {animal.iqg ?? animal.genetica_2 ?? '-'} • Excelente avaliação genética
+                  </p>
+                </div>
+                <div className="hidden sm:flex w-16 h-16 rounded-full bg-white/20 items-center justify-center text-3xl font-black">
+                  2º
                 </div>
               </div>
             </div>
           )}
+          {/* Destaque: 3º do Ranking IQG - troféu bronze */}
           {rankingPosicaoGenetica2 === 3 && (
-            <div className="bg-gradient-to-r from-indigo-700 to-indigo-800 rounded-2xl shadow-lg p-4 text-white">
-              <div className="flex items-center gap-3">
-                <TrophyIcon className="h-10 w-10 text-indigo-200" />
-                <div>
-                  <p className="font-bold">3º no Ranking IQG</p>
-                  <p className="text-sm opacity-90">Ótima avaliação genética</p>
+            <div className="bg-gradient-to-r from-violet-600 via-violet-700 to-violet-800 rounded-2xl shadow-xl p-6 text-white border-2 border-violet-500/50 ring-4 ring-violet-500/30">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-2xl bg-white/20 backdrop-blur">
+                  <TrophyIcon className="h-12 w-12 text-violet-100" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold tracking-wider opacity-90">🥉 3º LUGAR NO RANKING IQG</p>
+                  <p className="text-2xl font-bold mt-0.5">Terceira melhor avaliação genética IQG</p>
+                  <p className="text-sm mt-1 opacity-90 flex items-center gap-1">
+                    <SparklesIcon className="h-4 w-4" />
+                    IQG: {animal.iqg ?? animal.genetica_2 ?? '-'} • Ótima avaliação genética
+                  </p>
+                </div>
+                <div className="hidden sm:flex w-16 h-16 rounded-full bg-white/20 items-center justify-center text-3xl font-black">
+                  3º
                 </div>
               </div>
             </div>
@@ -922,7 +968,17 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
          
 
           {/* Cards de números rápidos - Grid responsivo com animações */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="relative group">
+            <button
+              type="button"
+              onClick={() => setIsEditGeneticaModalOpen(true)}
+              className="absolute -top-6 right-0 p-1 text-gray-400 hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100 flex items-center gap-1 text-xs font-medium z-10"
+              title="Editar dados genéticos"
+            >
+              <PencilIcon className="h-3 w-3" />
+              Editar Genética
+            </button>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {(animal.abczg || animal.abczg === 0) && (
               <div className={`rounded-xl p-3 border text-center ${
                 filhoTopRanking
@@ -1396,9 +1452,14 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
                         )
                       }
                       return (
-                        <span className="text-sm font-medium text-gray-900 dark:text-white">
-                          {animal.mae || '-'}
-                        </span>
+                        <div className="text-right">
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">
+                            {animal.mae || '-'}
+                          </span>
+                          <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
+                            ⚠️ Não encontrada no cadastro (pode estar inativa)
+                          </p>
+                        </div>
                       )
                     })()}
                     {animal.mae && (animal.serie_mae || maeLink) && (
@@ -1573,7 +1634,20 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
               )}
               <InfoRow label="Comprador/Destino" value={animal.comprador || animal.destino} />
               <InfoRow label="Receptora" value={animal.receptora} />
-              <InfoRow label="Situação ABCZ" value={animal.situacao_abcz || animal.situacaoAbcz || 'Não informado'} />
+              <InfoRow 
+                label="Situação ABCZ" 
+                value={animal.situacao_abcz || animal.situacaoAbcz || 'Não informado'} 
+                action={
+                  <button
+                    type="button"
+                    onClick={() => setIsEditGeneticaModalOpen(true)}
+                    className="p-1 text-gray-400 hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100"
+                    title="Editar dados genéticos"
+                  >
+                    <PencilIcon className="h-4 w-4" />
+                  </button>
+                }
+              />
               {(animal.custo_aquisicao || animal.custoAquisicao) && (
                 <InfoRow label="Custo aquisição" value={formatCurrency(animal.custo_aquisicao || animal.custoAquisicao)} />
               )}
@@ -2444,16 +2518,28 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
           </div>
         </div>
       )}
+
+      {isEditGeneticaModalOpen && (
+        <EditGeneticaModal
+          isOpen={isEditGeneticaModalOpen}
+          onClose={() => setIsEditGeneticaModalOpen(false)}
+          animal={animal}
+          onSave={handleSaveGenetica}
+        />
+      )}
     </>
   )
 }
 
-function InfoRow({ label, value }) {
+function InfoRow({ label, value, action }) {
   if (value == null || value === '') return null
   return (
-    <div className="px-6 py-3 flex justify-between items-center">
+    <div className="px-6 py-3 flex justify-between items-center group">
       <span className="text-sm text-gray-500 dark:text-gray-400">{label}</span>
-      <span className="text-sm font-medium text-gray-900 dark:text-white">{value}</span>
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-medium text-gray-900 dark:text-white">{value}</span>
+        {action}
+      </div>
     </div>
   )
 }

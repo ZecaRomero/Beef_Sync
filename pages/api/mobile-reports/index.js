@@ -98,17 +98,28 @@ export default async function handler(req, res) {
   if (req.method !== 'GET') return sendMethodNotAllowed(res, ['GET'])
 
   try {
-    const { tipo, startDate, endDate } = req.query
+    const { tipo, startDate, endDate, serie } = req.query
     const enabled = await getEnabled()
+    const serieFiltro = (serie || '').trim().toUpperCase() || null
 
     // GET sem tipo: retorna config (quando enabled vazio, retorna todos como habilitados)
     if (!tipo) {
       const allKeys = TIPOS_RELATORIOS.map(t => t.key)
       // Garantir que resumo_geral esteja sempre habilitado
       const enabledOut = enabled.length > 0 ? [...new Set([...enabled, 'resumo_geral'])] : allKeys
+      let series = []
+      try {
+        const qSeries = await query(`
+          SELECT DISTINCT serie FROM animais
+          WHERE serie IS NOT NULL AND TRIM(serie) != '' AND situacao = 'Ativo'
+          ORDER BY serie
+        `)
+        series = (qSeries.rows || []).map(r => r.serie).filter(Boolean)
+      } catch (_) {}
       return sendSuccess(res, {
         enabled: enabledOut,
-        allTypes: TIPOS_RELATORIOS
+        allTypes: TIPOS_RELATORIOS,
+        series
       })
     }
 
@@ -1478,6 +1489,12 @@ export default async function handler(req, res) {
 
       case 'ranking_animais_avaliados': {
         try {
+          const condSerie = serieFiltro ? 'AND UPPER(TRIM(COALESCE(a.serie, \'\'))) = $1' : ''
+          const paramsRankAval = serieFiltro ? [serieFiltro] : []
+          const condExcluirDuplicado = `AND NOT (
+            (a.iqg IS NOT NULL OR a.genetica_2 IS NOT NULL)
+            AND TRIM(REPLACE(COALESCE(a.abczg,''), ',', '.')) = TRIM(REPLACE(COALESCE(a.iqg::text, a.genetica_2::text,''), ',', '.'))
+          )`
           let r
           try {
             r = await query(`
@@ -1490,6 +1507,8 @@ export default async function handler(req, res) {
                 ORDER BY l2.data_entrada DESC LIMIT 1
               ) l ON TRUE
               WHERE a.situacao = 'Ativo' AND a.abczg IS NOT NULL AND TRIM(a.abczg) != ''
+              ${condExcluirDuplicado}
+              ${condSerie}
               ORDER BY
                 CASE
                   WHEN a.abczg ~ '^[0-9]+[.,]?[0-9]*$'
@@ -1497,29 +1516,53 @@ export default async function handler(req, res) {
                   ELSE NULL
                 END DESC NULLS LAST
               LIMIT 100
-            `)
-          } catch (colErr) {
-            if (/column.*does not exist/i.test(colErr?.message || '')) {
-              r = await query(`
-                SELECT a.id, a.serie, a.rg, a.nome, a.abczg, a.deca, a.raca, a.sexo,
-                  COALESCE(l.piquete, a.pasto_atual) as piquete
-                FROM animais a
-                LEFT JOIN LATERAL (
-                  SELECT l2.piquete FROM localizacoes_animais l2
-                  WHERE l2.animal_id = a.id AND l2.data_saida IS NULL
-                  ORDER BY l2.data_entrada DESC LIMIT 1
-                ) l ON TRUE
-                WHERE a.situacao = 'Ativo' AND a.abczg IS NOT NULL AND TRIM(a.abczg) != ''
-                ORDER BY
-                  CASE
-                    WHEN a.abczg ~ '^[0-9]+[.,]?[0-9]*$'
-                    THEN (REPLACE(REPLACE(TRIM(a.abczg), ',', '.'), ' ', '')::numeric)
-                    ELSE NULL
-                  END DESC NULLS LAST
-                LIMIT 100
-              `)
-            } else throw colErr
+            `, paramsRankAval)
+          } catch (colErrExcl) {
+            if (/column.*does not exist/i.test(colErrExcl?.message || '')) {
+              try {
+                r = await query(`
+                  SELECT a.id, a.serie, a.rg, a.nome, a.abczg, a.deca, a.raca, a.sexo,
+                    COALESCE(l.piquete, a.piquete_atual, a.pasto_atual) as piquete
+                  FROM animais a
+                  LEFT JOIN LATERAL (
+                    SELECT l2.piquete FROM localizacoes_animais l2
+                    WHERE l2.animal_id = a.id AND l2.data_saida IS NULL
+                    ORDER BY l2.data_entrada DESC LIMIT 1
+                  ) l ON TRUE
+                  WHERE a.situacao = 'Ativo' AND a.abczg IS NOT NULL AND TRIM(a.abczg) != '' ${condSerie}
+                  ORDER BY
+                    CASE
+                      WHEN a.abczg ~ '^[0-9]+[.,]?[0-9]*$'
+                      THEN (REPLACE(REPLACE(TRIM(a.abczg), ',', '.'), ' ', '')::numeric)
+                      ELSE NULL
+                    END DESC NULLS LAST
+                  LIMIT 100
+                `, paramsRankAval)
+              } catch (colErr) {
+                if (/column.*does not exist/i.test(colErr?.message || '')) {
+                  r = await query(`
+                    SELECT a.id, a.serie, a.rg, a.nome, a.abczg, a.deca, a.raca, a.sexo,
+                      COALESCE(l.piquete, a.pasto_atual) as piquete
+                    FROM animais a
+                    LEFT JOIN LATERAL (
+                      SELECT l2.piquete FROM localizacoes_animais l2
+                      WHERE l2.animal_id = a.id AND l2.data_saida IS NULL
+                      ORDER BY l2.data_entrada DESC LIMIT 1
+                    ) l ON TRUE
+                    WHERE a.situacao = 'Ativo' AND a.abczg IS NOT NULL AND TRIM(a.abczg) != '' ${condSerie}
+                    ORDER BY
+                      CASE
+                        WHEN a.abczg ~ '^[0-9]+[.,]?[0-9]*$'
+                        THEN (REPLACE(REPLACE(TRIM(a.abczg), ',', '.'), ' ', '')::numeric)
+                        ELSE NULL
+                      END DESC NULLS LAST
+                    LIMIT 100
+                  `, paramsRankAval)
+                } else throw colErr
+              }
+            } else throw colErrExcl
           }
+          if (!r?.rows) r = { rows: [] }
           data = (r.rows || []).map((row, i) => ({
             posicao: i + 1,
             animal_id: row.id,
@@ -1538,6 +1581,12 @@ export default async function handler(req, res) {
 
       case 'ranking_pmgz': {
         try {
+          const condSeriePmgz = serieFiltro ? 'AND UPPER(TRIM(COALESCE(a.serie, \'\'))) = $1' : ''
+          const paramsPmgz = serieFiltro ? [serieFiltro] : []
+          const condExcluirDuplicadoPmgz = `AND NOT (
+            (a.iqg IS NOT NULL OR a.genetica_2 IS NOT NULL)
+            AND TRIM(REPLACE(COALESCE(a.abczg,''), ',', '.')) = TRIM(REPLACE(COALESCE(a.iqg::text, a.genetica_2::text,''), ',', '.'))
+          )`
           const sqlPiquete = `
             COALESCE(l.piquete, a.piquete_atual, a.pasto_atual) as piquete
           `
@@ -1550,25 +1599,44 @@ export default async function handler(req, res) {
           `
           let rankingIABCZ, rankingPeso, rankingCE, rankingGenetica2
           try {
-            rankingIABCZ = await query(`
-              SELECT a.id, a.serie, a.rg, a.nome, a.abczg, a.raca, a.sexo, ${sqlPiquete}
-              FROM animais a ${joinLateral}
-              WHERE a.situacao = 'Ativo' AND a.abczg IS NOT NULL AND TRIM(a.abczg) != ''
-              ORDER BY
-                CASE
-                  WHEN a.abczg ~ '^[0-9]+[.,]?[0-9]*$'
-                  THEN (REPLACE(REPLACE(TRIM(a.abczg), ',', '.'), ' ', '')::numeric)
-                  ELSE NULL
-                END DESC NULLS LAST
-              LIMIT 10
-            `)
+            try {
+              rankingIABCZ = await query(`
+                SELECT a.id, a.serie, a.rg, a.nome, a.abczg, a.raca, a.sexo, ${sqlPiquete}
+                FROM animais a ${joinLateral}
+                WHERE a.situacao = 'Ativo' AND a.abczg IS NOT NULL AND TRIM(a.abczg) != ''
+                ${condExcluirDuplicadoPmgz}
+                ${condSeriePmgz}
+                ORDER BY
+                  CASE
+                    WHEN a.abczg ~ '^[0-9]+[.,]?[0-9]*$'
+                    THEN (REPLACE(REPLACE(TRIM(a.abczg), ',', '.'), ' ', '')::numeric)
+                    ELSE NULL
+                  END DESC NULLS LAST
+                LIMIT 10
+              `, paramsPmgz)
+            } catch (exclErr) {
+              if (/column.*does not exist/i.test(exclErr?.message || '')) {
+                rankingIABCZ = await query(`
+                  SELECT a.id, a.serie, a.rg, a.nome, a.abczg, a.raca, a.sexo, ${sqlPiquete}
+                  FROM animais a ${joinLateral}
+                  WHERE a.situacao = 'Ativo' AND a.abczg IS NOT NULL AND TRIM(a.abczg) != '' ${condSeriePmgz}
+                  ORDER BY
+                    CASE
+                      WHEN a.abczg ~ '^[0-9]+[.,]?[0-9]*$'
+                      THEN (REPLACE(REPLACE(TRIM(a.abczg), ',', '.'), ' ', '')::numeric)
+                      ELSE NULL
+                    END DESC NULLS LAST
+                  LIMIT 10
+                `, paramsPmgz)
+              } else throw exclErr
+            }
             rankingPeso = await query(`
               SELECT a.id, a.serie, a.rg, a.nome, a.peso, a.raca, a.sexo, ${sqlPiquete}
               FROM animais a ${joinLateral}
-              WHERE a.situacao = 'Ativo' AND a.peso IS NOT NULL AND a.peso > 0
+              WHERE a.situacao = 'Ativo' AND a.peso IS NOT NULL AND a.peso > 0 ${condSeriePmgz}
               ORDER BY a.peso DESC
               LIMIT 10
-            `)
+            `, paramsPmgz)
             rankingCE = await query(`
               SELECT a.id, a.serie, a.rg, a.nome, p.ce, a.raca, a.sexo, ${sqlPiquete}
               FROM animais a
@@ -1579,60 +1647,101 @@ export default async function handler(req, res) {
                 ORDER BY animal_id, data DESC
               ) p ON a.id = p.animal_id
               ${joinLateral}
-              WHERE a.situacao = 'Ativo' AND (a.sexo ILIKE 'M%' OR a.sexo = 'M')
+              WHERE a.situacao = 'Ativo' AND (a.sexo ILIKE 'M%' OR a.sexo = 'M') ${condSeriePmgz}
               ORDER BY p.ce DESC
               LIMIT 10
-            `)
+            `, paramsPmgz)
             try {
               rankingGenetica2 = await query(`
                 SELECT a.id, a.serie, a.rg, a.nome, a.iqg, a.pt_iqg, a.raca, a.sexo, ${sqlPiquete}
                 FROM animais a ${joinLateral}
-                WHERE a.situacao = 'Ativo' AND a.iqg IS NOT NULL AND TRIM(a.iqg) != ''
+                WHERE a.situacao = 'Ativo' AND a.iqg IS NOT NULL AND TRIM(a.iqg::text) != '' ${condSeriePmgz}
                 ORDER BY
-                  CASE WHEN a.iqg ~ '^[0-9]+[.,]?[0-9]*$'
-                  THEN (REPLACE(REPLACE(TRIM(a.iqg), ',', '.'), ' ', '')::numeric)
+                  CASE WHEN a.iqg::text ~ '^[0-9]+[.,]?[0-9]*$'
+                  THEN (REPLACE(REPLACE(TRIM(a.iqg::text), ',', '.'), ' ', '')::numeric)
                   ELSE NULL END DESC NULLS LAST
                 LIMIT 10
-              `)
-            } catch (_) { rankingGenetica2 = { rows: [] } }
+              `, paramsPmgz)
+            } catch (iqgErr) {
+              if (/column.*does not exist/i.test(iqgErr?.message || '')) {
+                try {
+                  rankingGenetica2 = await query(`
+                    SELECT a.id, a.serie, a.rg, a.nome, a.genetica_2 as iqg, a.decile_2 as pt_iqg, a.raca, a.sexo, ${sqlPiquete}
+                    FROM animais a ${joinLateral}
+                    WHERE a.situacao = 'Ativo' AND a.genetica_2 IS NOT NULL AND TRIM(a.genetica_2::text) != '' ${condSeriePmgz}
+                    ORDER BY CASE WHEN a.genetica_2::text ~ '^[0-9]+[.,]?[0-9]*$'
+                    THEN (REPLACE(REPLACE(TRIM(a.genetica_2::text), ',', '.'), ' ', '')::numeric) ELSE NULL END DESC NULLS LAST
+                    LIMIT 10
+                  `, paramsPmgz)
+                } catch (_) { rankingGenetica2 = { rows: [] } }
+              } else { rankingGenetica2 = { rows: [] } }
+            }
           } catch (colErr) {
             if (/column.*does not exist/i.test(colErr?.message || '')) {
               const sqlPiqueteAlt = `COALESCE(l.piquete, a.pasto_atual) as piquete`
-              rankingIABCZ = await query(`
-                SELECT a.id, a.serie, a.rg, a.nome, a.abczg, a.raca, a.sexo, ${sqlPiqueteAlt}
-                FROM animais a ${joinLateral}
-                WHERE a.situacao = 'Ativo' AND a.abczg IS NOT NULL AND TRIM(a.abczg) != ''
-                ORDER BY
-                  CASE WHEN a.abczg ~ '^[0-9]+[.,]?[0-9]*$'
-                  THEN (REPLACE(REPLACE(TRIM(a.abczg), ',', '.'), ' ', '')::numeric)
-                  ELSE NULL END DESC NULLS LAST
-                LIMIT 10
-              `)
+              try {
+                rankingIABCZ = await query(`
+                  SELECT a.id, a.serie, a.rg, a.nome, a.abczg, a.raca, a.sexo, ${sqlPiqueteAlt}
+                  FROM animais a ${joinLateral}
+                  WHERE a.situacao = 'Ativo' AND a.abczg IS NOT NULL AND TRIM(a.abczg) != ''
+                  ${condExcluirDuplicadoPmgz}
+                  ${condSeriePmgz}
+                  ORDER BY
+                    CASE WHEN a.abczg ~ '^[0-9]+[.,]?[0-9]*$'
+                    THEN (REPLACE(REPLACE(TRIM(a.abczg), ',', '.'), ' ', '')::numeric)
+                    ELSE NULL END DESC NULLS LAST
+                  LIMIT 10
+                `, paramsPmgz)
+              } catch (_) {
+                rankingIABCZ = await query(`
+                  SELECT a.id, a.serie, a.rg, a.nome, a.abczg, a.raca, a.sexo, ${sqlPiqueteAlt}
+                  FROM animais a ${joinLateral}
+                  WHERE a.situacao = 'Ativo' AND a.abczg IS NOT NULL AND TRIM(a.abczg) != '' ${condSeriePmgz}
+                  ORDER BY
+                    CASE WHEN a.abczg ~ '^[0-9]+[.,]?[0-9]*$'
+                    THEN (REPLACE(REPLACE(TRIM(a.abczg), ',', '.'), ' ', '')::numeric)
+                    ELSE NULL END DESC NULLS LAST
+                  LIMIT 10
+                `, paramsPmgz)
+              }
               rankingPeso = await query(`
                 SELECT a.id, a.serie, a.rg, a.nome, a.peso, a.raca, a.sexo, ${sqlPiqueteAlt}
                 FROM animais a ${joinLateral}
-                WHERE a.situacao = 'Ativo' AND a.peso IS NOT NULL AND a.peso > 0
+                WHERE a.situacao = 'Ativo' AND a.peso IS NOT NULL AND a.peso > 0 ${condSeriePmgz}
                 ORDER BY a.peso DESC LIMIT 10
-              `)
+              `, paramsPmgz)
               rankingCE = await query(`
                 SELECT a.id, a.serie, a.rg, a.nome, p.ce, a.raca, a.sexo, ${sqlPiqueteAlt}
                 FROM animais a
                 JOIN (SELECT DISTINCT ON (animal_id) animal_id, ce FROM pesagens
                   WHERE ce IS NOT NULL AND ce > 0 ORDER BY animal_id, data DESC) p ON a.id = p.animal_id
                 ${joinLateral}
-                WHERE a.situacao = 'Ativo' AND (a.sexo ILIKE 'M%' OR a.sexo = 'M')
+                WHERE a.situacao = 'Ativo' AND (a.sexo ILIKE 'M%' OR a.sexo = 'M') ${condSeriePmgz}
                 ORDER BY p.ce DESC LIMIT 10
-              `)
+              `, paramsPmgz)
               try {
                 rankingGenetica2 = await query(`
                   SELECT a.id, a.serie, a.rg, a.nome, a.iqg, a.pt_iqg, a.raca, a.sexo, ${sqlPiqueteAlt}
                   FROM animais a ${joinLateral}
-                  WHERE a.situacao = 'Ativo' AND a.iqg IS NOT NULL AND TRIM(a.iqg) != ''
-                  ORDER BY CASE WHEN a.iqg ~ '^[0-9]+[.,]?[0-9]*$'
-                  THEN (REPLACE(REPLACE(TRIM(a.iqg), ',', '.'), ' ', '')::numeric) ELSE NULL END DESC NULLS LAST
+                  WHERE a.situacao = 'Ativo' AND a.iqg IS NOT NULL AND TRIM(a.iqg::text) != '' ${condSeriePmgz}
+                  ORDER BY CASE WHEN a.iqg::text ~ '^[0-9]+[.,]?[0-9]*$'
+                  THEN (REPLACE(REPLACE(TRIM(a.iqg::text), ',', '.'), ' ', '')::numeric) ELSE NULL END DESC NULLS LAST
                   LIMIT 10
-                `)
-              } catch (_) { rankingGenetica2 = { rows: [] } }
+                `, paramsPmgz)
+              } catch (iqgErr2) {
+                if (/column.*does not exist/i.test(iqgErr2?.message || '')) {
+                  try {
+                    rankingGenetica2 = await query(`
+                      SELECT a.id, a.serie, a.rg, a.nome, a.genetica_2 as iqg, a.decile_2 as pt_iqg, a.raca, a.sexo, ${sqlPiqueteAlt}
+                      FROM animais a ${joinLateral}
+                      WHERE a.situacao = 'Ativo' AND a.genetica_2 IS NOT NULL AND TRIM(a.genetica_2::text) != '' ${condSeriePmgz}
+                      ORDER BY CASE WHEN a.genetica_2::text ~ '^[0-9]+[.,]?[0-9]*$'
+                      THEN (REPLACE(REPLACE(TRIM(a.genetica_2::text), ',', '.'), ' ', '')::numeric) ELSE NULL END DESC NULLS LAST
+                      LIMIT 10
+                    `, paramsPmgz)
+                  } catch (_) { rankingGenetica2 = { rows: [] } }
+                } else { rankingGenetica2 = { rows: [] } }
+              }
             } else throw colErr
           }
 

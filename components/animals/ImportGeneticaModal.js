@@ -26,16 +26,19 @@ const parsearTextoImport = (texto) => {
   const col3EhNumero = col3 != null && col3 !== '' && !isNaN(parseFloat(String(col3).replace(',', '.')))
   const col4EhNumeroOuDecil = col4 != null && col4 !== '' && (/^[\d,.\s]+$/.test(String(col4)) || col4.length <= 3)
   const formatoStatus = header.includes('STATUS') || (col3 != null && col3 !== '' && !col3EhNumero)
+  const headerCols = splitLinha(linhas[0])
   // Formato completo 6 colunas: SÉRIE | RG | iABCZg | DECA | IQG | Pt IQG
   const formatoCompleto6Cols = header.includes('IABCZ') && header.includes('DECA') &&
     (header.includes('IQG') || header.includes('IQGG')) &&
     (header.includes('PT') || header.includes('PL'))
+  // Formato 7 colunas: Série | RG | iABCZg | DECA | IQG | Pt IQG | Situação ABCZ
+  const col7Situacao = headerCols[6] && (String(headerCols[6]).toUpperCase().includes('SITUAÇÃO') || String(headerCols[6]).toUpperCase().includes('SITUACAO') || String(headerCols[6]).toUpperCase().includes('STATUS'))
+  const formatoCompleto7Cols = formatoCompleto6Cols && col7Situacao
   // Sem header: 6 cols com col2-5 numéricos = iABCZ, DECA, IQG, Pt IQG
   const col5Num = primeiraCols[4] != null && !isNaN(parseFloat(String(primeiraCols[4]).replace(',', '.')))
   const col6Num = primeiraCols[5] != null && !isNaN(parseFloat(String(primeiraCols[5]).replace(',', '.')))
-  const formatoCompleto6ColsPelosDados = !skipHeader && primeiraCols.length === 6 && col3EhNumero && col4EhNumeroOuDecil && col5Num && col6Num
+  const formatoCompleto6ColsPelosDados = !skipHeader && primeiraCols.length >= 6 && col3EhNumero && col4EhNumeroOuDecil && col5Num && col6Num
   // Formato: Série, RG, IQG, Pt IQG (4 cols)
-  const headerCols = splitLinha(linhas[0])
   const formatoIQGPeloHeader = headerCols.length >= 4 && headerCols.length <= 6 &&
     ((header.includes('IQG') || header.includes('IQGG')) && (header.includes('PT') || header.includes('PL'))) &&
     !header.includes('IABCZ') && !header.includes('DECA')
@@ -80,14 +83,15 @@ const parsearTextoImport = (texto) => {
       
       if (formatoStatus && cols.length >= 2 + offsetCols) {
         dados.push({ serie, rg, situacaoAbcz: c(2) || null })
-      } else if ((formatoCompleto6Cols || formatoCompleto6ColsPelosDados) && cols.length >= 6) {
-        // Série, RG, iABCZg, DECA, IQG, Pt IQG (6 colunas - sem confusão)
+      } else if ((formatoCompleto6Cols || formatoCompleto7Cols || formatoCompleto6ColsPelosDados) && cols.length >= 6) {
+        // Série, RG, iABCZg, DECA, IQG, Pt IQG (6 cols) + opcional Situação ABCZ (7ª col, pode ter espaço ex: "POSSUI RGN")
+        const situacaoAbczVal = cols.length >= 7 ? cols.slice(dataStart + 4).join(' ').trim() || null : null
         dados.push({
           serie,
           rg,
           iABCZ: c(2) || null,
           deca: c(3) || null,
-          situacaoAbcz: null,
+          situacaoAbcz: situacaoAbczVal,
           iqg: c(4) || null,
           pt_iqg: c(5) || null
         })
@@ -122,6 +126,7 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
   const [importTexto, setImportTexto] = useState('')
   const [importFile, setImportFile] = useState(null)
   const [criarNaoEncontrados, setCriarNaoEncontrados] = useState(true)
+  const [limparForaDaLista, setLimparForaDaLista] = useState(true)
   const [importando, setImportando] = useState(false)
   const [limpando, setLimpando] = useState(false)
   const [resultadoImport, setResultadoImport] = useState(null)
@@ -134,9 +139,11 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
   const formatarResultadoImport = (r) => {
     const n = r.animaisAtualizados ?? 0
     const criados = r.animaisCriados ?? 0
+    const limpos = r.animaisLimpos ?? 0
     const ignorados = (r.naoEncontrados?.length || 0) + (r.ignoradosInativos?.length || 0)
     let msg = `Importação concluída! ${n} animal(is) atualizado(s).`
     if (criados > 0) msg += ` ${criados} criado(s).`
+    if (limpos > 0) msg += ` ${limpos} limpo(s) (fora da planilha).`
     if (ignorados > 0) {
       msg += ` Os demais (${ignorados}) foram ignorados (não estão no cadastro ou estão inativos).`
     }
@@ -166,7 +173,7 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
         const res = await fetch('/api/import/excel-genetica', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ data: dados, criarNaoEncontrados })
+          body: JSON.stringify({ data: dados, criarNaoEncontrados, limparForaDaLista })
         })
         const json = await res.json()
         console.log('[Import Genética] Resposta:', res.status, json)
@@ -187,6 +194,7 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
         const formData = new FormData()
         formData.append('file', importFile)
         formData.append('criarNaoEncontrados', criarNaoEncontrados ? 'true' : 'false')
+        formData.append('limparForaDaLista', limparForaDaLista ? 'true' : 'false')
         const res = await fetch('/api/import/excel-genetica', {
           method: 'POST',
           body: formData
@@ -213,7 +221,7 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
   }
 
   const handleLimparTodas = async () => {
-    if (!confirm('Limpar TODOS os dados genéticos (iABCZ, DECA, IQG, Pt IQG, Situação ABCZ) de todos os animais? Depois você pode importar novamente.')) return
+    if (!confirm('ZERAR TODOS os dados genéticos (iABCZ, DECA, IQG, Pt IQG, Situação ABCZ) de TODOS os animais?\n\nDepois importe o Excel com 6 ou 7 colunas. O 17098 e outros fora da planilha deixarão de aparecer no ranking.')) return
     setLimpando(true)
     setResultadoImport(null)
     try {
@@ -226,7 +234,7 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
       if (res.ok) {
         setResultadoImport({ success: true, message: json.message })
         onSuccess?.()
-        alert(`${json.message}\n\nRecarregue a página (F5) para ver os dados atualizados.`)
+        alert(`${json.message}\n\nAgora importe o Excel (6 ou 7 colunas: Série, RG, iABCZg, DECA, IQG, Pt IQG, Situação ABCZ).`)
       } else {
         setResultadoImport({ erro: json.error || json.details || 'Erro ao limpar' })
         alert(`Erro: ${json.error || json.details || 'Erro ao limpar'}`)
@@ -247,8 +255,12 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Importar Série, RG (iABCZ/DECA ou IQG/Pt IQG)" size="lg">
+    <Modal isOpen={isOpen} onClose={handleClose} title="Importar Genética (iABCZ, DECA, IQG, Pt IQG)" size="lg">
       <div className="space-y-4">
+        <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+          <p className="text-sm font-semibold text-amber-800 dark:text-amber-200 mb-1">📋 Para reimportar do zero:</p>
+          <p className="text-xs text-amber-700 dark:text-amber-300">1) Clique em &quot;Zerar tudo&quot; abaixo → 2) Importe o Excel com 6 ou 7 colunas (Série, RG, iABCZg, DECA, IQG, Pt IQG, Situação ABCZ)</p>
+        </div>
         <div className="flex gap-2">
           <button
             onClick={() => setImportMode('texto')}
@@ -265,18 +277,18 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
         </div>
         {importMode === 'texto' ? (
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Cole os dados (tab entre colunas). Formato principal: Série, RG, iABCZg, DECA, IQG, Pt IQG (6 colunas). Ou só IQG: Série, RG, IQG, Pt IQG (4 cols).</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Cole os dados (tab entre colunas). Formato: Série, RG, iABCZg, DECA, IQG, Pt IQG (6 cols) ou + Situação ABCZ (7 cols). Ou só IQG: Série, RG, IQG, Pt IQG (4 cols).</p>
             <textarea
               value={importTexto}
               onChange={(e) => setImportTexto(e.target.value)}
-              placeholder="SÉRIE	RG	iABCZg	DECA	IQG	Pt IQG&#10;CJCS	1	34,8	1	45,93	0,1&#10;CJCS	3	40,5	1	53,86	0,5&#10;CJCS	10	36,68	1	52,02	2"
+              placeholder="SÉRIE	RG	iABCZg	DECA	IQG	Pt IQG	Situação ABCZ&#10;CJCS	1	34,8	1	45,93	0,1	E&#10;CJCS	3	40,5	1	53,86	0,5	E"
               className="w-full h-40 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-gray-700 dark:text-white text-sm font-mono"
               rows={6}
             />
           </div>
         ) : (
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Excel: Série, RG, iABCZg, DECA, IQG, Pt IQG (6 colunas). Ou só IQG: Série, RG, IQG, Pt IQG (4 cols). Animais não encontrados e inativos são ignorados.</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Excel com 6 ou 7 colunas: <strong>Série | RG | iABCZg | DECA | IQG | Pt IQG | Situação ABCZ</strong>. Importa iABCZ, IQG e Situação ABCZ. Ou só IQG: 4 colunas (Série, RG, IQG, Pt IQG).</p>
             <input
               type="file"
               accept=".xlsx,.xls,.csv"
@@ -311,15 +323,24 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
           />
           <span className="text-sm text-gray-600 dark:text-gray-400">Criar animais não cadastrados (cadastra automaticamente os que não existem)</span>
         </label>
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={limparForaDaLista}
+            onChange={(e) => setLimparForaDaLista(e.target.checked)}
+            className="rounded border-gray-300 dark:border-gray-600"
+          />
+          <span className="text-sm text-gray-600 dark:text-gray-400">Limpar iABCZ/DECA de animais que não estão na planilha (mesma série)</span>
+        </label>
         <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-gray-200 dark:border-gray-600">
           <button
             onClick={handleLimparTodas}
             disabled={limpando || importando}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 font-medium hover:bg-red-200 dark:hover:bg-red-900/50 disabled:opacity-50"
-            title="Zera todos os dados genéticos para importar novamente"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 font-semibold hover:bg-red-200 dark:hover:bg-red-900/60 disabled:opacity-50 border-2 border-red-300 dark:border-red-800"
+            title="Zera iABCZ, DECA, IQG, Pt IQG de TODOS os animais. Faça isso antes de importar."
           >
-            <TrashIcon className="h-4 w-4" />
-            {limpando ? 'Limpando...' : 'Excluir todas e importar novamente'}
+            <TrashIcon className="h-5 w-5" />
+            {limpando ? 'Zerando...' : '1. Zerar tudo'}
           </button>
           <div className="flex gap-2">
             <button
@@ -331,9 +352,9 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
             <button
               onClick={handleImportar}
               disabled={importando || (importMode === 'texto' ? !importTexto.trim() : !importFile)}
-              className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold"
+              className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold"
             >
-              {importando ? 'Importando... (aguarde)' : 'Importar'}
+              {importando ? 'Importando...' : '2. Importar Excel'}
             </button>
           </div>
         </div>

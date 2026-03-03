@@ -47,7 +47,9 @@ import {
   ChartBarIcon as ChartBarIconSolid
 } from '@heroicons/react/24/solid'
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Filler, Tooltip, Legend)
+if (typeof window !== 'undefined') {
+  ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Filler, Tooltip, Legend)
+}
 
 function formatDate(d) {
   if (!d) return '-'
@@ -126,6 +128,8 @@ export default function MobileRelatorios() {
   })
   const [sexoFilter, setSexoFilter] = useState('todos')
   const [tipoFiltroCalendario, setTipoFiltroCalendario] = useState('')
+  const [tipoFiltroRanking, setTipoFiltroRanking] = useState('')
+  const [serieFilter, setSerieFilter] = useState('')
   const [sharing, setSharing] = useState(false)
   const [calendarMonth, setCalendarMonth] = useState(() => {
     const d = new Date()
@@ -211,6 +215,9 @@ export default function MobileRelatorios() {
       startDate: period.startDate,
       endDate: period.endDate
     })
+    if ((selectedTipo === 'ranking_pmgz' || selectedTipo === 'ranking_animais_avaliados') && serieFilter) {
+      params.set('serie', serieFilter)
+    }
     fetch(`/api/mobile-reports?${params}`)
       .then(r => r.json())
       .then(d => {
@@ -222,7 +229,7 @@ export default function MobileRelatorios() {
       })
       .catch(() => setReportData(null))
       .finally(() => setLoadingData(false))
-  }, [selectedTipo, period.startDate, period.endDate])
+  }, [selectedTipo, period.startDate, period.endDate, serieFilter])
 
   useEffect(() => {
     if (selectedTipo === 'calendario_reprodutivo') {
@@ -715,6 +722,9 @@ export default function MobileRelatorios() {
     if (!selectedTipo) return
     setLoadingData(true)
     const params = new URLSearchParams({ tipo: selectedTipo, startDate: period.startDate, endDate: period.endDate })
+    if ((selectedTipo === 'ranking_pmgz' || selectedTipo === 'ranking_animais_avaliados') && serieFilter) {
+      params.set('serie', serieFilter)
+    }
     fetch(`/api/mobile-reports?${params}`)
       .then(r => r.json())
       .then(d => { 
@@ -724,9 +734,38 @@ export default function MobileRelatorios() {
       })
       .catch(() => {})
       .finally(() => setLoadingData(false))
-  }, [selectedTipo, period.startDate, period.endDate])
+  }, [selectedTipo, period.startDate, period.endDate, serieFilter])
 
-  const dadosParaExibir = temCalendario ? filteredCalendario : filteredBySexo
+  const baseDados = (() => {
+    if (temCalendario) return filteredCalendario
+    if (ehRanking && selectedTipo === 'ranking_pmgz' && tipoFiltroRanking) {
+      return filteredBySexo.filter(r => (r.ranking || '') === tipoFiltroRanking)
+    }
+    return filteredBySexo
+  })()
+  const dadosParaExibir = (() => {
+    if (!ehRanking || baseDados.length === 0) return baseDados
+    const valorKey = Object.keys(baseDados[0] || {}).find(k => /^iABCZ$|^valor$|^iqg$/i.test(k))
+    if (!valorKey) return baseDados
+    const parseVal = (v) => parseFloat(String(v || '0').replace(',', '.')) || 0
+    const rankingKey = baseDados[0]?.ranking != null ? 'ranking' : null
+    const sorted = [...baseDados].sort((a, b) => {
+      if (rankingKey && a[rankingKey] !== b[rankingKey]) {
+        const order = ['iABCZ', 'Peso', 'CE', 'IQG']
+        const ia = order.indexOf(a[rankingKey]) + 1 || 99
+        const ib = order.indexOf(b[rankingKey]) + 1 || 99
+        return ia - ib
+      }
+      return parseVal(b[valorKey]) - parseVal(a[valorKey])
+    })
+    if (!rankingKey) {
+      return sorted.map((row, i) => ({ ...row, posicao: i + 1 }))
+    }
+    return sorted.map((row, i) => {
+      const prevSame = sorted.slice(0, i).filter(r => r[rankingKey] === row[rankingKey]).length
+      return { ...row, posicao: prevSame + 1 }
+    })
+  })()
   const totalRegistros = searchQuery.trim() || (temCalendario && tipoFiltroCalendario) ? dadosParaExibir.length : (reportData?.total ?? filteredBySexo.length)
 
   // Insights inteligentes gerados dos dados
@@ -2159,6 +2198,56 @@ export default function MobileRelatorios() {
                     className={`px-3 py-1 rounded-lg text-xs font-semibold ${sexoFilter === 'F' ? 'bg-pink-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'}`}
                   >
                     Fêmeas
+                  </button>
+                </div>
+              )}
+
+              {(selectedTipo === 'ranking_pmgz' || selectedTipo === 'ranking_animais_avaliados') && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-2 py-1 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center gap-1">
+                    <FunnelIcon className="h-4 w-4" /> Série
+                  </span>
+                  <select
+                    value={serieFilter}
+                    onChange={e => setSerieFilter(e.target.value || '')}
+                    className="px-3 py-1.5 rounded-lg text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-w-[100px]"
+                  >
+                    <option value="">Todas as séries</option>
+                    {(config?.series || []).map(s => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {selectedTipo === 'ranking_pmgz' && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-2 py-1 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center gap-1">
+                    <FunnelIcon className="h-4 w-4" /> Ranking
+                  </span>
+                  {['iABCZ', 'Peso', 'CE', 'IQG'].map(tipo => {
+                    const qtd = (reportData?.data || []).filter(d => !d._resumo && d.ranking === tipo).length
+                    return (
+                      <button
+                        key={tipo}
+                        onClick={() => setTipoFiltroRanking(tipoFiltroRanking === tipo ? '' : tipo)}
+                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                          tipoFiltroRanking === tipo
+                            ? 'bg-amber-500 text-white shadow-md'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        {tipo} {qtd > 0 && <span className="opacity-75">({qtd})</span>}
+                      </button>
+                    )
+                  })}
+                  <button
+                    onClick={() => setTipoFiltroRanking('')}
+                    className={`px-3 py-1 rounded-lg text-xs font-semibold ${
+                      !tipoFiltroRanking ? 'bg-amber-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                    }`}
+                  >
+                    Todos
                   </button>
                 </div>
               )}

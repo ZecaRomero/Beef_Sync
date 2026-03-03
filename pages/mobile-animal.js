@@ -703,9 +703,14 @@ export default function MobileAnimal() {
                           )
                         }
                         return (
-                          <p className="font-semibold text-gray-900 dark:text-white">
-                            {animal.mae}
-                          </p>
+                          <>
+                            <p className="font-semibold text-gray-900 dark:text-white">
+                              {animal.mae}
+                            </p>
+                            <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
+                              ⚠️ Não encontrada no cadastro (pode estar inativa)
+                            </p>
+                          </>
                         )
                       })()}
                     </div>

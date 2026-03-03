@@ -1,7 +1,7 @@
 /**
- * Corrige animais onde iABCZ e DECA foram erroneamente sobrescritos com valores de IQG/Pt IQG.
- * Quando abczg = iqg (ou genetica_2) E deca = pt_iqg (ou decile_2), limpa abczg e deca
- * para remover a duplicação. Os valores corretos de iABCZ/DECA podem ser importados depois.
+ * Corrige animais onde iABCZ foi erroneamente preenchido com valor de IQG.
+ * Quando abczg = iqg (ou genetica_2), limpa abczg e deca no banco.
+ * Esses animais tinham iABCZ em branco no Excel e o IQG foi gravado por engano.
  *
  * Execute: node scripts/corrigir-iabcZ-deca-duplicados.js
  * Modo dry-run (só mostra): node scripts/corrigir-iabcZ-deca-duplicados.js --dry-run
@@ -12,36 +12,32 @@ async function corrigir() {
   const dryRun = process.argv.includes('--dry-run');
 
   try {
-    // Buscar animais onde abczg = iqg/genetica_2 E deca = pt_iqg/decile_2 (duplicação errada)
-    // Tenta colunas iqg/pt_iqg; se não existirem, usa genetica_2/decile_2
+    // Buscar animais onde abczg = iqg/genetica_2 (duplicação: iABCZ preenchido com IQG)
     let res;
     try {
       res = await query(`
         SELECT id, serie, rg, nome, abczg, deca,
-               COALESCE(iqg::text, genetica_2::text) as iqg_val,
-               COALESCE(pt_iqg::text, decile_2::text) as pt_iqg_val
+               COALESCE(iqg::text, genetica_2::text) as iqg_val
         FROM animais
         WHERE abczg IS NOT NULL AND TRIM(abczg::text) != ''
+          AND (iqg IS NOT NULL OR genetica_2 IS NOT NULL)
           AND TRIM(REPLACE(abczg::text, ',', '.')) = TRIM(REPLACE(COALESCE(iqg::text, genetica_2::text), ',', '.'))
-          AND TRIM(COALESCE(deca::text, '')) = TRIM(COALESCE(pt_iqg::text, decile_2::text, ''))
       `);
     } catch (e) {
       if (/column.*does not exist/i.test(e?.message || '')) {
         res = await query(`
           SELECT id, serie, rg, nome, abczg, deca,
-                 genetica_2::text as iqg_val,
-                 decile_2::text as pt_iqg_val
+                 genetica_2::text as iqg_val
           FROM animais
           WHERE abczg IS NOT NULL AND TRIM(abczg::text) != ''
             AND genetica_2 IS NOT NULL
             AND TRIM(REPLACE(abczg::text, ',', '.')) = TRIM(REPLACE(genetica_2::text, ',', '.'))
-            AND TRIM(COALESCE(deca::text, '')) = TRIM(COALESCE(decile_2::text, ''))
         `);
       } else throw e;
     }
 
     const afetados = res.rows || [];
-    console.log(`Encontrados ${afetados.length} animal(is) com iABCZ/DECA duplicados de IQG/Pt IQG:`);
+    console.log(`Encontrados ${afetados.length} animal(is) com iABCZ duplicado de IQG (serão limpos):`);
     afetados.slice(0, 20).forEach((a, i) => {
       console.log(`  ${i + 1}. ${a.serie}-${a.rg} (${a.nome}) - abczg=${a.abczg} deca=${a.deca}`);
     });

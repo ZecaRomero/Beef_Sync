@@ -95,17 +95,19 @@ export default async function handler(req, res) {
         req.on('error', reject);
       });
 
-      const { data: rows = [], criarNaoEncontrados = false } = body;
+      const { data: rows = [], criarNaoEncontrados = false, limparForaDaLista = false } = body;
       if (!Array.isArray(rows) || rows.length === 0) {
         return res.status(400).json({
           error: 'Envie um array "data" com objetos { serie, rg, iABCZ, deca, situacaoAbcz? }',
         });
       }
 
-      const resultados = await processarLinhas(rows, criarNaoEncontrados);
+      const resultados = await processarLinhas(rows, criarNaoEncontrados, limparForaDaLista);
+      let msg = `Importação concluída: ${resultados.animaisAtualizados} animais atualizados`;
+      if (resultados.animaisLimpos > 0) msg += `, ${resultados.animaisLimpos} limpos (fora da planilha)`;
       return res.status(200).json({
         success: true,
-        message: `Importação concluída: ${resultados.animaisAtualizados} animais atualizados`,
+        message: msg,
         resultados,
       });
     }
@@ -154,25 +156,26 @@ export default async function handler(req, res) {
     const cellD1 = (primeiraLinha.getCell(4).value ?? '').toString().toUpperCase();
     const cellE1 = (primeiraLinha.getCell(5).value ?? '').toString().toUpperCase();
     const cellF1 = (primeiraLinha.getCell(6).value ?? '').toString().toUpperCase();
+    const cellG1 = (primeiraLinha.getCell(7).value ?? '').toString().toUpperCase();
     // Formato completo 6 colunas: SÉRIE | RG | iABCZg | DECA | IQG | Pt IQG
     const formatoCompleto6Cols = cellC1.includes('IABCZ') && cellD1.includes('DECA') &&
       (cellE1.includes('IQG') || cellE1.includes('IQGG')) &&
       (cellF1.includes('PT') || cellF1.includes('PL') || cellF1.includes('IQG'));
-    // Sem header: 6 cols com col3-6 numéricos = iABCZ, DECA, IQG, Pt IQG (não situacaoAbcz)
+    // Formato 7 colunas: Série | RG | iABCZg | DECA | IQG | Pt IQG | Situação ABCZ
+    const formatoCompleto7Cols = formatoCompleto6Cols && (cellG1.includes('SITUAÇÃO') || cellG1.includes('SITUACAO') || cellG1.includes('STATUS'));
+    const row1 = worksheet.getRow(startRow);
+    const valC1 = row1.getCell(3).value;
+    const valD1 = row1.getCell(4).value;
     const valE1 = row1.getCell(5).value;
     const valF1 = row1.getCell(6).value;
+    const col3Num = valC1 != null && !isNaN(parseFloat(String(valC1).replace(',', '.')));
+    const col4Num = valD1 != null && (/^[\d,.\s]+$/.test(String(valD1)) || String(valD1).length <= 3);
     const col5Num = valE1 != null && !isNaN(parseFloat(String(valE1).replace(',', '.')));
     const col6Num = valF1 != null && !isNaN(parseFloat(String(valF1).replace(',', '.')));
     const formatoCompleto6ColsPelosDados = startRow === 1 && col3Num && col4Num && col5Num && col6Num;
     // Formato Série|RG|IQG/IQGg|Pt (4 colunas) - col 3 e 4 vão para IQG e Pt IQG (não iABCZ/DECA)
     const formatoIQGPeloHeader = (cellC1.includes('IQG') || cellC1.includes('IQGG') || cellD1.includes('PT') || cellD1.includes('PL') || cellD1.includes('IQG')) &&
       !cellC1.includes('IABCZ') && !cellC1.includes('DECA');
-    // Sem header: 4 cols com col3 e col4 numéricos = IQG (não confundir com iABCZ/DECA)
-    const row1 = worksheet.getRow(startRow);
-    const valC1 = row1.getCell(3).value;
-    const valD1 = row1.getCell(4).value;
-    const col3Num = valC1 != null && !isNaN(parseFloat(String(valC1).replace(',', '.')));
-    const col4Num = valD1 != null && (/^[\d,.\s]+$/.test(String(valD1)) || String(valD1).length <= 3);
     const formatoIQGPelosDados = startRow === 1 && col3Num && col4Num;
     const formatoIQG = formatoIQGPeloHeader || formatoIQGPelosDados;
 
@@ -192,12 +195,13 @@ export default async function handler(req, res) {
 
       if (formatoStatusAbcz) {
         situacaoAbcz = normalizarTexto(row.getCell(3).value) || null;
-      } else if (formatoCompleto6Cols || formatoCompleto6ColsPelosDados) {
-        // Série, RG, iABCZg, DECA, IQG, Pt IQG (6 colunas - sem confusão)
+      } else if (formatoCompleto6Cols || formatoCompleto7Cols || formatoCompleto6ColsPelosDados) {
+        // Série, RG, iABCZg, DECA, IQG, Pt IQG (6 cols) + opcional Situação ABCZ (7ª col)
         iABCZ = normalizarNumero(row.getCell(3).value);
         deca = normalizarTexto(row.getCell(4).value);
         genetica2 = normalizarNumero(row.getCell(5).value) || normalizarTexto(row.getCell(5).value) || null;
         decile2 = normalizarTexto(row.getCell(6).value) || null;
+        situacaoAbcz = normalizarTexto(row.getCell(7).value) || null;
       } else if (formatoIQG) {
         genetica2 = normalizarNumero(row.getCell(3).value) || normalizarTexto(row.getCell(3).value) || null;
         decile2 = normalizarTexto(row.getCell(4).value) || null;
@@ -218,10 +222,15 @@ export default async function handler(req, res) {
     const raw = typeof fields?.get === 'function' ? fields.get('criarNaoEncontrados') : fields?.criarNaoEncontrados;
     const val = Array.isArray(raw) ? raw[0] : raw;
     const criarNaoEncontrados = !!(val === 'true' || val === true);
-    const resultados = await processarLinhas(rows, criarNaoEncontrados);
+    const rawLimpar = typeof fields?.get === 'function' ? fields.get('limparForaDaLista') : fields?.limparForaDaLista;
+    const valLimpar = Array.isArray(rawLimpar) ? rawLimpar[0] : rawLimpar;
+    const limparForaDaLista = !!(valLimpar === 'true' || valLimpar === true);
+    const resultados = await processarLinhas(rows, criarNaoEncontrados, limparForaDaLista);
+    let msg = `Importação concluída: ${resultados.animaisAtualizados} animais atualizados`;
+    if (resultados.animaisLimpos > 0) msg += `, ${resultados.animaisLimpos} limpos (fora da planilha)`;
     return res.status(200).json({
       success: true,
-      message: `Importação concluída: ${resultados.animaisAtualizados} animais atualizados`,
+      message: msg,
       resultados,
     });
   } catch (error) {
@@ -247,8 +256,8 @@ async function insertOuUpdateAnimal(nome, serie, rg, tatuagem, abczg, deca, situ
        ON CONFLICT (serie, rg) DO UPDATE SET
          iqg = COALESCE(NULLIF(TRIM(REPLACE(EXCLUDED.iqg::text, ',', '.')), '')::numeric, animais.iqg),
          pt_iqg = COALESCE(NULLIF(TRIM(REPLACE(EXCLUDED.pt_iqg::text, ',', '.')), '')::numeric, animais.pt_iqg),
-         abczg = COALESCE(EXCLUDED.abczg::text, animais.abczg::text),
-         deca = COALESCE(EXCLUDED.deca::text, animais.deca::text),
+         abczg = CASE WHEN EXCLUDED.abczg IS NOT NULL AND TRIM(EXCLUDED.abczg::text) != '' THEN EXCLUDED.abczg::text ELSE NULL END,
+         deca = CASE WHEN EXCLUDED.deca IS NOT NULL AND TRIM(EXCLUDED.deca::text) != '' THEN EXCLUDED.deca::text ELSE NULL END,
          situacao_abcz = COALESCE(EXCLUDED.situacao_abcz::text, animais.situacao_abcz::text),
          updated_at = CURRENT_TIMESTAMP
        RETURNING id, serie, rg, situacao`,
@@ -262,8 +271,8 @@ async function insertOuUpdateAnimal(nome, serie, rg, tatuagem, abczg, deca, situ
          ON CONFLICT (serie, rg) DO UPDATE SET
            genetica_2 = COALESCE(NULLIF(TRIM(REPLACE(EXCLUDED.genetica_2::text, ',', '.')), '')::numeric, animais.genetica_2),
            decile_2 = COALESCE(EXCLUDED.decile_2::text, animais.decile_2::text),
-           abczg = COALESCE(EXCLUDED.abczg::text, animais.abczg::text),
-           deca = COALESCE(EXCLUDED.deca::text, animais.deca::text),
+           abczg = CASE WHEN EXCLUDED.abczg IS NOT NULL AND TRIM(EXCLUDED.abczg::text) != '' THEN EXCLUDED.abczg::text ELSE NULL END,
+           deca = CASE WHEN EXCLUDED.deca IS NOT NULL AND TRIM(EXCLUDED.deca::text) != '' THEN EXCLUDED.deca::text ELSE NULL END,
            situacao_abcz = COALESCE(EXCLUDED.situacao_abcz::text, animais.situacao_abcz::text),
            updated_at = CURRENT_TIMESTAMP
          RETURNING id, serie, rg, situacao`,
@@ -274,10 +283,11 @@ async function insertOuUpdateAnimal(nome, serie, rg, tatuagem, abczg, deca, situ
   }
 }
 
-async function processarLinhas(rows, criarNaoEncontrados = false) {
+async function processarLinhas(rows, criarNaoEncontrados = false, limparForaDaLista = false) {
   const resultados = {
     animaisAtualizados: 0,
     animaisCriados: 0,
+    animaisLimpos: 0,
     naoEncontrados: [],
     ignoradosInativos: [],
     erros: [],
@@ -311,7 +321,11 @@ async function processarLinhas(rows, criarNaoEncontrados = false) {
       deca: normalizarTexto(r.deca ?? r.Deca ?? r.DECA) || null,
       situacaoAbcz: normalizarTexto(r.situacaoAbcz ?? r.situacao_abcz ?? r['Situação ABCZ'] ?? r.Status) || null,
       genetica2: normalizarNumero(r.iqg ?? r.genetica_2 ?? r.genetica2 ?? r['IQG'] ?? r['Genética 2']) != null ? String(normalizarNumero(r.iqg ?? r.genetica_2 ?? r.genetica2 ?? r['IQG'] ?? r['Genética 2'])) : null,
-      decile2: normalizarTexto(r.pt_iqg ?? r.decile_2 ?? r.decile2 ?? r['Pt IQG'] ?? r['Pt'] ?? r['PL']) || null,
+      decile2: (() => {
+        const raw = r.pt_iqg ?? r.decile_2 ?? r.decile2 ?? r['Pt IQG'] ?? r['Pt'] ?? r['PL'];
+        const num = normalizarNumero(raw);
+        return num != null ? String(num) : null;
+      })(),
     });
   }
 
@@ -490,11 +504,12 @@ async function processarLinhas(rows, criarNaoEncontrados = false) {
       const flat = updates.flatMap(u =>
         comGenetica2 ? [u.id, u.abczg, u.deca, u.situacaoAbcz, u.genetica2, u.decile2] : [u.id, u.abczg, u.deca, u.situacaoAbcz]
       );
+      const setAbczDeca = 'abczg = CASE WHEN v.abczg IS NOT NULL AND TRIM(v.abczg::text) != \'\' THEN v.abczg::text ELSE NULL END, deca = CASE WHEN v.deca IS NOT NULL AND TRIM(v.deca::text) != \'\' THEN v.deca::text ELSE NULL END';
       const setClause = comGenetica2
         ? (useOldCols
-          ? 'abczg = COALESCE(v.abczg::text, animais.abczg::text), deca = COALESCE(v.deca::text, animais.deca::text), situacao_abcz = CASE WHEN v.situacao_abcz IS NOT NULL AND TRIM(v.situacao_abcz::text) != \'\' THEN v.situacao_abcz::text ELSE NULL END, genetica_2 = COALESCE(NULLIF(TRIM(REPLACE(v.genetica_2::text, \',\', \'.\')), \'\')::numeric, animais.genetica_2), decile_2 = COALESCE(v.decile_2::text, animais.decile_2::text)'
-          : 'abczg = COALESCE(v.abczg::text, animais.abczg::text), deca = COALESCE(v.deca::text, animais.deca::text), situacao_abcz = CASE WHEN v.situacao_abcz IS NOT NULL AND TRIM(v.situacao_abcz::text) != \'\' THEN v.situacao_abcz::text ELSE NULL END, iqg = COALESCE(NULLIF(TRIM(REPLACE(v.iqg::text, \',\', \'.\')), \'\')::numeric, animais.iqg), pt_iqg = COALESCE(NULLIF(TRIM(REPLACE(v.pt_iqg::text, \',\', \'.\')), \'\')::numeric, animais.pt_iqg)')
-        : 'abczg = COALESCE(v.abczg::text, animais.abczg::text), deca = COALESCE(v.deca::text, animais.deca::text), situacao_abcz = CASE WHEN v.situacao_abcz IS NOT NULL AND TRIM(v.situacao_abcz::text) != \'\' THEN v.situacao_abcz::text ELSE NULL END';
+          ? `${setAbczDeca}, situacao_abcz = CASE WHEN v.situacao_abcz IS NOT NULL AND TRIM(v.situacao_abcz::text) != \'\' THEN v.situacao_abcz::text ELSE NULL END, genetica_2 = COALESCE(NULLIF(TRIM(REPLACE(v.genetica_2::text, \',\', \'.\')), \'\')::numeric, animais.genetica_2), decile_2 = COALESCE(v.decile_2::text, animais.decile_2::text)`
+          : `${setAbczDeca}, situacao_abcz = CASE WHEN v.situacao_abcz IS NOT NULL AND TRIM(v.situacao_abcz::text) != \'\' THEN v.situacao_abcz::text ELSE NULL END, iqg = COALESCE(NULLIF(TRIM(REPLACE(v.iqg::text, \',\', \'.\')), \'\')::numeric, animais.iqg), pt_iqg = COALESCE(NULLIF(TRIM(REPLACE(v.pt_iqg::text, \',\', \'.\')), \'\')::numeric, animais.pt_iqg)`)
+        : `${setAbczDeca}, situacao_abcz = CASE WHEN v.situacao_abcz IS NOT NULL AND TRIM(v.situacao_abcz::text) != \'\' THEN v.situacao_abcz::text ELSE NULL END`;
       const vCols = comGenetica2 ? `id, ${cols}` : 'id, abczg, deca, situacao_abcz';
       await query(
         `UPDATE animais SET ${setClause}, updated_at = CURRENT_TIMESTAMP
@@ -539,6 +554,31 @@ async function processarLinhas(rows, criarNaoEncontrados = false) {
           resultados.erros.push({ linha: 0, serie: u.serie, rg: u.rg, erro: colErr.message });
         }
       }
+    }
+  }
+
+  // Limpar iABCZ/DECA de animais da mesma série que NÃO estão na planilha
+  if (limparForaDaLista && dados.length > 0) {
+    try {
+      const seriesNaPlanilha = [...new Set(dados.map(d => (d.serie || '').trim().toUpperCase()).filter(Boolean))];
+      for (const serie of seriesNaPlanilha) {
+        const rgsNaPlanilha = dados.filter(d => (d.serie || '').trim().toUpperCase() === serie).map(d => d.rg);
+        if (rgsNaPlanilha.length === 0) continue;
+        const clearRes = await query(
+          `UPDATE animais SET abczg = NULL, deca = NULL, updated_at = CURRENT_TIMESTAMP
+           WHERE UPPER(TRIM(COALESCE(serie, ''))) = $1
+             AND (abczg IS NOT NULL OR deca IS NOT NULL)
+             AND TRIM(REGEXP_REPLACE(TRIM(rg::text), '^0+', '')) != ALL($2::text[])
+           RETURNING id, serie, rg`,
+          [serie, rgsNaPlanilha]
+        );
+        if (clearRes.rows?.length > 0) {
+          resultados.animaisLimpos += clearRes.rows.length;
+        }
+      }
+    } catch (clearErr) {
+      console.warn('[excel-genetica] Erro ao limpar fora da lista:', clearErr?.message);
+      resultados.erros.push({ linha: 0, serie: '', rg: '', erro: `Limpar fora da lista: ${clearErr?.message}` });
     }
   }
 

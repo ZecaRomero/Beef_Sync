@@ -1231,6 +1231,8 @@ class DatabaseService {
       await query(`ALTER TABLE animais ADD COLUMN IF NOT EXISTS situacao_abcz VARCHAR(100)`)
       await query(`ALTER TABLE animais ADD COLUMN IF NOT EXISTS iqg VARCHAR(50)`)
       await query(`ALTER TABLE animais ADD COLUMN IF NOT EXISTS pt_iqg VARCHAR(50)`)
+      await query(`ALTER TABLE animais ADD COLUMN IF NOT EXISTS abczg VARCHAR(50)`)
+      await query(`ALTER TABLE animais ADD COLUMN IF NOT EXISTS deca VARCHAR(50)`)
     } catch (e) {
       if (!e.message?.includes('already exists')) logger?.warn?.('Migração colunas:', e.message)
     }
