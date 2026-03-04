@@ -13,6 +13,7 @@ import { useContabilidadeLembretes } from '../hooks/useContabilidadeLembretes';
 import NotificacaoContabilidade from './NotificacaoContabilidade';
 
 export default function ContabilidadeLembretes() {
+  const [isDeveloper, setIsDeveloper] = useState(false);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [mostrarNotificacao, setMostrarNotificacao] = useState(false);
   const [lembreteAtivo, setLembreteAtivo] = useState(null);
@@ -25,6 +26,16 @@ export default function ContabilidadeLembretes() {
     gerarRelatorioNascimentos,
     calcularProximoVencimento
   } = useContabilidadeLembretes();
+
+  // Somente para o desenvolvedor Zeca (localhost) — não exibir para usuários externos nem mobile
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const hostname = window.location.hostname;
+    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      || window.innerWidth < 768;
+    setIsDeveloper(isLocalhost && !isMobile);
+  }, []);
 
   useEffect(() => {
     // Verificar se há lembretes pendentes para mostrar notificação
@@ -63,6 +74,9 @@ export default function ContabilidadeLembretes() {
         break;
     }
   };
+
+  // Bloquear para não-desenvolvedor (usuário externo ou mobile)
+  if (!isDeveloper) return null;
 
   return (
     <>
