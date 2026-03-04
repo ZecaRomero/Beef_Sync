@@ -3,10 +3,11 @@ import Link from 'next/link'
 import { UserGroupIcon, ChevronDownIcon, ChevronUpIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline'
 import { formatDate, calcularMesesIdade } from '../../utils/formatters'
 
-export default function AnimalOffspring({ filhos }) {
+export default function AnimalOffspring({ animal, filhos }) {
+  const listaFilhos = filhos || animal?.filhos || []
   const [isExpanded, setIsExpanded] = useState(true)
 
-  if (!filhos || filhos.length === 0) return null
+  if (!listaFilhos || listaFilhos.length === 0) return null
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -23,12 +24,12 @@ export default function AnimalOffspring({ filhos }) {
           {isExpanded ? <ChevronUpIcon className="h-5 w-5" /> : <ChevronDownIcon className="h-5 w-5" />}
         </div>
         <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
-          {filhos.length} filho(s) registrado(s)
+          {listaFilhos.length} filho(s) registrado(s)
         </p>
       </button>
       <div className={`overflow-hidden transition-all ${isExpanded ? 'max-h-[999px]' : 'max-h-0'}`}>
         <div className="divide-y divide-gray-100 dark:divide-gray-700">
-          {filhos.map((f, i) => {
+          {listaFilhos.map((f, i) => {
             const identificacao = `${f.nome || f.serie || '-'} ${f.rg || ''}`.trim()
             const mesesFilho = calcularMesesIdade(f.data_nascimento, f.meses)
             

@@ -1,7 +1,10 @@
 import React, { useState } from 'react'
 import { PhotoIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline'
 
-export default function AnimalPhotos({ fotos, fotoPrincipal, nomeAnimal }) {
+export default function AnimalPhotos({ animal }) {
+  const fotos = animal?.fotos || []
+  const fotoPrincipal = animal?.foto_principal || animal?.fotoPrincipal
+  const nomeAnimal = animal?.nome || `${animal?.serie || ''} ${animal?.rg || ''}`.trim()
   const [isExpanded, setIsExpanded] = useState(true)
 
   // Combinar foto principal com lista de fotos

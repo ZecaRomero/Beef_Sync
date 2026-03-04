@@ -1,4 +1,9 @@
-/**
+const fs = require('fs');
+const path = require('path');
+
+const filePath = path.join(__dirname, 'pages', 'consulta-animal', '[id].jsx');
+
+const newContent = `/**
  * Ficha do Animal - Modo Consulta (somente leitura)
  * Usado quando o usuário acessa via /a - sem edição, sem sidebar
  * Inclui: machos = exames andrológicos | fêmeas = FIV, inseminações, gestações
@@ -47,18 +52,22 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
     setAnimal,
     loading,
     error,
-    rankings,
+    rankings: {
+      posicaoIABCZ: rankingPosicao,
+      posicaoIQG: rankingPosicaoGenetica2,
+      filhoTopIABCZ: filhoTopRanking,
+      filhoTopIQG: filhoTopRankingIQG
+    },
     maeLink,
     examesAndrologicos,
+    setExamesAndrologicos,
     ocorrencias,
     transferencias,
     inseminacoes,
     metrics
   } = useAnimalDetails(id)
 
-  const { posicaoIABCZ: rankingPosicao, posicaoIQG: rankingPosicaoGenetica2, filhoTopIABCZ: filhoTopRanking } = rankings
-
-  const [, setShowIABCZInfo] = useState(false)
+  const [showIABCZInfo, setShowIABCZInfo] = useState(false)
   const [isEditGeneticaModalOpen, setIsEditGeneticaModalOpen] = useState(false)
 
   const handleSaveGenetica = useCallback((updatedAnimal) => {
@@ -66,14 +75,13 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
     setIsEditGeneticaModalOpen(false)
   }, [setAnimal])
 
-  const [copiedIdent, setCopiedIdent] = useState(false)
   const handleCopyIdent = useCallback(() => {
-    const t = `${animal?.serie || ''} ${animal?.rg || ''}`.trim()
+    const t = \`\${animal?.serie || ''} \${animal?.rg || ''}\`.trim()
     if (!t) return
     if (navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(t)
-        .then(() => { setCopiedIdent(true); setTimeout(() => setCopiedIdent(false), 2000) })
-        .catch(() => {})
+      navigator.clipboard.writeText(t).then(() => {
+        alert('Identificação copiada')
+      }).catch(() => {})
     }
   }, [animal?.serie, animal?.rg])
 
@@ -84,18 +92,18 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
     const locBruto = locAtiva?.piquete || locMaisRecente?.piquete || animal.piquete_atual || animal.piqueteAtual || animal.localizacao_atual
     const locFiltrada = localizacaoValidaParaExibir(locBruto) || (locBruto ? 'Não informado' : null)
     const texto = [
-      `Animal: ${animal.nome || `${animal.serie || ''} ${animal.rg || ''}`.trim() || '-'}`,
-      `Identificação: ${animal.serie || '-'} ${animal.rg || '-'}`,
-      animal.sexo ? `Sexo: ${animal.sexo}` : null,
-      animal.raca ? `Raça: ${animal.raca}` : null,
-      metrics.mesesIdade ? `Idade: ${metrics.mesesIdade} meses` : null,
-      animal.peso ? `Peso: ${animal.peso} kg` : null,
-      (animal.abczg || animal.abczg === 0) ? `iABCZ: ${animal.abczg}${filhoTopRanking ? ' • Mãe do 1º do ranking' : rankingPosicao ? ` • ${rankingPosicao}º no ranking` : ''}` : null,
-      ((animal.iqg ?? animal.genetica_2) || (animal.iqg ?? animal.genetica_2) === 0) ? `IQG: ${(animal.iqg ?? animal.genetica_2)}${rankingPosicaoGenetica2 ? ` • ${rankingPosicaoGenetica2}º no ranking` : ''}` : null,
-      ((animal.pt_iqg ?? animal.decile_2) || (animal.pt_iqg ?? animal.decile_2) === 0) ? `Pt IQG: ${(animal.pt_iqg ?? animal.decile_2)}` : null,
-      locFiltrada ? `Localização: ${locFiltrada}` : null
-    ].filter(Boolean).join('\n')
-    const url = `https://wa.me/?text=${encodeURIComponent(texto)}`
+      \`Animal: \${animal.nome || \`\${animal.serie || ''} \${animal.rg || ''}\`.trim() || '-'}\`,
+      \`Identificação: \${animal.serie || '-'} \${animal.rg || '-'}\`,
+      animal.sexo ? \`Sexo: \${animal.sexo}\` : null,
+      animal.raca ? \`Raça: \${animal.raca}\` : null,
+      metrics.mesesIdade ? \`Idade: \${metrics.mesesIdade} meses\` : null,
+      animal.peso ? \`Peso: \${animal.peso} kg\` : null,
+      (animal.abczg || animal.abczg === 0) ? \`iABCZ: \${animal.abczg}\${filhoTopRanking ? ' • Mãe do 1º do ranking' : rankingPosicao ? \` • \${rankingPosicao}º no ranking\` : ''}\` : null,
+      ((animal.iqg ?? animal.genetica_2) || (animal.iqg ?? animal.genetica_2) === 0) ? \`IQG: \${(animal.iqg ?? animal.genetica_2)}\${rankingPosicaoGenetica2 ? \` • \${rankingPosicaoGenetica2}º no ranking\` : ''}\` : null,
+      ((animal.pt_iqg ?? animal.decile_2) || (animal.pt_iqg ?? animal.decile_2) === 0) ? \`Pt IQG: \${(animal.pt_iqg ?? animal.decile_2)}\` : null,
+      locFiltrada ? \`Localização: \${locFiltrada}\` : null
+    ].filter(Boolean).join('\\n')
+    const url = \`https://wa.me/?text=\${encodeURIComponent(texto)}\`
     window.open(url, '_blank')
   }, [animal, metrics, rankingPosicao, rankingPosicaoGenetica2, filhoTopRanking])
 
@@ -123,12 +131,12 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
       animal.raca,
       animal.pelagem,
       animal.categoria,
-      locAtual ? `📍 ${locAtual}` : null,
-      animal.brinco ? `🏷️ ${animal.brinco}` : null
+      locAtual ? \`📍 \${locAtual}\` : null,
+      animal.brinco ? \`🏷️ \${animal.brinco}\` : null
     ].filter(Boolean)
   }, [animal, locAtual])
 
-  const nome = animal ? (animal.nome || `${animal.serie || ''} ${animal.rg || ''}`.trim() || '-') : '-'
+  const nome = animal ? (animal.nome || \`\${animal.serie || ''} \${animal.rg || ''}\`.trim() || '-') : '-'
 
   if (loading) {
     return (
@@ -179,21 +187,35 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
           animal={animal}
           resumoChips={resumoChips}
           setShowIABCZInfo={setShowIABCZInfo}
-          rankings={rankings}
+          rankings={{
+            posicaoIABCZ: rankingPosicao,
+            posicaoIQG: rankingPosicaoGenetica2,
+            filhoTopIABCZ: filhoTopRanking,
+            filhoTopIQG: filhoTopRankingIQG
+          }}
         />
 
         <div className="max-w-lg mx-auto p-4 space-y-4">
-          <AnimalMetricsCards animal={animal} metrics={metrics} rankings={rankings} />
+          <AnimalMetricsCards animal={animal} metrics={metrics} rankings={{
+            posicaoIABCZ: rankingPosicao,
+            posicaoIQG: rankingPosicaoGenetica2,
+            filhoTopIABCZ: filhoTopRanking,
+            filhoTopIQG: filhoTopRankingIQG
+          }} />
 
           <AnimalMainInfo
             animal={animal}
-            rankings={rankings}
-            metrics={{...metrics, locAtual, previsaoPartoExibir: metrics.previsaoParto}}
+            rankings={{
+              posicaoIABCZ: rankingPosicao,
+              posicaoIQG: rankingPosicaoGenetica2,
+              filhoTopIABCZ: filhoTopRanking,
+              filhoTopIQG: filhoTopRankingIQG
+            }}
+            metrics={{...metrics, locAtual}}
             examesAndrologicos={examesAndrologicos}
             ultimaIA={metrics.ultimaIA}
             totalOocitos={metrics.totalOocitos}
             onCopyIdent={handleCopyIdent}
-            copiedIdent={copiedIdent}
             onWhatsAppShare={handleWhatsAppShare}
             onEditGenetica={() => setIsEditGeneticaModalOpen(true)}
             maeLink={maeLink}
@@ -202,7 +224,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
 
           <AnimalPlanningCards animal={animal} metrics={metrics} />
 
-          <AnimalAndrologicalExams examesAndrologicos={examesAndrologicos} metrics={metrics} />
+          <AnimalAndrologicalExams examesAndrologicos={examesAndrologicos} />
           
           <AnimalGestations gestacoes={animal.gestacoes || []} />
           
@@ -210,16 +232,11 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
 
           <AnimalReproduction animal={animal} />
           
-          <AnimalIVFCollections fivs={animal.fivs || []} />
+          <AnimalIVFCollections animal={animal} totalOocitos={metrics.totalOocitos} mediaOocitos={metrics.mediaOocitos} />
           
           <AnimalEmbryoTransfers transferencias={transferencias} />
 
-          <AnimalTimeline
-            animal={animal}
-            ocorrencias={ocorrencias}
-            inseminacoes={inseminacoes}
-            transferencias={transferencias}
-          />
+          <AnimalTimeline animal={animal} />
 
           <AnimalLocation animal={animal} locAtual={locAtual} diasNaFazenda={metrics.diasNaFazenda} />
 
@@ -243,8 +260,9 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
         </div>
 
         <AnimalFixedActions 
-          onShare={handleWhatsAppShare}
-          isSharing={false}
+          animal={animal} 
+          onWhatsAppShare={handleWhatsAppShare}
+          onCopyIdent={handleCopyIdent}
         />
 
         {isEditGeneticaModalOpen && (
@@ -259,3 +277,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
     </React.Fragment>
   )
 }
+`;
+
+fs.writeFileSync(filePath, newContent, 'utf8');
+console.log('File rewritten successfully');

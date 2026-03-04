@@ -2,7 +2,8 @@ import React from 'react'
 import Link from 'next/link'
 import { ArrowLeftIcon, ChartBarIcon, DocumentTextIcon } from '@heroicons/react/24/outline'
 
-export default function AnimalFixedActions({ onShare, isSharing }) {
+export default function AnimalFixedActions({ onShare, onWhatsAppShare, isSharing }) {
+  const handleShare = onShare || onWhatsAppShare
   return (
     <div className="fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-10">
       <div className="max-w-lg mx-auto grid grid-cols-3 gap-2">
@@ -22,7 +23,7 @@ export default function AnimalFixedActions({ onShare, isSharing }) {
         </Link>
         <button
           type="button"
-          onClick={onShare}
+          onClick={handleShare}
           disabled={isSharing}
           className="flex items-center justify-center gap-1 py-4 rounded-xl bg-blue-600 dark:bg-blue-500 text-white font-semibold text-sm hover:bg-blue-700 dark:hover:bg-blue-600 active:scale-[0.98] transition-transform disabled:opacity-60 disabled:cursor-not-allowed"
         >

@@ -1,8 +1,84 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { ClockIcon } from '@heroicons/react/24/outline'
 import { formatDate } from '../../utils/formatters'
 
-export default function AnimalTimeline({ timeline }) {
+export default function AnimalTimeline({ animal, ocorrencias = [], inseminacoes = [], transferencias = [] }) {
+  const timeline = useMemo(() => {
+    if (!animal) return []
+    const events = []
+
+    // Pesagens
+    if (animal.pesagens?.length) {
+      animal.pesagens.forEach(p => {
+        events.push({
+          data: p.data_pesagem,
+          tipo: 'Peso',
+          label: `Pesagem: ${p.peso} kg`
+        })
+      })
+    }
+
+    // Ocorrências
+    if (ocorrencias?.length) {
+      ocorrencias.forEach(o => {
+        events.push({
+          data: o.data_ocorrencia,
+          tipo: 'Ocorrência',
+          label: `${o.tipo_ocorrencia}${o.observacao ? `: ${o.observacao}` : ''}`
+        })
+      })
+    }
+    
+    // Inseminações
+    if (inseminacoes?.length) {
+      inseminacoes.forEach(i => {
+        events.push({
+          data: i.data_ia || i.data,
+          tipo: 'IA',
+          label: `Inseminação (${i.touro || 'Touro n/i'})`
+        })
+      })
+    }
+
+    // Transferências (Receptora)
+    if (transferencias?.length) {
+      transferencias.forEach(t => {
+        events.push({
+          data: t.data_transferencia || t.data,
+          tipo: 'TE',
+          label: `Transferência (${t.embriao || 'Embrião n/i'})`
+        })
+      })
+    }
+    
+    // FIVs (Doadora)
+    if (animal.fivs?.length) {
+      animal.fivs.forEach(f => {
+        events.push({
+          data: f.data_fiv || f.data,
+          tipo: 'FIV',
+          label: `Coleta FIV (${f.quantidade_oocitos || 0} oócitos)`
+        })
+      })
+    }
+    
+    // Localizações (Entrada)
+    if (animal.localizacoes?.length) {
+      animal.localizacoes.forEach(l => {
+        if (l.data_entrada) {
+          events.push({
+            data: l.data_entrada,
+            tipo: 'Localização',
+            label: `Entrada em ${l.piquete || 'Local n/i'}`
+          })
+        }
+      })
+    }
+
+    // Ordenar por data decrescente
+    return events.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0))
+  }, [animal, ocorrencias, inseminacoes, transferencias])
+
   if (!timeline || timeline.length === 0) return null
 
   return (
@@ -16,7 +92,7 @@ export default function AnimalTimeline({ timeline }) {
           Eventos recentes em ordem cronológica
         </p>
       </div>
-      <div className="divide-y divide-gray-100 dark:divide-gray-700">
+      <div className="divide-y divide-gray-100 dark:divide-gray-700 max-h-[400px] overflow-y-auto">
         {timeline.map((e, i) => (
           <div key={i} className="px-4 py-3 flex justify-between items-center gap-3">
             <div className="flex items-center gap-2 min-w-0">
@@ -24,6 +100,7 @@ export default function AnimalTimeline({ timeline }) {
                 e.tipo === 'IA' ? 'bg-pink-100 text-pink-700 dark:bg-pink-900/40' :
                 e.tipo === 'FIV' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40' :
                 e.tipo === 'Peso' ? 'bg-slate-100 text-slate-700 dark:bg-slate-700' :
+                e.tipo === 'Ocorrência' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40' :
                 'bg-blue-100 text-blue-700 dark:bg-blue-900/40'
               }`}>
                 {e.tipo.charAt(0)}

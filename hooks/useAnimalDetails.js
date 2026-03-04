@@ -301,7 +301,7 @@ export function useAnimalDetails(id) {
       custoTotal, custosArray,
       temBrucelose, elegivelBrucelose, precisaBrucelose, elegivelDGT,
       isPrenha, diasGestacao, previsaoParto, diasParaParto, gestacaoProgress,
-      totalIAs, taxaSucessoIA, mediaOocitos,
+      totalIAs, taxaSucessoIA, totalOocitos, mediaOocitos,
       evolucaoPeso,
       ultimoCE,
       ultExame, diasDesdeExame, isInapto, diasParaProximoExame
