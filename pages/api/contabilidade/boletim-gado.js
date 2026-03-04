@@ -1,6 +1,6 @@
-import ExcelJS from 'exceljs'
+﻿import ExcelJS from 'exceljs'
 import databaseService from '../../../services/databaseService'
-import { racasPorSerie } from '../../../services/mockData'
+import { RACAS_POR_SERIE as racasPorSerie } from '../../../utils/constants'
 
 // Função para corrigir raça baseada na série
 function corrigirRacaPorSerie(animal) {

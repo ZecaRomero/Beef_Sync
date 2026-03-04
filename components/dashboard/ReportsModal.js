@@ -1,7 +1,6 @@
-
+﻿
 import React, { useState } from 'react'
 
-import { mockAnimals } from '../../services/mockData'
 
 export default function ReportsModal({ reportType, onClose, timeRange }) {
   const [selectedTab, setSelectedTab] = useState('overview')

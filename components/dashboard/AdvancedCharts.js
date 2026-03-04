@@ -1,7 +1,6 @@
-
+﻿
 import React, { useState } from 'react'
 
-import { mockAnimals } from '../../services/mockData'
 
 export default function AdvancedCharts({ timeRange }) {
   const [selectedChart, setSelectedChart] = useState('costs')

@@ -156,33 +156,13 @@ export default function InseminacaoArtificial() {
   const loadInseminacoes = async () => {
     try {
       setIsLoading(true)
-      // Tentar carregar do banco de dados primeiro
       const response = await fetch('/api/inseminacoes')
-      if (response.ok) {
-        const data = await response.json()
-        setInseminacoes(data.data || [])
-      } else {
-        // Fallback para localStorage
-        if (typeof window !== 'undefined') {
-          const savedData = localStorage.getItem('inseminacoes')
-          if (savedData) {
-            setInseminacoes(JSON.parse(savedData))
-          } else {
-            setInseminacoes([])
-          }
-        }
-      }
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+      const data = await response.json()
+      setInseminacoes(data.data || [])
     } catch (error) {
-      console.error('Erro ao carregar dados:', error)
-      // Fallback para localStorage
-      if (typeof window !== 'undefined') {
-        const savedData = localStorage.getItem('inseminacoes')
-        if (savedData) {
-          setInseminacoes(JSON.parse(savedData))
-        } else {
-          setInseminacoes([])
-        }
-      }
+      console.error('Erro ao carregar inseminações:', error)
+      setInseminacoes([])
     } finally {
       setIsLoading(false)
     }

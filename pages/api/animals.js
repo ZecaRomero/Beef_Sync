@@ -1,8 +1,8 @@
-import databaseService from '../../services/databaseService'
+﻿import databaseService from '../../services/databaseService'
 import { logger } from '../../utils/logger'
 import boletimContabilService from '../../services/boletimContabilService'
 import { broadcast } from '../../lib/sseClients'
-import { racasPorSerie } from '../../services/mockData'
+import { RACAS_POR_SERIE as racasPorSerie } from '../../utils/constants'
 import { 
   sendSuccess, 
   sendError, 

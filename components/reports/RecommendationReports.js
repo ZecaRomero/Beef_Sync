@@ -1,7 +1,6 @@
-
+﻿
 import React, { useEffect, useState } from 'react'
 
-import { mockAnimals } from '../../services/mockData'
 
 export default function RecommendationReports() {
   const [selectedRecommendation, setSelectedRecommendation] = useState('all')

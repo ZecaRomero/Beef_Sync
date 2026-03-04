@@ -11,7 +11,7 @@ import {
   sendForbidden
 } from '../../../utils/apiResponse'
 import { canDelete } from '../../../utils/permissions'
-import { racasPorSerie } from '../../../services/mockData'
+import { RACAS_POR_SERIE as racasPorSerie } from '../../../utils/constants'
 
 // Função para criar nota fiscal de saída automaticamente
 async function criarNotaFiscalSaidaAutomatica(animal) {

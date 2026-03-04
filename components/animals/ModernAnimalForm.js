@@ -5,6 +5,7 @@ import Modal from '../ui/Modal'
 import Input from '../ui/Input'
 import Button from '../ui/Button'
 import AnimalImporter from '../AnimalImporter'
+import { SITUACOES_ANIMAL as SITUACOES } from '../../utils/constants'
 
 const SERIES_OPTIONS = [
   { value: 'RPT', label: 'RPT - Receptora', raca: 'Receptora' },
@@ -14,7 +15,6 @@ const SERIES_OPTIONS = [
   { value: 'PA', label: 'PA - Nelore PA', raca: 'Nelore PA' }
 ]
 
-const SITUACOES = ['Ativo', 'Vendido', 'Morto', 'Doado']
 
 export default function ModernAnimalForm({ 
   isOpen, 

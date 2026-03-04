@@ -1,7 +1,6 @@
-
+﻿
 import React, { useState } from 'react'
 
-import { mockAnimals } from '../../services/mockData'
 
 export default function MetricsCards({ timeRange, onReportClick }) {
   const [hoveredCard, setHoveredCard] = useState(null)

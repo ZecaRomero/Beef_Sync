@@ -1,5 +1,6 @@
 import React from 'react';
 import ReceptoraOrigemManager from './ReceptoraOrigemManager';
+import { SITUACOES_ANIMAL as SITUACOES } from '../../utils/constants';
 
 export default function CharacteristicsSection({ 
   formData, 
@@ -7,7 +8,6 @@ export default function CharacteristicsSection({
   handleDateChange, 
   errors 
 }) {
-  const SITUACOES = ['Ativo', 'Vendido', 'Morto', 'Doado'];
 
   return (
     <div className="space-y-4">

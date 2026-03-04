@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 
 ;
 import { MarketAPI } from "../services/marketAPI";
-import { mockAnimals } from "../services/mockData";
 
 export default function PriceComparison() {
   const [marketPrices, setMarketPrices] = useState(null);
@@ -46,8 +45,8 @@ export default function PriceComparison() {
 
   const calculateComparison = (market, regional) => {
     // Analisar animais do rebanho
-    const activeAnimals = mockAnimals.filter((a) => a.situacao === "Ativo");
-    const soldAnimals = mockAnimals.filter((a) => a.situacao === "Vendido");
+    const activeAnimals = [];
+    const soldAnimals = [];
 
     // Estimar peso médio por idade (simulado)
     const estimateWeight = (months, sex) => {

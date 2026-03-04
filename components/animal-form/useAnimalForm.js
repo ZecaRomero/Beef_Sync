@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import costManager from '../../services/costManager';
 import animalDataManager from '../../services/animalDataManager';
-import { racasPorSerie } from '../../services/mockData';
+import { RACAS_POR_SERIE as racasPorSerie } from '../../utils/constants';
 import { fetchAvailableLocations } from '../../utils/piqueteUtils';
 
 export default function useAnimalForm(animal, isOpen, onClose, onSave) {

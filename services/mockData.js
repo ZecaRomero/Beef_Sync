@@ -1,115 +1,35 @@
 /**
  * CONFIGURAÇÕES E DADOS ESTÁTICOS DO SISTEMA
  * 
- * ⚠️ ATENÇÃO: Este arquivo NÃO contém dados mock de animais!
- * Todos os dados de animais, nascimentos, custos e estoque são armazenados no PostgreSQL.
- * 
- * Este arquivo contém apenas:
- * - Configurações estáticas do sistema
- * - Listas de opções para formulários
- * - Tabelas de referência de preços e custos
- * - Calculadoras auxiliares
- * 
- * Sistema 100% integrado com PostgreSQL desde Janeiro 2025.
+ * ⚠️ ATENÇÃO: Este arquivo importa de utils/constants.js (fonte única de verdade).
+ * Adicione novas constantes lá, não aqui.
+ * Os re-exports abaixo existem apenas para retrocompatibilidade.
  */
+import {
+  RACAS_POR_SERIE,
+  TIPOS_CUSTO,
+  SUBTIPOS_CUSTO,
+  SITUACOES_ANIMAL,
+} from '../utils/constants'
 
 // ============================================================================
-// DADOS ESTÁTICOS E CONFIGURAÇÕES
+// RE-EXPORTS DE COMPATIBILIDADE
 // ============================================================================
 
-export const mockAnimals = [] // Deprecated - mantido apenas para compatibilidade
+/** @deprecated use RACAS_POR_SERIE de utils/constants.js */
+export const racasPorSerie = RACAS_POR_SERIE
 
-export const racasPorSerie = {
-  'RPT': 'Receptora',
-  'BENT': 'Brahman',
-  'JDHF': 'Brahman',
-  'CJCJ': 'Nelore',
-  'CJCG': 'Gir',
-  'PDJG': 'Gir',
-  'FELG': 'Gir',
-  'FFAL': 'Gir',
-  'CJCS': 'Nelore', // Confirmar se CJCS também é Nelore
-  'PA': 'Nelore PA'
-}
+/** @deprecated Array vazio — dados vêm do PostgreSQL */
+export const mockAnimals = []
 
-export const tiposCusto = [
-  'Aquisição',
-  'Nascimento', 
-  'Alimentação',
-  'DNA',
-  'Medicamentos',
-  'Veterinários',
-  'Mão de Obra Proporcional',
-  'Frete / Transporte',
-  'Manejo',
-  'Infraestrutura',
-  'Reprodução',
-  'Saída',
-  'Outros'
-]
+/** @deprecated use TIPOS_CUSTO de utils/constants.js */
+export const tiposCusto = TIPOS_CUSTO
 
-export const subtiposCusto = {
-  'Alimentação': [
-    'Ração Concentrada', 
-    'Ração Creep Feeding', 
-    'Silagem', 
-    'Sal Mineral', 
-    'Sal Proteinado',
-    'Suplemento Vitamínico',
-    'Pastagem (Sementes)',
-    'Feno'
-  ],
-  'DNA': [
-    'Paternidade', 
-    'Genômica',
-    'Teste de Parentesco',
-    'Análise Genética Completa'
-  ],
-  'Medicamentos': [
-    'Vacinas Obrigatórias',
-    'Vacinas Opcionais', 
-    'Vermífugos',
-    'Antibióticos',
-    'Anti-inflamatórios',
-    'Vitaminas e Minerais',
-    'Carrapaticidas',
-    'Brincos e Identificação',
-    'Outros Preventivos'
-  ],
-  'Veterinários': [
-    'T.E Embrião', 
-    'Andrológico', 
-    'Diagnóstico de Prenhez',
-    'Inseminação Artificial',
-    'Consulta Veterinária',
-    'Cirurgias',
-    'Exames Laboratoriais',
-    'Ultrassonografia'
-  ],
-  'Manejo': [
-    'Castração',
-    'Descorna',
-    'Marcação/Tatuagem',
-    'Pesagem',
-    'Apartação',
-    'Embarque/Desembarque'
-  ],
-  'Infraestrutura': [
-    'Cercas e Divisões',
-    'Bebedouros',
-    'Cochos',
-    'Currais',
-    'Mangueiras',
-    'Balança'
-  ],
-  'Reprodução': [
-    'Sêmen',
-    'Embriões',
-    'Sincronização',
-    'Hormônios',
-    'Material Descartável IA'
-  ]
-}
+/** @deprecated use SUBTIPOS_CUSTO de utils/constants.js */
+export const subtiposCusto = SUBTIPOS_CUSTO
+
+/** @deprecated use SITUACOES_ANIMAL de utils/constants.js */
+export const situacoes = SITUACOES_ANIMAL
 
 // Custos sugeridos por ERA (idade em meses)
 export const custosPorERA = {
@@ -321,8 +241,6 @@ export const calculadoras = {
     return (custoTotal / pesoAtual).toFixed(2)
   }
 }
-
-export const situacoes = ['Ativo', 'Morto', 'Doado']
 
 // Sistema integrado com PostgreSQL - dados vêm da API
 export const usuarios = []

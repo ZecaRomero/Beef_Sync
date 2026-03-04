@@ -1,7 +1,7 @@
-import { Chart, registerables } from 'chart.js'
+﻿import { Chart, registerables } from 'chart.js'
 import { ChartJSNodeCanvas } from 'chartjs-node-canvas'
 import databaseService from '../../../services/databaseService'
-import { racasPorSerie } from '../../../services/mockData'
+import { RACAS_POR_SERIE as racasPorSerie } from '../../../utils/constants'
 
 // Função para corrigir raça baseada na série
 function corrigirRacaPorSerie(animal) {

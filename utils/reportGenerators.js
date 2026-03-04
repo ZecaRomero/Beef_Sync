@@ -1,10 +1,10 @@
-// Funções auxiliares para gerar relatórios diretamente (sem HTTP)
+﻿// Funções auxiliares para gerar relatórios diretamente (sem HTTP)
 // Estas funções podem ser chamadas diretamente de outras APIs
 
 import ExcelJS from 'exceljs'
 import databaseService from '../services/databaseService'
 import { query } from '../lib/database'
-import { racasPorSerie } from '../services/mockData'
+import { RACAS_POR_SERIE as racasPorSerie } from './constants'
 
 // Função para corrigir raça baseada na série
 function corrigirRacaPorSerie(animal) {

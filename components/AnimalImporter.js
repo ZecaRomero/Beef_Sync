@@ -7,7 +7,7 @@ import {
 } from "@heroicons/react/24/outline";
 import logger from "../utils/logger";
 import { fetchAvailableLocations } from '../utils/piqueteUtils';
-import { racasPorSerie } from "../services/mockData";
+import { RACAS_POR_SERIE as racasPorSerie } from "../utils/constants";
 
 export default function AnimalImporter({ isOpen, onClose, onImport }) {
   const [importData, setImportData] = useState("");

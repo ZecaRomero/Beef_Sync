@@ -1,5 +1,5 @@
-import { query } from '../../../lib/database'
-import { racasPorSerie } from '../../../services/mockData'
+﻿import { query } from '../../../lib/database'
+import { RACAS_POR_SERIE as racasPorSerie } from '../../../utils/constants'
 import databaseService from '../../../services/databaseService'
 
 // Função para corrigir raça baseada na série (igual ao boletim)

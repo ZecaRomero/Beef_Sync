@@ -27,16 +27,7 @@ import {
   XMarkIcon,
 } from "../components/ui/Icons";
 
-const situacoes = [
-  "Ativo",
-  "Vendido",
-  "Morto",
-  "Transferido",
-  "Gestante",
-  "Lactante",
-  "Desmamado",
-  "Em Observação",
-];
+import { SITUACOES_ANIMAL as situacoes } from '../utils/constants'
 
 export default function Animals() {
   const router = useRouter();
@@ -87,105 +78,16 @@ export default function Animals() {
   const loadAnimals = async () => {
     try {
       setLoading(true)
-      
-      // Primeiro tentar carregar da API
-      try {
-        console.log('🔄 Fazendo requisição para /api/animals...')
-        const response = await fetch('/api/animals?orderBy=created_at')
-        console.log('📡 Status da resposta:', response.status, response.ok)
-        
-        if (response.ok) {
-          const result = await response.json()
-          console.log('🔍 Resposta completa da API:', result)
-          console.log('🔍 Tipo da resposta:', typeof result)
-          console.log('🔍 result.success:', result.success)
-          console.log('🔍 result.data:', result.data)
-          console.log('🔍 Array.isArray(result.data):', Array.isArray(result.data))
-          
-          // A API retorna { success: true, data: [...] }
-          let animalsData = [];
-          
-          if (result.success && result.data) {
-            animalsData = Array.isArray(result.data) ? result.data : []
-          } else if (Array.isArray(result)) {
-            // Fallback se a API retornar array diretamente
-            animalsData = result
-          } else if (Array.isArray(result.data)) {
-            animalsData = result.data
-          } else {
-            console.log('⚠️ Estrutura de resposta inesperada:', result)
-            animalsData = []
-          }
-          
-          console.log('✅ Processando animais da API:', animalsData.length, 'animais')
-          if (animalsData.length > 0) {
-            console.log('🐄 Primeiro animal:', animalsData[0])
-            console.log('🐄 Último animal:', animalsData[animalsData.length - 1])
-          }
-          
-          setAnimals(animalsData)
-          console.log('✅ Estado atualizado com', animalsData.length, 'animais')
-          
-          return
-        } else {
-          const errorText = await response.text()
-          console.log('⚠️ API retornou erro HTTP:', response.status, response.statusText, errorText)
-        }
-      } catch (apiError) {
-        console.error('❌ Erro ao conectar com API:', apiError)
-      }
-      
-      // Fallback para localStorage
-      const localStorageAnimals = JSON.parse(localStorage.getItem('animals') || '[]')
-      console.log('🔍 Verificando localStorage:', localStorageAnimals.length, 'animais')
-      
-      if (localStorageAnimals.length > 0) {
-        setAnimals(localStorageAnimals)
-        console.log('✅ Animais carregados do localStorage:', localStorageAnimals.length)
-        
-        // Tentar sincronizar com API em background
-        syncToAPI(localStorageAnimals)
-      } else {
-        setAnimals([])
-        console.log('⚠️ Nenhum animal encontrado em nenhuma fonte')
-      }
-      
+      const response = await fetch('/api/animals?orderBy=created_at')
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+      const result = await response.json()
+      const animalsData = Array.isArray(result.data) ? result.data : Array.isArray(result) ? result : []
+      setAnimals(animalsData)
     } catch (error) {
-      console.error('❌ Erro geral ao carregar animais:', error)
+      console.error('Erro ao carregar animais:', error)
       setAnimals([])
-      alert('❌ Erro ao carregar animais do banco de dados. Verifique o console para mais detalhes.')
     } finally {
       setLoading(false)
-      console.log('🏁 loadAnimals finalizado. Estado final dos animais:', animals.length)
-    }
-  }
-
-  // Função para sincronizar dados do localStorage com API
-  const syncToAPI = async (localStorageAnimals) => {
-    try {
-      console.log('🔄 Iniciando sincronização com API...')
-      
-      for (const animal of localStorageAnimals) {
-        try {
-          const response = await fetch('/api/animals', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(animal)
-          })
-          
-          if (response.ok) {
-            console.log('✅ Animal sincronizado:', animal.serie, animal.rg)
-          } else {
-            console.log('⚠️ Erro ao sincronizar:', animal.serie, animal.rg, response.status)
-          }
-        } catch (error) {
-          console.error('❌ Erro ao sincronizar animal:', animal.serie, animal.rg, error)
-        }
-      }
-      
-      console.log('✅ Sincronização concluída')
-    } catch (error) {
-      console.error('❌ Erro na sincronização:', error)
     }
   }
 
@@ -485,13 +387,6 @@ export default function Animals() {
       // Form já salvou via animalDataManager - atualizar estado e recarregar lista
       const savedId = animalData?.id ?? selectedAnimal?.id
       if (savedId) {
-        const updatedAnimals = selectedAnimal
-          ? animals.map(a => a.id === savedId ? { ...a, ...animalData, id: savedId } : a)
-          : [...animals, { ...animalData, id: savedId }]
-        setAnimals(updatedAnimals)
-        if (typeof localStorage !== 'undefined') {
-          localStorage.setItem('animals', JSON.stringify(updatedAnimals))
-        }
         setSelectedAnimal(null)
         setShowForm(false)
         await loadAnimals()
@@ -499,83 +394,33 @@ export default function Animals() {
       }
 
       if (selectedAnimal) {
-        // Editar animal existente - persistir na API PostgreSQL
-        try {
-          const response = await fetch(`/api/animals/${selectedAnimal.id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(animalData),
-          })
-          if (!response.ok) {
-            const err = await response.json()
-            throw new Error(err.message || 'Erro ao atualizar animal')
-          }
-          const savedAnimal = await response.json()
-          const data = savedAnimal.data || savedAnimal
-          const updatedAnimals = animals.map(animal =>
-            animal.id === selectedAnimal.id ? { ...animal, ...data } : animal
-          )
-          setAnimals(updatedAnimals)
-          if (typeof localStorage !== 'undefined') {
-            localStorage.setItem('animals', JSON.stringify(updatedAnimals))
-          }
-          alert('✅ Animal atualizado com sucesso!')
-        } catch (apiError) {
-          console.error('Erro ao atualizar na API:', apiError)
-          // Fallback: atualizar só localmente
-          const updatedAnimals = animals.map(animal =>
-            animal.id === selectedAnimal.id ? { ...animal, ...animalData } : animal
-          )
-          setAnimals(updatedAnimals)
-          if (typeof localStorage !== 'undefined') {
-            localStorage.setItem('animals', JSON.stringify(updatedAnimals))
-          }
-          alert('⚠️ Animal atualizado localmente (API indisponível)')
+        const response = await fetch(`/api/animals/${selectedAnimal.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(animalData),
+        })
+        if (!response.ok) {
+          const err = await response.json()
+          throw new Error(err.message || 'Erro ao atualizar animal')
         }
+        const savedAnimal = await response.json()
+        const data = savedAnimal.data || savedAnimal
+        setAnimals(prev => prev.map(a => a.id === selectedAnimal.id ? { ...a, ...data } : a))
+        alert('✅ Animal atualizado com sucesso!')
       } else {
-        // Adicionar novo animal via API PostgreSQL
-        try {
-          const response = await fetch('/api/animals', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(animalData),
-          });
-
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Erro ao cadastrar animal');
-          }
-
-          const savedAnimal = await response.json();
-          const newAnimalData = savedAnimal.data || savedAnimal;
-          console.log('✅ Animal cadastrado na API:', newAnimalData);
-          
-          // Atualizar lista local
-          const updatedAnimals = [...animals, newAnimalData];
-          setAnimals(updatedAnimals);
-          localStorage.setItem('animals', JSON.stringify(updatedAnimals));
-          
-          alert('✅ Novo animal adicionado com sucesso!');
-        } catch (apiError) {
-          console.error('❌ Erro ao cadastrar na API:', apiError);
-          
-          // Fallback para localStorage
-          const newAnimal = {
-            ...animalData,
-            id: Math.max(...animals.map(a => a.id), 0) + 1,
-            custoTotal: 0,
-            valorVenda: null,
-            dataVenda: null,
-            comprador: null,
-          };
-          const updatedAnimals = [...animals, newAnimal];
-          setAnimals(updatedAnimals);
-          localStorage.setItem('animals', JSON.stringify(updatedAnimals));
-          
-          alert('⚠️ Animal salvo localmente (API indisponível)');
+        const response = await fetch('/api/animals', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(animalData),
+        })
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.message || 'Erro ao cadastrar animal')
         }
+        const savedAnimal = await response.json()
+        const newAnimalData = savedAnimal.data || savedAnimal
+        setAnimals(prev => [...prev, newAnimalData])
+        alert('✅ Novo animal adicionado com sucesso!')
       }
       setSelectedAnimal(null);
       setShowForm(false);
@@ -617,14 +462,8 @@ export default function Animals() {
           console.error('❌ Erro ao conectar com API:', apiError);
         }
         
-        // Atualizar localStorage
-        const updatedAnimals = animals.filter((a) => a.id !== animal.id);
-        setAnimals(updatedAnimals);
-        localStorage.setItem('animals', JSON.stringify(updatedAnimals));
-        
+        setAnimals(prev => prev.filter((a) => a.id !== animal.id));
         alert(`✅ Animal "${animalName}" excluído com sucesso!`);
-        
-        // Recarregar animais para garantir sincronização
         await loadAnimals();
         
       } catch (error) {
@@ -733,10 +572,7 @@ export default function Animals() {
           }
         }
 
-        // Atualizar localStorage removendo todos os animais selecionados
-        const updatedAnimals = animals.filter(animal => !selectedAnimals.includes(animal.id));
-        setAnimals(updatedAnimals);
-        localStorage.setItem('animals', JSON.stringify(updatedAnimals));
+        setAnimals(prev => prev.filter(animal => !selectedAnimals.includes(animal.id)));
 
         // Limpar seleção e sair do modo de seleção
         setSelectedAnimals([]);
@@ -954,15 +790,7 @@ export default function Animals() {
       
       // Atualizar lista local
       const updatedAnimals = [...animals, ...importedAnimals]
-      console.log('🔍 Total após importação:', updatedAnimals.length)
-      
-      // Salvar no localStorage imediatamente
-      localStorage.setItem('animals', JSON.stringify(updatedAnimals))
-      console.log('💾 Dados salvos no localStorage')
-      
-      // Atualizar estado local
       setAnimals(updatedAnimals)
-      console.log('🔄 Estado local atualizado')
       
       // Preparar dados para API (garantir formato correto)
       const animaisParaAPI = importedAnimals.map((animal, index) => {
