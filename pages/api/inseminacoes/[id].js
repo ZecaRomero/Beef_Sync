@@ -36,11 +36,14 @@ export default async function handler(req, res) {
       const atual = insAtual.rows[0]
 
       const {
-        data_inseminacao,
-        touro,
+        data_ia,
+        touro_nome,
+        touro_rg,
+        serie_touro,
         semen_id,
         tecnico,
-        inseminador,
+        numero_ia,
+        protocolo,
         resultado_dg,
         data_dg,
         status_gestacao,
@@ -51,28 +54,34 @@ export default async function handler(req, res) {
       // Atualizar inseminação
       const updated = await query(
         `UPDATE inseminacoes SET
-          data_inseminacao = COALESCE($1, data_inseminacao),
-          touro            = COALESCE($2, touro),
-          semen_id         = COALESCE($3, semen_id),
-          tecnico          = COALESCE($4, tecnico),
-          inseminador      = COALESCE($5, inseminador),
-          resultado_dg     = COALESCE($6, resultado_dg),
-          data_dg          = COALESCE($7, data_dg),
-          status_gestacao  = COALESCE($8, status_gestacao),
-          observacoes      = COALESCE($9, observacoes),
-          updated_at       = CURRENT_TIMESTAMP
-         WHERE id = $10
+          data_ia         = COALESCE($1, data_ia),
+          touro_nome      = COALESCE($2, touro_nome),
+          touro_rg        = COALESCE($3, touro_rg),
+          serie_touro     = COALESCE($4, serie_touro),
+          semen_id        = COALESCE($5, semen_id),
+          tecnico         = COALESCE($6, tecnico),
+          numero_ia       = COALESCE($7, numero_ia),
+          protocolo       = COALESCE($8, protocolo),
+          resultado_dg    = COALESCE($9, resultado_dg),
+          data_dg         = COALESCE($10, data_dg),
+          status_gestacao = COALESCE($11, status_gestacao),
+          observacoes     = COALESCE($12, observacoes),
+          updated_at      = CURRENT_TIMESTAMP
+         WHERE id = $13
          RETURNING *`,
         [
-          data_inseminacao || null,
-          touro            || null,
-          semen_id         || null,
-          tecnico          || null,
-          inseminador      || null,
-          resultado_dg     || null,
-          data_dg          || null,
-          status_gestacao  || null,
-          observacoes      || null,
+          data_ia         || null,
+          touro_nome      || null,
+          touro_rg        || null,
+          serie_touro     || null,
+          semen_id        || null,
+          tecnico         || null,
+          numero_ia       || null,
+          protocolo       || null,
+          resultado_dg    || null,
+          data_dg         || null,
+          status_gestacao || null,
+          observacoes     || null,
           inseminacaoId,
         ]
       )
@@ -99,24 +108,27 @@ export default async function handler(req, res) {
             `SELECT id FROM gestacoes
              WHERE receptora_serie = $1 AND receptora_rg = $2 AND data_cobertura = $3
              LIMIT 1`,
-            [a.serie, a.rg, inseminacao.data_inseminacao]
+            [a.serie, a.rg, inseminacao.data_ia]
           )
 
           if (gestacaoExistente.rows.length === 0) {
             await query(
               `INSERT INTO gestacoes (
                 receptora_nome, receptora_serie, receptora_rg,
+                mae_serie, mae_rg,
                 pai_serie, pai_rg,
                 data_cobertura, situacao, observacoes
-               ) VALUES ($1,$2,$3,$4,$5,$6,'Gestante',$7)`,
+               ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'Gestante',$9)`,
               [
                 a.nome || `${a.serie} ${a.rg}`,
                 a.serie,
                 a.rg,
-                pai_info.serie,
-                pai_info.rg,
-                inseminacao.data_inseminacao,
-                `Gerada a partir da inseminação ID ${inseminacaoId}`,
+                a.serie,
+                a.rg,
+                inseminacao.serie_touro || 'N/A',
+                inseminacao.touro_rg    || 'N/A',
+                inseminacao.data_ia,
+                `IA confirmada - inseminação ID ${inseminacaoId}`,
               ]
             )
           }

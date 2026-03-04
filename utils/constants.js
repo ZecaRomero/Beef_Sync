@@ -9,18 +9,28 @@
 // ANIMAIS
 // ---------------------------------------------------------------------------
 
-/** Situações possíveis de um animal — use esta lista em formulários e filtros */
+/**
+ * Situações possíveis de um animal — deve corresponder exatamente ao
+ * CHECK constraint `animais_situacao_check` no PostgreSQL.
+ */
 export const SITUACOES_ANIMAL = [
   'Ativo',
   'Vendido',
   'Morto',
-  'Doado',
   'Transferido',
+  'Inativo',
   'Gestante',
   'Lactante',
   'Desmamado',
   'Em Observação',
+  'Doado',
 ]
+
+/**
+ * Situações de uma gestação — corresponde ao CHECK constraint
+ * `gestacoes_situacao_check` no PostgreSQL.
+ */
+export const SITUACOES_GESTACAO = ['Ativa', 'Gestante', 'Nasceu', 'Perdeu', 'Cancelada', 'Parida']
 
 /** Séries de identificação e suas raças correspondentes */
 export const RACAS_POR_SERIE = {
