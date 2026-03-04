@@ -44,11 +44,16 @@ export default function ContabilidadeLembretes() {
       l.tipo === 'contabilidade'
     );
     
-    if (lembretePendente && !mostrarNotificacao) {
+    // Só mostrar notificação se houver lembrete pendente E não estiver mostrando já
+    if (lembretePendente && !mostrarNotificacao && !lembreteAtivo) {
       setLembreteAtivo(lembretePendente);
       setMostrarNotificacao(true);
+    } else if (!lembretePendente && mostrarNotificacao) {
+      // Se não há mais lembretes pendentes, fechar a notificação
+      setMostrarNotificacao(false);
+      setLembreteAtivo(null);
     }
-  }, [lembretes, mostrarNotificacao]);
+  }, [lembretes]);
 
   // Função para lidar com ações da notificação
   const handleAcaoNotificacao = (acao) => {

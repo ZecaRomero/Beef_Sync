@@ -4,14 +4,9 @@ export default function Document() {
   return (
     <Html lang="pt-BR">
       <Head>
-        {/* Favicon e ícones do sistema */}
-        <link rel="icon" type="image/x-icon" href="/Host_ico_rede.ico" />
-        <link rel="shortcut icon" type="image/x-icon" href="/Host_ico_rede.ico" />
-        
-        {/* Ícones para diferentes dispositivos */}
-        <link rel="apple-touch-icon" href="/Host_ico_rede.ico" />
-        <link rel="icon" type="image/x-icon" sizes="16x16" href="/Host_ico_rede.ico" />
-        <link rel="icon" type="image/x-icon" sizes="32x32" href="/Host_ico_rede.ico" />
+        {/* Favicon padrão — substituído dinamicamente pelo DynamicFavicon.js */}
+        <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232563eb'/%3E%3Ctext x='16' y='13' font-family='Arial' font-size='9' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'%3EBS%3C/text%3E%3Ctext x='16' y='24' font-family='Arial' font-size='8' fill='rgba(255,255,255,0.85)' text-anchor='middle' dominant-baseline='middle'%3E%F0%9F%90%82%3C/text%3E%3C/svg%3E" />
+        <link rel="shortcut icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232563eb'/%3E%3Ctext x='16' y='21' font-family='Arial' font-size='14' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'%3EBS%3C/text%3E%3C/svg%3E" />
         
         {/* Viewport - crítico para layout mobile (deve estar no HTML inicial) */}
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />

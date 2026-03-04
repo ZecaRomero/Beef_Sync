@@ -80,6 +80,18 @@ export function useContabilidadeLembretes() {
     const mesAtual = hoje.getMonth();
     const anoAtual = hoje.getFullYear();
     
+    // Verificar se já existe um lembrete para este mês
+    const jaExisteLembreteDoMes = lembretes.some(lembrete => {
+      const dataLembrete = new Date(lembrete.criadoEm);
+      return dataLembrete.getMonth() === mesAtual && 
+             dataLembrete.getFullYear() === anoAtual &&
+             lembrete.tipo === 'contabilidade';
+    });
+    
+    if (jaExisteLembreteDoMes) {
+      return false; // Já existe lembrete para este mês
+    }
+    
     const quintoDiaUtil = calcularQuintoDiaUtil(anoAtual, mesAtual);
     const dataLembrete = new Date(quintoDiaUtil);
     dataLembrete.setDate(dataLembrete.getDate() - configuracoes.diasAntecedencia);
@@ -95,7 +107,7 @@ export function useContabilidadeLembretes() {
     }
     
     return false;
-  }, [configuracoes, calcularQuintoDiaUtil]);
+  }, [configuracoes, lembretes, calcularQuintoDiaUtil]);
 
   // Função para criar lembrete
   const criarLembrete = useCallback(() => {
@@ -145,7 +157,15 @@ export function useContabilidadeLembretes() {
     
     setLembretes(lembretesAtualizados);
     localStorage.setItem('lembretes', JSON.stringify(lembretesAtualizados));
-  }, [lembretes]);
+    
+    // Atualizar ultimoEnvio para evitar criar novo lembrete no mesmo mês
+    const novaConfig = {
+      ...configuracoes,
+      ultimoEnvio: new Date().toISOString()
+    };
+    setConfiguracoes(novaConfig);
+    localStorage.setItem('contabilidadeConfig', JSON.stringify(novaConfig));
+  }, [lembretes, configuracoes]);
 
   // Função para salvar configurações
   const salvarConfiguracoes = useCallback((novasConfig) => {

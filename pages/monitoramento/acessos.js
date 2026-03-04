@@ -20,6 +20,8 @@ export default function AcessosSistema() {
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
   const [mobileReportsDraft, setMobileReportsDraft] = useState(null)
+  // Lista dinâmica vinda da API — sempre em sincronia com o backend
+  const [tiposRelatorios, setTiposRelatorios] = useState([])
 
   const loadData = async () => {
     setRefreshing(true)
@@ -27,7 +29,7 @@ export default function AcessosSistema() {
       const [statsRes, logsRes, settingsRes] = await Promise.all([
         fetch('/api/access-log?stats=true'),
         fetch('/api/access-log?limit=30'),
-        fetch('/api/system-settings')
+        fetch('/api/system-settings'),
       ])
       if (statsRes.ok) {
         const d = await statsRes.json()
@@ -41,7 +43,8 @@ export default function AcessosSistema() {
         const d = await settingsRes.json()
         if (d.success && d.data) {
           setSettings(d.data)
-          setMobileReportsDraft(null)
+          // Só limpa o draft se não há edições pendentes
+          setMobileReportsDraft(prev => (prev === null ? null : prev))
         }
       }
     } catch (e) {
@@ -52,43 +55,29 @@ export default function AcessosSistema() {
     }
   }
 
+  // Busca a lista de tipos de relatórios apenas UMA vez no mount (nunca muda em runtime)
+  const loadTiposRelatorios = async () => {
+    try {
+      const res = await fetch('/api/mobile-reports')
+      if (res.ok) {
+        const d = await res.json()
+        const types = d?.data?.allTypes || d?.allTypes || []
+        if (types.length > 0) setTiposRelatorios(types)
+      }
+    } catch (e) {
+      console.error('Erro ao buscar tipos de relatórios:', e)
+    }
+  }
+
   useEffect(() => {
     loadData()
-    // Atualizar a cada 10 segundos (mais frequente)
+    loadTiposRelatorios() // apenas no mount
     const t = setInterval(loadData, 10000)
     return () => clearInterval(t)
   }, [])
 
-  const TIPOS_RELATORIOS = [
-    { key: 'pesagens', label: 'Pesagens' },
-    { key: 'resumo_pesagens', label: 'Resumo de Pesagens' },
-    { key: 'inseminacoes', label: 'Inseminações' },
-    { key: 'resumo_femeas_ia', label: 'Resumo de Fêmeas IA' },
-    { key: 'gestacoes', label: 'Gestações' },
-    { key: 'nascimentos', label: 'Nascimentos' },
-    { key: 'resumo_nascimentos', label: 'Resumo de Nascimentos' },
-    { key: 'previsoes_parto', label: 'Previsões de Parto' },
-    { key: 'exames_andrologicos', label: 'Exames Andrológicos' },
-    { key: 'transferencias_embrioes', label: 'Transferências de Embriões' },
-    { key: 'coleta_fiv', label: 'Coleta FIV' },
-    { key: 'receptoras_chegaram', label: 'Receptoras que Chegaram' },
-    { key: 'receptoras_faltam_parir', label: 'Receptoras que Faltam Parir' },
-    { key: 'receptoras_faltam_diagnostico', label: 'Receptoras que Faltam Diagnóstico' },
-    { key: 'calendario_reprodutivo', label: '📅 Calendário Reprodutivo' },
-    { key: 'agenda_atividades', label: '📋 Agenda de Atividades' },
-    { key: 'mortes', label: 'Mortes' },
-    { key: 'vacinacoes', label: 'Vacinações' },
-    { key: 'ocorrencias', label: 'Ocorrências' },
-    { key: 'estoque_semen', label: 'Estoque de Sêmen' },
-    { key: 'abastecimento_nitrogenio', label: 'Abastecimento de Nitrogênio' },
-    { key: 'animais_piquetes', label: 'Animais por Piquete' },
-    { key: 'notas_fiscais', label: 'Notas Fiscais' },
-    { key: 'movimentacoes_financeiras', label: 'Movimentações Financeiras' },
-    { key: 'custos', label: 'Custos' },
-    { key: 'ranking_animais_avaliados', label: 'Ranking dos Animais Avaliados' },
-    { key: 'ranking_pmgz', label: '🏆 Ranking de Animais' },
-    { key: 'boletim_rebanho', label: 'Boletim do Rebanho' }
-  ]
+  // Alias para compatibilidade com o restante da página
+  const TIPOS_RELATORIOS = tiposRelatorios
 
   const updateSetting = async (key, value) => {
     setSaving(true)
@@ -339,26 +328,40 @@ export default function AcessosSistema() {
                      </button>
                    </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto">
-                    {TIPOS_RELATORIOS.map(t => {
-                      const raw = mobileReportsDraft ?? settings?.mobile_reports_enabled ?? []
-                      const enabled = [...new Set(raw.map(k => k === 'femeas_ia' ? 'inseminacoes' : k))]
+                  {tiposRelatorios.length === 0 && (
+                    <p className="text-sm text-gray-500 italic">Carregando relatórios disponíveis...</p>
+                  )}
+                  {/* Agrupado por categoria — automático, sem lista hardcoded */}
+                  <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+                    {[...new Set(TIPOS_RELATORIOS.map(t => t.category || 'Geral'))].map(cat => {
+                      const itens = TIPOS_RELATORIOS.filter(t => (t.category || 'Geral') === cat)
                       return (
-                        <label key={t.key} className="flex items-center gap-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={enabled.includes(t.key)}
-                            onChange={(e) => {
-                              const current = mobileReportsDraft ?? settings?.mobile_reports_enabled ?? []
-                              const next = e.target.checked
-                                ? [...new Set([...current.filter(k => k !== 'femeas_ia'), t.key])]
-                                : current.filter(k => k !== t.key && k !== 'femeas_ia')
-                              setMobileReportsDraft(next)
-                            }}
-                            className="w-4 h-4 rounded border-teal-600 text-teal-600 focus:ring-teal-500"
-                          />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">{t.label}</span>
-                        </label>
+                        <div key={cat}>
+                          <p className="text-xs font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider mb-1">{cat}</p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 pl-1">
+                            {itens.map(t => {
+                              const raw = mobileReportsDraft ?? settings?.mobile_reports_enabled ?? []
+                              const enabled = [...new Set(raw.map(k => k === 'femeas_ia' ? 'inseminacoes' : k))]
+                              return (
+                                <label key={t.key} className="flex items-center gap-2 cursor-pointer hover:bg-teal-100/50 dark:hover:bg-teal-900/30 rounded px-1 py-0.5">
+                                  <input
+                                    type="checkbox"
+                                    checked={enabled.includes(t.key)}
+                                    onChange={(e) => {
+                                      const current = mobileReportsDraft ?? settings?.mobile_reports_enabled ?? []
+                                      const next = e.target.checked
+                                        ? [...new Set([...current.filter(k => k !== 'femeas_ia'), t.key])]
+                                        : current.filter(k => k !== t.key && k !== 'femeas_ia')
+                                      setMobileReportsDraft(next)
+                                    }}
+                                    className="w-4 h-4 rounded border-teal-600 text-teal-600 focus:ring-teal-500"
+                                  />
+                                  <span className="text-sm text-gray-700 dark:text-gray-300">{t.label}</span>
+                                </label>
+                              )
+                            })}
+                          </div>
+                        </div>
                       )
                     })}
                   </div>

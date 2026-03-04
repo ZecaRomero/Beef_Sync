@@ -30,6 +30,7 @@ const TIPOS_RELATORIOS = [
   { key: 'vacinacoes', label: 'Vacinações', category: 'Sanidade' },
   { key: 'ocorrencias', label: 'Ocorrências', category: 'Sanidade' },
   { key: 'estoque_semen', label: 'Estoque de Sêmen', category: 'Estoque' },
+  { key: 'estoque_embrioes', label: 'Estoque de Embriões', category: 'Estoque' },
   { key: 'abastecimento_nitrogenio', label: 'Abastecimento de Nitrogênio', category: 'Estoque' },
   { key: 'animais_piquetes', label: 'Animais por Piquete', category: 'Localização' },
   { key: 'notas_fiscais', label: 'Notas Fiscais', category: 'Documentos' },
@@ -291,6 +292,32 @@ export default async function handler(req, res) {
             ultimasAtividades = qFeed.rows
           } catch (e) { console.log('Erro feed atividades', e.message) }
 
+          // 11. Estoque de Sêmen e Embriões — totais para o resumo
+          let totalTouros = 0, totalDosesSemen = 0, totalAcasalamentos = 0, totalDosesEmbriao = 0
+          try {
+            const qSemenResumo = await query(`
+              SELECT
+                COUNT(*) FILTER (WHERE tipo = 'semen' OR (tipo IS NULL
+                  AND nome_touro NOT ILIKE '%ACASALAMENTO%'
+                  AND nome_touro NOT ILIKE '% X %')) AS touros,
+                COALESCE(SUM(doses_disponiveis) FILTER (WHERE tipo = 'semen' OR (tipo IS NULL
+                  AND nome_touro NOT ILIKE '%ACASALAMENTO%'
+                  AND nome_touro NOT ILIKE '% X %')), 0) AS doses_semen,
+                COUNT(*) FILTER (WHERE tipo = 'embriao'
+                  OR nome_touro ILIKE '%ACASALAMENTO%'
+                  OR nome_touro ILIKE '% X %') AS acasalamentos,
+                COALESCE(SUM(doses_disponiveis) FILTER (WHERE tipo = 'embriao'
+                  OR nome_touro ILIKE '%ACASALAMENTO%'
+                  OR nome_touro ILIKE '% X %'), 0) AS doses_embriao
+              FROM estoque_semen
+              WHERE tipo_operacao = 'entrada' AND doses_disponiveis > 0
+            `)
+            totalTouros = parseInt(qSemenResumo.rows[0]?.touros || 0)
+            totalDosesSemen = parseInt(qSemenResumo.rows[0]?.doses_semen || 0)
+            totalAcasalamentos = parseInt(qSemenResumo.rows[0]?.acasalamentos || 0)
+            totalDosesEmbriao = parseInt(qSemenResumo.rows[0]?.doses_embriao || 0)
+          } catch (_) {}
+
           resumo = {
             rebanho: {
               total: parseInt(statsRebanho.total || 0),
@@ -315,6 +342,12 @@ export default async function handler(req, res) {
             extras: {
                top_piquetes: topPiquetes,
                ultimas_atividades: ultimasAtividades
+            },
+            estoque: {
+              touros_semen: totalTouros,
+              doses_semen: totalDosesSemen,
+              acasalamentos: totalAcasalamentos,
+              doses_embriao: totalDosesEmbriao
             }
           }
 
@@ -360,6 +393,18 @@ export default async function handler(req, res) {
               dados: {
                 'Vacinações': vacinasTotal,
                 'Mortes': mortesTotal
+              }
+            })
+          }
+
+          if (totalDosesSemen > 0 || totalDosesEmbriao > 0) {
+            modules.push({
+              modulo: 'Estoque',
+              dados: {
+                'Touros (sêmen)': totalTouros,
+                'Doses Sêmen': totalDosesSemen,
+                'Acasalamentos': totalAcasalamentos,
+                'Embriões Disp.': totalDosesEmbriao
               }
             })
           }
@@ -992,15 +1037,62 @@ export default async function handler(req, res) {
 
       case 'estoque_semen': {
         const r = await query(`
-          SELECT id, nome_touro, raca, quantidade, created_at
+          SELECT id, nome_touro, rg_touro, raca, rack_touro, botijao, caneca,
+                 quantidade_doses, doses_disponiveis, doses_usadas, status,
+                 localizacao, observacoes, tipo, created_at
           FROM estoque_semen
+          WHERE tipo_operacao = 'entrada'
+            AND doses_disponiveis > 0
+            AND (tipo = 'semen' OR (tipo IS NULL
+                 AND nome_touro NOT ILIKE '%ACASALAMENTO%'
+                 AND nome_touro NOT ILIKE '% X %'))
           ORDER BY nome_touro
-          LIMIT 200
+          LIMIT 300
         `)
         data = (r.rows || []).map(row => ({
           touro: row.nome_touro,
+          rg: row.rg_touro,
           raca: row.raca,
-          quantidade: row.quantidade,
+          rack: row.rack_touro,
+          botijao: row.botijao,
+          caneca: row.caneca,
+          quantidade: row.doses_disponiveis || 0,
+          totalDoses: row.quantidade_doses || 0,
+          dosesUsadas: row.doses_usadas || 0,
+          status: row.status,
+          localizacao: row.localizacao,
+          observacoes: row.observacoes,
+          atualizado: row.created_at ? new Date(row.created_at).toLocaleDateString('pt-BR') : null
+        }))
+        break
+      }
+
+      case 'estoque_embrioes': {
+        const r = await query(`
+          SELECT id, nome_touro, raca, rack_touro, botijao, caneca,
+                 quantidade_doses, doses_disponiveis, doses_usadas, status,
+                 localizacao, observacoes, created_at
+          FROM estoque_semen
+          WHERE tipo_operacao = 'entrada'
+            AND doses_disponiveis > 0
+            AND (tipo = 'embriao'
+                 OR nome_touro ILIKE '%ACASALAMENTO%'
+                 OR nome_touro ILIKE '% X %')
+          ORDER BY nome_touro
+          LIMIT 300
+        `)
+        data = (r.rows || []).map(row => ({
+          acasalamento: row.nome_touro,
+          raca: row.raca,
+          rack: row.rack_touro,
+          botijao: row.botijao,
+          caneca: row.caneca,
+          quantidade: row.doses_disponiveis || 0,
+          totalDoses: row.quantidade_doses || 0,
+          dosesUsadas: row.doses_usadas || 0,
+          status: row.status,
+          localizacao: row.localizacao,
+          observacoes: row.observacoes,
           atualizado: row.created_at ? new Date(row.created_at).toLocaleDateString('pt-BR') : null
         }))
         break

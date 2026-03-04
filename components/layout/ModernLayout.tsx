@@ -5,7 +5,6 @@ import ModernSidebar from './ModernSidebar'
 import ModernHeader from './ModernHeader'
 import TabBar from './TabBar'
 import ContabilidadeLembretes from '../ContabilidadeLembretes'
-import AIAssistant from '../ai/AIAssistant'
 import { TabsProvider } from '../../contexts/TabsContext'
 import { cn } from '../../lib/utils'
 import { LayoutProps } from '../../types/components'
@@ -84,9 +83,6 @@ const ModernLayout: React.FC<LayoutProps> = ({ children, darkMode, toggleDarkMod
 
       {/* Sistema de Lembretes da Contabilidade */}
       <ContabilidadeLembretes />
-      
-      {/* Assistente Virtual Inteligente */}
-      <AIAssistant />
     </div>
   )
 }

@@ -41,6 +41,20 @@ export default function SemenStock() {
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
 
+  // Tipo de material: 'semen' ou 'embriao'
+  const [tipoMaterial, setTipoMaterial] = useState('semen')
+
+  // Retirada de sêmen
+  const [retirarItens, setRetirarItens] = useState({}) // { [id]: quantidade }
+
+  // Importação Excel
+  const [showImportModal, setShowImportModal] = useState(false)
+  const [importFile, setImportFile] = useState(null)
+  const [importPreview, setImportPreview] = useState([])
+  const [isImporting, setIsImporting] = useState(false)
+  const [localizacaoImport, setLocalizacaoImport] = useState('RANCHARIA')
+  const [fornecedorImport, setFornecedorImport] = useState('')
+
   const [newSemen, setNewSemen] = useState({
     nomeTouro: '',
     rgTouro: '',
@@ -71,26 +85,12 @@ export default function SemenStock() {
 
   const loadSemenStock = async () => {
     try {
-      console.log('🔄 Iniciando carregamento dos dados...')
       const response = await fetch('/api/semen')
-      console.log('📡 Response status:', response.status)
       if (response.ok) {
         const responseData = await response.json()
-        console.log('📊 Resposta completa da API:', responseData)
-        console.log('📊 Tipo da resposta:', typeof responseData)
-        console.log('📊 É array?', Array.isArray(responseData))
-        
-        // A API retorna um objeto com { success, message, data, timestamp }
-        // Os dados estão na propriedade 'data'
         const data = responseData.data || responseData
-        console.log('📊 Dados extraídos:', data)
-        console.log('📊 Tipo dos dados:', typeof data)
-        console.log('📊 É array?', Array.isArray(data))
-        console.log('📊 Quantidade de itens:', data?.length || 'N/A')
-        
         setSemenStock(data || [])
       } else {
-        console.error('Erro ao carregar estoque de sêmen - Status:', response.status)
         setSemenStock([])
       }
     } catch (error) {
@@ -104,10 +104,6 @@ export default function SemenStock() {
     const semenData = dadosRecebidos || { ...newSemen }
     const tipoOperacao = semenData.tipoOperacao || (activeTab === 'entradas' ? 'entrada' : 'saida')
     
-    console.log('🔍 Debug handleAddSemen - Dados recebidos:', dadosRecebidos)
-    console.log('🔍 Debug handleAddSemen - semenData final:', semenData)
-    console.log('🔍 Debug handleAddSemen - tipoOperacao:', tipoOperacao)
-
     // Validação específica para saída
     if (tipoOperacao === 'saida') {
       if (!semenData.entradaId) {
@@ -149,17 +145,6 @@ export default function SemenStock() {
       }
     }
     
-    // Debug para ajudar a identificar o problema
-    console.log('🔍 Debug validação:', {
-      nomeTouro: semenData.nomeTouro,
-      localizacao: semenData.localizacao,
-      quantidadeDoses: semenData.quantidadeDoses,
-      fornecedor: semenData.fornecedor,
-      valorCompra: semenData.valorCompra,
-      tipoOperacao,
-      camposObrigatorios
-    })
-    
     if (camposObrigatorios.length > 0) {
       alert(`Preencha os campos obrigatórios: ${camposObrigatorios.join(', ')}`)
       return
@@ -191,19 +176,13 @@ export default function SemenStock() {
       })
 
       if (response.ok) {
-        const responseData = await response.json()
-        const newSemenData = responseData.data || responseData
-        setSemenStock(prev => Array.isArray(prev) ? [newSemenData, ...prev] : [newSemenData])
         resetForm()
         setShowAddEntradaModal(false)
         setShowAddSaidaModal(false)
         alert(`${tipoOperacao === 'entrada' ? 'Sêmen adicionado ao estoque' : 'Saída de sêmen registrada'} com sucesso!`)
-        
-        // Recarregar dados para atualizar doses disponíveis
         loadSemenStock()
       } else {
         const errorData = await response.json()
-        console.error('Erro detalhado:', errorData)
         
         // Melhorar mensagem de erro para o usuário
         let errorMessage = errorData.message || 'Erro desconhecido'
@@ -226,7 +205,6 @@ export default function SemenStock() {
   }
 
   const resetForm = () => {
-    console.log('🔄 Resetando formulário...')
     setNewSemen({
       nomeTouro: '',
       rgTouro: '',
@@ -390,82 +368,65 @@ export default function SemenStock() {
 
   // Filtrar estoque por aba ativa
   const filteredStock = (Array.isArray(semenStock) ? semenStock : []).filter(semen => {
-    if (!semen) return false;
-    
-    // Debug: Log dos dados para verificar
-    if (activeTab === 'saidas') {
-      console.log('🔍 Debug filtro saídas - Item:', {
-        id: semen.id,
-        nome_touro: semen.nome_touro,
-        tipo_operacao: semen.tipo_operacao,
-        tipoOperacao: semen.tipoOperacao,
-        destino: semen.destino
-      });
-    }
-    
+    if (!semen) return false
+
+    // Filtrar por tipo de material (semen ou embriao)
+    const tipoItem = semen.tipo || 'semen'
+    const nome = (semen.nome_touro || semen.nomeTouro || '').toUpperCase()
+    const isEmbriao = tipoItem === 'embriao' || nome.includes(' X ') || nome.includes('ACASALAMENTO')
+    if (tipoMaterial === 'semen' && isEmbriao) return false
+    if (tipoMaterial === 'embriao' && !isEmbriao) return false
+
     // Filtrar por tipo de operação baseado na aba ativa
-    let matchesTab = false;
+    const dosesDisponiveis = semen.dosesDisponiveis || semen.doses_disponiveis || 0
+    const isEntrada = semen.tipoOperacao === 'entrada' || semen.tipo_operacao === 'entrada'
+    let matchesTab = false
     if (activeTab === 'entradas') {
-      // Entradas: apenas entradas que ainda têm doses disponíveis (não esgotadas)
-      const dosesDisponiveis = semen.dosesDisponiveis || semen.doses_disponiveis || 0;
-      matchesTab = (semen.tipoOperacao === 'entrada' || semen.tipo_operacao === 'entrada') && dosesDisponiveis > 0;
+      matchesTab = isEntrada && dosesDisponiveis > 0
     } else if (activeTab === 'saidas') {
-      matchesTab = semen.tipoOperacao === 'saida' || semen.tipo_operacao === 'saida';
+      matchesTab = semen.tipoOperacao === 'saida' || semen.tipo_operacao === 'saida'
     } else if (activeTab === 'estoque') {
-      // Estoque Real: apenas entradas com doses disponíveis > 0
-      const dosesDisponiveis = semen.dosesDisponiveis || semen.doses_disponiveis || 0;
-      matchesTab = (semen.tipoOperacao === 'entrada' || semen.tipo_operacao === 'entrada') && dosesDisponiveis > 0;
+      matchesTab = isEntrada && dosesDisponiveis > 0
     }
-    
-    const matchesSearch = 
-      (semen.nomeTouro && semen.nomeTouro.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (semen.nome_touro && semen.nome_touro.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (semen.rgTouro && semen.rgTouro.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (semen.rg_touro && semen.rg_touro.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (semen.fornecedor && semen.fornecedor.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (semen.serie && semen.serie.toLowerCase().includes(searchTerm.toLowerCase())) // Para compatibilidade com estrutura antiga
+
+    const searchLower = searchTerm.toLowerCase()
+    const matchesSearch = !searchTerm ||
+      (semen.nomeTouro || semen.nome_touro || '').toLowerCase().includes(searchLower) ||
+      (semen.rgTouro || semen.rg_touro || '').toLowerCase().includes(searchLower) ||
+      (semen.fornecedor || '').toLowerCase().includes(searchLower)
 
     const matchesFilters =
-      (!filters.touro || (semen.nomeTouro && semen.nomeTouro.toLowerCase().includes(filters.touro.toLowerCase())) || (semen.nome_touro && semen.nome_touro.toLowerCase().includes(filters.touro.toLowerCase())) || (semen.serie && semen.serie.toLowerCase().includes(filters.touro.toLowerCase()))) &&
-      (!filters.fornecedor || (semen.fornecedor && semen.fornecedor.toLowerCase().includes(filters.fornecedor.toLowerCase()))) &&
-      (!filters.localizacao || (semen.localizacao && semen.localizacao.toLowerCase().includes(filters.localizacao.toLowerCase()))) &&
+      (!filters.touro || (semen.nomeTouro || semen.nome_touro || '').toLowerCase().includes(filters.touro.toLowerCase())) &&
+      (!filters.fornecedor || (semen.fornecedor || '').toLowerCase().includes(filters.fornecedor.toLowerCase())) &&
+      (!filters.localizacao || (semen.localizacao || '').toLowerCase().includes(filters.localizacao.toLowerCase())) &&
       (!filters.status || semen.status === filters.status)
 
-    const result = matchesTab && matchesSearch && matchesFilters;
-    
-    if (activeTab === 'saidas' && result) {
-      console.log('✅ Item passou no filtro de saídas:', semen.id);
-    }
-    
-    return result;
-  });
-  
-  // Debug: Log do resultado final
-  if (activeTab === 'saidas') {
-    console.log(`🔍 Debug - Total de saídas filtradas: ${filteredStock.length}`);
-    console.log('🔍 Debug - IDs das saídas filtradas:', filteredStock.map(s => s.id));
-  }
+    return matchesTab && matchesSearch && matchesFilters
+  })
 
   // Paginação
   const totalPages = Math.ceil(filteredStock.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const paginatedStock = filteredStock.slice(startIndex, startIndex + itemsPerPage)
 
-  // Estatísticas
-  // Filtrar apenas entradas (touros) para o cálculo do total
-  const entradas = (Array.isArray(semenStock) ? semenStock : []).filter(s => 
-    s.tipoOperacao === 'entrada' || s.tipo_operacao === 'entrada'
-  )
-  
+  // Estatísticas — baseadas apenas em entradas do tipo de material selecionado
+  const todasEntradas = (Array.isArray(semenStock) ? semenStock : []).filter(s => {
+    const isEnt = s.tipoOperacao === 'entrada' || s.tipo_operacao === 'entrada'
+    if (!isEnt) return false
+    const n = (s.nome_touro || s.nomeTouro || '').toUpperCase()
+    const isEmb = (s.tipo || 'semen') === 'embriao' || n.includes(' X ') || n.includes('ACASALAMENTO')
+    return tipoMaterial === 'embriao' ? isEmb : !isEmb
+  })
+
   const stats = {
-    total: entradas.length,
-    disponivel: entradas.filter(s => s.status === 'disponivel').length,
-    esgotado: entradas.filter(s => s.status === 'esgotado').length,
-    totalDoses: (Array.isArray(semenStock) ? semenStock : []).reduce((acc, s) => acc + parseInt(s.quantidadeDoses || 0), 0),
-    dosesDisponiveis: (Array.isArray(semenStock) ? semenStock : []).reduce((acc, s) => acc + parseInt(s.dosesDisponiveis || 0), 0),
-    dosesUsadas: (Array.isArray(semenStock) ? semenStock : []).reduce((acc, s) => acc + parseInt(s.dosesUsadas || 0), 0),
-    valorTotal: (Array.isArray(semenStock) ? semenStock : []).reduce((acc, s) => acc + parseFloat(s.valorCompra || 0), 0),
-    fornecedores: [...new Set((Array.isArray(semenStock) ? semenStock : []).map(s => s.fornecedor))].length
+    total: todasEntradas.length,
+    disponivel: todasEntradas.filter(s => s.status === 'disponivel').length,
+    esgotado: todasEntradas.filter(s => s.status === 'esgotado').length,
+    totalDoses: todasEntradas.reduce((acc, s) => acc + parseInt(s.quantidade_doses || s.quantidadeDoses || 0), 0),
+    dosesDisponiveis: todasEntradas.reduce((acc, s) => acc + parseInt(s.doses_disponiveis || s.dosesDisponiveis || 0), 0),
+    dosesUsadas: todasEntradas.reduce((acc, s) => acc + parseInt(s.doses_usadas || s.dosesUsadas || 0), 0),
+    valorTotal: todasEntradas.reduce((acc, s) => acc + parseFloat(s.valor_compra || s.valorCompra || 0), 0),
+    fornecedores: [...new Set(todasEntradas.map(s => s.fornecedor).filter(Boolean))].length
   }
 
   const getStatusColor = (status) => {
@@ -564,6 +525,111 @@ export default function SemenStock() {
     }
   }
 
+  // ── Retirada de Sêmen ──────────────────────────────────────────────────────
+  const handleRetirarChange = (id, value) => {
+    const qtde = Math.max(0, parseInt(value) || 0)
+    setRetirarItens(prev => ({ ...prev, [id]: qtde }))
+  }
+
+  const totalItensRetirada = Object.values(retirarItens).filter(v => v > 0).length
+  const totalDosesRetirada = Object.values(retirarItens).reduce((a, b) => a + (b || 0), 0)
+
+  const exportarRetirada = async () => {
+    const itens = Object.entries(retirarItens)
+      .filter(([, qtde]) => qtde > 0)
+      .map(([id, qtde]) => {
+        const semen = (Array.isArray(semenStock) ? semenStock : []).find(s => s.id === parseInt(id))
+        if (!semen) return null
+        return {
+          'Touro': semen.nome_touro || semen.nomeTouro || '',
+          'RG': semen.rg_touro || semen.rgTouro || '',
+          'Raça': semen.raca || '',
+          'Rack': semen.rack_touro || semen.rackTouro || '',
+          'Botijão': semen.botijao || '',
+          'Caneca': semen.caneca || '',
+          'Localização': semen.localizacao || '',
+          'Doses Disponíveis': semen.doses_disponiveis || semen.dosesDisponiveis || 0,
+          'Qtde a Retirar': qtde,
+          'Observações': semen.observacoes || '',
+        }
+      })
+      .filter(Boolean)
+
+    if (itens.length === 0) {
+      alert('Nenhum item marcado para retirada.')
+      return
+    }
+
+    try {
+      const XLSX = await import('xlsx')
+      const ws = XLSX.utils.json_to_sheet(itens)
+      ws['!cols'] = [
+        { wch: 22 }, { wch: 14 }, { wch: 10 }, { wch: 10 },
+        { wch: 10 }, { wch: 10 }, { wch: 16 }, { wch: 18 }, { wch: 16 }, { wch: 22 },
+      ]
+      const wb = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(wb, ws, 'Retirada de Sêmen')
+      const date = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')
+      XLSX.writeFile(wb, `Retirada_Semen_${date}.xlsx`)
+      alert(`✅ Relatório de retirada exportado!\n\n${itens.length} touros • ${totalDosesRetirada} doses marcadas`)
+    } catch (err) {
+      alert('Erro ao gerar relatório: ' + err.message)
+    }
+  }
+
+  const limparRetirada = () => setRetirarItens({})
+
+  // ── Importação Excel ────────────────────────────────────────────────────────
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    setImportFile(file)
+    setImportPreview([])
+    try {
+      const XLSX = await import('xlsx')
+      const data = await file.arrayBuffer()
+      const wb = XLSX.read(data)
+      const ws = wb.Sheets[wb.SheetNames[0]]
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' })
+      setImportPreview(rows.slice(0, 11)) // cabeçalho + 10 linhas
+    } catch (err) {
+      console.error('Erro no preview:', err)
+    }
+  }
+
+  const handleImportExcel = async () => {
+    if (!importFile) {
+      alert('Selecione um arquivo Excel (.xlsx ou .xls)')
+      return
+    }
+    setIsImporting(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', importFile)
+      formData.append('localizacao', localizacaoImport)
+      formData.append('fornecedor', fornecedorImport)
+      formData.append('tipoMaterial', tipoMaterial)
+
+      const response = await fetch('/api/semen/import-excel', { method: 'POST', body: formData })
+      const result = await response.json()
+
+      if (response.ok) {
+        const errosMsg = result.erros?.length ? `\n\nAtenção — ${result.erros.length} linha(s) com erro:\n${result.erros.slice(0, 5).join('\n')}` : ''
+        alert(`✅ ${result.message}${errosMsg}`)
+        setShowImportModal(false)
+        setImportFile(null)
+        setImportPreview([])
+        loadSemenStock()
+      } else {
+        alert(`❌ Erro: ${result.error}\n${result.details || ''}`)
+      }
+    } catch (err) {
+      alert('Erro ao importar: ' + err.message)
+    } finally {
+      setIsImporting(false)
+    }
+  }
+
   // Abrir modal de exportação
   const handleExportClick = () => {
     // Inicializar período com mês atual
@@ -584,18 +650,51 @@ export default function SemenStock() {
     <div className="space-y-6">
       {/* Sincronização de Dados */}
       <DatabaseSync />
+
+      {/* Seletor de tipo de material */}
+      <div className="flex space-x-2">
+        <button
+          onClick={() => { setTipoMaterial('semen'); setCurrentPage(1); setRetirarItens({}) }}
+          className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all border ${
+            tipoMaterial === 'semen'
+              ? 'bg-blue-600 text-white border-blue-600 shadow-md'
+              : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-blue-400'
+          }`}
+        >
+          🧬 Sêmen
+        </button>
+        <button
+          onClick={() => { setTipoMaterial('embriao'); setCurrentPage(1); setRetirarItens({}) }}
+          className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all border ${
+            tipoMaterial === 'embriao'
+              ? 'bg-purple-600 text-white border-purple-600 shadow-md'
+              : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-purple-400'
+          }`}
+        >
+          🥚 Embriões
+        </button>
+      </div>
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-            🧬 Estoque de Sêmen
+            {tipoMaterial === 'embriao' ? '🥚 Estoque de Embriões' : '🧬 Estoque de Sêmen'}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Controle completo do material genético do rebanho
+            {tipoMaterial === 'embriao'
+              ? 'Controle de embriões (acasalamentos) do rebanho'
+              : 'Controle completo do material genético do rebanho'}
           </p>
         </div>
         <div className="mt-4 sm:mt-0 flex space-x-3">
+          <button
+            onClick={() => setShowImportModal(true)}
+            className="btn-secondary flex items-center"
+          >
+            <DocumentArrowDownIcon className="h-5 w-5 mr-2 rotate-180" />
+            Importar Excel
+          </button>
           <button
             onClick={handleExportClick}
             className="btn-secondary flex items-center"
@@ -792,16 +891,25 @@ export default function SemenStock() {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
               Estoque de Sêmen ({filteredStock.length} registros)
             </h3>
-            <button 
-              onClick={() => {
-                console.log('🔍 Debug - semenStock completo:', semenStock);
-                console.log('🔍 Debug - filteredStock:', filteredStock);
-                console.log('🔍 Debug - activeTab:', activeTab);
-              }}
-              className="btn-secondary text-xs"
-            >
-              Debug
-            </button>
+            {totalItensRetirada > 0 && (
+              <div className="flex items-center space-x-3 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700 rounded-lg px-3 py-2">
+                <span className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                  🧊 {totalItensRetirada} touro(s) • {totalDosesRetirada} dose(s) marcadas para retirada
+                </span>
+                <button
+                  onClick={exportarRetirada}
+                  className="text-xs bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded-lg font-medium"
+                >
+                  📥 Exportar Retirada
+                </button>
+                <button
+                  onClick={limparRetirada}
+                  className="text-xs text-yellow-700 dark:text-yellow-300 underline"
+                >
+                  Limpar
+                </button>
+              </div>
+            )}
             {selectedItems.length > 0 && (
               <div className="flex items-center space-x-3">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -866,6 +974,11 @@ export default function SemenStock() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Valor
                   </th>
+                  {activeTab !== 'saidas' && (
+                    <th className="px-6 py-3 text-left text-xs font-medium text-yellow-600 dark:text-yellow-400 uppercase tracking-wider">
+                      Retirar (doses)
+                    </th>
+                  )}
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Ações
                   </th>
@@ -928,7 +1041,7 @@ export default function SemenStock() {
                       <div className="text-sm text-gray-500 dark:text-gray-400">
                         {activeTab === 'saidas' 
                           ? `Destino: ${semen.destino || 'N/A'}`
-                          : `Usadas: ${semen.doses_usadas || semen.dosesUsadas}`
+                          : `Usadas: ${semen.doses_usadas ?? semen.dosesUsadas ?? 0}`
                         }
                       </div>
                     </td>
@@ -940,6 +1053,19 @@ export default function SemenStock() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                       R$ {parseFloat(semen.valorCompra || semen.valor_compra || 0).toFixed(2)}
                     </td>
+                    {activeTab !== 'saidas' && (
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <input
+                          type="number"
+                          min="0"
+                          max={semen.doses_disponiveis || semen.dosesDisponiveis || 0}
+                          value={retirarItens[semen.id] || ''}
+                          onChange={(e) => handleRetirarChange(semen.id, e.target.value)}
+                          placeholder="0"
+                          className="w-20 px-2 py-1 text-sm border border-yellow-300 dark:border-yellow-700 rounded-lg text-center focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 text-gray-900 dark:text-white"
+                        />
+                      </td>
+                    )}
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
                         <button
@@ -1238,6 +1364,127 @@ export default function SemenStock() {
               >
                 <TrashIcon className="h-4 w-4 mr-2" />
                 Excluir {selectedItems.length} Item(s)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Importação Excel */}
+      {showImportModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">📤 Importar Estoque de Sêmen</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  Importe sua planilha Excel com as colunas: COD RACK, TOURO, RAÇA, BOTIJÃO, CANECA, OBS, ESTOQUE
+                </p>
+              </div>
+              <button onClick={() => { setShowImportModal(false); setImportFile(null); setImportPreview([]) }}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl leading-none">✕</button>
+            </div>
+
+            <div className="p-6 overflow-y-auto space-y-4 flex-1">
+              {/* Upload de arquivo */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Arquivo Excel (.xlsx / .xls)
+                </label>
+                <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-blue-300 dark:border-blue-700 rounded-xl cursor-pointer bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
+                  <span className="text-3xl mb-1">📁</span>
+                  <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                    {importFile ? importFile.name : 'Clique para selecionar o arquivo'}
+                  </span>
+                  <input type="file" accept=".xlsx,.xls" className="hidden" onChange={handleFileChange} />
+                </label>
+              </div>
+
+              {/* Campos adicionais */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Localização (aplicada a todos)
+                  </label>
+                  <input
+                    type="text"
+                    value={localizacaoImport}
+                    onChange={e => setLocalizacaoImport(e.target.value)}
+                    placeholder="Ex: RANCHARIA"
+                    className="input-field"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Fornecedor (aplicado a todos)
+                  </label>
+                  <input
+                    type="text"
+                    value={fornecedorImport}
+                    onChange={e => setFornecedorImport(e.target.value)}
+                    placeholder="Ex: Central Peixes Touros"
+                    className="input-field"
+                  />
+                </div>
+              </div>
+
+              {/* Preview da planilha */}
+              {importPreview.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Pré-visualização ({importPreview.length - 1} linhas de dados detectadas):
+                  </p>
+                  <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 max-h-48">
+                    <table className="min-w-full text-xs">
+                      <thead className="bg-gray-100 dark:bg-gray-700">
+                        <tr>
+                          {(importPreview[0] || []).map((h, i) => (
+                            <th key={i} className="px-2 py-1 text-left font-semibold text-gray-600 dark:text-gray-300 whitespace-nowrap">
+                              {String(h || '')}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {importPreview.slice(1).map((row, ri) => (
+                          <tr key={ri} className={ri % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'}>
+                            {row.map((cell, ci) => (
+                              <td key={ci} className="px-2 py-1 text-gray-800 dark:text-gray-200 whitespace-nowrap">
+                                {String(cell || '')}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg p-3 text-sm text-amber-800 dark:text-amber-200">
+                <strong>Mapeamento automático de colunas:</strong> O sistema detecta as colunas pelos cabeçalhos.
+                A coluna <strong>ESTOQUE</strong> define a quantidade de doses disponíveis.
+                O campo <strong>TOURO</strong> no formato "NOME - RG" separa automaticamente o nome e o RG.
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
+              <button
+                onClick={() => { setShowImportModal(false); setImportFile(null); setImportPreview([]) }}
+                className="btn-secondary"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleImportExcel}
+                disabled={!importFile || isImporting}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg transition-colors flex items-center"
+              >
+                {isImporting ? (
+                  <><span className="animate-spin mr-2">⏳</span> Importando...</>
+                ) : (
+                  <><DocumentArrowDownIcon className="h-4 w-4 mr-2 rotate-180" /> Importar Agora</>
+                )}
               </button>
             </div>
           </div>

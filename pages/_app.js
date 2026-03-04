@@ -16,6 +16,21 @@ import logger from "../utils/logger";
 export default function App({ Component, pageProps }) {
   const router = useRouter();
   const [darkMode, setDarkMode] = useState(false);
+  const [routeLoading, setRouteLoading] = useState(false);
+
+  // Indicador de navegação entre páginas
+  useEffect(() => {
+    const start = () => setRouteLoading(true)
+    const end = () => setRouteLoading(false)
+    router.events.on('routeChangeStart', start)
+    router.events.on('routeChangeComplete', end)
+    router.events.on('routeChangeError', end)
+    return () => {
+      router.events.off('routeChangeStart', start)
+      router.events.off('routeChangeComplete', end)
+      router.events.off('routeChangeError', end)
+    }
+  }, [router.events])
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -115,6 +130,51 @@ export default function App({ Component, pageProps }) {
     <ErrorBoundary>
       <div className={darkMode ? "dark" : ""}>
         <DynamicFavicon />
+
+        {/* Barra de progresso + overlay "Atualizando App..." */}
+        {routeLoading && (
+          <>
+            {/* Barra fina no topo */}
+            <div
+              style={{
+                position: 'fixed', top: 0, left: 0, right: 0, height: '3px',
+                background: 'linear-gradient(90deg, #2563eb, #60a5fa, #2563eb)',
+                backgroundSize: '200% 100%',
+                animation: 'bsProgress 1s linear infinite',
+                zIndex: 99999,
+              }}
+            />
+            {/* Badge central */}
+            <div
+              style={{
+                position: 'fixed', top: '14px', left: '50%', transform: 'translateX(-50%)',
+                background: 'rgba(15,23,42,0.92)', color: '#fff',
+                padding: '6px 18px', borderRadius: '999px',
+                fontSize: '13px', fontWeight: 600, letterSpacing: '0.02em',
+                display: 'flex', alignItems: 'center', gap: '8px',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.35)',
+                zIndex: 99999, backdropFilter: 'blur(8px)',
+                border: '1px solid rgba(96,165,250,0.3)',
+              }}
+            >
+              <span style={{
+                width: '10px', height: '10px', borderRadius: '50%',
+                border: '2px solid #60a5fa', borderTopColor: 'transparent',
+                animation: 'bsSpin 0.7s linear infinite', display: 'inline-block'
+              }} />
+              Atualizando App...
+            </div>
+            <style>{`
+              @keyframes bsProgress {
+                0% { background-position: 200% 0 }
+                100% { background-position: -200% 0 }
+              }
+              @keyframes bsSpin {
+                to { transform: rotate(360deg) }
+              }
+            `}</style>
+          </>
+        )}
         <MaintenanceOverlay />
         <MobileIdentificationOverlay />
         <DevLiveReload />

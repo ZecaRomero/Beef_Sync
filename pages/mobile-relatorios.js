@@ -158,6 +158,9 @@ export default function MobileRelatorios() {
   const [cardFilterModal, setCardFilterModal] = useState({ open: false, title: '', filter: null, dataType: 'animais' })
   const [cardAnimalsList, setCardAnimalsList] = useState([])
   const [cardListLoading, setCardListLoading] = useState(false)
+  const [racaModalOpen, setRacaModalOpen] = useState(false)
+  const [racaSelecionada, setRacaSelecionada] = useState(null)
+  const [tourosRaca, setTourosRaca] = useState([])
 
   useEffect(() => {
     fetch('/api/mobile-reports')
@@ -575,6 +578,81 @@ export default function MobileRelatorios() {
     }
   })() : null
 
+  // Detalhes do estoque de sêmen por touro
+  const detalhesEstoqueSemen = selectedTipo === 'estoque_semen' && filteredData.length > 0 ? (() => {
+    const porTouro = {}
+    filteredData.forEach(r => {
+      const t = (r.touro || 'Não informado').trim() || 'Não informado'
+      const q = Number(r.quantidade) || 0
+      const raca = (r.raca || 'Não informada').trim() || 'Não informada'
+      if (!porTouro[t]) {
+        porTouro[t] = { total: 0, registros: 0, raca: raca }
+      }
+      porTouro[t].total += q
+      porTouro[t].registros += 1
+    })
+    return Object.entries(porTouro)
+      .sort(([, a], [, b]) => b.total - a.total)
+      .map(([touro, dados]) => ({
+        touro,
+        doses: dados.total,
+        registros: dados.registros,
+        raca: dados.raca
+      }))
+  })() : null
+
+  // Estoque agrupado por raça
+  const estoquePorRaca = selectedTipo === 'estoque_semen' && filteredData.length > 0 ? (() => {
+    const porRaca = {}
+    filteredData.forEach(r => {
+      const raca = (r.raca || 'Não informada').trim() || 'Não informada'
+      const q = Number(r.quantidade) || 0
+      if (!porRaca[raca]) {
+        porRaca[raca] = { total: 0, touros: new Set() }
+      }
+      porRaca[raca].total += q
+      if (r.touro) porRaca[raca].touros.add(r.touro.trim())
+    })
+    return Object.entries(porRaca)
+      .sort(([, a], [, b]) => b.total - a.total)
+      .map(([raca, dados]) => ({
+        raca,
+        doses: dados.total,
+        touros: dados.touros.size
+      }))
+  })() : null
+
+  // Função para abrir modal com touros de uma raça específica
+  const abrirModalRaca = (raca) => {
+    if (!filteredData || filteredData.length === 0) return
+    
+    const porTouro = {}
+    filteredData.forEach(r => {
+      const racaItem = (r.raca || 'Não informada').trim() || 'Não informada'
+      if (racaItem === raca) {
+        const t = (r.touro || 'Não informado').trim() || 'Não informado'
+        const q = Number(r.quantidade) || 0
+        if (!porTouro[t]) {
+          porTouro[t] = { total: 0, registros: 0 }
+        }
+        porTouro[t].total += q
+        porTouro[t].registros += 1
+      }
+    })
+    
+    const touros = Object.entries(porTouro)
+      .sort(([, a], [, b]) => b.total - a.total)
+      .map(([touro, dados]) => ({
+        touro,
+        doses: dados.total,
+        registros: dados.registros
+      }))
+    
+    setRacaSelecionada(raca)
+    setTourosRaca(touros)
+    setRacaModalOpen(true)
+  }
+
   // Gráfico de nascimentos por mês
   const nascimentosPorMes = selectedTipo === 'nascimentos' && filteredData.length > 0 ? (() => {
     const porMes = {}
@@ -830,6 +908,20 @@ export default function MobileRelatorios() {
       list.push({ icon: '📦', text: `${totalDoses} dose(s) em estoque total` })
       const touros = new Set(dados.map(r => (r.touro || '').trim()).filter(Boolean)).size
       list.push({ icon: '🐂', text: `${touros} touro(s) no catálogo` })
+      
+      // Touro com mais doses
+      const porTouro = {}
+      dados.forEach(r => {
+        const t = (r.touro || '').trim()
+        if (t) porTouro[t] = (porTouro[t] || 0) + (Number(r.quantidade) || 0)
+      })
+      const entries = Object.entries(porTouro).sort(([, a], [, b]) => b - a)
+      if (entries.length > 0) {
+        list.push({ icon: '🥇', text: `Maior estoque: ${entries[0][0]} com ${entries[0][1]} dose(s)` })
+      }
+      if (entries.length > 1) {
+        list.push({ icon: '🥈', text: `2º lugar: ${entries[1][0]} com ${entries[1][1]} dose(s)` })
+      }
     }
 
     if (selectedTipo === 'calendario_reprodutivo' && dados.length > 0) {
@@ -2618,6 +2710,107 @@ export default function MobileRelatorios() {
                     </div>
                   )}
 
+                  {/* Modal de touros por raça */}
+                  <AnimatePresence>
+                    {racaModalOpen && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                        onClick={() => setRacaModalOpen(false)}
+                      >
+                        <motion.div
+                          initial={{ scale: 0.9, y: 20 }}
+                          animate={{ scale: 1, y: 0 }}
+                          exit={{ scale: 0.9, y: 20 }}
+                          className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden"
+                          onClick={e => e.stopPropagation()}
+                        >
+                          {/* Header */}
+                          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-4 flex items-center justify-between">
+                            <div>
+                              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                                🐂 Touros - {racaSelecionada}
+                              </h3>
+                              <p className="text-sm text-purple-100 mt-1">
+                                {tourosRaca.length} {tourosRaca.length === 1 ? 'touro' : 'touros'} • {tourosRaca.reduce((sum, t) => sum + t.doses, 0)} doses
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => setRacaModalOpen(false)}
+                              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                            >
+                              <XMarkIcon className="h-6 w-6 text-white" />
+                            </button>
+                          </div>
+
+                          {/* Conteúdo */}
+                          <div className="p-4 overflow-y-auto max-h-[calc(80vh-100px)]">
+                            {tourosRaca.length === 0 ? (
+                              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                                <p>Nenhum touro encontrado para esta raça</p>
+                              </div>
+                            ) : (
+                              <div className="space-y-3">
+                                {tourosRaca.map((touro, idx) => (
+                                  <div
+                                    key={idx}
+                                    className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 border border-gray-200 dark:border-gray-600 hover:shadow-md transition-all"
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-2">
+                                          <span className="text-lg">
+                                            {idx === 0 && '🥇'}
+                                            {idx === 1 && '🥈'}
+                                            {idx === 2 && '🥉'}
+                                            {idx > 2 && `${idx + 1}º`}
+                                          </span>
+                                          <p className="font-bold text-gray-900 dark:text-white text-base">
+                                            {touro.touro}
+                                          </p>
+                                        </div>
+                                        <div className="flex items-center gap-3 text-sm">
+                                          <span className="text-gray-600 dark:text-gray-400">
+                                            {touro.registros} {touro.registros === 1 ? 'lote' : 'lotes'}
+                                          </span>
+                                        </div>
+                                      </div>
+                                      <div className="text-right">
+                                        <div className="inline-flex items-center px-4 py-2 rounded-full text-base font-bold bg-purple-600 text-white shadow-md">
+                                          {touro.doses}
+                                        </div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">doses</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Footer */}
+                          <div className="border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800/50">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                                  Total Geral
+                                </p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                  {tourosRaca.length} touros • {tourosRaca.reduce((sum, t) => sum + t.registros, 0)} lotes
+                                </p>
+                              </div>
+                              <div className="inline-flex items-center px-4 py-2 rounded-full text-lg font-bold bg-amber-500 text-white shadow-md">
+                                {tourosRaca.reduce((sum, t) => sum + t.doses, 0)}
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                   <div className="relative">
                     <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                     <input
@@ -2625,7 +2818,6 @@ export default function MobileRelatorios() {
                       value={searchQuery}
                       onChange={e => setSearchQuery(e.target.value)}
                       placeholder="Buscar..."
-                      inputMode="numeric"
                       className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                     />
                   </div>
@@ -2830,16 +3022,132 @@ export default function MobileRelatorios() {
                       )}
 
                       {estoquePorTouro && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm"
-                        >
-                          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Estoque de Sêmen por Touro</p>
-                          <div className="h-56">
-                            <Bar data={estoquePorTouro} options={chartOptions} />
-                          </div>
-                        </motion.div>
+                        <>
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm"
+                          >
+                            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Estoque de Sêmen por Touro</p>
+                            <div className="h-56">
+                              <Bar data={estoquePorTouro} options={chartOptions} />
+                            </div>
+                          </motion.div>
+
+                          {/* Card de resumo por raça */}
+                          {estoquePorRaca && estoquePorRaca.length > 0 && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: 0.05 }}
+                              className="rounded-2xl bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border-2 border-purple-200 dark:border-purple-700 p-4 shadow-sm"
+                            >
+                              <p className="text-sm font-semibold text-purple-800 dark:text-purple-300 mb-3 flex items-center gap-2">
+                                🐂 Estoque por Raça
+                                <span className="text-xs font-normal text-purple-600 dark:text-purple-400">(clique para ver touros)</span>
+                              </p>
+                              <div className="grid grid-cols-1 gap-3">
+                                {estoquePorRaca.map((item, idx) => (
+                                  <div 
+                                    key={idx}
+                                    onClick={() => abrirModalRaca(item.raca)}
+                                    className="bg-white dark:bg-gray-800 rounded-xl p-3 border border-purple-200 dark:border-purple-700 shadow-sm cursor-pointer hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all"
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex-1">
+                                        <p className="font-bold text-gray-900 dark:text-white text-base">
+                                          {item.raca}
+                                        </p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                          {item.touros} {item.touros === 1 ? 'touro' : 'touros'}
+                                        </p>
+                                      </div>
+                                      <div className="text-right">
+                                        <div className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-purple-600 text-white shadow-md">
+                                          {item.doses}
+                                        </div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">doses</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+
+                          {/* Tabela detalhada de estoque */}
+                          {detalhesEstoqueSemen && detalhesEstoqueSemen.length > 0 && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: 0.1 }}
+                              className="rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm"
+                            >
+                              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                                📊 Detalhamento Completo do Estoque
+                              </p>
+                              <div className="overflow-x-auto">
+                                <table className="w-full text-sm">
+                                  <thead>
+                                    <tr className="border-b border-gray-200 dark:border-gray-700">
+                                      <th className="text-left py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">#</th>
+                                      <th className="text-left py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">Touro</th>
+                                      <th className="text-left py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">Raça</th>
+                                      <th className="text-right py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">Doses</th>
+                                      <th className="text-right py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">Lotes</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {detalhesEstoqueSemen.map((item, idx) => (
+                                      <tr 
+                                        key={idx}
+                                        className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                                      >
+                                        <td className="py-2 px-2 text-gray-500 dark:text-gray-400">
+                                          {idx === 0 && '🥇'}
+                                          {idx === 1 && '🥈'}
+                                          {idx === 2 && '🥉'}
+                                          {idx > 2 && (idx + 1)}
+                                        </td>
+                                        <td className="py-2 px-2 text-gray-900 dark:text-white font-medium">
+                                          {item.touro}
+                                        </td>
+                                        <td className="py-2 px-2">
+                                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                                            {item.raca}
+                                          </span>
+                                        </td>
+                                        <td className="py-2 px-2 text-right">
+                                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
+                                            {item.doses}
+                                          </span>
+                                        </td>
+                                        <td className="py-2 px-2 text-right text-gray-600 dark:text-gray-400">
+                                          {item.registros}
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                  <tfoot>
+                                    <tr className="border-t-2 border-gray-300 dark:border-gray-600 font-bold">
+                                      <td colSpan="3" className="py-2 px-2 text-gray-900 dark:text-white">
+                                        TOTAL
+                                      </td>
+                                      <td className="py-2 px-2 text-right">
+                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+                                          {detalhesEstoqueSemen.reduce((sum, item) => sum + item.doses, 0)}
+                                        </span>
+                                      </td>
+                                      <td className="py-2 px-2 text-right text-gray-900 dark:text-white">
+                                        {detalhesEstoqueSemen.reduce((sum, item) => sum + item.registros, 0)}
+                                      </td>
+                                    </tr>
+                                  </tfoot>
+                                </table>
+                              </div>
+                            </motion.div>
+                          )}
+                        </>
                       )}
 
                       {nascimentosPorMes && (

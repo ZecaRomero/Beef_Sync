@@ -14,7 +14,6 @@ import {
   ClockIcon
 } from '../components/ui/Icons'
 import { SparklesIcon, LightBulbIcon } from '../components/ui/Icons'
-import AIAssistant from '../components/ai/AIAssistant'
 
 const NotasFiscaisRecentesWidget = () => {
   const router = useRouter()
@@ -778,9 +777,6 @@ export default function Dashboard() {
           </Card>
         </>
       )}
-      
-      {/* AI Assistant Floating Widget */}
-      <AIAssistant />
     </div>
   )
 }
