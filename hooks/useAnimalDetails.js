@@ -316,7 +316,25 @@ export function useAnimalDetails(id) {
     // Paramos de mostrar quando >640 dias (animais muito velhos, informação irrelevante)
     const precisaBrucelose = isFemea && idadeDias != null && idadeDias <= 640 && !temBrucelose
     const janelaEncerrada = isFemea && idadeDias != null && idadeDias > 240 && !temBrucelose
-    const elegivelDGT = idadeDias != null && idadeDias >= 330 && idadeDias <= 640
+    // DGT (Avaliação Andrológica/Reprodutiva): janela 330-640 dias (~11-21 meses)
+    // Considera DGT realizado se: machos com exame andrológico OU custo Andrológico registrado
+    const temDGT = (
+      (isMacho && examesAndrologicos.length > 0) ||
+      custosArray.some(c => {
+        const s = String(c.subtipo || '').toLowerCase()
+        const o = String(c.observacoes || '').toLowerCase()
+        const t = String(c.tipo || '').toLowerCase()
+        return s.includes('andrológico') || s.includes('andrologico') || s.includes('dgt') ||
+               o.includes('andrológico') || o.includes('andrologico') || o.includes('dgt') ||
+               t.includes('andrológico') || t.includes('andrologico')
+      })
+    )
+    // Elegível = está na janela agora (330-640 dias) e ainda não fez
+    const elegivelDGT = idadeDias != null && idadeDias >= 330 && idadeDias <= 640 && !temDGT
+    // Janela encerrada = passou dos 640 dias sem ter feito (máx até ~900 dias para ainda mostrar)
+    const janelaEncerradaDGT = idadeDias != null && idadeDias > 640 && idadeDias <= 900 && !temDGT
+    // precisaDGT = relevante mostrar no card (na janela, acabou de entrar ou passou recentemente)
+    const precisaDGT = idadeDias != null && idadeDias >= 330 && idadeDias <= 900
 
     // 6. Reprodução (Fêmeas)
     // Ordenar inseminações
@@ -399,7 +417,8 @@ export function useAnimalDetails(id) {
       diasNaFazenda,
       isMacho, isFemea,
       custoTotal, custosArray,
-      temBrucelose, elegivelBrucelose, precisaBrucelose, janelaEncerrada, elegivelDGT,
+      temBrucelose, elegivelBrucelose, precisaBrucelose, janelaEncerrada,
+      temDGT, elegivelDGT, janelaEncerradaDGT, precisaDGT,
       isPrenha, diasGestacao, previsaoParto, diasParaParto, gestacaoProgress,
       totalIAs, taxaSucessoIA, totalOocitos, mediaOocitos,
       evolucaoPeso,

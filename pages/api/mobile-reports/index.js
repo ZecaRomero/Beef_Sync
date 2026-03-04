@@ -1,4 +1,4 @@
-﻿/**
+/**
  * API para relatórios visíveis no mobile.
  * GET sem params: retorna config (enabled + allTypes)
  * GET ?tipo=X&startDate=&endDate=: retorna dados do relatório
@@ -446,7 +446,7 @@ export default async function handler(req, res) {
             ORDER BY a.data_nascimento DESC
           `)
 
-          // DGT: Animais entre 330 e 640 dias
+          // DGT: Animais entre 330 e 640 dias que ainda não fizeram a avaliação
           const dgtQuery = await query(`
             SELECT 
               a.id, a.serie, a.rg, a.sexo, a.raca, a.data_nascimento,
@@ -466,6 +466,15 @@ export default async function handler(req, res) {
             ) p ON TRUE
             WHERE a.situacao = 'Ativo'
               AND (CURRENT_DATE - a.data_nascimento::date) BETWEEN 330 AND 640
+              AND NOT EXISTS (
+                SELECT 1 FROM custos c
+                WHERE c.animal_id = a.id
+                AND (c.subtipo ILIKE '%androl%' OR c.observacoes ILIKE '%dgt%')
+              )
+              AND NOT EXISTS (
+                SELECT 1 FROM exames_andrologicos e
+                WHERE e.rg = a.rg::text
+              )
             ORDER BY a.data_nascimento DESC
           `)
 
@@ -559,7 +568,7 @@ export default async function handler(req, res) {
 
       case 'animais_dgt': {
         try {
-          // Animais entre 330 e 640 dias
+          // Animais entre 330 e 640 dias que ainda não fizeram DGT
           const dgtQuery = await query(`
             SELECT 
               a.id, a.serie, a.rg, a.sexo, a.raca, a.data_nascimento,
@@ -579,6 +588,15 @@ export default async function handler(req, res) {
             ) p ON TRUE
             WHERE a.situacao = 'Ativo'
               AND (CURRENT_DATE - a.data_nascimento::date) BETWEEN 330 AND 640
+              AND NOT EXISTS (
+                SELECT 1 FROM custos c
+                WHERE c.animal_id = a.id
+                AND (c.subtipo ILIKE '%androl%' OR c.observacoes ILIKE '%dgt%')
+              )
+              AND NOT EXISTS (
+                SELECT 1 FROM exames_andrologicos e
+                WHERE e.rg = a.rg::text
+              )
             ORDER BY a.data_nascimento DESC
           `)
 
