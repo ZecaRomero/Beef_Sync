@@ -13,11 +13,13 @@ export default function AnimalPlanningCards({ metrics }) {
     elegivelDGT,
     temBrucelose,
     precisaBrucelose,
+    janelaEncerrada,
     idadeDias,
     isFemea
   } = metrics
 
-  if (!elegivelBrucelose && !elegivelDGT && !temBrucelose) return null
+  // Renderizar somente se houver alguma informação relevante
+  if (!elegivelBrucelose && !elegivelDGT && !temBrucelose && !precisaBrucelose) return null
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-5 border border-gray-200 dark:border-gray-700">
@@ -26,22 +28,34 @@ export default function AnimalPlanningCards({ metrics }) {
         <h3 className="font-bold text-gray-900 dark:text-white">Planejamento / Obrigações</h3>
       </div>
       <div className="space-y-3 text-sm">
-        {isFemea && (
+        {isFemea && precisaBrucelose && (
           <div className={`p-3 rounded-xl border ${
-            elegivelBrucelose ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-300 dark:border-amber-700' :
-            temBrucelose ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700' :
-            precisaBrucelose ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-600' : ''
+            elegivelBrucelose
+              ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-300 dark:border-amber-700'
+              : temBrucelose
+              ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700'
+              : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-600'
           }`}>
             <p className="font-semibold text-gray-900 dark:text-white">Vacina Brucelose (obrigatório fêmeas 3-8 meses)</p>
             {temBrucelose ? (
               <p className="text-green-600 dark:text-green-400 mt-1">✓ Já vacinada</p>
             ) : elegivelBrucelose ? (
               <p className="text-amber-600 dark:text-amber-400 mt-1">⚠️ Elegível agora ({idadeDias} dias) – agendar vacinação</p>
-            ) : precisaBrucelose ? (
-              <p className="text-gray-600 dark:text-gray-400 mt-1">
-                {idadeDias < 90 ? `Aguardar até 90 dias (atual: ${idadeDias}d)` : `Janela encerrada (${idadeDias}d > 240d)`}
+            ) : janelaEncerrada ? (
+              <p className="text-red-500 dark:text-red-400 mt-1">
+                Janela encerrada ({Math.floor(idadeDias / 30)} meses) — não é mais necessário vacinar
               </p>
-            ) : null}
+            ) : (
+              <p className="text-gray-600 dark:text-gray-400 mt-1">
+                Aguardar até 3 meses (atual: {idadeDias}d)
+              </p>
+            )}
+          </div>
+        )}
+        {isFemea && temBrucelose && (
+          <div className="p-3 rounded-xl border bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700">
+            <p className="font-semibold text-gray-900 dark:text-white">Vacina Brucelose (obrigatório fêmeas 3-8 meses)</p>
+            <p className="text-green-600 dark:text-green-400 mt-1">✓ Já vacinada</p>
           </div>
         )}
         <div className={`p-3 rounded-xl border ${

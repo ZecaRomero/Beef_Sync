@@ -1,4 +1,4 @@
-/**
+﻿/**
  * API para relatórios visíveis no mobile.
  * GET sem params: retorna config (enabled + allTypes)
  * GET ?tipo=X&startDate=&endDate=: retorna dados do relatório
@@ -421,7 +421,7 @@ export default async function handler(req, res) {
           const bruceloseQuery = await query(`
             SELECT 
               a.id, a.serie, a.rg, a.sexo, a.raca, a.data_nascimento,
-              EXTRACT(DAY FROM (CURRENT_DATE - a.data_nascimento)) as idade_dias,
+              (CURRENT_DATE - a.data_nascimento::date) as idade_dias,
               COALESCE(l.piquete, a.piquete_atual, a.pasto_atual) as piquete,
               p.peso
             FROM animais a
@@ -437,7 +437,7 @@ export default async function handler(req, res) {
             ) p ON TRUE
             WHERE a.situacao = 'Ativo'
               AND a.sexo = 'Fêmea'
-              AND EXTRACT(DAY FROM (CURRENT_DATE - a.data_nascimento)) BETWEEN 90 AND 240
+              AND (CURRENT_DATE - a.data_nascimento::date) BETWEEN 90 AND 240
               AND NOT EXISTS (
                 SELECT 1 FROM historia_ocorrencias h
                 WHERE h.animal_id = a.id 
@@ -450,7 +450,7 @@ export default async function handler(req, res) {
           const dgtQuery = await query(`
             SELECT 
               a.id, a.serie, a.rg, a.sexo, a.raca, a.data_nascimento,
-              EXTRACT(DAY FROM (CURRENT_DATE - a.data_nascimento)) as idade_dias,
+              (CURRENT_DATE - a.data_nascimento::date) as idade_dias,
               COALESCE(l.piquete, a.piquete_atual, a.pasto_atual) as piquete,
               p.peso
             FROM animais a
@@ -465,7 +465,7 @@ export default async function handler(req, res) {
               ORDER BY data DESC LIMIT 1
             ) p ON TRUE
             WHERE a.situacao = 'Ativo'
-              AND EXTRACT(DAY FROM (CURRENT_DATE - a.data_nascimento)) BETWEEN 330 AND 640
+              AND (CURRENT_DATE - a.data_nascimento::date) BETWEEN 330 AND 640
             ORDER BY a.data_nascimento DESC
           `)
 
@@ -507,7 +507,7 @@ export default async function handler(req, res) {
           const bruceloseQuery = await query(`
             SELECT 
               a.id, a.serie, a.rg, a.sexo, a.raca, a.data_nascimento,
-              EXTRACT(DAY FROM (CURRENT_DATE - a.data_nascimento)) as idade_dias,
+              (CURRENT_DATE - a.data_nascimento::date) as idade_dias,
               COALESCE(l.piquete, a.piquete_atual, a.pasto_atual) as piquete,
               p.peso
             FROM animais a
@@ -523,7 +523,7 @@ export default async function handler(req, res) {
             ) p ON TRUE
             WHERE a.situacao = 'Ativo'
               AND a.sexo = 'Fêmea'
-              AND EXTRACT(DAY FROM (CURRENT_DATE - a.data_nascimento)) BETWEEN 90 AND 240
+              AND (CURRENT_DATE - a.data_nascimento::date) BETWEEN 90 AND 240
               AND NOT EXISTS (
                 SELECT 1 FROM historia_ocorrencias h
                 WHERE h.animal_id = a.id 
@@ -563,7 +563,7 @@ export default async function handler(req, res) {
           const dgtQuery = await query(`
             SELECT 
               a.id, a.serie, a.rg, a.sexo, a.raca, a.data_nascimento,
-              EXTRACT(DAY FROM (CURRENT_DATE - a.data_nascimento)) as idade_dias,
+              (CURRENT_DATE - a.data_nascimento::date) as idade_dias,
               COALESCE(l.piquete, a.piquete_atual, a.pasto_atual) as piquete,
               p.peso
             FROM animais a
@@ -578,7 +578,7 @@ export default async function handler(req, res) {
               ORDER BY data DESC LIMIT 1
             ) p ON TRUE
             WHERE a.situacao = 'Ativo'
-              AND EXTRACT(DAY FROM (CURRENT_DATE - a.data_nascimento)) BETWEEN 330 AND 640
+              AND (CURRENT_DATE - a.data_nascimento::date) BETWEEN 330 AND 640
             ORDER BY a.data_nascimento DESC
           `)
 
