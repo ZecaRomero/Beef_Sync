@@ -3,7 +3,6 @@ import { ReactNode, useEffect, useState } from 'react'
 import ModernSidebar from './layout/ModernSidebar'
 import ModernHeader from './layout/ModernHeader'
 import KeyboardShortcuts from './KeyboardShortcuts'
-import GlobalSearch from './GlobalSearch'
 import NetworkSyncButton from './NetworkSyncButton'
 
 interface LayoutProps {

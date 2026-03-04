@@ -103,6 +103,33 @@ export function formatPhone(phone) {
 }
 
 /**
+ * Calcula idade em meses
+ */
+export function calcularMesesIdade(dataNascimento, mesesCampo) {
+  if (mesesCampo != null && !isNaN(parseInt(mesesCampo))) return parseInt(mesesCampo)
+  if (!dataNascimento) return null
+  const dt = new Date(dataNascimento)
+  if (isNaN(dt.getTime())) return null
+  return Math.floor((new Date() - dt) / (1000 * 60 * 60 * 24 * 30.44))
+}
+
+/**
+ * Filtra nomes de touros que aparecem como localização
+ */
+export function localizacaoValidaParaExibir(loc) {
+  if (!loc || typeof loc !== 'string') return null
+  const n = loc.trim()
+  if (!n || /^(VAZIO|NÃO INFORMADO|NAO INFORMADO|-)$/i.test(n)) return null
+  if (/^PIQUETE\s+(\d+|CABANHA|CONF|GUARITA|PISTA)$/i.test(n)) return loc
+  if (/^PROJETO\s+[\dA-Za-z\-/]+$/i.test(n)) return loc
+  if (/^CONFINA$/i.test(n)) return loc
+  if (/^PIQ\s+\d+$/i.test(n)) return loc.replace(/^PIQ\s+/i, 'PIQUETE ')
+  // Abreviações comuns de importação: CABANHA, GUARITA, PISTA, CONF
+  if (/^(CABANHA|GUARITA|PISTA|CONF)$/i.test(n)) return loc
+  return null // Nome de touro ou inválido
+}
+
+/**
  * Formata porcentagem
  */
 export function formatPercentage(value, decimals = 1) {

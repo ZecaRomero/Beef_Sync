@@ -314,7 +314,6 @@ export default function MobileUsers() {
             </div>
           </div>
         </div>
-      </div>
     </>
   )
 }

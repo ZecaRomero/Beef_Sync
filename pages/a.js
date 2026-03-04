@@ -236,6 +236,57 @@ export default function ConsultaRapida() {
     }
   }, [nomeAnimal])
 
+  // Busca automática por RG quando digitar apenas números
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current)
+    }
+
+    const rgDigitado = rg.trim()
+    // Só busca se tiver pelo menos 4 dígitos e não tiver série preenchida
+    if (rgDigitado.length < 4 || serie.trim().length > 0) {
+      return
+    }
+
+    setLoadingSugestoes(true)
+    searchTimeoutRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/animals/buscar-por-rg?rg=${encodeURIComponent(rgDigitado)}`)
+        const data = await res.json()
+        
+        if (data.success && Array.isArray(data.data)) {
+          // Se encontrou apenas 1 animal, seleciona automaticamente
+          if (data.data.length === 1) {
+            const animal = data.data[0]
+            setSerie(animal.serie || '')
+            setRg(animal.rg || '')
+            setNomeAnimal(animal.nome || '')
+            setTouched({ serie: true, rg: true })
+            setError('')
+            // Redireciona automaticamente para a ficha do animal
+            if (animal.id) {
+              router.push(`/consulta-animal/${animal.id}`)
+            }
+          } else if (data.data.length > 1) {
+            // Se encontrou mais de 1, mostra as sugestões
+            setSugestoes(data.data)
+            setShowSugestoes(true)
+          }
+        }
+      } catch (err) {
+        console.error('Erro ao buscar por RG:', err)
+      } finally {
+        setLoadingSugestoes(false)
+      }
+    }, 500) // Debounce de 500ms para dar tempo de digitar
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current)
+      }
+    }
+  }, [rg, serie, router])
+
   // Fechar sugestões ao clicar fora
   useEffect(() => {
     const handleClickOutside = (event) => {

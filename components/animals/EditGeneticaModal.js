@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import Modal from '../ui/Modal'
+import { Modal } from '../ui/Modal'
 
 export default function EditGeneticaModal({ isOpen, onClose, animal, onSave }) {
   const [formData, setFormData] = useState({

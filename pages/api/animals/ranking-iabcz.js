@@ -62,7 +62,7 @@ export default async function handler(req, res) {
          ${serie ? 'AND UPPER(TRIM(COALESCE(a.serie, \'\'))) = $2' : ''}
        ORDER BY 
          CASE 
-           WHEN a.abczg ~ '^[0-9]+[.,]?[0-9]*$' 
+           WHEN a.abczg ~ '^[0-9]+[.,]?[0-9]*$'
            THEN (REPLACE(REPLACE(TRIM(a.abczg), ',', '.'), ' ', '')::numeric)
           ELSE NULL
         END DESC NULLS LAST,
@@ -102,7 +102,7 @@ export default async function handler(req, res) {
              ${serie ? 'AND UPPER(TRIM(COALESCE(a.serie, \'\'))) = $2' : ''}
            ORDER BY 
              CASE 
-               WHEN a.abczg ~ '^[0-9]+[.,]?[0-9]*$' 
+               WHEN a.abczg ~ '^[0-9]+[.,]?[0-9]*$'
               THEN (REPLACE(REPLACE(TRIM(a.abczg), ',', '.'), ' ', '')::numeric)
               ELSE NULL
             END DESC NULLS LAST,

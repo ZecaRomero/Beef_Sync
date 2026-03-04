@@ -50,29 +50,57 @@ export default function DebugAnimals() {
     }
   }
 
-  const syncData = () => {
+  const syncData = async () => {
     // Sincronizar dados do localStorage para a API
     const animals = JSON.parse(localStorage.getItem('animals') || '[]')
     
-    animals.forEach(async (animal) => {
+    if (animals.length === 0) {
+      alert('⚠️ Nenhum animal para sincronizar no localStorage.')
+      return
+    }
+
+    if (!confirm(`Deseja sincronizar ${animals.length} animais? Isso pode levar alguns instantes.`)) {
+      return
+    }
+
+    setLoading(true)
+    let successCount = 0
+    let errorCount = 0
+    
+    console.log('🔄 Iniciando sincronização de', animals.length, 'animais...')
+
+    for (const animal of animals) {
       try {
+        // Prepare payload with defaults for required fields
+        const payload = {
+          ...animal,
+          boletim: animal.boletim || 'Importação Debug',
+          pasto_atual: animal.pasto_atual || animal.piquete_atual || 'Sede'
+        }
+
         const response = await fetch('/api/animals', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(animal)
+          body: JSON.stringify(payload)
         })
         
         if (response.ok) {
           console.log('✅ Animal sincronizado:', animal.serie, animal.rg)
+          successCount++
         } else {
-          console.error('❌ Erro ao sincronizar:', animal.serie, animal.rg)
+          const errorData = await response.json().catch(() => ({}))
+          console.error('❌ Erro ao sincronizar:', animal.serie, animal.rg, response.status, errorData)
+          errorCount++
         }
       } catch (error) {
         console.error('❌ Erro ao sincronizar animal:', error)
+        errorCount++
       }
-    })
+    }
     
-    alert('🔄 Sincronização iniciada! Verifique o console para detalhes.')
+    setLoading(false)
+    alert(`✅ Sincronização concluída!\nSucessos: ${successCount}\nErros: ${errorCount}\nVerifique o console para detalhes.`)
+    loadData()
   }
 
   const clearAllData = () => {

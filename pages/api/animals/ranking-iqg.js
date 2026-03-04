@@ -47,7 +47,7 @@ export default async function handler(req, res) {
            ${serie ? 'AND UPPER(TRIM(COALESCE(a.serie, \'\'))) = $2' : ''}
          ORDER BY 
            CASE 
-             WHEN a.iqg::text ~ '^[0-9]+[.,]?[0-9]*$' 
+             WHEN a.iqg::text ~ '^[0-9]+[.,]?[0-9]*$'
              THEN (REPLACE(REPLACE(TRIM(a.iqg::text), ',', '.'), ' ', '')::numeric)
              ELSE NULL
            END DESC NULLS LAST,
@@ -64,7 +64,7 @@ export default async function handler(req, res) {
            WHERE a.situacao = 'Ativo' AND a.genetica_2 IS NOT NULL AND TRIM(a.genetica_2::text) != ''
              ${serie ? 'AND UPPER(TRIM(COALESCE(a.serie, \'\'))) = $2' : ''}
            ORDER BY 
-             CASE WHEN a.genetica_2::text ~ '^[0-9]+[.,]?[0-9]*$' 
+             CASE WHEN a.genetica_2::text ~ '^[0-9]+[.,]?[0-9]*$'
                THEN (REPLACE(REPLACE(TRIM(a.genetica_2::text), ',', '.'), ' ', '')::numeric)
                ELSE NULL END DESC NULLS LAST, a.rg DESC
            LIMIT $1`,
