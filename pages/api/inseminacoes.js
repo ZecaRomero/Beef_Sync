@@ -1,4 +1,5 @@
 import { query } from '../../lib/database';
+import { broadcast } from '../../lib/sseClients';
 
 export default async function handler(req, res) {
   try {
@@ -195,9 +196,11 @@ export default async function handler(req, res) {
         }
       }
 
+      const newInsem = result.rows[0]
+      broadcast('inseminacao.created', { animalId: newInsem?.animal_id })
       return res.status(201).json({
         success: true,
-        data: result.rows[0]
+        data: newInsem
       });
     }
 
@@ -254,9 +257,11 @@ export default async function handler(req, res) {
         return res.status(404).json({ error: 'Inseminação não encontrada' });
       }
 
+      const updatedInsem = result.rows[0]
+      broadcast('inseminacao.updated', { animalId: updatedInsem?.animal_id })
       return res.status(200).json({
         success: true,
-        data: result.rows[0]
+        data: updatedInsem
       });
     }
 

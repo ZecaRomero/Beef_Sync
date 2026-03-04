@@ -1,5 +1,6 @@
 import { query } from '../../lib/database'
 import { logger } from '../../utils/logger'
+import { broadcast } from '../../lib/sseClients'
 import { 
   sendSuccess, 
   sendError, 
@@ -142,6 +143,7 @@ async function birthsHandler(req, res) {
 
     const result = await query(queryText, params)
     
+    broadcast('birth.created', { animalId: result.rows[0]?.mae_id })
     return sendSuccess(res, result.rows[0], 'Nascimento criado com sucesso', HTTP_STATUS.CREATED)
 
   } else if (req.method === 'DELETE' && req.query.ids) {

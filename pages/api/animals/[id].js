@@ -1,6 +1,7 @@
 import databaseService from '../../../services/databaseService'
 import logger from '../../../utils/logger'
 import { asyncHandler } from '../../../utils/apiResponse'
+import { broadcast } from '../../../lib/sseClients'
 import { 
   sendSuccess, 
   sendValidationError, 
@@ -365,6 +366,7 @@ async function handlePut(req, res, id) {
     situacaoAbcz: animal.situacao_abcz || animal.situacaoAbcz || null
   }
   
+  broadcast('animal.updated', { animalId: animal.id, serie: animal.serie, rg: animal.rg })
   return sendSuccess(res, animalComIdentificacao)
 }
 
@@ -375,7 +377,8 @@ async function handleDelete(req, res, id) {
   }
 
   const animal = await databaseService.deletarAnimal(id)
-  
+
+  broadcast('animal.deleted', { animalId: Number(id) })
   return sendSuccess(res, {
     message: 'Animal deletado com sucesso',
     data: animal

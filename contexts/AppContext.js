@@ -3,9 +3,10 @@
  * Gerencia estado compartilhado entre componentes
  * Refatorado para usar PostgreSQL ao invés de localStorage
  */
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import apiClient from '../utils/apiClient'
 import logger from '../utils/logger'
+import { useServerEvents } from '../hooks/useServerEvents'
 
 const AppContext = createContext(null)
 
@@ -169,6 +170,51 @@ export function AppProvider({ children }) {
       loadAllData()
     }
   }, [initialized, loadAllData])
+
+  // Ref para throttle do refreshData via SSE (evita múltiplos refreshes simultâneos)
+  const refreshTimers = useRef({})
+
+  // Opção 3: SSE — auto-refresh quando servidor emite evento de mudança
+  useServerEvents(useCallback((event) => {
+    const throttledRefresh = (dataType, delayMs = 800) => {
+      if (refreshTimers.current[dataType]) return // já agendado
+      refreshTimers.current[dataType] = setTimeout(() => {
+        refreshData(dataType)
+        delete refreshTimers.current[dataType]
+      }, delayMs)
+    }
+
+    switch (event.type) {
+      case 'animal.created':
+      case 'animal.updated':
+      case 'animal.deleted':
+        throttledRefresh('animals')
+        break
+      case 'birth.created':
+        throttledRefresh('births')
+        throttledRefresh('animals', 1200)
+        break
+      case 'inseminacao.created':
+      case 'inseminacao.updated':
+        throttledRefresh('animals', 1200)
+        break
+      case 'pesagem.created':
+        throttledRefresh('animals', 1200)
+        break
+      case 'morte.created':
+        throttledRefresh('animals')
+        break
+      case 'semen.updated':
+        throttledRefresh('semen')
+        break
+      case 'nf.created':
+      case 'nf.updated':
+        throttledRefresh('notasFiscais')
+        break
+      default:
+        break
+    }
+  }, [refreshData]))
 
   // Estatísticas computadas
   const stats = {

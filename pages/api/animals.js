@@ -1,6 +1,7 @@
 import databaseService from '../../services/databaseService'
 import { logger } from '../../utils/logger'
 import boletimContabilService from '../../services/boletimContabilService'
+import { broadcast } from '../../lib/sseClients'
 import { racasPorSerie } from '../../services/mockData'
 import { 
   sendSuccess, 
@@ -283,6 +284,7 @@ async function animaisHandler(req, res) {
       }
       
       logger.debug(`[API] POST /api/animals - Enviando resposta de sucesso para animal criado`)
+      broadcast('animal.created', { animalId: animal.id, serie: animal.serie, rg: animal.rg })
       return sendSuccess(res, animalComIdentificacao, 'Animal criado com sucesso', HTTP_STATUS.CREATED)
       
     } catch (error) {

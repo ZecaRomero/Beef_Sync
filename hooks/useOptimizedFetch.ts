@@ -17,7 +17,7 @@ export function useOptimizedFetch<T = any>(
   const [error, setError] = useState<Error | null>(null);
   
   const abortControllerRef = useRef<AbortController | null>(null);
-  const { url, method = 'GET', body, headers, onSuccess, onError, cache = true, cacheTTL = 60000 } = options;
+  const { url, method = 'GET', body, headers, onSuccess, onError, cache = true, cacheTTL = 15000 } = options;
 
   const getCacheKey = useCallback(() => {
     return `${method}:${url}:${JSON.stringify(body || {})}`;

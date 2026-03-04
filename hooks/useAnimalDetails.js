@@ -1,17 +1,21 @@
-import { useState, useEffect, useMemo } from 'react'
-import { useOptimizedFetch } from './useOptimizedFetch'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useOptimizedFetch, invalidateCache } from './useOptimizedFetch'
+import { useServerEvents } from './useServerEvents'
 
 export function useAnimalDetails(id) {
   const [animal, setAnimal] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  
+
   // Dados complementares
   const [ocorrencias, setOcorrencias] = useState([])
   const [transferencias, setTransferencias] = useState([])
   const [inseminacoes, setInseminacoes] = useState([])
   const [examesAndrologicos, setExamesAndrologicos] = useState([])
   const [maeLink, setMaeLink] = useState(null)
+
+  // Ref para controlar se componente ainda está montado (evitar setState após unmount)
+  const mountedRef = useRef(true)
 
   // Rankings
   const [rankings, setRankings] = useState({
@@ -148,6 +152,97 @@ export function useAnimalDetails(id) {
 
     fetchRankings()
   }, [animal?.id])
+
+  // Função de refresh dos dados secundários (inseminações, ocorrências, TEs)
+  const refreshSecondary = useCallback((a) => {
+    if (!a?.id) return
+    const isMacho = a.sexo && (String(a.sexo).toLowerCase().includes('macho') || a.sexo === 'M')
+    const promises = [
+      fetch(`/api/animals/ocorrencias?animalId=${a.id}&limit=20`)
+        .then(r => r.json())
+        .then(d => { if (mountedRef.current) setOcorrencias(Array.isArray(d.ocorrencias || d.data || d) ? (d.ocorrencias || d.data || d) : []) })
+        .catch(() => {}),
+      fetch(`/api/transferencias-embrioes?receptora_id=${a.id}`)
+        .then(r => r.json())
+        .then(d => { if (mountedRef.current) setTransferencias(Array.isArray(d.data || d.transferencias || d) ? (d.data || d.transferencias || d) : []) })
+        .catch(() => {}),
+    ]
+    if (!isMacho) {
+      promises.push(
+        fetch(`/api/inseminacoes?animal_id=${a.id}`)
+          .then(r => r.json())
+          .then(d => { if (mountedRef.current) setInseminacoes(Array.isArray(d.data || d) ? (d.data || d) : []) })
+          .catch(() => {})
+      )
+    }
+    if (isMacho && a.rg) {
+      promises.push(
+        fetch(`/api/reproducao/exames-andrologicos?rg=${encodeURIComponent(a.rg)}`)
+          .then(r => r.json())
+          .then(d => { if (mountedRef.current) setExamesAndrologicos(Array.isArray(d.data ?? d) ? (d.data ?? d) : []) })
+          .catch(() => {})
+      )
+    }
+    return Promise.all(promises)
+  }, [])
+
+  // Opção 1: Polling automático a cada 30s (fallback quando SSE não estiver disponível)
+  useEffect(() => {
+    if (!id || !animal?.id) return
+
+    const poll = () => {
+      if (document.hidden) return // Não pollar com aba em background
+      invalidateCache(`/api/animals/${id}`)
+      // O refetch é disparado automaticamente pelo useOptimizedFetch ao invalidar o cache
+      // Para os dados secundários, atualizamos diretamente
+      refreshSecondary(animal)
+    }
+
+    const interval = setInterval(poll, 30000)
+    return () => clearInterval(interval)
+  }, [id, animal?.id, refreshSecondary])
+
+  // Cleanup ref ao desmontar
+  useEffect(() => {
+    mountedRef.current = true
+    return () => { mountedRef.current = false }
+  }, [])
+
+  // Opção 3: SSE — recebe eventos push do servidor e atualiza imediatamente
+  useServerEvents((event) => {
+    if (!id || !animal) return
+
+    const isThisAnimal = event.animalId === animal.id || event.animalId === Number(id)
+
+    if (event.type === 'animal.updated' && isThisAnimal) {
+      // Invalidar cache e buscar dados frescos do animal
+      invalidateCache(`/api/animals/${id}`)
+      refreshSecondary(animal)
+    }
+
+    if (event.type === 'animal.created') {
+      // Novo animal criado — não afeta a ficha atual, mas pode ser relevante para rankings
+      invalidateCache('/api/animals/ranking')
+    }
+
+    if (
+      (event.type === 'inseminacao.created' || event.type === 'inseminacao.updated') &&
+      isThisAnimal
+    ) {
+      fetch(`/api/inseminacoes?animal_id=${animal.id}`)
+        .then(r => r.json())
+        .then(d => { if (mountedRef.current) setInseminacoes(Array.isArray(d.data || d) ? (d.data || d) : []) })
+        .catch(() => {})
+    }
+
+    if (
+      (event.type === 'pesagem.created') &&
+      isThisAnimal
+    ) {
+      // Pesagem nova — invalida para forçar re-fetch do animal com pesagens
+      invalidateCache(`/api/animals/${id}`)
+    }
+  })
 
   // Buscar Mãe Link
   useEffect(() => {
