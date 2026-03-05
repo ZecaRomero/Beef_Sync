@@ -161,6 +161,9 @@ export default function MobileRelatorios() {
   const [racaModalOpen, setRacaModalOpen] = useState(false)
   const [racaSelecionada, setRacaSelecionada] = useState(null)
   const [tourosRaca, setTourosRaca] = useState([])
+  const [racaEmbriaoModalOpen, setRacaEmbriaoModalOpen] = useState(false)
+  const [racaEmbriaoSelecionada, setRacaEmbriaoSelecionada] = useState(null)
+  const [acasalamentosRaca, setAcasalamentosRaca] = useState([])
 
   useEffect(() => {
     fetch('/api/mobile-reports')
@@ -622,6 +625,79 @@ export default function MobileRelatorios() {
       }))
   })() : null
 
+  // ========== EMBRIÕES ==========
+  // Gráfico de estoque de embriões por acasalamento
+  const estoqueEmbriaoPorAcasalamento = selectedTipo === 'estoque_embrioes' && filteredData.length > 0 ? (() => {
+    const porAcasalamento = {}
+    filteredData.forEach(r => {
+      const acasalamento = (r.acasalamento || 'Não informado').trim() || 'Não informado'
+      const q = Number(r.quantidade) || 0
+      porAcasalamento[acasalamento] = (porAcasalamento[acasalamento] || 0) + q
+    })
+    const entries = Object.entries(porAcasalamento).sort(([, a], [, b]) => b - a).slice(0, 8)
+    if (entries.length === 0) return null
+    return {
+      labels: entries.map(([a]) => a.length > 20 ? a.slice(0, 17) + '...' : a),
+      datasets: [{
+        label: 'Embriões',
+        data: entries.map(([, c]) => c),
+        backgroundColor: 'rgba(245, 158, 11, 0.7)',
+        borderColor: 'rgba(245, 158, 11, 1)',
+        borderWidth: 1
+      }]
+    }
+  })() : null
+
+  // Detalhes do estoque de embriões por acasalamento
+  const detalhesEstoqueEmbrioes = selectedTipo === 'estoque_embrioes' && filteredData.length > 0 ? (() => {
+    const porAcasalamento = {}
+    filteredData.forEach(r => {
+      const acasalamento = (r.acasalamento || 'Não informado').trim() || 'Não informado'
+      const q = Number(r.quantidade) || 0
+      const raca = (r.raca || 'Não informada').trim() || 'Não informada'
+      const rack = r.rack || '-'
+      const botijao = r.botijao || '-'
+      const caneca = r.caneca || '-'
+      if (!porAcasalamento[acasalamento]) {
+        porAcasalamento[acasalamento] = { total: 0, registros: 0, raca: raca, rack, botijao, caneca }
+      }
+      porAcasalamento[acasalamento].total += q
+      porAcasalamento[acasalamento].registros += 1
+    })
+    return Object.entries(porAcasalamento)
+      .sort(([, a], [, b]) => b.total - a.total)
+      .map(([acasalamento, dados]) => ({
+        acasalamento,
+        embrioes: dados.total,
+        registros: dados.registros,
+        raca: dados.raca,
+        rack: dados.rack,
+        botijao: dados.botijao,
+        caneca: dados.caneca
+      }))
+  })() : null
+
+  // Estoque de embriões agrupado por raça
+  const estoqueEmbriaoPorRaca = selectedTipo === 'estoque_embrioes' && filteredData.length > 0 ? (() => {
+    const porRaca = {}
+    filteredData.forEach(r => {
+      const raca = (r.raca || 'Não informada').trim() || 'Não informada'
+      const q = Number(r.quantidade) || 0
+      if (!porRaca[raca]) {
+        porRaca[raca] = { total: 0, acasalamentos: new Set() }
+      }
+      porRaca[raca].total += q
+      if (r.acasalamento) porRaca[raca].acasalamentos.add(r.acasalamento.trim())
+    })
+    return Object.entries(porRaca)
+      .sort(([, a], [, b]) => b.total - a.total)
+      .map(([raca, dados]) => ({
+        raca,
+        embrioes: dados.total,
+        acasalamentos: dados.acasalamentos.size
+      }))
+  })() : null
+
   // Função para abrir modal com touros de uma raça específica
   const abrirModalRaca = (raca) => {
     if (!filteredData || filteredData.length === 0) return
@@ -651,6 +727,43 @@ export default function MobileRelatorios() {
     setRacaSelecionada(raca)
     setTourosRaca(touros)
     setRacaModalOpen(true)
+  }
+
+  // Função para abrir modal com acasalamentos de uma raça específica (embriões)
+  const abrirModalRacaEmbriao = (raca) => {
+    if (!filteredData || filteredData.length === 0) return
+    
+    const porAcasalamento = {}
+    filteredData.forEach(r => {
+      const racaItem = (r.raca || 'Não informada').trim() || 'Não informada'
+      if (racaItem === raca) {
+        const acasalamento = (r.acasalamento || 'Não informado').trim() || 'Não informado'
+        const q = Number(r.quantidade) || 0
+        const rack = r.rack || '-'
+        const botijao = r.botijao || '-'
+        const caneca = r.caneca || '-'
+        if (!porAcasalamento[acasalamento]) {
+          porAcasalamento[acasalamento] = { total: 0, registros: 0, rack, botijao, caneca }
+        }
+        porAcasalamento[acasalamento].total += q
+        porAcasalamento[acasalamento].registros += 1
+      }
+    })
+    
+    const acasalamentos = Object.entries(porAcasalamento)
+      .sort(([, a], [, b]) => b.total - a.total)
+      .map(([acasalamento, dados]) => ({
+        acasalamento,
+        embrioes: dados.total,
+        registros: dados.registros,
+        rack: dados.rack,
+        botijao: dados.botijao,
+        caneca: dados.caneca
+      }))
+    
+    setRacaEmbriaoSelecionada(raca)
+    setAcasalamentosRaca(acasalamentos)
+    setRacaEmbriaoModalOpen(true)
   }
 
   // Gráfico de nascimentos por mês
@@ -728,7 +841,7 @@ export default function MobileRelatorios() {
 
   const temGraficos = chartBarPiquete || chartPesoPiquete || chartSexo || chartPrenhez ||
     pesagensPorData || inseminacoesPorTouro || estoquePorTouro || nascimentosPorMes ||
-    nitrogenioEvolution || nitrogenioByDriver
+    nitrogenioEvolution || nitrogenioByDriver || estoqueEmbriaoPorAcasalamento
 
   const ehResumoGeral = selectedTipo === 'resumo_geral'
   const graficosResumo = ehResumoGeral ? (reportData?.resumo?.graficos || []) : []
@@ -2811,6 +2924,124 @@ export default function MobileRelatorios() {
                     )}
                   </AnimatePresence>
 
+                  {/* Modal de acasalamentos por raça (embriões) */}
+                  <AnimatePresence>
+                    {racaEmbriaoModalOpen && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                        onClick={() => setRacaEmbriaoModalOpen(false)}
+                      >
+                        <motion.div
+                          initial={{ scale: 0.9, y: 20 }}
+                          animate={{ scale: 1, y: 0 }}
+                          exit={{ scale: 0.9, y: 20 }}
+                          className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden"
+                          onClick={e => e.stopPropagation()}
+                        >
+                          {/* Header */}
+                          <div className="bg-gradient-to-r from-amber-600 to-orange-600 p-4 flex items-center justify-between">
+                            <div>
+                              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                                🥚 Acasalamentos - {racaEmbriaoSelecionada}
+                              </h3>
+                              <p className="text-sm text-amber-100 mt-1">
+                                {acasalamentosRaca.length} {acasalamentosRaca.length === 1 ? 'acasalamento' : 'acasalamentos'} • {acasalamentosRaca.reduce((sum, a) => sum + a.embrioes, 0)} embriões
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => setRacaEmbriaoModalOpen(false)}
+                              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                            >
+                              <XMarkIcon className="h-6 w-6 text-white" />
+                            </button>
+                          </div>
+
+                          {/* Conteúdo */}
+                          <div className="p-4 overflow-y-auto max-h-[calc(80vh-100px)]">
+                            {acasalamentosRaca.length === 0 ? (
+                              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                                <p>Nenhum acasalamento encontrado para esta raça</p>
+                              </div>
+                            ) : (
+                              <div className="space-y-3">
+                                {acasalamentosRaca.map((acasalamento, idx) => (
+                                  <div
+                                    key={idx}
+                                    className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 border border-gray-200 dark:border-gray-600 hover:shadow-md transition-all"
+                                  >
+                                    <div className="flex items-center justify-between mb-3">
+                                      <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-2">
+                                          <span className="text-lg">
+                                            {idx === 0 && '🥇'}
+                                            {idx === 1 && '🥈'}
+                                            {idx === 2 && '🥉'}
+                                            {idx > 2 && `${idx + 1}º`}
+                                          </span>
+                                          <p className="font-bold text-gray-900 dark:text-white text-base">
+                                            {acasalamento.acasalamento}
+                                          </p>
+                                        </div>
+                                        <div className="flex items-center gap-3 text-sm">
+                                          <span className="text-gray-600 dark:text-gray-400">
+                                            {acasalamento.registros} {acasalamento.registros === 1 ? 'lote' : 'lotes'}
+                                          </span>
+                                        </div>
+                                      </div>
+                                      <div className="text-right">
+                                        <div className="inline-flex items-center px-4 py-2 rounded-full text-base font-bold bg-amber-600 text-white shadow-md">
+                                          {acasalamento.embrioes}
+                                        </div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">embriões</p>
+                                      </div>
+                                    </div>
+                                    {acasalamento.rack && acasalamento.botijao && acasalamento.caneca && 
+                                     acasalamento.rack !== '-' && acasalamento.botijao !== '-' && acasalamento.caneca !== '-' && (
+                                      <div className="pt-2 border-t border-gray-200 dark:border-gray-600">
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Localização:</p>
+                                        <div className="flex items-center gap-2 text-sm font-mono">
+                                          <span className="px-2 py-1 rounded bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300">
+                                            Rack: {acasalamento.rack}
+                                          </span>
+                                          <span className="px-2 py-1 rounded bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300">
+                                            Botijão: {acasalamento.botijao}
+                                          </span>
+                                          <span className="px-2 py-1 rounded bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300">
+                                            Caneca: {acasalamento.caneca}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Footer */}
+                          <div className="border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800/50">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                                  Total Geral
+                                </p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                  {acasalamentosRaca.length} acasalamentos • {acasalamentosRaca.reduce((sum, a) => sum + a.registros, 0)} lotes
+                                </p>
+                              </div>
+                              <div className="inline-flex items-center px-4 py-2 rounded-full text-lg font-bold bg-amber-500 text-white shadow-md">
+                                {acasalamentosRaca.reduce((sum, a) => sum + a.embrioes, 0)}
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                   <div className="relative">
                     <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                     <input
@@ -3140,6 +3371,141 @@ export default function MobileRelatorios() {
                                       </td>
                                       <td className="py-2 px-2 text-right text-gray-900 dark:text-white">
                                         {detalhesEstoqueSemen.reduce((sum, item) => sum + item.registros, 0)}
+                                      </td>
+                                    </tr>
+                                  </tfoot>
+                                </table>
+                              </div>
+                            </motion.div>
+                          )}
+                        </>
+                      )}
+
+                      {/* ========== EMBRIÕES ========== */}
+                      {estoqueEmbriaoPorAcasalamento && (
+                        <>
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm"
+                          >
+                            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">🥚 Estoque de Embriões por Acasalamento</p>
+                            <div className="h-56">
+                              <Bar data={estoqueEmbriaoPorAcasalamento} options={chartOptions} />
+                            </div>
+                          </motion.div>
+
+                          {/* Card de resumo por raça - Embriões */}
+                          {estoqueEmbriaoPorRaca && estoqueEmbriaoPorRaca.length > 0 && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: 0.05 }}
+                              className="rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-2 border-amber-200 dark:border-amber-700 p-4 shadow-sm"
+                            >
+                              <p className="text-sm font-semibold text-amber-800 dark:text-amber-300 mb-3 flex items-center gap-2">
+                                🥚 Estoque por Raça
+                                <span className="text-xs font-normal text-amber-600 dark:text-amber-400">(clique para ver acasalamentos)</span>
+                              </p>
+                              <div className="grid grid-cols-1 gap-3">
+                                {estoqueEmbriaoPorRaca.map((item, idx) => (
+                                  <div 
+                                    key={idx}
+                                    onClick={() => abrirModalRacaEmbriao(item.raca)}
+                                    className="bg-white dark:bg-gray-800 rounded-xl p-3 border border-amber-200 dark:border-amber-700 shadow-sm cursor-pointer hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all"
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex-1">
+                                        <p className="font-bold text-gray-900 dark:text-white text-base">
+                                          {item.raca}
+                                        </p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                          {item.acasalamentos} {item.acasalamentos === 1 ? 'acasalamento' : 'acasalamentos'}
+                                        </p>
+                                      </div>
+                                      <div className="text-right">
+                                        <div className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-amber-600 text-white shadow-md">
+                                          {item.embrioes}
+                                        </div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">embriões</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+
+                          {/* Tabela detalhada de estoque de embriões */}
+                          {detalhesEstoqueEmbrioes && detalhesEstoqueEmbrioes.length > 0 && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: 0.1 }}
+                              className="rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm"
+                            >
+                              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                                📊 Detalhamento Completo do Estoque de Embriões
+                              </p>
+                              <div className="overflow-x-auto">
+                                <table className="w-full text-sm">
+                                  <thead>
+                                    <tr className="border-b border-gray-200 dark:border-gray-700">
+                                      <th className="text-left py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">#</th>
+                                      <th className="text-left py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">Acasalamento</th>
+                                      <th className="text-left py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">Raça</th>
+                                      <th className="text-center py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">Localização</th>
+                                      <th className="text-right py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">Embriões</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {detalhesEstoqueEmbrioes.map((item, idx) => (
+                                      <tr 
+                                        key={idx}
+                                        className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                                      >
+                                        <td className="py-2 px-2 text-gray-500 dark:text-gray-400">
+                                          {idx === 0 && '🥇'}
+                                          {idx === 1 && '🥈'}
+                                          {idx === 2 && '🥉'}
+                                          {idx > 2 && (idx + 1)}
+                                        </td>
+                                        <td className="py-2 px-2 text-gray-900 dark:text-white font-medium">
+                                          {item.acasalamento}
+                                        </td>
+                                        <td className="py-2 px-2">
+                                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                                            {item.raca}
+                                          </span>
+                                        </td>
+                                        <td className="py-2 px-2 text-center text-xs text-gray-600 dark:text-gray-400">
+                                          {item.rack && item.botijao && item.caneca ? (
+                                            <span className="inline-flex items-center gap-1">
+                                              <span className="font-mono">{item.rack}</span>
+                                              <span>/</span>
+                                              <span className="font-mono">{item.botijao}</span>
+                                              <span>/</span>
+                                              <span className="font-mono">{item.caneca}</span>
+                                            </span>
+                                          ) : '-'}
+                                        </td>
+                                        <td className="py-2 px-2 text-right">
+                                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+                                            {item.embrioes}
+                                          </span>
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                  <tfoot>
+                                    <tr className="border-t-2 border-gray-300 dark:border-gray-600 font-bold">
+                                      <td colSpan="4" className="py-2 px-2 text-gray-900 dark:text-white">
+                                        TOTAL
+                                      </td>
+                                      <td className="py-2 px-2 text-right">
+                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+                                          {detalhesEstoqueEmbrioes.reduce((sum, item) => sum + item.embrioes, 0)}
+                                        </span>
                                       </td>
                                     </tr>
                                   </tfoot>
