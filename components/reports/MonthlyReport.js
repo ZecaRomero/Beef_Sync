@@ -1,6 +1,11 @@
+import React, { useEffect, useState, useMemo } from 'react'
+import { apiAll } from '../../lib/apiClient'
+import logger from '../../utils/logger'
 
-
-import React, { useEffect, useState } from 'react'
+const MONTHS = [
+  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+]
 
 export default function MonthlyReport() {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
@@ -9,39 +14,47 @@ export default function MonthlyReport() {
   const [realData, setRealData] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  const months = [
-    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-  ]
+  const requests = useMemo(() => [
+    { key: 'animals', url: '/api/animals' },
+    { key: 'births', url: '/api/births' }
+  ], [])
 
-  // Carregar dados reais do banco
+  const [rawAnimals, setRawAnimals] = useState([])
+  const [rawBirths, setRawBirths] = useState([])
+
   useEffect(() => {
-    loadMonthlyData()
-  }, [selectedYear, selectedMonth])
+    let cancelled = false
 
-  const loadMonthlyData = async () => {
-    setLoading(true)
-    try {
-      // Buscar dados de custos, nascimentos e vendas do banco
-      const [animalsRes, costsRes, birthsRes] = await Promise.all([
-        fetch('/api/animals'),
-        fetch('/api/animals/custos'), // Precisará ser criada para retornar custos agregados
-        fetch('/api/births')
-      ])
+    async function loadData() {
+      setLoading(true)
+      try {
+        const result = await apiAll(requests)
+        if (cancelled) return
 
-      const animals = animalsRes.ok ? await animalsRes.json() : []
-      const births = birthsRes.ok ? await birthsRes.json() : []
-      
-      // Calcular dados reais baseados nos dados do banco
-      const monthlyData = calculateMonthlyData(animals, births, selectedYear)
-      setRealData(monthlyData)
-    } catch (error) {
-      console.error('Erro ao carregar dados mensais:', error)
-      setRealData(getEmptyMonthlyData())
-    } finally {
-      setLoading(false)
+        setRawAnimals(result.data?.animals ?? [])
+        setRawBirths(result.data?.births ?? [])
+      } catch (error) {
+        if (!cancelled) {
+          logger.error('Erro ao carregar dados mensais:', error)
+          setRawAnimals([])
+          setRawBirths([])
+        }
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
     }
-  }
+
+    loadData()
+    return () => { cancelled = true }
+  }, [requests])
+
+  useEffect(() => {
+    if (rawAnimals.length === 0 && rawBirths.length === 0 && !loading) {
+      setRealData(getEmptyMonthlyData())
+      return
+    }
+    setRealData(calculateMonthlyData(rawAnimals, rawBirths, selectedYear))
+  }, [rawAnimals, rawBirths, selectedYear, loading])
 
   const getEmptyMonthlyData = () => {
     const data = {}
@@ -133,7 +146,7 @@ export default function MonthlyReport() {
     )
   }
 
-  const monthlyData = realData
+  const monthlyData = realData ?? getEmptyMonthlyData()
   const currentMonthData = monthlyData[selectedMonth]
 
   // Calcular totais anuais
@@ -203,7 +216,7 @@ export default function MonthlyReport() {
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
         <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center">
           <span className="mr-2">🐄</span>
-          Movimentação de Animais - {months[selectedMonth - 1]}
+          Movimentação de Animais - {MONTHS[selectedMonth - 1]}
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -309,7 +322,7 @@ export default function MonthlyReport() {
             />
 
             {/* Labels dos meses */}
-            {months.map((month, index) => (
+            {MONTHS.map((month, index) => (
               <text
                 key={index}
                 x={50 + (index * 60)}
@@ -356,7 +369,7 @@ export default function MonthlyReport() {
               </tr>
             </thead>
             <tbody>
-              {months.map((month, index) => {
+              {MONTHS.map((month, index) => {
                 const data = monthlyData[index + 1]
                 const margin = data.revenue > 0 ? ((data.profit / data.revenue) * 100) : 0
                 
@@ -402,7 +415,7 @@ export default function MonthlyReport() {
             <h1 className="text-3xl font-bold mb-2 flex items-center">
               📅 Relatório Mensal
               <span className="ml-3 px-3 py-1 bg-white/20 rounded-full text-sm font-medium">
-                {months[selectedMonth - 1]} {selectedYear}
+                {MONTHS[selectedMonth - 1]} {selectedYear}
               </span>
             </h1>
             <p className="text-purple-100 text-lg">
@@ -447,7 +460,7 @@ export default function MonthlyReport() {
                 onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
-                {months.map((month, index) => (
+                {MONTHS.map((month, index) => (
                   <option key={index} value={index + 1}>
                     {month}
                   </option>

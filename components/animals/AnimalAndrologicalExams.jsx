@@ -1,15 +1,23 @@
 import React, { useState } from 'react'
 import { AcademicCapIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline'
-import { formatDate } from '../../utils/formatters'
 
-export default function AnimalAndrologicalExams({ examesAndrologicos, metrics = {} }) {
+function formatDate(d) {
+  if (!d) return '-'
+  const dt = new Date(d)
+  return isNaN(dt.getTime()) ? '-' : dt.toLocaleDateString('pt-BR')
+}
+
+export default function AnimalAndrologicalExams({ examesAndrologicos }) {
   const [isExpanded, setIsExpanded] = useState(true)
 
   if (!examesAndrologicos || examesAndrologicos.length === 0) return null
 
   const ultExame = examesAndrologicos[0]
-  const { diasDesdeExame, isInapto, diasParaProximoExame } = metrics
+  const diasDesdeExame = ultExame?.data_exame
+    ? Math.floor((new Date() - new Date(ultExame.data_exame)) / (1000 * 60 * 60 * 24))
+    : null
 
+  const isInapto = ultExame && String(ultExame.resultado || '').toUpperCase().includes('INAPTO')
   const dataProximoExame = (isInapto && ultExame?.data_exame)
     ? new Date(new Date(ultExame.data_exame).getTime() + 30 * 24 * 60 * 60 * 1000)
     : null

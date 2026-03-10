@@ -4,7 +4,8 @@ import { sendSuccess, sendError, sendMethodNotAllowed, asyncHandler, HTTP_STATUS
 const handler = async (req, res) => {
   if (req.method === 'GET') {
     try {
-      const result = await semenService.buscarEstoqueDisponivel()
+      const tipo = req.query.tipo || null // 'semen' | 'embriao' | null (todos)
+      const result = await semenService.buscarEstoqueDisponivel(tipo)
       
       if (result.success) {
         return sendSuccess(res, result.data, 'Entradas disponíveis obtidas com sucesso')

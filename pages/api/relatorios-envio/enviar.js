@@ -2902,6 +2902,9 @@ async function generateWhatsAppSummary(period, relatorios) {
       WITH animais_com_brucelose AS (
         SELECT DISTINCT c.animal_id FROM custos c
         WHERE c.tipo ILIKE '%brucelose%' OR c.subtipo ILIKE '%brucelose%' OR c.observacoes ILIKE '%brucelose%'
+        UNION
+        SELECT DISTINCT h.animal_id FROM historia_ocorrencias h
+        WHERE LOWER(h.tipo) LIKE '%brucelose%' OR LOWER(h.descricao) LIKE '%brucelose%'
       )
       SELECT COUNT(*) as total FROM animais a
       LEFT JOIN animais_com_brucelose b ON a.id = b.animal_id

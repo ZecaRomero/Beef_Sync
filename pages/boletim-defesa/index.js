@@ -1,9 +1,11 @@
 import { useState, useEffect, Fragment } from 'react'
 import Head from 'next/head'
 import ModernLayout from '../../components/layout/ModernLayout'
-import { DocumentTextIcon, ArrowDownTrayIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline'
+import BoletimCampo from '../../components/boletim/BoletimCampo'
+import { DocumentTextIcon, ArrowDownTrayIcon, PlusIcon, TrashIcon, TableCellsIcon, ShieldCheckIcon } from '@heroicons/react/24/outline'
 
 export default function BoletimDefesa() {
+  const [abaAtiva, setAbaAtiva] = useState('defesa')
   const [fazendas, setFazendas] = useState([])
   const [historico, setHistorico] = useState([])
   const [loading, setLoading] = useState(true)
@@ -17,6 +19,21 @@ export default function BoletimDefesa() {
     carregarDados()
   }, [])
 
+  const [redirecionandoMobile, setRedirecionandoMobile] = useState(false)
+
+  // Redirecionar para versão mobile em dispositivos móveis (igual ao app)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (window.location.pathname === '/boletim-defesa/mobile') return
+    const isMobile = window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    if (isMobile) {
+      setRedirecionandoMobile(true)
+      window.location.replace('/boletim-defesa/mobile')
+    }
+  }, [])
+
+  const [isAdelso, setIsAdelso] = useState(false)
+
   useEffect(() => {
     if (typeof window === 'undefined') return
     try {
@@ -26,6 +43,15 @@ export default function BoletimDefesa() {
         setCurrentUser(parsed?.nome || null)
       } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         setCurrentUser('Zeca')
+      }
+      const adelsoAuth = localStorage.getItem('beef_adelso_auth')
+      if (adelsoAuth) {
+        try {
+          const data = JSON.parse(adelsoAuth)
+          if (data.nome === 'Adelso' && data.expiresAt > Date.now()) {
+            setIsAdelso(true)
+          }
+        } catch (_) {}
       }
     } catch (_) {}
   }, [])
@@ -161,7 +187,7 @@ export default function BoletimDefesa() {
   }
 
   const podeExcluirRegistro = (h) => {
-    if (!currentUser) return false
+    if (!currentUser || isAdelso) return false
     const regUser = (h.usuario || '').trim()
     return regUser === '' || regUser === '-' || regUser === currentUser || currentUser === 'Zeca'
   }
@@ -553,13 +579,16 @@ export default function BoletimDefesa() {
     URL.revokeObjectURL(url)
   }
 
-  if (loading) {
+  if (loading || redirecionandoMobile) {
     return (
-      <ModernLayout title="Boletim Defesa" subtitle="Carregando..." icon={<DocumentTextIcon className="w-8 h-8" />}>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400 text-sm">
+            {redirecionandoMobile ? 'Abrindo versão mobile...' : 'Carregando...'}
+          </p>
         </div>
-      </ModernLayout>
+      </div>
     )
   }
 
@@ -645,10 +674,42 @@ export default function BoletimDefesa() {
 
       <ModernLayout
         title="Boletim Defesa"
-        subtitle="Quantidades de gado na defesa por faixa etária"
+        subtitle={abaAtiva === 'defesa' ? 'Quantidades de gado na defesa por faixa etária' : 'Boletim Campo - LOCAL, QUANT., SEXO, CATEGORIA, RAÇA, ERA'}
         icon={<DocumentTextIcon className="w-8 h-8 text-white" />}
       >
         <div className="space-y-6">
+          {/* Abas Boletim Defesa / Boletim Campo */}
+          <div className="flex gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
+            <button
+              onClick={() => setAbaAtiva('defesa')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-t-lg font-medium transition-colors ${
+                abaAtiva === 'defesa'
+                  ? 'bg-teal-600 text-white'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+              }`}
+            >
+              <ShieldCheckIcon className="w-5 h-5" />
+              Boletim Defesa
+            </button>
+            <button
+              onClick={() => setAbaAtiva('campo')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-t-lg font-medium transition-colors ${
+                abaAtiva === 'campo'
+                  ? 'bg-teal-600 text-white'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+              }`}
+            >
+              <TableCellsIcon className="w-5 h-5" />
+              Boletim Campo
+            </button>
+          </div>
+
+          {abaAtiva === 'campo' && (
+            <BoletimCampo usuario={currentUser} isAdelso={isAdelso} />
+          )}
+
+          {abaAtiva === 'defesa' && (
+          <>
           {/* Botões de ação */}
           <div className="flex flex-wrap gap-3">
             <button
@@ -659,23 +720,29 @@ export default function BoletimDefesa() {
               Exportar Excel
             </button>
 
-            <button
-              onClick={() => window.location.href = '/boletim-defesa/nova-fazenda'}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md"
-            >
-              <PlusIcon className="w-5 h-5" />
-              Nova Fazenda
-            </button>
-
-            <button
-              onClick={() => window.location.href = '/boletim-defesa/mobile'}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-lg hover:from-teal-700 hover:to-teal-800 transition-colors shadow-md"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-              </svg>
-              Versão Mobile
-            </button>
+            {!isAdelso && (
+              <>
+                <button
+                  onClick={() => window.location.href = '/boletim-defesa/nova-fazenda'}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md"
+                >
+                  <PlusIcon className="w-5 h-5" />
+                  Nova Fazenda
+                </button>
+                <button
+                  onClick={() => window.location.href = '/boletim-defesa/mobile'}
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-lg hover:from-teal-700 hover:to-teal-800 transition-colors shadow-md"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                  Versão Mobile
+                </button>
+              </>
+            )}
+            {isAdelso && (
+              <span className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400 italic">Somente consulta</span>
+            )}
           </div>
 
           {/* Tabela Unificada */}
@@ -723,33 +790,33 @@ export default function BoletimDefesa() {
                           <tr className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                             {['0a3', '3a8', '8a12', '12a24', '25a36', 'acima36'].map(faixa => (
                               <Fragment key={faixa}>
-                                <td className="border border-gray-200 dark:border-gray-700 p-0 relative group">
-                                  <input
-                                    type="number"
-                                    defaultValue={fazenda.quantidades[faixa]?.M || 0}
-                                    onBlur={(e) => handleCellChange(fazenda.id, faixa, 'M', e.target.value)}
-                                    onKeyDown={(e) => {
-                                      if (e.key === 'Enter') {
-                                        e.target.blur()
-                                      }
-                                    }}
-                                    className="w-full h-full px-1 py-3 text-center text-gray-700 dark:text-gray-300 bg-transparent focus:bg-blue-50 dark:focus:bg-blue-900/30 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 font-medium transition-all"
-                                    placeholder="0"
-                                  />
+                                <td className="border border-gray-200 dark:border-gray-700 px-1 py-3 text-center font-medium text-gray-700 dark:text-gray-300">
+                                  {isAdelso ? (
+                                    (fazenda.quantidades[faixa]?.M || 0)
+                                  ) : (
+                                    <input
+                                      type="number"
+                                      defaultValue={fazenda.quantidades[faixa]?.M || 0}
+                                      onBlur={(e) => handleCellChange(fazenda.id, faixa, 'M', e.target.value)}
+                                      onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur() }}
+                                      className="w-full h-full px-1 py-3 text-center text-gray-700 dark:text-gray-300 bg-transparent focus:bg-blue-50 dark:focus:bg-blue-900/30 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 font-medium transition-all"
+                                      placeholder="0"
+                                    />
+                                  )}
                                 </td>
-                                <td className="border border-gray-200 dark:border-gray-700 p-0 relative group">
-                                  <input
-                                    type="number"
-                                    defaultValue={fazenda.quantidades[faixa]?.F || 0}
-                                    onBlur={(e) => handleCellChange(fazenda.id, faixa, 'F', e.target.value)}
-                                    onKeyDown={(e) => {
-                                      if (e.key === 'Enter') {
-                                        e.target.blur()
-                                      }
-                                    }}
-                                    className="w-full h-full px-1 py-3 text-center text-gray-700 dark:text-gray-300 bg-transparent focus:bg-pink-50 dark:focus:bg-pink-900/30 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-pink-500 font-medium transition-all"
-                                    placeholder="0"
-                                  />
+                                <td className="border border-gray-200 dark:border-gray-700 px-1 py-3 text-center font-medium text-gray-700 dark:text-gray-300">
+                                  {isAdelso ? (
+                                    (fazenda.quantidades[faixa]?.F || 0)
+                                  ) : (
+                                    <input
+                                      type="number"
+                                      defaultValue={fazenda.quantidades[faixa]?.F || 0}
+                                      onBlur={(e) => handleCellChange(fazenda.id, faixa, 'F', e.target.value)}
+                                      onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur() }}
+                                      className="w-full h-full px-1 py-3 text-center text-gray-700 dark:text-gray-300 bg-transparent focus:bg-pink-50 dark:focus:bg-pink-900/30 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-pink-500 font-medium transition-all"
+                                      placeholder="0"
+                                    />
+                                  )}
                                 </td>
                               </Fragment>
                             ))}
@@ -833,7 +900,7 @@ export default function BoletimDefesa() {
                       <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Campo alterado</th>
                       <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">De → Para</th>
                       <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Usuário</th>
-                      {currentUser && <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase w-12">Excluir</th>}
+                      {currentUser && !isAdelso && <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase w-12">Excluir</th>}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -861,7 +928,7 @@ export default function BoletimDefesa() {
                           <span className="text-green-600 dark:text-green-400 font-medium">{h.valor_novo}</span>
                         </td>
                         <td className="px-3 py-2 text-gray-500 dark:text-gray-400 text-xs">{h.usuario || '-'}</td>
-                        {currentUser && (
+                        {currentUser && !isAdelso && (
                           <td className="px-2 py-2 text-center">
                             {podeExcluirRegistro(h) ? (
                               <button
@@ -906,6 +973,8 @@ export default function BoletimDefesa() {
                 Adicionar Fazenda
               </button>
             </div>
+          )}
+          </>
           )}
         </div>
       </ModernLayout>

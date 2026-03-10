@@ -9,15 +9,20 @@ import {
   ExclamationTriangleIcon,
   CheckCircleIcon,
   ClockIcon,
-  XMarkIcon
+  XMarkIcon,
+  PencilIcon,
+  TrashIcon
 } from './ui/Icons'
 import costManager from '../services/costManager'
 
-export default function CostManager({ isOpen, onClose, animal: propAnimal, onSave }) {
+export default function CostManager({ isOpen, onClose, animal: propAnimal, onSave, initialAnimalId }) {
   const [animals, setAnimals] = useState([])
   const [selectedAnimal, setSelectedAnimal] = useState(propAnimal || null)
   const [custosAnimal, setCustosAnimal] = useState([])
   const [showAddCost, setShowAddCost] = useState(false)
+  const [showEditCost, setShowEditCost] = useState(false)
+  const [editingCusto, setEditingCusto] = useState(null)
+  const [applyToAllCustos, setApplyToAllCustos] = useState(false)
   const [showProtocolos, setShowProtocolos] = useState(false)
   const [showServicosCadastrados, setShowServicosCadastrados] = useState(false)
   const [showMedicamentosEstoque, setShowMedicamentosEstoque] = useState(false)
@@ -33,6 +38,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
     valor: '',
     observacoes: ''
   })
+  const [aplicandoAutomaticos, setAplicandoAutomaticos] = useState(false)
 
   // Atualizar animal selecionado quando prop mudar
   useEffect(() => {
@@ -41,15 +47,17 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
     }
   }, [propAnimal])
 
+  const isStandalone = isOpen === undefined || isOpen === true
+
   useEffect(() => {
-    if (isOpen) {
+    if (isStandalone) {
       loadAnimals()
       loadRelatorioGeral()
       if (propAnimal) {
         loadServicosCadastrados()
       }
     }
-  }, [isOpen, propAnimal])
+  }, [isStandalone, propAnimal])
 
   useEffect(() => {
     if (selectedAnimal) {
@@ -81,6 +89,14 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
       setAnimals([])
     }
   }
+
+  useEffect(() => {
+    if (initialAnimalId && animals?.length && !selectedAnimal) {
+      const id = parseInt(initialAnimalId, 10)
+      const found = animals.find(a => a.id === id || String(a.id) === String(initialAnimalId))
+      if (found) setSelectedAnimal(found)
+    }
+  }, [initialAnimalId, animals])
 
   const loadCustosAnimal = async (animalId) => {
     try {
@@ -272,13 +288,13 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
     setShowAddCost(false)
   }
 
-  const handleAddCost = () => {
+  const handleAddCost = async () => {
     const camposFaltando = [];
-    
+
     if (!selectedAnimal) camposFaltando.push('Animal');
     if (!newCost.tipo) camposFaltando.push('Tipo de Custo');
     if (!newCost.valor) camposFaltando.push('Valor');
-    
+
     if (camposFaltando.length > 0) {
       let mensagem = '❌ Campos obrigatórios não preenchidos:\n\n';
       camposFaltando.forEach((campo, index) => {
@@ -297,23 +313,94 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
       observacoes: newCost.observacoes
     }
 
-    costManager.adicionarCusto(selectedAnimal.id, custo)
-    loadCustosAnimal(selectedAnimal.id)
-    loadRelatorioGeral()
-    
-    setNewCost({ tipo: '', subtipo: '', valor: '', observacoes: '' })
-    setShowAddCost(false)
-    
-    // Chamar callback se fornecido
-    if (onSave && selectedAnimal) {
-      const updatedAnimal = {
-        ...selectedAnimal,
-        custos: costManager.getCustosAnimal(selectedAnimal.id)
+    try {
+      await costManager.adicionarCusto(selectedAnimal.id, custo)
+      loadCustosAnimal(selectedAnimal.id)
+      loadRelatorioGeral()
+
+      setNewCost({ tipo: '', subtipo: '', valor: '', observacoes: '' })
+      setShowAddCost(false)
+
+      if (onSave && selectedAnimal) {
+        const custos = await costManager.getCustosAnimal(selectedAnimal.id)
+        onSave({ ...selectedAnimal, custos })
       }
-      onSave(updatedAnimal)
+      
+      alert('✅ Custo adicionado com sucesso!')
+    } catch (e) {
+      alert('❌ Erro ao adicionar custo: ' + (e.message || e))
     }
-    
-    alert('✅ Custo adicionado com sucesso!')
+  }
+
+  const handleEditCost = (custo) => {
+    setEditingCusto({
+      id: custo.id,
+      tipo: custo.tipo || '',
+      subtipo: custo.subtipo || '',
+      valor: custo.valor ? String(custo.valor) : '',
+      data: custo.data || new Date().toISOString().split('T')[0],
+      observacoes: custo.observacoes || ''
+    })
+    setApplyToAllCustos(false)
+    setShowEditCost(true)
+  }
+
+  const handleSaveEditCost = async () => {
+    if (!editingCusto) return
+    if (!editingCusto.tipo || !editingCusto.valor) {
+      alert('❌ Tipo e Valor são obrigatórios')
+      return
+    }
+    try {
+      const res = await fetch(`/api/custos?id=${editingCusto.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tipo: editingCusto.tipo,
+          subtipo: editingCusto.subtipo || null,
+          valor: parseFloat(editingCusto.valor),
+          data: editingCusto.data,
+          observacoes: editingCusto.observacoes || null,
+          applyToAll: applyToAllCustos
+        })
+      })
+      const data = await res.json()
+      if (!data.success) throw new Error(data.message || 'Erro ao atualizar')
+      loadCustosAnimal(selectedAnimal?.id)
+      if (selectedAnimal) loadRelatorioGeral()
+      setShowEditCost(false)
+      setEditingCusto(null)
+      if (onSave && selectedAnimal) {
+        const custos = await costManager.getCustosAnimal(selectedAnimal.id)
+        onSave({ ...selectedAnimal, custos })
+      }
+      const msg = data.data?.aplicadosTodos
+        ? `✅ Atualizado! Aplicado a ${data.data.aplicadosTodos.atualizados} lançamento(s) em ${data.data.aplicadosTodos.animais} animal(is).`
+        : '✅ Custo atualizado! As alterações aparecerão no celular ao recarregar.'
+      alert(msg)
+    } catch (e) {
+      alert('❌ Erro ao atualizar: ' + (e.message || e))
+    }
+  }
+
+  const handleDeleteCost = async (custo) => {
+    if (!confirm(`Excluir custo "${custo.tipo}${custo.subtipo ? ' - ' + custo.subtipo : ''}" de R$ ${parseFloat(custo.valor || 0).toFixed(2)}?`)) return
+    try {
+      const res = await fetch(`/api/custos?id=${custo.id}`, { method: 'DELETE' })
+      const data = await res.json()
+      if (!data.success) throw new Error(data.message || 'Erro ao excluir')
+      loadCustosAnimal(selectedAnimal?.id)
+      if (selectedAnimal) loadRelatorioGeral()
+      setShowEditCost(false)
+      setEditingCusto(null)
+      if (onSave && selectedAnimal) {
+        const custos = await costManager.getCustosAnimal(selectedAnimal.id)
+        onSave({ ...selectedAnimal, custos })
+      }
+      alert('✅ Custo excluído!')
+    } catch (e) {
+      alert('❌ Erro ao excluir: ' + (e.message || e))
+    }
   }
 
   const aplicarProtocolo = (animal) => {
@@ -345,14 +432,17 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
   }
 
   const getCustoTotal = (animalId) => {
-    const custos = costManager.getCustosAnimal(animalId)
-    const arr = Array.isArray(custos) ? custos : []
-    return arr.reduce((total, custo) => total + (parseFloat(custo.valor || 0) || 0), 0)
+    const porAnimal = relatorioGeral?.custoPorAnimal?.find(p => p.animalId === animalId)
+    if (porAnimal) return Number(porAnimal.total) || 0
+    if (selectedAnimal?.id === animalId && custosAnimal?.length) {
+      return custosAnimal.reduce((t, c) => t + (parseFloat(c.valor || 0) || 0), 0)
+    }
+    return 0
   }
 
   const getStatusCusto = (animal) => {
-    const custos = costManager.getCustosAnimal(animal.id)
-    const arr = Array.isArray(custos) ? custos : []
+    const porAnimal = relatorioGeral?.custoPorAnimal?.find(p => p.animalId === animal.id)
+    const arr = porAnimal?.custos || (selectedAnimal?.id === animal.id ? custosAnimal : []) || []
     const temProtocolo = arr.some(c => c.tipo === 'Protocolo Sanitário')
     const temDNA = arr.some(c => c.tipo === 'DNA')
     
@@ -384,8 +474,11 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
     'Vacina',
     'Alimentação',
     'Veterinário',
+    'Manejo',
     'Pesagens',
     'Transporte',
+    'ABCZ',
+    'Exame',
     'Outros'
   ]
 
@@ -403,13 +496,39 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
             Controle detalhado de custos por animal com protocolos automáticos
           </p>
         </div>
-        <button
-          onClick={() => setShowProtocolos(!showProtocolos)}
-          className="btn-secondary flex items-center mt-4 sm:mt-0"
-        >
-          <DocumentTextIcon className="h-5 w-5 mr-2" />
-          Ver Protocolos
-        </button>
+        <div className="flex flex-wrap gap-2 mt-4 sm:mt-0">
+          <button
+            onClick={async () => {
+              if (!confirm('Aplicar custos automáticos (RGN, RGD, Brucelose, DNA, Brinco, Botton, Ração R$120/mês, Andrológico R$165 machos 15-32m)?')) return
+              setAplicandoAutomaticos(true)
+              try {
+                const r = await fetch('/api/custos/aplicar-automaticos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) })
+                const d = await r.json()
+                if (d.success) {
+                  loadRelatorioGeral()
+                  if (selectedAnimal) loadCustosAnimal(selectedAnimal.id)
+                  alert(`✅ ${d.message}\n\nRGN: ${d.resultados?.rgn?.aplicados || 0}\nRGD: ${d.resultados?.rgd?.aplicados || 0}\nBrucelose: ${d.resultados?.brucelose?.aplicados || 0}\nDNA VRGEN: ${d.resultados?.dnaVrgen?.aplicados || 0}\nDNA Genômica Receptora: ${d.resultados?.dnaGenomicaReceptora?.aplicados || 0}\nBrinco Amarelo: ${d.resultados?.brincoAmarelo?.aplicados || 0}\nBotton: ${d.resultados?.botton?.aplicados || 0}\nRação: ${d.resultados?.racao?.aplicados || 0}\nAndrológico: ${d.resultados?.andrologico?.aplicados || 0}`)
+                } else alert('❌ ' + (d.error || 'Erro ao aplicar'))
+              } catch (e) {
+                alert('❌ Erro: ' + e.message)
+              } finally {
+                setAplicandoAutomaticos(false)
+              }
+            }}
+            disabled={aplicandoAutomaticos}
+            className="btn-primary flex items-center"
+          >
+            {aplicandoAutomaticos ? <span className="animate-spin mr-2">⏳</span> : null}
+            Aplicar Custos Automáticos
+          </button>
+          <button
+            onClick={() => setShowProtocolos(!showProtocolos)}
+            className="btn-secondary flex items-center"
+          >
+            <DocumentTextIcon className="h-5 w-5 mr-2" />
+            Ver Protocolos
+          </button>
+        </div>
       </div>
 
       {/* Resumo Geral */}
@@ -432,7 +551,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
             title="Clique para ver detalhes"
           >
             <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-              R$ {(relatorioGeral?.totalGeral || 0).toFixed(2)}
+              R$ {(Number(relatorioGeral?.totalGeral) || 0).toFixed(2)}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">Custo Total</div>
             <div className="text-xs text-green-500 mt-1">👆 Clique para detalhes</div>
@@ -443,7 +562,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
             title="Clique para ver detalhes"
           >
             <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-              R$ {(relatorioGeral?.mediaPorAnimal || 0).toFixed(2)}
+              R$ {(Number(relatorioGeral?.mediaPorAnimal) || 0).toFixed(2)}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">Média por Animal</div>
             <div className="text-xs text-purple-500 mt-1">👆 Clique para detalhes</div>
@@ -473,6 +592,8 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
             {(animals || []).map(animal => {
               const custoTotal = getCustoTotal(animal.id)
               const status = getStatusCusto(animal)
+              const valorVenda = parseFloat(animal.valor_venda || animal.valor_real || 0) || 0
+              const roi = valorVenda > 0 && custoTotal > 0 ? ((valorVenda - custoTotal) / custoTotal * 100).toFixed(1) : null
               
               return (
                 <div
@@ -501,8 +622,18 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                         </span>
                       </div>
                       <div className="text-sm font-bold text-green-600 dark:text-green-400">
-                        R$ {(custoTotal || 0).toFixed(2)}
+                        R$ {(Number(custoTotal) || 0).toFixed(2)}
                       </div>
+                      {valorVenda > 0 && (
+                        <div className="text-xs">
+                          <span className="text-blue-600 dark:text-blue-400">Venda: R$ {valorVenda.toFixed(2)}</span>
+                          {roi != null && (
+                            <span className={`ml-1 font-semibold ${parseFloat(roi) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              ROI {roi}%
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -554,6 +685,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                     <button
                       onClick={() => setShowAddCost(true)}
                       className="btn-success text-sm"
+                      title="Adicionar custo manual (Brinco, Botton ou qualquer outro)"
                     >
                       <PlusIcon className="h-4 w-4" />
                     </button>
@@ -576,21 +708,46 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                   <div>
                     <span className="font-medium">FIV:</span> {selectedAnimal.isFiv ? 'Sim' : 'Não'}
                   </div>
+                  <div>
+                    <span className="font-medium">Custo total:</span>{' '}
+                    <span className="font-bold text-green-600 dark:text-green-400">R$ {(Number(getCustoTotal(selectedAnimal.id)) || 0).toFixed(2)}</span>
+                  </div>
+                  {(parseFloat(selectedAnimal.valor_venda || selectedAnimal.valor_real || 0) || 0) > 0 && (
+                    <div className="col-span-2">
+                      <span className="font-medium">Valor venda:</span>{' '}
+                      <span className="font-bold text-blue-600 dark:text-blue-400">R$ {(parseFloat(selectedAnimal.valor_venda || selectedAnimal.valor_real || 0)).toFixed(2)}</span>
+                      {' • '}
+                      <span className="font-medium">ROI:</span>{' '}
+                      <span className={`font-bold ${((parseFloat(selectedAnimal.valor_venda || selectedAnimal.valor_real || 0) - getCustoTotal(selectedAnimal.id)) / (getCustoTotal(selectedAnimal.id) || 1) * 100) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {(((parseFloat(selectedAnimal.valor_venda || selectedAnimal.valor_real || 0) - getCustoTotal(selectedAnimal.id)) / (getCustoTotal(selectedAnimal.id) || 1)) * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Custos do Animal */}
               <div className="space-y-3">
-                <h4 className="font-medium text-gray-900 dark:text-white">
-                  💰 Custos Registrados ({custosAnimal.length})
-                </h4>
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium text-gray-900 dark:text-white">
+                    💰 Custos Registrados ({custosAnimal.length})
+                  </h4>
+                  <button
+                    onClick={() => setShowAddCost(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-medium"
+                    title="Adicionar custo manual"
+                  >
+                    <PlusIcon className="h-4 w-4" />
+                    Adicionar Custo
+                  </button>
+                </div>
                 
                 {custosAnimal.length > 0 ? (
                   <div className="space-y-2 max-h-64 overflow-y-auto">
                     {custosAnimal.map(custo => (
                       <div key={custo.id} className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-600">
-                        <div className="flex justify-between items-start">
-                          <div>
+                        <div className="flex justify-between items-start gap-2">
+                          <div className="flex-1 min-w-0">
                             <div className="font-medium text-gray-900 dark:text-white">
                               {custo.tipo}
                               {custo.subtipo && (
@@ -601,10 +758,26 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                               {custo.data} • {custo.observacoes}
                             </div>
                           </div>
-                          <div className="text-right">
-                            <div className="font-bold text-green-600 dark:text-green-400">
+                          <div className="flex items-center gap-1 shrink-0">
+                            <div className="font-bold text-green-600 dark:text-green-400 mr-2">
                               R$ {parseFloat(custo.valor || 0).toFixed(2)}
                             </div>
+                            <button
+                              type="button"
+                              onClick={() => handleEditCost(custo)}
+                              className="p-1.5 rounded text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600 hover:text-blue-600"
+                              title="Editar"
+                            >
+                              <PencilIcon className="h-4 w-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteCost(custo)}
+                              className="p-1.5 rounded text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600 hover:text-red-600"
+                              title="Excluir"
+                            >
+                              <TrashIcon className="h-4 w-4" />
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -612,7 +785,14 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                   </div>
                 ) : (
                   <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                    Nenhum custo registrado para este animal
+                    <p className="mb-4">Nenhum custo registrado para este animal</p>
+                    <button
+                      onClick={() => setShowAddCost(true)}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-medium"
+                    >
+                      <PlusIcon className="h-5 w-5" />
+                      Adicionar Custo
+                    </button>
                   </div>
                 )}
 
@@ -621,7 +801,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                   <div className="flex justify-between items-center">
                     <span className="font-medium text-gray-900 dark:text-white">Total:</span>
                     <span className="text-xl font-bold text-green-600 dark:text-green-400">
-                      R$ {(getCustoTotal(selectedAnimal.id) || 0).toFixed(2)}
+                      R$ {(Number(getCustoTotal(selectedAnimal.id)) || 0).toFixed(2)}
                     </span>
                   </div>
                 </div>
@@ -642,7 +822,9 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Adicionar Custo
             </h3>
-            
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              Acrescente Brinco Amarelo, Botton ou qualquer outro custo manualmente.
+            </p>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -669,7 +851,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                   value={newCost.subtipo}
                   onChange={(e) => setNewCost({...newCost, subtipo: e.target.value})}
                   className="input w-full"
-                  placeholder="Ex: Vacina específica, medicamento..."
+                  placeholder="Ex: Brinco Amarelo, Botton Eletrônico..."
                 />
               </div>
 
@@ -711,6 +893,174 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
               <button
                 onClick={() => setShowAddCost(false)}
                 className="btn-secondary flex-1"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Editar Custo */}
+      {showEditCost && editingCusto && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 rounded-t-2xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white/20 rounded-lg">
+                    <PencilIcon className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white">
+                      Editar Custo
+                    </h3>
+                    <p className="text-blue-100 text-sm">
+                      Altere os dados conforme necessário
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => { setShowEditCost(false); setEditingCusto(null); setApplyToAllCustos(false) }}
+                  className="text-white/80 hover:text-white transition-colors"
+                >
+                  <XMarkIcon className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="p-6">
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+                <p className="text-sm text-blue-800 dark:text-blue-200 flex items-center gap-2">
+                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                  As alterações serão sincronizadas automaticamente com o aplicativo móvel
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Tipo de Custo */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Tipo de Custo *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      list="tiposCustoList"
+                      value={editingCusto.tipo}
+                      onChange={(e) => setEditingCusto({...editingCusto, tipo: e.target.value})}
+                      className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-all"
+                      placeholder="Digite ou selecione um tipo"
+                    />
+                    <datalist id="tiposCustoList">
+                      {tiposCusto.map(tipo => (
+                        <option key={tipo} value={tipo} />
+                      ))}
+                    </datalist>
+                  </div>
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    💡 Você pode digitar um novo tipo ou selecionar da lista
+                  </p>
+                </div>
+
+                {/* Subtipo */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Subtipo / Descrição
+                  </label>
+                  <input
+                    type="text"
+                    value={editingCusto.subtipo}
+                    onChange={(e) => setEditingCusto({...editingCusto, subtipo: e.target.value})}
+                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-all"
+                    placeholder="Ex: Brinco Amarelo, Botton Eletrônico, RGN..."
+                  />
+                </div>
+
+                {/* Valor */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Valor (R$) *
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-semibold">
+                      R$
+                    </span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editingCusto.valor}
+                      onChange={(e) => setEditingCusto({...editingCusto, valor: e.target.value})}
+                      className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-all"
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+
+                {/* Data */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Data
+                  </label>
+                  <input
+                    type="date"
+                    value={editingCusto.data}
+                    onChange={(e) => setEditingCusto({...editingCusto, data: e.target.value})}
+                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-all"
+                  />
+                </div>
+
+                {/* Observações */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Observações
+                  </label>
+                  <textarea
+                    value={editingCusto.observacoes}
+                    onChange={(e) => setEditingCusto({...editingCusto, observacoes: e.target.value})}
+                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-all resize-none"
+                    rows="3"
+                    placeholder="Detalhes adicionais sobre o custo..."
+                  />
+                </div>
+
+                {/* Aplicar a todos */}
+                <div className="md:col-span-2">
+                  <label className="flex items-start gap-3 p-4 bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800 rounded-xl cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-all">
+                    <input
+                      type="checkbox"
+                      checked={applyToAllCustos}
+                      onChange={(e) => setApplyToAllCustos(e.target.checked)}
+                      className="mt-0.5 h-5 w-5 rounded border-amber-300 text-amber-600 focus:ring-amber-500"
+                    />
+                    <div className="flex-1">
+                      <span className="text-sm font-medium text-amber-900 dark:text-amber-100 block">
+                        Aplicar a todos os animais
+                      </span>
+                      <span className="text-xs text-amber-700 dark:text-amber-300">
+                        Esta alteração será aplicada a todos os animais que possuem este mesmo tipo e subtipo de custo
+                      </span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="bg-gray-50 dark:bg-gray-900/50 px-6 py-4 rounded-b-2xl flex gap-3">
+              <button
+                onClick={handleSaveEditCost}
+                className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
+              >
+                💾 Salvar Alterações
+              </button>
+              <button
+                onClick={() => { setShowEditCost(false); setEditingCusto(null); setApplyToAllCustos(false) }}
+                className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all"
               >
                 Cancelar
               </button>
@@ -1253,7 +1603,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                         </div>
                         <div className="text-right">
                           <div className="font-bold text-green-600 dark:text-green-400">
-                            R$ {(custoTotal || 0).toFixed(2)}
+                            R$ {(Number(custoTotal) || 0).toFixed(2)}
                           </div>
                           <div className="text-xs text-gray-500">
                             {(() => { const c = costManager.getCustosAnimal(animal.id); return (Array.isArray(c) ? c : []).length; })()} custos
@@ -1297,7 +1647,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                   <div className="flex justify-between items-center">
                     <div className="font-medium text-gray-900 dark:text-white">{tipo}</div>
                     <div className="font-bold text-green-600 dark:text-green-400">
-                      R$ {(valor || 0).toFixed(2)}
+                      R$ {(Number(valor) || 0).toFixed(2)}
                     </div>
                   </div>
                 </div>
@@ -1307,7 +1657,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                 <div className="flex justify-between items-center">
                   <div className="font-bold text-gray-900 dark:text-white">TOTAL GERAL</div>
                   <div className="font-bold text-green-600 dark:text-green-400 text-lg">
-                    R$ {((relatorioGeral?.totalGeral || 0).toFixed(2) || '0,00')}
+                    R$ {((Number(relatorioGeral?.totalGeral) || 0).toFixed(2) || '0,00')}
                   </div>
                 </div>
               </div>
@@ -1339,7 +1689,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                 </div>
                 <div className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg text-center">
                   <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                    R$ {((relatorioGeral?.mediaPorAnimal || 0).toFixed(2) || '0,00')}
+                    R$ {((Number(relatorioGeral?.mediaPorAnimal) || 0).toFixed(2) || '0,00')}
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">Média por Animal</div>
                 </div>
@@ -1356,7 +1706,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                           {animal.serie} {animal.rg}
                         </div>
                         <div className="text-sm font-medium text-purple-600 dark:text-purple-400">
-                          R$ {(custoTotal || 0).toFixed(2)}
+                          R$ {(Number(custoTotal) || 0).toFixed(2)}
                         </div>
                       </div>
                     </div>

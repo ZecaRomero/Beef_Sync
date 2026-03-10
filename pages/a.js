@@ -57,7 +57,7 @@ export default function ConsultaRapida() {
     
     try {
       const data = JSON.parse(authData)
-      if (!data.nome || !data.telefone) {
+      if (!data.nome) {
         router.push('/mobile-auth')
         return
       }
@@ -177,7 +177,8 @@ export default function ConsultaRapida() {
         .then((r) => r.json().then((data) => ({ res: r, data })))
         .then(({ res, data }) => {
           if (data.success && data.data?.id) {
-            router.replace(`/consulta-animal/${data.data.id}`)
+            const d = data.data
+            router.replace(`/consulta-animal/${d.serie && d.rg ? `${d.serie}-${d.rg}` : d.id}`)
           } else {
             setError(data.message || (res.status === 500 ? 'Serviço indisponível.' : 'Animal não encontrado'))
             setLoading(false)
@@ -263,8 +264,10 @@ export default function ConsultaRapida() {
             setNomeAnimal(animal.nome || '')
             setTouched({ serie: true, rg: true })
             setError('')
-            // Redireciona automaticamente para a ficha do animal
-            if (animal.id) {
+            // Redireciona automaticamente para a ficha do animal (usar serie-rg = mais confiável que ID)
+            if (animal.serie && animal.rg) {
+              router.push(`/consulta-animal/${animal.serie}-${animal.rg}`)
+            } else if (animal.id) {
               router.push(`/consulta-animal/${animal.id}`)
             }
           } else if (data.data.length > 1) {
@@ -311,17 +314,13 @@ export default function ConsultaRapida() {
 
   const handleIdentificacaoSubmit = (e) => {
     e.preventDefault()
-    const telDigits = telefoneIdent.replace(/\D/g, '')
     if (!nomeIdent.trim()) {
       setError('Informe seu nome.')
       return
     }
-    if (telDigits.length < 10) {
-      setError('Informe um telefone válido (com DDD).')
-      return
-    }
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ nome: nomeIdent.trim(), telefone: telDigits }))
+      // Salvar apenas o nome no localStorage
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ nome: nomeIdent.trim() }))
       setIdentificado(true)
       setError('')
     } catch (_) {
@@ -352,9 +351,11 @@ export default function ConsultaRapida() {
         throw new Error(msg)
       }
 
-      const animalId = data.data?.id
-      if (animalId) {
-        router.push(`/consulta-animal/${animalId}`)
+      const d = data.data
+      if (d) {
+        const linkId = (d.serie && d.rg) ? `${d.serie}-${d.rg}` : d.id
+        if (linkId) router.push(`/consulta-animal/${linkId}`)
+        else throw new Error('Animal não encontrado')
       } else {
         throw new Error('Animal não encontrado')
       }
@@ -462,43 +463,37 @@ export default function ConsultaRapida() {
                   Beef-Sync
                 </h1>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Identifique-se para acessar o sistema
+                  Digite seu nome para começar
                 </p>
               </div>
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6">
                 <form onSubmit={handleIdentificacaoSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 text-center">
+                      Qual é o seu nome?
+                    </label>
                     <input
                       type="text"
                       value={nomeIdent}
                       onChange={(e) => { setNomeIdent(e.target.value); setError('') }}
-                      placeholder="Seu nome"
-                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                      placeholder="Digite seu nome"
+                      className="w-full px-4 py-4 text-lg text-center rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                       required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Número do celular (com DDD)</label>
-                    <input
-                      type="tel"
-                      value={telefoneIdent}
-                      onChange={(e) => { setTelefoneIdent(formatPhone(e.target.value)); setError('') }}
-                      placeholder="(11) 99999-9999"
-                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                      inputMode="numeric"
+                      autoFocus
                     />
                   </div>
                   {error && (
-                    <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+                    <p className="text-sm text-red-600 dark:text-red-400 text-center">{error}</p>
                   )}
                   <button
                     type="submit"
-                    className="w-full py-4 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-white font-semibold flex items-center justify-center gap-2"
+                    className="w-full py-4 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02] active:scale-[0.98]"
                   >
-                    <DevicePhoneMobileIcon className="h-6 w-6" />
-                    Entrar no sistema
+                    Entrar
                   </button>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-3">
+                    Seu nome será salvo para facilitar o acesso
+                  </p>
                 </form>
               </div>
             </div>
@@ -554,6 +549,20 @@ export default function ConsultaRapida() {
                   ) : (
                     <span className="text-xl">🌙</span>
                   )}
+                </button>
+
+                {/* Botão Logout */}
+                <button
+                  onClick={() => {
+                    if (confirm('Deseja realmente sair?')) {
+                      localStorage.removeItem('mobile-auth')
+                      router.push('/mobile-auth')
+                    }
+                  }}
+                  className="bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 p-2 rounded-lg transition-all"
+                  title="Sair"
+                >
+                  <span className="text-xl">🚪</span>
                 </button>
               </div>
             </div>

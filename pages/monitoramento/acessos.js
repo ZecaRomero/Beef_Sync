@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import Head from 'next/head'
 import {
   EyeIcon,
@@ -11,6 +11,93 @@ import {
   ChartBarIcon
 } from '@heroicons/react/24/outline'
 
+// --- Helpers ---
+
+function formatTelefone(telefone) {
+  if (!telefone) return null
+  if (telefone.length === 11) return telefone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
+  if (telefone.length === 10) return telefone.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3')
+  return telefone
+}
+
+function normalizeReportKey(key) {
+  return key === 'femeas_ia' ? 'inseminacoes' : key
+}
+
+// --- Sub-componentes ---
+
+function LoadingSpinner() {
+  return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <span className="animate-spin rounded-full h-12 w-12 border-2 border-amber-500 border-t-transparent" />
+    </div>
+  )
+}
+
+function MessageBanner({ message }) {
+  if (!message) return null
+  const isSuccess = message.includes('✅')
+  const isError = message.includes('❌')
+  const cls = isSuccess
+    ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700 text-green-800 dark:text-green-200'
+    : isError
+    ? 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700 text-red-800 dark:text-red-200'
+    : 'bg-amber-50 dark:bg-amber-900/20 border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-200'
+  return (
+    <div className={`mb-4 p-4 rounded-lg border-2 text-sm font-medium flex items-center gap-2 ${cls}`}>
+      {message}
+    </div>
+  )
+}
+
+function Toggle({ checked, onChange, disabled, activeColor = 'bg-amber-600' }) {
+  return (
+    <button
+      type="button"
+      onClick={onChange}
+      disabled={disabled}
+      className={`relative inline-flex h-8 w-14 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 ${
+        checked ? activeColor : 'bg-gray-200 dark:bg-gray-600'
+      }`}
+    >
+      <span className={`pointer-events-none inline-block h-7 w-7 transform rounded-full bg-white shadow ring-0 transition ${
+        checked ? 'translate-x-6' : 'translate-x-1'
+      }`} />
+    </button>
+  )
+}
+
+function StatCard({ label, total, mobile, desktop }) {
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">{label}</h3>
+      <div className="flex items-center justify-between">
+        <span className="text-3xl font-bold text-gray-900 dark:text-white">{total ?? 0}</span>
+        <div className="text-right text-sm">
+          <p className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1 justify-end">
+            <DevicePhoneMobileIcon className="h-4 w-4" /> {mobile ?? 0} celulares
+          </p>
+          <p className="text-blue-600 dark:text-blue-400 flex items-center gap-1 justify-end">
+            <ComputerDesktopIcon className="h-4 w-4" /> {desktop ?? 0} desktop
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function TelefoneCell({ telefone }) {
+  const formatted = formatTelefone(telefone)
+  if (!formatted) return <span className="text-gray-400">-</span>
+  return (
+    <a href={`tel:${telefone}`} className="text-emerald-600 dark:text-emerald-400 hover:underline font-mono">
+      {formatted}
+    </a>
+  )
+}
+
+// --- Componente principal ---
+
 export default function AcessosSistema() {
   const [stats, setStats] = useState(null)
   const [logs, setLogs] = useState([])
@@ -20,10 +107,29 @@ export default function AcessosSistema() {
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
   const [mobileReportsDraft, setMobileReportsDraft] = useState(null)
-  // Lista dinâmica vinda da API — sempre em sincronia com o backend
   const [tiposRelatorios, setTiposRelatorios] = useState([])
 
-  const loadData = async () => {
+  const mobileLogs = useMemo(() => logs.filter(log => log.is_mobile), [logs])
+
+  const enabledReports = useMemo(() => {
+    const raw = mobileReportsDraft ?? settings?.mobile_reports_enabled ?? []
+    return [...new Set(raw.map(normalizeReportKey))]
+  }, [mobileReportsDraft, settings?.mobile_reports_enabled])
+
+  const allReportsSelected = tiposRelatorios.length > 0 &&
+    tiposRelatorios.every(t => enabledReports.includes(t.key))
+
+  const categories = useMemo(
+    () => [...new Set(tiposRelatorios.map(t => t.category || 'Geral'))],
+    [tiposRelatorios]
+  )
+
+  const showMessage = useCallback((msg, delay = 5000) => {
+    setMessage(msg)
+    setTimeout(() => setMessage(''), delay)
+  }, [])
+
+  const loadData = useCallback(async () => {
     setRefreshing(true)
     try {
       const [statsRes, logsRes, settingsRes] = await Promise.all([
@@ -41,11 +147,7 @@ export default function AcessosSistema() {
       }
       if (settingsRes.ok) {
         const d = await settingsRes.json()
-        if (d.success && d.data) {
-          setSettings(d.data)
-          // Só limpa o draft se não há edições pendentes
-          setMobileReportsDraft(prev => (prev === null ? null : prev))
-        }
+        if (d.success && d.data) setSettings(d.data)
       }
     } catch (e) {
       console.error('Erro ao carregar:', e)
@@ -53,10 +155,9 @@ export default function AcessosSistema() {
       setLoading(false)
       setRefreshing(false)
     }
-  }
+  }, [])
 
-  // Busca a lista de tipos de relatórios apenas UMA vez no mount (nunca muda em runtime)
-  const loadTiposRelatorios = async () => {
+  const loadTiposRelatorios = useCallback(async () => {
     try {
       const res = await fetch('/api/mobile-reports')
       if (res.ok) {
@@ -67,67 +168,98 @@ export default function AcessosSistema() {
     } catch (e) {
       console.error('Erro ao buscar tipos de relatórios:', e)
     }
-  }
+  }, [])
 
   useEffect(() => {
     loadData()
-    loadTiposRelatorios() // apenas no mount
+    loadTiposRelatorios()
     const t = setInterval(loadData, 10000)
     return () => clearInterval(t)
-  }, [])
+  }, [loadData, loadTiposRelatorios])
 
-  // Alias para compatibilidade com o restante da página
-  const TIPOS_RELATORIOS = tiposRelatorios
-
-  const updateSetting = async (key, value) => {
+  const updateSetting = useCallback(async (key, value) => {
     setSaving(true)
     setMessage('')
     try {
-      const body = {}
-      if (key === 'maintenance_mode') body.maintenance_mode = value
-      if (key === 'block_access') body.block_access = value
-      if (key === 'maintenance_message') body.maintenance_message = value
-      if (key === 'mobile_reports_enabled') body.mobile_reports_enabled = value
-
       const res = await fetch('/api/system-settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+        body: JSON.stringify({ [key]: value })
       })
       const d = await res.json()
       if (d.success && d.data) {
         setSettings(d.data)
         if (key === 'maintenance_message') {
-          setMessage('✅ Mensagem salva com sucesso! Já está visível no mobile.')
-        } else if (key === 'maintenance_mode' && value) {
-          setMessage('Modo manutenção ativado. Usuários verão a tela de atualização.')
-        } else if (key === 'block_access' && value) {
-          setMessage('Acesso bloqueado. Apenas localhost pode acessar.')
+          showMessage('✅ Mensagem salva com sucesso! Já está visível no mobile.')
         } else if (key === 'mobile_reports_enabled') {
-          setMessage('✅ Relatórios mobile atualizados!')
+          showMessage('✅ Relatórios mobile atualizados!')
+        } else if (key === 'maintenance_mode' && value) {
+          showMessage('Modo manutenção ativado. Usuários verão a tela de atualização.')
+        } else if (key === 'block_access' && value) {
+          showMessage('Acesso bloqueado. Apenas localhost pode acessar.')
         } else {
-          setMessage('Configuração atualizada.')
+          showMessage('Configuração atualizada.')
         }
-        setTimeout(() => setMessage(''), 5000)
       } else {
-        setMessage('❌ Erro ao salvar.')
-        setTimeout(() => setMessage(''), 3000)
+        showMessage('❌ Erro ao salvar.', 3000)
       }
-    } catch (e) {
-      setMessage('❌ Erro ao salvar.')
-      setTimeout(() => setMessage(''), 3000)
+    } catch {
+      showMessage('❌ Erro ao salvar.', 3000)
     } finally {
       setSaving(false)
     }
-  }
+  }, [showMessage])
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <span className="animate-spin rounded-full h-12 w-12 border-2 border-amber-500 border-t-transparent" />
-      </div>
-    )
-  }
+  const handleLogoutAll = useCallback(async () => {
+    if (!confirm('⚠️ Tem certeza? Todos os usuários mobile verão a tela de manutenção imediatamente e precisarão fazer login novamente.')) return
+    setSaving(true)
+    try {
+      const res = await fetch('/api/system-settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ maintenance_mode: true, session_token: Date.now().toString() })
+      })
+      const d = await res.json()
+      if (d.success && d.data) {
+        setSettings(d.data)
+        showMessage('✅ Modo manutenção ativado! Todos os celulares foram deslogados e precisarão fazer login novamente.')
+      } else {
+        showMessage('❌ Erro ao ativar modo manutenção.', 3000)
+      }
+    } catch {
+      showMessage('❌ Erro ao ativar modo manutenção.', 3000)
+    } finally {
+      setSaving(false)
+    }
+  }, [showMessage])
+
+  const handleToggleAll = useCallback(() => {
+    const allKeys = tiposRelatorios.map(t => t.key)
+    const current = mobileReportsDraft ?? settings?.mobile_reports_enabled ?? []
+    const currentNormalized = current.map(normalizeReportKey)
+    if (allReportsSelected) {
+      setMobileReportsDraft(current.filter(k => !allKeys.includes(k) && k !== 'femeas_ia'))
+    } else {
+      const toAdd = allKeys.filter(k => !currentNormalized.includes(k))
+      setMobileReportsDraft([...current, ...toAdd])
+    }
+  }, [tiposRelatorios, mobileReportsDraft, settings?.mobile_reports_enabled, allReportsSelected])
+
+  const handleToggleReport = useCallback((key, checked) => {
+    const current = mobileReportsDraft ?? settings?.mobile_reports_enabled ?? []
+    const next = checked
+      ? [...new Set([...current.filter(k => k !== 'femeas_ia'), key])]
+      : current.filter(k => k !== key && k !== 'femeas_ia')
+    setMobileReportsDraft(next)
+  }, [mobileReportsDraft, settings?.mobile_reports_enabled])
+
+  const handleSaveReports = useCallback(() => {
+    const next = [...new Set((mobileReportsDraft ?? settings?.mobile_reports_enabled ?? []).map(normalizeReportKey))]
+    updateSetting('mobile_reports_enabled', next)
+    setMobileReportsDraft(null)
+  }, [mobileReportsDraft, settings?.mobile_reports_enabled, updateSetting])
+
+  if (loading) return <LoadingSpinner />
 
   return (
     <>
@@ -135,6 +267,8 @@ export default function AcessosSistema() {
         <title>Acessos ao Sistema | Beef-Sync</title>
       </Head>
       <div className="space-y-6">
+
+        {/* Cabeçalho */}
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <EyeIcon className="h-8 w-8 text-violet-600 dark:text-violet-400" />
@@ -145,121 +279,73 @@ export default function AcessosSistema() {
           </p>
         </div>
 
-        {/* Destaque: Celulares */}
+        {/* Destaque: acessos por celular */}
         <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl p-6 text-white shadow-lg">
           <div className="flex items-center gap-3 mb-2">
             <DevicePhoneMobileIcon className="h-10 w-10 text-emerald-100" />
             <h3 className="text-lg font-semibold">Acessos por celular</h3>
           </div>
           <div className="grid grid-cols-3 gap-4 mt-4">
-            <div>
-              <p className="text-3xl font-bold">{stats?.hoje?.mobile ?? 0}</p>
-              <p className="text-sm text-emerald-100">Hoje</p>
-              <p className="text-xs text-emerald-200">{stats?.hoje?.celulares_unicos ?? 0} celular(es) diferente(s)</p>
-            </div>
-            <div>
-              <p className="text-3xl font-bold">{stats?.semana?.mobile ?? 0}</p>
-              <p className="text-sm text-emerald-100">Esta semana</p>
-              <p className="text-xs text-emerald-200">{stats?.semana?.celulares_unicos ?? 0} celular(es) diferente(s)</p>
-            </div>
-            <div>
-              <p className="text-3xl font-bold">{stats?.mes?.mobile ?? 0}</p>
-              <p className="text-sm text-emerald-100">Este mês</p>
-              <p className="text-xs text-emerald-200">{stats?.mes?.celulares_unicos ?? 0} celular(es) diferente(s)</p>
-            </div>
+            {[
+              { label: 'Hoje', period: stats?.hoje },
+              { label: 'Esta semana', period: stats?.semana },
+              { label: 'Este mês', period: stats?.mes },
+            ].map(({ label, period }) => (
+              <div key={label}>
+                <p className="text-3xl font-bold">{period?.mobile ?? 0}</p>
+                <p className="text-sm text-emerald-100">{label}</p>
+                <p className="text-xs text-emerald-200">{period?.celulares_unicos ?? 0} celular(es) diferente(s)</p>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Estatísticas gerais */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Hoje</h3>
-            <div className="flex items-center justify-between">
-              <span className="text-3xl font-bold text-gray-900 dark:text-white">{stats?.hoje?.total ?? 0}</span>
-              <div className="text-right text-sm">
-                <p className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1 justify-end">
-                  <DevicePhoneMobileIcon className="h-4 w-4" /> {stats?.hoje?.mobile ?? 0} celulares
-                </p>
-                <p className="text-blue-600 dark:text-blue-400 flex items-center gap-1 justify-end">
-                  <ComputerDesktopIcon className="h-4 w-4" /> {stats?.hoje?.desktop ?? 0} desktop
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Esta semana</h3>
-            <div className="flex items-center justify-between">
-              <span className="text-3xl font-bold text-gray-900 dark:text-white">{stats?.semana?.total ?? 0}</span>
-              <div className="text-right text-sm">
-                <p className="text-emerald-600 dark:text-emerald-400">{stats?.semana?.mobile ?? 0} celulares</p>
-                <p className="text-blue-600 dark:text-blue-400">{stats?.semana?.desktop ?? 0} desktop</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Este mês</h3>
-            <div className="flex items-center justify-between">
-              <span className="text-3xl font-bold text-gray-900 dark:text-white">{stats?.mes?.total ?? 0}</span>
-              <div className="text-right text-sm">
-                <p className="text-emerald-600 dark:text-emerald-400">{stats?.mes?.mobile ?? 0} celulares</p>
-                <p className="text-blue-600 dark:text-blue-400">{stats?.mes?.desktop ?? 0} desktop</p>
-              </div>
-            </div>
-          </div>
+          <StatCard label="Hoje"       total={stats?.hoje?.total}   mobile={stats?.hoje?.mobile}   desktop={stats?.hoje?.desktop} />
+          <StatCard label="Esta semana" total={stats?.semana?.total} mobile={stats?.semana?.mobile} desktop={stats?.semana?.desktop} />
+          <StatCard label="Este mês"   total={stats?.mes?.total}    mobile={stats?.mes?.mobile}    desktop={stats?.mes?.desktop} />
         </div>
 
-        {/* Controles: Bloquear e Manutenção */}
+        {/* Controle de Acesso */}
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
             <NoSymbolIcon className="h-5 w-5 text-amber-600" />
             Controle de Acesso
           </h2>
-          {message && (
-            <div className={`mb-4 p-4 rounded-lg border-2 text-sm font-medium flex items-center gap-2 ${
-              message.includes('✅') 
-                ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700 text-green-800 dark:text-green-200'
-                : message.includes('❌')
-                ? 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700 text-red-800 dark:text-red-200'
-                : 'bg-amber-50 dark:bg-amber-900/20 border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-200'
-            }`}>
-              {message}
-            </div>
-          )}
+
+          <MessageBanner message={message} />
+
           <div className="space-y-4">
+            {/* Toggle: bloquear acesso */}
             <div className="flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50">
               <div>
                 <p className="font-medium text-gray-900 dark:text-white">Bloquear uso do sistema</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Impede novos acessos (exceto localhost)</p>
               </div>
-              <button
-                onClick={() => updateSetting('block_access', !settings?.block_access)}
+              <Toggle
+                checked={!!settings?.block_access}
+                onChange={() => updateSetting('block_access', !settings?.block_access)}
                 disabled={saving}
-                className={`relative inline-flex h-8 w-14 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 ${
-                  settings?.block_access ? 'bg-red-600' : 'bg-gray-200 dark:bg-gray-600'
-                }`}
-              >
-                <span className={`pointer-events-none inline-block h-7 w-7 transform rounded-full bg-white shadow ring-0 transition ${
-                  settings?.block_access ? 'translate-x-6' : 'translate-x-1'
-                }`} />
-              </button>
+                activeColor="bg-red-600"
+              />
             </div>
+
+            {/* Toggle: modo manutenção */}
             <div className="flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50">
               <div>
                 <p className="font-medium text-gray-900 dark:text-white">Modo manutenção / Atualização</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Exibe tela de "Em atualização" para todos os usuários</p>
               </div>
-              <button
-                onClick={() => updateSetting('maintenance_mode', !settings?.maintenance_mode)}
+              <Toggle
+                checked={!!settings?.maintenance_mode}
+                onChange={() => updateSetting('maintenance_mode', !settings?.maintenance_mode)}
                 disabled={saving}
-                className={`relative inline-flex h-8 w-14 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 ${
-                  settings?.maintenance_mode ? 'bg-amber-600' : 'bg-gray-200 dark:bg-gray-600'
-                }`}
-              >
-                <span className={`pointer-events-none inline-block h-7 w-7 transform rounded-full bg-white shadow ring-0 transition ${
-                  settings?.maintenance_mode ? 'translate-x-6' : 'translate-x-1'
-                }`} />
-              </button>
+                activeColor="bg-amber-600"
+              />
             </div>
+
+            {/* Mensagem de manutenção */}
             {settings?.maintenance_mode && (
               <div className="mt-4 p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800">
                 <label className="block text-sm font-semibold text-amber-900 dark:text-amber-200 mb-2">
@@ -292,86 +378,48 @@ export default function AcessosSistema() {
               <div className="flex items-start gap-3">
                 <ChartBarIcon className="h-6 w-6 text-teal-600 dark:text-teal-400 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  <p className="font-semibold text-teal-900 dark:text-teal-200 mb-1">
-                    Relatórios visíveis no mobile
-                  </p>
+                  <p className="font-semibold text-teal-900 dark:text-teal-200 mb-1">Relatórios visíveis no mobile</p>
                   <p className="text-sm text-teal-700 dark:text-teal-300 mb-3">
                     Marque os relatórios que usuários mobile podem visualizar em /mobile-relatorios
                   </p>
-                  
+
                   <div className="flex justify-end mb-2">
-                     <button
-                       type="button"
-                       onClick={() => {
-                         const allKeys = TIPOS_RELATORIOS.map(t => t.key)
-                         const current = mobileReportsDraft ?? settings?.mobile_reports_enabled ?? []
-                         // Normalização para verificar se está marcado (compatibilidade com 'femeas_ia')
-                         const currentNormalized = current.map(k => k === 'femeas_ia' ? 'inseminacoes' : k)
-                         const allSelected = allKeys.every(k => currentNormalized.includes(k))
-                         
-                         if (allSelected) {
-                           // Desmarcar tudo: remove chaves conhecidas E a chave legada 'femeas_ia'
-                           setMobileReportsDraft(current.filter(k => !allKeys.includes(k) && k !== 'femeas_ia'))
-                         } else {
-                           // Marcar tudo: adiciona o que falta
-                           const toAdd = allKeys.filter(k => !currentNormalized.includes(k))
-                           setMobileReportsDraft([...current, ...toAdd])
-                         }
-                       }}
-                       className="text-xs font-bold text-teal-700 hover:text-teal-900 dark:text-teal-400 dark:hover:text-teal-200 underline cursor-pointer"
-                     >
-                       {TIPOS_RELATORIOS.every(t => {
-                         const current = mobileReportsDraft ?? settings?.mobile_reports_enabled ?? []
-                         const currentNormalized = current.map(k => k === 'femeas_ia' ? 'inseminacoes' : k)
-                         return currentNormalized.includes(t.key)
-                       }) ? 'Desmarcar todos' : 'Marcar todos'}
-                     </button>
-                   </div>
+                    <button
+                      type="button"
+                      onClick={handleToggleAll}
+                      className="text-xs font-bold text-teal-700 hover:text-teal-900 dark:text-teal-400 dark:hover:text-teal-200 underline cursor-pointer"
+                    >
+                      {allReportsSelected ? 'Desmarcar todos' : 'Marcar todos'}
+                    </button>
+                  </div>
 
                   {tiposRelatorios.length === 0 && (
                     <p className="text-sm text-gray-500 italic">Carregando relatórios disponíveis...</p>
                   )}
-                  {/* Agrupado por categoria — automático, sem lista hardcoded */}
+
                   <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
-                    {[...new Set(TIPOS_RELATORIOS.map(t => t.category || 'Geral'))].map(cat => {
-                      const itens = TIPOS_RELATORIOS.filter(t => (t.category || 'Geral') === cat)
-                      return (
-                        <div key={cat}>
-                          <p className="text-xs font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider mb-1">{cat}</p>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 pl-1">
-                            {itens.map(t => {
-                              const raw = mobileReportsDraft ?? settings?.mobile_reports_enabled ?? []
-                              const enabled = [...new Set(raw.map(k => k === 'femeas_ia' ? 'inseminacoes' : k))]
-                              return (
-                                <label key={t.key} className="flex items-center gap-2 cursor-pointer hover:bg-teal-100/50 dark:hover:bg-teal-900/30 rounded px-1 py-0.5">
-                                  <input
-                                    type="checkbox"
-                                    checked={enabled.includes(t.key)}
-                                    onChange={(e) => {
-                                      const current = mobileReportsDraft ?? settings?.mobile_reports_enabled ?? []
-                                      const next = e.target.checked
-                                        ? [...new Set([...current.filter(k => k !== 'femeas_ia'), t.key])]
-                                        : current.filter(k => k !== t.key && k !== 'femeas_ia')
-                                      setMobileReportsDraft(next)
-                                    }}
-                                    className="w-4 h-4 rounded border-teal-600 text-teal-600 focus:ring-teal-500"
-                                  />
-                                  <span className="text-sm text-gray-700 dark:text-gray-300">{t.label}</span>
-                                </label>
-                              )
-                            })}
-                          </div>
+                    {categories.map(cat => (
+                      <div key={cat}>
+                        <p className="text-xs font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider mb-1">{cat}</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 pl-1">
+                          {tiposRelatorios.filter(t => (t.category || 'Geral') === cat).map(t => (
+                            <label key={t.key} className="flex items-center gap-2 cursor-pointer hover:bg-teal-100/50 dark:hover:bg-teal-900/30 rounded px-1 py-0.5">
+                              <input
+                                type="checkbox"
+                                checked={enabledReports.includes(t.key)}
+                                onChange={(e) => handleToggleReport(t.key, e.target.checked)}
+                                className="w-4 h-4 rounded border-teal-600 text-teal-600 focus:ring-teal-500"
+                              />
+                              <span className="text-sm text-gray-700 dark:text-gray-300">{t.label}</span>
+                            </label>
+                          ))}
                         </div>
-                      )
-                    })}
+                      </div>
+                    ))}
                   </div>
+
                   <button
-                    onClick={() => {
-                      let next = mobileReportsDraft ?? settings?.mobile_reports_enabled ?? []
-                      next = [...new Set(next.map(k => k === 'femeas_ia' ? 'inseminacoes' : k))]
-                      updateSetting('mobile_reports_enabled', next)
-                      setMobileReportsDraft(null)
-                    }}
+                    onClick={handleSaveReports}
                     disabled={saving || mobileReportsDraft === null}
                     className="mt-3 px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -381,21 +429,17 @@ export default function AcessosSistema() {
               </div>
             </div>
 
-            {/* Classificação de Animais no PMGZ (Rankings) */}
+            {/* Classificação PMGZ */}
             <div className="mt-6 p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800">
               <div className="flex items-start gap-3">
                 <div className="text-2xl flex-shrink-0 mt-0.5">🏆</div>
                 <div className="flex-1">
-                  <p className="font-semibold text-amber-900 dark:text-amber-200 mb-1">
-                    Classificação de Animais no PMGZ
-                  </p>
+                  <p className="font-semibold text-amber-900 dark:text-amber-200 mb-1">Classificação de Animais no PMGZ</p>
                   <p className="text-sm text-amber-700 dark:text-amber-300 mb-3">
                     Exibe rankings de iABCZ, Peso e CE na página /mobile-animal
                   </p>
                   <div className="bg-white dark:bg-gray-800 rounded-lg p-3 mb-3">
-                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
-                      <strong>Rankings disponíveis:</strong>
-                    </p>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-2"><strong>Rankings disponíveis:</strong></p>
                     <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1 ml-4">
                       <li>• Top 10 iABCZ (quanto maior, melhor)</li>
                       <li>• Top 10 Peso (maiores pesos registrados)</li>
@@ -409,49 +453,17 @@ export default function AcessosSistema() {
               </div>
             </div>
 
-            {/* Botão de ação rápida: Deslogar todos os celulares */}
+            {/* Deslogar todos os celulares */}
             <div className="mt-6 p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800">
               <div className="flex items-start gap-3">
                 <ExclamationTriangleIcon className="h-6 w-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  <p className="font-semibold text-red-900 dark:text-red-200 mb-1">
-                    Deslogar todos os celulares
-                  </p>
+                  <p className="font-semibold text-red-900 dark:text-red-200 mb-1">Deslogar todos os celulares</p>
                   <p className="text-sm text-red-700 dark:text-red-300 mb-3">
                     Ativa o modo manutenção e força todos os usuários mobile a verem a tela de atualização. Use quando precisar fazer manutenção urgente.
                   </p>
                   <button
-                    onClick={async () => {
-                      if (!confirm('⚠️ Tem certeza? Todos os usuários mobile verão a tela de manutenção imediatamente e precisarão fazer login novamente.')) return
-                      setSaving(true)
-                      try {
-                        // Gerar um novo token de sessão para invalidar todos os logins
-                        const sessionToken = Date.now().toString()
-                        
-                        const res = await fetch('/api/system-settings', {
-                          method: 'PUT',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ 
-                            maintenance_mode: true,
-                            session_token: sessionToken
-                          })
-                        })
-                        const d = await res.json()
-                        if (d.success && d.data) {
-                          setSettings(d.data)
-                          setMessage('✅ Modo manutenção ativado! Todos os celulares foram deslogados e precisarão fazer login novamente.')
-                          setTimeout(() => setMessage(''), 5000)
-                        } else {
-                          setMessage('❌ Erro ao ativar modo manutenção.')
-                          setTimeout(() => setMessage(''), 3000)
-                        }
-                      } catch (e) {
-                        setMessage('❌ Erro ao ativar modo manutenção.')
-                        setTimeout(() => setMessage(''), 3000)
-                      } finally {
-                        setSaving(false)
-                      }
-                    }}
+                    onClick={handleLogoutAll}
                     disabled={saving || settings?.maintenance_mode}
                     className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
                   >
@@ -464,7 +476,7 @@ export default function AcessosSistema() {
           </div>
         </div>
 
-        {/* Log de acessos recentes */}
+        {/* Log de acessos mobile recentes */}
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
             <div>
@@ -480,14 +492,13 @@ export default function AcessosSistema() {
               onClick={loadData}
               disabled={refreshing}
               className={`px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition-all disabled:opacity-50 flex items-center gap-2 ${refreshing ? 'animate-pulse' : ''}`}
-              title="Atualizar agora"
             >
               <ArrowPathIcon className={`h-5 w-5 ${refreshing ? 'animate-spin' : ''}`} />
               {refreshing ? 'Atualizando...' : 'Atualizar'}
             </button>
           </div>
           <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
-            {logs.filter(log => log.is_mobile).length === 0 ? (
+            {mobileLogs.length === 0 ? (
               <div className="p-8 text-center">
                 <DevicePhoneMobileIcon className="h-16 w-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
                 <p className="text-gray-500 dark:text-gray-400 font-medium mb-2">Nenhum acesso mobile registrado ainda.</p>
@@ -505,46 +516,25 @@ export default function AcessosSistema() {
               <table className="w-full text-sm min-w-[900px]">
                 <thead className="bg-gray-50 dark:bg-gray-700/50 sticky top-0">
                   <tr>
-                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">Usuário</th>
-                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">Telefone</th>
-                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">Dispositivo</th>
-                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">IP</th>
-                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">Browser</th>
-                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">Sistema</th>
-                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">Aparelho</th>
-                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">Data/Hora</th>
+                    {['Usuário', 'Telefone', 'Dispositivo', 'IP', 'Browser', 'Sistema', 'Aparelho', 'Data/Hora'].map(col => (
+                      <th key={col} className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">{col}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {logs.filter(log => log.is_mobile).map((log) => (
+                  {mobileLogs.map((log) => (
                     <tr key={log.id} className="border-t border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/30">
                       <td className="px-4 py-2 font-medium text-gray-900 dark:text-white">{log.user_name}</td>
-                      <td className="px-4 py-2">
-                        {log.telefone ? (
-                          <a href={`tel:${log.telefone}`} className="text-emerald-600 dark:text-emerald-400 hover:underline font-mono">
-                            {log.telefone.length === 11
-                              ? log.telefone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
-                              : log.telefone.length === 10
-                              ? log.telefone.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3')
-                              : log.telefone}
-                          </a>
-                        ) : (
-                          <span className="text-gray-400">-</span>
-                        )}
-                      </td>
+                      <td className="px-4 py-2"><TelefoneCell telefone={log.telefone} /></td>
                       <td className="px-4 py-2">
                         <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
                           <DevicePhoneMobileIcon className="h-4 w-4" /> Celular
                         </span>
                       </td>
-                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400 font-mono text-xs" title={log.user_agent}>
-                        {log.ip_address || log.hostname || '-'}
-                      </td>
+                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400 font-mono text-xs">{log.ip_address || log.hostname || '-'}</td>
                       <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{log.browser || '-'}</td>
                       <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{log.os || '-'}</td>
-                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400" title={log.user_agent}>
-                        {log.device || '-'}
-                      </td>
+                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400" title={log.user_agent}>{log.device || '-'}</td>
                       <td className="px-4 py-2 text-gray-500 dark:text-gray-500 whitespace-nowrap">
                         {log.access_time ? new Date(log.access_time).toLocaleString('pt-BR') : '-'}
                       </td>
@@ -556,73 +546,55 @@ export default function AcessosSistema() {
           </div>
         </div>
 
-        {/* Debug: Acessos mobile com detalhes completos */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-amber-200 dark:border-amber-700 overflow-hidden">
-          <div className="p-4 border-b border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20">
-            <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              <WrenchScrewdriverIcon className="h-5 w-5 text-amber-600" />
-              Debug: Acessos Mobile Completos
-            </h2>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
-              Mostra TODOS os celulares detectados com informações completas do User-Agent
-            </p>
-          </div>
-          <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
-            {logs.filter(log => log.is_mobile).length === 0 ? (
-              <div className="p-8 text-center">
-                <DevicePhoneMobileIcon className="h-16 w-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-                <p className="text-gray-500 dark:text-gray-400 font-medium">Nenhum acesso mobile detectado</p>
-              </div>
-            ) : (
-              <table className="w-full text-sm min-w-[900px]">
-                <thead className="bg-amber-50 dark:bg-amber-900/20 sticky top-0">
-                  <tr>
-                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">Usuário</th>
-                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">Telefone</th>
-                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">IP/Host</th>
-                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">Browser</th>
-                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">Sistema</th>
-                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">Aparelho</th>
-                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">User-Agent</th>
-                    <th className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">Data/Hora</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {logs.filter(log => log.is_mobile).map((log) => (
-                    <tr key={`debug-${log.id}`} className="border-t border-amber-100 dark:border-amber-800 hover:bg-amber-50 dark:hover:bg-amber-900/10">
-                      <td className="px-4 py-2 font-medium text-gray-900 dark:text-white">{log.user_name}</td>
-                      <td className="px-4 py-2">
-                        {log.telefone ? (
-                          <a href={`tel:${log.telefone}`} className="text-emerald-600 dark:text-emerald-400 hover:underline font-mono">
-                            {log.telefone.length === 11
-                              ? log.telefone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
-                              : log.telefone.length === 10
-                              ? log.telefone.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3')
-                              : log.telefone}
-                          </a>
-                        ) : (
-                          <span className="text-gray-400">-</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400 font-mono text-xs">
-                        {log.ip_address || log.hostname || '-'}
-                      </td>
-                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{log.browser || '-'}</td>
-                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{log.os || '-'}</td>
-                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{log.device || '-'}</td>
-                      <td className="px-4 py-2 text-gray-500 dark:text-gray-500 text-xs max-w-xs truncate" title={log.user_agent}>
-                        {log.user_agent || '-'}
-                      </td>
-                      <td className="px-4 py-2 text-gray-500 dark:text-gray-500 whitespace-nowrap">
-                        {log.access_time ? new Date(log.access_time).toLocaleString('pt-BR') : '-'}
-                      </td>
+        {/* Debug: informações completas (apenas em desenvolvimento) */}
+        {process.env.NODE_ENV !== 'production' && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-amber-200 dark:border-amber-700 overflow-hidden">
+            <div className="p-4 border-b border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20">
+              <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <WrenchScrewdriverIcon className="h-5 w-5 text-amber-600" />
+                Debug: Acessos Mobile Completos
+              </h2>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+                Mostra TODOS os celulares detectados com informações completas do User-Agent
+              </p>
+            </div>
+            <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
+              {mobileLogs.length === 0 ? (
+                <div className="p-8 text-center">
+                  <DevicePhoneMobileIcon className="h-16 w-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
+                  <p className="text-gray-500 dark:text-gray-400 font-medium">Nenhum acesso mobile detectado</p>
+                </div>
+              ) : (
+                <table className="w-full text-sm min-w-[900px]">
+                  <thead className="bg-amber-50 dark:bg-amber-900/20 sticky top-0">
+                    <tr>
+                      {['Usuário', 'Telefone', 'IP/Host', 'Browser', 'Sistema', 'Aparelho', 'User-Agent', 'Data/Hora'].map(col => (
+                        <th key={col} className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">{col}</th>
+                      ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+                  </thead>
+                  <tbody>
+                    {mobileLogs.map((log) => (
+                      <tr key={`debug-${log.id}`} className="border-t border-amber-100 dark:border-amber-800 hover:bg-amber-50 dark:hover:bg-amber-900/10">
+                        <td className="px-4 py-2 font-medium text-gray-900 dark:text-white">{log.user_name}</td>
+                        <td className="px-4 py-2"><TelefoneCell telefone={log.telefone} /></td>
+                        <td className="px-4 py-2 text-gray-600 dark:text-gray-400 font-mono text-xs">{log.ip_address || log.hostname || '-'}</td>
+                        <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{log.browser || '-'}</td>
+                        <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{log.os || '-'}</td>
+                        <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{log.device || '-'}</td>
+                        <td className="px-4 py-2 text-gray-500 dark:text-gray-500 text-xs max-w-xs truncate" title={log.user_agent}>{log.user_agent || '-'}</td>
+                        <td className="px-4 py-2 text-gray-500 dark:text-gray-500 whitespace-nowrap">
+                          {log.access_time ? new Date(log.access_time).toLocaleString('pt-BR') : '-'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </div>
-        </div>
+        )}
+
       </div>
     </>
   )

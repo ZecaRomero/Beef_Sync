@@ -7,7 +7,7 @@ export default function AnimalAdditionalInfo({ animal }) {
   
   const hasInfo = animal.origem || animal.fazenda_origem || animal.fazendaOrigem || 
                   animal.lote || animal.status_sanitario || animal.statusSanitario || 
-                  animal.comprador || animal.destino || animal.receptora || 
+                  animal.comprador || animal.destino || 
                   dataChegada || animal.data_saida || 
                   animal.valor_venda || animal.valorVenda || 
                   animal.custo_aquisicao || animal.custoAquisicao
@@ -49,12 +49,6 @@ export default function AnimalAdditionalInfo({ animal }) {
           <div className="flex justify-between text-sm">
             <span className="text-gray-500 dark:text-gray-400">Comprador/Destino</span>
             <span className="font-medium text-gray-900 dark:text-white">{animal.comprador || animal.destino}</span>
-          </div>
-        )}
-        {animal.receptora && (
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-500 dark:text-gray-400">Receptora</span>
-            <span className="font-medium text-gray-900 dark:text-white">{animal.receptora}</span>
           </div>
         )}
         {dataChegada && (

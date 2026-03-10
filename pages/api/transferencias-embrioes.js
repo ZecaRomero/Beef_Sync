@@ -244,4 +244,5 @@ async function handleDelete(req, res) {
   }
 }
 
+export const config = { api: { externalResolver: true } }
 export default asyncHandler(transferenciasHandler)

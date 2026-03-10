@@ -7,12 +7,17 @@ import {
   TrashIcon,
   FunnelIcon,
   DocumentArrowDownIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  ArrowRightIcon,
+  ArrowLeftIcon,
+  PrinterIcon
 } from './ui/Icons'
+import { useAutocomplete } from '../hooks/useAutocomplete'
 // ExcelJS será importado dinamicamente na função de exportação
 import DatabaseSync from './DatabaseSync'
 import { ViewSemenModal, EditSemenModal } from './SemenModals'
 import { AddEntradaModal, AddSaidaModal } from './SemenEntradaSaidaModals'
+import TransferirLocalizacaoModal from './semen/TransferirLocalizacaoModal'
 
 export default function SemenStock() {
   const [semenStock, setSemenStock] = useState([])
@@ -47,6 +52,10 @@ export default function SemenStock() {
   // Retirada de sêmen
   const [retirarItens, setRetirarItens] = useState({}) // { [id]: quantidade }
 
+  // Modal de transferir localização
+  const [showTransferirModal, setShowTransferirModal] = useState(false)
+  const [semenParaTransferir, setSemenParaTransferir] = useState(null)
+
   // Importação Excel
   const [showImportModal, setShowImportModal] = useState(false)
   const [importFile, setImportFile] = useState(null)
@@ -77,6 +86,8 @@ export default function SemenStock() {
     origem: '',
     linhagem: ''
   })
+
+  const { data: acSemen } = useAutocomplete('estoque_semen')
 
   // Carregar dados
   useEffect(() => {
@@ -252,6 +263,48 @@ export default function SemenStock() {
     }
   }
 
+  const handleTransferirParaSemen = async (semenId, nomeTouro) => {
+    if (!confirm(`Transferir "${nomeTouro}" para o Estoque de Sêmen?\n\nO item deixará de aparecer em Embriões e passará a aparecer em Sêmen.`)) return
+    try {
+      const response = await fetch('/api/semen/transferir', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: semenId, tipo: 'semen' })
+      })
+      const data = await response.json()
+      if (response.ok && data.success) {
+        loadSemenStock()
+        alert(`"${nomeTouro}" transferido para o Estoque de Sêmen com sucesso!`)
+      } else {
+        alert(`Erro ao transferir: ${data.message}`)
+      }
+    } catch (e) {
+      console.error('Erro ao transferir para sêmen:', e)
+      alert('Erro ao transferir. Tente novamente.')
+    }
+  }
+
+  const handleTransferirParaEmbriao = async (semenId, nomeTouro) => {
+    if (!confirm(`Transferir "${nomeTouro}" para o Módulo de Embriões?\n\nO item deixará de aparecer em Sêmen e passará a aparecer em Embriões.`)) return
+    try {
+      const response = await fetch('/api/semen/transferir', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: semenId, tipo: 'embriao' })
+      })
+      const data = await response.json()
+      if (response.ok && data.success) {
+        loadSemenStock()
+        alert(`"${nomeTouro}" transferido para o Módulo de Embriões com sucesso!`)
+      } else {
+        alert(`Erro ao transferir: ${data.message}`)
+      }
+    } catch (e) {
+      console.error('Erro ao transferir para embriões:', e)
+      alert('Erro ao transferir. Tente novamente.')
+    }
+  }
+
   // Funções para exclusão múltipla
   const handleSelectAll = (checked) => {
     if (checked) {
@@ -371,9 +424,11 @@ export default function SemenStock() {
     if (!semen) return false
 
     // Filtrar por tipo de material (semen ou embriao)
-    const tipoItem = semen.tipo || 'semen'
+    // tipo explícito no banco tem precedência; sem tipo, usa detecção pelo nome
+    const tipoItem = semen.tipo
     const nome = (semen.nome_touro || semen.nomeTouro || '').toUpperCase()
-    const isEmbriao = tipoItem === 'embriao' || nome.includes(' X ') || nome.includes('ACASALAMENTO')
+    const isEmbriao = tipoItem === 'embriao' ||
+      (!tipoItem && (nome.includes(' X ') || nome.includes('ACASALAMENTO')))
     if (tipoMaterial === 'semen' && isEmbriao) return false
     if (tipoMaterial === 'embriao' && !isEmbriao) return false
 
@@ -414,7 +469,7 @@ export default function SemenStock() {
     const isEnt = s.tipoOperacao === 'entrada' || s.tipo_operacao === 'entrada'
     if (!isEnt) return false
     const n = (s.nome_touro || s.nomeTouro || '').toUpperCase()
-    const isEmb = (s.tipo || 'semen') === 'embriao' || n.includes(' X ') || n.includes('ACASALAMENTO')
+    const isEmb = s.tipo === 'embriao' || (!s.tipo && (n.includes(' X ') || n.includes('ACASALAMENTO')))
     return tipoMaterial === 'embriao' ? isEmb : !isEmb
   })
 
@@ -469,6 +524,47 @@ export default function SemenStock() {
       
       return dateStr >= startDate && dateStr <= endDate;
     });
+  }
+
+  // Imprimir relatório no formato BEEF-SYNC (layout para impressão)
+  const handlePrintReport = async () => {
+    const data = selectedItems.length > 0
+      ? (semenStock || []).filter(s => selectedItems.includes(s.id))
+      : filteredStock;
+    if (data.length === 0) {
+      alert('⚠️ Nenhum dado para imprimir');
+      return;
+    }
+    const tipo = activeTab === 'saidas' ? 'SAÍDAS' : activeTab === 'entradas' ? 'ENTRADAS' : 'ESTOQUE REAL';
+    const { openSemenPrintReport } = await import('../utils/semenPrintReport');
+    openSemenPrintReport(data, tipo);
+  };
+
+  // Exportar apenas os itens selecionados
+  const exportSelectedToExcel = async () => {
+    if (selectedItems.length === 0) {
+      alert('⚠️ Selecione pelo menos um item para exportar');
+      return;
+    }
+    const selected = (semenStock || []).filter(s => selectedItems.includes(s.id));
+    if (selected.length === 0) {
+      alert('⚠️ Nenhum item selecionado encontrado no estoque');
+      return;
+    }
+    try {
+      const { exportSemenToExcel } = await import('../utils/simpleExcelExporter');
+      const entradas = selected.filter(s => (s.tipoOperacao === 'entrada' || s.tipo_operacao === 'entrada'));
+      const saidas = selected.filter(s => s.tipoOperacao === 'saida' || s.tipo_operacao === 'saida');
+      const estoqueReal = selected.filter(s => {
+        const doses = parseInt(s.dosesDisponiveis || s.doses_disponiveis || 0);
+        return (s.tipoOperacao === 'entrada' || s.tipo_operacao === 'entrada') && doses > 0;
+      });
+      await exportSemenToExcel(selected, { entradas, saidas, estoqueReal }, null);
+      alert(`✅ ${selected.length} item(ns) exportado(s) com sucesso!`);
+    } catch (error) {
+      console.error('Erro ao exportar selecionados:', error);
+      alert('❌ Erro ao exportar: ' + error.message);
+    }
   }
 
   // Exportar para Excel com formatação profissional
@@ -671,7 +767,7 @@ export default function SemenStock() {
               : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-purple-400'
           }`}
         >
-          🥚 Embriões
+          🧬 Embriões
         </button>
       </div>
       
@@ -679,7 +775,7 @@ export default function SemenStock() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-            {tipoMaterial === 'embriao' ? '🥚 Estoque de Embriões' : '🧬 Estoque de Sêmen'}
+            {tipoMaterial === 'embriao' ? '🧬 Estoque de Embriões' : '🧬 Estoque de Sêmen'}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
             {tipoMaterial === 'embriao'
@@ -701,6 +797,14 @@ export default function SemenStock() {
           >
             <DocumentArrowDownIcon className="h-5 w-5 mr-2" />
             Exportar Excel
+          </button>
+          <button
+            onClick={handlePrintReport}
+            className="btn-secondary flex items-center"
+            title="Imprimir relatório no formato BEEF-SYNC"
+          >
+            <PrinterIcon className="h-5 w-5 mr-2" />
+            Imprimir
           </button>
         {/* Abas de Entrada, Saída e Estoque Real */}
         <div className="flex space-x-1 bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
@@ -817,6 +921,9 @@ export default function SemenStock() {
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           🔍 Filtros de Pesquisa
         </h3>
+        <datalist id="datalist-semen-touro">{(acSemen?.nome_touro || []).map((v, i) => <option key={i} value={v} />)}</datalist>
+        <datalist id="datalist-semen-fornecedor">{(acSemen?.fornecedor || []).map((v, i) => <option key={i} value={v} />)}</datalist>
+        <datalist id="datalist-semen-localizacao">{(acSemen?.localizacao || []).map((v, i) => <option key={i} value={v} />)}</datalist>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -824,6 +931,7 @@ export default function SemenStock() {
             </label>
             <input
               type="text"
+              list="datalist-semen-touro"
               placeholder="Nome do touro, RG, fornecedor..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -836,6 +944,7 @@ export default function SemenStock() {
             </label>
             <input
               type="text"
+              list="datalist-semen-touro"
               placeholder="Nome do touro"
               value={filters.touro}
               onChange={(e) => setFilters({ ...filters, touro: e.target.value })}
@@ -848,6 +957,7 @@ export default function SemenStock() {
             </label>
             <input
               type="text"
+              list="datalist-semen-fornecedor"
               placeholder="Nome do fornecedor"
               value={filters.fornecedor}
               onChange={(e) => setFilters({ ...filters, fornecedor: e.target.value })}
@@ -860,6 +970,7 @@ export default function SemenStock() {
             </label>
             <input
               type="text"
+              list="datalist-semen-localizacao"
               placeholder="Localização"
               value={filters.localizacao}
               onChange={(e) => setFilters({ ...filters, localizacao: e.target.value })}
@@ -915,6 +1026,13 @@ export default function SemenStock() {
                 <span className="text-sm text-gray-600 dark:text-gray-400">
                   {selectedItems.length} item(s) selecionado(s)
                 </span>
+                <button
+                  onClick={exportSelectedToExcel}
+                  className="btn-primary flex items-center"
+                >
+                  <DocumentArrowDownIcon className="h-4 w-4 mr-2" />
+                  Exportar Selecionados
+                </button>
                 <button
                   onClick={() => setShowBulkDeleteModal(true)}
                   className="btn-danger flex items-center"
@@ -1055,19 +1173,69 @@ export default function SemenStock() {
                     </td>
                     {activeTab !== 'saidas' && (
                       <td className="px-4 py-4 whitespace-nowrap">
-                        <input
-                          type="number"
-                          min="0"
-                          max={semen.doses_disponiveis || semen.dosesDisponiveis || 0}
-                          value={retirarItens[semen.id] || ''}
-                          onChange={(e) => handleRetirarChange(semen.id, e.target.value)}
-                          placeholder="0"
-                          className="w-20 px-2 py-1 text-sm border border-yellow-300 dark:border-yellow-700 rounded-lg text-center focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 text-gray-900 dark:text-white"
-                        />
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min="0"
+                            max={semen.doses_disponiveis || semen.dosesDisponiveis || 0}
+                            value={retirarItens[semen.id] || ''}
+                            onChange={(e) => handleRetirarChange(semen.id, e.target.value)}
+                            placeholder="0"
+                            className="w-20 px-2 py-1 text-sm border border-yellow-300 dark:border-yellow-700 rounded-lg text-center focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 text-gray-900 dark:text-white"
+                          />
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setSemenParaTransferir(semen)
+                              setShowTransferirModal(true)
+                            }}
+                            title="Transferir Localização"
+                            className="p-1.5 rounded-lg text-purple-600 hover:text-purple-900 hover:bg-purple-100 dark:text-purple-400 dark:hover:text-purple-300 dark:hover:bg-purple-900/30 transition-colors"
+                          >
+                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                            </svg>
+                          </button>
+                        </div>
                       </td>
                     )}
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex space-x-2">
+                      <div className="flex space-x-2 items-center">
+                        {tipoMaterial === 'semen' && (
+                          <button
+                            type="button"
+                            onClick={() => handleTransferirParaEmbriao(semen.id, semen.nome_touro || semen.nomeTouro)}
+                            title="Transferir para Módulo de Embriões"
+                            className="text-teal-600 hover:text-teal-900 dark:text-teal-400 dark:hover:text-teal-300"
+                          >
+                            <ArrowLeftIcon className="h-4 w-4" />
+                          </button>
+                        )}
+                        {tipoMaterial === 'embriao' && (
+                          <button
+                            type="button"
+                            onClick={() => handleTransferirParaSemen(semen.id, semen.nome_touro || semen.nomeTouro)}
+                            title="Transferir para Estoque de Sêmen"
+                            className="text-teal-600 hover:text-teal-900 dark:text-teal-400 dark:hover:text-teal-300"
+                          >
+                            <ArrowRightIcon className="h-4 w-4" />
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setSemenParaTransferir(semen)
+                            setShowTransferirModal(true)
+                          }}
+                          title="Transferir Localização"
+                          className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300"
+                        >
+                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                          </svg>
+                        </button>
                         <button
                           onClick={() => {
                             setSelectedSemen(semen)
@@ -1148,6 +1316,7 @@ export default function SemenStock() {
         setNewSemen={setNewSemen}
         handleAddSemen={handleAddSemen}
         semenStock={semenStock}
+        tipoMaterial={tipoMaterial}
       />
 
       {/* Modal de Exportação com Período */}
@@ -1311,6 +1480,19 @@ export default function SemenStock() {
         setShowModal={setShowEditModal}
         selectedSemen={selectedSemen}
         handleEditSemen={handleEditSemen}
+      />
+
+      {/* Modal de Transferir Localização */}
+      <TransferirLocalizacaoModal
+        isOpen={showTransferirModal}
+        onClose={() => {
+          setShowTransferirModal(false)
+          setSemenParaTransferir(null)
+        }}
+        registro={semenParaTransferir}
+        onSuccess={() => {
+          loadSemenStock()
+        }}
       />
 
       {/* Modal de Confirmação para Exclusão Múltipla */}

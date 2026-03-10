@@ -11,6 +11,7 @@ const pool = new Pool({
   port: parseInt(process.env.DB_PORT) || 5432,
 });
 
+export const config = { api: { externalResolver: true } }
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     try {

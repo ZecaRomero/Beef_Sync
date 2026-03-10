@@ -9,7 +9,7 @@ export default function Document() {
         <link rel="shortcut icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232563eb'/%3E%3Ctext x='16' y='21' font-family='Arial' font-size='14' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'%3EBS%3C/text%3E%3C/svg%3E" />
         
         {/* Viewport - crítico para layout mobile (deve estar no HTML inicial) */}
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
         {/* Meta tags */}
         <meta name="description" content="Beef-Sync - Sistema de Gestão Pecuária" />
         <meta name="keywords" content="pecuária, gestão, bovinos, rebanho, beef sync" />

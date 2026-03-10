@@ -47,7 +47,7 @@ export default function MobileIdentificationOverlay() {
     const hostname = window.location.hostname
     if (hostname === 'localhost' || hostname === '127.0.0.1') return
 
-    const skipPaths = ['/login', '/identificar', '/monitoramento']
+    const skipPaths = ['/login', '/identificar', '/monitoramento', '/adelso']
     if (skipPaths.includes(router.pathname)) return
 
     // Mostrar para mobile OU para usuários externos (ngrok, etc) em qualquer dispositivo
@@ -69,13 +69,8 @@ export default function MobileIdentificationOverlay() {
     e.preventDefault()
     setError('')
 
-    const telDigits = formData.telefone.replace(/\D/g, '')
     if (!formData.nome.trim()) {
       setError('Nome é obrigatório')
-      return
-    }
-    if (telDigits.length < 10) {
-      setError('Telefone válido com DDD é obrigatório')
       return
     }
 
@@ -90,9 +85,10 @@ export default function MobileIdentificationOverlay() {
         localStorage.removeItem('maintenance_saved_data')
       }
 
+      const telDigits = formData.telefone.replace(/\D/g, '')
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         nome: formData.nome.trim(),
-        telefone: telDigits
+        telefone: telDigits || null
       }))
 
       await fetch('/api/access-log', {
@@ -104,7 +100,7 @@ export default function MobileIdentificationOverlay() {
           ipAddress: 'N/A',
           hostname: window.location.hostname,
           userAgent: navigator.userAgent,
-          telefone: telDigits,
+          telefone: telDigits || null,
           action: 'Acesso ao Sistema'
         })
       })
@@ -145,7 +141,7 @@ export default function MobileIdentificationOverlay() {
           </div>
           <div className="text-left">
             <label className="block text-sm font-medium text-gray-300 mb-1">
-              Telefone <span className="text-red-400">*</span>
+              Telefone <span className="text-gray-500">(opcional)</span>
             </label>
             <input
               type="tel"

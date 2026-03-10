@@ -27,38 +27,66 @@ export default function AnimalOffspring({ animal, filhos }) {
           {listaFilhos.length} filho(s) registrado(s)
         </p>
       </button>
-      <div className={`overflow-hidden transition-all ${isExpanded ? 'max-h-[999px]' : 'max-h-0'}`}>
+      <div className={`transition-all duration-300 ${isExpanded ? '' : 'max-h-0 overflow-hidden'}`}>
         <div className="divide-y divide-gray-100 dark:divide-gray-700">
           {listaFilhos.map((f, i) => {
+            const reactKey = f.id ?? `filho-${f.serie}-${f.rg}-${i}`
             const identificacao = `${f.nome || f.serie || '-'} ${f.rg || ''}`.trim()
             const mesesFilho = calcularMesesIdade(f.data_nascimento, f.meses)
             
+            const isBaixa = f.status && f.status !== 'ATIVO'
+            const statusColor = f.status === 'VENDA' ? 'text-green-600 bg-green-50 dark:bg-green-900/20' 
+              : f.status === 'MORTE/BAIXA' || f.status === 'MORTE' ? 'text-red-600 bg-red-50 dark:bg-red-900/20'
+              : 'text-gray-600 bg-gray-50 dark:bg-gray-800'
+
             const conteudoFilho = (
               <>
                 <div className="flex-1 min-w-0">
-                  <span className="text-sm font-medium text-gray-900 dark:text-white block">
-                    {identificacao || '-'}
-                  </span>
-                  <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  <div className="flex justify-between items-start">
+                    <span className="text-sm font-medium text-gray-900 dark:text-white block">
+                      {identificacao || '-'}
+                    </span>
+                    {isBaixa && (
+                      <span className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded ${statusColor}`}>
+                        {f.status}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1.5 text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
                     {f.sexo && <span>{f.sexo}</span>}
                     {formatDate(f.data_nascimento) !== '-' && <span>Nasc: {formatDate(f.data_nascimento)}</span>}
                     {mesesFilho != null && <span className="font-medium text-amber-600 dark:text-amber-400">{mesesFilho}m</span>}
+                    
+                    {isBaixa && f.data_baixa && (
+                      <span className="font-medium text-gray-600 dark:text-gray-300">
+                        Saída: {formatDate(f.data_baixa)}
+                      </span>
+                    )}
+                    {isBaixa && f.valor && (
+                      <span className="font-medium text-green-600 dark:text-green-400">
+                        R$ {Number(f.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </span>
+                    )}
+
                     {(f.abczg != null && f.abczg !== '') && <span className="font-medium text-blue-600 dark:text-blue-400">iABCZ: {f.abczg}</span>}
                     {(f.deca != null && f.deca !== '') && <span className="font-medium text-emerald-600 dark:text-emerald-400">DECA: {f.deca}</span>}
                     {((f.iqg ?? f.genetica_2) != null && (f.iqg ?? f.genetica_2) !== '') && <span className="font-medium text-purple-600 dark:text-purple-400">IQG: {(f.iqg ?? f.genetica_2)}</span>}
                     {((f.pt_iqg ?? f.decile_2) != null && (f.pt_iqg ?? f.decile_2) !== '') && <span className="font-medium text-amber-600 dark:text-amber-400">Pt IQG: {(f.pt_iqg ?? f.decile_2)}</span>}
+                    {(f.mgte != null && f.mgte !== '') && <span className="font-medium text-amber-700 dark:text-amber-300">MGTe: {f.mgte}</span>}
+                    {(f.top != null && f.top !== '') && <span className="font-medium text-orange-600 dark:text-orange-400">TOP: {f.top}</span>}
                   </div>
                 </div>
-                {f.id && <ArrowTopRightOnSquareIcon className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />}
+                {f.id && !f.id.toString().startsWith('baixa-') && <ArrowTopRightOnSquareIcon className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />}
               </>
             )
             
-            if (f.id) {
+            if (f.id && !f.id.toString().startsWith('baixa-')) {
+              const linkId = (f.serie && f.rg) ? `${f.serie}-${f.rg}` : f.id
               return (
                 <Link 
-                  key={f.id || i} 
-                  href={`/consulta-animal/${f.id}`}
-                  className="px-4 py-3 flex justify-between items-center gap-3 hover:bg-amber-50 dark:hover:bg-amber-900/20 active:bg-amber-100 dark:active:bg-amber-900/30 transition-colors cursor-pointer"
+                  key={reactKey} 
+                  href={`/consulta-animal/${linkId}`}
+                  className="px-4 py-4 flex justify-between items-start gap-3 hover:bg-amber-50 dark:hover:bg-amber-900/20 active:bg-amber-100 dark:active:bg-amber-900/30 transition-colors cursor-pointer"
                 >
                   {conteudoFilho}
                 </Link>
@@ -66,7 +94,7 @@ export default function AnimalOffspring({ animal, filhos }) {
             }
             
             return (
-              <div key={f.id || i} className="px-4 py-3 flex justify-between items-center gap-3">
+              <div key={reactKey} className="px-4 py-4 flex justify-between items-start gap-3">
                 {conteudoFilho}
               </div>
             )

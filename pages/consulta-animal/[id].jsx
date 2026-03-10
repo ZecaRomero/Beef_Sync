@@ -3,7 +3,7 @@
  * Usado quando o usuário acessa via /a - sem edição, sem sidebar
  * Inclui: machos = exames andrológicos | fêmeas = FIV, inseminações, gestações
  */
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -49,6 +49,9 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
     error,
     rankings,
     maeLink,
+    maeColetas,
+    baixasResumo,
+    baixasMae,
     examesAndrologicos,
     ocorrencias,
     transferencias,
@@ -56,15 +59,73 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
     metrics
   } = useAnimalDetails(id)
 
+  const filhosCombinados = useMemo(() => {
+    const ativos = animal?.filhos || []
+    const baixados = baixasResumo?.resumoMae?.proleDetalhes || []
+    
+    // Combinar e remover duplicatas por ID (se houver) ou RG/Série
+    const map = new Map()
+    
+    ativos.forEach(f => {
+      const key = f.id ? `id-${f.id}` : `${f.serie}-${f.rg}`
+      map.set(key, { ...f, status: 'ATIVO' })
+    })
+    
+    baixados.forEach((f, idx) => {
+      const key = `${f.serie}-${f.rg}`
+      const fComId = { ...f, id: f.id || `baixa-${f.serie}-${f.rg}-${idx}`, status: f.tipo }
+      // Encontrar a chave do mapa onde esse filho já existe (evita duplicatas e chaves React duplicadas)
+      let mapKeyToUpdate = null
+      for (const [k, v] of map) {
+        if (v.serie === f.serie && v.rg === f.rg) {
+          mapKeyToUpdate = k
+          break
+        }
+      }
+      if (mapKeyToUpdate) {
+        map.set(mapKeyToUpdate, { ...map.get(mapKeyToUpdate), ...fComId, status: f.tipo })
+      } else {
+        map.set(`baixa-${key}`, fComId)
+      }
+    })
+    
+    return Array.from(map.values()).sort((a, b) => {
+      // Ordenar por nascimento (se tiver) ou data de baixa (se tiver) ou RG
+      // Melhora: ordenar por data (nascimento ou baixa) decrescente
+      const d1 = a.data_nascimento || a.data_baixa
+      const d2 = b.data_nascimento || b.data_baixa
+      if (d1 && d2) return new Date(d2) - new Date(d1)
+      return 0
+    })
+  }, [animal?.filhos, baixasResumo?.resumoMae?.proleDetalhes])
+
   const { posicaoIABCZ: rankingPosicao, posicaoIQG: rankingPosicaoGenetica2, filhoTopIABCZ: filhoTopRanking } = rankings
 
   const [, setShowIABCZInfo] = useState(false)
   const [isEditGeneticaModalOpen, setIsEditGeneticaModalOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  const sectionRefs = useRef({ custos: null, genética: null, pai: null, filhos: null, peso: null, fiv: null, localizacao: null })
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const mobile = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    setIsMobile(mobile)
+  }, [])
 
   const handleSaveGenetica = useCallback((updatedAnimal) => {
     setAnimal(prev => ({ ...prev, ...updatedAnimal }))
     setIsEditGeneticaModalOpen(false)
   }, [setAnimal])
+
+  const refreshCustos = useCallback(async () => {
+    if (!animal?.id) return
+    try {
+      const r = await fetch(`/api/animals/${animal.id}/custos`)
+      const d = r.ok ? await r.json() : { data: [] }
+      const custos = Array.isArray(d.data ?? d.custos ?? d) ? (d.data ?? d.custos ?? d) : []
+      setAnimal(prev => prev ? { ...prev, custos } : prev)
+    } catch {}
+  }, [animal?.id, setAnimal])
 
   const [copiedIdent, setCopiedIdent] = useState(false)
   const handleCopyIdent = useCallback(() => {
@@ -130,6 +191,11 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
 
   const nome = animal ? (animal.nome || `${animal.serie || ''} ${animal.rg || ''}`.trim() || '-') : '-'
 
+  const scrollToSection = useCallback((key) => {
+    const el = sectionRefs.current[key]
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [])
+
   if (loading) {
     return (
       <>
@@ -146,6 +212,11 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
   }
 
   if (error || !animal) {
+    const idForLink = id && typeof id === 'string' ? id : ''
+    const partsErr = idForLink.includes('-') ? idForLink.split('-') : []
+    const serieErr = (partsErr[0] || '').trim()
+    const rgErr = partsErr.length > 1 ? partsErr.slice(1).join('-').trim() : ''
+    const temSerieRg = serieErr && rgErr
     return (
       <>
         <Head>
@@ -153,7 +224,24 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
           <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
         </Head>
         <div className="min-h-screen flex flex-col items-center justify-center px-4 py-6 bg-gray-50 dark:bg-gray-900">
-          <p className="text-red-600 dark:text-red-400 text-center mb-6">{error || 'Animal não encontrado'}</p>
+          <p className="text-red-600 dark:text-red-400 text-center mb-2">{error || 'Animal não encontrado'}</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm text-center mb-4 max-w-sm">
+            Se o animal existe no banco, tente por identificação: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">/consulta-animal/SERIE-RG</code>
+          </p>
+          {temSerieRg && !isMobile && (
+            <Link
+              href={`/registrar-baixa?serie=${encodeURIComponent(serieErr)}&rg=${encodeURIComponent(rgErr)}`}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 mb-4"
+            >
+              Registrar baixa (abate/morte/venda) de {serieErr} {rgErr}
+            </Link>
+          )}
+          <Link
+            href="/consulta-animal/CJCJ-16974"
+            className="inline-block text-amber-600 dark:text-amber-400 hover:underline text-sm mb-6"
+          >
+            Exemplo: CJCJ-16974 →
+          </Link>
           <Link
             href="/a?buscar=1"
             className="flex items-center gap-2 px-6 py-3 rounded-xl bg-amber-600 text-white font-semibold hover:bg-amber-700"
@@ -170,9 +258,9 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
     <React.Fragment>
       <Head>
         <title>{nome} | Consulta Beef-Sync</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover" />
       </Head>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-24">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-[calc(7.5rem+env(safe-area-inset-bottom))] scroll-pt-4">
         <AnimalHeader
           darkMode={darkMode}
           toggleDarkMode={toggleDarkMode}
@@ -183,7 +271,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
         />
 
         <div className="max-w-lg mx-auto p-4 space-y-4">
-          <AnimalMetricsCards animal={animal} metrics={metrics} rankings={rankings} />
+          <AnimalMetricsCards animal={animal} metrics={metrics} rankings={rankings} onScrollTo={scrollToSection} />
 
           <AnimalMainInfo
             animal={animal}
@@ -197,7 +285,11 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
             onWhatsAppShare={handleWhatsAppShare}
             onEditGenetica={() => setIsEditGeneticaModalOpen(true)}
             maeLink={maeLink}
+            maeColetas={maeColetas}
+            baixasResumo={baixasResumo}
+            baixasMae={baixasMae}
             locAtual={locAtual}
+            onScrollToLocation={() => scrollToSection('localizacao')}
           />
 
           <AnimalPlanningCards animal={animal} metrics={metrics} />
@@ -210,7 +302,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
 
           <AnimalReproduction animal={animal} />
           
-          <AnimalIVFCollections fivs={animal.fivs || []} />
+          <div ref={r => sectionRefs.current.fiv = r} className="scroll-mb-28"><AnimalIVFCollections fivs={animal.fivs || []} /></div>
           
           <AnimalEmbryoTransfers transferencias={transferencias} />
 
@@ -221,19 +313,19 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
             transferencias={transferencias}
           />
 
-          <AnimalLocation animal={animal} locAtual={locAtual} diasNaFazenda={metrics.diasNaFazenda} />
+          <div ref={r => sectionRefs.current.localizacao = r} className="scroll-mb-28"><AnimalLocation animal={animal} locAtual={locAtual} diasNaFazenda={metrics.diasNaFazenda} /></div>
 
-          <AnimalOffspring animal={animal} />
+          <div ref={r => sectionRefs.current.filhos = r} className="scroll-mb-28"><AnimalOffspring animal={animal} filhos={filhosCombinados} /></div>
 
           <AnimalOccurrences animal={animal} ocorrencias={ocorrencias} />
 
           <AnimalHealthProtocols animal={animal} />
 
-          <AnimalWeightHistory animal={animal} />
+          <div ref={r => sectionRefs.current.peso = r} className="scroll-mb-28"><AnimalWeightHistory animal={animal} /></div>
 
-          <AnimalCosts animal={animal} />
+          <div ref={r => sectionRefs.current.custos = r} className="scroll-mb-28"><AnimalCosts animal={animal} onCustosUpdated={refreshCustos} /></div>
 
-          <AnimalGenetics animal={animal} />
+          <div ref={r => sectionRefs.current.genética = r} className="scroll-mb-28"><AnimalGenetics animal={animal} /></div>
 
           <AnimalNotes animal={animal} />
 
@@ -245,6 +337,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
         <AnimalFixedActions 
           onShare={handleWhatsAppShare}
           isSharing={false}
+          animalId={animal?.id}
         />
 
         {isEditGeneticaModalOpen && (

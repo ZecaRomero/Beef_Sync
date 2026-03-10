@@ -899,6 +899,7 @@ async function examesAndrologicosHandler(req, res) {
 }
 
 // Exportar handler com middleware de lotes aplicado
+export const config = { api: { externalResolver: true } }
 export default asyncHandler((req, res) => {
   // GET não precisa de tracking de lotes
   if (req.method === 'GET') {

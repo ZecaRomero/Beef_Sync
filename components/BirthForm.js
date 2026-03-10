@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react'
 
 import { XMarkIcon } from './ui/Icons'
+import { useAutocomplete } from '../hooks/useAutocomplete'
 
 export default function BirthForm({ birth, onSave, onClose }) {
   const [formData, setFormData] = useState({
@@ -72,14 +73,20 @@ export default function BirthForm({ birth, onSave, onClose }) {
     }
   }, [formData.tipoCobertura, formData.status])
 
+  const { data: acInseminacoes } = useAutocomplete('inseminacoes')
   const touros = [
     'A3139 FIV GUADALUPE-IDEAL',
     'ORIGINAL NATIMORTO',
     'ORIGINAL 16/1/24',
     'B2847 FIV SUPREMO',
     'C1234 FIV CAMPEÃO',
-    'D5678 FIV ELITE'
-  ]
+    'D5678 FIV ELITE',
+    ...(acInseminacoes?.touro_nome || [])
+  ].filter(Boolean)
+
+  const { data: acAnimais } = useAutocomplete('animais')
+  const { data: acGestacoes } = useAutocomplete('gestacoes')
+  const receptoraSugestoes = [...new Set([...(acAnimais?.serie || []), ...(acGestacoes?.receptora_nome || []), ...(acGestacoes?.receptora_serie || [])])]
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -114,12 +121,16 @@ export default function BirthForm({ birth, onSave, onClose }) {
               </label>
               <input
                 type="text"
+                list="datalist-birth-receptora"
                 value={formData.receptora}
                 onChange={(e) => setFormData({...formData, receptora: e.target.value})}
                 className="input-field"
                 placeholder="Ex: AF 6039"
                 required
               />
+              <datalist id="datalist-birth-receptora">
+                {receptoraSugestoes.map((v, i) => <option key={i} value={v} />)}
+              </datalist>
             </div>
 
             <div>
@@ -128,11 +139,15 @@ export default function BirthForm({ birth, onSave, onClose }) {
               </label>
               <input
                 type="text"
+                list="datalist-birth-doador"
                 value={formData.doador}
                 onChange={(e) => setFormData({...formData, doador: e.target.value})}
                 className="input-field"
                 placeholder="Ex: AF 6039"
               />
+              <datalist id="datalist-birth-doador">
+                {receptoraSugestoes.map((v, i) => <option key={i} value={v} />)}
+              </datalist>
             </div>
 
             <div>
@@ -181,17 +196,18 @@ export default function BirthForm({ birth, onSave, onClose }) {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Touro *
               </label>
-              <select
+              <input
+                type="text"
+                list="datalist-birth-touro"
                 value={formData.touro}
                 onChange={(e) => setFormData({...formData, touro: e.target.value})}
                 className="input-field"
+                placeholder="Selecione ou digite o touro"
                 required
-              >
-                <option value="">Selecione o touro</option>
-                {touros.map(touro => (
-                  <option key={touro} value={touro}>{touro}</option>
-                ))}
-              </select>
+              />
+              <datalist id="datalist-birth-touro">
+                {[...new Set(touros)].map((v, i) => <option key={i} value={v} />)}
+              </datalist>
             </div>
 
             {/* Dados do Nascimento */}

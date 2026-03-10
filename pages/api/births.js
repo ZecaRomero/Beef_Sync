@@ -184,5 +184,6 @@ function getBirthLoteConfig(req) {
   }
 }
 
+export const config = { api: { externalResolver: true } }
 export default asyncHandler(withLoteTracking(birthsHandler, getBirthLoteConfig))
 

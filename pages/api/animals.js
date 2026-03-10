@@ -1,4 +1,4 @@
-﻿import databaseService from '../../services/databaseService'
+import databaseService from '../../services/databaseService'
 import { logger } from '../../utils/logger'
 import boletimContabilService from '../../services/boletimContabilService'
 import { broadcast } from '../../lib/sseClients'
@@ -316,4 +316,5 @@ async function animaisHandler(req, res) {
 }
 
 // Exportar handler com middleware de lotes aplicado apenas para POST
+export const config = { api: { externalResolver: true } }
 export default asyncHandler(withLoteTracking(animaisHandler, LOTE_CONFIGS.CADASTRO_ANIMAL))

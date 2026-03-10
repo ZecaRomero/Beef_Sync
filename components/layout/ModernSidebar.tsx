@@ -63,7 +63,8 @@ const navigation: NavigationItem[] = [
     icon: ShieldCheckIcon,
     color: 'text-teal-600 dark:text-teal-400',
     children: [
-      { name: 'Dashboard', href: '/boletim-defesa', description: 'Visão geral do boletim de defesa' }
+      { name: 'Dashboard', href: '/boletim-defesa', description: 'Boletim Defesa + Boletim Campo (Excel)' },
+      { name: 'Acesso Adelso', href: '/adelso', description: 'Login Adelso - Relatórios ou Boletim' }
     ]
   },
   {

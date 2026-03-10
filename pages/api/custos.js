@@ -111,8 +111,37 @@ async function custosHandler(req, res) {
       }, 'ID do custo é obrigatório')
     }
     
-    // Atualização de custo não implementada ainda
-    return sendNotImplemented(res, 'Atualização de custo não implementada ainda')
+    const custoExistente = await databaseService.buscarCustoPorId(parseInt(id))
+    if (!custoExistente) {
+      return sendNotFound(res, 'Custo')
+    }
+    
+    const { tipo, subtipo, valor, data, observacoes, detalhes, applyToAll } = req.body
+    const custoData = {
+      tipo: tipo ?? custoExistente.tipo,
+      subtipo: subtipo !== undefined ? subtipo : custoExistente.subtipo,
+      valor: valor !== undefined ? parseFloat(valor) : custoExistente.valor,
+      data: data ?? custoExistente.data,
+      observacoes: observacoes !== undefined ? observacoes : custoExistente.observacoes,
+      detalhes: detalhes !== undefined ? detalhes : custoExistente.detalhes_json
+    }
+    
+    try {
+      const custo = await databaseService.atualizarCusto(parseInt(id), custoData)
+      let aplicadosTodos = null
+      if (applyToAll === true) {
+        const tipoOrig = custoExistente.tipo || ''
+        const subtipoOrig = custoExistente.subtipo ?? ''
+        const { atualizados, animais } = await databaseService.atualizarCustosPorTipoSubtipo(tipoOrig, subtipoOrig, custoData)
+        aplicadosTodos = { atualizados, animais }
+      }
+      return sendSuccess(res, { custo, aplicadosTodos }, 'Custo atualizado com sucesso', HTTP_STATUS.OK)
+    } catch (error) {
+      if (error.code === '23502') {
+        return sendValidationError(res, { field: error.column }, 'Dados inválidos')
+      }
+      throw error
+    }
     
   } else if (req.method === 'DELETE') {
     const { id } = req.query
@@ -124,8 +153,13 @@ async function custosHandler(req, res) {
       }, 'ID do custo é obrigatório')
     }
     
-    // Exclusão de custo não implementada ainda
-    return sendNotImplemented(res, 'Exclusão de custo não implementada ainda')
+    const custo = await databaseService.buscarCustoPorId(parseInt(id))
+    if (!custo) {
+      return sendNotFound(res, 'Custo')
+    }
+    
+    await databaseService.excluirCusto(parseInt(id))
+    return sendSuccess(res, { id: parseInt(id) }, 'Custo excluído com sucesso', HTTP_STATUS.OK)
     
   } else {
     return sendMethodNotAllowed(res, ['GET', 'POST', 'PUT', 'DELETE'])
@@ -146,4 +180,5 @@ function getCustoLoteConfig(req) {
   }
 }
 
+export const config = { api: { externalResolver: true } }
 export default asyncHandler(withLoteTracking(custosHandler, getCustoLoteConfig))

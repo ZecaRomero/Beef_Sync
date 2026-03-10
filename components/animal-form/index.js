@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Modal from '../ui/Modal';
 import Button from '../ui/Button';
 import useAnimalForm from './useAnimalForm';
+import { useAutocomplete } from '../../hooks/useAutocomplete';
 
 // Sections
 import IdentificationSection from './IdentificationSection';
@@ -34,6 +35,8 @@ export default function AnimalForm({ isOpen, onClose, animal, onSave }) {
   const [showImportModal, setShowImportModal] = useState(false);
   const [showNFModal, setShowNFModal] = useState(false);
   const [showNascimentoModal, setShowNascimentoModal] = useState(false);
+  const { data: autocompleteAnimais } = useAutocomplete('animais', isOpen);
+  const { data: autocompletePiquetes } = useAutocomplete('piquetes', isOpen);
 
   // Helper to handle NF save (refresh list)
   const handleSaveNF = async (novaNF) => {
@@ -118,6 +121,7 @@ export default function AnimalForm({ isOpen, onClose, animal, onSave }) {
 
           <IdentificationSection
             formData={formData}
+            autocompleteData={{ ...(autocompleteAnimais || {}), piquete: autocompletePiquetes?.nome || [] }}
             updateField={updateField}
             handleSerieChange={handleSerieChange}
             errors={errors}
@@ -134,6 +138,7 @@ export default function AnimalForm({ isOpen, onClose, animal, onSave }) {
           <GenealogySection
             formData={formData}
             updateField={updateField}
+            autocompleteData={autocompleteAnimais || {}}
           />
 
           {/* Only show NF Selection for Receptora or specific cases if needed */}

@@ -29,13 +29,16 @@ const semenHandler = async (req, res) => {
       }
       
       if (result.success) {
-        // Para lote, retornar array de resultados; para única, retornar o objeto
         const responseData = Array.isArray(result.data) 
           ? { resultados: result.data, count: result.count, errors: result.errors }
           : result.data || { count: result.count };
-        
         return sendSuccess(res, responseData, result.message, HTTP_STATUS.CREATED)
       } else {
+        // Falha parcial em lote: retornar 200 com dados para o cliente exibir detalhes
+        if (Array.isArray(req.body?.saidas) && result.count > 0) {
+          const data = { count: result.count, errors: result.errors, resultados: result.data }
+          return sendSuccess(res, data, result.message, HTTP_STATUS.OK)
+        }
         return sendError(res, result.message, HTTP_STATUS.BAD_REQUEST, result.error || result.errors)
       }
     } catch (error) {
@@ -72,4 +75,5 @@ function getSemenLoteConfig(req) {
   return null;
 }
 
+export const config = { api: { externalResolver: true } }
 export default asyncHandler(withLoteTracking(semenHandler, getSemenLoteConfig))

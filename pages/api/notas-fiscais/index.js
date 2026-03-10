@@ -110,6 +110,7 @@ async function gerarRelatorioDG(nfId, numeroNF, dataNF, dataDG, itens, letra, nu
   }
 }
 
+export const config = { api: { externalResolver: true } }
 export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {

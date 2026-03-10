@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3020 --webpack",
+    "dev": "next dev -p 3020",
     "dev:mobile": "node scripts/dev-with-live-reload.js",
-    "dev:network": "next dev -H 0.0.0.0 -p 3020 --webpack",
-    "build": "next build --webpack",
+    "dev:network": "next dev -H 0.0.0.0 -p 3020",
+    "build": "next build",
     "start": "next start -p 3020",
     "start:network": "next start -H 0.0.0.0 -p 3020",
     "lint": "next lint",

@@ -875,6 +875,29 @@ export default function Pesagem() {
               </button>
               <button
                 onClick={async () => {
+                  const ano = new Date().getFullYear()
+                  if (!confirm(`Aplicar localizações das pesagens de FEVEREIRO/${ano}?\n\nAnimais sem localização atual receberão o local informado na observação da pesagem.`)) return
+                  try {
+                    const r = await fetch('/api/pesagens/aplicar-localizacoes', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ mes: 2, ano })
+                    })
+                    const d = await r.json().catch(() => ({}))
+                    if (d.success) alert(d.mensagem || `✅ ${d.aplicados} localização(ões) aplicada(s)`)
+                    else alert('❌ ' + (d.error || 'Erro ao aplicar'))
+                  } catch (e) {
+                    alert('❌ Erro: ' + e.message)
+                  }
+                }}
+                className="flex items-center gap-2 bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors"
+                title="Aplica localização a partir das pesagens de fevereiro (mês 02)"
+              >
+                <MapPinIcon className="w-5 h-5" />
+                Aplicar do mês 02
+              </button>
+              <button
+                onClick={async () => {
                   if (!confirm('Aplicar localização (piquete/local) para todos os animais usando a última pesagem com observação?')) return
                   try {
                     const porAnimal = {}

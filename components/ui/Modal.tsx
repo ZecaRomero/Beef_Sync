@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ModalProps } from '../../types/components'
 import { cn } from '../../lib/utils'
@@ -15,6 +15,11 @@ const Modal: React.FC<ModalProps> = ({
 }) => {
   const modalRef = useRef<HTMLDivElement>(null)
   const previousActiveElement = useRef<HTMLElement | null>(null)
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   // Gerenciar foco
   useEffect(() => {
@@ -144,8 +149,8 @@ const Modal: React.FC<ModalProps> = ({
     </div>
   )
 
-  // Renderizar no portal
-  if (typeof window === 'undefined') return null
+  // Renderizar no portal apenas após montagem (evita hydration mismatch)
+  if (!isMounted || typeof window === 'undefined') return null
   return createPortal(modalContent, document.body)
 }
 

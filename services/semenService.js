@@ -84,18 +84,16 @@ class SemenService {
       }
 
       const entrada = entradaResult.rows[0];
-      const dosesDisponiveis = entrada.doses_disponiveis || 0;
+      const dosesDisponiveis = Math.max(0, parseInt(entrada.doses_disponiveis) || 0);
       const quantidadeSaida = parseInt(quantidadeDoses) || 0;
+      const touroNome = entrada.nome_touro || 'N/A';
 
-      console.log('📊 Validação de estoque:', {
-        entradaId,
-        dosesDisponiveis,
-        quantidadeSaida,
-        touro: entrada.nome_touro
-      });
+      if (dosesDisponiveis <= 0) {
+        throw new Error(`${touroNome}: Sem doses disponíveis (estoque: ${entrada.doses_disponiveis ?? 0})`);
+      }
 
       if (quantidadeSaida > dosesDisponiveis) {
-        throw new Error(`Quantidade solicitada (${quantidadeSaida}) excede doses disponíveis (${dosesDisponiveis})`);
+        throw new Error(`${touroNome}: Quantidade (${quantidadeSaida}) excede disponível (${dosesDisponiveis})`);
       }
 
       // Atualizar doses disponíveis na entrada
@@ -170,6 +168,10 @@ class SemenService {
       else falhas++
     }
 
+    const falhasDetalhes = resultados
+      .filter(r => !r.success)
+      .map(r => ({ entradaId: r.input?.entradaId, error: r.error }))
+
     return {
       success: falhas === 0,
       message: falhas === 0
@@ -177,18 +179,25 @@ class SemenService {
         : `Saídas registradas: ${sucesso}. Falhas: ${falhas}`,
       data: resultados,
       count: sucesso,
-      errors: resultados.filter(r => !r.success).map(r => r.error)
+      errors: falhasDetalhes
     }
   }
 
   // Buscar estoque disponível
-  async buscarEstoqueDisponivel() {
+  // tipo: 'semen' | 'embriao' | null (todos)
+  async buscarEstoqueDisponivel(tipo = null) {
     try {
-      const result = await query(`
+      let sql = `
         SELECT * FROM estoque_semen 
         WHERE tipo_operacao = 'entrada' AND doses_disponiveis > 0
-        ORDER BY created_at DESC
-      `);
+      `;
+      if (tipo === 'semen') {
+        sql += ` AND (COALESCE(tipo, '') != 'embriao') AND (nome_touro NOT ILIKE '% X %' AND nome_touro NOT ILIKE '%ACASALAMENTO%')`;
+      } else if (tipo === 'embriao') {
+        sql += ` AND (tipo = 'embriao' OR nome_touro ILIKE '% X %' OR nome_touro ILIKE '%ACASALAMENTO%')`;
+      }
+      sql += ` ORDER BY created_at DESC`;
+      const result = await query(sql);
 
       return {
         success: true,

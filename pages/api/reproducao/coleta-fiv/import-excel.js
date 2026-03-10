@@ -102,13 +102,15 @@ export default async function importExcelHandler(req, res) {
     logger.info(`📋 Cabeçalhos encontrados: ${headers.filter(h => h).join(', ')}`)
     
     // Mapear índices das colunas (apenas as colunas do cabeçalho especificado)
+    // Rqd = Registro da doadora (comum em planilhas ZebuEmbryo)
     const columnMap = {
       serie: headers.findIndex(h => h.includes('série') || h.includes('serie')),
-      rg: headers.findIndex(h => h === 'rg' || (h.includes('rg') && !h.includes('rgd'))),
-      rgd: headers.findIndex(h => h.includes('rgd') || h.includes('registro')),
-      data: headers.findIndex(h => h.includes('data') && !h.includes('transf')),
+      rg: headers.findIndex(h => h === 'rg' || (h.includes('rg') && !h.includes('rgd') && !h.includes('rqd'))),
+      rgd: headers.findIndex(h => h.includes('rgd') || h.includes('registro') || h === 'rqd' || h.includes('rqd') || h.includes('doadora')),
+      data: headers.findIndex(h => (h.includes('data') || h === 'data') && !h.includes('transf')),
       touro: headers.findIndex(h => h.includes('touro')),
       viaveis: headers.findIndex(h => h.includes('viavei') || h.includes('viaveis') || h.includes('viáveis')),
+      cultivados: headers.findIndex(h => h.includes('cultivad')),
       embriao: headers.findIndex(h => h.includes('embria') || h.includes('embriao') || h.includes('embrião')),
       pctemb: headers.findIndex(h => h.includes('%emb') || h.includes('percent') || h.includes('porcent')),
       te: headers.findIndex(h => {
@@ -116,7 +118,13 @@ export default async function importExcelHandler(req, res) {
         return hLower === 'te' || 
                hLower === 't.e.' || 
                hLower === 't e' ||
+               hLower.includes('transferidos') ||
+               hLower.includes('transferido') ||
                (hLower.includes('transfer') && hLower.includes('embri'))
+      }),
+      transferidos: headers.findIndex(h => {
+        const hLower = h.toLowerCase().trim()
+        return hLower === 'transferidos' || hLower === 'transferido'
       })
     }
     
@@ -130,11 +138,20 @@ export default async function importExcelHandler(req, res) {
       columnMap.rgd = columnMap.rg
     }
 
-    // Validar colunas obrigatórias
+    // Fallback: se rgd não encontrado, tentar colunas comuns (Rqd, Doadora, etc.)
+    if (columnMap.rgd === -1 && columnMap.rg === -1) {
+      const firstDataCol = headers.findIndex(h => h && (h.includes('rqd') || h.includes('doadora') || h.includes('registro') || h.includes('ident')))
+      if (firstDataCol !== -1) {
+        columnMap.rgd = firstDataCol
+        columnMap.rg = firstDataCol
+        logger.info(`   Usando coluna "${headers[firstDataCol]}" como RGD/RQd`)
+      }
+    }
+
     logger.info(`🔍 Mapeamento de colunas:`)
     logger.info(`   Série: ${columnMap.serie}, RG: ${columnMap.rg}, RGD: ${columnMap.rgd}`)
     logger.info(`   Data: ${columnMap.data}, Touro: ${columnMap.touro}`)
-    logger.info(`   Viáveis: ${columnMap.viaveis}, Embriões: ${columnMap.embriao}, %Emb: ${columnMap.pctemb}, TE: ${columnMap.te}`)
+    logger.info(`   Viáveis: ${columnMap.viaveis}, Cultivados: ${columnMap.cultivados}, Embriões: ${columnMap.embriao}, %Emb: ${columnMap.pctemb}, TE: ${columnMap.te}`)
     
     // Verificar se a coluna TE foi encontrada
     if (columnMap.te === -1) {
@@ -143,11 +160,13 @@ export default async function importExcelHandler(req, res) {
       logger.info(`✅ Coluna TE encontrada no índice ${columnMap.te} (cabeçalho: "${headers[columnMap.te]}")`)
     }
     
-    // Validar: precisa ter pelo menos RG ou RGD, e Data
+    // Validar: precisa ter pelo menos RG, RGD ou Rqd, e Data
     const temRg = columnMap.rg !== -1 || columnMap.rgd !== -1
     if (!temRg || columnMap.data === -1) {
-      logger.error(`❌ Colunas obrigatórias não encontradas. RG/RGD: ${temRg}, Data: ${columnMap.data}`)
-      return sendValidationError(res, 'Colunas obrigatórias não encontradas: RG/RGD e Data')
+      const cabecalhosStr = headers.filter(h => h).join(', ')
+      logger.error(`❌ Colunas obrigatórias não encontradas. RG/RGD/Rqd: ${temRg}, Data: ${columnMap.data}. Cabeçalhos: ${cabecalhosStr}`)
+      return sendValidationError(res, 
+        `Colunas obrigatórias não encontradas. A planilha precisa ter: (1) Rqd, RG, RGD ou Registro da doadora; (2) Data da FIV. Cabeçalhos encontrados: ${cabecalhosStr || 'nenhum'}`)
     }
 
     // Processar linhas de dados
@@ -360,10 +379,12 @@ export default async function importExcelHandler(req, res) {
         ? String(row[columnMap.touro]).trim() 
         : null
 
-      // Usar "Viaveis" como quantidade de oócitos
+      // Usar "Viaveis" como quantidade de oócitos; fallback para "Cultivados" (ZebuEmbryo)
       let quantidadeOocitos = 0
       if (columnMap.viaveis !== -1 && row[columnMap.viaveis]) {
         quantidadeOocitos = parseInt(row[columnMap.viaveis]) || 0
+      } else if (columnMap.cultivados !== -1 && row[columnMap.cultivados]) {
+        quantidadeOocitos = parseInt(row[columnMap.cultivados]) || 0
       }
 
       // Montar observações apenas com os dados do cabeçalho especificado
@@ -379,23 +400,25 @@ export default async function importExcelHandler(req, res) {
         ? observacoesParts.join(' | ') 
         : null
 
-      // Extrair quantidade de TE (Transferências de Embriões)
+      // Extrair quantidade de TE / Transferidos (embriões transferidos)
       let quantidadeTE = 0
-      if (columnMap.te !== -1) {
-        const teValue = row[columnMap.te]
+      const teIdx = columnMap.te !== -1 ? columnMap.te : columnMap.transferidos
+      if (teIdx !== -1 && teIdx !== undefined) {
+        const teValue = row[teIdx]
         if (teValue !== null && teValue !== undefined && teValue !== '') {
-          // Tentar converter para número (pode ser string ou número)
           const teNum = typeof teValue === 'number' ? teValue : parseInt(String(teValue).trim())
           quantidadeTE = isNaN(teNum) ? 0 : teNum
-          if (quantidadeTE > 0) {
-            logger.info(`📋 Linha ${rowNum}: Coluna TE encontrada, valor original: ${teValue}, quantidade: ${quantidadeTE}`)
-          }
-        } else {
-          logger.debug(`📋 Linha ${rowNum}: Coluna TE vazia (índice ${columnMap.te})`)
         }
-      } else {
-        logger.debug(`📋 Linha ${rowNum}: Coluna TE não encontrada no mapeamento`)
       }
+
+      // Extrair embriões produzidos
+      let embrioesProduzidos = 0
+      if (columnMap.embriao !== -1 && row[columnMap.embriao]) {
+        embrioesProduzidos = parseInt(row[columnMap.embriao]) || 0
+      }
+
+      // Identificador normalizado (SÉRIE_RG) para busca quando doadora não cadastrada
+      const doadoraIdentificador = rgd ? rgd.replace(/\s+/g, ' ').trim().toUpperCase() : null
 
       // Extrair receptora se houver
       let receptoraNome = null
@@ -427,10 +450,13 @@ export default async function importExcelHandler(req, res) {
       processedData.push({
         doadora_id: doadoraId,
         doadora_nome: doadoraNome,
+        doadora_identificador: doadoraIdentificador,
         laboratorio,
         veterinario,
         data_fiv: dataFiv,
         quantidade_oocitos: quantidadeOocitos,
+        embrioes_produzidos: embrioesProduzidos,
+        embrioes_transferidos: quantidadeTE,
         touro,
         observacoes: observacoes || null,
         quantidade_te: quantidadeTE,
@@ -468,14 +494,22 @@ export default async function importExcelHandler(req, res) {
         if (idx % 10 === 0) {
           logger.info(`📊 Processando item ${idx + 1}/${processedData.length}...`)
         }
+        const savepointName = `sp_${idx}`
         try {
+          await client.query(`SAVEPOINT ${savepointName}`)
+
           // Calcular data de transferência (FIV + 7 dias)
           const fivDate = new Date(item.data_fiv)
           const transferDate = new Date(fivDate)
           transferDate.setDate(transferDate.getDate() + 7)
           const data_transferencia = transferDate.toISOString().split('T')[0]
 
-          // Inserir coleta FIV
+          // Inserir coleta FIV (usa apenas colunas do schema base para compatibilidade)
+          const obsParts = [item.observacoes]
+          if (item.embrioes_produzidos != null) obsParts.push(`Embriões: ${item.embrioes_produzidos}`)
+          if (item.embrioes_transferidos != null) obsParts.push(`TE: ${item.embrioes_transferidos}`)
+          const observacoesFinal = obsParts.filter(Boolean).join(' | ') || null
+
           const { rows } = await client.query(
             `INSERT INTO coleta_fiv 
             (doadora_id, doadora_nome, laboratorio, veterinario, data_fiv, data_transferencia, quantidade_oocitos, touro, observacoes, created_at, updated_at)
@@ -490,7 +524,7 @@ export default async function importExcelHandler(req, res) {
               data_transferencia,
               item.quantidade_oocitos || 0,
               item.touro || null,
-              item.observacoes
+              observacoesFinal
             ]
           )
           const coletaFIV = rows[0]
@@ -521,29 +555,27 @@ export default async function importExcelHandler(req, res) {
             // Criar uma TE para cada embrião transferido
             for (let teNum = 1; teNum <= item.quantidade_te; teNum++) {
               try {
-                // Gerar número TE único: TE-YYYYMMDD-HHMMSS-TENUM
-                const now = new Date()
+                // Gerar número TE único: TE-YYYYMMDD-IDX-TENUM-TIMESTAMP (evita duplicatas em lote)
                 const teDateStr = data_transferencia.replace(/-/g, '')
-                const timeStr = now.getTime().toString().slice(-6)
-                const numeroTE = `TE-${teDateStr}-${timeStr}-${teNum}`
+                const uniquePart = `${idx}-${teNum}-${Date.now()}`
+                const numeroTE = `TE-${teDateStr}-${uniquePart}`
 
+                const teObs = [item.doadora_nome && `Doadora: ${item.doadora_nome}`, item.touro && `Touro: ${item.touro}`, item.receptora_nome && `Receptora: ${item.receptora_nome}`].filter(Boolean).join(' | ') || null
                 const teResult = await client.query(
                   `INSERT INTO transferencias_embrioes 
-                  (numero_te, data_te, doadora_id, doadora_nome, touro_id, touro, receptora_id, receptora_nome, data_fiv, local_te, tecnico_responsavel, status, created_at, updated_at)
-                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                  (numero_te, data_te, doadora_id, touro_id, receptora_id, data_fiv, local_te, tecnico_responsavel, observacoes, status)
+                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                   RETURNING *`,
                   [
                     numeroTE,
                     data_transferencia,
                     item.doadora_id || null,
-                    item.doadora_nome || null,
                     touroId,
-                    item.touro || null,
                     item.receptora_id || null,
-                    item.receptora_nome || null,
                     item.data_fiv,
                     item.laboratorio || null,
                     item.veterinario || null,
+                    teObs,
                     'realizada'
                   ]
                 )
@@ -555,7 +587,9 @@ export default async function importExcelHandler(req, res) {
               }
             }
           }
+          await client.query(`RELEASE SAVEPOINT ${savepointName}`)
         } catch (error) {
+          await client.query(`ROLLBACK TO SAVEPOINT ${savepointName}`)
           insertErrors.push(`Erro ao inserir registro para ${item.doadora_nome}: ${error.message}`)
           logger.error(`Erro ao inserir coleta FIV:`, error)
         }

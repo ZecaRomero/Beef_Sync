@@ -2,9 +2,7 @@
  * Hook otimizado para buscar dados com cache automático e gestão de estado
  */
 import { useCallback, useEffect, useRef, useState } from 'react'
-
-;
-import type { UseFetchOptions, UseFetchResult, ApiResponse } from '@/types';
+import type { UseFetchOptions, UseFetchResult, ApiResponse } from '@/types'
 
 // Cache global para compartilhar entre instâncias
 const globalCache = new Map<string, { data: any; timestamp: number; ttl: number }>();
@@ -12,18 +10,27 @@ const globalCache = new Map<string, { data: any; timestamp: number; ttl: number 
 export function useOptimizedFetch<T = any>(
   options: UseFetchOptions<T>
 ): UseFetchResult<T> {
+  const { url, method = 'GET', body, headers, onSuccess, onError, cache = true, cacheTTL = 15000 } = options;
+  
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
   
   const abortControllerRef = useRef<AbortController | null>(null);
-  const { url, method = 'GET', body, headers, onSuccess, onError, cache = true, cacheTTL = 15000 } = options;
+  const prevUrlRef = useRef<string>(url);
 
   const getCacheKey = useCallback(() => {
     return `${method}:${url}:${JSON.stringify(body || {})}`;
   }, [url, method, body]);
 
   const fetchData = useCallback(async () => {
+    // Limpar dados se a URL mudou (navegação para outro recurso)
+    if (url !== prevUrlRef.current) {
+      setData(null);
+      setError(null);
+      prevUrlRef.current = url;
+    }
+
     // Cancelar requisição anterior se existir
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();

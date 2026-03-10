@@ -67,6 +67,19 @@ export function formatDateTime(date) {
 }
 
 /**
+ * Normaliza identificação de doadora (ex: "CJCJ-13604 13604" -> "CJCJ 13604")
+ */
+export function formatDoadoraIdentificacao(str) {
+  if (!str || typeof str !== 'string') return str
+  const t = str.trim()
+  const m = t.match(/^([A-Za-z]+)-?(\d+)\s+\2$/) // "CJCJ-13604 13604" ou "CJCJ13604 13604"
+  if (m) return `${m[1]} ${m[2]}`
+  const m2 = t.match(/^([A-Za-z]+)-(\d+)$/) // "CJCJ-13604"
+  if (m2) return `${m2[1]} ${m2[2]}`
+  return t
+}
+
+/**
  * Formata CPF
  */
 export function formatCPF(cpf) {

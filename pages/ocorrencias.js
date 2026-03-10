@@ -787,7 +787,7 @@ export default function Ocorrencias() {
 
                   <div className="bg-white dark:bg-gray-800 border-2 border-pink-300 dark:border-pink-600 rounded-xl p-4">
                     <div className="flex items-center justify-center mb-3">
-                      <span className="text-2xl mr-2">🥚</span>
+                      <span className="text-2xl mr-2">🧬</span>
                       <label className="text-sm font-bold text-pink-700 dark:text-pink-300 uppercase text-center">
                         Oócitos Coletados
                       </label>

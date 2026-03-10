@@ -6,8 +6,10 @@ export default function IdentificationSection({
   handleSerieChange, 
   errors, 
   seriesOptions = [],
-  availableLocations = []
+  availableLocations = [],
+  autocompleteData = {}
 }) {
+  const ac = autocompleteData
   const SERIES_OPTIONS = [
     { value: 'RPT', label: 'RPT - Receptora' },
     { value: 'BENT', label: 'BENT - Brahman' },
@@ -29,11 +31,15 @@ export default function IdentificationSection({
         </label>
         <input
           type="text"
+          list="datalist-animal-nome"
           value={formData.nome || ''}
           onChange={(e) => updateField('nome', e.target.value)}
           className="input-field"
           placeholder="Nome do animal (opcional)"
         />
+        <datalist id="datalist-animal-nome">
+          {(ac.nome || []).map((v, i) => <option key={i} value={v} />)}
+        </datalist>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -90,11 +96,15 @@ export default function IdentificationSection({
           </label>
           <input
             type="text"
+            list="datalist-animal-raca"
             value={formData.raca}
             onChange={(e) => updateField('raca', e.target.value)}
             className={`input-field ${errors.raca ? 'input-error' : ''}`}
             readOnly={formData.serie === 'RPT'}
           />
+          <datalist id="datalist-animal-raca">
+            {(ac.raca || []).map((v, i) => <option key={i} value={v} />)}
+          </datalist>
           {errors.raca && (
             <p className="text-red-500 text-xs mt-1">{errors.raca}</p>
           )}
@@ -107,15 +117,19 @@ export default function IdentificationSection({
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Boletim (Local de Entrada) *
           </label>
-          <select
+          <input
+            type="text"
+            list="datalist-animal-boletim"
             value={formData.boletim || ''}
             onChange={(e) => updateField('boletim', e.target.value)}
             className={`input-field w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${errors.boletim ? 'border-red-500' : ''}`}
-          >
-            <option value="">Selecione...</option>
-            <option value="AGROPECUARIA PARDINHO">AGROPECUARIA PARDINHO</option>
-            <option value="FAZENDA SANT ANNA RANCHARIA">FAZENDA SANT ANNA RANCHARIA</option>
-          </select>
+            placeholder="Selecione ou digite..."
+          />
+          <datalist id="datalist-animal-boletim">
+            <option value="AGROPECUARIA PARDINHO" />
+            <option value="FAZENDA SANT ANNA RANCHARIA" />
+            {(ac.boletim || []).map((v, i) => <option key={i} value={v} />)}
+          </datalist>
           {errors.boletim && (
             <p className="text-red-500 text-xs mt-1">{errors.boletim}</p>
           )}
@@ -126,16 +140,19 @@ export default function IdentificationSection({
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Localização Atual (Piquete) *
           </label>
-          <select
+          <input
+            type="text"
+            list="datalist-animal-piquete"
             value={formData.pastoAtual || ''}
             onChange={(e) => updateField('pastoAtual', e.target.value)}
             className={`input-field w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${errors.pastoAtual ? 'border-red-500' : ''}`}
-          >
-            <option value="">Selecione...</option>
-            {availableLocations.map(loc => (
-              <option key={`atual-${loc}`} value={loc}>{loc}</option>
+            placeholder="Selecione ou digite..."
+          />
+          <datalist id="datalist-animal-piquete">
+            {[...new Set([...(availableLocations || []), ...(ac.piquete || [])])].map((loc, i) => (
+              <option key={`atual-${i}`} value={loc} />
             ))}
-          </select>
+          </datalist>
           {errors.pastoAtual && (
             <p className="text-red-500 text-xs mt-1">{errors.pastoAtual}</p>
           )}

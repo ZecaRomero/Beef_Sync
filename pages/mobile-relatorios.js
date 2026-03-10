@@ -146,6 +146,8 @@ export default function MobileRelatorios() {
   })
   const [searchReports, setSearchReports] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('')
+  const [lastUpdate, setLastUpdate] = useState(null)
+  const [, setUpdateTick] = useState(0)
   const [favorites, setFavorites] = useState(() => {
     try {
       const s = typeof window !== 'undefined' ? localStorage.getItem('mobile-relatorios-favorites') : null
@@ -164,6 +166,7 @@ export default function MobileRelatorios() {
   const [racaEmbriaoModalOpen, setRacaEmbriaoModalOpen] = useState(false)
   const [racaEmbriaoSelecionada, setRacaEmbriaoSelecionada] = useState(null)
   const [acasalamentosRaca, setAcasalamentosRaca] = useState([])
+  const [resumoDetalheModal, setResumoDetalheModal] = useState({ open: false, tipo: null, valor: null, titulo: '', qtd: 0 })
 
   useEffect(() => {
     fetch('/api/mobile-reports')
@@ -216,6 +219,24 @@ export default function MobileRelatorios() {
       return
     }
     setLoadingData(true)
+
+    if (selectedTipo === 'ranking_mgte') {
+      fetch(`/api/animals/ranking-mgte?limit=50&serie=${serieFilter}`)
+        .then(r => r.json())
+        .then(d => {
+          if (d.success && d.data) {
+            setReportData(d.data)
+            saveRecent(selectedTipo)
+            setLastUpdate(new Date())
+          } else {
+            setReportData([])
+          }
+        })
+        .catch(() => setReportData([]))
+        .finally(() => setLoadingData(false))
+      return
+    }
+
     const params = new URLSearchParams({
       tipo: selectedTipo,
       startDate: period.startDate,
@@ -230,6 +251,7 @@ export default function MobileRelatorios() {
         if (d.success && d.data) {
           setReportData(d.data)
           saveRecent(selectedTipo)
+          setLastUpdate(new Date())
         }
         else setReportData(null)
       })
@@ -237,9 +259,56 @@ export default function MobileRelatorios() {
       .finally(() => setLoadingData(false))
   }, [selectedTipo, period.startDate, period.endDate, serieFilter])
 
+  // Auto-refresh: recarregar dados automaticamente a cada 5 segundos
+  useEffect(() => {
+    if (!selectedTipo) return
+    
+    const intervalId = setInterval(() => {
+      const params = new URLSearchParams({
+        tipo: selectedTipo,
+        startDate: period.startDate,
+        endDate: period.endDate
+      })
+      if ((selectedTipo === 'ranking_pmgz' || selectedTipo === 'ranking_animais_avaliados') && serieFilter) {
+        params.set('serie', serieFilter)
+      }
+      
+      // Buscar dados sem mostrar loading para não interromper a visualização
+      fetch(`/api/mobile-reports?${params}`)
+        .then(r => r.json())
+        .then(d => {
+          if (d.success && d.data) {
+            setReportData(d.data)
+            setLastUpdate(new Date())
+          }
+        })
+        .catch(() => {})
+    }, 5000) // 5 segundos
+
+    return () => clearInterval(intervalId)
+  }, [selectedTipo, period.startDate, period.endDate, serieFilter])
+
+  // Atualizar o texto "há Xmin" a cada minuto
+  useEffect(() => {
+    if (!lastUpdate) return
+    
+    const tickInterval = setInterval(() => {
+      setUpdateTick(t => t + 1)
+    }, 60000) // 1 minuto
+
+    return () => clearInterval(tickInterval)
+  }, [lastUpdate])
+
   useEffect(() => {
     if (selectedTipo === 'calendario_reprodutivo') {
       setViewMode('calendar')
+    }
+  }, [selectedTipo])
+
+  // Ao selecionar um relatório, rolar para o topo para exibir o conteúdo
+  useEffect(() => {
+    if (selectedTipo) {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }, [selectedTipo])
 
@@ -280,8 +349,8 @@ export default function MobileRelatorios() {
       return
     }
     
-    // piquete_animais: lista já foi setada no click handler (originalRow.animais)
-    if (cardFilterModal.dataType === 'piquete_animais') {
+    // piquete_animais: se skipFetch, lista já foi setada no click (animais_piquetes)
+    if (cardFilterModal.dataType === 'piquete_animais' && cardFilterModal.skipFetch) {
       setCardListLoading(false)
       return
     }
@@ -338,18 +407,55 @@ export default function MobileRelatorios() {
       .finally(() => setCardListLoading(false))
   }, [cardFilterModal.open, cardFilterModal.filter, cardFilterModal.dataType, reportData?.data])
 
+  // Função helper para formatar valores de forma segura
+  const formatValue = useCallback((v) => {
+    if (v == null) return '-'
+    
+    // Se for um objeto
+    if (typeof v === 'object') {
+      // Se for array, retornar o tamanho
+      if (Array.isArray(v)) return v.length
+      
+      // Se for objeto com propriedades específicas conhecidas, extrair valor principal
+      if (v.total !== undefined) return v.total
+      if (v.valor !== undefined) return v.valor
+      if (v.quantidade !== undefined) return v.quantidade
+      if (v.count !== undefined) return v.count
+      
+      // Se tiver label e valor (comum em objetos de resumo)
+      if (v.label !== undefined && v.valor !== undefined) {
+        return `${v.label}: ${v.valor}`
+      }
+      
+      // Se for um objeto com poucas propriedades, tentar formatar de forma legível
+      const keys = Object.keys(v)
+      if (keys.length === 1) return formatValue(v[keys[0]])
+      
+      // Para objetos com 2-3 propriedades, mostrar de forma compacta
+      if (keys.length <= 3) {
+        return keys.map(k => `${k}: ${v[k]}`).join(', ')
+      }
+      
+      // Para objetos maiores, mostrar apenas a quantidade de itens
+      return `${keys.length} itens`
+    }
+    
+    return String(v)
+  }, [])
+
   const handleCardClick = useCallback((k, v) => {
     const key = String(k).toLowerCase()
+    const displayValue = formatValue(v)
     if (/machos?\b/i.test(k)) {
-      setCardFilterModal({ open: true, title: `Machos (${v})`, filter: { sexo: 'Macho' }, dataType: 'animais' })
+      setCardFilterModal({ open: true, title: `Machos (${displayValue})`, filter: { sexo: 'Macho' }, dataType: 'animais' })
       return
     }
     if (/fêmeas?|femeas?/i.test(k)) {
-      setCardFilterModal({ open: true, title: `Fêmeas (${v})`, filter: { sexo: 'Fêmea' }, dataType: 'animais' })
+      setCardFilterModal({ open: true, title: `Fêmeas (${displayValue})`, filter: { sexo: 'Fêmea' }, dataType: 'animais' })
       return
     }
     if (/animais únicos?/i.test(k)) {
-      setCardFilterModal({ open: true, title: `Animais únicos (${v})`, filter: {}, dataType: 'animais' })
+      setCardFilterModal({ open: true, title: `Animais únicos (${displayValue})`, filter: {}, dataType: 'animais' })
       return
     }
     if (/total de pesagens?/i.test(k)) {
@@ -358,12 +464,12 @@ export default function MobileRelatorios() {
       return
     }
     if (/piquetes?/i.test(k)) {
-      setCardFilterModal({ open: true, title: `Piquetes (${v})`, filter: {}, dataType: 'piquetes' })
+      setCardFilterModal({ open: true, title: `Piquetes (${displayValue})`, filter: {}, dataType: 'piquetes' })
       return
     }
     if (/peso médio|peso medio/i.test(k)) return
     setCardFilterModal({ open: true, title: k, filter: {}, dataType: 'animais' })
-  }, [])
+  }, [formatValue])
 
   const enabledReports = config?.enabled || []
   const allTypes = config?.allTypes || []
@@ -383,8 +489,8 @@ export default function MobileRelatorios() {
     const q = searchReports.trim().toLowerCase()
     return (label || '').toLowerCase().includes(q) || (key || '').toLowerCase().includes(q)
   }
-  const showRanking = enabledReports.includes('ranking_animais_avaliados') || enabledReports.includes('ranking_pmgz')
-  const ehRanking = selectedTipo === 'ranking_pmgz' || selectedTipo === 'ranking_animais_avaliados'
+  const showRanking = enabledReports.includes('ranking_animais_avaliados') || enabledReports.includes('ranking_pmgz') || enabledReports.includes('ranking_mgte')
+  const ehRanking = selectedTipo === 'ranking_pmgz' || selectedTipo === 'ranking_animais_avaliados' || selectedTipo === 'ranking_mgte'
   const LABELS_RANKING = {
     ranking: 'Ranking',
     posicao: 'Posição',
@@ -396,14 +502,63 @@ export default function MobileRelatorios() {
     iABCZ: 'iABCZ',
     deca: 'DECA',
     iqg: 'IQG',
-    pt_iqg: 'Pt IQG'
+    pt_iqg: 'Pt IQG',
+    mgte: 'MGTe',
+    top: 'TOP'
+  }
+  const LABELS_BOLETIM_CAMPO = {
+    local: 'Local',
+    local_1: 'Local 1',
+    sub_local_2: 'Sub Local',
+    quant: 'Qtd',
+    sexo: 'Sexo',
+    categoria: 'Categoria',
+    raca: 'Raça',
+    era: 'Era',
+    observacao: 'Observação'
+  }
+  const LABELS_BOLETIM_DEFESA = {
+    fazenda: 'Fazenda',
+    cnpj: 'CNPJ',
+    total: 'Total'
+  }
+  const LABELS_BOLETIM_REBANHO = {
+    raca: 'Raça',
+    sexo: 'Sexo',
+    era: 'Era',
+    total: 'Total'
+  }
+  const ehBoletimCampo = selectedTipo === 'boletim_campo'
+  const ehBoletimDefesa = selectedTipo === 'boletim_defesa'
+  const ehBoletimRebanho = selectedTipo === 'boletim_rebanho'
+  const ehBoletim = ehBoletimCampo || ehBoletimDefesa || ehBoletimRebanho
+  const getColumnLabel = (col) => {
+    if (col === 'mgte') return 'MGTe'
+    if (col === 'top') return 'TOP'
+    if (ehRanking) return LABELS_RANKING[col] || col
+    if (ehBoletimCampo) return LABELS_BOLETIM_CAMPO[col] || col
+    if (ehBoletimDefesa) return LABELS_BOLETIM_DEFESA[col] || col
+    if (ehBoletimRebanho) return LABELS_BOLETIM_REBANHO[col] || col
+    return col
   }
 
   const filteredData = reportData?.data?.filter(d => {
     if (d._resumo) return false
     if (!searchQuery.trim()) return true
     const q = searchQuery.trim().toLowerCase()
-    return Object.values(d).some(v => v != null && String(v).toLowerCase().includes(q))
+    // Busca em campos normais
+    if (Object.values(d).some(v => v != null && typeof v !== 'object' && String(v).toLowerCase().includes(q))) return true
+    // Resumo de pesagens / animais_piquetes: buscar dentro do array animais (rg, serie, animal)
+    const animais = d.animais || []
+    if (Array.isArray(animais) && animais.some(a => {
+      if (!a || typeof a !== 'object') return false
+      const rg = String(a.rg ?? '').toLowerCase()
+      const serie = String(a.serie ?? '').toLowerCase()
+      const animal = String(a.animal ?? '').toLowerCase()
+      const ident = String(a.identificacao ?? '').toLowerCase()
+      return rg.includes(q) || serie.includes(q) || animal.includes(q) || ident.includes(q)
+    })) return true
+    return false
   }) || []
   const hasSexo = (reportData?.data || []).some(r => r.sexo != null)
   const filteredBySexo = filteredData.filter(r => {
@@ -581,15 +736,23 @@ export default function MobileRelatorios() {
     }
   })() : null
 
+  // Normalizar raça para agrupamento (case-insensitive) e exibição (title case)
+  const racaKey = (s) => ((s || 'Não informada').trim() || 'Não informada').toUpperCase()
+  const racaDisplay = (s) => {
+    const t = (s || 'Não informada').trim() || 'Não informada'
+    if (t === 'NÃO INFORMADA') return 'Não informada'
+    return t.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
+  }
+
   // Detalhes do estoque de sêmen por touro
   const detalhesEstoqueSemen = selectedTipo === 'estoque_semen' && filteredData.length > 0 ? (() => {
     const porTouro = {}
     filteredData.forEach(r => {
       const t = (r.touro || 'Não informado').trim() || 'Não informado'
       const q = Number(r.quantidade) || 0
-      const raca = (r.raca || 'Não informada').trim() || 'Não informada'
+      const raca = racaDisplay(racaKey(r.raca))
       if (!porTouro[t]) {
-        porTouro[t] = { total: 0, registros: 0, raca: raca }
+        porTouro[t] = { total: 0, registros: 0, raca }
       }
       porTouro[t].total += q
       porTouro[t].registros += 1
@@ -604,22 +767,23 @@ export default function MobileRelatorios() {
       }))
   })() : null
 
-  // Estoque agrupado por raça
+  // Estoque agrupado por raça (case-insensitive: NELORE + Nelore = uma única entrada)
   const estoquePorRaca = selectedTipo === 'estoque_semen' && filteredData.length > 0 ? (() => {
     const porRaca = {}
     filteredData.forEach(r => {
-      const raca = (r.raca || 'Não informada').trim() || 'Não informada'
+      const key = racaKey(r.raca)
       const q = Number(r.quantidade) || 0
-      if (!porRaca[raca]) {
-        porRaca[raca] = { total: 0, touros: new Set() }
+      if (!porRaca[key]) {
+        porRaca[key] = { total: 0, touros: new Set() }
       }
-      porRaca[raca].total += q
-      if (r.touro) porRaca[raca].touros.add(r.touro.trim())
+      porRaca[key].total += q
+      if (r.touro) porRaca[key].touros.add(r.touro.trim())
     })
     return Object.entries(porRaca)
       .sort(([, a], [, b]) => b.total - a.total)
-      .map(([raca, dados]) => ({
-        raca,
+      .map(([key, dados]) => ({
+        raca: racaDisplay(key),
+        racaKey: key,
         doses: dados.total,
         touros: dados.touros.size
       }))
@@ -629,7 +793,10 @@ export default function MobileRelatorios() {
   // Gráfico de estoque de embriões por acasalamento
   const estoqueEmbriaoPorAcasalamento = selectedTipo === 'estoque_embrioes' && filteredData.length > 0 ? (() => {
     const porAcasalamento = {}
-    filteredData.forEach(r => {
+    // Filtrar apenas registros que são realmente embriões (têm acasalamento preenchido)
+    const embrioesReais = filteredData.filter(r => r.acasalamento && r.acasalamento.trim())
+    
+    embrioesReais.forEach(r => {
       const acasalamento = (r.acasalamento || 'Não informado').trim() || 'Não informado'
       const q = Number(r.quantidade) || 0
       porAcasalamento[acasalamento] = (porAcasalamento[acasalamento] || 0) + q
@@ -651,7 +818,10 @@ export default function MobileRelatorios() {
   // Detalhes do estoque de embriões por acasalamento
   const detalhesEstoqueEmbrioes = selectedTipo === 'estoque_embrioes' && filteredData.length > 0 ? (() => {
     const porAcasalamento = {}
-    filteredData.forEach(r => {
+    // Filtrar apenas registros que são realmente embriões (têm acasalamento preenchido)
+    const embrioesReais = filteredData.filter(r => r.acasalamento && r.acasalamento.trim())
+    
+    embrioesReais.forEach(r => {
       const acasalamento = (r.acasalamento || 'Não informado').trim() || 'Não informado'
       const q = Number(r.quantidade) || 0
       const raca = (r.raca || 'Não informada').trim() || 'Não informada'
@@ -677,22 +847,24 @@ export default function MobileRelatorios() {
       }))
   })() : null
 
-  // Estoque de embriões agrupado por raça
+  // Estoque de embriões agrupado por raça (case-insensitive)
   const estoqueEmbriaoPorRaca = selectedTipo === 'estoque_embrioes' && filteredData.length > 0 ? (() => {
     const porRaca = {}
-    filteredData.forEach(r => {
-      const raca = (r.raca || 'Não informada').trim() || 'Não informada'
+    const embrioesReais = filteredData.filter(r => r.acasalamento && r.acasalamento.trim())
+    
+    embrioesReais.forEach(r => {
+      const key = racaKey(r.raca)
       const q = Number(r.quantidade) || 0
-      if (!porRaca[raca]) {
-        porRaca[raca] = { total: 0, acasalamentos: new Set() }
+      if (!porRaca[key]) {
+        porRaca[key] = { total: 0, acasalamentos: new Set() }
       }
-      porRaca[raca].total += q
-      if (r.acasalamento) porRaca[raca].acasalamentos.add(r.acasalamento.trim())
+      porRaca[key].total += q
+      if (r.acasalamento) porRaca[key].acasalamentos.add(r.acasalamento.trim())
     })
     return Object.entries(porRaca)
       .sort(([, a], [, b]) => b.total - a.total)
-      .map(([raca, dados]) => ({
-        raca,
+      .map(([key, dados]) => ({
+        raca: racaDisplay(key),
         embrioes: dados.total,
         acasalamentos: dados.acasalamentos.size
       }))
@@ -702,10 +874,11 @@ export default function MobileRelatorios() {
   const abrirModalRaca = (raca) => {
     if (!filteredData || filteredData.length === 0) return
     
+    const racaBusca = racaKey(raca)
     const porTouro = {}
     filteredData.forEach(r => {
-      const racaItem = (r.raca || 'Não informada').trim() || 'Não informada'
-      if (racaItem === raca) {
+      const racaItem = racaKey(r.raca)
+      if (racaItem === racaBusca) {
         const t = (r.touro || 'Não informado').trim() || 'Não informado'
         const q = Number(r.quantidade) || 0
         if (!porTouro[t]) {
@@ -733,10 +906,11 @@ export default function MobileRelatorios() {
   const abrirModalRacaEmbriao = (raca) => {
     if (!filteredData || filteredData.length === 0) return
     
+    const racaBusca = racaKey(raca)
     const porAcasalamento = {}
     filteredData.forEach(r => {
-      const racaItem = (r.raca || 'Não informada').trim() || 'Não informada'
-      if (racaItem === raca) {
+      const racaItem = racaKey(r.raca)
+      if (racaItem === racaBusca) {
         const acasalamento = (r.acasalamento || 'Não informado').trim() || 'Não informado'
         const q = Number(r.quantidade) || 0
         const rack = r.rack || '-'
@@ -765,6 +939,14 @@ export default function MobileRelatorios() {
     setAcasalamentosRaca(acasalamentos)
     setRacaEmbriaoModalOpen(true)
   }
+
+  // Cada item decide individualmente: nome com "ACASALAMENTO" → embriões, senão → doses de sêmen
+  const itemEhEmbriao = (acasalamento) =>
+    typeof acasalamento === 'string' && acasalamento.toUpperCase().includes('ACASALAMENTO')
+
+  // Compatibilidade: true só quando TODOS os itens são embriões (usado em partes fora do loop)
+  const modalEhEmbriao = acasalamentosRaca.length > 0 &&
+    acasalamentosRaca.every(a => itemEhEmbriao(a.acasalamento))
 
   // Gráfico de nascimentos por mês
   const nascimentosPorMes = selectedTipo === 'nascimentos' && filteredData.length > 0 ? (() => {
@@ -936,13 +1118,13 @@ export default function MobileRelatorios() {
   })()
   const dadosParaExibir = (() => {
     if (!ehRanking || baseDados.length === 0) return baseDados
-    const valorKey = Object.keys(baseDados[0] || {}).find(k => /^iABCZ$|^valor$|^iqg$/i.test(k))
+    const valorKey = Object.keys(baseDados[0] || {}).find(k => /^iABCZ$|^valor$|^iqg$|^mgte$/i.test(k))
     if (!valorKey) return baseDados
     const parseVal = (v) => parseFloat(String(v || '0').replace(',', '.')) || 0
     const rankingKey = baseDados[0]?.ranking != null ? 'ranking' : null
     const sorted = [...baseDados].sort((a, b) => {
       if (rankingKey && a[rankingKey] !== b[rankingKey]) {
-        const order = ['iABCZ', 'Peso', 'CE', 'IQG']
+        const order = ['iABCZ', 'Peso', 'CE', 'IQG', 'MGTe']
         const ia = order.indexOf(a[rankingKey]) + 1 || 99
         const ib = order.indexOf(b[rankingKey]) + 1 || 99
         return ia - ib
@@ -1118,7 +1300,8 @@ export default function MobileRelatorios() {
     mortes: 'Analise causas para prevenir futuras perdas.',
     calendario_reprodutivo: 'Eventos manuais, receptoras, partos previstos e refazer andrológico. Veja meses com eventos e quantidade de parições.',
     femeas_brucelose: 'Fêmeas entre 3 e 8 meses (90-240 dias) que precisam receber a vacina de brucelose obrigatória.',
-    animais_dgt: 'Animais entre 11 e 21 meses (330-640 dias) elegíveis para avaliação de desempenho DGT.'
+    animais_dgt: 'Animais entre 11 e 21 meses (330-640 dias) elegíveis para avaliação de desempenho DGT.',
+    boletim_rebanho: 'Quantidades por raça, sexo e era, conforme o Boletim Campo. Mantém os dados sempre alinhados.'
   }
   const dicaAtual = selectedTipo ? DICAS_POR_TIPO[selectedTipo] : null
 
@@ -1127,7 +1310,7 @@ export default function MobileRelatorios() {
       setSharing(true)
       const titulo = `Relatório: ${selectedTipo || 'Geral'}`
       const resumoTxt = reportData?.resumo && typeof reportData.resumo === 'object'
-        ? Object.entries(reportData.resumo).map(([k, v]) => `${k}: ${v}`).join('\n')
+        ? Object.entries(reportData.resumo).map(([k, v]) => `${k}: ${formatValue(v)}`).join('\n')
         : null
       const texto = [
         titulo,
@@ -1148,6 +1331,156 @@ export default function MobileRelatorios() {
       setSharing(false)
     }
   }
+
+  const handleShareWhatsApp = () => {
+    try {
+      const titulo = `📊 *Relatório: ${selectedTipo || 'Geral'}*`
+      const resumoTxt = reportData?.resumo && typeof reportData.resumo === 'object'
+        ? Object.entries(reportData.resumo).map(([k, v]) => `• ${k}: ${formatValue(v)}`).join('\n')
+        : null
+      
+      let detalhes = ''
+      
+      // Detalhes para acasalamentos
+      if (selectedTipo === 'acasalamentos' && dadosParaExibir.length > 0) {
+        detalhes = '\n\n*Acasalamentos:*\n' + dadosParaExibir.slice(0, 10).map((a, i) => 
+          `${i + 1}. ${a.animal || a.identificacao || '-'} (${a.embrioes || 0} embriões)`
+        ).join('\n')
+        if (dadosParaExibir.length > 10) {
+          detalhes += `\n... e mais ${dadosParaExibir.length - 10} acasalamentos`
+        }
+      }
+      
+      // Detalhes para estoque de sêmen
+      if (selectedTipo === 'estoque_semen' && detalhesEstoqueSemen && detalhesEstoqueSemen.length > 0) {
+        const totalDoses = detalhesEstoqueSemen.reduce((s, t) => s + t.doses, 0)
+        detalhes = `\n\n*Estoque de Sêmen:*\n`
+        detalhes += `🧪 Total: ${totalDoses} doses\n`
+        detalhes += `🐂 Touros: ${detalhesEstoqueSemen.length}\n\n`
+        detalhes += '*Top 10 Touros:*\n'
+        detalhes += detalhesEstoqueSemen.slice(0, 10).map((t, i) => 
+          `${i + 1}. ${t.touro}\n   • ${t.doses} doses (${t.registros} lote${t.registros > 1 ? 's' : ''})\n   • Raça: ${t.raca}`
+        ).join('\n')
+        if (detalhesEstoqueSemen.length > 10) {
+          detalhes += `\n... e mais ${detalhesEstoqueSemen.length - 10} touros`
+        }
+        
+        // Adicionar resumo por raça se disponível
+        if (estoquePorRaca && estoquePorRaca.length > 0) {
+          detalhes += '\n\n*Por Raça:*\n'
+          detalhes += estoquePorRaca.slice(0, 5).map((r, i) => 
+            `${i + 1}. ${r.raca}: ${r.doses} doses (${r.touros} touro${r.touros > 1 ? 's' : ''})`
+          ).join('\n')
+        }
+      }
+      
+      // Detalhes para estoque de embriões
+      if (selectedTipo === 'estoque_embrioes' && detalhesEstoqueEmbrioes && detalhesEstoqueEmbrioes.length > 0) {
+        const totalEmbrioes = detalhesEstoqueEmbrioes.reduce((s, a) => s + a.embrioes, 0)
+        detalhes = `\n\n*Estoque de Embriões:*\n`
+        detalhes += `🧬 Total: ${totalEmbrioes} embriões\n`
+        detalhes += `🐄 Acasalamentos: ${detalhesEstoqueEmbrioes.length}\n\n`
+        detalhes += '*Top 10 Acasalamentos:*\n'
+        detalhes += detalhesEstoqueEmbrioes.slice(0, 10).map((a, i) => 
+          `${i + 1}. ${a.acasalamento}\n   • ${a.embrioes} embriões\n   • Raça: ${a.raca}\n   • Local: R${a.rack} B${a.botijao} C${a.caneca}`
+        ).join('\n')
+        if (detalhesEstoqueEmbrioes.length > 10) {
+          detalhes += `\n... e mais ${detalhesEstoqueEmbrioes.length - 10} acasalamentos`
+        }
+        
+        // Adicionar resumo por raça se disponível
+        if (estoqueEmbriaoPorRaca && estoqueEmbriaoPorRaca.length > 0) {
+          detalhes += '\n\n*Por Raça:*\n'
+          detalhes += estoqueEmbriaoPorRaca.slice(0, 5).map((r, i) => 
+            `${i + 1}. ${r.raca}: ${r.embrioes} embriões (${r.acasalamentos} acasalamento${r.acasalamentos > 1 ? 's' : ''})`
+          ).join('\n')
+        }
+      }
+      
+      const texto = [
+        titulo,
+        `📅 Período: ${formatDate(period.startDate)} a ${formatDate(period.endDate)}`,
+        `📋 Registros: ${totalRegistros}`,
+        resumoTxt ? `\n*Resumo:*\n${resumoTxt}` : null,
+        detalhes || null,
+        '\n_Gerado pelo Beef-Sync_'
+      ].filter(Boolean).join('\n')
+      
+      const url = `https://wa.me/?text=${encodeURIComponent(texto)}`
+      window.open(url, '_blank')
+      setToast({ type: 'success', msg: 'Abrindo WhatsApp...' })
+    } catch (e) {
+      setToast({ type: 'error', msg: 'Erro ao compartilhar' })
+    }
+  }
+
+  const handleShareEmail = () => {
+    try {
+      const titulo = `Relatório: ${selectedTipo || 'Geral'}`
+      const resumoTxt = reportData?.resumo && typeof reportData.resumo === 'object'
+        ? Object.entries(reportData.resumo).map(([k, v]) => `${k}: ${formatValue(v)}`).join('\n')
+        : null
+      
+      const corpo = [
+        `Período: ${formatDate(period.startDate)} a ${formatDate(period.endDate)}`,
+        `Registros: ${totalRegistros}`,
+        resumoTxt ? `\nResumo:\n${resumoTxt}` : null,
+        '\n\nGerado pelo Beef-Sync'
+      ].filter(Boolean).join('\n')
+      
+      const mailtoUrl = `mailto:?subject=${encodeURIComponent(titulo)}&body=${encodeURIComponent(corpo)}`
+      window.location.href = mailtoUrl
+      setToast({ type: 'success', msg: 'Abrindo email...' })
+    } catch (e) {
+      setToast({ type: 'error', msg: 'Erro ao abrir email' })
+    }
+  }
+
+  const handleShareModalWhatsApp = (tipo, titulo, dados) => {
+    try {
+      let texto = `📊 *${titulo}*\n\n`
+      
+      if (tipo === 'touros') {
+        const totalDoses = dados.reduce((s, t) => s + t.doses || s + t.embrioes, 0)
+        const totalLotes = dados.reduce((s, t) => s + t.registros, 0)
+        texto += `🐂 Total: ${dados.length} touros\n`
+        texto += `🧪 Doses: ${totalDoses}\n`
+        texto += `📦 Lotes: ${totalLotes}\n\n`
+        texto += '*Ranking:*\n'
+        texto += dados.slice(0, 15).map((t, i) => {
+          const doses = t.doses || t.embrioes || 0
+          return `${i + 1}. ${t.touro || t.acasalamento}\n   • ${doses} doses (${t.registros} lote${t.registros > 1 ? 's' : ''})`
+        }).join('\n')
+        if (dados.length > 15) {
+          texto += `\n... e mais ${dados.length - 15} touros`
+        }
+      } else if (tipo === 'acasalamentos' || tipo === 'estoque') {
+        const totalEmbrioes = dados.reduce((s, a) => s + a.embrioes, 0)
+        const totalLotes = dados.reduce((s, a) => s + a.registros, 0)
+        texto += `� Total: ${dados.length} acasalamentos\n`
+        texto += `🧬 Embriões: ${totalEmbrioes}\n`
+        texto += `📦 Lotes: ${totalLotes}\n\n`
+        texto += '*Ranking:*\n'
+        texto += dados.slice(0, 15).map((a, i) => 
+          `${i + 1}. ${a.acasalamento}\n   • ${a.embrioes} embriões (${a.registros} lote${a.registros > 1 ? 's' : ''})\n   • Local: R${a.rack} B${a.botijao} C${a.caneca}`
+        ).join('\n')
+        if (dados.length > 15) {
+          texto += `\n... e mais ${dados.length - 15} acasalamentos`
+        }
+      }
+      
+      texto += '\n\n_Gerado pelo Beef-Sync_'
+      
+      const url = `https://wa.me/?text=${encodeURIComponent(texto)}`
+      window.open(url, '_blank')
+      setToast({ type: 'success', msg: 'Abrindo WhatsApp...' })
+    } catch (e) {
+      setToast({ type: 'error', msg: 'Erro ao compartilhar' })
+    }
+  }
+
+  const [shareMenuOpen, setShareMenuOpen] = useState(false)
+  const [shareModalMenuOpen, setShareModalMenuOpen] = useState(false)
   const PERIOD_PRESETS = {
     '7d': () => {
       const end = new Date()
@@ -1163,6 +1496,17 @@ export default function MobileRelatorios() {
       const d = new Date()
       const start = new Date(d.getFullYear(), d.getMonth(), 1)
       const end = new Date(d.getFullYear(), d.getMonth() + 1, 0)
+      return { startDate: start.toISOString().split('T')[0], endDate: end.toISOString().split('T')[0] }
+    },
+    'mes_anterior': () => {
+      const d = new Date()
+      const start = new Date(d.getFullYear(), d.getMonth() - 1, 1)
+      const end = new Date(d.getFullYear(), d.getMonth(), 0)
+      return { startDate: start.toISOString().split('T')[0], endDate: end.toISOString().split('T')[0] }
+    },
+    '3meses': () => {
+      const end = new Date()
+      const start = new Date(end); start.setMonth(start.getMonth() - 3)
       return { startDate: start.toISOString().split('T')[0], endDate: end.toISOString().split('T')[0] }
     },
     'ano': () => {
@@ -1430,7 +1774,7 @@ export default function MobileRelatorios() {
                               </div>
                               
                               {/* Genealogia e índices */}
-                              {(a.pai || a.avo_materno || a.iabcz || a.deca || (a.iqg ?? a.genetica_2) || (a.pt_iqg ?? a.decile_2)) && (
+                              {(a.pai || a.avo_materno || a.iabcz || a.deca || (a.iqg ?? a.genetica_2) || (a.pt_iqg ?? a.decile_2) || a.mgte || a.top) && (
                                 <div className="pt-2 border-t border-gray-200 dark:border-gray-700 space-y-1.5">
                                   {a.pai && (
                                     <div className="flex items-start gap-1.5 text-xs">
@@ -1446,7 +1790,7 @@ export default function MobileRelatorios() {
                                     </div>
                                   )}
                                   
-                                  <div className="flex items-center gap-3 mt-2">
+                                  <div className="flex items-center gap-3 mt-2 flex-wrap">
                                     {a.iabcz && (
                                       <div className="flex items-center gap-1">
                                         <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400">iABCZ:</span>
@@ -1470,6 +1814,18 @@ export default function MobileRelatorios() {
                                       <div className="flex items-center gap-1">
                                         <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">Pt IQG:</span>
                                         <span className="text-xs font-bold text-gray-900 dark:text-white">{(a.pt_iqg ?? a.decile_2)}</span>
+                                      </div>
+                                    )}
+                                    {a.mgte && (
+                                      <div className="flex items-center gap-1">
+                                        <span className="text-[10px] font-bold text-teal-600 dark:text-teal-400">MGTe:</span>
+                                        <span className="text-xs font-bold text-gray-900 dark:text-white">{a.mgte}</span>
+                                      </div>
+                                    )}
+                                    {a.top && (
+                                      <div className="flex items-center gap-1">
+                                        <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400">TOP:</span>
+                                        <span className="text-xs font-bold text-gray-900 dark:text-white">{a.top}%</span>
                                       </div>
                                     )}
                                   </div>
@@ -1646,7 +2002,7 @@ export default function MobileRelatorios() {
                               {Object.entries(mod.dados || {}).slice(0, 2).map(([k, v]) => (
                                 <div key={k} className="flex justify-between items-baseline gap-2">
                                   <span className="text-xs text-gray-600 dark:text-gray-400 truncate">{k}</span>
-                                  <span className={`text-base font-bold truncate ${config.textColor}`}>{String(v)}</span>
+                                  <span className={`text-base font-bold truncate ${config.textColor}`}>{formatValue(v)}</span>
                                 </div>
                               ))}
                             </div>
@@ -2350,6 +2706,15 @@ export default function MobileRelatorios() {
                   )}
                 </div>
                 <div className="flex items-center gap-1">
+                  {lastUpdate && (
+                    <span className="text-xs text-gray-500 dark:text-gray-400 mr-2">
+                      {(() => {
+                        const diffMs = new Date().getTime() - new Date(lastUpdate).getTime()
+                        const diffMin = Math.floor(diffMs / 60000)
+                        return diffMin < 1 ? 'Atualizado agora' : `há ${diffMin}min`
+                      })()}
+                    </span>
+                  )}
                   <button
                     onClick={refetch}
                     disabled={loadingData}
@@ -2366,7 +2731,7 @@ export default function MobileRelatorios() {
                 {Object.entries(PERIOD_PRESETS).map(([key, fn]) => {
                   const p = fn()
                   const isActive = period.startDate === p.startDate && period.endDate === p.endDate
-                  const labels = { '7d': '7 dias', '30d': '30 dias', 'mes': 'Mês', 'ano': 'Ano' }
+                  const labels = { '7d': '7 dias', '30d': '30 dias', 'mes': 'Mês', 'mes_anterior': 'Mês ant.', '3meses': '3 meses', 'ano': 'Ano' }
                   return (
                     <button
                       key={key}
@@ -2430,7 +2795,7 @@ export default function MobileRelatorios() {
                   <span className="px-2 py-1 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center gap-1">
                     <FunnelIcon className="h-4 w-4" /> Ranking
                   </span>
-                  {['iABCZ', 'Peso', 'CE', 'IQG'].map(tipo => {
+                  {['iABCZ', 'Peso', 'CE', 'IQG', 'MGTe'].map(tipo => {
                     const qtd = (reportData?.data || []).filter(d => !d._resumo && d.ranking === tipo).length
                     return (
                       <button
@@ -2536,7 +2901,7 @@ export default function MobileRelatorios() {
                                {Object.entries(mod.dados || {}).map(([label, val], j) => (
                                  <div key={j} className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
                                    <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wide mb-1">{label}</p>
-                                   <p className="text-lg font-bold text-gray-900 dark:text-white truncate">{val}</p>
+                                   <p className="text-lg font-bold text-gray-900 dark:text-white truncate">{formatValue(val)}</p>
                                  </div>
                                ))}
                              </div>
@@ -2753,54 +3118,296 @@ export default function MobileRelatorios() {
                     </motion.div>
                   )}
 
-                  {reportData.resumo && typeof reportData.resumo === 'object' && (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      <AnimatePresence>
-                        {Object.entries(reportData.resumo).slice(0, 6).map(([k, v], i) => {
-                          const isPeso = /peso|kg/i.test(k)
-                          const isAnimais = /animais|machos|fêmeas|total|piquetes/i.test(k)
-                          const isTaxa = /taxa|prenhez/i.test(k)
-                          const isClicavel = /machos?|fêmeas?|femeas?|animais únicos?|total de pesagens?|piquetes?|entradas?|saídas?|total nfs?|nf|notas?/i.test(k) && !/peso médio|peso medio/i.test(k)
-                          const cardCls = isPeso ? 'bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-900/10 border-amber-200 dark:border-amber-800' :
-                            isAnimais ? 'bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/10 border-blue-200 dark:border-blue-800' :
-                            isTaxa ? 'bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-900/20 dark:to-green-900/10 border-green-200 dark:border-green-800' :
-                            'bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-800/50 border-gray-200 dark:border-gray-700'
-                          const valCls = isPeso ? 'text-amber-700 dark:text-amber-300' :
-                            isAnimais ? 'text-blue-700 dark:text-blue-300' :
-                            isTaxa ? 'text-green-700 dark:text-green-300' :
-                            'text-gray-900 dark:text-white'
-                          const icon = isPeso ? '⚖️' : isAnimais ? '🐄' : isTaxa ? '✅' : '📊'
-                          const taxaNum = /taxa|prenhez/i.test(k) ? parseFloat(String(v).replace('%', '')) : null
-                          const isDestaque = taxaNum != null && taxaNum >= 50
-                          return (
-                            <motion.div
-                              key={k}
-                              initial={{ opacity: 0, scale: 0.9 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              transition={{ delay: i * 0.05 }}
-                              role={isClicavel ? 'button' : undefined}
-                              tabIndex={isClicavel ? 0 : undefined}
-                              onClick={isClicavel ? () => handleCardClick(k, v) : undefined}
-                              onKeyDown={isClicavel ? (e) => { if (e.key === 'Enter' || e.key === ' ') handleCardClick(k, v) } : undefined}
-                              whileHover={isClicavel ? { scale: 1.05, y: -2 } : {}}
-                              whileTap={isClicavel ? { scale: 0.98 } : {}}
-                              className={`p-4 rounded-xl border-2 shadow-sm relative overflow-hidden group ${cardCls} ${isClicavel ? 'cursor-pointer hover:shadow-md transition-all' : ''}`}
+                  {/* Resumo visual: quantidade por raça, era, sexo (Boletim Campo e Boletim Rebanho) */}
+                  {(ehBoletimCampo || ehBoletimRebanho) && dadosParaExibir.length > 0 && (() => {
+                    const qtyKey = ehBoletimCampo ? 'quant' : 'total'
+                    const rows = dadosParaExibir.filter(d => 
+                      d.raca !== 'TOTAL GERAL' && 
+                      d.local !== 'TOTAL GERAL' && 
+                      d.local_1 !== 'TOTAL GERAL' && 
+                      d.fazenda !== 'TOTAL GERAL'
+                    )
+                    // Calcular resumos por raça, era e sexo
+                    const porRaca = {}
+                    const porEra = {}
+                    const porSexo = {}
+                    
+                    rows.forEach(d => {
+                      const raca = d.raca || 'Não informado'
+                      const era = d.era || '-'
+                      const sexo = d.sexo || '-'
+                      const total = parseInt(d[qtyKey] ?? d.total ?? d.quant) || 0
+                      
+                      porRaca[raca] = (porRaca[raca] || 0) + total
+                      porEra[era] = (porEra[era] || 0) + total
+                      porSexo[sexo] = (porSexo[sexo] || 0) + total
+                    })
+                    
+                    const racasTop = Object.entries(porRaca).sort(([,a], [,b]) => b - a).slice(0, 5)
+                    const erasTop = Object.entries(porEra).sort(([,a], [,b]) => b - a).slice(0, 5)
+                    const sexosTop = Object.entries(porSexo).sort(([,a], [,b]) => b - a)
+                    
+                    return (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="space-y-4 mb-6"
+                      >
+                        {/* Título */}
+                        <div className="flex items-center gap-2 px-1">
+                          <ChartBarIcon className="h-5 w-5 text-amber-500" />
+                          <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                            {ehBoletimCampo ? 'Resumo por Raça, Era e Sexo' : 'Resumo do Rebanho'}
+                          </h3>
+                        </div>
+                        
+                        {/* Por Raça */}
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="text-2xl">🐄</span>
+                            <h4 className="font-bold text-gray-900 dark:text-white">Por Raça</h4>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            {racasTop.map(([raca, qtd], idx) => (
+                              <motion.button
+                                key={raca}
+                                type="button"
+                                onClick={() => setResumoDetalheModal({ open: true, tipo: 'raca', valor: raca, titulo: `Raça: ${raca}`, qtd })}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: idx * 0.05 }}
+                                whileTap={{ scale: 0.97 }}
+                                className="text-left bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/10 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-3 cursor-pointer active:ring-2 active:ring-blue-400"
+                              >
+                                <p className="text-xs font-medium text-blue-600 dark:text-blue-400 mb-1 truncate">
+                                  {raca}
+                                </p>
+                                <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+                                  {qtd}
+                                </p>
+                              </motion.button>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        {/* Por Era */}
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="text-2xl">📅</span>
+                            <h4 className="font-bold text-gray-900 dark:text-white">Por Era</h4>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            {erasTop.map(([era, qtd], idx) => (
+                              <motion.button
+                                key={era}
+                                type="button"
+                                onClick={() => setResumoDetalheModal({ open: true, tipo: 'era', valor: era, titulo: `Era: ${era}`, qtd })}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: idx * 0.05 }}
+                                whileTap={{ scale: 0.97 }}
+                                className="text-left bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-900/10 border-2 border-amber-200 dark:border-amber-800 rounded-xl p-3 cursor-pointer active:ring-2 active:ring-amber-400"
+                              >
+                                <p className="text-xs font-medium text-amber-600 dark:text-amber-400 mb-1 truncate">
+                                  {era}
+                                </p>
+                                <p className="text-2xl font-bold text-amber-900 dark:text-amber-100">
+                                  {qtd}
+                                </p>
+                              </motion.button>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        {/* Por Sexo */}
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="text-2xl">⚥</span>
+                            <h4 className="font-bold text-gray-900 dark:text-white">Por Sexo</h4>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            {sexosTop.map(([sexo, qtd], idx) => {
+                              const ehMacho = sexo.toLowerCase().includes('macho')
+                              const gradient = ehMacho 
+                                ? 'from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/10'
+                                : 'from-pink-50 to-pink-100/50 dark:from-pink-900/20 dark:to-pink-900/10'
+                              const border = ehMacho
+                                ? 'border-blue-200 dark:border-blue-800'
+                                : 'border-pink-200 dark:border-pink-800'
+                              const textColor = ehMacho
+                                ? 'text-blue-600 dark:text-blue-400'
+                                : 'text-pink-600 dark:text-pink-400'
+                              const valueColor = ehMacho
+                                ? 'text-blue-900 dark:text-blue-100'
+                                : 'text-pink-900 dark:text-pink-100'
+                              
+                              return (
+                                <motion.button
+                                  key={sexo}
+                                  type="button"
+                                  onClick={() => setResumoDetalheModal({ open: true, tipo: 'sexo', valor: sexo, titulo: `Sexo: ${sexo}`, qtd })}
+                                  initial={{ opacity: 0, scale: 0.9 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  transition={{ delay: idx * 0.05 }}
+                                  whileTap={{ scale: 0.97 }}
+                                  className={`text-left bg-gradient-to-br ${gradient} border-2 ${border} rounded-xl p-3 cursor-pointer active:ring-2 active:ring-amber-400`}
+                                >
+                                  <p className={`text-xs font-medium ${textColor} mb-1`}>
+                                    {sexo}
+                                  </p>
+                                  <p className={`text-2xl font-bold ${valueColor}`}>
+                                    {qtd}
+                                  </p>
+                                </motion.button>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )
+                  })()}
+
+                  {/* Modal de detalhes ao clicar nos cards do resumo (raça, era, sexo) */}
+                  {resumoDetalheModal.open && resumoDetalheModal.tipo && (ehBoletimCampo || ehBoletimRebanho) && (() => {
+                    const { tipo, valor, titulo, qtd } = resumoDetalheModal
+                    const rows = dadosParaExibir.filter(d =>
+                      d.raca !== 'TOTAL GERAL' && d.local !== 'TOTAL GERAL' &&
+                      d.local_1 !== 'TOTAL GERAL' && d.fazenda !== 'TOTAL GERAL'
+                    )
+                    const filtered = rows.filter(d => {
+                      if (tipo === 'raca') return (d.raca || 'Não informado') === valor
+                      if (tipo === 'era') return (d.era || '-') === valor
+                      if (tipo === 'sexo') {
+                        const s = (d.sexo || '-').toString()
+                        if (s === valor) return true
+                        if (valor.toLowerCase().includes('macho') && /^m/i.test(s)) return true
+                        if (valor.toLowerCase().includes('fêmea') && /^f/i.test(s)) return true
+                        return false
+                      }
+                      return false
+                    })
+                    const cols = filtered[0] ? Object.keys(filtered[0]).filter(c => !['_resumo', 'animal_id'].includes(c) && typeof (filtered[0][c]) !== 'object') : []
+                    const qtyKey = ehBoletimCampo ? 'quant' : 'total'
+                    return (
+                      <div
+                        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/50 backdrop-blur-sm"
+                        onClick={() => setResumoDetalheModal(m => ({ ...m, open: false }))}
+                      >
+                        <motion.div
+                          initial={{ opacity: 0, y: 100 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 100 }}
+                          onClick={e => e.stopPropagation()}
+                          className="w-full max-h-[85vh] sm:max-w-lg bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-2xl shadow-xl flex flex-col overflow-hidden"
+                        >
+                          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">{titulo} ({qtd})</h3>
+                            <button
+                              type="button"
+                              onClick={() => setResumoDetalheModal(m => ({ ...m, open: false }))}
+                              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                             >
-                              {isClicavel && (
-                                <div className="absolute top-2 right-2 opacity-50 group-hover:opacity-100 transition-opacity">
-                                  <ChevronRightIcon className="h-4 w-4 text-gray-400" />
+                              <XMarkIcon className="h-6 w-6 text-gray-500" />
+                            </button>
+                          </div>
+                          <div className="overflow-y-auto flex-1 p-4 space-y-2">
+                            {filtered.length === 0 ? (
+                              <p className="text-sm text-gray-500 dark:text-gray-400">Nenhum registro</p>
+                            ) : (
+                              filtered.map((row, i) => (
+                                <div
+                                  key={i}
+                                  className="p-3 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 space-y-1"
+                                >
+                                  {cols.map(k => {
+                                    const v = row[k]
+                                    const label = getColumnLabel(k)
+                                    const display = k.toLowerCase().includes('data') && v ? formatDate(v) : String(v ?? '-')
+                                    if (label === 'Qtd' && row.quant != null) return (
+                                      <div key={k} className="flex justify-between text-sm">
+                                        <span className="text-gray-500 dark:text-gray-400">{label}:</span>
+                                        <span className="font-semibold">{row.quant ?? row.total ?? display}</span>
+                                      </div>
+                                    )
+                                    return (
+                                      <div key={k} className="flex justify-between text-sm">
+                                        <span className="text-gray-500 dark:text-gray-400">{label}:</span>
+                                        <span className="font-medium text-gray-900 dark:text-white truncate max-w-[60%]">{display}</span>
+                                      </div>
+                                    )
+                                  })}
                                 </div>
-                              )}
-                              {isDestaque && (
-                                <span className="absolute top-1 right-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-green-500/20 text-green-700 dark:text-green-400">
-                                  ✓ Destaque
-                                </span>
-                              )}
-                              <div className="flex items-start justify-between mb-1">
-                                <p className="text-xs font-medium text-gray-600 dark:text-gray-400 truncate flex-1">{k}</p>
-                                <span className="text-base ml-1">{icon}</span>
-                              </div>
-                              <p className={`text-xl font-bold truncate ${valCls}`}>{String(v)}</p>
+                              ))
+                            )}
+                          </div>
+                        </motion.div>
+                      </div>
+                    )
+                  })()}
+
+                  {reportData.resumo && typeof reportData.resumo === 'object' && (
+                    <div className="space-y-3">
+                      {ehBoletimRebanho && (
+                        <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                          📊 Resumo (conforme Boletim Campo)
+                        </p>
+                      )}
+                      <div className={`grid gap-3 ${ehBoletimRebanho ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3'}`}>
+                        <AnimatePresence>
+                          {Object.entries(reportData.resumo)
+                            .filter(([k, v]) => {
+                              // Filtrar apenas campos que definitivamente não devem aparecer
+                              if (k === 'graficos' || k === 'erro') return false
+                              return true
+                            })
+                            .slice(0, 6)
+                            .map(([k, v], i) => {
+                            const isPeso = /peso|kg/i.test(k)
+                            const isAnimais = /animais|machos|fêmeas|total|piquetes|raças/i.test(k)
+                            const isTaxa = /taxa|prenhez/i.test(k)
+                            const isClicavel = /machos?|fêmeas?|femeas?|animais únicos?|total de pesagens?|piquetes?|entradas?|saídas?|total nfs?|nf|notas?/i.test(k) && !/peso médio|peso medio/i.test(k)
+                            const cardCls = isPeso ? 'bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-900/10 border-amber-200 dark:border-amber-800' :
+                              isAnimais ? 'bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/10 border-blue-200 dark:border-blue-800' :
+                              isTaxa ? 'bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-900/20 dark:to-green-900/10 border-green-200 dark:border-green-800' :
+                              'bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-800/50 border-gray-200 dark:border-gray-700'
+                            const valCls = isPeso ? 'text-amber-700 dark:text-amber-300' :
+                              isAnimais ? 'text-blue-700 dark:text-blue-300' :
+                              isTaxa ? 'text-green-700 dark:text-green-300' :
+                              'text-gray-900 dark:text-white'
+                            const icon = isPeso ? '⚖️' : isAnimais ? '🐄' : isTaxa ? '✅' : '📊'
+                            const taxaNum = /taxa|prenhez/i.test(k) ? parseFloat(String(v).replace('%', '')) : null
+                            const isDestaque = taxaNum != null && taxaNum >= 50
+                            const cardPadding = ehBoletimRebanho ? 'p-5' : 'p-4'
+                            const valSize = ehBoletimRebanho ? 'text-2xl' : 'text-xl'
+                            return (
+                              <motion.div
+                                key={k}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: i * 0.05 }}
+                                role={isClicavel ? 'button' : undefined}
+                                tabIndex={isClicavel ? 0 : undefined}
+                                onClick={isClicavel ? () => handleCardClick(k, v) : undefined}
+                                onKeyDown={isClicavel ? (e) => { if (e.key === 'Enter' || e.key === ' ') handleCardClick(k, v) } : undefined}
+                                whileHover={isClicavel ? { scale: 1.05, y: -2 } : {}}
+                                whileTap={isClicavel ? { scale: 0.98 } : {}}
+                                className={`${cardPadding} rounded-xl border-2 shadow-sm relative overflow-hidden group ${cardCls} ${isClicavel ? 'cursor-pointer hover:shadow-md transition-all' : ''}`}
+                              >
+                                {isClicavel && (
+                                  <div className="absolute top-2 right-2 opacity-50 group-hover:opacity-100 transition-opacity">
+                                    <ChevronRightIcon className="h-4 w-4 text-gray-400" />
+                                  </div>
+                                )}
+                                {isDestaque && (
+                                  <span className="absolute top-1 right-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-green-500/20 text-green-700 dark:text-green-400">
+                                    ✓ Destaque
+                                  </span>
+                                )}
+                                <div className="flex items-start justify-between mb-1">
+                                  <p className={`font-medium text-gray-600 dark:text-gray-400 flex-1 break-words ${ehBoletimRebanho ? 'text-sm' : 'text-xs'}`}>{k}</p>
+                                  <span className={`ml-1 flex-shrink-0 ${ehBoletimRebanho ? 'text-lg' : 'text-base'}`}>{icon}</span>
+                                </div>
+                                <p className={`font-bold ${valSize} ${valCls}`}>{formatValue(v)}</p>
                               {isClicavel && (
                                 <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-1 opacity-70">
                                   Toque para ver detalhes
@@ -2820,6 +3427,7 @@ export default function MobileRelatorios() {
                           )
                         })}
                       </AnimatePresence>
+                    </div>
                     </div>
                   )}
 
@@ -2905,8 +3513,8 @@ export default function MobileRelatorios() {
 
                           {/* Footer */}
                           <div className="border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800/50">
-                            <div className="flex items-center justify-between">
-                              <div>
+                            <div className="flex items-center justify-between gap-3">
+                              <div className="flex-1">
                                 <p className="text-sm font-semibold text-gray-900 dark:text-white">
                                   Total Geral
                                 </p>
@@ -2914,8 +3522,17 @@ export default function MobileRelatorios() {
                                   {tourosRaca.length} touros • {tourosRaca.reduce((sum, t) => sum + t.registros, 0)} lotes
                                 </p>
                               </div>
-                              <div className="inline-flex items-center px-4 py-2 rounded-full text-lg font-bold bg-amber-500 text-white shadow-md">
-                                {tourosRaca.reduce((sum, t) => sum + t.doses, 0)}
+                              <div className="flex items-center gap-2">
+                                <div className="inline-flex items-center px-4 py-2 rounded-full text-lg font-bold bg-amber-500 text-white shadow-md">
+                                  {tourosRaca.reduce((sum, t) => sum + t.doses, 0)}
+                                </div>
+                                <button
+                                  onClick={() => handleShareModalWhatsApp('touros', `Touros - ${racaSelecionada}`, tourosRaca)}
+                                  className="p-2.5 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-md hover:shadow-lg transition-all active:scale-95"
+                                  title="Compartilhar no WhatsApp"
+                                >
+                                  <ChatBubbleLeftRightIcon className="h-5 w-5" />
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -2945,10 +3562,16 @@ export default function MobileRelatorios() {
                           <div className="bg-gradient-to-r from-amber-600 to-orange-600 p-4 flex items-center justify-between">
                             <div>
                               <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                                🥚 Acasalamentos - {racaEmbriaoSelecionada}
+                                {modalEhEmbriao ? '🧬 Acasalamentos' : '🐂 Touros'} - {racaEmbriaoSelecionada}
                               </h3>
                               <p className="text-sm text-amber-100 mt-1">
-                                {acasalamentosRaca.length} {acasalamentosRaca.length === 1 ? 'acasalamento' : 'acasalamentos'} • {acasalamentosRaca.reduce((sum, a) => sum + a.embrioes, 0)} embriões
+                                {acasalamentosRaca.length} {acasalamentosRaca.length === 1 ? 'item' : 'itens'} • {(() => {
+                                  const totalEmbrioes = acasalamentosRaca.filter(a => itemEhEmbriao(a.acasalamento)).reduce((s, a) => s + a.embrioes, 0)
+                                  const totalDoses    = acasalamentosRaca.filter(a => !itemEhEmbriao(a.acasalamento)).reduce((s, a) => s + a.embrioes, 0)
+                                  if (totalEmbrioes > 0 && totalDoses > 0) return `${totalEmbrioes} embriões • ${totalDoses} doses`
+                                  if (totalEmbrioes > 0) return `${totalEmbrioes} embriões`
+                                  return `${totalDoses} doses`
+                                })()}
                               </p>
                             </div>
                             <button
@@ -2963,11 +3586,11 @@ export default function MobileRelatorios() {
                           <div className="p-4 overflow-y-auto max-h-[calc(80vh-100px)]">
                             {acasalamentosRaca.length === 0 ? (
                               <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                                <p>Nenhum acasalamento encontrado para esta raça</p>
+                                <p>Nenhum item encontrado para esta raça</p>
                               </div>
                             ) : (
                               <div className="space-y-3">
-                                {acasalamentosRaca.map((acasalamento, idx) => (
+                                {acasalamentosRaca.map((item, idx) => (
                                   <div
                                     key={idx}
                                     className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 border border-gray-200 dark:border-gray-600 hover:shadow-md transition-all"
@@ -2982,35 +3605,37 @@ export default function MobileRelatorios() {
                                             {idx > 2 && `${idx + 1}º`}
                                           </span>
                                           <p className="font-bold text-gray-900 dark:text-white text-base">
-                                            {acasalamento.acasalamento}
+                                            {item.acasalamento}
                                           </p>
                                         </div>
                                         <div className="flex items-center gap-3 text-sm">
                                           <span className="text-gray-600 dark:text-gray-400">
-                                            {acasalamento.registros} {acasalamento.registros === 1 ? 'lote' : 'lotes'}
+                                            {item.registros} {item.registros === 1 ? 'lote' : 'lotes'}
                                           </span>
                                         </div>
                                       </div>
                                       <div className="text-right">
                                         <div className="inline-flex items-center px-4 py-2 rounded-full text-base font-bold bg-amber-600 text-white shadow-md">
-                                          {acasalamento.embrioes}
+                                          {item.embrioes}
                                         </div>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">embriões</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                          {itemEhEmbriao(item.acasalamento) ? 'embriões' : 'doses'}
+                                        </p>
                                       </div>
                                     </div>
-                                    {acasalamento.rack && acasalamento.botijao && acasalamento.caneca && 
-                                     acasalamento.rack !== '-' && acasalamento.botijao !== '-' && acasalamento.caneca !== '-' && (
+                                    {item.rack && item.botijao && item.caneca && 
+                                     item.rack !== '-' && item.botijao !== '-' && item.caneca !== '-' && (
                                       <div className="pt-2 border-t border-gray-200 dark:border-gray-600">
                                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Localização:</p>
                                         <div className="flex items-center gap-2 text-sm font-mono">
                                           <span className="px-2 py-1 rounded bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300">
-                                            Rack: {acasalamento.rack}
+                                            Rack: {item.rack}
                                           </span>
                                           <span className="px-2 py-1 rounded bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300">
-                                            Botijão: {acasalamento.botijao}
+                                            Botijão: {item.botijao}
                                           </span>
                                           <span className="px-2 py-1 rounded bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300">
-                                            Caneca: {acasalamento.caneca}
+                                            Caneca: {item.caneca}
                                           </span>
                                         </div>
                                       </div>
@@ -3023,17 +3648,30 @@ export default function MobileRelatorios() {
 
                           {/* Footer */}
                           <div className="border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800/50">
-                            <div className="flex items-center justify-between">
-                              <div>
+                            <div className="flex items-center justify-between gap-3">
+                              <div className="flex-1">
                                 <p className="text-sm font-semibold text-gray-900 dark:text-white">
                                   Total Geral
                                 </p>
                                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                                  {acasalamentosRaca.length} acasalamentos • {acasalamentosRaca.reduce((sum, a) => sum + a.registros, 0)} lotes
+                                  {acasalamentosRaca.length} {acasalamentosRaca.length === 1 ? 'item' : 'itens'} • {acasalamentosRaca.reduce((sum, a) => sum + a.registros, 0)} lotes
                                 </p>
                               </div>
-                              <div className="inline-flex items-center px-4 py-2 rounded-full text-lg font-bold bg-amber-500 text-white shadow-md">
-                                {acasalamentosRaca.reduce((sum, a) => sum + a.embrioes, 0)}
+                              <div className="flex items-center gap-2">
+                                <div className="inline-flex items-center px-4 py-2 rounded-full text-lg font-bold bg-amber-500 text-white shadow-md">
+                                  {acasalamentosRaca.reduce((sum, a) => sum + a.embrioes, 0)}
+                                </div>
+                                <button
+                                  onClick={() => handleShareModalWhatsApp(
+                                    'estoque',
+                                    `Estoque - ${racaEmbriaoSelecionada}`,
+                                    acasalamentosRaca
+                                  )}
+                                  className="p-2.5 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-md hover:shadow-lg transition-all active:scale-95"
+                                  title="Compartilhar no WhatsApp"
+                                >
+                                  <ChatBubbleLeftRightIcon className="h-5 w-5" />
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -3046,12 +3684,39 @@ export default function MobileRelatorios() {
                     <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                     <input
                       type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       value={searchQuery}
                       onChange={e => setSearchQuery(e.target.value)}
-                      placeholder="Buscar..."
+                      placeholder="Buscar animais (RG ou número)"
                       className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                     />
                   </div>
+                  {searchQuery.trim() && selectedTipo === 'resumo_pesagens' && (() => {
+                    const q = searchQuery.trim().toLowerCase()
+                    const matches = (reportData?.data || []).filter(d => !d._resumo && (d.animais || []).some(a =>
+                      String(a.rg ?? '').toLowerCase().includes(q) || String(a.serie ?? '').toLowerCase().includes(q) ||
+                      String(a.animal ?? '').toLowerCase().includes(q) || String(a.identificacao ?? '').toLowerCase().includes(q)
+                    )).flatMap(d => (d.animais || []).filter(a =>
+                      String(a.rg ?? '').toLowerCase().includes(q) || String(a.serie ?? '').toLowerCase().includes(q) ||
+                      String(a.animal ?? '').toLowerCase().includes(q) || String(a.identificacao ?? '').toLowerCase().includes(q)
+                    ).map(a => ({ ...a, piquete: d.Piquete || d.piquete })))
+                    if (matches.length > 0) return (
+                      <div className="mt-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                        <p className="text-sm font-semibold text-amber-800 dark:text-amber-200 mb-1">Animal(is) encontrado(s):</p>
+                        {matches.slice(0, 5).map((m, i) => (
+                          <div key={i} className="flex items-center justify-between gap-2 py-1">
+                            <span className="text-gray-600 dark:text-gray-300">{m.animal || `${(m.serie || '')} ${(m.rg || '')}`.trim()} - {m.piquete}</span>
+                            <Link href={`/consulta-animal/${String(m.serie || '').trim().replace(/\s+/g, '-')}-${String(m.rg || '').trim()}`} className="text-amber-600 dark:text-amber-400 font-medium text-sm hover:underline">
+                              Ver ficha
+                            </Link>
+                          </div>
+                        ))}
+                        {matches.length > 5 && <p className="text-xs text-gray-500 mt-1">+{matches.length - 5} mais</p>}
+                      </div>
+                    )
+                    return null
+                  })()}
 
                   {viewMode === 'calendar' && temCalendario && (
                     <motion.div
@@ -3259,7 +3924,10 @@ export default function MobileRelatorios() {
                             animate={{ opacity: 1, y: 0 }}
                             className="rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm"
                           >
-                            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Estoque de Sêmen por Touro</p>
+                            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                              <img src="/emoji-semen.png" alt="Sêmen" className="w-5 h-5" />
+                              Estoque de Sêmen por Touro
+                            </p>
                             <div className="h-56">
                               <Bar data={estoquePorTouro} options={chartOptions} />
                             </div>
@@ -3274,7 +3942,8 @@ export default function MobileRelatorios() {
                               className="rounded-2xl bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border-2 border-purple-200 dark:border-purple-700 p-4 shadow-sm"
                             >
                               <p className="text-sm font-semibold text-purple-800 dark:text-purple-300 mb-3 flex items-center gap-2">
-                                🐂 Estoque por Raça
+                                <img src="/emoji-semen.png" alt="Sêmen" className="w-5 h-5" />
+                                Estoque por Raça
                                 <span className="text-xs font-normal text-purple-600 dark:text-purple-400">(clique para ver touros)</span>
                               </p>
                               <div className="grid grid-cols-1 gap-3">
@@ -3389,7 +4058,7 @@ export default function MobileRelatorios() {
                             animate={{ opacity: 1, y: 0 }}
                             className="rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm"
                           >
-                            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">🥚 Estoque de Embriões por Acasalamento</p>
+                            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">� Estoque de Embriões por Acasalamento</p>
                             <div className="h-56">
                               <Bar data={estoqueEmbriaoPorAcasalamento} options={chartOptions} />
                             </div>
@@ -3404,7 +4073,7 @@ export default function MobileRelatorios() {
                               className="rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-2 border-amber-200 dark:border-amber-700 p-4 shadow-sm"
                             >
                               <p className="text-sm font-semibold text-amber-800 dark:text-amber-300 mb-3 flex items-center gap-2">
-                                🥚 Estoque por Raça
+                                � Estoque por Raça
                                 <span className="text-xs font-normal text-amber-600 dark:text-amber-400">(clique para ver acasalamentos)</span>
                               </p>
                               <div className="grid grid-cols-1 gap-3">
@@ -3563,7 +4232,7 @@ export default function MobileRelatorios() {
                       animate={{ opacity: 1 }}
                       className="rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm"
                     >
-                      <div className="overflow-x-auto max-h-[55vh] overflow-y-auto">
+                      <div className={`overflow-y-auto max-h-[55vh] ${ehBoletim ? 'p-3 space-y-3' : 'overflow-x-auto'}`}>
                         {dadosParaExibir.length > 0 ? (() => {
                           const firstRow = reportData.data?.find(d => !d._resumo)
                           const columns = firstRow ? Object.keys(firstRow).filter(c => {
@@ -3573,14 +4242,78 @@ export default function MobileRelatorios() {
                             if (typeof val === 'object' && val !== null) return false
                             return true
                           }) : []
+
+                          // Layout em cards para Boletim Campo e Boletim Defesa - melhor leitura no mobile
+                          if (ehBoletim) {
+                            return (
+                              <div className="space-y-3">
+                                {dadosParaExibir.map((row, i) => {
+                                  const isTotalGeral = row.local === 'TOTAL GERAL' || row.fazenda === 'TOTAL GERAL' || row.local_1 === 'TOTAL GERAL' || row.raca === 'TOTAL GERAL'
+                                  return (
+                                    <motion.div
+                                      key={i}
+                                      initial={{ opacity: 0, y: 8 }}
+                                      animate={{ opacity: 1, y: 0 }}
+                                      transition={{ delay: i * 0.02 }}
+                                      className={`rounded-xl border-2 p-4 shadow-sm ${
+                                        isTotalGeral
+                                          ? 'bg-amber-50 dark:bg-amber-900/30 border-amber-300 dark:border-amber-600'
+                                          : 'bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600'
+                                      }`}
+                                    >
+                                      <div className="space-y-2">
+                                        {columns.map(k => {
+                                          const v = row[k]
+                                          let display = k.toLowerCase().includes('data') && v ? formatDate(v) : String(v ?? '-')
+                                          const label = getColumnLabel(k)
+                                          if (label === 'Qtd' && isTotalGeral) {
+                                            display = row.quant ?? display
+                                          }
+                                          return (
+                                            <div key={k} className="flex justify-between items-start gap-3 text-base">
+                                              <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0 min-w-[100px]">
+                                                {label}:
+                                              </span>
+                                              <span className={`text-right break-words ${isTotalGeral ? 'font-bold text-amber-800 dark:text-amber-200' : 'text-gray-900 dark:text-white'}`}>
+                                                {display}
+                                              </span>
+                                            </div>
+                                          )
+                                        })}
+                                        {ehBoletimDefesa && row.quantidades && typeof row.quantidades === 'object' && (
+                                          <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
+                                            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Por faixa etária:</p>
+                                            <div className="flex flex-wrap gap-2">
+                                              {Object.entries(row.quantidades).map(([faixa, vals]) => {
+                                                const m = vals?.M || 0
+                                                const f = vals?.F || 0
+                                                const tot = m + f
+                                                if (tot === 0) return null
+                                                const label = faixa.replace('a', '-').replace('acima', '>')
+                                                return (
+                                                  <span key={faixa} className="inline-flex px-2 py-1 rounded-lg bg-gray-200 dark:bg-gray-600 text-xs">
+                                                    {label}: {tot} (M:{m} F:{f})
+                                                  </span>
+                                                )
+                                              })}
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </motion.div>
+                                  )
+                                })}
+                              </div>
+                            )
+                          }
                           
                           return (
-                          <table className="w-full text-sm">
+                          <table className="w-full text-base min-w-[500px]">
                             <thead className="sticky top-0 bg-gray-100 dark:bg-gray-700 z-10">
                               <tr>
                                 {columns.map(col => (
-                                  <th key={col} className="px-3 py-2.5 text-left text-gray-600 dark:text-gray-400 font-medium">
-                                    {ehRanking ? (LABELS_RANKING[col] || col) : col}
+                                  <th key={col} className="px-3 py-3 text-left text-gray-600 dark:text-gray-400 font-semibold whitespace-nowrap">
+                                    {getColumnLabel(col)}
                                   </th>
                                 ))}
                               </tr>
@@ -3590,20 +4323,51 @@ export default function MobileRelatorios() {
                                 // Buscar a linha original completa do reportData para ter acesso ao campo animais
                                 const originalRow = reportData.data?.find(d => 
                                   d.piquete === row.piquete || 
+                                  d.Piquete === row.Piquete ||
                                   (d.animal_id && d.animal_id === row.animal_id)
                                 ) || row
                                 
+                                const piqueteNome = row.Piquete || row.piquete
+                                const animaisResumo = originalRow.animais || row.animais
+                                const ehClicavelPiquete = selectedTipo === 'resumo_pesagens' && piqueteNome
                                 return (
                                 <tr 
                                   key={i} 
                                   onClick={() => {
+                                    // Resumo de Pesagens: clicar no piquete abre modal com animais (da própria API)
+                                    if (selectedTipo === 'resumo_pesagens' && piqueteNome) {
+                                      if (animaisResumo && Array.isArray(animaisResumo) && animaisResumo.length > 0) {
+                                        setCardFilterModal({
+                                          open: true,
+                                          title: `Animais em ${piqueteNome}`,
+                                          filter: { piquete: piqueteNome },
+                                          dataType: 'piquete_animais',
+                                          skipFetch: true
+                                        })
+                                        setCardAnimalsList(animaisResumo.map(a => ({
+                                          ...a,
+                                          id: a.animal_id,
+                                          identificacao: a.animal || `${(a.serie || '')} ${(a.rg || '')}`.trim()
+                                        })))
+                                      } else {
+                                        setCardFilterModal({
+                                          open: true,
+                                          title: `Animais em ${piqueteNome}`,
+                                          filter: { piquete: piqueteNome },
+                                          dataType: 'piquete_animais'
+                                        })
+                                        setCardAnimalsList([])
+                                      }
+                                      return
+                                    }
                                     // Se for o relatorio de animais por piquete e tiver a lista de animais
                                     if (selectedTipo === 'animais_piquetes' && originalRow.animais && Array.isArray(originalRow.animais)) {
                                       setCardFilterModal({
                                         open: true,
                                         title: `Animais em ${originalRow.piquete || 'Piquete'}`,
                                         filter: { piquete: originalRow.piquete },
-                                        dataType: 'piquete_animais'
+                                        dataType: 'piquete_animais',
+                                        skipFetch: true
                                       })
                                       // Preservar todos os campos dos animais
                                       setCardAnimalsList(originalRow.animais.map(a => ({
@@ -3618,7 +4382,7 @@ export default function MobileRelatorios() {
                                       router.push(`/animals/${row.animal_id}`)
                                     }
                                   }}
-                                  className={`border-t border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 ${(row.animal_id || (selectedTipo === 'animais_piquetes' && originalRow.animais)) ? 'cursor-pointer' : ''}`}
+                                  className={`border-t border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 ${(row.animal_id || (selectedTipo === 'animais_piquetes' && originalRow.animais) || ehClicavelPiquete) ? 'cursor-pointer' : ''}`}
                                 >
                                   {columns.map(k => {
                                     const v = row[k]
@@ -3628,7 +4392,7 @@ export default function MobileRelatorios() {
                                       display = `${trofeus[Number(v)]} ${v}º`
                                     }
                                     return (
-                                      <td key={k} className="px-3 py-2 text-gray-900 dark:text-white">
+                                      <td key={k} className="px-3 py-2.5 text-gray-900 dark:text-white break-words min-w-0">
                                         {display}
                                       </td>
                                     )
@@ -3697,23 +4461,102 @@ export default function MobileRelatorios() {
                   <ArrowDownTrayIcon className="h-5 w-5" />
                   Exportar
                 </button>
-                <button
-                  onClick={handleShareSummary}
-                  disabled={sharing}
-                  className="flex items-center justify-center gap-1 py-3 rounded-xl bg-blue-600 dark:bg-blue-500 text-white font-semibold text-sm disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  {sharing ? (
-                    <>
-                      <span className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
-                      Compartilhando
-                    </>
-                  ) : (
-                    <>
-                      <ShareIcon className="h-5 w-5" />
-                      Compartilhar
-                    </>
-                  )}
-                </button>
+                <div className="relative">
+                  <button
+                    onClick={() => setShareMenuOpen(!shareMenuOpen)}
+                    disabled={sharing}
+                    className="flex items-center justify-center gap-1 py-3 px-4 rounded-xl bg-blue-600 dark:bg-blue-500 text-white font-semibold text-sm disabled:opacity-60 disabled:cursor-not-allowed w-full"
+                  >
+                    {sharing ? (
+                      <>
+                        <span className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
+                        Compartilhando
+                      </>
+                    ) : (
+                      <>
+                        <ShareIcon className="h-5 w-5" />
+                        Compartilhar
+                      </>
+                    )}
+                  </button>
+                  
+                  {/* Menu de compartilhamento */}
+                  <AnimatePresence>
+                    {shareMenuOpen && (
+                      <>
+                        {/* Backdrop */}
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          onClick={() => setShareMenuOpen(false)}
+                          className="fixed inset-0 z-40"
+                        />
+                        
+                        {/* Menu */}
+                        <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                          transition={{ duration: 0.15 }}
+                          className="absolute bottom-full mb-2 right-0 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50"
+                        >
+                          <div className="p-2 space-y-1">
+                            <button
+                              onClick={() => {
+                                handleShareWhatsApp()
+                                setShareMenuOpen(false)
+                              }}
+                              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors text-left group"
+                            >
+                              <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <ChatBubbleLeftRightIcon className="h-5 w-5 text-green-600 dark:text-green-400" />
+                              </div>
+                              <div className="flex-1">
+                                <p className="font-semibold text-gray-900 dark:text-white text-sm">WhatsApp</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">Enviar por mensagem</p>
+                              </div>
+                            </button>
+                            
+                            <button
+                              onClick={() => {
+                                handleShareEmail()
+                                setShareMenuOpen(false)
+                              }}
+                              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors text-left group"
+                            >
+                              <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <svg className="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                              </div>
+                              <div className="flex-1">
+                                <p className="font-semibold text-gray-900 dark:text-white text-sm">Email</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">Enviar por email</p>
+                              </div>
+                            </button>
+                            
+                            <button
+                              onClick={async () => {
+                                await handleShareSummary()
+                                setShareMenuOpen(false)
+                              }}
+                              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors text-left group"
+                            >
+                              <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <ShareIcon className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                              </div>
+                              <div className="flex-1">
+                                <p className="font-semibold text-gray-900 dark:text-white text-sm">Outros</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">Mais opções</p>
+                              </div>
+                            </button>
+                          </div>
+                        </motion.div>
+                      </>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
             </div>
           )}

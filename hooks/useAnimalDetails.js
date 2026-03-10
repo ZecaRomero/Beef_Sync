@@ -6,6 +6,7 @@ export function useAnimalDetails(id) {
   const [animal, setAnimal] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const prevIdRef = useRef(null)
 
   // Dados complementares
   const [ocorrencias, setOcorrencias] = useState([])
@@ -13,27 +14,53 @@ export function useAnimalDetails(id) {
   const [inseminacoes, setInseminacoes] = useState([])
   const [examesAndrologicos, setExamesAndrologicos] = useState([])
   const [maeLink, setMaeLink] = useState(null)
+  const [maeColetas, setMaeColetas] = useState(null)
+  const [baixasResumo, setBaixasResumo] = useState(null) // { baixaPropria, resumoMae }
+  const [baixasMae, setBaixasMae] = useState(null) // resumo de baixas da mãe (exibido na ficha do filho)
 
   // Ref para controlar se componente ainda está montado (evitar setState após unmount)
   const mountedRef = useRef(true)
 
-  // Rankings
+  // Rankings (iABCZg, DECA, IQG, Pt IQG, MGTe)
   const [rankings, setRankings] = useState({
     posicaoIABCZ: null,
+    posicaoDECA: null,
     posicaoIQG: null,
+    posicaoPtIQG: null,
+    posicaoMGte: null,
     filhoTopIABCZ: null,
-    filhoTopIQG: null
+    filhoTopDECA: null,
+    filhoTopIQG: null,
+    filhoTopPtIQG: null
   })
 
-  // 1. Buscar dados principais do animal
+  // Invalidar cache IMEDIATAMENTE quando ID mudar (antes do fetch) - evita mostrar animal errado
+  if (id && id !== prevIdRef.current) {
+    prevIdRef.current = id
+    invalidateCache(`/api/animals/`)
+  }
+
+  // Resetar estado quando ID da URL mudar
+  useEffect(() => {
+    if (id) {
+      setAnimal(null)
+      setError(null)
+      setLoading(true)
+      setRetryCount(0)
+    }
+  }, [id])
+
+  // 1. Buscar dados principais do animal (cache desabilitado para consulta - evita animal errado)
+  const [retryCount, setRetryCount] = useState(0)
+  const fetchUrl = id ? `/api/animals/${encodeURIComponent(id)}?history=true${retryCount > 0 ? `&_r=${retryCount}` : ''}` : ''
   const { 
     data: animalData, 
     loading: animalLoading, 
     error: animalError 
   } = useOptimizedFetch({
-    url: id ? `/api/animals/${id}?history=true` : '',
-    cache: true,
-    cacheTTL: 60000
+    url: fetchUrl,
+    cache: false,
+    cacheTTL: 0
   })
 
   // Atualizar animal e disparar buscas secundárias
@@ -84,6 +111,17 @@ export function useAnimalDetails(id) {
                 .catch(() => {})
             )
           }
+
+          // Custos: buscar sempre (fallback se API principal não retornou ou retornou vazio)
+          fetchPromises.push(
+            fetch(`/api/animals/${a.id}/custos`)
+              .then(r => r.ok ? r.json() : { data: [] })
+              .then(d => {
+                const custos = Array.isArray(d.data ?? d.custos ?? d) ? (d.data ?? d.custos ?? d) : []
+                setAnimal(prev => prev ? { ...prev, custos } : prev)
+              })
+              .catch(() => {})
+          )
         }
 
         Promise.all(fetchPromises).finally(() => setLoading(false))
@@ -93,10 +131,18 @@ export function useAnimalDetails(id) {
         setLoading(false)
       }
     } else if (animalError) {
-      setError('Erro ao carregar dados')
+      const msg = animalError?.message || ''
+      const is404 = msg.includes('404')
+      if (is404 && retryCount < 2) {
+        // Retry até 2x (3 tentativas total) - evita 404 intermitente (replicação/timing)
+        const delay = retryCount === 0 ? 800 : 1500
+        const t = setTimeout(() => setRetryCount(c => c + 1), delay)
+        return () => clearTimeout(t)
+      }
+      setError(is404 ? 'Animal não encontrado' : 'Erro ao carregar dados')
       setLoading(false)
     }
-  }, [animalData, animalError])
+  }, [animalData, animalError, retryCount])
 
   // Buscar Rankings (separado para não bloquear render inicial)
   useEffect(() => {
@@ -104,44 +150,49 @@ export function useAnimalDetails(id) {
 
     const fetchRankings = async () => {
       try {
-        const [resIABCZ, resIQG] = await Promise.all([
+        const [resIABCZ, resDECA, resIQG, resPtIQG] = await Promise.all([
           fetch('/api/animals/ranking-iabcz?limit=50').then(r => r.json()),
-          fetch('/api/animals/ranking-iqg?limit=50').then(r => r.json())
+          fetch('/api/animals/ranking-deca?limit=50').then(r => r.json()),
+          fetch('/api/animals/ranking-iqg?limit=50').then(r => r.json()),
+          fetch('/api/animals/ranking-pt-iqg?limit=50').then(r => r.json())
         ])
 
         const newRankings = { ...rankings }
         const serieMatch = String(animal.serie || '').toUpperCase()
 
-        // Processar IABCZ
-        if (resIABCZ.success && resIABCZ.data?.length) {
-          const list = resIABCZ.data
+        const processarRanking = (list, campoPosicao, campoFilhoTop, primeiroExtra = null) => {
+          if (!list?.length) return
           const idx = list.findIndex(r => 
             r.id === animal.id || (String(r.rg) === String(animal.rg) && String(r.serie || '').toUpperCase() === serieMatch)
           )
-          if (idx >= 0) newRankings.posicaoIABCZ = idx + 1
+          if (idx >= 0) newRankings[campoPosicao] = idx + 1
 
           const primeiro = list[0]
-          const filhoTop = animal.filhos?.find(f => 
-            f.id === primeiro?.id || 
+          const maeConfere = primeiro?.serie_mae != null && primeiro?.rg_mae != null &&
+            String(primeiro.serie_mae || '').trim().toUpperCase() === String(animal.serie || '').trim().toUpperCase() &&
+            String(primeiro.rg_mae || '').trim() === String(animal.rg || '').trim()
+          const filhoTop = maeConfere || animal.filhos?.find(f =>
+            f.id === primeiro?.id ||
             (String(f.rg) === String(primeiro?.rg) && String(f.serie || '').toUpperCase() === String(primeiro?.serie || '').toUpperCase())
           )
-          if (filhoTop) newRankings.filhoTopIABCZ = { serie: primeiro.serie, rg: primeiro.rg, nome: primeiro.nome }
+          if (filhoTop) {
+            newRankings[campoFilhoTop] = { serie: primeiro.serie, rg: primeiro.rg, nome: primeiro.nome, ...primeiroExtra }
+          }
         }
 
-        // Processar IQG
-        if (resIQG.success && resIQG.data?.length) {
-          const list = resIQG.data
-          const idx = list.findIndex(r => 
-            r.id === animal.id || (String(r.rg) === String(animal.rg) && String(r.serie || '').toUpperCase() === serieMatch)
-          )
-          if (idx >= 0) newRankings.posicaoIQG = idx + 1
+        if (resIABCZ.success && resIABCZ.data?.length) processarRanking(resIABCZ.data, 'posicaoIABCZ', 'filhoTopIABCZ')
+        if (resDECA.success && resDECA.data?.length) processarRanking(resDECA.data, 'posicaoDECA', 'filhoTopDECA', { deca: resDECA.data[0]?.deca })
+        if (resIQG.success && resIQG.data?.length) processarRanking(resIQG.data, 'posicaoIQG', 'filhoTopIQG', { iqg: resIQG.data[0]?.iqg })
+        if (resPtIQG.success && resPtIQG.data?.length) processarRanking(resPtIQG.data, 'posicaoPtIQG', 'filhoTopPtIQG', { pt_iqg: resPtIQG.data[0]?.pt_iqg })
 
-          const primeiro = list[0]
-          const filhoTop = animal.filhos?.find(f => 
-            f.id === primeiro?.id || 
-            (String(f.rg) === String(primeiro?.rg) && String(f.serie || '').toUpperCase() === String(primeiro?.serie || '').toUpperCase())
-          )
-          if (filhoTop) newRankings.filhoTopIQG = { serie: primeiro.serie, rg: primeiro.rg, nome: primeiro.nome, iqg: primeiro.iqg }
+        // MGTe: API específica retorna posição (não está no ranking limit 50)
+        if (animal.serie && animal.rg) {
+          try {
+            const resMgte = await fetch(`/api/animals/ranking-mgte-posicao?serie=${encodeURIComponent(animal.serie)}&rg=${encodeURIComponent(animal.rg)}`).then(r => r.json())
+            if (resMgte.success && resMgte.posicao != null) {
+              newRankings.posicaoMGte = resMgte.posicao
+            }
+          } catch (_) {}
         }
 
         setRankings(newRankings)
@@ -244,33 +295,146 @@ export function useAnimalDetails(id) {
     }
   })
 
-  // Buscar Mãe Link
+  // Buscar Mãe Link e coletas FIV da mãe (quando não cadastrada)
   useEffect(() => {
-    if (!animal?.mae) return
-    
-    const extrairSerieRG = (t) => {
+    // Permitir buscar quando tem serie_mae+rg_mae mesmo sem mae (ex: CJCJ 16013)
+    const temSerieRgMae = animal?.serie_mae && animal?.rg_mae
+    if (!animal?.mae && !temSerieRgMae) {
+      setMaeLink(null)
+      setMaeColetas(null)
+      return
+    }
+
+    const extrairSerieRG = (t, serieFilho) => {
       if (!t) return { serie: '', rg: '' }
       t = String(t).trim()
       const m1 = t.match(/^([A-Za-z]+)-(\d+)$/)
       if (m1) return { serie: m1[1], rg: m1[2] }
       const m2 = t.match(/^([A-Za-z]+)\s+(\d+)$/)
       if (m2) return { serie: m2[1], rg: m2[2] }
+      // Formato "CJ SANT ANNA 13604" - extrair RG do final e usar série do filho (ex: CJCJ)
+      const m3 = t.match(/\s+(\d+)$/)
+      if (m3) {
+        const rg = m3[1]
+        const serie = serieFilho || (t.match(/^CJ/i) ? 'CJCJ' : '')
+        return { serie, rg }
+      }
       return { serie: '', rg: '' }
     }
 
-    const { serie, rg } = extrairSerieRG(animal.mae)
-    if (serie && rg) {
-      setMaeLink({ serie, rg })
+    const { serie, rg } = animal?.mae ? extrairSerieRG(animal.mae, animal.serie) : { serie: '', rg: '' }
+    
+    // Se tem serie_mae e rg_mae, usar isso (mais confiável)
+    const serieMae = animal.serie_mae || serie
+    const rgMae = animal.rg_mae || rg
+    
+    if (serieMae && rgMae) {
+      setMaeLink({ serie: serieMae, rg: rgMae })
+      
+      // SEMPRE buscar coletas FIV, mesmo que a mãe tenha link
+      const params = new URLSearchParams()
+      params.set('serie', serieMae)
+      params.set('rg', rgMae)
+      
+      console.log('🔍 Buscando coletas FIV da mãe:', `${serieMae} ${rgMae}`)
+      
+      fetch(`/api/animals/doadora-coletas?${params}`)
+        .then(r2 => r2.json())
+        .then(d2 => {
+          console.log('📊 Resultado coletas mãe:', d2)
+          if (d2.success && d2.data?.resumo) {
+            setMaeColetas(d2.data)
+            console.log('✅ Coletas da mãe encontradas:', d2.data.resumo.totalColetas)
+          } else {
+            setMaeColetas(null)
+            console.log('ℹ️ Nenhuma coleta encontrada para a mãe')
+          }
+        })
+        .catch((err) => {
+          console.error('❌ Erro ao buscar coletas da mãe:', err)
+          setMaeColetas(null)
+        })
     } else {
+      // Tentar buscar por nome
       const p = new URLSearchParams({ mae: animal.mae.trim() })
       if (animal.serie) p.set('animalSerie', animal.serie)
       if (animal.rg) p.set('animalRg', animal.rg)
       fetch(`/api/animals/buscar-mae?${p}`)
         .then(r => r.json())
-        .then(d => d.success ? setMaeLink({ serie: d.serie, rg: d.rg }) : setMaeLink(null))
-        .catch(() => setMaeLink(null))
+        .then(d => {
+          if (d.success) {
+            setMaeLink({ serie: d.serie, rg: d.rg })
+            
+            // Buscar coletas mesmo que encontrou a mãe
+            const params = new URLSearchParams()
+            params.set('serie', d.serie)
+            params.set('rg', d.rg)
+            
+            fetch(`/api/animals/doadora-coletas?${params}`)
+              .then(r2 => r2.json())
+              .then(d2 => {
+                if (d2.success && d2.data?.resumo) setMaeColetas(d2.data)
+                else setMaeColetas(null)
+              })
+              .catch(() => setMaeColetas(null))
+          } else {
+            setMaeLink(null)
+            // Mãe não cadastrada: buscar histórico de coletas FIV por nome
+            const params = new URLSearchParams({ identificador: animal.mae.trim() })
+            fetch(`/api/animals/doadora-coletas?${params}`)
+              .then(r2 => r2.json())
+              .then(d2 => {
+                if (d2.success && d2.data?.resumo) setMaeColetas(d2.data)
+                else setMaeColetas(null)
+              })
+              .catch(() => setMaeColetas(null))
+          }
+        })
+        .catch(() => {
+          setMaeLink(null)
+          const params = new URLSearchParams({ identificador: animal.mae.trim() })
+          fetch(`/api/animals/doadora-coletas?${params}`)
+            .then(r2 => r2.json())
+            .then(d2 => {
+              if (d2.success && d2.data?.resumo) setMaeColetas(d2.data)
+              else setMaeColetas(null)
+            })
+            .catch(() => setMaeColetas(null))
+        })
     }
-  }, [animal?.mae])
+  }, [animal?.mae, animal?.serie_mae, animal?.rg_mae])
+
+  // Buscar resumo de baixas (venda própria, resumo filhos vendidos)
+  useEffect(() => {
+    if (!animal?.serie || !animal?.rg) {
+      setBaixasResumo(null)
+      return
+    }
+    const params = new URLSearchParams({ serie: animal.serie, rg: animal.rg })
+    fetch(`/api/animals/baixas-resumo?${params}`)
+      .then(r => r.json())
+      .then(d => {
+        if (mountedRef.current && d.success && d.data) setBaixasResumo(d.data)
+        else if (mountedRef.current) setBaixasResumo(null)
+      })
+      .catch(() => { if (mountedRef.current) setBaixasResumo(null) })
+  }, [animal?.serie, animal?.rg])
+
+  // Buscar resumo de baixas da MÃE (para exibir na ficha do filho: NF, valor, comprador da mãe)
+  useEffect(() => {
+    if (!maeLink?.serie || !maeLink?.rg) {
+      setBaixasMae(null)
+      return
+    }
+    const params = new URLSearchParams({ serie: maeLink.serie, rg: maeLink.rg })
+    fetch(`/api/animals/baixas-resumo?${params}`)
+      .then(r => r.json())
+      .then(d => {
+        if (mountedRef.current && d.success && d.data) setBaixasMae(d.data)
+        else if (mountedRef.current) setBaixasMae(null)
+      })
+      .catch(() => { if (mountedRef.current) setBaixasMae(null) })
+  }, [maeLink?.serie, maeLink?.rg])
 
   // CÁLCULOS E MÉTRICAS (Refatorado do [id].jsx)
   const metrics = useMemo(() => {
@@ -439,6 +603,9 @@ export function useAnimalDetails(id) {
     examesAndrologicos,
     setExamesAndrologicos,
     maeLink,
+    maeColetas,
+    baixasResumo,
+    baixasMae,
     rankings,
     // Métricas calculadas
     metrics

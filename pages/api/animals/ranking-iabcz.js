@@ -36,6 +36,7 @@ export default async function handler(req, res) {
       `SELECT 
          a.id, a.serie, a.rg, a.nome, a.abczg, a.deca, a.raca, a.sexo, a.situacao,
          a.data_nascimento, a.pasto_atual, a.piquete_atual,
+         a.serie_mae, a.rg_mae,
          p_ult.peso AS ultimo_peso,
          p_ult.ce   AS ultimo_ce,
          p_ult.data AS data_ultima_pesagem,
@@ -72,10 +73,12 @@ export default async function handler(req, res) {
       )
     } catch (colErr) {
       if (/column.*does not exist/i.test(colErr?.message || '')) {
-        result = await query(
-          `SELECT 
+        try {
+          result = await query(
+            `SELECT 
              a.id, a.serie, a.rg, a.nome, a.abczg, a.deca, a.raca, a.sexo, a.situacao,
              a.data_nascimento, a.pasto_atual,
+             a.serie_mae, a.rg_mae,
              p_ult.peso AS ultimo_peso,
              p_ult.ce   AS ultimo_ce,
              p_ult.data AS data_ultima_pesagem,
@@ -110,6 +113,48 @@ export default async function handler(req, res) {
           LIMIT $1`,
           serie ? [limit, serie] : [limit]
         )
+        } catch (colErr2) {
+          if (/column.*does not exist/i.test(colErr2?.message || '')) {
+            result = await query(
+              `SELECT 
+               a.id, a.serie, a.rg, a.nome, a.abczg, a.deca, a.raca, a.sexo, a.situacao,
+               a.data_nascimento, a.pasto_atual,
+               p_ult.peso AS ultimo_peso,
+               p_ult.ce   AS ultimo_ce,
+               p_ult.data AS data_ultima_pesagem,
+               la.piquete AS localizacao_piquete
+             FROM animais a
+             LEFT JOIN LATERAL (
+               SELECT p.peso, p.ce, p.data
+               FROM pesagens p
+               WHERE p.animal_id = a.id
+               ORDER BY p.data DESC, p.created_at DESC
+               LIMIT 1
+             ) p_ult ON TRUE
+             LEFT JOIN LATERAL (
+               SELECT l.piquete
+               FROM localizacoes_animais l
+               WHERE l.animal_id = a.id
+                 AND (l.data_saida IS NULL OR l.data_saida >= CURRENT_DATE)
+               ORDER BY l.data_entrada DESC
+               LIMIT 1
+             ) la ON TRUE
+             WHERE a.situacao = 'Ativo' 
+               AND a.abczg IS NOT NULL 
+               AND TRIM(a.abczg) != ''
+               ${serie ? 'AND UPPER(TRIM(COALESCE(a.serie, \'\'))) = $2' : ''}
+             ORDER BY 
+               CASE 
+                 WHEN a.abczg ~ '^[0-9]+[.,]?[0-9]*$'
+                 THEN (REPLACE(REPLACE(TRIM(a.abczg), ',', '.'), ' ', '')::numeric)
+                 ELSE NULL
+               END DESC NULLS LAST,
+               a.rg DESC
+             LIMIT $1`,
+              serie ? [limit, serie] : [limit]
+            )
+          } else throw colErr2
+        }
       } else throw colErr
     }
 
@@ -119,6 +164,8 @@ export default async function handler(req, res) {
       id: r.id,
       serie: r.serie,
       rg: r.rg,
+      serie_mae: r.serie_mae,
+      rg_mae: r.rg_mae,
       identificacao: `${r.serie || ''}-${r.rg || ''}`.replace(/^-|-$/g, ''),
       nome: r.nome,
       abczg: r.abczg,

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { CubeTransparentIcon, ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
-import { formatDate } from '../../utils/formatters'
+import { formatDate, formatDoadoraIdentificacao } from '../../utils/formatters'
 
 export default function AnimalEmbryoTransfers({ transferencias }) {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -34,7 +34,7 @@ export default function AnimalEmbryoTransfers({ transferencias }) {
                 {te.numero_te && <span className="ml-2 text-xs text-gray-500">#{te.numero_te}</span>}
               </p>
               <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
-                Doadora: {te.doadora_nome || te.doadora || '-'} • Touro: {te.touro || '-'}
+                Doadora: {formatDoadoraIdentificacao(te.doadora_nome || te.doadora) || '-'} • Touro: {te.touro || '-'}
               </p>
               {(te.resultado || te.status) && (
                 <span className={`inline-block mt-1 px-2 py-0.5 rounded text-xs font-medium ${

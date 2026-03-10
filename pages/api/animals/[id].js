@@ -2,6 +2,13 @@ import databaseService from '../../../services/databaseService'
 import logger from '../../../utils/logger'
 import { asyncHandler } from '../../../utils/apiResponse'
 import { broadcast } from '../../../lib/sseClients'
+
+// Função auxiliar de log
+function debugLog(msg) {
+  // Em produção, remover ou usar logger.debug
+  console.log(`[DEBUG-ANIMAL-API] ${msg}`);
+}
+
 import { 
   sendSuccess, 
   sendValidationError, 
@@ -86,6 +93,7 @@ function calcularEra(meses, sexo) {
   return '24+'
 }
 
+export const config = { api: { externalResolver: true } }
 export default asyncHandler(async function handler(req, res) {
   const { id } = req.query
 
@@ -111,21 +119,303 @@ export default asyncHandler(async function handler(req, res) {
 })
 
 async function handleGet(req, res, id) {
-  const { history } = req.query
+  const { history, serie, rg } = req.query
   
-  console.log(`🔍 Buscando animal com ID/RG: ${id} (tipo: ${typeof id}, history: ${history})`)
+  debugLog(`[START] Buscando animal com ID/RG: ${id} (tipo: ${typeof id}, history: ${history})`);
   
   let animal = null
-  
-  // 1. Tentar buscar por ID numérico primeiro
   const animalId = parseInt(id, 10)
-  if (!isNaN(animalId)) {
+
+  // 0. Se id tem formato SÉRIE-RG (ex: CJCJ-16974) ou SÉRIE RG (ex: CJCJ 17037), tentar PRIMEIRO - evita 404 recorrente
+  const idStr = id && typeof id === 'string' ? String(id).trim() : ''
+  const isSerieRgFormat = idStr && isNaN(animalId) && (idStr.includes('-') || /^[A-Za-z]+\s+\d+$/.test(idStr))
+  if (isSerieRgFormat) {
+    try {
+      const { query } = require('../../../lib/database')
+      let serieBusca, rgBruto
+      if (idStr.includes('-')) {
+        const parts = idStr.split('-')
+        serieBusca = (parts[0] || '').trim()
+        rgBruto = (parts.slice(1).join('-') || '').trim()
+      } else {
+        const match = idStr.match(/^([A-Za-z]+)\s+(\d+)$/)
+        if (match) {
+          serieBusca = match[1].trim()
+          rgBruto = match[2].trim()
+        } else {
+          serieBusca = ''
+          rgBruto = ''
+        }
+      }
+      const rgBusca = rgBruto.replace(/^0+/, '') || '0'
+      const rgNum = /^\d+$/.test(rgBusca) ? parseInt(rgBusca, 10) : null
+
+      if (serieBusca && (rgBusca || rgNum !== null)) {
+        debugLog(`Tentando buscar animal por SÉRIE-RG: ${serieBusca}-${rgBusca} (bruto: ${rgBruto})`)
+
+        // Tentativa 1: match exato normalizado (rg sem zeros à esquerda)
+        let result = await query(
+          `SELECT id, serie, rg FROM animais 
+           WHERE UPPER(TRIM(COALESCE(serie, ''))) = UPPER(TRIM($1)) 
+             AND COALESCE(NULLIF(REGEXP_REPLACE(TRIM(rg::text), '^0+', ''), ''), '0') = $2
+           LIMIT 1`,
+          [serieBusca, rgBusca]
+        )
+        debugLog(`Tentativa 1 (normalizada): ${result.rows.length} encontrados`)
+
+        // Tentativa 2: rg como texto exato
+        if (result.rows.length === 0) {
+          result = await query(
+            `SELECT id, serie, rg FROM animais 
+             WHERE UPPER(TRIM(COALESCE(serie, ''))) = UPPER(TRIM($1)) 
+               AND (TRIM(rg::text) = $2 OR rg::text = $2)
+             LIMIT 1`,
+            [serieBusca, rgBruto]
+          )
+          debugLog(`Tentativa 2 (texto exato): ${result.rows.length} encontrados`)
+        }
+
+        // Tentativa 3: rg como inteiro (coluna pode ser int ou varchar)
+        if (result.rows.length === 0 && rgNum !== null) {
+          try {
+            const r3 = await query(
+              `SELECT id, serie, rg FROM animais 
+               WHERE UPPER(TRIM(COALESCE(serie, ''))) = UPPER(TRIM($1)) 
+                 AND (rg::text = $2 OR rg = $3)
+               LIMIT 1`,
+              [serieBusca, String(rgNum), rgNum]
+            )
+            if (r3.rows.length > 0) result = r3
+            debugLog(`Tentativa 3 (numérico): ${result.rows.length} encontrados`)
+          } catch (_) { /* ignora se rg não for numérico */ }
+        }
+
+        // Tentativa 4: busca mais flexível (rg contém ou termina com)
+        if (result.rows.length === 0 && rgBruto) {
+          result = await query(
+            `SELECT id, serie, rg FROM animais 
+             WHERE UPPER(TRIM(COALESCE(serie, ''))) = UPPER(TRIM($1)) 
+               AND TRIM(rg::text) = TRIM($2)
+             LIMIT 1`,
+            [serieBusca, rgBruto]
+          )
+          debugLog(`Tentativa 4 (flexível): ${result.rows.length} encontrados`)
+        }
+
+        // Tentativa 5: usar buscarAnimais (mesma lógica da API principal - mais robusta)
+        if (result.rows.length === 0) {
+          try {
+            debugLog(`Tentativa 5 (buscarAnimais service)...`)
+            const animais = await databaseService.buscarAnimais({ serie: serieBusca, rg: rgBruto || rgBusca, limit: 1 })
+            if (animais && animais.length > 0) {
+              result = { rows: [{ id: animais[0].id, serie: animais[0].serie, rg: animais[0].rg }] }
+            }
+            debugLog(`Tentativa 5: ${result.rows.length} encontrados`)
+          } catch (errService) { 
+             debugLog(`Erro na Tentativa 5: ${errService.message}`)
+          }
+        }
+
+        // Tentativa 6: match por CONCAT (serie-rg ou serie rg) - cobre formatos variados no banco
+        if (result.rows.length === 0) {
+          try {
+            const idNorm = String(id).trim()
+            const idComEspaco = idNorm.replace('-', ' ')
+            result = await query(
+              `SELECT id, serie, rg FROM animais 
+               WHERE (TRIM(COALESCE(serie,'')) || '-' || TRIM(rg::text)) IN ($1, $2)
+                  OR (TRIM(COALESCE(serie,'')) || ' ' || TRIM(rg::text)) IN ($1, $2)
+               LIMIT 1`,
+              [idNorm, idComEspaco]
+            )
+            debugLog(`Tentativa 6 (CONCAT): ${result.rows.length} encontrados`)
+          } catch (_) {}
+        }
+
+        // Tentativa 7: serie com espaços (ex: "CJ CJ" = "CJCJ")
+        if (result.rows.length === 0 && serieBusca && rgBruto) {
+          try {
+            const serieSemEspacos = String(serieBusca).replace(/\s/g, '')
+            result = await query(
+              `SELECT id, serie, rg FROM animais 
+               WHERE UPPER(REPLACE(TRIM(COALESCE(serie, '')), ' ', '')) = UPPER($1)
+                 AND (TRIM(rg::text) = $2 OR rg::text = $2)
+               LIMIT 1`,
+              [serieSemEspacos, rgBruto]
+            )
+            debugLog(`Tentativa 7 (serie sem espaços): ${result.rows.length} encontrados`)
+          } catch (_) {}
+        }
+
+        // Tentativa 8: RG com zeros à esquerda (ex: 013604 quando busca 13604) - tenta variantes
+        if (result.rows.length === 0 && serieBusca && rgBruto && /^\d+$/.test(rgBruto)) {
+          try {
+            const variantesRg = [rgBruto]
+            if (rgBruto.length <= 5) variantesRg.push(rgBruto.padStart(6, '0')) // 13604 -> 013604
+            if (rgBruto.length <= 4) variantesRg.push(rgBruto.padStart(5, '0'))
+            for (const rgVar of variantesRg) {
+              if (result.rows.length > 0) break
+              const r8 = await query(
+                `SELECT id, serie, rg FROM animais 
+                 WHERE UPPER(TRIM(COALESCE(serie, ''))) = UPPER(TRIM($1)) 
+                   AND (TRIM(rg::text) = $2 OR TRIM(LEADING '0' FROM rg::text) = $3)
+                 LIMIT 1`,
+                [serieBusca, rgVar, rgBruto]
+              )
+              if (r8.rows.length > 0) result = r8
+            }
+            debugLog(`Tentativa 8 (rg variantes): ${result.rows.length} encontrados`)
+          } catch (_) {}
+        }
+
+        if (result.rows.length > 0) {
+          const row = result.rows[0]
+          debugLog(`✅ Animal encontrado por SÉRIE-RG ${id} → ID ${row.id}`)
+          try {
+            if (history === 'true') {
+              debugLog(`Buscando histórico completo para ID ${row.id}...`)
+              animal = await databaseService.buscarHistoricoAnimal(row.id)
+            } else {
+              debugLog(`Buscando dados básicos para ID ${row.id}...`)
+              animal = await databaseService.buscarAnimalPorId(row.id)
+            }
+            if (!animal) {
+                debugLog(`❌ buscarHistoricoAnimal/buscarAnimalPorId retornou null para ID ${row.id}`)
+            } else {
+                debugLog(`✅ Dados carregados com sucesso para ID ${row.id}`)
+            }
+          } catch (e) {
+            debugLog(`ERRO CRÍTICO ao buscar animal/histórico ID ${row.id}: ${e.message}`)
+            logger.warn('buscarHistoricoAnimal falhou após match serie-rg:', e?.message)
+            try {
+              debugLog(`Tentando fallback básico (buscarAnimalPorId) para ID ${row.id}...`)
+              animal = await databaseService.buscarAnimalPorId(row.id)
+            } catch (_) {
+              debugLog(`Fallback básico falhou. Tentando query direta manual...`)
+              const { query: q2 } = require('../../../lib/database')
+              const full = await q2('SELECT * FROM animais WHERE id = $1', [row.id])
+              if (full.rows[0]) {
+                const r = full.rows[0]
+                let filhos = []
+                try {
+                  const fRes = await q2(
+                    `SELECT * FROM animais WHERE (serie_mae = $1 AND rg_mae = $2) OR mae LIKE $3 OR mae = $4 ORDER BY data_nascimento DESC`,
+                    [r.serie, r.rg, `%${r.serie}-${r.rg}%`, `${r.serie} ${r.rg}`]
+                  )
+                  filhos = fRes.rows || []
+                } catch (_) {
+                  try {
+                    const fRes = await q2(`SELECT * FROM animais WHERE mae LIKE $1 OR mae = $2 ORDER BY data_nascimento DESC`, [`%${r.serie}-${r.rg}%`, `${r.serie} ${r.rg}`])
+                    filhos = fRes.rows || []
+                  } catch (__) {}
+                }
+                animal = { ...r, pesagens: [], inseminacoes: [], custos: [], gestacoes: [], filhos, protocolos: [], localizacoes: [], fivs: [] }
+                console.log(`⚠️ Retornando animal ${r.serie}-${r.rg} (fallback básico com ${filhos.length} filhos)`)
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      debugLog(`❌ Busca SÉRIE-RG falhou: ${e?.message || e}`)
+      logger.warn('Busca SÉRIE-RG falhou:', e?.message)
+    }
+  }
+
+  // 1. Tentar buscar por ID numérico (se ainda não encontrou)
+  if (!animal && !isNaN(animalId)) {
     console.log(`📋 Tentando buscar por ID numérico: ${animalId}`)
     
-    if (history === 'true') {
-      animal = await databaseService.buscarHistoricoAnimal(animalId)
-    } else {
-      animal = await databaseService.buscarAnimalPorId(animalId)
+    try {
+      if (history === 'true') {
+        animal = await databaseService.buscarHistoricoAnimal(animalId)
+      } else {
+        animal = await databaseService.buscarAnimalPorId(animalId)
+      }
+    } catch (err) {
+      logger.warn('Erro na busca principal por ID:', err?.message)
+    }
+    
+    // Fallback 1: query direta (evita inconsistências - mesma lógica do /verificar)
+    if (!animal) {
+      try {
+        const { query } = require('../../../lib/database')
+        const direct = await query(
+          `SELECT id FROM animais WHERE id = $1 OR rg::text = TRIM($2) OR rg = $3 LIMIT 1`,
+          [animalId, String(id), animalId]
+        )
+        if (direct.rows.length > 0) {
+          const foundId = direct.rows[0].id
+          console.log(`📋 Fallback: encontrado por query direta (id=${foundId}), buscando completo...`)
+          try {
+            if (history === 'true') {
+              animal = await databaseService.buscarHistoricoAnimal(foundId)
+            } else {
+              animal = await databaseService.buscarAnimalPorId(foundId)
+            }
+          } catch (e2) {
+            logger.warn('Fallback busca completa falhou:', e2?.message)
+          }
+        }
+      } catch (e) {
+        logger.warn('Fallback query direta falhou:', e?.message)
+      }
+    }
+    
+    // Fallback 2: buscar por serie+rg (quando ID falha mas animal existe - ex: CJCJ 16974)
+    if (!animal && serie && rg) {
+      try {
+        const { query } = require('../../../lib/database')
+        const bySerieRg = await query(
+          `SELECT id FROM animais WHERE UPPER(TRIM(serie)) = UPPER(TRIM($1)) AND TRIM(rg::text) = TRIM($2) LIMIT 1`,
+          [String(serie).trim(), String(rg).trim()]
+        )
+        if (bySerieRg.rows.length > 0) {
+          const foundId = bySerieRg.rows[0].id
+          console.log(`📋 Fallback serie+rg: encontrado ${serie}-${rg} (id=${foundId})`)
+          try {
+            if (history === 'true') {
+              animal = await databaseService.buscarHistoricoAnimal(foundId)
+            } else {
+              animal = await databaseService.buscarAnimalPorId(foundId)
+            }
+          } catch (e2) {
+            logger.warn('Fallback serie+rg busca completa falhou:', e2?.message)
+          }
+        }
+      } catch (e) {
+        logger.warn('Fallback serie+rg falhou:', e?.message)
+      }
+    }
+    
+    // Fallback 3: verificação crua - animal existe mas buscarHistoricoAnimal falhou?
+    if (!animal && history === 'true') {
+      try {
+        const { query } = require('../../../lib/database')
+        const raw = await query(
+          `SELECT id, serie, rg, nome, sexo, raca, mgte, top FROM animais WHERE id = $1 LIMIT 1`,
+          [animalId]
+        )
+        if (raw.rows.length > 0) {
+          const row = raw.rows[0]
+          console.log(`📋 Fallback cru: animal existe (${row.serie}-${row.rg}), buscarHistoricoAnimal falhou - tentando buscarAnimalPorId`)
+          try {
+            animal = await databaseService.buscarHistoricoAnimal(animalId)
+          } catch (_) {
+            try {
+              animal = await databaseService.buscarAnimalPorId(animalId)
+              if (animal) {
+                animal = { ...animal, pesagens: animal.pesagens || [], inseminacoes: animal.inseminacoes || [], custos: animal.custos || [], gestacoes: [], filhos: [], protocolos: [], localizacoes: animal.localizacoes || [], fivs: animal.fivs || [] }
+              }
+            } catch (_) {
+              animal = { ...row, pesagens: [], inseminacoes: [], custos: [], gestacoes: [], filhos: [], protocolos: [], localizacoes: [], fivs: [] }
+              console.log(`⚠️ Retornando dados básicos do animal ${row.serie}-${row.rg} (histórico incompleto)`)
+            }
+          }
+        }
+      } catch (e) {
+        logger.warn('Fallback cru falhou:', e?.message)
+      }
     }
     
     if (animal) {
@@ -158,15 +448,44 @@ async function handleGet(req, res, id) {
           animal = await databaseService.buscarAnimalPorId(animalRG.id)
         }
       } else {
-        // Tentar buscar por série-RG combinado (ex: "CJCJ-17836")
+        // Tentar buscar por série-RG combinado (ex: "CJCJ-17836" ou "CJCJ-16013")
         if (id.includes('-')) {
-          const [serie, rg] = id.split('-')
+          const parts = id.split('-')
+          const serie = parts[0].trim()
+          const rg = parts.slice(1).join('-').trim() // RG pode ter hífen (ex: 16013)
           console.log(`📋 Tentando buscar por série-RG: ${serie}-${rg}`)
           
-          const resultSerieRG = await query(
-            `SELECT * FROM animais WHERE serie = $1 AND rg = $2 LIMIT 1`,
-            [serie.trim(), rg.trim()]
+          // Busca flexível: rg como texto e como número (PostgreSQL aceita ambos)
+          let resultSerieRG = await query(
+            `SELECT * FROM animais 
+             WHERE UPPER(TRIM(serie)) = UPPER(TRIM($1)) 
+               AND (TRIM(rg::text) = $2 OR rg::text = $2)
+             LIMIT 1`,
+            [serie, rg]
           )
+          // Fallback 1: tentar rg como inteiro (alguns bancos armazenam assim)
+          if (resultSerieRG.rows.length === 0 && /^\d+$/.test(rg)) {
+            try {
+              const alt = await query(
+                `SELECT * FROM animais WHERE UPPER(TRIM(serie)) = UPPER(TRIM($1)) AND rg::text = $2 LIMIT 1`,
+                [serie, rg]
+              )
+              if (alt.rows.length > 0) resultSerieRG = alt
+            } catch (e) { /* ignora */ }
+          }
+          // Fallback 2: typo comum I↔J (ex: CJCI vs CJCJ)
+          if (resultSerieRG.rows.length === 0 && serie.length >= 2) {
+            const serieAlt = serie.includes('I') ? serie.replace(/I/g, 'J') : serie.replace(/J/g, 'I')
+            if (serieAlt !== serie) {
+              try {
+                const alt = await query(
+                  `SELECT * FROM animais WHERE UPPER(TRIM(serie)) = UPPER(TRIM($1)) AND TRIM(rg::text) = $2 LIMIT 1`,
+                  [serieAlt, rg]
+                )
+                if (alt.rows.length > 0) resultSerieRG = alt
+              } catch (e) { /* ignora */ }
+            }
+          }
           
           if (resultSerieRG.rows.length > 0) {
             const animalSerieRG = resultSerieRG.rows[0]
@@ -207,6 +526,113 @@ async function handleGet(req, res, id) {
     }
   }
   
+  // Fallback: se não encontrou em animais, buscar coletas FIV por doadora_nome (doadora inativa/não cadastrada)
+  if (!animal && id.includes('-')) {
+    try {
+      const { query: dbQuery } = require('../../../lib/database')
+      const [serie, rg] = id.split('-').map(s => s.trim())
+      const ident1 = `${serie} ${rg}`
+      const ident2 = `${serie}-${rg}`
+      const colsFiv = 'id, data_fiv, data_transferencia, quantidade_oocitos, touro, laboratorio, veterinario, doadora_nome, observacoes'
+      const coletasResult = await dbQuery(
+        `SELECT ${colsFiv} FROM coleta_fiv
+         WHERE UPPER(TRIM(doadora_nome)) = UPPER($1)
+            OR UPPER(TRIM(doadora_nome)) = UPPER($2)
+            OR UPPER(REPLACE(COALESCE(doadora_nome,''), ' ', '')) = UPPER(REPLACE($1, ' ', ''))
+         ORDER BY data_fiv DESC`,
+        [ident1, ident2]
+      )
+      if (coletasResult.rows.length > 0) {
+        const fivs = coletasResult.rows
+        const skeletonAnimal = {
+          id: null,
+          serie,
+          rg,
+          nome: `${serie} ${rg}`,
+          situacao: 'Inativo (apenas coletas FIV)',
+          sexo: 'Fêmea',
+          fivs,
+          is_doadora: true,
+          _apenas_coletas: true
+        }
+        const animalComIdentificacao = {
+          ...skeletonAnimal,
+          localizacoes: [],
+          identificacao: `${serie}-${rg}`,
+          dataNascimento: null,
+          precoVenda: null,
+          status: skeletonAnimal.situacao
+        }
+        console.log(`✅ Doadora ${id} não cadastrada - retornando ficha com ${fivs.length} coletas FIV`)
+        return sendSuccess(res, animalComIdentificacao)
+      }
+    } catch (e) {
+      console.warn('Erro ao buscar coletas FIV para doadora não cadastrada:', e.message)
+    }
+  }
+
+  // Fallback final: ID numérico falhou - se animal existe, retornar dados básicos (buscarHistoricoAnimal pode falhar)
+  if (!animal && !isNaN(animalId)) {
+    try {
+      const { query: dbQuery } = require('../../../lib/database')
+      const lookup = await dbQuery(
+        `SELECT * FROM animais WHERE id = $1 LIMIT 1`,
+        [animalId]
+      )
+      if (lookup.rows.length > 0) {
+        const row = lookup.rows[0]
+        console.log(`📋 Fallback final: animal ${animalId} existe (${row.serie}-${row.rg}), retornando dados básicos`)
+        try {
+          animal = history === 'true'
+            ? await databaseService.buscarHistoricoAnimal(row.id)
+            : await databaseService.buscarAnimalPorId(row.id)
+        } catch (_) {
+          animal = { ...row, pesagens: [], inseminacoes: [], custos: [], gestacoes: [], filhos: [], protocolos: [], localizacoes: [], fivs: [] }
+        }
+      }
+    } catch (e) {
+      logger.warn('Fallback final lookup falhou:', e?.message)
+    }
+  }
+
+  // Fallback: animal inativo - existe apenas em baixas (abate, morte, venda)
+  if (!animal && idStr && idStr.includes('-')) {
+    try {
+      const [serieBaixa, rgBaixa] = idStr.split('-').map(s => s?.trim() || '')
+      if (serieBaixa && rgBaixa) {
+        const baixas = await databaseService.buscarBaixasPorSerieRg(serieBaixa, rgBaixa)
+        if (baixas && baixas.length > 0) {
+          const venda = baixas.find(b => b.tipo === 'VENDA')
+          const morte = baixas.find(b => b.tipo === 'MORTE/BAIXA')
+          const situacao = venda ? 'Vendido' : (morte ? 'Morto/Abate' : 'Baixa')
+          const skeletonAnimal = {
+            id: null,
+            serie: serieBaixa,
+            rg: rgBaixa,
+            nome: `${serieBaixa} ${rgBaixa}`,
+            situacao: `Inativo (${situacao})`,
+            sexo: null,
+            raca: null,
+            filhos: [],
+            gestacoes: [],
+            inseminacoes: [],
+            pesagens: [],
+            custos: [],
+            protocolos: [],
+            localizacoes: [],
+            fivs: [],
+            _apenas_baixas: true,
+            baixas
+          }
+          debugLog(`✅ Animal ${id} não cadastrado - retornando ficha com ${baixas.length} baixa(s) (histórico)`)
+          return sendSuccess(res, skeletonAnimal)
+        }
+      }
+    } catch (e) {
+      debugLog(`Fallback baixas falhou: ${e?.message}`)
+    }
+  }
+
   // Se não encontrou no PostgreSQL, retornar erro (fallback desativado)
   if (!animal) {
     return sendNotFound(res, 'Animal não encontrado')

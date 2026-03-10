@@ -85,6 +85,23 @@ const safeNumber = (val) => {
   return isNaN(num) ? 0 : num;
 };
 
+// Formatar data para Excel como texto (evita ######## e problemas de locale)
+const formatDateForExcel = (val) => {
+  if (!val) return '';
+  try {
+    const d = new Date(val);
+    if (isNaN(d.getTime())) return '';
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    const hours = String(d.getHours()).padStart(2, '0');
+    const mins = String(d.getMinutes()).padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${mins}`;
+  } catch {
+    return '';
+  }
+};
+
 // Função para criar uma aba completa com dados
 function createSheetWithData(worksheet, title, data, allSemenStock, periodData = null) {
   const isSaidaTab = title === 'SAÍDAS';
@@ -105,13 +122,14 @@ function createSheetWithData(worksheet, title, data, allSemenStock, periodData =
     ...(isSaidaTab ? [{ header: 'Destino', key: 'destino', width: 20 }] : []),
     { header: 'Nº NF', key: 'numeroNF', width: 15 },
     { header: 'Valor (R$)', key: 'valorCompra', width: 15 },
-    { header: 'Data Compra', key: 'dataCompra', width: 15 },
+    { header: 'Data Compra', key: 'dataCompra', width: 18 },
     { header: 'Qtd Doses', key: 'quantidadeDoses', width: 12 },
     { header: 'Disponíveis', key: 'dosesDisponiveis', width: 12 },
     { header: 'Usadas', key: 'dosesUsadas', width: 10 },
     { header: 'Status', key: 'status', width: 15 },
-    { header: 'Criado em', key: 'created_at', width: 15 },
-    { header: 'Atualizado', key: 'updated_at', width: 15 }
+    { header: 'Observações', key: 'observacoes', width: 25 },
+    { header: 'Criado em', key: 'created_at', width: 18 },
+    { header: 'Atualizado', key: 'updated_at', width: 18 }
   ];
 
   const endCol = headers.length;
@@ -207,13 +225,14 @@ function createSheetWithData(worksheet, title, data, allSemenStock, periodData =
       ...(isSaidaTab ? [semen.destino || ''] : []), // Destino
       semen.numeroNF || semen.numero_nf || '',
       safeNumber(semen.valorCompra || semen.valor_compra),
-      semen.dataCompra || semen.data_compra ? new Date(semen.dataCompra || semen.data_compra) : '',
+      formatDateForExcel(semen.dataCompra || semen.data_compra),
       safeNumber(semen.quantidadeDoses || semen.quantidade_doses),
       safeNumber(semen.dosesDisponiveis || semen.doses_disponiveis),
       safeNumber(semen.dosesUsadas || semen.doses_usadas),
       formatStatus(semen.status),
-      semen.created_at ? new Date(semen.created_at) : '',
-      semen.updated_at ? new Date(semen.updated_at) : ''
+      (semen.observacoes || '').toString().slice(0, 500),
+      formatDateForExcel(semen.created_at),
+      formatDateForExcel(semen.updated_at)
     ];
 
     // Determinar cor da linha baseada no status
@@ -364,9 +383,7 @@ function applyColumnFormatting(cell, colKey, value, status, rowIndex, semen) {
       cell.numFmt = 'R$ #,##0.00';
       cell.alignment = { horizontal: 'right', vertical: 'middle' };
   } else if (['dataCompra', 'created_at', 'updated_at'].includes(colKey)) {
-      if (value) {
-        cell.numFmt = 'dd/mm/yyyy';
-      }
+      // Datas já vêm formatadas como texto (dd/mm/yyyy HH:mm) - sem numFmt
       cell.alignment = { horizontal: 'center', vertical: 'middle' };
   } else if (['quantidadeDoses', 'dosesDisponiveis', 'dosesUsadas'].includes(colKey)) {
       cell.numFmt = '#,##0';

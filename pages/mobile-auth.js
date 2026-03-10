@@ -4,24 +4,26 @@ import Head from 'next/head'
 import { motion } from 'framer-motion'
 import { 
   DevicePhoneMobileIcon, 
-  UserIcon, 
-  PhoneIcon,
+  UserIcon,
   CheckCircleIcon 
 } from '@heroicons/react/24/outline'
 
 export default function MobileAuth() {
   const router = useRouter()
   const [nome, setNome] = useState('')
-  const [telefone, setTelefone] = useState('')
+  const [senha, setSenha] = useState('')
+  const [mostrarSenha, setMostrarSenha] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  const isAdelso = nome.trim().toLowerCase() === 'adelso'
 
   useEffect(() => {
     const authData = localStorage.getItem('mobile-auth')
     if (authData) {
       try {
         const data = JSON.parse(authData)
-        if (data.nome && data.telefone) {
+        if (data.nome) {
           router.push('/a')
         }
       } catch (e) {
@@ -29,20 +31,6 @@ export default function MobileAuth() {
       }
     }
   }, [router])
-
-  const formatarTelefone = (valor) => {
-    const numeros = valor.replace(/\D/g, '')
-    if (numeros.length <= 10) {
-      return numeros.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3')
-    } else {
-      return numeros.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3')
-    }
-  }
-
-  const handleTelefoneChange = (e) => {
-    const formatted = formatarTelefone(e.target.value)
-    setTelefone(formatted)
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -53,10 +41,17 @@ export default function MobileAuth() {
       return
     }
 
-    const telefoneLimpo = telefone.replace(/\D/g, '')
-    if (telefoneLimpo.length < 10) {
-      setError('Por favor, informe um telefone valido')
-      return
+    // Se for Adelso, verificar senha
+    if (isAdelso) {
+      if (!senha.trim()) {
+        setError('Por favor, informe a senha')
+        return
+      }
+      // Verificar senha
+      if (senha !== '123') {
+        setError('Senha incorreta')
+        return
+      }
     }
 
     setLoading(true)
@@ -67,7 +62,6 @@ export default function MobileAuth() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           nome: nome.trim(),
-          telefone: telefoneLimpo,
           userAgent: navigator.userAgent,
           timestamp: new Date().toISOString()
         })
@@ -78,10 +72,15 @@ export default function MobileAuth() {
       if (data.success) {
         localStorage.setItem('mobile-auth', JSON.stringify({
           nome: nome.trim(),
-          telefone: telefoneLimpo,
           registeredAt: new Date().toISOString()
         }))
-        router.push('/a')
+        
+        // Se for Adelso, redireciona para o menu especial
+        if (isAdelso) {
+          router.push('/adelso-menu')
+        } else {
+          router.push('/a')
+        }
       } else {
         setError(data.message || 'Erro ao registrar acesso')
       }
@@ -116,7 +115,7 @@ export default function MobileAuth() {
               <DevicePhoneMobileIcon className="h-10 w-10 text-white" />
             </motion.div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Bem-vindo ao Beef-Sync</h1>
-            <p className="text-gray-600">Para continuar, precisamos de algumas informacoes</p>
+            <p className="text-gray-600">Digite seu nome para acessar o sistema</p>
           </div>
 
           <motion.div
@@ -128,7 +127,7 @@ export default function MobileAuth() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label htmlFor="nome" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Nome Completo
+                  Nome
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -137,35 +136,62 @@ export default function MobileAuth() {
                   <input
                     type="text"
                     id="nome"
+                    name="nome"
                     value={nome}
-                    onChange={(e) => setNome(e.target.value)}
+                    onChange={(e) => {
+                      setNome(e.target.value)
+                      setError('')
+                    }}
                     placeholder="Digite seu nome"
-                    className="block w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
+                    className="block w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all text-gray-900"
                     disabled={loading}
+                    autoFocus
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="words"
+                    spellCheck="false"
                   />
                 </div>
               </div>
 
-              <div>
-                <label htmlFor="telefone" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Telefone/WhatsApp
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <PhoneIcon className="h-5 w-5 text-gray-400" />
+              {/* Campo de senha - só aparece se for Adelso */}
+              {isAdelso && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <label htmlFor="senha" className="block text-sm font-semibold text-gray-700 mb-2">
+                    Senha
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={mostrarSenha ? 'text' : 'password'}
+                      id="senha"
+                      name="senha"
+                      value={senha}
+                      onChange={(e) => {
+                        setSenha(e.target.value)
+                        setError('')
+                      }}
+                      placeholder="Digite sua senha"
+                      className="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all pr-12 text-gray-900"
+                      disabled={loading}
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      spellCheck="false"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setMostrarSenha(!mostrarSenha)}
+                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600"
+                    >
+                      {mostrarSenha ? '🙈' : '👁️'}
+                    </button>
                   </div>
-                  <input
-                    type="tel"
-                    id="telefone"
-                    value={telefone}
-                    onChange={handleTelefoneChange}
-                    placeholder="(00) 00000-0000"
-                    maxLength={15}
-                    className="block w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
-                    disabled={loading}
-                  />
-                </div>
-              </div>
+                </motion.div>
+              )}
 
               {error && (
                 <motion.div
@@ -201,7 +227,7 @@ export default function MobileAuth() {
 
             <div className="mt-6 p-4 bg-amber-50 rounded-xl border border-amber-200">
               <p className="text-xs text-gray-600 text-center">
-                Suas informacoes serao usadas apenas para controle de acesso e comunicacao sobre o sistema.
+                Suas informações serão usadas apenas para controle de acesso ao sistema.
               </p>
             </div>
           </motion.div>

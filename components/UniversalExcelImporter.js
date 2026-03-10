@@ -15,10 +15,12 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
   const [detectedType, setDetectedType] = useState(null)
   const [preview, setPreview] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [importProgress, setImportProgress] = useState(null) // { current, total, processed }
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(null)
   const [importMethod, setImportMethod] = useState('file') // 'file' ou 'paste'
   const [pastedText, setPastedText] = useState('')
+  const [selectedType, setSelectedType] = useState(null) // override do tipo detectado
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0]
@@ -53,9 +55,10 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
             return
           }
 
-          // Detectar tipo de dados
-          const type = detectDataType(jsonData[0], workbook.SheetNames[0])
+          // Detectar tipo de dados (usa planilha + nome do arquivo)
+          const type = detectDataType(jsonData[0], workbook.SheetNames[0], file?.name || '')
           setDetectedType(type)
+          setSelectedType(null) // reset ao trocar arquivo
 
           // Processar preview
           const processed = processDataByType(jsonData, type)
@@ -79,9 +82,17 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
     }
   }
 
-  const detectDataType = (firstRow, sheetName) => {
+  const detectDataType = (firstRow, sheetName, fileName = '') => {
     const keys = Object.keys(firstRow).map(k => k.toLowerCase())
     const sheetLower = sheetName.toLowerCase()
+    const fileLower = String(fileName).toLowerCase()
+
+    // Se nome da planilha/arquivo sugere vendas ou baixas, priorizar
+    if (sheetLower.includes('venda') || sheetLower.includes('baixa') || fileLower.includes('venda') || fileLower.includes('baixa')) {
+      const temSerieRg = keys.some(k => (k === 'ser' || k === 'sér' || k.includes('serie')) && !k.includes('mae')) && keys.some(k => k === 'rg' || k.includes('rg'))
+      const temIdentificacao = keys.some(k => k.includes('identific'))
+      if (temSerieRg || temIdentificacao) return 'baixas'
+    }
 
     // Detectar por colunas específicas
     if (keys.some(k => k.includes('data_ia') || k.includes('dataia') || k.includes('data ia'))) {
@@ -101,6 +112,24 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
     if (keys.some(k => k.includes('numero_nf') || k.includes('numeronf') || k.includes('numero nf') || k.includes('nf'))) {
       return 'notas_fiscais'
     }
+    // Baixas: SÉRIE, RG, OCORRENCIA (MORTE/BAIXA ou VENDA), Causa/COMPRADOR, Data/DATA
+    if (keys.some(k => (k.includes('ocorrencia') || k.includes('ocorrenc')) && keys.some(k => k.includes('serie')) && keys.some(k => k === 'rg' || k.includes('rg')))) {
+      const ocorKey = Object.keys(firstRow).find(k => k.toLowerCase().includes('ocorren'))
+      const ocorVal = ocorKey ? String(firstRow[ocorKey] || '').toUpperCase() : ''
+      if (ocorVal.includes('MORTE') || ocorVal.includes('BAIXA') || ocorVal.includes('VENDA')) {
+        return 'baixas'
+      }
+    }
+    // Formato VENDAS-only: SÉR/SÉRIE, RG, DATA, COMPRADOR/CLIENTE, VALOR, NOTA FISCAL (sem OCORRENCIA)
+    const temSerieRg = keys.some(k => (k === 'ser' || k === 'sér' || k.includes('serie') || k.includes('identific')) && !k.includes('mae')) && (keys.some(k => k === 'rg' || k.includes('rg')) || keys.some(k => k.includes('identific')))
+    const temData = keys.some(k => k.includes('data') || k === 'dt')
+    const temComprador = keys.some(k => k.includes('comprador') || k.includes('cliente') || k.includes('destinat'))
+    const temValor = keys.some(k => k.includes('valor') || k.includes('preco') || k.includes('preço') || k.includes('vlr'))
+    const temDataCompradorValor = temData && temComprador && temValor
+    const temNf = keys.some(k => k.includes('nota') || k.includes('fiscal') || (k.includes('nf') && !k.includes('confer')))
+    if (temSerieRg && (temDataCompradorValor || temNf)) {
+      return 'baixas'
+    }
     if (keys.some(k => k.includes('serie') && k.includes('rg'))) {
       return 'animais'
     }
@@ -115,6 +144,9 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
     }
     if (sheetLower.includes('nota') || sheetLower.includes('nf')) {
       return 'notas_fiscais'
+    }
+    if (sheetLower.includes('baixa') || sheetLower.includes('venda')) {
+      return 'baixas'
     }
 
     return 'animais' // Padrão
@@ -132,6 +164,8 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
         return processDGData(data)
       case 'notas_fiscais':
         return processNotasFiscaisData(data)
+      case 'baixas':
+        return data.map((row, idx) => ({ id: idx + 1, ...row }))
       default:
         return processAnimaisData(data)
     }
@@ -344,33 +378,27 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
     console.log('🔍 Primeiro registro completo:', data[0])
     
     return data.map((row, idx) => {
-      const getVal = (keys) => {
+      const getVal = (keys, colMustContain = null) => {
+        const mustContain = Array.isArray(colMustContain) ? colMustContain : (colMustContain ? [colMustContain] : null)
         for (const key of keys) {
-          // Tentar diferentes variações do nome da coluna
           let val = row[key]
+          if (val === undefined || val === null) val = row[key.toLowerCase()]
+          if (val === undefined || val === null) val = row[key.toUpperCase()]
           if (val === undefined || val === null) {
-            val = row[key.toLowerCase()]
-          }
-          if (val === undefined || val === null) {
-            val = row[key.toUpperCase()]
-          }
-          if (val === undefined || val === null) {
-            // Tentar com espaços removidos
             const keyNoSpaces = key.replace(/\s+/g, '')
             val = row[keyNoSpaces] || row[keyNoSpaces.toLowerCase()] || row[keyNoSpaces.toUpperCase()]
           }
           if (val === undefined || val === null) {
-            // Tentar buscar por substring (ex: "serie" em "SERIE_ANIMAL")
-            const foundKey = availableKeys.find(k => 
-              k.toLowerCase().includes(key.toLowerCase()) || 
-              key.toLowerCase().includes(k.toLowerCase())
-            )
-            if (foundKey) {
-              val = row[foundKey]
-            }
+            const foundKey = availableKeys.find(k => {
+              const match = k.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(k.toLowerCase())
+              if (!match) return false
+              if (mustContain && !mustContain.some(c => k.toLowerCase().includes(String(c).toLowerCase()))) return false
+              if (/^nome\s*(animal|do\s*animal)?$/i.test(k.trim())) return false
+              return true
+            })
+            if (foundKey) val = row[foundKey]
           }
           if (val !== undefined && val !== null && val !== '') {
-            // Converter para string e limpar espaços
             return String(val).trim()
           }
         }
@@ -379,18 +407,18 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
 
       const processed = {
         id: idx + 1,
-        serie: getVal(['Serie', 'Série', 'serie', 'SERIE', 'Serie Animal', 'Série Animal', 'SERIE_ANIMAL', 'SériePai', 'SérieMãe', 'SérieMae']),
-        rg: getVal(['RG', 'rg', 'Rg', 'R.G.', 'R. G.', 'RG_ANIMAL', 'RGN', 'rgn', 'RgnPai', 'RgnMãe', 'RgnMae']),
+        serie: getVal(['Serie', 'Série', 'serie', 'SERIE', 'Serie Animal', 'Série Animal', 'SERIE_ANIMAL']),
+        rg: getVal(['RG', 'rg', 'Rg', 'R.G.', 'RG_ANIMAL', 'RGN', 'rgn']),
         nome: getVal(['Nome', 'nome', 'NOME', 'Nome Animal', 'NOME_ANIMAL', 'Nome do Animal']),
         sexo: getVal(['Sexo', 'sexo', 'SEXO', 'Sexo Animal', 'SEXO_ANIMAL', 'Sx', 'sx', 'SX']),
         raca: getVal(['Raça', 'Raca', 'raca', 'RACA', 'Raça Animal', 'RACA_ANIMAL']),
-        data_nascimento: getVal(['Data Nascimento', 'DataNascimento', 'data_nascimento', 'DATA_NASCIMENTO', 'Data de Nascimento', 'Data de nascimento', 'Nascimento', 'nascimento']),
+        data_nascimento: getVal(['Data Nascimento', 'DataNascimento', 'data_nascimento', 'DATA_NASCIMENTO', 'Data de Nascimento', 'Nascimento', 'nascimento']),
         meses: getVal(['Meses', 'meses', 'MESES']),
         peso: getVal(['Peso', 'peso', 'PESO', 'Peso Animal', 'PESO_ANIMAL']),
-        pai: getVal(['Pai', 'pai', 'PAI', 'Pai Animal', 'PAI_ANIMAL', 'Nome do Pai', 'NomePai']),
+        pai: getVal(['Pai', 'pai', 'PAI', 'Pai Animal', 'PAI_ANIMAL', 'Nome do Pai', 'NomePai'], 'pai'),
         serie_pai: getVal(['SériePai', 'SeriePai', 'serie_pai', 'SERIE_PAI', 'Série Pai']),
         rg_pai: getVal(['RgnPai', 'Rgn Pai', 'rg_pai', 'RG_PAI', 'RGN Pai']),
-        mae: getVal(['Mãe', 'Mae', 'mae', 'MAE', 'Mãe Animal', 'MAE_ANIMAL', 'Nome da Mãe', 'NomeMãe', 'NomeMae']),
+        mae: getVal(['Mãe', 'Mae', 'mae', 'MAE', 'Mãe Animal', 'MAE_ANIMAL', 'Nome da Mãe', 'NomeMãe', 'NomeMae'], ['mae', 'mãe']),
         serie_mae: getVal(['SérieMãe', 'SerieMãe', 'SerieMae', 'serie_mae', 'SERIE_MAE', 'Série Mãe']),
         rg_mae: getVal(['RgnMãe', 'RgnMae', 'Rgn Mãe', 'rg_mae', 'RG_MAE', 'RGN Mãe']),
         receptora: getVal(['Receptora', 'receptora', 'RECEPTORA']),
@@ -419,69 +447,137 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
       setLoading(true)
       setError(null)
 
+      const tipoParaUsar = selectedType || preview.type
+      const CHUNK_SIZE = 300 // Evita timeout e ERR_CONNECTION_RESET em arquivos grandes
+      const usaBatch = tipoParaUsar === 'animais' || tipoParaUsar === 'nascimentos'
+      const usarChunks = usaBatch && preview.all.length > CHUNK_SIZE
+
       console.log('🚀 Iniciando importação...')
-      console.log('📊 Tipo detectado:', preview.type)
+      console.log('📊 Tipo:', tipoParaUsar, selectedType ? '(selecionado manualmente)' : '(detectado)')
       console.log('📦 Total de registros:', preview.all.length)
-      console.log('🔍 Primeiro registro a ser enviado:', preview.all[0])
+      if (usarChunks) console.log(`📦 Enviando em lotes de ${CHUNK_SIZE} (evita timeout)`)
 
       let response
-      switch (preview.type) {
-        case 'inseminacao':
-          response = await fetch('/api/reproducao/inseminacao/import-excel', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ data: preview.all })
-          })
-          break
-        case 'fiv':
-          response = await fetch('/api/reproducao/coleta-fiv/import-excel', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ data: preview.all })
-          })
-          break
-        case 'nascimentos':
-          // Usar API de animais com flag de nascimento
-          response = await fetch('/api/animals/batch', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ animais: preview.all })
-          })
-          break
-        case 'diagnostico_gestacao':
-          response = await fetch('/api/reproducao/diagnostico-gestacao/import-excel', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ data: preview.all })
-          })
-          break
-        case 'notas_fiscais':
-          response = await fetch('/api/notas-fiscais/import-excel', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ data: preview.all })
-          })
-          break
-        default:
-          response = await fetch('/api/animals/batch', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ animais: preview.all })
-          })
-      }
+      let result = {}
 
-      const result = await response.json()
+      if (usarChunks) {
+        const chunks = []
+        for (let i = 0; i < preview.all.length; i += CHUNK_SIZE) {
+          chunks.push(preview.all.slice(i, i + CHUNK_SIZE))
+        }
+        const totalChunks = chunks.length
+        let totalSucessos = 0
+        let totalErros = 0
+        const todosErros = []
+
+        for (let c = 0; c < chunks.length; c++) {
+          setImportProgress({ current: c + 1, total: totalChunks, processed: (c * CHUNK_SIZE) + chunks[c].length })
+          const r = await fetch('/api/animals/batch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ animais: chunks[c] })
+          })
+          const data = await r.json().catch(() => ({}))
+          if (r.ok && data.success && data.data?.resumo) {
+            totalSucessos += data.data.resumo.total_sucessos ?? 0
+            totalErros += data.data.resumo.total_erros ?? 0
+            if (data.data.resultados?.erros?.length) {
+              todosErros.push(...data.data.resultados.erros)
+            }
+          } else {
+            throw new Error(data.message || `Lote ${c + 1} falhou`)
+          }
+        }
+
+        setImportProgress(null)
+        result = {
+          success: true,
+          data: {
+            resultados: {
+              importados: totalSucessos,
+              erros: todosErros
+            },
+            resumo: {
+              total_sucessos: totalSucessos,
+              total_erros: totalErros,
+              total_processados: preview.all.length
+            }
+          }
+        }
+      } else {
+        switch (tipoParaUsar) {
+          case 'inseminacao':
+            response = await fetch('/api/reproducao/inseminacao/import-excel', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ data: preview.all })
+            })
+            break
+          case 'fiv':
+            response = await fetch('/api/reproducao/coleta-fiv/import-excel', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ data: preview.all })
+            })
+            break
+          case 'nascimentos':
+            response = await fetch('/api/animals/batch', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ animais: preview.all })
+            })
+            break
+          case 'diagnostico_gestacao':
+            response = await fetch('/api/reproducao/diagnostico-gestacao/import-excel', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ data: preview.all })
+            })
+            break
+          case 'notas_fiscais':
+            response = await fetch('/api/notas-fiscais/import-excel', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ data: preview.all })
+            })
+            break
+          case 'baixas':
+            if (!file) {
+              setError('Arquivo não disponível. Selecione novamente.')
+              setLoading(false)
+              return
+            }
+            const formData = new FormData()
+            formData.append('file', file)
+            response = await fetch('/api/import/baixas', {
+              method: 'POST',
+              body: formData
+            })
+            break
+          default:
+            response = await fetch('/api/animals/batch', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ animais: preview.all })
+            })
+        }
+        result = await response.json().catch(() => ({}))
+      }
 
       console.log('📥 Resposta da API:', result)
 
-      if (response.ok && result.success) {
+      const totalImportados = result.data?.resumo?.total_sucessos ?? result.resultados?.importados ?? result.data?.importados ?? preview.total
+      if (result.success && (usarChunks || response?.ok)) {
+        const msg = tipoParaUsar === 'baixas' && result.resultados
+          ? `✅ ${result.resultados.importados} baixas importadas${result.resultados.erroCount > 0 ? ` (${result.resultados.erroCount} erros)` : ''}${result.resultados.ignorados > 0 ? ` • ${result.resultados.ignorados} ignorados` : ''}`
+          : `✅ ${totalImportados} registros importados com sucesso!`
         setSuccess({
-          message: `✅ ${preview.total} registros importados com sucesso!`,
-          details: result.data || {}
+          message: msg,
+          details: result.data || result.resultados || {}
         })
         
         if (onImportSuccess) {
-          onImportSuccess(preview.type, preview.total)
+          onImportSuccess(tipoParaUsar, tipoParaUsar === 'baixas' ? (result.resultados?.importados ?? 0) : preview.total)
         }
 
         // Limpar após 3 segundos
@@ -515,6 +611,7 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
       setError(`Erro ao importar: ${err.message}`)
     } finally {
       setLoading(false)
+      setImportProgress(null)
     }
   }
 
@@ -524,6 +621,7 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
     setPreview(null)
     setError(null)
     setSuccess(null)
+    setImportProgress(null)
     onClose()
   }
 
@@ -534,6 +632,7 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
       nascimentos: 'Nascimentos',
       diagnostico_gestacao: 'Diagnóstico de Gestação (DG)',
       notas_fiscais: 'Notas Fiscais',
+      baixas: 'Baixas (MORTE/BAIXA e VENDA)',
       animais: 'Animais'
     }
     return labels[type] || 'Dados'
@@ -635,22 +734,52 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
 
         {/* Loading */}
         {loading && (
-          <div className="flex items-center justify-center p-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span className="ml-3 text-gray-600 dark:text-gray-400">Processando arquivo...</span>
+          <div className="flex flex-col items-center justify-center p-8">
+            <div className="flex items-center gap-3">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <span className="text-gray-600 dark:text-gray-400">
+                {importProgress
+                  ? `Lote ${importProgress.current}/${importProgress.total} (${importProgress.processed} registros)...`
+                  : 'Processando arquivo...'}
+              </span>
+            </div>
+            {importProgress && (
+              <p className="mt-2 text-sm text-blue-600 dark:text-blue-400">
+                Aguarde, não feche a janela. Arquivos grandes são enviados em partes.
+              </p>
+            )}
           </div>
         )}
 
-        {/* Detected Type */}
+        {/* Detected Type + Seletor manual */}
         {detectedType && !loading && (
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mb-2">
               <SparklesIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               <span className="font-semibold text-blue-900 dark:text-blue-100">
                 Tipo detectado: {getTypeLabel(detectedType)}
               </span>
             </div>
-            <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+            <div className="flex items-center gap-3 flex-wrap">
+              <label className="text-sm text-blue-700 dark:text-blue-300">
+                Usar tipo:
+              </label>
+              <select
+                value={selectedType || ''}
+                onChange={(e) => setSelectedType(e.target.value || null)}
+                className="text-sm border border-blue-300 dark:border-blue-700 rounded-lg px-3 py-1.5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              >
+                <option value="">Detectado ({getTypeLabel(detectedType)})</option>
+                <option value="baixas">Baixas (MORTE/BAIXA e VENDA)</option>
+                <option value="animais">Animais</option>
+                <option value="inseminacao">Inseminação (IA)</option>
+                <option value="fiv">FIV</option>
+                <option value="nascimentos">Nascimentos</option>
+                <option value="diagnostico_gestacao">Diagnóstico de Gestação</option>
+                <option value="notas_fiscais">Notas Fiscais</option>
+              </select>
+            </div>
+            <p className="text-sm text-blue-700 dark:text-blue-300 mt-2">
               {preview?.total || 0} registros encontrados
             </p>
           </div>
@@ -663,8 +792,8 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
               Preview (mostrando 5 primeiros registros)
             </h3>
             
-            {/* Aviso sobre campos vazios */}
-            {preview.sample && preview.sample.length > 0 && (() => {
+            {/* Aviso sobre campos vazios (apenas para Animais, não para Baixas) */}
+            {preview.sample && preview.sample.length > 0 && (selectedType || detectedType) !== 'baixas' && (() => {
               const firstRow = preview.sample[0]
               const camposVazios = []
               const camposObrigatorios = ['serie', 'rg']
@@ -768,11 +897,29 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
 
         {/* Success */}
         {success && (
-          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-            <div className="flex items-center gap-2">
-              <CheckCircleIcon className="h-5 w-5 text-green-600" />
-              <span className="text-green-800 dark:text-green-200">{success.message}</span>
+          <div className="space-y-2">
+            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+              <div className="flex items-center gap-2">
+                <CheckCircleIcon className="h-5 w-5 text-green-600" />
+                <span className="text-green-800 dark:text-green-200">{success.message}</span>
+              </div>
             </div>
+            {/* Exemplos de erros quando há muitos */}
+            {success.details?.erros?.length > 0 && (
+              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 text-sm">
+                <p className="font-semibold text-amber-800 dark:text-amber-200 mb-2">
+                  Exemplos de erros (primeiros {Math.min(5, success.details.erros.length)}):
+                </p>
+                <ul className="list-disc list-inside space-y-1 text-amber-700 dark:text-amber-300">
+                  {success.details.erros.slice(0, 5).map((e, i) => (
+                    <li key={i}>Linha {e.linha}: {e.animal || '—'} — {e.msg}</li>
+                  ))}
+                </ul>
+                <p className="text-xs text-amber-600 dark:text-amber-400 mt-2">
+                  💡 Verifique se as colunas do Excel estão corretas (SÉR/SÉRIE, RG, DATA, COMPRADOR, VALOR). Data no formato DD/MM/AAAA.
+                </p>
+              </div>
+            )}
           </div>
         )}
 

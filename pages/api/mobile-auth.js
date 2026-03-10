@@ -12,14 +12,12 @@ export default async function handler(req, res) {
   try {
     const { nome, telefone, userAgent, timestamp } = req.body
 
-    // Validações
-    if (!nome || !telefone) {
-      return sendError(res, 'Nome e telefone são obrigatórios', 400)
+    if (!nome || !nome.trim()) {
+      return sendError(res, 'Nome é obrigatório', 400)
     }
 
-    if (telefone.length < 10) {
-      return sendError(res, 'Telefone inválido', 400)
-    }
+    const telefoneLimpo = (telefone || '').replace(/\D/g, '')
+    const telefoneFinal = telefoneLimpo.length >= 10 ? telefoneLimpo : `nome_${nome.trim().toLowerCase().replace(/\s+/g, '_')}`
 
     // Obter IP do cliente
     const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'unknown'
@@ -50,10 +48,10 @@ export default async function handler(req, res) {
       CREATE INDEX IF NOT EXISTS idx_mobile_access_ativo ON mobile_access_logs(ativo)
     `)
 
-    // Verificar se já existe registro para este telefone
+    // Verificar se já existe registro
     const existing = await query(
       'SELECT * FROM mobile_access_logs WHERE telefone = $1',
-      [telefone]
+      [telefoneFinal]
     )
 
     let result
@@ -71,7 +69,7 @@ export default async function handler(req, res) {
           updated_at = CURRENT_TIMESTAMP
         WHERE telefone = $4
         RETURNING *
-      `, [nome, ip, userAgent, telefone])
+      `, [nome, ip, userAgent, telefoneFinal])
     } else {
       // Criar novo registro
       result = await query(`
@@ -79,7 +77,7 @@ export default async function handler(req, res) {
           nome, telefone, ip_address, user_agent
         ) VALUES ($1, $2, $3, $4)
         RETURNING *
-      `, [nome, telefone, ip, userAgent])
+      `, [nome, telefoneFinal, ip, userAgent])
     }
 
     // Registrar no log de acesso geral (se a tabela existir)
@@ -94,7 +92,7 @@ export default async function handler(req, res) {
         ip,
         req.headers.host || 'unknown',
         userAgent || 'unknown',
-        telefone,
+        telefoneFinal,
         'mobile_auth'
       ])
     } catch (e) {

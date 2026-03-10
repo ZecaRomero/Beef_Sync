@@ -37,6 +37,7 @@ import Toast from '../../components/ui/SimpleToast'
 import ToastUI from '../../components/ui/Toast'
 import { integrarNFSaida } from '../../services/notasFiscaisIntegration'
 import DNAHistorySection from '../../components/DNAHistorySection'
+import { animalDataCache } from '../../utils/animalDataCache'
 
 // Filtrar nomes de touros que aparecem como localização (C2747 DA S.NICE, NACION 15397, etc.)
 function localizacaoValidaParaExibir(loc) {
@@ -190,6 +191,7 @@ export default function AnimalDetail() {
   const [ocorrenciasRecentes, setOcorrenciasRecentes] = useState([])
   const [showUltimoEventoModal, setShowUltimoEventoModal] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [coletasFIVMae, setColetasFIVMae] = useState(null) // Coletas FIV da mãe
 
   // Detectar se é mobile e mostrar splash apenas em mobile
   useEffect(() => {
@@ -205,7 +207,7 @@ export default function AnimalDetail() {
   useEffect(() => {
     if (!showSplash) return
     
-    const duration = 5000 // 5 segundos
+    const duration = 10000 // 10 segundos
     const interval = 50 // atualizar a cada 50ms
     const steps = duration / interval
     let currentStep = 0
@@ -493,6 +495,10 @@ export default function AnimalDetail() {
         setEditingField(null)
         setEditValue('')
         if (campo === 'peso') carregarDataUltimaPesagem()
+        
+        // Invalidar cache quando animal for atualizado
+        animalDataCache.invalidate(id)
+        
         showToast('Dados salvos com sucesso no banco de dados!', 'success')
       } else {
         const err = await response.json()
@@ -584,23 +590,114 @@ export default function AnimalDetail() {
     return () => window.removeEventListener('keydown', onKey)
   }, [animal, custos, examesAndrologicos])
 
+  // Carregamento escalonado dos dados do animal (evita requisições simultâneas)
   useEffect(() => {
-    if (id && animal) {
-      loadCustos()
-      // Buscar avô materno imediatamente após carregar o animal
-      buscarAvoMaterno()
-      buscarSerieRgMae()
-      carregarLocalizacao()
-      loadExamesAndrologicos()
+    if (!id || !animal) return
+
+    loadCustos()
+    loadExamesAndrologicos()
+    carregarLocalizacao()
+    carregarDataUltimaPesagem()
+
+    const t2 = setTimeout(() => {
       loadReproducaoStats()
       loadTransferenciasEmbrioes()
-      carregarDataUltimaPesagem()
-      // Se animal está morto, buscar informações da morte
-      if (animal.situacao === 'Morto') {
-        carregarInfoMorte()
-      }
+      buscarAvoMaterno()
+      buscarSerieRgMae()
+    }, 150)
+
+    const t3 = setTimeout(() => {
+      carregarColetasFIV()
+      carregarColetasFIVMae()
+      if (animal.situacao === 'Morto') carregarInfoMorte()
+    }, 300)
+
+    return () => {
+      clearTimeout(t2)
+      clearTimeout(t3)
     }
   }, [id, animal])
+
+  // Carregar coletas FIV da doadora
+  const carregarColetasFIV = async () => {
+    if (!animal || (!animal.serie && !animal.rg && !animal.nome)) return
+    
+    try {
+      // Buscar coletas FIV por identificador (série+RG ou nome)
+      let url = '/api/animals/doadora-coletas?'
+      
+      if (animal.serie && animal.rg) {
+        // Buscar por série e RG separadamente (mais preciso)
+        url += `serie=${encodeURIComponent(animal.serie)}&rg=${encodeURIComponent(animal.rg)}`
+      } else if (animal.nome) {
+        // Buscar por nome
+        url += `identificador=${encodeURIComponent(animal.nome)}`
+      } else {
+        return
+      }
+      
+      console.log('🔍 Buscando coletas FIV:', url)
+      const response = await fetch(url)
+      
+      if (response.ok) {
+        const result = await response.json()
+        console.log('📊 Resultado coletas FIV:', result)
+        if (result.success && result.data) {
+          // Adicionar coletas ao objeto animal
+          setAnimal(prev => ({
+            ...prev,
+            fivs: result.data.coletas || [],
+            resumoFIV: result.data.resumo
+          }))
+          console.log('✅ Coletas FIV adicionadas ao animal:', result.data.coletas?.length || 0)
+        }
+      } else {
+        console.warn('⚠️ Erro ao buscar coletas FIV:', response.status)
+      }
+    } catch (error) {
+      console.error('❌ Erro ao carregar coletas FIV:', error)
+    }
+  }
+
+  // Carregar coletas FIV da mãe (para mostrar histórico da doadora mesmo que não esteja ativa)
+  const carregarColetasFIVMae = async () => {
+    if (!animal || !animal.mae) return
+    
+    try {
+      // Buscar coletas FIV da mãe por nome ou série+RG
+      let url = '/api/animals/doadora-coletas?'
+      
+      // Se tem série e RG da mãe, usar isso (mais preciso)
+      if (animal.serie_mae && animal.rg_mae) {
+        url += `serie=${encodeURIComponent(animal.serie_mae)}&rg=${encodeURIComponent(animal.rg_mae)}`
+      } else {
+        // Senão, buscar pelo nome da mãe
+        url += `identificador=${encodeURIComponent(animal.mae)}`
+      }
+      
+      console.log('🔍 Buscando coletas FIV da mãe:', url, 'Mae:', animal.mae)
+      const response = await fetch(url)
+      
+      if (response.ok) {
+        const result = await response.json()
+        console.log('📊 Resultado coletas FIV da mãe:', result)
+        if (result.success && result.data && result.data.coletas && result.data.coletas.length > 0) {
+          setColetasFIVMae({
+            nome: result.data.doadora_nome || animal.mae,
+            coletas: result.data.coletas,
+            resumo: result.data.resumo
+          })
+          console.log('✅ Coletas FIV da mãe encontradas:', result.data.coletas.length)
+        } else {
+          console.log('ℹ️ Nenhuma coleta FIV encontrada para a mãe')
+        }
+      } else {
+        console.warn('⚠️ Erro ao buscar coletas FIV da mãe:', response.status)
+      }
+    } catch (error) {
+      console.error('❌ Erro ao carregar coletas FIV da mãe:', error)
+    }
+  }
 
   // Carregar informações de venda quando custos estiverem disponíveis
   useEffect(() => {
@@ -969,7 +1066,7 @@ export default function AnimalDetail() {
     const handleReloadCustos = () => {
       if (id) {
         setTimeout(() => {
-          loadCustos()
+          loadCustos(true) // Forçar refresh para buscar dados atualizados
         }, 1000) // Aguardar 1 segundo para garantir que o banco foi atualizado
       }
     }
@@ -1575,11 +1672,26 @@ export default function AnimalDetail() {
     }
   }
 
-  const loadCustos = async () => {
+  const loadCustos = async (forceRefresh = false) => {
     if (!id) return
     
     try {
       setLoadingCustos(true)
+      
+      // Usar custos já carregados no animal (evita requisição duplicada) - exceto em refresh forçado
+      if (!forceRefresh) {
+        const custosDoAnimal = animal?.custos
+        if (Array.isArray(custosDoAnimal) && custosDoAnimal.length > 0) {
+          const custosOrdenados = [...custosDoAnimal].sort((a, b) => {
+            const dataA = new Date(a.data || a.data_custo || 0)
+            const dataB = new Date(b.data || b.data_custo || 0)
+            return dataB - dataA
+          })
+          setCustos(custosOrdenados)
+          setLoadingCustos(false)
+          return
+        }
+      }
       
       // Primeiro tentar buscar via API específica de custos
       try {
@@ -1867,19 +1979,26 @@ export default function AnimalDetail() {
   if (animal && animal.fivs && animal.fivs.length > 0) {
     const totalColetas = animal.fivs.length
     const totalOocitos = animal.fivs.reduce((sum, fiv) => sum + (parseInt(fiv.quantidade_oocitos) || 0), 0)
+    const totalEmbrioes = animal.fivs.reduce((sum, fiv) => sum + (parseInt(fiv.embrioes_produzidos) || 0), 0)
+    const totalTransferidos = animal.fivs.reduce((sum, fiv) => sum + (parseInt(fiv.embrioes_transferidos) || 0), 0)
     const mediaOocitos = totalColetas > 0 ? (totalOocitos / totalColetas).toFixed(1) : 0
-    
-    // Ordenar coletas por data para pegar primeira e última
+    const mediaEmbrioes = totalColetas > 0 ? (totalEmbrioes / totalColetas).toFixed(1) : 0
+    const mediaTransferidos = totalColetas > 0 ? (totalTransferidos / totalColetas).toFixed(1) : 0
+
     const coletasOrdenadas = [...animal.fivs].sort((a, b) => 
       new Date(a.data_fiv) - new Date(b.data_fiv)
     )
     const primeiraColeta = coletasOrdenadas[0]
     const ultimaColeta = coletasOrdenadas[coletasOrdenadas.length - 1]
-    
+
     doadoraStats = {
       totalColetas,
       totalOocitos,
       mediaOocitos,
+      totalEmbrioesProduzidos: totalEmbrioes,
+      mediaEmbrioesProduzidos: mediaEmbrioes,
+      totalEmbrioesTransferidos: totalTransferidos,
+      mediaEmbrioesTransferidos: mediaTransferidos,
       primeiraColeta,
       ultimaColeta
     }
@@ -1897,14 +2016,22 @@ export default function AnimalDetail() {
     if (isDoadora) {
       const totalColetas = animal.fivs.length
       const totalOocitos = animal.fivs.reduce((sum, fiv) => sum + (parseInt(fiv.quantidade_oocitos) || 0), 0)
+      const totalEmbrioes = animal.fivs.reduce((sum, fiv) => sum + (parseInt(fiv.embrioes_produzidos) || 0), 0)
+      const totalTransferidos = animal.fivs.reduce((sum, fiv) => sum + (parseInt(fiv.embrioes_transferidos) || 0), 0)
       const mediaOocitos = totalColetas > 0 ? (totalOocitos / totalColetas).toFixed(1) : 0
+      const mediaEmbrioes = totalColetas > 0 ? (totalEmbrioes / totalColetas).toFixed(1) : 0
+      const mediaTransferidos = totalColetas > 0 ? (totalTransferidos / totalColetas).toFixed(1) : 0
       const coletasOrdenadas = [...animal.fivs].sort((a, b) => new Date(b.data_fiv) - new Date(a.data_fiv))
       const ultimaColeta = coletasOrdenadas[0]
-      
+
       statsDoadora = {
         totalColetas,
         totalOocitos,
         mediaOocitos,
+        totalEmbrioesProduzidos: totalEmbrioes,
+        mediaEmbrioesProduzidos: mediaEmbrioes,
+        totalEmbrioesTransferidos: totalTransferidos,
+        mediaEmbrioesTransferidos: mediaTransferidos,
         ultimaColeta
       }
     }
@@ -2035,6 +2162,63 @@ export default function AnimalDetail() {
                       Última coleta: {new Date(statsDoadora.ultimaColeta.data_fiv).toLocaleDateString('pt-BR')}
                       {statsDoadora.ultimaColeta.quantidade_oocitos && 
                         ` • ${statsDoadora.ultimaColeta.quantidade_oocitos} oócitos`
+                      }
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Card de Coletas FIV da Mãe */}
+          {coletasFIVMae && coletasFIVMae.resumo && (
+            <div className="px-3 pb-3">
+              <div className="bg-gradient-to-br from-indigo-900 to-blue-900 rounded-lg p-4 border-2 border-indigo-500">
+                <div className="flex items-center gap-2 mb-2">
+                  <BeakerIcon className="h-5 w-5 text-indigo-300" />
+                  <h3 className="font-bold text-white">Mãe Doadora</h3>
+                </div>
+                <p className="text-sm font-semibold text-indigo-200 mb-3">{coletasFIVMae.nome}</p>
+                <p className="text-xs text-indigo-200 mb-3">Histórico de coletas de oócitos (FIV)</p>
+                
+                {/* Stats Grid */}
+                <div className="grid grid-cols-3 gap-2 mb-2">
+                  <div className="bg-black/20 rounded-lg p-2 text-center">
+                    <p className="text-xl font-bold text-indigo-300">{coletasFIVMae.resumo.totalColetas}</p>
+                    <p className="text-xs text-indigo-200">Coletas</p>
+                  </div>
+                  <div className="bg-black/20 rounded-lg p-2 text-center">
+                    <p className="text-xl font-bold text-blue-300">{coletasFIVMae.resumo.totalOocitos}</p>
+                    <p className="text-xs text-blue-200">Oócitos</p>
+                  </div>
+                  <div className="bg-black/20 rounded-lg p-2 text-center">
+                    <p className="text-xl font-bold text-cyan-300">{coletasFIVMae.resumo.mediaOocitos}</p>
+                    <p className="text-xs text-cyan-200">Média</p>
+                  </div>
+                </div>
+
+                {/* Linha adicional com embriões */}
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="bg-black/20 rounded-lg p-2 text-center">
+                    <p className="text-xl font-bold text-purple-300">{coletasFIVMae.resumo.totalEmbrioesProduzidos}</p>
+                    <p className="text-xs text-purple-200">Embriões</p>
+                  </div>
+                  <div className="bg-black/20 rounded-lg p-2 text-center">
+                    <p className="text-xl font-bold text-pink-300">{coletasFIVMae.resumo.mediaEmbrioesProduzidos}</p>
+                    <p className="text-xs text-pink-200">Média Emb</p>
+                  </div>
+                  <div className="bg-black/20 rounded-lg p-2 text-center">
+                    <p className="text-xl font-bold text-green-300">{coletasFIVMae.resumo.totalEmbrioesTransferidos}</p>
+                    <p className="text-xs text-green-200">Transfer.</p>
+                  </div>
+                </div>
+
+                {coletasFIVMae.coletas && coletasFIVMae.coletas.length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-indigo-700">
+                    <p className="text-xs text-indigo-200">
+                      Última coleta: {new Date(coletasFIVMae.coletas[0].data_fiv).toLocaleDateString('pt-BR')}
+                      {coletasFIVMae.coletas[0].quantidade_oocitos && 
+                        ` • ${coletasFIVMae.coletas[0].quantidade_oocitos} oócitos`
                       }
                     </p>
                   </div>
@@ -4354,7 +4538,7 @@ export default function AnimalDetail() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={loadCustos}
+                onClick={() => loadCustos(true)}
                 disabled={loadingCustos}
                 className="flex items-center gap-1 text-xs h-7 px-2"
               >
@@ -4525,7 +4709,7 @@ export default function AnimalDetail() {
             </h2>
           </CardHeader>
           <CardBody>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
               {/* Total de Coletas */}
               <div className="bg-gradient-to-br from-pink-50 to-pink-100 dark:from-pink-900/30 dark:to-pink-800/20 p-3 rounded-lg border border-pink-200 dark:border-pink-700/50">
                 <div className="flex items-center gap-1.5 mb-1">
@@ -4536,24 +4720,34 @@ export default function AnimalDetail() {
                 <p className="text-[10px] text-pink-600 dark:text-pink-400">vezes coletada</p>
               </div>
 
-              {/* Total de Oócitos */}
+              {/* Total de Oócitos Viáveis */}
               <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/20 p-3 rounded-lg border border-purple-200 dark:border-purple-700/50">
                 <div className="flex items-center gap-1.5 mb-1">
                   <BeakerIcon className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                  <p className="text-xs font-medium text-purple-700 dark:text-purple-300">Total Oócitos</p>
+                  <p className="text-xs font-medium text-purple-700 dark:text-purple-300">Oócitos Viáveis</p>
                 </div>
                 <p className="text-2xl font-bold text-purple-800 dark:text-purple-200">{doadoraStats.totalOocitos}</p>
-                <p className="text-[10px] text-purple-600 dark:text-purple-400">oócitos coletados</p>
+                <p className="text-[10px] text-purple-600 dark:text-purple-400">média {doadoraStats.mediaOocitos}/coleta</p>
               </div>
 
-              {/* Média de Oócitos */}
+              {/* Embriões Produzidos */}
               <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/20 p-3 rounded-lg border border-blue-200 dark:border-blue-700/50">
                 <div className="flex items-center gap-1.5 mb-1">
                   <BeakerIcon className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  <p className="text-xs font-medium text-blue-700 dark:text-blue-300">Média/Coleta</p>
+                  <p className="text-xs font-medium text-blue-700 dark:text-blue-300">Embriões Produzidos</p>
                 </div>
-                <p className="text-2xl font-bold text-blue-800 dark:text-blue-200">{doadoraStats.mediaOocitos}</p>
-                <p className="text-[10px] text-blue-600 dark:text-blue-400">oócitos/coleta</p>
+                <p className="text-2xl font-bold text-blue-800 dark:text-blue-200">{doadoraStats.totalEmbrioesProduzidos ?? 0}</p>
+                <p className="text-[10px] text-blue-600 dark:text-blue-400">média {doadoraStats.mediaEmbrioesProduzidos ?? 0}/coleta</p>
+              </div>
+
+              {/* Embriões Transferidos */}
+              <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-800/20 p-3 rounded-lg border border-emerald-200 dark:border-emerald-700/50">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <BeakerIcon className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                  <p className="text-xs font-medium text-emerald-700 dark:text-emerald-300">Embriões Transferidos</p>
+                </div>
+                <p className="text-2xl font-bold text-emerald-800 dark:text-emerald-200">{doadoraStats.totalEmbrioesTransferidos ?? 0}</p>
+                <p className="text-[10px] text-emerald-600 dark:text-emerald-400">média {doadoraStats.mediaEmbrioesTransferidos ?? 0}/coleta</p>
               </div>
 
               {/* Primeira Coleta */}
@@ -4607,6 +4801,8 @@ export default function AnimalDetail() {
                     <th className="px-3 py-2 text-left text-pink-800 dark:text-pink-300 font-semibold">Laboratório</th>
                     <th className="px-3 py-2 text-left text-pink-800 dark:text-pink-300 font-semibold">Touro</th>
                     <th className="px-3 py-2 text-center text-pink-800 dark:text-pink-300 font-semibold">Oócitos</th>
+                    <th className="px-3 py-2 text-center text-pink-800 dark:text-pink-300 font-semibold">Embriões</th>
+                    <th className="px-3 py-2 text-center text-pink-800 dark:text-pink-300 font-semibold">Transferidos</th>
                     <th className="px-3 py-2 text-left text-pink-800 dark:text-pink-300 font-semibold">Data Transf.</th>
                     <th className="px-3 py-2 text-center text-pink-800 dark:text-pink-300 font-semibold">TE</th>
                   </tr>
@@ -4628,7 +4824,7 @@ export default function AnimalDetail() {
                       }
                       return false
                     })
-                    const quantidadeTE = tesRelacionadas.length
+                    const quantidadeTE = fiv.embrioes_transferidos != null ? fiv.embrioes_transferidos : tesRelacionadas.length
 
                     return (
                       <tr key={fiv.id || idx} className="hover:bg-pink-50/30 dark:hover:bg-pink-900/10 transition-colors">
@@ -4646,6 +4842,12 @@ export default function AnimalDetail() {
                         </td>
                         <td className="px-3 py-2 text-center font-medium text-gray-900 dark:text-white">
                           {fiv.quantidade_oocitos || 0}
+                        </td>
+                        <td className="px-3 py-2 text-center font-medium text-gray-800 dark:text-gray-200">
+                          {fiv.embrioes_produzidos ?? '-'}
+                        </td>
+                        <td className="px-3 py-2 text-center font-medium text-gray-800 dark:text-gray-200">
+                          {(fiv.embrioes_transferidos ?? quantidadeTE) || '-'}
                         </td>
                         <td className="px-3 py-2 text-gray-600 dark:text-gray-400">
                           {fiv.data_transferencia ? formatDate(fiv.data_transferencia) : '-'}

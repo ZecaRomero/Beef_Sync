@@ -21,7 +21,7 @@ class DatabaseService {
   }
 
   // Contar registros em uma tabela (whitelist para evitar SQL injection)
-  static ALLOWED_TABLES = ['animais', 'nascimentos', 'custos', 'estoque_semen', 'inseminacoes', 'gestacoes', 'mortes', 'pesagens', 'localizacoes_animais', 'notas_fiscais', 'servicos', 'notificacoes'];
+  static ALLOWED_TABLES = ['animais', 'nascimentos', 'custos', 'estoque_semen', 'inseminacoes', 'gestacoes', 'mortes', 'baixas', 'pesagens', 'localizacoes_animais', 'notas_fiscais', 'servicos', 'notificacoes'];
 
   async getTableCount(tableName) {
     const safeName = String(tableName || '').trim().toLowerCase();
@@ -90,15 +90,30 @@ class DatabaseService {
       `, [animal.serie, animal.rg]);
 
       // Buscar nascimentos (filhos) - onde este animal é a mãe
-      // Busca por: serie-rg no mae, serie+rg, ou nome da mãe (ex: MOSCA SANT ANNA)
-      const filhosParams = [`%${animal.serie}-${animal.rg}%`, `${animal.serie} ${animal.rg}`]
-      let filhosSql = `SELECT * FROM animais WHERE mae LIKE $1 OR mae = $2`
-      if (animal.nome) {
-        filhosParams.push(animal.nome.trim())
-        filhosSql += ` OR UPPER(TRIM(mae)) = UPPER(TRIM($${filhosParams.length}))`
+      // Prioridade: serie_mae + rg_mae (identificação exata, evita erros como "JALY SANT ANNA" vs "Mosca, CJCJ 15959")
+      // Fallback: mae (texto) para compatibilidade com dados antigos
+      let filhosResult
+      try {
+        const filhosParams = [animal.serie, animal.rg, `%${animal.serie}-${animal.rg}%`, `${animal.serie} ${animal.rg}`]
+        let filhosSql = `SELECT * FROM animais WHERE (serie_mae = $1 AND rg_mae = $2) OR (mae LIKE $3 OR mae = $4)`
+        if (animal.nome) {
+          filhosParams.push(animal.nome.trim())
+          filhosSql += ` OR UPPER(TRIM(mae)) = UPPER(TRIM($${filhosParams.length}))`
+        }
+        filhosSql += ` ORDER BY data_nascimento DESC NULLS LAST`
+        filhosResult = await query(filhosSql, filhosParams)
+      } catch (colErr) {
+        if (/column.*does not exist/i.test(colErr?.message || '')) {
+          const filhosParams = [`%${animal.serie}-${animal.rg}%`, `${animal.serie} ${animal.rg}`]
+          let filhosSql = `SELECT * FROM animais WHERE mae LIKE $1 OR mae = $2`
+          if (animal.nome) {
+            filhosParams.push(animal.nome.trim())
+            filhosSql += ` OR UPPER(TRIM(mae)) = UPPER(TRIM($${filhosParams.length}))`
+          }
+          filhosSql += ` ORDER BY data_nascimento DESC NULLS LAST`
+          filhosResult = await query(filhosSql, filhosParams)
+        } else throw colErr
       }
-      filhosSql += ` ORDER BY data_nascimento DESC NULLS LAST`
-      const filhosResult = await query(filhosSql, filhosParams)
       
       // Buscar protocolos sanitários
       const protocolos = await query(`
@@ -406,6 +421,114 @@ class DatabaseService {
       throw new Error(`Erro ao excluir morte: ${error.message}`);
     }
   }
+
+  // ============ OPERAÇÕES COM BAIXAS ============
+
+  async inserirBaixa(baixaData) {
+    const { animal_id, serie, rg, tipo, causa, data_baixa, comprador, valor, numero_nf, serie_mae, rg_mae, observacoes } = baixaData;
+    const result = await query(`
+      INSERT INTO baixas (animal_id, serie, rg, tipo, causa, data_baixa, comprador, valor, numero_nf, serie_mae, rg_mae, observacoes)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      RETURNING *
+    `, [animal_id || null, serie, rg, tipo, causa || null, data_baixa, comprador || null, valor || null, numero_nf || null, serie_mae || null, rg_mae || null, observacoes || null]);
+    return result.rows[0];
+  }
+
+  async buscarBaixasPorAnimal(animalId) {
+    const result = await query(`
+      SELECT * FROM baixas WHERE animal_id = $1 ORDER BY data_baixa DESC
+    `, [animalId]);
+    return result.rows;
+  }
+
+  async buscarBaixasPorSerieRg(serie, rg) {
+    const rgStr = String(rg || '').trim()
+    const result = await query(`
+      SELECT * FROM baixas 
+      WHERE UPPER(TRIM(serie)) = UPPER(TRIM($1))
+        AND (
+          TRIM(rg::text) = $2
+          OR TRIM(LEADING '0' FROM rg::text) = TRIM(LEADING '0' FROM $2)
+          OR TRIM(rg::text) = TRIM(LEADING '0' FROM $2)
+          OR TRIM(LEADING '0' FROM rg::text) = $2
+        )
+      ORDER BY data_baixa DESC
+    `, [serie, rgStr]);
+    return result.rows;
+  }
+
+  async buscarResumoBaixasMae(serieMae, rgMae) {
+    const rgStr = String(rgMae || '').trim()
+    const result = await query(`
+      SELECT 
+        COUNT(*) FILTER (WHERE tipo = 'VENDA') as qtd_vendidos,
+        COUNT(*) FILTER (WHERE tipo = 'MORTE/BAIXA') as qtd_mortes_baixas,
+        COALESCE(AVG(valor) FILTER (WHERE tipo = 'VENDA' AND valor IS NOT NULL AND valor > 0), 0) as media_vendas,
+        COALESCE(SUM(valor) FILTER (WHERE tipo = 'VENDA'), 0) as total_vendas
+      FROM baixas
+      WHERE UPPER(TRIM(COALESCE(serie_mae, ''))) = UPPER(TRIM($1))
+        AND (
+          TRIM(rg_mae::text) = $2
+          OR TRIM(LEADING '0' FROM rg_mae::text) = TRIM(LEADING '0' FROM $2)
+          OR TRIM(rg_mae::text) = TRIM(LEADING '0' FROM $2)
+        )
+    `, [serieMae, rgStr]);
+    return result.rows[0] || { qtd_vendidos: 0, qtd_mortes_baixas: 0, media_vendas: 0, total_vendas: 0 };
+  }
+
+  async buscarBaixasFilhosMae(serieMae, rgMae) {
+    const rgStr = String(rgMae || '').trim()
+    const result = await query(`
+      SELECT b.*, a.serie as animal_serie, a.rg as animal_rg
+      FROM baixas b
+      LEFT JOIN animais a ON b.animal_id = a.id
+      WHERE UPPER(TRIM(COALESCE(b.serie_mae, ''))) = UPPER(TRIM($1))
+        AND (
+          TRIM(b.rg_mae::text) = $2
+          OR TRIM(LEADING '0' FROM b.rg_mae::text) = TRIM(LEADING '0' FROM $2)
+          OR TRIM(b.rg_mae::text) = TRIM(LEADING '0' FROM $2)
+        )
+      ORDER BY b.data_baixa DESC
+    `, [serieMae, rgStr]);
+    return result.rows;
+  }
+
+  /** Buscar venda em movimentacoes_contabeis (NF de saída) por serie e rg do animal */
+  async buscarVendaPorMovimentacaoContabil(serie, rg) {
+    const result = await query(`
+      SELECT m.valor, m.data_movimento, m.dados_extras
+      FROM movimentacoes_contabeis m
+      JOIN animais a ON m.animal_id = a.id
+      WHERE UPPER(TRIM(a.serie)) = UPPER(TRIM($1)) AND TRIM(a.rg::text) = TRIM($2::text)
+        AND m.tipo = 'saida' AND m.subtipo = 'venda'
+      ORDER BY m.data_movimento DESC
+      LIMIT 1
+    `, [serie, String(rg)]);
+    return result.rows[0] || null;
+  }
+
+  /** Buscar venda em notas_fiscais de saída por tatuagem (serie+rg) - para doadoras não cadastradas */
+  async buscarVendaPorNotaFiscalSaida(serie, rg) {
+    const padroes = [`${serie} ${rg}`, `${serie}-${rg}`, `${serie}${rg}`]
+    try {
+      const result = await query(`
+        SELECT nf.numero_nf, nf.destino, nf.data_compra, nfi.dados_item
+        FROM notas_fiscais nf
+        JOIN notas_fiscais_itens nfi ON nfi.nota_fiscal_id = nf.id
+        WHERE nf.tipo = 'saida'
+          AND (nfi.dados_item::jsonb->>'tatuagem' = $1
+               OR nfi.dados_item::jsonb->>'tatuagem' = $2
+               OR nfi.dados_item::jsonb->>'tatuagem' = $3
+               OR nfi.dados_item::jsonb->>'tatuagem' ILIKE $4)
+        ORDER BY nf.data_compra DESC NULLS LAST
+        LIMIT 1
+      `, [padroes[0], padroes[1], padroes[2], `%${serie}%${rg}%`]);
+      return result.rows[0] || null;
+    } catch (e) {
+      if (e.code === '42P01') return null // tabela não existe
+      throw e
+    }
+  }
   
   // ============ OPERAÇÕES COM CAUSAS DE MORTE ============
   
@@ -616,7 +739,7 @@ class DatabaseService {
       nome, serie, rg, tatuagem, sexo, raca, data_nascimento, hora_nascimento,
       peso, cor, tipo_nascimento, dificuldade_parto, meses, situacao,
       pai, mae, avo_materno, receptora, is_fiv, custo_total, valor_venda, valor_real,
-      veterinario, abczg, deca, iqg, pt_iqg, observacoes, boletim, local_nascimento, pasto_atual,
+      veterinario, abczg, deca, iqg, pt_iqg, mgte, top, observacoes, boletim, local_nascimento, pasto_atual,
       serie_pai, rg_pai, serie_mae, rg_mae
     } = animalData;
 
@@ -626,16 +749,16 @@ class DatabaseService {
           nome, serie, rg, tatuagem, sexo, raca, data_nascimento, hora_nascimento,
           peso, cor, tipo_nascimento, dificuldade_parto, meses, situacao,
           pai, mae, avo_materno, receptora, is_fiv, custo_total, valor_venda, valor_real,
-          veterinario, abczg, deca, iqg, pt_iqg, observacoes, boletim, local_nascimento, pasto_atual,
+          veterinario, abczg, deca, iqg, pt_iqg, mgte, top, observacoes, boletim, local_nascimento, pasto_atual,
           serie_pai, rg_pai, serie_mae, rg_mae
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37
         ) RETURNING *
       `, [
         nome, serie, rg, tatuagem, sexo, raca, data_nascimento, hora_nascimento,
         peso, cor, tipo_nascimento, dificuldade_parto, meses, situacao,
         pai, mae, avo_materno, receptora, is_fiv, custo_total, valor_venda, valor_real,
-        veterinario, abczg, deca, iqg ?? null, pt_iqg ?? null, observacoes, boletim, local_nascimento, pasto_atual,
+        veterinario, abczg, deca, iqg ?? null, pt_iqg ?? null, mgte ?? null, top ?? null, observacoes, boletim, local_nascimento, pasto_atual,
         serie_pai, rg_pai, serie_mae, rg_mae
       ]);
 
@@ -1233,6 +1356,8 @@ class DatabaseService {
       await query(`ALTER TABLE animais ADD COLUMN IF NOT EXISTS pt_iqg VARCHAR(50)`)
       await query(`ALTER TABLE animais ADD COLUMN IF NOT EXISTS abczg VARCHAR(50)`)
       await query(`ALTER TABLE animais ADD COLUMN IF NOT EXISTS deca VARCHAR(50)`)
+      await query(`ALTER TABLE animais ADD COLUMN IF NOT EXISTS mgte VARCHAR(50)`)
+      await query(`ALTER TABLE animais ADD COLUMN IF NOT EXISTS top VARCHAR(50)`)
     } catch (e) {
       if (!e.message?.includes('already exists')) logger?.warn?.('Migração colunas:', e.message)
     }
@@ -1359,6 +1484,71 @@ class DatabaseService {
     `, [limit]);
 
     return result.rows;
+  }
+
+  // Buscar custo por ID
+  async buscarCustoPorId(custoId) {
+    const result = await query(`
+      SELECT c.*, c.detalhes::json as detalhes_json
+      FROM custos c
+      WHERE c.id = $1
+    `, [custoId]);
+    return result.rows[0] || null;
+  }
+
+  // Atualizar custo
+  async atualizarCusto(custoId, custoData) {
+    const { tipo, subtipo, valor, data, observacoes, detalhes } = custoData;
+    const result = await query(`
+      UPDATE custos
+      SET tipo = $2,
+          subtipo = $3,
+          valor = $4,
+          data = $5,
+          observacoes = $6,
+          detalhes = $7
+      WHERE id = $1
+      RETURNING *
+    `, [
+      custoId, 
+      tipo, 
+      subtipo, 
+      valor, 
+      data, 
+      observacoes, 
+      detalhes ? JSON.stringify(detalhes) : null
+    ]);
+
+    const custo = result.rows[0];
+    if (custo) {
+      await this.atualizarCustoTotalAnimal(custo.animal_id);
+    }
+    return custo;
+  }
+
+  // Excluir custo
+  async excluirCusto(custoId) {
+    const custo = await this.buscarCustoPorId(custoId);
+    if (!custo) return null;
+
+    await query(`DELETE FROM custos WHERE id = $1`, [custoId]);
+    await this.atualizarCustoTotalAnimal(custo.animal_id);
+    return custo;
+  }
+
+  async atualizarCustosPorTipoSubtipo(tipoOriginal, subtipoOriginal, custoData) {
+    const { tipo, subtipo, valor, data, observacoes } = custoData
+    const result = await query(
+      `UPDATE custos SET tipo = $3, subtipo = $4, valor = $5, data = $6, observacoes = $7
+       WHERE tipo = $1 AND (COALESCE(subtipo, '') = COALESCE($2, ''))
+       RETURNING id, animal_id`,
+      [tipoOriginal, subtipoOriginal || '', tipo, subtipo, valor, data, observacoes]
+    )
+    const animalIds = [...new Set(result.rows.map((r) => r.animal_id))]
+    for (const aid of animalIds) {
+      await this.atualizarCustoTotalAnimal(aid)
+    }
+    return { atualizados: result.rows.length, animais: animalIds.length }
   }
 
   // Atualizar custo total do animal (exclui custos com data futura - exames agendados não contam ainda)

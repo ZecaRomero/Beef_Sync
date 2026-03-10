@@ -9,9 +9,12 @@ import Layout from '../components/Layout'
 import UniversalExcelImporter from '../components/UniversalExcelImporter'
 import ImportGeneticaModal from '../components/animals/ImportGeneticaModal'
 import ImportarObservacoesAnimais from '../components/ImportarObservacoesAnimais'
+import ImportarSerieRgNome from '../components/ImportarSerieRgNome'
+import ImportarSerieRgMae from '../components/ImportarSerieRgMae'
 import ImportarExcelPiquetes from '../components/ImportarExcelPiquetes'
 import ImportarTextoPiquetes from '../components/ImportarTextoPiquetes'
 import ImportarTextoPesagens from '../components/ImportarTextoPesagens'
+import ImportarBaixas from '../components/ImportarBaixas'
 import {
   DocumentArrowUpIcon,
   BeakerIcon,
@@ -23,7 +26,8 @@ import {
   CubeIcon,
   ScaleIcon,
   CheckCircleIcon,
-  ArrowTopRightOnSquareIcon
+  ArrowTopRightOnSquareIcon,
+  ExclamationTriangleIcon
 } from '@heroicons/react/24/outline'
 
 const IMPORT_TIPOS = [
@@ -33,7 +37,7 @@ const IMPORT_TIPOS = [
     descricao: 'Animais, IA, FIV, Nascimentos, Diagnóstico de Gestação, Notas Fiscais',
     icon: DocumentArrowUpIcon,
     color: 'blue',
-    tipos: ['Animais', 'IA', 'FIV', 'Nascimentos', 'DG', 'Notas Fiscais']
+    tipos: ['Animais', 'IA', 'FIV', 'Nascimentos', 'DG', 'Notas Fiscais', 'Baixas']
   },
   {
     id: 'genetica',
@@ -307,6 +311,36 @@ export default function ImportacoesPage() {
           </section>
 
           <section className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800">
+            <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-amber-500/10 to-orange-600/10 border-b border-gray-200 dark:border-gray-700">
+              <DocumentArrowUpIcon className="h-6 w-6 text-amber-600" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Corrigir Série, RG e Nome</h2>
+            </div>
+            <div className="p-4">
+              <ImportarSerieRgNome onImportComplete={(count) => handleImportSuccess('Correção Série/RG/Nome', count)} />
+            </div>
+          </section>
+
+          <section className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800">
+            <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-emerald-500/10 to-teal-600/10 border-b border-gray-200 dark:border-gray-700">
+              <UserGroupIcon className="h-6 w-6 text-emerald-600" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Série e RG da Mãe</h2>
+            </div>
+            <div className="p-4">
+              <ImportarSerieRgMae onImportComplete={(count) => handleImportSuccess('Série/RG da Mãe', count)} />
+            </div>
+          </section>
+
+          <section className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800">
+            <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-rose-500/10 to-red-600/10 border-b border-gray-200 dark:border-gray-700">
+              <ExclamationTriangleIcon className="h-6 w-6 text-rose-600" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Corrigir Pai/Mãe = Nome</h2>
+            </div>
+            <div className="p-4">
+              <CorrigirPaiMaeNome />
+            </div>
+          </section>
+
+          <section className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800">
             <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-cyan-500/10 to-cyan-600/10 border-b border-gray-200 dark:border-gray-700">
               <ClipboardDocumentListIcon className="h-6 w-6 text-cyan-600" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Observações</h2>
@@ -327,6 +361,16 @@ export default function ImportacoesPage() {
                 onImportComplete={() => handleImportSuccess('Pesagens', 0)}
                 onRefreshAnimais={() => fetch('/api/animals').then((r) => r.json()).then((d) => setAnimais(d.animals || [])).catch(() => {})}
               />
+            </div>
+          </section>
+
+          <section className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800">
+            <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-amber-500/10 to-amber-600/10 border-b border-gray-200 dark:border-gray-700">
+              <DocumentArrowUpIcon className="h-6 w-6 text-amber-600" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Baixas (MORTE/BAIXA e VENDA)</h2>
+            </div>
+            <div className="p-4">
+              <ImportarBaixas onImportComplete={(count) => handleImportSuccess('Baixas', count)} />
             </div>
           </section>
 
@@ -355,6 +399,86 @@ export default function ImportacoesPage() {
         onSuccess={() => handleImportSuccess('Genética', 0)}
       />
     </Layout>
+  )
+}
+
+// Componente para corrigir animais com pai/mae = nome (bug de importação)
+function CorrigirPaiMaeNome() {
+  const [total, setTotal] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [corrigindo, setCorrigindo] = useState(false)
+  const [msg, setMsg] = useState(null)
+
+  const verificar = async () => {
+    setLoading(true)
+    setMsg(null)
+    try {
+      const res = await fetch('/api/animals/corrigir-pai-mae-nome')
+      const data = await res.json()
+      if (data.success) setTotal(data.total)
+    } catch (e) {
+      setMsg('Erro ao verificar')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const corrigir = async () => {
+    if (!confirm(`Corrigir ${total} animal(is) com pai/mãe incorretos? Os campos serão zerados.`)) return
+    setCorrigindo(true)
+    setMsg(null)
+    try {
+      const res = await fetch('/api/animals/corrigir-pai-mae-nome', { method: 'POST' })
+      const data = await res.json()
+      if (data.success) {
+        setMsg(`✅ ${data.corrigidos} corrigido(s)`)
+        setTotal(0)
+      } else {
+        setMsg(data.message || 'Erro')
+      }
+    } catch (e) {
+      setMsg('Erro ao corrigir')
+    } finally {
+      setCorrigindo(false)
+    }
+  }
+
+  useEffect(() => { verificar() }, [])
+
+  return (
+    <div className="space-y-3">
+      <p className="text-sm text-gray-600 dark:text-gray-400">
+        Animais onde pai ou mãe estão preenchidos com o nome do próprio animal (bug de importação).
+      </p>
+      {loading ? (
+        <p className="text-sm">Verificando...</p>
+      ) : (
+        <>
+          <p className="text-sm font-semibold">
+            {total != null ? `${total} animal(is) afetado(s)` : '—'}
+          </p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={verificar}
+              disabled={loading}
+              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600"
+            >
+              Atualizar
+            </button>
+            <button
+              type="button"
+              onClick={corrigir}
+              disabled={corrigindo || total === 0}
+              className="px-4 py-2 bg-rose-600 text-white rounded-lg text-sm font-medium hover:bg-rose-700 disabled:opacity-50"
+            >
+              {corrigindo ? 'Corrigindo...' : 'Corrigir todos'}
+            </button>
+          </div>
+        </>
+      )}
+      {msg && <p className="text-sm text-green-600 dark:text-green-400">{msg}</p>}
+    </div>
   )
 }
 

@@ -11,6 +11,7 @@ export default async function handler(req, res) {
 
   try {
     const { mae, animalSerie, animalRg } = req.query
+    const serieFilho = (animalSerie || '').trim()
 
     if (!mae || typeof mae !== 'string') {
       return res.status(400).json({ success: false, message: 'Parâmetro mae é obrigatório' })
@@ -23,6 +24,35 @@ export default async function handler(req, res) {
 
     let serie = null
     let rg = null
+
+    // 0. Formato "CJ SANT ANNA 13604" - extrair RG do final e buscar por serie+rg
+    const m3 = maeNome.match(/\s+(\d+)$/)
+    if (m3) {
+      const rgExtraido = m3[1]
+      const serieTentativa = serieFilho || (maeNome.match(/^CJ/i) ? 'CJCJ' : null)
+      if (serieTentativa && rgExtraido) {
+        const r = await query(
+          `SELECT serie, rg FROM animais 
+           WHERE UPPER(TRIM(serie)) = UPPER(TRIM($1)) AND TRIM(rg::text) = $2
+           LIMIT 1`,
+          [serieTentativa, rgExtraido]
+        )
+        if (r.rows.length > 0) {
+          serie = r.rows[0].serie
+          rg = r.rows[0].rg
+        }
+      }
+      if (!serie && !rg) {
+        const r = await query(
+          `SELECT serie, rg FROM animais WHERE TRIM(rg::text) = $1 OR rg = $2 LIMIT 1`,
+          [rgExtraido, parseInt(rgExtraido, 10)]
+        )
+        if (r.rows.length > 0) {
+          serie = r.rows[0].serie
+          rg = r.rows[0].rg
+        }
+      }
+    }
 
     // 1. Buscar em animais por nome
     let r = await query(

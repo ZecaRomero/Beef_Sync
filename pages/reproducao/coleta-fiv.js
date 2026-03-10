@@ -2,11 +2,19 @@ import React, { useState, useEffect } from 'react'
 import Head from 'next/head'
 import { BeakerIcon, CalendarIcon, UserIcon, PlusIcon, PencilIcon, TrashIcon, MagnifyingGlassIcon, XMarkIcon, DocumentArrowUpIcon } from '../../components/ui/Icons'
 import { useDebouncedCallback } from '../../hooks/useDebounce'
+import { formatDoadoraIdentificacao } from '../../utils/formatters'
 
 export default function ColetaFiv() {
   const [coletas, setColetas] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
+  
+  // Filtros e busca
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterLab, setFilterLab] = useState('')
+  const [filterVet, setFilterVet] = useState('')
+  const [filterDateStart, setFilterDateStart] = useState('')
+  const [filterDateEnd, setFilterDateEnd] = useState('')
   
   // Form State
   const [formData, setFormData] = useState({
@@ -291,6 +299,34 @@ export default function ColetaFiv() {
     setImportSuccess('')
   }
 
+  // Função de filtro
+  const filteredColetas = coletas.filter(coleta => {
+    // Filtro de busca (doadora, touro, laboratório)
+    const searchLower = searchTerm.toLowerCase()
+    const matchesSearch = !searchTerm || 
+      (coleta.doadora_nome && coleta.doadora_nome.toLowerCase().includes(searchLower)) ||
+      (coleta.touro && coleta.touro.toLowerCase().includes(searchLower)) ||
+      (coleta.laboratorio && coleta.laboratorio.toLowerCase().includes(searchLower)) ||
+      (coleta.veterinario && coleta.veterinario.toLowerCase().includes(searchLower))
+    
+    // Filtro de laboratório
+    const matchesLab = !filterLab || coleta.laboratorio === filterLab
+    
+    // Filtro de veterinário
+    const matchesVet = !filterVet || coleta.veterinario === filterVet
+    
+    // Filtro de data
+    const coletaDate = new Date(coleta.data_fiv)
+    const matchesDateStart = !filterDateStart || coletaDate >= new Date(filterDateStart)
+    const matchesDateEnd = !filterDateEnd || coletaDate <= new Date(filterDateEnd)
+    
+    return matchesSearch && matchesLab && matchesVet && matchesDateStart && matchesDateEnd
+  })
+
+  // Obter listas únicas para os filtros
+  const uniqueLabs = [...new Set(coletas.map(c => c.laboratorio).filter(Boolean))].sort()
+  const uniqueVets = [...new Set(coletas.map(c => c.veterinario).filter(Boolean))].sort()
+
   const handleImportExcel = async () => {
     if (!importFile) {
       setImportError('Selecione um arquivo Excel')
@@ -537,7 +573,7 @@ export default function ColetaFiv() {
                       <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
                         {formData.itens.map((item, idx) => (
                           <tr key={idx}>
-                            <td className="px-4 py-2 text-sm text-gray-900 dark:text-white">{item.doadora_nome}</td>
+                            <td className="px-4 py-2 text-sm text-gray-900 dark:text-white">{formatDoadoraIdentificacao(item.doadora_nome)}</td>
                             <td className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">{item.touro || '-'}</td>
                             <td className="px-4 py-2 text-sm text-gray-900 dark:text-white">{item.quantidade_oocitos}</td>
                             <td className="px-4 py-2 text-right">
@@ -696,6 +732,105 @@ export default function ColetaFiv() {
 
         {/* Lista de Coletas */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+          
+          {/* Barra de Busca e Filtros */}
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+              
+              {/* Campo de Busca */}
+              <div className="lg:col-span-2">
+                <div className="relative">
+                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Buscar por doadora, touro, laboratório..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-10 py-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm"
+                  />
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm('')}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      <XMarkIcon className="h-5 w-5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Filtro Laboratório */}
+              <div>
+                <select
+                  value={filterLab}
+                  onChange={(e) => setFilterLab(e.target.value)}
+                  className="w-full py-2 px-3 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm"
+                >
+                  <option value="">Todos os laboratórios</option>
+                  {uniqueLabs.map((lab, idx) => (
+                    <option key={idx} value={lab}>{lab}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Filtro Veterinário */}
+              <div>
+                <select
+                  value={filterVet}
+                  onChange={(e) => setFilterVet(e.target.value)}
+                  className="w-full py-2 px-3 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm"
+                >
+                  <option value="">Todos os veterinários</option>
+                  {uniqueVets.map((vet, idx) => (
+                    <option key={idx} value={vet}>{vet}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Filtro Data */}
+              <div className="flex gap-2">
+                <input
+                  type="date"
+                  value={filterDateStart}
+                  onChange={(e) => setFilterDateStart(e.target.value)}
+                  placeholder="Data início"
+                  className="w-full py-2 px-3 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm"
+                  title="Data início"
+                />
+                <input
+                  type="date"
+                  value={filterDateEnd}
+                  onChange={(e) => setFilterDateEnd(e.target.value)}
+                  placeholder="Data fim"
+                  className="w-full py-2 px-3 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm"
+                  title="Data fim"
+                />
+              </div>
+            </div>
+
+            {/* Indicador de resultados e limpar filtros */}
+            <div className="mt-3 flex items-center justify-between text-sm">
+              <span className="text-gray-600 dark:text-gray-400">
+                {filteredColetas.length} {filteredColetas.length === 1 ? 'resultado' : 'resultados'}
+                {filteredColetas.length !== coletas.length && ` de ${coletas.length} total`}
+              </span>
+              {(searchTerm || filterLab || filterVet || filterDateStart || filterDateEnd) && (
+                <button
+                  onClick={() => {
+                    setSearchTerm('')
+                    setFilterLab('')
+                    setFilterVet('')
+                    setFilterDateStart('')
+                    setFilterDateEnd('')
+                  }}
+                  className="text-pink-600 hover:text-pink-700 dark:text-pink-400 dark:hover:text-pink-300 font-medium"
+                >
+                  Limpar filtros
+                </button>
+              )}
+            </div>
+          </div>
+
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-900">
@@ -716,20 +851,24 @@ export default function ColetaFiv() {
                       Carregando...
                     </td>
                   </tr>
-                ) : coletas.length === 0 ? (
+                ) : filteredColetas.length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="px-6 py-12 text-center text-gray-500">
-                      Nenhuma coleta registrada
+                    <td colSpan="7" className="px-6 py-12 text-center">
+                      <div className="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+                        <MagnifyingGlassIcon className="h-12 w-12 mb-3 text-gray-300 dark:text-gray-600" />
+                        <p className="text-lg font-medium">Nenhum resultado encontrado</p>
+                        <p className="text-sm mt-1">Tente ajustar os filtros de busca</p>
+                      </div>
                     </td>
                   </tr>
                 ) : (
-                  coletas.map((coleta) => (
+                  filteredColetas.map((coleta) => (
                     <tr key={coleta.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                         {new Date(coleta.data_fiv).toLocaleDateString('pt-BR')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white font-medium">
-                        {coleta.doadora_nome}
+                        {formatDoadoraIdentificacao(coleta.doadora_nome)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         {coleta.laboratorio}
@@ -907,6 +1046,17 @@ export default function ColetaFiv() {
                     </div>
                   )}
 
+                  {/* Mensagem de validação */}
+                  {!importFile || !importLaboratorio || !importVeterinario ? (
+                    <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
+                      <p className="text-sm text-yellow-800 dark:text-yellow-400">
+                        {!importFile && 'Selecione um arquivo Excel para continuar.'}
+                        {importFile && !importLaboratorio && 'Preencha o campo Laboratório para continuar.'}
+                        {importFile && importLaboratorio && !importVeterinario && 'Preencha o campo Veterinário para continuar.'}
+                      </p>
+                    </div>
+                  ) : null}
+
                   <div className="flex justify-end gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <button
                       onClick={() => {
@@ -926,6 +1076,7 @@ export default function ColetaFiv() {
                       onClick={handleImportExcel}
                       disabled={importLoading || !importFile || !importLaboratorio || !importVeterinario}
                       className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                      title={!importFile || !importLaboratorio || !importVeterinario ? 'Preencha todos os campos obrigatórios' : ''}
                     >
                       {importLoading ? (
                         <>

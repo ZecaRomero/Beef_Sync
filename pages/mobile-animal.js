@@ -24,12 +24,22 @@ export default function MobileAnimal() {
   const [allAnimals, setAllAnimals] = useState([])
   const [currentIndex, setCurrentIndex] = useState(-1)
   const [ranking, setRanking] = useState([])
+  const [rankingDECA, setRankingDECA] = useState([])
   const [rankingIQG, setRankingIQG] = useState([])
+  const [rankingPtIQG, setRankingPtIQG] = useState([])
+  const [rankingMGte, setRankingMGte] = useState([])
+  const [mgtePosicao, setMgtePosicao] = useState(null) // { posicao, total, mgte }
   const [rankingPeso, setRankingPeso] = useState([])
   const [rankingCE, setRankingCE] = useState([])
   const [sincronizandoNascimento, setSincronizandoNascimento] = useState(false)
   const [toastSync, setToastSync] = useState(null)
   const [maeLink, setMaeLink] = useState(null) // { serie, rg } quando mãe pode ser linkada
+  const [maeColetas, setMaeColetas] = useState(null) // resumo de coletas quando mãe não cadastrada mas tem histórico FIV
+  const [fichaDoadora, setFichaDoadora] = useState(null) // histórico FIV quando o animal é doadora (sua própria ficha)
+  const [custoTotal, setCustoTotal] = useState(0)
+  const [custosLista, setCustosLista] = useState([])
+  const [refreshingCustos, setRefreshingCustos] = useState(false)
+  const [baixasResumo, setBaixasResumo] = useState(null) // { baixaPropria, resumoMae }
 
   const sincronizarNascimentos = async () => {
     setSincronizandoNascimento(true)
@@ -92,21 +102,32 @@ export default function MobileAnimal() {
 
     fetch('/api/animals/ranking-iabcz?limit=10')
       .then(r => r.json())
-      .then(data => {
-        if (data.success && data.data) {
-          setRanking(data.data)
-        }
-      })
+      .then(data => { if (data.success && data.data) setRanking(data.data) })
       .catch(err => console.error('Erro ao carregar ranking:', err))
+
+    fetch('/api/animals/ranking-deca?limit=10')
+      .then(r => r.json())
+      .then(data => { if (data.success && data.data) setRankingDECA(data.data) })
+      .catch(err => console.error('Erro ao carregar ranking DECA:', err))
 
     fetch('/api/animals/ranking-genetica-2?limit=10')
       .then(r => r.json())
+      .then(data => { if (data.success && data.data) setRankingIQG(data.data) })
+      .catch(err => console.error('Erro ao carregar ranking IQG:', err))
+
+    fetch('/api/animals/ranking-pt-iqg?limit=10')
+      .then(r => r.json())
+      .then(data => { if (data.success && data.data) setRankingPtIQG(data.data) })
+      .catch(err => console.error('Erro ao carregar ranking Pt IQG:', err))
+
+    fetch('/api/animals/ranking-mgte?limit=10')
+      .then(r => r.json())
       .then(data => {
         if (data.success && data.data) {
-          setRankingIQG(data.data)
+          setRankingMGte(data.data)
         }
       })
-      .catch(err => console.error('Erro ao carregar ranking IQG:', err))
+      .catch(err => console.error('Erro ao carregar ranking MGTe:', err))
   }, [])
 
   const buscarAnimal = async (e, overrideSerie, overrideRg) => {
@@ -187,11 +208,13 @@ export default function MobileAnimal() {
   useEffect(() => {
     if (!animal?.mae || (animal.serie_mae && animal.rg_mae)) {
       setMaeLink(null)
+      setMaeColetas(null)
       return
     }
     const { serie, rg } = extrairSerieRG(animal.mae)
     if (serie && rg) {
       setMaeLink({ serie, rg })
+      setMaeColetas(null)
       return
     }
     const params = new URLSearchParams({ mae: animal.mae.trim() })
@@ -200,11 +223,117 @@ export default function MobileAnimal() {
     fetch(`/api/animals/buscar-mae?${params}`)
       .then(r => r.json())
       .then(d => {
-        if (d.success && d.serie && d.rg) setMaeLink({ serie: d.serie, rg: d.rg })
-        else setMaeLink(null)
+        if (d.success && d.serie && d.rg) {
+          setMaeLink({ serie: d.serie, rg: d.rg })
+          setMaeColetas(null)
+        } else {
+          setMaeLink(null)
+          // Mãe não cadastrada: buscar se tem histórico de coletas FIV
+          fetch(`/api/animals/doadora-coletas?identificador=${encodeURIComponent(animal.mae.trim())}`)
+            .then(r2 => r2.json())
+            .then(d2 => {
+              if (d2.success && d2.data?.resumo) setMaeColetas(d2.data)
+              else setMaeColetas(null)
+            })
+            .catch(() => setMaeColetas(null))
+        }
       })
-      .catch(() => setMaeLink(null))
+      .catch(() => {
+        setMaeLink(null)
+        fetch(`/api/animals/doadora-coletas?identificador=${encodeURIComponent(animal.mae.trim())}`)
+          .then(r2 => r2.json())
+          .then(d2 => {
+            if (d2.success && d2.data?.resumo) setMaeColetas(d2.data)
+            else setMaeColetas(null)
+          })
+          .catch(() => setMaeColetas(null))
+      })
   }, [animal?.mae, animal?.serie, animal?.rg, animal?.serie_mae, animal?.rg_mae])
+
+  // Buscar custos do animal
+  const refreshCustos = async () => {
+    if (!animal?.id) return
+    setRefreshingCustos(true)
+    try {
+      const r = await fetch(`/api/animals/${animal.id}/custos`)
+      const result = r.ok ? await r.json() : { data: [] }
+      const custos = result.data || result.custos || []
+      const total = custos.reduce((s, c) => s + (parseFloat(c.valor) || 0), 0)
+      setCustoTotal(total)
+      setCustosLista(custos)
+    } catch {
+      setCustoTotal(0)
+      setCustosLista([])
+    } finally {
+      setRefreshingCustos(false)
+    }
+  }
+
+  useEffect(() => {
+    if (!animal?.id) {
+      setCustoTotal(0)
+      setCustosLista([])
+      return
+    }
+    refreshCustos()
+  }, [animal?.id])
+
+  // Buscar resumo de baixas (próprias e como mãe)
+  useEffect(() => {
+    if (!animal?.serie || !animal?.rg) {
+      setBaixasResumo(null)
+      return
+    }
+    const params = new URLSearchParams({ serie: animal.serie, rg: animal.rg })
+    fetch(`/api/animals/baixas-resumo?${params}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.success && d.data) setBaixasResumo(d.data)
+        else setBaixasResumo(null)
+      })
+      .catch(() => setBaixasResumo(null))
+  }, [animal?.serie, animal?.rg])
+
+  // Buscar histórico FIV quando o animal é doadora (sua própria ficha)
+  // Buscar posição MGTe do animal
+  useEffect(() => {
+    if (!animal?.serie || !animal?.rg) {
+      setMgtePosicao(null)
+      return
+    }
+    fetch(`/api/animals/ranking-mgte-posicao?serie=${encodeURIComponent(animal.serie)}&rg=${encodeURIComponent(animal.rg)}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.success && d.posicao != null) {
+          setMgtePosicao({ posicao: d.posicao, total: d.total, mgte: d.mgte })
+        } else {
+          setMgtePosicao(null)
+        }
+      })
+      .catch(() => setMgtePosicao(null))
+  }, [animal?.serie, animal?.rg])
+
+  useEffect(() => {
+    if (!animal?.id || !animal?.sexo) {
+      setFichaDoadora(null)
+      return
+    }
+    const isFemea = String(animal.sexo || '').toLowerCase().includes('f') || animal.sexo === 'F'
+    if (!isFemea) {
+      setFichaDoadora(null)
+      return
+    }
+    const params = new URLSearchParams({ animalId: animal.id })
+    if (animal.serie && animal.rg) params.set('identificador', `${animal.serie} ${animal.rg}`)
+    else if (animal.nome) params.set('identificador', animal.nome.trim())
+    fetch(`/api/animals/doadora-coletas?${params}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.success && d.data?.resumo) setFichaDoadora(d.data)
+        else setFichaDoadora(null)
+      })
+      .catch(() => setFichaDoadora(null))
+  }, [animal?.id, animal?.sexo, animal?.serie, animal?.rg, animal?.nome])
 
   return (
     <>
@@ -246,6 +375,15 @@ export default function MobileAnimal() {
             >
               <DocumentArrowUpIcon className="h-5 w-5" />
             </button>
+            <button
+              onClick={() => router.push('/custos')}
+              className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white"
+              title="Custos por Animal"
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -258,7 +396,7 @@ export default function MobileAnimal() {
           </div>
         )}
 
-        {/* Ranking Top 10 iABCZ */}
+        {/* Ordem: iABCZ, DECA, IQG, Pt IQG, MGTe (conforme planilha) */}
         {ranking.length > 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 mb-4">
             <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-3">
@@ -291,7 +429,38 @@ export default function MobileAnimal() {
           </div>
         )}
 
-        {/* Ranking Top 10 IQG */}
+        {rankingDECA.length > 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 mb-4">
+            <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-3">
+              <TrophyIcon className="h-5 w-5 text-emerald-500" />
+              Ranking DECA (Top 10)
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Menor DECA = melhor (1º lugar)</p>
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {rankingDECA.map((r) => (
+                <div
+                  key={r.id}
+                  onClick={() => buscarAnimal(null, r.serie, r.rg)}
+                  className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                      r.posicao === 1 ? 'bg-amber-500 text-white' :
+                      r.posicao === 2 ? 'bg-gray-400 text-white' :
+                      r.posicao === 3 ? 'bg-amber-700 text-white' :
+                      'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
+                    }`}>
+                      {r.posicao === 1 ? '🥇' : r.posicao === 2 ? '🥈' : r.posicao === 3 ? '🥉' : r.posicao}
+                    </span>
+                    <span className="font-medium text-gray-900 dark:text-white">{r.identificacao}</span>
+                  </div>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400">{r.deca}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {rankingIQG.length > 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 mb-4">
             <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-3">
@@ -318,6 +487,70 @@ export default function MobileAnimal() {
                     <span className="font-medium text-gray-900 dark:text-white">{r.identificacao}</span>
                   </div>
                   <span className="font-bold text-emerald-600 dark:text-emerald-400">{(r.iqg ?? r.genetica_2)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {rankingPtIQG.length > 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 mb-4">
+            <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-3">
+              <TrophyIcon className="h-5 w-5 text-cyan-500" />
+              Ranking Pt IQG (Top 10)
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Percentil IQG</p>
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {rankingPtIQG.map((r) => (
+                <div
+                  key={r.id}
+                  onClick={() => buscarAnimal(null, r.serie, r.rg)}
+                  className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                      r.posicao === 1 ? 'bg-amber-500 text-white' :
+                      r.posicao === 2 ? 'bg-gray-400 text-white' :
+                      r.posicao === 3 ? 'bg-amber-700 text-white' :
+                      'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
+                    }`}>
+                      {r.posicao === 1 ? '🥇' : r.posicao === 2 ? '🥈' : r.posicao === 3 ? '🥉' : r.posicao}
+                    </span>
+                    <span className="font-medium text-gray-900 dark:text-white">{r.identificacao}</span>
+                  </div>
+                  <span className="font-bold text-cyan-600 dark:text-cyan-400">{(r.pt_iqg ?? r.decile_2)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {rankingMGte.length > 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 mb-4">
+            <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-3">
+              <TrophyIcon className="h-5 w-5 text-amber-600" />
+              Ranking MGTe (Top 10)
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Quanto maior o MGTe, melhor o animal</p>
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {rankingMGte.map((r) => (
+                <div
+                  key={r.id}
+                  onClick={() => buscarAnimal(null, r.serie, r.rg)}
+                  className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                      r.posicao === 1 ? 'bg-amber-500 text-white' :
+                      r.posicao === 2 ? 'bg-gray-400 text-white' :
+                      r.posicao === 3 ? 'bg-amber-700 text-white' :
+                      'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
+                    }`}>
+                      {r.posicao === 1 ? '🥇' : r.posicao === 2 ? '🥈' : r.posicao === 3 ? '🥉' : r.posicao}
+                    </span>
+                    <span className="font-medium text-gray-900 dark:text-white">{r.identificacao}</span>
+                  </div>
+                  <span className="font-bold text-amber-600 dark:text-amber-400">{r.mgte}</span>
                 </div>
               ))}
             </div>
@@ -491,6 +724,16 @@ export default function MobileAnimal() {
               <p className="text-white/90 text-sm font-medium">
                 Situação ABCZ: {animal.situacao_abcz || animal.situacaoAbcz || 'Não informado'}
               </p>
+              {(animal.mgte || mgtePosicao) && (
+                <p className="text-white/90 text-sm font-bold mt-1">
+                  🏆 MGTe: {animal.mgte || mgtePosicao?.mgte || '-'}
+                  {mgtePosicao?.posicao != null && (
+                    <span className="ml-2 px-2 py-0.5 rounded-full bg-amber-500/80 text-white text-xs">
+                      Posição {mgtePosicao.posicao} de {mgtePosicao.total}
+                    </span>
+                  )}
+                </p>
+              )}
 
               {/* Navegação */}
               {allAnimals.length > 0 && currentIndex >= 0 && (
@@ -541,14 +784,178 @@ export default function MobileAnimal() {
             </div>
 
             {/* Custos */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4">
-              <div className="text-center">
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Custos Totais</p>
-                <p className="text-2xl font-bold text-red-600 dark:text-red-400">
-                  R$ 0,00
+            <div
+              onClick={() => router.push('/custos')}
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Custo na Propriedade</p>
+                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                    R$ {Number(custoTotal).toFixed(2)}
+                  </p>
+                  {(parseFloat(animal.valor_venda || animal.valor_real || 0) || 0) > 0 && (
+                    <p className="text-xs mt-1">
+                      Venda: R$ {(parseFloat(animal.valor_venda || animal.valor_real || 0)).toFixed(2)}
+                      {' • '}
+                      <span className={((parseFloat(animal.valor_venda || animal.valor_real || 0) - custoTotal) / (custoTotal || 1) * 100) >= 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
+                        ROI {(((parseFloat(animal.valor_venda || animal.valor_real || 0) - custoTotal) / (custoTotal || 1)) * 100).toFixed(1)}%
+                      </span>
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); refreshCustos() }}
+                    disabled={refreshingCustos}
+                    className="p-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50"
+                    title="Atualizar custos (alterações feitas no app)"
+                  >
+                    <ArrowPathIcon className={`h-4 w-4 text-gray-600 dark:text-gray-300 ${refreshingCustos ? 'animate-spin' : ''}`} />
+                  </button>
+                  <span className="text-blue-600 dark:text-blue-400 text-sm font-medium">Ver todos custos →</span>
+                </div>
+              </div>
+              {custosLista.length > 0 && (
+                <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600 space-y-1">
+                  {custosLista.slice(0, 8).map((c, i) => (
+                    <div key={i} className="flex justify-between text-xs">
+                      <span className="text-gray-600 dark:text-gray-400 truncate pr-2">
+                        {c.subtipo || c.tipo || 'Custo'}
+                      </span>
+                      <span className="text-gray-900 dark:text-white font-medium">
+                        R$ {(Number(c.valor) || 0).toFixed(2)}
+                      </span>
+                    </div>
+                  ))}
+                  {custosLista.length > 8 && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      +{custosLista.length - 8} mais...
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Destaque Baixas - MORTE/BAIXA */}
+            {baixasResumo?.baixaPropria?.morto && !baixasResumo?.baixaPropria?.vendido && (
+              <div className="bg-gradient-to-br from-gray-500/20 to-slate-600/20 dark:from-gray-900/30 dark:to-slate-900/30 rounded-xl shadow-lg p-4 border border-gray-200/50 dark:border-gray-700/50">
+                <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg mb-2 flex items-center gap-2">
+                  <span>⚠️</span> Morte/Baixa
+                </h3>
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  Causa: {baixasResumo.baixaPropria.causa || 'Não informada'}
+                  {baixasResumo.baixaPropria.data_baixa && (
+                    <span className="ml-2">• {new Date(baixasResumo.baixaPropria.data_baixa).toLocaleDateString('pt-BR')}</span>
+                  )}
                 </p>
               </div>
-            </div>
+            )}
+
+            {/* Destaque Baixas - Venda (NF, Data, Valor) */}
+            {baixasResumo?.baixaPropria?.vendido && (
+              <div className="bg-gradient-to-br from-emerald-500/20 to-green-600/20 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl shadow-lg p-4 border border-emerald-200/50 dark:border-emerald-800/50">
+                <h3 className="font-bold text-emerald-800 dark:text-emerald-200 text-lg mb-3 flex items-center gap-2">
+                  <span>💰</span> Venda
+                </h3>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  {baixasResumo.baixaPropria.numero_nf && (
+                    <div className="bg-white/50 dark:bg-gray-800/50 rounded-lg p-3">
+                      <p className="text-gray-500 dark:text-gray-400 text-xs">NF</p>
+                      <p className="font-bold text-emerald-700 dark:text-emerald-300">{baixasResumo.baixaPropria.numero_nf}</p>
+                    </div>
+                  )}
+                  {baixasResumo.baixaPropria.data_venda && (
+                    <div className="bg-white/50 dark:bg-gray-800/50 rounded-lg p-3">
+                      <p className="text-gray-500 dark:text-gray-400 text-xs">Data</p>
+                      <p className="font-bold text-emerald-700 dark:text-emerald-300">
+                        {new Date(baixasResumo.baixaPropria.data_venda).toLocaleDateString('pt-BR')}
+                      </p>
+                    </div>
+                  )}
+                  {baixasResumo.baixaPropria.valor != null && baixasResumo.baixaPropria.valor > 0 && (
+                    <div className="bg-white/50 dark:bg-gray-800/50 rounded-lg p-3 col-span-2">
+                      <p className="text-gray-500 dark:text-gray-400 text-xs">Valor</p>
+                      <p className="font-bold text-emerald-700 dark:text-emerald-300 text-lg">
+                        R$ {Number(baixasResumo.baixaPropria.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </p>
+                      {baixasResumo.baixaPropria.comprador && (
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Comprador: {baixasResumo.baixaPropria.comprador}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Resumo Mãe - Filhos vendidos e mortes/abates */}
+            {baixasResumo?.resumoMae && (baixasResumo.resumoMae.qtdVendidos > 0 || baixasResumo.resumoMae.qtdMortesBaixas > 0) && (
+              <div className="bg-gradient-to-br from-amber-500/20 to-orange-600/20 dark:from-amber-900/30 dark:to-orange-900/30 rounded-xl shadow-lg p-4 border border-amber-200/50 dark:border-amber-800/50">
+                <h3 className="font-bold text-amber-800 dark:text-amber-200 text-lg mb-3 flex items-center gap-2">
+                  <span>📊</span> Prole (Baixas)
+                </h3>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  {baixasResumo.resumoMae.qtdVendidos > 0 && (
+                    <>
+                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-lg p-3">
+                        <p className="text-gray-500 dark:text-gray-400 text-xs">Filhos vendidos</p>
+                        <p className="font-bold text-amber-700 dark:text-amber-300">{baixasResumo.resumoMae.qtdVendidos}</p>
+                      </div>
+                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-lg p-3">
+                        <p className="text-gray-500 dark:text-gray-400 text-xs">Média de vendas</p>
+                        <p className="font-bold text-amber-700 dark:text-amber-300">
+                          R$ {Number(baixasResumo.resumoMae.mediaVendas).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </p>
+                      </div>
+                      <div className="bg-white/50 dark:bg-gray-800/50 rounded-lg p-3 col-span-2">
+                        <p className="text-gray-500 dark:text-gray-400 text-xs">Total vendas</p>
+                        <p className="font-bold text-amber-700 dark:text-amber-300">
+                          R$ {Number(baixasResumo.resumoMae.totalVendas).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </p>
+                      </div>
+                    </>
+                  )}
+                  {baixasResumo.resumoMae.qtdMortesBaixas > 0 && (
+                    <div className="bg-white/50 dark:bg-gray-800/50 rounded-lg p-3">
+                      <p className="text-gray-500 dark:text-gray-400 text-xs">Mortes/Abates</p>
+                      <p className="font-bold text-amber-700 dark:text-amber-300">{baixasResumo.resumoMae.qtdMortesBaixas}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Histórico FIV - Doadora de Oócitos */}
+            {fichaDoadora?.resumo && (
+              <div className="bg-gradient-to-br from-pink-500/20 to-purple-500/20 dark:from-pink-900/30 dark:to-purple-900/30 rounded-xl shadow-lg p-4 border border-pink-200/50 dark:border-pink-800/50">
+                <h3 className="font-bold text-pink-800 dark:text-pink-200 text-lg mb-3 flex items-center gap-2">
+                  <span>🧪</span> Histórico FIV (Doadora)
+                </h3>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="bg-white/50 dark:bg-gray-800/50 rounded-lg p-3">
+                    <p className="text-gray-500 dark:text-gray-400 text-xs">Coletas</p>
+                    <p className="font-bold text-pink-700 dark:text-pink-300">{fichaDoadora.resumo.totalColetas}</p>
+                  </div>
+                  <div className="bg-white/50 dark:bg-gray-800/50 rounded-lg p-3">
+                    <p className="text-gray-500 dark:text-gray-400 text-xs">Oócitos (média)</p>
+                    <p className="font-bold text-pink-700 dark:text-pink-300">{fichaDoadora.resumo.mediaOocitos} / coleta</p>
+                  </div>
+                  <div className="bg-white/50 dark:bg-gray-800/50 rounded-lg p-3">
+                    <p className="text-gray-500 dark:text-gray-400 text-xs">Total oócitos</p>
+                    <p className="font-bold text-pink-700 dark:text-pink-300">{fichaDoadora.resumo.totalOocitos}</p>
+                  </div>
+                  <div className="bg-white/50 dark:bg-gray-800/50 rounded-lg p-3">
+                    <p className="text-gray-500 dark:text-gray-400 text-xs">Embriões (média)</p>
+                    <p className="font-bold text-pink-700 dark:text-pink-300">{fichaDoadora.resumo.mediaEmbrioesProduzidos} / coleta</p>
+                  </div>
+                  <div className="bg-white/50 dark:bg-gray-800/50 rounded-lg p-3 col-span-2">
+                    <p className="text-gray-500 dark:text-gray-400 text-xs">Transferidos (média)</p>
+                    <p className="font-bold text-pink-700 dark:text-pink-300">{fichaDoadora.resumo.totalEmbrioesTransferidos} total ({fichaDoadora.resumo.mediaEmbrioesTransferidos} / coleta)</p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Botões de Ação - Grid 2x2 */}
             <div className="grid grid-cols-2 gap-3">
@@ -680,6 +1087,29 @@ export default function MobileAnimal() {
                     </p>
                   </div>
 
+                  {(animal.mgte || animal.mgte === 0) && (
+                    <div>
+                      <p className="text-gray-500 dark:text-gray-400 text-xs">MGTe</p>
+                      <p className="font-bold text-amber-600 dark:text-amber-400">
+                        {animal.mgte}
+                        {mgtePosicao?.posicao != null && (
+                          <span className="ml-1 text-xs font-normal text-gray-600 dark:text-gray-400">
+                            (pos. {mgtePosicao.posicao})
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  )}
+
+                  {(animal.top || animal.top === 0) && (
+                    <div>
+                      <p className="text-gray-500 dark:text-gray-400 text-xs">TOP</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">
+                        {animal.top}
+                      </p>
+                    </div>
+                  )}
+
                   {animal.pai && (
                     <div className="col-span-2">
                       <p className="text-gray-500 dark:text-gray-400 text-xs">Pai</p>
@@ -710,6 +1140,17 @@ export default function MobileAnimal() {
                             <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
                               ⚠️ Não encontrada no cadastro (pode estar inativa)
                             </p>
+                            {maeColetas?.resumo && (
+                              <div className="mt-2 p-2 rounded-lg bg-pink-50 dark:bg-pink-900/20 border border-pink-200 dark:border-pink-800">
+                                <p className="text-xs font-medium text-pink-800 dark:text-pink-200 mb-1">📋 Histórico de Coletas FIV</p>
+                                <p className="text-xs text-pink-700 dark:text-pink-300">
+                                  Coletas: {maeColetas.resumo.totalColetas} • Oócitos viáveis: {maeColetas.resumo.totalOocitos} (média {maeColetas.resumo.mediaOocitos})
+                                </p>
+                                <p className="text-xs text-pink-700 dark:text-pink-300">
+                                  Embriões produzidos: {maeColetas.resumo.totalEmbrioesProduzidos} (média {maeColetas.resumo.mediaEmbrioesProduzidos}) • Transferidos: {maeColetas.resumo.totalEmbrioesTransferidos} (média {maeColetas.resumo.mediaEmbrioesTransferidos})
+                                </p>
+                              </div>
+                            )}
                           </>
                         )
                       })()}

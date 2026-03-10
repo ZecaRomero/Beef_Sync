@@ -1,16 +1,177 @@
 import React, { useState, useEffect, useRef } from 'react'
 
+// DestinoSelector extraído para fora do modal - evita recriação a cada digitação (input travando)
+function DestinoSelector({ value, onChange, destinos, setDestinos, error }) {
+  const [busca, setBusca] = useState(value || '')
+  const [mostrarDropdown, setMostrarDropdown] = useState(false)
+  const [mostrarCriar, setMostrarCriar] = useState(false)
+  const [novoNome, setNovoNome] = useState('')
+  const dropdownRef = useRef(null)
+  const inputRef = useRef(null)
+  const isInteractingRef = useRef(false)
+
+  useEffect(() => {
+    setBusca(value || '')
+  }, [value])
+
+  const destinosFiltrados = (destinos || []).filter(d =>
+    (d.nome || '').toLowerCase().includes((busca || '').toLowerCase())
+  )
+
+  const handleSelect = (destino) => {
+    onChange(destino)
+    setBusca(destino)
+    setMostrarDropdown(false)
+  }
+
+  const handleCreate = async () => {
+    if (!novoNome.trim()) {
+      alert('⚠️ Digite o nome do destino')
+      return
+    }
+    try {
+      const response = await fetch('/api/semen/destinos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome: novoNome.trim() })
+      })
+      if (response.ok) {
+        const result = await response.json()
+        setDestinos(prev => [...(prev || []), result.data].sort((a, b) => (a.nome || '').localeCompare(b.nome || '')))
+        onChange(result.data.nome)
+        setNovoNome('')
+        setMostrarCriar(false)
+        setMostrarDropdown(false)
+        alert(`✅ Destino "${result.data.nome}" criado!`)
+      } else {
+        const errorData = await response.json()
+        alert(`❌ Erro: ${errorData.message || 'Erro desconhecido'}`)
+      }
+    } catch (error) {
+      console.error('Erro ao criar destino:', error)
+      alert('❌ Erro ao criar destino. Tente novamente.')
+    }
+  }
+
+  return (
+    <div className="relative">
+      <input
+        type="text"
+        value={busca}
+        onChange={(e) => {
+          const v = e.target.value
+          setBusca(v)
+          onChange(v)
+          setMostrarDropdown(true)
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && busca?.trim()) {
+            const existe = (destinos || []).some(d => (d.nome || '').toLowerCase() === busca.trim().toLowerCase())
+            if (!existe) {
+              e.preventDefault()
+              setMostrarCriar(true)
+              setNovoNome(busca.trim())
+            }
+          }
+        }}
+        onFocus={() => setMostrarDropdown(true)}
+        onBlur={() => {
+          setTimeout(() => {
+            if (!isInteractingRef.current) setMostrarDropdown(false)
+          }, 200)
+        }}
+        ref={inputRef}
+        placeholder="Digite ou selecione o destino..."
+        className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
+          error ? 'border-red-300 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'
+        }`}
+      />
+      {mostrarDropdown && (
+        <div
+          ref={dropdownRef}
+          className="dropdown-destinos absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-auto"
+          onMouseDown={(e) => { e.preventDefault(); isInteractingRef.current = true }}
+          onMouseEnter={() => { isInteractingRef.current = true }}
+          onMouseLeave={() => { setTimeout(() => { isInteractingRef.current = false }, 200) }}
+        >
+          {!mostrarCriar ? (
+            <>
+              {destinosFiltrados.length > 0 ? (
+                destinosFiltrados.map(d => (
+                  <div
+                    key={d.id}
+                    onMouseDown={(e) => { e.preventDefault(); handleSelect(d.nome) }}
+                    className="px-3 py-2 hover:bg-blue-50 dark:hover:bg-blue-900/30 cursor-pointer border-b border-gray-200 dark:border-gray-700 last:border-b-0"
+                  >
+                    <div className="font-medium text-gray-900 dark:text-white">{d.nome}</div>
+                    {d.observacoes && <div className="text-xs text-gray-500 dark:text-gray-400">{d.observacoes}</div>}
+                  </div>
+                ))
+              ) : (
+                <div className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm">Nenhum destino encontrado</div>
+              )}
+              <button
+                type="button"
+                onMouseDown={(e) => { e.preventDefault(); setMostrarCriar(true); setNovoNome(busca || '') }}
+                className="w-full text-left px-3 py-2 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 cursor-pointer border-t border-gray-300 dark:border-gray-600 font-medium text-blue-600 dark:text-blue-400 sticky bottom-0"
+              >
+                ➕ Criar novo destino {busca && `"${busca}"`}
+              </button>
+            </>
+          ) : (
+            <div className="p-3 border-t border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800">
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Nome do novo destino:</label>
+              <input
+                type="text"
+                value={novoNome}
+                onChange={(e) => setNovoNome(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleCreate(); if (e.key === 'Escape') { setMostrarCriar(false); setNovoNome('') } }}
+                placeholder="Ex: ZEBUEMBRYO, Fazenda ABC..."
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 mb-2"
+                autoFocus
+              />
+              <div className="flex gap-2">
+                <button type="button" onClick={handleCreate} disabled={!novoNome.trim()} className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded text-sm font-medium">
+                  ✓ Criar
+                </button>
+                <button type="button" onClick={() => { setMostrarCriar(false); setNovoNome('') }} className="px-3 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded text-sm font-medium">
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSemen, setNewSemen }) {
   const [savedTemplates, setSavedTemplates] = useState([])
   const [useLastData, setUseLastData] = useState(false)
   const [fornecedores, setFornecedores] = useState([])
+  const [autocomplete, setAutocomplete] = useState({})
 
-  // Carregar templates salvos e último cadastro
+  // Carregar templates salvos, último cadastro, fornecedores e sugestões do banco
   useEffect(() => {
     if (showModal) {
       // Carregar templates salvos
       const templates = JSON.parse(localStorage.getItem('semenTemplates') || '[]')
       setSavedTemplates(templates)
+
+      // Buscar sugestões de autocomplete do estoque (valores já cadastrados)
+      const fetchAutocomplete = async () => {
+        try {
+          const res = await fetch('/api/autocomplete?tabela=estoque_semen&todos=1')
+          if (res.ok) {
+            const result = await res.json()
+            setAutocomplete(result.data || {})
+          }
+        } catch (e) {
+          console.error('Erro ao buscar sugestões:', e)
+        }
+      }
+      fetchAutocomplete()
 
       // Buscar fornecedores do banco de dados
       const fetchFornecedores = async () => {
@@ -527,6 +688,15 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               🐂 Informações do Touro
             </h3>
+            <datalist id="datalist-nome-touro">
+              {(autocomplete.nome_touro || []).map((v, i) => <option key={i} value={v} />)}
+            </datalist>
+            <datalist id="datalist-rg-touro">
+              {(autocomplete.rg_touro || []).map((v, i) => <option key={i} value={v} />)}
+            </datalist>
+            <datalist id="datalist-raca">
+              {(autocomplete.raca || []).map((v, i) => <option key={i} value={v} />)}
+            </datalist>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -534,6 +704,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                 </label>
                 <input
                   type="text"
+                  list="datalist-nome-touro"
                   placeholder="Digite o nome do touro..."
                   value={newSemen.nomeTouro}
                   onChange={(e) => setNewSemen(prev => ({ ...prev, nomeTouro: e.target.value }))}
@@ -550,6 +721,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                 </label>
                 <input
                   type="text"
+                  list="datalist-rg-touro"
                   placeholder="Digite aqui..."
                   value={newSemen.rgTouro}
                   onChange={(e) => setNewSemen(prev => ({ ...prev, rgTouro: e.target.value }))}
@@ -562,6 +734,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                 </label>
                 <input
                   type="text"
+                  list="datalist-raca"
                   placeholder="Ex: Nelore, Angus..."
                   value={newSemen.raca}
                   onChange={(e) => setNewSemen(prev => ({ ...prev, raca: e.target.value }))}
@@ -576,6 +749,18 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               📍 Localização Física
             </h3>
+            <datalist id="datalist-localizacao">
+              {(autocomplete.localizacao || []).map((v, i) => <option key={i} value={v} />)}
+            </datalist>
+            <datalist id="datalist-rack">
+              {(autocomplete.rack_touro || []).map((v, i) => <option key={i} value={v} />)}
+            </datalist>
+            <datalist id="datalist-botijao">
+              {(autocomplete.botijao || []).map((v, i) => <option key={i} value={v} />)}
+            </datalist>
+            <datalist id="datalist-caneca">
+              {(autocomplete.caneca || []).map((v, i) => <option key={i} value={v} />)}
+            </datalist>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -583,6 +768,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                 </label>
                 <input
                   type="text"
+                  list="datalist-localizacao"
                   placeholder="Ex: Tanque A, Sala A, Freezer 1..."
                   value={newSemen.localizacao}
                   onChange={(e) => setNewSemen(prev => ({ ...prev, localizacao: e.target.value }))}
@@ -599,6 +785,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                 </label>
                 <input
                   type="text"
+                  list="datalist-rack"
                   placeholder="Ex: Rack 5"
                   value={newSemen.rackTouro}
                   onChange={(e) => setNewSemen(prev => ({ ...prev, rackTouro: e.target.value }))}
@@ -611,6 +798,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                 </label>
                 <input
                   type="text"
+                  list="datalist-botijao"
                   placeholder="Ex: Botijão 3"
                   value={newSemen.botijao}
                   onChange={(e) => setNewSemen(prev => ({ ...prev, botijao: e.target.value }))}
@@ -623,6 +811,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                 </label>
                 <input
                   type="text"
+                  list="datalist-caneca"
                   placeholder="Ex: Caneca 12"
                   value={newSemen.caneca}
                   onChange={(e) => setNewSemen(prev => ({ ...prev, caneca: e.target.value }))}
@@ -770,6 +959,15 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               📝 Informações Adicionais
             </h3>
+            <datalist id="datalist-certificado">
+              {(autocomplete.certificado || []).map((v, i) => <option key={i} value={v} />)}
+            </datalist>
+            <datalist id="datalist-origem">
+              {(autocomplete.origem || []).map((v, i) => <option key={i} value={v} />)}
+            </datalist>
+            <datalist id="datalist-linhagem">
+              {(autocomplete.linhagem || []).map((v, i) => <option key={i} value={v} />)}
+            </datalist>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -777,6 +975,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                 </label>
                 <input
                   type="text"
+                  list="datalist-certificado"
                   placeholder="Número do certificado"
                   value={newSemen.certificado}
                   onChange={(e) => setNewSemen(prev => ({ ...prev, certificado: e.target.value }))}
@@ -789,6 +988,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                 </label>
                 <input
                   type="text"
+                  list="datalist-origem"
                   placeholder="Local de origem"
                   value={newSemen.origem}
                   onChange={(e) => setNewSemen(prev => ({ ...prev, origem: e.target.value }))}
@@ -801,6 +1001,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                 </label>
                 <input
                   type="text"
+                  list="datalist-linhagem"
                   placeholder="Linhagem genética"
                   value={newSemen.linhagem}
                   onChange={(e) => setNewSemen(prev => ({ ...prev, linhagem: e.target.value }))}
@@ -888,8 +1089,11 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
   )
 }
 
-export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSemen, setNewSemen, semenStock }) {
+const unidadeLabel = (tipo) => tipo === 'embriao' ? 'embriões' : 'doses'
+
+export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSemen, setNewSemen, semenStock, tipoMaterial = 'semen' }) {
   const [availableStock, setAvailableStock] = useState([])
+  const unidade = unidadeLabel(tipoMaterial)
   const [saidasItems, setSaidasItems] = useState([])
   const [loading, setLoading] = useState(false)
   const [common, setCommon] = useState({ destino: '', dataOperacao: new Date().toISOString().split('T')[0], observacoes: '', numeroNF: '' })
@@ -899,11 +1103,15 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
     if (showModal) {
       const fetchEntradasDisponiveis = async () => {
         try {
-          const response = await fetch('/api/semen/entradas-disponiveis');
+          const tipo = tipoMaterial === 'embriao' ? 'embriao' : tipoMaterial === 'semen' ? 'semen' : '';
+          const url = tipo ? `/api/semen/entradas-disponiveis?tipo=${tipo}` : '/api/semen/entradas-disponiveis';
+          const response = await fetch(url);
           if (response.ok) {
             const result = await response.json();
-            // A API retorna { success: true, data: [...], message: '...' }
-            setAvailableStock(result.data || []);
+            const raw = result.data || [];
+            // Filtrar itens com doses <= 0 (evitar negativos ou zerados)
+            const filtrado = raw.filter(s => (parseInt(s.doses_disponiveis ?? s.dosesDisponiveis) || 0) > 0);
+            setAvailableStock(filtrado);
           } else {
             console.error('Erro ao buscar entradas disponíveis');
             setAvailableStock([]);
@@ -934,7 +1142,6 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
 
       fetchEntradasDisponiveis();
       fetchDestinos();
-      
       // Inicializar com um item vazio
       setSaidasItems([{
         id: Date.now(),
@@ -951,7 +1158,7 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
         errors: {}
       }]);
     }
-  }, [showModal])
+  }, [showModal, tipoMaterial])
 
   const adicionarItem = () => {
     setSaidasItems(prev => [...prev, {
@@ -1016,7 +1223,7 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
         if (field === 'quantidadeDoses') {
           const qtd = parseInt(value) || 0;
           if (qtd > updated.maxDoses) {
-            updated.errors = { ...updated.errors, quantidadeDoses: `Máximo: ${updated.maxDoses} doses` };
+            updated.errors = { ...updated.errors, quantidadeDoses: `Máximo: ${updated.maxDoses} ${unidade}` };
           } else {
             updated.errors = { ...updated.errors, quantidadeDoses: null };
           }
@@ -1035,7 +1242,7 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
       const errors = {};
       
       if (!item.entradaId) {
-        errors.entradaId = 'Selecione um sêmen';
+        errors.entradaId = tipoMaterial === 'embriao' ? 'Selecione um acasalamento' : 'Selecione um sêmen';
         todosValidos = false;
       }
       
@@ -1045,7 +1252,7 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
       }
       
       if (parseInt(item.quantidadeDoses) > item.maxDoses) {
-        errors.quantidadeDoses = `Máximo: ${item.maxDoses} doses disponíveis`;
+        errors.quantidadeDoses = `Máximo: ${item.maxDoses} ${unidade} disponíveis`;
         todosValidos = false;
       }
       
@@ -1053,295 +1260,6 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
     }));
     
     return todosValidos;
-  }
-
-  const DestinoSelector = ({ value, onChange, itemId, error }) => {
-    const [busca, setBusca] = useState(value || '')
-    const [mostrarDropdown, setMostrarDropdown] = useState(false)
-    const [mostrarCriar, setMostrarCriar] = useState(false)
-    const [novoNome, setNovoNome] = useState('')
-    const isUserTypingRef = useRef(false)
-    const dropdownRef = useRef(null)
-    const inputRef = useRef(null)
-    const isInteractingRef = useRef(false)
-
-    // Sincronizar busca com value quando value muda externamente (mas não quando usuário está digitando)
-    useEffect(() => {
-      if (!isUserTypingRef.current) {
-        setBusca(value || '')
-      }
-    }, [value])
-
-    const destinosFiltrados = destinos.filter(d => 
-      d.nome.toLowerCase().includes(busca.toLowerCase())
-    )
-
-    const handleSelect = (destino) => {
-      isUserTypingRef.current = false
-      onChange(destino)
-      setBusca(destino)
-      setMostrarDropdown(false)
-    }
-
-    const handleCreate = async () => {
-      if (!novoNome.trim()) {
-        alert('⚠️ Digite o nome do destino');
-        return;
-      }
-
-      try {
-        const response = await fetch('/api/semen/destinos', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nome: novoNome.trim() })
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          // Atualizar a lista de destinos do componente pai
-          setDestinos(prev => [...prev, result.data].sort((a, b) => a.nome.localeCompare(b.nome)));
-          onChange(result.data.nome)
-          setNovoNome('')
-          setMostrarCriar(false)
-          setMostrarDropdown(false)
-          alert(`✅ Destino "${result.data.nome}" criado!`);
-        } else {
-          const errorData = await response.json();
-          alert(`❌ Erro: ${errorData.message || 'Erro desconhecido'}`);
-        }
-      } catch (error) {
-        console.error('Erro ao criar destino:', error);
-        alert('❌ Erro ao criar destino. Tente novamente.');
-      }
-    }
-
-    return (
-      <div className="relative">
-        <div className="flex gap-1">
-          <input
-            type="text"
-            value={busca}
-            onChange={(e) => {
-              const novoValor = e.target.value
-              isUserTypingRef.current = true
-              setBusca(novoValor)
-              onChange(novoValor)
-              if (novoValor.length > 0) {
-                setMostrarDropdown(true)
-              }
-              // Resetar flag após um pequeno delay
-              setTimeout(() => {
-                isUserTypingRef.current = false
-              }, 100)
-            }}
-            onKeyDown={(e) => {
-              // Se pressionar Enter e não houver destino exato correspondente, criar novo
-              if (e.key === 'Enter' && busca && busca.trim()) {
-                const existeExato = destinos.some(d => d.nome.toLowerCase() === busca.trim().toLowerCase())
-                if (!existeExato) {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  setMostrarCriar(true)
-                  setNovoNome(busca.trim())
-                }
-              }
-            }}
-            onFocus={() => {
-              setMostrarDropdown(true)
-            }}
-            onBlur={(e) => {
-              // Se está interagindo com o dropdown, não fechar
-              if (isInteractingRef.current) {
-                return
-              }
-              
-              // Verificar se o clique foi dentro do dropdown
-              const relatedTarget = e.relatedTarget || document.activeElement
-              const dropdown = dropdownRef.current
-              
-              // Se o clique foi dentro do dropdown, não fechar
-              if (dropdown && dropdown.contains(relatedTarget)) {
-                return
-              }
-              
-              // Fechar dropdown depois de um delay maior para permitir cliques
-              setTimeout(() => {
-                // Verificar novamente se não está interagindo ou focando em algo dentro do dropdown
-                if (!isInteractingRef.current) {
-                  const activeElement = document.activeElement
-                  if (!activeElement || !dropdown?.contains(activeElement)) {
-                    setMostrarDropdown(false)
-                  }
-                }
-              }, 300)
-            }}
-            ref={inputRef}
-            placeholder="Digite ou selecione o destino..."
-            className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
-              error ? 'border-red-300 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'
-            }`}
-          />
-        </div>
-        {mostrarDropdown && (
-          <div 
-            ref={dropdownRef}
-            className="dropdown-destinos absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-auto"
-            onMouseDown={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              isInteractingRef.current = true
-            }}
-            onMouseUp={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-            }}
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-            }}
-            onFocus={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-            }}
-            onMouseEnter={() => {
-              isInteractingRef.current = true
-            }}
-            onMouseLeave={() => {
-              setTimeout(() => {
-                isInteractingRef.current = false
-              }, 200)
-            }}
-          >
-            {!mostrarCriar ? (
-              <>
-                {destinosFiltrados.length > 0 ? (
-                  destinosFiltrados.map(destino => (
-                    <div
-                      key={destino.id}
-                      onClick={(e) => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        handleSelect(destino.nome)
-                      }}
-                      onMouseDown={(e) => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                      }}
-                      className="px-3 py-2 hover:bg-blue-50 dark:hover:bg-blue-900/30 cursor-pointer border-b border-gray-200 dark:border-gray-700 last:border-b-0"
-                    >
-                      <div className="font-medium text-gray-900 dark:text-white">{destino.nome}</div>
-                      {destino.observacoes && (
-                        <div className="text-xs text-gray-500 dark:text-gray-400">{destino.observacoes}</div>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <div className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm">
-                    Nenhum destino encontrado
-                  </div>
-                )}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    isInteractingRef.current = true
-                    setMostrarCriar(true)
-                    setNovoNome(busca || '')
-                    // Pequeno delay para garantir que o estado seja atualizado
-                    setTimeout(() => {
-                      isInteractingRef.current = false
-                    }, 100)
-                  }}
-                  onMouseDown={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    isInteractingRef.current = true
-                  }}
-                  onMouseUp={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                  }}
-                  className="w-full text-left px-3 py-2 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 cursor-pointer border-t border-gray-300 dark:border-gray-600 font-medium text-blue-600 dark:text-blue-400 sticky bottom-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  ➕ Criar novo destino {busca && `"${busca}"`}
-                </button>
-              </>
-            ) : (
-              <div className="p-3 border-t border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800">
-                <div className="mb-2">
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Nome do novo destino:
-                  </label>
-                  <input
-                    type="text"
-                    value={novoNome}
-                    onChange={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      setNovoNome(e.target.value)
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        handleCreate()
-                      } else if (e.key === 'Escape') {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        setMostrarCriar(false)
-                        setNovoNome('')
-                      }
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                    }}
-                    placeholder="Ex: ZEBUEMBRYO, Fazenda ABC..."
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    autoFocus
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      handleCreate()
-                    }}
-                    onMouseDown={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                    }}
-                    disabled={!novoNome.trim()}
-                    className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded text-sm font-medium transition-colors"
-                  >
-                    ✓ Criar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      setMostrarCriar(false)
-                      setNovoNome('')
-                    }}
-                    onMouseDown={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                    }}
-                    className="px-3 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded text-sm font-medium transition-colors"
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    )
   }
 
   const handleRegistrarSaidas = async () => {
@@ -1356,30 +1274,44 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
       return;
     }
 
-    // Preparar dados para envio em lote
-    const saidas = saidasItems
-      .filter(item => item.entradaId) // Apenas itens com sêmen selecionado
-      .map(item => ({
-        entradaId: parseInt(item.entradaId),
-        destino: common.destino.trim(),
-        quantidadeDoses: parseInt(item.quantidadeDoses),
-        dataOperacao: common.dataOperacao || new Date().toISOString().split('T')[0],
-        observacoes: common.observacoes || null,
-        numeroNF: (common.numeroNF || '').trim() || null
-      }));
+    // Preparar dados: agrupar por entradaId para evitar falhas por duplicatas
+    const porEntrada = {};
+    saidasItems
+      .filter(item => item.entradaId && parseInt(item.quantidadeDoses) > 0)
+      .forEach(item => {
+        const id = parseInt(item.entradaId);
+        if (!porEntrada[id]) porEntrada[id] = { ...item, quantidadeDoses: 0 };
+        porEntrada[id].quantidadeDoses += parseInt(item.quantidadeDoses) || 0;
+      });
 
-    if (saidas.length === 0) {
+    const saidas = Object.values(porEntrada);
+    for (const item of saidas) {
+      if (item.quantidadeDoses > (item.maxDoses || 0)) {
+        alert(`⚠️ ${item.nomeTouro || 'Item'}: quantidade total (${item.quantidadeDoses}) excede o disponível (${item.maxDoses} ${unidade})`);
+        return;
+      }
+    }
+
+    const saidasPayload = saidas.map(item => ({
+      entradaId: parseInt(item.entradaId),
+      destino: common.destino.trim(),
+      quantidadeDoses: item.quantidadeDoses,
+      dataOperacao: common.dataOperacao || new Date().toISOString().split('T')[0],
+      observacoes: common.observacoes || null,
+      numeroNF: (common.numeroNF || '').trim() || null
+    }));
+
+    if (saidasPayload.length === 0) {
       alert('⚠️ Adicione pelo menos um item de saída');
       return;
     }
 
-    // Mostrar preview
-    const preview = saidas.map((s, i) => {
+    const preview = saidasPayload.map((s, i) => {
       const item = saidasItems.find(it => it.entradaId == s.entradaId);
-      return `${i + 1}. ${item?.nomeTouro || 'N/A'} - ${s.quantidadeDoses} doses → ${s.destino}`;
+      return `${i + 1}. ${item?.nomeTouro || 'N/A'} - ${s.quantidadeDoses} doses → ${common.destino}`;
     }).join('\n');
 
-    if (!confirm(`📦 Você está prestes a registrar ${saidas.length} saída(s):\n\n${preview}\n\nConfirma?`)) {
+    if (!confirm(`📦 Registrar ${saidasPayload.length} saída(s):\n\n${preview}\n\nConfirma?`)) {
       return;
     }
 
@@ -1391,35 +1323,44 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           tipoOperacao: 'saida',
-          saidas: saidas
+          saidas: saidasPayload
         })
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        // Para lote, a estrutura é { data: { resultados: [...], count, errors } }
-        const resultados = result.data?.resultados || result.data || [];
-        const sucessos = resultados.filter(r => r.success || !r.error) || [];
-        const falhas = resultados.filter(r => !r.success || r.error) || [];
+      const result = await response.json().catch(() => ({}));
 
-        if (falhas.length === 0) {
-          alert(`✅ ${sucessos.length} saída(s) registrada(s) com sucesso!`);
+      if (response.ok) {
+        const data = result.data || {};
+        const count = data.count ?? 0;
+        const errors = data.errors || [];
+        const resultados = data.resultados || [];
+
+        if (errors.length === 0) {
+          alert(`✅ ${count} saída(s) registrada(s) com sucesso!`);
           setShowModal(false);
           setSaidasItems([]);
-          // Recarregar estoque
           await new Promise(resolve => setTimeout(resolve, 500));
           window.location.reload();
         } else {
-          const mensagemErro = falhas.map(f => f.error || f.message || 'Erro desconhecido').join('\n');
-          alert(`⚠️ ${sucessos.length} saída(s) registrada(s), ${falhas.length} falha(s):\n\n${mensagemErro}`);
+          const mapaNome = Object.fromEntries(saidas.map(it => [String(it.entradaId), it.nomeTouro || 'N/A']));
+          const detalhes = errors.map(e => {
+            const nome = mapaNome[String(e.entradaId)] || `Entrada #${e.entradaId}`;
+            return `• ${nome}: ${e.error || 'Erro desconhecido'}`;
+          }).join('\n');
+          alert(`⚠️ ${result.message || 'Resultado parcial'}\n\nFalhas:\n${detalhes}\n\nAs ${count} saída(s) bem-sucedida(s) já foram registradas.`);
+          window.location.reload();
         }
       } else {
-        const errorData = await response.json();
-        alert(`❌ Erro ao registrar saídas: ${errorData.message || 'Erro desconhecido'}`);
+        const msg = result.message || result.error || 'Erro desconhecido';
+        const errors = result.errors || [];
+        const detalhes = Array.isArray(errors) && errors.length > 0
+          ? '\n\n' + errors.map(e => typeof e === 'object' ? (e.error || e.message) : e).join('\n')
+          : '';
+        alert(`❌ Erro ao registrar saídas: ${msg}${detalhes}`);
       }
     } catch (error) {
       console.error('Erro ao registrar saídas:', error);
-      alert('❌ Erro ao registrar saídas. Tente novamente.');
+      alert('❌ Erro ao registrar saídas. Verifique a conexão e tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -1432,10 +1373,10 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-            📤 Saída de Sêmen do Estoque
+            {tipoMaterial === 'embriao' ? '🧬 Saída de Embriões do Estoque' : '📤 Saída de Sêmen do Estoque'}
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            Registre a saída de material genético do estoque
+            {tipoMaterial === 'embriao' ? 'Registre a saída de embriões do estoque' : 'Registre a saída de material genético do estoque'}
           </p>
         </div>
         
@@ -1461,6 +1402,8 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
                 <DestinoSelector
                   value={common.destino}
                   onChange={(value) => setCommon(prev => ({ ...prev, destino: value }))}
+                  destinos={destinos}
+                  setDestinos={setDestinos}
                 />
               </div>
               <div>
@@ -1542,7 +1485,7 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
                     {/* Seleção de Sêmen */}
                     <div className="md:col-span-9">
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Sêmen * {item.errors?.entradaId && <span className="text-red-500 text-xs">({item.errors.entradaId})</span>}
+                        {tipoMaterial === 'embriao' ? 'Acasalamento' : 'Sêmen'} * {item.errors?.entradaId && <span className="text-red-500 text-xs">({item.errors.entradaId})</span>}
                       </label>
                       <select
                         value={item.entradaId || ''}
@@ -1551,19 +1494,19 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
                           item.errors?.entradaId ? 'border-red-300 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'
                         }`}
                       >
-                        <option value="">Selecione um sêmen...</option>
+                        <option value="">{tipoMaterial === 'embriao' ? 'Selecione um acasalamento...' : 'Selecione um sêmen...'}</option>
                         {availableStock.map(semen => (
                           <option key={semen.id} value={semen.id}>
                             {semen.nomeTouro || semen.nome_touro}
                             {semen.rgTouro || semen.rg_touro ? ` (${semen.rgTouro || semen.rg_touro})` : ''}
                             {' - '}
-                            {semen.doses_disponiveis || semen.dosesDisponiveis} doses disponíveis
+                            {semen.doses_disponiveis || semen.dosesDisponiveis} {unidade} disponíveis
                           </option>
                         ))}
                       </select>
                       {item.entradaId && (
                         <p className="text-xs text-gray-500 mt-1">
-                          {item.nomeTouro} - {item.raca} - Máx: {item.maxDoses} doses
+                          {item.nomeTouro} - {item.raca} - Máx: {item.maxDoses} {unidade}
                         </p>
                       )}
                     </div>
@@ -1586,7 +1529,7 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
                       />
                       {item.maxDoses > 0 && (
                         <p className="text-xs text-gray-500 mt-1">
-                          Máx: {item.maxDoses} doses
+                          Máx: {item.maxDoses} {unidade}
                         </p>
                       )}
                     </div>
@@ -1622,7 +1565,7 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
                   • <strong>{saidasItems.filter(item => item.entradaId).length}</strong> item(s) selecionado(s)
                 </p>
                 <p>
-                  • <strong>{saidasItems.reduce((sum, item) => sum + (parseInt(item.quantidadeDoses) || 0), 0)}</strong> dose(s) no total
+                  • <strong>{saidasItems.reduce((sum, item) => sum + (parseInt(item.quantidadeDoses) || 0), 0)}</strong> {unidade} no total
                 </p>
 
               </div>

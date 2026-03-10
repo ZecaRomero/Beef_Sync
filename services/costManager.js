@@ -307,6 +307,11 @@ class CostManager {
     }
   }
 
+  // Adicionar custo (alias para saveCost)
+  async adicionarCusto(animalId, custo) {
+    return this.saveCost(animalId, custo)
+  }
+
   // Salvar custos no banco de dados
   async saveCost(animalId, custo) {
     try {
@@ -475,7 +480,7 @@ class CostManager {
         let totalGeral = 0
         
         Object.entries(custosPorAnimal).forEach(([animalId, custos]) => {
-          const totalAnimal = custos.reduce((sum, custo) => sum + custo.valor, 0)
+          const totalAnimal = custos.reduce((sum, custo) => sum + (parseFloat(custo.valor) || 0), 0)
           totalGeral += totalAnimal
           
           relatorio.push({

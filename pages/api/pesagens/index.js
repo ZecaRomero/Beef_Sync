@@ -7,6 +7,7 @@ function formatData(value) {
   return String(value)
 }
 
+export const config = { api: { externalResolver: true } }
 export default async function handler(req, res) {
   if (req.method === 'DELETE') {
     try {

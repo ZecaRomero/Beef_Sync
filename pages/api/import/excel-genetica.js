@@ -1,4 +1,4 @@
-import { query } from '../../../lib/database';
+import { query, createTablesIfNotExist } from '../../../lib/database';
 import formidable from 'formidable';
 import ExcelJS from 'exceljs';
 import fs from 'fs';
@@ -10,38 +10,53 @@ export const config = {
 };
 
 /**
- * Normaliza valor numérico (iABCZ pode vir com vírgula: 47,71)
+ * Extrai valor efetivo de célula Excel (fórmulas retornam .result)
+ */
+function getCellValue(cell) {
+  if (!cell) return null;
+  if (cell.result !== undefined && cell.result !== null) return cell.result;
+  if (cell.value !== undefined && cell.value !== null) return cell.value;
+  return null;
+}
+
+/**
+ * Normaliza valor numérico (iABCZ pode vir com vírgula: 47,71).
+ * Trata objetos do Excel (fórmulas, richText) e evita "[object Object]".
  */
 function normalizarNumero(val) {
   if (val === null || val === undefined) return null;
-  
+
   let s = '';
   if (typeof val === 'object') {
     if (val.richText) {
       s = val.richText.map(t => t.text).join('');
     } else if (val.text) {
       s = val.text;
-    } else if (val.result !== undefined) {
+    } else if (val.result !== undefined && val.result !== null) {
       s = String(val.result);
+    } else if (val.value !== undefined && val.value !== null) {
+      s = String(val.value);
+    } else if (val.v !== undefined && val.v !== null) {
+      s = String(val.v);
     } else {
       s = String(val);
     }
   } else {
     s = String(val);
   }
-  
-  s = s.trim();
-  if (!s) return null;
+
+  s = (s || '').trim();
+  if (!s || s === '[object Object]') return null;
   const num = parseFloat(s.replace(',', '.').replace(/\s/g, ''));
   return isNaN(num) ? null : s.replace(',', '.');
 }
 
 /**
- * Normaliza texto (Série, RG, Deca)
+ * Normaliza texto (Série, RG, Deca). Evita retornar "[object Object]".
  */
 function normalizarTexto(val) {
   if (val === null || val === undefined) return '';
-  
+
   if (typeof val === 'object') {
     if (val.richText) {
       return val.richText.map(t => t.text).join('').trim();
@@ -49,12 +64,16 @@ function normalizarTexto(val) {
     if (val.text) {
       return val.text.trim();
     }
-    if (val.result !== undefined) {
+    if (val.result !== undefined && val.result !== null) {
       return String(val.result).trim();
     }
+    if (val.value !== undefined && val.value !== null) {
+      return String(val.value).trim();
+    }
   }
-  
-  return String(val).trim();
+
+  const s = String(val).trim();
+  return s === '[object Object]' ? '' : s;
 }
 
 /**
@@ -101,7 +120,9 @@ export default async function handler(req, res) {
           error: 'Envie um array "data" com objetos { serie, rg, iABCZ, deca, situacaoAbcz? }',
         });
       }
-
+      if (rows.some(r => r.mgte != null || r.top != null)) {
+        try { await createTablesIfNotExist(); } catch (e) { /* ignora */ }
+      }
       const resultados = await processarLinhas(rows, criarNaoEncontrados, limparForaDaLista);
       let msg = `Importação concluída: ${resultados.animaisAtualizados} animais atualizados`;
       if (resultados.animaisLimpos > 0) msg += `, ${resultados.animaisLimpos} limpos (fora da planilha)`;
@@ -157,6 +178,15 @@ export default async function handler(req, res) {
     const cellE1 = (primeiraLinha.getCell(5).value ?? '').toString().toUpperCase();
     const cellF1 = (primeiraLinha.getCell(6).value ?? '').toString().toUpperCase();
     const cellG1 = (primeiraLinha.getCell(7).value ?? '').toString().toUpperCase();
+    const cellH1 = (primeiraLinha.getCell(8).value ?? '').toString().toUpperCase();
+    const cellI1 = (primeiraLinha.getCell(9).value ?? '').toString().toUpperCase();
+    // Formato completo 9 colunas: Série | RG | MGTe | TOP | iABCZ | DECA | IQG | Pt IQG | situações_abcz
+    const formatoCompleto9Cols = /MGTE|MGT\b/i.test(String(cellC1 || '').trim()) && /TOP/i.test(String(cellD1 || '').trim()) &&
+      (cellE1.includes('IABCZ') || cellE1.includes('ABCZ')) && cellF1.includes('DECA') &&
+      (cellG1.includes('IQG') || cellG1.includes('IQGG')) && (cellH1.includes('PT') || cellH1.includes('PL') || cellH1.includes('IQG')) &&
+      (cellI1.includes('SITUA') || cellI1.includes('STATUS') || cellI1.includes('RGN') || cellI1.includes('ABCZ'));
+    // Formato Série | RG | MGTe | TOP (4 colunas) - ex: planilha de mérito genético (ANCP, etc)
+    const formatoMGTeTOP = !formatoCompleto9Cols && /MGTE|MGT\b/i.test(String(cellC1 || '').trim()) && /TOP/i.test(String(cellD1 || '').trim());
     // Formato completo 6 colunas: SÉRIE | RG | iABCZg | DECA | IQG | Pt IQG
     const formatoCompleto6Cols = cellC1.includes('IABCZ') && cellD1.includes('DECA') &&
       (cellE1.includes('IQG') || cellE1.includes('IQGG')) &&
@@ -182,8 +212,10 @@ export default async function handler(req, res) {
     const rows = [];
     for (let i = startRow; i <= worksheet.rowCount; i++) {
       const row = worksheet.getRow(i);
-      const serie = normalizarTexto(row.getCell(1).value);
-      const rg = normalizarRG(row.getCell(2).value); // RG normalizado (sem zeros à esquerda) para matching
+      const cell = (col) => row.getCell(col);
+      const val = (col) => getCellValue(cell(col));
+      const serie = (normalizarTexto(val(1)) || '').substring(0, 10).trim(); // limite 10 chars
+      const rg = normalizarRG(val(2));
       if (!serie && !rg) continue;
 
       let iABCZ = null;
@@ -193,27 +225,40 @@ export default async function handler(req, res) {
       let genetica2 = null;
       let decile2 = null;
 
+      let mgte = null;
+      let top = null;
+
       if (formatoStatusAbcz) {
-        situacaoAbcz = normalizarTexto(row.getCell(3).value) || null;
+        situacaoAbcz = normalizarTexto(val(3)) || null;
+      } else if (formatoCompleto9Cols) {
+        mgte = normalizarNumero(val(3));
+        top = normalizarNumero(val(4)) || normalizarTexto(val(4)) || null;
+        iABCZ = normalizarNumero(val(5));
+        deca = normalizarTexto(val(6));
+        genetica2 = normalizarNumero(val(7)) || normalizarTexto(val(7)) || null;
+        decile2 = normalizarTexto(val(8)) || null;
+        situacaoAbcz = normalizarTexto(val(9)) || null;
+      } else if (formatoMGTeTOP) {
+        mgte = normalizarNumero(val(3));
+        top = normalizarNumero(val(4)) || normalizarTexto(val(4)) || null;
       } else if (formatoCompleto6Cols || formatoCompleto7Cols || formatoCompleto6ColsPelosDados) {
-        // Série, RG, iABCZg, DECA, IQG, Pt IQG (6 cols) + opcional Situação ABCZ (7ª col)
-        iABCZ = normalizarNumero(row.getCell(3).value);
-        deca = normalizarTexto(row.getCell(4).value);
-        genetica2 = normalizarNumero(row.getCell(5).value) || normalizarTexto(row.getCell(5).value) || null;
-        decile2 = normalizarTexto(row.getCell(6).value) || null;
-        situacaoAbcz = normalizarTexto(row.getCell(7).value) || null;
+        iABCZ = normalizarNumero(val(3));
+        deca = normalizarTexto(val(4));
+        genetica2 = normalizarNumero(val(5)) || normalizarTexto(val(5)) || null;
+        decile2 = normalizarTexto(val(6)) || null;
+        situacaoAbcz = normalizarTexto(val(7)) || null;
       } else if (formatoIQG) {
-        genetica2 = normalizarNumero(row.getCell(3).value) || normalizarTexto(row.getCell(3).value) || null;
-        decile2 = normalizarTexto(row.getCell(4).value) || null;
+        genetica2 = normalizarNumero(val(3)) || normalizarTexto(val(3)) || null;
+        decile2 = normalizarTexto(val(4)) || null;
       } else {
-        iABCZ = normalizarNumero(row.getCell(3).value);
-        deca = normalizarTexto(row.getCell(4).value);
-        situacaoAbcz = normalizarTexto(row.getCell(5).value) || null;
-        genetica2 = normalizarNumero(row.getCell(6).value) || normalizarTexto(row.getCell(6).value) || null;
-        decile2 = normalizarTexto(row.getCell(7).value) || null;
+        iABCZ = normalizarNumero(val(3));
+        deca = normalizarTexto(val(4));
+        situacaoAbcz = normalizarTexto(val(5)) || null;
+        genetica2 = normalizarNumero(val(6)) || normalizarTexto(val(6)) || null;
+        decile2 = normalizarTexto(val(7)) || null;
       }
 
-      rows.push({ serie, rg, iABCZ, deca, situacaoAbcz, iqg: genetica2, pt_iqg: decile2 });
+      rows.push({ serie, rg, iABCZ, deca, situacaoAbcz, iqg: genetica2, pt_iqg: decile2, mgte, top, apenasMgteTop: !!formatoMGTeTOP });
     }
 
     try { fs.unlinkSync(filepath); } catch (e) { /* ignorar */ }
@@ -225,6 +270,9 @@ export default async function handler(req, res) {
     const rawLimpar = typeof fields?.get === 'function' ? fields.get('limparForaDaLista') : fields?.limparForaDaLista;
     const valLimpar = Array.isArray(rawLimpar) ? rawLimpar[0] : rawLimpar;
     const limparForaDaLista = !!(valLimpar === 'true' || valLimpar === true);
+    if (rows.some(r => r.mgte != null || r.top != null)) {
+      try { await createTablesIfNotExist(); } catch (e) { /* ignora */ }
+    }
     const resultados = await processarLinhas(rows, criarNaoEncontrados, limparForaDaLista);
     let msg = `Importação concluída: ${resultados.animaisAtualizados} animais atualizados`;
     if (resultados.animaisLimpos > 0) msg += `, ${resultados.animaisLimpos} limpos (fora da planilha)`;
@@ -297,7 +345,7 @@ async function processarLinhas(rows, criarNaoEncontrados = false, limparForaDaLi
   const dados = [];
   for (let i = 0; i < rows.length; i++) {
     const r = rows[i];
-    let serie = normalizarTexto(r.serie || r.Série || r.SERIE);
+    let serie = (normalizarTexto(r.serie || r.Série || r.SERIE) || '').substring(0, 10).trim();
     let rg = normalizarRG(r.rg || r.RG || r.RGN);
     
     // Se RG contém hífen, pode estar no formato "CJCJ-16310" (série-rg junto)
@@ -313,19 +361,36 @@ async function processarLinhas(rows, criarNaoEncontrados = false, limparForaDaLi
     }
     
     if (!serie && !rg) continue;
+    const apenasMgteTop = !!r.apenasMgteTop;
+    const safeNum = (v) => {
+      const n = normalizarNumero(v);
+      if (n == null) return null;
+      const s = String(n);
+      return s === '[object Object]' ? null : s;
+    };
+    const abczgVal = apenasMgteTop ? null : safeNum(r.iABCZ ?? r.iabcz ?? r.abczg ?? r.mgte ?? r.MGTe);
+    const decile2Val = apenasMgteTop ? null : (() => {
+      const raw = r.pt_iqg ?? r.decile_2 ?? r.decile2 ?? r['Pt IQG'] ?? r['Pt'] ?? r['PL'] ?? r.top ?? r.TOP;
+      const num = normalizarNumero(raw);
+      if (num != null) {
+        const s = String(num);
+        return s === '[object Object]' ? null : s;
+      }
+      const t = normalizarTexto(raw);
+      return (t && t !== '[object Object]') ? t : null;
+    })();
     dados.push({
       linha: i + 1,
       serie,
       rg,
-      abczg: normalizarNumero(r.iABCZ ?? r.iabcz ?? r.abczg) != null ? String(normalizarNumero(r.iABCZ ?? r.iabcz ?? r.abczg)) : null,
-      deca: normalizarTexto(r.deca ?? r.Deca ?? r.DECA) || null,
-      situacaoAbcz: normalizarTexto(r.situacaoAbcz ?? r.situacao_abcz ?? r['Situação ABCZ'] ?? r.Status) || null,
-      genetica2: normalizarNumero(r.iqg ?? r.genetica_2 ?? r.genetica2 ?? r['IQG'] ?? r['Genética 2']) != null ? String(normalizarNumero(r.iqg ?? r.genetica_2 ?? r.genetica2 ?? r['IQG'] ?? r['Genética 2'])) : null,
-      decile2: (() => {
-        const raw = r.pt_iqg ?? r.decile_2 ?? r.decile2 ?? r['Pt IQG'] ?? r['Pt'] ?? r['PL'];
-        const num = normalizarNumero(raw);
-        return num != null ? String(num) : null;
-      })(),
+      abczg: abczgVal,
+      deca: apenasMgteTop ? null : (normalizarTexto(r.deca ?? r.Deca ?? r.DECA) || null),
+      situacaoAbcz: apenasMgteTop ? null : (normalizarTexto(r.situacaoAbcz ?? r.situacao_abcz ?? r['Situação ABCZ'] ?? r.Status) || null),
+      genetica2: apenasMgteTop ? null : safeNum(r.iqg ?? r.genetica_2 ?? r.genetica2 ?? r['IQG'] ?? r['Genética 2']),
+      decile2: decile2Val,
+      mgte: safeNum(r.mgte ?? r.MGTe),
+      top: safeNum(r.top ?? r.TOP) ?? (apenasMgteTop ? null : decile2Val),
+      apenasMgteTop,
     });
   }
 
@@ -447,7 +512,7 @@ async function processarLinhas(rows, criarNaoEncontrados = false, limparForaDaLi
     for (const d of batch) {
       const key = `${(d.serie || '').toUpperCase().trim()}|${d.rg}`;
       let animal = mapaAnimais.get(key);
-      if (!animal && criarNaoEncontrados) {
+      if (!animal && criarNaoEncontrados && !d.apenasMgteTop) {
         try {
           const nome = `${(d.serie || '').trim()} ${d.rg}`.replace(/\s+/g, ' ').trim();
           const tatuagem = `${(d.serie || '').trim()}-${d.rg}`;
@@ -484,33 +549,66 @@ async function processarLinhas(rows, criarNaoEncontrados = false, limparForaDaLi
         situacaoAbcz: d.situacaoAbcz,
         genetica2: d.genetica2,
         decile2: d.decile2,
+        mgte: d.mgte,
+        top: d.top,
+        apenasMgteTop: d.apenasMgteTop,
       });
     }
 
     if (updates.length === 0) continue;
 
-    const runBatchUpdate = async (comGenetica2, useOldCols = false) => {
+    const updatesMgteTop = updates.filter(u => u.apenasMgteTop);
+    const batchForFullUpdate = updates.filter(u => !u.apenasMgteTop);
+
+    if (updatesMgteTop.length > 0) {
+      try {
+        const vals = updatesMgteTop.map((u, i) => `($${i * 3 + 1}::int, $${i * 3 + 2}, $${i * 3 + 3})`).join(', ');
+        const flat = updatesMgteTop.flatMap(u => [u.id, u.mgte, u.top]);
+        await query(
+          `UPDATE animais SET mgte = CASE WHEN v.mgte IS NOT NULL AND TRIM(v.mgte::text) != '' THEN v.mgte::text ELSE animais.mgte END,
+            "top" = CASE WHEN v.top IS NOT NULL AND TRIM(v.top::text) != '' THEN v.top::text ELSE animais."top" END,
+            updated_at = CURRENT_TIMESTAMP
+           FROM (VALUES ${vals}) AS v(id, mgte, "top") WHERE animais.id = v.id`,
+          flat
+        );
+        resultados.animaisAtualizados += updatesMgteTop.length;
+      } catch (e) {
+        if (/column.*mgte|column.*top|does not exist/i.test(e?.message || '')) {
+          console.warn('[excel-genetica] Colunas mgte/top não existem, ignorando import MGTe/TOP');
+        } else {
+          batchForFullUpdate.push(...updatesMgteTop);
+        }
+      }
+    }
+
+    const runBatchUpdate = async (comGenetica2, useOldCols = false, comMgteTop = false, updatesToUse = batchForFullUpdate) => {
       const cols = comGenetica2
         ? (useOldCols ? 'abczg, deca, situacao_abcz, genetica_2, decile_2' : 'abczg, deca, situacao_abcz, iqg, pt_iqg')
         : 'abczg, deca, situacao_abcz';
       const nCols = comGenetica2 ? 6 : 4;
-      const vals = updates.map((u, i) => {
-        const off = i * nCols;
-        const params = comGenetica2
-          ? `($${off + 1}::int, $${off + 2}, $${off + 3}, $${off + 4}, $${off + 5}, $${off + 6})`
-          : `($${off + 1}::int, $${off + 2}, $${off + 3}, $${off + 4})`;
-        return params;
+      const nColsFull = comMgteTop ? nCols + 2 : nCols;
+      const vals = updatesToUse.map((u, i) => {
+        const off = i * nColsFull;
+        const base = comGenetica2
+          ? `($${off + 1}::int, $${off + 2}, $${off + 3}, $${off + 4}, $${off + 5}, $${off + 6}`
+          : `($${off + 1}::int, $${off + 2}, $${off + 3}, $${off + 4}`;
+        const ext = comMgteTop ? `, $${off + nCols + 1}, $${off + nCols + 2})` : ')';
+        return base + ext;
       }).join(', ');
-      const flat = updates.flatMap(u =>
-        comGenetica2 ? [u.id, u.abczg, u.deca, u.situacaoAbcz, u.genetica2, u.decile2] : [u.id, u.abczg, u.deca, u.situacaoAbcz]
-      );
-      const setAbczDeca = 'abczg = CASE WHEN v.abczg IS NOT NULL AND TRIM(v.abczg::text) != \'\' THEN v.abczg::text ELSE NULL END, deca = CASE WHEN v.deca IS NOT NULL AND TRIM(v.deca::text) != \'\' THEN v.deca::text ELSE NULL END';
-      const setClause = comGenetica2
+      const flat = updatesToUse.flatMap(u => {
+        const base = comGenetica2 ? [u.id, u.abczg, u.deca, u.situacaoAbcz, u.genetica2, u.decile2] : [u.id, u.abczg, u.deca, u.situacaoAbcz];
+        return comMgteTop ? [...base, u.mgte, u.top] : base;
+      });
+      const setAbczDeca = 'abczg = CASE WHEN v.abczg IS NOT NULL AND TRIM(v.abczg::text) != \'\' THEN v.abczg::text ELSE animais.abczg END, deca = CASE WHEN v.deca IS NOT NULL AND TRIM(v.deca::text) != \'\' THEN v.deca::text ELSE animais.deca END';
+      let setClause = comGenetica2
         ? (useOldCols
-          ? `${setAbczDeca}, situacao_abcz = CASE WHEN v.situacao_abcz IS NOT NULL AND TRIM(v.situacao_abcz::text) != \'\' THEN v.situacao_abcz::text ELSE NULL END, genetica_2 = COALESCE(NULLIF(TRIM(REPLACE(v.genetica_2::text, \',\', \'.\')), \'\')::numeric, animais.genetica_2), decile_2 = COALESCE(v.decile_2::text, animais.decile_2::text)`
-          : `${setAbczDeca}, situacao_abcz = CASE WHEN v.situacao_abcz IS NOT NULL AND TRIM(v.situacao_abcz::text) != \'\' THEN v.situacao_abcz::text ELSE NULL END, iqg = COALESCE(NULLIF(TRIM(REPLACE(v.iqg::text, \',\', \'.\')), \'\')::numeric, animais.iqg), pt_iqg = COALESCE(NULLIF(TRIM(REPLACE(v.pt_iqg::text, \',\', \'.\')), \'\')::numeric, animais.pt_iqg)`)
-        : `${setAbczDeca}, situacao_abcz = CASE WHEN v.situacao_abcz IS NOT NULL AND TRIM(v.situacao_abcz::text) != \'\' THEN v.situacao_abcz::text ELSE NULL END`;
-      const vCols = comGenetica2 ? `id, ${cols}` : 'id, abczg, deca, situacao_abcz';
+          ? `${setAbczDeca}, situacao_abcz = CASE WHEN v.situacao_abcz IS NOT NULL AND TRIM(v.situacao_abcz::text) != \'\' THEN v.situacao_abcz::text ELSE animais.situacao_abcz END, genetica_2 = COALESCE(NULLIF(TRIM(REPLACE(v.genetica_2::text, \',\', \'.\')), \'\')::numeric, animais.genetica_2), decile_2 = COALESCE(v.decile_2::text, animais.decile_2::text)`
+          : `${setAbczDeca}, situacao_abcz = CASE WHEN v.situacao_abcz IS NOT NULL AND TRIM(v.situacao_abcz::text) != \'\' THEN v.situacao_abcz::text ELSE animais.situacao_abcz END, iqg = COALESCE(NULLIF(TRIM(REPLACE(v.iqg::text, \',\', \'.\')), \'\')::numeric, animais.iqg), pt_iqg = COALESCE(NULLIF(TRIM(REPLACE(v.pt_iqg::text, \',\', \'.\')), \'\')::numeric, animais.pt_iqg)`)
+        : `${setAbczDeca}, situacao_abcz = CASE WHEN v.situacao_abcz IS NOT NULL AND TRIM(v.situacao_abcz::text) != \'\' THEN v.situacao_abcz::text ELSE animais.situacao_abcz END`;
+      if (comMgteTop) {
+        setClause += ', mgte = CASE WHEN v.mgte IS NOT NULL AND TRIM(v.mgte::text) != \'\' THEN v.mgte::text ELSE animais.mgte END, "top" = CASE WHEN v.top IS NOT NULL AND TRIM(v.top::text) != \'\' THEN v.top::text ELSE animais."top" END';
+      }
+      const vCols = comMgteTop ? (comGenetica2 ? `id, ${cols}, mgte, "top"` : 'id, abczg, deca, situacao_abcz, mgte, "top"') : (comGenetica2 ? `id, ${cols}` : 'id, abczg, deca, situacao_abcz');
       await query(
         `UPDATE animais SET ${setClause}, updated_at = CURRENT_TIMESTAMP
          FROM (VALUES ${vals}) AS v(${vCols}) WHERE animais.id = v.id`,
@@ -518,20 +616,33 @@ async function processarLinhas(rows, criarNaoEncontrados = false, limparForaDaLi
       );
     };
 
-    try {
+    const temMgteTop = updates.some(u => u.mgte != null || u.top != null);
+    const runUpdate = async (withMgteTop = temMgteTop) => {
       if (temColGenetica2) {
         try {
-          await runBatchUpdate(true, false);
+          await runBatchUpdate(true, false, withMgteTop, batchForFullUpdate);
         } catch (e) {
-          if (/column.*does not exist|coluna.*não existe/i.test(e?.message || '')) {
+          if (withMgteTop && /column.*mgte|column.*top|does not exist/i.test(e?.message || '')) {
+            await runBatchUpdate(true, false, false, batchForFullUpdate);
+          } else if (/column.*iqg|column.*genetica|coluna.*não existe/i.test(e?.message || '')) {
             temColGenetica2 = false;
-            await runBatchUpdate(true, true); // fallback: genetica_2, decile_2
+            await runBatchUpdate(true, true, false, batchForFullUpdate);
           } else throw e;
         }
-        resultados.animaisAtualizados += updates.length;
       } else {
-        await runBatchUpdate(false);
-        resultados.animaisAtualizados += updates.length;
+        try {
+          await runBatchUpdate(false, false, withMgteTop, batchForFullUpdate);
+        } catch (e) {
+          if (withMgteTop && /column.*mgte|column.*top|does not exist/i.test(e?.message || '')) {
+            await runBatchUpdate(false, false, false, batchForFullUpdate);
+          } else throw e;
+        }
+      }
+    };
+    try {
+      if (batchForFullUpdate.length > 0) {
+        await runUpdate();
+        resultados.animaisAtualizados += batchForFullUpdate.length;
       }
     } catch (colErr) {
       if (/column.*does not exist|coluna.*não existe/i.test(colErr?.message || '')) {

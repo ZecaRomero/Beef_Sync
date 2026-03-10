@@ -38,7 +38,10 @@ const TIPOS_RELATORIOS = [
   { key: 'custos', label: 'Custos', category: 'Financeiro' },
   { key: 'ranking_animais_avaliados', label: 'Ranking dos Animais Avaliados', category: 'Gestão' },
   { key: 'ranking_pmgz', label: '🏆 Ranking de animais', category: 'Gestão' },
-  { key: 'boletim_rebanho', label: 'Boletim do Rebanho', category: 'Gestão' }
+  { key: 'ranking_mgte', label: '🏆 Ranking MGTe', category: 'Gestão' },
+  { key: 'boletim_rebanho', label: 'Boletim do Rebanho', category: 'Gestão' },
+  { key: 'boletim_defesa', label: '📋 Boletim Defesa', category: 'Gestão' },
+  { key: 'boletim_campo', label: '📋 Boletim Campo', category: 'Gestão' }
 ]
 
 async function getEnabled() {
@@ -368,8 +371,8 @@ export default async function handler(req, res) {
               modulo: 'Reprodução',
               dados: {
                 'Gestações Ativas': totalGestacoesAtivas,
-                'Nascimentos': parseInt(qNascimentos.rows[0]?.total || 0),
-                'Partos (30d)': partosPrevistos
+                'Para Parir (30d)': partosPrevistos,
+                'Nascimentos': parseInt(qNascimentos.rows[0]?.total || 0)
               }
             },
             {
@@ -673,7 +676,8 @@ export default async function handler(req, res) {
       case 'pesagens': {
         const r = await query(`
           SELECT p.id, p.animal_id, p.peso, p.ce, p.data, p.observacoes,
-                 a.serie, a.rg, a.nome as animal_nome, a.sexo as animal_sexo
+                 a.serie, a.rg, a.nome as animal_nome, a.sexo as animal_sexo,
+                 a.mgte, a.top
           FROM pesagens p
           JOIN animais a ON a.id = p.animal_id
           WHERE p.data >= $1 AND p.data <= $2
@@ -686,7 +690,9 @@ export default async function handler(req, res) {
           ce: row.ce,
           data: toDateStr(row.data),
           sexo: row.animal_sexo,
-          observacoes: row.observacoes
+          observacoes: row.observacoes,
+          mgte: row.mgte,
+          top: row.top
         }))
         break
       }
@@ -716,9 +722,10 @@ export default async function handler(req, res) {
         let r
         try {
           r = await query(`
-            SELECT p.id, p.animal_id, p.peso, p.ce, p.data, p.observacoes, a.sexo,
+            SELECT p.id, p.animal_id, p.peso, p.ce, p.data, p.observacoes, a.sexo, a.serie, a.rg,
                    la.piquete as piquete_loc,
-                   a.piquete_atual, a.pasto_atual
+                   a.piquete_atual, a.pasto_atual,
+                   a.mgte, a.top
             FROM pesagens p
             JOIN animais a ON a.id = p.animal_id
             LEFT JOIN LATERAL (
@@ -732,10 +739,11 @@ export default async function handler(req, res) {
         } catch (colErr) {
           if (/column.*does not exist/i.test(colErr?.message || '')) {
             r = await query(`
-              SELECT p.id, p.animal_id, p.peso, p.ce, p.data, p.observacoes, a.sexo,
+              SELECT p.id, p.animal_id, p.peso, p.ce, p.data, p.observacoes, a.sexo, a.serie, a.rg,
                      la.piquete as piquete_loc,
                      a.pasto_atual as piquete_atual,
-                     a.pasto_atual
+                     a.pasto_atual,
+                     a.mgte, a.top
               FROM pesagens p
               JOIN animais a ON a.id = p.animal_id
               LEFT JOIN LATERAL (
@@ -777,7 +785,7 @@ export default async function handler(req, res) {
           const pBruto = x.piquete_loc || x.piquete_atual || x.pasto_atual || extrairLocal(x.observacoes) || 'Não informado'
           const pValidado = piqueteOuNaoInformado(pBruto)
           const p = normalizarPiquete(pValidado)
-          if (!porPiquete[p]) porPiquete[p] = { total: 0, machos: 0, femeas: 0, pesos: [], ces: [] }
+          if (!porPiquete[p]) porPiquete[p] = { total: 0, machos: 0, femeas: 0, pesos: [], ces: [], animais: [] }
           porPiquete[p].total++
           if ((x.sexo || '').toLowerCase().startsWith('m')) porPiquete[p].machos++
           else if ((x.sexo || '').toLowerCase().startsWith('f')) porPiquete[p].femeas++
@@ -785,6 +793,16 @@ export default async function handler(req, res) {
           if (!isNaN(pv)) porPiquete[p].pesos.push(pv)
           const cv = parseFloat(x.ce)
           if (!isNaN(cv) && cv > 0) porPiquete[p].ces.push(cv)
+          porPiquete[p].animais.push({
+            animal_id: x.animal_id,
+            serie: x.serie || '',
+            rg: x.rg || '',
+            animal: `${(x.serie || '').trim()} ${(x.rg || '').trim()}`.trim() || null,
+            sexo: x.sexo,
+            peso: pv,
+            mgte: x.mgte,
+            top: x.top
+          })
         })
 
         const piquetesValidos = Object.keys(porPiquete).filter(p => !/^(não informado|nao informado|-|vazio)$/i.test(String(p).trim()))
@@ -812,13 +830,15 @@ export default async function handler(req, res) {
             const mediaCE = s.ces.length ? (s.ces.reduce((a, b) => a + b, 0) / s.ces.length).toFixed(1) : '-'
             return {
               Piquete: p,
+              piquete: p,
               Animais: s.total,
               Machos: s.machos,
               Fêmeas: s.femeas,
               'Média Peso (kg)': mediaPeso,
               'Peso Min (kg)': pesoMinP,
               'Peso Max (kg)': pesoMaxP,
-              'Média CE (cm)': mediaCE
+              'Média CE (cm)': mediaCE,
+              animais: s.animais || []
             }
           })
         break
@@ -1043,9 +1063,10 @@ export default async function handler(req, res) {
           FROM estoque_semen
           WHERE tipo_operacao = 'entrada'
             AND doses_disponiveis > 0
-            AND (tipo = 'semen' OR (tipo IS NULL
-                 AND nome_touro NOT ILIKE '%ACASALAMENTO%'
-                 AND nome_touro NOT ILIKE '% X %'))
+            AND (tipo = 'semen' 
+                 OR (tipo IS NULL
+                     AND nome_touro NOT ILIKE '%ACASALAMENTO%'
+                     AND nome_touro NOT ILIKE '% X %'))
           ORDER BY nome_touro
           LIMIT 300
         `)
@@ -1076,8 +1097,7 @@ export default async function handler(req, res) {
           WHERE tipo_operacao = 'entrada'
             AND doses_disponiveis > 0
             AND (tipo = 'embriao'
-                 OR nome_touro ILIKE '%ACASALAMENTO%'
-                 OR nome_touro ILIKE '% X %')
+                 OR nome_touro ILIKE '%ACASALAMENTO%')
           ORDER BY nome_touro
           LIMIT 300
         `)
@@ -1866,6 +1886,36 @@ export default async function handler(req, res) {
             piquete: piqueteOuNaoInformado(row.piquete) || '-'
           }))
 
+          // Ranking MGTe
+          let rankingMGTe = { rows: [] }
+          try {
+            rankingMGTe = await query(`
+              SELECT a.id, a.serie, a.rg, a.nome, a.mgte, a.top, a.raca, a.sexo, ${sqlPiquete}
+              FROM animais a ${joinLateral}
+              WHERE a.situacao = 'Ativo' AND a.mgte IS NOT NULL AND TRIM(a.mgte::text) != '' ${condSeriePmgz}
+              ORDER BY
+                CASE WHEN a.mgte::text ~ '^[0-9]+[.,]?[0-9]*$'
+                THEN (REPLACE(REPLACE(TRIM(a.mgte::text), ',', '.'), ' ', '')::numeric)
+                ELSE NULL END DESC NULLS LAST
+              LIMIT 10
+            `, paramsPmgz)
+          } catch (mgteErr) {
+            console.error('Erro ao buscar ranking MGTe:', mgteErr)
+            rankingMGTe = { rows: [] }
+          }
+
+          const mgteRows = (rankingMGTe?.rows || []).map((row, i) => ({
+            ranking: 'MGTe',
+            posicao: i + 1,
+            animal_id: row.id,
+            animal: `${row.serie || ''} ${row.rg || ''}`.trim() || row.nome,
+            valor: row.mgte,
+            top: row.top,
+            raca: row.raca,
+            sexo: formatarSexo(row.sexo),
+            piquete: piqueteOuNaoInformado(row.piquete) || '-'
+          }))
+
           data = [
             { _resumo: true, tipo: 'iABCZ', titulo: 'Top 10 iABCZ', descricao: 'Quanto maior o iABCZ, melhor o animal' },
             ...rankingIABCZ.rows.map((row, i) => ({
@@ -1903,10 +1953,59 @@ export default async function handler(req, res) {
             ...(genetica2Rows.length > 0 ? [
               { _resumo: true, tipo: 'genetica2', titulo: 'Top 10 IQG', descricao: 'Maior valor = melhor animal' },
               ...genetica2Rows
+            ] : []),
+            ...(mgteRows.length > 0 ? [
+              { _resumo: true, tipo: 'mgte', titulo: 'Top 10 MGTe', descricao: 'Quanto maior o MGTe, melhor o animal' },
+              ...mgteRows
             ] : [])
           ]
         } catch (e) {
           console.error('Erro ao buscar ranking PMGZ:', e)
+          data = []
+        }
+        break
+      }
+
+      case 'ranking_mgte': {
+        try {
+          const condSerie = serieFiltro ? 'AND UPPER(TRIM(COALESCE(a.serie, \'\'))) = $1' : ''
+          const params = serieFiltro ? [serieFiltro] : []
+          
+          const r = await query(`
+            SELECT a.id, a.serie, a.rg, a.nome, a.mgte, a.top, a.raca, a.sexo,
+              COALESCE(l.piquete, a.piquete_atual, a.pasto_atual) as piquete
+            FROM animais a
+            LEFT JOIN LATERAL (
+              SELECT l2.piquete FROM localizacoes_animais l2
+              WHERE l2.animal_id = a.id AND l2.data_saida IS NULL
+              ORDER BY l2.data_entrada DESC LIMIT 1
+            ) l ON TRUE
+            WHERE a.situacao = 'Ativo' 
+              AND a.mgte IS NOT NULL 
+              AND TRIM(a.mgte::text) != ''
+              ${condSerie}
+            ORDER BY 
+              CASE 
+                WHEN a.mgte::text ~ '^[0-9]+[.,]?[0-9]*$'
+                THEN (REPLACE(REPLACE(TRIM(a.mgte::text), ',', '.'), ' ', '')::numeric)
+                ELSE NULL
+              END DESC NULLS LAST,
+              a.rg DESC
+            LIMIT 100
+          `, params)
+
+          data = (r.rows || []).map((row, i) => ({
+            posicao: i + 1,
+            animal_id: row.id,
+            animal: `${row.serie || ''} ${row.rg || ''}`.trim() || row.nome,
+            mgte: row.mgte,
+            top: row.top,
+            raca: row.raca,
+            sexo: formatarSexo(row.sexo),
+            piquete: piqueteOuNaoInformado(row.piquete) || '-'
+          }))
+        } catch (e) {
+          console.error('Erro ao buscar ranking MGTe exclusivo:', e)
           data = []
         }
         break
@@ -2153,21 +2252,85 @@ export default async function handler(req, res) {
 
       case 'boletim_rebanho': {
         try {
+          // Usa dados do boletim_campo (mesma fonte do Boletim Campo) para consistência
           const r = await query(`
-            SELECT raca, sexo, COUNT(*) as total
-            FROM animais
-            WHERE situacao = 'Ativo'
-            GROUP BY raca, sexo
-            ORDER BY raca, sexo
-            LIMIT 100
+            SELECT
+              COALESCE(NULLIF(TRIM(raca), ''), 'Não informado') as raca,
+              sexo,
+              COALESCE(NULLIF(TRIM(era), ''), '-') as era,
+              SUM(COALESCE(quant::int, 0)) as total
+            FROM boletim_campo
+            GROUP BY COALESCE(NULLIF(TRIM(raca), ''), 'Não informado'), sexo, COALESCE(NULLIF(TRIM(era), ''), '-')
+            HAVING SUM(COALESCE(quant::int, 0)) > 0
+            ORDER BY raca, sexo, era
           `)
           data = (r.rows || []).map(row => ({
             raca: row.raca || 'Não informado',
             sexo: formatarSexo(row.sexo),
+            era: row.era || '-',
             total: parseInt(row.total || 0)
           }))
           const totalAnimais = data.reduce((s, d) => s + (d.total || 0), 0)
-          resumo = { 'Total de animais ativos': totalAnimais, 'Racas': [...new Set(data.map(d => d.raca))].length }
+          const racasUnicas = [...new Set(data.map(d => d.raca))]
+          resumo = { 'Total de animais': totalAnimais, 'Raças': racasUnicas.length }
+          data.push({ raca: 'TOTAL GERAL', sexo: '-', era: '-', total: totalAnimais })
+        } catch (e) {
+          data = []
+        }
+        break
+      }
+
+      case 'boletim_defesa': {
+        try {
+          const r = await query(`
+            SELECT id, nome, cnpj, quantidades
+            FROM boletim_defesa_fazendas
+            ORDER BY nome
+          `)
+          data = (r.rows || []).map(row => {
+            const q = row.quantidades || {}
+            const faixas = ['0a3', '3a8', '8a12', '12a24', '25a36', 'acima36']
+            let total = 0
+            faixas.forEach(f => {
+              total += (q[f]?.M || 0) + (q[f]?.F || 0)
+            })
+            return {
+              fazenda: row.nome,
+              cnpj: row.cnpj,
+              total,
+              quantidades: q
+            }
+          })
+          const totalGeral = data.reduce((s, d) => s + (d.total || 0), 0)
+          resumo = { 'Fazendas': data.length, 'Total geral': totalGeral }
+          data.push({ fazenda: 'TOTAL GERAL', cnpj: '-', total: totalGeral })
+        } catch (e) {
+          data = []
+        }
+        break
+      }
+
+      case 'boletim_campo': {
+        try {
+          const r = await query(`
+            SELECT local, local_1, sub_local_2, quant, sexo, categoria, raca, era, observacao
+            FROM boletim_campo
+            ORDER BY local, local_1, sub_local_2
+          `)
+          data = (r.rows || []).map(row => ({
+            local: row.local,
+            local_1: row.local_1 || '-',
+            sub_local_2: row.sub_local_2 || '-',
+            quant: parseInt(row.quant) || 0,
+            sexo: row.sexo || '-',
+            categoria: row.categoria || '-',
+            raca: row.raca || '-',
+            era: row.era || '-',
+            observacao: row.observacao || '-'
+          }))
+          const totalGeral = data.reduce((s, d) => s + (d.quant || 0), 0)
+          resumo = { 'Registros': data.length, 'Total geral': totalGeral }
+          data.push({ local: 'TOTAL GERAL', local_1: 'TOTAL GERAL', sub_local_2: 'TOTAL GERAL', quant: totalGeral, sexo: '-', categoria: '-', raca: '-', era: '-', observacao: '-' })
         } catch (e) {
           data = []
         }

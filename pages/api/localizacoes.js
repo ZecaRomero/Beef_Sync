@@ -3,6 +3,7 @@ const logger = require('../../utils/logger.cjs')
 const { canDelete } = require('../../utils/permissions')
 import LoteTracker from '../../utils/loteTracker'
 
+export const config = { api: { externalResolver: true } }
 export default async function handler(req, res) {
   const { method } = req
 

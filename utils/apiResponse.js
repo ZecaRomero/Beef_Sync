@@ -158,7 +158,12 @@ export const sendPaginatedResponse = (res, data, pagination, message = 'Dados re
 export const asyncHandler = (fn) => {
   return (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch((error) => {
-      console.error('Erro na API:', error)
+      try {
+        const logger = require('./logger').default || require('./logger').logger
+        logger?.error('Erro na API:', error)
+      } catch (_) {
+        console.error('Erro na API:', error)
+      }
       
       // Se o erro já foi tratado (resposta já enviada), não fazer nada
       if (res.headersSent) {
@@ -205,7 +210,12 @@ export const requestLogger = (req, res, next) => {
   
   res.on('finish', () => {
     const duration = Date.now() - start
-    console.log(`${req.method} ${req.originalUrl} - ${res.statusCode} - ${duration}ms`)
+    try {
+      const logger = require('./logger').default || require('./logger').logger
+      logger?.info(`${req.method} ${req.originalUrl} - ${res.statusCode} - ${duration}ms`)
+    } catch (_) {
+      console.log(`${req.method} ${req.originalUrl} - ${res.statusCode} - ${duration}ms`)
+    }
   })
   
   next()

@@ -27,6 +27,12 @@ const parsearTextoImport = (texto) => {
   const col4EhNumeroOuDecil = col4 != null && col4 !== '' && (/^[\d,.\s]+$/.test(String(col4)) || col4.length <= 3)
   const formatoStatus = header.includes('STATUS') || (col3 != null && col3 !== '' && !col3EhNumero)
   const headerCols = splitLinha(linhas[0])
+  // Formato completo 9 colunas: Série | RG | MGTe | TOP | iABCZ | DECA | IQG | Pt IQG | situações_abcz
+  const formatoCompleto9Cols = header.includes('MGTE') && header.includes('TOP') && header.includes('IABCZ') && header.includes('DECA') &&
+    (header.includes('IQG') || header.includes('IQGG')) && (header.includes('PT') || header.includes('PL')) &&
+    (header.includes('SITUA') || header.includes('STATUS') || header.includes('ABCZ'))
+  // Formato Série | RG | MGTe | TOP (4 colunas)
+  const formatoMGTeTOP = !formatoCompleto9Cols && header.includes('MGTE') && header.includes('TOP')
   // Formato completo 6 colunas: SÉRIE | RG | iABCZg | DECA | IQG | Pt IQG
   const formatoCompleto6Cols = header.includes('IABCZ') && header.includes('DECA') &&
     (header.includes('IQG') || header.includes('IQGG')) &&
@@ -83,6 +89,26 @@ const parsearTextoImport = (texto) => {
       
       if (formatoStatus && cols.length >= 2 + offsetCols) {
         dados.push({ serie, rg, situacaoAbcz: c(2) || null })
+      } else if (formatoCompleto9Cols && cols.length >= 9) {
+        dados.push({
+          serie,
+          rg,
+          mgte: c(2) || null,
+          top: c(3) || null,
+          iABCZ: c(4) || null,
+          deca: c(5) || null,
+          iqg: c(6) || null,
+          pt_iqg: c(7) || null,
+          situacaoAbcz: c(8) || null
+        })
+      } else if (formatoMGTeTOP && cols.length >= 4) {
+        dados.push({
+          serie,
+          rg,
+          mgte: c(2) || null,
+          top: c(3) || null,
+          apenasMgteTop: true
+        })
       } else if ((formatoCompleto6Cols || formatoCompleto7Cols || formatoCompleto6ColsPelosDados) && cols.length >= 6) {
         // Série, RG, iABCZg, DECA, IQG, Pt IQG (6 cols) + opcional Situação ABCZ (7ª col, pode ter espaço ex: "POSSUI RGN")
         const situacaoAbczVal = cols.length >= 7 ? cols.slice(dataStart + 4).join(' ').trim() || null : null
@@ -277,7 +303,7 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
         </div>
         {importMode === 'texto' ? (
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Cole os dados (tab entre colunas). Formato: Série, RG, iABCZg, DECA, IQG, Pt IQG (6 cols) ou + Situação ABCZ (7 cols). Ou só IQG: Série, RG, IQG, Pt IQG (4 cols).</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Cole os dados (tab entre colunas). <strong>MGTe/TOP:</strong> Série, RG, MGTe, TOP (4 cols — não altera iABCZ/DECA/IQG). <strong>Completo:</strong> Série, RG, iABCZg, DECA, IQG, Pt IQG (6 cols) ou + Situação ABCZ (7 cols). Ou só IQG: Série, RG, IQG, Pt IQG (4 cols).</p>
             <textarea
               value={importTexto}
               onChange={(e) => setImportTexto(e.target.value)}
@@ -288,7 +314,12 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
           </div>
         ) : (
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Excel com 6 ou 7 colunas: <strong>Série | RG | iABCZg | DECA | IQG | Pt IQG | Situação ABCZ</strong>. Importa iABCZ, IQG e Situação ABCZ. Ou só IQG: 4 colunas (Série, RG, IQG, Pt IQG).</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+              <strong>Tudo junto (9 colunas):</strong> <strong>Série | RG | MGTe | TOP | iABCZ | DECA | IQG | Pt IQG | situações_abcz</strong> — importa tudo de uma vez.
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+              <strong>MGTe e TOP:</strong> 4 colunas <strong>Série | RG | MGTe | TOP</strong>. <strong>Completo:</strong> 6 ou 7 colunas <strong>Série | RG | iABCZg | DECA | IQG | Pt IQG | Situação ABCZ</strong>.
+            </p>
             <input
               type="file"
               accept=".xlsx,.xls,.csv"
@@ -330,7 +361,7 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
             onChange={(e) => setLimparForaDaLista(e.target.checked)}
             className="rounded border-gray-300 dark:border-gray-600"
           />
-          <span className="text-sm text-gray-600 dark:text-gray-400">Limpar iABCZ/DECA de animais que não estão na planilha (mesma série)</span>
+          <span className="text-sm text-gray-600 dark:text-gray-400">Limpar iABCZ/DECA de animais que não estão na planilha (mesma série) — <em>não se aplica a MGTe/TOP</em></span>
         </label>
         <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-gray-200 dark:border-gray-600">
           <button
