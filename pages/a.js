@@ -9,15 +9,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { MagnifyingGlassIcon, CheckCircleIcon, XCircleIcon, DevicePhoneMobileIcon, ChartBarIcon, ChatBubbleLeftRightIcon, TrophyIcon } from '@heroicons/react/24/outline'
 
-const STORAGE_KEY = 'beef_usuario_identificado'
-
-function formatPhone(v) {
-  const digits = String(v).replace(/\D/g, '')
-  if (digits.length <= 2) return digits ? `(${digits}` : ''
-  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`
-  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`
-}
-
 export default function ConsultaRapida() {
   const router = useRouter()
   const [serie, setSerie] = useState('')
@@ -30,9 +21,9 @@ export default function ConsultaRapida() {
   const [isMobile, setIsMobile] = useState(false)
   const [identificado, setIdentificado] = useState(null)
   const [nomeIdent, setNomeIdent] = useState('')
-  const [telefoneIdent, setTelefoneIdent] = useState('')
   const [isDarkMode, setIsDarkMode] = useState(false)
   const serieRef = useRef(null)
+  const buscaPrincipalRef = useRef(null)
   const autoSearchDone = useRef(false)
   const inactivityTimerRef = useRef(null)
   
@@ -64,18 +55,16 @@ export default function ConsultaRapida() {
       // Usuário autenticado
       setIdentificado(true)
       setNomeIdent(data.nome)
-      setTelefoneIdent(data.telefone)
     } catch (e) {
       console.error('Erro ao verificar autenticação:', e)
       router.push('/mobile-auth')
     }
   }, [router])
 
-  // Verificar se já está identificado (localStorage) - localhost pula
+  // Carregar tema e verificar identificação - mobile-auth é a única tela de entrada (sem duplicar)
   useEffect(() => {
     if (typeof window === 'undefined') return
     
-    // Carregar tema - usar a mesma chave que _app.js
     const savedDarkMode = localStorage.getItem('darkMode')
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
     const shouldBeDark = savedDarkMode === 'true' || (!savedDarkMode && prefersDark)
@@ -88,21 +77,29 @@ export default function ConsultaRapida() {
       setIsDarkMode(false)
     }
     
-    // Verificar identificação
     const host = window.location.hostname
     if (host === 'localhost' || host === '127.0.0.1') {
       setIdentificado(true)
       return
     }
+    // Usar mobile-auth como única fonte - não mostrar segunda tela de identificação
     try {
-      const stored = localStorage.getItem(STORAGE_KEY)
-      setIdentificado(!!stored)
+      const authData = localStorage.getItem('mobile-auth')
+      if (authData) {
+        const data = JSON.parse(authData)
+        if (data.nome) {
+          setIdentificado(true)
+          setNomeIdent(data.nome)
+          return
+        }
+      }
+      setIdentificado(false)
     } catch (_) {
       setIdentificado(false)
     }
   }, [])
 
-  // Deslogar após 10 min de inatividade (exceto localhost)
+  // Deslogar após 10 min de inatividade (exceto localhost) - usa mobile-auth
   useEffect(() => {
     if (typeof window === 'undefined' || identificado !== true) return
     const host = window.location.hostname
@@ -114,7 +111,7 @@ export default function ConsultaRapida() {
       if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current)
       inactivityTimerRef.current = setTimeout(() => {
         try {
-          localStorage.removeItem(STORAGE_KEY)
+          localStorage.removeItem('mobile-auth')
         } catch (_) {}
         setIdentificado(false)
       }, INACTIVITY_MS)
@@ -192,17 +189,20 @@ export default function ConsultaRapida() {
   }, [router.isReady, router.query])
 
   useEffect(() => {
-    serieRef.current?.focus()
-  }, [])
+    // Foco no campo principal (nome ou RG) para digitar número direto
+    buscaPrincipalRef.current?.focus()
+  }, [identificado])
 
-  // Buscar sugestões de animais por nome
+  // Buscar sugestões: se digitar só número = busca por RG; se tiver letras = busca por nome
   useEffect(() => {
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current)
     }
 
-    const nome = nomeAnimal.trim()
-    if (nome.length < 2) {
+    const texto = nomeAnimal.trim()
+    const soNumeros = /^\d+$/.test(texto)
+    const minLen = soNumeros ? 3 : 2
+    if (texto.length < minLen) {
       setSugestoes([])
       setShowSugestoes(false)
       return
@@ -211,12 +211,34 @@ export default function ConsultaRapida() {
     setLoadingSugestoes(true)
     searchTimeoutRef.current = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/animals/buscar-por-nome?nome=${encodeURIComponent(nome)}`)
-        const data = await res.json()
-        
+        let data = { success: false, data: [] }
+        if (soNumeros) {
+          // Digitar só número = buscar por RG (preenche série e nome)
+          const res = await fetch(`/api/animals/buscar-por-rg?rg=${encodeURIComponent(texto)}`)
+          data = await res.json()
+        } else {
+          // Texto com letras = buscar por nome
+          const res = await fetch(`/api/animals/buscar-por-nome?nome=${encodeURIComponent(texto)}`)
+          data = await res.json()
+        }
+
         if (data.success && Array.isArray(data.data)) {
           setSugestoes(data.data)
           setShowSugestoes(data.data.length > 0)
+          // Se só 1 resultado e digitou número, preencher e ir direto
+          if (soNumeros && data.data.length === 1) {
+            const animal = data.data[0]
+            setSerie(animal.serie || '')
+            setRg(animal.rg || '')
+            setNomeAnimal(animal.nome || '')
+            setTouched({ serie: true, rg: true })
+            setError('')
+            if (animal.serie && animal.rg) {
+              router.push(`/consulta-animal/${animal.serie}-${animal.rg}`)
+            } else if (animal.id) {
+              router.push(`/consulta-animal/${animal.id}`)
+            }
+          }
         } else {
           setSugestoes([])
           setShowSugestoes(false)
@@ -228,14 +250,14 @@ export default function ConsultaRapida() {
       } finally {
         setLoadingSugestoes(false)
       }
-    }, 300) // Debounce de 300ms
+    }, soNumeros ? 400 : 300)
 
     return () => {
       if (searchTimeoutRef.current) {
         clearTimeout(searchTimeoutRef.current)
       }
     }
-  }, [nomeAnimal])
+  }, [nomeAnimal, router])
 
   // Busca automática por RG quando digitar apenas números
   useEffect(() => {
@@ -244,8 +266,8 @@ export default function ConsultaRapida() {
     }
 
     const rgDigitado = rg.trim()
-    // Só busca se tiver pelo menos 4 dígitos e não tiver série preenchida
-    if (rgDigitado.length < 4 || serie.trim().length > 0) {
+    // Só busca se tiver pelo menos 3 dígitos e não tiver série preenchida
+    if (rgDigitado.length < 3 || serie.trim().length > 0) {
       return
     }
 
@@ -310,22 +332,6 @@ export default function ConsultaRapida() {
     setShowSugestoes(false)
     setTouched({ serie: true, rg: true })
     setError('')
-  }
-
-  const handleIdentificacaoSubmit = (e) => {
-    e.preventDefault()
-    if (!nomeIdent.trim()) {
-      setError('Informe seu nome.')
-      return
-    }
-    try {
-      // Salvar apenas o nome no localStorage
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ nome: nomeIdent.trim() }))
-      setIdentificado(true)
-      setError('')
-    } catch (_) {
-      setError('Erro ao salvar.')
-    }
   }
 
   const handleSubmit = async (e) => {
@@ -452,54 +458,7 @@ export default function ConsultaRapida() {
 
       <div className="min-h-screen flex flex-col items-center justify-center px-4 py-6 bg-gradient-to-br from-gray-50 via-amber-50/30 to-gray-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
         <div className="">
-          {/* Tela de identificação - ANTES da consulta (exceto localhost) */}
-          {identificado !== true && (
-            <div className="w-full max-w-sm animate-fade-in">
-              <div className="mb-6 text-center">
-                <div className="inline-flex items-center justify-center w-24 h-24 mb-4 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 shadow-lg overflow-hidden p-2">
-                  <Image src="/Host_ico_rede.ico" alt="Beef-Sync" width={100} height={58} className="object-contain" />
-                </div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-amber-600 to-amber-500 dark:from-amber-500 dark:to-amber-400 bg-clip-text text-transparent mb-1">
-                  Beef-Sync
-                </h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Digite seu nome para começar
-                </p>
-              </div>
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6">
-                <form onSubmit={handleIdentificacaoSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 text-center">
-                      Qual é o seu nome?
-                    </label>
-                    <input
-                      type="text"
-                      value={nomeIdent}
-                      onChange={(e) => { setNomeIdent(e.target.value); setError('') }}
-                      placeholder="Digite seu nome"
-                      className="w-full px-4 py-4 text-lg text-center rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                      required
-                      autoFocus
-                    />
-                  </div>
-                  {error && (
-                    <p className="text-sm text-red-600 dark:text-red-400 text-center">{error}</p>
-                  )}
-                  <button
-                    type="submit"
-                    className="w-full py-4 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02] active:scale-[0.98]"
-                  >
-                    Entrar
-                  </button>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-3">
-                    Seu nome será salvo para facilitar o acesso
-                  </p>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* Logo e Header - só quando identificado */}
+          {/* Logo e Header - só quando identificado (mobile-auth é a única tela de entrada) */}
           {identificado === true && (
           <>
           <div className="mb-8 text-center animate-fade-in">
@@ -578,7 +537,7 @@ export default function ConsultaRapida() {
               Consulta Animal
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-              Digite os números no celular (Série e RG)
+              Digite só o número (RG) ou o nome — preenche automaticamente
             </p>
 
             {/* Links para Feedback e Relatórios - Grid 2 colunas */}
@@ -604,10 +563,11 @@ export default function ConsultaRapida() {
               {/* Campo de Busca por Nome */}
               <div className="relative sugestoes-container">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Buscar por Nome do Animal
+                  Buscar por Nome ou RG (digite o número)
                 </label>
                 <div className="relative">
                   <input
+                    ref={buscaPrincipalRef}
                     type="text"
                     value={nomeAnimal}
                     onChange={(e) => {
@@ -617,7 +577,7 @@ export default function ConsultaRapida() {
                     onFocus={() => {
                       if (sugestoes.length > 0) setShowSugestoes(true)
                     }}
-                    placeholder="Digite o nome do animal..."
+                    placeholder="Digite o número (RG) ou nome..."
                     className="w-full px-4 py-4 text-lg rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:border-amber-500 focus:ring-amber-500"
                     autoComplete="off"
                     disabled={loading}
@@ -640,11 +600,25 @@ export default function ConsultaRapida() {
                         className="w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-gray-700 transition-colors border-b border-gray-200 dark:border-gray-700 last:border-b-0"
                       >
                         <div className="font-semibold text-gray-900 dark:text-white">
-                          {animal.nome}
+                          {animal.nome || `${animal.serie || ''} ${animal.rg || ''}`.trim() || '—'}
                         </div>
                         <div className="text-sm text-gray-600 dark:text-gray-400">
                           Série: <span className="font-medium text-amber-600 dark:text-amber-500">{animal.serie}</span> • RG: <span className="font-medium text-amber-600 dark:text-amber-500">{animal.rg}</span>
                         </div>
+                        {(animal.situacao_reprodutiva || animal.carimbo_leilao) && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {animal.situacao_reprodutiva && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+                                {animal.situacao_reprodutiva}
+                              </span>
+                            )}
+                            {animal.carimbo_leilao && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300">
+                                🏷️ {animal.carimbo_leilao}
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </button>
                     ))}
                   </div>
@@ -652,7 +626,7 @@ export default function ConsultaRapida() {
                 
                 {nomeAnimal.length >= 2 && !loadingSugestoes && sugestoes.length === 0 && (
                   <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    Nenhum animal encontrado com esse nome
+                    Nenhum animal encontrado. Dica: digite só o RG (ex: 17037) para buscar diretamente.
                   </p>
                 )}
               </div>
@@ -678,8 +652,14 @@ export default function ConsultaRapida() {
                     type="text"
                     value={serie}
                     onChange={(e) => {
-                      setSerie(e.target.value.toUpperCase())
+                      const v = e.target.value
+                      setSerie(v.toUpperCase())
                       setError('')
+                      // Se digitou só números no campo Série, tratar como RG e buscar
+                      if (/^\d+$/.test(v) && v.length >= 3) {
+                        setRg(v)
+                        setNomeAnimal(v)
+                      }
                     }}
                     onBlur={() => setTouched(prev => ({ ...prev, serie: true }))}
                     placeholder="Série (Ex: CJCJ)"

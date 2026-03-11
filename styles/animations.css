@@ -63,8 +63,14 @@
 }
 
 .animate-fade-in {
-  animation: fade-in 0.5s ease-out;
+  animation: fade-in 0.5s ease-out forwards;
 }
+
+.animate-fade-in-stagger-1 { animation: fade-in 0.45s ease-out 0.05s forwards; opacity: 0; }
+.animate-fade-in-stagger-2 { animation: fade-in 0.45s ease-out 0.1s forwards; opacity: 0; }
+.animate-fade-in-stagger-3 { animation: fade-in 0.45s ease-out 0.15s forwards; opacity: 0; }
+.animate-fade-in-stagger-4 { animation: fade-in 0.45s ease-out 0.2s forwards; opacity: 0; }
+.animate-fade-in-stagger-5 { animation: fade-in 0.45s ease-out 0.25s forwards; opacity: 0; }
 
 .animate-slide-in-right {
   animation: slide-in-right 0.5s ease-out;

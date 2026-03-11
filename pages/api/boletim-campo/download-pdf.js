@@ -16,6 +16,8 @@ export default async function handler(req, res) {
       ORDER BY local, local_1, sub_local_2
     `)
     const dados = dadosResult.rows || []
+    const dadosComQuant = dados.filter((r) => (r.quant || 0) > 0)
+    const totalGeral = dadosComQuant.reduce((s, r) => s + (r.quant || 0), 0)
 
     const doc = new jsPDF({ orientation: 'landscape' })
     doc.setFontSize(14)
@@ -23,7 +25,7 @@ export default async function handler(req, res) {
     doc.setFontSize(10)
     doc.text(new Date().toLocaleDateString('pt-BR'), 14, 22)
 
-    const tableData = dados.map(row => [
+    const tableData = dadosComQuant.map(row => [
       row.local || '',
       row.local_1 || '',
       row.sub_local_2 || '',
@@ -34,6 +36,9 @@ export default async function handler(req, res) {
       row.era || '',
       (row.observacao || '').substring(0, 30)
     ])
+    if (tableData.length > 0) {
+      tableData.push(['TOTAL GERAL', '', '', String(totalGeral), '', '', '', '', ''])
+    }
 
     autoTable(doc, {
       head: [HEADERS],

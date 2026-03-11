@@ -688,6 +688,41 @@ async function handleGet(req, res, id) {
           animal.rg_mae = gestMae.rows[0].rg
         }
       }
+      // 2b. Gestações mae_serie/mae_rg (doadora biológica) - mãe pode estar inativa
+      if (!animal.serie_mae && !animal.rg_mae) {
+        const gestMaeBio = await dbQuery(
+          `SELECT g.mae_serie as serie, g.mae_rg as rg 
+           FROM gestacoes g
+           INNER JOIN animais a ON UPPER(TRIM(COALESCE(a.serie,''))) = UPPER(TRIM(COALESCE(g.mae_serie,''))) 
+             AND TRIM(COALESCE(a.rg,'')::text) = TRIM(COALESCE(g.mae_rg,'')::text)
+           WHERE (UPPER(TRIM(COALESCE(a.nome,''))) = UPPER(TRIM($1))
+              OR UPPER(TRIM(COALESCE(a.nome,''))) LIKE UPPER($2))
+             AND g.mae_serie IS NOT NULL AND g.mae_rg IS NOT NULL
+           LIMIT 1`,
+          [maeNome, `%${maeNome}%`]
+        )
+        if (gestMaeBio.rows.length > 0) {
+          animal.serie_mae = gestMaeBio.rows[0].serie
+          animal.rg_mae = gestMaeBio.rows[0].rg
+        }
+      }
+      // 2c. Coleta FIV (doadora) - mãe pode ter coletas mesmo inativa
+      if (!animal.serie_mae && !animal.rg_mae) {
+        const cfMae = await dbQuery(
+          `SELECT a.serie, a.rg FROM coleta_fiv cf
+           JOIN animais a ON a.id = cf.doadora_id
+           WHERE (UPPER(TRIM(COALESCE(a.nome,''))) = UPPER(TRIM($1))
+              OR UPPER(TRIM(COALESCE(cf.doadora_nome,''))) = UPPER(TRIM($1))
+              OR UPPER(TRIM(COALESCE(a.nome,''))) LIKE UPPER($2))
+             AND cf.doadora_id IS NOT NULL AND a.serie IS NOT NULL AND a.rg IS NOT NULL
+           LIMIT 1`,
+          [maeNome, `%${maeNome}%`]
+        )
+        if (cfMae.rows.length > 0) {
+          animal.serie_mae = cfMae.rows[0].serie
+          animal.rg_mae = cfMae.rows[0].rg
+        }
+      }
       // 3. Se ainda não achou, buscar via nascimentos: gestação onde este animal nasceu
       if (!animal.serie_mae && !animal.rg_mae && animal.serie && animal.rg) {
         const nascMae = await dbQuery(
@@ -728,10 +763,58 @@ async function handleGet(req, res, id) {
       localizacoes = []
     }
   }
+
+  // Corrigir nome quando cadastro está errado - buscar em coleta_fiv (doadora) e gestacoes (receptora)
+  let nomeExibir = animal.nome
+  const nomeAtual = (animal.nome || '').trim()
+  const nomePareceErrado = !nomeAtual || /^[A-Z]\d{4}\s+[A-Z0-9\.]*\s*\d*$/i.test(nomeAtual) // ex: A7389 MAT. ou A7389 MAT. 17037
+  if (animal.id || (animal.serie && animal.rg)) {
+    try {
+      const { query: dbQuery } = require('../../../lib/database')
+      // 1. Doadora FIV (ex: Mosca vs TREM BALA FIV DA EAO)
+      if (animal.id) {
+        const cfNome = await dbQuery(
+          'SELECT doadora_nome FROM coleta_fiv WHERE doadora_id = $1 AND doadora_nome IS NOT NULL AND TRIM(doadora_nome) != \'\' ORDER BY data_fiv DESC LIMIT 1',
+          [animal.id]
+        )
+        if (cfNome.rows.length > 0) {
+          const dn = String(cfNome.rows[0].doadora_nome || '').trim()
+          if (dn && (nomePareceErrado || dn !== nomeAtual)) {
+            nomeExibir = dn
+          }
+        }
+      }
+      // 2. Receptora em gestações (ex: JATAUBA SANT ANNA vs A7389 MAT. para CJCJ 17037)
+      if ((!nomeExibir || nomeExibir === animal.nome) && nomePareceErrado && animal.serie && animal.rg) {
+        const gestNome = await dbQuery(
+          'SELECT receptora_nome FROM gestacoes WHERE receptora_serie = $1 AND receptora_rg::text = $2 AND receptora_nome IS NOT NULL AND TRIM(receptora_nome) != \'\' ORDER BY created_at DESC LIMIT 1',
+          [String(animal.serie).trim(), String(animal.rg).trim()]
+        )
+        if (gestNome.rows.length > 0) {
+          const rn = String(gestNome.rows[0].receptora_nome || '').trim()
+          if (rn && /[a-záàâãéêíóôõúç]/i.test(rn)) nomeExibir = rn
+        }
+      }
+      // 3. Receptora em transferências de embriões
+      if ((!nomeExibir || nomeExibir === animal.nome) && nomePareceErrado && animal.id) {
+        const teNome = await dbQuery(
+          'SELECT receptora_nome FROM transferencias_embrioes WHERE receptora_id = $1 AND receptora_nome IS NOT NULL AND TRIM(receptora_nome) != \'\' ORDER BY data_te DESC LIMIT 1',
+          [animal.id]
+        )
+        if (teNome.rows.length > 0) {
+          const tn = String(teNome.rows[0].receptora_nome || '').trim()
+          if (tn && /[a-záàâãéêíóôõúç]/i.test(tn)) nomeExibir = tn
+        }
+      }
+    } catch (e) {
+      // ignora
+    }
+  }
   
   // Adicionar campos para compatibilidade
   const animalComIdentificacao = {
     ...animal,
+    nome: nomeExibir,
     localizacoes,
     identificacao: `${animal.serie}-${animal.rg}`,
     dataNascimento: animal.data_nascimento,

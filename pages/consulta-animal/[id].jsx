@@ -37,6 +37,7 @@ import AnimalNotes from '../../components/animals/AnimalNotes'
 
 import { localizacaoValidaParaExibir } from '../../utils/formatters'
 import { useAnimalDetails } from '../../hooks/useAnimalDetails'
+import { getSexTheme, getPageBgClasses } from '../../utils/animalSexTheme'
 
 export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode }) {
   const router = useRouter()
@@ -103,14 +104,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
 
   const [, setShowIABCZInfo] = useState(false)
   const [isEditGeneticaModalOpen, setIsEditGeneticaModalOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
   const sectionRefs = useRef({ custos: null, genética: null, pai: null, filhos: null, peso: null, fiv: null, localizacao: null })
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const mobile = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-    setIsMobile(mobile)
-  }, [])
 
   const handleSaveGenetica = useCallback((updatedAnimal) => {
     setAnimal(prev => ({ ...prev, ...updatedAnimal }))
@@ -190,6 +184,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
   }, [animal, locAtual])
 
   const nome = animal ? (animal.nome || `${animal.serie || ''} ${animal.rg || ''}`.trim() || '-') : '-'
+  const sexTheme = getSexTheme(animal)
 
   const scrollToSection = useCallback((key) => {
     const el = sectionRefs.current[key]
@@ -203,20 +198,54 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
           <title>Carregando... | Beef-Sync</title>
           <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
         </Head>
-        <div className="min-h-screen flex flex-col items-center justify-center px-4 py-6 bg-gray-50 dark:bg-gray-900">
-          <span className="animate-spin rounded-full h-10 w-10 border-2 border-amber-500 border-t-transparent" />
-          <p className="mt-4 text-gray-500 dark:text-gray-400">Carregando...</p>
+        <div className="min-h-screen bg-gradient-to-b from-gray-100 via-gray-50 to-sky-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900 pb-24">
+          {/* Skeleton header */}
+          <header className="sticky top-0 z-20 bg-white/90 dark:bg-gray-800/90 border-b border-gray-200 dark:border-gray-700 backdrop-blur-md pt-[env(safe-area-inset-top)]">
+            <div className="flex items-center justify-between max-w-lg mx-auto px-4 py-3 min-h-[52px]">
+              <div className="skeleton h-6 w-24 rounded-lg" />
+              <div className="skeleton h-10 w-10 rounded-xl" />
+            </div>
+          </header>
+          <div className="max-w-lg mx-auto p-4 space-y-4">
+            {/* Skeleton chips */}
+            <div className="flex gap-2">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="skeleton h-7 w-20 rounded-full" style={{ animationDelay: `${i * 80}ms` }} />
+              ))}
+            </div>
+            {/* Skeleton metrics grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="skeleton h-[72px] rounded-lg" style={{ animationDelay: `${i * 60}ms` }} />
+              ))}
+            </div>
+            {/* Skeleton main card */}
+            <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80">
+              <div className="h-12 bg-gray-100 dark:bg-gray-700" />
+              <div className="p-4 space-y-3">
+                <div className="flex gap-3">
+                  <div className="skeleton h-12 w-12 rounded-lg flex-shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className="skeleton h-5 w-3/4 rounded" />
+                    <div className="skeleton h-4 w-1/2 rounded" />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <div className="skeleton h-9 w-28 rounded-lg" />
+                  <div className="skeleton h-9 w-24 rounded-lg" />
+                </div>
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="skeleton h-10 w-full rounded" style={{ animationDelay: `${i * 50}ms` }} />
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </>
     )
   }
 
   if (error || !animal) {
-    const idForLink = id && typeof id === 'string' ? id : ''
-    const partsErr = idForLink.includes('-') ? idForLink.split('-') : []
-    const serieErr = (partsErr[0] || '').trim()
-    const rgErr = partsErr.length > 1 ? partsErr.slice(1).join('-').trim() : ''
-    const temSerieRg = serieErr && rgErr
     return (
       <>
         <Head>
@@ -225,23 +254,9 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
         </Head>
         <div className="min-h-screen flex flex-col items-center justify-center px-4 py-6 bg-gray-50 dark:bg-gray-900">
           <p className="text-red-600 dark:text-red-400 text-center mb-2">{error || 'Animal não encontrado'}</p>
-          <p className="text-gray-500 dark:text-gray-400 text-sm text-center mb-4 max-w-sm">
+          <p className="text-gray-500 dark:text-gray-400 text-sm text-center mb-6 max-w-sm">
             Se o animal existe no banco, tente por identificação: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">/consulta-animal/SERIE-RG</code>
           </p>
-          {temSerieRg && !isMobile && (
-            <Link
-              href={`/registrar-baixa?serie=${encodeURIComponent(serieErr)}&rg=${encodeURIComponent(rgErr)}`}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 mb-4"
-            >
-              Registrar baixa (abate/morte/venda) de {serieErr} {rgErr}
-            </Link>
-          )}
-          <Link
-            href="/consulta-animal/CJCJ-16974"
-            className="inline-block text-amber-600 dark:text-amber-400 hover:underline text-sm mb-6"
-          >
-            Exemplo: CJCJ-16974 →
-          </Link>
           <Link
             href="/a?buscar=1"
             className="flex items-center gap-2 px-6 py-3 rounded-xl bg-amber-600 text-white font-semibold hover:bg-amber-700"
@@ -260,7 +275,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
         <title>{nome} | Consulta Beef-Sync</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover" />
       </Head>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-[calc(7.5rem+env(safe-area-inset-bottom))] scroll-pt-4">
+      <div className={`min-h-screen ${getPageBgClasses(sexTheme)} pb-[calc(6.5rem+env(safe-area-inset-bottom))] scroll-pt-4`}>
         <AnimalHeader
           darkMode={darkMode}
           toggleDarkMode={toggleDarkMode}
@@ -268,13 +283,18 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
           resumoChips={resumoChips}
           setShowIABCZInfo={setShowIABCZInfo}
           rankings={rankings}
+          sexTheme={sexTheme}
         />
 
-        <div className="max-w-lg mx-auto p-4 space-y-4">
-          <AnimalMetricsCards animal={animal} metrics={metrics} rankings={rankings} onScrollTo={scrollToSection} />
+        <div className="max-w-lg mx-auto p-3 sm:p-4 space-y-3">
+          <div className="animate-fade-in-stagger-1">
+            <AnimalMetricsCards animal={animal} metrics={metrics} rankings={rankings} onScrollTo={scrollToSection} sexTheme={sexTheme} />
+          </div>
 
+          <div className="animate-fade-in-stagger-2">
           <AnimalMainInfo
             animal={animal}
+            sexTheme={sexTheme}
             rankings={rankings}
             metrics={{...metrics, locAtual, previsaoPartoExibir: metrics.previsaoParto}}
             examesAndrologicos={examesAndrologicos}
@@ -295,11 +315,15 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
           <AnimalPlanningCards animal={animal} metrics={metrics} />
 
           <AnimalAndrologicalExams examesAndrologicos={examesAndrologicos} metrics={metrics} />
+          </div>
           
+          <div className="animate-fade-in-stagger-4">
           <AnimalGestations gestacoes={animal.gestacoes || []} />
           
-          <AnimalInseminations inseminacoes={inseminacoes} />
+          <AnimalInseminations inseminacoes={inseminacoes} dataNascimento={animal?.data_nascimento} />
+          </div>
 
+          <div className="animate-fade-in-stagger-5">
           <AnimalReproduction animal={animal} />
           
           <div ref={r => sectionRefs.current.fiv = r} className="scroll-mb-28"><AnimalIVFCollections fivs={animal.fivs || []} /></div>
@@ -332,12 +356,14 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
           <AnimalPhotos animal={animal} />
 
           <AnimalAdditionalInfo animal={animal} />
+          </div>
         </div>
 
         <AnimalFixedActions 
           onShare={handleWhatsAppShare}
           isSharing={false}
           animalId={animal?.id}
+          sexTheme={sexTheme}
         />
 
         {isEditGeneticaModalOpen && (

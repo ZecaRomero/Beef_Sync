@@ -62,14 +62,30 @@ export default asyncHandler(async function handler(req, res) {
     return serieLimpa
   }
 
+  // Função auxiliar para sanitizar Nome (preserva o valor do Excel para busca no mobile)
+  const sanitizarNome = (nome) => {
+    if (nome === undefined || nome === null) return null
+    const s = String(nome).trim()
+    if (!s) return null
+    // Limitar a 100 caracteres (VARCHAR na tabela animais)
+    if (s.length > 100) {
+      console.warn(`⚠️ Nome muito longo (${s.length} caracteres), truncando: ${s.substring(0, 30)}...`)
+      return s.substring(0, 100)
+    }
+    return s
+  }
+
   // Validar e sanitizar cada animal - Série e RG são sempre obrigatórios
   // Sexo e raça são obrigatórios apenas para animais novos (não para atualizações parciais)
   for (let i = 0; i < animais.length; i++) {
     const animal = animais[i]
     
-    // Sanitizar série e RG
+    // Sanitizar série, RG e nome
     animal.serie = sanitizarSerie(animal.serie)
     animal.rg = sanitizarRG(animal.rg)
+    if (animal.nome !== undefined && animal.nome !== null) {
+      animal.nome = sanitizarNome(animal.nome)
+    }
     
     // Validar que série e RG existem e não são vazios
     if (!animal.serie || !animal.rg) {
@@ -639,16 +655,17 @@ export default asyncHandler(async function handler(req, res) {
     // Usar os valores já calculados acima (linhas 394-396)
     console.log(`📊 Total de animais DEPOIS da importação: ${totalDepoisNum}`)
     console.log(`📊 Diferença (animais adicionados): ${diferenca}`)
-    
-    // Verificar se realmente foram adicionados
-    if (diferenca === 0 && resultados.total_sucessos > 0) {
-      console.error(`❌ ERRO CRÍTICO: ${resultados.total_sucessos} animais foram processados mas NENHUM foi adicionado ao banco!`)
+
+    // Contar quantos foram inserções novas vs atualizações (atualizações não aumentam o total)
+    const totalCriados = resultados.sucessos.filter(s => s.acao === 'criado').length
+    const totalAtualizados = resultados.sucessos.filter(s => s.tipo === 'atualizado').length
+    console.log(`📊 Novos criados: ${totalCriados}, Atualizados: ${totalAtualizados}`)
+
+    // Só validar aumento quando houve inserções novas; atualizações não alteram o total
+    if (totalCriados > 0 && diferenca < totalCriados) {
+      console.error(`❌ ERRO CRÍTICO: ${totalCriados} animais novos foram processados mas apenas ${diferenca} foram adicionados ao banco!`)
       console.error(`📋 Total antes: ${totalAntesNum}, Total depois: ${totalDepoisNum}`)
-      throw new Error(`Animais processados mas não foram salvos no banco. Total não aumentou de ${totalAntesNum} para ${totalDepoisNum + resultados.total_sucessos}`)
-    }
-    
-    if (diferenca < resultados.total_sucessos) {
-      console.warn(`⚠️ ATENÇÃO: Apenas ${diferenca} de ${resultados.total_sucessos} animais foram realmente adicionados ao banco`)
+      throw new Error(`Animais processados mas não foram salvos no banco. Total não aumentou de ${totalAntesNum} para ${totalDepoisNum + totalCriados}`)
     }
     
     console.log(`✅ Confirmação: ${diferenca} novos animais foram adicionados ao banco de dados`)

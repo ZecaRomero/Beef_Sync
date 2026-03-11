@@ -2,7 +2,7 @@
  * API para buscar animais por RG
  * Retorna todos os animais que possuem o RG informado
  */
-import { query } from '../../../lib/database'
+const { query } = require('../../../lib/database')
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -11,28 +11,20 @@ export default async function handler(req, res) {
 
   const { rg } = req.query
 
-  if (!rg || !rg.trim()) {
+  if (!rg || typeof rg !== 'string' || !rg.trim()) {
     return res.status(400).json({ success: false, message: 'RG é obrigatório' })
   }
 
   try {
-    const rgTrimmed = rg.trim()
+    const rgTrimmed = String(rg).trim()
     
-    // Buscar animais com o RG informado
+    // Query mínima para máxima compatibilidade (rg pode ser VARCHAR ou INTEGER)
     const result = await query(
-      `SELECT 
-        id,
-        serie,
-        rg,
-        nome,
-        sexo,
-        raca,
-        data_nascimento,
-        situacao
-      FROM animais 
-      WHERE CAST(rg AS TEXT) = $1
-      ORDER BY serie, rg
-      LIMIT 10`,
+      `SELECT id, serie, rg, nome, sexo, raca, data_nascimento, situacao
+       FROM animais 
+       WHERE TRIM(COALESCE(rg::text, '')) = $1
+       ORDER BY serie, rg
+       LIMIT 10`,
       [rgTrimmed]
     )
     

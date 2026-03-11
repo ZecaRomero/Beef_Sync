@@ -6,7 +6,11 @@ import InfoRow from './InfoRow'
 export default function AnimalNotes({ animal }) {
   const [isExpanded, setIsExpanded] = useState(true)
 
-  const hasInfo = animal.observacoes || animal.informacoes_adicionais || animal.origem || animal.data_entrada || animal.valor_compra
+  // Filtrar observações de sistema (ex: "Atualizado via lote LOTE-00192")
+  const obsFiltrada = (animal.observacoes || animal.informacoes_adicionais || '')
+    .replace(/Atualizado via lote LOTE-\d+/gi, '')
+    .trim()
+  const hasInfo = obsFiltrada || animal.origem || animal.data_entrada || animal.valor_compra
 
   if (!hasInfo) return null
 
@@ -27,10 +31,10 @@ export default function AnimalNotes({ animal }) {
       </button>
       <div className={`overflow-hidden transition-all ${isExpanded ? 'max-h-[999px]' : 'max-h-0'}`}>
         <div className="p-4 space-y-3">
-          {(animal.observacoes || animal.informacoes_adicionais) && (
+          {obsFiltrada && (
             <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg border border-yellow-100 dark:border-yellow-900/30">
               <p className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-line">
-                {animal.observacoes || animal.informacoes_adicionais}
+                {obsFiltrada}
               </p>
             </div>
           )}

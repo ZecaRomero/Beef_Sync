@@ -1,22 +1,20 @@
 import React from 'react'
 import {
   UserGroupIcon,
-  TrophyIcon,
-  SparklesIcon,
   HeartIcon,
   MapPinIcon,
-  CurrencyDollarIcon,
   AcademicCapIcon,
   ExclamationTriangleIcon,
   BeakerIcon
 } from '@heroicons/react/24/outline'
+import { getMetricsCardShadowClasses } from '../../utils/animalSexTheme'
 
 function formatCurrency(v) {
   if (v == null || v === '') return '-'
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(parseFloat(v))
 }
 
-export default function AnimalMetricsCards({ animal, metrics, rankings, onScrollTo }) {
+export default function AnimalMetricsCards({ animal, metrics, rankings, onScrollTo, sexTheme = 'neutral' }) {
   if (!animal || !metrics) return null
 
   const {
@@ -40,14 +38,16 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
   // Exibir previsão de parto apenas se estiver prenha
   const previsaoPartoExibir = isPrenha && diasParaParto != null
 
+  const shadowAccent = getMetricsCardShadowClasses(sexTheme) // accent para cards neutros
+
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
       {/* iABCZ */}
       {(animal.abczg || animal.abczg === 0) && (
         <button
           type="button"
           onClick={() => onScrollTo?.('genética')}
-          className={`rounded-xl p-3 border text-center w-full text-left cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform ${
+          className={`rounded-lg p-2.5 border text-center w-full text-left cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-sm hover:shadow-md ${
           filhoTopIABCZ
             ? 'bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40 border-2 border-emerald-400 dark:border-emerald-500'
             : posicaoIABCZ === 1
@@ -60,7 +60,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
             ? 'bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-300 dark:border-blue-700'
             : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
         }`}>
-          <p className={`text-2xl font-bold ${
+          <p className={`text-xl font-bold ${
             filhoTopIABCZ ? 'text-emerald-600 dark:text-emerald-400' :
             posicaoIABCZ === 1 ? 'text-amber-600 dark:text-amber-400' :
             posicaoIABCZ === 2 ? 'text-slate-600 dark:text-slate-300' :
@@ -90,7 +90,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
         <button
           type="button"
           onClick={() => onScrollTo?.('genética')}
-          className={`rounded-xl p-3 border text-center w-full text-left cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform ${
+          className={`rounded-lg p-2.5 border text-center w-full text-left cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-sm hover:shadow-md ${
           filhoTopDECA
             ? 'bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40 border-2 border-emerald-400 dark:border-emerald-500'
             : posicaoDECA === 1
@@ -103,7 +103,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
             ? 'bg-teal-50 dark:bg-teal-900/20 border-2 border-teal-300 dark:border-teal-700'
             : 'bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-900/30 dark:to-cyan-900/30 border-2 border-teal-300 dark:border-teal-600'
         }`}>
-          <p className={`text-2xl font-bold ${
+          <p className={`text-xl font-bold ${
             filhoTopDECA ? 'text-emerald-600 dark:text-emerald-400' :
             posicaoDECA === 1 ? 'text-amber-600 dark:text-amber-400' :
             posicaoDECA === 2 ? 'text-slate-600 dark:text-slate-300' :
@@ -133,7 +133,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
         <button
           type="button"
           onClick={() => onScrollTo?.('genética')}
-          className={`rounded-xl p-3 border text-center w-full text-left cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform ${
+          className={`rounded-lg p-2.5 border text-center w-full text-left cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-sm hover:shadow-md ${
           filhoTopIQG
             ? 'bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40 border-2 border-emerald-400 dark:border-emerald-500'
             : posicaoIQG === 1
@@ -146,7 +146,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
             ? 'bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border-2 border-blue-300 dark:border-blue-600'
             : 'bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-2 border-purple-300 dark:border-purple-600'
         }`}>
-          <p className={`text-2xl font-bold ${
+          <p className={`text-xl font-bold ${
             filhoTopIQG ? 'text-emerald-600 dark:text-emerald-400' :
             posicaoIQG === 1 ? 'text-purple-600 dark:text-purple-400' :
             posicaoIQG === 2 ? 'text-indigo-600 dark:text-indigo-400' :
@@ -176,7 +176,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
         <button
           type="button"
           onClick={() => onScrollTo?.('genética')}
-          className={`rounded-xl p-3 border text-center w-full text-left cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform ${
+          className={`rounded-lg p-2.5 border text-center w-full text-left cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-sm hover:shadow-md ${
           filhoTopPtIQG
             ? 'bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40 border-2 border-emerald-400 dark:border-emerald-500'
             : posicaoPtIQG === 1
@@ -189,7 +189,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
             ? 'bg-cyan-50 dark:bg-cyan-900/20 border-2 border-cyan-300 dark:border-cyan-700'
             : 'bg-gradient-to-br from-cyan-50 to-sky-50 dark:from-cyan-900/30 dark:to-sky-900/30 border-2 border-cyan-300 dark:border-cyan-600'
         }`}>
-          <p className={`text-2xl font-bold ${
+          <p className={`text-xl font-bold ${
             filhoTopPtIQG ? 'text-emerald-600 dark:text-emerald-400' :
             posicaoPtIQG === 1 ? 'text-amber-600 dark:text-amber-400' :
             posicaoPtIQG === 2 ? 'text-slate-600 dark:text-slate-300' :
@@ -219,7 +219,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
         <button
           type="button"
           onClick={() => onScrollTo?.('genética')}
-          className={`rounded-xl p-3 border text-center w-full text-left cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform ${
+          className={`rounded-lg p-2.5 border text-center w-full text-left cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-sm hover:shadow-md ${
             posicaoMGte === 1
               ? 'bg-gradient-to-br from-amber-100 to-yellow-100 dark:from-amber-900/40 dark:to-yellow-900/40 border-2 border-amber-400 dark:border-amber-500'
               : posicaoMGte === 2
@@ -231,7 +231,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
               : 'bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 border-2 border-indigo-300 dark:border-indigo-600'
           }`}
         >
-          <p className={`text-2xl font-bold ${
+          <p className={`text-xl font-bold ${
             posicaoMGte === 1 ? 'text-amber-600 dark:text-amber-400' :
             posicaoMGte === 2 ? 'text-slate-600 dark:text-slate-300' :
             posicaoMGte === 3 ? 'text-amber-700 dark:text-amber-300' :
@@ -298,7 +298,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
         <button
           type="button"
           onClick={() => onScrollTo?.('filhos')}
-          className="bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 rounded-lg p-3 border border-amber-300 dark:border-amber-700 text-center w-full cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform"
+          className={`bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 rounded-lg p-3 border border-amber-300 dark:border-amber-700 text-center w-full cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 hover:shadow-md ${shadowAccent}`}
         >
           <div className="flex items-center justify-center mb-0.5">
             <UserGroupIcon className="h-4 w-4 text-amber-600 dark:text-amber-400" />
@@ -353,7 +353,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
         <button
           type="button"
           onClick={() => onScrollTo?.('localizacao')}
-          className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg p-3 border border-blue-300 dark:border-blue-700 text-center w-full cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform"
+          className={`bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg p-3 border border-blue-300 dark:border-blue-700 text-center w-full cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 hover:shadow-md ${shadowAccent}`}
         >
           <div className="flex items-center justify-center mb-0.5">
             <MapPinIcon className="h-4 w-4 text-blue-600 dark:text-blue-400" />

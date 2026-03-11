@@ -247,6 +247,18 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
   }
 
   const handleLimparTodas = async () => {
+    // Solicitar senha de desenvolvedor
+    const senha = prompt('🔒 ÁREA RESTRITA - Digite a senha do desenvolvedor para continuar:')
+    
+    if (!senha) {
+      return // Usuário cancelou
+    }
+    
+    if (senha !== 'bfzk26') {
+      alert('❌ Senha incorreta! Acesso negado.')
+      return
+    }
+    
     if (!confirm('ZERAR TODOS os dados genéticos (iABCZ, DECA, IQG, Pt IQG, Situação ABCZ) de TODOS os animais?\n\nDepois importe o Excel com 6 ou 7 colunas. O 17098 e outros fora da planilha deixarão de aparecer no ranking.')) return
     setLimpando(true)
     setResultadoImport(null)

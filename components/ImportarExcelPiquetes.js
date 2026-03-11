@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ImportProgressOverlay from './ImportProgressOverlay';
 
 export default function ImportarExcelPiquetes({ onImportComplete }) {
   const [arquivo, setArquivo] = useState(null);
@@ -65,7 +66,9 @@ export default function ImportarExcelPiquetes({ onImportComplete }) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <>
+      <ImportProgressOverlay importando={importando} progress={{ etapa: 'Importando piquetes e animais...' }} />
+      <div className="bg-white rounded-lg shadow-md p-6">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">
         📊 Importar Excel - Piquetes e Animais
       </h2>
@@ -183,5 +186,6 @@ export default function ImportarExcelPiquetes({ onImportComplete }) {
         </div>
       )}
     </div>
+    </>
   );
 }

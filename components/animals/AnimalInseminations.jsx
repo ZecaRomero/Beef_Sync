@@ -6,7 +6,20 @@ import {
 } from '@heroicons/react/24/outline'
 import { formatDate } from '../../utils/formatters'
 
-export default function AnimalInseminations({ inseminacoes }) {
+/** Calcula idade em meses na data da concepção (data_ia) e se é super precoce (< 14 meses) */
+function calcularIdadeConcepcao(dataNascimento, dataConcepcao) {
+  if (!dataNascimento || !dataConcepcao) return null
+  const nasc = new Date(dataNascimento)
+  const conc = new Date(dataConcepcao)
+  if (isNaN(nasc.getTime()) || isNaN(conc.getTime())) return null
+  if (conc < nasc) return null
+  const diffMs = conc - nasc
+  const meses = Math.floor(diffMs / (1000 * 60 * 60 * 24 * 30.44))
+  const diasExtras = Math.floor((diffMs % (1000 * 60 * 60 * 24 * 30.44)) / (1000 * 60 * 60 * 24))
+  return { meses, diasExtras, superPrecoce: meses < 14 }
+}
+
+export default function AnimalInseminations({ inseminacoes, dataNascimento }) {
   const [isExpanded, setIsExpanded] = useState(true)
 
   if (!inseminacoes || inseminacoes.length === 0) return null
@@ -76,6 +89,22 @@ export default function AnimalInseminations({ inseminacoes }) {
                         DG: {ia.resultado_dg}
                       </span>
                     )}
+                    {ehPrenha && dataIA && dataNascimento && (() => {
+                      const info = calcularIdadeConcepcao(dataNascimento, dataIA)
+                      if (!info) return null
+                      return (
+                        <>
+                          <span className="inline-block px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200">
+                            Emprenhou com {info.meses}m {info.diasExtras > 0 ? `+${info.diasExtras}d` : ''}
+                          </span>
+                          {info.superPrecoce && (
+                            <span className="inline-block px-2 py-0.5 rounded text-xs font-bold bg-amber-200 text-amber-900 dark:bg-amber-500/50 dark:text-amber-100">
+                              Super precoce
+                            </span>
+                          )}
+                        </>
+                      )
+                    })()}
                     {invalida && (
                       <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 font-medium">
                         Inválida

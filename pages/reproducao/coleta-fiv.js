@@ -3,6 +3,7 @@ import Head from 'next/head'
 import { BeakerIcon, CalendarIcon, UserIcon, PlusIcon, PencilIcon, TrashIcon, MagnifyingGlassIcon, XMarkIcon, DocumentArrowUpIcon } from '../../components/ui/Icons'
 import { useDebouncedCallback } from '../../hooks/useDebounce'
 import { formatDoadoraIdentificacao } from '../../utils/formatters'
+import ImportProgressOverlay from '../../components/ImportProgressOverlay'
 
 export default function ColetaFiv() {
   const [coletas, setColetas] = useState([])
@@ -441,6 +442,7 @@ export default function ColetaFiv() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <ImportProgressOverlay importando={importLoading} progress={{ etapa: 'Importando coletas FIV...' }} />
       <Head>
         <title>Coleta de Oócitos (FIV) - Beef Sync</title>
       </Head>

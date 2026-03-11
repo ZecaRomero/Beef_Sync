@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import * as XLSX from 'xlsx'
+import { extrairSerieRG } from '../utils/animalUtils'
 import {
   DocumentArrowUpIcon,
   CheckCircleIcon,
@@ -9,6 +10,7 @@ import {
 } from '@heroicons/react/24/outline'
 import Modal from './ui/Modal'
 import Button from './ui/Button'
+import ImportProgressOverlay from './ImportProgressOverlay'
 
 export default function UniversalExcelImporter({ isOpen, onClose, onImportSuccess }) {
   const [file, setFile] = useState(null)
@@ -419,12 +421,22 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
         serie_pai: getVal(['SériePai', 'SeriePai', 'serie_pai', 'SERIE_PAI', 'Série Pai']),
         rg_pai: getVal(['RgnPai', 'Rgn Pai', 'rg_pai', 'RG_PAI', 'RGN Pai']),
         mae: getVal(['Mãe', 'Mae', 'mae', 'MAE', 'Mãe Animal', 'MAE_ANIMAL', 'Nome da Mãe', 'NomeMãe', 'NomeMae'], ['mae', 'mãe']),
-        serie_mae: getVal(['SérieMãe', 'SerieMãe', 'SerieMae', 'serie_mae', 'SERIE_MAE', 'Série Mãe']),
-        rg_mae: getVal(['RgnMãe', 'RgnMae', 'Rgn Mãe', 'rg_mae', 'RG_MAE', 'RGN Mãe']),
+        serie_mae: getVal(['SérieMãe', 'SerieMãe', 'SerieMae', 'serie_mae', 'SERIE_MAE', 'Série Mãe', 'Série da Mãe', 'Serie da Mae', 'SERIE DA MAE', 'Serie Mae']),
+        rg_mae: getVal(['RgnMãe', 'RgnMae', 'Rgn Mãe', 'rg_mae', 'RG_MAE', 'RGN Mãe', 'RG da Mãe', 'Rg da Mae', 'RG DA MAE', 'RG Mae']),
         receptora: getVal(['Receptora', 'receptora', 'RECEPTORA']),
         avo_materno: getVal(['Avô Materno', 'Avo Materno', 'avo_materno', 'AVO_MATERNO', 'AvôMaterno', 'AvoMaterno']),
         iabcz: getVal(['iABCZ', 'IABCZ', 'iabcz', 'iABZ', 'IABZ']),
         deca: getVal(['DECA', 'deca', 'Deca'])
+      }
+
+      // Coluna combinada "Série e RG da Mãe" (ex: "CJCJ 16982")
+      const serieRgMaeCombined = getVal(['Série e RG da Mãe', 'Serie e RG da Mae', 'SERIE E RG DA MAE', 'Serie RG Mae', 'Série RG Mãe', 'Identificação Mãe', 'Identificacao Mae'])
+      if (serieRgMaeCombined && (!processed.serie_mae || !processed.rg_mae)) {
+        const { serie: s, rg: r } = extrairSerieRG(serieRgMaeCombined, processed.serie)
+        if (s || r) {
+          processed.serie_mae = processed.serie_mae || s
+          processed.rg_mae = processed.rg_mae || r
+        }
       }
       
       // Log do primeiro registro para debug
@@ -457,6 +469,9 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
       console.log('📦 Total de registros:', preview.all.length)
       if (usarChunks) console.log(`📦 Enviando em lotes de ${CHUNK_SIZE} (evita timeout)`)
 
+      const totalSteps = usarChunks ? Math.ceil(preview.all.length / CHUNK_SIZE) : preview.all.length
+      setImportProgress({ atual: 0, total: totalSteps, etapa: usarChunks ? `Importando ${getTypeLabel(tipoParaUsar)}` : `Enviando ${preview.all.length} registros...` })
+
       let response
       let result = {}
 
@@ -471,7 +486,7 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
         const todosErros = []
 
         for (let c = 0; c < chunks.length; c++) {
-          setImportProgress({ current: c + 1, total: totalChunks, processed: (c * CHUNK_SIZE) + chunks[c].length })
+          setImportProgress({ current: c + 1, total: totalChunks, processed: (c * CHUNK_SIZE) + chunks[c].length, atual: c + 1, etapa: `Processando lote ${c + 1} de ${totalChunks}...` })
           const r = await fetch('/api/animals/batch', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -585,19 +600,24 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
           handleClose()
         }, 3000)
       } else {
-        // Mostrar erro detalhado
-        const errorMessage = result.message || 'Erro ao importar dados'
+        // Mostrar erro detalhado (garantir que message seja string - API pode retornar objeto)
+        const rawMessage = result.message || result.errors || 'Erro ao importar dados'
+        const errorMessage = typeof rawMessage === 'string'
+          ? rawMessage
+          : (rawMessage?.required
+            ? `Animal ${rawMessage.animal_index || '?'}: campos obrigatórios ausentes (${(rawMessage.required || []).join(', ')})`
+            : JSON.stringify(rawMessage))
         const errorDetails = result.data?.resultados?.erros || []
         
         console.error('❌ Erro na importação:', errorMessage)
         console.error('📋 Detalhes dos erros:', errorDetails)
         
-        // Montar mensagem de erro detalhada
-        let fullErrorMessage = errorMessage
+        // Montar mensagem de erro detalhada (sempre string)
+        let fullErrorMessage = String(errorMessage)
         if (errorDetails.length > 0) {
           fullErrorMessage += '\n\nDetalhes:\n'
           errorDetails.slice(0, 5).forEach(err => {
-            fullErrorMessage += `\n• ${err.brinco || 'Animal'}: ${err.erro}`
+            fullErrorMessage += `\n• ${err.brinco || err.animal || 'Animal'}: ${err.erro || err.msg || '—'}`
           })
           if (errorDetails.length > 5) {
             fullErrorMessage += `\n\n... e mais ${errorDetails.length - 5} erros`
@@ -641,7 +661,12 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
   if (!isOpen) return null
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Importação Universal de Excel" size="xl">
+    <>
+      <ImportProgressOverlay
+        importando={loading}
+        progress={importProgress ? { atual: importProgress.atual ?? importProgress.current, total: importProgress.total, etapa: importProgress.etapa || `Lote ${importProgress.current}/${importProgress.total} (${importProgress.processed} registros)...` } : {}}
+      />
+      <Modal isOpen={isOpen} onClose={handleClose} title="Importação Universal de Excel" size="xl">
       <div className="space-y-4">
         {/* Método de Importação */}
         <div className="flex gap-4 mb-4">
@@ -889,8 +914,8 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
         {error && (
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
             <div className="flex items-center gap-2">
-              <ExclamationTriangleIcon className="h-5 w-5 text-red-600" />
-              <span className="text-red-800 dark:text-red-200">{error}</span>
+              <ExclamationTriangleIcon className="h-5 w-5 text-red-600 flex-shrink-0" />
+              <span className="text-red-800 dark:text-red-200 whitespace-pre-wrap">{typeof error === 'string' ? error : JSON.stringify(error)}</span>
             </div>
           </div>
         )}
@@ -900,8 +925,8 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
           <div className="space-y-2">
             <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
               <div className="flex items-center gap-2">
-                <CheckCircleIcon className="h-5 w-5 text-green-600" />
-                <span className="text-green-800 dark:text-green-200">{success.message}</span>
+                <CheckCircleIcon className="h-5 w-5 text-green-600 flex-shrink-0" />
+                <span className="text-green-800 dark:text-green-200">{typeof success.message === 'string' ? success.message : String(success.message || '')}</span>
               </div>
             </div>
             {/* Exemplos de erros quando há muitos */}
@@ -936,5 +961,6 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
         </div>
       </div>
     </Modal>
+    </>
   )
 }

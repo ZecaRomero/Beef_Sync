@@ -1666,6 +1666,69 @@ class DatabaseService {
     return result.rows;
   }
 
+  async buscarGestacaoPorId(id) {
+    const result = await query('SELECT * FROM gestacoes WHERE id = $1', [id]);
+    return result.rows[0];
+  }
+
+  async atualizarGestacao(id, dadosAtualizados) {
+    const campos = [];
+    const valores = [];
+    let contador = 1;
+
+    const camposPermitidos = [
+      'pai_serie', 'pai_rg', 'mae_serie', 'mae_rg', 'receptora_nome',
+      'receptora_serie', 'receptora_rg', 'data_cobertura', 'custo_acumulado',
+      'situacao', 'observacoes'
+    ];
+
+    for (const campo of camposPermitidos) {
+      if (dadosAtualizados[campo] !== undefined) {
+        campos.push(`${campo} = $${contador}`);
+        valores.push(dadosAtualizados[campo]);
+        contador++;
+      }
+    }
+
+    if (campos.length === 0) {
+      throw new Error('Nenhum campo para atualizar');
+    }
+
+    valores.push(id);
+    const queryText = `
+      UPDATE gestacoes
+      SET ${campos.join(', ')}
+      WHERE id = $${contador}
+      RETURNING *
+    `;
+
+    const result = await query(queryText, valores);
+    return result.rows[0];
+  }
+
+  async excluirGestacao(id) {
+    // Primeiro, verificar se existem nascimentos vinculados
+    const nascimentosVinculados = await query(
+      'SELECT COUNT(*) as count FROM nascimentos WHERE gestacao_id = $1',
+      [id]
+    );
+
+    if (parseInt(nascimentosVinculados.rows[0].count) > 0) {
+      // Se houver nascimentos, apenas desvincula (SET NULL já está configurado no ON DELETE)
+      logger.info(`Gestação ${id} tem nascimentos vinculados. Desvinculando...`);
+    }
+
+    // Excluir a gestação
+    const result = await query('DELETE FROM gestacoes WHERE id = $1 RETURNING *', [id]);
+
+    if (result.rows.length === 0) {
+      throw new Error('Gestação não encontrada');
+    }
+
+    return result.rows[0];
+  }
+
+
   // ============ OPERAÇÕES COM NASCIMENTOS ============
   
   // Registrar nascimento

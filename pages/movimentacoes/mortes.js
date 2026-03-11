@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import * as XLSX from 'xlsx'
 
 import { ExclamationTriangleIcon, PlusIcon, TrashIcon, MagnifyingGlassIcon, XMarkIcon, PencilIcon, UserGroupIcon } from '../../components/ui/Icons'
+import ImportProgressOverlay from '../../components/ImportProgressOverlay'
 
 // Componentes simples inline para evitar problemas de importação
 const Card = ({ children, className = '' }) => (
@@ -122,6 +123,8 @@ export default function Mortes() {
   const [importStep, setImportStep] = useState('upload') // upload, preview, processing, result
   const [importSummary, setImportSummary] = useState(null)
   const [importErrors, setImportErrors] = useState([])
+  const [importandoMortes, setImportandoMortes] = useState(false)
+  const [importProgressMortes, setImportProgressMortes] = useState({ atual: 0, total: 0, etapa: '' })
 
   useEffect(() => {
     loadMortes()
@@ -326,24 +329,25 @@ export default function Mortes() {
   }
 
   const processImport = async () => {
+    const deathsToImport = importData.filter(d => d.isValid).map(d => ({
+      serie: d.serie,
+      rg: d.rg,
+      animalId: d.animalId,
+      dataMorte: d.dataMorte,
+      causaMorte: d.causaMorte,
+      observacoes: d.observacoes,
+      valorPerda: d.valorPerda
+    }))
+
+    if (deathsToImport.length === 0) {
+      alert('Nenhum registro válido para importar')
+      return
+    }
+
+    setImportandoMortes(true)
+    setImportProgressMortes({ atual: 0, total: deathsToImport.length, etapa: 'Importando óbitos...' })
+    setLoading(true)
     try {
-      setLoading(true)
-      const deathsToImport = importData.filter(d => d.isValid).map(d => ({
-        serie: d.serie,
-        rg: d.rg,
-        animalId: d.animalId,
-        dataMorte: d.dataMorte,
-        causaMorte: d.causaMorte,
-        observacoes: d.observacoes,
-        valorPerda: d.valorPerda
-      }))
-
-      if (deathsToImport.length === 0) {
-        alert('Nenhum registro válido para importar')
-        setLoading(false)
-        return
-      }
-
       const response = await fetch('/api/deaths/bulk', {
         method: 'POST',
         headers: {
@@ -355,6 +359,7 @@ export default function Mortes() {
       const result = await response.json()
 
       if (response.ok) {
+        setImportProgressMortes(prev => ({ ...prev, atual: deathsToImport.length, etapa: 'Importação concluída!' }))
         setImportSummary(result.data.summary)
         setImportErrors(result.data.errors || [])
         setImportStep('result')
@@ -368,6 +373,8 @@ export default function Mortes() {
       alert('Erro interno ao processar importação')
     } finally {
       setLoading(false)
+      setImportandoMortes(false)
+      setImportProgressMortes({ atual: 0, total: 0, etapa: '' })
     }
   }
 
@@ -946,6 +953,7 @@ export default function Mortes() {
 
   return (
     <div className="space-y-6">
+      <ImportProgressOverlay importando={importandoMortes} progress={importProgressMortes} />
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <div className="flex items-center justify-between">

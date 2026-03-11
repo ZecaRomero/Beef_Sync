@@ -54,7 +54,14 @@ export default asyncHandler(async function handler(req, res) {
         }
 
         const animal = animalResult.rows[0]
-        const sexo = (animal.sexo || '').toString().trim()
+        let sexo = (animal.sexo || '').toString().trim()
+        const ehMacho = /macho|^m$/i.test(sexo) || sexo === 'M'
+
+        // Se está como Macho no banco mas está na planilha de IA (é fêmea), corrigir para Fêmea
+        if (ehMacho) {
+          await client.query('UPDATE animais SET sexo = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2', ['Fêmea', animal.id])
+          sexo = 'Fêmea'
+        }
 
         if (sexo !== 'Fêmea' && sexo !== 'F' && sexo !== 'Femea') {
           errors.push(`Animal ${item.serie}${item.rg} não é fêmea (${sexo})`)
@@ -70,13 +77,7 @@ export default asyncHandler(async function handler(req, res) {
           const dataIA = converterData(item[`data_ia${i}`] || item[`dataIA${i}`])
           if (!dataIA) continue
 
-          await client.query(`
-            UPDATE inseminacoes SET valida = false, status_gestacao = 'Vazia',
-              resultado_dg = COALESCE(NULLIF(TRIM(resultado_dg), ''), 'Vazia'),
-              updated_at = CURRENT_TIMESTAMP
-            WHERE animal_id = $1
-          `, [animal.id])
-
+          // Não invalidar IAs anteriores - permite múltiplas IAs por animal (acrescenta)
           const touro = item[`touro${i}`] || item[`touro_${i}`] || null
           const serieTouro = item[`serie_touro${i}`] || item[`serieTouro${i}`] || null
           const rgTouro = item[`rg_touro${i}`] || item[`rgTouro${i}`] || null

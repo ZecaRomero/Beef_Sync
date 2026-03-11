@@ -23,7 +23,7 @@ const LABELS_CAMPO = {
 }
 
 export default function BoletimDefesaMobile() {
-  const [abaAtiva, setAbaAtiva] = useState('defesa')
+  const [abaAtiva, setAbaAtiva] = useState('campo')
   const [fazendas, setFazendas] = useState([])
   const [dadosCampo, setDadosCampo] = useState([])
   const [loading, setLoading] = useState(true)
@@ -53,6 +53,7 @@ export default function BoletimDefesaMobile() {
   const [alteracoesFeitas, setAlteracoesFeitas] = useState([])
   const [sugerirResumo, setSugerirResumo] = useState(false)
   const [modalResumoAlteracoes, setModalResumoAlteracoes] = useState(false)
+  const [modalEscolhaEnvio, setModalEscolhaEnvio] = useState(null) // { downloadUrl, waLink, nomeContato } quando fallback
 
   useEffect(() => {
     carregarDados()
@@ -242,12 +243,18 @@ export default function BoletimDefesaMobile() {
       })
       const json = await res.json()
       if (json.success) {
+        setModalConferencia(false)
         setModalEnviar(false)
         if (json.fallback) {
-          window.open(json.downloadUrl === '/api/boletim-campo/download-excel' ? '/api/boletim-campo/download-excel' : '/api/boletim-campo/download-pdf', '_blank')
-          window.open(json.waLink, '_blank')
-          alert('Arquivo baixado. Envie o arquivo no WhatsApp que abriu.')
+          const base = typeof window !== 'undefined' ? window.location.origin : ''
+          const url = json.downloadUrl?.startsWith('/') ? `${base}${json.downloadUrl}` : json.downloadUrl
+          setModalEscolhaEnvio({
+            downloadUrl: url || `${base}/api/boletim-campo/download-excel`,
+            waLink: json.waLink,
+            nomeContato: contatoSelecionado?.nome
+          })
         } else {
+          setContatoSelecionado(null)
           alert(`Enviado para ${contatoSelecionado.nome}!`)
         }
       } else {
@@ -342,17 +349,6 @@ export default function BoletimDefesaMobile() {
         {/* Abas */}
         <div className="flex gap-2 mb-4">
           <button
-            onClick={() => setAbaAtiva('defesa')}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold transition-all ${
-              abaAtiva === 'defesa'
-                ? 'bg-teal-600 text-white shadow-md'
-                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-600'
-            }`}
-          >
-            <ShieldCheckIcon className="w-5 h-5" />
-            Defesa
-          </button>
-          <button
             onClick={() => setAbaAtiva('campo')}
             className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold transition-all ${
               abaAtiva === 'campo'
@@ -362,6 +358,17 @@ export default function BoletimDefesaMobile() {
           >
             <TableCellsIcon className="w-5 h-5" />
             Campo
+          </button>
+          <button
+            onClick={() => setAbaAtiva('defesa')}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold transition-all ${
+              abaAtiva === 'defesa'
+                ? 'bg-teal-600 text-white shadow-md'
+                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-600'
+            }`}
+          >
+            <ShieldCheckIcon className="w-5 h-5" />
+            Defesa
           </button>
         </div>
 
@@ -1110,6 +1117,47 @@ export default function BoletimDefesaMobile() {
                 {enviando ? 'Enviando...' : 'Confirmar e enviar'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal escolher: Baixar ou Enviar (quando WhatsApp API não configurada) */}
+      {modalEscolhaEnvio && (
+        <div className="fixed inset-0 bg-black/50 z-[70] flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Arquivo pronto</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              O link do WhatsApp não permite anexar arquivos automaticamente. Baixe o arquivo e anexe manualmente no chat.
+            </p>
+            <div className="space-y-3">
+              <button
+                onClick={() => {
+                  window.open(modalEscolhaEnvio.downloadUrl, '_blank')
+                  setModalEscolhaEnvio(null)
+                }}
+                className="w-full py-3 bg-blue-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2"
+              >
+                <DocumentTextIcon className="w-5 h-5" />
+                Baixar arquivo
+              </button>
+              <button
+                onClick={() => {
+                  window.open(modalEscolhaEnvio.downloadUrl, '_blank')
+                  setTimeout(() => window.open(modalEscolhaEnvio.waLink, '_blank'), 300)
+                  setModalEscolhaEnvio(null)
+                }}
+                className="w-full py-3 bg-green-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2"
+              >
+                <PaperAirplaneIcon className="w-5 h-5" />
+                Baixar arquivo e abrir WhatsApp
+              </button>
+            </div>
+            <button
+              onClick={() => setModalEscolhaEnvio(null)}
+              className="w-full mt-4 py-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+            >
+              Fechar
+            </button>
           </div>
         </div>
       )}

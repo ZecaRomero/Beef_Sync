@@ -2,7 +2,7 @@
  * Relatórios visíveis no mobile.
  * Gráficos, KPI cards, animações e visual aprimorado.
  */
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -167,6 +167,7 @@ export default function MobileRelatorios() {
   const [racaEmbriaoSelecionada, setRacaEmbriaoSelecionada] = useState(null)
   const [acasalamentosRaca, setAcasalamentosRaca] = useState([])
   const [resumoDetalheModal, setResumoDetalheModal] = useState({ open: false, tipo: null, valor: null, titulo: '', qtd: 0 })
+  const [cardInfoModal, setCardInfoModal] = useState({ open: false, title: '', value: '', description: '', reportKey: null })
 
   useEffect(() => {
     fetch('/api/mobile-reports')
@@ -196,7 +197,7 @@ export default function MobileRelatorios() {
     setIsDarkMode(shouldBeDark)
   }, [])
 
-  // Carregar dashboard (resumo geral) na entrada
+  // Carregar dashboard (resumo geral) na entrada e ao mudar período
   useEffect(() => {
     if (!config?.enabled?.includes('resumo_geral')) return
     const params = new URLSearchParams({
@@ -210,7 +211,7 @@ export default function MobileRelatorios() {
         if (d.success && d.data) setDashboardData(d.data)
       })
       .catch(() => {})
-  }, [config?.enabled])
+  }, [config?.enabled, period.startDate, period.endDate])
 
   useEffect(() => {
     if (!selectedTipo) {
@@ -407,6 +408,21 @@ export default function MobileRelatorios() {
       .finally(() => setCardListLoading(false))
   }, [cardFilterModal.open, cardFilterModal.filter, cardFilterModal.dataType, reportData?.data])
 
+  // Formatar valor monetário com 2 casas decimais (padrão BR)
+  const formatMoney = useCallback((val) => {
+    let n
+    if (typeof val === 'number') {
+      n = val
+    } else {
+      const s = String(val || '0').replace(/[^\d.,-]/g, '')
+      n = s.includes(',') && s.lastIndexOf(',') > (s.lastIndexOf('.') || -1)
+        ? parseFloat(s.replace(/\./g, '').replace(',', '.'))
+        : parseFloat(s.replace(',', '.'))
+    }
+    if (isNaN(n)) return '-'
+    return 'R$ ' + n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }, [])
+
   // Função helper para formatar valores de forma segura
   const formatValue = useCallback((v) => {
     if (v == null) return '-'
@@ -440,8 +456,53 @@ export default function MobileRelatorios() {
       return `${keys.length} itens`
     }
     
+    // Valores monetários (R$ X): sempre 2 casas decimais + separador de milhares
+    const s = String(v).trim()
+    if (s.startsWith('R$')) {
+      const numStr = s.replace(/[^\d,.-]/g, '').replace(',', '.')
+      const n = parseFloat(numStr)
+      if (!isNaN(n)) return formatMoney(n)
+    }
+    
     return String(v)
-  }, [])
+  }, [formatMoney])
+
+  // Descrições dos cards para modal de informação (clicáveis em todo o app)
+  const DESCRICOES_CARDS = useMemo(() => ({
+    Total: 'Total de cabeças no rebanho conforme o Boletim de Campo.',
+    Machos: 'Quantidade de machos no rebanho.',
+    Fêmeas: 'Quantidade de fêmeas no rebanho.',
+    Bezerros: 'Animais com até 12 meses de idade.',
+    Novilhas: 'Animais entre 12 e 24 meses de idade.',
+    Adultos: 'Animais com mais de 24 meses de idade.',
+    Custos: 'Soma dos custos registrados no período selecionado.',
+    Vendas: 'Total de vendas de animais no período.',
+    'Gestações Ativas': 'Fêmeas em gestação (gestações cadastradas + prenhas por IA).',
+    'Para Parir (30d)': 'Partos previstos nos próximos 30 dias.',
+    Nascimentos: 'Nascimentos registrados no período.',
+    'Média Recente': 'Peso médio das últimas pesagens (90 dias).',
+    Vacinações: 'Vacinações aplicadas no período.',
+    Mortes: 'Mortes registradas no período.',
+    'Touros (sêmen)': 'Quantidade de touros com doses de sêmen em estoque.',
+    'Doses Sêmen': 'Total de doses de sêmen disponíveis.',
+    Acasalamentos: 'Quantidade de acasalamentos cadastrados.',
+    'Embriões Disp.': 'Embriões disponíveis em estoque.',
+    rebanho: 'Resumo do rebanho: total de animais, machos, fêmeas e distribuição por idade.',
+    reproducao: 'Resumo reprodutivo: gestações ativas, nascimentos e partos previstos.',
+    peso: 'Média de peso recente dos animais.',
+    financeiro: 'Resumo financeiro: custos e vendas no período.',
+    estoque: 'Estoque de sêmen e embriões disponíveis.',
+    'Valor total': 'Soma total dos valores no relatório.',
+    'Total de custos': 'Quantidade de registros de custos e valor total.'
+  }), [])
+
+  const showCardInfo = useCallback((title, value, reportKey = null) => {
+    const desc = DESCRICOES_CARDS[title] || DESCRICOES_CARDS[title?.trim?.()] || `Informação sobre ${title}.`
+    const rawVal = typeof value === 'object' && value !== null
+      ? (value.total ?? value.valor ?? value.quantidade ?? value.custos ?? value.vendas)
+      : value
+    setCardInfoModal({ open: true, title, value: formatValue(rawVal), description: desc, reportKey })
+  }, [DESCRICOES_CARDS, formatValue])
 
   const handleCardClick = useCallback((k, v) => {
     const key = String(k).toLowerCase()
@@ -468,8 +529,31 @@ export default function MobileRelatorios() {
       return
     }
     if (/peso médio|peso medio/i.test(k)) return
-    setCardFilterModal({ open: true, title: k, filter: {}, dataType: 'animais' })
-  }, [formatValue])
+    
+    // Mapeamento direto para relatórios (clique no card abre a lista)
+    const reportMap = {
+      Custos: 'custos',
+      Vendas: 'movimentacoes_financeiras',
+      Vacinações: 'vacinacoes',
+      Mortes: 'mortes',
+      'Touros (sêmen)': 'estoque_semen',
+      'Doses Sêmen': 'estoque_semen',
+      Acasalamentos: 'estoque_embrioes',
+      'Embriões Disp.': 'estoque_embrioes',
+      financeiro: 'custos',
+      estoque: 'estoque_semen',
+      'Valor total': 'custos',
+      'Total de custos': 'custos'
+    }
+
+    if (reportMap[k]) {
+      setSelectedTipo(reportMap[k])
+      setViewMode('table')
+      return
+    }
+
+    showCardInfo(k, v, reportMap[k] || null)
+  }, [formatValue, showCardInfo])
 
   const enabledReports = config?.enabled || []
   const allTypes = config?.allTypes || []
@@ -1549,8 +1633,9 @@ export default function MobileRelatorios() {
   return (
     <>
       <Head>
-        <title>Relatórios | Beef-Sync</title>
+        <title>Relatórios | Beef-Sync — Gestão Inteligente de Rebanho</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+        <meta name="description" content="Painel de relatórios e visão geral da sua fazenda. Beef-Sync - Gestão inteligente de rebanho." />
       </Head>
       {/* Toast */}
       <AnimatePresence>
@@ -1717,10 +1802,8 @@ export default function MobileRelatorios() {
                       const ehMacho = sexo.toLowerCase().includes('macho')
                       
                       return (
-                        <Link
+                        <div
                           key={a.animal_id || a.id || idx}
-                          href={`/animals/${a.animal_id || a.id}`}
-                          onClick={() => setCardFilterModal(m => ({ ...m, open: false }))}
                           className="block px-4 py-4 hover:bg-amber-50 dark:hover:bg-gray-800 transition-colors"
                         >
                           <div className="flex items-start justify-between gap-3">
@@ -1835,7 +1918,7 @@ export default function MobileRelatorios() {
                             
                             <ChevronRightIcon className="h-5 w-5 text-gray-400 flex-shrink-0 mt-1" />
                           </div>
-                        </Link>
+                        </div>
                       )
                     })}
                   </div>
@@ -1848,8 +1931,58 @@ export default function MobileRelatorios() {
           </motion.div>
         )}
       </AnimatePresence>
-      <div className="min-h-screen bg-gradient-to-b from-amber-50/80 via-gray-50 to-gray-100 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950 pb-24">
-        <div className="sticky top-0 z-10 bg-white/98 dark:bg-gray-900/98 backdrop-blur-md border-b border-gray-200/80 dark:border-gray-700 shadow-sm px-4 py-3">
+      {/* Modal de informação ao clicar em card */}
+      <AnimatePresence>
+        {cardInfoModal.open && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setCardInfoModal(m => ({ ...m, open: false }))}
+            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              onClick={e => e.stopPropagation()}
+              className="absolute left-4 right-4 top-1/2 -translate-y-1/2 p-5 rounded-2xl bg-white dark:bg-gray-800 shadow-2xl border border-gray-200 dark:border-gray-700"
+            >
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">{cardInfoModal.title}</h3>
+                <button
+                  onClick={() => setCardInfoModal(m => ({ ...m, open: false }))}
+                  className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <XMarkIcon className="h-5 w-5 text-gray-500" />
+                </button>
+              </div>
+              <p className="text-2xl font-bold text-amber-600 dark:text-amber-400 mb-3">{cardInfoModal.value}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{cardInfoModal.description}</p>
+              {cardInfoModal.reportKey && (
+                <button
+                  onClick={() => {
+                    setSelectedTipo(cardInfoModal.reportKey)
+                    setViewMode('table')
+                    setCardInfoModal(m => ({ ...m, open: false }))
+                  }}
+                  className="w-full py-2.5 rounded-xl bg-amber-500 text-white font-semibold hover:bg-amber-600 transition-colors flex items-center justify-center gap-2"
+                >
+                  <ChartBarIcon className="h-5 w-5" />
+                  Ver relatório completo
+                </button>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <div className="min-h-screen bg-gradient-to-b from-amber-50/80 via-white to-amber-50/30 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 pb-24 relative overflow-hidden">
+        {/* Decoração sutil de fundo */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-100/20 via-transparent to-transparent dark:from-amber-900/10 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-200/10 dark:bg-amber-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-amber-100/20 dark:bg-amber-900/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+        <div className="sticky top-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-amber-200/50 dark:border-amber-900/30 shadow-[0_4px_30px_rgba(251,191,36,0.08)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)] px-4 py-3">
           <div className="max-w-lg mx-auto flex items-center justify-between">
             {selectedTipo ? (
               <button
@@ -1869,7 +2002,9 @@ export default function MobileRelatorios() {
               </Link>
             )}
             <h1 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <ChartBarIcon className="h-6 w-6 text-amber-500" />
+              <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/40">
+                <ChartBarIcon className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+              </div>
               {selectedTipo ? (
                 <span className="truncate max-w-[180px]">
                   {allTypes.find(t => t.key === selectedTipo)?.label || 'Relatório'}
@@ -1882,21 +2017,21 @@ export default function MobileRelatorios() {
           </div>
         </div>
 
-        <div className="max-w-lg mx-auto px-4 py-6">
+        <div className="relative max-w-lg mx-auto px-4 py-6">
           {loading ? (
             <div className="space-y-3">
               {[1, 2, 3, 4, 5, 6].map((i, idx) => (
                 <motion.div
                   key={i}
                   initial={{ opacity: 0.5 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ repeat: Infinity, repeatType: 'reverse', duration: 0.8, delay: idx * 0.1 }}
-                  className="h-16 rounded-2xl bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700"
+                  animate={{ opacity: [0.5, 0.9, 0.5] }}
+                  transition={{ repeat: Infinity, duration: 1.2, delay: idx * 0.08 }}
+                  className="h-16 rounded-2xl bg-gradient-to-r from-amber-100/50 via-amber-50 to-amber-100/50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800"
                 />
               ))}
             </div>
           ) : !selectedTipo ? (
-            <div className="pb-24 space-y-4 relative">
+            <div className="pb-28 space-y-5 relative">
               {currentTab === 'home' && (
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -1904,13 +2039,21 @@ export default function MobileRelatorios() {
                   exit={{ opacity: 0 }}
                   className="space-y-6"
                 >
-                  <div className="px-1 pt-2">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                      {getGreeting()},
-                      <span className="text-amber-500">Fazendeiro</span>
+                  <div className="px-1 pt-4 pb-2">
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5 }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100/80 dark:bg-amber-900/30 border border-amber-200/60 dark:border-amber-700/50 mb-3"
+                    >
+                      <SparklesIcon className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                      <span className="text-xs font-semibold text-amber-700 dark:text-amber-300 uppercase tracking-wide">Beef-Sync</span>
+                    </motion.div>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
+                      {getGreeting()}, <span className="bg-gradient-to-r from-amber-500 to-amber-600 dark:from-amber-400 dark:to-amber-500 bg-clip-text text-transparent">Fazendeiro</span>
                     </h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                      Aqui está o resumo da sua fazenda hoje.
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 font-medium">
+                      Resumo executivo da sua fazenda
                     </p>
                   </div>
 
@@ -1920,23 +2063,25 @@ export default function MobileRelatorios() {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
-                  className="mb-6"
+                  className="mb-5"
                 >
-                  <div className="flex items-center justify-between mb-3 px-1">
+                  <div className="flex items-center justify-between mb-4 px-1">
                     <div className="flex items-center gap-2">
-                      <SparklesIcon className="h-4 w-4 text-amber-500" />
-                      <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Visão Geral</span>
+                      <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/40">
+                        <ChartBarIcon className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                      </div>
+                      <span className="text-xs font-bold uppercase tracking-widest text-amber-600/90 dark:text-amber-400/90">Visão Geral</span>
                     </div>
                     <button
                       onClick={() => setSelectedTipo('resumo_geral')}
-                      className="flex items-center gap-1 text-xs font-semibold text-amber-600 dark:text-amber-400 hover:underline active:scale-95"
+                      className="flex items-center gap-1 text-xs font-semibold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 active:scale-95 transition-colors"
                     >
                       Ver completo
-                      <ChevronRightIcon className="h-3 w-3" />
+                      <ChevronRightIcon className="h-3.5 w-3.5" />
                     </button>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                    {dashboardData.data.slice(0, 4).map((mod, i) => {
+                    {dashboardData.data.slice(0, 6).map((mod, i) => {
                       const modConfig = {
                         Rebanho: { 
                           gradient: 'from-blue-50 via-blue-100/70 to-blue-50 dark:from-blue-900/30 dark:via-blue-800/20 dark:to-blue-900/30',
@@ -1965,6 +2110,20 @@ export default function MobileRelatorios() {
                           icon: '💰',
                           iconBg: 'bg-emerald-200/50 dark:bg-emerald-800/50',
                           textColor: 'text-emerald-700 dark:text-emerald-300'
+                        },
+                        Sanidade: { 
+                          gradient: 'from-violet-50 via-violet-100/70 to-violet-50 dark:from-violet-900/30 dark:via-violet-800/20 dark:to-violet-900/30',
+                          border: 'border-violet-300 dark:border-violet-700',
+                          icon: '💉',
+                          iconBg: 'bg-violet-200/50 dark:bg-violet-800/50',
+                          textColor: 'text-violet-700 dark:text-violet-300'
+                        },
+                        Estoque: { 
+                          gradient: 'from-cyan-50 via-cyan-100/70 to-cyan-50 dark:from-cyan-900/30 dark:via-cyan-800/20 dark:to-cyan-900/30',
+                          border: 'border-cyan-300 dark:border-cyan-700',
+                          icon: '📦',
+                          iconBg: 'bg-cyan-200/50 dark:bg-cyan-800/50',
+                          textColor: 'text-cyan-700 dark:text-cyan-300'
                         }
                       }
                       const config = modConfig[mod.modulo] || {
@@ -1977,43 +2136,47 @@ export default function MobileRelatorios() {
                       return (
                         <motion.div
                           key={i}
-                          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                          initial={{ opacity: 0, scale: 0.95, y: 16 }}
                           animate={{ opacity: 1, scale: 1, y: 0 }}
-                          transition={{ delay: 0.05 * i, type: 'spring', stiffness: 200 }}
-                          whileHover={{ scale: 1.05, y: -4 }}
-                          whileTap={{ scale: 0.97 }}
+                          transition={{ delay: 0.06 * i, type: 'spring', stiffness: 260, damping: 20 }}
+                          whileHover={{ scale: 1.02, y: -2 }}
+                          whileTap={{ scale: 0.98 }}
                           onClick={() => setSelectedTipo('resumo_geral')}
-                          className={`relative p-4 rounded-2xl bg-gradient-to-br border-2 shadow-md hover:shadow-xl transition-all cursor-pointer overflow-hidden group ${config.gradient} ${config.border}`}
+                          className={`relative p-4 rounded-2xl bg-gradient-to-br border shadow-lg shadow-gray-200/60 dark:shadow-black/30 hover:shadow-xl hover:shadow-amber-200/30 dark:hover:shadow-amber-900/20 transition-all duration-300 cursor-pointer overflow-hidden group ${config.gradient} ${config.border}`}
                         >
-                          {/* Ícone decorativo no canto */}
-                          <div className={`absolute -top-2 -right-2 w-16 h-16 rounded-full ${config.iconBg} opacity-20 blur-xl`} />
-                          
-                          {/* Indicador de clicável */}
-                          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <ChevronRightIcon className="h-4 w-4 text-gray-400" />
+                          <div className={`absolute -top-2 -right-2 w-20 h-20 rounded-full ${config.iconBg} opacity-30 blur-2xl`} />
+                          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                            <ChevronRightIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                           </div>
-                          
                           <div className="relative z-10">
-                            <div className="flex items-center justify-between mb-2">
-                              <p className="text-[10px] font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">{mod.modulo}</p>
-                              <span className="text-2xl">{config.icon}</span>
+                            <div className="flex items-center justify-between mb-2.5">
+                              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500/90 dark:text-gray-400/90">{mod.modulo}</p>
+                              <span className="text-2xl drop-shadow-sm">{config.icon}</span>
                             </div>
                             <div className="space-y-1.5">
-                              {Object.entries(mod.dados || {}).slice(0, 2).map(([k, v]) => (
-                                <div key={k} className="flex justify-between items-baseline gap-2">
-                                  <span className="text-xs text-gray-600 dark:text-gray-400 truncate">{k}</span>
-                                  <span className={`text-base font-bold truncate ${config.textColor}`}>{formatValue(v)}</span>
-                                </div>
-                              ))}
+                              {Object.entries(mod.dados || {}).slice(0, 6).map(([k, v]) => {
+                                const labelCurto = {
+                                  'Média Recente': 'Média',
+                                  'Para Parir (30d)': 'Parir 30d',
+                                  'Gestações Ativas': 'Gestações',
+                                  'Touros (sêmen)': 'Touros',
+                                  'Doses Sêmen': 'Doses',
+                                  'Embriões Disp.': 'Embriões'
+                                }[k] || k
+                                return (
+                                  <div key={k} className="flex flex-col gap-0.5 min-w-0">
+                                    <span className="text-[11px] text-gray-600/90 dark:text-gray-400/90 font-medium break-words leading-tight">{labelCurto}</span>
+                                    <span className={`text-sm font-bold ${config.textColor} tabular-nums break-all`}>{formatValue(v)}</span>
+                                  </div>
+                                )
+                              })}
                             </div>
                           </div>
-                          
-                          {/* Barra de progresso decorativa */}
                           <motion.div 
                             initial={{ width: 0 }}
                             animate={{ width: '100%' }}
-                            transition={{ delay: 0.2 + (i * 0.1), duration: 0.6 }}
-                            className={`absolute bottom-0 left-0 h-1 ${config.iconBg} opacity-50`}
+                            transition={{ delay: 0.3 + (i * 0.08), duration: 0.5, ease: 'easeOut' }}
+                            className={`absolute bottom-0 left-0 h-0.5 ${config.iconBg} opacity-60 rounded-b-2xl`}
                           />
                         </motion.div>
                       )
@@ -2024,34 +2187,34 @@ export default function MobileRelatorios() {
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="mt-3 grid grid-cols-3 gap-2"
+                    transition={{ delay: 0.35 }}
+                    className="mt-5 grid grid-cols-3 gap-2"
                   >
                     <motion.div 
                       whileHover={{ scale: 1.05, y: -2 }}
                       whileTap={{ scale: 0.95 }}
-                      className="p-2 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100/50 dark:from-purple-900/20 dark:to-purple-900/10 border border-purple-200 dark:border-purple-800 cursor-default"
+                      className="p-3 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-white/80 dark:border-gray-700/80 shadow-md shadow-gray-200/40 dark:shadow-black/20 cursor-default"
                     >
-                      <p className="text-[9px] font-semibold text-purple-600 dark:text-purple-400 uppercase">Hoje</p>
-                      <p className="text-sm font-bold text-purple-900 dark:text-purple-100">{new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</p>
+                      <p className="text-[9px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Hoje</p>
+                      <p className="text-sm font-bold text-purple-900 dark:text-purple-100 mt-0.5 tabular-nums">{new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</p>
                     </motion.div>
                     <motion.button
                       whileHover={{ scale: 1.05, y: -2 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setCurrentTab('reports')}
-                      className="p-2 rounded-xl bg-gradient-to-br from-teal-50 to-teal-100/50 dark:from-teal-900/20 dark:to-teal-900/10 border border-teal-200 dark:border-teal-800 hover:border-teal-400 dark:hover:border-teal-600 transition-all cursor-pointer"
+                      className="p-3 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-white/80 dark:border-gray-700/80 shadow-md shadow-gray-200/40 dark:shadow-black/20 hover:shadow-lg hover:shadow-emerald-200/30 dark:hover:shadow-emerald-900/20 hover:border-emerald-200 dark:hover:border-emerald-700/50 transition-all cursor-pointer"
                     >
-                      <p className="text-[9px] font-semibold text-teal-600 dark:text-teal-400 uppercase">Relatórios</p>
-                      <p className="text-sm font-bold text-teal-900 dark:text-teal-100">{enabledReports.length}</p>
+                      <p className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Relatórios</p>
+                      <p className="text-sm font-bold text-emerald-900 dark:text-emerald-100 mt-0.5 tabular-nums">{enabledReports.length}</p>
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.05, y: -2 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setCurrentTab('reports')}
-                      className="p-2 rounded-xl bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-900/20 dark:to-orange-900/10 border border-orange-200 dark:border-orange-800 hover:border-orange-400 dark:hover:border-orange-600 transition-all cursor-pointer"
+                      className="p-3 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-white/80 dark:border-gray-700/80 shadow-md shadow-gray-200/40 dark:shadow-black/20 hover:shadow-lg hover:shadow-amber-200/30 dark:hover:shadow-amber-900/20 hover:border-amber-200 dark:hover:border-amber-700/50 transition-all cursor-pointer"
                     >
-                      <p className="text-[9px] font-semibold text-orange-600 dark:text-orange-400 uppercase">Favoritos</p>
-                      <p className="text-sm font-bold text-orange-900 dark:text-orange-100">{favorites.length}</p>
+                      <p className="text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Favoritos</p>
+                      <p className="text-sm font-bold text-amber-900 dark:text-amber-100 mt-0.5 tabular-nums">{favorites.length}</p>
                     </motion.button>
                   </motion.div>
                 </motion.div>
@@ -2144,12 +2307,15 @@ export default function MobileRelatorios() {
                       className="space-y-6"
                     >
                   {/* Acesso Rápido - Relatórios mais usados */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-2 px-1">
-                      <SparklesIcon className="h-4 w-4 text-amber-500" />
-                      <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Acesso Rápido</span>
+                  <div className="pt-4">
+                    <div className="flex items-center gap-2 mb-4 px-1">
+                      <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/40">
+                        <ChartBarIcon className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                      </div>
+                      <span className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Acesso Rápido</span>
+                      <div className="flex-1 h-px bg-gradient-to-r from-amber-200/60 to-transparent dark:from-amber-800/40" />
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-3">
                       {ACESSO_RAPIDO_KEYS.filter(k => enabledReports.includes(k)).map((id, i) => {
                         const tipo = allTypes.find(t => t.key === id)
                         if (!tipo) return null
@@ -2160,93 +2326,51 @@ export default function MobileRelatorios() {
                             key={id}
                             initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.05 * i }}
-                            whileTap={{ scale: 0.97 }}
-                            whileHover={{ scale: 1.02 }}
+                            transition={{ delay: 0.05 * i, type: 'spring', stiffness: 200 }}
+                            whileTap={{ scale: 0.98 }}
+                            whileHover={{ scale: 1.01, y: -1 }}
                             onClick={() => setSelectedTipo(id)}
-                            className="flex flex-col items-start gap-1 p-3 rounded-xl bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/30 dark:to-amber-900/10 border-2 border-amber-200 dark:border-amber-800 hover:border-amber-400 dark:hover:border-amber-600 shadow-sm hover:shadow-md transition-all text-left"
+                            className="flex flex-col items-start gap-1.5 p-4 rounded-2xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-amber-200/60 dark:border-amber-800/40 shadow-lg shadow-gray-200/50 dark:shadow-black/20 hover:shadow-xl hover:shadow-amber-200/25 dark:hover:shadow-amber-900/15 hover:border-amber-300 dark:hover:border-amber-700/60 transition-all duration-300 text-left"
                           >
-                            <div className="flex items-center gap-2 w-full">
-                              <div className="p-2 rounded-lg bg-amber-200/50 dark:bg-amber-800/50 flex-shrink-0">
-                                <Icon className="h-5 w-5 text-amber-700 dark:text-amber-300" />
+                            <div className="flex items-center gap-2.5 w-full min-w-0">
+                              <div className="p-2 rounded-xl bg-amber-100/80 dark:bg-amber-900/40 flex-shrink-0">
+                                <Icon className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                               </div>
-                              <span className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate flex-1">{tipo.label.replace(/^[📊📅🏆]\s*/, '')}</span>
+                              <span className="text-sm font-bold text-gray-800 dark:text-gray-200 flex-1 min-w-0 break-words">{tipo.label.replace(/^[📊📅🏆]\s*/, '')}</span>
+                              <ChevronRightIcon className="h-4 w-4 text-amber-400/70 dark:text-amber-500/70 flex-shrink-0" />
                             </div>
-                            {desc && <span className="text-[10px] text-gray-500 dark:text-gray-400 pl-1 line-clamp-1">{desc}</span>}
+                            {desc && <span className="text-[10px] text-gray-500 dark:text-gray-400 pl-0.5 line-clamp-2 font-medium break-words">{desc}</span>}
                           </motion.button>
                         )
                       })}
                     </div>
                   </div>
 
-                  {/* Card especial para Boletim Defesa */}
-                  <Link href="/boletim-defesa/mobile">
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      whileHover={{ scale: 1.02, y: -2 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="relative p-5 rounded-2xl bg-gradient-to-br from-teal-500 via-teal-600 to-emerald-600 dark:from-teal-600 dark:to-teal-800 border-2 border-teal-400 dark:border-teal-500 shadow-xl hover:shadow-2xl transition-all overflow-hidden"
-                    >
-                      {/* Efeito de brilho animado */}
-                      <motion.div
-                        animate={{
-                          x: ['-100%', '200%'],
-                        }}
-                        transition={{
-                          duration: 3,
-                          repeat: Infinity,
-                          repeatDelay: 2,
-                          ease: 'easeInOut'
-                        }}
-                        className="absolute inset-0 w-1/3 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
-                      />
-                      
-                      <div className="relative z-10 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <motion.div 
-                            whileHover={{ rotate: 360 }}
-                            transition={{ duration: 0.5 }}
-                            className="p-3 rounded-xl bg-white/20 backdrop-blur shadow-inner"
-                          >
-                            <DocumentTextIcon className="h-7 w-7 text-white" />
-                          </motion.div>
-                          <div>
-                            <p className="font-bold text-white text-lg flex items-center gap-2">
-                              Boletim Defesa
-                              <span className="px-2 py-0.5 rounded-full bg-white/20 text-xs font-medium">Novo</span>
-                            </p>
-                            <p className="text-teal-100 text-sm">Quantidades por faixa etária</p>
-                          </div>
-                        </div>
-                        <ChevronRightIcon className="h-6 w-6 text-white opacity-90" />
-                      </div>
-                    </motion.div>
-                  </Link>
-
-                  {/* Ações Rápidas - NOVO */}
+                  {/* Ações Rápidas */}
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
+                    transition={{ delay: 0.25 }}
                   >
-                    <div className="flex items-center gap-2 mb-3 px-1">
-                      <LightBulbIcon className="h-4 w-4 text-amber-500" />
-                      <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Ações Rápidas</span>
-                      <div className="flex-1 h-px bg-gradient-to-r from-amber-200 to-transparent dark:from-amber-800" />
+                    <div className="flex items-center gap-2 mb-4 px-1">
+                      <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/40">
+                        <LightBulbIcon className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                      </div>
+                      <span className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Ações Rápidas</span>
+                      <div className="flex-1 h-px bg-gradient-to-r from-amber-200/60 to-transparent dark:from-amber-800/40" />
                     </div>
                     <div className="grid grid-cols-3 gap-2">
                       <Link href="/a">
                         <motion.div
                           whileHover={{ scale: 1.05, y: -2 }}
                           whileTap={{ scale: 0.95 }}
-                          className="p-3 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/10 border border-blue-200 dark:border-blue-800 hover:border-blue-400 dark:hover:border-blue-600 shadow-sm hover:shadow-md transition-all cursor-pointer"
+                          className="p-3 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-blue-200/70 dark:border-blue-800/50 shadow-md shadow-blue-100/40 dark:shadow-black/20 hover:shadow-lg hover:shadow-blue-200/30 dark:hover:shadow-blue-900/20 transition-all cursor-pointer"
                         >
                           <div className="flex flex-col items-center gap-1.5 text-center">
-                            <div className="p-2 rounded-lg bg-blue-200/50 dark:bg-blue-800/50">
-                              <MagnifyingGlassIcon className="h-5 w-5 text-blue-700 dark:text-blue-300" />
+                            <div className="p-2 rounded-xl bg-blue-100/80 dark:bg-blue-900/40">
+                              <MagnifyingGlassIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                             </div>
-                            <span className="text-xs font-semibold text-blue-900 dark:text-blue-100">Consultar Animal</span>
+                            <span className="text-[10px] font-bold text-blue-900 dark:text-blue-100">Consultar Animal</span>
                           </div>
                         </motion.div>
                       </Link>
@@ -2255,13 +2379,13 @@ export default function MobileRelatorios() {
                         <motion.div
                           whileHover={{ scale: 1.05, y: -2 }}
                           whileTap={{ scale: 0.95 }}
-                          className="p-3 rounded-xl bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-900/20 dark:to-green-900/10 border border-green-200 dark:border-green-800 hover:border-green-400 dark:hover:border-green-600 shadow-sm hover:shadow-md transition-all cursor-pointer"
+                          className="p-3 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-emerald-200/70 dark:border-emerald-800/50 shadow-md shadow-emerald-100/40 dark:shadow-black/20 hover:shadow-lg hover:shadow-emerald-200/30 dark:hover:shadow-emerald-900/20 transition-all cursor-pointer"
                         >
                           <div className="flex flex-col items-center gap-1.5 text-center">
-                            <div className="p-2 rounded-lg bg-green-200/50 dark:bg-green-800/50">
-                              <ChatBubbleLeftRightIcon className="h-5 w-5 text-green-700 dark:text-green-300" />
+                            <div className="p-2 rounded-xl bg-emerald-100/80 dark:bg-emerald-900/40">
+                              <ChatBubbleLeftRightIcon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                             </div>
-                            <span className="text-xs font-semibold text-green-900 dark:text-green-100">Enviar Feedback</span>
+                            <span className="text-[10px] font-bold text-emerald-900 dark:text-emerald-100">Enviar Feedback</span>
                           </div>
                         </motion.div>
                       </Link>
@@ -2278,13 +2402,13 @@ export default function MobileRelatorios() {
                             endDate: today.toISOString().split('T')[0]
                           })
                         }}
-                        className="p-3 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100/50 dark:from-purple-900/20 dark:to-purple-900/10 border border-purple-200 dark:border-purple-800 hover:border-purple-400 dark:hover:border-purple-600 shadow-sm hover:shadow-md transition-all cursor-pointer"
+                        className="p-3 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-purple-200/70 dark:border-purple-800/50 shadow-md shadow-purple-100/40 dark:shadow-black/20 hover:shadow-lg hover:shadow-purple-200/30 dark:hover:shadow-purple-900/20 transition-all cursor-pointer"
                       >
                         <div className="flex flex-col items-center gap-1.5 text-center">
-                          <div className="p-2 rounded-lg bg-purple-200/50 dark:bg-purple-800/50">
-                            <CalendarIcon className="h-5 w-5 text-purple-700 dark:text-purple-300" />
+                          <div className="p-2 rounded-xl bg-purple-100/80 dark:bg-purple-900/40">
+                            <CalendarIcon className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                           </div>
-                          <span className="text-xs font-semibold text-purple-900 dark:text-purple-100">Último Mês</span>
+                          <span className="text-[10px] font-bold text-purple-900 dark:text-purple-100">Último Mês</span>
                         </div>
                       </motion.div>
                     </div>
@@ -2292,10 +2416,13 @@ export default function MobileRelatorios() {
 
                   {/* Favoritos */}
                   {favorites.filter(id => enabledReports.includes(id)).length > 0 && (
-                    <div>
-                      <div className="flex items-center gap-2 mb-2 px-1">
-                        <StarIconSolid className="h-4 w-4 text-amber-500" />
-                        <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">Seus Favoritos</span>
+                    <div className="pt-2">
+                      <div className="flex items-center gap-2 mb-3 px-1">
+                        <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/40">
+                          <StarIconSolid className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                        </div>
+                        <span className="text-xs font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400">Seus Favoritos</span>
+                        <div className="flex-1 h-px bg-gradient-to-r from-amber-200/60 to-transparent dark:from-amber-800/40" />
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {favorites.filter(id => enabledReports.includes(id)).map(id => {
@@ -2310,7 +2437,7 @@ export default function MobileRelatorios() {
                             >
                               <button
                                 onClick={() => setSelectedTipo(id)}
-                                className="flex items-center gap-2 px-3 py-2 rounded-xl bg-amber-100 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-sm font-medium hover:bg-amber-200 dark:hover:bg-amber-900/50"
+                                className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-amber-200/70 dark:border-amber-800/50 text-amber-800 dark:text-amber-200 text-sm font-semibold shadow-md hover:shadow-lg hover:border-amber-300 dark:hover:border-amber-700/60 transition-all"
                               >
                                 <Icon className="h-4 w-4" />
                                 {tipo.label.replace(/^[📊📅🏆]\s*/, '')}
@@ -2354,10 +2481,10 @@ export default function MobileRelatorios() {
                                 key={tipo.key}
                                 whileTap={{ scale: 0.97 }}
                                 onClick={() => setSelectedTipo(tipo.key)}
-                                className="flex items-center gap-2 px-3 py-2 rounded-xl bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 text-violet-700 dark:text-violet-300 text-sm font-medium hover:bg-violet-100 dark:hover:bg-violet-900/30 transition-colors"
+                                className="flex items-center gap-2 px-3 py-2 rounded-xl bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 text-violet-700 dark:text-violet-300 text-sm font-medium hover:bg-violet-100 dark:hover:bg-violet-900/30 transition-colors text-left max-w-full"
                               >
-                                <Icon className="h-4 w-4" />
-                                {tipo.label.replace(/^[📊📅🏆]\s*/, '')}
+                                <Icon className="h-4 w-4 flex-shrink-0" />
+                                <span className="break-words min-w-0">{tipo.label.replace(/^[📊📅🏆]\s*/, '')}</span>
                               </motion.button>
                             )
                           })}
@@ -2382,10 +2509,10 @@ export default function MobileRelatorios() {
                               key={id}
                               whileTap={{ scale: 0.97 }}
                               onClick={() => setSelectedTipo(id)}
-                              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600/50 transition-colors"
+                              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600/50 transition-colors text-left max-w-full"
                             >
-                              <Icon className="h-4 w-4" />
-                              {tipo.label.replace(/^[📊📅🏆]\s*/, '')}
+                              <Icon className="h-4 w-4 flex-shrink-0" />
+                              <span className="break-words min-w-0">{tipo.label.replace(/^[📊📅🏆]\s*/, '')}</span>
                             </motion.button>
                           )
                         })}
@@ -2899,10 +3026,21 @@ export default function MobileRelatorios() {
                              </div>
                              <div className="grid grid-cols-2 gap-3">
                                {Object.entries(mod.dados || {}).map(([label, val], j) => (
-                                 <div key={j} className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
-                                   <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wide mb-1">{label}</p>
-                                   <p className="text-lg font-bold text-gray-900 dark:text-white truncate">{formatValue(val)}</p>
-                                 </div>
+                                 <motion.button
+                                   key={j}
+                                   type="button"
+                                   onClick={() => handleCardClick(label, val)}
+                                   whileHover={{ scale: 1.02 }}
+                                   whileTap={{ scale: 0.98 }}
+                                   className="text-left bg-gray-50 dark:bg-gray-700/50 p-3 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-amber-300 dark:hover:border-amber-600 hover:shadow-md transition-all cursor-pointer group min-w-0"
+                                 >
+                                   <div className="flex items-center justify-between gap-1">
+                                     <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wide mb-1 break-words flex-1 min-w-0">{label}</p>
+                                     <ChevronRightIcon className="h-4 w-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                                   </div>
+                                   <p className="text-base font-bold text-gray-900 dark:text-white break-all min-w-0">{formatValue(val)}</p>
+                                   <p className="text-[9px] text-gray-400 dark:text-gray-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Toque para ver detalhes</p>
+                                 </motion.button>
                                ))}
                              </div>
                            </motion.div>
@@ -3145,7 +3283,7 @@ export default function MobileRelatorios() {
                     
                     const racasTop = Object.entries(porRaca).sort(([,a], [,b]) => b - a).slice(0, 5)
                     const erasTop = Object.entries(porEra).sort(([,a], [,b]) => b - a).slice(0, 5)
-                    const sexosTop = Object.entries(porSexo).sort(([,a], [,b]) => b - a)
+                    const sexosTop = Object.entries(porSexo).filter(([, qtd]) => qtd > 0).sort(([,a], [,b]) => b - a)
                     
                     return (
                       <motion.div
@@ -3365,7 +3503,7 @@ export default function MobileRelatorios() {
                             const isPeso = /peso|kg/i.test(k)
                             const isAnimais = /animais|machos|fêmeas|total|piquetes|raças/i.test(k)
                             const isTaxa = /taxa|prenhez/i.test(k)
-                            const isClicavel = /machos?|fêmeas?|femeas?|animais únicos?|total de pesagens?|piquetes?|entradas?|saídas?|total nfs?|nf|notas?/i.test(k) && !/peso médio|peso medio/i.test(k)
+                            const isClicavel = true
                             const cardCls = isPeso ? 'bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-900/10 border-amber-200 dark:border-amber-800' :
                               isAnimais ? 'bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/10 border-blue-200 dark:border-blue-800' :
                               isTaxa ? 'bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-900/20 dark:to-green-900/10 border-green-200 dark:border-green-800' :
@@ -3707,9 +3845,7 @@ export default function MobileRelatorios() {
                         {matches.slice(0, 5).map((m, i) => (
                           <div key={i} className="flex items-center justify-between gap-2 py-1">
                             <span className="text-gray-600 dark:text-gray-300">{m.animal || `${(m.serie || '')} ${(m.rg || '')}`.trim()} - {m.piquete}</span>
-                            <Link href={`/consulta-animal/${String(m.serie || '').trim().replace(/\s+/g, '-')}-${String(m.rg || '').trim()}`} className="text-amber-600 dark:text-amber-400 font-medium text-sm hover:underline">
-                              Ver ficha
-                            </Link>
+                            <span className="text-gray-400 dark:text-gray-500 text-sm">—</span>
                           </div>
                         ))}
                         {matches.length > 5 && <p className="text-xs text-gray-500 mt-1">+{matches.length - 5} mais</p>}
@@ -4377,10 +4513,7 @@ export default function MobileRelatorios() {
                                       })))
                                       return
                                     }
-                                    // Comportamento padrao: navegar para detalhes do animal
-                                    if (row.animal_id) {
-                                      router.push(`/animals/${row.animal_id}`)
-                                    }
+                                    // Navegação para ficha do animal desativada no mobile
                                   }}
                                   className={`border-t border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 ${(row.animal_id || (selectedTipo === 'animais_piquetes' && originalRow.animais) || ehClicavelPiquete) ? 'cursor-pointer' : ''}`}
                                 >

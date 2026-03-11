@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react'
 import { ScaleIcon, PlusIcon, PencilIcon, XMarkIcon, DocumentArrowUpIcon, MagnifyingGlassIcon, DocumentTextIcon, FunnelIcon, ChartBarIcon, ArrowPathIcon, MapPinIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon, CalendarIcon, SparklesIcon } from '../../components/ui/Icons'
 import * as XLSX from 'xlsx'
 import ImportarTextoPesagens from '../../components/ImportarTextoPesagens'
+import ImportProgressOverlay from '../../components/ImportProgressOverlay'
 
 export default function Pesagem() {
   const [mounted, setMounted] = useState(false)
@@ -37,6 +38,8 @@ export default function Pesagem() {
   const [sortOrder, setSortOrder] = useState('desc') // 'asc', 'desc'
   const [selectedAnimalForHistory, setSelectedAnimalForHistory] = useState(null)
   const [showHistoryModal, setShowHistoryModal] = useState(false)
+  const [importandoPesagens, setImportandoPesagens] = useState(false)
+  const [importProgressPesagens, setImportProgressPesagens] = useState({ atual: 0, total: 0, etapa: '' })
   const [formData, setFormData] = useState({
     animal_id: '',
     peso: '',
@@ -368,6 +371,10 @@ export default function Pesagem() {
       return
     }
 
+    setImportandoPesagens(true)
+    setImportProgressPesagens({ atual: 0, total: importData.length, etapa: 'Importando pesagens...' })
+
+    try {
     const animalColIndex = availableColumns.indexOf(columnMapping.animal)
     const serieColIndex = columnMapping.serie ? availableColumns.indexOf(columnMapping.serie) : -1
     const rgColIndex = columnMapping.rg ? availableColumns.indexOf(columnMapping.rg) : -1
@@ -385,6 +392,7 @@ export default function Pesagem() {
     let createdCount = 0
 
     for (let index = 0; index < importData.length; index++) {
+      setImportProgressPesagens({ atual: index + 1, total: importData.length, etapa: `Processando linha ${index + 1} de ${importData.length}...` })
       const row = importData[index]
       try {
         const animalIdentifier = animalColIndex >= 0 ? String(row[animalColIndex] ?? '').trim() : ''
@@ -508,6 +516,13 @@ export default function Pesagem() {
       await aplicarLocalizacoesAutomaticamente()
     } else {
       alert('Nenhuma pesagem válida foi encontrada para importar.')
+    }
+    } catch (err) {
+      alert('Erro na importação: ' + (err?.message || String(err)))
+      throw err
+    } finally {
+      setImportandoPesagens(false)
+      setImportProgressPesagens({ atual: 0, total: 0, etapa: '' })
     }
   }
 
@@ -791,6 +806,10 @@ export default function Pesagem() {
 
   return (
     <div className="space-y-6">
+      <ImportProgressOverlay
+        importando={importandoPesagens}
+        progress={importProgressPesagens}
+      />
       <style jsx>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }

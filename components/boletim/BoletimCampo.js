@@ -117,58 +117,8 @@ export default function BoletimCampo({ usuario, isAdelso }) {
     }
   }
 
-  const exportarExcel = async () => {
-    const ExcelJS = (await import('exceljs')).default
-    const workbook = new ExcelJS.Workbook()
-    const sheet = workbook.addWorksheet('Boletim Campo')
-
-    const corLaranja = { argb: 'FFFFA500' }
-
-    sheet.getRow(1).values = HEADERS
-    sheet.getRow(1).eachCell((cell) => {
-      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: corLaranja }
-      cell.font = { bold: true }
-    })
-    sheet.getRow(1).height = 22
-
-    const rowsToExport = dados.length ? dados : [{ local: '', local_1: '', sub_local_2: '', quant: 0, sexo: '', categoria: '', raca: '', era: '', observacao: '' }]
-    rowsToExport.forEach((row, idx) => {
-      const r = sheet.getRow(idx + 2)
-      r.values = [
-        row.local,
-        row.local_1 || '',
-        row.sub_local_2 || '',
-        row.quant || 0,
-        row.sexo || '',
-        row.categoria || '',
-        row.raca || '',
-        row.era || '',
-        row.observacao || ''
-      ]
-    })
-
-    sheet.columns = [
-      { width: 25 },
-      { width: 20 },
-      { width: 20 },
-      { width: 10 },
-      { width: 8 },
-      { width: 15 },
-      { width: 12 },
-      { width: 12 },
-      { width: 25 }
-    ]
-
-    const buffer = await workbook.xlsx.writeBuffer()
-    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `Boletim_Campo_${new Date().toISOString().split('T')[0]}.xlsx`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
+  const exportarExcel = () => {
+    window.open('/api/boletim-campo/download-excel', '_blank')
   }
 
   const handleImport = async (e) => {
@@ -245,7 +195,9 @@ export default function BoletimCampo({ usuario, isAdelso }) {
       if (json.success) {
         setModalEnviar(false)
         if (json.fallback) {
-          window.open(json.downloadUrl === '/api/boletim-campo/download-excel' ? '/api/boletim-campo/download-excel' : '/api/boletim-campo/download-pdf', '_blank')
+          const base = typeof window !== 'undefined' ? window.location.origin : ''
+          const url = json.downloadUrl?.startsWith('/') ? `${base}${json.downloadUrl}` : json.downloadUrl
+          window.open(url || '/api/boletim-campo/download-excel', '_blank')
           window.open(json.waLink, '_blank')
           alert('Arquivo baixado. Envie o arquivo no WhatsApp que abriu.')
         } else {

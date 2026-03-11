@@ -82,7 +82,7 @@ export default async function handler(req, res) {
       }
     }
 
-    // 3. Buscar em gestações (receptora_nome)
+    // 3. Buscar em gestações (receptora_nome - receptora da gestação)
     if (!serie && !rg) {
       r = await query(
         `SELECT receptora_serie as serie, receptora_rg as rg 
@@ -105,6 +105,92 @@ export default async function handler(req, res) {
       if (r.rows.length > 0) {
         serie = r.rows[0].serie
         rg = r.rows[0].rg
+      }
+    }
+
+    // 3b. Buscar em gestações (mae_serie/mae_rg = doadora biológica) - mãe pode estar inativa
+    if (!serie && !rg) {
+      r = await query(
+        `SELECT g.mae_serie as serie, g.mae_rg as rg 
+         FROM gestacoes g
+         INNER JOIN animais a ON UPPER(TRIM(COALESCE(a.serie,''))) = UPPER(TRIM(COALESCE(g.mae_serie,''))) 
+           AND TRIM(COALESCE(a.rg,'')::text) = TRIM(COALESCE(g.mae_rg,'')::text)
+         WHERE (UPPER(TRIM(COALESCE(a.nome,''))) = UPPER(TRIM($1))
+            OR UPPER(TRIM(COALESCE(a.nome,''))) LIKE UPPER($2))
+           AND g.mae_serie IS NOT NULL AND g.mae_rg IS NOT NULL
+         LIMIT 1`,
+        [maeNome, `%${maeNome}%`]
+      )
+      if (r.rows.length > 0) {
+        serie = r.rows[0].serie
+        rg = r.rows[0].rg
+      }
+    }
+
+    // 3c. Buscar em coleta_fiv (doadora com doadora_id - mãe pode ter coletas mesmo inativa)
+    if (!serie && !rg) {
+      r = await query(
+        `SELECT a.serie, a.rg FROM coleta_fiv cf
+         JOIN animais a ON a.id = cf.doadora_id
+         WHERE (UPPER(TRIM(COALESCE(a.nome,''))) = UPPER(TRIM($1))
+            OR UPPER(TRIM(COALESCE(cf.doadora_nome,''))) = UPPER(TRIM($1))
+            OR UPPER(TRIM(COALESCE(a.nome,''))) LIKE UPPER($2))
+           AND cf.doadora_id IS NOT NULL AND a.serie IS NOT NULL AND a.rg IS NOT NULL
+         LIMIT 1`,
+        [maeNome, `%${maeNome}%`]
+      )
+      if (r.rows.length > 0) {
+        serie = r.rows[0].serie
+        rg = r.rows[0].rg
+      }
+    }
+
+    // 3d. coleta_fiv doadora_nome com formato "SÉRIE RG" ou "NOME SÉRIE RG" - extrair identificação
+    if (!serie && !rg) {
+      const matchDoadora = maeNome.match(/([A-Za-z]{2,})\s+(\d+)\s*$/)
+      if (matchDoadora) {
+        const [, seriePart, rgPart] = matchDoadora
+        const serieTent = serieFilho || (maeNome.match(/^CJ/i) ? 'CJCJ' : seriePart)
+        r = await query(
+          `SELECT serie, rg FROM animais 
+           WHERE (UPPER(TRIM(serie)) = UPPER(TRIM($1)) AND TRIM(rg::text) = $2)
+              OR (UPPER(TRIM(COALESCE(nome,''))) LIKE $3 AND TRIM(rg::text) = $2)
+           LIMIT 1`,
+          [serieTent, rgPart, `%${maeNome}%`]
+        )
+        if (r.rows.length > 0) {
+          serie = r.rows[0].serie
+          rg = r.rows[0].rg
+        }
+      }
+    }
+
+    // 3e. coleta_fiv: doadora_nome igual ao nome da mãe (doadora pode não ter doadora_id) - buscar em animais por nome
+    // Já coberto em 1 e 2 - mas se doadora_nome em coleta_fiv = maeNome e temos doadora_id, 3c cobre.
+    // Se doadora_nome contém identificação (ex: "MANEKA SANT ANNA CJCJ 16982"), tentar extrair
+    if (!serie && !rg) {
+      r = await query(
+        `SELECT doadora_nome FROM coleta_fiv 
+         WHERE UPPER(TRIM(COALESCE(doadora_nome,''))) = UPPER(TRIM($1))
+            OR UPPER(TRIM(COALESCE(doadora_nome,''))) LIKE UPPER($2)
+         LIMIT 1`,
+        [maeNome, `%${maeNome}%`]
+      )
+      if (r.rows.length > 0) {
+        const dn = String(r.rows[0].doadora_nome || '').trim()
+        const matchIdent = dn.match(/([A-Za-z]{2,})\s*[-]?\s*(\d+)\s*$/)
+        if (matchIdent) {
+          const [, sPart, rPart] = matchIdent
+          const sTent = serieFilho || (dn.match(/^CJ/i) ? 'CJCJ' : sPart)
+          const r2 = await query(
+            `SELECT serie, rg FROM animais WHERE UPPER(TRIM(serie)) = UPPER(TRIM($1)) AND TRIM(rg::text) = $2 LIMIT 1`,
+            [sTent, rPart]
+          )
+          if (r2.rows.length > 0) {
+            serie = r2.rows[0].serie
+            rg = r2.rows[0].rg
+          }
+        }
       }
     }
 

@@ -38,6 +38,9 @@ export default function InseminacaoArtificial() {
   const [excelHeaders, setExcelHeaders] = useState([])
   const [excelData, setExcelData] = useState([])
   const [showFieldMapping, setShowFieldMapping] = useState(false)
+  const [modoImportacaoIA, setModoImportacaoIA] = useState('adicionar') // 'adicionar' | 'atualizar'
+  const [importando, setImportando] = useState(false)
+  const [importProgress, setImportProgress] = useState({ atual: 0, total: 0, etapa: '' })
   const [fieldMapping, setFieldMapping] = useState({
     serie: { enabled: true, source: '' },
     rg: { enabled: true, source: '' },
@@ -113,10 +116,29 @@ export default function InseminacaoArtificial() {
   }
 
   const handleLimparTudo = async () => {
+    // Solicitar senha de desenvolvedor
+    const senha = prompt('🔒 ÁREA RESTRITA - Digite a senha do desenvolvedor para continuar:')
+    
+    if (!senha) {
+      return // Usuário cancelou
+    }
+    
+    if (senha !== 'bfzk26') {
+      alert('❌ Senha incorreta! Acesso negado.')
+      return
+    }
+    
     if (!confirm('⚠️ ATENÇÃO: Isso apagará TODAS as inseminações do banco. Deseja continuar?')) return
+    
     setLimandoTudo(true)
     try {
-      const r = await fetch('/api/inseminacoes?todos=true', { method: 'DELETE' })
+      const r = await fetch('/api/inseminacoes?todos=true', { 
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-dev-password': 'bfzk26'
+        }
+      })
       const data = await r.json().catch(() => ({}))
       if (r.ok && data.success) {
         alert(`✅ ${data.count ?? 0} inseminação(ões) removida(s). Você pode importar novamente.`)
@@ -249,23 +271,31 @@ export default function InseminacaoArtificial() {
     setBuscandoAnimal(true)
     try {
       // Extrair série e RG da entrada
-      // Formato esperado: "CJCJ 17372" ou "CJCJ17372" ou "CJCJ-17372"
+      // Formato esperado: "CJCJ 17372" ou "CJCJ17372" ou "CJCJ-17372" ou apenas "17372"
       let serie = ''
       let rg = ''
       
-      const partes = serieRG.trim().split(/[\s\-]+/)
-      if (partes.length >= 2) {
-        serie = partes[0].toUpperCase().trim()
-        rg = partes.slice(1).join(' ').trim()
+      const entrada = serieRG.trim()
+      
+      // Se for apenas números, é só o RG
+      if (/^\d+$/.test(entrada)) {
+        rg = entrada
       } else {
-        // Tentar extrair série do início (2-5 letras) e o resto é RG
-        const match = serieRG.match(/^([A-Z]{2,5})(\d+.*)$/i)
-        if (match) {
-          serie = match[1].toUpperCase()
-          rg = match[2].trim()
+        // Tentar separar por espaço ou hífen
+        const partes = entrada.split(/[\s\-]+/)
+        if (partes.length >= 2) {
+          serie = partes[0].toUpperCase().trim()
+          rg = partes.slice(1).join(' ').trim()
         } else {
-          // Se não conseguir separar, tentar buscar diretamente
-          serie = serieRG.trim().toUpperCase()
+          // Tentar extrair série do início (2-5 letras) e o resto é RG
+          const match = entrada.match(/^([A-Z]{2,5})(\d+.*)$/i)
+          if (match) {
+            serie = match[1].toUpperCase()
+            rg = match[2].trim()
+          } else {
+            // Se não conseguir separar, tentar buscar diretamente
+            serie = entrada.toUpperCase()
+          }
         }
       }
 
@@ -287,7 +317,7 @@ export default function InseminacaoArtificial() {
       }
 
       // Estratégia 2: Se não encontrou, tentar só com série
-      if (animais.length === 0 && serie) {
+      if (animais.length === 0 && serie && !rg) {
         const params2 = new URLSearchParams()
         params2.append('serie', serie)
         
@@ -295,23 +325,11 @@ export default function InseminacaoArtificial() {
         if (response2.ok) {
           const data2 = await response2.json()
           const animaisPorSerie = data2.data || data2.animals || []
-          
-          if (rg) {
-            animais = animaisPorSerie.filter(a => {
-              const rgAnimal = a.rg?.toString().trim()
-              const rgBuscado = rg.toString().trim()
-              return (a.sexo === 'Fêmea' || a.sexo === 'F') && (
-                rgAnimal === rgBuscado || 
-                parseInt(rgAnimal) === parseInt(rgBuscado)
-              )
-            })
-          } else {
-            animais = animaisPorSerie.filter(a => a.sexo === 'Fêmea' || a.sexo === 'F')
-          }
+          animais = animaisPorSerie.filter(a => a.sexo === 'Fêmea' || a.sexo === 'F')
         }
       }
 
-      // Estratégia 3: Se ainda não encontrou e tem RG, tentar só com RG
+      // Estratégia 3: Se ainda não encontrou e tem RG (com ou sem série), buscar só pelo RG
       if (animais.length === 0 && rg) {
         const params3 = new URLSearchParams()
         params3.append('rg', rg)
@@ -321,15 +339,42 @@ export default function InseminacaoArtificial() {
           const data3 = await response3.json()
           const animaisPorRG = data3.data || data3.animals || []
           
+          // Se tinha série especificada, filtrar por ela também
           if (serie) {
             animais = animaisPorRG.filter(a => 
               (a.sexo === 'Fêmea' || a.sexo === 'F') &&
               a.serie?.toUpperCase().trim() === serie.toUpperCase().trim()
             )
           } else {
+            // Se não tinha série, aceitar qualquer fêmea com esse RG
             animais = animaisPorRG.filter(a => a.sexo === 'Fêmea' || a.sexo === 'F')
           }
         }
+      }
+
+      // Estratégia 4: Buscar em todos os animais carregados (fallback)
+      if (animais.length === 0 && animals.length > 0) {
+        animais = animals.filter(a => {
+          const rgAnimal = a.rg?.toString().trim()
+          const serieAnimal = a.serie?.toUpperCase().trim()
+          
+          // Se só tem RG, buscar por RG
+          if (!serie && rg) {
+            return rgAnimal === rg || parseInt(rgAnimal) === parseInt(rg)
+          }
+          
+          // Se tem série e RG, buscar por ambos
+          if (serie && rg) {
+            return serieAnimal === serie && (rgAnimal === rg || parseInt(rgAnimal) === parseInt(rg))
+          }
+          
+          // Se só tem série, buscar por série
+          if (serie && !rg) {
+            return serieAnimal === serie
+          }
+          
+          return false
+        })
       }
 
       // Se encontrou exatamente um animal, usar ele
@@ -343,11 +388,23 @@ export default function InseminacaoArtificial() {
         }))
       } else if (animais.length > 1) {
         // Múltiplos encontrados - tentar encontrar o exato
-        const animalExato = animais.find(a => {
-          const rgAnimal = a.rg?.toString().trim()
-          const rgBuscado = rg.toString().trim()
-          return rgAnimal === rgBuscado || parseInt(rgAnimal) === parseInt(rgBuscado)
-        })
+        let animalExato = null
+        
+        // Se tem RG, tentar encontrar por RG exato
+        if (rg) {
+          animalExato = animais.find(a => {
+            const rgAnimal = a.rg?.toString().trim()
+            const rgBuscado = rg.toString().trim()
+            const match = rgAnimal === rgBuscado || parseInt(rgAnimal) === parseInt(rgBuscado)
+            
+            // Se também tem série, validar série
+            if (match && serie) {
+              return a.serie?.toUpperCase().trim() === serie.toUpperCase().trim()
+            }
+            return match
+          })
+        }
+        
         if (animalExato) {
           setAnimalEncontrado(animalExato)
           setFormData(prev => ({ 
@@ -358,17 +415,21 @@ export default function InseminacaoArtificial() {
         } else {
           setAnimalEncontrado(null)
           setFormData(prev => ({ ...prev, animalId: '' }))
-          alert(`⚠️ Múltiplas fêmeas encontradas. Seja mais específico com o RG.`)
+          
+          // Mostrar lista de opções
+          const opcoes = animais.slice(0, 5).map(a => `${a.serie} ${a.rg} - ${a.nome || 'Sem nome'}`).join('\n')
+          alert(`⚠️ ${animais.length} fêmeas encontradas com esse RG. Especifique a série:\n\n${opcoes}${animais.length > 5 ? '\n...' : ''}`)
         }
       } else {
         setAnimalEncontrado(null)
         setFormData(prev => ({ ...prev, animalId: '' }))
-        alert(`❌ Fêmea não encontrada: ${serieRG}`)
+        alert(`❌ Fêmea não encontrada: ${serieRG}\n\n💡 Dica: Você pode buscar apenas pelo RG (ex: 16588) ou com a série completa (ex: CJCJ 16588)`)
       }
     } catch (error) {
       console.error('Erro ao buscar animal:', error)
       setAnimalEncontrado(null)
       setFormData(prev => ({ ...prev, animalId: '' }))
+      alert(`❌ Erro ao buscar animal: ${error.message}`)
     } finally {
       setBuscandoAnimal(false)
     }
@@ -553,6 +614,20 @@ export default function InseminacaoArtificial() {
       const dataStr = data.toString().trim()
       if (!dataStr || dataStr === '' || dataStr === 'null' || dataStr === 'undefined') return null
       
+      // Se for número serial do Excel (ex: "40050", "46031") - XLSX às vezes exporta datas como string
+      const numVal = parseFloat(dataStr)
+      if (!isNaN(numVal) && numVal > 0 && numVal < 1000000) {
+        try {
+          const dias = Math.floor(numVal)
+          const excelEpoch = new Date(1899, 11, 30)
+          const date = new Date(excelEpoch.getTime() + dias * 24 * 60 * 60 * 1000)
+          if (!isNaN(date.getTime())) {
+            const isoDate = date.toISOString().split('T')[0]
+            if (isoDate >= '1900-01-01' && isoDate <= '2100-12-31') return isoDate
+          }
+        } catch (_) {}
+      }
+      
       // Tentar diferentes formatos de data
       const dateParts = dataStr.split(/[\/\-\.]/)
       if (dateParts.length === 3) {
@@ -616,10 +691,13 @@ export default function InseminacaoArtificial() {
     return null
   }
 
-  // Função auxiliar para normalizar resultado do DG
+  // Função auxiliar para normalizar resultado do DG (inclui SITUAÇÃO: PARIDA/PRENHA do Excel)
   const normalizarResultadoDG = (resultado) => {
     if (!resultado) return null
     const resultadoLower = resultado.toString().toLowerCase().trim()
+    if (resultadoLower.includes('parida') || resultadoLower === 'parida') {
+      return 'Parida'
+    }
     if (resultadoLower.includes('prenha') || resultadoLower === 'prenha' || resultadoLower === 'prenhez' || resultadoLower === 'p' || resultadoLower === 'sim') {
       return 'prenha'
     } else if (resultadoLower.includes('não prenha') || resultadoLower.includes('nao prenha') || resultadoLower === 'não prenha' || resultadoLower === 'nao prenha' || resultadoLower === 'vazia' || resultadoLower === 'np' || resultadoLower === 'não' || resultadoLower === 'nao' || resultadoLower === 'n') {
@@ -699,7 +777,10 @@ export default function InseminacaoArtificial() {
     
     newMapping.observacao.source = findColumnIndex(['OBSERVAÇÃO', 'Observação', 'observacao', 'OBS', 'obs', 'OBSERVAÇÃO']) || ''
 
-    // Encontrar Results
+    // Encontrar Results ou SITUAÇÃO (PARIDA/PRENHA)
+    const situacaoCol = findColumnIndex(['SITUAÇÃO', 'SITUACAO', 'SITUACAO', 'SITUAC'])
+    if (situacaoCol) newMapping.result1.source = situacaoCol
+
     const resultColumns = headers
       .map((h, idx) => ({ name: h.name, index: idx }))
       .filter(h => {
@@ -711,7 +792,7 @@ export default function InseminacaoArtificial() {
       })
       .sort((a, b) => a.index - b.index)
 
-    if (resultColumns.length >= 1) {
+    if (resultColumns.length >= 1 && !newMapping.result1.source) {
       newMapping.result1.source = resultColumns[0].name
     }
     if (resultColumns.length >= 2) {
@@ -792,6 +873,7 @@ export default function InseminacaoArtificial() {
         alert('⚠️ Campos obrigatórios (Série e RG) devem estar mapeados!')
         return
       }
+      setImportando(true)
 
       // Função auxiliar para encontrar índice do cabeçalho (compatível com variações de espaços/case)
       const findHeaderIndex = (source) => {
@@ -831,9 +913,13 @@ export default function InseminacaoArtificial() {
       })
 
       if (jsonData.length === 0) {
+        setImportando(false)
         alert('⚠️ Arquivo Excel está vazio')
         return
       }
+
+      const totalLinhas = jsonData.length
+      setImportProgress({ atual: 0, total: totalLinhas, etapa: 'Carregando animais e sêmen...' })
 
       // Carregar animais e sêmen uma vez
       const animaisResponse = await fetch('/api/animals')
@@ -844,12 +930,18 @@ export default function InseminacaoArtificial() {
       const semenData = await semenResponse.json()
       const semenList = semenData.data || semenData || []
 
+      setImportProgress({ atual: 0, total: totalLinhas, etapa: 'Importando inseminações...' })
+
       // Processar cada linha (cada linha = um animal com até 3 IAs)
       let sucesso = 0
+      let atualizadas = 0
       let erros = 0
       const errosDetalhes = []
+      let linhaAtual = 0
 
         for (const row of jsonData) {
+          linhaAtual++
+          setImportProgress({ atual: linhaAtual, total: totalLinhas, etapa: `Processando linha ${linhaAtual} de ${totalLinhas}...` })
           try {
             // Mapear colunas do formato específico (agora usando os índices mapeados)
             const serie = (row.serie || '').toString().trim()
@@ -894,12 +986,20 @@ export default function InseminacaoArtificial() {
               continue
             }
 
-            // Validar se o animal é fêmea ANTES de processar inseminações
+            // Se o animal está como Macho no banco mas está na planilha de IA (é fêmea), corrigir para Fêmea
             const sexoAnimal = (animalEncontrado.sexo || '').toString().trim()
-            if (sexoAnimal !== 'Fêmea' && sexoAnimal !== 'F' && sexoAnimal !== 'Femea') {
-              erros++
-              errosDetalhes.push(`❌ ERRO: Animal ${serie} ${rg} é ${sexoAnimal.toUpperCase()} - apenas FÊMEAS podem ser inseminadas. Remova este animal da planilha.`)
-              continue
+            const ehMacho = /macho|^m$/i.test(sexoAnimal) || sexoAnimal === 'M'
+            if (ehMacho) {
+              try {
+                const resSexo = await fetch('/api/animals/' + animalEncontrado.id, {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ sexo: 'Fêmea' })
+                })
+                if (resSexo.ok) animalEncontrado.sexo = 'Fêmea'
+              } catch (_) {}
+              // Sempre tratar como Fêmea e prosseguir (animal na planilha de IA é fêmea)
+              animalEncontrado.sexo = 'Fêmea'
             }
 
             // Processar até 3 inseminações
@@ -1147,6 +1247,7 @@ export default function InseminacaoArtificial() {
                 const dadosEnvio = {
                   animal_id: parseInt(animalEncontrado.id),
                   data_inseminacao: dataIAFormatada,
+                  modo: modoImportacaoIA,
                   touro_nome: touroNome,
                   touro: touroNome,
                   serie_touro: serieTouro,
@@ -1178,12 +1279,16 @@ export default function InseminacaoArtificial() {
 
                 if (response.ok) {
                   sucesso++
+                  try {
+                    const resData = await response.json()
+                    if (resData.updated) atualizadas++
+                  } catch (_) {}
                 } else {
                   erros++
                   let errorMessage = 'Erro desconhecido'
                   try {
                     const errorData = await response.json()
-                    errorMessage = errorData.error || errorData.message || errorData.details || 'Erro desconhecido'
+                    errorMessage = errorData.details || errorData.error || errorData.message || 'Erro desconhecido'
                   } catch (parseError) {
                     errorMessage = `Erro HTTP ${response.status}: ${response.statusText}`
                   }
@@ -1201,12 +1306,15 @@ export default function InseminacaoArtificial() {
         }
 
         // Mostrar resultado
-        let mensagem = `✅ SUCESSO: ${sucesso} inseminação(ões) importada(s)!`
+        let mensagem = sucesso > 0
+          ? (atualizadas > 0
+            ? `✅ SUCESSO: ${sucesso - atualizadas} adicionada(s), ${atualizadas} atualizada(s)!`
+            : `✅ SUCESSO: ${sucesso} inseminação(ões) importada(s)!`)
+          : (erros > 0 ? '❌ Nenhuma inseminação importada.\n\n' : '')
         
         if (erros > 0) {
           mensagem += `\n\n❌ ERROS ENCONTRADOS: ${erros}`
           mensagem += `\n\n📋 PRINCIPAIS CAUSAS DE ERRO:`
-          mensagem += `\n• Animais MACHOS na planilha (apenas fêmeas podem ser inseminadas)`
           mensagem += `\n• Animais não encontrados no sistema`
           mensagem += `\n• Datas inválidas`
           mensagem += `\n\n💡 SOLUÇÃO: Revise a planilha e remova os animais problemáticos`
@@ -1225,6 +1333,9 @@ export default function InseminacaoArtificial() {
         }
         alert(mensagem)
 
+      setImportando(false)
+      setImportProgress({ atual: 0, total: 0, etapa: '' })
+
       // Recarregar dados
       loadInseminacoes()
       loadAlertasDG()
@@ -1233,6 +1344,8 @@ export default function InseminacaoArtificial() {
       setExcelHeaders([])
       setExcelData([])
     } catch (error) {
+      setImportando(false)
+      setImportProgress({ atual: 0, total: 0, etapa: '' })
       alert(`❌ Erro ao processar arquivo Excel: ${error.message}`)
       console.error('Erro detalhado:', error)
     }
@@ -1251,6 +1364,30 @@ export default function InseminacaoArtificial() {
 
   return (
     <div className="space-y-6">
+      {/* Overlay de importação em andamento */}
+      {importando && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-pink-500 border-t-transparent mx-auto mb-4"></div>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Importando inseminações...</h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">{importProgress.etapa}</p>
+            {importProgress.total > 0 && (
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+                <div 
+                  className="bg-pink-500 h-full transition-all duration-300"
+                  style={{ width: `${Math.min(100, (importProgress.atual / importProgress.total) * 100)}%` }}
+                />
+              </div>
+            )}
+            {importProgress.total > 0 && (
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                {importProgress.atual} de {importProgress.total} linhas
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="mb-6 flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -1263,11 +1400,11 @@ export default function InseminacaoArtificial() {
           <button
             onClick={handleLimparTudo}
             disabled={limandoTudo}
-            title="Apagar todas as inseminações para importar novamente"
-            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+            title="🔒 Apenas desenvolvedores - Apagar todas as inseminações (requer senha)"
+            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors shadow-md hover:shadow-lg"
           >
             <TrashIcon className="w-5 h-5" />
-            {limandoTudo ? 'Limpando...' : 'Limpar Tudo'}
+            🔒 {limandoTudo ? 'Limpando...' : 'Limpar Tudo'}
           </button>
           <button
             onClick={() => setShowImportModal(true)}
@@ -1305,6 +1442,107 @@ export default function InseminacaoArtificial() {
             Nova Inseminação
           </button>
         </div>
+      </div>
+
+      {/* Campo de Busca Rápida de Animal */}
+      <div className="bg-gradient-to-r from-pink-50 via-purple-50 to-blue-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 rounded-xl shadow-lg p-6 border-2 border-pink-200 dark:border-pink-800">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-3 bg-pink-600 rounded-lg">
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Buscar Animal</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Digite a Série e RG para encontrar uma fêmea</p>
+          </div>
+        </div>
+        
+        <div className="relative">
+          <input
+            type="text"
+            value={formData.animalSerieRG}
+            onChange={(e) => {
+              const valor = e.target.value
+              setFormData({...formData, animalSerieRG: valor, animalId: ''})
+              setAnimalEncontrado(null)
+              if (valor.trim().length >= 3) {
+                clearTimeout(window.buscaAnimalTimeout)
+                window.buscaAnimalTimeout = setTimeout(() => {
+                  buscarAnimalPorSerieRG(valor)
+                }, 500)
+              } else if (valor.trim() === '') {
+                setAnimalEncontrado(null)
+                setFormData(prev => ({ ...prev, animalId: '' }))
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                buscarAnimalPorSerieRG(formData.animalSerieRG)
+              }
+            }}
+            placeholder="Ex: CJCJ 17372, CJCJ17372 ou apenas 16588"
+            className="w-full px-6 py-4 text-lg border-2 border-pink-300 dark:border-pink-700 rounded-xl focus:ring-4 focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:text-white transition-all duration-200 shadow-md hover:shadow-lg"
+          />
+          {buscandoAnimal && (
+            <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-pink-600"></div>
+            </div>
+          )}
+        </div>
+
+        {animalEncontrado && (
+          <div className="mt-4 p-4 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 border-2 border-green-400 dark:border-green-600 rounded-xl animate-bounce-in">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-green-600 rounded-lg">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-green-800 dark:text-green-200 mb-2">✅ Animal Encontrado!</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Identificação</p>
+                    <p className="font-bold text-gray-900 dark:text-white">{animalEncontrado.serie} {animalEncontrado.rg}</p>
+                  </div>
+                  {animalEncontrado.nome && (
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Nome</p>
+                      <p className="font-bold text-gray-900 dark:text-white">{animalEncontrado.nome}</p>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Sexo</p>
+                    <p className="font-bold text-gray-900 dark:text-white">{animalEncontrado.sexo}</p>
+                  </div>
+                  {animalEncontrado.raca && (
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Raça</p>
+                      <p className="font-bold text-gray-900 dark:text-white">{animalEncontrado.raca}</p>
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={() => setShowForm(true)}
+                  className="mt-4 w-full flex items-center justify-center gap-2 bg-pink-600 text-white px-6 py-3 rounded-lg hover:bg-pink-700 transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105 font-bold"
+                >
+                  <PlusIcon className="w-5 h-5" />
+                  Registrar Inseminação para este Animal
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!animalEncontrado && formData.animalSerieRG && !buscandoAnimal && (
+          <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-300 dark:border-blue-700 rounded-xl">
+            <p className="text-sm text-blue-800 dark:text-blue-200">
+              💡 Digite pelo menos 3 caracteres e pressione Enter ou aguarde para buscar automaticamente
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Estatísticas de IA */}
@@ -1398,7 +1636,7 @@ export default function InseminacaoArtificial() {
                         buscarAnimalPorSerieRG(formData.animalSerieRG)
                       }
                     }}
-                    placeholder="Ex: CJCJ 17372 ou CJCJ17372"
+                    placeholder="Ex: CJCJ 17372, CJCJ17372 ou apenas 16588"
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:text-white"
                     required
                   />
@@ -1901,6 +2139,37 @@ export default function InseminacaoArtificial() {
 
                 {!showFieldMapping ? (
                   <div className="space-y-4">
+                    <div className="bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg border border-amber-200 dark:border-amber-900/50">
+                      <p className="text-sm font-medium text-amber-900 dark:text-amber-200 mb-2">Modo de importação</p>
+                      <div className="flex gap-4">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="modoImportacaoIA"
+                            checked={modoImportacaoIA === 'adicionar'}
+                            onChange={() => setModoImportacaoIA('adicionar')}
+                            className="rounded-full"
+                          />
+                          <span className="text-sm text-amber-800 dark:text-amber-100">Adicionar novas</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="modoImportacaoIA"
+                            checked={modoImportacaoIA === 'atualizar'}
+                            onChange={() => setModoImportacaoIA('atualizar')}
+                            className="rounded-full"
+                          />
+                          <span className="text-sm text-amber-800 dark:text-amber-100">Atualizar IA</span>
+                        </label>
+                      </div>
+                      <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
+                        {modoImportacaoIA === 'atualizar' 
+                          ? 'Se o animal já tiver IA na mesma data, atualiza (touro, etc). Senão, adiciona.'
+                          : 'Adiciona novas IAs. Se o animal já tiver IA na mesma data, cria outra.'}
+                      </p>
+                    </div>
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Arquivo Excel (.xlsx, .xls)
@@ -1931,7 +2200,7 @@ export default function InseminacaoArtificial() {
                     <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
                       <p className="text-sm text-green-700 dark:text-green-300">
                         ✅ Arquivo carregado com sucesso! {excelHeaders.length} coluna(s) detectada(s). 
-                        Selecione quais campos deseja importar:
+                        Modo: <strong>{modoImportacaoIA === 'atualizar' ? 'Atualizar IA' : 'Adicionar novas'}</strong>. Selecione quais campos importar:
                       </p>
                     </div>
 

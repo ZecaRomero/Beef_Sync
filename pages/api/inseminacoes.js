@@ -109,6 +109,7 @@ export default async function handler(req, res) {
     if (req.method === 'POST') {
       // Criar nova inseminação
       const body = req.body || {};
+      const modoAtualizar = body.modo === 'atualizar' || body.modoAtualizar === true;
       const animalId = body.animalId ?? body.animal_id;
       const numeroIA = body.numeroIA ?? body.numero_ia ?? 1;
       const dataIA = body.dataIA ?? body.data_inseminacao ?? body.data_ia;
@@ -117,6 +118,7 @@ export default async function handler(req, res) {
       const touroNome = body.touroNome ?? body.touro_nome ?? body.touro ?? null;
       const touroRG = body.touroRG ?? body.touro_rg ?? null;
       const serieTouro = body.serie_touro ?? body.serieTouro ?? null;
+      const semenId = body.semen_id ?? body.semenId ?? null;
       const tecnico = body.tecnico ?? null;
       const protocolo = body.protocolo ?? null;
       const statusGestacao = body.statusGestacao ?? body.status_gestacao ?? 'Pendente';
@@ -131,70 +133,71 @@ export default async function handler(req, res) {
         });
       }
 
-      // Garantir coluna valida existe e invalidar IAs anteriores da mesma fêmea
-      await query('ALTER TABLE inseminacoes ADD COLUMN IF NOT EXISTS valida BOOLEAN DEFAULT true').catch(() => {})
-      await query(`
-        UPDATE inseminacoes 
-        SET valida = false, status_gestacao = 'Vazia', 
-            resultado_dg = COALESCE(NULLIF(TRIM(resultado_dg), ''), 'Vazia'),
-            updated_at = CURRENT_TIMESTAMP
-        WHERE animal_id = $1
-      `, [parseInt(animalId, 10)])
+      // Garantir data_ia em formato YYYY-MM-DD (converter Excel serial se necessário)
+      let dataIAFinal = dataIA
+      if (typeof dataIA === 'number' || (typeof dataIA === 'string' && /^\d+\.?\d*$/.test(String(dataIA).trim()))) {
+        const num = parseFloat(dataIA)
+        if (num > 0 && num < 1000000) {
+          const excelEpoch = new Date(1899, 11, 30)
+          const d = new Date(excelEpoch.getTime() + Math.floor(num) * 86400000)
+          if (!isNaN(d.getTime())) dataIAFinal = d.toISOString().split('T')[0]
+        }
+      } else if (typeof dataIA === 'string' && dataIA.includes('T')) {
+        dataIAFinal = dataIA.split('T')[0]
+      }
 
-      // Adicionar serie_touro se a coluna existir (compatibilidade)
-      let result;
-      try {
-        result = await query(`
+      // Garantir colunas existem (migração automática)
+      await query('ALTER TABLE inseminacoes ADD COLUMN IF NOT EXISTS valida BOOLEAN DEFAULT true').catch(() => {})
+      await query('ALTER TABLE inseminacoes ADD COLUMN IF NOT EXISTS serie_touro VARCHAR(50)').catch(() => {})
+      await query('ALTER TABLE inseminacoes ADD COLUMN IF NOT EXISTS semen_id INTEGER').catch(() => {})
+
+      // Modo Atualizar: se já existe IA com animal_id + data_ia, atualizar em vez de inserir
+      if (modoAtualizar) {
+        const dataFormatada = dataIAFinal;
+        const existente = await query(
+          'SELECT id FROM inseminacoes WHERE animal_id = $1 AND data_ia::date = $2::date LIMIT 1',
+          [parseInt(animalId, 10), dataFormatada]
+        );
+        if (existente.rows.length > 0) {
+          const id = existente.rows[0].id;
+          await query(`
+            UPDATE inseminacoes SET
+              touro_nome = COALESCE($1, touro_nome),
+              touro_rg = COALESCE($2, touro_rg),
+              data_dg = COALESCE($3, data_dg), resultado_dg = COALESCE($4, resultado_dg),
+              status_gestacao = COALESCE($5, status_gestacao), custo_dose = COALESCE($6, custo_dose),
+              updated_at = CURRENT_TIMESTAMP
+            WHERE id = $7
+          `, [touroNome, touroRG, dataDG, resultadoDG, statusGestacao || 'Pendente', custoDose, id]);
+          const updated = await query('SELECT * FROM inseminacoes WHERE id = $1', [id]);
+          broadcast('inseminacao.updated', { animalId: parseInt(animalId, 10) });
+          return res.status(200).json({ success: true, data: updated.rows[0], updated: true });
+        }
+      }
+
+      // INSERT usando apenas colunas que existem na tabela base (sem serie_touro, semen_id)
+      const result = await query(`
           INSERT INTO inseminacoes (
             animal_id, numero_ia, data_ia, data_dg, resultado_dg,
-            touro_nome, touro_rg, serie_touro, tecnico, protocolo,
+            touro_nome, touro_rg, tecnico, protocolo,
             status_gestacao, observacoes, custo_dose, valida,
             created_at, updated_at
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
           RETURNING *
         `, [
           animalId,
-          numeroIA || 1,
-          dataIA,
-          dataDG || null,
-          resultadoDG || null,
-          touroNome || null,
-          touroRG || null,
-          serieTouro || null,
-          tecnico || null,
-          protocolo || null,
-          statusGestacao || 'Pendente',
-          observacoes || null,
-          custoDose || null
-        ]);
-      } catch (insertErr) {
-        if (insertErr.message && insertErr.message.includes('serie_touro')) {
-          result = await query(`
-            INSERT INTO inseminacoes (
-              animal_id, numero_ia, data_ia, data_dg, resultado_dg,
-              touro_nome, touro_rg, tecnico, protocolo,
-              status_gestacao, observacoes, custo_dose, valida,
-              created_at, updated_at
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-            RETURNING *
-          `, [
-            animalId,
-            numeroIA || 1,
-            dataIA,
-            dataDG || null,
-            resultadoDG || null,
-            touroNome || null,
-            touroRG || null,
-            tecnico || null,
-            protocolo || null,
-            statusGestacao || 'Pendente',
-            observacoes || null,
-            custoDose || null
-          ]);
-        } else {
-          throw insertErr;
-        }
-      }
+        numeroIA || 1,
+        dataIAFinal,
+        dataDG || null,
+        resultadoDG || null,
+        touroNome || null,
+        touroRG || null,
+        tecnico || null,
+        protocolo || null,
+        statusGestacao || 'Pendente',
+        observacoes || null,
+        custoDose || null
+      ]);
 
       const newInsem = result.rows[0]
       broadcast('inseminacao.created', { animalId: newInsem?.animal_id })
@@ -270,8 +273,21 @@ export default async function handler(req, res) {
 
       // Limpar todas as inseminações
       if (todos === 'true' || todos === '1') {
+        // Verificar senha de desenvolvedor
+        const senha = req.headers['x-dev-password'] || req.body?.senha
+        
+        if (senha !== 'bfzk26') {
+          return res.status(403).json({ 
+            success: false,
+            error: '🔒 Acesso negado. Senha de desenvolvedor incorreta.' 
+          })
+        }
+        
         const result = await query('DELETE FROM inseminacoes RETURNING id');
         const count = result.rowCount || 0;
+        
+        broadcast('inseminacao.deleted', { all: true })
+        
         return res.status(200).json({
           success: true,
           message: `${count} inseminação(ões) removida(s)`,
@@ -284,7 +300,14 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'ID não fornecido. Use ?todos=true para limpar todas.' });
       }
 
+      const existing = await query('SELECT animal_id FROM inseminacoes WHERE id = $1', [id])
+      const animalId = existing.rows[0]?.animal_id
+
       await query('DELETE FROM inseminacoes WHERE id = $1', [id]);
+
+      if (animalId) {
+        broadcast('inseminacao.deleted', { animalId, id })
+      }
 
       return res.status(200).json({
         success: true,

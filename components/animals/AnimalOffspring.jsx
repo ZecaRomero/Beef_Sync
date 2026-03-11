@@ -31,7 +31,10 @@ export default function AnimalOffspring({ animal, filhos }) {
         <div className="divide-y divide-gray-100 dark:divide-gray-700">
           {listaFilhos.map((f, i) => {
             const reactKey = f.id ?? `filho-${f.serie}-${f.rg}-${i}`
-            const identificacao = `${f.nome || f.serie || '-'} ${f.rg || ''}`.trim()
+            // Priorizar Série + RG (identificação oficial); nome só quando for nome real, não concatenação
+            const serieRg = [f.serie, f.rg].filter(Boolean).join(' ').trim()
+            const nomeValido = f.nome && f.nome.trim() && !/^[A-Z0-9]+\s+[A-Z0-9\.]*\s*\d+$/i.test(f.nome.trim())
+            const identificacao = serieRg || (nomeValido ? f.nome.trim() : null) || f.nome || '-'
             const mesesFilho = calcularMesesIdade(f.data_nascimento, f.meses)
             
             const isBaixa = f.status && f.status !== 'ATIVO'

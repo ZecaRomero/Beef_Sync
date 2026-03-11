@@ -26,6 +26,7 @@ export interface NavigationChild {
   href: string
   description?: string
   danger?: boolean
+  new?: boolean  // Badge "Novo" para itens recentes
 }
 
 export interface SearchResult {

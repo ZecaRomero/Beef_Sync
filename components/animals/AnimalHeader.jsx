@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { ArrowLeftIcon, SunIcon, MoonIcon } from '@heroicons/react/24/outline'
+import { getAccentClasses, getChipClasses } from '../../utils/animalSexTheme'
 
 export default function AnimalHeader({ 
   darkMode, 
@@ -7,7 +8,8 @@ export default function AnimalHeader({
   animal, 
   resumoChips, 
   setShowIABCZInfo,
-  rankings 
+  rankings,
+  sexTheme = 'neutral'
 }) {
   const { 
     posicaoIABCZ: rankingPosicao, 
@@ -24,7 +26,7 @@ export default function AnimalHeader({
         <div className="flex items-center justify-between max-w-lg mx-auto px-4 py-3 min-h-[52px]">
           <Link
             href="/a?buscar=1"
-            className="flex items-center gap-2 text-amber-600 dark:text-amber-500 font-semibold py-2 -ml-2 pr-2 min-w-[88px] active:opacity-80 transition-opacity"
+            className={`flex items-center gap-2 font-semibold py-2 -ml-2 pr-2 min-w-[88px] active:opacity-80 transition-opacity ${getAccentClasses(sexTheme)}`}
             aria-label="Voltar para nova consulta"
           >
             <ArrowLeftIcon className="h-5 w-5 flex-shrink-0" />
@@ -51,11 +53,26 @@ export default function AnimalHeader({
       <div className="sticky z-10 bg-white/95 dark:bg-gray-800/95 border-b border-gray-200 dark:border-gray-700 backdrop-blur-sm">
         <div className="max-w-lg mx-auto px-4 py-2.5">
           <div className="flex flex-wrap gap-2">
-          {resumoChips.slice(0, 3).map((c, i) => (
-            <span key={i} className="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-white">
+          {resumoChips.slice(0, 5).map((c, i) => (
+            <span key={i} className={`px-2.5 py-1 rounded-full text-xs font-semibold ${getChipClasses(sexTheme)}`}>
               {c}
             </span>
           ))}
+          {animal.situacao_reprodutiva && (
+            <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 dark:bg-green-900/30 border border-green-400 text-green-700 dark:text-green-300">
+              🩺 {animal.situacao_reprodutiva}
+            </span>
+          )}
+          {animal.prev_parto && (
+            <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300">
+              📅 Prev: {animal.prev_parto}
+            </span>
+          )}
+          {animal.carimbo_leilao && (
+            <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-900/30 border border-amber-400 text-amber-700 dark:text-amber-300">
+              🏷️ {animal.carimbo_leilao}
+            </span>
+          )}
           {(animal.abczg || animal.abczg === 0) && (
             <button
               type="button"

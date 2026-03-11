@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
+import { extrairSerieRG } from '../utils/animalUtils'
 import Head from 'next/head'
 import Link from 'next/link'
 import { 
@@ -193,17 +194,6 @@ export default function MobileAnimal() {
     setCurrentIndex(-1)
   }
 
-  // Extrair série e RG da mãe para link
-  const extrairSerieRG = (texto) => {
-    if (!texto) return { serie: '', rg: '' }
-    const t = String(texto).trim()
-    const matchTraco = t.match(/^([A-Za-z]+)-(\d+)$/)
-    if (matchTraco) return { serie: matchTraco[1], rg: matchTraco[2] }
-    const matchEspaco = t.match(/^([A-Za-z]+)\s+(\d+)$/)
-    if (matchEspaco) return { serie: matchEspaco[1], rg: matchEspaco[2] }
-    return { serie: '', rg: '' }
-  }
-
   // Buscar serie/rg da mãe quando não vier do backend
   useEffect(() => {
     if (!animal?.mae || (animal.serie_mae && animal.rg_mae)) {
@@ -211,7 +201,7 @@ export default function MobileAnimal() {
       setMaeColetas(null)
       return
     }
-    const { serie, rg } = extrairSerieRG(animal.mae)
+    const { serie, rg } = extrairSerieRG(animal.mae, animal.serie)
     if (serie && rg) {
       setMaeLink({ serie, rg })
       setMaeColetas(null)

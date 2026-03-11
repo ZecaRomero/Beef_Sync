@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx'
+import ImportProgressOverlay from '../components/ImportProgressOverlay'
 
 // Função auxiliar para formatar data
 const formatDate = (date, formatStr) => {
@@ -15,6 +16,7 @@ export default function Ocorrencias() {
   const [animals, setAnimals] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [importandoExcel, setImportandoExcel] = useState(false);
   const [formData, setFormData] = useState({
     animalId: '',
     nome: '',
@@ -279,6 +281,7 @@ export default function Ocorrencias() {
     const file = e.target.files[0];
     if (!file) return;
 
+    setImportandoExcel(true);
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
@@ -311,7 +314,12 @@ export default function Ocorrencias() {
       } catch (error) {
         setMessage(`❌ Erro ao processar arquivo Excel: ${error.message}`);
         setTimeout(() => setMessage(''), 4000);
+      } finally {
+        setImportandoExcel(false);
       }
+    };
+    reader.onerror = () => {
+      setImportandoExcel(false);
     };
     
     reader.readAsArrayBuffer(file);
@@ -509,6 +517,10 @@ export default function Ocorrencias() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4">
+      <ImportProgressOverlay
+        importando={importandoExcel}
+        progress={{ atual: 0, total: 0, etapa: 'Importando dados do Excel...' }}
+      />
       <div className="w-full max-w-none mx-auto px-2 sm:px-4 lg:px-6">
         <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg border border-gray-200 dark:border-gray-700">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">

@@ -11,6 +11,13 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Verificar senha de desenvolvedor
+    const senha = req.headers['x-dev-password'] || req.body?.senha || req.query?.senha
+    
+    if (senha !== 'bfzk26') {
+      return sendError(res, '🔒 Acesso negado. Senha de desenvolvedor incorreta.', 403)
+    }
+    
     // Contar quantas localizações existem antes de deletar
     const countResult = await query('SELECT COUNT(*) as total FROM localizacoes_animais')
     const totalLocalizacoes = parseInt(countResult.rows[0]?.total || 0)

@@ -1,7 +1,5 @@
 import { query } from '../../../lib/database'
-import ExcelJS from 'exceljs'
-
-const HEADERS = ['LOCAL', 'LOCAL 1', 'SUB_LOCAL_2', 'QUANT.', 'SEXO', 'CATEGORIA', 'RAÇA', 'ERA', 'OBSERVAÇÃO']
+import { generateBoletimCampoWorkbook } from '../../../utils/boletimCampoExcel'
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -10,40 +8,29 @@ export default async function handler(req, res) {
 
   try {
     const dadosResult = await query(`
-      SELECT local, local_1, sub_local_2, quant, sexo, categoria, raca, era, observacao
+      SELECT id, local, local_1, sub_local_2, quant, sexo, categoria, raca, era, observacao
       FROM boletim_campo
       ORDER BY local, local_1, sub_local_2
     `)
     const dados = dadosResult.rows || []
 
-    const workbook = new ExcelJS.Workbook()
-    const sheet = workbook.addWorksheet('Boletim Campo')
-    const corLaranja = { argb: 'FFFFA500' }
+    const historicoResult = await query(`
+      SELECT m.id, m.tipo, m.destino_local, m.destino_sub_local, m.motivo, m.quantidade,
+             m.sexo, m.era, m.raca, m.categoria, m.observacao, m.usuario, m.created_at,
+             b.local, b.local_1, b.sub_local_2
+      FROM boletim_campo_movimentacoes m
+      LEFT JOIN boletim_campo b ON b.id = m.boletim_campo_id
+      ORDER BY m.created_at DESC
+      LIMIT 500
+    `)
+    const historico = historicoResult.rows || []
 
-    sheet.getRow(1).values = HEADERS
-    sheet.getRow(1).eachCell((cell) => {
-      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: corLaranja }
-      cell.font = { bold: true }
-    })
-
-    const rowsToExport = dados.length ? dados : [{ local: '', local_1: '', sub_local_2: '', quant: 0, sexo: '', categoria: '', raca: '', era: '', observacao: '' }]
-    rowsToExport.forEach((row, idx) => {
-      const r = sheet.getRow(idx + 2)
-      r.values = [
-        row.local || '',
-        row.local_1 || '',
-        row.sub_local_2 || '',
-        row.quant || 0,
-        row.sexo || '',
-        row.categoria || '',
-        row.raca || '',
-        row.era || '',
-        row.observacao || ''
-      ]
-    })
-
+    const workbook = await generateBoletimCampoWorkbook(dados, historico)
     const buffer = await workbook.xlsx.writeBuffer()
-    const filename = `Boletim_Campo_${new Date().toISOString().split('T')[0]}.xlsx`
+    const now = new Date()
+    const dataStr = now.toISOString().split('T')[0]
+    const horaStr = now.toTimeString().slice(0, 5).replace(':', 'h')
+    const filename = `Boletim_Campo_${dataStr}_${horaStr}.xlsx`
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)

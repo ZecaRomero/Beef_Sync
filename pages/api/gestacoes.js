@@ -95,8 +95,44 @@ async function gestacoesHandler(req, res) {
       })
     }
     
-    // Atualização de gestação não implementada ainda
-    return sendNotImplemented(res, 'Atualização de gestação não implementada ainda')
+    try {
+      // Verificar se a gestação existe
+      const gestacaoExistente = await databaseService.buscarGestacaoPorId(id)
+      
+      if (!gestacaoExistente) {
+        return sendError(res, 'Gestação não encontrada', HTTP_STATUS.NOT_FOUND, {
+          id
+        })
+      }
+      
+      // Preparar dados para atualização
+      const dadosAtualizacao = {}
+      
+      if (req.body.paiSerie !== undefined) dadosAtualizacao.pai_serie = req.body.paiSerie
+      if (req.body.paiRg !== undefined) dadosAtualizacao.pai_rg = req.body.paiRg
+      if (req.body.maeSerie !== undefined) dadosAtualizacao.mae_serie = req.body.maeSerie
+      if (req.body.maeRg !== undefined) dadosAtualizacao.mae_rg = req.body.maeRg
+      if (req.body.receptoraNome !== undefined) dadosAtualizacao.receptora_nome = req.body.receptoraNome
+      if (req.body.receptoraSerie !== undefined) dadosAtualizacao.receptora_serie = req.body.receptoraSerie
+      if (req.body.receptoraRg !== undefined) dadosAtualizacao.receptora_rg = req.body.receptoraRg
+      if (req.body.data_cobertura !== undefined) dadosAtualizacao.data_cobertura = req.body.data_cobertura
+      if (req.body.custoAcumulado !== undefined) dadosAtualizacao.custo_acumulado = parseFloat(req.body.custoAcumulado)
+      if (req.body.situacao !== undefined) dadosAtualizacao.situacao = req.body.situacao
+      if (req.body.observacoes !== undefined) dadosAtualizacao.observacoes = req.body.observacoes
+      
+      const gestacaoAtualizada = await databaseService.atualizarGestacao(id, dadosAtualizacao)
+      
+      return sendSuccess(res, gestacaoAtualizada, 'Gestação atualizada com sucesso', HTTP_STATUS.OK)
+      
+    } catch (error) {
+      if (error.message === 'Nenhum campo para atualizar') {
+        return sendValidationError(res, 'Nenhum campo válido fornecido para atualização', {
+          provided: Object.keys(req.body)
+        })
+      }
+      
+      throw error
+    }
     
   } else if (req.method === 'DELETE') {
     const { id } = req.query
@@ -108,8 +144,29 @@ async function gestacoesHandler(req, res) {
       })
     }
     
-    // Exclusão de gestação não implementada ainda
-    return sendNotImplemented(res, 'Exclusão de gestação não implementada ainda')
+    try {
+      // Verificar se a gestação existe
+      const gestacaoExistente = await databaseService.buscarGestacaoPorId(id)
+      
+      if (!gestacaoExistente) {
+        return sendError(res, 'Gestação não encontrada', HTTP_STATUS.NOT_FOUND, {
+          id
+        })
+      }
+      
+      const gestacaoExcluida = await databaseService.excluirGestacao(id)
+      
+      return sendSuccess(res, gestacaoExcluida, 'Gestação excluída com sucesso', HTTP_STATUS.OK)
+      
+    } catch (error) {
+      if (error.message === 'Gestação não encontrada') {
+        return sendError(res, 'Gestação não encontrada', HTTP_STATUS.NOT_FOUND, {
+          id
+        })
+      }
+      
+      throw error
+    }
     
   } else {
     return sendMethodNotAllowed(res, ['GET', 'POST', 'PUT', 'DELETE'])

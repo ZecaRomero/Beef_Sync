@@ -1,6 +1,6 @@
 /**
  * Identificação para monitoramento de acessos
- * Usuário informa nome e telefone para aparecer no painel de acessos
+ * Usuário informa nome para aparecer no painel de acessos (sem telefone)
  */
 import React, { useState, useEffect } from 'react'
 import Head from 'next/head'
@@ -8,19 +8,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { UserCircleIcon, DevicePhoneMobileIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
 
-const STORAGE_KEY = 'beef_usuario_identificado' // localStorage para persistir entre sessões
-
-function formatPhone(v) {
-  const digits = String(v).replace(/\D/g, '')
-  if (digits.length <= 2) return digits ? `(${digits}` : ''
-  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`
-  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`
-}
+const STORAGE_KEY = 'beef_usuario_identificado'
 
 export default function Identificar() {
   const router = useRouter()
   const [nome, setNome] = useState('')
-  const [telefone, setTelefone] = useState('')
   const [salvo, setSalvo] = useState(false)
   const [jaIdentificado, setJaIdentificado] = useState(false)
 
@@ -28,37 +20,22 @@ export default function Identificar() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) {
-        const { nome: n, telefone: t } = JSON.parse(stored)
+        const { nome: n } = JSON.parse(stored)
         setNome(n || '')
-        setTelefone(t || '')
         setJaIdentificado(true)
       }
     } catch (_) {}
   }, [])
 
-  const handleTelefoneChange = (e) => {
-    const v = e.target.value.replace(/\D/g, '').slice(0, 11)
-    setTelefone(formatPhone(v))
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const telDigits = telefone.replace(/\D/g, '')
     if (!nome.trim()) {
       alert('Informe seu nome.')
       return
     }
-    if (telDigits.length < 10) {
-      alert('Informe um telefone válido (com DDD).')
-      return
-    }
     try {
       const nomeTrim = nome.trim()
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        nome: nomeTrim,
-        telefone: telDigits
-      }))
-      // Registrar acesso com nome e telefone para aparecer no monitoramento
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ nome: nomeTrim }))
       try {
         await fetch('/api/access-log', {
           method: 'POST',
@@ -69,7 +46,6 @@ export default function Identificar() {
             ipAddress: typeof window !== 'undefined' ? window.location.hostname : 'N/A',
             hostname: typeof window !== 'undefined' ? window.location.hostname : '',
             userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
-            telefone: telDigits,
             action: 'Identificação registrada'
           })
         })
@@ -87,7 +63,6 @@ export default function Identificar() {
   const handleLimpar = () => {
     localStorage.removeItem(STORAGE_KEY)
     setNome('')
-    setTelefone('')
     setJaIdentificado(false)
   }
 
@@ -107,7 +82,7 @@ export default function Identificar() {
               <div>
                 <h1 className="text-xl font-bold text-gray-900 dark:text-white">Identificar-se</h1>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Apareça no monitor de acessos com seu telefone
+                  Apareça no monitor de acessos com seu nome
                 </p>
               </div>
             </div>
@@ -117,7 +92,7 @@ export default function Identificar() {
                 <CheckCircleIcon className="h-16 w-16 text-emerald-500 mx-auto mb-4" />
                 <p className="text-lg font-semibold text-gray-900 dark:text-white">Identificação salva!</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  Seus próximos acessos aparecerão com seu nome e telefone no painel.
+                  Seus próximos acessos aparecerão com seu nome no painel.
                 </p>
               </div>
             ) : (
@@ -131,17 +106,6 @@ export default function Identificar() {
                     placeholder="Seu nome"
                     className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400"
                     required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Telefone (com DDD)</label>
-                  <input
-                    type="tel"
-                    value={telefone}
-                    onChange={handleTelefoneChange}
-                    placeholder="(11) 99999-9999"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400"
-                    inputMode="numeric"
                   />
                 </div>
                 <button

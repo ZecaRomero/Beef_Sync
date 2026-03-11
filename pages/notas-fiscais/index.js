@@ -22,6 +22,7 @@ import ResumoAnimaisNF from '../../components/ResumoAnimaisNF'
 // import NotasFiscaisSyncPanel from '../../components/NotasFiscaisSyncPanel'
 // import PainelIntegracaoBoletim from '../../components/PainelIntegracaoBoletim'
 import Toast from '../../components/ui/SimpleToast'
+import ImportProgressOverlay from '../../components/ImportProgressOverlay'
 import { integrarNFEntrada, integrarNFSaida } from '../../services/notasFiscaisIntegration'
 
 export default function NotasFiscais() {
@@ -59,6 +60,8 @@ export default function NotasFiscais() {
   const [importDataNF, setImportDataNF] = useState('')
   const [isValidatingNF, setIsValidatingNF] = useState(false)
   const [validationNF, setValidationNF] = useState(null)
+  const [importandoNF, setImportandoNF] = useState(false)
+  const [importProgressNF, setImportProgressNF] = useState({ atual: 0, total: 0, etapa: '' })
 
   const [mappingModeNF, setMappingModeNF] = useState('manual')
   const [headersDetectedNF, setHeadersDetectedNF] = useState([])
@@ -846,10 +849,14 @@ export default function NotasFiscais() {
 
   const handleImportNF = async () => {
     if (!validationNF || validationNF.sucesso.length === 0) return
+    const lista = validationNF.sucesso
+    setImportandoNF(true)
+    setImportProgressNF({ atual: 0, total: lista.length, etapa: 'Importando notas fiscais...' })
     try {
-      const lista = validationNF.sucesso
       let ok = 0
-      for (const nf of lista) {
+      for (let i = 0; i < lista.length; i++) {
+        setImportProgressNF({ atual: i + 1, total: lista.length, etapa: `Processando nota ${i + 1} de ${lista.length}...` })
+        const nf = lista[i]
         const payload = { ...nf }
         delete payload.id
         const resp = await fetch('/api/notas-fiscais', {
@@ -867,6 +874,9 @@ export default function NotasFiscais() {
     } catch (err) {
       console.error('Erro na importação NF:', err)
       Toast.error('Erro na importação de notas fiscais')
+    } finally {
+      setImportandoNF(false)
+      setImportProgressNF({ atual: 0, total: 0, etapa: '' })
     }
   }
 
@@ -911,6 +921,7 @@ export default function NotasFiscais() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-900/20 dark:to-indigo-900/20">
+      <ImportProgressOverlay importando={importandoNF} progress={importProgressNF} />
       <div className="p-6 space-y-8">
         {/* Header Moderno */}
         <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-3xl shadow-2xl">

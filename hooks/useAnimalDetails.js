@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useOptimizedFetch, invalidateCache } from './useOptimizedFetch'
 import { useServerEvents } from './useServerEvents'
+import { extrairSerieRG } from '../utils/animalUtils'
 
 export function useAnimalDetails(id) {
   const [animal, setAnimal] = useState(null)
@@ -105,7 +106,7 @@ export function useAnimalDetails(id) {
           const isFemea = !isMacho // Simplificação, verificar string se necessário
           if (isFemea) {
              fetchPromises.push(
-              fetch(`/api/inseminacoes?animal_id=${a.id}`)
+              fetch(`/api/inseminacoes?animal_id=${a.id}&_t=${Date.now()}`)
                 .then(r => r.json())
                 .then(d => setInseminacoes(Array.isArray(d.data || d) ? (d.data || d) : []))
                 .catch(() => {})
@@ -114,7 +115,7 @@ export function useAnimalDetails(id) {
 
           // Custos: buscar sempre (fallback se API principal não retornou ou retornou vazio)
           fetchPromises.push(
-            fetch(`/api/animals/${a.id}/custos`)
+            fetch(`/api/animals/${a.id}/custos?_t=${Date.now()}`)
               .then(r => r.ok ? r.json() : { data: [] })
               .then(d => {
                 const custos = Array.isArray(d.data ?? d.custos ?? d) ? (d.data ?? d.custos ?? d) : []
@@ -220,7 +221,7 @@ export function useAnimalDetails(id) {
     ]
     if (!isMacho) {
       promises.push(
-        fetch(`/api/inseminacoes?animal_id=${a.id}`)
+        fetch(`/api/inseminacoes?animal_id=${a.id}&_t=${Date.now()}`)
           .then(r => r.json())
           .then(d => { if (mountedRef.current) setInseminacoes(Array.isArray(d.data || d) ? (d.data || d) : []) })
           .catch(() => {})
@@ -277,13 +278,12 @@ export function useAnimalDetails(id) {
     }
 
     if (
-      (event.type === 'inseminacao.created' || event.type === 'inseminacao.updated') &&
-      isThisAnimal
+      (event.type === 'inseminacao.created' || event.type === 'inseminacao.updated' || event.type === 'inseminacao.deleted') &&
+      (isThisAnimal || event.all)
     ) {
-      fetch(`/api/inseminacoes?animal_id=${animal.id}`)
-        .then(r => r.json())
-        .then(d => { if (mountedRef.current) setInseminacoes(Array.isArray(d.data || d) ? (d.data || d) : []) })
-        .catch(() => {})
+      // Invalidar cache e buscar dados frescos do animal
+      invalidateCache(`/api/animals/${id}`)
+      refreshSecondary(animal)
     }
 
     if (
@@ -303,23 +303,6 @@ export function useAnimalDetails(id) {
       setMaeLink(null)
       setMaeColetas(null)
       return
-    }
-
-    const extrairSerieRG = (t, serieFilho) => {
-      if (!t) return { serie: '', rg: '' }
-      t = String(t).trim()
-      const m1 = t.match(/^([A-Za-z]+)-(\d+)$/)
-      if (m1) return { serie: m1[1], rg: m1[2] }
-      const m2 = t.match(/^([A-Za-z]+)\s+(\d+)$/)
-      if (m2) return { serie: m2[1], rg: m2[2] }
-      // Formato "CJ SANT ANNA 13604" - extrair RG do final e usar série do filho (ex: CJCJ)
-      const m3 = t.match(/\s+(\d+)$/)
-      if (m3) {
-        const rg = m3[1]
-        const serie = serieFilho || (t.match(/^CJ/i) ? 'CJCJ' : '')
-        return { serie, rg }
-      }
-      return { serie: '', rg: '' }
     }
 
     const { serie, rg } = animal?.mae ? extrairSerieRG(animal.mae, animal.serie) : { serie: '', rg: '' }
@@ -512,6 +495,13 @@ export function useAnimalDetails(id) {
       const r = String(ia.resultado_dg || ia.status_gestacao || '').toLowerCase()
       return r.includes('prenha') || r.includes('pren') || r.includes('positivo') || r.trim() === 'p'
     }
+    const ehParida = (ia) => {
+      const r = String(ia.resultado_dg || ia.status_gestacao || '').toLowerCase()
+      return r.includes('parida')
+    }
+    const temParida = insOrdenadas.some(ehParida)
+    const temPrenha = insOrdenadas.some(ehPrenha)
+    const isParidaEPrenha = temParida && temPrenha
     
     const iaPrenha = insOrdenadas.find(ehPrenha)
     const ultimaIA = iaPrenha || insOrdenadas.find(ia => !ehVazia(ia)) || insOrdenadas[0]
@@ -584,10 +574,12 @@ export function useAnimalDetails(id) {
       temBrucelose, elegivelBrucelose, precisaBrucelose, janelaEncerrada,
       temDGT, elegivelDGT, janelaEncerradaDGT, precisaDGT,
       isPrenha, diasGestacao, previsaoParto, diasParaParto, gestacaoProgress,
+      isParidaEPrenha,
       totalIAs, taxaSucessoIA, totalOocitos, mediaOocitos,
       evolucaoPeso,
       ultimoCE,
-      ultExame, diasDesdeExame, isInapto, diasParaProximoExame
+      ultExame, diasDesdeExame, isInapto, diasParaProximoExame,
+      ultimaIA
     }
   }, [animal, inseminacoes, ocorrencias, examesAndrologicos])
 

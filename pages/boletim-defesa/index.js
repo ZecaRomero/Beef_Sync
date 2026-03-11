@@ -21,15 +21,12 @@ export default function BoletimDefesa() {
 
   const [redirecionandoMobile, setRedirecionandoMobile] = useState(false)
 
-  // Redirecionar para versão mobile em dispositivos móveis (igual ao app)
+  // Redirecionar para a mesma tela (mobile) em todos os dispositivos - desktop e mobile veem a mesma interface
   useEffect(() => {
     if (typeof window === 'undefined') return
     if (window.location.pathname === '/boletim-defesa/mobile') return
-    const isMobile = window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-    if (isMobile) {
-      setRedirecionandoMobile(true)
-      window.location.replace('/boletim-defesa/mobile')
-    }
+    setRedirecionandoMobile(true)
+    window.location.replace('/boletim-defesa/mobile')
   }, [])
 
   const [isAdelso, setIsAdelso] = useState(false)

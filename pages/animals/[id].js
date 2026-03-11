@@ -38,29 +38,8 @@ import ToastUI from '../../components/ui/Toast'
 import { integrarNFSaida } from '../../services/notasFiscaisIntegration'
 import DNAHistorySection from '../../components/DNAHistorySection'
 import { animalDataCache } from '../../utils/animalDataCache'
-
-// Filtrar nomes de touros que aparecem como localização (C2747 DA S.NICE, NACION 15397, etc.)
-function localizacaoValidaParaExibir(loc) {
-  if (!loc || typeof loc !== 'string') return null
-  const n = loc.trim()
-  if (!n || /^(VAZIO|NÃO INFORMADO|NAO INFORMADO|-)$/i.test(n)) return null
-  if (/^PIQUETE\s+(\d+|CABANHA|CONF|GUARITA|PISTA)$/i.test(n)) return loc
-  if (/^PROJETO\s+[\dA-Za-z\-]+$/i.test(n)) return loc
-  if (/^CONFINA$/i.test(n)) return loc
-  if (/^PIQ\s+\d+$/i.test(n)) return loc.replace(/^PIQ\s+/i, 'PIQUETE ')
-  if (/^(CABANHA|GUARITA|PISTA|CONF)$/i.test(n)) return loc
-  return null // Nome de touro ou inválido
-}
-
-// Função auxiliar para extrair série e RG de uma string
-const extrairSerieRG = (texto) => {
-  if (!texto) return { serie: '', rg: '' }
-  const match = texto.match(/^([A-Z]+)\s*(\d+)$/)
-  if (match) {
-    return { serie: match[1], rg: match[2] }
-  }
-  return { serie: '', rg: texto }
-}
+import { localizacaoValidaParaExibir } from '../../utils/formatters'
+import { extrairSerieRG } from '../../utils/animalUtils'
 
 // Modal para editar Data do DG, Resultado e Veterinário
 function EditDGModal({ animal, onClose, onSave }) {
@@ -1447,7 +1426,7 @@ export default function AnimalDetail() {
   const buscarSerieRgMae = async () => {
     if (!animal?.mae?.trim()) return
     if (animal.serie_mae && animal.rg_mae) return // Já tem no cadastro
-    const { serie, rg } = extrairSerieRG(animal.mae)
+    const { serie, rg } = extrairSerieRG(animal.mae, animal.serie)
     if (serie && rg) {
       setMaeSerieRg({ serie, rg }) // Extraído do formato "SERIE RG"
       return
@@ -1483,7 +1462,7 @@ export default function AnimalDetail() {
     // 2) SEGUNDO: Tentar buscar através da mãe (se mãe estiver cadastrada)
     if (animal && animal.mae) {
       try {
-        const { serie, rg } = extrairSerieRG(animal.mae)
+        const { serie, rg } = extrairSerieRG(animal.mae, animal.serie)
         
         if (serie && rg) {
           // Buscar a mãe no banco de dados
@@ -1517,7 +1496,7 @@ export default function AnimalDetail() {
               
               // Encontrar irmão com mesma mãe que tem avô materno
               const irmaoComAvo = irmaos.find(irmao => {
-                const irmaoMae = extrairSerieRG(irmao.mae || '')
+                const irmaoMae = extrairSerieRG(irmao.mae || '', irmao.serie)
                 return irmaoMae.serie === serie && irmaoMae.rg === rg && 
                        (irmao.avo_materno || irmao.avoMaterno) &&
                        irmao.id !== animal.id

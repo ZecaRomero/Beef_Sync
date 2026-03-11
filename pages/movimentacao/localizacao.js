@@ -16,6 +16,7 @@ import {
 import { usePermissions } from '../../hooks/usePermissions'
 import PermissionGuard, { PermissionButton } from '../../components/ui/PermissionGuard'
 import { exportAnimalsWithLocationToExcel, exportAnimalsWithLocationToPDF } from '../../services/exportUtils'
+import ImportProgressOverlay from '../../components/ImportProgressOverlay'
 
 export default function LocalizacaoAnimais() {
   const permissions = usePermissions()
@@ -75,6 +76,7 @@ export default function LocalizacaoAnimais() {
   const [exportType, setExportType] = useState(null) // 'geral' ou 'piquete'
   const [exportFormat, setExportFormat] = useState('excel') // 'excel' ou 'pdf'
   const [importandoExcel, setImportandoExcel] = useState(false)
+  const [importProgressLocalizacao, setImportProgressLocalizacao] = useState({ atual: 0, total: 0, etapa: '' })
   const [resultadoImportacao, setResultadoImportacao] = useState(null)
   const [showImportTextModal, setShowImportTextModal] = useState(false)
   const [importText, setImportText] = useState('')
@@ -965,6 +967,18 @@ export default function LocalizacaoAnimais() {
 
   // Limpar todas as localizações
   const limparTodasLocalizacoes = async () => {
+    // Solicitar senha de desenvolvedor
+    const senha = prompt('🔒 ÁREA RESTRITA - Digite a senha do desenvolvedor para continuar:')
+    
+    if (!senha) {
+      return // Usuário cancelou
+    }
+    
+    if (senha !== 'bfzk26') {
+      alert('❌ Senha incorreta! Acesso negado.')
+      return
+    }
+    
     const confirmacao = window.confirm(
       '⚠️ ATENÇÃO!\n\n' +
       'Esta ação irá REMOVER TODAS as localizações de animais do sistema.\n\n' +
@@ -987,7 +1001,11 @@ export default function LocalizacaoAnimais() {
     
     try {
       const response = await fetch('/api/localizacoes/limpar-todas', {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-dev-password': 'bfzk26'
+        }
       })
       
       const data = await response.json()
@@ -1016,6 +1034,7 @@ export default function LocalizacaoAnimais() {
       return
     }
     setImportandoExcel(true)
+    setImportProgressLocalizacao({ atual: 0, total: 0, etapa: 'Importando localizações...' })
     setResultadoImportacao(null)
     try {
       const formData = new FormData()
@@ -1044,6 +1063,7 @@ export default function LocalizacaoAnimais() {
       alert('❌ Erro ao importar. Verifique a conexão.')
     } finally {
       setImportandoExcel(false)
+      setImportProgressLocalizacao({ atual: 0, total: 0, etapa: '' })
       e.target.value = ''
     }
   }
@@ -1056,6 +1076,7 @@ export default function LocalizacaoAnimais() {
     }
 
     setImportandoTexto(true)
+    setImportProgressLocalizacao({ atual: 0, total: 0, etapa: 'Importando localizações...' })
     setResultadoImportacao(null)
 
     try {
@@ -1106,6 +1127,7 @@ export default function LocalizacaoAnimais() {
       if (dados.length === 0) {
         alert('⚠️ Nenhum dado válido encontrado. Formato esperado:\nSÉRIE RG LOCAL [OBSERVAÇÕES]')
         setImportandoTexto(false)
+        setImportProgressLocalizacao({ atual: 0, total: 0, etapa: '' })
         return
       }
 
@@ -1182,11 +1204,16 @@ export default function LocalizacaoAnimais() {
       alert(`❌ Erro ao importar: ${err.message || 'Verifique a conexão.'}`)
     } finally {
       setImportandoTexto(false)
+      setImportProgressLocalizacao({ atual: 0, total: 0, etapa: '' })
     }
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-900/20 dark:to-indigo-900/20">
+      <ImportProgressOverlay
+        importando={importandoExcel || importandoTexto}
+        progress={importProgressLocalizacao}
+      />
       <div className="container mx-auto p-6 space-y-8">
         {/* Header Moderno */}
         <div className="relative overflow-hidden bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 rounded-3xl shadow-2xl">

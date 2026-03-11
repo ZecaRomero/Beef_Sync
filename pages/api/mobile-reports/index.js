@@ -144,19 +144,40 @@ export default async function handler(req, res) {
     switch (tipo) {
       case 'resumo_geral': {
         try {
-          // 1. Totais do Rebanho (Ativos)
-          const qRebanho = await query(`
-            SELECT 
-              COUNT(*) as total,
-              COUNT(CASE WHEN sexo = 'Macho' THEN 1 END) as machos,
-              COUNT(CASE WHEN sexo = 'Fêmea' THEN 1 END) as femeas,
-              COUNT(CASE WHEN data_nascimento > NOW() - INTERVAL '12 months' THEN 1 END) as bezerros,
-              COUNT(CASE WHEN data_nascimento <= NOW() - INTERVAL '12 months' AND data_nascimento > NOW() - INTERVAL '24 months' THEN 1 END) as novilhas,
-              COUNT(CASE WHEN data_nascimento <= NOW() - INTERVAL '24 months' THEN 1 END) as adultos
-            FROM animais 
-            WHERE situacao = 'Ativo'
-          `)
-          const statsRebanho = qRebanho.rows[0]
+          // 1. Totais do Rebanho - quando Boletim Campo tem dados, usa TUDO dele (fonte oficial do campo)
+          let statsRebanho
+          try {
+            const qBoletim = await query(`
+              SELECT
+                COALESCE(SUM(COALESCE(quant::int, 0)), 0) as total,
+                COALESCE(SUM(CASE WHEN UPPER(TRIM(COALESCE(sexo,''))) LIKE 'M%' THEN COALESCE(quant::int, 0) ELSE 0 END), 0) as machos,
+                COALESCE(SUM(CASE WHEN UPPER(TRIM(COALESCE(sexo,''))) LIKE 'F%' THEN COALESCE(quant::int, 0) ELSE 0 END), 0) as femeas,
+                COALESCE(SUM(CASE WHEN UPPER(TRIM(COALESCE(categoria,''))) LIKE '%BEZERRO%' OR UPPER(TRIM(COALESCE(categoria,''))) LIKE '%DESMAMA%' OR TRIM(COALESCE(era,'')) IN ('0/7','08/12') THEN COALESCE(quant::int, 0) ELSE 0 END), 0) as bezerros,
+                COALESCE(SUM(CASE WHEN UPPER(TRIM(COALESCE(categoria,''))) LIKE '%NOVILHA%' OR TRIM(COALESCE(era,'')) = '12/23' THEN COALESCE(quant::int, 0) ELSE 0 END), 0) as novilhas,
+                COALESCE(SUM(CASE WHEN UPPER(TRIM(COALESCE(categoria,''))) LIKE '%TOURO%' OR UPPER(TRIM(COALESCE(categoria,''))) LIKE '%VACA%' OR UPPER(TRIM(COALESCE(categoria,''))) LIKE '%GARROTE%' OR TRIM(COALESCE(era,'')) IN ('+23','+25') THEN COALESCE(quant::int, 0) ELSE 0 END), 0) as adultos
+              FROM boletim_campo
+            `)
+            const totalBoletim = parseInt(qBoletim.rows[0]?.total || 0)
+            if (totalBoletim > 0) {
+              statsRebanho = qBoletim.rows[0]
+            } else {
+              throw new Error('Boletim vazio')
+            }
+          } catch (_) {
+            // Fallback: usar animais quando boletim_campo vazio ou erro
+            const qRebanho = await query(`
+              SELECT 
+                COUNT(*) as total,
+                COUNT(CASE WHEN sexo = 'Macho' THEN 1 END) as machos,
+                COUNT(CASE WHEN sexo = 'Fêmea' THEN 1 END) as femeas,
+                COUNT(CASE WHEN data_nascimento > NOW() - INTERVAL '12 months' THEN 1 END) as bezerros,
+                COUNT(CASE WHEN data_nascimento <= NOW() - INTERVAL '12 months' AND data_nascimento > NOW() - INTERVAL '24 months' THEN 1 END) as novilhas,
+                COUNT(CASE WHEN data_nascimento <= NOW() - INTERVAL '24 months' THEN 1 END) as adultos
+              FROM animais 
+              WHERE situacao = 'Ativo'
+            `)
+            statsRebanho = qRebanho.rows[0]
+          }
 
           // 2. Reprodução (Gestações Ativas) - gestacoes + inseminacoes prenhas
           let gestacoesAtivas = 0

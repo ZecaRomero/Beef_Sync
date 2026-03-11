@@ -26,7 +26,8 @@ import {
   ScaleIcon,
   EyeIcon,
   ArrowPathIcon,
-  ArrowUpTrayIcon
+  ArrowUpTrayIcon,
+  BanknotesIcon
 } from '@heroicons/react/24/outline'
 import { cn } from '../../lib/utils'
 import NetworkStatusIndicator from '../ui/NetworkStatusIndicator'
@@ -77,6 +78,15 @@ const navigation: NavigationItem[] = [
       { name: 'Clientes', href: '/comercial/clientes', description: 'Cadastro de clientes' },
       { name: 'Fornecedores', href: '/comercial/fornecedores', description: 'Gestão de fornecedores' },
       { name: 'Contratos', href: '/comercial/contratos', description: 'Contratos comerciais' }
+    ]
+  },
+  {
+    name: 'Leilão',
+    icon: BanknotesIcon,
+    color: 'text-amber-600 dark:text-amber-400',
+    children: [
+      { name: 'Dashboard Leilão', href: '/leilao', description: 'Custo atual, sugestão de venda e ROI', new: true },
+      { name: 'Importar Excel', href: '/leilao/importar', description: 'Pesagens, IA, parições e dados para leilão', new: true }
     ]
   },
   {
@@ -475,11 +485,16 @@ const ModernSidebar: React.FC<SidebarProps> = ({ isOpen, isCollapsed, onToggleCo
                                     : 'text-gray-400 dark:text-gray-500'
                                 )} />
                               )}
-                              <div className="flex-1 min-w-0">
+                              <div className="flex-1 min-w-0 flex items-center gap-2">
                                 <div className={cn(
                                   'truncate',
                                   child.danger && 'font-semibold'
                                 )}>{child.name}</div>
+                                {child.new && (
+                                  <span className="flex-shrink-0 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded">
+                                    Novo
+                                  </span>
+                                )}
                               </div>
                             </div>
                           </Link>

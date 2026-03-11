@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import ImportProgressOverlay from './ImportProgressOverlay'
 
 export default function ImportarObservacoesAnimais() {
   const [textoColado, setTextoColado] = useState('')
@@ -44,6 +45,10 @@ export default function ImportarObservacoesAnimais() {
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+      <ImportProgressOverlay
+        importando={processando}
+        progress={{ atual: 0, total: 0, etapa: 'Importando observações...' }}
+      />
       <div className="flex items-center gap-3 mb-6">
         <div className="bg-blue-600 p-3 rounded-xl">
           <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

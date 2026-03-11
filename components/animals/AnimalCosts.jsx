@@ -36,8 +36,13 @@ export default function AnimalCosts({ animal, onCustosUpdated }) {
   }, [])
 
   const custosArray = animal?.custos || []
+  const [margin, setMargin] = useState(30) // Margem de lucro padrão 30%
+
   const custoTotal = custosArray.reduce((acc, curr) => acc + (Number(curr.valor) || 0), 0)
   const temCustos = custosArray.length > 0 && custoTotal > 0
+
+  const precoVendaSugerido = custoTotal * (1 + (margin / 100))
+  const lucroProjetado = precoVendaSugerido - custoTotal
 
   const custosPorTipo = custosArray.reduce((acc, curr) => {
     const tipo = curr.tipo || curr.subtipo || 'Outros'
@@ -208,6 +213,36 @@ export default function AnimalCosts({ animal, onCustosUpdated }) {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Simulação de Lucro */}
+        <div className="bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-700 p-4">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Simulação de Venda e Lucro</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Margem de Lucro Desejada (%)</label>
+              <input 
+                type="number" 
+                value={margin}
+                onChange={(e) => setMargin(Number(e.target.value))}
+                className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              />
+            </div>
+            <div className="space-y-1">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600 dark:text-gray-400">Custo Total:</span>
+                <span className="font-medium text-gray-900 dark:text-white">{formatCurrency(custoTotal)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600 dark:text-gray-400">Lucro Projetado:</span>
+                <span className="font-medium text-green-600 dark:text-green-400">+{formatCurrency(lucroProjetado)}</span>
+              </div>
+              <div className="flex justify-between text-base font-bold pt-2 border-t border-gray-200 dark:border-gray-700">
+                <span className="text-gray-900 dark:text-white">Preço de Venda:</span>
+                <span className="text-blue-600 dark:text-blue-400">{formatCurrency(precoVendaSugerido)}</span>
+              </div>
+            </div>
+          </div>
         </div>
         </>
         )}
