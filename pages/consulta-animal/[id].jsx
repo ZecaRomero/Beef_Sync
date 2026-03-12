@@ -12,6 +12,7 @@ import {
 } from '@heroicons/react/24/outline'
 
 import EditGeneticaModal from '../../components/animals/EditGeneticaModal'
+import ErrorBoundary from '../../components/ErrorBoundary'
 import AnimalHeader from '../../components/animals/AnimalHeader'
 import AnimalMetricsCards from '../../components/animals/AnimalMetricsCards'
 import AnimalPlanningCards from '../../components/animals/AnimalPlanningCards'
@@ -43,6 +44,11 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
   const router = useRouter()
   const { id } = router.query
 
+  // Log para debug
+  useEffect(() => {
+    console.log('ConsultaAnimalView montado', { id, pathname: router.pathname })
+  }, [id, router.pathname])
+
   const {
     animal,
     setAnimal,
@@ -61,8 +67,9 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
   } = useAnimalDetails(id)
 
   const filhosCombinados = useMemo(() => {
-    const ativos = animal?.filhos || []
-    const baixados = baixasResumo?.resumoMae?.proleDetalhes || []
+    try {
+      const ativos = animal?.filhos || []
+      const baixados = baixasResumo?.resumoMae?.proleDetalhes || []
     
     // Combinar e remover duplicatas por ID (se houver) ou RG/Série
     const map = new Map()
@@ -98,6 +105,10 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
       if (d1 && d2) return new Date(d2) - new Date(d1)
       return 0
     })
+    } catch (error) {
+      console.error('Erro ao combinar filhos:', error)
+      return []
+    }
   }, [animal?.filhos, baixasResumo?.resumoMae?.proleDetalhes])
 
   const { posicaoIABCZ: rankingPosicao, posicaoIQG: rankingPosicaoGenetica2, filhoTopIABCZ: filhoTopRanking } = rankings
@@ -171,16 +182,21 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
   }, [animal])
 
   const resumoChips = useMemo(() => {
-    if (!animal) return []
-    return [
-      animal.situacao,
-      animal.sexo,
-      animal.raca,
-      animal.pelagem,
-      animal.categoria,
-      locAtual ? `📍 ${locAtual}` : null,
-      animal.brinco ? `🏷️ ${animal.brinco}` : null
-    ].filter(Boolean)
+    try {
+      if (!animal) return []
+      return [
+        animal.situacao,
+        animal.sexo,
+        animal.raca,
+        animal.pelagem,
+        animal.categoria,
+        locAtual ? `📍 ${locAtual}` : null,
+        animal.brinco ? `🏷️ ${animal.brinco}` : null
+      ].filter(Boolean)
+    } catch (error) {
+      console.error('Erro ao gerar resumoChips:', error)
+      return []
+    }
   }, [animal, locAtual])
 
   const nome = animal ? (animal.nome || `${animal.serie || ''} ${animal.rg || ''}`.trim() || '-') : '-'
@@ -276,6 +292,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover" />
       </Head>
       <div className={`min-h-screen ${getPageBgClasses(sexTheme)} pb-[calc(6.5rem+env(safe-area-inset-bottom))] scroll-pt-4`}>
+        <ErrorBoundary fallbackMessage="Erro ao carregar a ficha do animal. Tente recarregar a página.">
         <AnimalHeader
           darkMode={darkMode}
           toggleDarkMode={toggleDarkMode}
@@ -374,6 +391,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
             onSave={handleSaveGenetica}
           />
         )}
+        </ErrorBoundary>
       </div>
     </React.Fragment>
   )
