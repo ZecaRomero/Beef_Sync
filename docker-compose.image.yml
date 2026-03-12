@@ -1,0 +1,14 @@
+# Docker Compose usando imagem publicada (Docker Hub/GHCR)
+# Use quando o ambiente nao suporta build: local
+
+version: '3.8'
+
+services:
+  beefsync-app:
+    image: SEU_USUARIO/beefsync:latest
+    container_name: beefsync-app
+    restart: unless-stopped
+    ports:
+      - "3020:3020"
+    environment:
+      - NODE_ENV=production

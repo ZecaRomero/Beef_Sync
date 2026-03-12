@@ -49,6 +49,7 @@
     "verify:db": "node scripts/verificar-conexao-postgresql.js",
     "ip": "node scripts/mostrar-ip.js",
     "deploy:vps": "powershell -ExecutionPolicy Bypass -File scripts/deploy-to-vps.ps1",
+    "docker:push": "powershell -ExecutionPolicy Bypass -File scripts/publicar-docker-hub.ps1",
     "validate": "npm run type-check && npm run lint && npm run test",
     "health:check": "node scripts/health-check.js",
     "optimize:production": "node scripts/optimize-production.js",

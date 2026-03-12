@@ -1,0 +1,52 @@
+=== CONTEÚDO PARA O KODEE ===
+Cole isso no chat do Kodee para ele criar os arquivos em /opt/beefsync
+
+--- ARQUIVO: Dockerfile ---
+
+# Beef Sync - Dockerfile
+# Build na imagem (não no startup) - container sobe rápido
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+# 1. Copiar e instalar dependências
+COPY package.json package-lock.json* ./
+RUN npm ci
+
+# 2. Copiar código e fazer build
+COPY . .
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN npm run build
+
+# 3. Rodar (sem npm ci/build no startup)
+EXPOSE 3020
+ENV PORT=3020
+ENV HOSTNAME="0.0.0.0"
+
+CMD ["npm", "run", "start:docker"]
+
+--- ARQUIVO: docker-compose.yml (ou docker-compose.beefsync.yml) ---
+
+version: '3.8'
+
+services:
+  beefsync-app:
+    build: .
+    container_name: beefsync-app
+    restart: unless-stopped
+    ports:
+      - "3020:3020"
+    environment:
+      - NODE_ENV=production
+
+--- ALTERAÇÃO NO package.json ---
+Adicione esta linha na seção "scripts":
+"start:docker": "next start -H 0.0.0.0 -p 3020",
+
+Fica assim (exemplo):
+"start": "next start -p 8081",
+"start:network": "next start -H 0.0.0.0 -p 8081",
+"start:docker": "next start -H 0.0.0.0 -p 3020",
+
+--- FIM ---
