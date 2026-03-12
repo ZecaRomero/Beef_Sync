@@ -40,6 +40,31 @@ services:
     environment:
       - NODE_ENV=production
 
+--- ARQUIVO: docker-compose.beefsync-completo.yml (com banco) ---
+Use este para conectar ao PostgreSQL do Evolution. ANTES: crie o banco beef_sync:
+  docker exec evolution-postgres psql -U evolution -d evolution -c "CREATE DATABASE beef_sync;"
+
+Ajuste o nome da rede conforme: docker network ls
+
+version: '3.8'
+
+services:
+  beefsync-app:
+    image: zeca85/beefsync:latest
+    container_name: beefsync-app
+    restart: unless-stopped
+    ports:
+      - "3020:3020"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://evolution:evolution123@postgres:5432/beef_sync
+    networks:
+      - beef_sync_default
+
+networks:
+  beef_sync_default:
+    external: true
+
 --- ALTERAÇÃO NO package.json ---
 Adicione esta linha na seção "scripts":
 "start:docker": "next start -H 0.0.0.0 -p 3020",

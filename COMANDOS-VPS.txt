@@ -1,0 +1,40 @@
+=== COMANDOS PARA EXECUTAR NO VPS (SSH) ===
+
+1. Criar o arquivo docker-compose.beefsync-completo.yml em /opt/beefsync:
+
+cd /opt/beefsync
+
+cat > docker-compose.beefsync-completo.yml << 'EOF'
+version: '3.8'
+
+services:
+  beefsync-app:
+    image: zeca85/beefsync:latest
+    container_name: beefsync-app
+    restart: unless-stopped
+    ports:
+      - "3020:3020"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://evolution:evolution123@postgres:5432/beef_sync
+    networks:
+      - beef_sync_default
+
+networks:
+  beef_sync_default:
+    external: true
+EOF
+
+2. Parar o container atual (se estiver rodando) e subir com o novo compose:
+
+docker compose -f docker-compose.beefsync-completo.yml down
+docker compose -f docker-compose.beefsync-completo.yml up -d
+
+3. Verificar os logs:
+
+docker logs beefsync-app --tail 30
+
+4. Se o evolution-postgres estiver em outra rede (ex: beefsync_default), ajuste:
+   - Edite o arquivo: nano docker-compose.beefsync-completo.yml
+   - Troque beef_sync_default pelo nome da rede onde está o postgres
+   - Para descobrir: docker inspect evolution-postgres | grep -A 5 Networks
