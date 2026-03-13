@@ -5,6 +5,8 @@ import { useRouter } from "next/router";
 import ModernLayout from "../components/layout/ModernLayout";
 import { ToastProvider } from "../contexts/ToastContext";
 import { AppProvider } from "../contexts/AppContext";
+import { AuthProvider } from "../contexts/AuthContext";
+import AuthGuard from "../components/auth/AuthGuard";
 import ErrorBoundary from "../components/ErrorBoundary";
 import DynamicFavicon from "../components/ui/DynamicFavicon";
 import MaintenanceOverlay from "../components/MaintenanceOverlay";
@@ -34,38 +36,6 @@ export default function App({ Component, pageProps }) {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // Registrar acesso para monitoramento (uma vez por sessão, todas as páginas)
-      const sessionKey = 'beef_access_logged'
-      if (!sessionStorage.getItem(sessionKey)) {
-        const hostname = window.location.hostname
-        const userType = hostname === 'localhost' || hostname === '127.0.0.1' ? 'developer' :
-          hostname.startsWith('192.168.') || hostname.startsWith('10.') || hostname.startsWith('172.') ? 'network' : 'external'
-        let userName = userType === 'developer' ? 'Zeca' : userType === 'network' ? 'Usuário da Rede' : 'Usuário Externo'
-        let telefone = null
-        try {
-          const id = localStorage.getItem('beef_usuario_identificado')
-          if (id) {
-            const { nome, telefone: tel } = JSON.parse(id)
-            if (nome) userName = nome
-            if (tel) telefone = tel
-          }
-        } catch (_) {}
-        // Usuários externos sem identificação: não registrar aqui - o overlay/página identificar fará quando tiverem nome
-        if (userType === 'external' && userName === 'Usuário Externo') return
-        fetch('/api/access-log', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userName,
-            userType,
-            ipAddress: hostname,
-            hostname,
-            userAgent: navigator.userAgent,
-            telefone,
-            action: 'Acesso ao Sistema'
-          })
-        }).then(() => sessionStorage.setItem(sessionKey, '1')).catch(() => {})
-      }
       // Limpeza preventiva de dados corrompidos
       try {
         const keys = Object.keys(localStorage);
@@ -128,76 +98,77 @@ export default function App({ Component, pageProps }) {
 
   return (
     <ErrorBoundary>
-      <div className={darkMode ? "dark" : ""}>
-        <DynamicFavicon />
+      <AuthProvider>
+        <AuthGuard>
+          <div className={darkMode ? "dark" : ""}>
+            <DynamicFavicon />
 
-        {/* Barra de progresso + overlay "Atualizando App..." */}
-        {routeLoading && (
-          <>
-            {/* Barra fina no topo */}
-            <div
-              style={{
-                position: 'fixed', top: 0, left: 0, right: 0, height: '3px',
-                background: 'linear-gradient(90deg, #2563eb, #60a5fa, #2563eb)',
-                backgroundSize: '200% 100%',
-                animation: 'bsProgress 1s linear infinite',
-                zIndex: 99999,
-              }}
-            />
-            {/* Badge central */}
-            <div
-              style={{
-                position: 'fixed', top: '14px', left: '50%', transform: 'translateX(-50%)',
-                background: 'rgba(15,23,42,0.92)', color: '#fff',
-                padding: '6px 18px', borderRadius: '999px',
-                fontSize: '13px', fontWeight: 600, letterSpacing: '0.02em',
-                display: 'flex', alignItems: 'center', gap: '8px',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.35)',
-                zIndex: 99999, backdropFilter: 'blur(8px)',
-                border: '1px solid rgba(96,165,250,0.3)',
-              }}
-            >
-              <span style={{
-                width: '10px', height: '10px', borderRadius: '50%',
-                border: '2px solid #60a5fa', borderTopColor: 'transparent',
-                animation: 'bsSpin 0.7s linear infinite', display: 'inline-block'
-              }} />
-              Atualizando App...
-            </div>
-            <style>{`
-              @keyframes bsProgress {
-                0% { background-position: 200% 0 }
-                100% { background-position: -200% 0 }
-              }
-              @keyframes bsSpin {
-                to { transform: rotate(360deg) }
-              }
-            `}</style>
-          </>
-        )}
-        <MaintenanceOverlay />
-        <MobileIdentificationOverlay />
-        <DevLiveReload />
-        <ToastProvider>
-          <AppProvider>
-            {useLayout ? (
-              <ModernLayout darkMode={darkMode} toggleDarkMode={toggleDarkMode}>
-                <Component
-                  {...pageProps}
-                  darkMode={darkMode}
-                  toggleDarkMode={toggleDarkMode}
+            {routeLoading && (
+              <>
+                <div
+                  style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, height: '3px',
+                    background: 'linear-gradient(90deg, #2563eb, #60a5fa, #2563eb)',
+                    backgroundSize: '200% 100%',
+                    animation: 'bsProgress 1s linear infinite',
+                    zIndex: 99999,
+                  }}
                 />
-              </ModernLayout>
-            ) : (
-              <Component
-                {...pageProps}
-                darkMode={darkMode}
-                toggleDarkMode={toggleDarkMode}
-              />
+                <div
+                  style={{
+                    position: 'fixed', top: '14px', left: '50%', transform: 'translateX(-50%)',
+                    background: 'rgba(15,23,42,0.92)', color: '#fff',
+                    padding: '6px 18px', borderRadius: '999px',
+                    fontSize: '13px', fontWeight: 600, letterSpacing: '0.02em',
+                    display: 'flex', alignItems: 'center', gap: '8px',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.35)',
+                    zIndex: 99999, backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(96,165,250,0.3)',
+                  }}
+                >
+                  <span style={{
+                    width: '10px', height: '10px', borderRadius: '50%',
+                    border: '2px solid #60a5fa', borderTopColor: 'transparent',
+                    animation: 'bsSpin 0.7s linear infinite', display: 'inline-block'
+                  }} />
+                  Atualizando App...
+                </div>
+                <style>{`
+                  @keyframes bsProgress {
+                    0% { background-position: 200% 0 }
+                    100% { background-position: -200% 0 }
+                  }
+                  @keyframes bsSpin {
+                    to { transform: rotate(360deg) }
+                  }
+                `}</style>
+              </>
             )}
-          </AppProvider>
-        </ToastProvider>
-      </div>
+            <MaintenanceOverlay />
+            <MobileIdentificationOverlay />
+            <DevLiveReload />
+            <ToastProvider>
+              <AppProvider>
+                {useLayout ? (
+                  <ModernLayout darkMode={darkMode} toggleDarkMode={toggleDarkMode}>
+                    <Component
+                      {...pageProps}
+                      darkMode={darkMode}
+                      toggleDarkMode={toggleDarkMode}
+                    />
+                  </ModernLayout>
+                ) : (
+                  <Component
+                    {...pageProps}
+                    darkMode={darkMode}
+                    toggleDarkMode={toggleDarkMode}
+                  />
+                )}
+              </AppProvider>
+            </ToastProvider>
+          </div>
+        </AuthGuard>
+      </AuthProvider>
     </ErrorBoundary>
   );
 }

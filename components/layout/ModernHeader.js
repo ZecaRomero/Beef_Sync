@@ -21,8 +21,8 @@ import Button from '../ui/Button'
 import Input from '../ui/Input'
 import SystemInfo from '../ui/SystemInfo'
 import ConnectionStatus from '../system/ConnectionStatus'
-import { useUserIdentification } from '../../hooks/useUserIdentification'
 import useNotifications from '../../hooks/useNotifications'
+import { useAuth } from '../../contexts/AuthContext'
 
 export default function ModernHeader({ 
   darkMode, 
@@ -32,6 +32,7 @@ export default function ModernHeader({
   onToggleSidebar 
 }) {
   const router = useRouter()
+  const { user, signOut } = useAuth()
   const [searchQuery, setSearchQuery] = useState('')
   const [showNotifications, setShowNotifications] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
@@ -152,35 +153,24 @@ export default function ModernHeader({
     setIsSearchFocused(false)
   }
 
-  const handleLogout = () => {
-    // Implementar logout
+  const handleLogout = async () => {
+    try {
+      await signOut()
+    } catch (_) {}
     router.push('/login')
   }
 
-  // Componente para informações do usuário
   const UserInfo = () => {
-    const userInfo = useUserIdentification()
-    
-    if (!userInfo || !userInfo.name) {
-      return (
-        <>
-          <p className="text-sm font-medium text-gray-900 dark:text-white">
-            Usuário
-          </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            Carregando...
-          </p>
-        </>
-      )
-    }
-    
+    const userName = user?.user_metadata?.nome || user?.email?.split('@')[0] || 'Usuário'
+    const userEmail = user?.email || ''
+
     return (
       <>
         <p className="text-sm font-medium text-gray-900 dark:text-white">
-          {userInfo.name}
+          {userName}
         </p>
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          {userInfo.role} • {userInfo.ip}
+          {userEmail}
         </p>
       </>
     )

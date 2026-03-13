@@ -1,79 +1,54 @@
 import { useState, useEffect } from 'react'
+import { useAuth } from '../contexts/AuthContext'
 
 export function useUserIdentification() {
-  const [userInfo, setUserInfo] = useState(null) // Start with null to prevent hydration mismatch
+  const { user, loading } = useAuth()
+  const [userInfo, setUserInfo] = useState(null)
+  const [logged, setLogged] = useState(false)
 
   useEffect(() => {
-    // Only run on client side to prevent hydration mismatch
+    if (loading) return
+
     const hostname = window.location.hostname
     const port = window.location.port
-    
-    let userType, userName, userRole, isDev, isNetwork
 
-    // Identificar tipo de usuário baseado no hostname
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      userType = 'developer'
-      userName = 'Zeca'
-      userRole = 'Desenvolvedor'
-      isDev = true
-      isNetwork = false
-    } else if (hostname.startsWith('192.168.') || hostname.startsWith('10.') || hostname.startsWith('172.')) {
-      userType = 'network'
-      userName = 'Usuário da Rede'
-      userRole = 'Usuário'
-      isDev = false
-      isNetwork = true
-    } else {
-      userType = 'external'
-      userName = 'Usuário Externo'
-      userRole = 'Visitante'
-      isDev = false
-      isNetwork = false
-    }
+    const role = user?.user_metadata?.role || 'externo'
+    const isDev = role === 'desenvolvedor'
+    const userName = user?.user_metadata?.nome || user?.email?.split('@')[0] || 'Usuário'
+    const userType = isDev ? 'developer' : 'external'
+    const userRole = isDev ? 'Desenvolvedor' : 'Externo'
 
     setUserInfo({
       type: userType,
       name: userName,
       role: userRole,
-      hostname: hostname,
+      hostname,
       ip: hostname,
-      port: port,
+      port,
       isDeveloper: isDev,
-      isNetworkUser: isNetwork,
+      isNetworkUser: false,
+      isExternal: !isDev,
       fullUrl: window.location.origin,
-      accessTime: new Date().toLocaleString('pt-BR')
+      accessTime: new Date().toLocaleString('pt-BR'),
+      email: user?.email || '',
     })
 
-    // Log do acesso para monitoramento
-    console.log(`🔐 Acesso identificado:`, {
-      usuario: userName,
-      tipo: userType,
-      hostname: hostname,
-      horario: new Date().toLocaleString('pt-BR')
-    })
-
-    // Registrar acesso na API (sem bloquear a interface)
-    try {
+    if (user && !logged) {
+      setLogged(true)
       fetch('/api/access-log', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userName: userName,
-          userType: userType,
+          userName,
+          userType,
           ipAddress: hostname,
-          hostname: hostname,
+          hostname,
           userAgent: navigator.userAgent,
           action: 'Acesso ao Sistema'
         })
-      }).catch(error => {
-        console.warn('Erro ao registrar acesso:', error)
-      })
-    } catch (error) {
-      console.warn('Erro ao registrar acesso:', error)
+      }).catch(() => {})
     }
-  }, [])
+  }, [user, loading, logged])
 
   return userInfo
 }

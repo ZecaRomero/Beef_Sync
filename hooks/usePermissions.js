@@ -2,11 +2,8 @@ import { useMemo } from 'react'
 import { useUserIdentification } from './useUserIdentification'
 
 /**
- * Hook para gerenciar permissões baseadas no tipo de usuário
- * 
- * Permissões:
- * - Developer (localhost): Acesso total (incluir, alterar, excluir, backup, etc.)
- * - Network User (192.168.x.x): Acesso limitado (só incluir e alterar)
+ * Hook para gerenciar permissões baseadas no perfil do Supabase Auth.
+ * O role vem de user_metadata.role ("desenvolvedor" ou "externo").
  */
 export function usePermissions() {
   const userInfo = useUserIdentification()
@@ -60,7 +57,7 @@ export function usePermissions() {
       // Mensagens
       getPermissionMessage: (action) => {
         if (!isDeveloper && (action === 'excluir' || action === 'backup' || action === 'restaurar')) {
-          return '⚠️ Esta ação é permitida apenas para o desenvolvedor (acesso local).'
+          return 'Esta ação é permitida apenas para usuários com perfil Desenvolvedor.'
         }
         return null
       }
