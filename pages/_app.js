@@ -10,7 +10,6 @@ import AuthGuard from "../components/auth/AuthGuard";
 import ErrorBoundary from "../components/ErrorBoundary";
 import DynamicFavicon from "../components/ui/DynamicFavicon";
 import MaintenanceOverlay from "../components/MaintenanceOverlay";
-import MobileIdentificationOverlay from "../components/MobileIdentificationOverlay";
 import DevLiveReload from "../components/DevLiveReload";
 import logger from "../utils/logger";
 
@@ -145,7 +144,6 @@ export default function App({ Component, pageProps }) {
               </>
             )}
             <MaintenanceOverlay />
-            <MobileIdentificationOverlay />
             <DevLiveReload />
             <ToastProvider>
               <AppProvider>
