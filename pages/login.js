@@ -71,17 +71,20 @@ export default function LoginPage() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 px-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4 shadow-lg shadow-blue-600/30">
-              <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7c0-2-1-3-3-3H7C5 4 4 5 4 7z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h8M12 8v8" />
-              </svg>
+            <div className="flex justify-center mb-8">
+              <div className="bg-white p-6 rounded-3xl shadow-2xl shadow-black/30 transform hover:scale-105 transition-transform duration-300">
+                <img 
+                  src="/logo-santanna.png.jpg" 
+                  alt="Sant Anna" 
+                  className="h-32 object-contain"
+                />
+              </div>
             </div>
-            <h1 className="text-3xl font-bold text-white">Beef Sync</h1>
-            <p className="text-blue-300/70 mt-1">Sistema de Gestão Pecuária</p>
+            <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">Beef Sync</h1>
+            <p className="text-blue-200/80 font-medium">Sistema de Gestão Pecuária</p>
           </div>
 
-          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
             <h2 className="text-xl font-semibold text-white mb-6">
               {mode === 'login' && 'Entrar'}
               {mode === 'register' && 'Criar conta'}
