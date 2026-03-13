@@ -50,6 +50,7 @@
     "ip": "node scripts/mostrar-ip.js",
     "deploy:vps": "powershell -ExecutionPolicy Bypass -File scripts/deploy-to-vps.ps1",
     "migrar:vps": "powershell -ExecutionPolicy Bypass -File scripts/migrar-banco-vps.ps1",
+    "configurar:dominio": "powershell -ExecutionPolicy Bypass -File scripts/configurar-dominio.ps1",
     "docker:push": "powershell -ExecutionPolicy Bypass -File scripts/publicar-docker-hub.ps1",
     "validate": "npm run type-check && npm run lint && npm run test",
     "health:check": "node scripts/health-check.js",
