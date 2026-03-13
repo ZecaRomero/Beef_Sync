@@ -43,14 +43,15 @@ export function AppProvider({ children }) {
 
   /**
    * Carrega todos os dados do PostgreSQL
+   * Não bloqueia a UI - carrega em background
    */
   const loadAllData = useCallback(async () => {
     try {
-      setLoading(true)
       setError(null)
+      setLoading(true)
 
-      // Timeout de 15s por requisição para não travar o app
-      const fetchOpts = { timeout: 15000 }
+      // Timeout de 8s por requisição - falha mais rápido para não travar o app
+      const fetchOpts = { timeout: 8000 }
 
       // Carregar dados em paralelo para melhor performance
       const [animalsRes, birthsRes, costsRes, semenRes, nfsRes] = await Promise.allSettled([

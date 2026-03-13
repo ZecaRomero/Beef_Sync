@@ -24,6 +24,13 @@ function normalizeReportKey(key) {
   return key === 'femeas_ia' ? 'inseminacoes' : key
 }
 
+// --- Helpers de fetch ---
+const fetchWithTimeout = (url, ms = 8000) => {
+  const ctrl = new AbortController()
+  const t = setTimeout(() => ctrl.abort(), ms)
+  return fetch(url, { signal: ctrl.signal }).finally(() => clearTimeout(t))
+}
+
 // --- Sub-componentes ---
 
 function LoadingSpinner() {
@@ -133,9 +140,9 @@ export default function AcessosSistema() {
     setRefreshing(true)
     try {
       const [statsRes, logsRes, settingsRes] = await Promise.all([
-        fetch('/api/access-log?stats=true'),
-        fetch('/api/access-log?limit=30'),
-        fetch('/api/system-settings'),
+        fetchWithTimeout('/api/access-log?stats=true'),
+        fetchWithTimeout('/api/access-log?limit=30'),
+        fetchWithTimeout('/api/system-settings'),
       ])
       if (statsRes.ok) {
         const d = await statsRes.json()

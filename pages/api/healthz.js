@@ -4,9 +4,9 @@ import { sendHealthCheck, sendError, asyncHandler } from '../../utils/apiRespons
 const handler = async (req, res) => {
   try {
     const startTime = Date.now()
-    const timeoutMs = 8000
+    const timeoutMs = 5000
 
-    // Testar conexão com banco (com timeout para não travar)
+    // Testar conexão com banco (timeout curto para não travar requisições)
     const dbStatus = await Promise.race([
       testConnection(),
       new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), timeoutMs))
