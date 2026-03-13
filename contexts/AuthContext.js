@@ -38,12 +38,14 @@ export function AuthProvider({ children }) {
   }, [])
 
   const signIn = async (email, password) => {
+    if (!supabase) throw new Error('Supabase não configurado. Verifique as variáveis de ambiente.')
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) throw error
     return data
   }
 
   const signUp = async (email, password, metadata = {}) => {
+    if (!supabase) throw new Error('Supabase não configurado. Verifique as variáveis de ambiente.')
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -54,11 +56,13 @@ export function AuthProvider({ children }) {
   }
 
   const signOut = async () => {
+    if (!supabase) return
     const { error } = await supabase.auth.signOut()
     if (error) throw error
   }
 
   const resetPassword = async (email) => {
+    if (!supabase) throw new Error('Supabase não configurado. Verifique as variáveis de ambiente.')
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     })
