@@ -1,40 +1,36 @@
 === COMANDOS PARA EXECUTAR NO VPS (SSH) ===
 
-1. Criar o arquivo docker-compose.beefsync-completo.yml em /opt/beefsync:
+--- 0. PREPARAÇÃO DO AMBIENTE (Se for a primeira vez) ---
+# 1. Instalar Docker (se não tiver)
+curl -fsSL https://get.docker.com -o get-docker.sh
+sh get-docker.sh
 
+# 2. Criar diretório
+mkdir -p /opt/beefsync
 cd /opt/beefsync
 
-cat > docker-compose.beefsync-completo.yml << 'EOF'
-version: '3.8'
+# 3. Subir Banco de Dados (Postgres)
+# Certifique-se de ter o arquivo docker-compose.yml (o principal, com o postgres)
+docker compose up -d postgres
 
-services:
-  beefsync-app:
-    image: zeca85/beefsync:latest
-    container_name: beefsync-app
-    restart: unless-stopped
-    ports:
-      - "3020:3020"
-    environment:
-      - NODE_ENV=production
-      - DATABASE_URL=postgresql://evolution:evolution123@postgres:5432/beef_sync
-    networks:
-      - beef_sync_default
+# 4. Criar rede se necessário (normalmente o docker compose cria)
+docker network create beef_sync_default 2>/dev/null || true
 
-networks:
-  beef_sync_default:
-    external: true
-EOF
+--- 1. DEPLOY DO APP ---
+# 1. Ir para o diretório
+cd /opt/beefsync
 
-2. Parar o container atual (se estiver rodando) e subir com o novo compose:
+# 2. Parar e remover container antigo
+docker stop beefsync-app 2>/dev/null; docker rm beefsync-app 2>/dev/null
 
-docker compose -f docker-compose.beefsync-completo.yml down
-docker compose -f docker-compose.beefsync-completo.yml up -d
+# 3. Build e subir
+docker compose -f docker-compose.beefsync-build.yml build --no-cache
+docker compose -f docker-compose.beefsync-build.yml up -d
 
-3. Verificar os logs:
+--- 2. MIGRAR DADOS (Opccional) ---
+# Rode no SEU COMPUTADOR (PowerShell):
+# npm run migrar:vps
 
-docker logs beefsync-app --tail 30
+--- 3. Verificar logs ---
+docker logs beefsync-app --tail 50
 
-4. Se o evolution-postgres estiver em outra rede (ex: beefsync_default), ajuste:
-   - Edite o arquivo: nano docker-compose.beefsync-completo.yml
-   - Troque beef_sync_default pelo nome da rede onde está o postgres
-   - Para descobrir: docker inspect evolution-postgres | grep -A 5 Networks

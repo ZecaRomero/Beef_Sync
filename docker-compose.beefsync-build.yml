@@ -1,8 +1,11 @@
-# Docker Compose Beef Sync - com conexão ao PostgreSQL
-# IMPORTANTE: Ajuste o nome da rede (beef_sync_default) conforme: docker network ls
+# Build local no VPS (em vez de usar imagem do Docker Hub)
+# Use: docker compose -f /opt/beefsync/docker-compose.beefsync-build.yml up -d --build
 
 services:
   beefsync-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: zeca85/beefsync:latest
     container_name: beefsync-app
     restart: unless-stopped
@@ -10,8 +13,6 @@ services:
       - "3020:3020"
     environment:
       - NODE_ENV=production
-      # Host "postgres" = nome do serviço no docker-compose do Evolution
-      # Banco beef_sync: crie antes com: docker exec evolution-postgres psql -U evolution -d evolution -c "CREATE DATABASE beef_sync;"
       - DATABASE_URL=postgresql://evolution:evolution123@postgres:5432/beef_sync
     networks:
       - beef_sync_default

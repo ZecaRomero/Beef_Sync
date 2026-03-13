@@ -38,5 +38,10 @@ Write-Host ""
 Write-Host "Deploy concluido! package.json e demais arquivos estao em $DestPath" -ForegroundColor Green
 Write-Host ""
 Write-Host "No VPS, execute:" -ForegroundColor Cyan
-Write-Host "  cd $DestPath && npm install && npm run build && npm run start" -ForegroundColor White
+Write-Host "  cd $DestPath" -ForegroundColor White
+Write-Host "  docker compose -f docker-compose.beefsync-build.yml build --no-cache" -ForegroundColor White
+Write-Host "  docker compose -f docker-compose.beefsync-build.yml up -d" -ForegroundColor White
+Write-Host ""
+Write-Host "Ou se preferir rodar sem Docker:" -ForegroundColor DarkGray
+Write-Host "  npm install && npm run build && npm run start" -ForegroundColor DarkGray
 Write-Host ""
