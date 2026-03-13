@@ -479,7 +479,8 @@ class DatabaseService {
   async buscarBaixasFilhosMae(serieMae, rgMae) {
     const rgStr = String(rgMae || '').trim()
     const result = await query(`
-      SELECT b.*, a.serie as animal_serie, a.rg as animal_rg
+      SELECT b.*, a.serie as animal_serie, a.rg as animal_rg,
+        a.sexo, a.pai, a.mae, a.avo_materno, a.data_nascimento, a.meses
       FROM baixas b
       LEFT JOIN animais a ON b.animal_id = a.id
       WHERE UPPER(TRIM(COALESCE(b.serie_mae, ''))) = UPPER(TRIM($1))

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { UserGroupIcon, ChevronDownIcon, ChevronUpIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline'
-import { formatDate, calcularMesesIdade } from '../../utils/formatters'
+import { formatDate, calcularMesesIdade, calcularMesesIdadeNaData, calcularEra } from '../../utils/formatters'
 
 export default function AnimalOffspring({ animal, filhos }) {
   const listaFilhos = filhos || animal?.filhos || []
@@ -36,6 +36,8 @@ export default function AnimalOffspring({ animal, filhos }) {
             const nomeValido = f.nome && f.nome.trim() && !/^[A-Z0-9]+\s+[A-Z0-9\.]*\s*\d+$/i.test(f.nome.trim())
             const identificacao = serieRg || (nomeValido ? f.nome.trim() : null) || f.nome || '-'
             const mesesFilho = calcularMesesIdade(f.data_nascimento, f.meses)
+            const mesesNaVenda = f.data_baixa ? calcularMesesIdadeNaData(f.data_nascimento, f.data_baixa, f.meses) : null
+            const eraNaVenda = mesesNaVenda != null ? calcularEra(mesesNaVenda, f.sexo) : null
             
             const isBaixa = f.status && f.status !== 'ATIVO'
             const statusColor = f.status === 'VENDA' ? 'text-green-600 bg-green-50 dark:bg-green-900/20' 
@@ -59,7 +61,16 @@ export default function AnimalOffspring({ animal, filhos }) {
                     {f.sexo && <span>{f.sexo}</span>}
                     {formatDate(f.data_nascimento) !== '-' && <span>Nasc: {formatDate(f.data_nascimento)}</span>}
                     {mesesFilho != null && <span className="font-medium text-amber-600 dark:text-amber-400">{mesesFilho}m</span>}
-                    
+                    {isBaixa && eraNaVenda && (
+                      <span className="font-medium text-amber-700 dark:text-amber-300" title="Era na data da venda/baixa">
+                        Era: {eraNaVenda}
+                      </span>
+                    )}
+                    {(f.pai || f.mae || f.avo_materno) && (
+                      <span className="block w-full mt-0.5 text-gray-600 dark:text-gray-400">
+                        {[f.pai && `Pai: ${f.pai}`, f.mae && `Mãe: ${f.mae}`, (f.avo_materno || f.avoMaterno) && `Avô mat.: ${f.avo_materno || f.avoMaterno}`].filter(Boolean).join(' • ')}
+                      </span>
+                    )}
                     {isBaixa && f.data_baixa && (
                       <span className="font-medium text-gray-600 dark:text-gray-300">
                         Saída: {formatDate(f.data_baixa)}

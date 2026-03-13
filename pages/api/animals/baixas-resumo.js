@@ -111,6 +111,12 @@ export default async function handler(req, res) {
         comprador: b.comprador,
         valor: b.valor != null ? parseFloat(b.valor) : null,
         numero_nf: b.numero_nf,
+        sexo: b.sexo,
+        pai: b.pai,
+        mae: b.mae,
+        avo_materno: b.avo_materno,
+        data_nascimento: b.data_nascimento,
+        meses: b.meses,
       }))
     }
 

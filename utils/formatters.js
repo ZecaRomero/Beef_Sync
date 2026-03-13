@@ -127,6 +127,47 @@ export function calcularMesesIdade(dataNascimento, mesesCampo) {
 }
 
 /**
+ * Calcula idade em meses em uma data de referência (ex: data da venda)
+ */
+export function calcularMesesIdadeNaData(dataNascimento, dataRef, mesesCampo) {
+  if (mesesCampo != null && !isNaN(parseInt(mesesCampo)) && !dataRef) return parseInt(mesesCampo)
+  if (!dataNascimento || !dataRef) return null
+  const dtNasc = new Date(dataNascimento)
+  const dtRef = new Date(dataRef)
+  if (isNaN(dtNasc.getTime()) || isNaN(dtRef.getTime())) return null
+  return Math.floor((dtRef - dtNasc) / (1000 * 60 * 60 * 24 * 30.44))
+}
+
+/**
+ * Calcula era (faixa etária) baseada em meses e sexo
+ */
+export function calcularEra(meses, sexo) {
+  if (!meses || meses <= 0) return null
+  const m = parseInt(meses)
+  const isFemea = sexo && (String(sexo).toLowerCase().includes('fêmea') || String(sexo).toLowerCase().includes('femea') || sexo === 'F')
+  const isMacho = sexo && (String(sexo).toLowerCase().includes('macho') || sexo === 'M')
+  if (isFemea) {
+    if (m <= 7) return '0/7'
+    if (m <= 12) return '7/12'
+    if (m <= 18) return '12/18'
+    if (m <= 24) return '18/24'
+    return '24+'
+  }
+  if (isMacho) {
+    if (m <= 7) return '0/7'
+    if (m <= 15) return '7/15'
+    if (m <= 18) return '15/18'
+    if (m <= 22) return '18/22'
+    return '22+'
+  }
+  if (m <= 7) return '0/7'
+  if (m <= 12) return '7/12'
+  if (m <= 18) return '12/18'
+  if (m <= 24) return '18/24'
+  return '24+'
+}
+
+/**
  * Filtra nomes de touros que aparecem como localização
  */
 export function localizacaoValidaParaExibir(loc) {

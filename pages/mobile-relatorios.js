@@ -1703,76 +1703,90 @@ export default function MobileRelatorios() {
                   </div>
                 ) : cardFilterModal.dataType === 'piquetes' ? (
                   <div className="p-4 space-y-3">
-                    {cardAnimalsList.map((row, idx) => {
-                      const piqueteNome = (row.Piquete || row.piquete || '-').replace(/PROJETO\s*/i, 'PROJETO ')
-                      const totalAnimais = row.Animais ?? row.total ?? 0
-                      const machos = row.Machos ?? row.machos ?? 0
-                      const femeas = row.Fêmeas ?? row.femeas ?? row.Femeas ?? 0
-                      const mediaPeso = row['Média Peso (kg)'] ?? row.mediaPeso ?? row.media_peso
-                      const cor = CORES_PIQUETE[idx % CORES_PIQUETE.length]
+                    {cardAnimalsList
+                  .filter(row => (row.Animais ?? row.total ?? 0) > 0)
+                  .map((row, idx) => {
+                  const piqueteNome = (row.Piquete || row.piquete || '-').replace(/PROJETO\s*/i, 'PROJETO ')
+                  const totalAnimais = row.Animais ?? row.total ?? 0
+                  const machos = row.Machos ?? row.machos ?? 0
+                  const femeas = row.Fêmeas ?? row.femeas ?? row.Femeas ?? 0
+                  const mediaPeso = row['Média Peso (kg)'] ?? row.mediaPeso ?? row.media_peso
+                  const cor = CORES_PIQUETE[idx % CORES_PIQUETE.length]
+                  
+                  // Cálculos para barra de proporção visual
+                  const totalMF = machos + femeas
+                  const percMachos = totalMF > 0 ? (machos / totalMF) * 100 : 0
+                  const percFemeas = totalMF > 0 ? (femeas / totalMF) * 100 : 0
+                  
+                  return (
+                    <motion.button
+                      key={idx}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        // Buscar animais deste piquete
+                        setCardFilterModal({
+                          open: true,
+                          title: `Animais em ${piqueteNome}`,
+                          filter: { piquete: piqueteNome },
+                          dataType: 'animais'
+                        })
+                      }}
+                      className="w-full p-4 rounded-xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-800/50 border-2 border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-amber-400 dark:hover:border-amber-600 transition-all text-left"
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div 
+                            className="w-3 h-3 rounded-full shadow-sm"
+                            style={{ backgroundColor: cor }}
+                          />
+                          <h4 className="font-bold text-gray-900 dark:text-white text-lg">
+                            {piqueteNome}
+                          </h4>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 text-sm font-bold">
+                            {totalAnimais} 🐄
+                          </span>
+                          <ChevronRightIcon className="h-5 w-5 text-gray-400" />
+                        </div>
+                      </div>
                       
-                      return (
-                        <motion.button
-                          key={idx}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: idx * 0.05 }}
-                          whileHover={{ scale: 1.02, y: -2 }}
-                          whileTap={{ scale: 0.98 }}
-                          onClick={() => {
-                            // Buscar animais deste piquete
-                            setCardFilterModal({
-                              open: true,
-                              title: `Animais em ${piqueteNome}`,
-                              filter: { piquete: piqueteNome },
-                              dataType: 'animais'
-                            })
-                          }}
-                          className="w-full p-4 rounded-xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-800/50 border-2 border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-amber-400 dark:hover:border-amber-600 transition-all text-left"
-                        >
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center gap-3">
-                              <div 
-                                className="w-3 h-3 rounded-full shadow-sm"
-                                style={{ backgroundColor: cor }}
-                              />
-                              <h4 className="font-bold text-gray-900 dark:text-white text-lg">
-                                {piqueteNome}
-                              </h4>
+                      <div className="grid grid-cols-2 gap-3">
+                        {machos > 0 && (
+                          <div className="flex items-center gap-2 p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20">
+                            <div className="w-8 h-8 rounded-full bg-blue-200 dark:bg-blue-800 flex items-center justify-center">
+                              <span className="text-blue-700 dark:text-blue-300 font-bold text-sm">M</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <span className="px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 text-sm font-bold">
-                                {totalAnimais} 🐄
-                              </span>
-                              <ChevronRightIcon className="h-5 w-5 text-gray-400" />
+                            <div>
+                              <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">Machos</p>
+                              <p className="text-lg font-bold text-blue-900 dark:text-blue-100">{machos}</p>
                             </div>
                           </div>
-                          
-                          <div className="grid grid-cols-2 gap-3">
-                            {machos > 0 && (
-                              <div className="flex items-center gap-2 p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20">
-                                <div className="w-8 h-8 rounded-full bg-blue-200 dark:bg-blue-800 flex items-center justify-center">
-                                  <span className="text-blue-700 dark:text-blue-300 font-bold text-sm">M</span>
-                                </div>
-                                <div>
-                                  <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">Machos</p>
-                                  <p className="text-lg font-bold text-blue-900 dark:text-blue-100">{machos}</p>
-                                </div>
-                              </div>
-                            )}
-                            
-                            {femeas > 0 && (
-                              <div className="flex items-center gap-2 p-2 rounded-lg bg-pink-50 dark:bg-pink-900/20">
-                                <div className="w-8 h-8 rounded-full bg-pink-200 dark:bg-pink-800 flex items-center justify-center">
-                                  <span className="text-pink-700 dark:text-pink-300 font-bold text-sm">F</span>
-                                </div>
-                                <div>
-                                  <p className="text-xs text-pink-600 dark:text-pink-400 font-medium">Fêmeas</p>
-                                  <p className="text-lg font-bold text-pink-900 dark:text-pink-100">{femeas}</p>
-                                </div>
-                              </div>
-                            )}
+                        )}
+                        
+                        {femeas > 0 && (
+                          <div className="flex items-center gap-2 p-2 rounded-lg bg-pink-50 dark:bg-pink-900/20">
+                            <div className="w-8 h-8 rounded-full bg-pink-200 dark:bg-pink-800 flex items-center justify-center">
+                              <span className="text-pink-700 dark:text-pink-300 font-bold text-sm">F</span>
+                            </div>
+                            <div>
+                              <p className="text-xs text-pink-600 dark:text-pink-400 font-medium">Fêmeas</p>
+                              <p className="text-lg font-bold text-pink-900 dark:text-pink-100">{femeas}</p>
+                            </div>
                           </div>
+                        )}
+                      </div>
+                      
+                      {machos > 0 && femeas > 0 && (
+                        <div className="mt-3 h-1.5 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden flex" title={`Machos: ${percMachos.toFixed(0)}% | Fêmeas: ${percFemeas.toFixed(0)}%`}>
+                          <div style={{ width: `${percMachos}%` }} className="bg-blue-400 dark:bg-blue-500 h-full" />
+                          <div style={{ width: `${percFemeas}%` }} className="bg-pink-400 dark:bg-pink-500 h-full" />
+                        </div>
+                      )}
                           
                           {mediaPeso && (
                             <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
@@ -1810,9 +1824,18 @@ export default function MobileRelatorios() {
                             <div className="flex-1 min-w-0">
                               {/* Cabeçalho com nome e sexo */}
                               <div className="flex items-center gap-2 mb-2">
-                                <span className="font-bold text-gray-900 dark:text-white text-base">
-                                  {a.identificacao || a.animal || `${a.serie || ''}-${a.rg || ''}`.trim() || a.nome || '—'}
-                                </span>
+                                {a.id || a.animal_id ? (
+                                  <Link 
+                                    href={`/animals/${a.id || a.animal_id}`}
+                                    className="font-bold text-amber-600 dark:text-amber-400 text-base hover:underline"
+                                  >
+                                    {a.identificacao || a.animal || `${a.serie || ''}-${a.rg || ''}`.trim() || a.nome || '—'}
+                                  </Link>
+                                ) : (
+                                  <span className="font-bold text-gray-900 dark:text-white text-base">
+                                    {a.identificacao || a.animal || `${a.serie || ''}-${a.rg || ''}`.trim() || a.nome || '—'}
+                                  </span>
+                                )}
                                 <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
                                   ehMacho 
                                     ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
@@ -4524,6 +4547,25 @@ export default function MobileRelatorios() {
                                       const trofeus = { 1: '🥇', 2: '🥈', 3: '🥉' }
                                       display = `${trofeus[Number(v)]} ${v}º`
                                     }
+                                    
+                                    // Tornar o número do animal clicável
+                                    const isAnimalColumn = k.toLowerCase() === 'animal' || k.toLowerCase() === 'identificacao'
+                                    const animalId = row.animal_id || row.id || originalRow.animal_id || originalRow.id
+                                    
+                                    if (isAnimalColumn && animalId) {
+                                      return (
+                                        <td key={k} className="px-3 py-2.5 text-gray-900 dark:text-white break-words min-w-0">
+                                          <Link 
+                                            href={`/animals/${animalId}`}
+                                            onClick={(e) => e.stopPropagation()}
+                                            className="text-amber-600 dark:text-amber-400 font-bold hover:underline"
+                                          >
+                                            {display}
+                                          </Link>
+                                        </td>
+                                      )
+                                    }
+                                    
                                     return (
                                       <td key={k} className="px-3 py-2.5 text-gray-900 dark:text-white break-words min-w-0">
                                         {display}
