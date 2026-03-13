@@ -7,10 +7,12 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useAuth } from '../contexts/AuthContext'
 import { MagnifyingGlassIcon, CheckCircleIcon, XCircleIcon, DevicePhoneMobileIcon, ChartBarIcon, ChatBubbleLeftRightIcon, TrophyIcon } from '@heroicons/react/24/outline'
 
 export default function ConsultaRapida() {
   const router = useRouter()
+  const { user, loading: authLoading } = useAuth()
   const [serie, setSerie] = useState('')
   const [rg, setRg] = useState('')
   const [loading, setLoading] = useState(false)
@@ -34,41 +36,24 @@ export default function ConsultaRapida() {
   const [showSugestoes, setShowSugestoes] = useState(false)
   const searchTimeoutRef = useRef(null)
 
-  // Verificar autenticação mobile
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    
-    // Verificar se está autenticado
-    const authData = localStorage.getItem('mobile-auth')
-    if (!authData) {
-      // Não autenticado, redirecionar para página de autenticação
-      router.push('/mobile-auth')
-      return
-    }
-    
-    try {
-      const data = JSON.parse(authData)
-      if (!data.nome) {
-        router.push('/mobile-auth')
-        return
-      }
-      // Usuário autenticado
-      setIdentificado(true)
-      setNomeIdent(data.nome)
-    } catch (e) {
-      console.error('Erro ao verificar autenticação:', e)
-      router.push('/mobile-auth')
-    }
-  }, [router])
+    if (authLoading) return
 
-  // Carregar tema e verificar identificação - mobile-auth é a única tela de entrada (sem duplicar)
+    if (user) {
+      setIdentificado(true)
+      setNomeIdent(user.user_metadata?.nome || user.email?.split('@')[0] || 'Usuário')
+    } else {
+      router.push('/login?redirect=/a')
+    }
+  }, [user, authLoading, router])
+
   useEffect(() => {
     if (typeof window === 'undefined') return
-    
+
     const savedDarkMode = localStorage.getItem('darkMode')
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
     const shouldBeDark = savedDarkMode === 'true' || (!savedDarkMode && prefersDark)
-    
+
     if (shouldBeDark) {
       document.documentElement.classList.add('dark')
       setIsDarkMode(true)
@@ -76,56 +61,7 @@ export default function ConsultaRapida() {
       document.documentElement.classList.remove('dark')
       setIsDarkMode(false)
     }
-    
-    const host = window.location.hostname
-    if (host === 'localhost' || host === '127.0.0.1') {
-      setIdentificado(true)
-      return
-    }
-    // Usar mobile-auth como única fonte - não mostrar segunda tela de identificação
-    try {
-      const authData = localStorage.getItem('mobile-auth')
-      if (authData) {
-        const data = JSON.parse(authData)
-        if (data.nome) {
-          setIdentificado(true)
-          setNomeIdent(data.nome)
-          return
-        }
-      }
-      setIdentificado(false)
-    } catch (_) {
-      setIdentificado(false)
-    }
   }, [])
-
-  // Deslogar após 10 min de inatividade (exceto localhost) - usa mobile-auth
-  useEffect(() => {
-    if (typeof window === 'undefined' || identificado !== true) return
-    const host = window.location.hostname
-    if (host === 'localhost' || host === '127.0.0.1') return
-
-    const INACTIVITY_MS = 10 * 60 * 1000 // 10 minutos
-
-    const resetTimer = () => {
-      if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current)
-      inactivityTimerRef.current = setTimeout(() => {
-        try {
-          localStorage.removeItem('mobile-auth')
-        } catch (_) {}
-        setIdentificado(false)
-      }, INACTIVITY_MS)
-    }
-
-    resetTimer()
-    const events = ['mousedown', 'mousemove', 'keydown', 'touchstart', 'scroll', 'click']
-    events.forEach((ev) => window.addEventListener(ev, resetTimer))
-
-    return () => {
-      events.forEach((ev) => window.removeEventListener(ev, resetTimer))
-      if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current)
-    }
-  }, [identificado])
 
   // Detectar se é mobile e mostrar splash apenas em mobile, e só após identificação
   useEffect(() => {
@@ -512,10 +448,11 @@ export default function ConsultaRapida() {
 
                 {/* Botão Logout */}
                 <button
-                  onClick={() => {
+                  onClick={async () => {
                     if (confirm('Deseja realmente sair?')) {
-                      localStorage.removeItem('mobile-auth')
-                      router.push('/mobile-auth')
+                      const { supabase } = await import('../lib/supabase')
+                      if (supabase) await supabase.auth.signOut()
+                      router.push('/login')
                     }
                   }}
                   className="bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 p-2 rounded-lg transition-all"
