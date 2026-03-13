@@ -1,19 +1,19 @@
 /**
  * Página de entrada do usuário Adelso.
- * Login com senha (temporária 123) e escolha: Relatórios ou Boletim.
+ * Login via Supabase Auth - senha fixa adfaz2630, sem pedir email nem telefone.
  */
 import { useState, useEffect } from 'react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { motion } from 'framer-motion'
 import { ChartBarIcon, DocumentTextIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline'
+import { supabase } from '../lib/supabase'
 
-const STORAGE_KEY = 'beef_adelso_auth'
+const ADELSO_EMAIL = 'adelso@beefsync.local'
+const ADELSO_PASSWORD = 'adfaz2630'
 
 export default function AdelsoPage() {
   const router = useRouter()
-  const [nome, setNome] = useState('')
-  const [senha, setSenha] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [autenticado, setAutenticado] = useState(false)
@@ -22,80 +22,77 @@ export default function AdelsoPage() {
   const [confirmaSenha, setConfirmaSenha] = useState('')
   const [senhaAtual, setSenhaAtual] = useState('')
 
+  // Verificar se já está logado no Supabase como Adelso
   useEffect(() => {
-    const auth = localStorage.getItem(STORAGE_KEY)
-    if (auth) {
-      try {
-        const data = JSON.parse(auth)
-        if (data.nome === 'Adelso' && data.expiresAt > Date.now()) {
-          setAutenticado(true)
-        }
-      } catch (_) {}
-    }
+    if (!supabase) return
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const email = session?.user?.email
+      const nome = session?.user?.user_metadata?.nome
+      if (email === ADELSO_EMAIL || nome === 'Adelso') {
+        setAutenticado(true)
+      }
+    })
   }, [])
 
   const handleLogin = async (e) => {
     e.preventDefault()
     setError('')
 
-    if (!nome.trim()) {
-      setError('Informe o nome')
-      return
-    }
-    if (nome.trim().toLowerCase() !== 'adelso') {
-      setError('Usuário não encontrado. Use "Adelso".')
-      return
-    }
-    if (!senha) {
-      setError('Informe a senha')
+    if (!supabase) {
+      setError('Supabase não configurado. Verifique o .env')
       return
     }
 
     setLoading(true)
     try {
-      const res = await fetch('/api/boletim-campo/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nome: nome.trim(), senha })
-      })
+      // Garantir que o usuário Adelso existe no Supabase Auth
+      const res = await fetch('/api/adelso-supabase-auth', { method: 'POST' })
       const json = await res.json()
 
-      if (json.success) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({
-          nome: 'Adelso',
-          expiresAt: Date.now() + 24 * 60 * 60 * 1000
-        }))
-        setAutenticado(true)
-      } else {
-        setError(json.message || 'Senha incorreta')
+      if (!json.success) {
+        setError(json.message || 'Erro ao configurar acesso')
+        return
       }
+
+      // Login no Supabase Auth (senha fixa adfaz2630)
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: ADELSO_EMAIL,
+        password: ADELSO_PASSWORD,
+      })
+
+      if (signInError) {
+        setError(signInError.message || 'Erro ao entrar')
+        return
+      }
+
+      setAutenticado(true)
     } catch (err) {
-      setError('Erro ao conectar')
+      setError(err.message || 'Erro ao conectar')
     } finally {
       setLoading(false)
     }
   }
 
   const handleEscolha = (opcao) => {
+    // Compatibilidade com páginas que checam Adelso via localStorage
+    try {
+      localStorage.setItem('beef_adelso_auth', JSON.stringify({
+        nome: 'Adelso',
+        expiresAt: Date.now() + 24 * 60 * 60 * 1000,
+      }))
+      localStorage.setItem('beef_usuario_identificado', JSON.stringify({ nome: 'Adelso' }))
+      localStorage.setItem('mobile-auth', JSON.stringify({ nome: 'Adelso', telefone: '', registeredAt: new Date().toISOString() }))
+    } catch (_) {}
     if (opcao === 'relatorios') {
-      try {
-        localStorage.setItem('beef_usuario_identificado', JSON.stringify({ nome: 'Adelso' }))
-        localStorage.setItem('mobile-auth', JSON.stringify({ nome: 'Adelso', telefone: '', registeredAt: new Date().toISOString() }))
-      } catch (_) {}
       router.push('/a')
     } else {
-      try {
-        localStorage.setItem('beef_usuario_identificado', JSON.stringify({ nome: 'Adelso' }))
-        localStorage.setItem('mobile-auth', JSON.stringify({ nome: 'Adelso', telefone: '', registeredAt: new Date().toISOString() }))
-      } catch (_) {}
       router.push('/boletim-defesa')
     }
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem(STORAGE_KEY)
+  const handleLogout = async () => {
+    if (supabase) await supabase.auth.signOut()
     setAutenticado(false)
-    setSenha('')
   }
 
   if (autenticado) {
@@ -173,36 +170,39 @@ export default function AdelsoPage() {
 
   const handleTrocarSenha = async (e) => {
     e.preventDefault()
-    if (novaSenha.length < 3) {
-      setError('Senha deve ter pelo menos 3 caracteres')
+    if (novaSenha.length < 6) {
+      setError('Senha deve ter pelo menos 6 caracteres')
       return
     }
     if (novaSenha !== confirmaSenha) {
       setError('As senhas não coincidem')
       return
     }
+    if (!supabase) {
+      setError('Supabase não configurado')
+      return
+    }
     setLoading(true)
     setError('')
     try {
-      const res = await fetch('/api/boletim-campo/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nome: 'Adelso',
-          senha: senhaAtual,
-          novaSenha,
-          acao: 'trocar_senha'
-        })
+      // Verificar senha atual
+      const { error: signInErr } = await supabase.auth.signInWithPassword({
+        email: ADELSO_EMAIL,
+        password: senhaAtual,
       })
-      const json = await res.json()
-      if (json.success) {
-        setMostrarTrocarSenha(false)
-        setNovaSenha('')
-        setConfirmaSenha('')
-        setSenhaAtual('')
-      } else {
-        setError(json.message || 'Senha atual incorreta')
+      if (signInErr) {
+        setError('Senha atual incorreta')
+        return
       }
+      const { error: updateErr } = await supabase.auth.updateUser({ password: novaSenha })
+      if (updateErr) {
+        setError(updateErr.message || 'Erro ao atualizar senha')
+        return
+      }
+      setMostrarTrocarSenha(false)
+      setNovaSenha('')
+      setConfirmaSenha('')
+      setSenhaAtual('')
     } catch (err) {
       setError('Erro ao trocar senha')
     } finally {
@@ -280,33 +280,13 @@ export default function AdelsoPage() {
         >
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Acesso Adelso</h1>
-            <p className="text-gray-600 dark:text-gray-400">Informe sua senha para continuar</p>
+            <p className="text-gray-600 dark:text-gray-400">Clique para entrar (sem email nem telefone)</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nome</label>
-              <input
-                type="text"
-                value={nome}
-                onChange={(e) => setNome(e.target.value)}
-                placeholder="Adelso"
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                disabled={loading}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Senha</label>
-              <input
-                type="password"
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-                placeholder="••••••"
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                disabled={loading}
-              />
-              <p className="mt-1 text-xs text-gray-500">Senha temporária: 123 (você pode alterar depois)</p>
+            <div className="p-4 bg-teal-50 dark:bg-teal-900/20 rounded-xl border border-teal-200 dark:border-teal-800">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Usuário</p>
+              <p className="text-xl font-bold text-teal-700 dark:text-teal-300">Adelso</p>
             </div>
 
             {error && (
@@ -325,7 +305,7 @@ export default function AdelsoPage() {
           </form>
 
           <p className="mt-6 text-center text-xs text-gray-500">
-            O desenvolvedor tem acesso para resetar sua senha caso necessário.
+            Senha configurada no sistema. Use &quot;Trocar senha&quot; após entrar para alterar.
           </p>
         </motion.div>
       </div>

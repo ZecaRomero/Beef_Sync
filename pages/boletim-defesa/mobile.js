@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Head from 'next/head'
 import { DocumentTextIcon, ArrowPathIcon, ShieldCheckIcon, TableCellsIcon, PencilSquareIcon, PaperAirplaneIcon, Cog6ToothIcon, MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { useAuth } from '../../contexts/AuthContext'
 
 const CATEGORIAS_LOCAL = [
   { key: 'Piquetes', label: 'Piquetes', test: (s) => /piquete|^piq\s/i.test(s) },
@@ -23,6 +24,7 @@ const LABELS_CAMPO = {
 }
 
 export default function BoletimDefesaMobile() {
+  const { user } = useAuth()
   const [abaAtiva, setAbaAtiva] = useState('campo')
   const [fazendas, setFazendas] = useState([])
   const [dadosCampo, setDadosCampo] = useState([])
@@ -74,6 +76,11 @@ export default function BoletimDefesaMobile() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
+        // Supabase Auth: Adelso logado
+        if (user?.email === 'adelso@beefsync.local' || user?.user_metadata?.nome === 'Adelso') {
+          setIsAdelso(true)
+          return
+        }
         const auth = localStorage.getItem('beef_adelso_auth')
         if (auth) {
           const data = JSON.parse(auth)
@@ -87,7 +94,7 @@ export default function BoletimDefesaMobile() {
         }
       } catch (_) {}
     }
-  }, [])
+  }, [user])
 
   useEffect(() => {
     if (isAdelso) {
