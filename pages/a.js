@@ -36,32 +36,78 @@ export default function ConsultaRapida() {
   const [showSugestoes, setShowSugestoes] = useState(false)
   const searchTimeoutRef = useRef(null)
 
-  useEffect(() => {
-    if (authLoading) return
-
-    if (user) {
-      setIdentificado(true)
-      setNomeIdent(user.user_metadata?.nome || user.email?.split('@')[0] || 'Usuário')
-    } else {
-      router.push('/login?redirect=/a')
-    }
-  }, [user, authLoading, router])
-
+  // Autenticação Unificada
   useEffect(() => {
     if (typeof window === 'undefined') return
 
+    // Configurar Dark Mode
     const savedDarkMode = localStorage.getItem('darkMode')
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    const shouldBeDark = savedDarkMode === 'true' || (!savedDarkMode && prefersDark)
-
-    if (shouldBeDark) {
+    if (savedDarkMode === 'true' || (!savedDarkMode && prefersDark)) {
       document.documentElement.classList.add('dark')
       setIsDarkMode(true)
     } else {
       document.documentElement.classList.remove('dark')
       setIsDarkMode(false)
     }
-  }, [])
+
+    // Aguardar carregamento do auth
+    if (authLoading) return
+
+    // 1. Prioridade: Login Principal (Supabase)
+    if (user) {
+      setIdentificado(true)
+      setNomeIdent(user.user_metadata?.nome || user.email)
+      return
+    }
+
+    // 2. Localhost sempre liberado
+    const host = window.location.hostname
+    if (host === 'localhost' || host === '127.0.0.1') {
+      setIdentificado(true)
+      return
+    }
+
+    // 3. Fallback: Mobile Auth Legacy (mantido para compatibilidade, mas não forçado)
+    try {
+      const authData = localStorage.getItem('mobile-auth')
+      if (authData) {
+        const data = JSON.parse(authData)
+        if (data.nome) {
+          setIdentificado(true)
+          setNomeIdent(data.nome)
+          return
+        }
+      }
+    } catch (_) {}
+
+    // 4. Redirecionar para Login Principal se não autenticado
+    router.push('/login')
+  }, [user, authLoading, router])
+
+  // Deslogar após 10 min de inatividade (apenas para mobile-auth legacy)
+  useEffect(() => {
+    // Se tiver usuário logado pelo sistema principal (user), não aplica timeout
+    if (typeof window === 'undefined' || identificado !== true || user) return
+
+    const resetTimer = () => {
+      if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current)
+      inactivityTimerRef.current = setTimeout(() => {
+        localStorage.removeItem('mobile-auth')
+        setIdentificado(false)
+        router.push('/login')
+      }, 600000)
+    }
+
+    const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart']
+    events.forEach(event => document.addEventListener(event, resetTimer))
+    resetTimer()
+
+    return () => {
+      if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current)
+      events.forEach(event => document.removeEventListener(event, resetTimer))
+    }
+  }, [identificado, user, router])
 
   // Detectar se é mobile e mostrar splash apenas em mobile, e só após identificação
   useEffect(() => {
