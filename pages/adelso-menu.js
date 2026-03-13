@@ -8,32 +8,43 @@ import {
   ChartBarIcon,
   ArrowRightIcon
 } from '@heroicons/react/24/outline'
+import { useAuth } from '../contexts/AuthContext'
+
+const ADELSO_EMAIL = 'adelso@fazendasantanna.com.br'
 
 export default function AdelsoMenu() {
   const router = useRouter()
+  const { user, loading: authLoading } = useAuth()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Verificar se está autenticado como Adelso
+    if (authLoading) return
+
+    // Supabase Auth: adelso@fazendasantanna.com.br ou user_metadata.nome Adelso
+    if (user?.email === ADELSO_EMAIL || user?.user_metadata?.nome === 'Adelso') {
+      setLoading(false)
+      return
+    }
+
+    // Legacy: localStorage mobile-auth
     const authData = localStorage.getItem('mobile-auth')
     if (!authData) {
-      router.push('/mobile-auth')
+      router.push('/login')
       return
     }
     
     try {
       const data = JSON.parse(authData)
       if (data.nome?.toLowerCase() !== 'adelso') {
-        // Se não for Adelso, redireciona para página normal
         router.push('/a')
         return
       }
       setLoading(false)
     } catch (e) {
       console.error('Erro ao verificar autenticação:', e)
-      router.push('/mobile-auth')
+      router.push('/login')
     }
-  }, [router])
+  }, [router, user, authLoading])
 
   if (loading) {
     return (
@@ -131,10 +142,13 @@ export default function AdelsoMenu() {
             className="mt-8"
           >
             <button
-              onClick={() => {
+              onClick={async () => {
                 if (confirm('Deseja realmente sair?')) {
+                  const { supabase } = await import('../lib/supabase')
+                  if (supabase) await supabase.auth.signOut()
                   localStorage.removeItem('mobile-auth')
-                  router.push('/mobile-auth')
+                  localStorage.removeItem('beef_adelso_auth')
+                  router.push('/login')
                 }
               }}
               className="w-full py-3 px-4 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-xl transition-all"

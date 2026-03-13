@@ -91,7 +91,7 @@ export default function App({ Component, pageProps }) {
   };
 
   // Pages that don't need layout (login, 404, 500, consulta celular, ficha read-only, identificar)
-  const noLayoutPages = ['/login', '/404', '/500', '/a', '/A', '/identificar', '/mobile-relatorios', '/boletim-defesa/mobile', '/adelso'];
+  const noLayoutPages = ['/login', '/404', '/500', '/a', '/A', '/identificar', '/mobile-relatorios', '/boletim-defesa/mobile', '/adelso', '/adelso-menu'];
   const isConsultaAnimal = router.pathname === '/consulta-animal/[id]';
   const useLayout = !noLayoutPages.includes(router.pathname) && !isConsultaAnimal;
 

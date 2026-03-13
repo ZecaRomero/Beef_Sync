@@ -27,7 +27,7 @@ function normalizeReportKey(key) {
 // --- Helpers de fetch ---
 const fetchWithTimeout = (url, ms = 8000) => {
   const ctrl = new AbortController()
-  const t = setTimeout(() => ctrl.abort(), ms)
+  const t = setTimeout(() => ctrl.abort('Timeout'), ms)
   return fetch(url, { signal: ctrl.signal }).finally(() => clearTimeout(t))
 }
 
@@ -157,7 +157,9 @@ export default function AcessosSistema() {
         if (d.success && d.data) setSettings(d.data)
       }
     } catch (e) {
-      console.error('Erro ao carregar:', e)
+      if (e.name !== 'AbortError' && e !== 'Timeout') {
+        console.error('Erro ao carregar:', e)
+      }
     } finally {
       setLoading(false)
       setRefreshing(false)

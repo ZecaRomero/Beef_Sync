@@ -402,7 +402,7 @@ export default function Dashboard() {
         // Carregar estatísticas da API (timeout 12s para não travar)
         try {
           const controller = new AbortController()
-          const timeoutId = setTimeout(() => controller.abort(), 12000)
+          const timeoutId = setTimeout(() => controller.abort('Timeout'), 12000)
           const statsResponse = await fetch('/api/statistics', { signal: controller.signal })
           clearTimeout(timeoutId)
           if (statsResponse.ok) {
@@ -419,12 +419,14 @@ export default function Dashboard() {
             throw new Error('API de estatísticas indisponível')
           }
         } catch (apiError) {
-          console.warn('API de estatísticas indisponível, usando dados básicos:', apiError)
+          if (apiError.name !== 'AbortError' && apiError !== 'Timeout') {
+            console.warn('API de estatísticas indisponível, usando dados básicos:', apiError)
+          }
           
           // Fallback: tentar carregar animais diretamente (timeout 12s)
           try {
             const ctrl = new AbortController()
-            const t = setTimeout(() => ctrl.abort(), 12000)
+            const t = setTimeout(() => ctrl.abort('Timeout'), 12000)
             const animalsResponse = await fetch('/api/animals', { signal: ctrl.signal })
             clearTimeout(t)
             if (animalsResponse.ok) {
@@ -453,14 +455,18 @@ export default function Dashboard() {
               }
             }
           } catch (fallbackError) {
-            console.error('Erro no fallback:', fallbackError)
-            setError('Não foi possível carregar os dados do sistema')
+            if (fallbackError.name !== 'AbortError' && fallbackError !== 'Timeout') {
+              console.error('Erro no fallback:', fallbackError)
+              setError('Não foi possível carregar os dados do sistema')
+            }
           }
         }
 
       } catch (error) {
-        console.error('Erro ao carregar estatísticas:', error)
-        setError('Erro ao carregar dados do dashboard')
+        if (error.name !== 'AbortError' && error !== 'Timeout') {
+          console.error('Erro ao carregar estatísticas:', error)
+          setError('Erro ao carregar dados do dashboard')
+        }
       } finally {
         setLoading(false)
       }

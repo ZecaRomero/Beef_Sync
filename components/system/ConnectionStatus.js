@@ -36,7 +36,7 @@ const ConnectionStatus = ({ className = '' }) => {
       // Helper para criar timeout
       const createTimeout = (ms) => {
         const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), ms)
+        const timeoutId = setTimeout(() => controller.abort('Timeout'), ms)
         return { signal: controller.signal, cleanup: () => clearTimeout(timeoutId) }
       }
       

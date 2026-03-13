@@ -76,8 +76,12 @@ export default function BoletimDefesaMobile() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
-        // Supabase Auth: Adelso logado
-        if (user?.email === 'adelso@beefsync.local' || user?.user_metadata?.nome === 'Adelso') {
+        // Supabase Auth: Adelso logado (adelso@beefsync.local, adelso@fazendasantanna.com.br ou metadata)
+        if (
+          user?.email === 'adelso@beefsync.local' ||
+          user?.email === 'adelso@fazendasantanna.com.br' ||
+          user?.user_metadata?.nome === 'Adelso'
+        ) {
           setIsAdelso(true)
           return
         }

@@ -37,7 +37,7 @@ class ApiValidator {
     while (attempt < endpoint.retries) {
       try {
         const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), endpoint.timeout)
+        const timeoutId = setTimeout(() => controller.abort('Timeout'), endpoint.timeout)
 
         const response = await fetch(endpoint.url, {
           method: endpoint.method,

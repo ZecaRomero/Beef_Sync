@@ -16,6 +16,13 @@ export default function Home() {
       return
     }
 
+    // Adelso (email fazenda): acesso ao Boletim Campo e Relatórios
+    if (user.email === 'adelso@fazendasantanna.com.br') {
+      router.prefetch('/adelso-menu')
+      router.replace('/adelso-menu')
+      return
+    }
+
     const role = user.user_metadata?.role || 'externo'
     const target = role === 'desenvolvedor' ? '/dashboard' : '/a'
 
@@ -29,7 +36,11 @@ export default function Home() {
   }, [user, loading, router])
 
   const role = user?.user_metadata?.role || 'externo'
-  const targetPath = role === 'desenvolvedor' ? '/dashboard' : '/a'
+  const targetPath = user?.email === 'adelso@fazendasantanna.com.br'
+    ? '/adelso-menu'
+    : role === 'desenvolvedor'
+      ? '/dashboard'
+      : '/a'
 
   return (
     <div className="flex items-center justify-center min-h-screen">

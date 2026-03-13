@@ -127,7 +127,7 @@ export default function Contabilidade() {
   // Função auxiliar para fazer requisições com timeout e retry
   const fetchWithTimeout = async (url, options = {}, timeout = 10000, retries = 2) => {
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), timeout)
+    const timeoutId = setTimeout(() => controller.abort('Timeout'), timeout)
     
     try {
       const response = await fetch(url, {
@@ -138,7 +138,7 @@ export default function Contabilidade() {
       return response
     } catch (error) {
       clearTimeout(timeoutId)
-      if (retries > 0 && (error.name === 'AbortError' || error.message.includes('500'))) {
+      if (retries > 0 && (error.name === 'AbortError' || error.message.includes('500') || error === 'Timeout')) {
         console.log(`Tentando novamente... (${retries} tentativas restantes)`)
         await new Promise(resolve => setTimeout(resolve, 1000)) // Aguardar 1 segundo
         return fetchWithTimeout(url, options, timeout, retries - 1)
