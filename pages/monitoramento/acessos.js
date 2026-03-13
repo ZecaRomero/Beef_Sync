@@ -8,7 +8,8 @@ import {
   WrenchScrewdriverIcon,
   ArrowPathIcon,
   ExclamationTriangleIcon,
-  ChartBarIcon
+  ChartBarIcon,
+  UserCircleIcon
 } from '@heroicons/react/24/outline'
 
 // --- Helpers ---
@@ -109,6 +110,7 @@ export default function AcessosSistema() {
   const [stats, setStats] = useState(null)
   const [logs, setLogs] = useState([])
   const [settings, setSettings] = useState(null)
+  const [supabaseUsers, setSupabaseUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -139,10 +141,11 @@ export default function AcessosSistema() {
   const loadData = useCallback(async () => {
     setRefreshing(true)
     try {
-      const [statsRes, logsRes, settingsRes] = await Promise.all([
+      const [statsRes, logsRes, settingsRes, usersRes] = await Promise.all([
         fetchWithTimeout('/api/access-log?stats=true'),
         fetchWithTimeout('/api/access-log?limit=30'),
         fetchWithTimeout('/api/system-settings'),
+        fetchWithTimeout('/api/supabase-users'),
       ])
       if (statsRes.ok) {
         const d = await statsRes.json()
@@ -155,6 +158,12 @@ export default function AcessosSistema() {
       if (settingsRes.ok) {
         const d = await settingsRes.json()
         if (d.success && d.data) setSettings(d.data)
+      }
+      if (usersRes?.ok) {
+        const d = await usersRes.json()
+        if (d.success && Array.isArray(d.data)) setSupabaseUsers(d.data)
+      } else {
+        setSupabaseUsers([])
       }
     } catch (e) {
       if (e.name !== 'AbortError' && e !== 'Timeout') {
@@ -482,6 +491,72 @@ export default function AcessosSistema() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Usuários Supabase Auth */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <div>
+              <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <UserCircleIcon className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+                Usuários Supabase (Auth)
+              </h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                Usuários cadastrados no Supabase Authentication (como na dashboard do Supabase)
+              </p>
+            </div>
+            <button
+              onClick={loadData}
+              disabled={refreshing}
+              className={`px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-700 text-white font-semibold text-sm transition-all disabled:opacity-50 flex items-center gap-2 ${refreshing ? 'animate-pulse' : ''}`}
+            >
+              <ArrowPathIcon className={`h-5 w-5 ${refreshing ? 'animate-spin' : ''}`} />
+              {refreshing ? 'Atualizando...' : 'Atualizar'}
+            </button>
+          </div>
+          <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
+            {supabaseUsers.length === 0 ? (
+              <div className="p-8 text-center">
+                <UserCircleIcon className="h-16 w-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
+                <p className="text-gray-500 dark:text-gray-400 font-medium mb-2">
+                  Nenhum usuário encontrado ou Supabase não configurado.
+                </p>
+                <p className="text-sm text-gray-400 dark:text-gray-500">
+                  Configure SUPABASE_SERVICE_ROLE_KEY no .env para exibir os usuários.
+                </p>
+                <button
+                  onClick={loadData}
+                  className="mt-4 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-700 text-white font-semibold text-sm transition-colors"
+                >
+                  Verificar novamente
+                </button>
+              </div>
+            ) : (
+              <table className="w-full text-sm min-w-[600px]">
+                <thead className="bg-gray-50 dark:bg-gray-700/50 sticky top-0">
+                  <tr>
+                    {['UID', 'Nome', 'Email', 'Telefone', 'Provedor', 'Criado em'].map(col => (
+                      <th key={col} className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">{col}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {supabaseUsers.map((u) => (
+                    <tr key={u.id} className="border-t border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/30">
+                      <td className="px-4 py-2 text-gray-500 dark:text-gray-400 font-mono text-xs truncate max-w-[180px]" title={u.id}>{u.id}</td>
+                      <td className="px-4 py-2 text-gray-900 dark:text-white">{u.display_name || '-'}</td>
+                      <td className="px-4 py-2 font-medium text-gray-900 dark:text-white">{u.email || '-'}</td>
+                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{u.phone || '-'}</td>
+                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400 capitalize">{Array.isArray(u.providers) ? u.providers.join(', ') : 'email'}</td>
+                      <td className="px-4 py-2 text-gray-500 dark:text-gray-500 whitespace-nowrap">
+                        {u.created_at ? new Date(u.created_at).toLocaleString('pt-BR') : '-'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
 
