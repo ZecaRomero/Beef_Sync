@@ -1,9 +1,9 @@
-// UtilitÃ¡rio especializado para exportaÃ§Ã£o de estoque de sÃªmen com formataÃ§Ã£o profissional
+// Utilitário especializado para exportação de estoque de sêmen com formatação profissional
 
 export const exportSemenToExcel = async (semenStock, filteredStock) => {
   // Verificar se estamos no browser
   if (typeof window === 'undefined') {
-    throw new Error('Esta funÃ§Ã£o sÃ³ pode ser executada no browser');
+    throw new Error('Esta função só pode ser executada no browser');
   }
   try {
     // Importar ExcelJS dinamicamente
@@ -11,16 +11,16 @@ export const exportSemenToExcel = async (semenStock, filteredStock) => {
     
     // Criar workbook
     const workbook = new ExcelJS.Workbook();
-    workbook.creator = 'BeefSync - Sistema de GestÃ£o PecuÃ¡ria';
+    workbook.creator = 'BeefSync - Sistema de Gestão Pecuária';
     workbook.lastModifiedBy = 'BeefSync';
     workbook.created = new Date();
     workbook.modified = new Date();
     workbook.company = 'BeefSync';
-    workbook.subject = 'RelatÃ³rio de Estoque de SÃªmen';
-    workbook.keywords = 'sÃªmen, estoque, bovinos, genÃ©tica';
+    workbook.subject = 'Relatório de Estoque de Sêmen';
+    workbook.keywords = 'sêmen, estoque, bovinos, genética';
     
     // ===== ABA PRINCIPAL - ESTOQUE DETALHADO =====
-    const mainSheet = workbook.addWorksheet('ðÅ¸â€œÅ  Estoque Detalhado', {
+    const mainSheet = workbook.addWorksheet('📊 Estoque Detalhado', {
       pageSetup: { 
         paperSize: 9, 
         orientation: 'landscape',
@@ -35,10 +35,10 @@ export const exportSemenToExcel = async (semenStock, filteredStock) => {
       }
     });
 
-    // CabeÃ§alho principal com logo/tÃ­tulo
+    // Cabeçalho principal com logo/título
     mainSheet.mergeCells('A1:Y2');
     const titleCell = mainSheet.getCell('A1');
-    titleCell.value = 'ðÅ¸§¬ BEEF-SYNC - CONTROLE DE ESTOQUE DE SÃÅ MEN BOVINO';
+    titleCell.value = '🧬 BEEF-SYNC - CONTROLE DE ESTOQUE DE SÊMEN BOVINO';
     titleCell.font = { 
       name: 'Calibri', 
       size: 20, 
@@ -61,13 +61,13 @@ export const exportSemenToExcel = async (semenStock, filteredStock) => {
     mainSheet.getRow(1).height = 45;
     mainSheet.getRow(2).height = 5;
 
-    // InformaÃ§Ãµes do relatÃ³rio
+    // Informações do relatório
     const currentDate = new Date();
     const stats = calculateStats(semenStock);
     
     mainSheet.mergeCells('A3:Y3');
     const infoCell = mainSheet.getCell('A3');
-    infoCell.value = `ðÅ¸â€œâ€¦ RelatÃ³rio gerado em ${currentDate.toLocaleDateString('pt-BR')} Ã s ${currentDate.toLocaleTimeString('pt-BR')} | ðÅ¸â€˜¤ UsuÃ¡rio: Sistema | ðÅ¸â€œÅ  Registros: ${filteredStock.length}`;
+    infoCell.value = `📅 Relatório gerado em ${currentDate.toLocaleDateString('pt-BR')} às ${currentDate.toLocaleTimeString('pt-BR')} | 👤 Usuário: Sistema | 📊 Registros: ${filteredStock.length}`;
     infoCell.font = { 
       name: 'Calibri', 
       size: 11, 
@@ -85,44 +85,44 @@ export const exportSemenToExcel = async (semenStock, filteredStock) => {
     };
     mainSheet.getRow(3).height = 22;
 
-    // Painel de estatÃ­sticas
+    // Painel de estatísticas
     addStatsPanel(mainSheet, stats, 4);
 
-    // CabeÃ§alhos da tabela
+    // Cabeçalhos da tabela
     const headers = [
       { key: 'nomeTouro', header: 'Nome do Touro', width: 22 },
       { key: 'rgTouro', header: 'RG/Registro', width: 16 },
-      { key: 'raca', header: 'RaÃ§a', width: 15 },
-      { key: 'localizacao', header: 'LocalizaÃ§Ã£o', width: 18 },
+      { key: 'raca', header: 'Raça', width: 15 },
+      { key: 'localizacao', header: 'Localização', width: 18 },
       { key: 'rackTouro', header: 'Rack', width: 12 },
-      { key: 'botijao', header: 'BotijÃ£o', width: 12 },
+      { key: 'botijao', header: 'Botijão', width: 12 },
       { key: 'caneca', header: 'Caneca', width: 12 },
       { key: 'tipoOperacao', header: 'Tipo', width: 12 },
       { key: 'fornecedor', header: 'Fornecedor', width: 22 },
       { key: 'destino', header: 'Destino', width: 20 },
-      { key: 'numeroNF', header: 'NÂº NF', width: 14 },
+      { key: 'numeroNF', header: 'Nº NF', width: 14 },
       { key: 'valorCompra', header: 'Valor (R$)', width: 16 },
       { key: 'dataCompra', header: 'Data Compra', width: 16 },
       { key: 'quantidadeDoses', header: 'Qtd Doses', width: 14 },
-      { key: 'dosesDisponiveis', header: 'DisponÃ­veis', width: 14 },
+      { key: 'dosesDisponiveis', header: 'Disponíveis', width: 14 },
       { key: 'dosesUsadas', header: 'Usadas', width: 12 },
       { key: 'certificado', header: 'Certificado', width: 18 },
       { key: 'dataValidade', header: 'Validade', width: 16 },
       { key: 'origem', header: 'Origem', width: 20 },
       { key: 'linhagem', header: 'Linhagem', width: 20 },
-      { key: 'observacoes', header: 'ObservaÃ§Ãµes', width: 35 },
+      { key: 'observacoes', header: 'Observações', width: 35 },
       { key: 'status', header: 'Status', width: 14 },
       { key: 'created_at', header: 'Criado em', width: 16 },
       { key: 'updated_at', header: 'Atualizado', width: 16 }
     ];
 
-    // Aplicar cabeÃ§alhos
+    // Aplicar cabeçalhos
     const headerRow = mainSheet.getRow(8);
     headers.forEach((col, index) => {
       const cell = headerRow.getCell(index + 1);
       cell.value = col.header;
       
-      // Estilo do cabeÃ§alho
+      // Estilo do cabeçalho
       cell.font = { 
         name: 'Calibri', 
         size: 11, 
@@ -181,12 +181,12 @@ export const exportSemenToExcel = async (semenStock, filteredStock) => {
         semen.updated_at ? new Date(semen.updated_at) : ''
       ];
 
-      // Aplicar dados e formataÃ§Ã£o
+      // Aplicar dados e formatação
       rowData.forEach((value, colIndex) => {
         const cell = row.getCell(colIndex + 1);
         cell.value = value;
         
-        // FormataÃ§Ã£o especÃ­fica por tipo
+        // Formatação específica por tipo
         applyColumnFormatting(cell, colIndex, value, semen.status);
         
         // Cor de fundo alternada
@@ -213,14 +213,14 @@ export const exportSemenToExcel = async (semenStock, filteredStock) => {
     });
 
     // ===== ABA RESUMO EXECUTIVO =====
-    const summarySheet = workbook.addWorksheet('ðÅ¸â€œË† Resumo Executivo');
+    const summarySheet = workbook.addWorksheet('📈 Resumo Executivo');
     createSummarySheet(summarySheet, stats, semenStock);
 
-    // ===== ABA ANÃ�LISE POR TOURO =====
-    const touroSheet = workbook.addWorksheet('ðÅ¸�â€š AnÃ¡lise por Touro');
+    // ===== ABA ANÁLISE POR TOURO =====
+    const touroSheet = workbook.addWorksheet('🐂 Análise por Touro');
     createTouroAnalysisSheet(touroSheet, semenStock);
 
-    // ConfiguraÃ§Ãµes finais da planilha principal
+    // Configurações finais da planilha principal
     mainSheet.autoFilter = {
       from: 'A8',
       to: `X${filteredStock.length + 8}`
@@ -252,7 +252,7 @@ export const exportSemenToExcel = async (semenStock, filteredStock) => {
   }
 };
 
-// FunÃ§Ãµes auxiliares
+// Funções auxiliares
 function calculateStats(semenStock) {
   const entradas = semenStock.filter(s => (s.tipoOperacao || s.tipo_operacao) === 'entrada');
   const saidas = semenStock.filter(s => (s.tipoOperacao || s.tipo_operacao) === 'saida');
@@ -272,19 +272,19 @@ function calculateStats(semenStock) {
 }
 
 function addStatsPanel(sheet, stats, startRow) {
-  // Painel de estatÃ­sticas com 4 colunas
+  // Painel de estatísticas com 4 colunas
   const panels = [
-    { title: 'ðÅ¸�â€š Touros', value: stats.totalTouros, color: 'FF3B82F6' },
-    { title: 'ðÅ¸â€œ¦ Total Doses', value: stats.totalDoses.toLocaleString('pt-BR'), color: 'FF10B981' },
-    { title: 'âÅ“â€¦ DisponÃ­veis', value: stats.dosesDisponiveis.toLocaleString('pt-BR'), color: 'FF059669' },
-    { title: 'ðÅ¸â€™° Valor Total', value: `R$ ${stats.valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, color: 'FFDC2626' }
+    { title: '🐂 Touros', value: stats.totalTouros, color: 'FF3B82F6' },
+    { title: '📦 Total Doses', value: stats.totalDoses.toLocaleString('pt-BR'), color: 'FF10B981' },
+    { title: '✅ Disponíveis', value: stats.dosesDisponiveis.toLocaleString('pt-BR'), color: 'FF059669' },
+    { title: '💰 Valor Total', value: `R$ ${stats.valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, color: 'FFDC2626' }
   ];
 
   panels.forEach((panel, index) => {
     const startCol = index * 6 + 1;
     const endCol = startCol + 5;
     
-    // Mesclar cÃ©lulas para o painel
+    // Mesclar células para o painel
     sheet.mergeCells(startRow, startCol, startRow + 1, endCol);
     const cell = sheet.getCell(startRow, startCol);
     
@@ -318,7 +318,7 @@ function addStatsPanel(sheet, stats, startRow) {
 }
 
 function applyColumnFormatting(cell, colIndex, value, status) {
-  // FormataÃ§Ã£o por tipo de coluna
+  // Formatação por tipo de coluna
   switch (colIndex) {
     case 11: // Valor
       cell.numFmt = 'R$ #,##0.00';
@@ -328,7 +328,7 @@ function applyColumnFormatting(cell, colIndex, value, status) {
       cell.numFmt = 'dd/mm/yyyy';
       cell.alignment = { horizontal: 'center', vertical: 'middle' };
       break;
-    case 13: case 14: case 15: // NÃºmeros
+    case 13: case 14: case 15: // Números
       cell.numFmt = '#,##0';
       cell.alignment = { horizontal: 'right', vertical: 'middle' };
       break;
@@ -342,7 +342,7 @@ function applyColumnFormatting(cell, colIndex, value, status) {
         cell.font = { color: { argb: 'FFDC2626' }, bold: true };
       }
       break;
-    case 20: // ObservaÃ§Ãµes
+    case 20: // Observações
       cell.alignment = { horizontal: 'left', vertical: 'top', wrapText: true };
       break;
     default:
@@ -352,42 +352,42 @@ function applyColumnFormatting(cell, colIndex, value, status) {
 
 function formatTipoOperacao(tipo) {
   switch (tipo) {
-    case 'entrada': return 'ðÅ¸â€œ¥ Entrada';
-    case 'saida': return 'ðÅ¸â€œ¤ SaÃ­da';
+    case 'entrada': return '📥 Entrada';
+    case 'saida': return '📤 Saída';
     default: return tipo || '';
   }
 }
 
 function formatStatus(status) {
   switch (status) {
-    case 'disponivel': return 'âÅ“â€¦ DisponÃ­vel';
-    case 'esgotado': return 'â�Å’ Esgotado';
-    case 'vencido': return 'âÅ¡ ï¸� Vencido';
+    case 'disponivel': return '✅ Disponível';
+    case 'esgotado': return '❌ Esgotado';
+    case 'vencido': return '⚠️ Vencido';
     default: return status || '';
   }
 }
 
 function createSummarySheet(sheet, stats, semenStock) {
-  // TÃ­tulo
+  // Título
   sheet.mergeCells('A1:F1');
   const titleCell = sheet.getCell('A1');
-  titleCell.value = 'ðÅ¸â€œË† RESUMO EXECUTIVO - ESTOQUE DE SÃÅ MEN';
+  titleCell.value = '📈 RESUMO EXECUTIVO - ESTOQUE DE SÊMEN';
   titleCell.font = { name: 'Calibri', size: 16, bold: true, color: { argb: 'FF1F4E79' } };
   titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
   titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE7F3FF' } };
   sheet.getRow(1).height = 30;
 
-  // EstatÃ­sticas principais
+  // Estatísticas principais
   const summaryData = [
-    ['MÃ©trica', 'Valor', 'DescriÃ§Ã£o'],
-    ['Total de Touros', stats.totalTouros, 'NÃºmero Ãºnico de touros no estoque'],
+    ['Métrica', 'Valor', 'Descrição'],
+    ['Total de Touros', stats.totalTouros, 'Número único de touros no estoque'],
     ['Total de Doses', stats.totalDoses.toLocaleString('pt-BR'), 'Quantidade total de doses adquiridas'],
-    ['Doses DisponÃ­veis', stats.dosesDisponiveis.toLocaleString('pt-BR'), 'Doses ainda disponÃ­veis para uso'],
-    ['Doses Utilizadas', stats.dosesUsadas.toLocaleString('pt-BR'), 'Doses jÃ¡ utilizadas'],
-    ['Valor Total Investido', `R$ ${stats.valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, 'Valor total investido em sÃªmen'],
-    ['Fornecedores Ativos', stats.fornecedores, 'NÃºmero de fornecedores diferentes'],
-    ['Entradas DisponÃ­veis', stats.disponivel, 'Entradas com doses disponÃ­veis'],
-    ['Entradas Esgotadas', stats.esgotado, 'Entradas sem doses disponÃ­veis']
+    ['Doses Disponíveis', stats.dosesDisponiveis.toLocaleString('pt-BR'), 'Doses ainda disponíveis para uso'],
+    ['Doses Utilizadas', stats.dosesUsadas.toLocaleString('pt-BR'), 'Doses já utilizadas'],
+    ['Valor Total Investido', `R$ ${stats.valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, 'Valor total investido em sêmen'],
+    ['Fornecedores Ativos', stats.fornecedores, 'Número de fornecedores diferentes'],
+    ['Entradas Disponíveis', stats.disponivel, 'Entradas com doses disponíveis'],
+    ['Entradas Esgotadas', stats.esgotado, 'Entradas sem doses disponíveis']
   ];
 
   summaryData.forEach((row, index) => {
@@ -396,7 +396,7 @@ function createSummarySheet(sheet, stats, semenStock) {
       const cell = excelRow.getCell(colIndex + 1);
       cell.value = value;
       
-      if (index === 0) { // CabeÃ§alho
+      if (index === 0) { // Cabeçalho
         cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1F4E79' } };
       } else if (colIndex === 1) { // Valores
@@ -418,10 +418,10 @@ function createSummarySheet(sheet, stats, semenStock) {
 }
 
 function createTouroAnalysisSheet(sheet, semenStock) {
-  // TÃ­tulo
+  // Título
   sheet.mergeCells('A1:H1');
   const titleCell = sheet.getCell('A1');
-  titleCell.value = 'ðÅ¸�â€š ANÃ�LISE DETALHADA POR TOURO';
+  titleCell.value = '🐂 ANÁLISE DETALHADA POR TOURO';
   titleCell.font = { name: 'Calibri', size: 16, bold: true, color: { argb: 'FF1F4E79' } };
   titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
   titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE7F3FF' } };
@@ -452,8 +452,8 @@ function createTouroAnalysisSheet(sheet, semenStock) {
     touroData[nome].entradas += 1;
   });
 
-  // CabeÃ§alhos
-  const headers = ['Nome do Touro', 'RaÃ§a', 'Entradas', 'Total Doses', 'DisponÃ­veis', 'Usadas', 'Valor Total', 'EficiÃªncia'];
+  // Cabeçalhos
+  const headers = ['Nome do Touro', 'Raça', 'Entradas', 'Total Doses', 'Disponíveis', 'Usadas', 'Valor Total', 'Eficiência'];
   const headerRow = sheet.getRow(3);
   
   headers.forEach((header, index) => {
@@ -490,7 +490,7 @@ function createTouroAnalysisSheet(sheet, semenStock) {
       
       if (colIndex === 6) { // Valor
         cell.numFmt = 'R$ #,##0.00';
-      } else if ([2, 3, 4, 5].includes(colIndex)) { // NÃºmeros
+      } else if ([2, 3, 4, 5].includes(colIndex)) { // Números
         cell.numFmt = '#,##0';
       }
       

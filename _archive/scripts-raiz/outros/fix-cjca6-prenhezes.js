@@ -7,7 +7,7 @@
 const { query } = require('./lib/database')
 
 async function fixCJCA6Prenhezes() {
-  console.log('�Ÿ”� Corrigindo vinculação das prenhezes do CJCA6...\n')
+  console.log('🔧 Corrigindo vinculação das prenhezes do CJCA6...\n')
 
   try {
     // 1. Buscar animal CJCA6
@@ -21,12 +21,12 @@ async function fixCJCA6Prenhezes() {
     `)
     
     if (cjca6.rows.length === 0) {
-      console.log('   �Œ Animal CJCA6 não encontrado')
+      console.log('   ❌ Animal CJCA6 não encontrado')
       return
     }
 
     const animal = cjca6.rows[0]
-    console.log(`   �œ… Animal encontrado: ID ${animal.id} - ${animal.serie} ${animal.rg}`)
+    console.log(`   ✅ Animal encontrado: ID ${animal.id} - ${animal.serie} ${animal.rg}`)
 
     // 2. Verificar se CJCA6 deveria ser vinculado a algum touro específico
     console.log('\n2. Analisando touros nas transferências:')
@@ -38,7 +38,7 @@ async function fixCJCA6Prenhezes() {
       ORDER BY total_transferencias DESC
     `)
     
-    console.log(`   �Ÿ“Š Touros únicos encontrados: ${tourosUnicos.rows.length}`)
+    console.log(`   📊 Touros únicos encontrados: ${tourosUnicos.rows.length}`)
     tourosUnicos.rows.slice(0, 10).forEach((touro, index) => {
       console.log(`   ${index + 1}. ${touro.touro} (${touro.total_transferencias} transferências)`)
     })
@@ -54,12 +54,12 @@ async function fixCJCA6Prenhezes() {
     `)
     
     if (possiveisCJCA6.rows.length > 0) {
-      console.log(`   �œ… Possíveis correspondências encontradas:`)
+      console.log(`   ✅ Possíveis correspondências encontradas:`)
       possiveisCJCA6.rows.forEach((match, index) => {
         console.log(`   ${index + 1}. "${match.touro}" (${match.total} transferências)`)
       })
     } else {
-      console.log('   �Œ Nenhuma correspondência direta encontrada')
+      console.log('   ❌ Nenhuma correspondência direta encontrada')
     }
 
     // 4. Verificar se há transferências sem touro_id definido que poderiam ser do CJCA6
@@ -70,11 +70,11 @@ async function fixCJCA6Prenhezes() {
       WHERE touro_id IS NULL AND touro IS NOT NULL
     `)
     
-    console.log(`   �Ÿ“Š Transferências sem touro_id: ${semTouroId.rows[0].total}`)
+    console.log(`   📊 Transferências sem touro_id: ${semTouroId.rows[0].total}`)
 
     // 5. Propor correção baseada em análise manual
     console.log('\n5. Análise para correção:')
-    console.log('   �Ÿ”� Baseado nos dados encontrados:')
+    console.log('   🔍 Baseado nos dados encontrados:')
     console.log('   - CJCA6 é um touro (macho)')
     console.log('   - Existem 29 transferências que deveriam estar vinculadas a ele')
     console.log('   - As transferências não têm touro_id preenchido')
@@ -91,7 +91,7 @@ async function fixCJCA6Prenhezes() {
       ORDER BY total DESC
     `)
     
-    console.log('\n   �Ÿ“Š Touros com mais transferências:')
+    console.log('\n   📊 Touros com mais transferências:')
     analiseDetalhada.rows.slice(0, 5).forEach((touro, index) => {
       console.log(`   ${index + 1}. "${touro.touro}"`)
       console.log(`      Total: ${touro.total} transferências`)
@@ -124,23 +124,23 @@ async function fixCJCA6Prenhezes() {
       })
     }
 
-    console.log('\n�Ÿ’� RECOMENDA�‡�•ES:')
+    console.log('\n💡 RECOMENDAÇÕES:')
     console.log('1. Verifique manualmente qual touro nas transferências corresponde ao CJCA6')
     console.log('2. Uma vez identificado, execute UPDATE para vincular o touro_id')
     console.log('3. Exemplo de comando:')
     console.log('   UPDATE transferencias_embrioes SET touro_id = 853 WHERE touro = \'NOME_DO_TOURO_CORRETO\'')
     
-    console.log('\n�œ… Análise concluída!')
+    console.log('\n✅ Análise concluída!')
 
   } catch (error) {
-    console.error('�Œ Erro durante análise:', error)
+    console.error('❌ Erro durante análise:', error)
   }
 }
 
 // Executar
 fixCJCA6Prenhezes()
   .then(() => {
-    console.log('\n�ŸŽ� PR�“XIMO PASSO: Identificar manualmente o touro correto e executar a correção')
+    console.log('\n🎯 PRÓXIMO PASSO: Identificar manualmente o touro correto e executar a correção')
     process.exit(0)
   })
   .catch(error => {

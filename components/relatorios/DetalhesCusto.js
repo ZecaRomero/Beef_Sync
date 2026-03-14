@@ -7,7 +7,7 @@ export default function DetalhesCusto({ body }) {
   return (
     <div className="bg-gradient-to-r from-yellow-900/30 to-yellow-800/20 p-4 rounded-lg border border-yellow-500/30">
       <h4 className="font-bold text-yellow-300 mb-3 flex items-center gap-2">
-        ðÅ¸â€™° DETALHES DO CUSTO
+        💰 DETALHES DO CUSTO
       </h4>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <SecaoClassificacao body={body} />
@@ -20,7 +20,7 @@ export default function DetalhesCusto({ body }) {
 function SecaoClassificacao({ body }) {
   return (
     <div className="bg-gray-800/50 p-3 rounded">
-      <h5 className="text-yellow-200 font-semibold mb-2">ðÅ¸â€œÅ  ClassificaÃ§Ã£o</h5>
+      <h5 className="text-yellow-200 font-semibold mb-2">📊 Classificação</h5>
       {body.tipo && (
         <div className="mb-1">
           <span className="text-gray-400">Tipo:</span>{' '}
@@ -48,7 +48,7 @@ function SecaoClassificacao({ body }) {
 function SecaoValor({ body }) {
   return (
     <div className="bg-gray-800/50 p-3 rounded">
-      <h5 className="text-yellow-200 font-semibold mb-2">ðÅ¸â€™µ Valor</h5>
+      <h5 className="text-yellow-200 font-semibold mb-2">💵 Valor</h5>
       {body.valor && (
         <div className="p-3 bg-yellow-900/30 rounded text-center">
           <span className="text-yellow-100 font-bold text-xl">

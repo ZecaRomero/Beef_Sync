@@ -3,7 +3,7 @@ import { query } from '../../../lib/database'
 export default async function handler(req, res) {
   try {
     // Garantir que as tabelas existam
-    // (createTablesIfNotExist removido â€” tabelas criadas automaticamente no primeiro uso)
+    // (createTablesIfNotExist removido — tabelas criadas automaticamente no primeiro uso)
     
     if (req.method === 'GET') {
       const { busca, tipo } = req.query

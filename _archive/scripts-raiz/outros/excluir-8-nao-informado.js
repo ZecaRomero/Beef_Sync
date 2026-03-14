@@ -18,18 +18,18 @@ async function excluir() {
     LIMIT 8
   `)
   
-  console.log(`�Ÿ“Š Encontrados ${result.rows.length} animais para excluir:`)
+  console.log(`📊 Encontrados ${result.rows.length} animais para excluir:`)
   result.rows.forEach((a, idx) => {
     console.log(`${idx + 1}. ${a.serie} ${a.rg} - Sexo: ${a.sexo} - ID: ${a.id}`)
   })
   
   if (result.rows.length === 0) {
-    console.log('\n�œ… Nenhum animal para excluir')
+    console.log('\n✅ Nenhum animal para excluir')
     process.exit(0)
   }
   
   // Confirmar exclusão
-  console.log('\n�š�️ Esses animais serão marcados como INATIVOS (não serão deletados)')
+  console.log('\n⚠️ Esses animais serão marcados como INATIVOS (não serão deletados)')
   console.log('Pressione Ctrl+C para cancelar ou aguarde 3 segundos...')
   
   await new Promise(resolve => setTimeout(resolve, 3000))
@@ -41,7 +41,7 @@ async function excluir() {
     [ids]
   )
   
-  console.log(`\n�œ… ${result.rows.length} animais marcados como INATIVOS`)
+  console.log(`\n✅ ${result.rows.length} animais marcados como INATIVOS`)
   console.log('Eles não aparecerão mais nos relatórios')
   
   process.exit(0)

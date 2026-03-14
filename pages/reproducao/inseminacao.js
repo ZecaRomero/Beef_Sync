@@ -76,7 +76,7 @@ export default function InseminacaoArtificial() {
       loadSemenStock()
       loadAnimals()
       loadAlertasDG()
-      // Carregar custo padrÃ£o do localStorage
+      // Carregar custo padrão do localStorage
       const custoSalvo = localStorage.getItem('custo_dose_ia')
       if (custoSalvo) {
         setCustoDosePadrao(parseFloat(custoSalvo))
@@ -102,7 +102,7 @@ export default function InseminacaoArtificial() {
       const r = await fetch('/api/inseminacoes/corrigir-resultado-p', { method: 'POST' })
       const data = await r.json().catch(() => ({}))
       if (r.ok && data.success) {
-        alert(`âÅ“â€¦ Corrigidos: ${data.atualizados?.status_gestacao ?? 0} status_gestacao, ${data.atualizados?.resultado_dg ?? 0} resultado_dg`)
+        alert(`✅ Corrigidos: ${data.atualizados?.status_gestacao ?? 0} status_gestacao, ${data.atualizados?.resultado_dg ?? 0} resultado_dg`)
         loadInseminacoes()
         loadAlertasDG()
       } else {
@@ -117,18 +117,18 @@ export default function InseminacaoArtificial() {
 
   const handleLimparTudo = async () => {
     // Solicitar senha de desenvolvedor
-    const senha = prompt('ðÅ¸â€�â€™ Ã�REA RESTRITA - Digite a senha do desenvolvedor para continuar:')
+    const senha = prompt('🔒 ÁREA RESTRITA - Digite a senha do desenvolvedor para continuar:')
     
     if (!senha) {
-      return // UsuÃ¡rio cancelou
+      return // Usuário cancelou
     }
     
     if (senha !== 'bfzk26') {
-      alert('â�Å’ Senha incorreta! Acesso negado.')
+      alert('❌ Senha incorreta! Acesso negado.')
       return
     }
     
-    if (!confirm('âÅ¡ ï¸� ATENÃâ€¡ÃÆ’O: Isso apagarÃ¡ TODAS as inseminaÃ§Ãµes do banco. Deseja continuar?')) return
+    if (!confirm('⚠️ ATENÇÃO: Isso apagará TODAS as inseminações do banco. Deseja continuar?')) return
     
     setLimandoTudo(true)
     try {
@@ -141,14 +141,14 @@ export default function InseminacaoArtificial() {
       })
       const data = await r.json().catch(() => ({}))
       if (r.ok && data.success) {
-        alert(`âÅ“â€¦ ${data.count ?? 0} inseminaÃ§Ã£o(Ãµes) removida(s). VocÃª pode importar novamente.`)
+        alert(`✅ ${data.count ?? 0} inseminação(ões) removida(s). Você pode importar novamente.`)
         loadInseminacoes()
         loadAlertasDG()
       } else {
         throw new Error(data.error || data.details || `HTTP ${r.status}`)
       }
     } catch (e) {
-      alert('Erro ao limpar: ' + (e.message || 'Falha na requisiÃ§Ã£o'))
+      alert('Erro ao limpar: ' + (e.message || 'Falha na requisição'))
     } finally {
       setLimandoTudo(false)
     }
@@ -164,7 +164,7 @@ export default function InseminacaoArtificial() {
       const r = await fetch('/api/inseminacoes/corrigir-touros-excel', { method: 'POST', body: fd })
       const data = await r.json().catch(() => ({}))
       if (r.ok && data.success) {
-        alert(`âÅ“â€¦ ${data.corrigidos ?? 0} touro(s) corrigido(s) no banco.`)
+        alert(`✅ ${data.corrigidos ?? 0} touro(s) corrigido(s) no banco.`)
         loadInseminacoes()
       } else throw new Error(data.details || data.error || 'Erro')
     } catch (err) {
@@ -183,7 +183,7 @@ export default function InseminacaoArtificial() {
       const data = await response.json()
       setInseminacoes(data.data || [])
     } catch (error) {
-      console.error('Erro ao carregar inseminaÃ§Ãµes:', error)
+      console.error('Erro ao carregar inseminações:', error)
       setInseminacoes([])
     } finally {
       setIsLoading(false)
@@ -213,7 +213,7 @@ export default function InseminacaoArtificial() {
         const data = responseData.data || responseData
         const allSemen = Array.isArray(data) ? data : []
         
-        // Agrupar por touro (nome + RG) e somar doses disponÃ­veis
+        // Agrupar por touro (nome + RG) e somar doses disponíveis
         // Mas manter o ID do primeiro registro encontrado para cada touro
         const tourosMap = new Map()
         
@@ -222,7 +222,7 @@ export default function InseminacaoArtificial() {
           const rgTouro = (semen.rgTouro || semen.rg_touro || '').trim()
           const key = `${nomeTouro}|${rgTouro}`
           
-          // Somar apenas doses disponÃ­veis de entradas
+          // Somar apenas doses disponíveis de entradas
           if (semen.tipoOperacao === 'entrada' && parseInt(semen.dosesDisponiveis || 0) > 0) {
             if (!tourosMap.has(key)) {
               tourosMap.set(key, {
@@ -247,7 +247,7 @@ export default function InseminacaoArtificial() {
           }
         })
         
-        // Converter para array e filtrar apenas os que tÃªm doses disponÃ­veis
+        // Converter para array e filtrar apenas os que têm doses disponíveis
         const availableSemen = Array.from(tourosMap.values()).filter(touro => 
           touro.dosesDisponiveis > 0 && touro.status === 'disponivel'
         )
@@ -255,12 +255,12 @@ export default function InseminacaoArtificial() {
         setSemenStock(availableSemen)
       }
     } catch (error) {
-      console.error('Erro ao carregar estoque de sÃªmen:', error)
+      console.error('Erro ao carregar estoque de sêmen:', error)
       setSemenStock([])
     }
   }
 
-  // Buscar animal por sÃ©rie/RG
+  // Buscar animal por série/RG
   const buscarAnimalPorSerieRG = async (serieRG) => {
     if (!serieRG || serieRG.trim() === '') {
       setAnimalEncontrado(null)
@@ -270,30 +270,30 @@ export default function InseminacaoArtificial() {
 
     setBuscandoAnimal(true)
     try {
-      // Extrair sÃ©rie e RG da entrada
+      // Extrair série e RG da entrada
       // Formato esperado: "CJCJ 17372" ou "CJCJ17372" ou "CJCJ-17372" ou apenas "17372"
       let serie = ''
       let rg = ''
       
       const entrada = serieRG.trim()
       
-      // Se for apenas nÃºmeros, Ã© sÃ³ o RG
+      // Se for apenas números, é só o RG
       if (/^\d+$/.test(entrada)) {
         rg = entrada
       } else {
-        // Tentar separar por espaÃ§o ou hÃ­fen
+        // Tentar separar por espaço ou hífen
         const partes = entrada.split(/[\s\-]+/)
         if (partes.length >= 2) {
           serie = partes[0].toUpperCase().trim()
           rg = partes.slice(1).join(' ').trim()
         } else {
-          // Tentar extrair sÃ©rie do inÃ­cio (2-5 letras) e o resto Ã© RG
+          // Tentar extrair série do início (2-5 letras) e o resto é RG
           const match = entrada.match(/^([A-Z]{2,5})(\d+.*)$/i)
           if (match) {
             serie = match[1].toUpperCase()
             rg = match[2].trim()
           } else {
-            // Se nÃ£o conseguir separar, tentar buscar diretamente
+            // Se não conseguir separar, tentar buscar diretamente
             serie = entrada.toUpperCase()
           }
         }
@@ -301,7 +301,7 @@ export default function InseminacaoArtificial() {
 
       let animais = []
 
-      // EstratÃ©gia 1: Busca exata com sÃ©rie e RG
+      // Estratégia 1: Busca exata com série e RG
       if (serie && rg) {
         const params1 = new URLSearchParams()
         params1.append('serie', serie)
@@ -311,12 +311,12 @@ export default function InseminacaoArtificial() {
         if (response1.ok) {
           const data1 = await response1.json()
           animais = (data1.data || data1.animals || []).filter(a => 
-            a.sexo === 'FÃªmea' || a.sexo === 'F'
+            a.sexo === 'Fêmea' || a.sexo === 'F'
           )
         }
       }
 
-      // EstratÃ©gia 2: Se nÃ£o encontrou, tentar sÃ³ com sÃ©rie
+      // Estratégia 2: Se não encontrou, tentar só com série
       if (animais.length === 0 && serie && !rg) {
         const params2 = new URLSearchParams()
         params2.append('serie', serie)
@@ -325,11 +325,11 @@ export default function InseminacaoArtificial() {
         if (response2.ok) {
           const data2 = await response2.json()
           const animaisPorSerie = data2.data || data2.animals || []
-          animais = animaisPorSerie.filter(a => a.sexo === 'FÃªmea' || a.sexo === 'F')
+          animais = animaisPorSerie.filter(a => a.sexo === 'Fêmea' || a.sexo === 'F')
         }
       }
 
-      // EstratÃ©gia 3: Se ainda nÃ£o encontrou e tem RG (com ou sem sÃ©rie), buscar sÃ³ pelo RG
+      // Estratégia 3: Se ainda não encontrou e tem RG (com ou sem série), buscar só pelo RG
       if (animais.length === 0 && rg) {
         const params3 = new URLSearchParams()
         params3.append('rg', rg)
@@ -339,36 +339,36 @@ export default function InseminacaoArtificial() {
           const data3 = await response3.json()
           const animaisPorRG = data3.data || data3.animals || []
           
-          // Se tinha sÃ©rie especificada, filtrar por ela tambÃ©m
+          // Se tinha série especificada, filtrar por ela também
           if (serie) {
             animais = animaisPorRG.filter(a => 
-              (a.sexo === 'FÃªmea' || a.sexo === 'F') &&
+              (a.sexo === 'Fêmea' || a.sexo === 'F') &&
               a.serie?.toUpperCase().trim() === serie.toUpperCase().trim()
             )
           } else {
-            // Se nÃ£o tinha sÃ©rie, aceitar qualquer fÃªmea com esse RG
-            animais = animaisPorRG.filter(a => a.sexo === 'FÃªmea' || a.sexo === 'F')
+            // Se não tinha série, aceitar qualquer fêmea com esse RG
+            animais = animaisPorRG.filter(a => a.sexo === 'Fêmea' || a.sexo === 'F')
           }
         }
       }
 
-      // EstratÃ©gia 4: Buscar em todos os animais carregados (fallback)
+      // Estratégia 4: Buscar em todos os animais carregados (fallback)
       if (animais.length === 0 && animals.length > 0) {
         animais = animals.filter(a => {
           const rgAnimal = a.rg?.toString().trim()
           const serieAnimal = a.serie?.toUpperCase().trim()
           
-          // Se sÃ³ tem RG, buscar por RG
+          // Se só tem RG, buscar por RG
           if (!serie && rg) {
             return rgAnimal === rg || parseInt(rgAnimal) === parseInt(rg)
           }
           
-          // Se tem sÃ©rie e RG, buscar por ambos
+          // Se tem série e RG, buscar por ambos
           if (serie && rg) {
             return serieAnimal === serie && (rgAnimal === rg || parseInt(rgAnimal) === parseInt(rg))
           }
           
-          // Se sÃ³ tem sÃ©rie, buscar por sÃ©rie
+          // Se só tem série, buscar por série
           if (serie && !rg) {
             return serieAnimal === serie
           }
@@ -387,7 +387,7 @@ export default function InseminacaoArtificial() {
           animalSerieRG: `${animal.serie} ${animal.rg}`.trim()
         }))
       } else if (animais.length > 1) {
-        // MÃºltiplos encontrados - tentar encontrar o exato
+        // Múltiplos encontrados - tentar encontrar o exato
         let animalExato = null
         
         // Se tem RG, tentar encontrar por RG exato
@@ -397,7 +397,7 @@ export default function InseminacaoArtificial() {
             const rgBuscado = rg.toString().trim()
             const match = rgAnimal === rgBuscado || parseInt(rgAnimal) === parseInt(rgBuscado)
             
-            // Se tambÃ©m tem sÃ©rie, validar sÃ©rie
+            // Se também tem série, validar série
             if (match && serie) {
               return a.serie?.toUpperCase().trim() === serie.toUpperCase().trim()
             }
@@ -416,20 +416,20 @@ export default function InseminacaoArtificial() {
           setAnimalEncontrado(null)
           setFormData(prev => ({ ...prev, animalId: '' }))
           
-          // Mostrar lista de opÃ§Ãµes
+          // Mostrar lista de opções
           const opcoes = animais.slice(0, 5).map(a => `${a.serie} ${a.rg} - ${a.nome || 'Sem nome'}`).join('\n')
-          alert(`âÅ¡ ï¸� ${animais.length} fÃªmeas encontradas com esse RG. Especifique a sÃ©rie:\n\n${opcoes}${animais.length > 5 ? '\n...' : ''}`)
+          alert(`⚠️ ${animais.length} fêmeas encontradas com esse RG. Especifique a série:\n\n${opcoes}${animais.length > 5 ? '\n...' : ''}`)
         }
       } else {
         setAnimalEncontrado(null)
         setFormData(prev => ({ ...prev, animalId: '' }))
-        alert(`â�Å’ FÃªmea nÃ£o encontrada: ${serieRG}\n\nðÅ¸â€™¡ Dica: VocÃª pode buscar apenas pelo RG (ex: 16588) ou com a sÃ©rie completa (ex: CJCJ 16588)`)
+        alert(`❌ Fêmea não encontrada: ${serieRG}\n\n💡 Dica: Você pode buscar apenas pelo RG (ex: 16588) ou com a série completa (ex: CJCJ 16588)`)
       }
     } catch (error) {
       console.error('Erro ao buscar animal:', error)
       setAnimalEncontrado(null)
       setFormData(prev => ({ ...prev, animalId: '' }))
-      alert(`â�Å’ Erro ao buscar animal: ${error.message}`)
+      alert(`❌ Erro ao buscar animal: ${error.message}`)
     } finally {
       setBuscandoAnimal(false)
     }
@@ -441,9 +441,9 @@ export default function InseminacaoArtificial() {
       if (response.ok) {
         const responseData = await response.json()
         const data = responseData.data || responseData
-        // Filtrar apenas fÃªmeas em idade reprodutiva
+        // Filtrar apenas fêmeas em idade reprodutiva
         const femaleAnimals = (Array.isArray(data) ? data : []).filter(animal => 
-          animal.sexo === 'FÃªmea' || animal.sexo === 'F'
+          animal.sexo === 'Fêmea' || animal.sexo === 'F'
         )
         setAnimals(femaleAnimals)
       }
@@ -468,40 +468,40 @@ export default function InseminacaoArtificial() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    // ValidaÃ§Ãµes
+    // Validações
     if (!formData.animalId) {
       alert('Selecione um animal')
       return
     }
     
     if (!formData.semenId) {
-      alert('Selecione um sÃªmen disponÃ­vel')
+      alert('Selecione um sêmen disponível')
       return
     }
     
     if (!formData.tecnico.trim()) {
-      alert('Informe o tÃ©cnico responsÃ¡vel')
+      alert('Informe o técnico responsável')
       return
     }
 
-    // Verificar se o sÃªmen ainda estÃ¡ disponÃ­vel
+    // Verificar se o sêmen ainda está disponível
     if (!semenSelecionado || parseInt(semenSelecionado.dosesDisponiveis) <= 0) {
-      alert('SÃªmen selecionado nÃ£o estÃ¡ mais disponÃ­vel')
+      alert('Sêmen selecionado não está mais disponível')
       return
     }
 
     try {
       // Validar se animal foi encontrado
       if (!formData.animalId || !animalEncontrado) {
-        alert('âÅ¡ ï¸� Por favor, busque e selecione uma fÃªmea vÃ¡lida pelo SÃ©rie e RG')
+        alert('⚠️ Por favor, busque e selecione uma fêmea válida pelo Série e RG')
         return
       }
 
       const selectedAnimal = animalEncontrado
       
-      // Validar se sÃªmen foi selecionado
+      // Validar se sêmen foi selecionado
       if (!formData.semenId || !semenSelecionado) {
-        alert('âÅ¡ ï¸� Por favor, selecione um sÃªmen disponÃ­vel do estoque')
+        alert('⚠️ Por favor, selecione um sêmen disponível do estoque')
         return
       }
       
@@ -526,13 +526,13 @@ export default function InseminacaoArtificial() {
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Erro ao salvar inseminaÃ§Ã£o')
+        throw new Error(errorData.error || 'Erro ao salvar inseminação')
       }
 
       const result = await response.json()
       const newInseminacao = result.data
 
-      // Registrar saÃ­da do sÃªmen (usar 1 dose)
+      // Registrar saída do sêmen (usar 1 dose)
       const saidaResponse = await fetch('/api/semen', {
         method: 'POST',
         headers: {
@@ -544,14 +544,14 @@ export default function InseminacaoArtificial() {
           quantidadeDoses: 1,
           destino: `IA - ${newInseminacao.animal}`,
           dataCompra: formData.dataInseminacao,
-          observacoes: `InseminaÃ§Ã£o artificial - ${formData.tecnico}`,
+          observacoes: `Inseminação artificial - ${formData.tecnico}`,
           nomeTouro: selectedSemen.nomeTouro || selectedSemen.nome_touro,
           localizacao: selectedSemen.localizacao
         })
       })
 
       if (saidaResponse.ok) {
-        alert('InseminaÃ§Ã£o registrada com sucesso!')
+        alert('Inseminação registrada com sucesso!')
         setShowForm(false)
         setFormData({
           animalId: '',
@@ -571,33 +571,33 @@ export default function InseminacaoArtificial() {
         loadSemenStock()
         loadAlertasDG()
         
-        // Se status_gestacao for 'prenha', alertar sobre vinculaÃ§Ã£o com nascimentos
+        // Se status_gestacao for 'prenha', alertar sobre vinculação com nascimentos
         if (formData.statusGestacao === 'prenha' || formData.statusGestacao === 'Prenha') {
-          alert('âÅ“â€¦ GestaÃ§Ã£o confirmada! A gestaÃ§Ã£o foi vinculada automaticamente. O parto estÃ¡ previsto para aproximadamente 9 meses apÃ³s a IA.')
+          alert('✅ Gestação confirmada! A gestação foi vinculada automaticamente. O parto está previsto para aproximadamente 9 meses após a IA.')
         } else if (!formData.statusGestacao) {
-          alert('âÅ¡ ï¸� Lembrete: Em 30 dias apÃ³s a IA, realize o DiagnÃ³stico de GestaÃ§Ã£o (DG). O sistema gerarÃ¡ um alerta automÃ¡tico.')
+          alert('⚠️ Lembrete: Em 30 dias após a IA, realize o Diagnóstico de Gestação (DG). O sistema gerará um alerta automático.')
         }
       } else {
-        alert('Erro ao registrar saÃ­da do sÃªmen')
+        alert('Erro ao registrar saída do sêmen')
       }
     } catch (error) {
-      console.error('Erro ao registrar inseminaÃ§Ã£o:', error)
-      alert('Erro ao registrar inseminaÃ§Ã£o')
+      console.error('Erro ao registrar inseminação:', error)
+      alert('Erro ao registrar inseminação')
     }
   }
 
-  // FunÃ§Ã£o auxiliar para converter data
+  // Função auxiliar para converter data
   const converterData = (data) => {
     if (!data) return null
     
-    // Se for nÃºmero (serial do Excel), converter
+    // Se for número (serial do Excel), converter
     if (typeof data === 'number') {
       try {
         const excelEpoch = new Date(1899, 11, 30)
         const date = new Date(excelEpoch.getTime() + data * 24 * 60 * 60 * 1000)
         if (isNaN(date.getTime())) return null
         const isoDate = date.toISOString().split('T')[0]
-        // Validar se a data Ã© vÃ¡lida (nÃ£o muito antiga ou futura)
+        // Validar se a data é válida (não muito antiga ou futura)
         if (isoDate < '1900-01-01' || isoDate > '2100-12-31') return null
         return isoDate
       } catch (e) {
@@ -614,7 +614,7 @@ export default function InseminacaoArtificial() {
       const dataStr = data.toString().trim()
       if (!dataStr || dataStr === '' || dataStr === 'null' || dataStr === 'undefined') return null
       
-      // Se for nÃºmero serial do Excel (ex: "40050", "46031") - XLSX Ã s vezes exporta datas como string
+      // Se for número serial do Excel (ex: "40050", "46031") - XLSX às vezes exporta datas como string
       const numVal = parseFloat(dataStr)
       if (!isNaN(numVal) && numVal > 0 && numVal < 1000000) {
         try {
@@ -635,14 +635,14 @@ export default function InseminacaoArtificial() {
         let mes = dateParts[1].trim()
         let ano = dateParts[2].trim()
         
-        // Validar que sÃ£o nÃºmeros
+        // Validar que são números
         const diaNum = parseInt(dia)
         const mesNum = parseInt(mes)
         const anoNum = parseInt(ano)
         
         if (isNaN(diaNum) || isNaN(mesNum) || isNaN(anoNum)) return null
         
-        // Se o ano tem 2 dÃ­gitos, assumir 20XX
+        // Se o ano tem 2 dígitos, assumir 20XX
         if (ano.length === 2) {
           ano = anoNum > 50 ? `19${ano}` : `20${ano}`
         }
@@ -655,7 +655,7 @@ export default function InseminacaoArtificial() {
         const anoFinal = parseInt(ano)
         if (anoFinal < 1900 || anoFinal > 2100) return null
         
-        // Se o ano tem 4 dÃ­gitos e estÃ¡ no inÃ­cio (formato YYYY-MM-DD)
+        // Se o ano tem 4 dígitos e está no início (formato YYYY-MM-DD)
         if (dateParts[0].length === 4) {
           const formatted = `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`
           // Validar data final
@@ -679,7 +679,7 @@ export default function InseminacaoArtificial() {
         const parsed = new Date(dataStr)
         if (!isNaN(parsed.getTime())) {
           const isoDate = parsed.toISOString().split('T')[0]
-          // Validar se a data Ã© vÃ¡lida
+          // Validar se a data é válida
           if (isoDate < '1900-01-01' || isoDate > '2100-12-31') return null
           return isoDate
         }
@@ -691,7 +691,7 @@ export default function InseminacaoArtificial() {
     return null
   }
 
-  // FunÃ§Ã£o auxiliar para normalizar resultado do DG (inclui SITUAÃâ€¡ÃÆ’O: PARIDA/PRENHA do Excel)
+  // Função auxiliar para normalizar resultado do DG (inclui SITUAÇÃO: PARIDA/PRENHA do Excel)
   const normalizarResultadoDG = (resultado) => {
     if (!resultado) return null
     const resultadoLower = resultado.toString().toLowerCase().trim()
@@ -700,13 +700,13 @@ export default function InseminacaoArtificial() {
     }
     if (resultadoLower.includes('prenha') || resultadoLower === 'prenha' || resultadoLower === 'prenhez' || resultadoLower === 'p' || resultadoLower === 'sim') {
       return 'prenha'
-    } else if (resultadoLower.includes('nÃ£o prenha') || resultadoLower.includes('nao prenha') || resultadoLower === 'nÃ£o prenha' || resultadoLower === 'nao prenha' || resultadoLower === 'vazia' || resultadoLower === 'np' || resultadoLower === 'nÃ£o' || resultadoLower === 'nao' || resultadoLower === 'n') {
-      return 'nÃ£o prenha'
+    } else if (resultadoLower.includes('não prenha') || resultadoLower.includes('nao prenha') || resultadoLower === 'não prenha' || resultadoLower === 'nao prenha' || resultadoLower === 'vazia' || resultadoLower === 'np' || resultadoLower === 'não' || resultadoLower === 'nao' || resultadoLower === 'n') {
+      return 'não prenha'
     }
     return null
   }
 
-  // FunÃ§Ã£o para detectar automaticamente campos do Excel
+  // Função para detectar automaticamente campos do Excel
   const detectFields = (headers) => {
     const findColumnIndex = (names, startFromIndex = 0) => {
       for (const name of names) {
@@ -737,48 +737,48 @@ export default function InseminacaoArtificial() {
 
     const newMapping = { ...fieldMapping }
     
-    // Campos bÃ¡sicos (animal) - primeiras colunas
-    newMapping.serie.source = findColumnIndex(['SÃâ€°RIE', 'SÃ©rie', 'serie', 'SERIE']) || ''
+    // Campos básicos (animal) - primeiras colunas
+    newMapping.serie.source = findColumnIndex(['SÉRIE', 'Série', 'serie', 'SERIE']) || ''
     newMapping.rg.source = findColumnIndex(['RG', 'rg']) || ''
     newMapping.local.source = findColumnIndex(['LOCAL', 'Local', 'local']) || ''
     
-    // 1Âª IA - coluna TOURO deve conter NOME (nunca SÃâ€°RIE ou RG) - ACASALAMENTO Ã© o nome principal no Excel
-    const touro1Col = findColumnIndexByHeader(['ACASALAMENTO', 'ACASALAMENTOS', 'TOURO_1Âª I.A', 'TOURO 1Âª IA', 'TOURO_1Âª IA', 'TOURO 1Âª I.A', 'Touro_1Âª I.A', 'TOURO 1Âª', '1Âª TOURO', 'TOURO', 'NOME TOURO', 'REPRODUTOR'], 0, ['SÃâ€°RIE', 'RG'])
+    // 1ª IA - coluna TOURO deve conter NOME (nunca SÉRIE ou RG) - ACASALAMENTO é o nome principal no Excel
+    const touro1Col = findColumnIndexByHeader(['ACASALAMENTO', 'ACASALAMENTOS', 'TOURO_1ª I.A', 'TOURO 1ª IA', 'TOURO_1ª IA', 'TOURO 1ª I.A', 'Touro_1ª I.A', 'TOURO 1ª', '1ª TOURO', 'TOURO', 'NOME TOURO', 'REPRODUTOR'], 0, ['SÉRIE', 'RG'])
     newMapping.touro1.source = touro1Col ? (headers.filter(h => h.name === touro1Col.name).length > 1 ? `${touro1Col.name}|${touro1Col.index}` : touro1Col.name) : ''
     const idxDepoisTouro1 = touro1Col ? touro1Col.index + 1 : 0
-    const serieTouro1Col = findColumnIndexByHeader(['SÃâ€°RIE TOURO 1Âª', 'SERIE TOURO 1Âª', 'SÃâ€°RIE', 'SÃ©rie'], idxDepoisTouro1)
-    const rgTouro1Col = findColumnIndexByHeader(['RG TOURO 1Âª', 'RG TOURO 1Âª', 'RG', 'rg'], idxDepoisTouro1)
+    const serieTouro1Col = findColumnIndexByHeader(['SÉRIE TOURO 1ª', 'SERIE TOURO 1ª', 'SÉRIE', 'Série'], idxDepoisTouro1)
+    const rgTouro1Col = findColumnIndexByHeader(['RG TOURO 1ª', 'RG TOURO 1ª', 'RG', 'rg'], idxDepoisTouro1)
     newMapping.serieTouro1.source = serieTouro1Col ? `${serieTouro1Col.name}|${serieTouro1Col.index}` : ''
     newMapping.rgTouro1.source = rgTouro1Col ? `${rgTouro1Col.name}|${rgTouro1Col.index}` : ''
-    newMapping.dataIA1.source = findColumnIndex(['DATA I.A.', 'DATA I.A', 'Data I.A.', 'Data I.A', 'data i.a', 'DATA IA', 'DATA IA 1Âª', 'DATA IA 1', 'DATA I.A 1Âª']) || ''
-    newMapping.dataDG1.source = findColumnIndex(['DATA DG 1Âª IA', 'Data DG 1Âª IA', 'data dg 1Âª ia', 'DATA DG 1ÂªIA', 'DATA DG 1Âª IA', 'DATA DG', 'Data DG', 'data dg', 'DATA DG 1Âª', 'DATA DG 1']) || ''
+    newMapping.dataIA1.source = findColumnIndex(['DATA I.A.', 'DATA I.A', 'Data I.A.', 'Data I.A', 'data i.a', 'DATA IA', 'DATA IA 1ª', 'DATA IA 1', 'DATA I.A 1ª']) || ''
+    newMapping.dataDG1.source = findColumnIndex(['DATA DG 1ª IA', 'Data DG 1ª IA', 'data dg 1ª ia', 'DATA DG 1ªIA', 'DATA DG 1ª IA', 'DATA DG', 'Data DG', 'data dg', 'DATA DG 1ª', 'DATA DG 1']) || ''
     
-    // 2Âª IA
-    newMapping.touro2.source = findColumnIndex(['TOURO_2Âª I.A', 'TOURO_2Âª I.A', 'Touro_2Âª I.A', 'touro_2Âª i.a', 'TOURO 2Âª IA', 'TOURO_2Âª IA', 'TOURO 2Âª', 'Touro 2Âª']) || ''
-    const touro2Col = findColumnIndexByHeader(['TOURO_2Âª I.A', 'TOURO 2Âª IA', 'TOURO 2Âª'])
+    // 2ª IA
+    newMapping.touro2.source = findColumnIndex(['TOURO_2ª I.A', 'TOURO_2ª I.A', 'Touro_2ª I.A', 'touro_2ª i.a', 'TOURO 2ª IA', 'TOURO_2ª IA', 'TOURO 2ª', 'Touro 2ª']) || ''
+    const touro2Col = findColumnIndexByHeader(['TOURO_2ª I.A', 'TOURO 2ª IA', 'TOURO 2ª'])
     const idxDepoisTouro2 = touro2Col ? touro2Col.index + 1 : 0
-    const serieTouro2Col = findColumnIndexByHeader(['SÃâ€°RIE TOURO 2Âª', 'SERIE TOURO 2Âª', 'SÃâ€°RIE', 'SÃ©rie'], idxDepoisTouro2)
-    const rgTouro2Col = findColumnIndexByHeader(['RG TOURO 2Âª', 'RG TOURO 2Âª', 'RG', 'rg'], idxDepoisTouro2)
+    const serieTouro2Col = findColumnIndexByHeader(['SÉRIE TOURO 2ª', 'SERIE TOURO 2ª', 'SÉRIE', 'Série'], idxDepoisTouro2)
+    const rgTouro2Col = findColumnIndexByHeader(['RG TOURO 2ª', 'RG TOURO 2ª', 'RG', 'rg'], idxDepoisTouro2)
     newMapping.serieTouro2.source = serieTouro2Col ? `${serieTouro2Col.name}|${serieTouro2Col.index}` : ''
     newMapping.rgTouro2.source = rgTouro2Col ? `${rgTouro2Col.name}|${rgTouro2Col.index}` : ''
-    newMapping.dataIA2.source = findColumnIndex(['DATA 2Âª I.A', 'Data 2Âª I.A', 'data 2Âª i.a', 'DATA 2ÂªIA', 'DATA 2Âª I.A', 'DATA 2Âª IA', 'DATA IA 2Âª']) || ''
-    newMapping.dataDG2.source = findColumnIndex(['DATA DG 2Âª IA', 'Data DG 2Âª IA', 'data dg 2Âª ia', 'DATA DG 2ÂªIA', 'DATA DG 2Âª IA', 'DATA DG 2Âª', 'DATA DG 2']) || ''
+    newMapping.dataIA2.source = findColumnIndex(['DATA 2ª I.A', 'Data 2ª I.A', 'data 2ª i.a', 'DATA 2ªIA', 'DATA 2ª I.A', 'DATA 2ª IA', 'DATA IA 2ª']) || ''
+    newMapping.dataDG2.source = findColumnIndex(['DATA DG 2ª IA', 'Data DG 2ª IA', 'data dg 2ª ia', 'DATA DG 2ªIA', 'DATA DG 2ª IA', 'DATA DG 2ª', 'DATA DG 2']) || ''
     
-    // 3Âª IA
-    newMapping.touro3.source = findColumnIndex(['TOURO_3Âª I.A', 'TOURO_3Âª I.A', 'Touro_3Âª I.A', 'touro_3Âª i.a', 'TOURO 3Âª IA', 'TOURO_3Âª IA', 'TOURO 3Âª', 'Touro 3Âª']) || ''
-    const touro3Col = findColumnIndexByHeader(['TOURO_3Âª I.A', 'TOURO 3Âª IA', 'TOURO 3Âª'])
+    // 3ª IA
+    newMapping.touro3.source = findColumnIndex(['TOURO_3ª I.A', 'TOURO_3ª I.A', 'Touro_3ª I.A', 'touro_3ª i.a', 'TOURO 3ª IA', 'TOURO_3ª IA', 'TOURO 3ª', 'Touro 3ª']) || ''
+    const touro3Col = findColumnIndexByHeader(['TOURO_3ª I.A', 'TOURO 3ª IA', 'TOURO 3ª'])
     const idxDepoisTouro3 = touro3Col ? touro3Col.index + 1 : 0
-    const serieTouro3Col = findColumnIndexByHeader(['SÃâ€°RIE TOURO 3Âª', 'SERIE TOURO 3Âª', 'SÃâ€°RIE', 'SÃ©rie'], idxDepoisTouro3)
-    const rgTouro3Col = findColumnIndexByHeader(['RG TOURO 3Âª', 'RG TOURO 3Âª', 'RG', 'rg'], idxDepoisTouro3)
+    const serieTouro3Col = findColumnIndexByHeader(['SÉRIE TOURO 3ª', 'SERIE TOURO 3ª', 'SÉRIE', 'Série'], idxDepoisTouro3)
+    const rgTouro3Col = findColumnIndexByHeader(['RG TOURO 3ª', 'RG TOURO 3ª', 'RG', 'rg'], idxDepoisTouro3)
     newMapping.serieTouro3.source = serieTouro3Col ? `${serieTouro3Col.name}|${serieTouro3Col.index}` : ''
     newMapping.rgTouro3.source = rgTouro3Col ? `${rgTouro3Col.name}|${rgTouro3Col.index}` : ''
-    newMapping.dataIA3.source = findColumnIndex(['DATA 3Âª I.A', 'Data 3Âª I.A', 'data 3Âª i.a', 'DATA 3ÂªIA', 'DATA 3Âª I.A', 'DATA 3Âª IA', 'DATA IA 3Âª']) || ''
-    newMapping.dataDG3.source = findColumnIndex(['DATA DG 3Âª IA', 'Data DG 3Âª IA', 'data dg 3Âª ia', 'DATA DG 3ÂªIA', 'DATA DG 3Âª IA', 'DATA DG 3Âª', 'DATA DG 3']) || ''
+    newMapping.dataIA3.source = findColumnIndex(['DATA 3ª I.A', 'Data 3ª I.A', 'data 3ª i.a', 'DATA 3ªIA', 'DATA 3ª I.A', 'DATA 3ª IA', 'DATA IA 3ª']) || ''
+    newMapping.dataDG3.source = findColumnIndex(['DATA DG 3ª IA', 'Data DG 3ª IA', 'data dg 3ª ia', 'DATA DG 3ªIA', 'DATA DG 3ª IA', 'DATA DG 3ª', 'DATA DG 3']) || ''
     
-    newMapping.observacao.source = findColumnIndex(['OBSERVAÃâ€¡ÃÆ’O', 'ObservaÃ§Ã£o', 'observacao', 'OBS', 'obs', 'OBSERVAÃâ€¡ÃÆ’O']) || ''
+    newMapping.observacao.source = findColumnIndex(['OBSERVAÇÃO', 'Observação', 'observacao', 'OBS', 'obs', 'OBSERVAÇÃO']) || ''
 
-    // Encontrar Results ou SITUAÃâ€¡ÃÆ’O (PARIDA/PRENHA)
-    const situacaoCol = findColumnIndex(['SITUAÃâ€¡ÃÆ’O', 'SITUACAO', 'SITUACAO', 'SITUAC'])
+    // Encontrar Results ou SITUAÇÃO (PARIDA/PRENHA)
+    const situacaoCol = findColumnIndex(['SITUAÇÃO', 'SITUACAO', 'SITUACAO', 'SITUAC'])
     if (situacaoCol) newMapping.result1.source = situacaoCol
 
     const resultColumns = headers
@@ -817,14 +817,14 @@ export default function InseminacaoArtificial() {
       }
     })
 
-    // Sempre habilitar campos obrigatÃ³rios
+    // Sempre habilitar campos obrigatórios
     newMapping.serie.enabled = true
     newMapping.rg.enabled = true
 
     return newMapping
   }
 
-  // FunÃ§Ã£o para ler arquivo Excel e preparar mapeamento
+  // Função para ler arquivo Excel e preparar mapeamento
   const handleExcelFileSelect = async (e) => {
     const file = e.target.files[0]
     if (!file) return
@@ -837,14 +837,14 @@ export default function InseminacaoArtificial() {
         const sheetName = workbook.SheetNames[0]
         const worksheet = workbook.Sheets[sheetName]
         
-        // Ler primeiro como array para identificar posiÃ§Ãµes das colunas
+        // Ler primeiro como array para identificar posições das colunas
         const arrayData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' })
         if (arrayData.length < 2) {
-          alert('âÅ¡ ï¸� Arquivo Excel deve ter pelo menos 2 linhas (cabeÃ§alho + dados)')
+          alert('⚠️ Arquivo Excel deve ter pelo menos 2 linhas (cabeçalho + dados)')
           return
         }
 
-        // Mapear cabeÃ§alhos e suas posiÃ§Ãµes
+        // Mapear cabeçalhos e suas posições
         const headers = arrayData[0].map((h, idx) => ({ 
           name: String(h || '').trim() || `Coluna ${idx + 1}`, 
           index: idx 
@@ -859,23 +859,23 @@ export default function InseminacaoArtificial() {
         setFieldMapping(detectedMapping)
         setShowFieldMapping(true)
       } catch (error) {
-        alert(`â�Å’ Erro ao ler arquivo Excel: ${error.message}`)
+        alert(`❌ Erro ao ler arquivo Excel: ${error.message}`)
         console.error('Erro detalhado:', error)
       }
     }
     reader.readAsArrayBuffer(file)
   }
 
-  // FunÃ§Ã£o para processar importaÃ§Ã£o usando mapeamento escolhido
+  // Função para processar importação usando mapeamento escolhido
   const processImportWithMapping = async () => {
     try {
       if (!fieldMapping.serie.source || !fieldMapping.rg.source) {
-        alert('âÅ¡ ï¸� Campos obrigatÃ³rios (SÃ©rie e RG) devem estar mapeados!')
+        alert('⚠️ Campos obrigatórios (Série e RG) devem estar mapeados!')
         return
       }
       setImportando(true)
 
-      // FunÃ§Ã£o auxiliar para encontrar Ã­ndice do cabeÃ§alho (compatÃ­vel com variaÃ§Ãµes de espaÃ§os/case)
+      // Função auxiliar para encontrar índice do cabeçalho (compatível com variações de espaços/case)
       const findHeaderIndex = (source) => {
         if (!source) return -1
         const sourceNorm = String(source).trim().toUpperCase()
@@ -886,7 +886,7 @@ export default function InseminacaoArtificial() {
         return found
       }
 
-      // Converter dados usando mapeamento (source pode ser "Nome" ou "Nome|Ã­ndice" para colunas duplicadas)
+      // Converter dados usando mapeamento (source pode ser "Nome" ou "Nome|índice" para colunas duplicadas)
       const jsonData = excelData.map(row => {
         const obj = {}
         Object.keys(fieldMapping).forEach(key => {
@@ -914,14 +914,14 @@ export default function InseminacaoArtificial() {
 
       if (jsonData.length === 0) {
         setImportando(false)
-        alert('âÅ¡ ï¸� Arquivo Excel estÃ¡ vazio')
+        alert('⚠️ Arquivo Excel está vazio')
         return
       }
 
       const totalLinhas = jsonData.length
-      setImportProgress({ atual: 0, total: totalLinhas, etapa: 'Carregando animais e sÃªmen...' })
+      setImportProgress({ atual: 0, total: totalLinhas, etapa: 'Carregando animais e sêmen...' })
 
-      // Carregar animais e sÃªmen uma vez
+      // Carregar animais e sêmen uma vez
       const animaisResponse = await fetch('/api/animals')
       const animaisData = await animaisResponse.json()
       const animais = animaisData.animals || animaisData.data || []
@@ -930,9 +930,9 @@ export default function InseminacaoArtificial() {
       const semenData = await semenResponse.json()
       const semenList = semenData.data || semenData || []
 
-      setImportProgress({ atual: 0, total: totalLinhas, etapa: 'Importando inseminaÃ§Ãµes...' })
+      setImportProgress({ atual: 0, total: totalLinhas, etapa: 'Importando inseminações...' })
 
-      // Processar cada linha (cada linha = um animal com atÃ© 3 IAs)
+      // Processar cada linha (cada linha = um animal com até 3 IAs)
       let sucesso = 0
       let atualizadas = 0
       let erros = 0
@@ -943,20 +943,20 @@ export default function InseminacaoArtificial() {
           linhaAtual++
           setImportProgress({ atual: linhaAtual, total: totalLinhas, etapa: `Processando linha ${linhaAtual} de ${totalLinhas}...` })
           try {
-            // Mapear colunas do formato especÃ­fico (agora usando os Ã­ndices mapeados)
+            // Mapear colunas do formato específico (agora usando os índices mapeados)
             const serie = (row.serie || '').toString().trim()
             const rg = (row.rg || '').toString().trim()
             const local = (row.local || '').toString().trim()
             const observacoes = (row.observacao || '').toString().trim()
 
-            // Validar campos obrigatÃ³rios
+            // Validar campos obrigatórios
             if (!serie || !rg) {
               erros++
-              errosDetalhes.push(`Linha sem SÃ©rie ou RG: ${serie || 'N/A'} ${rg || 'N/A'}`)
+              errosDetalhes.push(`Linha sem Série ou RG: ${serie || 'N/A'} ${rg || 'N/A'}`)
               continue
             }
 
-            // Buscar animal (busca mais flexÃ­vel)
+            // Buscar animal (busca mais flexível)
             let animalEncontrado = animais.find(a => {
               const serieAnimal = (a.serie || '').toString().toUpperCase().trim()
               const rgAnimal = (a.rg || '').toString().trim()
@@ -968,7 +968,7 @@ export default function InseminacaoArtificial() {
                 return true
               }
               
-              // Busca com conversÃ£o numÃ©rica do RG
+              // Busca com conversão numérica do RG
               if (serieAnimal === serieBuscada) {
                 const rgAnimalNum = parseInt(rgAnimal)
                 const rgBuscadoNum = parseInt(rgBuscado)
@@ -982,11 +982,11 @@ export default function InseminacaoArtificial() {
 
             if (!animalEncontrado) {
               erros++
-              errosDetalhes.push(`Animal nÃ£o encontrado: ${serie} ${rg}`)
+              errosDetalhes.push(`Animal não encontrado: ${serie} ${rg}`)
               continue
             }
 
-            // Se o animal estÃ¡ como Macho no banco mas estÃ¡ na planilha de IA (Ã© fÃªmea), corrigir para FÃªmea
+            // Se o animal está como Macho no banco mas está na planilha de IA (é fêmea), corrigir para Fêmea
             const sexoAnimal = (animalEncontrado.sexo || '').toString().trim()
             const ehMacho = /macho|^m$/i.test(sexoAnimal) || sexoAnimal === 'M'
             if (ehMacho) {
@@ -994,18 +994,18 @@ export default function InseminacaoArtificial() {
                 const resSexo = await fetch('/api/animals/' + animalEncontrado.id, {
                   method: 'PUT',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ sexo: 'FÃªmea' })
+                  body: JSON.stringify({ sexo: 'Fêmea' })
                 })
-                if (resSexo.ok) animalEncontrado.sexo = 'FÃªmea'
+                if (resSexo.ok) animalEncontrado.sexo = 'Fêmea'
               } catch (_) {}
-              // Sempre tratar como FÃªmea e prosseguir (animal na planilha de IA Ã© fÃªmea)
-              animalEncontrado.sexo = 'FÃªmea'
+              // Sempre tratar como Fêmea e prosseguir (animal na planilha de IA é fêmea)
+              animalEncontrado.sexo = 'Fêmea'
             }
 
-            // Processar atÃ© 3 inseminaÃ§Ãµes
+            // Processar até 3 inseminações
             const inseminacoes = []
 
-            // 1Âª IA
+            // 1ª IA
             const touro1 = (row.touro1 || '').toString().trim()
             const serieTouro1 = (row.serieTouro1 || '').toString().trim()
             const rgTouro1 = (row.rgTouro1 || '').toString().trim()
@@ -1013,7 +1013,7 @@ export default function InseminacaoArtificial() {
             const dataDG1 = (row.dataDG1 || '').toString().trim()
             const result1 = (row.result1 || '').toString().trim()
 
-            // Se tem data da IA, processar (mesmo que nÃ£o tenha touro)
+            // Se tem data da IA, processar (mesmo que não tenha touro)
             if (dataIA1 && dataIA1.toString().trim() !== '') {
               inseminacoes.push({
                 numero_ia: 1,
@@ -1026,7 +1026,7 @@ export default function InseminacaoArtificial() {
               })
             }
 
-            // 2Âª IA
+            // 2ª IA
             const touro2 = (row.touro2 || '').toString().trim()
             const serieTouro2 = (row.serieTouro2 || '').toString().trim()
             const rgTouro2 = (row.rgTouro2 || '').toString().trim()
@@ -1034,7 +1034,7 @@ export default function InseminacaoArtificial() {
             const dataDG2 = (row.dataDG2 || '').toString().trim()
             const result2 = (row.result2 || '').toString().trim()
 
-            // Se tem data da IA, processar (mesmo que nÃ£o tenha touro)
+            // Se tem data da IA, processar (mesmo que não tenha touro)
             if (dataIA2 && dataIA2.toString().trim() !== '') {
               inseminacoes.push({
                 numero_ia: 2,
@@ -1047,7 +1047,7 @@ export default function InseminacaoArtificial() {
               })
             }
 
-            // 3Âª IA
+            // 3ª IA
             const touro3 = (row.touro3 || '').toString().trim()
             const serieTouro3 = (row.serieTouro3 || '').toString().trim()
             const rgTouro3 = (row.rgTouro3 || '').toString().trim()
@@ -1055,7 +1055,7 @@ export default function InseminacaoArtificial() {
             const dataDG3 = (row.dataDG3 || '').toString().trim()
             const result3 = (row.result3 || '').toString().trim()
 
-            // Se tem data da IA, processar (mesmo que nÃ£o tenha touro)
+            // Se tem data da IA, processar (mesmo que não tenha touro)
             if (dataIA3 && dataIA3.toString().trim() !== '') {
               inseminacoes.push({
                 numero_ia: 3,
@@ -1068,14 +1068,14 @@ export default function InseminacaoArtificial() {
               })
             }
 
-            // Se nÃ£o tem nenhuma IA vÃ¡lida, pular (mas nÃ£o Ã© erro crÃ­tico se o animal existe)
+            // Se não tem nenhuma IA válida, pular (mas não é erro crítico se o animal existe)
             if (inseminacoes.length === 0) {
-              // NÃ£o contar como erro, apenas informar
-              console.log(`Animal ${serie} ${rg} sem dados de inseminaÃ§Ã£o vÃ¡lidos`)
+              // Não contar como erro, apenas informar
+              console.log(`Animal ${serie} ${rg} sem dados de inseminação válidos`)
               continue
             }
 
-            // Processar cada inseminaÃ§Ã£o
+            // Processar cada inseminação
             for (const ia of inseminacoes) {
               // Validar data da IA
               if (!ia.data_ia || ia.data_ia.toString().trim() === '') {
@@ -1088,7 +1088,7 @@ export default function InseminacaoArtificial() {
               const dataIAFormatada = converterData(ia.data_ia)
               if (!dataIAFormatada || dataIAFormatada === 'Invalid Date' || dataIAFormatada === '') {
                 erros++
-                errosDetalhes.push(`IA ${ia.numero_ia} do animal ${serie} ${rg} - data invÃ¡lida: ${ia.data_ia}`)
+                errosDetalhes.push(`IA ${ia.numero_ia} do animal ${serie} ${rg} - data inválida: ${ia.data_ia}`)
                 continue
               }
               
@@ -1096,20 +1096,20 @@ export default function InseminacaoArtificial() {
               const dataTest = new Date(dataIAFormatada)
               if (isNaN(dataTest.getTime())) {
                 erros++
-                errosDetalhes.push(`IA ${ia.numero_ia} do animal ${serie} ${rg} - data invÃ¡lida apÃ³s conversÃ£o: ${dataIAFormatada}`)
+                errosDetalhes.push(`IA ${ia.numero_ia} do animal ${serie} ${rg} - data inválida após conversão: ${dataIAFormatada}`)
                 continue
               }
               
               let dataDGFormatada = ia.data_dg && ia.data_dg.toString().trim() ? converterData(ia.data_dg) : null
               // Validar data DG se foi fornecida
               if (dataDGFormatada && (dataDGFormatada === 'Invalid Date' || dataDGFormatada === '' || !dataDGFormatada)) {
-                // Se data DG Ã© invÃ¡lida, usar null
+                // Se data DG é inválida, usar null
                 dataDGFormatada = null
               }
               
               const resultadoDGNormalizado = normalizarResultadoDG(ia.resultado_dg)
 
-            // Buscar sÃªmen do touro
+            // Buscar sêmen do touro
               let semenEncontrado = null
               let rgTouroExtraido = null
               let nomeTouroExtraido = null
@@ -1117,7 +1117,7 @@ export default function InseminacaoArtificial() {
               // Extrair RG do touro do nome se estiver embutido (ex: "NORTICO - CJCJ 15236")
               if (ia.touro) {
                 const touroStr = ia.touro.toString().trim()
-                // Procurar padrÃ£o "SÃâ€°RIE RG" no nome do touro
+                // Procurar padrão "SÉRIE RG" no nome do touro
                 const rgMatch = touroStr.match(/\b([A-Z]{2,5})\s+(\d+)\b/i)
                 if (rgMatch && !ia.serie_touro && !ia.rg_touro) {
                   ia.serie_touro = rgMatch[1].toUpperCase()
@@ -1125,12 +1125,12 @@ export default function InseminacaoArtificial() {
                 }
               }
 
-              // Priorizar SÃ©rie e RG do touro se fornecidos
+              // Priorizar Série e RG do touro se fornecidos
               if (ia.serie_touro && ia.rg_touro) {
                 const serieTouro = ia.serie_touro.toString().trim().toUpperCase()
                 const rgTouro = ia.rg_touro.toString().trim()
                 
-                // Buscar pelo RG completo (SÃ©rie + RG)
+                // Buscar pelo RG completo (Série + RG)
                 const rgCompleto = `${serieTouro} ${rgTouro}`.trim()
                 rgTouroExtraido = rgCompleto
                 
@@ -1143,7 +1143,7 @@ export default function InseminacaoArtificial() {
                     return true
                   }
                   
-                  // Buscar por sÃ©rie + RG separados
+                  // Buscar por série + RG separados
                   if (serieSemen === serieTouro) {
                     const rgSemenNum = rgSemen.replace(/^[A-Z]{2,5}\s*/i, '').trim()
                     const rgBuscadoNum = rgTouro.toString().trim()
@@ -1154,7 +1154,7 @@ export default function InseminacaoArtificial() {
                   return false
                 })
               } else if (ia.rg_touro) {
-                // Se sÃ³ tem RG, buscar pelo RG
+                // Se só tem RG, buscar pelo RG
                 rgTouroExtraido = ia.rg_touro.toString().trim()
                 semenEncontrado = semenList.find(s => {
                   const rgSemen = (s.rgTouro || s.rg_touro || '').toString().trim()
@@ -1165,7 +1165,7 @@ export default function InseminacaoArtificial() {
                 })
               }
 
-              // Se nÃ£o encontrou pelos campos especÃ­ficos, tentar pelo nome do touro
+              // Se não encontrou pelos campos específicos, tentar pelo nome do touro
               if (!semenEncontrado && ia.touro) {
                 const touroStr = ia.touro.toString().trim()
                 
@@ -1175,10 +1175,10 @@ export default function InseminacaoArtificial() {
                   rgTouroExtraido = rgMatch[1].trim()
                 }
                 
-                // Nome do touro Ã© o resto (remover o RG se encontrado)
+                // Nome do touro é o resto (remover o RG se encontrado)
                 nomeTouroExtraido = touroStr.replace(/\b([A-Z]{2,5}\s*\d+|\d+)\b/gi, '').trim()
 
-                // Buscar primeiro pelo RG do touro (se extraÃ­do do nome)
+                // Buscar primeiro pelo RG do touro (se extraído do nome)
                 if (rgTouroExtraido && !semenEncontrado) {
                   semenEncontrado = semenList.find(s => {
                     const rgSemen = (s.rgTouro || s.rg_touro || '').toString().trim()
@@ -1190,7 +1190,7 @@ export default function InseminacaoArtificial() {
                   })
                 }
 
-                // Se nÃ£o encontrou pelo RG, buscar pelo nome
+                // Se não encontrou pelo RG, buscar pelo nome
                 if (!semenEncontrado && nomeTouroExtraido) {
                   semenEncontrado = semenList.find(s => {
                     const nomeTouro = (s.nomeTouro || s.nome_touro || '').toLowerCase().trim()
@@ -1201,7 +1201,7 @@ export default function InseminacaoArtificial() {
                   })
                 }
 
-                // Se ainda nÃ£o encontrou, tentar buscar pelo campo completo
+                // Se ainda não encontrou, tentar buscar pelo campo completo
                 if (!semenEncontrado) {
                   semenEncontrado = semenList.find(s => {
                     const nomeTouro = (s.nomeTouro || s.nome_touro || '').toLowerCase().trim()
@@ -1218,19 +1218,19 @@ export default function InseminacaoArtificial() {
               // Validar dados antes de enviar
               if (!animalEncontrado.id) {
                 erros++
-                errosDetalhes.push(`Erro: Animal ${serie} ${rg} sem ID vÃ¡lido`)
+                errosDetalhes.push(`Erro: Animal ${serie} ${rg} sem ID válido`)
                 continue
               }
 
               if (!dataIAFormatada) {
                 erros++
-                errosDetalhes.push(`Erro: Data de IA invÃ¡lida para ${ia.numero_ia}Âª IA de ${serie} ${rg}`)
+                errosDetalhes.push(`Erro: Data de IA inválida para ${ia.numero_ia}ª IA de ${serie} ${rg}`)
                 continue
               }
 
-              // Criar inseminaÃ§Ã£o
+              // Criar inseminação
               try {
-                // Nome do touro: priorizar semen.nomeTouro quando encontrado; evitar usar sÃ³ SÃâ€°RIE (ex: FGPA) como nome
+                // Nome do touro: priorizar semen.nomeTouro quando encontrado; evitar usar só SÉRIE (ex: FGPA) como nome
                 const iaTouroStr = (ia.touro || '').toString().trim()
                 const pareceSerie = /^[A-Z]{2,6}$/i.test(iaTouroStr) && !iaTouroStr.includes(' ') && iaTouroStr.length <= 6
                 let touroNomeFinal = nomeTouroExtraido || iaTouroStr
@@ -1264,10 +1264,10 @@ export default function InseminacaoArtificial() {
                   resultado_dg: resultadoDGNormalizado || null
                 }
                 
-                // ValidaÃ§Ã£o final antes de enviar
+                // Validação final antes de enviar
                 if (!dadosEnvio.data_inseminacao || dadosEnvio.data_inseminacao === '' || dadosEnvio.data_inseminacao === 'Invalid Date') {
                   erros++
-                  errosDetalhes.push(`IA ${ia.numero_ia} do animal ${serie} ${rg} - data invÃ¡lida antes do envio`)
+                  errosDetalhes.push(`IA ${ia.numero_ia} do animal ${serie} ${rg} - data inválida antes do envio`)
                   continue
                 }
                 
@@ -1292,11 +1292,11 @@ export default function InseminacaoArtificial() {
                   } catch (parseError) {
                     errorMessage = `Erro HTTP ${response.status}: ${response.statusText}`
                   }
-                  errosDetalhes.push(`Erro ao salvar ${ia.numero_ia}Âª IA de ${serie} ${rg}: ${errorMessage}`)
+                  errosDetalhes.push(`Erro ao salvar ${ia.numero_ia}ª IA de ${serie} ${rg}: ${errorMessage}`)
                 }
               } catch (fetchError) {
                 erros++
-                errosDetalhes.push(`Erro de rede ao salvar ${ia.numero_ia}Âª IA de ${serie} ${rg}: ${fetchError.message || 'Erro desconhecido'}`)
+                errosDetalhes.push(`Erro de rede ao salvar ${ia.numero_ia}ª IA de ${serie} ${rg}: ${fetchError.message || 'Erro desconhecido'}`)
               }
             }
           } catch (error) {
@@ -1308,19 +1308,19 @@ export default function InseminacaoArtificial() {
         // Mostrar resultado
         let mensagem = sucesso > 0
           ? (atualizadas > 0
-            ? `âÅ“â€¦ SUCESSO: ${sucesso - atualizadas} adicionada(s), ${atualizadas} atualizada(s)!`
-            : `âÅ“â€¦ SUCESSO: ${sucesso} inseminaÃ§Ã£o(Ãµes) importada(s)!`)
-          : (erros > 0 ? 'â�Å’ Nenhuma inseminaÃ§Ã£o importada.\n\n' : '')
+            ? `✅ SUCESSO: ${sucesso - atualizadas} adicionada(s), ${atualizadas} atualizada(s)!`
+            : `✅ SUCESSO: ${sucesso} inseminação(ões) importada(s)!`)
+          : (erros > 0 ? '❌ Nenhuma inseminação importada.\n\n' : '')
         
         if (erros > 0) {
-          mensagem += `\n\nâ�Å’ ERROS ENCONTRADOS: ${erros}`
-          mensagem += `\n\nðÅ¸â€œâ€¹ PRINCIPAIS CAUSAS DE ERRO:`
-          mensagem += `\nââ‚¬¢ Animais nÃ£o encontrados no sistema`
-          mensagem += `\nââ‚¬¢ Datas invÃ¡lidas`
-          mensagem += `\n\nðÅ¸â€™¡ SOLUÃâ€¡ÃÆ’O: Revise a planilha e remova os animais problemÃ¡ticos`
+          mensagem += `\n\n❌ ERROS ENCONTRADOS: ${erros}`
+          mensagem += `\n\n📋 PRINCIPAIS CAUSAS DE ERRO:`
+          mensagem += `\n• Animais não encontrados no sistema`
+          mensagem += `\n• Datas inválidas`
+          mensagem += `\n\n💡 SOLUÇÃO: Revise a planilha e remova os animais problemáticos`
         }
         if (erros > 0) {
-          mensagem += `\nâÅ¡ ï¸� ${erros} erro(s) encontrado(s).`
+          mensagem += `\n⚠️ ${erros} erro(s) encontrado(s).`
           if (errosDetalhes.length > 0) {
             console.error('Detalhes dos erros:', errosDetalhes)
             // Mostrar primeiros 10 erros no alerta
@@ -1346,7 +1346,7 @@ export default function InseminacaoArtificial() {
     } catch (error) {
       setImportando(false)
       setImportProgress({ atual: 0, total: 0, etapa: '' })
-      alert(`â�Å’ Erro ao processar arquivo Excel: ${error.message}`)
+      alert(`❌ Erro ao processar arquivo Excel: ${error.message}`)
       console.error('Erro detalhado:', error)
     }
   }
@@ -1364,12 +1364,12 @@ export default function InseminacaoArtificial() {
 
   return (
     <div className="space-y-6">
-      {/* Overlay de importaÃ§Ã£o em andamento */}
+      {/* Overlay de importação em andamento */}
       {importando && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-pink-500 border-t-transparent mx-auto mb-4"></div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Importando inseminaÃ§Ãµes...</h3>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Importando inseminações...</h3>
             <p className="text-gray-600 dark:text-gray-300 mb-4">{importProgress.etapa}</p>
             {importProgress.total > 0 && (
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
@@ -1392,7 +1392,7 @@ export default function InseminacaoArtificial() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <HeartIcon className="w-8 h-8 text-pink-600" />
-            InseminaÃ§Ã£o Artificial
+            Inseminação Artificial
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-2">Registro de IA</p>
         </div>
@@ -1400,11 +1400,11 @@ export default function InseminacaoArtificial() {
           <button
             onClick={handleLimparTudo}
             disabled={limandoTudo}
-            title="ðÅ¸â€�â€™ Apenas desenvolvedores - Apagar todas as inseminaÃ§Ãµes (requer senha)"
+            title="🔒 Apenas desenvolvedores - Apagar todas as inseminações (requer senha)"
             className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors shadow-md hover:shadow-lg"
           >
             <TrashIcon className="w-5 h-5" />
-            ðÅ¸â€�â€™ {limandoTudo ? 'Limpando...' : 'Limpar Tudo'}
+            🔒 {limandoTudo ? 'Limpando...' : 'Limpar Tudo'}
           </button>
           <button
             onClick={() => setShowImportModal(true)}
@@ -1417,21 +1417,21 @@ export default function InseminacaoArtificial() {
             onClick={() => setShowImportTextoModal(true)}
             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
-            ðÅ¸â€œ�
+            📝
             Importar Texto
           </button>
           <button
             onClick={corrigirResultadoP}
             disabled={corrigindoP}
-            title="Corrige registros com resultado 'P' para 'Prenha' (apÃ³s importaÃ§Ã£o)"
+            title="Corrige registros com resultado 'P' para 'Prenha' (após importação)"
             className="flex items-center gap-2 bg-amber-600 text-white px-4 py-2 rounded-lg hover:bg-amber-700 disabled:opacity-50 transition-colors"
           >
-            {corrigindoP ? '...' : 'ðÅ¸â€�§'}
-            Corrigir Pââ€ â€™Prenha
+            {corrigindoP ? '...' : '🔧'}
+            Corrigir P→Prenha
           </button>
           <label className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 cursor-pointer disabled:opacity-50 transition-colors">
             <input type="file" accept=".xlsx,.xls" className="hidden" onChange={corrigirTourosExcel} disabled={corrigindoTouros} />
-            {corrigindoTouros ? '...' : 'ðÅ¸�â€š'}
+            {corrigindoTouros ? '...' : '🐂'}
             Corrigir Touros (Excel)
           </label>
           <button
@@ -1439,12 +1439,12 @@ export default function InseminacaoArtificial() {
             className="flex items-center gap-2 bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700 transition-colors"
           >
             <PlusIcon className="w-5 h-5" />
-            Nova InseminaÃ§Ã£o
+            Nova Inseminação
           </button>
         </div>
       </div>
 
-      {/* Campo de Busca RÃ¡pida de Animal */}
+      {/* Campo de Busca Rápida de Animal */}
       <div className="bg-gradient-to-r from-pink-50 via-purple-50 to-blue-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-800 rounded-xl shadow-lg p-6 border-2 border-pink-200 dark:border-pink-800">
         <div className="flex items-center gap-3 mb-4">
           <div className="p-3 bg-pink-600 rounded-lg">
@@ -1454,7 +1454,7 @@ export default function InseminacaoArtificial() {
           </div>
           <div>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">Buscar Animal</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Digite a SÃ©rie e RG para encontrar uma fÃªmea</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Digite a Série e RG para encontrar uma fêmea</p>
           </div>
         </div>
         
@@ -1501,10 +1501,10 @@ export default function InseminacaoArtificial() {
                 </svg>
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-green-800 dark:text-green-200 mb-2">âÅ“â€¦ Animal Encontrado!</h3>
+                <h3 className="text-lg font-bold text-green-800 dark:text-green-200 mb-2">✅ Animal Encontrado!</h3>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">IdentificaÃ§Ã£o</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Identificação</p>
                     <p className="font-bold text-gray-900 dark:text-white">{animalEncontrado.serie} {animalEncontrado.rg}</p>
                   </div>
                   {animalEncontrado.nome && (
@@ -1519,7 +1519,7 @@ export default function InseminacaoArtificial() {
                   </div>
                   {animalEncontrado.raca && (
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">RaÃ§a</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Raça</p>
                       <p className="font-bold text-gray-900 dark:text-white">{animalEncontrado.raca}</p>
                     </div>
                   )}
@@ -1529,7 +1529,7 @@ export default function InseminacaoArtificial() {
                   className="mt-4 w-full flex items-center justify-center gap-2 bg-pink-600 text-white px-6 py-3 rounded-lg hover:bg-pink-700 transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105 font-bold"
                 >
                   <PlusIcon className="w-5 h-5" />
-                  Registrar InseminaÃ§Ã£o para este Animal
+                  Registrar Inseminação para este Animal
                 </button>
               </div>
             </div>
@@ -1539,13 +1539,13 @@ export default function InseminacaoArtificial() {
         {!animalEncontrado && formData.animalSerieRG && !buscandoAnimal && (
           <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-300 dark:border-blue-700 rounded-xl">
             <p className="text-sm text-blue-800 dark:text-blue-200">
-              ðÅ¸â€™¡ Digite pelo menos 3 caracteres e pressione Enter ou aguarde para buscar automaticamente
+              💡 Digite pelo menos 3 caracteres e pressione Enter ou aguarde para buscar automaticamente
             </p>
           </div>
         )}
       </div>
 
-      {/* EstatÃ­sticas de IA */}
+      {/* Estatísticas de IA */}
       <IAStatistics />
 
       {/* Alertas de DG */}
@@ -1555,10 +1555,10 @@ export default function InseminacaoArtificial() {
             <ExclamationTriangleIcon className="h-6 w-6 text-yellow-600 mr-3 mt-1" />
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
-                âÅ¡ ï¸� Alertas de DiagnÃ³stico de GestaÃ§Ã£o (DG)
+                ⚠️ Alertas de Diagnóstico de Gestação (DG)
               </h3>
               <p className="text-sm text-yellow-700 dark:text-yellow-300 mb-3">
-                {alertasDG.length} fÃªmea(s) precisam realizar DG (30 dias apÃ³s a IA)
+                {alertasDG.length} fêmea(s) precisam realizar DG (30 dias após a IA)
               </p>
               <div className="space-y-2 max-h-60 overflow-y-auto">
                 {alertasDG.slice(0, 5).map((alerta, index) => (
@@ -1570,7 +1570,7 @@ export default function InseminacaoArtificial() {
                         </p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           IA realizada em {new Date(alerta.data_inseminacao).toLocaleDateString('pt-BR')} - 
-                          {alerta.dias_apos_ia} dias atrÃ¡s
+                          {alerta.dias_apos_ia} dias atrás
                         </p>
                       </div>
                       <span className="px-3 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 rounded-full text-xs font-medium">
@@ -1590,12 +1590,12 @@ export default function InseminacaoArtificial() {
         </div>
       )}
 
-      {/* FormulÃ¡rio de Nova InseminaÃ§Ã£o */}
+      {/* Formulário de Nova Inseminação */}
       {showForm && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-              Nova InseminaÃ§Ã£o Artificial
+              Nova Inseminação Artificial
             </h2>
             <button
               onClick={() => setShowForm(false)}
@@ -1607,10 +1607,10 @@ export default function InseminacaoArtificial() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Busca do Animal por SÃ©rie/RG */}
+              {/* Busca do Animal por Série/RG */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  FÃªmea (SÃ©rie e RG) *
+                  Fêmea (Série e RG) *
                 </label>
                 <div className="relative">
                   <input
@@ -1620,7 +1620,7 @@ export default function InseminacaoArtificial() {
                       const valor = e.target.value
                       setFormData({...formData, animalSerieRG: valor, animalId: ''})
                       setAnimalEncontrado(null)
-                      // Debounce para buscar apÃ³s parar de digitar
+                      // Debounce para buscar após parar de digitar
                       if (valor.trim().length >= 3) {
                         clearTimeout(window.buscaAnimalTimeout)
                         window.buscaAnimalTimeout = setTimeout(() => {
@@ -1649,27 +1649,27 @@ export default function InseminacaoArtificial() {
                 {animalEncontrado ? (
                   <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md">
                     <p className="text-sm font-medium text-green-800 dark:text-green-200">
-                      âÅ“â€¦ {animalEncontrado.serie} {animalEncontrado.rg}
+                      ✅ {animalEncontrado.serie} {animalEncontrado.rg}
                       {animalEncontrado.nome && ` - ${animalEncontrado.nome}`}
                       {animalEncontrado.raca && ` (${animalEncontrado.raca})`}
                     </p>
                   </div>
                 ) : formData.animalSerieRG.trim() && !buscandoAnimal ? (
                   <p className="text-xs text-red-500 mt-1">
-                    âÅ¡ ï¸� Digite a sÃ©rie e RG da fÃªmea (ex: CJCJ 17372)
+                    ⚠️ Digite a série e RG da fêmea (ex: CJCJ 17372)
                   </p>
                 ) : (
                   <p className="text-xs text-gray-500 mt-1">
-                    Digite a sÃ©rie e RG da fÃªmea para buscar no banco de dados
+                    Digite a série e RG da fêmea para buscar no banco de dados
                   </p>
                 )}
                 <input type="hidden" value={formData.animalId} required />
               </div>
 
-              {/* SeleÃ§Ã£o do SÃªmen */}
+              {/* Seleção do Sêmen */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  SÃªmen DisponÃ­vel (Estoque) *
+                  Sêmen Disponível (Estoque) *
                 </label>
                 <select
                   value={formData.semenId}
@@ -1682,7 +1682,7 @@ export default function InseminacaoArtificial() {
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:text-white"
                   required
                 >
-                  <option value="">Selecione um sÃªmen do estoque</option>
+                  <option value="">Selecione um sêmen do estoque</option>
                   {semenStock.map(semen => (
                     <option key={semen.id} value={semen.id}>
                       {semen.nomeTouro} {semen.rgTouro ? `(RG: ${semen.rgTouro})` : ''} - {semen.dosesDisponiveis} doses
@@ -1692,28 +1692,28 @@ export default function InseminacaoArtificial() {
                 {semenSelecionado && (
                   <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
                     <p className="text-xs font-medium text-blue-800 dark:text-blue-200 mb-1">
-                      ðÅ¸â€œâ€¹ Dados do Reprodutor:
+                      📋 Dados do Reprodutor:
                     </p>
                     <div className="text-xs text-blue-700 dark:text-blue-300 space-y-1">
                       <p><strong>Touro:</strong> {semenSelecionado.nomeTouro}</p>
                       {semenSelecionado.rgTouro && <p><strong>RG:</strong> {semenSelecionado.rgTouro}</p>}
-                      {semenSelecionado.raca && <p><strong>RaÃ§a:</strong> {semenSelecionado.raca}</p>}
+                      {semenSelecionado.raca && <p><strong>Raça:</strong> {semenSelecionado.raca}</p>}
                       {semenSelecionado.origem && <p><strong>Origem:</strong> {semenSelecionado.origem}</p>}
                       {semenSelecionado.linhagem && <p><strong>Linha:</strong> {semenSelecionado.linhagem}</p>}
-                      {semenSelecionado.localizacao && <p><strong>LocalizaÃ§Ã£o:</strong> {semenSelecionado.localizacao}</p>}
+                      {semenSelecionado.localizacao && <p><strong>Localização:</strong> {semenSelecionado.localizacao}</p>}
                       {semenSelecionado.certificado && <p><strong>Certificado:</strong> {semenSelecionado.certificado}</p>}
                     </div>
                   </div>
                 )}
                 <p className="text-xs text-gray-500 mt-1">
-                  {semenStock.length} touro(s) com sÃªmen disponÃ­vel em estoque
+                  {semenStock.length} touro(s) com sêmen disponível em estoque
                 </p>
               </div>
 
-              {/* Data da InseminaÃ§Ã£o */}
+              {/* Data da Inseminação */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Data da InseminaÃ§Ã£o *
+                  Data da Inseminação *
                 </label>
                 <input
                   type="date"
@@ -1724,16 +1724,16 @@ export default function InseminacaoArtificial() {
                 />
               </div>
 
-              {/* TÃ©cnico ResponsÃ¡vel */}
+              {/* Técnico Responsável */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  TÃ©cnico ResponsÃ¡vel *
+                  Técnico Responsável *
                 </label>
                 <input
                   type="text"
                   value={formData.tecnico}
                   onChange={(e) => setFormData({...formData, tecnico: e.target.value})}
-                  placeholder="Nome do tÃ©cnico"
+                  placeholder="Nome do técnico"
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:text-white"
                   required
                 />
@@ -1750,9 +1750,9 @@ export default function InseminacaoArtificial() {
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:text-white"
                 >
                   <option value="">Selecione um protocolo</option>
-                  <option value="IATF">IATF - InseminaÃ§Ã£o Artificial em Tempo Fixo</option>
+                  <option value="IATF">IATF - Inseminação Artificial em Tempo Fixo</option>
                   <option value="Cio Natural">Cio Natural</option>
-                  <option value="SincronizaÃ§Ã£o">SincronizaÃ§Ã£o de Cio</option>
+                  <option value="Sincronização">Sincronização de Cio</option>
                   <option value="Outro">Outro</option>
                 </select>
               </div>
@@ -1780,23 +1780,23 @@ export default function InseminacaoArtificial() {
                       const novoPadrao = parseFloat(formData.custoDose) || 18.00
                       setCustoDosePadrao(novoPadrao)
                       localStorage.setItem('custo_dose_ia', novoPadrao.toString())
-                      alert(`âÅ“â€¦ Valor padrÃ£o atualizado para R$ ${novoPadrao.toFixed(2)}`)
+                      alert(`✅ Valor padrão atualizado para R$ ${novoPadrao.toFixed(2)}`)
                     }}
                     className="px-3 py-2 text-xs bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500"
-                    title="Salvar como padrÃ£o"
+                    title="Salvar como padrão"
                   >
-                    Salvar PadrÃ£o
+                    Salvar Padrão
                   </button>
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
-                  Valor padrÃ£o: R$ {custoDosePadrao.toFixed(2)} por dose
+                  Valor padrão: R$ {custoDosePadrao.toFixed(2)} por dose
                 </p>
               </div>
 
-              {/* Status de GestaÃ§Ã£o */}
+              {/* Status de Gestação */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Status de GestaÃ§Ã£o
+                  Status de Gestação
                 </label>
                 <select
                   value={formData.statusGestacao}
@@ -1805,29 +1805,29 @@ export default function InseminacaoArtificial() {
                 >
                   <option value="">Aguardando DG</option>
                   <option value="prenha">Prenha</option>
-                  <option value="nÃ£o prenha">NÃ£o Prenha</option>
+                  <option value="não prenha">Não Prenha</option>
                 </select>
                 <p className="text-xs text-gray-500 mt-1">
-                  Se confirmar prenhez, a gestaÃ§Ã£o serÃ¡ vinculada automaticamente
+                  Se confirmar prenhez, a gestação será vinculada automaticamente
                 </p>
               </div>
 
-              {/* ObservaÃ§Ãµes */}
+              {/* Observações */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  ObservaÃ§Ãµes
+                  Observações
                 </label>
                 <textarea
                   value={formData.observacoes}
                   onChange={(e) => setFormData({...formData, observacoes: e.target.value})}
-                  placeholder="ObservaÃ§Ãµes sobre a inseminaÃ§Ã£o..."
+                  placeholder="Observações sobre a inseminação..."
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:text-white"
                 />
               </div>
             </div>
 
-            {/* BotÃµes */}
+            {/* Botões */}
             <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-600">
               <button
                 type="button"
@@ -1840,14 +1840,14 @@ export default function InseminacaoArtificial() {
                 type="submit"
                 className="px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
               >
-                Registrar InseminaÃ§Ã£o
+                Registrar Inseminação
               </button>
             </div>
           </form>
         </div>
       )}
 
-      {/* EstatÃ­sticas */}
+      {/* Estatísticas */}
       {!isLoading && (
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
           <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
@@ -1879,7 +1879,7 @@ export default function InseminacaoArtificial() {
                 <div className="ml-5 w-0 flex-1">
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
-                      Este MÃªs
+                      Este Mês
                     </dt>
                     <dd className="text-lg font-medium text-gray-900 dark:text-white">
                       {inseminacoes.filter(ia => {
@@ -1918,12 +1918,12 @@ export default function InseminacaoArtificial() {
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="text-2xl">ðÅ¸§¬</div>
+                  <div className="text-2xl">🧬</div>
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
-                      SÃªmen DisponÃ­vel
+                      Sêmen Disponível
                     </dt>
                     <dd className="text-lg font-medium text-gray-900 dark:text-white">
                       {semenStock.reduce((total, semen) => total + parseInt(semen.dosesDisponiveis || 0), 0)} doses
@@ -1964,24 +1964,24 @@ export default function InseminacaoArtificial() {
         <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-12 text-center">
           <HeartIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            Nenhuma inseminaÃ§Ã£o registrada
+            Nenhuma inseminação registrada
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            Comece registrando a primeira inseminaÃ§Ã£o artificial
+            Comece registrando a primeira inseminação artificial
           </p>
           <button
             onClick={() => setShowForm(true)}
             className="inline-flex items-center gap-2 bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700"
           >
             <PlusIcon className="w-5 h-5" />
-            Adicionar InseminaÃ§Ã£o
+            Adicionar Inseminação
           </button>
         </div>
       ) : (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              HistÃ³rico de InseminaÃ§Ãµes ({inseminacoes.length})
+              Histórico de Inseminações ({inseminacoes.length})
             </h3>
           </div>
           <div className="overflow-x-auto">
@@ -1992,7 +1992,7 @@ export default function InseminacaoArtificial() {
                     Animal
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Touro / SÃ©rie / RG
+                    Touro / Série / RG
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Data
@@ -2004,7 +2004,7 @@ export default function InseminacaoArtificial() {
                     Custo
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    AÃ§Ãµes
+                    Ações
                   </th>
                 </tr>
               </thead>
@@ -2027,7 +2027,7 @@ export default function InseminacaoArtificial() {
                             </span>
                             {invalida && (
                               <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
-                                InvÃ¡lida
+                                Inválida
                               </span>
                             )}
                           </div>
@@ -2045,7 +2045,7 @@ export default function InseminacaoArtificial() {
                         <div className="text-xs text-gray-600 dark:text-gray-400 space-y-0.5">
                           {item.serie_touro && (
                             <div>
-                              <span className="font-medium">SÃ©rie:</span> {item.serie_touro}
+                              <span className="font-medium">Série:</span> {item.serie_touro}
                             </div>
                           )}
                           {item.rg_touro && (
@@ -2054,7 +2054,7 @@ export default function InseminacaoArtificial() {
                             </div>
                           )}
                           {!item.serie_touro && !item.rg_touro && (
-                            <div className="text-gray-400 italic">SÃ©rie/RG nÃ£o informado</div>
+                            <div className="text-gray-400 italic">Série/RG não informado</div>
                           )}
                         </div>
                       </div>
@@ -2104,7 +2104,7 @@ export default function InseminacaoArtificial() {
         </div>
       )}
 
-      {/* Modal de ImportaÃ§Ã£o Excel */}
+      {/* Modal de Importação Excel */}
       {showImportModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
@@ -2122,7 +2122,7 @@ export default function InseminacaoArtificial() {
               <div className="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {showFieldMapping ? 'Mapear Campos do Excel' : 'Importar InseminaÃ§Ãµes do Excel'}
+                    {showFieldMapping ? 'Mapear Campos do Excel' : 'Importar Inseminações do Excel'}
                   </h3>
                   <button
                     onClick={() => {
@@ -2140,7 +2140,7 @@ export default function InseminacaoArtificial() {
                 {!showFieldMapping ? (
                   <div className="space-y-4">
                     <div className="bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg border border-amber-200 dark:border-amber-900/50">
-                      <p className="text-sm font-medium text-amber-900 dark:text-amber-200 mb-2">Modo de importaÃ§Ã£o</p>
+                      <p className="text-sm font-medium text-amber-900 dark:text-amber-200 mb-2">Modo de importação</p>
                       <div className="flex gap-4">
                         <label className="flex items-center gap-2 cursor-pointer">
                           <input
@@ -2165,8 +2165,8 @@ export default function InseminacaoArtificial() {
                       </div>
                       <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
                         {modoImportacaoIA === 'atualizar' 
-                          ? 'Se o animal jÃ¡ tiver IA na mesma data, atualiza (touro, etc). SenÃ£o, adiciona.'
-                          : 'Adiciona novas IAs. Se o animal jÃ¡ tiver IA na mesma data, cria outra.'}
+                          ? 'Se o animal já tiver IA na mesma data, atualiza (touro, etc). Senão, adiciona.'
+                          : 'Adiciona novas IAs. Se o animal já tiver IA na mesma data, cria outra.'}
                       </p>
                     </div>
 
@@ -2181,17 +2181,17 @@ export default function InseminacaoArtificial() {
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:text-white"
                       />
                       <p className="text-xs text-gray-500 mt-2">
-                        Selecione o arquivo Excel. VocÃª poderÃ¡ escolher quais campos importar na prÃ³xima etapa.
+                        Selecione o arquivo Excel. Você poderá escolher quais campos importar na próxima etapa.
                       </p>
                     </div>
 
                     <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
                       <h4 className="font-medium text-blue-900 dark:text-blue-200 mb-2">
-                        ðÅ¸â€™¡ InformaÃ§Ãµes
+                        💡 Informações
                       </h4>
                       <p className="text-sm text-blue-700 dark:text-blue-300">
-                        ApÃ³s selecionar o arquivo, vocÃª poderÃ¡ escolher quais colunas do Excel mapear para cada campo do sistema. 
-                        Os campos obrigatÃ³rios sÃ£o <strong>SÃ©rie</strong> e <strong>RG</strong>.
+                        Após selecionar o arquivo, você poderá escolher quais colunas do Excel mapear para cada campo do sistema. 
+                        Os campos obrigatórios são <strong>Série</strong> e <strong>RG</strong>.
                       </p>
                     </div>
                   </div>
@@ -2199,7 +2199,7 @@ export default function InseminacaoArtificial() {
                   <div className="space-y-4">
                     <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
                       <p className="text-sm text-green-700 dark:text-green-300">
-                        âÅ“â€¦ Arquivo carregado com sucesso! {excelHeaders.length} coluna(s) detectada(s). 
+                        ✅ Arquivo carregado com sucesso! {excelHeaders.length} coluna(s) detectada(s). 
                         Modo: <strong>{modoImportacaoIA === 'atualizar' ? 'Atualizar IA' : 'Adicionar novas'}</strong>. Selecione quais campos importar:
                       </p>
                     </div>
@@ -2214,17 +2214,17 @@ export default function InseminacaoArtificial() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                          {/* Campos bÃ¡sicos */}
+                          {/* Campos básicos */}
                           <tr className="bg-gray-50 dark:bg-gray-800">
                             <td colSpan="3" className="px-4 py-2 font-semibold text-gray-700 dark:text-gray-300">
-                              InformaÃ§Ãµes do Animal
+                              Informações do Animal
                             </td>
                           </tr>
                           {[
-                            { key: 'serie', label: 'SÃ©rie *', required: true },
+                            { key: 'serie', label: 'Série *', required: true },
                             { key: 'rg', label: 'RG *', required: true },
                             { key: 'local', label: 'Local', required: false },
-                            { key: 'observacao', label: 'ObservaÃ§Ã£o', required: false }
+                            { key: 'observacao', label: 'Observação', required: false }
                           ].map(field => (
                             <tr key={field.key} className={field.required ? 'bg-yellow-50 dark:bg-yellow-900/10' : ''}>
                               <td className="px-4 py-2">
@@ -2236,7 +2236,7 @@ export default function InseminacaoArtificial() {
                                   checked={fieldMapping[field.key].enabled}
                                   onChange={(e) => {
                                     if (field.required && !e.target.checked) {
-                                      alert('Este campo Ã© obrigatÃ³rio!')
+                                      alert('Este campo é obrigatório!')
                                       return
                                     }
                                     setFieldMapping(prev => ({
@@ -2276,21 +2276,21 @@ export default function InseminacaoArtificial() {
                             </tr>
                           ))}
 
-                          {/* 1Âª IA */}
+                          {/* 1ª IA */}
                           {[1, 2, 3].map(numIA => (
                             <React.Fragment key={numIA}>
                               <tr className="bg-gray-50 dark:bg-gray-800">
                                 <td colSpan="3" className="px-4 py-2 font-semibold text-gray-700 dark:text-gray-300">
-                                  {numIA}Âª InseminaÃ§Ã£o Artificial
+                                  {numIA}ª Inseminação Artificial
                                 </td>
                               </tr>
                               {[
-                                { key: `touro${numIA}`, label: `Touro ${numIA}Âª IA` },
-                                { key: `serieTouro${numIA}`, label: `SÃ©rie Touro ${numIA}Âª` },
-                                { key: `rgTouro${numIA}`, label: `RG Touro ${numIA}Âª` },
-                                { key: `dataIA${numIA}`, label: `Data IA ${numIA}Âª` },
-                                { key: `dataDG${numIA}`, label: `Data DG ${numIA}Âª` },
-                                { key: `result${numIA}`, label: `Resultado ${numIA}Âª` }
+                                { key: `touro${numIA}`, label: `Touro ${numIA}ª IA` },
+                                { key: `serieTouro${numIA}`, label: `Série Touro ${numIA}ª` },
+                                { key: `rgTouro${numIA}`, label: `RG Touro ${numIA}ª` },
+                                { key: `dataIA${numIA}`, label: `Data IA ${numIA}ª` },
+                                { key: `dataDG${numIA}`, label: `Data DG ${numIA}ª` },
+                                { key: `result${numIA}`, label: `Resultado ${numIA}ª` }
                               ].map(field => (
                                 <tr key={field.key}>
                                   <td className="px-4 py-2 pl-6">{field.label}</td>
@@ -2369,13 +2369,13 @@ export default function InseminacaoArtificial() {
         </div>
       )}
 
-      {/* Modal de ImportaÃ§Ã£o via Texto */}
+      {/* Modal de Importação via Texto */}
       <ImportarTextoInseminacoes
         isOpen={showImportTextoModal}
         onClose={() => setShowImportTextoModal(false)}
         onImportComplete={(resultados) => {
-          console.log('ImportaÃ§Ã£o concluÃ­da:', resultados);
-          // Recarregar inseminaÃ§Ãµes
+          console.log('Importação concluída:', resultados);
+          // Recarregar inseminações
           loadInseminacoes();
           loadAnimals();
         }}

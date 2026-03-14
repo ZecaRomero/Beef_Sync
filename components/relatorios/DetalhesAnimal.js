@@ -9,18 +9,18 @@ export default function DetalhesAnimal({ body }) {
   
   if (!body.serie && !body.rg) return null;
 
-  // Buscar localizaÃ§Ã£o mais recente do animal
+  // Buscar localização mais recente do animal
   useEffect(() => {
     async function buscarLocalizacao() {
       if (!body.serie || !body.rg) return;
       
       setCarregandoLocalizacao(true);
       try {
-        // Primeiro, buscar o ID do animal pela sÃ©rie e RG
+        // Primeiro, buscar o ID do animal pela série e RG
         const responseAnimal = await fetch(`/api/animals?serie=${body.serie}&rg=${body.rg}`);
         
         if (!responseAnimal.ok) {
-          console.warn('Animal nÃ£o encontrado para buscar localizaÃ§Ã£o');
+          console.warn('Animal não encontrado para buscar localização');
           return;
         }
         
@@ -28,17 +28,17 @@ export default function DetalhesAnimal({ body }) {
         const animais = dataAnimal.data || dataAnimal.animais || [];
         
         if (animais.length === 0) {
-          console.warn('Nenhum animal encontrado com sÃ©rie e RG fornecidos');
+          console.warn('Nenhum animal encontrado com série e RG fornecidos');
           return;
         }
         
         const animalId = animais[0].id;
         
-        // Buscar localizaÃ§Ã£o do animal
+        // Buscar localização do animal
         const responseLocalizacao = await fetch(`/api/animais/${animalId}/localizacoes`);
         
         if (!responseLocalizacao.ok) {
-          console.warn('NÃ£o foi possÃ­vel buscar localizaÃ§Ã£o do animal');
+          console.warn('Não foi possível buscar localização do animal');
           return;
         }
         
@@ -48,7 +48,7 @@ export default function DetalhesAnimal({ body }) {
           setLocalizacaoAtual(dataLocalizacao.localizacao_atual);
         }
       } catch (error) {
-        console.error('Erro ao buscar localizaÃ§Ã£o do animal:', error);
+        console.error('Erro ao buscar localização do animal:', error);
       } finally {
         setCarregandoLocalizacao(false);
       }
@@ -60,20 +60,20 @@ export default function DetalhesAnimal({ body }) {
   return (
     <div className="bg-gradient-to-r from-blue-900/30 to-blue-800/20 p-4 rounded-lg border border-blue-500/30">
       <h4 className="font-bold text-blue-300 mb-3 flex items-center gap-2">
-        ðÅ¸�â€ž DADOS COMPLETOS DO ANIMAL
+        🐄 DADOS COMPLETOS DO ANIMAL
       </h4>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {/* IdentificaÃ§Ã£o */}
+        {/* Identificação */}
         <SecaoIdentificacao body={body} />
         
-        {/* CaracterÃ­sticas FÃ­sicas */}
+        {/* Características Físicas */}
         <SecaoCaracteristicas body={body} />
         
-        {/* Status e SituaÃ§Ã£o */}
+        {/* Status e Situação */}
         <SecaoStatus body={body} />
       </div>
 
-      {/* LocalizaÃ§Ã£o Atual */}
+      {/* Localização Atual */}
       <SecaoLocalizacao 
         localizacao={localizacaoAtual} 
         carregando={carregandoLocalizacao} 
@@ -82,17 +82,17 @@ export default function DetalhesAnimal({ body }) {
       {/* Genealogia */}
       {(body.pai || body.mae || body.receptora) && <SecaoGenealogia body={body} />}
 
-      {/* InformaÃ§Ãµes de Nascimento */}
+      {/* Informações de Nascimento */}
       {(body.tipo_nascimento || body.dificuldade_parto || body.veterinario) && (
         <SecaoNascimento body={body} />
       )}
 
-      {/* InformaÃ§Ãµes Financeiras */}
+      {/* Informações Financeiras */}
       {(body.custo_total || body.valor_venda || body.valor_real || body.valorCompra) && (
         <SecaoFinanceira body={body} />
       )}
 
-      {/* ObservaÃ§Ãµes */}
+      {/* Observações */}
       {body.observacoes && <SecaoObservacoes observacoes={body.observacoes} />}
     </div>
   );
@@ -103,10 +103,10 @@ export default function DetalhesAnimal({ body }) {
 function SecaoIdentificacao({ body }) {
   return (
     <div className="bg-gray-800/50 p-3 rounded">
-      <h5 className="text-blue-200 font-semibold mb-2">ðÅ¸â€œâ€¹ IdentificaÃ§Ã£o</h5>
+      <h5 className="text-blue-200 font-semibold mb-2">📋 Identificação</h5>
       {body.serie && (
         <div className="mb-1">
-          <span className="text-gray-400">SÃ©rie:</span>{' '}
+          <span className="text-gray-400">Série:</span>{' '}
           <span className="text-white font-bold">{body.serie}</span>
         </div>
       )}
@@ -136,7 +136,7 @@ function SecaoIdentificacao({ body }) {
 function SecaoCaracteristicas({ body }) {
   return (
     <div className="bg-gray-800/50 p-3 rounded">
-      <h5 className="text-green-200 font-semibold mb-2">ðÅ¸Å½¯ CaracterÃ­sticas</h5>
+      <h5 className="text-green-200 font-semibold mb-2">🎯 Características</h5>
       {body.sexo && (
         <div className="mb-1">
           <span className="text-gray-400">Sexo:</span>{' '}
@@ -145,7 +145,7 @@ function SecaoCaracteristicas({ body }) {
       )}
       {body.raca && (
         <div className="mb-1">
-          <span className="text-gray-400">RaÃ§a:</span>{' '}
+          <span className="text-gray-400">Raça:</span>{' '}
           <span className="text-white font-bold">{body.raca}</span>
         </div>
       )}
@@ -174,10 +174,10 @@ function SecaoCaracteristicas({ body }) {
 function SecaoStatus({ body }) {
   return (
     <div className="bg-gray-800/50 p-3 rounded">
-      <h5 className="text-yellow-200 font-semibold mb-2">ðÅ¸â€œÅ  Status</h5>
+      <h5 className="text-yellow-200 font-semibold mb-2">📊 Status</h5>
       {body.situacao && (
         <div className="mb-2">
-          <span className="text-gray-400">SituaÃ§Ã£o:</span>
+          <span className="text-gray-400">Situação:</span>
           <span
             className={`ml-2 px-2 py-1 rounded text-xs font-bold ${
               body.situacao === 'Ativo'
@@ -214,7 +214,7 @@ function SecaoStatus({ body }) {
 function SecaoGenealogia({ body }) {
   return (
     <div className="mt-3 bg-purple-900/20 p-3 rounded border border-purple-500/30">
-      <h5 className="text-purple-200 font-semibold mb-2">ðÅ¸â€˜¨ââ‚¬�ðÅ¸â€˜©ââ‚¬�ðÅ¸â€˜§ââ‚¬�ðÅ¸â€˜¦ Genealogia</h5>
+      <h5 className="text-purple-200 font-semibold mb-2">👨‍👩‍👧‍👦 Genealogia</h5>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
         {body.pai && (
           <div>
@@ -224,7 +224,7 @@ function SecaoGenealogia({ body }) {
         )}
         {body.mae && (
           <div>
-            <span className="text-gray-400">MÃ£e:</span>{' '}
+            <span className="text-gray-400">Mãe:</span>{' '}
             <span className="text-white font-bold">{body.mae}</span>
           </div>
         )}
@@ -237,7 +237,7 @@ function SecaoGenealogia({ body }) {
       </div>
       {body.is_fiv && (
         <div className="mt-2 p-2 bg-purple-800/30 rounded">
-          <span className="text-purple-200">ðÅ¸§¬ Animal FIV (FertilizaÃ§Ã£o in Vitro)</span>
+          <span className="text-purple-200">🧬 Animal FIV (Fertilização in Vitro)</span>
         </div>
       )}
     </div>
@@ -247,7 +247,7 @@ function SecaoGenealogia({ body }) {
 function SecaoNascimento({ body }) {
   return (
     <div className="mt-3 bg-pink-900/20 p-3 rounded border border-pink-500/30">
-      <h5 className="text-pink-200 font-semibold mb-2">ðÅ¸�¥ InformaÃ§Ãµes do Nascimento</h5>
+      <h5 className="text-pink-200 font-semibold mb-2">🏥 Informações do Nascimento</h5>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
         {body.tipo_nascimento && (
           <div>
@@ -263,7 +263,7 @@ function SecaoNascimento({ body }) {
         )}
         {body.veterinario && (
           <div>
-            <span className="text-gray-400">VeterinÃ¡rio:</span>{' '}
+            <span className="text-gray-400">Veterinário:</span>{' '}
             <span className="text-white">{body.veterinario}</span>
           </div>
         )}
@@ -275,7 +275,7 @@ function SecaoNascimento({ body }) {
 function SecaoFinanceira({ body }) {
   return (
     <div className="mt-3 bg-green-900/20 p-3 rounded border border-green-500/30">
-      <h5 className="text-green-200 font-semibold mb-2">ðÅ¸â€™° InformaÃ§Ãµes Financeiras</h5>
+      <h5 className="text-green-200 font-semibold mb-2">💰 Informações Financeiras</h5>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
         {body.custo_total && (
           <div>
@@ -309,7 +309,7 @@ function SecaoFinanceira({ body }) {
 function SecaoObservacoes({ observacoes }) {
   return (
     <div className="mt-3 bg-gray-800/50 p-3 rounded border border-gray-500/30">
-      <h5 className="text-gray-200 font-semibold mb-2">ðÅ¸â€œ� ObservaÃ§Ãµes</h5>
+      <h5 className="text-gray-200 font-semibold mb-2">📝 Observações</h5>
       <p className="text-white bg-gray-700/50 p-2 rounded italic">"{observacoes}"</p>
     </div>
   );
@@ -319,8 +319,8 @@ function SecaoLocalizacao({ localizacao, carregando }) {
   if (carregando) {
     return (
       <div className="mt-3 bg-orange-900/20 p-3 rounded border border-orange-500/30">
-        <h5 className="text-orange-200 font-semibold mb-2">ðÅ¸â€œ� LocalizaÃ§Ã£o Atual</h5>
-        <div className="text-gray-300 text-sm italic">Carregando localizaÃ§Ã£o...</div>
+        <h5 className="text-orange-200 font-semibold mb-2">📍 Localização Atual</h5>
+        <div className="text-gray-300 text-sm italic">Carregando localização...</div>
       </div>
     );
   }
@@ -337,7 +337,7 @@ function SecaoLocalizacao({ localizacao, carregando }) {
   return (
     <div className="mt-3 bg-orange-900/20 p-3 rounded border border-orange-500/30">
       <h5 className="text-orange-200 font-semibold mb-2 flex items-center gap-2">
-        ðÅ¸â€œ� LocalizaÃ§Ã£o Atual
+        📍 Localização Atual
         <span className="text-xs bg-green-600 text-white px-2 py-1 rounded">Mais Recente</span>
       </h5>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
@@ -364,7 +364,7 @@ function SecaoLocalizacao({ localizacao, carregando }) {
       )}
       {localizacao.usuario_responsavel && (
         <div className="mt-2 text-sm text-gray-400">
-          ResponsÃ¡vel: <span className="text-white">{localizacao.usuario_responsavel}</span>
+          Responsável: <span className="text-white">{localizacao.usuario_responsavel}</span>
         </div>
       )}
     </div>

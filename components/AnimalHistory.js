@@ -33,20 +33,20 @@ export default function AnimalHistory() {
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
 
-  // Tipos de ocorrÃªncias disponÃ­veis
+  // Tipos de ocorrências disponíveis
   const tiposOcorrencia = [
-    { id: 'parto', label: 'Parto', icon: 'ðÅ¸�â€ž', color: 'bg-green-500' },
-    { id: 'pesagem', label: 'Pesagem', icon: 'âÅ¡â€“ï¸�', color: 'bg-blue-500' },
-    { id: 'leilao', label: 'SeparaÃ§Ã£o para LeilÃ£o', icon: 'ðÅ¸�â€ ', color: 'bg-yellow-500' },
-    { id: 'venda', label: 'Venda', icon: 'ðÅ¸â€™°', color: 'bg-emerald-500' },
-    { id: 'medicacao', label: 'MedicaÃ§Ã£o/Tratamento', icon: 'ðÅ¸â€™Å ', color: 'bg-red-500' },
-    { id: 'vacinacao', label: 'VacinaÃ§Ã£o', icon: 'ðÅ¸â€™â€°', color: 'bg-purple-500' },
-    { id: 'inseminacao', label: 'InseminaÃ§Ã£o', icon: 'ðÅ¸§¬', color: 'bg-pink-500' },
-    { id: 'desmame', label: 'Desmame', icon: 'ðÅ¸�¼', color: 'bg-orange-500' },
-    { id: 'transferencia', label: 'TransferÃªncia de Pasto', icon: 'ðÅ¸Å’±', color: 'bg-teal-500' },
-    { id: 'exame', label: 'Exame VeterinÃ¡rio', icon: 'ðÅ¸â€�¬', color: 'bg-indigo-500' },
-    { id: 'morte', label: 'Morte/Descarte', icon: 'ðÅ¸â€™â‚¬', color: 'bg-gray-500' },
-    { id: 'outros', label: 'Outros', icon: 'ðÅ¸â€œ�', color: 'bg-slate-500' }
+    { id: 'parto', label: 'Parto', icon: '🐄', color: 'bg-green-500' },
+    { id: 'pesagem', label: 'Pesagem', icon: '⚖️', color: 'bg-blue-500' },
+    { id: 'leilao', label: 'Separação para Leilão', icon: '🏆', color: 'bg-yellow-500' },
+    { id: 'venda', label: 'Venda', icon: '💰', color: 'bg-emerald-500' },
+    { id: 'medicacao', label: 'Medicação/Tratamento', icon: '💊', color: 'bg-red-500' },
+    { id: 'vacinacao', label: 'Vacinação', icon: '💉', color: 'bg-purple-500' },
+    { id: 'inseminacao', label: 'Inseminação', icon: '🧬', color: 'bg-pink-500' },
+    { id: 'desmame', label: 'Desmame', icon: '🍼', color: 'bg-orange-500' },
+    { id: 'transferencia', label: 'Transferência de Pasto', icon: '🌱', color: 'bg-teal-500' },
+    { id: 'exame', label: 'Exame Veterinário', icon: '🔬', color: 'bg-indigo-500' },
+    { id: 'morte', label: 'Morte/Descarte', icon: '💀', color: 'bg-gray-500' },
+    { id: 'outros', label: 'Outros', icon: '📝', color: 'bg-slate-500' }
   ]
 
   const [newEvent, setNewEvent] = useState({
@@ -96,7 +96,7 @@ export default function AnimalHistory() {
 
   const handleAddEvent = () => {
     if (!newEvent.animalId || !newEvent.tipo || !newEvent.data) {
-      alert('Preencha os campos obrigatÃ³rios: Animal, Tipo e Data')
+      alert('Preencha os campos obrigatórios: Animal, Tipo e Data')
       return
     }
 
@@ -127,11 +127,11 @@ export default function AnimalHistory() {
     })
     
     setShowAddModal(false)
-    alert('OcorrÃªncia registrada com sucesso!')
+    alert('Ocorrência registrada com sucesso!')
   }
 
   const handleDeleteEvent = (eventId) => {
-    if (confirm('Tem certeza que deseja excluir esta ocorrÃªncia?')) {
+    if (confirm('Tem certeza que deseja excluir esta ocorrência?')) {
       const updatedEvents = events.filter(e => e.id !== eventId)
       saveEvents(updatedEvents)
     }
@@ -139,7 +139,7 @@ export default function AnimalHistory() {
 
   const getAnimalName = (animalId) => {
     const animal = animals.find(a => a.id === parseInt(animalId))
-    return animal ? `${animal.serie} ${animal.rg}` : 'Animal nÃ£o encontrado'
+    return animal ? `${animal.serie} ${animal.rg}` : 'Animal não encontrado'
   }
 
   const getTipoInfo = (tipo) => {
@@ -171,12 +171,12 @@ export default function AnimalHistory() {
     return matchesSearch && matchesFilters
   })
 
-  // PaginaÃ§Ã£o
+  // Paginação
   const totalPages = Math.ceil(filteredEvents.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const paginatedEvents = filteredEvents.slice(startIndex, startIndex + itemsPerPage)
 
-  // EstatÃ­sticas
+  // Estatísticas
   const stats = {
     total: events.length,
     porTipo: tiposOcorrencia.map(tipo => ({
@@ -224,9 +224,9 @@ export default function AnimalHistory() {
       })
 
       const headers = [
-        'Data', 'Animal', 'RaÃ§a', 'Tipo de OcorrÃªncia', 'DescriÃ§Ã£o', 'ObservaÃ§Ãµes',
-        'Peso (kg)', 'Valor (R$)', 'VeterinÃ¡rio', 'Medicamento', 'Dosagem',
-        'PrÃ³xima AplicaÃ§Ã£o', 'Local', 'ResponsÃ¡vel', 'Data de Registro'
+        'Data', 'Animal', 'Raça', 'Tipo de Ocorrência', 'Descrição', 'Observações',
+        'Peso (kg)', 'Valor (R$)', 'Veterinário', 'Medicamento', 'Dosagem',
+        'Próxima Aplicação', 'Local', 'Responsável', 'Data de Registro'
       ]
 
       const wb = XLSX.utils.book_new()
@@ -239,7 +239,7 @@ export default function AnimalHistory() {
         { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 12 }
       ]
 
-      XLSX.utils.book_append_sheet(wb, ws, 'HistÃ³rico de OcorrÃªncias')
+      XLSX.utils.book_append_sheet(wb, ws, 'Histórico de Ocorrências')
 
       // Planilha de resumo por tipo
       const resumoPorTipo = stats.porTipo.map(tipo => [
@@ -249,7 +249,7 @@ export default function AnimalHistory() {
       ])
 
       const wsResumo = XLSX.utils.aoa_to_sheet([
-        ['Tipo de OcorrÃªncia', 'Quantidade', 'Percentual'],
+        ['Tipo de Ocorrência', 'Quantidade', 'Percentual'],
         ...resumoPorTipo
       ])
       
@@ -259,10 +259,10 @@ export default function AnimalHistory() {
       const fileName = `Historico_Animais_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.xlsx`
       XLSX.writeFile(wb, fileName)
 
-      alert('âÅ“â€¦ RelatÃ³rio exportado com sucesso!')
+      alert('✅ Relatório exportado com sucesso!')
     } catch (error) {
       console.error('Erro ao exportar:', error)
-      alert('â�Å’ Erro ao exportar relatÃ³rio')
+      alert('❌ Erro ao exportar relatório')
     }
   }
 
@@ -272,7 +272,7 @@ export default function AnimalHistory() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-            ðÅ¸â€œâ€¹ HistÃ³rico de OcorrÃªncias
+            📋 Histórico de Ocorrências
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
             Registre e acompanhe todos os eventos dos animais
@@ -291,30 +291,30 @@ export default function AnimalHistory() {
             className="btn-primary flex items-center"
           >
             <PlusIcon className="h-5 w-5 mr-2" />
-            Nova OcorrÃªncia
+            Nova Ocorrência
           </button>
         </div>
       </div>
 
-      {/* EstatÃ­sticas RÃ¡pidas */}
+      {/* Estatísticas Rápidas */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="card p-4 text-center">
           <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
             {stats.total}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">Total de OcorrÃªncias</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">Total de Ocorrências</div>
         </div>
         <div className="card p-4 text-center">
           <div className="text-2xl font-bold text-green-600 dark:text-green-400">
             {stats.ultimaSemana}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">ÃÅ¡ltima Semana</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">Última Semana</div>
         </div>
         <div className="card p-4 text-center">
           <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
             {stats.mesAtual}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">MÃªs Atual</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">Mês Atual</div>
         </div>
         <div className="card p-4 text-center">
           <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
@@ -371,7 +371,7 @@ export default function AnimalHistory() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Tipo de OcorrÃªncia
+              Tipo de Ocorrência
             </label>
             <select
               value={filters.tipo}
@@ -389,7 +389,7 @@ export default function AnimalHistory() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Data InÃ­cio
+              Data Início
             </label>
             <input
               type="date"
@@ -414,7 +414,7 @@ export default function AnimalHistory() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Buscar por descriÃ§Ã£o ou observaÃ§Ãµes
+            Buscar por descrição ou observações
           </label>
           <input
             type="text"
@@ -426,15 +426,15 @@ export default function AnimalHistory() {
         </div>
       </div>
 
-      {/* Lista de OcorrÃªncias */}
+      {/* Lista de Ocorrências */}
       <div className="card overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              OcorrÃªncias Registradas
+              Ocorrências Registradas
             </h3>
             <div className="text-sm text-gray-500 dark:text-gray-400">
-              {filteredEvents.length} registros encontrados ââ‚¬¢ PÃ¡gina {currentPage} de {totalPages}
+              {filteredEvents.length} registros encontrados • Página {currentPage} de {totalPages}
             </div>
           </div>
         </div>
@@ -443,11 +443,11 @@ export default function AnimalHistory() {
           <div className="p-8 text-center">
             <DocumentTextIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              Nenhuma ocorrÃªncia encontrada
+              Nenhuma ocorrência encontrada
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               {events.length === 0 
-                ? 'Comece registrando a primeira ocorrÃªncia dos seus animais'
+                ? 'Comece registrando a primeira ocorrência dos seus animais'
                 : 'Tente ajustar os filtros ou termos de busca'
               }
             </p>
@@ -455,7 +455,7 @@ export default function AnimalHistory() {
               onClick={() => setShowAddModal(true)}
               className="btn-primary"
             >
-              Registrar Primeira OcorrÃªncia
+              Registrar Primeira Ocorrência
             </button>
           </div>
         ) : (
@@ -474,13 +474,13 @@ export default function AnimalHistory() {
                       Tipo
                     </th>
                     <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      DescriÃ§Ã£o
+                      Descrição
                     </th>
                     <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Detalhes
                     </th>
                     <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      AÃ§Ãµes
+                      Ações
                     </th>
                   </tr>
                 </thead>
@@ -547,7 +547,7 @@ export default function AnimalHistory() {
               </table>
             </div>
 
-            {/* PaginaÃ§Ã£o */}
+            {/* Paginação */}
             {totalPages > 1 && (
               <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex items-center justify-between">
@@ -570,7 +570,7 @@ export default function AnimalHistory() {
                       disabled={currentPage === totalPages}
                       className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      PrÃ³xima
+                      Próxima
                     </button>
                   </div>
                 </div>
@@ -580,18 +580,18 @@ export default function AnimalHistory() {
         )}
       </div>
 
-      {/* Modal de Adicionar OcorrÃªncia */}
+      {/* Modal de Adicionar Ocorrência */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                Registrar Nova OcorrÃªncia
+                Registrar Nova Ocorrência
               </h2>
             </div>
             
             <div className="p-6 space-y-6">
-              {/* InformaÃ§Ãµes BÃ¡sicas */}
+              {/* Informações Básicas */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -614,7 +614,7 @@ export default function AnimalHistory() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Tipo de OcorrÃªncia *
+                    Tipo de Ocorrência *
                   </label>
                   <select
                     value={newEvent.tipo}
@@ -645,15 +645,15 @@ export default function AnimalHistory() {
                 </div>
               </div>
 
-              {/* DescriÃ§Ã£o e ObservaÃ§Ãµes */}
+              {/* Descrição e Observações */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    DescriÃ§Ã£o
+                    Descrição
                   </label>
                   <input
                     type="text"
-                    placeholder="Ex: Pesagem mensal, AplicaÃ§Ã£o de vacina..."
+                    placeholder="Ex: Pesagem mensal, Aplicação de vacina..."
                     value={newEvent.descricao}
                     onChange={(e) => setNewEvent(prev => ({ ...prev, descricao: e.target.value }))}
                     className="input"
@@ -662,11 +662,11 @@ export default function AnimalHistory() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    ResponsÃ¡vel
+                    Responsável
                   </label>
                   <input
                     type="text"
-                    placeholder="Nome do responsÃ¡vel"
+                    placeholder="Nome do responsável"
                     value={newEvent.responsavel}
                     onChange={(e) => setNewEvent(prev => ({ ...prev, responsavel: e.target.value }))}
                     className="input"
@@ -674,7 +674,7 @@ export default function AnimalHistory() {
                 </div>
               </div>
 
-              {/* Campos EspecÃ­ficos por Tipo */}
+              {/* Campos Específicos por Tipo */}
               {(newEvent.tipo === 'pesagem' || newEvent.tipo === 'leilao') && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -749,7 +749,7 @@ export default function AnimalHistory() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      PrÃ³xima AplicaÃ§Ã£o
+                      Próxima Aplicação
                     </label>
                     <input
                       type="date"
@@ -764,11 +764,11 @@ export default function AnimalHistory() {
               {(newEvent.tipo === 'exame' || newEvent.tipo === 'medicacao') && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    VeterinÃ¡rio
+                    Veterinário
                   </label>
                   <input
                     type="text"
-                    placeholder="Nome do veterinÃ¡rio"
+                    placeholder="Nome do veterinário"
                     value={newEvent.veterinario}
                     onChange={(e) => setNewEvent(prev => ({ ...prev, veterinario: e.target.value }))}
                     className="input"
@@ -776,14 +776,14 @@ export default function AnimalHistory() {
                 </div>
               )}
 
-              {/* ObservaÃ§Ãµes */}
+              {/* Observações */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  ObservaÃ§Ãµes
+                  Observações
                 </label>
                 <textarea
                   rows={3}
-                  placeholder="ObservaÃ§Ãµes adicionais sobre a ocorrÃªncia..."
+                  placeholder="Observações adicionais sobre a ocorrência..."
                   value={newEvent.observacoes}
                   onChange={(e) => setNewEvent(prev => ({ ...prev, observacoes: e.target.value }))}
                   className="input"
@@ -802,27 +802,27 @@ export default function AnimalHistory() {
                 onClick={handleAddEvent}
                 className="btn-primary"
               >
-                Registrar OcorrÃªncia
+                Registrar Ocorrência
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Modal de VisualizaÃ§Ã£o */}
+      {/* Modal de Visualização */}
       {showViewModal && selectedEvent && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                  Detalhes da OcorrÃªncia
+                  Detalhes da Ocorrência
                 </h2>
                 <button
                   onClick={() => setShowViewModal(false)}
                   className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl"
                 >
-                  Ãâ€”
+                  ×
                 </button>
               </div>
             </div>
@@ -860,14 +860,14 @@ export default function AnimalHistory() {
 
               {selectedEvent.descricao && (
                 <div>
-                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">DescriÃ§Ã£o</label>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Descrição</label>
                   <div className="text-gray-900 dark:text-white">{selectedEvent.descricao}</div>
                 </div>
               )}
 
               {selectedEvent.observacoes && (
                 <div>
-                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">ObservaÃ§Ãµes</label>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Observações</label>
                   <div className="text-gray-900 dark:text-white">{selectedEvent.observacoes}</div>
                 </div>
               )}
@@ -903,7 +903,7 @@ export default function AnimalHistory() {
 
                 {selectedEvent.veterinario && (
                   <div>
-                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">VeterinÃ¡rio</label>
+                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Veterinário</label>
                     <div className="text-gray-900 dark:text-white">{selectedEvent.veterinario}</div>
                   </div>
                 )}
@@ -917,14 +917,14 @@ export default function AnimalHistory() {
 
                 {selectedEvent.responsavel && (
                   <div>
-                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">ResponsÃ¡vel</label>
+                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Responsável</label>
                     <div className="text-gray-900 dark:text-white">{selectedEvent.responsavel}</div>
                   </div>
                 )}
 
                 {selectedEvent.proximaAplicacao && (
                   <div>
-                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">PrÃ³xima AplicaÃ§Ã£o</label>
+                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Próxima Aplicação</label>
                     <div className="text-gray-900 dark:text-white">
                       {new Date(selectedEvent.proximaAplicacao).toLocaleDateString('pt-BR')}
                     </div>

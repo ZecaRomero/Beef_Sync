@@ -2,12 +2,12 @@ const ExcelJS = require('exceljs');
 
 async function testExcelContent() {
   try {
-    console.log('�Ÿ”� Testando conteúdo do Excel...');
+    console.log('🔍 Testando conteúdo do Excel...');
     
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile('debug-excel-output.xlsx');
     
-    console.log('�Ÿ“Š Planilhas encontradas:');
+    console.log('📊 Planilhas encontradas:');
     workbook.eachSheet((worksheet, sheetId) => {
       console.log(`- ${sheetId}: ${worksheet.name}`);
     });
@@ -15,7 +15,7 @@ async function testExcelContent() {
     // Verificar a planilha de estoque
     const estoqueSheet = workbook.getWorksheet('Relatório de Estoque');
     if (estoqueSheet) {
-      console.log('\n�Ÿ“� Conteúdo da planilha "Relatório de Estoque":');
+      console.log('\n📦 Conteúdo da planilha "Relatório de Estoque":');
       
       // Ler as primeiras 20 linhas
       for (let i = 1; i <= 20; i++) {
@@ -29,13 +29,13 @@ async function testExcelContent() {
         }
       }
     } else {
-      console.log('�Œ Planilha "Relatório de Estoque" não encontrada');
+      console.log('❌ Planilha "Relatório de Estoque" não encontrada');
     }
     
     // Verificar a planilha resumo
     const resumoSheet = workbook.getWorksheet('Resumo');
     if (resumoSheet) {
-      console.log('\n�Ÿ“‹ Conteúdo da planilha "Resumo":');
+      console.log('\n📋 Conteúdo da planilha "Resumo":');
       
       // Ler as primeiras 10 linhas
       for (let i = 1; i <= 10; i++) {
@@ -51,7 +51,7 @@ async function testExcelContent() {
     }
     
   } catch (error) {
-    console.error('�Œ Erro ao ler Excel:', error.message);
+    console.error('❌ Erro ao ler Excel:', error.message);
   }
 }
 

@@ -14,7 +14,7 @@ async function atualizar() {
   const client = await pool.connect()
   
   try {
-    console.log('ðÅ¸â€�â€ž Atualizando animal_id nas baixas...\n')
+    console.log('🔄 Atualizando animal_id nas baixas...\n')
     
     const updateResult = await client.query(`
       UPDATE baixas b
@@ -25,10 +25,10 @@ async function atualizar() {
         AND b.animal_id IS NULL
     `)
     
-    console.log(`âÅ“â€¦ ${updateResult.rowCount} baixas atualizadas com animal_id`)
+    console.log(`✅ ${updateResult.rowCount} baixas atualizadas com animal_id`)
     
   } catch (error) {
-    console.error('â�Å’ Erro:', error)
+    console.error('❌ Erro:', error)
   } finally {
     client.release()
     await pool.end()
@@ -38,6 +38,6 @@ async function atualizar() {
 atualizar()
   .then(() => process.exit(0))
   .catch(error => {
-    console.error('ðÅ¸â€™¥ Erro fatal:', error)
+    console.error('💥 Erro fatal:', error)
     process.exit(1)
   })

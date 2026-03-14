@@ -1,53 +1,53 @@
 
 
-// Sistema de notificaÃ§Ãµes inteligentes para Beef Sync
+// Sistema de notificações inteligentes para Beef Sync
 import React, { useCallback, useEffect, useState } from 'react'
 
 export default function useSmartNotifications() {
   const [notifications, setNotifications] = useState([])
   const [isEnabled, setIsEnabled] = useState(true)
 
-  // Tipos de notificaÃ§Ãµes disponÃ­veis
+  // Tipos de notificações disponíveis
   const notificationTypes = {
     BIRTH: {
-      icon: 'ðÅ¸�£',
+      icon: '🐣',
       color: 'green',
       priority: 'high',
       title: 'Novo Nascimento'
     },
     PROTOCOL: {
-      icon: 'ðÅ¸â€™Å ',
+      icon: '💊',
       color: 'blue',
       priority: 'medium',
       title: 'Protocolo Pendente'
     },
     COST: {
-      icon: 'ðÅ¸â€™°',
+      icon: '💰',
       color: 'yellow',
       priority: 'medium',
       title: 'Custo Alto'
     },
     HEALTH: {
-      icon: 'âÅ¡ ï¸�',
+      icon: '⚠️',
       color: 'red',
       priority: 'high',
-      title: 'Alerta de SaÃºde'
+      title: 'Alerta de Saúde'
     },
     MARKET: {
-      icon: 'ðÅ¸â€œË†',
+      icon: '📈',
       color: 'purple',
       priority: 'low',
       title: 'Oportunidade de Mercado'
     },
     SYSTEM: {
-      icon: 'ðÅ¸â€�§',
+      icon: '🔧',
       color: 'gray',
       priority: 'low',
       title: 'Sistema'
     }
   }
 
-  // Adicionar notificaÃ§Ã£o
+  // Adicionar notificação
   const addNotification = useCallback((type, message, data = {}) => {
     if (!isEnabled) return
 
@@ -61,9 +61,9 @@ export default function useSmartNotifications() {
       ...notificationTypes[type]
     }
 
-    setNotifications(prev => [notification, ...prev.slice(0, 49)]) // MÃ¡ximo 50 notificaÃ§Ãµes
+    setNotifications(prev => [notification, ...prev.slice(0, 49)]) // Máximo 50 notificações
 
-    // Auto-remover notificaÃ§Ãµes de baixa prioridade apÃ³s 5 minutos
+    // Auto-remover notificações de baixa prioridade após 5 minutos
     if (notification.priority === 'low') {
       setTimeout(() => {
         removeNotification(notification.id)
@@ -71,7 +71,7 @@ export default function useSmartNotifications() {
     }
   }, [isEnabled])
 
-  // Remover notificaÃ§Ã£o
+  // Remover notificação
   const removeNotification = useCallback((id) => {
     setNotifications(prev => prev.filter(n => n.id !== id))
   }, [])
@@ -88,17 +88,17 @@ export default function useSmartNotifications() {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })))
   }, [])
 
-  // Limpar notificaÃ§Ãµes lidas
+  // Limpar notificações lidas
   const clearRead = useCallback(() => {
     setNotifications(prev => prev.filter(n => !n.read))
   }, [])
 
-  // Limpar todas as notificaÃ§Ãµes
+  // Limpar todas as notificações
   const clearAll = useCallback(() => {
     setNotifications([])
   }, [])
 
-  // NotificaÃ§Ãµes especÃ­ficas do sistema
+  // Notificações específicas do sistema
   const notifyBirth = useCallback((animalData) => {
     addNotification('BIRTH', `Novo nascimento: ${animalData.serie}${animalData.rg}`, animalData)
   }, [addNotification])
@@ -112,7 +112,7 @@ export default function useSmartNotifications() {
   }, [addNotification])
 
   const notifyHealthAlert = useCallback((animalData, alert) => {
-    addNotification('HEALTH', `Alerta de saÃºde: ${alert} para ${animalData.serie}${animalData.rg}`, { animalData, alert })
+    addNotification('HEALTH', `Alerta de saúde: ${alert} para ${animalData.serie}${animalData.rg}`, { animalData, alert })
   }, [addNotification])
 
   const notifyMarketOpportunity = useCallback((message, data) => {
@@ -123,7 +123,7 @@ export default function useSmartNotifications() {
     addNotification('SYSTEM', message, data)
   }, [addNotification])
 
-  // EstatÃ­sticas das notificaÃ§Ãµes
+  // Estatísticas das notificações
   const stats = {
     total: notifications.length,
     unread: notifications.filter(n => !n.read).length,
@@ -138,18 +138,18 @@ export default function useSmartNotifications() {
     }, {})
   }
 
-  // Auto-detecÃ§Ã£o de eventos (simulado)
+  // Auto-detecção de eventos (simulado)
   useEffect(() => {
     if (!isEnabled) return
 
     const interval = setInterval(() => {
-      // Simular eventos aleatÃ³rios para demonstraÃ§Ã£o
+      // Simular eventos aleatórios para demonstração
       const random = Math.random()
       
       if (random < 0.1) { // 10% chance
         notifySystem('Sistema funcionando normalmente', { type: 'status' })
       } else if (random < 0.15) { // 5% chance
-        notifyMarketOpportunity('PreÃ§o do boi gordo subiu 2%', { price: 180.50 })
+        notifyMarketOpportunity('Preço do boi gordo subiu 2%', { price: 180.50 })
       }
     }, 30000) // A cada 30 segundos
 
@@ -167,7 +167,7 @@ export default function useSmartNotifications() {
     markAllAsRead,
     clearRead,
     clearAll,
-    // MÃ©todos especÃ­ficos
+    // Métodos específicos
     notifyBirth,
     notifyProtocol,
     notifyHighCost,

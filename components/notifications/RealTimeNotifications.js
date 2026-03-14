@@ -15,17 +15,17 @@ const NotificationItem = ({ notification, onDismiss, onMarkAsRead }) => {
   const getIcon = () => {
     switch (notification.type) {
       case 'birth':
-        return 'ðÅ¸â€˜¶'
+        return '👶'
       case 'health':
-        return 'ðÅ¸�¥'
+        return '🏥'
       case 'cost':
-        return 'ðÅ¸â€™°'
+        return '💰'
       case 'system':
-        return 'âÅ¡â„¢ï¸�'
+        return '⚙️'
       case 'warning':
-        return 'âÅ¡ ï¸�'
+        return '⚠️'
       default:
-        return 'ðÅ¸â€œ¢'
+        return '📢'
     }
   }
 
@@ -79,7 +79,7 @@ const NotificationItem = ({ notification, onDismiss, onMarkAsRead }) => {
               )}
               {notification.read && (
                 <span className="text-xs text-green-600 dark:text-green-400 font-medium">
-                  âÅ“â€œ Lida
+                  ✓ Lida
                 </span>
               )}
             </div>
@@ -119,7 +119,7 @@ export default function RealTimeNotifications() {
     }
   }, [])
 
-  // Calcular posiÃ§Ã£o do dropdown quando abrir
+  // Calcular posição do dropdown quando abrir
   useEffect(() => {
     if (isOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect()
@@ -133,10 +133,10 @@ export default function RealTimeNotifications() {
   const connectWebSocket = () => {
     try {
       // Simular WebSocket para desenvolvimento
-      // Em produÃ§Ã£o, vocÃª usaria: const ws = new WebSocket('ws://localhost:3020/ws')
-      logger.info('Conectando ao sistema de notificaÃ§Ãµes em tempo real')
+      // Em produção, você usaria: const ws = new WebSocket('ws://localhost:3020/ws')
+      logger.info('Conectando ao sistema de notificações em tempo real')
       
-      // Simular recebimento de notificaÃ§Ãµes
+      // Simular recebimento de notificações
       const simulateNotification = () => {
         const notificationTypes = ['birth', 'health', 'cost', 'system', 'warning']
         const priorities = ['low', 'medium', 'high']
@@ -145,7 +145,7 @@ export default function RealTimeNotifications() {
           id: Date.now(),
           type: notificationTypes[Math.floor(Math.random() * notificationTypes.length)],
           priority: priorities[Math.floor(Math.random() * priorities.length)],
-          title: 'Nova notificaÃ§Ã£o',
+          title: 'Nova notificação',
           message: 'Sistema atualizado com sucesso',
           timestamp: new Date().toISOString(),
           read: false
@@ -154,7 +154,7 @@ export default function RealTimeNotifications() {
         addNotification(newNotification)
       }
 
-      // Simular notificaÃ§Ãµes a cada 30 segundos
+      // Simular notificações a cada 30 segundos
       const interval = setInterval(simulateNotification, 30000)
       
       return () => clearInterval(interval)
@@ -172,26 +172,26 @@ export default function RealTimeNotifications() {
         setNotifications(data || [])
         updateUnreadCount(data || [])
       } else if (response.status !== 404) {
-        // SÃ³ logar se nÃ£o for 404 (rota nÃ£o encontrada)
-        logger.warn(`Erro ao carregar notificaÃ§Ãµes: ${response.status} ${response.statusText}`)
+        // Só logar se não for 404 (rota não encontrada)
+        logger.warn(`Erro ao carregar notificações: ${response.status} ${response.statusText}`)
       }
     } catch (error) {
-      // Silenciar erros de rede (servidor nÃ£o disponÃ­vel)
+      // Silenciar erros de rede (servidor não disponível)
       if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
-        // Servidor nÃ£o disponÃ­vel - nÃ£o logar para nÃ£o poluir o console
+        // Servidor não disponível - não logar para não poluir o console
         return
       }
       
-      logger.error('Erro ao carregar notificaÃ§Ãµes:', error)
+      logger.error('Erro ao carregar notificações:', error)
       
-      // NotificaÃ§Ãµes de exemplo com estados consistentes (apenas se nÃ£o for erro de rede)
+      // Notificações de exemplo com estados consistentes (apenas se não for erro de rede)
       const sampleNotifications = [
         {
           id: 1,
           type: 'system',
           priority: 'medium',
           title: 'Sistema atualizado',
-          message: 'O Beef Sync foi atualizado para a versÃ£o mais recente com melhorias visuais',
+          message: 'O Beef Sync foi atualizado para a versão mais recente com melhorias visuais',
           timestamp: new Date(Date.now() - 2 * 60 * 1000).toISOString(),
           read: false
         },
@@ -209,7 +209,7 @@ export default function RealTimeNotifications() {
           type: 'warning',
           priority: 'medium',
           title: 'Estoque baixo',
-          message: 'Alguns produtos estÃ£o com estoque baixo',
+          message: 'Alguns produtos estão com estoque baixo',
           timestamp: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
           read: true
         }
@@ -222,7 +222,7 @@ export default function RealTimeNotifications() {
 
   const addNotification = (notification) => {
     setNotifications(prev => {
-      const newNotifications = [notification, ...prev.slice(0, 9)] // Manter apenas 10 notificaÃ§Ãµes
+      const newNotifications = [notification, ...prev.slice(0, 9)] // Manter apenas 10 notificações
       updateUnreadCount(newNotifications)
       return newNotifications
     })
@@ -255,7 +255,7 @@ export default function RealTimeNotifications() {
         })
       }
     } catch (error) {
-      logger.error('Erro ao marcar notificaÃ§Ã£o como lida:', error)
+      logger.error('Erro ao marcar notificação como lida:', error)
       
       // Fallback local se a API falhar
       setNotifications(prev => {
@@ -280,7 +280,7 @@ export default function RealTimeNotifications() {
         })
       }
     } catch (error) {
-      logger.error('Erro ao marcar todas as notificaÃ§Ãµes como lidas:', error)
+      logger.error('Erro ao marcar todas as notificações como lidas:', error)
       
       // Fallback local se a API falhar
       setNotifications(prev => {
@@ -326,7 +326,7 @@ export default function RealTimeNotifications() {
             <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                NotificaÃ§Ãµes
+                Notificações
               </h3>
                 {unreadCount > 0 && (
                   <button
@@ -339,7 +339,7 @@ export default function RealTimeNotifications() {
             </div>
             {unreadCount > 0 && (
               <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                {unreadCount} notificaÃ§Ã£o{unreadCount > 1 ? 'Ãµes' : ''} nÃ£o lida{unreadCount > 1 ? 's' : ''}
+                {unreadCount} notificação{unreadCount > 1 ? 'ões' : ''} não lida{unreadCount > 1 ? 's' : ''}
               </div>
             )}
           </div>
@@ -348,8 +348,8 @@ export default function RealTimeNotifications() {
             {notifications.length === 0 ? (
                 <div className="p-4 text-center text-gray-500 dark:text-gray-400">
                   <BellIcon className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                  <p>Nenhuma notificaÃ§Ã£o</p>
-                  <p className="text-xs mt-1">VocÃª estÃ¡ em dia!</p>
+                  <p>Nenhuma notificação</p>
+                  <p className="text-xs mt-1">Você está em dia!</p>
               </div>
             ) : (
                 <div className="p-2 space-y-2">
@@ -368,7 +368,7 @@ export default function RealTimeNotifications() {
           {notifications.length > 0 && (
             <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
               <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                Total: {notifications.length} notificaÃ§Ã£o{notifications.length > 1 ? 'Ãµes' : ''}
+                Total: {notifications.length} notificação{notifications.length > 1 ? 'ões' : ''}
               </div>
             </div>
           )}

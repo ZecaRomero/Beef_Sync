@@ -1,7 +1,7 @@
 import { Pool } from 'pg';
 import logger from '../../utils/logger';
 
-// Carregar variÃ¡veis de ambiente
+// Carregar variáveis de ambiente
 require('dotenv').config();
 
 const pool = new Pool({
@@ -16,14 +16,14 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({
       status: 'error',
-      message: 'MÃ©todo nÃ£o permitido'
+      message: 'Método não permitido'
     });
   }
 
   const client = await pool.connect();
   
   try {
-    logger.info('ðÅ¸â€�§ Iniciando correÃ§Ã£o do campo RG via API...');
+    logger.info('🔧 Iniciando correção do campo RG via API...');
     
     // Verificar estrutura atual
     const checkResult = await client.query(`
@@ -40,29 +40,29 @@ export default async function handler(req, res) {
     if (checkResult.rows.length === 0) {
       return res.status(404).json({
         status: 'error',
-        message: 'Tabela animais nÃ£o encontrada'
+        message: 'Tabela animais não encontrada'
       });
     }
     
     const currentField = checkResult.rows[0];
-    logger.info('ðÅ¸â€œÅ  Campo RG atual:', currentField);
+    logger.info('📊 Campo RG atual:', currentField);
     
-    // Se jÃ¡ estÃ¡ correto, nÃ£o precisa alterar
+    // Se já está correto, não precisa alterar
     if (currentField.data_type === 'character varying' && currentField.character_maximum_length >= 20) {
       return res.status(200).json({
         status: 'success',
-        message: 'Campo RG jÃ¡ estÃ¡ correto',
+        message: 'Campo RG já está correto',
         currentField: currentField
       });
     }
     
     // Alterar o campo RG
-    logger.info('ðÅ¸â€�¨ Alterando campo RG para VARCHAR(20)...');
+    logger.info('🔨 Alterando campo RG para VARCHAR(20)...');
     await client.query(`
       ALTER TABLE animais ALTER COLUMN rg TYPE VARCHAR(20)
     `);
     
-    // Verificar se a alteraÃ§Ã£o foi aplicada
+    // Verificar se a alteração foi aplicada
     const verifyResult = await client.query(`
       SELECT 
         column_name, 
@@ -75,26 +75,26 @@ export default async function handler(req, res) {
     `);
     
     const updatedField = verifyResult.rows[0];
-    logger.info('âÅ“â€¦ Campo RG atualizado:', updatedField);
+    logger.info('✅ Campo RG atualizado:', updatedField);
     
-    // Testar com um valor de 6 dÃ­gitos
-    logger.info('ðÅ¸§ª Testando com valor de 6 dÃ­gitos...');
+    // Testar com um valor de 6 dígitos
+    logger.info('🧪 Testando com valor de 6 dígitos...');
     try {
       await client.query(`
         INSERT INTO animais (serie, rg, sexo, raca, situacao) 
-        VALUES ('TEST', '123456', 'FÃªmea', 'Teste', 'Ativo')
+        VALUES ('TEST', '123456', 'Fêmea', 'Teste', 'Ativo')
         ON CONFLICT (serie, rg) DO NOTHING
       `);
-      logger.info('âÅ“â€¦ Teste bem-sucedido! Campo RG aceita 6 dÃ­gitos.');
+      logger.info('✅ Teste bem-sucedido! Campo RG aceita 6 dígitos.');
       
       // Limpar o teste
       await client.query(`
         DELETE FROM animais WHERE serie = 'TEST' AND rg = '123456'
       `);
-      logger.info('ðÅ¸§¹ Registro de teste removido.');
+      logger.info('🧹 Registro de teste removido.');
       
     } catch (testError) {
-      logger.error('â�Å’ Erro no teste:', testError.message);
+      logger.error('❌ Erro no teste:', testError.message);
       return res.status(500).json({
         status: 'error',
         message: 'Erro no teste do campo RG',
@@ -107,11 +107,11 @@ export default async function handler(req, res) {
       message: 'Campo RG corrigido com sucesso!',
       before: currentField,
       after: updatedField,
-      testResult: 'Campo aceita valores de atÃ© 6 dÃ­gitos'
+      testResult: 'Campo aceita valores de até 6 dígitos'
     });
     
   } catch (error) {
-    logger.error('â�Å’ Erro ao corrigir campo RG:', error);
+    logger.error('❌ Erro ao corrigir campo RG:', error);
     res.status(500).json({
       status: 'error',
       message: 'Erro ao corrigir campo RG',

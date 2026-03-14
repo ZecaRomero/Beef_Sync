@@ -16,7 +16,7 @@ async function checkTableStructure() {
   const client = await pool.connect()
   
   try {
-    console.log('�Ÿ”� Verificando estrutura da tabela notas_fiscais...')
+    console.log('🔍 Verificando estrutura da tabela notas_fiscais...')
     
     const columns = await client.query(`
       SELECT column_name, data_type, is_nullable
@@ -25,7 +25,7 @@ async function checkTableStructure() {
       ORDER BY ordinal_position
     `)
     
-    console.log('�Ÿ“‹ Colunas da tabela notas_fiscais:')
+    console.log('📋 Colunas da tabela notas_fiscais:')
     columns.rows.forEach(col => {
       console.log(`  ${col.column_name}: ${col.data_type} ${col.is_nullable === 'NO' ? '(NOT NULL)' : ''}`)
     })
@@ -34,14 +34,14 @@ async function checkTableStructure() {
     const hasDataColumn = columns.rows.some(col => col.column_name === 'data')
     
     if (!hasDataColumn) {
-      console.log('\n�Ÿ“… Adicionando coluna "data"...')
+      console.log('\n📅 Adicionando coluna "data"...')
       await client.query(`
         ALTER TABLE notas_fiscais 
         ADD COLUMN data DATE
       `)
-      console.log('�œ… Coluna "data" adicionada!')
+      console.log('✅ Coluna "data" adicionada!')
     } else {
-      console.log('�œ… Coluna "data" já existe!')
+      console.log('✅ Coluna "data" já existe!')
     }
     
     // Verificar outras colunas necessárias
@@ -50,7 +50,7 @@ async function checkTableStructure() {
     for (const col of requiredColumns) {
       const exists = columns.rows.some(c => c.column_name === col)
       if (!exists) {
-        console.log(`�Ÿ“� Adicionando coluna "${col}"...`)
+        console.log(`📝 Adicionando coluna "${col}"...`)
         let dataType = 'VARCHAR(100)'
         if (col === 'valor_total') dataType = 'DECIMAL(12,2)'
         if (col === 'tipo') dataType = 'VARCHAR(20)'
@@ -59,14 +59,14 @@ async function checkTableStructure() {
         if (col === 'fornecedor' || col === 'destino') dataType = 'VARCHAR(200)'
         
         await client.query(`ALTER TABLE notas_fiscais ADD COLUMN ${col} ${dataType}`)
-        console.log(`�œ… Coluna "${col}" adicionada!`)
+        console.log(`✅ Coluna "${col}" adicionada!`)
       }
     }
     
-    console.log('\n�œ… Estrutura da tabela verificada e corrigida!')
+    console.log('\n✅ Estrutura da tabela verificada e corrigida!')
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message)
+    console.error('❌ Erro:', error.message)
     throw error
   } finally {
     client.release()
@@ -77,11 +77,11 @@ async function checkTableStructure() {
 // Executar verificação
 checkTableStructure()
   .then(() => {
-    console.log('\n�ŸŽ‰ Verificação concluída!')
+    console.log('\n🎉 Verificação concluída!')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n�Ÿ’� Erro:', error.message)
+    console.error('\n💥 Erro:', error.message)
     process.exit(1)
   })
 

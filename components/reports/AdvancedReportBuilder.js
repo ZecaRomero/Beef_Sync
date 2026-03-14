@@ -20,18 +20,18 @@ import Modal from '../ui/Modal'
 
 const REPORT_SECTIONS = {
   header: {
-    name: 'CabeÃ§alho',
-    description: 'InformaÃ§Ãµes bÃ¡sicas do relatÃ³rio',
+    name: 'Cabeçalho',
+    description: 'Informações básicas do relatório',
     fields: ['title', 'period', 'generated_date', 'logo']
   },
   summary: {
     name: 'Resumo Executivo',
-    description: 'Principais mÃ©tricas e KPIs',
+    description: 'Principais métricas e KPIs',
     fields: ['total_animals', 'births', 'deaths', 'sales', 'revenue']
   },
   charts: {
-    name: 'GrÃ¡ficos',
-    description: 'VisualizaÃ§Ãµes de dados',
+    name: 'Gráficos',
+    description: 'Visualizações de dados',
     fields: ['birth_trends', 'location_distribution', 'breed_analysis', 'financial_charts']
   },
   tables: {
@@ -40,31 +40,31 @@ const REPORT_SECTIONS = {
     fields: ['animal_list', 'financial_details', 'location_history', 'breeding_records']
   },
   analysis: {
-    name: 'AnÃ¡lises',
-    description: 'Insights e recomendaÃ§Ãµes',
+    name: 'Análises',
+    description: 'Insights e recomendações',
     fields: ['performance_analysis', 'cost_efficiency', 'recommendations', 'alerts']
   },
   appendix: {
     name: 'Anexos',
-    description: 'InformaÃ§Ãµes complementares',
+    description: 'Informações complementares',
     fields: ['methodology', 'data_sources', 'glossary', 'contacts']
   }
 }
 
 const CHART_TYPES = [
-  { id: 'bar', name: 'GrÃ¡fico de Barras', icon: ChartBarIcon },
-  { id: 'line', name: 'GrÃ¡fico de Linha', icon: ChartBarIcon },
-  { id: 'pie', name: 'GrÃ¡fico de Pizza', icon: ChartBarIcon },
-  { id: 'area', name: 'GrÃ¡fico de Ã�rea', icon: ChartBarIcon }
+  { id: 'bar', name: 'Gráfico de Barras', icon: ChartBarIcon },
+  { id: 'line', name: 'Gráfico de Linha', icon: ChartBarIcon },
+  { id: 'pie', name: 'Gráfico de Pizza', icon: ChartBarIcon },
+  { id: 'area', name: 'Gráfico de Área', icon: ChartBarIcon }
 ]
 
 const DATA_SOURCES = [
   { id: 'animals', name: 'Animais', table: 'animais' },
   { id: 'births', name: 'Nascimentos', table: 'nascimentos' },
   { id: 'deaths', name: 'Mortes', table: 'animais' },
-  { id: 'locations', name: 'LocalizaÃ§Ãµes', table: 'localizacoes_animais' },
+  { id: 'locations', name: 'Localizações', table: 'localizacoes_animais' },
   { id: 'costs', name: 'Custos', table: 'custos' },
-  { id: 'semen', name: 'Estoque de SÃªmen', table: 'estoque_semen' }
+  { id: 'semen', name: 'Estoque de Sêmen', table: 'estoque_semen' }
 ]
 
 export default function AdvancedReportBuilder({ onSave, onCancel, initialReport = null }) {
@@ -150,11 +150,11 @@ export default function AdvancedReportBuilder({ onSave, onCancel, initialReport 
   const generatePreview = async () => {
     setLoading(true)
     try {
-      // Simular geraÃ§Ã£o de preview
+      // Simular geração de preview
       await new Promise(resolve => setTimeout(resolve, 2000))
       setShowPreview(true)
     } catch (error) {
-      alert('â�Å’ Erro ao gerar preview')
+      alert('❌ Erro ao gerar preview')
     } finally {
       setLoading(false)
     }
@@ -162,21 +162,21 @@ export default function AdvancedReportBuilder({ onSave, onCancel, initialReport 
 
   const saveReport = async () => {
     if (!reportConfig.name.trim()) {
-      alert('âÅ¡ ï¸� Nome do relatÃ³rio Ã© obrigatÃ³rio')
+      alert('⚠️ Nome do relatório é obrigatório')
       return
     }
 
     if (reportConfig.sections.length === 0) {
-      alert('âÅ¡ ï¸� Adicione pelo menos uma seÃ§Ã£o ao relatÃ³rio')
+      alert('⚠️ Adicione pelo menos uma seção ao relatório')
       return
     }
 
     try {
       setLoading(true)
       await onSave(reportConfig)
-      alert('âÅ“â€¦ RelatÃ³rio salvo com sucesso!')
+      alert('✅ Relatório salvo com sucesso!')
     } catch (error) {
-      alert('â�Å’ Erro ao salvar relatÃ³rio')
+      alert('❌ Erro ao salvar relatório')
     } finally {
       setLoading(false)
     }
@@ -188,10 +188,10 @@ export default function AdvancedReportBuilder({ onSave, onCancel, initialReport 
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-            ðÅ¸â€�§ Construtor de RelatÃ³rios AvanÃ§ado
+            🔧 Construtor de Relatórios Avançado
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Crie relatÃ³rios personalizados com seÃ§Ãµes e campos especÃ­ficos
+            Crie relatórios personalizados com seções e campos específicos
           </p>
         </div>
         <div className="flex space-x-3">
@@ -206,7 +206,7 @@ export default function AdvancedReportBuilder({ onSave, onCancel, initialReport 
             onClick={saveReport}
             loading={loading}
           >
-            Salvar RelatÃ³rio
+            Salvar Relatório
           </Button>
         </div>
       </div>
@@ -218,25 +218,25 @@ export default function AdvancedReportBuilder({ onSave, onCancel, initialReport 
           <Card>
             <CardHeader>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                ðÅ¸â€œ� InformaÃ§Ãµes BÃ¡sicas
+                📝 Informações Básicas
               </h3>
             </CardHeader>
             <CardBody>
               <div className="space-y-4">
                 <Input
-                  label="Nome do RelatÃ³rio"
+                  label="Nome do Relatório"
                   value={reportConfig.name}
                   onChange={(e) => setReportConfig(prev => ({ 
                     ...prev, 
                     name: e.target.value 
                   }))}
-                  placeholder="Ex: RelatÃ³rio Mensal de Performance"
+                  placeholder="Ex: Relatório Mensal de Performance"
                   required
                 />
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    DescriÃ§Ã£o
+                    Descrição
                   </label>
                   <textarea
                     value={reportConfig.description}
@@ -244,7 +244,7 @@ export default function AdvancedReportBuilder({ onSave, onCancel, initialReport 
                       ...prev, 
                       description: e.target.value 
                     }))}
-                    placeholder="Descreva o objetivo e conteÃºdo do relatÃ³rio..."
+                    placeholder="Descreva o objetivo e conteúdo do relatório..."
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
                   />
@@ -258,7 +258,7 @@ export default function AdvancedReportBuilder({ onSave, onCancel, initialReport 
             <CardHeader>
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  ðÅ¸â€œâ€¹ SeÃ§Ãµes do RelatÃ³rio
+                  📋 Seções do Relatório
                 </h3>
                 <Button
                   variant="secondary"
@@ -266,7 +266,7 @@ export default function AdvancedReportBuilder({ onSave, onCancel, initialReport 
                   onClick={() => setShowSectionModal(true)}
                   leftIcon={<PlusIcon className="h-4 w-4" />}
                 >
-                  Adicionar SeÃ§Ã£o
+                  Adicionar Seção
                 </Button>
               </div>
             </CardHeader>
@@ -275,14 +275,14 @@ export default function AdvancedReportBuilder({ onSave, onCancel, initialReport 
                 <div className="text-center py-8">
                   <DocumentTextIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-500 dark:text-gray-400 mb-4">
-                    Nenhuma seÃ§Ã£o adicionada ainda
+                    Nenhuma seção adicionada ainda
                   </p>
                   <Button
                     variant="primary"
                     onClick={() => setShowSectionModal(true)}
                     leftIcon={<PlusIcon className="h-4 w-4" />}
                   >
-                    Adicionar Primeira SeÃ§Ã£o
+                    Adicionar Primeira Seção
                   </Button>
                 </div>
               ) : (
@@ -314,7 +314,7 @@ export default function AdvancedReportBuilder({ onSave, onCancel, initialReport 
                             disabled={index === 0}
                             title="Mover para cima"
                           >
-                            ââ€ â€˜
+                            ↑
                           </Button>
                           <Button
                             variant="ghost"
@@ -323,7 +323,7 @@ export default function AdvancedReportBuilder({ onSave, onCancel, initialReport 
                             disabled={index === reportConfig.sections.length - 1}
                             title="Mover para baixo"
                           >
-                            ââ€ â€œ
+                            ↓
                           </Button>
                           <Button
                             variant="ghost"
@@ -332,7 +332,7 @@ export default function AdvancedReportBuilder({ onSave, onCancel, initialReport 
                               setCurrentSection(section)
                               setShowSectionModal(true)
                             }}
-                            title="Editar seÃ§Ã£o"
+                            title="Editar seção"
                           >
                             <Cog6ToothIcon className="h-4 w-4" />
                           </Button>
@@ -340,7 +340,7 @@ export default function AdvancedReportBuilder({ onSave, onCancel, initialReport 
                             variant="ghost"
                             size="sm"
                             onClick={() => removeSection(section.id)}
-                            title="Remover seÃ§Ã£o"
+                            title="Remover seção"
                             className="text-red-600 hover:text-red-700"
                           >
                             <TrashIcon className="h-4 w-4" />
@@ -379,7 +379,7 @@ export default function AdvancedReportBuilder({ onSave, onCancel, initialReport 
           <Card>
             <CardHeader>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                ðÅ¸Å½¨ OpÃ§Ãµes de FormataÃ§Ã£o
+                🎨 Opções de Formatação
               </h3>
             </CardHeader>
             <CardBody>
@@ -397,7 +397,7 @@ export default function AdvancedReportBuilder({ onSave, onCancel, initialReport 
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
                   >
                     <option value="modern">Moderno</option>
-                    <option value="classic">ClÃ¡ssico</option>
+                    <option value="classic">Clássico</option>
                     <option value="minimal">Minimalista</option>
                     <option value="corporate">Corporativo</option>
                   </select>
@@ -405,7 +405,7 @@ export default function AdvancedReportBuilder({ onSave, onCancel, initialReport 
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Tamanho da PÃ¡gina
+                    Tamanho da Página
                   </label>
                   <select
                     value={reportConfig.formatting.pageSize}
@@ -424,7 +424,7 @@ export default function AdvancedReportBuilder({ onSave, onCancel, initialReport 
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    OrientaÃ§Ã£o
+                    Orientação
                   </label>
                   <select
                     value={reportConfig.formatting.orientation}
@@ -451,7 +451,7 @@ export default function AdvancedReportBuilder({ onSave, onCancel, initialReport 
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
                     <span className="text-sm text-gray-700 dark:text-gray-300">
-                      Incluir GrÃ¡ficos
+                      Incluir Gráficos
                     </span>
                   </label>
                   
@@ -480,7 +480,7 @@ export default function AdvancedReportBuilder({ onSave, onCancel, initialReport 
           <Card>
             <CardHeader>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                ðÅ¸â€˜�ï¸� Preview
+                👁️ Preview
               </h3>
             </CardHeader>
             <CardBody>
@@ -511,13 +511,13 @@ export default function AdvancedReportBuilder({ onSave, onCancel, initialReport 
           <Card>
             <CardHeader>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                ðÅ¸â€œÅ  Resumo
+                📊 Resumo
               </h3>
             </CardHeader>
             <CardBody>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">SeÃ§Ãµes:</span>
+                  <span className="text-gray-600 dark:text-gray-400">Seções:</span>
                   <span className="font-medium">{reportConfig.sections.length}</span>
                 </div>
                 <div className="flex justify-between">
@@ -553,7 +553,7 @@ export default function AdvancedReportBuilder({ onSave, onCancel, initialReport 
           setShowSectionModal(false)
           setCurrentSection(null)
         }}
-        title={currentSection ? 'Editar SeÃ§Ã£o' : 'Adicionar SeÃ§Ã£o'}
+        title={currentSection ? 'Editar Seção' : 'Adicionar Seção'}
         size="lg"
       >
         <div className="space-y-4">
@@ -590,17 +590,17 @@ export default function AdvancedReportBuilder({ onSave, onCancel, initialReport 
       <Modal
         isOpen={showPreview}
         onClose={() => setShowPreview(false)}
-        title="Preview do RelatÃ³rio"
+        title="Preview do Relatório"
         size="full"
       >
         <div className="bg-white dark:bg-gray-900 p-8 rounded-lg">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                {reportConfig.name || 'RelatÃ³rio Personalizado'}
+                {reportConfig.name || 'Relatório Personalizado'}
               </h1>
               <p className="text-gray-600 dark:text-gray-400">
-                {reportConfig.description || 'DescriÃ§Ã£o do relatÃ³rio'}
+                {reportConfig.description || 'Descrição do relatório'}
               </p>
               <div className="mt-4 text-sm text-gray-500 dark:text-gray-500">
                 Gerado em: {new Date().toLocaleDateString('pt-BR')}
@@ -619,7 +619,7 @@ export default function AdvancedReportBuilder({ onSave, onCancel, initialReport 
                         {field.name}
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                        [Dados serÃ£o carregados aqui]
+                        [Dados serão carregados aqui]
                       </div>
                     </div>
                   ))}

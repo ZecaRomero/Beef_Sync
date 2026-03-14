@@ -41,35 +41,35 @@ export default function LiveStats({ data }) {
     {
       label: 'Animais Totais',
       value: animatedValues.totalAnimals,
-      icon: 'ðÅ¸�â€ž',
+      icon: '🐄',
       color: 'text-blue-600',
       bgColor: 'bg-blue-100 dark:bg-blue-900/30'
     },
     {
       label: 'Ativos',
       value: animatedValues.activeAnimals,
-      icon: 'âÅ“â€¦',
+      icon: '✅',
       color: 'text-green-600',
       bgColor: 'bg-green-100 dark:bg-green-900/30'
     },
     {
       label: 'Investido',
       value: `R$ ${(animatedValues.totalInvested / 1000).toFixed(0)}k`,
-      icon: 'ðÅ¸â€™°',
+      icon: '💰',
       color: 'text-red-600',
       bgColor: 'bg-red-100 dark:bg-red-900/30'
     },
     {
       label: 'Receita',
       value: `R$ ${(animatedValues.totalRevenue / 1000).toFixed(0)}k`,
-      icon: 'ðÅ¸â€œË†',
+      icon: '📈',
       color: 'text-purple-600',
       bgColor: 'bg-purple-100 dark:bg-purple-900/30'
     },
     {
-      label: 'ROI MÃ©dio',
+      label: 'ROI Médio',
       value: `${data.avgROI?.toFixed(1) || 0}%`,
-      icon: 'ðÅ¸â€œÅ ',
+      icon: '📊',
       color: 'text-orange-600',
       bgColor: 'bg-orange-100 dark:bg-orange-900/30'
     }
@@ -79,7 +79,7 @@ export default function LiveStats({ data }) {
     <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
-          <span className="mr-3 text-2xl">âÅ¡¡</span>
+          <span className="mr-3 text-2xl">⚡</span>
           Stats em Tempo Real
         </h2>
         <div className="flex items-center space-x-2">
@@ -117,7 +117,7 @@ export default function LiveStats({ data }) {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-semibold text-gray-900 dark:text-white flex items-center">
-                ðÅ¸�â€  Top Performer
+                🏆 Top Performer
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 {data.topPerformer.serie} {data.topPerformer.rg}

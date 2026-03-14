@@ -26,7 +26,7 @@ async function buscarNF() {
     console.log(`Total de NFs encontradas: ${nfs.rows.length}\n`);
     
     nfs.rows.forEach(nf => {
-      console.log(`\n�Ÿ“‹ NF ${nf.numero_nf} (ID: ${nf.id})`);
+      console.log(`\n📋 NF ${nf.numero_nf} (ID: ${nf.id})`);
       console.log(`   Fornecedor: ${nf.fornecedor}`);
       console.log(`   Data NF: ${nf.data ? new Date(nf.data).toLocaleDateString('pt-BR') : 'N/A'}`);
       console.log(`   Data TE: ${nf.data_te ? new Date(nf.data_te).toLocaleDateString('pt-BR') : 'N/A'}`);
@@ -65,12 +65,12 @@ async function buscarNF() {
           }
         }
       } else {
-        console.log(`\n�Œ M ${rg} N�ƒO ENCONTRADA`);
+        console.log(`\n❌ M ${rg} NÃO ENCONTRADA`);
       }
     }
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
     console.error(error.stack);
   } finally {
     client.release();

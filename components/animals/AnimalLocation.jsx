@@ -21,7 +21,7 @@ export default function AnimalLocation({ animal }) {
     || (typeof animal.localizacao_atual === 'object' ? animal.localizacao_atual?.piquete : null)
     || animal.localizacao_atual
   
-  const locAtual = localizacaoValidaParaExibir(locBruto) || (locBruto ? 'NÃ£o informado' : null)
+  const locAtual = localizacaoValidaParaExibir(locBruto) || (locBruto ? 'Não informado' : null)
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -33,25 +33,25 @@ export default function AnimalLocation({ animal }) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <MapPinIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            <h2 className="font-semibold text-gray-900 dark:text-white">LocalizaÃ§Ã£o</h2>
+            <h2 className="font-semibold text-gray-900 dark:text-white">Localização</h2>
           </div>
           {isExpanded ? <ChevronUpIcon className="h-5 w-5" /> : <ChevronDownIcon className="h-5 w-5" />}
         </div>
         <p className="text-sm font-semibold text-blue-700 dark:text-blue-300 mt-1">
-          Atual: {locAtual || 'NÃ£o informado'}
+          Atual: {locAtual || 'Não informado'}
         </p>
       </button>
       <div className={`overflow-hidden transition-all ${isExpanded ? 'max-h-[999px]' : 'max-h-0'}`}>
         {animal.localizacoes && animal.localizacoes.length > 1 && (
           <div className="p-4">
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">HistÃ³rico recente</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Histórico recente</p>
             <div className="space-y-1">
               {animal.localizacoes.slice(0, 6).map((l, i) => (
                 <div key={l.id || i} className="flex justify-between text-sm py-1">
-                  <span className="text-gray-700 dark:text-gray-300 font-medium">{localizacaoValidaParaExibir(l.piquete) || 'NÃ£o informado'}</span>
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">{localizacaoValidaParaExibir(l.piquete) || 'Não informado'}</span>
                   <span className="text-gray-500 dark:text-gray-400 text-xs">
                     {formatDate(l.data_entrada)}
-                    {l.data_saida && ` ââ€ â€™ ${formatDate(l.data_saida)}`}
+                    {l.data_saida && ` → ${formatDate(l.data_saida)}`}
                   </span>
                 </div>
               ))}

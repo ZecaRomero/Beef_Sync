@@ -12,7 +12,7 @@ async function testarEstrutura() {
   const client = await pool.connect();
   
   try {
-    console.log('�Ÿ”� VERIFICANDO ESTRUTURA DE PIQUETES\n');
+    console.log('🔍 VERIFICANDO ESTRUTURA DE PIQUETES\n');
     console.log('='.repeat(80));
     
     // Verificar tabela piquetes
@@ -23,7 +23,7 @@ async function testarEstrutura() {
       ORDER BY ordinal_position
     `);
     
-    console.log('\n�Ÿ“‹ Estrutura da tabela PIQUETES:');
+    console.log('\n📋 Estrutura da tabela PIQUETES:');
     console.log('-'.repeat(80));
     piquetes.rows.forEach(col => {
       console.log(`  ${col.column_name.padEnd(25)} | ${col.data_type.padEnd(20)} | ${col.is_nullable === 'YES' ? 'NULL' : 'NOT NULL'}`);
@@ -38,14 +38,14 @@ async function testarEstrutura() {
       ORDER BY ordinal_position
     `);
     
-    console.log('\n�Ÿ“‹ Colunas de piquete na tabela ANIMAIS:');
+    console.log('\n📋 Colunas de piquete na tabela ANIMAIS:');
     console.log('-'.repeat(80));
     if (animaisCols.rows.length > 0) {
       animaisCols.rows.forEach(col => {
         console.log(`  ${col.column_name.padEnd(25)} | ${col.data_type.padEnd(20)} | ${col.is_nullable === 'YES' ? 'NULL' : 'NOT NULL'}`);
       });
     } else {
-      console.log('  �Œ Colunas não encontradas');
+      console.log('  ❌ Colunas não encontradas');
     }
     
     // Verificar índices
@@ -56,7 +56,7 @@ async function testarEstrutura() {
         AND indexname LIKE '%piquete%'
     `);
     
-    console.log('\n�Ÿ“‹ Índices relacionados a piquetes:');
+    console.log('\n📋 Índices relacionados a piquetes:');
     console.log('-'.repeat(80));
     if (indices.rows.length > 0) {
       indices.rows.forEach(idx => {
@@ -64,12 +64,12 @@ async function testarEstrutura() {
         console.log(`    ${idx.indexdef}`);
       });
     } else {
-      console.log('  �„�️ Nenhum índice específico encontrado');
+      console.log('  ℹ️ Nenhum índice específico encontrado');
     }
     
     // Contar piquetes existentes
     const countPiquetes = await client.query('SELECT COUNT(*) as total FROM piquetes');
-    console.log(`\n�Ÿ“Š Total de piquetes cadastrados: ${countPiquetes.rows[0].total}`);
+    console.log(`\n📊 Total de piquetes cadastrados: ${countPiquetes.rows[0].total}`);
     
     // Contar animais com piquete
     const countAnimaisComPiquete = await client.query(`
@@ -77,17 +77,17 @@ async function testarEstrutura() {
       FROM animais 
       WHERE piquete_atual IS NOT NULL
     `);
-    console.log(`�Ÿ“Š Animais com piquete definido: ${countAnimaisComPiquete.rows[0].total}`);
+    console.log(`📊 Animais com piquete definido: ${countAnimaisComPiquete.rows[0].total}`);
     
     console.log('\n' + '='.repeat(80));
-    console.log('\n�œ… Estrutura verificada com sucesso!');
-    console.log('\n�Ÿ’� Próximos passos:');
+    console.log('\n✅ Estrutura verificada com sucesso!');
+    console.log('\n💡 Próximos passos:');
     console.log('   1. Acesse http://localhost:3000/importar-piquetes');
     console.log('   2. Selecione um arquivo Excel com os dados');
     console.log('   3. Clique em "Importar Dados"');
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
     console.error(error);
   } finally {
     client.release();

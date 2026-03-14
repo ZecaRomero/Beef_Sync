@@ -13,18 +13,18 @@ export default function BasicMedicationForm() {
     custo: ''
   })
 
-  // Dados bÃ¡sicos fixos
+  // Dados básicos fixos
   const medicamentos = [
     { id: 'panacoxx', nome: 'PANACOXX', custo: 9.10 },
     { id: 'vitamina', nome: 'Vitamina A', custo: 5.50 },
-    { id: 'antibiotico', nome: 'AntibiÃ³tico', custo: 12.00 }
+    { id: 'antibiotico', nome: 'Antibiótico', custo: 12.00 }
   ]
 
   const animais = [
     { id: 'br001', brinco: 'BR001', sexo: 'Macho' },
-    { id: 'br002', brinco: 'BR002', sexo: 'FÃªmea' },
+    { id: 'br002', brinco: 'BR002', sexo: 'Fêmea' },
     { id: 'br003', brinco: 'BR003', sexo: 'Macho' },
-    { id: 'br004', brinco: 'BR004', sexo: 'FÃªmea' }
+    { id: 'br004', brinco: 'BR004', sexo: 'Fêmea' }
   ]
 
   const handleSubmit = (e) => {
@@ -71,7 +71,7 @@ export default function BasicMedicationForm() {
       custo: ''
     })
     setShowForm(false)
-    alert('MedicaÃ§Ã£o registrada!')
+    alert('Medicação registrada!')
   }
 
   // Carregar dados salvos
@@ -90,27 +90,27 @@ export default function BasicMedicationForm() {
     <div className="p-6 max-w-6xl mx-auto">
       {/* Header */}
       <div className="bg-blue-600 text-white p-6 rounded-lg mb-6">
-        <h1 className="text-2xl font-bold">ðÅ¸â€™â€° Registro de MedicaÃ§Ã£o</h1>
-        <p>Sistema bÃ¡sico para registrar medicaÃ§Ãµes aplicadas</p>
+        <h1 className="text-2xl font-bold">💉 Registro de Medicação</h1>
+        <p>Sistema básico para registrar medicações aplicadas</p>
       </div>
 
-      {/* BotÃ£o Nova MedicaÃ§Ã£o */}
+      {/* Botão Nova Medicação */}
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold">ðÅ¸â€œâ€¹ OcorrÃªncias Registradas</h2>
+        <h2 className="text-xl font-bold">📋 Ocorrências Registradas</h2>
         <button
           onClick={() => setShowForm(true)}
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
         >
-          âÅ¾â€¢ Nova MedicaÃ§Ã£o
+          ➕ Nova Medicação
         </button>
       </div>
 
-      {/* Lista de OcorrÃªncias */}
+      {/* Lista de Ocorrências */}
       <div className="bg-white border rounded-lg p-4 mb-6">
         {occurrences.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            <div className="text-4xl mb-2">ðÅ¸§ª</div>
-            <p>Nenhuma medicaÃ§Ã£o registrada ainda</p>
+            <div className="text-4xl mb-2">🧪</div>
+            <p>Nenhuma medicação registrada ainda</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -123,7 +123,7 @@ export default function BasicMedicationForm() {
                       Animal: {item.animalBrinco} | Data: {item.data} | Hora: {item.hora}
                     </p>
                     {item.responsavel && (
-                      <p className="text-sm text-gray-600">ResponsÃ¡vel: {item.responsavel}</p>
+                      <p className="text-sm text-gray-600">Responsável: {item.responsavel}</p>
                     )}
                     {item.observacoes && (
                       <p className="text-sm text-gray-600">Obs: {item.observacoes}</p>
@@ -141,23 +141,23 @@ export default function BasicMedicationForm() {
         )}
       </div>
 
-      {/* Modal do FormulÃ¡rio */}
+      {/* Modal do Formulário */}
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">Nova MedicaÃ§Ã£o</h3>
+              <h3 className="text-lg font-semibold">Nova Medicação</h3>
               <button
                 onClick={() => setShowForm(false)}
                 className="text-gray-500 hover:text-gray-700 text-xl"
               >
-                â�Å’
+                ❌
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">ðÅ¸â€™Å  Medicamento *</label>
+                <label className="block text-sm font-medium mb-1">💊 Medicamento *</label>
                 <select
                   value={formData.medicamento}
                   onChange={(e) => setFormData({...formData, medicamento: e.target.value})}
@@ -174,7 +174,7 @@ export default function BasicMedicationForm() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">ðÅ¸�â€ž Animal *</label>
+                <label className="block text-sm font-medium mb-1">🐄 Animal *</label>
                 <select
                   value={formData.animal}
                   onChange={(e) => setFormData({...formData, animal: e.target.value})}
@@ -192,7 +192,7 @@ export default function BasicMedicationForm() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium mb-1">ðÅ¸â€œâ€¦ Data</label>
+                  <label className="block text-sm font-medium mb-1">📅 Data</label>
                   <input
                     type="date"
                     value={formData.data}
@@ -201,7 +201,7 @@ export default function BasicMedicationForm() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">ðÅ¸â€¢� Hora</label>
+                  <label className="block text-sm font-medium mb-1">🕐 Hora</label>
                   <input
                     type="time"
                     value={formData.hora}
@@ -212,36 +212,36 @@ export default function BasicMedicationForm() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">ðÅ¸â€™° Custo (opcional)</label>
+                <label className="block text-sm font-medium mb-1">💰 Custo (opcional)</label>
                 <input
                   type="number"
                   step="0.01"
                   value={formData.custo}
                   onChange={(e) => setFormData({...formData, custo: e.target.value})}
                   className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Deixe vazio para usar custo padrÃ£o"
+                  placeholder="Deixe vazio para usar custo padrão"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">ðÅ¸â€˜¤ ResponsÃ¡vel</label>
+                <label className="block text-sm font-medium mb-1">👤 Responsável</label>
                 <input
                   type="text"
                   value={formData.responsavel}
                   onChange={(e) => setFormData({...formData, responsavel: e.target.value})}
                   className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Nome do responsÃ¡vel"
+                  placeholder="Nome do responsável"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">ðÅ¸â€œ� ObservaÃ§Ãµes</label>
+                <label className="block text-sm font-medium mb-1">📝 Observações</label>
                 <textarea
                   value={formData.observacoes}
                   onChange={(e) => setFormData({...formData, observacoes: e.target.value})}
                   rows={3}
                   className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="ObservaÃ§Ãµes sobre a aplicaÃ§Ã£o..."
+                  placeholder="Observações sobre a aplicação..."
                 />
               </div>
 

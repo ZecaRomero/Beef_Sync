@@ -9,10 +9,10 @@ export default async function handler(req, res) {
   try {
     const { period } = req.body
 
-    console.log('ðÅ¸â€œâ€¹ Recebida requisiÃ§Ã£o para gerar relatÃ³rio de notas fiscais:', { period })
+    console.log('📋 Recebida requisição para gerar relatório de notas fiscais:', { period })
 
     if (!period || !period.startDate || !period.endDate) {
-      return res.status(400).json({ message: 'PerÃ­odo Ã© obrigatÃ³rio' })
+      return res.status(400).json({ message: 'Período é obrigatório' })
     }
 
     // Normalizar datas para formato aceito pelo PostgreSQL (YYYY-MM-DD)
@@ -38,7 +38,7 @@ export default async function handler(req, res) {
     const pgStart = toPgDate(period.startDate)
     const pgEnd = toPgDate(period.endDate)
     if (!pgStart || !pgEnd) {
-      return res.status(400).json({ message: 'Formato de data invÃ¡lido. Use YYYY-MM-DD ou dd/MM/yyyy.' })
+      return res.status(400).json({ message: 'Formato de data inválido. Use YYYY-MM-DD ou dd/MM/yyyy.' })
     }
 
     const workbook = new ExcelJS.Workbook()
@@ -46,9 +46,9 @@ export default async function handler(req, res) {
     // ABA 1: NFs de Entrada
     const sheetEntradas = workbook.addWorksheet('NFs de Entrada')
     
-    // CabeÃ§alho Entradas
+    // Cabeçalho Entradas
     sheetEntradas.mergeCells('A1:G1')
-    sheetEntradas.getCell('A1').value = 'ðÅ¸â€œ¥ NOTAS FISCAIS DE ENTRADA - BEEF SYNC'
+    sheetEntradas.getCell('A1').value = '📥 NOTAS FISCAIS DE ENTRADA - BEEF SYNC'
     sheetEntradas.getCell('A1').font = { size: 16, bold: true, color: { argb: '059669' } }
     sheetEntradas.getCell('A1').alignment = { horizontal: 'center', vertical: 'middle' }
     sheetEntradas.getCell('A1').fill = {
@@ -59,7 +59,7 @@ export default async function handler(req, res) {
     sheetEntradas.getRow(1).height = 30
 
     sheetEntradas.mergeCells('A2:G2')
-    sheetEntradas.getCell('A2').value = `PerÃ­odo: ${formatDate(period.startDate)} atÃ© ${formatDate(period.endDate)}`
+    sheetEntradas.getCell('A2').value = `Período: ${formatDate(period.startDate)} até ${formatDate(period.endDate)}`
     sheetEntradas.getCell('A2').font = { size: 12, bold: true }
     sheetEntradas.getCell('A2').alignment = { horizontal: 'center' }
 
@@ -70,26 +70,26 @@ export default async function handler(req, res) {
 
     sheetEntradas.addRow([])
 
-    // CabeÃ§alhos da tabela de Entradas - com detalhamento por sexo
+    // Cabeçalhos da tabela de Entradas - com detalhamento por sexo
     const headerEntradas = sheetEntradas.addRow([
-      'NÃºmero NF',
+      'Número NF',
       'Data Entrada',
       'Fornecedor',
-      'Natureza OperaÃ§Ã£o',
+      'Natureza Operação',
       'Valor Total',
       'Qtd. Total',
       'Qtd. Machos',
       'Valor Machos',
-      'Qtd. FÃªmeas',
-      'Valor FÃªmeas',
-      'RaÃ§a',
-      'ObservaÃ§Ãµes'
+      'Qtd. Fêmeas',
+      'Valor Fêmeas',
+      'Raça',
+      'Observações'
     ])
     
     styleHeaderRow(headerEntradas, '059669')
 
     sheetEntradas.columns = [
-      { width: 15 }, // NÃºmero NF
+      { width: 15 }, // Número NF
       { width: 14 }, // Data
       { width: 25 }, // Fornecedor
       { width: 20 }, // Natureza
@@ -97,18 +97,18 @@ export default async function handler(req, res) {
       { width: 12 }, // Qtd Total
       { width: 12 }, // Qtd Machos
       { width: 15 }, // Valor Machos
-      { width: 12 }, // Qtd FÃªmeas
-      { width: 15 }, // Valor FÃªmeas
-      { width: 15 }, // RaÃ§a
+      { width: 12 }, // Qtd Fêmeas
+      { width: 15 }, // Valor Fêmeas
+      { width: 15 }, // Raça
       { width: 30 }  // Obs
     ]
 
-    // ABA 2: NFs de SaÃ­da
-    const sheetSaidas = workbook.addWorksheet('NFs de SaÃ­da')
+    // ABA 2: NFs de Saída
+    const sheetSaidas = workbook.addWorksheet('NFs de Saída')
     
-    // CabeÃ§alho SaÃ­das
+    // Cabeçalho Saídas
     sheetSaidas.mergeCells('A1:H1')
-    sheetSaidas.getCell('A1').value = 'ðÅ¸â€œ¤ NOTAS FISCAIS DE SAÃ�DA - BEEF SYNC'
+    sheetSaidas.getCell('A1').value = '📤 NOTAS FISCAIS DE SAÍDA - BEEF SYNC'
     sheetSaidas.getCell('A1').font = { size: 16, bold: true, color: { argb: 'DC2626' } }
     sheetSaidas.getCell('A1').alignment = { horizontal: 'center', vertical: 'middle' }
     sheetSaidas.getCell('A1').fill = {
@@ -119,7 +119,7 @@ export default async function handler(req, res) {
     sheetSaidas.getRow(1).height = 30
 
     sheetSaidas.mergeCells('A2:H2')
-    sheetSaidas.getCell('A2').value = `PerÃ­odo: ${formatDate(period.startDate)} atÃ© ${formatDate(period.endDate)}`
+    sheetSaidas.getCell('A2').value = `Período: ${formatDate(period.startDate)} até ${formatDate(period.endDate)}`
     sheetSaidas.getCell('A2').font = { size: 12, bold: true }
     sheetSaidas.getCell('A2').alignment = { horizontal: 'center' }
 
@@ -130,27 +130,27 @@ export default async function handler(req, res) {
 
     sheetSaidas.addRow([])
 
-    // CabeÃ§alhos da tabela de SaÃ­das - com detalhamento por sexo
+    // Cabeçalhos da tabela de Saídas - com detalhamento por sexo
     const headerSaidas = sheetSaidas.addRow([
-      'NÃºmero NF',
-      'Data SaÃ­da',
+      'Número NF',
+      'Data Saída',
       'Destino',
-      'Natureza OperaÃ§Ã£o',
+      'Natureza Operação',
       'Valor Total',
       'Qtd. Total',
       'Qtd. Machos',
       'Valor Machos',
-      'Qtd. FÃªmeas',
-      'Valor FÃªmeas',
-      'RaÃ§a',
+      'Qtd. Fêmeas',
+      'Valor Fêmeas',
+      'Raça',
       'Tatuagem',
-      'ObservaÃ§Ãµes'
+      'Observações'
     ])
     
     styleHeaderRow(headerSaidas, 'DC2626')
 
     sheetSaidas.columns = [
-      { width: 15 }, // NÃºmero NF
+      { width: 15 }, // Número NF
       { width: 14 }, // Data
       { width: 25 }, // Destino
       { width: 20 }, // Natureza
@@ -158,9 +158,9 @@ export default async function handler(req, res) {
       { width: 12 }, // Qtd Total
       { width: 12 }, // Qtd Machos
       { width: 15 }, // Valor Machos
-      { width: 12 }, // Qtd FÃªmeas
-      { width: 15 }, // Valor FÃªmeas
-      { width: 15 }, // RaÃ§a
+      { width: 12 }, // Qtd Fêmeas
+      { width: 15 }, // Valor Fêmeas
+      { width: 15 }, // Raça
       { width: 20 }, // Tatuagem
       { width: 30 }  // Obs
     ]
@@ -169,7 +169,7 @@ export default async function handler(req, res) {
     const sheetResumo = workbook.addWorksheet('Resumo Geral')
     
     sheetResumo.mergeCells('A1:D1')
-    sheetResumo.getCell('A1').value = 'ðÅ¸â€œÅ  RESUMO GERAL - NOTAS FISCAIS'
+    sheetResumo.getCell('A1').value = '📊 RESUMO GERAL - NOTAS FISCAIS'
     sheetResumo.getCell('A1').font = { size: 16, bold: true, color: { argb: '2563EB' } }
     sheetResumo.getCell('A1').alignment = { horizontal: 'center', vertical: 'middle' }
     sheetResumo.getCell('A1').fill = {
@@ -180,7 +180,7 @@ export default async function handler(req, res) {
     sheetResumo.getRow(1).height = 30
 
     sheetResumo.mergeCells('A2:D2')
-    sheetResumo.getCell('A2').value = `PerÃ­odo: ${formatDate(period.startDate)} atÃ© ${formatDate(period.endDate)}`
+    sheetResumo.getCell('A2').value = `Período: ${formatDate(period.startDate)} até ${formatDate(period.endDate)}`
     sheetResumo.getCell('A2').font = { size: 12, bold: true }
     sheetResumo.getCell('A2').alignment = { horizontal: 'center' }
 
@@ -201,8 +201,8 @@ export default async function handler(req, res) {
     sheetResumo.addRow(['Valor Total:', 'R$ 0,00'])
     sheetResumo.addRow([])
 
-    // Resumo de SaÃ­das
-    const resumoSaidas = sheetResumo.addRow(['SAÃ�DAS', '', '', ''])
+    // Resumo de Saídas
+    const resumoSaidas = sheetResumo.addRow(['SAÍDAS', '', '', ''])
     resumoSaidas.font = { bold: true, size: 12 }
     resumoSaidas.getCell(1).fill = {
       type: 'pattern',
@@ -234,17 +234,17 @@ export default async function handler(req, res) {
       { width: 20 }
     ]
 
-    // Adicionar observaÃ§Ãµes
+    // Adicionar observações
     const obsRow = sheetResumo.lastRow.number + 3
     sheetResumo.mergeCells(`A${obsRow}:D${obsRow}`)
-    sheetResumo.getCell(`A${obsRow}`).value = 'ObservaÃ§Ãµes'
+    sheetResumo.getCell(`A${obsRow}`).value = 'Observações'
     sheetResumo.getCell(`A${obsRow}`).font = { bold: true }
     
     const obs = [
-      'ââ‚¬¢ Os valores apresentados referem-se ao perÃ­odo especificado',
-      'ââ‚¬¢ NFs sem data nÃ£o sÃ£o consideradas no filtro de perÃ­odo',
-      'ââ‚¬¢ Verifique a aba "NFs de Entrada" e "NFs de SaÃ­da" para detalhes completos',
-      'ââ‚¬¢ RelatÃ³rio gerado automaticamente pelo sistema Beef Sync'
+      '• Os valores apresentados referem-se ao período especificado',
+      '• NFs sem data não são consideradas no filtro de período',
+      '• Verifique a aba "NFs de Entrada" e "NFs de Saída" para detalhes completos',
+      '• Relatório gerado automaticamente pelo sistema Beef Sync'
     ]
 
     obs.forEach(texto => {
@@ -254,10 +254,10 @@ export default async function handler(req, res) {
     })
 
     // Buscar dados das notas fiscais
-    console.log('ðÅ¸â€�� Buscando notas fiscais de entrada...', { pgStart, pgEnd })
+    console.log('🔍 Buscando notas fiscais de entrada...', { pgStart, pgEnd })
     let nfsEntradas
     try {
-      // Primeiro, buscar todas as notas fiscais de entrada no perÃ­odo
+      // Primeiro, buscar todas as notas fiscais de entrada no período
       const queryEntradas = await query(`
         SELECT numero_nf, data_compra, data, fornecedor, natureza_operacao, valor_total, itens, observacoes, id
         FROM notas_fiscais 
@@ -267,10 +267,10 @@ export default async function handler(req, res) {
       `, [pgStart, pgEnd])
       
       nfsEntradas = queryEntradas
-      console.log(`âÅ“â€¦ Encontradas ${nfsEntradas?.rows?.length || 0} notas fiscais de entrada no perÃ­odo`)
+      console.log(`✅ Encontradas ${nfsEntradas?.rows?.length || 0} notas fiscais de entrada no período`)
       
-      // Buscar tambÃ©m notas fiscais recentes que possam ter sido criadas hoje mas com data diferente
-      // Isso garante que notas fiscais recÃ©m-criadas sejam incluÃ­das
+      // Buscar também notas fiscais recentes que possam ter sido criadas hoje mas com data diferente
+      // Isso garante que notas fiscais recém-criadas sejam incluídas
       const hoje = new Date().toISOString().split('T')[0]
       const nfsRecentes = await query(`
         SELECT numero_nf, data_compra, data, fornecedor, natureza_operacao, valor_total, itens, observacoes, id
@@ -300,12 +300,12 @@ export default async function handler(req, res) {
       }
       
       nfsEntradas = { rows: Array.from(nfsMap.values()) }
-      console.log(`âÅ“â€¦ Total de NFs de entrada apÃ³s combinar: ${nfsEntradas?.rows?.length || 0}`)
+      console.log(`✅ Total de NFs de entrada após combinar: ${nfsEntradas?.rows?.length || 0}`)
       
-      // Verificar se a NF especÃ­fica 26650993 estÃ¡ presente
+      // Verificar se a NF específica 26650993 está presente
       const nf26650993 = nfsEntradas.rows.find(nf => nf.numero_nf === '26650993' || nf.numero_nf === 26650993)
       if (nf26650993) {
-        console.log('âÅ“â€¦ NF 26650993 encontrada:', {
+        console.log('✅ NF 26650993 encontrada:', {
           numero: nf26650993.numero_nf,
           data_compra: nf26650993.data_compra,
           data: nf26650993.data,
@@ -314,14 +314,14 @@ export default async function handler(req, res) {
           id: nf26650993.id
         })
         
-        // Buscar itens especÃ­ficos desta NF para debug
+        // Buscar itens específicos desta NF para debug
         if (nf26650993.id) {
           try {
             const itensDebug = await query(`
               SELECT dados_item FROM notas_fiscais_itens
               WHERE nota_fiscal_id = $1
             `, [nf26650993.id])
-            console.log(`ðÅ¸â€œâ€¹ NF 26650993: ${itensDebug?.rows?.length || 0} itens encontrados`)
+            console.log(`📋 NF 26650993: ${itensDebug?.rows?.length || 0} itens encontrados`)
             if (itensDebug?.rows?.length > 0) {
               const itensParsed = itensDebug.rows.map(row => {
                 try {
@@ -345,27 +345,27 @@ export default async function handler(req, res) {
                 const valorUnit = parseFloat(String(item.valorUnitario || item.valor_unitario || item.valor || 0).replace(',', '.')) || 0
                 return sum + (qtd * valorUnit)
               }, 0)
-              console.log(`ðÅ¸â€œÅ  NF 26650993: Total de animais calculado: ${totalQtd}, Valor total calculado: R$ ${totalValor.toFixed(2)}`)
-              console.log(`ðÅ¸â€œâ€¹ NF 26650993: Primeiros 3 itens:`, itensParsed.slice(0, 3).map(item => ({
+              console.log(`📊 NF 26650993: Total de animais calculado: ${totalQtd}, Valor total calculado: R$ ${totalValor.toFixed(2)}`)
+              console.log(`📋 NF 26650993: Primeiros 3 itens:`, itensParsed.slice(0, 3).map(item => ({
                 quantidade: item.quantidade || item.quantidadeAnimais || item.qtd,
                 valorUnitario: item.valorUnitario || item.valor_unitario || item.valor,
                 modoCadastro: item.modoCadastro
               })))
             }
           } catch (e) {
-            console.warn(`âÅ¡ ï¸� Erro ao buscar itens da NF 26650993 para debug:`, e.message)
+            console.warn(`⚠️ Erro ao buscar itens da NF 26650993 para debug:`, e.message)
           }
         }
       } else {
-        console.log('âÅ¡ ï¸� NF 26650993 nÃ£o encontrada nas entradas. Buscando especificamente...')
+        console.log('⚠️ NF 26650993 não encontrada nas entradas. Buscando especificamente...')
         const nfEspecifica = await query(`
           SELECT numero_nf, data_compra, data, fornecedor, tipo, created_at, updated_at
           FROM notas_fiscais 
           WHERE numero_nf = $1 OR numero_nf::text = $1
         `, ['26650993'])
         if (nfEspecifica?.rows?.length > 0) {
-          console.log('ðÅ¸â€œâ€¹ NF 26650993 encontrada no banco:', nfEspecifica.rows[0])
-          // Adicionar Ã  lista se nÃ£o estiver presente
+          console.log('📋 NF 26650993 encontrada no banco:', nfEspecifica.rows[0])
+          // Adicionar à lista se não estiver presente
           if (!nfsEntradas.rows.find(nf => (nf.numero_nf === '26650993' || nf.numero_nf === 26650993))) {
             const nfCompleta = await query(`
               SELECT numero_nf, data_compra, data, fornecedor, natureza_operacao, valor_total, itens, observacoes, id
@@ -374,15 +374,15 @@ export default async function handler(req, res) {
             `, ['26650993'])
             if (nfCompleta?.rows?.length > 0) {
               nfsEntradas.rows.push(nfCompleta.rows[0])
-              console.log('âÅ“â€¦ NF 26650993 adicionada Ã  lista de entradas')
+              console.log('✅ NF 26650993 adicionada à lista de entradas')
             }
           }
         }
       }
       
-      // Se nÃ£o encontrou nenhuma, buscar todas as notas fiscais de entrada para debug
+      // Se não encontrou nenhuma, buscar todas as notas fiscais de entrada para debug
       if (nfsEntradas?.rows?.length === 0) {
-        console.log('âÅ¡ ï¸� Nenhuma NF de entrada encontrada no perÃ­odo. Buscando todas as NFs de entrada para debug...')
+        console.log('⚠️ Nenhuma NF de entrada encontrada no período. Buscando todas as NFs de entrada para debug...')
         const todasEntradas = await query(`
           SELECT numero_nf, data_compra, data, fornecedor, tipo, created_at
           FROM notas_fiscais 
@@ -390,9 +390,9 @@ export default async function handler(req, res) {
           ORDER BY COALESCE(data_compra, data, created_at) DESC
           LIMIT 10
         `)
-        console.log(`ðÅ¸â€œÅ  Total de NFs de entrada no banco: ${todasEntradas?.rows?.length || 0}`)
+        console.log(`📊 Total de NFs de entrada no banco: ${todasEntradas?.rows?.length || 0}`)
         if (todasEntradas?.rows?.length > 0) {
-          console.log('ðÅ¸â€œâ€¹ ÃÅ¡ltimas 10 NFs de entrada:', todasEntradas.rows.map(nf => ({
+          console.log('📋 Últimas 10 NFs de entrada:', todasEntradas.rows.map(nf => ({
             numero: nf.numero_nf,
             data_compra: nf.data_compra,
             data: nf.data,
@@ -401,7 +401,7 @@ export default async function handler(req, res) {
           })))
         }
       } else if (nfsEntradas?.rows?.length > 0) {
-        console.log('ðÅ¸â€œâ€¹ Primeiras NFs encontradas:', nfsEntradas.rows.slice(0, 3).map(nf => ({
+        console.log('📋 Primeiras NFs encontradas:', nfsEntradas.rows.slice(0, 3).map(nf => ({
           numero: nf.numero_nf,
           data_compra: nf.data_compra,
           data: nf.data,
@@ -409,15 +409,15 @@ export default async function handler(req, res) {
         })))
       }
     } catch (error) {
-      console.error('â�Å’ Erro ao buscar NFs de entrada:', error)
+      console.error('❌ Erro ao buscar NFs de entrada:', error)
       console.error('Stack:', error.stack)
       nfsEntradas = { rows: [] }
     }
 
-    console.log('ðÅ¸â€�� Buscando notas fiscais de saÃ­da...', { pgStart, pgEnd })
+    console.log('🔍 Buscando notas fiscais de saída...', { pgStart, pgEnd })
     let nfsSaidas
     try {
-      // Buscar todas as notas fiscais de saÃ­da no perÃ­odo
+      // Buscar todas as notas fiscais de saída no período
       const querySaidas = await query(`
         SELECT numero_nf, data_compra, data, destino, natureza_operacao, valor_total, itens, observacoes, id
         FROM notas_fiscais 
@@ -427,9 +427,9 @@ export default async function handler(req, res) {
       `, [pgStart, pgEnd])
       
       nfsSaidas = querySaidas
-      console.log(`âÅ“â€¦ Encontradas ${nfsSaidas?.rows?.length || 0} notas fiscais de saÃ­da no perÃ­odo`)
+      console.log(`✅ Encontradas ${nfsSaidas?.rows?.length || 0} notas fiscais de saída no período`)
       
-      // Buscar tambÃ©m notas fiscais recentes que possam ter sido criadas hoje mas com data diferente
+      // Buscar também notas fiscais recentes que possam ter sido criadas hoje mas com data diferente
       const hoje = new Date().toISOString().split('T')[0]
       const nfsRecentesSaidas = await query(`
         SELECT numero_nf, data_compra, data, destino, natureza_operacao, valor_total, itens, observacoes, id
@@ -459,11 +459,11 @@ export default async function handler(req, res) {
       }
       
       nfsSaidas = { rows: Array.from(nfsMapSaidas.values()) }
-      console.log(`âÅ“â€¦ Total de NFs de saÃ­da apÃ³s combinar: ${nfsSaidas?.rows?.length || 0}`)
+      console.log(`✅ Total de NFs de saída após combinar: ${nfsSaidas?.rows?.length || 0}`)
       
-      // Se nÃ£o encontrou nenhuma, buscar todas as notas fiscais de saÃ­da para debug
+      // Se não encontrou nenhuma, buscar todas as notas fiscais de saída para debug
       if (nfsSaidas?.rows?.length === 0) {
-        console.log('âÅ¡ ï¸� Nenhuma NF de saÃ­da encontrada no perÃ­odo. Buscando todas as NFs de saÃ­da para debug...')
+        console.log('⚠️ Nenhuma NF de saída encontrada no período. Buscando todas as NFs de saída para debug...')
         const todasSaidas = await query(`
           SELECT numero_nf, data_compra, data, destino, tipo, created_at
           FROM notas_fiscais 
@@ -471,9 +471,9 @@ export default async function handler(req, res) {
           ORDER BY COALESCE(data_compra, data, created_at) DESC
           LIMIT 10
         `)
-        console.log(`ðÅ¸â€œÅ  Total de NFs de saÃ­da no banco: ${todasSaidas?.rows?.length || 0}`)
+        console.log(`📊 Total de NFs de saída no banco: ${todasSaidas?.rows?.length || 0}`)
         if (todasSaidas?.rows?.length > 0) {
-          console.log('ðÅ¸â€œâ€¹ ÃÅ¡ltimas 10 NFs de saÃ­da:', todasSaidas.rows.map(nf => ({
+          console.log('📋 Últimas 10 NFs de saída:', todasSaidas.rows.map(nf => ({
             numero: nf.numero_nf,
             data_compra: nf.data_compra,
             data: nf.data,
@@ -482,7 +482,7 @@ export default async function handler(req, res) {
           })))
         }
       } else if (nfsSaidas?.rows?.length > 0) {
-        console.log('ðÅ¸â€œâ€¹ Primeiras NFs encontradas:', nfsSaidas.rows.slice(0, 3).map(nf => ({
+        console.log('📋 Primeiras NFs encontradas:', nfsSaidas.rows.slice(0, 3).map(nf => ({
           numero: nf.numero_nf,
           data_compra: nf.data_compra,
           data: nf.data,
@@ -490,14 +490,14 @@ export default async function handler(req, res) {
         })))
       }
     } catch (error) {
-      console.error('â�Å’ Erro ao buscar NFs de saÃ­da:', error)
+      console.error('❌ Erro ao buscar NFs de saída:', error)
       console.error('Stack:', error.stack)
       nfsSaidas = { rows: [] }
     }
 
     // Adicionar dados de entrada
     if (!nfsEntradas || !nfsEntradas.rows) {
-      console.warn('âÅ¡ ï¸� Nenhuma nota fiscal de entrada encontrada ou estrutura invÃ¡lida')
+      console.warn('⚠️ Nenhuma nota fiscal de entrada encontrada ou estrutura inválida')
     } else {
       for (const nf of nfsEntradas.rows) {
         let itens = []
@@ -537,24 +537,24 @@ export default async function handler(req, res) {
                   const valorUnit = parseFloat(String(item.valorUnitario || item.valor_unitario || item.valor || 0).replace(',', '.')) || 0
                   const valorItem = qtd * valorUnit
                   
-                  // Identificar sexo - verificar mÃºltiplas formas e normalizar
+                  // Identificar sexo - verificar múltiplas formas e normalizar
                   const sexoRaw = String(item.sexo || '').trim()
                   const sexoLower = sexoRaw.toLowerCase()
                   
-                  // Verificar se Ã© macho (mais especÃ­fico primeiro)
+                  // Verificar se é macho (mais específico primeiro)
                   const isMacho = sexoLower === 'macho' || 
                                  sexoLower === 'm' || 
                                  sexoLower.startsWith('macho') ||
                                  sexoRaw.toUpperCase() === 'MACHO' ||
                                  sexoRaw.toUpperCase() === 'M'
                   
-                  // Verificar se Ã© fÃªmea (mais especÃ­fico primeiro)
-                  const isFemea = sexoLower === 'fÃªmea' || 
+                  // Verificar se é fêmea (mais específico primeiro)
+                  const isFemea = sexoLower === 'fêmea' || 
                                  sexoLower === 'femea' || 
                                  sexoLower === 'f' ||
-                                 sexoLower.startsWith('fÃªmea') ||
+                                 sexoLower.startsWith('fêmea') ||
                                  sexoLower.startsWith('femea') ||
-                                 sexoRaw.toUpperCase() === 'FÃÅ MEA' ||
+                                 sexoRaw.toUpperCase() === 'FÊMEA' ||
                                  sexoRaw.toUpperCase() === 'FEMEA' ||
                                  sexoRaw.toUpperCase() === 'F'
                   
@@ -562,7 +562,7 @@ export default async function handler(req, res) {
                   
                   // Log para debug da NF 26650993
                   if (nf.numero_nf === '26650993' || nf.numero_nf === 26650993) {
-                    console.log(`ðÅ¸â€�� Item NF 26650993: qtd=${qtd}, sexo="${sexoRaw}" (lower="${sexoLower}"), isMacho=${isMacho}, isFemea=${isFemea}, valorUnit=${valorUnit}`)
+                    console.log(`🔍 Item NF 26650993: qtd=${qtd}, sexo="${sexoRaw}" (lower="${sexoLower}"), isMacho=${isMacho}, isFemea=${isFemea}, valorUnit=${valorUnit}`)
                   }
                   
                   if (isMacho && !isFemea) {
@@ -572,21 +572,21 @@ export default async function handler(req, res) {
                     quantidadeFemeas += qtd
                     valorFemeas += valorItem
                   } else if (!isMacho && !isFemea) {
-                    // Se nÃ£o identificar, nÃ£o adicionar a nenhum (manter como 0)
-                    // Ou distribuir proporcionalmente apenas se realmente nÃ£o conseguir identificar
-                    console.warn(`âÅ¡ ï¸� NF ${nf.numero_nf}: Sexo nÃ£o identificado para item: "${sexoRaw}"`)
-                    // NÃ£o adicionar a nenhum grupo se nÃ£o conseguir identificar
+                    // Se não identificar, não adicionar a nenhum (manter como 0)
+                    // Ou distribuir proporcionalmente apenas se realmente não conseguir identificar
+                    console.warn(`⚠️ NF ${nf.numero_nf}: Sexo não identificado para item: "${sexoRaw}"`)
+                    // Não adicionar a nenhum grupo se não conseguir identificar
                   }
                   
-                  // Coletar raÃ§as
+                  // Coletar raças
                   if (item.raca) racas.add(item.raca)
                 })
                 
-                // Calcular valor total a partir dos itens se nÃ£o estiver definido
+                // Calcular valor total a partir dos itens se não estiver definido
                 if (valorTotalNF === 0 && itens.length > 0) {
                   valorTotalNF = valorMachos + valorFemeas
                 } else {
-                  // Se valor total estÃ¡ definido mas nÃ£o temos valores separados, distribuir proporcionalmente
+                  // Se valor total está definido mas não temos valores separados, distribuir proporcionalmente
                   if (valorTotalNF > 0 && valorMachos === 0 && valorFemeas === 0) {
                     if (quantidadeTotal > 0) {
                       valorMachos = (quantidadeMachos / quantidadeTotal) * valorTotalNF
@@ -595,23 +595,23 @@ export default async function handler(req, res) {
                   }
                 }
                 
-                console.log(`ðÅ¸â€œÅ  NF ${nf.numero_nf}: ${itens.length} itens, ${quantidadeTotal} animais (${quantidadeMachos}M + ${quantidadeFemeas}F), R$ ${valorTotalNF.toFixed(2)}`)
+                console.log(`📊 NF ${nf.numero_nf}: ${itens.length} itens, ${quantidadeTotal} animais (${quantidadeMachos}M + ${quantidadeFemeas}F), R$ ${valorTotalNF.toFixed(2)}`)
                 
                 // Log detalhado para NF 26650993
                 if (nf.numero_nf === '26650993' || nf.numero_nf === 26650993) {
-                  console.log(`âÅ“â€¦ NF 26650993 - Resumo Final:`)
+                  console.log(`✅ NF 26650993 - Resumo Final:`)
                   console.log(`   Total de animais: ${quantidadeTotal}`)
                   console.log(`   Machos: ${quantidadeMachos} (R$ ${valorMachos.toFixed(2)})`)
-                  console.log(`   FÃªmeas: ${quantidadeFemeas} (R$ ${valorFemeas.toFixed(2)})`)
+                  console.log(`   Fêmeas: ${quantidadeFemeas} (R$ ${valorFemeas.toFixed(2)})`)
                   console.log(`   Valor Total: R$ ${valorTotalNF.toFixed(2)}`)
                 }
               }
             } catch (e) {
-              console.warn(`âÅ¡ ï¸� Erro ao buscar itens da tabela para NF ${nf.numero_nf}:`, e.message)
+              console.warn(`⚠️ Erro ao buscar itens da tabela para NF ${nf.numero_nf}:`, e.message)
             }
           }
           
-          // Se nÃ£o encontrou na tabela, tentar do campo JSONB
+          // Se não encontrou na tabela, tentar do campo JSONB
           if (itens.length === 0 && nf.itens) {
             try {
               const raw = typeof nf.itens === 'string' ? JSON.parse(nf.itens) : nf.itens
@@ -627,7 +627,7 @@ export default async function handler(req, res) {
                 const valorUnit = parseFloat(String(item.valorUnitario || item.valor_unitario || item.valor || 0).replace(',', '.')) || 0
                 const valorItem = qtd * valorUnit
                 
-                // Identificar sexo - verificar mÃºltiplas formas e normalizar
+                // Identificar sexo - verificar múltiplas formas e normalizar
                 const sexoRaw = String(item.sexo || '').trim()
                 const sexoLower = sexoRaw.toLowerCase()
                 
@@ -637,12 +637,12 @@ export default async function handler(req, res) {
                                sexoRaw.toUpperCase() === 'MACHO' ||
                                sexoRaw.toUpperCase() === 'M'
                 
-                const isFemea = sexoLower === 'fÃªmea' || 
+                const isFemea = sexoLower === 'fêmea' || 
                                sexoLower === 'femea' || 
                                sexoLower === 'f' ||
-                               sexoLower.startsWith('fÃªmea') ||
+                               sexoLower.startsWith('fêmea') ||
                                sexoLower.startsWith('femea') ||
-                               sexoRaw.toUpperCase() === 'FÃÅ MEA' ||
+                               sexoRaw.toUpperCase() === 'FÊMEA' ||
                                sexoRaw.toUpperCase() === 'FEMEA' ||
                                sexoRaw.toUpperCase() === 'F'
                 
@@ -650,7 +650,7 @@ export default async function handler(req, res) {
                 
                 // Log para debug da NF 26650993
                 if (nf.numero_nf === '26650993' || nf.numero_nf === 26650993) {
-                  console.log(`ðÅ¸â€�� Item NF 26650993: qtd=${qtd}, sexo="${sexoRaw}" (lower="${sexoLower}"), isMacho=${isMacho}, isFemea=${isFemea}, valorUnit=${valorUnit}`)
+                  console.log(`🔍 Item NF 26650993: qtd=${qtd}, sexo="${sexoRaw}" (lower="${sexoLower}"), isMacho=${isMacho}, isFemea=${isFemea}, valorUnit=${valorUnit}`)
                 }
                 
                 if (isMacho && !isFemea) {
@@ -660,7 +660,7 @@ export default async function handler(req, res) {
                   quantidadeFemeas += qtd
                   valorFemeas += valorItem
                 } else if (!isMacho && !isFemea) {
-                  console.warn(`âÅ¡ ï¸� NF ${nf.numero_nf}: Sexo nÃ£o identificado para item: "${sexoRaw}"`)
+                  console.warn(`⚠️ NF ${nf.numero_nf}: Sexo não identificado para item: "${sexoRaw}"`)
                 }
                 
                 if (item.raca) racas.add(item.raca)
@@ -675,14 +675,14 @@ export default async function handler(req, res) {
                 }
               }
             } catch (e) {
-              console.warn(`âÅ¡ ï¸� Erro ao parsear itens JSONB da NF ${nf.numero_nf}:`, e.message)
+              console.warn(`⚠️ Erro ao parsear itens JSONB da NF ${nf.numero_nf}:`, e.message)
             }
           }
         } catch (error) {
-          console.error(`â�Å’ Erro ao processar itens da NF ${nf.numero_nf}:`, error)
+          console.error(`❌ Erro ao processar itens da NF ${nf.numero_nf}:`, error)
         }
         
-        // Se ainda nÃ£o tem valor total, buscar do banco novamente
+        // Se ainda não tem valor total, buscar do banco novamente
         if (valorTotalNF === 0) {
           try {
             const nfCompleta = await query(`
@@ -690,24 +690,24 @@ export default async function handler(req, res) {
             `, [nf.id])
             if (nfCompleta?.rows?.length > 0) {
               valorTotalNF = parseFloat(nfCompleta.rows[0].valor_total) || 0
-              // Distribuir proporcionalmente se nÃ£o temos valores separados
+              // Distribuir proporcionalmente se não temos valores separados
               if (valorTotalNF > 0 && quantidadeTotal > 0) {
                 valorMachos = (quantidadeMachos / quantidadeTotal) * valorTotalNF
                 valorFemeas = (quantidadeFemeas / quantidadeTotal) * valorTotalNF
               }
             }
           } catch (e) {
-            console.warn(`âÅ¡ ï¸� Erro ao buscar valor_total da NF ${nf.numero_nf}:`, e.message)
+            console.warn(`⚠️ Erro ao buscar valor_total da NF ${nf.numero_nf}:`, e.message)
           }
         }
         
-        // Criar observaÃ§Ãµes detalhadas
+        // Criar observações detalhadas
         let observacoesDetalhadas = nf.observacoes || ''
         
         if (itens.length > 0) {
           const detalhesAnimais = []
           if (quantidadeMachos > 0) detalhesAnimais.push(`${quantidadeMachos} macho${quantidadeMachos > 1 ? 's' : ''}`)
-          if (quantidadeFemeas > 0) detalhesAnimais.push(`${quantidadeFemeas} fÃªmea${quantidadeFemeas > 1 ? 's' : ''}`)
+          if (quantidadeFemeas > 0) detalhesAnimais.push(`${quantidadeFemeas} fêmea${quantidadeFemeas > 1 ? 's' : ''}`)
           
           if (detalhesAnimais.length > 0) {
             if (observacoesDetalhadas) {
@@ -735,9 +735,9 @@ export default async function handler(req, res) {
       }
     }
 
-    // Adicionar dados de saÃ­da
+    // Adicionar dados de saída
     if (!nfsSaidas || !nfsSaidas.rows) {
-      console.warn('âÅ¡ ï¸� Nenhuma nota fiscal de saÃ­da encontrada ou estrutura invÃ¡lida')
+      console.warn('⚠️ Nenhuma nota fiscal de saída encontrada ou estrutura inválida')
     } else {
       for (const nf of nfsSaidas.rows) {
         let itens = []
@@ -780,7 +780,7 @@ export default async function handler(req, res) {
                   
                   const sexo = String(item.sexo || '').toUpperCase()
                   const isMacho = sexo.includes('M') || sexo.includes('MACHO') || sexo === 'M'
-                  const isFemea = sexo.includes('F') || sexo.includes('FÃÅ MEA') || sexo.includes('FEMEA') || sexo === 'F'
+                  const isFemea = sexo.includes('F') || sexo.includes('FÊMEA') || sexo.includes('FEMEA') || sexo === 'F'
                   
                   quantidadeTotal += qtd
                   
@@ -811,11 +811,11 @@ export default async function handler(req, res) {
                 }
               }
             } catch (e) {
-              console.warn(`âÅ¡ ï¸� Erro ao buscar itens da tabela para NF ${nf.numero_nf}:`, e.message)
+              console.warn(`⚠️ Erro ao buscar itens da tabela para NF ${nf.numero_nf}:`, e.message)
             }
           }
           
-          // Se nÃ£o encontrou na tabela, tentar do campo JSONB
+          // Se não encontrou na tabela, tentar do campo JSONB
           if (itens.length === 0 && nf.itens) {
             try {
               const raw = typeof nf.itens === 'string' ? JSON.parse(nf.itens) : nf.itens
@@ -831,7 +831,7 @@ export default async function handler(req, res) {
                 const valorUnit = parseFloat(String(item.valorUnitario || item.valor_unitario || item.valor || 0).replace(',', '.')) || 0
                 const valorItem = qtd * valorUnit
                 
-                // Identificar sexo - verificar mÃºltiplas formas e normalizar
+                // Identificar sexo - verificar múltiplas formas e normalizar
                 const sexoRaw = String(item.sexo || '').trim()
                 const sexoLower = sexoRaw.toLowerCase()
                 
@@ -841,12 +841,12 @@ export default async function handler(req, res) {
                                sexoRaw.toUpperCase() === 'MACHO' ||
                                sexoRaw.toUpperCase() === 'M'
                 
-                const isFemea = sexoLower === 'fÃªmea' || 
+                const isFemea = sexoLower === 'fêmea' || 
                                sexoLower === 'femea' || 
                                sexoLower === 'f' ||
-                               sexoLower.startsWith('fÃªmea') ||
+                               sexoLower.startsWith('fêmea') ||
                                sexoLower.startsWith('femea') ||
-                               sexoRaw.toUpperCase() === 'FÃÅ MEA' ||
+                               sexoRaw.toUpperCase() === 'FÊMEA' ||
                                sexoRaw.toUpperCase() === 'FEMEA' ||
                                sexoRaw.toUpperCase() === 'F'
                 
@@ -854,7 +854,7 @@ export default async function handler(req, res) {
                 
                 // Log para debug da NF 26650993
                 if (nf.numero_nf === '26650993' || nf.numero_nf === 26650993) {
-                  console.log(`ðÅ¸â€�� Item NF 26650993: qtd=${qtd}, sexo="${sexoRaw}" (lower="${sexoLower}"), isMacho=${isMacho}, isFemea=${isFemea}, valorUnit=${valorUnit}`)
+                  console.log(`🔍 Item NF 26650993: qtd=${qtd}, sexo="${sexoRaw}" (lower="${sexoLower}"), isMacho=${isMacho}, isFemea=${isFemea}, valorUnit=${valorUnit}`)
                 }
                 
                 if (isMacho && !isFemea) {
@@ -864,7 +864,7 @@ export default async function handler(req, res) {
                   quantidadeFemeas += qtd
                   valorFemeas += valorItem
                 } else if (!isMacho && !isFemea) {
-                  console.warn(`âÅ¡ ï¸� NF ${nf.numero_nf}: Sexo nÃ£o identificado para item: "${sexoRaw}"`)
+                  console.warn(`⚠️ NF ${nf.numero_nf}: Sexo não identificado para item: "${sexoRaw}"`)
                 }
                 
                 if (item.raca) racas.add(item.raca)
@@ -879,14 +879,14 @@ export default async function handler(req, res) {
                 }
               }
             } catch (e) {
-              console.warn(`âÅ¡ ï¸� Erro ao parsear itens JSONB da NF ${nf.numero_nf}:`, e.message)
+              console.warn(`⚠️ Erro ao parsear itens JSONB da NF ${nf.numero_nf}:`, e.message)
             }
           }
         } catch (error) {
-          console.error(`â�Å’ Erro ao processar itens da NF ${nf.numero_nf}:`, error)
+          console.error(`❌ Erro ao processar itens da NF ${nf.numero_nf}:`, error)
         }
         
-        // Se ainda nÃ£o tem valor total, buscar do banco novamente
+        // Se ainda não tem valor total, buscar do banco novamente
         if (valorTotalNF === 0) {
           try {
             const nfCompleta = await query(`
@@ -900,17 +900,17 @@ export default async function handler(req, res) {
               }
             }
           } catch (e) {
-            console.warn(`âÅ¡ ï¸� Erro ao buscar valor_total da NF ${nf.numero_nf}:`, e.message)
+            console.warn(`⚠️ Erro ao buscar valor_total da NF ${nf.numero_nf}:`, e.message)
           }
         }
         
-        // Criar observaÃ§Ãµes detalhadas
+        // Criar observações detalhadas
         let observacoesDetalhadas = nf.observacoes || ''
         
         if (itens.length > 0) {
           const detalhesAnimais = []
           if (quantidadeMachos > 0) detalhesAnimais.push(`${quantidadeMachos} macho${quantidadeMachos > 1 ? 's' : ''}`)
-          if (quantidadeFemeas > 0) detalhesAnimais.push(`${quantidadeFemeas} fÃªmea${quantidadeFemeas > 1 ? 's' : ''}`)
+          if (quantidadeFemeas > 0) detalhesAnimais.push(`${quantidadeFemeas} fêmea${quantidadeFemeas > 1 ? 's' : ''}`)
           
           if (detalhesAnimais.length > 0) {
             if (observacoesDetalhadas) {
@@ -1018,7 +1018,7 @@ export default async function handler(req, res) {
         totalAnimaisEntradas += quantidadeNF || itens.length
         valorTotalEntradas += valorNF || parseFloat(nf.valor_total) || 0
       } catch (e) {
-        console.warn(`âÅ¡ ï¸� Erro ao calcular total de animais da NF ${nf.numero_nf}:`, e.message)
+        console.warn(`⚠️ Erro ao calcular total de animais da NF ${nf.numero_nf}:`, e.message)
         valorTotalEntradas += parseFloat(nf.valor_total) || 0
       }
     }
@@ -1092,7 +1092,7 @@ export default async function handler(req, res) {
         totalAnimaisSaidas += quantidadeNF || itens.length
         valorTotalSaidas += valorNF || parseFloat(nf.valor_total) || 0
       } catch (e) {
-        console.warn(`âÅ¡ ï¸� Erro ao calcular total de animais da NF ${nf.numero_nf}:`, e.message)
+        console.warn(`⚠️ Erro ao calcular total de animais da NF ${nf.numero_nf}:`, e.message)
         valorTotalSaidas += parseFloat(nf.valor_total) || 0
       }
     }
@@ -1117,10 +1117,10 @@ export default async function handler(req, res) {
     res.send(Buffer.from(buffer))
 
   } catch (error) {
-    console.error('â�Å’ Erro ao gerar relatÃ³rio de notas fiscais:', error)
+    console.error('❌ Erro ao gerar relatório de notas fiscais:', error)
     console.error('Stack trace:', error.stack)
     res.status(500).json({ 
-      message: 'Erro ao gerar relatÃ³rio de notas fiscais',
+      message: 'Erro ao gerar relatório de notas fiscais',
       error: error.message,
       details: process.env.NODE_ENV === 'development' ? error.stack : undefined
     })

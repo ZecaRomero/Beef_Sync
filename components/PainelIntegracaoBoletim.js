@@ -76,10 +76,10 @@ export default function PainelIntegracaoBoletim({ estatisticas, onRefresh }) {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            ðÅ¸â€�â€” IntegraÃ§Ã£o com Boletim de Animais
+            🔗 Integração com Boletim de Animais
           </h3>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            Controle de integraÃ§Ã£o entre notas fiscais e histÃ³rico de animais
+            Controle de integração entre notas fiscais e histórico de animais
           </p>
         </div>
         <button
@@ -91,11 +91,11 @@ export default function PainelIntegracaoBoletim({ estatisticas, onRefresh }) {
         </button>
       </div>
 
-      {/* EstatÃ­sticas de IntegraÃ§Ã£o */}
+      {/* Estatísticas de Integração */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
           <div className="flex items-center space-x-2">
-            <div className="text-2xl">ðÅ¸â€œâ€¹</div>
+            <div className="text-2xl">📋</div>
             <div>
               <p className="text-sm text-blue-600 dark:text-blue-400">Total de NFs</p>
               <p className="text-lg font-semibold text-blue-700 dark:text-blue-300">
@@ -107,7 +107,7 @@ export default function PainelIntegracaoBoletim({ estatisticas, onRefresh }) {
 
         <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
           <div className="flex items-center space-x-2">
-            <div className="text-2xl">âÅ“â€¦</div>
+            <div className="text-2xl">✅</div>
             <div>
               <p className="text-sm text-green-600 dark:text-green-400">Integradas</p>
               <p className="text-lg font-semibold text-green-700 dark:text-green-300">
@@ -119,7 +119,7 @@ export default function PainelIntegracaoBoletim({ estatisticas, onRefresh }) {
 
         <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg">
           <div className="flex items-center space-x-2">
-            <div className="text-2xl">â�³</div>
+            <div className="text-2xl">⏳</div>
             <div>
               <p className="text-sm text-orange-600 dark:text-orange-400">Pendentes</p>
               <p className="text-lg font-semibold text-orange-700 dark:text-orange-300">
@@ -131,9 +131,9 @@ export default function PainelIntegracaoBoletim({ estatisticas, onRefresh }) {
 
         <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
           <div className="flex items-center space-x-2">
-            <div className="text-2xl">ðÅ¸â€œ�</div>
+            <div className="text-2xl">📝</div>
             <div>
-              <p className="text-sm text-purple-600 dark:text-purple-400">OcorrÃªncias</p>
+              <p className="text-sm text-purple-600 dark:text-purple-400">Ocorrências</p>
               <p className="text-lg font-semibold text-purple-700 dark:text-purple-300">
                 {estatisticas.ocorrenciasGeradas || 0}
               </p>
@@ -145,7 +145,7 @@ export default function PainelIntegracaoBoletim({ estatisticas, onRefresh }) {
       {/* Lista de Notas Fiscais */}
       <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
         <h4 className="font-medium text-gray-900 dark:text-white mb-4">
-          ðÅ¸â€œâ€¹ Status de IntegraÃ§Ã£o das Notas Fiscais
+          📋 Status de Integração das Notas Fiscais
         </h4>
         
         {nfs.length === 0 ? (
@@ -184,15 +184,15 @@ export default function PainelIntegracaoBoletim({ estatisticas, onRefresh }) {
                             ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
                             : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
                         }`}>
-                          {nf.tipo === 'entrada' ? 'Entrada' : 'SaÃ­da'}
+                          {nf.tipo === 'entrada' ? 'Entrada' : 'Saída'}
                         </span>
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400">
-                        {formatDate(nf.data)} ââ‚¬¢ {formatCurrency(nf.valorTotal)} ââ‚¬¢ {nf.itens?.length || 0} itens
+                        {formatDate(nf.data)} • {formatCurrency(nf.valorTotal)} • {nf.itens?.length || 0} itens
                       </div>
                       {ocorrencias.length > 0 && (
                         <div className="text-xs text-purple-600 dark:text-purple-400 mt-1">
-                          {ocorrencias.length} ocorrÃªncia(s) no boletim
+                          {ocorrencias.length} ocorrência(s) no boletim
                         </div>
                       )}
                     </div>
@@ -221,13 +221,13 @@ export default function PainelIntegracaoBoletim({ estatisticas, onRefresh }) {
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  ðÅ¸â€œâ€¹ Detalhes da NF {nfDetalhes.numeroNF}
+                  📋 Detalhes da NF {nfDetalhes.numeroNF}
                 </h3>
                 <button
                   onClick={() => setMostrarDetalhes(false)}
                   className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl"
                 >
-                  âÅ“â€¢
+                  ✕
                 </button>
               </div>
             </div>
@@ -240,7 +240,7 @@ export default function PainelIntegracaoBoletim({ estatisticas, onRefresh }) {
                   <div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">Tipo</p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {nfDetalhes.tipo === 'entrada' ? 'Entrada' : 'SaÃ­da'}
+                      {nfDetalhes.tipo === 'entrada' ? 'Entrada' : 'Saída'}
                     </p>
                   </div>
                   <div>
@@ -275,12 +275,12 @@ export default function PainelIntegracaoBoletim({ estatisticas, onRefresh }) {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="font-medium text-gray-900 dark:text-white">
-                            {item.tipoProduto === 'bovino' ? 'ðÅ¸�â€ž Bovino' : 
-                             item.tipoProduto === 'semen' ? 'ðÅ¸§¬ SÃªmen' : 'ðÅ¸§« EmbriÃ£o'}
+                            {item.tipoProduto === 'bovino' ? '🐄 Bovino' : 
+                             item.tipoProduto === 'semen' ? '🧬 Sêmen' : '🧫 Embrião'}
                           </p>
                           {item.tipoProduto === 'bovino' && (
                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                              Tatuagem: {item.tatuagem} ââ‚¬¢ Sexo: {item.sexo} ââ‚¬¢ Era: {item.era}
+                              Tatuagem: {item.tatuagem} • Sexo: {item.sexo} • Era: {item.era}
                             </p>
                           )}
                         </div>
@@ -295,15 +295,15 @@ export default function PainelIntegracaoBoletim({ estatisticas, onRefresh }) {
                 </div>
               </div>
 
-              {/* OcorrÃªncias no Boletim */}
+              {/* Ocorrências no Boletim */}
               <div>
                 <h4 className="font-medium text-gray-900 dark:text-white mb-3">
-                  ðÅ¸â€œ� OcorrÃªncias no Boletim de Animais ({nfDetalhes.ocorrencias.length})
+                  📝 Ocorrências no Boletim de Animais ({nfDetalhes.ocorrencias.length})
                 </h4>
                 {nfDetalhes.ocorrencias.length === 0 ? (
                   <div className="text-center py-8 bg-gray-50 dark:bg-gray-700 rounded-lg">
                     <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                    <p className="text-gray-600 dark:text-gray-400">Nenhuma ocorrÃªncia registrada no boletim</p>
+                    <p className="text-gray-600 dark:text-gray-400">Nenhuma ocorrência registrada no boletim</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -312,10 +312,10 @@ export default function PainelIntegracaoBoletim({ estatisticas, onRefresh }) {
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="font-medium text-gray-900 dark:text-white">
-                              {ocorrencia.tipo === 'entrada' ? 'ðÅ¸â€œ¥ Entrada' : 'ðÅ¸â€œ¤ SaÃ­da'}
+                              {ocorrencia.tipo === 'entrada' ? '📥 Entrada' : '📤 Saída'}
                             </p>
                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                              {formatDate(ocorrencia.data)} ââ‚¬¢ {ocorrencia.descricao}
+                              {formatDate(ocorrencia.data)} • {ocorrencia.descricao}
                             </p>
                             {ocorrencia.observacoes && (
                               <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">

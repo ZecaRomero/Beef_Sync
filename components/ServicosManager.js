@@ -41,7 +41,7 @@ export default function ServicosManager() {
         setServicos(data)
       }
     } catch (error) {
-      console.error('Erro ao carregar serviÃ§os:', error)
+      console.error('Erro ao carregar serviços:', error)
     }
   }
 
@@ -62,16 +62,16 @@ export default function ServicosManager() {
 
     const camposFaltando = [];
     
-    if (!formData.nome) camposFaltando.push('Nome do ServiÃ§o');
+    if (!formData.nome) camposFaltando.push('Nome do Serviço');
     if (!formData.categoria) camposFaltando.push('Categoria');
-    if (!formData.valor_padrao) camposFaltando.push('Valor PadrÃ£o');
+    if (!formData.valor_padrao) camposFaltando.push('Valor Padrão');
     
     if (camposFaltando.length > 0) {
-      let mensagem = 'â�Å’ Campos obrigatÃ³rios nÃ£o preenchidos:\n\n';
+      let mensagem = '❌ Campos obrigatórios não preenchidos:\n\n';
       camposFaltando.forEach((campo, index) => {
         mensagem += `${index + 1}. ${campo}\n`;
       });
-      mensagem += '\nPor favor, preencha todos os campos obrigatÃ³rios antes de salvar.';
+      mensagem += '\nPor favor, preencha todos os campos obrigatórios antes de salvar.';
       alert(mensagem);
       return;
     }
@@ -90,7 +90,7 @@ export default function ServicosManager() {
       })
 
       if (response.ok) {
-        alert(editingServico ? 'ServiÃ§o atualizado!' : 'ServiÃ§o cadastrado!')
+        alert(editingServico ? 'Serviço atualizado!' : 'Serviço cadastrado!')
         resetForm()
         loadServicos()
         loadCategorias()
@@ -99,8 +99,8 @@ export default function ServicosManager() {
         alert(`Erro: ${error.message}`)
       }
     } catch (error) {
-      console.error('Erro ao salvar serviÃ§o:', error)
-      alert('Erro ao salvar serviÃ§o')
+      console.error('Erro ao salvar serviço:', error)
+      alert('Erro ao salvar serviço')
     }
   }
 
@@ -119,7 +119,7 @@ export default function ServicosManager() {
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('Tem certeza que deseja excluir este serviÃ§o?')) return
+    if (!confirm('Tem certeza que deseja excluir este serviço?')) return
 
     try {
       const response = await fetch(`/api/servicos/${id}`, {
@@ -127,13 +127,13 @@ export default function ServicosManager() {
       })
 
       if (response.ok) {
-        alert('ServiÃ§o excluÃ­do com sucesso!')
+        alert('Serviço excluído com sucesso!')
         loadServicos()
         loadCategorias()
       }
     } catch (error) {
-      console.error('Erro ao excluir serviÃ§o:', error)
-      alert('Erro ao excluir serviÃ§o')
+      console.error('Erro ao excluir serviço:', error)
+      alert('Erro ao excluir serviço')
     }
   }
 
@@ -172,10 +172,10 @@ export default function ServicosManager() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            ðÅ¸â€™¼ Cadastro de ServiÃ§os e Custos
+            💼 Cadastro de Serviços e Custos
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Gerencie os tipos de serviÃ§os que podem ser aplicados aos animais
+            Gerencie os tipos de serviços que podem ser aplicados aos animais
           </p>
         </div>
         <button
@@ -183,7 +183,7 @@ export default function ServicosManager() {
           className="mt-4 sm:mt-0 btn-primary flex items-center"
         >
           <PlusIcon className="h-5 w-5 mr-2" />
-          Novo ServiÃ§o
+          Novo Serviço
         </button>
       </div>
 
@@ -192,13 +192,13 @@ export default function ServicosManager() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              ðÅ¸â€�� Buscar
+              🔍 Buscar
             </label>
             <div className="relative">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Nome ou descriÃ§Ã£o..."
+                placeholder="Nome ou descrição..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="input-field pl-10"
@@ -224,13 +224,13 @@ export default function ServicosManager() {
         </div>
       </div>
 
-      {/* Lista de ServiÃ§os por Categoria */}
+      {/* Lista de Serviços por Categoria */}
       <div className="space-y-4">
         {Object.keys(servicosPorCategoria).sort().map(categoria => (
           <div key={categoria} className="card">
             <div className="p-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                ðÅ¸â€œâ€¹ {categoria} ({servicosPorCategoria[categoria].length})
+                📋 {categoria} ({servicosPorCategoria[categoria].length})
               </h3>
             </div>
             <div className="overflow-x-auto">
@@ -238,19 +238,19 @@ export default function ServicosManager() {
                 <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      Nome do ServiÃ§o
+                      Nome do Serviço
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      Valor PadrÃ£o
+                      Valor Padrão
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      AplicÃ¡vel
+                      Aplicável
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Status
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      AÃ§Ãµes
+                      Ações
                     </th>
                   </tr>
                 </thead>
@@ -278,12 +278,12 @@ export default function ServicosManager() {
                         <div className="flex gap-2">
                           {servico.aplicavel_macho && (
                             <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                              ðÅ¸�â€š Machos
+                              🐂 Machos
                             </span>
                           )}
                           {servico.aplicavel_femea && (
                             <span className="px-2 py-1 text-xs font-semibold rounded-full bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200">
-                              ðÅ¸�â€ž FÃªmeas
+                              🐄 Fêmeas
                             </span>
                           )}
                         </div>
@@ -329,30 +329,30 @@ export default function ServicosManager() {
 
         {filteredServicos.length === 0 && (
           <div className="card p-12 text-center">
-            <div className="text-6xl mb-4">ðÅ¸â€™¼</div>
+            <div className="text-6xl mb-4">💼</div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              Nenhum serviÃ§o encontrado
+              Nenhum serviço encontrado
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
-              Comece cadastrando os serviÃ§os que vocÃª utiliza na fazenda
+              Comece cadastrando os serviços que você utiliza na fazenda
             </p>
             <button
               onClick={() => setShowForm(true)}
               className="btn-primary"
             >
-              Cadastrar Primeiro ServiÃ§o
+              Cadastrar Primeiro Serviço
             </button>
           </div>
         )}
       </div>
 
-      {/* Modal de FormulÃ¡rio */}
+      {/* Modal de Formulário */}
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                {editingServico ? 'âÅ“�ï¸� Editar ServiÃ§o' : 'âÅ¾â€¢ Novo ServiÃ§o'}
+                {editingServico ? '✏️ Editar Serviço' : '➕ Novo Serviço'}
               </h2>
             </div>
 
@@ -360,14 +360,14 @@ export default function ServicosManager() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Nome do ServiÃ§o *
+                    Nome do Serviço *
                   </label>
                   <input
                     type="text"
                     value={formData.nome}
                     onChange={(e) => setFormData({...formData, nome: e.target.value})}
                     className="input-field"
-                    placeholder="Ex: Exame AndrolÃ³gico"
+                    placeholder="Ex: Exame Andrológico"
                     required
                   />
                 </div>
@@ -383,8 +383,8 @@ export default function ServicosManager() {
                     required
                   >
                     <option value="">Selecione...</option>
-                    <option value="VeterinÃ¡rios">VeterinÃ¡rios</option>
-                    <option value="ReproduÃ§Ã£o">ReproduÃ§Ã£o</option>
+                    <option value="Veterinários">Veterinários</option>
+                    <option value="Reprodução">Reprodução</option>
                     <option value="Medicamentos">Medicamentos</option>
                     <option value="Manejo">Manejo</option>
                     <option value="DNA">DNA</option>
@@ -394,7 +394,7 @@ export default function ServicosManager() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Valor PadrÃ£o (R$) *
+                    Valor Padrão (R$) *
                   </label>
                   <input
                     type="number"
@@ -409,7 +409,7 @@ export default function ServicosManager() {
 
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    AplicÃ¡vel a:
+                    Aplicável a:
                   </label>
                   <div className="flex gap-4">
                     <label className="flex items-center">
@@ -420,7 +420,7 @@ export default function ServicosManager() {
                         className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2"
                       />
                       <span className="text-sm text-gray-900 dark:text-white">
-                        ðÅ¸�â€š Machos
+                        🐂 Machos
                       </span>
                     </label>
                     <label className="flex items-center">
@@ -431,7 +431,7 @@ export default function ServicosManager() {
                         className="rounded border-gray-300 text-pink-600 focus:ring-pink-500 mr-2"
                       />
                       <span className="text-sm text-gray-900 dark:text-white">
-                        ðÅ¸�â€ž FÃªmeas
+                        🐄 Fêmeas
                       </span>
                     </label>
                   </div>
@@ -439,13 +439,13 @@ export default function ServicosManager() {
 
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    DescriÃ§Ã£o
+                    Descrição
                   </label>
                   <textarea
                     value={formData.descricao}
                     onChange={(e) => setFormData({...formData, descricao: e.target.value})}
                     className="input-field h-20 resize-none"
-                    placeholder="Detalhes sobre o serviÃ§o..."
+                    placeholder="Detalhes sobre o serviço..."
                   />
                 </div>
 
@@ -458,7 +458,7 @@ export default function ServicosManager() {
                       className="rounded border-gray-300 text-green-600 focus:ring-green-500 mr-2"
                     />
                     <span className="text-sm text-gray-900 dark:text-white">
-                      ServiÃ§o ativo (disponÃ­vel para uso)
+                      Serviço ativo (disponível para uso)
                     </span>
                   </label>
                 </div>

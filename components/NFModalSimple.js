@@ -43,7 +43,7 @@ function NFModalSimple({ onSave, onClose, naturezasOperacao = [] }) {
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
           >
-            âÅ“â€¢
+            ✕
           </button>
         </div>
 
@@ -51,7 +51,7 @@ function NFModalSimple({ onSave, onClose, naturezasOperacao = [] }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                NÃºmero da NF *
+                Número da NF *
               </label>
               <input
                 type="text"
@@ -87,7 +87,7 @@ function NFModalSimple({ onSave, onClose, naturezasOperacao = [] }) {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Natureza da OperaÃ§Ã£o
+                Natureza da Operação
               </label>
               <select
                 value={formData.naturezaOperacaoId}
@@ -106,7 +106,7 @@ function NFModalSimple({ onSave, onClose, naturezasOperacao = [] }) {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              ObservaÃ§Ãµes
+              Observações
             </label>
             <textarea
               value={formData.observacoes}

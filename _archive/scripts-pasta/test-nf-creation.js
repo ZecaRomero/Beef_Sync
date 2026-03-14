@@ -30,16 +30,16 @@ fetch('http://localhost:3020/api/notas-fiscais', {
 })
 .then(response => response.json())
 .then(data => {
-  console.log('�œ… Nota fiscal criada com sucesso:', data)
+  console.log('✅ Nota fiscal criada com sucesso:', data)
   
   // Testar API GET para verificar se foi salva
   return fetch('http://localhost:3020/api/notas-fiscais')
 })
 .then(response => response.json())
 .then(nfs => {
-  console.log('�Ÿ“‹ Notas fiscais no PostgreSQL:', nfs)
-  console.log(`�Ÿ“Š Total: ${nfs.length} nota(s)`)
+  console.log('📋 Notas fiscais no PostgreSQL:', nfs)
+  console.log(`📊 Total: ${nfs.length} nota(s)`)
 })
 .catch(error => {
-  console.error('�Œ Erro ao criar nota fiscal:', error)
+  console.error('❌ Erro ao criar nota fiscal:', error)
 })

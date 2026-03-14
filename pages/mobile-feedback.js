@@ -45,8 +45,8 @@ export default function MobileFeedback() {
       setGravando(true)
       setErro('')
     } catch (error) {
-      console.error('Erro ao iniciar gravaÃ§Ã£o:', error)
-      setErro('Erro ao acessar o microfone. Verifique as permissÃµes.')
+      console.error('Erro ao iniciar gravação:', error)
+      setErro('Erro ao acessar o microfone. Verifique as permissões.')
     }
   }
 
@@ -69,7 +69,7 @@ export default function MobileFeedback() {
     }
 
     if (!sugestao.trim() && !audioBlob) {
-      setErro('Por favor, escreva uma sugestÃ£o ou grave um Ã¡udio')
+      setErro('Por favor, escreva uma sugestão ou grave um áudio')
       return
     }
 
@@ -79,7 +79,7 @@ export default function MobileFeedback() {
     try {
       let audioBase64 = null
       
-      // Converter Ã¡udio para base64 se existir
+      // Converter áudio para base64 se existir
       if (audioBlob) {
         audioBase64 = await new Promise((resolve) => {
           const reader = new FileReader()
@@ -129,7 +129,7 @@ export default function MobileFeedback() {
           <div className="text-center">
             <CheckCircleIcon className="h-24 w-24 text-white mx-auto mb-4" />
             <h1 className="text-3xl font-bold text-white mb-2">Feedback Enviado!</h1>
-            <p className="text-white/80">Obrigado pela sua sugestÃ£o</p>
+            <p className="text-white/80">Obrigado pela sua sugestão</p>
           </div>
         </div>
       </>
@@ -156,14 +156,14 @@ export default function MobileFeedback() {
           <div className="w-9"></div>
         </div>
 
-        {/* FormulÃ¡rio */}
+        {/* Formulário */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 space-y-6">
           <div>
             <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-              ðÅ¸â€™¡ Sua opiniÃ£o Ã© importante!
+              💡 Sua opinião é importante!
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Ajude-nos a melhorar o sistema com suas sugestÃµes
+              Ajude-nos a melhorar o sistema com suas sugestões
             </p>
           </div>
 
@@ -181,24 +181,24 @@ export default function MobileFeedback() {
             />
           </div>
 
-          {/* SugestÃ£o */}
+          {/* Sugestão */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Sua SugestÃ£o
+              Sua Sugestão
             </label>
             <textarea
               value={sugestao}
               onChange={(e) => setSugestao(e.target.value)}
-              placeholder="Descreva sua sugestÃ£o ou melhoria..."
+              placeholder="Descreva sua sugestão ou melhoria..."
               rows={5}
               className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white resize-none"
             />
           </div>
 
-          {/* GravaÃ§Ã£o de Ã�udio */}
+          {/* Gravação de Áudio */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Ou grave um Ã¡udio (opcional)
+              Ou grave um áudio (opcional)
             </label>
             
             {!audioBlob ? (
@@ -214,12 +214,12 @@ export default function MobileFeedback() {
                 {gravando ? (
                   <>
                     <StopIcon className="h-6 w-6" />
-                    Parar GravaÃ§Ã£o
+                    Parar Gravação
                   </>
                 ) : (
                   <>
                     <MicrophoneIcon className="h-6 w-6" />
-                    Gravar Ã�udio
+                    Gravar Áudio
                   </>
                 )}
               </button>
@@ -229,7 +229,7 @@ export default function MobileFeedback() {
                   <div className="flex items-center gap-2">
                     <CheckCircleIcon className="h-6 w-6 text-green-600 dark:text-green-400" />
                     <span className="text-sm font-medium text-green-700 dark:text-green-300">
-                      Ã�udio gravado com sucesso
+                      Áudio gravado com sucesso
                     </span>
                   </div>
                   <button
@@ -251,7 +251,7 @@ export default function MobileFeedback() {
             </div>
           )}
 
-          {/* BotÃ£o Enviar */}
+          {/* Botão Enviar */}
           <button
             type="button"
             onClick={enviarFeedback}

@@ -20,19 +20,19 @@ import {
 } from '../../utils/apiErrorHandler'
 import { withLoteTracking, LOTE_CONFIGS } from '../../utils/loteMiddleware'
 
-// FunÃ§Ã£o para corrigir a raÃ§a baseada na sÃ©rie
+// Função para corrigir a raça baseada na série
 function corrigirRacaPorSerie(animal) {
   if (animal.serie && racasPorSerie[animal.serie]) {
     const racaCorreta = racasPorSerie[animal.serie]
     if (animal.raca !== racaCorreta) {
-      logger.debug(`Corrigindo raÃ§a de ${animal.serie}-${animal.rg}: ${animal.raca} ââ€ â€™ ${racaCorreta}`)
+      logger.debug(`Corrigindo raça de ${animal.serie}-${animal.rg}: ${animal.raca} → ${racaCorreta}`)
       return { ...animal, raca: racaCorreta }
     }
   }
   return animal
 }
 
-// FunÃ§Ã£o para criar nota fiscal de entrada automaticamente
+// Função para criar nota fiscal de entrada automaticamente
 async function criarNotaFiscalEntradaAutomatica(animal) {
   try {
     const nfData = {
@@ -69,20 +69,20 @@ async function criarNotaFiscalEntradaAutomatica(animal) {
 
     return await response.json()
   } catch (error) {
-    logger.error('Erro ao criar NF automÃ¡tica:', error)
+    logger.error('Erro ao criar NF automática:', error)
     throw error
   }
 }
 
-// FunÃ§Ã£o para calcular era baseada na idade em meses e sexo
+// Função para calcular era baseada na idade em meses e sexo
 function calcularEra(meses, sexo) {
-  if (!meses || meses <= 0) return 'NÃ£o informado'
+  if (!meses || meses <= 0) return 'Não informado'
   
-  const isFemea = sexo && (sexo.toLowerCase().includes('fÃªmea') || sexo.toLowerCase().includes('femea') || sexo === 'F')
+  const isFemea = sexo && (sexo.toLowerCase().includes('fêmea') || sexo.toLowerCase().includes('femea') || sexo === 'F')
   const isMacho = sexo && (sexo.toLowerCase().includes('macho') || sexo === 'M')
   
   if (isFemea) {
-    // FÃÅ MEA: 0-7 / 7-12 / 12-18 / 18-24 / 24+
+    // FÊMEA: 0-7 / 7-12 / 12-18 / 18-24 / 24+
     if (meses <= 7) return '0/7'
     if (meses <= 12) return '7/12'
     if (meses <= 18) return '12/18'
@@ -97,7 +97,7 @@ function calcularEra(meses, sexo) {
     return '22+'
   }
   
-  // Se nÃ£o tem sexo definido, usar padrÃ£o antigo para compatibilidade
+  // Se não tem sexo definido, usar padrão antigo para compatibilidade
   if (meses <= 7) return '0/7'
   if (meses <= 12) return '7/12'
   if (meses <= 18) return '12/18'
@@ -122,7 +122,7 @@ async function animaisHandler(req, res) {
     const animais = await databaseService.buscarAnimais(filtros)
     
     // Adicionar campo identificacao para compatibilidade com componentes
-    // e corrigir raÃ§a baseada na sÃ©rie
+    // e corrigir raça baseada na série
     const animaisComIdentificacao = animais.map(animal => {
       const animalCorrigido = corrigirRacaPorSerie(animal)
       return {
@@ -146,27 +146,27 @@ async function animaisHandler(req, res) {
   } else if (req.method === 'POST') {
     const { serie, rg, sexo, raca, boletim, pasto_atual, preRegistro } = req.body
     
-    // PrÃ©-cadastro: sÃ³ SÃ©rie e RG obrigatÃ³rios; demais campos opcionais
+    // Pré-cadastro: só Série e RG obrigatórios; demais campos opcionais
     const isPreRegistro = preRegistro === true || preRegistro === 'true'
     if (isPreRegistro) {
       if (!serie?.trim() || !rg?.trim()) {
-        return sendValidationError(res, 'PrÃ©-cadastro exige SÃ©rie e RG', {
+        return sendValidationError(res, 'Pré-cadastro exige Série e RG', {
           required: ['serie', 'rg'],
           provided: { serie: !!serie?.trim(), rg: !!rg?.trim() }
         })
       }
     } else {
-      // Cadastro completo: validaÃ§Ã£o normal
+      // Cadastro completo: validação normal
       if (!serie || !rg || !sexo || !raca || !boletim || !pasto_atual) {
-        return sendValidationError(res, 'Dados obrigatÃ³rios nÃ£o fornecidos', {
+        return sendValidationError(res, 'Dados obrigatórios não fornecidos', {
           required: ['serie', 'rg', 'sexo', 'raca', 'boletim', 'pasto_atual'],
           provided: { serie: !!serie, rg: !!rg, sexo: !!sexo, raca: !!raca, boletim: !!boletim, pasto_atual: !!pasto_atual }
         })
       }
     }
     
-    // Mapear dados do formulÃ¡rio para o formato do banco
-    const defaults = isPreRegistro ? { sexo: 'NÃ£o informado', raca: 'NÃ£o informada', boletim: 'PrÃ©-cadastro', pasto_atual: req.body.pasto_atual || req.body.piquete_atual || null } : {}
+    // Mapear dados do formulário para o formato do banco
+    const defaults = isPreRegistro ? { sexo: 'Não informado', raca: 'Não informada', boletim: 'Pré-cadastro', pasto_atual: req.body.pasto_atual || req.body.piquete_atual || null } : {}
     const animalData = {
       nome: req.body.nome || null,
       serie: (req.body.serie || '').trim(),
@@ -207,7 +207,7 @@ async function animaisHandler(req, res) {
     }
     
     try {
-      // Buscar informaÃ§Ãµes do animal na internet antes de criar
+      // Buscar informações do animal na internet antes de criar
       let dadosInternet = null
       try {
         const animalSearchService = (await import('../../services/animalSearchService')).default
@@ -218,7 +218,7 @@ async function animaisHandler(req, res) {
           if (!animalData.observacoes && dadosInternet.informacoes.observacoes) {
             animalData.observacoes = dadosInternet.informacoes.observacoes
           }
-          // Adicionar informaÃ§Ãµes encontradas nas observaÃ§Ãµes
+          // Adicionar informações encontradas nas observações
           if (dadosInternet.informacoes.origem_registro) {
             animalData.observacoes = (animalData.observacoes || '') + 
               `\n[Dados da Internet] Origem: ${dadosInternet.informacoes.origem_registro}`
@@ -226,29 +226,29 @@ async function animaisHandler(req, res) {
         }
       } catch (searchError) {
         logger.warn(`Erro ao buscar animal na internet (continuando cadastro): ${searchError.message}`)
-        // NÃ£o falhar o cadastro se a busca falhar
+        // Não falhar o cadastro se a busca falhar
       }
       
       const animal = await databaseService.criarAnimal(animalData)
       
-      // Lote serÃ¡ criado automaticamente pelo middleware
+      // Lote será criado automaticamente pelo middleware
       
-      // DESABILITADO COMPLETAMENTE: NÃ£o criar nota fiscal de entrada automaticamente
-      // Animais de nascimento (com tipo_nascimento) NÃÆ’O devem ter NF de entrada
+      // DESABILITADO COMPLETAMENTE: Não criar nota fiscal de entrada automaticamente
+      // Animais de nascimento (com tipo_nascimento) NÃO devem ter NF de entrada
       // Apenas animais comprados devem ter NF, e isso deve ser feito manualmente
-      // atravÃ©s do mÃ³dulo de Notas Fiscais
+      // através do módulo de Notas Fiscais
       // 
-      // VerificaÃ§Ã£o adicional: se o animal tem tipo_nascimento, Ã© nascimento, nÃ£o compra
+      // Verificação adicional: se o animal tem tipo_nascimento, é nascimento, não compra
       // if (!animalData.tipo_nascimento && animalData.fornecedor) {
       //   try {
       //     await criarNotaFiscalEntradaAutomatica(animal)
       //     logger.info(`NF de entrada criada automaticamente para: ${animal.serie}${animal.rg}`)
       //   } catch (nfError) {
-      //     logger.error(`Erro ao criar NF automÃ¡tica: ${nfError.message}`)
+      //     logger.error(`Erro ao criar NF automática: ${nfError.message}`)
       //   }
       // }
       
-      // Registrar compra no Boletim ContÃ¡bil automaticamente
+      // Registrar compra no Boletim Contábil automaticamente
       if (req.body.valorCompra && req.body.dataCompra) {
         try {
           await boletimContabilService.registrarCompra({
@@ -263,10 +263,10 @@ async function animaisHandler(req, res) {
             notaFiscal: req.body.notaFiscal,
             observacoes: `Compra de animal - ${req.body.serie} ${req.body.rg}`
           })
-          logger.info(`Compra registrada no Boletim ContÃ¡bil: ${req.body.serie}${req.body.rg}`)
+          logger.info(`Compra registrada no Boletim Contábil: ${req.body.serie}${req.body.rg}`)
         } catch (boletimError) {
           logger.error(`Erro ao registrar compra no Boletim: ${boletimError.message}`)
-          // NÃ£o falhar o cadastro por erro no boletim
+          // Não falhar o cadastro por erro no boletim
         }
       }
       
@@ -284,19 +284,19 @@ async function animaisHandler(req, res) {
       return sendSuccess(res, animalComIdentificacao, 'Animal criado com sucesso', HTTP_STATUS.CREATED)
       
     } catch (error) {
-      // Tratar erros especÃ­ficos do banco de dados
-      if (error.code === '23505') { // ViolaÃ§Ã£o de constraint Ãºnica
-        return sendConflict(res, 'Animal com esta sÃ©rie/RG jÃ¡ existe', {
+      // Tratar erros específicos do banco de dados
+      if (error.code === '23505') { // Violação de constraint única
+        return sendConflict(res, 'Animal com esta série/RG já existe', {
           serie: req.body.serie,
           rg: req.body.rg
         })
-      } else if (error.code === '23502') { // ViolaÃ§Ã£o de NOT NULL
-        return sendValidationError(res, 'Dados obrigatÃ³rios nÃ£o fornecidos', {
+      } else if (error.code === '23502') { // Violação de NOT NULL
+        return sendValidationError(res, 'Dados obrigatórios não fornecidos', {
           field: error.column,
           constraint: 'NOT NULL'
         })
-      } else if (error.code === '23514') { // ViolaÃ§Ã£o de CHECK
-        return sendValidationError(res, 'Valor invÃ¡lido fornecido', {
+      } else if (error.code === '23514') { // Violação de CHECK
+        return sendValidationError(res, 'Valor inválido fornecido', {
           constraint: 'CHECK',
           detail: error.detail
         })
@@ -306,7 +306,7 @@ async function animaisHandler(req, res) {
     }
     
   } else {
-    logger.debug(`[API] ${req.method} /api/animals - MÃ©todo nÃ£o permitido`)
+    logger.debug(`[API] ${req.method} /api/animals - Método não permitido`)
     return sendMethodNotAllowed(res, ['GET', 'POST'])
   }
 }

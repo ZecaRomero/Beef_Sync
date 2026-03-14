@@ -11,14 +11,14 @@ export function useContabilidadeLembretes() {
 
   const [lembretes, setLembretes] = useState([]);
 
-  // Carregar configuraÃ§Ãµes do localStorage
+  // Carregar configurações do localStorage
   useEffect(() => {
     const configSalva = localStorage.getItem('contabilidadeConfig');
     if (configSalva) {
       try {
         setConfiguracoes(JSON.parse(configSalva));
       } catch (error) {
-        console.error('Erro ao carregar configuraÃ§Ãµes:', error);
+        console.error('Erro ao carregar configurações:', error);
       }
     }
 
@@ -32,7 +32,7 @@ export function useContabilidadeLembretes() {
     }
   }, []);
 
-  // FunÃ§Ã£o para calcular o 5Âº dia Ãºtil do mÃªs
+  // Função para calcular o 5º dia útil do mês
   const calcularQuintoDiaUtil = useCallback((ano, mes) => {
     let diasUteis = 0;
     let dia = 1;
@@ -41,7 +41,7 @@ export function useContabilidadeLembretes() {
       const data = new Date(ano, mes, dia);
       const diaSemana = data.getDay();
       
-      // Se nÃ£o Ã© sÃ¡bado (6) nem domingo (0)
+      // Se não é sábado (6) nem domingo (0)
       if (diaSemana !== 0 && diaSemana !== 6) {
         diasUteis++;
       }
@@ -54,7 +54,7 @@ export function useContabilidadeLembretes() {
     return new Date(ano, mes, dia);
   }, []);
 
-  // FunÃ§Ã£o para calcular prÃ³ximo vencimento
+  // Função para calcular próximo vencimento
   const calcularProximoVencimento = useCallback(() => {
     const hoje = new Date();
     const mesAtual = hoje.getMonth();
@@ -62,7 +62,7 @@ export function useContabilidadeLembretes() {
     
     const quintoDiaUtil = calcularQuintoDiaUtil(anoAtual, mesAtual);
     
-    // Se jÃ¡ passou, calcular para o prÃ³ximo mÃªs
+    // Se já passou, calcular para o próximo mês
     if (quintoDiaUtil < hoje) {
       const proximoMes = mesAtual === 11 ? 0 : mesAtual + 1;
       const proximoAno = mesAtual === 11 ? anoAtual + 1 : anoAtual;
@@ -72,7 +72,7 @@ export function useContabilidadeLembretes() {
     return quintoDiaUtil;
   }, [calcularQuintoDiaUtil]);
 
-  // FunÃ§Ã£o para verificar se precisa criar lembrete
+  // Função para verificar se precisa criar lembrete
   const verificarLembretes = useCallback(() => {
     if (!configuracoes.ativo) return false;
 
@@ -80,7 +80,7 @@ export function useContabilidadeLembretes() {
     const mesAtual = hoje.getMonth();
     const anoAtual = hoje.getFullYear();
     
-    // Verificar se jÃ¡ existe um lembrete para este mÃªs
+    // Verificar se já existe um lembrete para este mês
     const jaExisteLembreteDoMes = lembretes.some(lembrete => {
       const dataLembrete = new Date(lembrete.criadoEm);
       return dataLembrete.getMonth() === mesAtual && 
@@ -89,7 +89,7 @@ export function useContabilidadeLembretes() {
     });
     
     if (jaExisteLembreteDoMes) {
-      return false; // JÃ¡ existe lembrete para este mÃªs
+      return false; // Já existe lembrete para este mês
     }
     
     const quintoDiaUtil = calcularQuintoDiaUtil(anoAtual, mesAtual);
@@ -109,7 +109,7 @@ export function useContabilidadeLembretes() {
     return false;
   }, [configuracoes, lembretes, calcularQuintoDiaUtil]);
 
-  // FunÃ§Ã£o para criar lembrete
+  // Função para criar lembrete
   const criarLembrete = useCallback(() => {
     const hoje = new Date();
     const quintoDiaUtil = calcularQuintoDiaUtil(hoje.getFullYear(), hoje.getMonth());
@@ -117,15 +117,15 @@ export function useContabilidadeLembretes() {
     const novoLembrete = {
       id: Date.now(),
       tipo: 'contabilidade',
-      titulo: 'ðÅ¸â€œÅ  Lembrete: Envio para Contabilidade',
-      descricao: `Prazo atÃ© ${quintoDiaUtil.toLocaleDateString('pt-BR')} (5Âº dia Ãºtil)`,
+      titulo: '📊 Lembrete: Envio para Contabilidade',
+      descricao: `Prazo até ${quintoDiaUtil.toLocaleDateString('pt-BR')} (5º dia útil)`,
       dataVencimento: quintoDiaUtil,
       itens: [
-        'ðÅ¸â€œâ€ž Notas Fiscais do mÃªs',
-        'ðÅ¸â€˜¶ Planilha de Nascimentos',
-        'ðÅ¸â€œâ€¹ RelatÃ³rios de MovimentaÃ§Ã£o',
-        'ðÅ¸â€™° Comprovantes de Vendas',
-        'ðÅ¸â€œÅ  RelatÃ³rio de Custos'
+        '📄 Notas Fiscais do mês',
+        '👶 Planilha de Nascimentos',
+        '📋 Relatórios de Movimentação',
+        '💰 Comprovantes de Vendas',
+        '📊 Relatório de Custos'
       ],
       status: 'pendente',
       criadoEm: new Date(),
@@ -136,7 +136,7 @@ export function useContabilidadeLembretes() {
     setLembretes(novosLembretes);
     localStorage.setItem('lembretes', JSON.stringify(novosLembretes));
     
-    // Atualizar configuraÃ§Ãµes
+    // Atualizar configurações
     const novaConfig = {
       ...configuracoes,
       ultimoEnvio: new Date().toISOString()
@@ -147,7 +147,7 @@ export function useContabilidadeLembretes() {
     return novoLembrete;
   }, [lembretes, configuracoes, calcularQuintoDiaUtil]);
 
-  // FunÃ§Ã£o para marcar lembrete como concluÃ­do
+  // Função para marcar lembrete como concluído
   const marcarConcluido = useCallback((lembreteId) => {
     const lembretesAtualizados = lembretes.map(lembrete => 
       lembrete.id === lembreteId 
@@ -158,7 +158,7 @@ export function useContabilidadeLembretes() {
     setLembretes(lembretesAtualizados);
     localStorage.setItem('lembretes', JSON.stringify(lembretesAtualizados));
     
-    // Atualizar ultimoEnvio para evitar criar novo lembrete no mesmo mÃªs
+    // Atualizar ultimoEnvio para evitar criar novo lembrete no mesmo mês
     const novaConfig = {
       ...configuracoes,
       ultimoEnvio: new Date().toISOString()
@@ -167,13 +167,13 @@ export function useContabilidadeLembretes() {
     localStorage.setItem('contabilidadeConfig', JSON.stringify(novaConfig));
   }, [lembretes, configuracoes]);
 
-  // FunÃ§Ã£o para salvar configuraÃ§Ãµes
+  // Função para salvar configurações
   const salvarConfiguracoes = useCallback((novasConfig) => {
     setConfiguracoes(novasConfig);
     localStorage.setItem('contabilidadeConfig', JSON.stringify(novasConfig));
   }, []);
 
-  // FunÃ§Ã£o para gerar relatÃ³rio de nascimentos
+  // Função para gerar relatório de nascimentos
   const gerarRelatorioNascimentos = useCallback(() => {
     try {
       const nascimentos = JSON.parse(localStorage.getItem('birthData') || '[]');
@@ -188,7 +188,7 @@ export function useContabilidadeLembretes() {
 
       // Criar CSV com mais detalhes
       const csvContent = [
-        ['Data Nascimento', 'Nome/SÃ©rie', 'RG', 'Sexo', 'RaÃ§a', 'MÃ£e', 'Pai', 'Peso Nascimento', 'ObservaÃ§Ãµes'],
+        ['Data Nascimento', 'Nome/Série', 'RG', 'Sexo', 'Raça', 'Mãe', 'Pai', 'Peso Nascimento', 'Observações'],
         ...nascimentosDoMes.map(n => [
           new Date(n.data_nascimento).toLocaleDateString('pt-BR'),
           n.nome || n.serie || '',
@@ -220,7 +220,7 @@ export function useContabilidadeLembretes() {
         periodo: `${mesPassado.toLocaleDateString('pt-BR')} - ${ultimoDiaMesPassado.toLocaleDateString('pt-BR')}`
       };
     } catch (error) {
-      console.error('Erro ao gerar relatÃ³rio:', error);
+      console.error('Erro ao gerar relatório:', error);
       return {
         sucesso: false,
         erro: error.message
@@ -228,10 +228,10 @@ export function useContabilidadeLembretes() {
     }
   }, []);
 
-  // FunÃ§Ã£o para enviar email (simulaÃ§Ã£o)
+  // Função para enviar email (simulação)
   const enviarEmailContabilidade = useCallback(async (lembrete) => {
     if (!configuracoes.emailContabilidade) {
-      throw new Error('Email da contabilidade nÃ£o configurado');
+      throw new Error('Email da contabilidade não configurado');
     }
 
     // Simular envio de email
@@ -247,7 +247,7 @@ export function useContabilidadeLembretes() {
     });
   }, [configuracoes.emailContabilidade]);
 
-  // VerificaÃ§Ã£o automÃ¡tica de lembretes
+  // Verificação automática de lembretes
   useEffect(() => {
     const verificarAutomaticamente = () => {
       if (verificarLembretes()) {
@@ -258,7 +258,7 @@ export function useContabilidadeLembretes() {
     // Verificar imediatamente
     verificarAutomaticamente();
 
-    // Configurar verificaÃ§Ã£o diÃ¡ria Ã s 9h
+    // Configurar verificação diária às 9h
     const agora = new Date();
     const proximaVerificacao = new Date();
     proximaVerificacao.setHours(9, 0, 0, 0);
@@ -270,7 +270,7 @@ export function useContabilidadeLembretes() {
     const timeout = setTimeout(() => {
       verificarAutomaticamente();
       
-      // Depois configurar interval diÃ¡rio
+      // Depois configurar interval diário
       const interval = setInterval(verificarAutomaticamente, 24 * 60 * 60 * 1000);
       
       return () => clearInterval(interval);

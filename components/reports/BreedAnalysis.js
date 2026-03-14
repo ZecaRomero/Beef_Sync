@@ -1,4 +1,4 @@
-
+﻿
 import React, { useState } from 'react'
 
 
@@ -6,7 +6,7 @@ export default function BreedAnalysis() {
   const [selectedBreed, setSelectedBreed] = useState('all')
   const [sortBy, setSortBy] = useState('roi')
 
-  // AnÃ¡lise por raÃ§a
+  // Análise por raça
   const analyzeByBreed = () => {
     const breedStats = {}
     
@@ -39,7 +39,7 @@ export default function BreedAnalysis() {
       }
     })
 
-    // Calcular mÃ©dias e ROI
+    // Calcular médias e ROI
     Object.keys(breedStats).forEach(breed => {
       const stats = breedStats[breed]
       stats.avgAge = stats.avgAge / stats.count
@@ -58,22 +58,22 @@ export default function BreedAnalysis() {
 
   const getBreedIcon = (breed) => {
     const icons = {
-      'Nelore': 'ðÅ¸�â€š',
-      'Brahman': 'ðÅ¸�â€ž',
-      'Gir': 'ðÅ¸�®',
-      'Receptora': 'ðÅ¸�â€ž',
-      'Angus': 'âÅ¡«',
-      'Senepol': 'ðÅ¸â€�´'
+      'Nelore': '🐂',
+      'Brahman': '🐄',
+      'Gir': '🐮',
+      'Receptora': '🐄',
+      'Angus': '⚫',
+      'Senepol': '🔴'
     }
-    return icons[breed] || 'ðÅ¸�â€ž'
+    return icons[breed] || '🐄'
   }
 
   const getPerformanceLevel = (roi) => {
-    if (roi >= 30) return { level: 'Excelente', color: 'text-green-600 bg-green-100', icon: 'ðÅ¸�â€ ' }
-    if (roi >= 15) return { level: 'Boa', color: 'text-blue-600 bg-blue-100', icon: 'â­�' }
-    if (roi >= 5) return { level: 'Regular', color: 'text-yellow-600 bg-yellow-100', icon: 'ðÅ¸â€œÅ ' }
-    if (roi >= 0) return { level: 'Baixa', color: 'text-orange-600 bg-orange-100', icon: 'ðÅ¸â€œâ€°' }
-    return { level: 'PrejuÃ­zo', color: 'text-red-600 bg-red-100', icon: 'â�Å’' }
+    if (roi >= 30) return { level: 'Excelente', color: 'text-green-600 bg-green-100', icon: '🏆' }
+    if (roi >= 15) return { level: 'Boa', color: 'text-blue-600 bg-blue-100', icon: '⭐' }
+    if (roi >= 5) return { level: 'Regular', color: 'text-yellow-600 bg-yellow-100', icon: '📊' }
+    if (roi >= 0) return { level: 'Baixa', color: 'text-orange-600 bg-orange-100', icon: '📉' }
+    return { level: 'Prejuízo', color: 'text-red-600 bg-red-100', icon: '❌' }
   }
 
   return (
@@ -83,18 +83,18 @@ export default function BreedAnalysis() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2 flex items-center">
-              ðÅ¸�â€ž AnÃ¡lise por RaÃ§a
+              🐄 Análise por Raça
               <span className="ml-3 px-3 py-1 bg-white/20 rounded-full text-sm font-medium">
                 Detalhado
               </span>
             </h1>
             <p className="text-green-100 text-lg">
-              Performance comparativa entre diferentes raÃ§as do rebanho
+              Performance comparativa entre diferentes raças do rebanho
             </p>
           </div>
           <div className="text-right">
             <div className="text-2xl font-bold">{breeds.length}</div>
-            <div className="text-green-200">RaÃ§as Diferentes</div>
+            <div className="text-green-200">Raças Diferentes</div>
           </div>
         </div>
       </div>
@@ -111,7 +111,7 @@ export default function BreedAnalysis() {
                   : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
               }`}
             >
-              Todas as RaÃ§as
+              Todas as Raças
             </button>
             {breeds.map(breed => (
               <button
@@ -138,12 +138,12 @@ export default function BreedAnalysis() {
             <option value="profit">Lucro Total</option>
             <option value="revenue">Receita</option>
             <option value="count">Quantidade</option>
-            <option value="conversion">Taxa ConversÃ£o</option>
+            <option value="conversion">Taxa Conversão</option>
           </select>
         </div>
       </div>
 
-      {/* Cards de RaÃ§as */}
+      {/* Cards de Raças */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {Object.entries(breedData)
           .filter(([breed]) => selectedBreed === 'all' || selectedBreed === breed)
@@ -184,7 +184,7 @@ export default function BreedAnalysis() {
                   </div>
                 </div>
 
-                {/* MÃ©tricas Principais */}
+                {/* Métricas Principais */}
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div className="text-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
                     <div className="text-lg font-bold text-red-600 dark:text-red-400">
@@ -208,11 +208,11 @@ export default function BreedAnalysis() {
                     <div className="text-lg font-bold text-purple-600 dark:text-purple-400">
                       {stats.conversionRate.toFixed(1)}%
                     </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">ConversÃ£o</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">Conversão</div>
                   </div>
                 </div>
 
-                {/* EstatÃ­sticas Detalhadas */}
+                {/* Estatísticas Detalhadas */}
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600 dark:text-gray-400">Vendidos:</span>
@@ -227,20 +227,20 @@ export default function BreedAnalysis() {
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">Idade MÃ©dia:</span>
+                    <span className="text-gray-600 dark:text-gray-400">Idade Média:</span>
                     <span className="font-medium text-gray-900 dark:text-white">
                       {(parseFloat(stats.avgAge) || 0).toFixed(1)} meses
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">Investimento MÃ©dio:</span>
+                    <span className="text-gray-600 dark:text-gray-400">Investimento Médio:</span>
                     <span className="font-medium text-gray-900 dark:text-white">
                       R$ {(parseFloat(stats.avgInvestment) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                   {(parseFloat(stats.avgRevenue) || 0) > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">Receita MÃ©dia:</span>
+                      <span className="text-gray-600 dark:text-gray-400">Receita Média:</span>
                       <span className="font-medium text-gray-900 dark:text-white">
                         R$ {(parseFloat(stats.avgRevenue) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
@@ -273,7 +273,7 @@ export default function BreedAnalysis() {
       {/* Comparativo Geral */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
-          <span className="mr-3">ðÅ¸â€œÅ </span>
+          <span className="mr-3">📊</span>
           Comparativo Geral
         </h2>
 
@@ -281,11 +281,11 @@ export default function BreedAnalysis() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200 dark:border-gray-700">
-                <th className="text-left p-3 font-semibold text-gray-900 dark:text-white">RaÃ§a</th>
+                <th className="text-left p-3 font-semibold text-gray-900 dark:text-white">Raça</th>
                 <th className="text-center p-3 font-semibold text-gray-900 dark:text-white">Qtd</th>
                 <th className="text-center p-3 font-semibold text-gray-900 dark:text-white">ROI</th>
                 <th className="text-center p-3 font-semibold text-gray-900 dark:text-white">Lucro</th>
-                <th className="text-center p-3 font-semibold text-gray-900 dark:text-white">ConversÃ£o</th>
+                <th className="text-center p-3 font-semibold text-gray-900 dark:text-white">Conversão</th>
                 <th className="text-center p-3 font-semibold text-gray-900 dark:text-white">Performance</th>
               </tr>
             </thead>

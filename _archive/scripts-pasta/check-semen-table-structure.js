@@ -13,7 +13,7 @@ async function checkTableStructure() {
   const client = await pool.connect();
   
   try {
-    console.log('�Ÿ”� Verificando estrutura da tabela estoque_semen...');
+    console.log('🔍 Verificando estrutura da tabela estoque_semen...');
     
     // Verificar colunas da tabela
     const columns = await client.query(`
@@ -23,18 +23,18 @@ async function checkTableStructure() {
       ORDER BY ordinal_position;
     `);
     
-    console.log('\n�Ÿ“‹ Colunas encontradas:');
+    console.log('\n📋 Colunas encontradas:');
     columns.rows.forEach(col => {
       console.log(`   - ${col.column_name} (${col.data_type}) ${col.is_nullable === 'NO' ? 'NOT NULL' : 'NULL'}`);
     });
     
     // Verificar alguns registros
     const sample = await client.query('SELECT * FROM estoque_semen LIMIT 3');
-    console.log('\n�Ÿ“Š Registros de exemplo:');
+    console.log('\n📊 Registros de exemplo:');
     console.log(sample.rows);
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
   } finally {
     client.release();
     await pool.end();

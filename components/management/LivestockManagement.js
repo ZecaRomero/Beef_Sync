@@ -57,18 +57,18 @@ const LivestockManagement = () => {
       {
         id: 2,
         type: 'movement',
-        title: 'TransferÃªncia para Pasto 3',
+        title: 'Transferência para Pasto 3',
         description: 'Mover 20 novilhas para pastagem rotacionada',
         scheduledTime: '14:00',
         status: 'in_progress',
         priority: 'medium',
-        location: 'Pasto 2 ââ€ â€™ Pasto 3'
+        location: 'Pasto 2 → Pasto 3'
       },
       {
         id: 3,
         type: 'feeding',
-    title: 'DistribuiÃ§Ã£o de Insumos',
-    description: 'DistribuiÃ§Ã£o de sal mineral nos cochos',
+    title: 'Distribuição de Insumos',
+    description: 'Distribuição de sal mineral nos cochos',
         scheduledTime: '16:00',
         status: 'completed',
         priority: 'medium',
@@ -77,8 +77,8 @@ const LivestockManagement = () => {
       {
         id: 4,
         type: 'inspection',
-        title: 'InspeÃ§Ã£o SanitÃ¡ria',
-        description: 'VerificaÃ§Ã£o visual do rebanho',
+        title: 'Inspeção Sanitária',
+        description: 'Verificação visual do rebanho',
         scheduledTime: '07:00',
         status: 'completed',
         priority: 'high',
@@ -94,7 +94,7 @@ const LivestockManagement = () => {
         animal: 'Lote 15',
         from: 'Pasto 2',
         to: 'Curral de Manejo',
-        reason: 'VacinaÃ§Ã£o',
+        reason: 'Vacinação',
         time: '09:30',
         status: 'completed'
       },
@@ -103,7 +103,7 @@ const LivestockManagement = () => {
         animal: 'Vaca 234',
         from: 'Enfermaria',
         to: 'Pasto 4',
-        reason: 'RecuperaÃ§Ã£o completa',
+        reason: 'Recuperação completa',
         time: '11:15',
         status: 'completed'
       },
@@ -112,7 +112,7 @@ const LivestockManagement = () => {
         animal: 'Lote 8',
         from: 'Pasto 1',
         to: 'Pasto 3',
-        reason: 'RotaÃ§Ã£o de pastagem',
+        reason: 'Rotação de pastagem',
         time: '14:00',
         status: 'scheduled'
       }
@@ -150,7 +150,7 @@ const LivestockManagement = () => {
       switch (status) {
         case 'pending': return 'Pendente'
         case 'in_progress': return 'Em Andamento'
-        case 'completed': return 'ConcluÃ­da'
+        case 'completed': return 'Concluída'
         default: return 'Desconhecido'
       }
     }
@@ -202,7 +202,7 @@ const LivestockManagement = () => {
             </div>
           </div>
           <span className={`text-xs font-medium ${getPriorityColor(activity.priority)}`}>
-            {activity.priority === 'high' ? 'Alta' : activity.priority === 'medium' ? 'MÃ©dia' : 'Baixa'}
+            {activity.priority === 'high' ? 'Alta' : activity.priority === 'medium' ? 'Média' : 'Baixa'}
           </span>
         </div>
       </div>
@@ -223,13 +223,13 @@ const LivestockManagement = () => {
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-semibold text-gray-900 dark:text-white">{movement.animal}</h3>
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(movement.status)}`}>
-            {movement.status === 'completed' ? 'ConcluÃ­do' : 'Agendado'}
+            {movement.status === 'completed' ? 'Concluído' : 'Agendado'}
           </span>
         </div>
         <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
           <div className="flex items-center">
             <MapPinIcon className="h-4 w-4 mr-2" />
-            <span>{movement.from} ââ€ â€™ {movement.to}</span>
+            <span>{movement.from} → {movement.to}</span>
           </div>
           <div className="flex items-center justify-between">
             <span>Motivo: {movement.reason}</span>
@@ -250,12 +250,12 @@ const LivestockManagement = () => {
             Manejo do Gado
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Controle de atividades diÃ¡rias e movimentaÃ§Ã£o do rebanho
+            Controle de atividades diárias e movimentação do rebanho
           </p>
         </div>
       </div>
 
-      {/* EstatÃ­sticas */}
+      {/* Estatísticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <StatCard
           title="Atividades Agendadas"
@@ -265,7 +265,7 @@ const LivestockManagement = () => {
           subtitle="Para hoje"
         />
         <StatCard
-          title="ConcluÃ­das Hoje"
+          title="Concluídas Hoje"
           value={managementData.completedToday}
           icon={CheckCircleIcon}
           color="text-green-600"
@@ -279,7 +279,7 @@ const LivestockManagement = () => {
           subtitle="Animais"
         />
         <StatCard
-          title="MovimentaÃ§Ãµes"
+          title="Movimentações"
           value={managementData.animalMovements}
           icon={TruckIcon}
           color="text-purple-600"
@@ -306,10 +306,10 @@ const LivestockManagement = () => {
         </div>
       </div>
 
-      {/* MovimentaÃ§Ãµes Recentes */}
+      {/* Movimentações Recentes */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          MovimentaÃ§Ãµes Recentes
+          Movimentações Recentes
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {movements.map(movement => (
@@ -318,7 +318,7 @@ const LivestockManagement = () => {
         </div>
       </div>
 
-      {/* AÃ§Ãµes RÃ¡pidas */}
+      {/* Ações Rápidas */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <button className="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-xl shadow-lg transition-colors">
           <CalendarDaysIcon className="h-8 w-8 mx-auto mb-3" />
@@ -334,14 +334,14 @@ const LivestockManagement = () => {
         
         <button className="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-xl shadow-lg transition-colors">
           <TruckIcon className="h-8 w-8 mx-auto mb-3" />
-          <h3 className="font-semibold">MovimentaÃ§Ã£o</h3>
+          <h3 className="font-semibold">Movimentação</h3>
           <p className="text-sm opacity-90 mt-1">Mover animais</p>
         </button>
         
         <button className="bg-indigo-600 hover:bg-indigo-700 text-white p-6 rounded-xl shadow-lg transition-colors">
           <ClipboardDocumentListIcon className="h-8 w-8 mx-auto mb-3" />
-          <h3 className="font-semibold">RelatÃ³rio</h3>
-          <p className="text-sm opacity-90 mt-1">RelatÃ³rio de manejo</p>
+          <h3 className="font-semibold">Relatório</h3>
+          <p className="text-sm opacity-90 mt-1">Relatório de manejo</p>
         </button>
       </div>
     </div>

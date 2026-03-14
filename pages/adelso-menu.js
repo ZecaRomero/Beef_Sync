@@ -41,7 +41,7 @@ export default function AdelsoMenu() {
       }
       setLoading(false)
     } catch (e) {
-      console.error('Erro ao verificar autenticaÃ§Ã£o:', e)
+      console.error('Erro ao verificar autenticação:', e)
       router.push('/login')
     }
   }, [router, user, authLoading])
@@ -75,10 +75,10 @@ export default function AdelsoMenu() {
               transition={{ type: 'spring', stiffness: 200 }}
               className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg mb-4"
             >
-              <span className="text-4xl">ðÅ¸â€˜¨ââ‚¬�ðÅ¸â€™¼</span>
+              <span className="text-4xl">👨‍💼</span>
             </motion.div>
-            <h1 className="text-3xl font-bold text-white mb-2">OlÃ¡, Adelso!</h1>
-            <p className="text-gray-400">Escolha uma opÃ§Ã£o para continuar</p>
+            <h1 className="text-3xl font-bold text-white mb-2">Olá, Adelso!</h1>
+            <p className="text-gray-400">Escolha uma opção para continuar</p>
           </div>
 
           {/* Menu Cards */}
@@ -108,7 +108,7 @@ export default function AdelsoMenu() {
               </Link>
             </motion.div>
 
-            {/* RelatÃ³rios */}
+            {/* Relatórios */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -124,8 +124,8 @@ export default function AdelsoMenu() {
                       <ChartBarIcon className="h-8 w-8 text-white" />
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-white mb-1">RelatÃ³rios</h2>
-                      <p className="text-blue-100 text-sm">Visualizar relatÃ³rios do sistema</p>
+                      <h2 className="text-xl font-bold text-white mb-1">Relatórios</h2>
+                      <p className="text-blue-100 text-sm">Visualizar relatórios do sistema</p>
                     </div>
                   </div>
                   <ArrowRightIcon className="h-6 w-6 text-white/80" />
@@ -134,7 +134,7 @@ export default function AdelsoMenu() {
             </motion.div>
           </div>
 
-          {/* BotÃ£o Sair */}
+          {/* Botão Sair */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -158,7 +158,7 @@ export default function AdelsoMenu() {
           </motion.div>
 
           <p className="text-center text-sm text-gray-500 mt-6">
-            Beef-Sync {new Date().getFullYear()} - Sistema de GestÃ£o PecuÃ¡ria
+            Beef-Sync {new Date().getFullYear()} - Sistema de Gestão Pecuária
           </p>
         </motion.div>
       </div>
@@ -166,7 +166,7 @@ export default function AdelsoMenu() {
   )
 }
 
-// Desabilitar layout padrÃ£o
+// Desabilitar layout padrão
 AdelsoMenu.getLayout = function getLayout(page) {
   return page
 }

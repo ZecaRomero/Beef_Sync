@@ -7,9 +7,9 @@ const http = require('http')
 
 async function zerarGenetica() {
   try {
-    console.log('\n�š�️  ATEN�‡�ƒO: Este script vai ZERAR todos os dados genéticos!')
+    console.log('\n⚠️  ATENÇÃO: Este script vai ZERAR todos os dados genéticos!')
     console.log('   (iABCZ, DECA, IQG, Pt IQG, Situação ABCZ)\n')
-    console.log('�Ÿ”� Enviando requisição...\n')
+    console.log('🔧 Enviando requisição...\n')
     
     const options = {
       hostname: 'localhost',
@@ -40,13 +40,13 @@ async function zerarGenetica() {
     })
     
     if (!response.success) {
-      console.log('�Œ Erro:', response.error || response.details)
+      console.log('❌ Erro:', response.error || response.details)
       return
     }
     
-    console.log('�œ…', response.message)
+    console.log('✅', response.message)
     console.log('')
-    console.log('�Ÿ“‹ Próximos passos:')
+    console.log('📋 Próximos passos:')
     console.log('   1. Abra o sistema no navegador')
     console.log('   2. Vá em Importações > Genética')
     console.log('   3. Importe seu Excel com as colunas na ordem:')
@@ -54,8 +54,8 @@ async function zerarGenetica() {
     console.log('')
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message)
-    console.error('\n�Ÿ’� Certifique-se de que o servidor está rodando em http://localhost:3020')
+    console.error('❌ Erro:', error.message)
+    console.error('\n💡 Certifique-se de que o servidor está rodando em http://localhost:3020')
   }
 }
 

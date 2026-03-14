@@ -109,7 +109,7 @@ const StatsCard = ({
                       trend === 'down' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' : 
                       'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'}
                   `}>
-                    <span>{trend === 'up' ? 'ââ€ â€”ï¸�' : trend === 'down' ? 'ââ€ Ëœï¸�' : 'âÅ¾¡ï¸�'}</span>
+                    <span>{trend === 'up' ? '↗️' : trend === 'down' ? '↘️' : '➡️'}</span>
                     <span>{trendValue}</span>
                   </div>
                 </div>

@@ -1,6 +1,6 @@
 /**
- * API para limpar todas as localizaÃ§Ãµes de animais
- * DELETE - Remove todas as localizaÃ§Ãµes da tabela localizacoes_animais
+ * API para limpar todas as localizações de animais
+ * DELETE - Remove todas as localizações da tabela localizacoes_animais
  */
 import { query } from '../../../lib/database'
 import { sendSuccess, sendError, sendMethodNotAllowed } from '../../../utils/apiResponse'
@@ -15,24 +15,24 @@ export default async function handler(req, res) {
     const senha = req.headers['x-dev-password'] || req.body?.senha || req.query?.senha
     
     if (senha !== 'bfzk26') {
-      return sendError(res, 'ðÅ¸â€�â€™ Acesso negado. Senha de desenvolvedor incorreta.', 403)
+      return sendError(res, '🔒 Acesso negado. Senha de desenvolvedor incorreta.', 403)
     }
     
-    // Contar quantas localizaÃ§Ãµes existem antes de deletar
+    // Contar quantas localizações existem antes de deletar
     const countResult = await query('SELECT COUNT(*) as total FROM localizacoes_animais')
     const totalLocalizacoes = parseInt(countResult.rows[0]?.total || 0)
 
     if (totalLocalizacoes === 0) {
       return sendSuccess(res, {
-        message: 'Nenhuma localizaÃ§Ã£o encontrada para limpar',
+        message: 'Nenhuma localização encontrada para limpar',
         deleted: 0
       })
     }
 
-    // Deletar todas as localizaÃ§Ãµes
+    // Deletar todas as localizações
     await query('DELETE FROM localizacoes_animais')
 
-    // Limpar tambÃ©m o campo piquete_atual dos animais (opcional)
+    // Limpar também o campo piquete_atual dos animais (opcional)
     await query(`
       UPDATE animais 
       SET piquete_atual = NULL, 
@@ -41,12 +41,12 @@ export default async function handler(req, res) {
     `)
 
     return sendSuccess(res, {
-      message: `${totalLocalizacoes} localizaÃ§Ã£o(Ãµes) removida(s) com sucesso`,
+      message: `${totalLocalizacoes} localização(ões) removida(s) com sucesso`,
       deleted: totalLocalizacoes
     })
 
   } catch (error) {
-    console.error('Erro ao limpar localizaÃ§Ãµes:', error)
-    return sendError(res, error.message || 'Erro ao limpar localizaÃ§Ãµes', 500)
+    console.error('Erro ao limpar localizações:', error)
+    return sendError(res, error.message || 'Erro ao limpar localizações', 500)
   }
 }

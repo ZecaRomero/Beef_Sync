@@ -5,38 +5,38 @@
  * 
  * Tipos: completo, animais, reprodutivo, comercial, financeiro
  * Formatos: json, sql
- * --local: forÃ§a uso do PostgreSQL local (ignora DATABASE_URL/Supabase)
+ * --local: força uso do PostgreSQL local (ignora DATABASE_URL/Supabase)
  */
 
 require('dotenv').config()
 if (process.argv.includes('--local')) {
   delete process.env.DATABASE_URL
-  console.log('ðÅ¸â€œÅ’ Modo local: usando PostgreSQL local (localhost)\n')
+  console.log('📌 Modo local: usando PostgreSQL local (localhost)\n')
 }
 
 const { query } = require('../lib/database')
 const fs = require('fs')
 const path = require('path')
 
-// ConfiguraÃ§Ã£o
+// Configuração
 const tipo = process.argv[2] || 'completo'
 const formato = process.argv[3] || 'json'
 
-console.log('ðÅ¸â€�â€ž Iniciando backup do banco de dados...')
-console.log(`ðÅ¸â€œâ€¹ Tipo: ${tipo}`)
-console.log(`ðÅ¸â€œâ€ž Formato: ${formato}`)
+console.log('🔄 Iniciando backup do banco de dados...')
+console.log(`📋 Tipo: ${tipo}`)
+console.log(`📄 Formato: ${formato}`)
 console.log('')
 
 async function main() {
   try {
-    // Testar conexÃ£o
-    console.log('ðÅ¸â€�Å’ Testando conexÃ£o com banco de dados...')
+    // Testar conexão
+    console.log('🔌 Testando conexão com banco de dados...')
     await query('SELECT NOW()')
-    console.log('âÅ“â€¦ ConexÃ£o estabelecida!')
+    console.log('✅ Conexão estabelecida!')
     console.log('')
 
     // Gerar backup
-    console.log('ðÅ¸â€œ¦ Gerando backup...')
+    console.log('📦 Gerando backup...')
     let backupData = {}
 
     switch (tipo) {
@@ -56,8 +56,8 @@ async function main() {
         backupData = await generateFinancialBackup()
         break
       default:
-        console.error('â�Å’ Tipo de backup invÃ¡lido!')
-        console.log('Tipos vÃ¡lidos: completo, animais, reprodutivo, comercial, financeiro')
+        console.error('❌ Tipo de backup inválido!')
+        console.log('Tipos válidos: completo, animais, reprodutivo, comercial, financeiro')
         process.exit(1)
     }
 
@@ -91,8 +91,8 @@ async function main() {
       const sqlContent = generateSQLBackup(backupData)
       fs.writeFileSync(filePath, sqlContent)
     } else {
-      console.error('â�Å’ Formato invÃ¡lido!')
-      console.log('Formatos vÃ¡lidos: json, sql')
+      console.error('❌ Formato inválido!')
+      console.log('Formatos válidos: json, sql')
       process.exit(1)
     }
 
@@ -100,26 +100,26 @@ async function main() {
     const stats = fs.statSync(filePath)
     const sizeMB = (stats.size / 1024 / 1024).toFixed(2)
 
-    console.log('âÅ“â€¦ Backup concluÃ­do com sucesso!')
+    console.log('✅ Backup concluído com sucesso!')
     console.log('')
-    console.log('ðÅ¸â€œÅ  EstatÃ­sticas:')
-    console.log(`   ââ‚¬¢ Total de registros: ${backup.metadata.totalRegistros}`)
-    console.log(`   ââ‚¬¢ Tabelas: ${backup.metadata.tabelas.length}`)
-    console.log(`   ââ‚¬¢ Tamanho: ${sizeMB} MB`)
+    console.log('📊 Estatísticas:')
+    console.log(`   • Total de registros: ${backup.metadata.totalRegistros}`)
+    console.log(`   • Tabelas: ${backup.metadata.tabelas.length}`)
+    console.log(`   • Tamanho: ${sizeMB} MB`)
     console.log('')
-    console.log('ðÅ¸â€™¾ Arquivo salvo:')
+    console.log('💾 Arquivo salvo:')
     console.log(`   ${filePath}`)
     console.log('')
 
     process.exit(0)
   } catch (error) {
-    console.error('â�Å’ Erro ao gerar backup:', error.message)
+    console.error('❌ Erro ao gerar backup:', error.message)
     console.error(error)
     process.exit(1)
   }
 }
 
-// FunÃ§Ãµes de backup (mesmas da API)
+// Funções de backup (mesmas da API)
 async function generateCompleteBackup() {
   const backup = {}
   const tabelas = [
@@ -134,9 +134,9 @@ async function generateCompleteBackup() {
     try {
       const result = await query(`SELECT * FROM ${tabela} ORDER BY id`)
       backup[tabela] = result.rows
-      console.log(`   âÅ“â€œ ${tabela}: ${result.rows.length} registros`)
+      console.log(`   ✓ ${tabela}: ${result.rows.length} registros`)
     } catch (error) {
-      console.log(`   âÅ¡  ${tabela}: tabela nÃ£o encontrada`)
+      console.log(`   ⚠ ${tabela}: tabela não encontrada`)
       backup[tabela] = []
     }
   }
@@ -151,7 +151,7 @@ async function generateAnimalsBackup() {
   for (const tabela of tabelas) {
     const result = await query(`SELECT * FROM ${tabela} ORDER BY id`)
     backup[tabela] = result.rows
-    console.log(`   âÅ“â€œ ${tabela}: ${result.rows.length} registros`)
+    console.log(`   ✓ ${tabela}: ${result.rows.length} registros`)
   }
 
   return backup
@@ -168,7 +168,7 @@ async function generateReproductiveBackup() {
     try {
       const result = await query(`SELECT * FROM ${tabela} ORDER BY id`)
       backup[tabela] = result.rows
-      console.log(`   âÅ“â€œ ${tabela}: ${result.rows.length} registros`)
+      console.log(`   ✓ ${tabela}: ${result.rows.length} registros`)
     } catch (error) {
       backup[tabela] = []
     }
@@ -185,7 +185,7 @@ async function generateCommercialBackup() {
     try {
       const result = await query(`SELECT * FROM ${tabela} ORDER BY id`)
       backup[tabela] = result.rows
-      console.log(`   âÅ“â€œ ${tabela}: ${result.rows.length} registros`)
+      console.log(`   ✓ ${tabela}: ${result.rows.length} registros`)
     } catch (error) {
       backup[tabela] = []
     }
@@ -201,20 +201,20 @@ async function generateFinancialBackup() {
     'SELECT id, serie, rg, custo_aquisicao, custo_total, valor_venda FROM animais ORDER BY id'
   )
   backup.animais = animaisResult.rows
-  console.log(`   âÅ“â€œ animais: ${animaisResult.rows.length} registros`)
+  console.log(`   ✓ animais: ${animaisResult.rows.length} registros`)
 
   const custosResult = await query('SELECT * FROM custos ORDER BY id')
   backup.custos = custosResult.rows
-  console.log(`   âÅ“â€œ custos: ${custosResult.rows.length} registros`)
+  console.log(`   ✓ custos: ${custosResult.rows.length} registros`)
 
   try {
     const nfResult = await query('SELECT * FROM notas_fiscais ORDER BY id')
     backup.notas_fiscais = nfResult.rows
-    console.log(`   âÅ“â€œ notas_fiscais: ${nfResult.rows.length} registros`)
+    console.log(`   ✓ notas_fiscais: ${nfResult.rows.length} registros`)
 
     const servicosResult = await query('SELECT * FROM servicos ORDER BY id')
     backup.servicos = servicosResult.rows
-    console.log(`   âÅ“â€œ servicos: ${servicosResult.rows.length} registros`)
+    console.log(`   ✓ servicos: ${servicosResult.rows.length} registros`)
   } catch (error) {
     backup.notas_fiscais = []
     backup.servicos = []

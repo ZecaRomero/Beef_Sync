@@ -2,22 +2,22 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 
 async function testEntradasDisponiveis() {
   try {
-    console.log('�Ÿ�� Testando API de entradas disponíveis...');
+    console.log('🧪 Testando API de entradas disponíveis...');
     
     const response = await fetch('http://localhost:3020/api/semen/entradas-disponiveis');
     const data = await response.json();
     
-    console.log('�Ÿ“Š Resultado:', data);
+    console.log('📊 Resultado:', data);
     
     if (response.ok) {
-      console.log('�œ… API funcionando corretamente!');
-      console.log(`�Ÿ“� ${data.data.length} entradas disponíveis encontradas`);
+      console.log('✅ API funcionando corretamente!');
+      console.log(`📦 ${data.data.length} entradas disponíveis encontradas`);
     } else {
-      console.log('�Œ Erro na API:', data);
+      console.log('❌ Erro na API:', data);
     }
     
   } catch (error) {
-    console.error('�Ÿ’� Erro no teste:', error);
+    console.error('💥 Erro no teste:', error);
   }
 }
 

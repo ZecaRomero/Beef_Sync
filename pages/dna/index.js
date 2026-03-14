@@ -66,17 +66,17 @@ export default function DNAPage() {
         const data = await response.json()
         const animaisList = data.data || data.animais || data || []
         
-        // Filtrar apenas animais com IDs vÃ¡lidos
+        // Filtrar apenas animais com IDs válidos
         const animaisValidos = animaisList.filter(animal => {
           const id = parseInt(animal.id, 10)
           if (isNaN(id)) {
-            console.warn(`âÅ¡ ï¸� Animal sem ID vÃ¡lido ignorado:`, animal)
+            console.warn(`⚠️ Animal sem ID válido ignorado:`, animal)
             return false
           }
           return true
         })
         
-        console.log(`âÅ“â€¦ Carregados ${animaisValidos.length} animais vÃ¡lidos de ${animaisList.length} totais`)
+        console.log(`✅ Carregados ${animaisValidos.length} animais válidos de ${animaisList.length} totais`)
         
         setAnimais(animaisValidos)
         setAnimaisFiltrados(animaisValidos)
@@ -93,8 +93,8 @@ export default function DNAPage() {
     // Validar ID
     const id = parseInt(animalId, 10)
     if (isNaN(id)) {
-      console.error(`â�Å’ Tentativa de selecionar animal com ID invÃ¡lido: ${animalId}`)
-      Toast.error(`ID de animal invÃ¡lido: ${animalId}`)
+      console.error(`❌ Tentativa de selecionar animal com ID inválido: ${animalId}`)
+      Toast.error(`ID de animal inválido: ${animalId}`)
       return
     }
     
@@ -125,7 +125,7 @@ export default function DNAPage() {
 
   const handleConfirmarEnvio = async () => {
     if (!laboratorio) {
-      Toast.error('Selecione um laboratÃ³rio')
+      Toast.error('Selecione um laboratório')
       return
     }
 
@@ -152,38 +152,38 @@ export default function DNAPage() {
       if (response.ok) {
         const result = await response.json()
         
-        // Verificar se hÃ¡ animais nÃ£o encontrados
+        // Verificar se há animais não encontrados
         if (result.data?.animais_nao_encontrados > 0) {
           Toast.error(
-            `${result.data.animais_atualizados} animal(is) enviado(s), mas ${result.data.animais_nao_encontrados} nÃ£o foram encontrados no banco de dados. IDs: ${result.data.animais_nao_encontrados_ids?.join(', ')}`
+            `${result.data.animais_atualizados} animal(is) enviado(s), mas ${result.data.animais_nao_encontrados} não foram encontrados no banco de dados. IDs: ${result.data.animais_nao_encontrados_ids?.join(', ')}`
           )
-          console.warn('âÅ¡ ï¸� Animais nÃ£o encontrados:', result.data.animais_nao_encontrados_ids)
+          console.warn('⚠️ Animais não encontrados:', result.data.animais_nao_encontrados_ids)
         } else {
           Toast.success(result.message || `${selectedAnimals.length} animal(is) enviado(s) para ${laboratorio} com sucesso!`)
         }
 
-        // Se for VRGEN, gerar PDF automaticamente apÃ³s o envio
+        // Se for VRGEN, gerar PDF automaticamente após o envio
         if (laboratorio === 'VRGEN') {
           setTimeout(() => {
             handleGerarPDFVRGEN()
           }, 500)
         }
         
-        // Limpar seleÃ§Ã£o
+        // Limpar seleção
         setSelectedAnimals([])
         setShowLaboratorioModal(false)
         setLaboratorio('')
         setObservacoes('')
         
-        // Recarregar animais para atualizar informaÃ§Ãµes de DNA
+        // Recarregar animais para atualizar informações de DNA
         loadAnimais()
       } else {
         const error = await response.json()
-        Toast.error(error.message || 'Erro ao enviar para laboratÃ³rio')
+        Toast.error(error.message || 'Erro ao enviar para laboratório')
       }
     } catch (error) {
-      console.error('Erro ao enviar para laboratÃ³rio:', error)
-      Toast.error('Erro ao enviar para laboratÃ³rio')
+      console.error('Erro ao enviar para laboratório:', error)
+      Toast.error('Erro ao enviar para laboratório')
     } finally {
       setSaving(false)
     }
@@ -210,7 +210,7 @@ export default function DNAPage() {
             const data = await response.json()
             const animal = data.animal || data
             
-            // Determinar raÃ§a automaticamente baseado na sÃ©rie
+            // Determinar raça automaticamente baseado na série
             let raca = animal.raca || 'NELORE'
             if (animal.serie) {
               const serie = animal.serie.toUpperCase()
@@ -244,11 +244,11 @@ export default function DNAPage() {
                   }
                 }
               } catch (e) {
-                console.log('Pai nÃ£o encontrado, usando nome:', animal.pai)
+                console.log('Pai não encontrado, usando nome:', animal.pai)
               }
             }
             
-            // Buscar dados da mÃ£e
+            // Buscar dados da mãe
             let dadosMae = { serie: '', rg: '', nome: animal.mae || '' }
             if (animal.mae_id) {
               try {
@@ -263,7 +263,7 @@ export default function DNAPage() {
                   }
                 }
               } catch (e) {
-                console.log('MÃ£e nÃ£o encontrada, usando nome:', animal.mae)
+                console.log('Mãe não encontrada, usando nome:', animal.mae)
               }
             }
             
@@ -288,13 +288,13 @@ export default function DNAPage() {
       }
 
       if (animaisCompletos.length === 0) {
-        Toast.error('Nenhum animal vÃ¡lido encontrado')
+        Toast.error('Nenhum animal válido encontrado')
         return
       }
 
       console.log('Animais completos para PDF:', animaisCompletos)
-      console.log('ðÅ¸â€œÅ  Total de animais:', animaisCompletos.length)
-      console.log('ðÅ¸â€œâ€¹ Primeiro animal:', animaisCompletos[0])
+      console.log('📊 Total de animais:', animaisCompletos.length)
+      console.log('📋 Primeiro animal:', animaisCompletos[0])
 
       // Importar dinamicamente o gerador de PDF
       const { downloadDNAFormularioVRGEN } = await import('../../utils/dnaFormularioPDF')
@@ -310,11 +310,11 @@ export default function DNAPage() {
         emailFazenda: emailFazenda,
         tipoExame: tipoExame,
         animais: animaisCompletos,
-        observacoes: observacoes || 'ANIMAIS VÃÆ’O SER CONTROLADOS NO COMEÃâ€¡O DE FEVEREIRO'
+        observacoes: observacoes || 'ANIMAIS VÃO SER CONTROLADOS NO COMEÇO DE FEVEREIRO'
       }
 
-      console.log('ðÅ¸â€œâ€ž Dados preparados para PDF:', dadosPDF)
-      console.log('ðÅ¸â€œÅ  Animais no dadosPDF:', dadosPDF.animais?.length)
+      console.log('📄 Dados preparados para PDF:', dadosPDF)
+      console.log('📊 Animais no dadosPDF:', dadosPDF.animais?.length)
 
       await downloadDNAFormularioVRGEN(dadosPDF)
       Toast.success('PDF gerado com sucesso!')
@@ -331,21 +331,21 @@ export default function DNAPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <BeakerIcon className="h-8 w-8 text-indigo-600" />
-            AnÃ¡lise de DNA
+            Análise de DNA
           </h1>
           <p className="text-gray-600 dark:text-gray-300 mt-1">
-            Selecione animais para envio ao laboratÃ³rio de anÃ¡lise genÃ©tica
+            Selecione animais para envio ao laboratório de análise genética
           </p>
         </div>
         <Button
           onClick={() => router.push('/dna/historico')}
           variant="outline"
         >
-          Ver HistÃ³rico
+          Ver Histórico
         </Button>
       </div>
 
-      {/* InformaÃ§Ãµes dos LaboratÃ³rios */}
+      {/* Informações dos Laboratórios */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card className="p-4 border-2 border-blue-200 dark:border-blue-800">
           <div className="flex items-center justify-between">
@@ -398,7 +398,7 @@ export default function DNAPage() {
         </Card>
       </div>
 
-      {/* BotÃ£o para editar custos */}
+      {/* Botão para editar custos */}
       <div className="flex justify-end">
         <Button
           variant={editandoCustos ? "primary" : "outline"}
@@ -420,7 +420,7 @@ export default function DNAPage() {
         </Button>
       </div>
 
-      {/* Busca e SeleÃ§Ã£o */}
+      {/* Busca e Seleção */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -440,7 +440,7 @@ export default function DNAPage() {
                   className="flex items-center gap-2"
                 >
                   <BeakerIcon className="h-5 w-5" />
-                  Enviar para LaboratÃ³rio ({selectedAnimals.length})
+                  Enviar para Laboratório ({selectedAnimals.length})
                 </Button>
               )}
             </div>
@@ -453,7 +453,7 @@ export default function DNAPage() {
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               <Input
                 type="text"
-                placeholder="Buscar por sÃ©rie, RG, nome ou raÃ§a..."
+                placeholder="Buscar por série, RG, nome ou raça..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -484,7 +484,7 @@ export default function DNAPage() {
                       />
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      SÃ©rie
+                      Série
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       RG
@@ -496,13 +496,13 @@ export default function DNAPage() {
                       ID
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      RaÃ§a
+                      Raça
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Sexo
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      LaboratÃ³rio DNA
+                      Laboratório DNA
                     </th>
                   </tr>
                 </thead>
@@ -511,9 +511,9 @@ export default function DNAPage() {
                     const isSelected = selectedAnimals.includes(animal.id)
                     const labInfo = animal.laboratorio_dna ? getLaboratorioInfo(animal.laboratorio_dna) : null
                     
-                    // Validar se o animal tem ID vÃ¡lido
+                    // Validar se o animal tem ID válido
                     if (!animal.id || isNaN(parseInt(animal.id, 10))) {
-                      console.warn(`âÅ¡ ï¸� Animal sem ID vÃ¡lido:`, animal)
+                      console.warn(`⚠️ Animal sem ID válido:`, animal)
                       return null
                     }
                     
@@ -571,17 +571,17 @@ export default function DNAPage() {
         </CardBody>
       </Card>
 
-      {/* Modal de SeleÃ§Ã£o de LaboratÃ³rio */}
+      {/* Modal de Seleção de Laboratório */}
       <Modal
         isOpen={showLaboratorioModal}
         onClose={() => !saving && setShowLaboratorioModal(false)}
-        title="Selecionar LaboratÃ³rio"
+        title="Selecionar Laboratório"
         size="md"
       >
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              LaboratÃ³rio *
+              Laboratório *
             </label>
             <select
               value={laboratorio}
@@ -589,7 +589,7 @@ export default function DNAPage() {
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               disabled={saving}
             >
-              <option value="">Selecione um laboratÃ³rio</option>
+              <option value="">Selecione um laboratório</option>
               <option value="VRGEN">VRGEN - R$ {custoVrgen.toFixed(2)} por animal</option>
               <option value="NEOGEN">NEOGEN - R$ {custoNeogen.toFixed(2)} por animal</option>
             </select>
@@ -607,7 +607,7 @@ export default function DNAPage() {
                   </p>
                   {laboratorio === 'VRGEN' && (
                     <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                      ðÅ¸â€œâ€ž O formulÃ¡rio PDF serÃ¡ gerado automaticamente apÃ³s o envio
+                      📄 O formulário PDF será gerado automaticamente após o envio
                     </p>
                   )}
                 </div>
@@ -638,7 +638,7 @@ export default function DNAPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    ProprietÃ¡rio
+                    Proprietário
                   </label>
                   <Input
                     type="text"
@@ -650,7 +650,7 @@ export default function DNAPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    ResponsÃ¡vel
+                    Responsável
                   </label>
                   <Input
                     type="text"
@@ -663,7 +663,7 @@ export default function DNAPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  E-mail AssociaÃ§Ã£o ABCZ
+                  E-mail Associação ABCZ
                 </label>
                 <Input
                   type="text"
@@ -693,7 +693,7 @@ export default function DNAPage() {
                   type="text"
                   value={tipoExame}
                   onChange={(e) => setTipoExame(e.target.value)}
-                  placeholder="Ex: GenÃ´mico, Paternidade, etc."
+                  placeholder="Ex: Genômico, Paternidade, etc."
                   disabled={saving}
                 />
               </div>
@@ -702,14 +702,14 @@ export default function DNAPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              ObservaÃ§Ãµes
+              Observações
             </label>
             <textarea
               value={observacoes}
               onChange={(e) => setObservacoes(e.target.value)}
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              placeholder="ObservaÃ§Ãµes sobre o envio..."
+              placeholder="Observações sobre o envio..."
               disabled={saving}
             />
           </div>

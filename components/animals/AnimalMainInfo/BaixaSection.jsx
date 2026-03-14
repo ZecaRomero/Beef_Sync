@@ -8,16 +8,16 @@ export default function BaixaSection({ baixaPropriaExibir, animal, baixasResumo 
     return (
       <div className="px-4 py-2.5 bg-gray-100/50 dark:bg-gray-700/30 border-b border-gray-200 dark:border-gray-600">
         <h3 className="font-bold text-gray-800 dark:text-gray-200 text-sm mb-2 flex items-center gap-2">
-          <span>âÅ¡ ï¸�</span> {baixaPropriaExibir.causa === 'Abate' ? 'Abate' : 'Morte/Baixa'}
+          <span>⚠️</span> {baixaPropriaExibir.causa === 'Abate' ? 'Abate' : 'Morte/Baixa'}
         </h3>
         <p className="text-sm text-gray-700 dark:text-gray-300">
           {baixaPropriaExibir.data_baixa ? (
             <span className="font-semibold">{new Date(baixaPropriaExibir.data_baixa).toLocaleDateString('pt-BR')}</span>
           ) : (
-            'Data nÃ£o informada'
+            'Data não informada'
           )}
           {baixaPropriaExibir.causa && baixaPropriaExibir.causa !== 'Abate' && (
-            <span className="ml-2">ââ‚¬¢ Causa: {baixaPropriaExibir.causa}</span>
+            <span className="ml-2">• Causa: {baixaPropriaExibir.causa}</span>
           )}
         </p>
       </div>
@@ -28,7 +28,7 @@ export default function BaixaSection({ baixaPropriaExibir, animal, baixasResumo 
     return (
       <div className="px-6 py-4 bg-emerald-50/80 dark:bg-emerald-900/20 border-b border-emerald-200/50 dark:border-emerald-800/50">
         <h3 className="font-bold text-emerald-800 dark:text-emerald-200 text-sm mb-3 flex items-center gap-2">
-          <span>ðÅ¸â€™°</span> Venda
+          <span>💰</span> Venda
         </h3>
         <div className="grid grid-cols-2 gap-2 text-xs">
           {baixaPropriaExibir.data_venda && (

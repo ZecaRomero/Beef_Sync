@@ -1,6 +1,6 @@
 /**
- * ServiÃ§o de InteligÃªncia Artificial AvanÃ§ado
- * Fornece anÃ¡lises preditivas, recomendaÃ§Ãµes inteligentes e insights automÃ¡ticos
+ * Serviço de Inteligência Artificial Avançado
+ * Fornece análises preditivas, recomendações inteligentes e insights automáticos
  */
 
 import logger from '../utils/logger'
@@ -17,7 +17,7 @@ class AIIntelligenceService {
   }
 
   /**
-   * Gera recomendaÃ§Ãµes inteligentes para um animal
+   * Gera recomendações inteligentes para um animal
    */
   async generateAnimalRecommendations(animal) {
     try {
@@ -30,7 +30,7 @@ class AIIntelligenceService {
         insights: []
       }
 
-      // 1. AnÃ¡lise de mercado
+      // 1. Análise de mercado
       try {
         const marketAnalysis = await marketAnalysisService.analyzeSaleReadiness(animal)
         if (marketAnalysis.apto_venda) {
@@ -45,48 +45,48 @@ class AIIntelligenceService {
           })
         }
       } catch (error) {
-        logger.error('Erro na anÃ¡lise de mercado:', error)
+        logger.error('Erro na análise de mercado:', error)
       }
 
-      // 2. AnÃ¡lise de peso e crescimento
+      // 2. Análise de peso e crescimento
       const weightAnalysis = this.analyzeWeightGrowth(animal)
       if (weightAnalysis.recommendation) {
         recommendations.recommendations.push(weightAnalysis.recommendation)
       }
 
-      // 3. AnÃ¡lise de saÃºde
+      // 3. Análise de saúde
       const healthAnalysis = this.analyzeHealth(animal)
       if (healthAnalysis.alerts.length > 0) {
         recommendations.alerts.push(...healthAnalysis.alerts)
       }
 
-      // 4. AnÃ¡lise reprodutiva (para fÃªmeas)
-      if (animal.sexo && (animal.sexo.toLowerCase().includes('fÃªmea') || animal.sexo.toLowerCase().includes('femea'))) {
+      // 4. Análise reprodutiva (para fêmeas)
+      if (animal.sexo && (animal.sexo.toLowerCase().includes('fêmea') || animal.sexo.toLowerCase().includes('femea'))) {
         const reproAnalysis = this.analyzeReproduction(animal)
         if (reproAnalysis.recommendations.length > 0) {
           recommendations.recommendations.push(...reproAnalysis.recommendations)
         }
       }
 
-      // 5. AnÃ¡lise de custos
+      // 5. Análise de custos
       const costAnalysis = this.analyzeCosts(animal)
       if (costAnalysis.insights.length > 0) {
         recommendations.insights.push(...costAnalysis.insights)
       }
 
-      // 6. PrevisÃ£o de ganho de peso
+      // 6. Previsão de ganho de peso
       const weightPrediction = this.predictWeightGain(animal)
       if (weightPrediction) {
         recommendations.insights.push({
           type: 'prediction',
-          title: 'PrevisÃ£o de Peso',
+          title: 'Previsão de Peso',
           description: weightPrediction
         })
       }
 
       return recommendations
     } catch (error) {
-      logger.error('Erro ao gerar recomendaÃ§Ãµes:', error)
+      logger.error('Erro ao gerar recomendações:', error)
       throw error
     }
   }
@@ -109,7 +109,7 @@ class AIIntelligenceService {
             priority: 'high',
             title: 'Peso abaixo do esperado',
             description: `Animal com ${percentual.toFixed(1)}% do peso esperado para a idade`,
-            action: 'Verificar saÃºde e condiÃ§Ãµes gerais'
+            action: 'Verificar saúde e condições gerais'
           }
         }
       } else if (percentual > 115) {
@@ -119,7 +119,7 @@ class AIIntelligenceService {
             priority: 'medium',
             title: 'Peso acima do esperado',
             description: `Animal com ${percentual.toFixed(1)}% do peso esperado`,
-            action: 'Monitorar saÃºde'
+            action: 'Monitorar saúde'
           }
         }
       }
@@ -132,7 +132,7 @@ class AIIntelligenceService {
    * Calcula peso esperado para idade
    */
   calculateExpectedWeight(idadeMeses, sexo, raca) {
-    // FÃ³rmula simplificada baseada em mÃ©dias da raÃ§a Nelore
+    // Fórmula simplificada baseada em médias da raça Nelore
     const baseWeight = sexo && sexo.toLowerCase().includes('macho') ? 250 : 220
     const monthlyGain = sexo && sexo.toLowerCase().includes('macho') ? 15 : 12
     
@@ -140,33 +140,33 @@ class AIIntelligenceService {
   }
 
   /**
-   * Analisa saÃºde do animal
+   * Analisa saúde do animal
    */
   analyzeHealth(animal) {
     const alerts = []
     const idadeMeses = this.calculateAgeInMonths(animal.dataNascimento || animal.data_nascimento)
 
-    // Verificar vacinaÃ§Ã£o
+    // Verificar vacinação
     if (idadeMeses > 6 && !animal.vacinado) {
       alerts.push({
         type: 'health',
         priority: 'high',
-        title: 'VacinaÃ§Ã£o pendente',
-        description: 'Animal com mais de 6 meses sem registro de vacinaÃ§Ã£o',
-        action: 'Verificar calendÃ¡rio de vacinaÃ§Ã£o'
+        title: 'Vacinação pendente',
+        description: 'Animal com mais de 6 meses sem registro de vacinação',
+        action: 'Verificar calendário de vacinação'
       })
     }
 
-    // Verificar ocorrÃªncias recentes
+    // Verificar ocorrências recentes
     if (animal.ultima_ocorrencia) {
       const diasDesdeOcorrencia = this.calculateDaysSince(animal.ultima_ocorrencia)
       if (diasDesdeOcorrencia < 30) {
         alerts.push({
           type: 'health',
           priority: 'medium',
-          title: 'OcorrÃªncia recente',
-          description: `ÃÅ¡ltima ocorrÃªncia hÃ¡ ${diasDesdeOcorrencia} dias`,
-          action: 'Monitorar recuperaÃ§Ã£o'
+          title: 'Ocorrência recente',
+          description: `Última ocorrência há ${diasDesdeOcorrencia} dias`,
+          action: 'Monitorar recuperação'
         })
       }
     }
@@ -175,20 +175,20 @@ class AIIntelligenceService {
   }
 
   /**
-   * Analisa reproduÃ§Ã£o (para fÃªmeas)
+   * Analisa reprodução (para fêmeas)
    */
   analyzeReproduction(animal) {
     const recommendations = []
     const idadeMeses = this.calculateAgeInMonths(animal.dataNascimento || animal.data_nascimento)
 
-    // Verificar idade para reproduÃ§Ã£o
+    // Verificar idade para reprodução
     if (idadeMeses >= 14 && idadeMeses <= 18 && !animal.prenha) {
       recommendations.push({
         type: 'reproduction',
         priority: 'medium',
-        title: 'Idade ideal para reproduÃ§Ã£o',
-        description: 'Animal na faixa etÃ¡ria ideal para primeira cobertura',
-        action: 'Considerar inseminaÃ§Ã£o ou monta natural'
+        title: 'Idade ideal para reprodução',
+        description: 'Animal na faixa etária ideal para primeira cobertura',
+        action: 'Considerar inseminação ou monta natural'
       })
     }
 
@@ -199,8 +199,8 @@ class AIIntelligenceService {
         recommendations.push({
           type: 'reproduction',
           priority: 'high',
-          title: 'PerÃ­odo ideal para nova gestaÃ§Ã£o',
-          description: `ÃÅ¡ltimo parto hÃ¡ ${mesesDesdeParto} meses`,
+          title: 'Período ideal para nova gestação',
+          description: `Último parto há ${mesesDesdeParto} meses`,
           action: 'Considerar nova cobertura'
         })
       }
@@ -224,7 +224,7 @@ class AIIntelligenceService {
         insights.push({
           type: 'cost',
           title: 'Custo mensal elevado',
-          description: `Custo mÃ©dio de R$ ${custoMensal.toFixed(2)}/mÃªs`,
+          description: `Custo médio de R$ ${custoMensal.toFixed(2)}/mês`,
           action: 'Revisar custos e otimizar gastos'
         })
       }
@@ -234,7 +234,7 @@ class AIIntelligenceService {
   }
 
   /**
-   * PrevisÃ£o de ganho de peso
+   * Previsão de ganho de peso
    */
   predictWeightGain(animal) {
     const pesoAtual = parseFloat(animal.peso) || 0
@@ -245,17 +245,17 @@ class AIIntelligenceService {
       const pesoEm6Meses = pesoAtual + (ganhoMensalMedio * 6)
       const pesoEm12Meses = pesoAtual + (ganhoMensalMedio * 12)
 
-      return `PrevisÃ£o: ${pesoEm6Meses.toFixed(0)}kg em 6 meses, ${pesoEm12Meses.toFixed(0)}kg em 12 meses (baseado em ganho mÃ©dio atual)`
+      return `Previsão: ${pesoEm6Meses.toFixed(0)}kg em 6 meses, ${pesoEm12Meses.toFixed(0)}kg em 12 meses (baseado em ganho médio atual)`
     }
 
     return null
   }
 
   /**
-   * PrevisÃ£o de risco de saÃºde
+   * Previsão de risco de saúde
    */
   predictHealthRisk(animal) {
-    // Implementar modelo de prediÃ§Ã£o de saÃºde
+    // Implementar modelo de predição de saúde
     return {
       risk_level: 'low',
       factors: []
@@ -263,10 +263,10 @@ class AIIntelligenceService {
   }
 
   /**
-   * PrevisÃ£o de sucesso reprodutivo
+   * Previsão de sucesso reprodutivo
    */
   predictReproductionSuccess(animal) {
-    // Implementar modelo de prediÃ§Ã£o reprodutiva
+    // Implementar modelo de predição reprodutiva
     return {
       success_probability: 0.75,
       factors: []
@@ -274,7 +274,7 @@ class AIIntelligenceService {
   }
 
   /**
-   * PrevisÃ£o de melhor momento para venda
+   * Previsão de melhor momento para venda
    */
   predictOptimalSaleTime(animal) {
     const idadeMeses = this.calculateAgeInMonths(animal.dataNascimento || animal.data_nascimento)
@@ -294,7 +294,7 @@ class AIIntelligenceService {
       optimal: false,
       meses_para_peso_ideal: mesesParaPesoIdeal,
       meses_para_idade_ideal: mesesParaIdadeIdeal,
-      message: `Aguardar aproximadamente ${Math.max(mesesParaPesoIdeal || 0, mesesParaIdadeIdeal)} meses para condiÃ§Ãµes ideais`
+      message: `Aguardar aproximadamente ${Math.max(mesesParaPesoIdeal || 0, mesesParaIdadeIdeal)} meses para condições ideais`
     }
   }
 

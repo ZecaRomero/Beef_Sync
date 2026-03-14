@@ -34,11 +34,11 @@ async function importar() {
   const client = await pool.connect();
   
   try {
-    console.log('�Ÿš€ IMPORTANDO DADOS\n');
+    console.log('🚀 IMPORTANDO DADOS\n');
     console.log('='.repeat(80));
     
     for (const dado of dados) {
-      console.log(`\n�Ÿ“� Processando: ${dado.serie} ${dado.rg}`);
+      console.log(`\n📝 Processando: ${dado.serie} ${dado.rg}`);
       
       // 1. Criar piquete
       const piqueteExiste = await client.query(
@@ -51,12 +51,12 @@ async function importar() {
           'INSERT INTO piquetes (codigo, nome, ativo) VALUES ($1, $2, true)',
           [dado.local, dado.local]
         );
-        console.log(`  �œ… Piquete criado: ${dado.local}`);
+        console.log(`  ✅ Piquete criado: ${dado.local}`);
       } else {
-        console.log(`  �„�️ Piquete já existe: ${dado.local}`);
+        console.log(`  ℹ️ Piquete já existe: ${dado.local}`);
       }
       
-      // 2. Criar/atualizar animal - SEMPRE F�ŠMEA
+      // 2. Criar/atualizar animal - SEMPRE FÊMEA
       const animalExiste = await client.query(
         'SELECT id FROM animais WHERE serie = $1 AND rg = $2',
         [dado.serie, dado.rg]
@@ -76,7 +76,7 @@ async function importar() {
           [dado.serie, dado.rg, tatuagem, tatuagem, 'Fêmea', 'Ativo', dado.local, dataEntrada]
         );
         animalId = result.rows[0].id;
-        console.log(`  �œ… Animal criado: ${tatuagem} (ID: ${animalId})`);
+        console.log(`  ✅ Animal criado: ${tatuagem} (ID: ${animalId})`);
       } else {
         animalId = animalExiste.rows[0].id;
         await client.query(
@@ -85,15 +85,15 @@ async function importar() {
            WHERE id = $4`,
           [dado.local, dataEntrada, 'Fêmea', animalId]
         );
-        console.log(`  �œ… Animal atualizado: ${tatuagem} (ID: ${animalId})`);
+        console.log(`  ✅ Animal atualizado: ${tatuagem} (ID: ${animalId})`);
       }
       
       // 3. Registrar IA
       const dataIAFormatada = converterData(dado.dataIA);
       const dataDGFormatada = converterData(dado.dataDG);
       
-      console.log(`  �Ÿ“… Data IA: ${dado.dataIA} �†’ ${dataIAFormatada}`);
-      console.log(`  �Ÿ“… Data DG: ${dado.dataDG} �†’ ${dataDGFormatada}`);
+      console.log(`  📅 Data IA: ${dado.dataIA} → ${dataIAFormatada}`);
+      console.log(`  📅 Data DG: ${dado.dataDG} → ${dataDGFormatada}`);
       
       const iaExiste = await client.query(
         'SELECT id FROM inseminacoes WHERE animal_id = $1 AND data_ia = $2',
@@ -112,18 +112,18 @@ async function importar() {
             `Importado - Piquete: ${dado.local}`
           ]
         );
-        console.log(`  �œ… IA registrada`);
+        console.log(`  ✅ IA registrada`);
       } else {
-        console.log(`  �„�️ IA já existe`);
+        console.log(`  ℹ️ IA já existe`);
       }
     }
     
     console.log('\n' + '='.repeat(80));
-    console.log('\n�œ… Importação concluída com sucesso!');
+    console.log('\n✅ Importação concluída com sucesso!');
     console.log(`   ${dados.length} registro(s) processado(s)`);
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
     console.error(error);
   } finally {
     client.release();

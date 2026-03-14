@@ -8,7 +8,7 @@
 const { query } = require('./lib/database')
 
 async function fixSexoReceptorasTE() {
-  console.log('�Ÿ”� Verificando animais com Transferências de Embriões como receptora...\n')
+  console.log('🔍 Verificando animais com Transferências de Embriões como receptora...\n')
 
   try {
     // 1. Buscar animal CJCJ 16319 especificamente
@@ -22,10 +22,10 @@ async function fixSexoReceptorasTE() {
     `)
     
     if (cjcj16319.rows.length === 0) {
-      console.log('   �Œ Animal CJCJ 16319 não encontrado')
+      console.log('   ❌ Animal CJCJ 16319 não encontrado')
     } else {
       const animal = cjcj16319.rows[0]
-      console.log(`   �œ… Animal encontrado:`)
+      console.log(`   ✅ Animal encontrado:`)
       console.log(`   ID: ${animal.id}`)
       console.log(`   Identificação: ${animal.serie} ${animal.rg}`)
       console.log(`   Nome: ${animal.nome || 'Não informado'}`)
@@ -44,8 +44,8 @@ async function fixSexoReceptorasTE() {
       if (totalTE > 0) {
         const isMacho = animal.sexo && (animal.sexo.toLowerCase().includes('macho') || animal.sexo === 'M')
         if (isMacho) {
-          console.log(`   �š�️  PROBLEMA DETECTADO: Animal está como Macho mas tem ${totalTE} TE(s) como receptora!`)
-          console.log(`   �Ÿ”� Corrigindo sexo para Fêmea...`)
+          console.log(`   ⚠️  PROBLEMA DETECTADO: Animal está como Macho mas tem ${totalTE} TE(s) como receptora!`)
+          console.log(`   🔧 Corrigindo sexo para Fêmea...`)
           
           const updateResult = await query(`
             UPDATE animais 
@@ -55,14 +55,14 @@ async function fixSexoReceptorasTE() {
           `, [animal.id])
           
           if (updateResult.rows.length > 0) {
-            console.log(`   �œ… Sexo corrigido com sucesso!`)
+            console.log(`   ✅ Sexo corrigido com sucesso!`)
             console.log(`   Novo sexo: ${updateResult.rows[0].sexo}`)
           }
         } else {
-          console.log(`   �œ… Sexo está correto (já é Fêmea)`)
+          console.log(`   ✅ Sexo está correto (já é Fêmea)`)
         }
       } else {
-        console.log(`   �„�️  Animal não tem TE como receptora`)
+        console.log(`   ℹ️  Animal não tem TE como receptora`)
       }
     }
 
@@ -83,8 +83,8 @@ async function fixSexoReceptorasTE() {
       if (teComoDoadora.rows.length > 0) {
         const isMacho = animal.sexo && (animal.sexo.toLowerCase().includes('macho') || animal.sexo === 'M')
         if (isMacho) {
-          console.log(`   �š�️  PROBLEMA DETECTADO: Animal está como Macho mas tem ${teComoDoadora.rows.length} TE(s) como DOADORA!`)
-          console.log(`   �Ÿ”� Corrigindo sexo para Fêmea...`)
+          console.log(`   ⚠️  PROBLEMA DETECTADO: Animal está como Macho mas tem ${teComoDoadora.rows.length} TE(s) como DOADORA!`)
+          console.log(`   🔧 Corrigindo sexo para Fêmea...`)
           
           const updateResult = await query(`
             UPDATE animais 
@@ -94,12 +94,12 @@ async function fixSexoReceptorasTE() {
           `, [animal.id])
           
           if (updateResult.rows.length > 0) {
-            console.log(`   �œ… Sexo corrigido com sucesso!`)
+            console.log(`   ✅ Sexo corrigido com sucesso!`)
             console.log(`   Novo sexo: ${updateResult.rows[0].sexo}`)
             correcoesDoadora++
           }
         } else {
-          console.log(`   �œ… Sexo está correto (já é Fêmea)`)
+          console.log(`   ✅ Sexo está correto (já é Fêmea)`)
         }
         
         console.log(`   Transferências encontradas:`)
@@ -107,7 +107,7 @@ async function fixSexoReceptorasTE() {
           console.log(`      - TE ${te.numero_te} em ${te.data_te}: Doadora "${te.doadora_nome}", Receptora "${te.receptora_nome}"`)
         })
       } else {
-        console.log(`   �„�️  Animal não tem TE como doadora`)
+        console.log(`   ℹ️  Animal não tem TE como doadora`)
       }
     }
 
@@ -133,14 +133,14 @@ async function fixSexoReceptorasTE() {
       ORDER BY a.serie, a.rg
     `)
     
-    console.log(`   �œ… Encontrados ${animaisComTE.rows.length} animal(is) com problema:`)
+    console.log(`   ✅ Encontrados ${animaisComTE.rows.length} animal(is) com problema:`)
     
     let correcoes = 0
     for (const animal of animaisComTE.rows) {
-      console.log(`\n   �Ÿ“‹ ${animal.serie} ${animal.rg} - ${animal.nome || 'Sem nome'}`)
+      console.log(`\n   📋 ${animal.serie} ${animal.rg} - ${animal.nome || 'Sem nome'}`)
       console.log(`      Sexo atual: ${animal.sexo}`)
       console.log(`      Total de TE como receptora: ${animal.total_te}`)
-      console.log(`      �Ÿ”� Corrigindo sexo para Fêmea...`)
+      console.log(`      🔧 Corrigindo sexo para Fêmea...`)
       
       const updateResult = await query(`
         UPDATE animais 
@@ -150,7 +150,7 @@ async function fixSexoReceptorasTE() {
       `, [animal.id])
       
       if (updateResult.rows.length > 0) {
-        console.log(`      �œ… Corrigido! Novo sexo: ${updateResult.rows[0].sexo}`)
+        console.log(`      ✅ Corrigido! Novo sexo: ${updateResult.rows[0].sexo}`)
         correcoes++
       }
     }
@@ -178,13 +178,13 @@ async function fixSexoReceptorasTE() {
       ORDER BY a.serie, a.rg
     `)
     
-    console.log(`   �œ… Encontrados ${animaisComTEDoadora.rows.length} animal(is) com problema:`)
+    console.log(`   ✅ Encontrados ${animaisComTEDoadora.rows.length} animal(is) com problema:`)
     
     for (const animal of animaisComTEDoadora.rows) {
-      console.log(`\n   �Ÿ“‹ ${animal.serie} ${animal.rg} - ${animal.nome || 'Sem nome'}`)
+      console.log(`\n   📋 ${animal.serie} ${animal.rg} - ${animal.nome || 'Sem nome'}`)
       console.log(`      Sexo atual: ${animal.sexo}`)
       console.log(`      Total de TE como doadora: ${animal.total_te}`)
-      console.log(`      �Ÿ”� Corrigindo sexo para Fêmea...`)
+      console.log(`      🔧 Corrigindo sexo para Fêmea...`)
       
       const updateResult = await query(`
         UPDATE animais 
@@ -194,7 +194,7 @@ async function fixSexoReceptorasTE() {
       `, [animal.id])
       
       if (updateResult.rows.length > 0) {
-        console.log(`      �œ… Corrigido! Novo sexo: ${updateResult.rows[0].sexo}`)
+        console.log(`      ✅ Corrigido! Novo sexo: ${updateResult.rows[0].sexo}`)
         correcoesDoadora++
       }
     }
@@ -202,14 +202,14 @@ async function fixSexoReceptorasTE() {
     // 5. Resumo final
     const totalCorrecoes = correcoes + correcoesDoadora
     console.log('\n' + '='.repeat(60))
-    console.log('�Ÿ“Š RESUMO:')
+    console.log('📊 RESUMO:')
     console.log(`   Animais verificados como receptora: ${animaisComTE.rows.length}`)
     console.log(`   Animais verificados como doadora: ${animaisComTEDoadora.rows.length}`)
     console.log(`   Total de correções realizadas: ${totalCorrecoes}`)
     console.log('='.repeat(60))
 
   } catch (error) {
-    console.error('�Œ Erro ao executar correção:', error)
+    console.error('❌ Erro ao executar correção:', error)
     throw error
   }
 }
@@ -218,11 +218,11 @@ async function fixSexoReceptorasTE() {
 if (require.main === module) {
   fixSexoReceptorasTE()
     .then(() => {
-      console.log('\n�œ… Script executado com sucesso!')
+      console.log('\n✅ Script executado com sucesso!')
       process.exit(0)
     })
     .catch((error) => {
-      console.error('\n�Œ Erro ao executar script:', error)
+      console.error('\n❌ Erro ao executar script:', error)
       process.exit(1)
     })
 }

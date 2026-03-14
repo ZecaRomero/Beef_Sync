@@ -13,7 +13,7 @@ async function checkSaidasSemen() {
   const client = await pool.connect();
   
   try {
-    console.log('�Ÿ”� Verificando saídas de sêmen no PostgreSQL...');
+    console.log('🔍 Verificando saídas de sêmen no PostgreSQL...');
     
     // 1. Verificar todos os registros na tabela estoque_semen
     const allRecords = await client.query(`
@@ -23,7 +23,7 @@ async function checkSaidasSemen() {
       ORDER BY created_at DESC
     `);
     
-    console.log('\n�Ÿ“Š Todos os registros na tabela estoque_semen:');
+    console.log('\n📊 Todos os registros na tabela estoque_semen:');
     allRecords.rows.forEach(record => {
       console.log(`   ID: ${record.id} | Touro: ${record.nome_touro} | Tipo: ${record.tipo_operacao} | Doses: ${record.quantidade_doses} | Destino: ${record.destino || 'N/A'} | Data: ${record.created_at}`);
     });
@@ -35,10 +35,10 @@ async function checkSaidasSemen() {
       ORDER BY created_at DESC
     `);
     
-    console.log(`\n�Ÿ“� Saídas encontradas: ${saidas.rows.length}`);
+    console.log(`\n📤 Saídas encontradas: ${saidas.rows.length}`);
     if (saidas.rows.length > 0) {
       saidas.rows.forEach(saida => {
-        console.log(`   �Ÿ”� ID: ${saida.id}`);
+        console.log(`   🔸 ID: ${saida.id}`);
         console.log(`     Touro: ${saida.nome_touro}`);
         console.log(`     Destino: ${saida.destino}`);
         console.log(`     Quantidade: ${saida.quantidade_doses} doses`);
@@ -47,7 +47,7 @@ async function checkSaidasSemen() {
         console.log('     ---');
       });
     } else {
-      console.log('   �Œ Nenhuma saída encontrada!');
+      console.log('   ❌ Nenhuma saída encontrada!');
     }
     
     // 3. Verificar se existe a tabela saidas_semen
@@ -59,15 +59,15 @@ async function checkSaidasSemen() {
       );
     `);
     
-    console.log(`\n�Ÿ—‚️  Tabela 'saidas_semen' existe: ${saidasTable.rows[0].exists}`);
+    console.log(`\n🗂️  Tabela 'saidas_semen' existe: ${saidasTable.rows[0].exists}`);
     
     if (saidasTable.rows[0].exists) {
       const saidasSeparadas = await client.query('SELECT * FROM saidas_semen ORDER BY created_at DESC');
-      console.log(`�Ÿ“‹ Registros na tabela saidas_semen: ${saidasSeparadas.rows.length}`);
+      console.log(`📋 Registros na tabela saidas_semen: ${saidasSeparadas.rows.length}`);
       
       if (saidasSeparadas.rows.length > 0) {
         saidasSeparadas.rows.forEach(saida => {
-          console.log(`   �Ÿ”� ID: ${saida.id} | Entrada ID: ${saida.entrada_id} | Destino: ${saida.destino} | Doses: ${saida.quantidade_doses}`);
+          console.log(`   🔸 ID: ${saida.id} | Entrada ID: ${saida.entrada_id} | Destino: ${saida.destino} | Doses: ${saida.quantidade_doses}`);
         });
       }
     }
@@ -80,13 +80,13 @@ async function checkSaidasSemen() {
       ORDER BY created_at DESC
     `);
     
-    console.log(`\n�Ÿ“� Entradas encontradas: ${entradas.rows.length}`);
+    console.log(`\n📥 Entradas encontradas: ${entradas.rows.length}`);
     entradas.rows.forEach(entrada => {
-      console.log(`   �Ÿ”� ID: ${entrada.id} | Touro: ${entrada.nome_touro} | Total: ${entrada.quantidade_doses} | Disponível: ${entrada.doses_disponiveis} | Usadas: ${entrada.doses_usadas} | Status: ${entrada.status}`);
+      console.log(`   🔸 ID: ${entrada.id} | Touro: ${entrada.nome_touro} | Total: ${entrada.quantidade_doses} | Disponível: ${entrada.doses_disponiveis} | Usadas: ${entrada.doses_usadas} | Status: ${entrada.status}`);
     });
     
   } catch (error) {
-    console.error('�Œ Erro:', error);
+    console.error('❌ Erro:', error);
   } finally {
     client.release();
     await pool.end();

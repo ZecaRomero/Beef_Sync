@@ -1,13 +1,13 @@
 
 // Simulation of texto-simples.js logic
 
-const texto = `S�‰RIE	RG	LOCAL	ACASALAMENTO	DATA IA	DATA DG	RESULT
+const texto = `SÉRIE	RG	LOCAL	ACASALAMENTO	DATA IA	DATA DG	RESULT
 123	456	Piquete 1	TOURO TESTE	01/01/2024	01/02/2024	P
 789	012	Piquete 2		01/01/2024	01/02/2024	N
 345	678	Piquete 3	OUTRO TOURO	01/01/2024	01/02/2024	P`;
 
 // Case 2: Spaces instead of tabs (common in some copy-pastes or text editors)
-const textoSpaces = `S�‰RIE     RG     LOCAL     ACASALAMENTO     DATA IA     DATA DG     RESULT
+const textoSpaces = `SÉRIE     RG     LOCAL     ACASALAMENTO     DATA IA     DATA DG     RESULT
 123       456    Piquete 1  TOURO TESTE      01/01/2024  01/02/2024  P
 789       012    Piquete 2                   01/01/2024  01/02/2024  N
 345       678    Piquete 3  OUTRO TOURO      01/01/2024  01/02/2024  P`;
@@ -18,7 +18,7 @@ function processText(texto, label) {
     
     // Remover cabeçalho se tiver
     const primeiraLinha = linhas[0].toUpperCase();
-    const temCabecalho = primeiraLinha.includes('S�‰RIE') || primeiraLinha.includes('SERIE') || primeiraLinha.includes('LOCAL') || primeiraLinha.includes('ACASALAMENTO') || primeiraLinha.includes('TOURO');
+    const temCabecalho = primeiraLinha.includes('SÉRIE') || primeiraLinha.includes('SERIE') || primeiraLinha.includes('LOCAL') || primeiraLinha.includes('ACASALAMENTO') || primeiraLinha.includes('TOURO');
     
     let mapaColunas = null;
     let dadosLinhas = linhas;
@@ -46,7 +46,7 @@ function processText(texto, label) {
         cols.forEach((col, idx) => {
           if (!col) return;
           const c = col.toUpperCase();
-          if (c.includes('S�‰RIE') || c.includes('SERIE')) mapaColunas.serie = idx;
+          if (c.includes('SÉRIE') || c.includes('SERIE')) mapaColunas.serie = idx;
           else if (c === 'RG') mapaColunas.rg = idx;
           else if (c.includes('LOCAL') || c.includes('PIQUETE')) mapaColunas.local = idx;
           else if (c.includes('TOURO') || c.includes('ACASALAMENTO') || c.includes('REPRODUTOR')) mapaColunas.touro = idx;
@@ -54,7 +54,7 @@ function processText(texto, label) {
           else if (c.includes('DATA DG') || c.includes('DIAG') || c.includes('PREVISAO')) mapaColunas.dataDG = idx;
           else if (c.includes('RESULT')) mapaColunas.resultado = idx;
         });
-        console.log('�Ÿ—�️ Mapa de colunas detectado:', mapaColunas);
+        console.log('🗺️ Mapa de colunas detectado:', mapaColunas);
       }
     }
 
@@ -85,7 +85,7 @@ function processText(texto, label) {
 
       console.log(`  -> Touro extraído: '${touroIA}'`);
       
-      if (!touroIA) console.log('  �š�️ FALHA: Touro não encontrado!');
+      if (!touroIA) console.log('  ⚠️ FALHA: Touro não encontrado!');
     }
 }
 

@@ -7,7 +7,7 @@ async function contar() {
     WHERE piquete_atual = 'PIQUETE 1'
   `)
   
-  console.log('�œ… Total de animais no PIQUETE 1:', result.rows[0].total)
+  console.log('✅ Total de animais no PIQUETE 1:', result.rows[0].total)
   
   // Verificar localizações ativas
   const locResult = await query(`
@@ -17,7 +17,7 @@ async function contar() {
     AND data_saida IS NULL
   `)
   
-  console.log('�Ÿ“� Total de localizações ativas no PIQUETE 1:', locResult.rows[0].total)
+  console.log('📍 Total de localizações ativas no PIQUETE 1:', locResult.rows[0].total)
   
   process.exit(0)
 }

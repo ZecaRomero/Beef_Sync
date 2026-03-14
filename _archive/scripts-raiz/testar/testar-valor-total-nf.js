@@ -9,7 +9,7 @@ async function testarValorTotalNF() {
   const client = await pool.connect();
   
   try {
-    console.log('�Ÿ”� Verificando valores totais das notas fiscais...\n');
+    console.log('🔍 Verificando valores totais das notas fiscais...\n');
     
     // Buscar últimas 10 NFs
     const result = await client.query(`
@@ -39,13 +39,13 @@ async function testarValorTotalNF() {
       LIMIT 10
     `);
     
-    console.log(`�Ÿ“Š �šltimas ${result.rows.length} Notas Fiscais:\n`);
+    console.log(`📊 Últimas ${result.rows.length} Notas Fiscais:\n`);
     
     result.rows.forEach(nf => {
       const valorNF = parseFloat(nf.valor_total) || 0;
       const valorCalculado = parseFloat(nf.valor_calculado_itens) || 0;
       const diferenca = Math.abs(valorNF - valorCalculado);
-      const status = diferenca < 0.01 ? '�œ…' : '�š�️';
+      const status = diferenca < 0.01 ? '✅' : '⚠️';
       
       console.log(`${status} NF ${nf.numero_nf} (${nf.tipo})`);
       console.log(`   Data: ${nf.data}`);
@@ -53,13 +53,13 @@ async function testarValorTotalNF() {
       console.log(`   Valor Calculado (itens): R$ ${valorCalculado.toFixed(2)}`);
       console.log(`   Total de Itens: ${nf.total_itens}`);
       if (diferenca >= 0.01) {
-        console.log(`   �š�️ Diferença: R$ ${diferenca.toFixed(2)}`);
+        console.log(`   ⚠️ Diferença: R$ ${diferenca.toFixed(2)}`);
       }
       console.log('');
     });
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
   } finally {
     client.release();
     await pool.end();

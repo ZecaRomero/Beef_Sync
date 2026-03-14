@@ -7,7 +7,7 @@
 const { query } = require('./lib/database')
 
 async function fixCorrectDoadoras() {
-  console.log('�Ÿ”� Corrigindo vinculações incorretas de doadoras...\n')
+  console.log('🔧 Corrigindo vinculações incorretas de doadoras...\n')
 
   try {
     // 1. Verificar estado atual das transferências
@@ -20,9 +20,9 @@ async function fixCorrectDoadoras() {
       FROM transferencias_embrioes
     `)
     
-    console.log(`   �Ÿ“Š Total de transferências: ${currentState.rows[0].total}`)
-    console.log(`   �Ÿ“Š Com doadora_id: ${currentState.rows[0].com_doadora_id}`)
-    console.log(`   �Ÿ“Š Com touro_id: ${currentState.rows[0].com_touro_id}`)
+    console.log(`   📊 Total de transferências: ${currentState.rows[0].total}`)
+    console.log(`   📊 Com doadora_id: ${currentState.rows[0].com_doadora_id}`)
+    console.log(`   📊 Com touro_id: ${currentState.rows[0].com_touro_id}`)
 
     // 2. Verificar quais doadoras estão vinculadas incorretamente
     console.log('\n2. Verificando doadoras vinculadas:')
@@ -39,10 +39,10 @@ async function fixCorrectDoadoras() {
       ORDER BY total_transferencias DESC
     `)
     
-    console.log(`   �Ÿ“Š Doadoras vinculadas encontradas:`)
+    console.log(`   📊 Doadoras vinculadas encontradas:`)
     vinculacoesAtuais.rows.forEach((vinc, index) => {
       const isCorrect = vinc.doadora_nome && vinc.doadora_nome.includes('CJCJ')
-      console.log(`   ${index + 1}. "${vinc.doadora_nome}" �†’ ${vinc.serie} ${vinc.rg} (${vinc.total_transferencias} TEs) ${isCorrect ? '�œ…' : '�Œ'}`)
+      console.log(`   ${index + 1}. "${vinc.doadora_nome}" → ${vinc.serie} ${vinc.rg} (${vinc.total_transferencias} TEs) ${isCorrect ? '✅' : '❌'}`)
     })
 
     // 3. Remover vinculações incorretas (não-CJCJ)
@@ -56,7 +56,7 @@ async function fixCorrectDoadoras() {
     `)
     
     if (incorrectLinks.rows.length > 0) {
-      console.log(`   �Œ Encontradas ${incorrectLinks.rows.length} vinculações incorretas:`)
+      console.log(`   ❌ Encontradas ${incorrectLinks.rows.length} vinculações incorretas:`)
       
       for (const link of incorrectLinks.rows) {
         console.log(`      Removendo: ${link.serie} ${link.rg} (ID: ${link.doadora_id}) de "${link.doadora_nome}"`)
@@ -67,9 +67,9 @@ async function fixCorrectDoadoras() {
           WHERE doadora_id = $1
         `, [link.doadora_id])
       }
-      console.log(`   �œ… Vinculações incorretas removidas`)
+      console.log(`   ✅ Vinculações incorretas removidas`)
     } else {
-      console.log(`   �œ… Nenhuma vinculação incorreta encontrada`)
+      console.log(`   ✅ Nenhuma vinculação incorreta encontrada`)
     }
 
     // 4. Verificar e corrigir vinculações de touros (CJCA6 não deveria ter prenhezes como touro)
@@ -87,9 +87,9 @@ async function fixCorrectDoadoras() {
       ORDER BY total_transferencias DESC
     `)
     
-    console.log(`   �Ÿ“Š Touros vinculados:`)
+    console.log(`   📊 Touros vinculados:`)
     touroLinks.rows.forEach((touro, index) => {
-      console.log(`   ${index + 1}. "${touro.touro}" �†’ ${touro.serie} ${touro.rg} (${touro.total_transferencias} TEs)`)
+      console.log(`   ${index + 1}. "${touro.touro}" → ${touro.serie} ${touro.rg} (${touro.total_transferencias} TEs)`)
     })
 
     // 5. Remover vinculação incorreta do CJCA6 como touro
@@ -102,7 +102,7 @@ async function fixCorrectDoadoras() {
     `)
     
     if (cjca6AsTouro.rows[0].total > 0) {
-      console.log(`   �Œ CJCA6 está vinculado a ${cjca6AsTouro.rows[0].total} transferências como touro`)
+      console.log(`   ❌ CJCA6 está vinculado a ${cjca6AsTouro.rows[0].total} transferências como touro`)
       
       await query(`
         UPDATE transferencias_embrioes 
@@ -110,9 +110,9 @@ async function fixCorrectDoadoras() {
         WHERE touro_id = (SELECT id FROM animais WHERE serie = 'CJCA' AND rg = '6')
       `)
       
-      console.log(`   �œ… CJCA6 removido das vinculações de touro`)
+      console.log(`   ✅ CJCA6 removido das vinculações de touro`)
     } else {
-      console.log(`   �œ… CJCA6 não está vinculado como touro`)
+      console.log(`   ✅ CJCA6 não está vinculado como touro`)
     }
 
     // 6. Vincular corretamente apenas as doadoras CJCJ
@@ -127,7 +127,7 @@ async function fixCorrectDoadoras() {
       ORDER BY CAST(rg AS INTEGER)
     `)
     
-    console.log(`   �Ÿ“Š Encontradas ${cjcjFemeas.rows.length} fêmeas CJCJ`)
+    console.log(`   📊 Encontradas ${cjcjFemeas.rows.length} fêmeas CJCJ`)
     
     let correcoesCJCJ = 0
     
@@ -145,7 +145,7 @@ async function fixCorrectDoadoras() {
       `)
       
       if (transferencias.rows.length > 0) {
-        console.log(`   �Ÿ”— Vinculando CJCJ ${femea.rg} a ${transferencias.rows.length} transferências`)
+        console.log(`   🔗 Vinculando CJCJ ${femea.rg} a ${transferencias.rows.length} transferências`)
         
         for (const te of transferencias.rows) {
           await query(`
@@ -159,7 +159,7 @@ async function fixCorrectDoadoras() {
       }
     }
     
-    console.log(`   �œ… ${correcoesCJCJ} transferências vinculadas a doadoras CJCJ`)
+    console.log(`   ✅ ${correcoesCJCJ} transferências vinculadas a doadoras CJCJ`)
 
     // 7. Verificação final
     console.log('\n7. Verificação final:')
@@ -171,7 +171,7 @@ async function fixCorrectDoadoras() {
       WHERE touro_id = (SELECT id FROM animais WHERE serie = 'CJCA' AND rg = '6')
     `)
     
-    console.log(`   �Ÿ“Š CJCA6 prenhezes como touro: ${cjca6Final.rows[0].prenhezes}`)
+    console.log(`   📊 CJCA6 prenhezes como touro: ${cjca6Final.rows[0].prenhezes}`)
     
     // Doadoras CJCJ
     const cjcjDoadoras = await query(`
@@ -187,7 +187,7 @@ async function fixCorrectDoadoras() {
       ORDER BY transferencias DESC
     `)
     
-    console.log(`   �Ÿ“Š Doadoras CJCJ com transferências:`)
+    console.log(`   📊 Doadoras CJCJ com transferências:`)
     cjcjDoadoras.rows.forEach((doadora, index) => {
       console.log(`   ${index + 1}. CJCJ ${doadora.rg}: ${doadora.transferencias} transferências`)
     })
@@ -202,26 +202,26 @@ async function fixCorrectDoadoras() {
     `)
     
     const stats = resumoFinal.rows[0]
-    console.log(`\n�Ÿ“Š Resumo final:`)
+    console.log(`\n📊 Resumo final:`)
     console.log(`   Total de transferências: ${stats.total_transferencias}`)
     console.log(`   Touros vinculados: ${stats.touros_vinculados}`)
     console.log(`   Doadoras vinculadas: ${stats.doadoras_vinculadas}`)
 
-    console.log('\n�œ… Correção concluída!')
-    console.log('\n�Ÿ’� Resultado esperado:')
+    console.log('\n✅ Correção concluída!')
+    console.log('\n💡 Resultado esperado:')
     console.log('- CJCA6 não deve ter prenhezes ativas (não é touro reprodutor)')
     console.log('- Apenas doadoras CJCJ devem estar vinculadas às transferências')
     console.log('- Atualize a página do CJCA6 para confirmar')
 
   } catch (error) {
-    console.error('�Œ Erro durante correção:', error)
+    console.error('❌ Erro durante correção:', error)
   }
 }
 
 // Executar
 fixCorrectDoadoras()
   .then(() => {
-    console.log('\n�ŸŽ� CORRE�‡�ƒO DE DOADORAS CONCLUÍDA')
+    console.log('\n🎯 CORREÇÃO DE DOADORAS CONCLUÍDA')
     process.exit(0)
   })
   .catch(error => {

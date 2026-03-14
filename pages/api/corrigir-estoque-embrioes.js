@@ -2,11 +2,11 @@ import { query } from '../../lib/database'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, message: 'MÃ©todo nÃ£o permitido' })
+    return res.status(405).json({ success: false, message: 'Método não permitido' })
   }
 
   try {
-    console.log('ðÅ¸â€�§ Iniciando correÃ§Ã£o do estoque de embriÃµes...')
+    console.log('🔧 Iniciando correção do estoque de embriões...')
 
     // 1. Verificar estado atual
     const estoqueAtual = await query(`
@@ -28,17 +28,17 @@ export default async function handler(req, res) {
     `)
 
     const registrosComProblema = estoqueAtual.rows || []
-    console.log(`ðÅ¸â€œ¦ Encontrados ${registrosComProblema.length} registros com doses disponÃ­veis`)
+    console.log(`📦 Encontrados ${registrosComProblema.length} registros com doses disponíveis`)
 
     if (registrosComProblema.length === 0) {
       return res.status(200).json({
         success: true,
-        message: 'Nenhum registro precisa de correÃ§Ã£o',
+        message: 'Nenhum registro precisa de correção',
         corrigidos: 0
       })
     }
 
-    // 2. Verificar se hÃ¡ transferÃªncias registradas
+    // 2. Verificar se há transferências registradas
     let transferenciasMap = {}
     try {
       const transferencias = await query(`
@@ -52,12 +52,12 @@ export default async function handler(req, res) {
       transferencias.rows.forEach(t => {
         transferenciasMap[t.acasalamento.toLowerCase()] = t.total
       })
-      console.log(`ðÅ¸â€œ¤ Encontradas ${transferencias.rows.length} acasalamentos com transferÃªncias`)
+      console.log(`📤 Encontradas ${transferencias.rows.length} acasalamentos com transferências`)
     } catch (e) {
-      console.log('ââ€ž¹ï¸�  Tabela transferencias_embriao nÃ£o existe ou estÃ¡ vazia')
+      console.log('ℹ️  Tabela transferencias_embriao não existe ou está vazia')
     }
 
-    // 3. Aplicar correÃ§Ã£o: recalcular doses_disponiveis baseado em doses_usadas
+    // 3. Aplicar correção: recalcular doses_disponiveis baseado em doses_usadas
     const resultado = await query(`
       UPDATE estoque_semen 
       SET doses_disponiveis = GREATEST(0, quantidade_doses - COALESCE(doses_usadas, 0)),
@@ -70,7 +70,7 @@ export default async function handler(req, res) {
     `)
 
     const registrosCorrigidos = resultado.rows || []
-    console.log(`âÅ“â€¦ ${registrosCorrigidos.length} registros corrigidos`)
+    console.log(`✅ ${registrosCorrigidos.length} registros corrigidos`)
 
     // 4. Verificar resultado
     const estoqueDepois = await query(`
@@ -88,7 +88,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       success: true,
-      message: 'Estoque de embriÃµes corrigido com sucesso',
+      message: 'Estoque de embriões corrigido com sucesso',
       antes: registrosComProblema.length,
       depois: totalDepois,
       corrigidos: registrosCorrigidos.length,
@@ -101,10 +101,10 @@ export default async function handler(req, res) {
     })
 
   } catch (error) {
-    console.error('â�Å’ Erro ao corrigir estoque:', error)
+    console.error('❌ Erro ao corrigir estoque:', error)
     return res.status(500).json({
       success: false,
-      message: 'Erro ao corrigir estoque de embriÃµes',
+      message: 'Erro ao corrigir estoque de embriões',
       error: error.message
     })
   }

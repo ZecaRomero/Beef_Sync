@@ -1,6 +1,6 @@
 
 
-// Sistema de gestos touch para dispositivos mÃ³veis
+// Sistema de gestos touch para dispositivos móveis
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 export default function useTouchGestures() {
@@ -38,16 +38,16 @@ export default function useTouchGestures() {
     initialAngle: 0
   })
 
-  // ConfiguraÃ§Ãµes dos gestos
+  // Configurações dos gestos
   const config = {
-    swipeThreshold: 50, // DistÃ¢ncia mÃ­nima para considerar swipe
-    swipeVelocity: 0.3, // Velocidade mÃ­nima para swipe
-    tapThreshold: 10, // DistÃ¢ncia mÃ¡xima para considerar tap
-    tapTime: 300, // Tempo mÃ¡ximo para tap
-    doubleTapTime: 300, // Tempo mÃ¡ximo entre taps para double tap
+    swipeThreshold: 50, // Distância mínima para considerar swipe
+    swipeVelocity: 0.3, // Velocidade mínima para swipe
+    tapThreshold: 10, // Distância máxima para considerar tap
+    tapTime: 300, // Tempo máximo para tap
+    doubleTapTime: 300, // Tempo máximo entre taps para double tap
     longPressTime: 500, // Tempo para long press
-    pinchThreshold: 0.1, // MudanÃ§a mÃ­nima de escala para pinch
-    rotationThreshold: 5 // Ãâ€šngulo mÃ­nimo para rotaÃ§Ã£o
+    pinchThreshold: 0.1, // Mudança mínima de escala para pinch
+    rotationThreshold: 5 // Ângulo mínimo para rotação
   }
 
   // Detectar gestos
@@ -107,7 +107,7 @@ export default function useTouchGestures() {
         touchRef.current.isLongPress = false
       }
     } else if (touches.length === 2) {
-      // Detectar pinch e rotaÃ§Ã£o
+      // Detectar pinch e rotação
       const touch1 = touches[0]
       const touch2 = touches[1]
 
@@ -222,7 +222,7 @@ export default function useTouchGestures() {
     // Detectar gestos
     const detectedGestures = detectGestures(touches)
 
-    // Resetar dados apÃ³s um delay
+    // Resetar dados após um delay
     setTimeout(() => {
       setGestures(prev => ({
         ...prev,
@@ -248,7 +248,7 @@ export default function useTouchGestures() {
     return detectedGestures
   }, [detectGestures])
 
-  // FunÃ§Ã£o para adicionar eventos em um elemento
+  // Função para adicionar eventos em um elemento
   const attachTouchElement = useCallback((elementRef, options = {}) => {
     const element = elementRef.current
     if (!element) return null
@@ -301,7 +301,7 @@ export default function useTouchGestures() {
     }
   }, [handleTouchStart, handleTouchMove, handleTouchEnd])
 
-  // FunÃ§Ã£o para adicionar eventos globais
+  // Função para adicionar eventos globais
   const attachGlobalTouchGestures = useCallback((options = {}) => {
     const {
       onSwipeLeft,
@@ -351,7 +351,7 @@ export default function useTouchGestures() {
     }
   }, [handleTouchStart, handleTouchMove, handleTouchEnd])
 
-  // Verificar se Ã© dispositivo touch
+  // Verificar se é dispositivo touch
   const isTouchDevice = useCallback(() => {
     return typeof window !== 'undefined' && (
       'ontouchstart' in window ||
@@ -360,7 +360,7 @@ export default function useTouchGestures() {
     )
   }, [])
 
-  // Obter informaÃ§Ãµes do touch atual
+  // Obter informações do touch atual
   const getTouchInfo = useCallback(() => {
     return {
       ...touchData,
@@ -376,15 +376,15 @@ export default function useTouchGestures() {
     gestures,
     touchData,
     
-    // FunÃ§Ãµes principais
+    // Funções principais
     attachTouchElement,
     attachGlobalTouchGestures,
     
-    // FunÃ§Ãµes utilitÃ¡rias
+    // Funções utilitárias
     isTouchDevice,
     getTouchInfo,
     
-    // ConfiguraÃ§Ãµes
+    // Configurações
     config
   }
 }

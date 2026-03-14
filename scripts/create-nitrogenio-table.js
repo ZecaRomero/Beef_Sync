@@ -11,7 +11,7 @@ const pool = new Pool({
 
 async function createNitrogenioTable() {
   try {
-    console.log('ðÅ¸â€�§ Criando tabela abastecimento_nitrogenio...');
+    console.log('🔧 Criando tabela abastecimento_nitrogenio...');
     
     // Ler o arquivo SQL
     const sql = fs.readFileSync('CREATE_NITROGENIO_TABLE.sql', 'utf8');
@@ -19,7 +19,7 @@ async function createNitrogenioTable() {
     // Executar o SQL
     await pool.query(sql);
     
-    console.log('âÅ“â€¦ Tabela abastecimento_nitrogenio criada com sucesso!');
+    console.log('✅ Tabela abastecimento_nitrogenio criada com sucesso!');
     
     // Verificar se a tabela foi criada
     const result = await pool.query(`
@@ -27,10 +27,10 @@ async function createNitrogenioTable() {
       FROM abastecimento_nitrogenio
     `);
     
-    console.log(`ðÅ¸â€œÅ  Registros na tabela: ${result.rows[0].count}`);
+    console.log(`📊 Registros na tabela: ${result.rows[0].count}`);
     
   } catch (error) {
-    console.error('â�Å’ Erro ao criar tabela:', error.message);
+    console.error('❌ Erro ao criar tabela:', error.message);
   } finally {
     await pool.end();
   }

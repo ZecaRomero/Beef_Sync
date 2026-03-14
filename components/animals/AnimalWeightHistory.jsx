@@ -42,7 +42,7 @@ export default function AnimalWeightHistory({ animal }) {
         </div>
         <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
           {animal.pesagens.length} pesagem(ns)
-          {evolucaoPeso != null && ` ââ‚¬¢ EvoluÃ§Ã£o desde ${formatDate(primeiraPesagem?.data)}`}
+          {evolucaoPeso != null && ` • Evolução desde ${formatDate(primeiraPesagem?.data)}`}
         </p>
       </button>
       <div className={`overflow-hidden transition-all ${isExpanded ? 'max-h-[999px]' : 'max-h-0'}`}>

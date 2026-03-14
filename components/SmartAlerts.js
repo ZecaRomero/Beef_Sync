@@ -46,7 +46,7 @@ export default function SmartAlerts() {
           message: `${animal.serie} ${animal.rg} tem custo de R$ ${(animal.custoTotal || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
           animal: animal,
           action: 'Revisar custos',
-          icon: 'âÅ¡ ï¸�',
+          icon: '⚠️',
           color: 'bg-yellow-500'
         })
       }
@@ -58,10 +58,10 @@ export default function SmartAlerts() {
           type: 'info',
           priority: 'medium',
           title: 'Animal Maduro',
-          message: `${animal.serie} ${animal.rg} tem ${animal.meses} meses e ainda estÃ¡ ativo`,
+          message: `${animal.serie} ${animal.rg} tem ${animal.meses} meses e ainda está ativo`,
           animal: animal,
           action: 'Considerar venda',
-          icon: 'ðÅ¸�â€ž',
+          icon: '🐄',
           color: 'bg-blue-500'
         })
       }
@@ -74,10 +74,10 @@ export default function SmartAlerts() {
           type: 'error',
           priority: 'high',
           title: 'ROI Negativo',
-          message: `${animal.serie} ${animal.rg} teve prejuÃ­zo de R$ ${loss.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+          message: `${animal.serie} ${animal.rg} teve prejuízo de R$ ${loss.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
           animal: animal,
           action: 'Analisar causas',
-          icon: 'ðÅ¸â€œâ€°',
+          icon: '📉',
           color: 'bg-red-500'
         })
       }
@@ -91,8 +91,8 @@ export default function SmartAlerts() {
           title: 'Excelente Performance',
           message: `${animal.serie} ${animal.rg} teve ROI de ${(((animal.valorVenda - animal.custoTotal) / animal.custoTotal) * 100).toFixed(1)}%`,
           animal: animal,
-          action: 'Replicar estratÃ©gia',
-          icon: 'ðÅ¸�â€ ',
+          action: 'Replicar estratégia',
+          icon: '🏆',
           color: 'bg-green-500'
         })
       }
@@ -107,10 +107,10 @@ export default function SmartAlerts() {
         id: 'high-avg-cost',
         type: 'warning',
         priority: 'medium',
-        title: 'Custo MÃ©dio Elevado',
-        message: `Custo mÃ©dio por animal: R$ ${avgCost.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+        title: 'Custo Médio Elevado',
+        message: `Custo médio por animal: R$ ${avgCost.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
         action: 'Otimizar custos',
-        icon: 'ðÅ¸â€™°',
+        icon: '💰',
         color: 'bg-orange-500'
       })
     }
@@ -139,7 +139,7 @@ export default function SmartAlerts() {
     <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
-          <span className="mr-3 text-2xl">ðÅ¸Å¡¨</span>
+          <span className="mr-3 text-2xl">🚨</span>
           Alertas Inteligentes
         </h2>
         <div className="flex items-center space-x-2">
@@ -157,7 +157,7 @@ export default function SmartAlerts() {
 
       {alerts.length === 0 ? (
         <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-          <div className="text-4xl mb-2">âÅ“â€¦</div>
+          <div className="text-4xl mb-2">✅</div>
           <div className="text-sm">Nenhum alerta no momento</div>
           <div className="text-xs mt-1">Tudo funcionando perfeitamente!</div>
         </div>
@@ -183,7 +183,7 @@ export default function SmartAlerts() {
                         alert.priority === 'medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
                         'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                       }`}>
-                        {alert.priority === 'high' ? 'Alta' : alert.priority === 'medium' ? 'MÃ©dia' : 'Baixa'}
+                        {alert.priority === 'high' ? 'Alta' : alert.priority === 'medium' ? 'Média' : 'Baixa'}
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
@@ -207,7 +207,7 @@ export default function SmartAlerts() {
                   onClick={() => dismissAlert(alert.id)}
                   className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 ml-2"
                 >
-                  Ãâ€”
+                  ×
                 </button>
               </div>
             </div>
@@ -224,7 +224,7 @@ export default function SmartAlerts() {
         </div>
       )}
 
-      {/* EstatÃ­sticas dos Alertas */}
+      {/* Estatísticas dos Alertas */}
       <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
         <div className="grid grid-cols-3 gap-4 text-center">
           <div>
@@ -237,7 +237,7 @@ export default function SmartAlerts() {
             <div className="text-lg font-bold text-yellow-600 dark:text-yellow-400">
               {alerts.filter(a => a.priority === 'medium').length}
             </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">MÃ©dia Prioridade</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Média Prioridade</div>
           </div>
           <div>
             <div className="text-lg font-bold text-green-600 dark:text-green-400">

@@ -19,7 +19,7 @@ async function handler(req, res) {
 
   const { reports, period, sections, format = 'pdf', filters } = req.body
 
-  console.log('ðÅ¸â€œÅ  RequisiÃ§Ã£o de download recebida:', {
+  console.log('📊 Requisição de download recebida:', {
     reports,
     period,
     format,
@@ -28,18 +28,18 @@ async function handler(req, res) {
   })
 
   if (!reports || !Array.isArray(reports) || reports.length === 0) {
-    console.error('â�Å’ Erro de validaÃ§Ã£o: reports invÃ¡lido')
-    return sendValidationError(res, 'Tipos de relatÃ³rio sÃ£o obrigatÃ³rios')
+    console.error('❌ Erro de validação: reports inválido')
+    return sendValidationError(res, 'Tipos de relatório são obrigatórios')
   }
 
   if (!period || !period.startDate || !period.endDate) {
-    console.error('â�Å’ Erro de validaÃ§Ã£o: period invÃ¡lido')
-    return sendValidationError(res, 'PerÃ­odo Ã© obrigatÃ³rio')
+    console.error('❌ Erro de validação: period inválido')
+    return sendValidationError(res, 'Período é obrigatório')
   }
 
   try {
     // Generate report data directly instead of making HTTP request
-    console.log('ðÅ¸â€�â€ž Gerando dados do relatÃ³rio...')
+    console.log('🔄 Gerando dados do relatório...')
     const reportData = {
       success: true,
       data: {
@@ -50,9 +50,9 @@ async function handler(req, res) {
     }
 
     // Generate each requested report type
-    console.log('ðÅ¸â€œâ€¹ Processando tipos de relatÃ³rio:', reports)
+    console.log('📋 Processando tipos de relatório:', reports)
     for (const reportType of reports) {
-      console.log(`ðÅ¸â€�â€ž Gerando: ${reportType}`)
+      console.log(`🔄 Gerando: ${reportType}`)
       switch (reportType) {
         case 'monthly_summary':
           reportData.data.data.monthly_summary = await generateMonthlySummary(period, sections?.[reportType])
@@ -73,33 +73,33 @@ async function handler(req, res) {
           reportData.data.data.location_report = await generateLocationReport(period, sections?.[reportType])
           break
         default:
-          console.warn(`âÅ¡ ï¸� Tipo de relatÃ³rio desconhecido: ${reportType}`)
+          console.warn(`⚠️ Tipo de relatório desconhecido: ${reportType}`)
       }
     }
 
-    console.log('ðÅ¸â€œÅ  Dados gerados, iniciando criaÃ§Ã£o do arquivo...')
+    console.log('📊 Dados gerados, iniciando criação do arquivo...')
     let fileBuffer
     let contentType
     let fileExtension
 
     if (format === 'pdf') {
-      console.log('ðÅ¸â€œâ€ž Gerando PDF...')
+      console.log('📄 Gerando PDF...')
       fileBuffer = await generatePDFReport(reportData, period)
       contentType = 'application/pdf'
       fileExtension = 'pdf'
     } else if (format === 'xlsx' || format === 'excel') {
-      console.log('ðÅ¸â€œÅ  Gerando Excel...')
+      console.log('📊 Gerando Excel...')
       fileBuffer = await generateExcelReport(reportData, period)
       contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       fileExtension = 'xlsx'
     } else {
-      console.error('â�Å’ Formato nÃ£o suportado:', format)
-      return sendValidationError(res, 'Formato nÃ£o suportado')
+      console.error('❌ Formato não suportado:', format)
+      return sendValidationError(res, 'Formato não suportado')
     }
 
-    console.log(`âÅ“â€¦ Arquivo gerado: ${fileBuffer.length} bytes`)
+    console.log(`✅ Arquivo gerado: ${fileBuffer.length} bytes`)
 
-    // Gerar nome do arquivo baseado nos tipos de relatÃ³rio
+    // Gerar nome do arquivo baseado nos tipos de relatório
     let reportNames = []
     const reportTypeNames = {
       'monthly_summary': 'Resumo-Mensal',
@@ -120,24 +120,24 @@ async function handler(req, res) {
     const datePart = `${period.startDate}-${period.endDate}`
     const filename = `${reportNamePart}_${datePart}.${fileExtension}`
 
-    console.log('ðÅ¸â€œ� Nome do arquivo:', filename)
-    console.log('ðÅ¸â€œâ€¹ Content-Type:', contentType)
+    console.log('📁 Nome do arquivo:', filename)
+    console.log('📋 Content-Type:', contentType)
 
     res.setHeader('Content-Type', contentType)
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
     res.setHeader('Content-Length', fileBuffer.length)
 
-    console.log('âÅ“â€¦ Enviando arquivo para o cliente...')
+    console.log('✅ Enviando arquivo para o cliente...')
     res.send(fileBuffer)
   } catch (error) {
-    console.error('â�Å’ Erro detalhado ao gerar relatÃ³rio:', {
+    console.error('❌ Erro detalhado ao gerar relatório:', {
       message: error.message,
       stack: error.stack,
       reports,
       period,
       format
     })
-    logger.error('Erro ao gerar relatÃ³rio para download:', error)
+    logger.error('Erro ao gerar relatório para download:', error)
     return sendError(res, `Erro interno do servidor: ${error.message}`)
   }
 }

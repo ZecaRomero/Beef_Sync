@@ -10,7 +10,7 @@ const { query } = require('../lib/database')
 const DRY_RUN = process.argv.includes('--dry-run')
 
 async function corrigir() {
-  console.log(DRY_RUN ? '�Ÿ”� Modo dry-run (não altera o banco)\n' : '�Ÿ”� Corrigindo Situação ABCZ...\n')
+  console.log(DRY_RUN ? '🔍 Modo dry-run (não altera o banco)\n' : '🔧 Corrigindo Situação ABCZ...\n')
 
   try {
     // 1. CJCJ 16958-16976: garantir que todos tenham POSSUI RGN (faixa do Excel do usuário)
@@ -25,7 +25,7 @@ async function corrigir() {
     `)
 
     if (cjcjFaixa.rows.length > 0) {
-      console.log(`�Ÿ“‹ CJCJ 16958-16976 a corrigir (${cjcjFaixa.rows.length}):`)
+      console.log(`📋 CJCJ 16958-16976 a corrigir (${cjcjFaixa.rows.length}):`)
       cjcjFaixa.rows.forEach((r) => console.log(`   ${r.serie} ${r.rg} (atual: ${r.situacao_abcz || 'null'})`))
       if (!DRY_RUN) {
         await query(`
@@ -35,7 +35,7 @@ async function corrigir() {
             AND rg::text ~ '^[0-9]+$' 
             AND rg::int BETWEEN 16958 AND 16976
         `)
-        console.log(`   �œ… Atualizados: ${cjcjFaixa.rows.length}`)
+        console.log(`   ✅ Atualizados: ${cjcjFaixa.rows.length}`)
       }
     }
 
@@ -46,7 +46,7 @@ async function corrigir() {
     `)
 
     if (okParaRgn.rows.length > 0) {
-      console.log(`\n�Ÿ“‹ "Ok para RGN" -> "POSSUI RGN" (${okParaRgn.rows.length} animais)`)
+      console.log(`\n📋 "Ok para RGN" -> "POSSUI RGN" (${okParaRgn.rows.length} animais)`)
       if (okParaRgn.rows.length <= 20) {
         okParaRgn.rows.forEach((r) => console.log(`   ${r.serie} ${r.rg}`))
       } else {
@@ -59,7 +59,7 @@ async function corrigir() {
           SET situacao_abcz = 'POSSUI RGN', updated_at = CURRENT_TIMESTAMP
           WHERE UPPER(TRIM(situacao_abcz)) = 'OK PARA RGN'
         `)
-        console.log(`   �œ… Corrigidos: ${okParaRgn.rows.length}`)
+        console.log(`   ✅ Corrigidos: ${okParaRgn.rows.length}`)
       }
     }
 
@@ -70,13 +70,13 @@ async function corrigir() {
       WHERE situacao_abcz IS NOT NULL AND TRIM(situacao_abcz) <> ''
       GROUP BY situacao_abcz ORDER BY total DESC
     `)
-    console.log('\n�Ÿ“Š Situação após correção:')
+    console.log('\n📊 Situação após correção:')
     resumo.rows.forEach((r) => console.log(`   "${r.situacao_abcz}": ${r.total}`))
 
     const total = await query('SELECT COUNT(*) as c FROM animais')
-    console.log(`\n�Ÿ“� Total de animais no banco: ${total.rows[0].c}`)
+    console.log(`\n📦 Total de animais no banco: ${total.rows[0].c}`)
   } catch (err) {
-    console.error('�Œ Erro:', err.message)
+    console.error('❌ Erro:', err.message)
     process.exit(1)
   }
   process.exit(0)

@@ -96,7 +96,7 @@ export default function BatchImportModal({ isOpen, onClose, onImport, batchData,
                 </p>
                 {existingCount > 0 && (
                   <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
-                    âÅ¡ ï¸� {existingCount} animais jÃ¡ constam no sistema (marcados em cinza)
+                    ⚠️ {existingCount} animais já constam no sistema (marcados em cinza)
                   </p>
                 )}
             </div>
@@ -107,7 +107,7 @@ export default function BatchImportModal({ isOpen, onClose, onImport, batchData,
         
         <div className="mb-4 grid grid-cols-2 gap-4 bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
             <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Valor UnitÃ¡rio (R$)</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Valor Unitário (R$)</label>
                 <input 
                     type="text"
                     value={commonValues.valorUnitario}
@@ -173,7 +173,7 @@ export default function BatchImportModal({ isOpen, onClose, onImport, batchData,
                                 <td className="p-3 text-right">
                                     {exists ? (
                                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                                            JÃ¡ Cadastrado
+                                            Já Cadastrado
                                         </span>
                                     ) : (
                                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
@@ -190,7 +190,7 @@ export default function BatchImportModal({ isOpen, onClose, onImport, batchData,
 
         <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700">
             <div className="text-sm text-gray-500 dark:text-gray-400">
-                {selectedIds.length} selecionados de {availableCount} disponÃ­veis
+                {selectedIds.length} selecionados de {availableCount} disponíveis
             </div>
             <div className="flex gap-2">
                 <button 

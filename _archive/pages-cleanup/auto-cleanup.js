@@ -16,7 +16,7 @@ export default function AutoCleanup() {
   const performCleanup = async () => {
     try {
       setStep(1)
-      setStatus('�Ÿ�� Limpando localStorage...')
+      setStatus('🧹 Limpando localStorage...')
       
       // Limpar localStorage
       if (typeof window !== 'undefined') {
@@ -33,7 +33,7 @@ export default function AutoCleanup() {
       await new Promise(resolve => setTimeout(resolve, 1000))
       
       setStep(2)
-      setStatus('�Ÿ”„ Verificando PostgreSQL...')
+      setStatus('🔄 Verificando PostgreSQL...')
       
       // Verificar se PostgreSQL está limpo
       try {
@@ -41,19 +41,19 @@ export default function AutoCleanup() {
         if (response.ok) {
           const data = await response.json()
           if (data.length === 0) {
-            setStatus('�œ… PostgreSQL já está limpo')
+            setStatus('✅ PostgreSQL já está limpo')
           } else {
-            setStatus(`�š�️ PostgreSQL ainda tem ${data.length} animais`)
+            setStatus(`⚠️ PostgreSQL ainda tem ${data.length} animais`)
           }
         }
       } catch (error) {
-        setStatus('�Œ Erro ao verificar PostgreSQL')
+        setStatus('❌ Erro ao verificar PostgreSQL')
       }
       
       await new Promise(resolve => setTimeout(resolve, 1000))
       
       setStep(3)
-      setStatus('�œ… Limpeza concluída!')
+      setStatus('✅ Limpeza concluída!')
       setCompleted(true)
       
       // Redirecionar após 3 segundos
@@ -62,7 +62,7 @@ export default function AutoCleanup() {
       }, 3000)
       
     } catch (error) {
-      setStatus('�Œ Erro na limpeza: ' + error.message)
+      setStatus('❌ Erro na limpeza: ' + error.message)
     }
   }
 
@@ -82,7 +82,7 @@ export default function AutoCleanup() {
             </div>
             
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              �Ÿ�� Limpeza Automática
+              🧹 Limpeza Automática
             </h1>
             
             <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -130,7 +130,7 @@ export default function AutoCleanup() {
           {completed && (
             <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
               <p className="text-green-700 dark:text-green-300 text-sm">
-                �œ… Limpeza concluída com sucesso!<br/>
+                ✅ Limpeza concluída com sucesso!<br/>
                 Redirecionando para a lista de animais...
               </p>
             </div>
@@ -141,7 +141,7 @@ export default function AutoCleanup() {
               onClick={() => router.push('/animals')}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              �Ÿ‘€ Ir para Lista de Animais
+              👀 Ir para Lista de Animais
             </button>
           </div>
         </div>

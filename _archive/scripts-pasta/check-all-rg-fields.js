@@ -13,7 +13,7 @@ async function checkAllRgFields() {
   const client = await pool.connect();
   
   try {
-    console.log('�Ÿ”� Verificando todos os campos RG no banco de dados...');
+    console.log('🔍 Verificando todos os campos RG no banco de dados...');
     
     // Buscar todos os campos que contenham 'rg' no nome
     const result = await client.query(`
@@ -28,7 +28,7 @@ async function checkAllRgFields() {
       ORDER BY table_name, column_name
     `);
     
-    console.log('�Ÿ“Š Campos encontrados:');
+    console.log('📊 Campos encontrados:');
     console.table(result.rows);
     
     // Verificar especificamente campos que podem estar causando o problema
@@ -39,12 +39,12 @@ async function checkAllRgFields() {
     );
     
     if (problematicFields.length > 0) {
-      console.log('�š�️ Campos problemáticos encontrados:');
+      console.log('⚠️ Campos problemáticos encontrados:');
       console.table(problematicFields);
       
       // Corrigir campos problemáticos
       for (const field of problematicFields) {
-        console.log(`�Ÿ”� Corrigindo campo ${field.table_name}.${field.column_name}...`);
+        console.log(`🔧 Corrigindo campo ${field.table_name}.${field.column_name}...`);
         
         try {
           await client.query(`
@@ -52,13 +52,13 @@ async function checkAllRgFields() {
             ALTER COLUMN ${field.column_name} TYPE VARCHAR(20)
           `);
           
-          console.log(`�œ… Campo ${field.table_name}.${field.column_name} corrigido!`);
+          console.log(`✅ Campo ${field.table_name}.${field.column_name} corrigido!`);
         } catch (error) {
-          console.log(`�Œ Erro ao corrigir ${field.table_name}.${field.column_name}:`, error.message);
+          console.log(`❌ Erro ao corrigir ${field.table_name}.${field.column_name}:`, error.message);
         }
       }
     } else {
-      console.log('�œ… Nenhum campo problemático encontrado!');
+      console.log('✅ Nenhum campo problemático encontrado!');
     }
     
     // Verificar novamente após correções
@@ -74,11 +74,11 @@ async function checkAllRgFields() {
       ORDER BY table_name, column_name
     `);
     
-    console.log('�Ÿ“Š Campos após correções:');
+    console.log('📊 Campos após correções:');
     console.table(finalCheck.rows);
     
   } catch (error) {
-    console.error('�Œ Erro ao verificar campos RG:', error);
+    console.error('❌ Erro ao verificar campos RG:', error);
     throw error;
   } finally {
     client.release();
@@ -90,11 +90,11 @@ async function checkAllRgFields() {
 if (require.main === module) {
   checkAllRgFields()
     .then(() => {
-      console.log('�ŸŽ‰ Verificação dos campos RG concluída!');
+      console.log('🎉 Verificação dos campos RG concluída!');
       process.exit(0);
     })
     .catch((error) => {
-      console.error('�Ÿ’� Falha na verificação:', error);
+      console.error('💥 Falha na verificação:', error);
       process.exit(1);
     });
 }

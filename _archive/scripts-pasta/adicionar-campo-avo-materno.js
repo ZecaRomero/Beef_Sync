@@ -12,7 +12,7 @@ async function adicionarCampoAvoMaterno() {
   const client = await pool.connect()
   
   try {
-    console.log('�Ÿ”� Verificando se a coluna avo_materno existe...')
+    console.log('🔍 Verificando se a coluna avo_materno existe...')
     
     // Verificar se a coluna já existe
     const checkColumn = await client.query(`
@@ -22,16 +22,16 @@ async function adicionarCampoAvoMaterno() {
     `)
     
     if (checkColumn.rows.length > 0) {
-      console.log('�œ… Coluna avo_materno já existe!')
+      console.log('✅ Coluna avo_materno já existe!')
     } else {
-      console.log('�ž• Adicionando coluna avo_materno...')
+      console.log('➕ Adicionando coluna avo_materno...')
       
       await client.query(`
         ALTER TABLE animais 
         ADD COLUMN avo_materno VARCHAR(50)
       `)
       
-      console.log('�œ… Coluna avo_materno adicionada com sucesso!')
+      console.log('✅ Coluna avo_materno adicionada com sucesso!')
     }
     
     // Verificar estrutura
@@ -43,13 +43,13 @@ async function adicionarCampoAvoMaterno() {
       ORDER BY ordinal_position
     `)
     
-    console.log('\n�Ÿ“‹ Estrutura da tabela (campos de genealogia):')
+    console.log('\n📋 Estrutura da tabela (campos de genealogia):')
     estrutura.rows.forEach(col => {
       console.log(`  - ${col.column_name}: ${col.data_type}`)
     })
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message)
+    console.error('❌ Erro:', error.message)
     throw error
   } finally {
     client.release()
@@ -59,11 +59,11 @@ async function adicionarCampoAvoMaterno() {
 
 adicionarCampoAvoMaterno()
   .then(() => {
-    console.log('\n�œ… Script concluído!')
+    console.log('\n✅ Script concluído!')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n�Œ Erro fatal:', error)
+    console.error('\n❌ Erro fatal:', error)
     process.exit(1)
   })
 

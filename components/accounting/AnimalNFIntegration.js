@@ -27,7 +27,7 @@ const AnimalNFIntegration = ({ animals, onUpdateAnimal }) => {
   const handleAnimalSelect = (animal) => {
     setSelectedAnimal(animal)
     
-    // PrÃ©-preencher dados baseado no animal
+    // Pré-preencher dados baseado no animal
     if (animal.situacao === 'Vendido') {
       setNfData(prev => ({
         ...prev,
@@ -43,7 +43,7 @@ const AnimalNFIntegration = ({ animals, onUpdateAnimal }) => {
         ...prev,
         tipo: 'entrada',
         valor: animal.custoTotal || '',
-        descricao: `AquisiÃ§Ã£o de bovino ${animal.raca} - ${animal.sexo} - ${animal.peso}kg`,
+        descricao: `Aquisição de bovino ${animal.raca} - ${animal.sexo} - ${animal.peso}kg`,
         observacoes: `Animal: ${animal.nome || animal.numero} - ERA: ${animal.era}`
       }))
     }
@@ -56,12 +56,12 @@ const AnimalNFIntegration = ({ animals, onUpdateAnimal }) => {
     }
 
     if (!nfData.numero || !nfData.fornecedor_cliente || !nfData.valor) {
-      toast.error('Preencha todos os campos obrigatÃ³rios')
+      toast.error('Preencha todos os campos obrigatórios')
       return
     }
 
     try {
-      // Simular geraÃ§Ã£o da NF
+      // Simular geração da NF
       const nfGerada = {
         id: Date.now(),
         numero: nfData.numero,
@@ -75,7 +75,7 @@ const AnimalNFIntegration = ({ animals, onUpdateAnimal }) => {
         data_emissao: nfData.data_emissao,
         descricao: nfData.descricao,
         observacoes: nfData.observacoes,
-        categoria_fiscal: nfData.tipo === 'entrada' ? 'AquisiÃ§Ã£o de Estoque' : 'Venda de Estoque',
+        categoria_fiscal: nfData.tipo === 'entrada' ? 'Aquisição de Estoque' : 'Venda de Estoque',
         ncm: '0102.90.00', // Bovinos vivos
         cfop: nfData.tipo === 'entrada' ? '1102' : '5102',
         icms: parseFloat(nfData.valor) * 0.12, // 12% ICMS
@@ -83,12 +83,12 @@ const AnimalNFIntegration = ({ animals, onUpdateAnimal }) => {
         data_criacao: new Date().toISOString()
       }
 
-      // Salvar NF (em produÃ§Ã£o seria uma chamada Ã  API)
+      // Salvar NF (em produção seria uma chamada à API)
       const nfsExistentes = JSON.parse(localStorage.getItem('notasFiscais') || '[]')
       nfsExistentes.push(nfGerada)
       localStorage.setItem('notasFiscais', JSON.stringify(nfsExistentes))
 
-      // Atualizar animal com referÃªncia da NF
+      // Atualizar animal com referência da NF
       const animalAtualizado = {
         ...selectedAnimal,
         nf_associada: nfGerada.id,
@@ -103,16 +103,16 @@ const AnimalNFIntegration = ({ animals, onUpdateAnimal }) => {
 
       // Gerar arquivo da NF para download
       const nfContent = `
-NOTA FISCAL ELETRÃâ€�NICA - NFe
-NÃºmero: ${nfGerada.numero} | SÃ©rie: ${nfGerada.serie}
-Tipo: ${nfGerada.tipo === 'entrada' ? 'ENTRADA' : 'SAÃ�DA'}
+NOTA FISCAL ELETRÔNICA - NFe
+Número: ${nfGerada.numero} | Série: ${nfGerada.serie}
+Tipo: ${nfGerada.tipo === 'entrada' ? 'ENTRADA' : 'SAÍDA'}
 
 ${nfGerada.tipo === 'entrada' ? 'FORNECEDOR' : 'CLIENTE'}:
-Nome/RazÃ£o Social: ${nfGerada.fornecedor_cliente}
+Nome/Razão Social: ${nfGerada.fornecedor_cliente}
 CNPJ/CPF: ${nfGerada.cnpj_cpf}
 
-DADOS DO PRODUTO/SERVIÃâ€¡O:
-DescriÃ§Ã£o: ${nfGerada.descricao}
+DADOS DO PRODUTO/SERVIÇO:
+Descrição: ${nfGerada.descricao}
 NCM: ${nfGerada.ncm}
 CFOP: ${nfGerada.cfop}
 Valor: ${formatCurrency(nfGerada.valor)}
@@ -120,16 +120,16 @@ ICMS (12%): ${formatCurrency(nfGerada.icms)}
 
 ANIMAL RELACIONADO:
 ID: ${selectedAnimal.id}
-Nome/NÃºmero: ${selectedAnimal.nome || selectedAnimal.numero}
-RaÃ§a: ${selectedAnimal.raca}
+Nome/Número: ${selectedAnimal.nome || selectedAnimal.numero}
+Raça: ${selectedAnimal.raca}
 Sexo: ${selectedAnimal.sexo}
 Peso: ${selectedAnimal.peso}kg
 ERA: ${selectedAnimal.era}
 
-OBSERVAÃâ€¡Ãâ€¢ES:
+OBSERVAÇÕES:
 ${nfGerada.observacoes}
 
-Data de EmissÃ£o: ${formatDate(nfGerada.data_emissao)}
+Data de Emissão: ${formatDate(nfGerada.data_emissao)}
 Gerado pelo Sistema Beef Sync em ${formatDate(new Date())}
       `
 
@@ -143,7 +143,7 @@ Gerado pelo Sistema Beef Sync em ${formatDate(new Date())}
 
       toast.success(`NF ${nfData.numero} gerada com sucesso! Arquivo baixado.`)
       
-      // Limpar formulÃ¡rio
+      // Limpar formulário
       setSelectedAnimal(null)
       setNfData({
         tipo: 'entrada',
@@ -169,59 +169,59 @@ Gerado pelo Sistema Beef Sync em ${formatDate(new Date())}
       return
     }
 
-    const emailSubject = `SolicitaÃ§Ã£o de NF - ${nfData.tipo === 'entrada' ? 'Compra' : 'Venda'} de Gado - ${selectedAnimal.nome || selectedAnimal.numero}`
+    const emailSubject = `Solicitação de NF - ${nfData.tipo === 'entrada' ? 'Compra' : 'Venda'} de Gado - ${selectedAnimal.nome || selectedAnimal.numero}`
     
     const emailBody = `Prezado(a) Contador(a),
 
-Solicito a emissÃ£o de Nota Fiscal com os seguintes dados:
+Solicito a emissão de Nota Fiscal com os seguintes dados:
 
-ðÅ¸â€œâ€¹ TIPO DE OPERAÃâ€¡ÃÆ’O: ${nfData.tipo === 'entrada' ? 'ENTRADA (Compra)' : 'SAÃ�DA (Venda)'}
+📋 TIPO DE OPERAÇÃO: ${nfData.tipo === 'entrada' ? 'ENTRADA (Compra)' : 'SAÍDA (Venda)'}
 
-ðÅ¸�â€ž DADOS DO ANIMAL:
-ââ‚¬¢ IdentificaÃ§Ã£o: ${selectedAnimal.nome || selectedAnimal.numero}
-ââ‚¬¢ RaÃ§a: ${selectedAnimal.raca}
-ââ‚¬¢ Sexo: ${selectedAnimal.sexo}
-ââ‚¬¢ Peso: ${selectedAnimal.peso}kg
-ââ‚¬¢ ERA: ${selectedAnimal.era}
-ââ‚¬¢ SituaÃ§Ã£o: ${selectedAnimal.situacao}
+🐄 DADOS DO ANIMAL:
+• Identificação: ${selectedAnimal.nome || selectedAnimal.numero}
+• Raça: ${selectedAnimal.raca}
+• Sexo: ${selectedAnimal.sexo}
+• Peso: ${selectedAnimal.peso}kg
+• ERA: ${selectedAnimal.era}
+• Situação: ${selectedAnimal.situacao}
 
-ðÅ¸â€œâ€ž DADOS DA NOTA FISCAL:
-ââ‚¬¢ NÃºmero sugerido: ${nfData.numero}
-ââ‚¬¢ SÃ©rie: ${nfData.serie}
-ââ‚¬¢ ${nfData.tipo === 'entrada' ? 'Fornecedor' : 'Cliente'}: ${nfData.fornecedor_cliente}
-ââ‚¬¢ CNPJ/CPF: ${nfData.cnpj_cpf}
-ââ‚¬¢ Valor: ${formatCurrency(nfData.valor)}
-ââ‚¬¢ Data de EmissÃ£o: ${formatDate(nfData.data_emissao)}
+📄 DADOS DA NOTA FISCAL:
+• Número sugerido: ${nfData.numero}
+• Série: ${nfData.serie}
+• ${nfData.tipo === 'entrada' ? 'Fornecedor' : 'Cliente'}: ${nfData.fornecedor_cliente}
+• CNPJ/CPF: ${nfData.cnpj_cpf}
+• Valor: ${formatCurrency(nfData.valor)}
+• Data de Emissão: ${formatDate(nfData.data_emissao)}
 
-ðÅ¸â€œÅ  INFORMAÃâ€¡Ãâ€¢ES FISCAIS:
-ââ‚¬¢ NCM: 0102.90.00 (Bovinos vivos)
-ââ‚¬¢ CFOP: ${nfData.tipo === 'entrada' ? '1102 (Compra)' : '5102 (Venda)'}
-ââ‚¬¢ Categoria Fiscal: ${nfData.tipo === 'entrada' ? 'AquisiÃ§Ã£o de Estoque' : 'Venda de Estoque'}
-ââ‚¬¢ ICMS estimado (12%): ${formatCurrency(parseFloat(nfData.valor || 0) * 0.12)}
+📊 INFORMAÇÕES FISCAIS:
+• NCM: 0102.90.00 (Bovinos vivos)
+• CFOP: ${nfData.tipo === 'entrada' ? '1102 (Compra)' : '5102 (Venda)'}
+• Categoria Fiscal: ${nfData.tipo === 'entrada' ? 'Aquisição de Estoque' : 'Venda de Estoque'}
+• ICMS estimado (12%): ${formatCurrency(parseFloat(nfData.valor || 0) * 0.12)}
 
-ðÅ¸â€œ� DESCRIÃâ€¡ÃÆ’O:
+📝 DESCRIÇÃO:
 ${nfData.descricao}
 
-ðÅ¸â€™¬ OBSERVAÃâ€¡Ãâ€¢ES:
+💬 OBSERVAÇÕES:
 ${nfData.observacoes}
 
-Por favor, proceder com a emissÃ£o da NF e me informar quando estiver disponÃ­vel.
+Por favor, proceder com a emissão da NF e me informar quando estiver disponível.
 
 Atenciosamente,
-Sistema Beef Sync - GestÃ£o Integrada`
+Sistema Beef Sync - Gestão Integrada`
 
     const mailtoLink = `mailto:?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`
     window.open(mailtoLink, '_blank')
 
-    toast.success('SolicitaÃ§Ã£o enviada! Outlook aberto.')
+    toast.success('Solicitação enviada! Outlook aberto.')
   }
 
   return (
     <div className="space-y-6">
-      {/* SeleÃ§Ã£o de Animal */}
+      {/* Seleção de Animal */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          ðÅ¸�â€ž Associar NF a Animal
+          🐄 Associar NF a Animal
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -248,7 +248,7 @@ Sistema Beef Sync - GestÃ£o Integrada`
                 </span>
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                <p>{animal.raca} ââ‚¬¢ {animal.sexo} ââ‚¬¢ {animal.peso}kg</p>
+                <p>{animal.raca} • {animal.sexo} • {animal.peso}kg</p>
                 <p>ERA: {animal.era}</p>
                 {animal.situacao === 'Vendido' && animal.valorVenda && (
                   <p className="text-green-600 dark:text-green-400 font-medium">
@@ -261,11 +261,11 @@ Sistema Beef Sync - GestÃ£o Integrada`
         </div>
       </div>
 
-      {/* FormulÃ¡rio da NF */}
+      {/* Formulário da NF */}
       {selectedAnimal && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-4">
-            ðÅ¸â€œâ€ž Dados da Nota Fiscal - {selectedAnimal.nome || selectedAnimal.numero}
+            📄 Dados da Nota Fiscal - {selectedAnimal.nome || selectedAnimal.numero}
           </h4>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -280,14 +280,14 @@ Sistema Beef Sync - GestÃ£o Integrada`
                   className="input-field"
                 >
                   <option value="entrada">Entrada (Compra)</option>
-                  <option value="saida">SaÃ­da (Venda)</option>
+                  <option value="saida">Saída (Venda)</option>
                 </select>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    NÃºmero *
+                    Número *
                   </label>
                   <input
                     type="text"
@@ -299,7 +299,7 @@ Sistema Beef Sync - GestÃ£o Integrada`
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    SÃ©rie
+                    Série
                   </label>
                   <input
                     type="text"
@@ -319,7 +319,7 @@ Sistema Beef Sync - GestÃ£o Integrada`
                   value={nfData.fornecedor_cliente}
                   onChange={(e) => setNfData(prev => ({ ...prev, fornecedor_cliente: e.target.value }))}
                   className="input-field"
-                  placeholder="Nome/RazÃ£o Social"
+                  placeholder="Nome/Razão Social"
                 />
               </div>
 
@@ -354,7 +354,7 @@ Sistema Beef Sync - GestÃ£o Integrada`
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Data de EmissÃ£o
+                    Data de Emissão
                   </label>
                   <input
                     type="date"
@@ -367,27 +367,27 @@ Sistema Beef Sync - GestÃ£o Integrada`
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  DescriÃ§Ã£o
+                  Descrição
                 </label>
                 <textarea
                   value={nfData.descricao}
                   onChange={(e) => setNfData(prev => ({ ...prev, descricao: e.target.value }))}
                   rows={3}
                   className="input-field"
-                  placeholder="DescriÃ§Ã£o do produto/serviÃ§o"
+                  placeholder="Descrição do produto/serviço"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  ObservaÃ§Ãµes
+                  Observações
                 </label>
                 <textarea
                   value={nfData.observacoes}
                   onChange={(e) => setNfData(prev => ({ ...prev, observacoes: e.target.value }))}
                   rows={2}
                   className="input-field"
-                  placeholder="ObservaÃ§Ãµes adicionais"
+                  placeholder="Observações adicionais"
                 />
               </div>
             </div>
@@ -418,19 +418,19 @@ Sistema Beef Sync - GestÃ£o Integrada`
             </div>
           )}
 
-          {/* AÃ§Ãµes */}
+          {/* Ações */}
           <div className="mt-6 flex space-x-4">
             <button
               onClick={gerarNF}
               className="btn-primary flex items-center"
             >
-              ðÅ¸â€œâ€ž Gerar NF
+              📄 Gerar NF
             </button>
             <button
               onClick={enviarParaContador}
               className="btn-secondary flex items-center"
             >
-              ðÅ¸â€œ§ Enviar p/ Contador
+              📧 Enviar p/ Contador
             </button>
           </div>
         </div>

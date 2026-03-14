@@ -8,7 +8,7 @@ async function criarTabelaPesagens() {
   const client = await pool.connect()
   
   try {
-    console.log('�Ÿ”� Criando tabela de pesagens...')
+    console.log('🔧 Criando tabela de pesagens...')
 
     await client.query(`
       CREATE TABLE IF NOT EXISTS pesagens (
@@ -24,7 +24,7 @@ async function criarTabelaPesagens() {
       )
     `)
 
-    console.log('�œ… Tabela pesagens criada com sucesso!')
+    console.log('✅ Tabela pesagens criada com sucesso!')
 
     // Criar índices para melhor performance
     await client.query(`
@@ -32,7 +32,7 @@ async function criarTabelaPesagens() {
       CREATE INDEX IF NOT EXISTS idx_pesagens_data ON pesagens(data);
     `)
 
-    console.log('�œ… Índices criados com sucesso!')
+    console.log('✅ Índices criados com sucesso!')
 
     // Verificar estrutura
     const result = await client.query(`
@@ -42,11 +42,11 @@ async function criarTabelaPesagens() {
       ORDER BY ordinal_position
     `)
 
-    console.log('\n�Ÿ“‹ Estrutura da tabela pesagens:')
+    console.log('\n📋 Estrutura da tabela pesagens:')
     console.table(result.rows)
 
   } catch (error) {
-    console.error('�Œ Erro ao criar tabela:', error.message)
+    console.error('❌ Erro ao criar tabela:', error.message)
   } finally {
     client.release()
     await pool.end()

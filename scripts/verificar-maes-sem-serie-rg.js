@@ -1,13 +1,13 @@
 /**
- * Verifica animais que tÃªm mae (nome) mas NÃÆ’O tÃªm serie_mae e rg_mae.
- * Esses animais mostram "NÃ£o encontrada no cadastro (pode estar inativa)" na ficha.
+ * Verifica animais que têm mae (nome) mas NÃO têm serie_mae e rg_mae.
+ * Esses animais mostram "Não encontrada no cadastro (pode estar inativa)" na ficha.
  * 
  * Uso: node scripts/verificar-maes-sem-serie-rg.js
  */
 const { query } = require('../lib/database')
 
 async function main() {
-  console.log('ðÅ¸â€�� Verificando animais com mae mas sem serie_mae/rg_mae...\n')
+  console.log('🔍 Verificando animais com mae mas sem serie_mae/rg_mae...\n')
 
   // 1. Animais com mae preenchida mas sem serie_mae ou rg_mae
   const r = await query(`
@@ -18,10 +18,10 @@ async function main() {
     ORDER BY serie, rg::text
   `)
 
-  console.log(`ðÅ¸â€œÅ  Total: ${r.rows.length} animal(is) com mae mas sem serie_mae/rg_mae\n`)
+  console.log(`📊 Total: ${r.rows.length} animal(is) com mae mas sem serie_mae/rg_mae\n`)
 
   if (r.rows.length === 0) {
-    console.log('âÅ“â€¦ Nenhum animal encontrado nessa condiÃ§Ã£o.')
+    console.log('✅ Nenhum animal encontrado nessa condição.')
     return
   }
 
@@ -31,35 +31,35 @@ async function main() {
     (a.mae || '').toUpperCase().includes('MARUA')
   )
   if (mapua) {
-    console.log('ðÅ¸�â€ž MAPUA/MARUA SANT ANNA (filho):')
+    console.log('🐄 MAPUA/MARUA SANT ANNA (filho):')
     console.log(`   Filho: ${mapua.serie} ${mapua.rg} | ${mapua.nome || '-'}`)
-    console.log(`   MÃ£e: ${mapua.mae}`)
+    console.log(`   Mãe: ${mapua.mae}`)
     console.log(`   serie_mae: ${mapua.serie_mae || 'NULL'}`)
     console.log(`   rg_mae: ${mapua.rg_mae ?? 'NULL'}\n`)
   }
 
-  // Verificar se MAPUA SANT ANNA existe como animal (mÃ£e cadastrada)
+  // Verificar se MAPUA SANT ANNA existe como animal (mãe cadastrada)
   const maeMapua = await query(`
     SELECT id, serie, rg, nome FROM animais 
     WHERE UPPER(TRIM(COALESCE(nome,''))) LIKE '%MAPUA%' OR UPPER(TRIM(COALESCE(nome,''))) LIKE '%MARUA%'
   `)
   if (maeMapua.rows.length > 0) {
-    console.log('ðÅ¸â€œâ€¹ MAPUA/MARUA encontrada(s) no cadastro de animais:')
+    console.log('📋 MAPUA/MARUA encontrada(s) no cadastro de animais:')
     maeMapua.rows.forEach(a => console.log(`   ${a.serie} ${a.rg} | ${a.nome}`))
     console.log('')
   }
 
   // Listar todos (primeiros 50)
-  console.log('ðÅ¸â€œâ€¹ Lista (primeiros 50):')
+  console.log('📋 Lista (primeiros 50):')
   r.rows.slice(0, 50).forEach((a, i) => {
-    console.log(`   ${i + 1}. ${a.serie} ${a.rg} | ${a.nome || '-'} | MÃ£e: ${a.mae}`)
+    console.log(`   ${i + 1}. ${a.serie} ${a.rg} | ${a.nome || '-'} | Mãe: ${a.mae}`)
   })
   if (r.rows.length > 50) {
     console.log(`   ... e mais ${r.rows.length - 50} animais`)
   }
 
-  console.log('\nðÅ¸â€™¡ Para corrigir: use a importaÃ§Ã£o "SÃ©rie e RG da MÃ£e" em ImportaÃ§Ãµes')
-  console.log('   Formato Excel: SÃ©rie | RG | SÃ©rie MÃ£e | RG MÃ£e')
+  console.log('\n💡 Para corrigir: use a importação "Série e RG da Mãe" em Importações')
+  console.log('   Formato Excel: Série | RG | Série Mãe | RG Mãe')
 }
 
 main().catch(e => {

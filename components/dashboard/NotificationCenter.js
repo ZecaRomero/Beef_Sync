@@ -11,8 +11,8 @@ import {
 import Badge from '../ui/Badge'
 
 /**
- * Central de notificaÃ§Ãµes inteligente
- * Analisa dados e gera notificaÃ§Ãµes automÃ¡ticas Ãºteis
+ * Central de notificações inteligente
+ * Analisa dados e gera notificações automáticas úteis
  */
 export default function NotificationCenter({ animals = [], births = [], semen = [], costs = [] }) {
   const [showPanel, setShowPanel] = useState(false)
@@ -28,7 +28,7 @@ export default function NotificationCenter({ animals = [], births = [], semen = 
     const items = []
     const now = new Date()
 
-    // 1. Alertas de Estoque de SÃªmen
+    // 1. Alertas de Estoque de Sêmen
     const lowStockSemen = semen.filter(s => 
       s.doses_disponiveis > 0 && s.doses_disponiveis < 5 && s.status === 'disponivel'
     )
@@ -37,28 +37,28 @@ export default function NotificationCenter({ animals = [], births = [], semen = 
         id: 'low-semen-stock',
         type: 'warning',
         icon: ExclamationTriangleIcon,
-        title: 'Estoque Baixo de SÃªmen',
-        message: `${lowStockSemen.length} touro(s) com menos de 5 doses disponÃ­veis`,
+        title: 'Estoque Baixo de Sêmen',
+        message: `${lowStockSemen.length} touro(s) com menos de 5 doses disponíveis`,
         priority: 'high',
         action: { label: 'Ver Estoque', link: '/estoque-semen' }
       })
     }
 
-    // 2. SÃªmen Esgotado
+    // 2. Sêmen Esgotado
     const outOfStockSemen = semen.filter(s => s.doses_disponiveis === 0)
     if (outOfStockSemen.length > 0) {
       items.push({
         id: 'out-of-stock-semen',
         type: 'error',
         icon: ExclamationTriangleIcon,
-        title: 'SÃªmen Esgotado',
-        message: `${outOfStockSemen.length} touro(s) sem doses disponÃ­veis`,
+        title: 'Sêmen Esgotado',
+        message: `${outOfStockSemen.length} touro(s) sem doses disponíveis`,
         priority: 'critical',
         action: { label: 'Reabastecer', link: '/estoque-semen' }
       })
     }
 
-    // 3. Nascimentos Recentes (Ãºltimos 7 dias)
+    // 3. Nascimentos Recentes (últimos 7 dias)
     const recentBirths = births.filter(b => {
       if (!b.data_nascimento) return false
       const birthDate = new Date(b.data_nascimento)
@@ -71,7 +71,7 @@ export default function NotificationCenter({ animals = [], births = [], semen = 
         type: 'success',
         icon: CheckCircleIcon,
         title: 'Nascimentos Recentes',
-        message: `${recentBirths.length} nascimento(s) nos Ãºltimos 7 dias`,
+        message: `${recentBirths.length} nascimento(s) nos últimos 7 dias`,
         priority: 'low',
         action: { label: 'Ver Nascimentos', link: '/nascimentos' }
       })
@@ -86,7 +86,7 @@ export default function NotificationCenter({ animals = [], births = [], semen = 
         id: 'animals-without-costs',
         type: 'info',
         icon: InformationCircleIcon,
-        title: 'Custos nÃ£o Registrados',
+        title: 'Custos não Registrados',
         message: `${animalsWithoutCosts.length} animais sem custos cadastrados`,
         priority: 'medium',
         action: { label: 'Cadastrar Custos', link: '/custos' }
@@ -103,10 +103,10 @@ export default function NotificationCenter({ animals = [], births = [], semen = 
         id: 'good-profit-margin',
         type: 'success',
         icon: CheckCircleIcon,
-        title: 'Ãâ€œtima Performance!',
+        title: 'Ótima Performance!',
         message: `${((profitableAnimals.length / soldAnimals.length) * 100).toFixed(0)}% dos animais vendidos geraram lucro`,
         priority: 'low',
-        action: { label: 'Ver RelatÃ³rio', link: '/reports' }
+        action: { label: 'Ver Relatório', link: '/reports' }
       })
     }
 
@@ -124,13 +124,13 @@ export default function NotificationCenter({ animals = [], births = [], semen = 
         type: 'warning',
         icon: ExclamationTriangleIcon,
         title: 'Custos Elevados',
-        message: `R$ ${total.toFixed(2)} em custos altos nos Ãºltimos 30 dias`,
+        message: `R$ ${total.toFixed(2)} em custos altos nos últimos 30 dias`,
         priority: 'medium',
         action: { label: 'Analisar', link: '/custos' }
       })
     }
 
-    // Filtrar notificaÃ§Ãµes jÃ¡ dispensadas
+    // Filtrar notificações já dispensadas
     return items.filter(item => !dismissed.includes(item.id))
       .sort((a, b) => {
         const priorityOrder = { critical: 0, high: 1, medium: 2, low: 3 }
@@ -168,7 +168,7 @@ export default function NotificationCenter({ animals = [], births = [], semen = 
 
   return (
     <div className="relative z-[9999]">
-      {/* BotÃ£o de NotificaÃ§Ãµes */}
+      {/* Botão de Notificações */}
       <button
         onClick={() => setShowPanel(!showPanel)}
         className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -192,13 +192,13 @@ export default function NotificationCenter({ animals = [], births = [], semen = 
         />
       )}
 
-      {/* Painel de NotificaÃ§Ãµes */}
+      {/* Painel de Notificações */}
       {showPanel && (
         <div className="absolute right-0 mt-2 w-96 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 z-[9999] max-h-[600px] overflow-auto">
           <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                NotificaÃ§Ãµes
+                Notificações
               </h3>
               <Badge variant="primary">{notifications.length}</Badge>
             </div>
@@ -208,7 +208,7 @@ export default function NotificationCenter({ animals = [], births = [], semen = 
             <div className="p-8 text-center">
               <CheckCircleIcon className="h-12 w-12 text-green-500 mx-auto mb-2" />
               <p className="text-gray-600 dark:text-gray-400">
-                Tudo certo! Nenhuma notificaÃ§Ã£o pendente.
+                Tudo certo! Nenhuma notificação pendente.
               </p>
             </div>
           ) : (
@@ -234,7 +234,7 @@ export default function NotificationCenter({ animals = [], births = [], semen = 
                             href={notification.action.link}
                             className="text-xs text-blue-600 dark:text-blue-400 hover:underline mt-2 inline-block"
                           >
-                            {notification.action.label} ââ€ â€™
+                            {notification.action.label} →
                           </a>
                         )}
                       </div>

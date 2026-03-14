@@ -116,7 +116,7 @@ export default function TestAnimals() {
 
         if (response.ok) {
           await loadAnimals() // Recarregar da API
-          alert(`�œ… ${testAnimals.length} animais de teste criados na API!`)
+          alert(`✅ ${testAnimals.length} animais de teste criados na API!`)
           return
         }
       } catch (apiError) {
@@ -126,12 +126,12 @@ export default function TestAnimals() {
       // Fallback para localStorage
       setAnimals(allAnimals)
       localStorage.setItem('animals', JSON.stringify(allAnimals))
-      alert(`�œ… ${testAnimals.length} animais de teste criados no localStorage!`)
+      alert(`✅ ${testAnimals.length} animais de teste criados no localStorage!`)
 
     } catch (error) {
       console.error('Erro ao criar animais de teste:', error)
       setError('Erro ao criar animais de teste')
-      alert('�Œ Erro ao criar animais de teste: ' + error.message)
+      alert('❌ Erro ao criar animais de teste: ' + error.message)
     } finally {
       setLoading(false)
     }
@@ -144,7 +144,7 @@ export default function TestAnimals() {
 
       // Garantir que animals seja um array
       if (!Array.isArray(animals)) {
-        alert('�Œ Erro: Lista de animais não é válida.')
+        alert('❌ Erro: Lista de animais não é válida.')
         return
       }
 
@@ -153,7 +153,7 @@ export default function TestAnimals() {
       )
 
       if (testAnimals.length === 0) {
-        alert('�„�️ Nenhum animal de teste encontrado.')
+        alert('ℹ️ Nenhum animal de teste encontrado.')
         return
       }
 
@@ -177,7 +177,7 @@ export default function TestAnimals() {
 
         if (response.ok) {
           await loadAnimals() // Recarregar da API
-          alert(`�œ… ${testAnimals.length} animais de teste removidos da API! Restam ${filteredAnimals.length} animais.`)
+          alert(`✅ ${testAnimals.length} animais de teste removidos da API! Restam ${filteredAnimals.length} animais.`)
           return
         }
       } catch (apiError) {
@@ -187,12 +187,12 @@ export default function TestAnimals() {
       // Fallback para localStorage
       setAnimals(filteredAnimals)
       localStorage.setItem('animals', JSON.stringify(filteredAnimals))
-      alert(`�œ… ${testAnimals.length} animais de teste removidos do localStorage! Restam ${filteredAnimals.length} animais.`)
+      alert(`✅ ${testAnimals.length} animais de teste removidos do localStorage! Restam ${filteredAnimals.length} animais.`)
 
     } catch (error) {
       console.error('Erro ao remover animais de teste:', error)
       setError('Erro ao remover animais de teste')
-      alert('�Œ Erro ao remover animais de teste: ' + error.message)
+      alert('❌ Erro ao remover animais de teste: ' + error.message)
     } finally {
       setLoading(false)
     }
@@ -202,7 +202,7 @@ export default function TestAnimals() {
     <ModernLayout
       title="Teste de Animais"
       subtitle="Crie e gerencie dados de teste para o sistema"
-      icon="�Ÿ��"
+      icon="🧪"
     >
       <div className="max-w-6xl mx-auto space-y-8">
 
@@ -211,7 +211,7 @@ export default function TestAnimals() {
             <ModernCardBody>
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-red-500 rounded-xl text-white">
-                  <span>�š�️</span>
+                  <span>⚠️</span>
                 </div>
                 <div>
                   <h3 className="font-semibold text-red-800 dark:text-red-200">
@@ -231,7 +231,7 @@ export default function TestAnimals() {
             title="Total de Animais"
             value={animals?.length || 0}
             subtitle="Cadastrados no sistema"
-            icon={<span className="text-xl">�Ÿ�„</span>}
+            icon={<span className="text-xl">🐄</span>}
             color="blue"
             loading={loading}
           />
@@ -240,7 +240,7 @@ export default function TestAnimals() {
             title="Animais de Teste"
             value={animals?.filter(a => a.serie && a.serie.startsWith('TEST')).length || 0}
             subtitle="Dados para demonstração"
-            icon={<span className="text-xl">�Ÿ��</span>}
+            icon={<span className="text-xl">🧪</span>}
             color="purple"
             loading={loading}
           />
@@ -249,7 +249,7 @@ export default function TestAnimals() {
             title="Animais Reais"
             value={(animals?.length || 0) - (animals?.filter(a => a.serie && a.serie.startsWith('TEST')).length || 0)}
             subtitle="Dados de produção"
-            icon={<span className="text-xl">�œ…</span>}
+            icon={<span className="text-xl">✅</span>}
             color="green"
             loading={loading}
           />
@@ -257,7 +257,7 @@ export default function TestAnimals() {
 
         <ModernCard modern={true} hover={true}>
           <ModernCardHeader
-            icon={<span className="text-2xl">�š™️</span>}
+            icon={<span className="text-2xl">⚙️</span>}
             title="Ações de Teste"
             subtitle="Gerencie dados de demonstração do sistema"
           />
@@ -271,7 +271,7 @@ export default function TestAnimals() {
                 size="lg"
                 modern={true}
                 glow={true}
-                leftIcon={<span>�ž•</span>}
+                leftIcon={<span>➕</span>}
               >
                 Criar 25 Animais de Teste
               </Button>
@@ -283,7 +283,7 @@ export default function TestAnimals() {
                 variant="danger"
                 size="lg"
                 modern={true}
-                leftIcon={<span>�Ÿ—‘️</span>}
+                leftIcon={<span>🗑️</span>}
               >
                 Remover Animais de Teste
               </Button>
@@ -293,7 +293,7 @@ export default function TestAnimals() {
                 variant="success"
                 size="lg"
                 modern={true}
-                leftIcon={<span>�Ÿ‘€</span>}
+                leftIcon={<span>👀</span>}
               >
                 Ver Lista de Animais
               </Button>
@@ -304,8 +304,8 @@ export default function TestAnimals() {
         {animals && animals.length > 0 && (
           <ModernCard modern={true} hover={true}>
             <ModernCardHeader
-              icon={<span className="text-xl">�Ÿ“‹</span>}
-              title="�šltimos 10 Animais"
+              icon={<span className="text-xl">📋</span>}
+              title="Últimos 10 Animais"
               subtitle="Visualização dos dados mais recentes"
             />
             <ModernCardBody>
@@ -358,7 +358,7 @@ export default function TestAnimals() {
                               ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
                               : 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300'
                           }`}>
-                            {animal.serie && animal.serie.startsWith('TEST') ? '�Ÿ�� Teste' : '�œ… Real'}
+                            {animal.serie && animal.serie.startsWith('TEST') ? '🧪 Teste' : '✅ Real'}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
@@ -377,7 +377,7 @@ export default function TestAnimals() {
           <ModernCard variant="glass" modern={true}>
             <ModernCardBody>
               <div className="text-center py-12">
-                <div className="text-6xl mb-6 animate-bounce">�Ÿ�„</div>
+                <div className="text-6xl mb-6 animate-bounce">🐄</div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
                   Nenhum animal encontrado
                 </h3>
@@ -390,7 +390,7 @@ export default function TestAnimals() {
                   size="lg"
                   modern={true}
                   glow={true}
-                  leftIcon={<span>�Ÿš€</span>}
+                  leftIcon={<span>🚀</span>}
                 >
                   Criar Primeiros Animais
                 </Button>

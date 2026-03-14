@@ -27,7 +27,7 @@ const receptoraPorAnimal = {
 }
 
 async function fixAllCJCCReceptora() {
-  console.log('�Ÿ”� Verificando todos os animais CJCC sem receptora...\n')
+  console.log('🔍 Verificando todos os animais CJCC sem receptora...\n')
 
   try {
     // 1. Buscar todos os animais CJCC
@@ -40,18 +40,18 @@ async function fixAllCJCCReceptora() {
     `)
     
     if (allCJCC.rows.length === 0) {
-      console.log('   �Œ Nenhum animal CJCC encontrado')
+      console.log('   ❌ Nenhum animal CJCC encontrado')
       return
     }
 
-    console.log(`   �œ… Encontrados ${allCJCC.rows.length} animais CJCC:`)
+    console.log(`   ✅ Encontrados ${allCJCC.rows.length} animais CJCC:`)
     
     const animaisSemReceptora = []
     const animaisComReceptora = []
     
     allCJCC.rows.forEach((animal, index) => {
       const temReceptora = animal.receptora && animal.receptora.trim() !== ''
-      console.log(`   ${index + 1}. CJCC ${animal.rg} - Receptora: "${animal.receptora || 'VAZIO'}" ${temReceptora ? '�œ…' : '�Œ'}`)
+      console.log(`   ${index + 1}. CJCC ${animal.rg} - Receptora: "${animal.receptora || 'VAZIO'}" ${temReceptora ? '✅' : '❌'}`)
       
       if (temReceptora) {
         animaisComReceptora.push(animal)
@@ -60,12 +60,12 @@ async function fixAllCJCCReceptora() {
       }
     })
 
-    console.log(`\n�Ÿ“Š Resumo:`)
-    console.log(`   �œ… Com receptora: ${animaisComReceptora.length}`)
-    console.log(`   �Œ Sem receptora: ${animaisSemReceptora.length}`)
+    console.log(`\n📊 Resumo:`)
+    console.log(`   ✅ Com receptora: ${animaisComReceptora.length}`)
+    console.log(`   ❌ Sem receptora: ${animaisSemReceptora.length}`)
 
     if (animaisSemReceptora.length === 0) {
-      console.log('\n�ŸŽ‰ Todos os animais CJCC já têm receptora preenchida!')
+      console.log('\n🎉 Todos os animais CJCC já têm receptora preenchida!')
       return
     }
 
@@ -80,15 +80,15 @@ async function fixAllCJCCReceptora() {
           ...animal,
           receptoraSugerida
         })
-        console.log(`   �œ… CJCC ${animal.rg} �†’ ${receptoraSugerida}`)
+        console.log(`   ✅ CJCC ${animal.rg} → ${receptoraSugerida}`)
       } else {
-        console.log(`   �š�️ CJCC ${animal.rg} �†’ Dados não disponíveis (precisa ser adicionado manualmente)`)
+        console.log(`   ⚠️ CJCC ${animal.rg} → Dados não disponíveis (precisa ser adicionado manualmente)`)
       }
     })
 
     if (animaisParaCorrigir.length === 0) {
-      console.log('\n�š�️ Nenhum animal tem dados de receptora disponíveis para correção automática')
-      console.log('�Ÿ’� Você precisa fornecer os dados da receptora para cada animal')
+      console.log('\n⚠️ Nenhum animal tem dados de receptora disponíveis para correção automática')
+      console.log('💡 Você precisa fornecer os dados da receptora para cada animal')
       return
     }
 
@@ -106,10 +106,10 @@ async function fixAllCJCCReceptora() {
 
         if (updateResult.rows.length > 0) {
           const updated = updateResult.rows[0]
-          console.log(`   �œ… CJCC ${updated.rg} atualizado: "${updated.receptora}"`)
+          console.log(`   ✅ CJCC ${updated.rg} atualizado: "${updated.receptora}"`)
         }
       } catch (error) {
-        console.error(`   �Œ Erro ao atualizar CJCC ${animal.rg}:`, error.message)
+        console.error(`   ❌ Erro ao atualizar CJCC ${animal.rg}:`, error.message)
       }
     }
 
@@ -129,35 +129,35 @@ async function fixAllCJCCReceptora() {
       const temReceptora = animal.receptora && animal.receptora.trim() !== ''
       if (temReceptora) {
         corrigidos++
-        console.log(`   �œ… CJCC ${animal.rg}: "${animal.receptora}"`)
+        console.log(`   ✅ CJCC ${animal.rg}: "${animal.receptora}"`)
       } else {
         aindaSemReceptora++
-        console.log(`   �Œ CJCC ${animal.rg}: Ainda sem receptora`)
+        console.log(`   ❌ CJCC ${animal.rg}: Ainda sem receptora`)
       }
     })
 
-    console.log('\n�Ÿ“Š Resultado final:')
-    console.log(`   �œ… Animais com receptora: ${corrigidos}`)
-    console.log(`   �Œ Animais ainda sem receptora: ${aindaSemReceptora}`)
+    console.log('\n📊 Resultado final:')
+    console.log(`   ✅ Animais com receptora: ${corrigidos}`)
+    console.log(`   ❌ Animais ainda sem receptora: ${aindaSemReceptora}`)
 
     if (aindaSemReceptora > 0) {
-      console.log('\n�Ÿ’� Para corrigir os animais restantes:')
+      console.log('\n💡 Para corrigir os animais restantes:')
       console.log('1. Consulte a planilha original de importação')
       console.log('2. Adicione os dados no objeto "receptoraPorAnimal" neste script')
       console.log('3. Execute o script novamente')
     } else {
-      console.log('\n�ŸŽ‰ Todos os animais CJCC agora têm receptora preenchida!')
+      console.log('\n🎉 Todos os animais CJCC agora têm receptora preenchida!')
     }
 
   } catch (error) {
-    console.error('�Œ Erro durante verificação:', error)
+    console.error('❌ Erro durante verificação:', error)
   }
 }
 
 // Executar
 fixAllCJCCReceptora()
   .then(() => {
-    console.log('\n�œ… Verificação concluída!')
+    console.log('\n✅ Verificação concluída!')
     process.exit(0)
   })
   .catch(error => {

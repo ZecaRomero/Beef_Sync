@@ -12,7 +12,7 @@ import {
 import dynamic from 'next/dynamic'
 import MobileOptimizedLayout from '../components/mobile/MobileOptimizedLayout'
 
-// ImportaÃ§Ãµes dinÃ¢micas para evitar erros de hidrataÃ§Ã£o
+// Importações dinâmicas para evitar erros de hidratação
 const AccessibilityEnhancements = dynamic(
   () => import('../components/accessibility/AccessibilityEnhancements'),
   { ssr: false }
@@ -58,7 +58,7 @@ export default function Settings() {
       return (
         <div className="p-6 text-center">
           <p className="text-red-600 dark:text-red-400">
-            Erro ao carregar configuraÃ§Ãµes. Por favor, recarregue a pÃ¡gina.
+            Erro ao carregar configurações. Por favor, recarregue a página.
           </p>
         </div>
       )
@@ -66,15 +66,15 @@ export default function Settings() {
   }
 
   return (
-    <MobileOptimizedLayout title="ConfiguraÃ§Ãµes">
+    <MobileOptimizedLayout title="Configurações">
       <div className="max-w-6xl mx-auto p-6">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            âÅ¡â„¢ï¸� ConfiguraÃ§Ãµes do Sistema
+            ⚙️ Configurações do Sistema
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Personalize e otimize sua experiÃªncia com o Beef Sync
+            Personalize e otimize sua experiência com o Beef Sync
           </p>
         </div>
 
@@ -136,7 +136,7 @@ function GeneralSettings() {
       <div className="flex items-center space-x-2 mb-6">
         <Cog6ToothIcon className="h-6 w-6 text-gray-600 dark:text-gray-400" />
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-          ConfiguraÃ§Ãµes Gerais
+          Configurações Gerais
         </h2>
       </div>
 
@@ -151,26 +151,26 @@ function GeneralSettings() {
             onChange={(e) => handleSettingChange('language', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
           >
-            <option value="pt-BR">PortuguÃªs (Brasil)</option>
+            <option value="pt-BR">Português (Brasil)</option>
             <option value="en-US">English (US)</option>
-            <option value="es-ES">EspaÃ±ol</option>
+            <option value="es-ES">Español</option>
           </select>
         </div>
 
-        {/* Fuso HorÃ¡rio */}
+        {/* Fuso Horário */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Fuso HorÃ¡rio
+            Fuso Horário
           </label>
           <select
             value={settings.timezone}
             onChange={(e) => handleSettingChange('timezone', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
           >
-            <option value="America/Sao_Paulo">BrasÃ­lia (GMT-3)</option>
+            <option value="America/Sao_Paulo">Brasília (GMT-3)</option>
             <option value="America/New_York">Nova York (GMT-5)</option>
             <option value="Europe/London">Londres (GMT+0)</option>
-            <option value="Asia/Tokyo">TÃ³quio (GMT+9)</option>
+            <option value="Asia/Tokyo">Tóquio (GMT+9)</option>
           </select>
         </div>
 
@@ -201,17 +201,17 @@ function GeneralSettings() {
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
           >
             <option value="BRL">Real Brasileiro (R$)</option>
-            <option value="USD">DÃ³lar Americano ($)</option>
-            <option value="EUR">Euro (ââ€š¬)</option>
+            <option value="USD">Dólar Americano ($)</option>
+            <option value="EUR">Euro (€)</option>
           </select>
         </div>
 
-        {/* NotificaÃ§Ãµes */}
+        {/* Notificações */}
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-medium text-gray-900 dark:text-white">NotificaÃ§Ãµes</h3>
+            <h3 className="font-medium text-gray-900 dark:text-white">Notificações</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Receber notificaÃ§Ãµes do sistema
+              Receber notificações do sistema
             </p>
           </div>
           <label className="relative inline-flex items-center cursor-pointer">
@@ -228,9 +228,9 @@ function GeneralSettings() {
         {/* Auto Save */}
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-medium text-gray-900 dark:text-white">Salvamento AutomÃ¡tico</h3>
+            <h3 className="font-medium text-gray-900 dark:text-white">Salvamento Automático</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Salvar alteraÃ§Ãµes automaticamente
+              Salvar alterações automaticamente
             </p>
           </div>
           <label className="relative inline-flex items-center cursor-pointer">
@@ -244,10 +244,10 @@ function GeneralSettings() {
           </label>
         </div>
 
-        {/* FrequÃªncia de Backup */}
+        {/* Frequência de Backup */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            FrequÃªncia de Backup
+            Frequência de Backup
           </label>
           <select
             value={settings.backupFrequency}
@@ -285,7 +285,7 @@ function MobileSettings() {
       <div className="flex items-center space-x-2 mb-6">
         <DevicePhoneMobileIcon className="h-6 w-6 text-gray-600 dark:text-gray-400" />
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-          ConfiguraÃ§Ãµes Mobile
+          Configurações Mobile
         </h2>
       </div>
 
@@ -314,7 +314,7 @@ function MobileSettings() {
           <div>
             <h3 className="font-medium text-gray-900 dark:text-white">Gestos de Swipe</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Habilitar navegaÃ§Ã£o por gestos
+              Habilitar navegação por gestos
             </p>
           </div>
           <label className="relative inline-flex items-center cursor-pointer">
@@ -328,12 +328,12 @@ function MobileSettings() {
           </label>
         </div>
 
-        {/* Feedback HÃ¡ptico */}
+        {/* Feedback Háptico */}
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-medium text-gray-900 dark:text-white">Feedback HÃ¡ptico</h3>
+            <h3 className="font-medium text-gray-900 dark:text-white">Feedback Háptico</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              VibraÃ§Ã£o ao tocar em elementos
+              Vibração ao tocar em elementos
             </p>
           </div>
           <label className="relative inline-flex items-center cursor-pointer">
@@ -352,7 +352,7 @@ function MobileSettings() {
           <div>
             <h3 className="font-medium text-gray-900 dark:text-white">Modo Offline</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Funcionar sem conexÃ£o com internet
+              Funcionar sem conexão com internet
             </p>
           </div>
           <label className="relative inline-flex items-center cursor-pointer">
@@ -371,7 +371,7 @@ function MobileSettings() {
           <div>
             <h3 className="font-medium text-gray-900 dark:text-white">Sincronizar apenas no WiFi</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Evitar uso de dados mÃ³veis
+              Evitar uso de dados móveis
             </p>
           </div>
           <label className="relative inline-flex items-center cursor-pointer">
@@ -386,17 +386,17 @@ function MobileSettings() {
         </div>
       </div>
 
-      {/* InformaÃ§Ãµes */}
+      {/* Informações */}
       <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
         <div className="flex items-start space-x-2">
           <InformationCircleIcon className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
           <div className="text-sm text-blue-700 dark:text-blue-300">
             <p className="font-medium">Dicas para Mobile:</p>
             <ul className="mt-1 list-disc list-inside space-y-1">
-              <li>Use gestos de swipe para navegaÃ§Ã£o rÃ¡pida</li>
+              <li>Use gestos de swipe para navegação rápida</li>
               <li>O modo offline permite trabalhar sem internet</li>
-              <li>O feedback hÃ¡ptico melhora a experiÃªncia tÃ¡til</li>
-              <li>Configure sincronizaÃ§Ã£o apenas no WiFi para economizar dados</li>
+              <li>O feedback háptico melhora a experiência tátil</li>
+              <li>Configure sincronização apenas no WiFi para economizar dados</li>
             </ul>
           </div>
         </div>

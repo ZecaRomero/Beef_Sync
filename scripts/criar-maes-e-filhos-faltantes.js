@@ -16,9 +16,9 @@ async function criar() {
   try {
     await client.query('BEGIN')
     
-    console.log('ðÅ¸â€�� Identificando mÃ£es e filhos faltantes...\n')
+    console.log('🔍 Identificando mães e filhos faltantes...\n')
     
-    // 1. Buscar todas as mÃ£es Ãºnicas que tÃªm baixas mas nÃ£o estÃ£o cadastradas
+    // 1. Buscar todas as mães únicas que têm baixas mas não estão cadastradas
     const maesResult = await client.query(`
       SELECT DISTINCT b.serie_mae, b.rg_mae
       FROM baixas b
@@ -32,32 +32,32 @@ async function criar() {
       ORDER BY b.serie_mae, b.rg_mae
     `)
     
-    console.log(`ðÅ¸â€œÅ  MÃ£es faltantes: ${maesResult.rows.length}\n`)
+    console.log(`📊 Mães faltantes: ${maesResult.rows.length}\n`)
     
     let maesCriadas = 0
     
     for (const mae of maesResult.rows) {
-      // Criar a mÃ£e
+      // Criar a mãe
       const insertMae = await client.query(`
         INSERT INTO animais (
           serie, rg, nome, sexo, raca, situacao, 
           created_at, updated_at
         ) VALUES (
-          $1, $2, $3, 'FÃªmea', 'Nelore', 'Ativo',
+          $1, $2, $3, 'Fêmea', 'Nelore', 'Ativo',
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
         RETURNING id
       `, [mae.serie_mae, mae.rg_mae, `Doadora ${mae.serie_mae} ${mae.rg_mae}`])
       
       maesCriadas++
-      console.log(`âÅ“â€¦ MÃ£e criada: ${mae.serie_mae} ${mae.rg_mae} (ID: ${insertMae.rows[0].id})`)
+      console.log(`✅ Mãe criada: ${mae.serie_mae} ${mae.rg_mae} (ID: ${insertMae.rows[0].id})`)
     }
     
-    console.log(`\nââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��`)
-    console.log(`âÅ“â€¦ Total de mÃ£es criadas: ${maesCriadas}`)
-    console.log(`ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��\n`)
+    console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
+    console.log(`✅ Total de mães criadas: ${maesCriadas}`)
+    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`)
     
-    // 2. Buscar todos os filhos Ãºnicos que tÃªm baixas mas nÃ£o estÃ£o cadastrados
+    // 2. Buscar todos os filhos únicos que têm baixas mas não estão cadastrados
     const filhosResult = await client.query(`
       SELECT DISTINCT b.serie, b.rg, b.serie_mae, b.rg_mae, b.tipo, b.data_baixa
       FROM baixas b
@@ -71,12 +71,12 @@ async function criar() {
       ORDER BY b.serie, b.rg
     `)
     
-    console.log(`ðÅ¸â€œÅ  Filhos faltantes: ${filhosResult.rows.length}\n`)
+    console.log(`📊 Filhos faltantes: ${filhosResult.rows.length}\n`)
     
     let filhosCriados = 0
     
     for (const filho of filhosResult.rows) {
-      // Determinar situaÃ§Ã£o baseado no tipo de baixa
+      // Determinar situação baseado no tipo de baixa
       let situacao = 'Ativo'
       if (filho.tipo === 'VENDA') {
         situacao = 'Vendido'
@@ -97,7 +97,7 @@ async function criar() {
           serie_mae, rg_mae, data_nascimento,
           created_at, updated_at
         ) VALUES (
-          $1, $2, $3, 'NÃ£o informado', 'Nelore', $4,
+          $1, $2, $3, 'Não informado', 'Nelore', $4,
           $5, $6, $7,
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
@@ -113,19 +113,19 @@ async function criar() {
       ])
       
       filhosCriados++
-      console.log(`âÅ“â€¦ Filho criado: ${serieFilho} ${rgFilho} (ID: ${insertFilho.rows[0].id}) | MÃ£e: ${serieMaeFilho || 'N/A'} ${rgMaeFilho || 'N/A'} | ${situacao}`)
+      console.log(`✅ Filho criado: ${serieFilho} ${rgFilho} (ID: ${insertFilho.rows[0].id}) | Mãe: ${serieMaeFilho || 'N/A'} ${rgMaeFilho || 'N/A'} | ${situacao}`)
     }
     
     await client.query('COMMIT')
     
-    console.log(`\nââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��`)
-    console.log(`âÅ“â€¦ CRIAÃâ€¡ÃÆ’O CONCLUÃ�DA!`)
-    console.log(`ðÅ¸â€œÅ  MÃ£es criadas: ${maesCriadas}`)
-    console.log(`ðÅ¸â€œÅ  Filhos criados: ${filhosCriados}`)
-    console.log(`ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��`)
+    console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
+    console.log(`✅ CRIAÇÃO CONCLUÍDA!`)
+    console.log(`📊 Mães criadas: ${maesCriadas}`)
+    console.log(`📊 Filhos criados: ${filhosCriados}`)
+    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
     
     // Atualizar animal_id nas baixas
-    console.log(`\nðÅ¸â€�â€ž Atualizando animal_id nas baixas...`)
+    console.log(`\n🔄 Atualizando animal_id nas baixas...`)
     const updateResult = await client.query(`
       UPDATE baixas b
       SET animal_id = a.id
@@ -134,11 +134,11 @@ async function criar() {
         AND TRIM(a.rg::text) = TRIM(b.rg::text)
         AND b.animal_id IS NULL
     `)
-    console.log(`âÅ“â€¦ ${updateResult.rowCount} baixas atualizadas com animal_id`)
+    console.log(`✅ ${updateResult.rowCount} baixas atualizadas com animal_id`)
     
   } catch (error) {
     await client.query('ROLLBACK')
-    console.error('â�Å’ Erro ao criar mÃ£es e filhos:', error)
+    console.error('❌ Erro ao criar mães e filhos:', error)
     throw error
   } finally {
     client.release()
@@ -148,10 +148,10 @@ async function criar() {
 
 criar()
   .then(() => {
-    console.log('\nâÅ“¨ Script finalizado')
+    console.log('\n✨ Script finalizado')
     process.exit(0)
   })
   .catch(error => {
-    console.error('\nðÅ¸â€™¥ Erro fatal:', error)
+    console.error('\n💥 Erro fatal:', error)
     process.exit(1)
   })

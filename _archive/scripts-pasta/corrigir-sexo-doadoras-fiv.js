@@ -5,7 +5,7 @@ async function corrigirSexoDoadorasFIV() {
   const client = await pool.connect()
   
   try {
-    console.log('�Ÿ”� Verificando animais com coletas FIV cadastrados como macho...\n')
+    console.log('🔍 Verificando animais com coletas FIV cadastrados como macho...\n')
     
     // Buscar todos os animais únicos que têm coletas FIV
     const animaisComFIV = await query(`
@@ -26,7 +26,7 @@ async function corrigirSexoDoadorasFIV() {
       ORDER BY a.serie, a.rg
     `)
     
-    console.log(`�Ÿ“Š Total de animais com coletas FIV encontrados: ${animaisComFIV.rows.length}\n`)
+    console.log(`📊 Total de animais com coletas FIV encontrados: ${animaisComFIV.rows.length}\n`)
     
     // Filtrar apenas os que estão como macho
     const machosComFIV = animaisComFIV.rows.filter(animal => {
@@ -34,20 +34,20 @@ async function corrigirSexoDoadorasFIV() {
       return sexo === 'macho' || sexo === 'm' || sexo.startsWith('m')
     })
     
-    console.log(`�š�️  Animais com coletas FIV cadastrados como MACHO: ${machosComFIV.length}\n`)
+    console.log(`⚠️  Animais com coletas FIV cadastrados como MACHO: ${machosComFIV.length}\n`)
     
     if (machosComFIV.length === 0) {
-      console.log('�œ… Nenhum animal precisa ser corrigido!')
+      console.log('✅ Nenhum animal precisa ser corrigido!')
       return
     }
     
     // Mostrar lista dos animais que serão corrigidos
-    console.log('�Ÿ“‹ Animais que serão corrigidos:')
-    console.log('�”€'.repeat(80))
+    console.log('📋 Animais que serão corrigidos:')
+    console.log('─'.repeat(80))
     machosComFIV.forEach((animal, index) => {
       console.log(`${index + 1}. ID: ${animal.id} | ${animal.serie || 'N/A'} ${animal.rg || 'N/A'} | Nome: ${animal.nome || 'N/A'} | Sexo atual: ${animal.sexo} | Coletas: ${animal.total_coletas}`)
     })
-    console.log('�”€'.repeat(80))
+    console.log('─'.repeat(80))
     console.log()
     
     // Perguntar confirmação (em ambiente de produção, você pode querer adicionar uma flag --yes)
@@ -55,13 +55,13 @@ async function corrigirSexoDoadorasFIV() {
     const autoConfirm = args.includes('--yes') || args.includes('-y')
     
     if (!autoConfirm) {
-      console.log('�š�️  Para executar a correção, execute novamente com --yes ou -y')
+      console.log('⚠️  Para executar a correção, execute novamente com --yes ou -y')
       console.log('   Exemplo: node scripts/corrigir-sexo-doadoras-fiv.js --yes\n')
       return
     }
     
     // Corrigir cada animal
-    console.log('�Ÿ”� Iniciando correção...\n')
+    console.log('🔧 Iniciando correção...\n')
     let corrigidos = 0
     let erros = 0
     
@@ -80,33 +80,33 @@ async function corrigirSexoDoadorasFIV() {
           
           if (result.rows.length > 0) {
             const atualizado = result.rows[0]
-            console.log(`�œ… Corrigido: ID ${atualizado.id} | ${atualizado.serie || 'N/A'} ${atualizado.rg || 'N/A'} | ${atualizado.nome || 'N/A'} �†’ ${atualizado.sexo}`)
+            console.log(`✅ Corrigido: ID ${atualizado.id} | ${atualizado.serie || 'N/A'} ${atualizado.rg || 'N/A'} | ${atualizado.nome || 'N/A'} → ${atualizado.sexo}`)
             corrigidos++
           } else {
-            console.log(`�š�️  Animal ID ${animal.id} não encontrado para atualização`)
+            console.log(`⚠️  Animal ID ${animal.id} não encontrado para atualização`)
             erros++
           }
         } catch (error) {
-          console.error(`�Œ Erro ao corrigir animal ID ${animal.id}:`, error.message)
+          console.error(`❌ Erro ao corrigir animal ID ${animal.id}:`, error.message)
           erros++
         }
       }
       
       await client.query('COMMIT')
       console.log('\n' + '='.repeat(80))
-      console.log(`�œ… Correção concluída!`)
+      console.log(`✅ Correção concluída!`)
       console.log(`   Corrigidos: ${corrigidos}`)
       console.log(`   Erros: ${erros}`)
       console.log('='.repeat(80))
       
     } catch (error) {
       await client.query('ROLLBACK')
-      console.error('\n�Œ Erro durante a correção. Rollback executado.')
+      console.error('\n❌ Erro durante a correção. Rollback executado.')
       throw error
     }
     
     // Verificar novamente após correção
-    console.log('\n�Ÿ”� Verificando novamente após correção...\n')
+    console.log('\n🔍 Verificando novamente após correção...\n')
     const verificacao = await query(`
       SELECT DISTINCT 
         a.id,
@@ -126,16 +126,16 @@ async function corrigirSexoDoadorasFIV() {
     `)
     
     if (verificacao.rows.length === 0) {
-      console.log('�œ… Todos os animais com coletas FIV estão agora cadastrados como F�ŠMEA!')
+      console.log('✅ Todos os animais com coletas FIV estão agora cadastrados como FÊMEA!')
     } else {
-      console.log(`�š�️  Ainda existem ${verificacao.rows.length} animais com coletas FIV cadastrados como macho:`)
+      console.log(`⚠️  Ainda existem ${verificacao.rows.length} animais com coletas FIV cadastrados como macho:`)
       verificacao.rows.forEach(animal => {
         console.log(`   - ID: ${animal.id} | ${animal.serie || 'N/A'} ${animal.rg || 'N/A'} | ${animal.nome || 'N/A'}`)
       })
     }
     
   } catch (error) {
-    console.error('�Œ Erro ao executar correção:', error)
+    console.error('❌ Erro ao executar correção:', error)
     throw error
   } finally {
     client.release()
@@ -145,10 +145,10 @@ async function corrigirSexoDoadorasFIV() {
 // Executar
 corrigirSexoDoadorasFIV()
   .then(() => {
-    console.log('\n�œ… Script finalizado')
+    console.log('\n✅ Script finalizado')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n�Œ Erro fatal:', error)
+    console.error('\n❌ Erro fatal:', error)
     process.exit(1)
   })

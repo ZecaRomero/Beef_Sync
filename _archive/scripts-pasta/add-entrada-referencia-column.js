@@ -13,7 +13,7 @@ async function createNitrogenioTable() {
   const client = await pool.connect();
   
   try {
-    console.log('�Ÿš€ Criando tabela de abastecimento de nitrogênio...');
+    console.log('🚀 Criando tabela de abastecimento de nitrogênio...');
     
     // Criar tabela de abastecimento de nitrogênio
     await client.query(`
@@ -65,8 +65,8 @@ async function createNitrogenioTable() {
         EXECUTE FUNCTION update_updated_at_column();
     `);
     
-    console.log('�œ… Tabela de abastecimento de nitrogênio criada com sucesso!');
-    console.log('�Ÿ“Š Estrutura criada:');
+    console.log('✅ Tabela de abastecimento de nitrogênio criada com sucesso!');
+    console.log('📊 Estrutura criada:');
     console.log('   - Tabela: abastecimento_nitrogenio');
     console.log('   - Campos: id, data_abastecimento, quantidade_litros, motorista, observacoes');
     console.log('   - Campo calculado: proximo_abastecimento (data + 1 mês)');
@@ -75,7 +75,7 @@ async function createNitrogenioTable() {
     console.log('   - Trigger para updated_at');
     
   } catch (error) {
-    console.error('�Œ Erro ao criar tabela de nitrogênio:', error.message);
+    console.error('❌ Erro ao criar tabela de nitrogênio:', error.message);
     throw error;
   } finally {
     client.release();
@@ -86,7 +86,7 @@ async function testTable() {
   const client = await pool.connect();
   
   try {
-    console.log('\n�Ÿ”� Testando tabela criada...');
+    console.log('\n🔍 Testando tabela criada...');
     
     // Verificar se a tabela existe
     const tableExists = await client.query(`
@@ -98,7 +98,7 @@ async function testTable() {
     `);
     
     if (tableExists.rows[0].exists) {
-      console.log('�œ… Tabela abastecimento_nitrogenio existe');
+      console.log('✅ Tabela abastecimento_nitrogenio existe');
       
       // Verificar estrutura da tabela
       const columns = await client.query(`
@@ -108,7 +108,7 @@ async function testTable() {
         ORDER BY ordinal_position;
       `);
       
-      console.log('�Ÿ“‹ Colunas da tabela:');
+      console.log('📋 Colunas da tabela:');
       columns.rows.forEach(col => {
         console.log(`   - ${col.column_name}: ${col.data_type} ${col.is_nullable === 'NO' ? '(NOT NULL)' : ''}`);
       });
@@ -120,17 +120,17 @@ async function testTable() {
         WHERE tablename = 'abastecimento_nitrogenio';
       `);
       
-      console.log('�Ÿ”� Índices criados:');
+      console.log('🔍 Índices criados:');
       indexes.rows.forEach(idx => {
         console.log(`   - ${idx.indexname}`);
       });
       
     } else {
-      console.log('�Œ Tabela não foi criada');
+      console.log('❌ Tabela não foi criada');
     }
     
   } catch (error) {
-    console.error('�Œ Erro ao testar tabela:', error.message);
+    console.error('❌ Erro ao testar tabela:', error.message);
   } finally {
     client.release();
   }
@@ -140,9 +140,9 @@ async function main() {
   try {
     await createNitrogenioTable();
     await testTable();
-    console.log('\n�ŸŽ‰ Script executado com sucesso!');
+    console.log('\n🎉 Script executado com sucesso!');
   } catch (error) {
-    console.error('�Œ Erro geral:', error.message);
+    console.error('❌ Erro geral:', error.message);
     process.exit(1);
   } finally {
     await pool.end();

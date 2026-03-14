@@ -66,16 +66,16 @@ export default function ImportarBaixas({ onImportComplete }) {
   return (
     <div className="space-y-4">
       <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
-        <h3 className="font-semibold text-amber-900 dark:text-amber-200 mb-2">ðÅ¸â€œâ€¹ Formato do Excel (cabeÃ§alhos em amarelo)</h3>
+        <h3 className="font-semibold text-amber-900 dark:text-amber-200 mb-2">📋 Formato do Excel (cabeçalhos em amarelo)</h3>
         <p className="text-sm text-amber-800 dark:text-amber-300 mb-2">
           Aceita 2 tipos de baixas na coluna <strong>OCORRENCIA</strong>:
         </p>
         <ul className="text-sm text-amber-800 dark:text-amber-300 space-y-1 list-disc list-inside">
-          <li><strong>MORTE/BAIXA</strong>: SÃâ€°RIE, RG, OCORRENCIA, Causa, Data, SÃâ€°RIE MAE, RG (mÃ£e)</li>
-          <li><strong>VENDA</strong>: SÃâ€°RIE, RG, OCORRENCIA, DATA, COMPRADOR, VALOR, NOTA FISCAL</li>
-          <li><strong>SÃâ€°RIE MAE + RG</strong>: colunas separadas ou combinadas em &quot;SÃâ€°RIE MAE RG&quot;</li>
-          <li>Pode importar em arquivos separados: um sÃ³ com MORTE/BAIXA e outro sÃ³ com VENDA</li>
-          <li><strong>VENDAS-only</strong>: SÃâ€°RIE RG, DATA, COMPRADOR, VALOR, NOTA FISCAL, SÃâ€°RIE MAE RG</li>
+          <li><strong>MORTE/BAIXA</strong>: SÉRIE, RG, OCORRENCIA, Causa, Data, SÉRIE MAE, RG (mãe)</li>
+          <li><strong>VENDA</strong>: SÉRIE, RG, OCORRENCIA, DATA, COMPRADOR, VALOR, NOTA FISCAL</li>
+          <li><strong>SÉRIE MAE + RG</strong>: colunas separadas ou combinadas em &quot;SÉRIE MAE RG&quot;</li>
+          <li>Pode importar em arquivos separados: um só com MORTE/BAIXA e outro só com VENDA</li>
+          <li><strong>VENDAS-only</strong>: SÉRIE RG, DATA, COMPRADOR, VALOR, NOTA FISCAL, SÉRIE MAE RG</li>
           <li>Arquivos muito grandes (5000+ linhas): divida em partes para evitar erro de tamanho</li>
         </ul>
       </div>
@@ -93,7 +93,7 @@ export default function ImportarBaixas({ onImportComplete }) {
           className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer dark:file:bg-amber-900/30 dark:file:text-amber-200"
         />
         {arquivo && (
-          <p className="mt-2 text-sm text-green-600 dark:text-green-400">âÅ“â€œ Arquivo: {arquivo.name}</p>
+          <p className="mt-2 text-sm text-green-600 dark:text-green-400">✓ Arquivo: {arquivo.name}</p>
         )}
       </div>
 
@@ -126,13 +126,13 @@ export default function ImportarBaixas({ onImportComplete }) {
         <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
           <div className="flex items-center gap-2 text-green-800 dark:text-green-200 font-medium mb-2">
             <CheckCircleIcon className="h-5 w-5" />
-            ImportaÃ§Ã£o concluÃ­da
+            Importação concluída
           </div>
           <p className="text-sm text-green-700 dark:text-green-300">
             <strong>{resultado.importados}</strong> baixas importadas
-            {resultado.ignorados > 0 && ` ââ‚¬¢ ${resultado.ignorados} linhas ignoradas`}
+            {resultado.ignorados > 0 && ` • ${resultado.ignorados} linhas ignoradas`}
             {resultado.erroCount > 0 && (
-              <span className="text-amber-600 dark:text-amber-400"> ââ‚¬¢ {resultado.erroCount} erros</span>
+              <span className="text-amber-600 dark:text-amber-400"> • {resultado.erroCount} erros</span>
             )}
           </p>
           {resultado.erros?.length > 0 && (

@@ -1,18 +1,18 @@
-
+﻿
 import React, { useState } from 'react'
 
 
 export default function MetricsCards({ timeRange, onReportClick }) {
   const [hoveredCard, setHoveredCard] = useState(null)
 
-  // Calcular mÃ©tricas baseadas no perÃ­odo selecionado
+  // Calcular métricas baseadas no período selecionado
   const calculateMetrics = () => {
     const now = new Date()
     let filteredAnimals = mockAnimals
 
-    // Filtrar por perÃ­odo (simulado)
+    // Filtrar por período (simulado)
     if (timeRange !== 'all') {
-      // Para demonstraÃ§Ã£o, vamos usar todos os dados
+      // Para demonstração, vamos usar todos os dados
       filteredAnimals = mockAnimals
     }
 
@@ -33,7 +33,7 @@ export default function MetricsCards({ timeRange, onReportClick }) {
       value: `R$ ${(parseFloat(metrics.totalInvested) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       change: '+12.5%',
       trend: 'up',
-      icon: 'ðÅ¸â€™°',
+      icon: '💰',
       color: 'from-red-500 to-pink-600',
       bgColor: 'bg-red-50 dark:bg-red-900/20',
       description: 'Investimento total em todos os animais',
@@ -45,7 +45,7 @@ export default function MetricsCards({ timeRange, onReportClick }) {
       value: `R$ ${(parseFloat(metrics.totalRevenue) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       change: '+18.3%',
       trend: 'up',
-      icon: 'ðÅ¸â€œË†',
+      icon: '📈',
       color: 'from-green-500 to-emerald-600',
       bgColor: 'bg-green-50 dark:bg-green-900/20',
       description: 'Receita com vendas realizadas',
@@ -53,27 +53,27 @@ export default function MetricsCards({ timeRange, onReportClick }) {
     },
     {
       id: 'profit',
-      title: 'Lucro LÃ­quido',
+      title: 'Lucro Líquido',
       value: `R$ ${(parseFloat(metrics.totalProfit) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       change: (parseFloat(metrics.totalProfit) || 0) >= 0 ? '+25.7%' : '-8.2%',
       trend: (parseFloat(metrics.totalProfit) || 0) >= 0 ? 'up' : 'down',
-      icon: (parseFloat(metrics.totalProfit) || 0) >= 0 ? 'ðÅ¸Å½¯' : 'ðÅ¸â€œâ€°',
+      icon: (parseFloat(metrics.totalProfit) || 0) >= 0 ? '🎯' : '📉',
       color: (parseFloat(metrics.totalProfit) || 0) >= 0 ? 'from-blue-500 to-cyan-600' : 'from-red-500 to-orange-600',
       bgColor: (parseFloat(metrics.totalProfit) || 0) >= 0 ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-red-50 dark:bg-red-900/20',
-      description: 'Lucro lÃ­quido das operaÃ§Ãµes',
+      description: 'Lucro líquido das operações',
       details: `Margem: ${(parseFloat(metrics.totalRevenue) || 0) > 0 ? (((parseFloat(metrics.totalProfit) || 0) / (parseFloat(metrics.totalRevenue) || 1)) * 100).toFixed(1) : 0}%`
     },
     {
       id: 'roi',
-      title: 'ROI MÃ©dio',
+      title: 'ROI Médio',
       value: `${metrics.avgROI.toFixed(1)}%`,
       change: '+5.4%',
       trend: 'up',
-      icon: 'ðÅ¸â€œÅ ',
+      icon: '📊',
       color: 'from-purple-500 to-indigo-600',
       bgColor: 'bg-purple-50 dark:bg-purple-900/20',
-      description: 'Retorno mÃ©dio sobre investimento',
-      details: `Taxa de conversÃ£o: ${metrics.conversionRate.toFixed(1)}%`
+      description: 'Retorno médio sobre investimento',
+      details: `Taxa de conversão: ${metrics.conversionRate.toFixed(1)}%`
     },
     {
       id: 'active',
@@ -81,7 +81,7 @@ export default function MetricsCards({ timeRange, onReportClick }) {
       value: metrics.activeAnimals.toString(),
       change: '+3',
       trend: 'up',
-      icon: 'ðÅ¸�â€ž',
+      icon: '🐄',
       color: 'from-orange-500 to-yellow-600',
       bgColor: 'bg-orange-50 dark:bg-orange-900/20',
       description: 'Animais ativos no rebanho',
@@ -93,10 +93,10 @@ export default function MetricsCards({ timeRange, onReportClick }) {
       value: metrics.avgROI > 15 ? 'Excelente' : metrics.avgROI > 5 ? 'Boa' : 'Regular',
       change: 'Melhorando',
       trend: 'up',
-      icon: metrics.avgROI > 15 ? 'ðÅ¸�â€ ' : metrics.avgROI > 5 ? 'â­�' : 'ðÅ¸â€œË†',
+      icon: metrics.avgROI > 15 ? '🏆' : metrics.avgROI > 5 ? '⭐' : '📈',
       color: 'from-teal-500 to-green-600',
       bgColor: 'bg-teal-50 dark:bg-teal-900/20',
-      description: 'AvaliaÃ§Ã£o geral do desempenho',
+      description: 'Avaliação geral do desempenho',
       details: `Meta: ROI > 20%`
     }
   ]
@@ -141,7 +141,7 @@ export default function MetricsCards({ timeRange, onReportClick }) {
                   : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                 }
               `}>
-                <span className="mr-1">{card.trend === 'up' ? 'ââ€ â€”ï¸�' : 'ââ€ Ëœï¸�'}</span>
+                <span className="mr-1">{card.trend === 'up' ? '↗️' : '↘️'}</span>
                 {card.change}
               </div>
             </div>
@@ -177,7 +177,7 @@ export default function MetricsCards({ timeRange, onReportClick }) {
             {/* Click Indicator */}
             <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
               <div className="w-6 h-6 rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center">
-                <span className="text-xs">ðÅ¸â€œÅ </span>
+                <span className="text-xs">📊</span>
               </div>
             </div>
           </div>

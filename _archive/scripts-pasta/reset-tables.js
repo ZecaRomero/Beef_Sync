@@ -4,12 +4,12 @@ require('dotenv').config();
 const { query, closePool } = require('../lib/database');
 
 async function resetTables() {
-  console.log('�Ÿ”„ Removendo tabelas problemáticas...');
+  console.log('🔄 Removendo tabelas problemáticas...');
   
   try {
     await query('DROP TABLE IF EXISTS protocolos_aplicados CASCADE');
     await query('DROP TABLE IF EXISTS protocolos_reprodutivos CASCADE');
-    console.log('�œ… Tabelas removidas');
+    console.log('✅ Tabelas removidas');
     
     // Recriar tabelas
     await query(`
@@ -41,10 +41,10 @@ async function resetTables() {
       )
     `);
     
-    console.log('�œ… Tabelas recriadas sem constraints');
+    console.log('✅ Tabelas recriadas sem constraints');
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
   } finally {
     await closePool();
   }

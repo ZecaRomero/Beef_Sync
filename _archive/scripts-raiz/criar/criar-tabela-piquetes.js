@@ -12,7 +12,7 @@ async function criarTabelaPiquetes() {
   const client = await pool.connect();
   
   try {
-    console.log('�Ÿ”� CRIANDO TABELA DE PIQUETES\n');
+    console.log('🔧 CRIANDO TABELA DE PIQUETES\n');
     console.log('='.repeat(80));
     
     // Criar tabela piquetes
@@ -31,7 +31,7 @@ async function criarTabelaPiquetes() {
       )
     `);
     
-    console.log('�œ… Tabela piquetes criada');
+    console.log('✅ Tabela piquetes criada');
     
     // Adicionar coluna piquete_atual na tabela animais se não existir
     await client.query(`
@@ -40,7 +40,7 @@ async function criarTabelaPiquetes() {
       ADD COLUMN IF NOT EXISTS data_entrada_piquete DATE
     `);
     
-    console.log('�œ… Colunas piquete_atual e data_entrada_piquete adicionadas na tabela animais');
+    console.log('✅ Colunas piquete_atual e data_entrada_piquete adicionadas na tabela animais');
     
     // Criar índices
     await client.query(`
@@ -48,13 +48,13 @@ async function criarTabelaPiquetes() {
       CREATE INDEX IF NOT EXISTS idx_piquetes_codigo ON piquetes(codigo);
     `);
     
-    console.log('�œ… Índices criados');
+    console.log('✅ Índices criados');
     
     console.log('\n' + '='.repeat(80));
-    console.log('\n�œ… Estrutura de piquetes criada com sucesso!');
+    console.log('\n✅ Estrutura de piquetes criada com sucesso!');
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
     console.error(error);
   } finally {
     client.release();

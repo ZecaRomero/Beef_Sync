@@ -15,7 +15,7 @@ const pool = new Pool({
 
 async function desativarManutencao() {
   try {
-    console.log('�Ÿ”� Desativando modo de manutenção...')
+    console.log('🔧 Desativando modo de manutenção...')
     
     // Desativar modo de manutenção
     await pool.query(`
@@ -31,12 +31,12 @@ async function desativarManutencao() {
       WHERE key = 'block_access'
     `)
     
-    console.log('�œ… Modo de manutenção desativado com sucesso!')
-    console.log('�œ… Bloqueio de acesso removido!')
-    console.log('\n�Ÿ“� Agora você pode acessar o sistema pelo celular normalmente.')
+    console.log('✅ Modo de manutenção desativado com sucesso!')
+    console.log('✅ Bloqueio de acesso removido!')
+    console.log('\n📱 Agora você pode acessar o sistema pelo celular normalmente.')
     
   } catch (error) {
-    console.error('�Œ Erro ao desativar manutenção:', error.message)
+    console.error('❌ Erro ao desativar manutenção:', error.message)
   } finally {
     await pool.end()
   }

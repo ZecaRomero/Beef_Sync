@@ -12,11 +12,11 @@ export default function ReceptoraOrigemManager({ value, onChange }) {
     if (savedOrigens) {
       setOrigens(JSON.parse(savedOrigens));
     } else {
-      // Origens padrÃ£o
+      // Origens padrão
       const origensDefault = [
-        'Fazenda SÃ£o JoÃ£o',
+        'Fazenda São João',
         'Fazenda Santa Maria',
-        'LeilÃ£o Nelore Elite',
+        'Leilão Nelore Elite',
         'Compra Particular'
       ];
       setOrigens(origensDefault);
@@ -68,14 +68,14 @@ export default function ReceptoraOrigemManager({ value, onChange }) {
         ))}
       </select>
 
-      {/* BotÃµes de aÃ§Ã£o */}
+      {/* Botões de ação */}
       <div className="flex space-x-2">
         <button
           type="button"
           onClick={() => setShowAddModal(true)}
           className="btn-secondary text-sm px-3 py-1"
         >
-          âÅ¾â€¢ Incluir
+          ➕ Incluir
         </button>
         {value && (
           <>
@@ -84,7 +84,7 @@ export default function ReceptoraOrigemManager({ value, onChange }) {
               onClick={() => setEditingOrigem(value)}
               className="btn-secondary text-sm px-3 py-1"
             >
-              âÅ“�ï¸� Editar
+              ✏️ Editar
             </button>
             <button
               type="button"
@@ -95,7 +95,7 @@ export default function ReceptoraOrigemManager({ value, onChange }) {
               }}
               className="btn-secondary text-sm px-3 py-1 text-red-600 hover:text-red-700"
             >
-              ðÅ¸â€”â€˜ï¸� Excluir
+              🗑️ Excluir
             </button>
           </>
         )}
@@ -158,7 +158,7 @@ function OrigemModal({ title, initialValue, onSave, onClose }) {
               value={valor}
               onChange={(e) => setValor(e.target.value)}
               className="input-field w-full"
-              placeholder="Ex: Fazenda Nova EsperanÃ§a"
+              placeholder="Ex: Fazenda Nova Esperança"
               autoFocus
             />
           </div>

@@ -8,12 +8,12 @@ const http = require('http')
 
 async function debugAnimal(serie, rg) {
   try {
-    console.log(`\n�Ÿ”� Buscando dados do animal: ${serie} ${rg}\n`)
+    console.log(`\n🔍 Buscando dados do animal: ${serie} ${rg}\n`)
     
     // Primeiro buscar o ID do animal
     const verificarUrl = `http://localhost:3020/api/animals/verificar?serie=${encodeURIComponent(serie)}&rg=${encodeURIComponent(rg)}`
     
-    console.log('�Ÿ“� Buscando ID do animal...')
+    console.log('📡 Buscando ID do animal...')
     
     const verificarData = await new Promise((resolve, reject) => {
       http.get(verificarUrl, (res) => {
@@ -30,18 +30,18 @@ async function debugAnimal(serie, rg) {
     })
     
     if (!verificarData.success || !verificarData.data?.id) {
-      console.log('�Œ Animal não encontrado')
+      console.log('❌ Animal não encontrado')
       return
     }
     
     const animalId = verificarData.data.id
-    console.log(`�œ… Animal encontrado! ID: ${animalId}`)
+    console.log(`✅ Animal encontrado! ID: ${animalId}`)
     console.log('')
     
     // Buscar dados completos do animal
     const animalUrl = `http://localhost:3020/api/animals/${animalId}`
     
-    console.log('�Ÿ“� Buscando dados completos...')
+    console.log('📡 Buscando dados completos...')
     
     const animalData = await new Promise((resolve, reject) => {
       http.get(animalUrl, (res) => {
@@ -58,20 +58,20 @@ async function debugAnimal(serie, rg) {
     })
     
     if (!animalData.success || !animalData.data) {
-      console.log('�Œ Erro ao buscar dados do animal')
+      console.log('❌ Erro ao buscar dados do animal')
       return
     }
     
     const animal = animalData.data
     
-    console.log('�Ÿ“‹ Dados do Animal:')
-    console.log('�”€'.repeat(50))
+    console.log('📋 Dados do Animal:')
+    console.log('─'.repeat(50))
     console.log(`ID: ${animal.id}`)
     console.log(`Série/RG: ${animal.serie} ${animal.rg}`)
     console.log(`Nome: ${animal.nome || 'Não informado'}`)
     console.log('')
-    console.log('�Ÿ�� Dados Genéticos (valores brutos do banco):')
-    console.log('�”€'.repeat(50))
+    console.log('🧬 Dados Genéticos (valores brutos do banco):')
+    console.log('─'.repeat(50))
     console.log(`abczg: ${animal.abczg ?? 'NULL'}`)
     console.log(`deca: ${animal.deca ?? 'NULL'}`)
     console.log(`iqg: ${animal.iqg ?? 'NULL'}`)
@@ -81,8 +81,8 @@ async function debugAnimal(serie, rg) {
     console.log(`situacao_abcz: ${animal.situacao_abcz || 'NULL'}`)
     console.log(`situacaoAbcz: ${animal.situacaoAbcz || 'NULL'}`)
     console.log('')
-    console.log('�œ… Valores que DEVERIAM ser exibidos:')
-    console.log('�”€'.repeat(50))
+    console.log('✅ Valores que DEVERIAM ser exibidos:')
+    console.log('─'.repeat(50))
     console.log(`iABCZ: ${animal.abczg ?? 'Não informado'}`)
     console.log(`DECA: ${animal.deca ?? 'Não informado'}`)
     console.log(`IQG: ${animal.iqg ?? animal.genetica_2 ?? 'Não informado'}`)
@@ -91,21 +91,21 @@ async function debugAnimal(serie, rg) {
     console.log('')
     
     // Verificar se há mapeamento incorreto
-    console.log('�š�️  DIAGN�“STICO:')
-    console.log('�”€'.repeat(50))
+    console.log('⚠️  DIAGNÓSTICO:')
+    console.log('─'.repeat(50))
     
     if (animal.iqg === null && animal.genetica_2 !== null) {
-      console.log('�Œ PROBLEMA: IQG está NULL mas genetica_2 tem valor!')
+      console.log('❌ PROBLEMA: IQG está NULL mas genetica_2 tem valor!')
       console.log(`   Solução: Copiar genetica_2 (${animal.genetica_2}) para iqg`)
     }
     
     if (animal.pt_iqg === null && animal.decile_2 !== null) {
-      console.log('�Œ PROBLEMA: pt_iqg está NULL mas decile_2 tem valor!')
+      console.log('❌ PROBLEMA: pt_iqg está NULL mas decile_2 tem valor!')
       console.log(`   Solução: Copiar decile_2 (${animal.decile_2}) para pt_iqg`)
     }
     
     if (animal.iqg !== null && animal.genetica_2 !== null && animal.iqg !== animal.genetica_2) {
-      console.log('�š�️  AVISO: iqg e genetica_2 têm valores diferentes!')
+      console.log('⚠️  AVISO: iqg e genetica_2 têm valores diferentes!')
       console.log(`   iqg: ${animal.iqg}`)
       console.log(`   genetica_2: ${animal.genetica_2}`)
     }
@@ -113,9 +113,9 @@ async function debugAnimal(serie, rg) {
     console.log('')
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message)
+    console.error('❌ Erro:', error.message)
     console.error('')
-    console.error('�Ÿ’� Certifique-se de que o servidor está rodando em http://localhost:3020')
+    console.error('💡 Certifique-se de que o servidor está rodando em http://localhost:3020')
   }
 }
 
@@ -123,7 +123,7 @@ const serie = process.argv[2]
 const rg = process.argv[3]
 
 if (!serie || !rg) {
-  console.log('�Œ Uso: node debug-animal-api.js SERIE RG')
+  console.log('❌ Uso: node debug-animal-api.js SERIE RG')
   console.log('Exemplo: node debug-animal-api.js CJCJ 15668')
   process.exit(1)
 }

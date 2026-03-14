@@ -10,7 +10,7 @@ export default function RelatorioFiscal() {
   const [loadingDetalhes, setLoadingDetalhes] = useState(false)
   const [exportando, setExportando] = useState(false)
   const [filtros, setFiltros] = useState({
-    dataInicio: new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0], // InÃ­cio do ano
+    dataInicio: new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0], // Início do ano
     dataFim: new Date().toISOString().split('T')[0], // Hoje
     tipo: 'todos' // todos, entrada, saida
   })
@@ -28,7 +28,7 @@ export default function RelatorioFiscal() {
   // Recarregar quando os filtros mudarem (opcional - pode ser removido se quiser apenas atualizar manualmente)
   // useEffect(() => {
   //   if (mounted && notasFiscais.length > 0) {
-  //     // Apenas filtrar, nÃ£o recarregar da API
+  //     // Apenas filtrar, não recarregar da API
   //   }
   // }, [filtros])
 
@@ -37,12 +37,12 @@ export default function RelatorioFiscal() {
       if (typeof window === 'undefined') return
       
       setLoading(true)
-      console.log('ðÅ¸â€�â€ž Buscando notas fiscais da API...')
+      console.log('🔄 Buscando notas fiscais da API...')
       const response = await fetch('/api/notas-fiscais')
       
       if (response.ok) {
         const data = await response.json()
-        console.log('ðÅ¸â€œ¥ Resposta da API (primeiros 3 itens):', data.slice ? data.slice(0, 3) : data)
+        console.log('📥 Resposta da API (primeiros 3 itens):', data.slice ? data.slice(0, 3) : data)
         
         // A API pode retornar { success: true, data: [...] } ou apenas o array
         let nfsData = []
@@ -54,7 +54,7 @@ export default function RelatorioFiscal() {
           nfsData = data.data
         }
         
-        console.log(`ðÅ¸â€œÅ  Total de notas recebidas: ${nfsData.length}`)
+        console.log(`📊 Total de notas recebidas: ${nfsData.length}`)
         
         // Debug: verificar tipos
         const tiposEncontrados = {}
@@ -62,14 +62,14 @@ export default function RelatorioFiscal() {
           const tipo = nf.tipo || 'entrada'
           tiposEncontrados[tipo] = (tiposEncontrados[tipo] || 0) + 1
         })
-        console.log('ðÅ¸â€œâ€¹ Tipos encontrados:', tiposEncontrados)
+        console.log('📋 Tipos encontrados:', tiposEncontrados)
         
         // Normalizar os dados para o formato esperado
         const notasNormalizadas = nfsData.map(nf => {
-          // Determinar data de emissÃ£o (prioridade: data > data_compra > created_at)
+          // Determinar data de emissão (prioridade: data > data_compra > created_at)
           let dataEmissao = nf.data || nf.data_compra || nf.created_at
           
-          // Se dataEmissao Ã© uma string, converter para Date
+          // Se dataEmissao é uma string, converter para Date
           if (typeof dataEmissao === 'string') {
             dataEmissao = new Date(dataEmissao)
           }
@@ -88,7 +88,7 @@ export default function RelatorioFiscal() {
           
           // Debug para NF 4393
           if (notaNormalizada.numero === '4393') {
-            console.log('ðÅ¸â€�� NF 4393 encontrada:', notaNormalizada)
+            console.log('🔍 NF 4393 encontrada:', notaNormalizada)
           }
           
           return notaNormalizada
@@ -97,17 +97,17 @@ export default function RelatorioFiscal() {
         // Debug: contar por tipo
         const entradasCount = notasNormalizadas.filter(n => n.tipo === 'entrada').length
         const saidasCount = notasNormalizadas.filter(n => n.tipo === 'saida').length
-        console.log(`âÅ“â€¦ ${notasNormalizadas.length} notas fiscais carregadas (${entradasCount} entradas, ${saidasCount} saÃ­das)`)
+        console.log(`✅ ${notasNormalizadas.length} notas fiscais carregadas (${entradasCount} entradas, ${saidasCount} saídas)`)
         
-        // Debug: listar todas as saÃ­das
+        // Debug: listar todas as saídas
         const saidas = notasNormalizadas.filter(n => n.tipo === 'saida')
         if (saidas.length > 0) {
-          console.log('ðÅ¸â€œ¤ Notas de SAÃ�DA encontradas:')
+          console.log('📤 Notas de SAÍDA encontradas:')
           saidas.forEach(s => {
             console.log(`   - NF ${s.numero}: R$ ${s.valorTotal.toFixed(2)} - Data: ${s.dataEmissao}`)
           })
         } else {
-          console.log('âÅ¡ ï¸� Nenhuma nota de SAÃ�DA encontrada apÃ³s normalizaÃ§Ã£o!')
+          console.log('⚠️ Nenhuma nota de SAÍDA encontrada após normalização!')
         }
         
         setNotasFiscais(notasNormalizadas)
@@ -132,7 +132,7 @@ export default function RelatorioFiscal() {
   }
 
   const filtrarNotas = () => {
-    console.log('ðÅ¸â€�� Iniciando filtro com:', {
+    console.log('🔍 Iniciando filtro com:', {
       totalNotas: notasFiscais.length,
       filtroDataInicio: filtros.dataInicio,
       filtroDataFim: filtros.dataFim,
@@ -149,21 +149,21 @@ export default function RelatorioFiscal() {
           dataEmissao = new Date(nota.dataEmissao)
         }
       } else {
-        console.warn('âÅ¡ ï¸� Nota sem data:', nota.numero)
-        return false // Se nÃ£o tem data, nÃ£o incluir
+        console.warn('⚠️ Nota sem data:', nota.numero)
+        return false // Se não tem data, não incluir
       }
       
-      // Verificar se a data Ã© vÃ¡lida
+      // Verificar se a data é válida
       if (isNaN(dataEmissao.getTime())) {
-        console.warn('âÅ¡ ï¸� Data invÃ¡lida para nota:', nota.numero, nota.dataEmissao)
+        console.warn('⚠️ Data inválida para nota:', nota.numero, nota.dataEmissao)
         return false
       }
       
-      // Criar datas de comparaÃ§Ã£o (apenas data, sem hora)
+      // Criar datas de comparação (apenas data, sem hora)
       const dataInicio = new Date(filtros.dataInicio + 'T00:00:00')
       const dataFim = new Date(filtros.dataFim + 'T23:59:59')
       
-      // Normalizar data de emissÃ£o para inÃ­cio do dia para comparaÃ§Ã£o
+      // Normalizar data de emissão para início do dia para comparação
       const dataEmissaoNormalizada = new Date(dataEmissao)
       dataEmissaoNormalizada.setHours(0, 0, 0, 0)
       
@@ -176,9 +176,9 @@ export default function RelatorioFiscal() {
       const dentroDataRange = dataEmissaoNormalizada >= dataInicioNormalizada && dataEmissaoNormalizada <= dataFimNormalizada
       const tipoMatch = filtros.tipo === 'todos' || nota.tipo === filtros.tipo
       
-      // Debug para todas as saÃ­das
+      // Debug para todas as saídas
       if (nota.tipo === 'saida') {
-        console.log(`ðÅ¸â€�� Filtrando SAÃ�DA NF ${nota.numero}:`, {
+        console.log(`🔍 Filtrando SAÍDA NF ${nota.numero}:`, {
           dataEmissaoOriginal: nota.dataEmissao,
           dataEmissaoNormalizada: dataEmissaoNormalizada.toISOString(),
           dataInicio: dataInicioNormalizada.toISOString(),
@@ -197,17 +197,17 @@ export default function RelatorioFiscal() {
     // Debug: contar filtradas por tipo
     const entradasFiltradas = filtradas.filter(n => n.tipo === 'entrada').length
     const saidasFiltradas = filtradas.filter(n => n.tipo === 'saida').length
-    console.log(`ðÅ¸â€�� Notas filtradas: ${filtradas.length} (${entradasFiltradas} entradas, ${saidasFiltradas} saÃ­das)`)
+    console.log(`🔍 Notas filtradas: ${filtradas.length} (${entradasFiltradas} entradas, ${saidasFiltradas} saídas)`)
     
-    // Listar todas as saÃ­das filtradas
+    // Listar todas as saídas filtradas
     const saidasFiltradasList = filtradas.filter(n => n.tipo === 'saida')
     if (saidasFiltradasList.length > 0) {
-      console.log('âÅ“â€¦ SaÃ­das que passaram no filtro:')
+      console.log('✅ Saídas que passaram no filtro:')
       saidasFiltradasList.forEach(s => {
         console.log(`   - NF ${s.numero}: R$ ${s.valorTotal.toFixed(2)}`)
       })
     } else {
-      console.log('â�Å’ Nenhuma saÃ­da passou no filtro!')
+      console.log('❌ Nenhuma saída passou no filtro!')
     }
     
     return filtradas
@@ -223,7 +223,7 @@ export default function RelatorioFiscal() {
       if (response.ok) {
         const data = await response.json()
         setNfDetalhes(data)
-        console.log('ðÅ¸â€œâ€ž Detalhes da NF carregados:', data)
+        console.log('📄 Detalhes da NF carregados:', data)
       } else {
         console.error('Erro ao buscar detalhes da NF:', response.status)
         setNfDetalhes(null)
@@ -258,10 +258,10 @@ export default function RelatorioFiscal() {
       // Importar ExcelJS dinamicamente
       const ExcelJS = (await import('exceljs')).default
       const workbook = new ExcelJS.Workbook()
-      workbook.creator = 'BeefSync - Sistema de GestÃ£o PecuÃ¡ria'
+      workbook.creator = 'BeefSync - Sistema de Gestão Pecuária'
       workbook.created = new Date()
       
-      // Recalcular notas filtradas e resumo dentro da funÃ§Ã£o
+      // Recalcular notas filtradas e resumo dentro da função
       const notasFiltradasAtual = filtrarNotas()
       
       // Buscar detalhes completos de todas as notas filtradas
@@ -273,20 +273,20 @@ export default function RelatorioFiscal() {
             const detalhes = await response.json()
             notasComDetalhes.push(detalhes)
           } else {
-            notasComDetalhes.push(nota) // Usar dados bÃ¡sicos se nÃ£o conseguir buscar detalhes
+            notasComDetalhes.push(nota) // Usar dados básicos se não conseguir buscar detalhes
           }
         } catch (error) {
           console.error(`Erro ao buscar detalhes da NF ${nota.numero}:`, error)
-          notasComDetalhes.push(nota) // Usar dados bÃ¡sicos
+          notasComDetalhes.push(nota) // Usar dados básicos
         }
       }
 
-      // Separar entradas e saÃ­das
+      // Separar entradas e saídas
       const entradas = notasComDetalhes.filter(n => n.tipo === 'entrada')
       const saidas = notasComDetalhes.filter(n => n.tipo === 'saida')
 
       // ===== ABA RESUMO =====
-      const resumoSheet = workbook.addWorksheet('ðÅ¸â€œÅ  Resumo', {
+      const resumoSheet = workbook.addWorksheet('📊 Resumo', {
         pageSetup: {
           paperSize: 9,
           orientation: 'portrait',
@@ -294,10 +294,10 @@ export default function RelatorioFiscal() {
         }
       })
 
-      // TÃ­tulo
+      // Título
       resumoSheet.mergeCells('A1:B1')
       const titleCell = resumoSheet.getCell('A1')
-      titleCell.value = 'RELATÃâ€œRIO FISCAL - RESUMO'
+      titleCell.value = 'RELATÓRIO FISCAL - RESUMO'
       titleCell.font = { size: 16, bold: true, color: { argb: 'FFFFFFFF' } }
       titleCell.fill = {
         type: 'pattern',
@@ -322,14 +322,14 @@ export default function RelatorioFiscal() {
       resumoAtual.saldo = resumoAtual.totalSaidas - resumoAtual.totalEntradas
 
       const resumoData = [
-        { indicador: 'PerÃ­odo', valor: `${new Date(filtros.dataInicio).toLocaleDateString('pt-BR')} a ${new Date(filtros.dataFim).toLocaleDateString('pt-BR')}` },
+        { indicador: 'Período', valor: `${new Date(filtros.dataInicio).toLocaleDateString('pt-BR')} a ${new Date(filtros.dataFim).toLocaleDateString('pt-BR')}` },
         { indicador: 'Total de Notas', valor: notasFiltradas.length },
         { indicador: 'Notas de Entrada', valor: entradas.length },
-        { indicador: 'Notas de SaÃ­da (Vendas)', valor: saidas.length },
+        { indicador: 'Notas de Saída (Vendas)', valor: saidas.length },
         { indicador: 'Valor Total Entradas', valor: `R$ ${resumoAtual.totalEntradas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` },
-        { indicador: 'Valor Total SaÃ­das', valor: `R$ ${resumoAtual.totalSaidas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` },
+        { indicador: 'Valor Total Saídas', valor: `R$ ${resumoAtual.totalSaidas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` },
         { indicador: 'Saldo (Vendas - Compras)', valor: `R$ ${resumoAtual.saldo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` },
-        { indicador: resumoAtual.saldo >= 0 ? 'Lucro' : 'PrejuÃ­zo', valor: resumoAtual.saldo >= 0 ? 'âÅ“â€¦' : 'â�Å’' }
+        { indicador: resumoAtual.saldo >= 0 ? 'Lucro' : 'Prejuízo', valor: resumoAtual.saldo >= 0 ? '✅' : '❌' }
       ]
 
       resumoData.forEach((row, index) => {
@@ -346,7 +346,7 @@ export default function RelatorioFiscal() {
         }
       })
 
-      // Estilizar cabeÃ§alho
+      // Estilizar cabeçalho
       const resumoHeaderRow = resumoSheet.getRow(2)
       resumoHeaderRow.eachCell((cell) => {
         cell.fill = {
@@ -364,7 +364,7 @@ export default function RelatorioFiscal() {
 
       // ===== ABA ENTRADAS =====
       if (entradas.length > 0) {
-        const entradasSheet = workbook.addWorksheet('ðÅ¸â€œ¥ Entradas', {
+        const entradasSheet = workbook.addWorksheet('📥 Entradas', {
           pageSetup: {
             paperSize: 9,
             orientation: 'landscape',
@@ -373,14 +373,14 @@ export default function RelatorioFiscal() {
         })
 
         entradasSheet.columns = [
-          { header: 'NÃºmero NF', key: 'numero', width: 15 },
+          { header: 'Número NF', key: 'numero', width: 15 },
           { header: 'Data', key: 'data', width: 12 },
           { header: 'Fornecedor', key: 'fornecedor', width: 30 },
           { header: 'CNPJ/CPF', key: 'cnpj', width: 18 },
-          { header: 'Natureza OperaÃ§Ã£o', key: 'natureza', width: 20 },
+          { header: 'Natureza Operação', key: 'natureza', width: 20 },
           { header: 'Valor Total', key: 'valor', width: 15 },
           { header: 'Qtd Itens', key: 'qtdItens', width: 12 },
-          { header: 'ObservaÃ§Ãµes', key: 'observacoes', width: 40 }
+          { header: 'Observações', key: 'observacoes', width: 40 }
         ]
 
         entradas.forEach(nota => {
@@ -396,7 +396,7 @@ export default function RelatorioFiscal() {
           })
         })
 
-        // Estilizar cabeÃ§alho
+        // Estilizar cabeçalho
         const entradasHeaderRow = entradasSheet.getRow(1)
         entradasHeaderRow.eachCell((cell) => {
           cell.fill = {
@@ -416,9 +416,9 @@ export default function RelatorioFiscal() {
         entradasSheet.getColumn('valor').numFmt = 'R$ #,##0.00'
       }
 
-      // ===== ABA SAÃ�DAS =====
+      // ===== ABA SAÍDAS =====
       if (saidas.length > 0) {
-        const saidasSheet = workbook.addWorksheet('ðÅ¸â€œ¤ SaÃ­das (Vendas)', {
+        const saidasSheet = workbook.addWorksheet('📤 Saídas (Vendas)', {
           pageSetup: {
             paperSize: 9,
             orientation: 'landscape',
@@ -427,14 +427,14 @@ export default function RelatorioFiscal() {
         })
 
         saidasSheet.columns = [
-          { header: 'NÃºmero NF', key: 'numero', width: 15 },
+          { header: 'Número NF', key: 'numero', width: 15 },
           { header: 'Data', key: 'data', width: 12 },
           { header: 'Destino/Comprador', key: 'destino', width: 30 },
           { header: 'CNPJ/CPF', key: 'cnpj', width: 18 },
-          { header: 'Natureza OperaÃ§Ã£o', key: 'natureza', width: 20 },
+          { header: 'Natureza Operação', key: 'natureza', width: 20 },
           { header: 'Valor Total', key: 'valor', width: 15 },
           { header: 'Qtd Itens', key: 'qtdItens', width: 12 },
-          { header: 'ObservaÃ§Ãµes', key: 'observacoes', width: 40 }
+          { header: 'Observações', key: 'observacoes', width: 40 }
         ]
 
         saidas.forEach(nota => {
@@ -450,7 +450,7 @@ export default function RelatorioFiscal() {
           })
         })
 
-        // Estilizar cabeÃ§alho
+        // Estilizar cabeçalho
         const saidasHeaderRow = saidasSheet.getRow(1)
         saidasHeaderRow.eachCell((cell) => {
           cell.fill = {
@@ -485,7 +485,7 @@ export default function RelatorioFiscal() {
               numeroNF: nota.numero_nf || nota.numeroNF || nota.numero,
               dataNF: new Date(nota.data || nota.data_compra || nota.created_at).toLocaleDateString('pt-BR'),
               identificacao: item.tatuagem || item.identificacao || `${item.serie || ''} ${item.rg || ''}`.trim() || 'N/A',
-              sexo: item.sexo === 'macho' || item.sexo === 'M' ? 'Macho' : item.sexo === 'femea' || item.sexo === 'F' ? 'FÃªmea' : item.sexo || 'N/A',
+              sexo: item.sexo === 'macho' || item.sexo === 'M' ? 'Macho' : item.sexo === 'femea' || item.sexo === 'F' ? 'Fêmea' : item.sexo || 'N/A',
               raca: item.raca || 'N/A',
               era: item.era || 'N/A',
               peso: item.peso ? `${item.peso} kg` : 'N/A',
@@ -504,7 +504,7 @@ export default function RelatorioFiscal() {
 
       // Aba Animais Comprados
       if (animaisComprados.length > 0) {
-        const animaisCompradosSheet = workbook.addWorksheet('ðÅ¸�â€š Animais Comprados', {
+        const animaisCompradosSheet = workbook.addWorksheet('🐂 Animais Comprados', {
           pageSetup: {
             paperSize: 9,
             orientation: 'landscape',
@@ -515,12 +515,12 @@ export default function RelatorioFiscal() {
         animaisCompradosSheet.columns = [
           { header: 'NF', key: 'numeroNF', width: 12 },
           { header: 'Data NF', key: 'dataNF', width: 12 },
-          { header: 'IdentificaÃ§Ã£o', key: 'identificacao', width: 20 },
+          { header: 'Identificação', key: 'identificacao', width: 20 },
           { header: 'Sexo', key: 'sexo', width: 10 },
-          { header: 'RaÃ§a', key: 'raca', width: 15 },
+          { header: 'Raça', key: 'raca', width: 15 },
           { header: 'Era', key: 'era', width: 10 },
           { header: 'Peso', key: 'peso', width: 12 },
-          { header: 'Valor UnitÃ¡rio', key: 'valorUnitario', width: 15 },
+          { header: 'Valor Unitário', key: 'valorUnitario', width: 15 },
           { header: 'Fornecedor', key: 'fornecedorDestino', width: 30 }
         ]
 
@@ -528,7 +528,7 @@ export default function RelatorioFiscal() {
           animaisCompradosSheet.addRow(animal)
         })
 
-        // Estilizar cabeÃ§alho
+        // Estilizar cabeçalho
         const compradosHeaderRow = animaisCompradosSheet.getRow(1)
         compradosHeaderRow.eachCell((cell) => {
           cell.fill = {
@@ -548,7 +548,7 @@ export default function RelatorioFiscal() {
 
       // Aba Animais Vendidos
       if (animaisVendidos.length > 0) {
-        const animaisVendidosSheet = workbook.addWorksheet('ðÅ¸â€™° Animais Vendidos', {
+        const animaisVendidosSheet = workbook.addWorksheet('💰 Animais Vendidos', {
           pageSetup: {
             paperSize: 9,
             orientation: 'landscape',
@@ -559,12 +559,12 @@ export default function RelatorioFiscal() {
         animaisVendidosSheet.columns = [
           { header: 'NF', key: 'numeroNF', width: 12 },
           { header: 'Data NF', key: 'dataNF', width: 12 },
-          { header: 'IdentificaÃ§Ã£o', key: 'identificacao', width: 20 },
+          { header: 'Identificação', key: 'identificacao', width: 20 },
           { header: 'Sexo', key: 'sexo', width: 10 },
-          { header: 'RaÃ§a', key: 'raca', width: 15 },
+          { header: 'Raça', key: 'raca', width: 15 },
           { header: 'Era', key: 'era', width: 10 },
           { header: 'Peso', key: 'peso', width: 12 },
-          { header: 'Valor UnitÃ¡rio', key: 'valorUnitario', width: 15 },
+          { header: 'Valor Unitário', key: 'valorUnitario', width: 15 },
           { header: 'Comprador', key: 'fornecedorDestino', width: 30 }
         ]
 
@@ -572,7 +572,7 @@ export default function RelatorioFiscal() {
           animaisVendidosSheet.addRow(animal)
         })
 
-        // Estilizar cabeÃ§alho
+        // Estilizar cabeçalho
         const vendidosHeaderRow = animaisVendidosSheet.getRow(1)
         vendidosHeaderRow.eachCell((cell) => {
           cell.fill = {
@@ -606,10 +606,10 @@ export default function RelatorioFiscal() {
       document.body.removeChild(link)
       window.URL.revokeObjectURL(url)
 
-      console.log('âÅ“â€¦ RelatÃ³rio Excel gerado com sucesso!')
+      console.log('✅ Relatório Excel gerado com sucesso!')
     } catch (error) {
-      console.error('â�Å’ Erro ao gerar relatÃ³rio Excel:', error)
-      alert('Erro ao gerar relatÃ³rio. Verifique o console para mais detalhes.')
+      console.error('❌ Erro ao gerar relatório Excel:', error)
+      alert('Erro ao gerar relatório. Verifique o console para mais detalhes.')
     } finally {
       setExportando(false)
     }
@@ -620,7 +620,7 @@ export default function RelatorioFiscal() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Carregando relatÃ³rio...</p>
+          <p className="text-gray-600 dark:text-gray-400">Carregando relatório...</p>
         </div>
       </div>
     )
@@ -632,9 +632,9 @@ export default function RelatorioFiscal() {
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <ChartBarIcon className="w-8 h-8 text-orange-600" />
-          RelatÃ³rio Fiscal
+          Relatório Fiscal
         </h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-2">AnÃ¡lise de entradas e saÃ­das (vendas)</p>
+        <p className="text-gray-500 dark:text-gray-400 mt-2">Análise de entradas e saídas (vendas)</p>
       </div>
 
       {/* Filtros */}
@@ -643,7 +643,7 @@ export default function RelatorioFiscal() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Data InÃ­cio
+              Data Início
             </label>
             <input
               type="date"
@@ -676,7 +676,7 @@ export default function RelatorioFiscal() {
             >
               <option value="todos">Todos</option>
               <option value="entrada">Entradas</option>
-              <option value="saida">SaÃ­das (Vendas)</option>
+              <option value="saida">Saídas (Vendas)</option>
             </select>
           </div>
 
@@ -694,7 +694,7 @@ export default function RelatorioFiscal() {
               className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               <DocumentArrowDownIcon className="h-5 w-5" />
-              {exportando ? 'Gerando...' : 'Gerar RelatÃ³rio Excel'}
+              {exportando ? 'Gerando...' : 'Gerar Relatório Excel'}
             </button>
           </div>
         </div>
@@ -723,7 +723,7 @@ export default function RelatorioFiscal() {
               <ArrowUpIcon className="w-6 h-6 text-blue-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">SaÃ­das (Vendas)</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Saídas (Vendas)</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
                 R$ {resumo.totalSaidas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </p>
@@ -743,7 +743,7 @@ export default function RelatorioFiscal() {
                 R$ {resumo.saldo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </p>
               <p className="text-xs text-gray-500">
-                {resumo.saldo >= 0 ? 'Lucro' : 'PrejuÃ­zo'}
+                {resumo.saldo >= 0 ? 'Lucro' : 'Prejuízo'}
               </p>
             </div>
           </div>
@@ -759,7 +759,7 @@ export default function RelatorioFiscal() {
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
                 {notasFiltradas.length}
               </p>
-              <p className="text-xs text-gray-500">No perÃ­odo</p>
+              <p className="text-xs text-gray-500">No período</p>
             </div>
           </div>
         </div>
@@ -769,7 +769,7 @@ export default function RelatorioFiscal() {
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Notas Fiscais do PerÃ­odo
+            Notas Fiscais do Período
           </h2>
         </div>
 
@@ -785,11 +785,11 @@ export default function RelatorioFiscal() {
               Nenhuma nota fiscal encontrada
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Ajuste os filtros ou verifique se hÃ¡ notas fiscais cadastradas
+              Ajuste os filtros ou verifique se há notas fiscais cadastradas
             </p>
             {notasFiscais.length > 0 && (
               <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
-                Total de notas no sistema: {notasFiscais.length} (fora do perÃ­odo filtrado)
+                Total de notas no sistema: {notasFiscais.length} (fora do período filtrado)
               </p>
             )}
           </div>
@@ -799,7 +799,7 @@ export default function RelatorioFiscal() {
               <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    NÃºmero
+                    Número
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Tipo
@@ -833,7 +833,7 @@ export default function RelatorioFiscal() {
                           ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                           : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
                       }`}>
-                        {nota.tipo === 'entrada' ? 'Entrada' : 'SaÃ­da (Venda)'}
+                        {nota.tipo === 'entrada' ? 'Entrada' : 'Saída (Venda)'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
@@ -855,16 +855,16 @@ export default function RelatorioFiscal() {
         )}
       </div>
 
-      {/* InformaÃ§Ãµes adicionais */}
+      {/* Informações adicionais */}
       <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg">
         <h3 className="font-medium text-orange-900 dark:text-orange-200 mb-2">
-          ðÅ¸â€œÅ  Sobre este RelatÃ³rio
+          📊 Sobre este Relatório
         </h3>
         <ul className="text-sm text-orange-800 dark:text-orange-300 space-y-1">
-          <li>ââ‚¬¢ <strong>Entradas:</strong> Compras e aquisiÃ§Ãµes registradas via notas fiscais</li>
-          <li>ââ‚¬¢ <strong>SaÃ­das (Vendas):</strong> Vendas e transferÃªncias registradas como notas fiscais de saÃ­da</li>
-          <li>ââ‚¬¢ <strong>Saldo:</strong> DiferenÃ§a entre vendas e compras (receita lÃ­quida)</li>
-          <li>ââ‚¬¢ <strong>PerÃ­odo:</strong> Baseado na data de emissÃ£o das notas fiscais</li>
+          <li>• <strong>Entradas:</strong> Compras e aquisições registradas via notas fiscais</li>
+          <li>• <strong>Saídas (Vendas):</strong> Vendas e transferências registradas como notas fiscais de saída</li>
+          <li>• <strong>Saldo:</strong> Diferença entre vendas e compras (receita líquida)</li>
+          <li>• <strong>Período:</strong> Baseado na data de emissão das notas fiscais</li>
         </ul>
       </div>
 
@@ -901,11 +901,11 @@ export default function RelatorioFiscal() {
                   </div>
                 ) : nfDetalhes ? (
                   <div className="space-y-6">
-                    {/* InformaÃ§Ãµes Gerais */}
+                    {/* Informações Gerais */}
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                          NÃºmero da NF
+                          Número da NF
                         </label>
                         <p className="text-lg font-semibold text-gray-900 dark:text-white">
                           {nfDetalhes.numero_nf || nfDetalhes.numeroNF}
@@ -928,7 +928,7 @@ export default function RelatorioFiscal() {
                             ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                             : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
                         }`}>
-                          {nfDetalhes.tipo === 'entrada' ? 'Entrada' : 'SaÃ­da (Venda)'}
+                          {nfDetalhes.tipo === 'entrada' ? 'Entrada' : 'Saída (Venda)'}
                         </span>
                       </div>
                       <div>
@@ -944,7 +944,7 @@ export default function RelatorioFiscal() {
                           {nfDetalhes.tipo === 'entrada' ? 'Fornecedor' : 'Destino/Comprador'}
                         </label>
                         <p className="text-base text-gray-900 dark:text-white">
-                          {nfDetalhes.fornecedor || nfDetalhes.destino || 'NÃ£o informado'}
+                          {nfDetalhes.fornecedor || nfDetalhes.destino || 'Não informado'}
                         </p>
                       </div>
                       {nfDetalhes.cnpj_origem_destino && (
@@ -960,7 +960,7 @@ export default function RelatorioFiscal() {
                       {nfDetalhes.natureza_operacao && (
                         <div className="col-span-2">
                           <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                            Natureza da OperaÃ§Ã£o
+                            Natureza da Operação
                           </label>
                           <p className="text-base text-gray-900 dark:text-white">
                             {nfDetalhes.natureza_operacao}
@@ -970,7 +970,7 @@ export default function RelatorioFiscal() {
                       {nfDetalhes.observacoes && (
                         <div className="col-span-2">
                           <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                            ObservaÃ§Ãµes
+                            Observações
                           </label>
                           <p className="text-base text-gray-900 dark:text-white whitespace-pre-wrap">
                             {nfDetalhes.observacoes}
@@ -993,20 +993,20 @@ export default function RelatorioFiscal() {
                           return itensBovinos.length > 0 ? (
                             <div className="mb-4">
                               <h5 className="text-md font-medium text-gray-900 dark:text-white mb-2">
-                                ðÅ¸�â€š Animais {nfDetalhes.tipo === 'entrada' ? 'Comprados' : 'Vendidos'} ({itensBovinos.length})
+                                🐂 Animais {nfDetalhes.tipo === 'entrada' ? 'Comprados' : 'Vendidos'} ({itensBovinos.length})
                               </h5>
                               <div className="overflow-x-auto">
                                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                   <thead className="bg-gray-50 dark:bg-gray-700">
                                     <tr>
                                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                                        IdentificaÃ§Ã£o
+                                        Identificação
                                       </th>
                                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                                         Sexo
                                       </th>
                                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                                        RaÃ§a
+                                        Raça
                                       </th>
                                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                                         Era
@@ -1015,7 +1015,7 @@ export default function RelatorioFiscal() {
                                         Peso
                                       </th>
                                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                                        Valor UnitÃ¡rio
+                                        Valor Unitário
                                       </th>
                                     </tr>
                                   </thead>
@@ -1026,7 +1026,7 @@ export default function RelatorioFiscal() {
                                           {item.tatuagem || item.identificacao || `${item.serie || ''} ${item.rg || ''}`.trim() || 'N/A'}
                                         </td>
                                         <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                          {item.sexo === 'macho' || item.sexo === 'M' ? 'Macho' : item.sexo === 'femea' || item.sexo === 'F' ? 'FÃªmea' : item.sexo || 'N/A'}
+                                          {item.sexo === 'macho' || item.sexo === 'M' ? 'Macho' : item.sexo === 'femea' || item.sexo === 'F' ? 'Fêmea' : item.sexo || 'N/A'}
                                         </td>
                                         <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
                                           {item.raca || 'N/A'}
@@ -1049,7 +1049,7 @@ export default function RelatorioFiscal() {
                           ) : null
                         })()}
 
-                        {/* Outros itens (sÃªmen, embriÃµes) */}
+                        {/* Outros itens (sêmen, embriões) */}
                         {nfDetalhes.itens.filter(item => (item.tipoProduto !== 'bovino' && item.tipo_produto !== 'bovino')).length > 0 && (
                           <div>
                             <h5 className="text-md font-medium text-gray-900 dark:text-white mb-2">

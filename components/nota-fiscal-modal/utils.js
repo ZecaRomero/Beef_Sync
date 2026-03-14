@@ -1,14 +1,14 @@
 
-// FunÃ§Ã£o auxiliar para normalizar data para formato YYYY-MM-DD (formato do input date)
+// Função auxiliar para normalizar data para formato YYYY-MM-DD (formato do input date)
 export const normalizarDataParaInput = (data) => {
   if (!data) return ''
   
-  // Se jÃ¡ estÃ¡ no formato YYYY-MM-DD, retornar como estÃ¡
+  // Se já está no formato YYYY-MM-DD, retornar como está
   if (typeof data === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(data)) {
     return data
   }
   
-  // Se estÃ¡ no formato DD/MM/YYYY, converter para YYYY-MM-DD
+  // Se está no formato DD/MM/YYYY, converter para YYYY-MM-DD
   if (typeof data === 'string' && data.includes('/')) {
     const [dia, mes, ano] = data.split('/')
     if (dia && mes && ano) {
@@ -31,7 +31,7 @@ export const normalizarDataParaInput = (data) => {
   return ''
 }
 
-// FunÃ§Ã£o para formatar valor no input
+// Função para formatar valor no input
 export const formatCurrencyInput = (value) => {
   if (!value) return ''
   const cleaned = value.toString().replace(/[^\d,]/g, '')
@@ -42,43 +42,43 @@ export const formatCurrencyInput = (value) => {
   return cleaned
 }
 
-// FunÃ§Ã£o para converter valor formatado para nÃºmero (formato brasileiro)
+// Função para converter valor formatado para número (formato brasileiro)
 export const parseCurrencyValue = (value) => {
   if (!value) return 0
   if (typeof value === 'number') return value
   
   const str = value.toString().trim()
   
-  // Se jÃ¡ for nÃºmero puro, retornar
+  // Se já for número puro, retornar
   if (!isNaN(str) && !str.includes(',') && !str.includes('.')) {
     return parseFloat(str) || 0
   }
   
-  // Formato brasileiro: ponto Ã© milhar, vÃ­rgula Ã© decimal
+  // Formato brasileiro: ponto é milhar, vírgula é decimal
   // Exemplo: "10.808,00" = 10808.00 ou "10,81" = 10.81
   let cleaned = str.replace(/[^\d,.-]/g, '')
   
-  // Se tem vÃ­rgula, ela SEMPRE Ã© o separador decimal no formato brasileiro
+  // Se tem vírgula, ela SEMPRE é o separador decimal no formato brasileiro
   if (cleaned.includes(',')) {
-    // Remover TODOS os pontos (separadores de milhar) e substituir vÃ­rgula por ponto
+    // Remover TODOS os pontos (separadores de milhar) e substituir vírgula por ponto
     cleaned = cleaned.replace(/\./g, '').replace(',', '.')
   } else if (cleaned.includes('.')) {
-    // Se sÃ³ tem ponto, verificar se Ã© separador de milhar ou decimal
+    // Se só tem ponto, verificar se é separador de milhar ou decimal
     const parts = cleaned.split('.')
     if (parts.length > 1) {
-      // Se a Ãºltima parte tem 2 ou menos dÃ­gitos, Ã© decimal
+      // Se a última parte tem 2 ou menos dígitos, é decimal
       if (parts[parts.length - 1].length <= 2) {
-        // ÃÅ¡ltimo ponto Ã© decimal, remover os outros pontos (milhares)
+        // Último ponto é decimal, remover os outros pontos (milhares)
         cleaned = parts.slice(0, -1).join('') + '.' + parts[parts.length - 1]
       } else {
-        // Todos os pontos sÃ£o separadores de milhar
+        // Todos os pontos são separadores de milhar
         cleaned = cleaned.replace(/\./g, '')
       }
     }
   }
   
   const resultado = parseFloat(cleaned) || 0
-  // Garantir que nÃ£o hÃ¡ problemas de precisÃ£o
+  // Garantir que não há problemas de precisão
   return Math.round(resultado * 100) / 100
 }
 

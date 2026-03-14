@@ -15,7 +15,7 @@ async function fixConstraint() {
   const client = await pool.connect()
   
   try {
-    console.log('�Ÿ”� Verificando constraints da tabela localizacoes_animais...\n')
+    console.log('🔍 Verificando constraints da tabela localizacoes_animais...\n')
     
     // Verificar constraints existentes
     const constraints = await client.query(`
@@ -41,18 +41,18 @@ async function fixConstraint() {
     )
     
     if (problematicConstraint) {
-      console.log('�Œ Encontrada constraint UNIQUE incorreta em animal_id!')
+      console.log('❌ Encontrada constraint UNIQUE incorreta em animal_id!')
       console.log('   Esta constraint impede que um animal tenha múltiplas localizações.\n')
       
-      console.log('�Ÿ”� Removendo constraint...')
+      console.log('🔧 Removendo constraint...')
       await client.query(`
         ALTER TABLE localizacoes_animais 
         DROP CONSTRAINT IF EXISTS localizacoes_animais_animal_id_key
       `)
-      console.log('�œ… Constraint removida com sucesso!\n')
+      console.log('✅ Constraint removida com sucesso!\n')
       
       // Verificar se há registros duplicados que precisam ser corrigidos
-      console.log('�Ÿ”� Verificando registros duplicados...')
+      console.log('🔍 Verificando registros duplicados...')
       const duplicates = await client.query(`
         SELECT animal_id, COUNT(*) as count
         FROM localizacoes_animais
@@ -62,21 +62,21 @@ async function fixConstraint() {
       `)
       
       if (duplicates.rows.length > 0) {
-        console.log(`�š�️  Encontrados ${duplicates.rows.length} animais com múltiplas localizações ativas:`)
+        console.log(`⚠️  Encontrados ${duplicates.rows.length} animais com múltiplas localizações ativas:`)
         duplicates.rows.forEach(row => {
           console.log(`   - Animal ID ${row.animal_id}: ${row.count} localizações ativas`)
         })
-        console.log('\n�Ÿ’� Recomendação: Verifique manualmente e finalize as localizações antigas.')
+        console.log('\n💡 Recomendação: Verifique manualmente e finalize as localizações antigas.')
       } else {
-        console.log('�œ… Nenhum registro duplicado encontrado.\n')
+        console.log('✅ Nenhum registro duplicado encontrado.\n')
       }
       
     } else {
-      console.log('�œ… Constraint UNIQUE em animal_id não existe (correto!).\n')
+      console.log('✅ Constraint UNIQUE em animal_id não existe (correto!).\n')
     }
     
     // Verificar índices
-    console.log('�Ÿ”� Verificando índices...')
+    console.log('🔍 Verificando índices...')
     const indexes = await client.query(`
       SELECT 
         indexname,
@@ -94,24 +94,24 @@ async function fixConstraint() {
     console.log()
     
     // Criar índice útil se não existir
-    console.log('�Ÿ”� Criando índices úteis...')
+    console.log('🔧 Criando índices úteis...')
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_localizacoes_animal_ativo 
       ON localizacoes_animais(animal_id) 
       WHERE data_saida IS NULL
     `)
-    console.log('�œ… Índice para localizações ativas criado.\n')
+    console.log('✅ Índice para localizações ativas criado.\n')
     
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_localizacoes_piquete 
       ON localizacoes_animais(piquete)
     `)
-    console.log('�œ… Índice para piquetes criado.\n')
+    console.log('✅ Índice para piquetes criado.\n')
     
-    console.log('�œ… Correção concluída com sucesso!')
+    console.log('✅ Correção concluída com sucesso!')
     
   } catch (error) {
-    console.error('�Œ Erro ao corrigir constraints:', error)
+    console.error('❌ Erro ao corrigir constraints:', error)
     throw error
   } finally {
     client.release()
@@ -121,10 +121,10 @@ async function fixConstraint() {
 
 fixConstraint()
   .then(() => {
-    console.log('\n�œ… Script finalizado.')
+    console.log('\n✅ Script finalizado.')
     process.exit(0)
   })
   .catch(error => {
-    console.error('\n�Œ Erro fatal:', error)
+    console.error('\n❌ Erro fatal:', error)
     process.exit(1)
   })

@@ -1,11 +1,11 @@
 /**
  * Tipos TypeScript centralizados para o Beef Sync
- * Sistema de gestÃ£o pecuÃ¡ria
+ * Sistema de gestão pecuária
  */
 
 // ============ TIPOS BASE ============
 
-export type Sexo = 'Macho' | 'FÃªmea';
+export type Sexo = 'Macho' | 'Fêmea';
 export type Situacao = 'Ativo' | 'Vendido' | 'Morto' | 'Transferido';
 export type TipoOperacao = 'entrada' | 'saida' | 'uso';
 export type StatusSemen = 'disponivel' | 'esgotado' | 'vencido';
@@ -14,8 +14,8 @@ export type TipoProduto = 'bovino' | 'semen' | 'embriao';
 export type StatusProtocolo = 'em_andamento' | 'concluido' | 'cancelado';
 export type TipoNotificacao = 'nascimento' | 'estoque' | 'gestacao' | 'saude' | 'financeiro' | 'sistema';
 export type PrioridadeNotificacao = 'low' | 'medium' | 'high';
-export type TipoServico = 'VacinaÃ§Ã£o' | 'ReproduÃ§Ã£o' | 'Tratamento' | 'ManutenÃ§Ã£o' | 'Outro';
-export type StatusServico = 'Ativo' | 'ConcluÃ­do' | 'Pendente' | 'Cancelado';
+export type TipoServico = 'Vacinação' | 'Reprodução' | 'Tratamento' | 'Manutenção' | 'Outro';
+export type StatusServico = 'Ativo' | 'Concluído' | 'Pendente' | 'Cancelado';
 
 // ============ INTERFACES DE ENTIDADES ============
 
@@ -204,7 +204,7 @@ export interface ProtocoloReprodutivo {
   id?: number;
   nome: string;
   descricao?: string;
-  tipo: 'IATF' | 'SincronizaÃ§Ã£o' | 'TE' | 'Outro';
+  tipo: 'IATF' | 'Sincronização' | 'TE' | 'Outro';
   duracao_dias?: number;
   medicamentos?: Record<string, any>;
   observacoes?: string;
@@ -265,7 +265,7 @@ export interface SemenFilter {
   vencido?: boolean;
 }
 
-// ============ TIPOS DE ESTATÃ�STICAS ============
+// ============ TIPOS DE ESTATÍSTICAS ============
 
 export interface DashboardStats {
   totalAnimals: number;
@@ -328,7 +328,7 @@ export interface ToastContextType {
   info: (message: string, duration?: number) => number;
 }
 
-// ============ TIPOS DE CONFIGURAÃâ€¡ÃÆ’O ============
+// ============ TIPOS DE CONFIGURAÇÃO ============
 
 export interface DatabaseConfig {
   host: string;
@@ -344,11 +344,11 @@ export interface DatabaseConfig {
 
 export interface CacheConfig {
   ttl: number; // Time to live em milissegundos
-  maxSize: number; // Tamanho mÃ¡ximo do cache
+  maxSize: number; // Tamanho máximo do cache
   strategy: 'LRU' | 'LFU' | 'FIFO';
 }
 
-// ============ TIPOS UTILITÃ�RIOS ============
+// ============ TIPOS UTILITÁRIOS ============
 
 export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 export type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>;
@@ -356,17 +356,17 @@ export type DeepPartial<T> = T extends object ? {
   [P in keyof T]?: DeepPartial<T[P]>;
 } : T;
 
-// ============ TIPOS DE FORMULÃ�RIOS ============
+// ============ TIPOS DE FORMULÁRIOS ============
 
 export interface AnimalFormData extends Omit<Animal, 'id' | 'created_at' | 'updated_at'> {
-  // Campos adicionais especÃ­ficos do formulÃ¡rio se necessÃ¡rio
+  // Campos adicionais específicos do formulário se necessário
 }
 
 export interface CustoFormData extends Omit<Custo, 'id' | 'created_at' | 'data_registro'> {
-  // Campos adicionais especÃ­ficos do formulÃ¡rio se necessÃ¡rio
+  // Campos adicionais específicos do formulário se necessário
 }
 
-// ============ TIPOS DE VALIDAÃâ€¡ÃÆ’O ============
+// ============ TIPOS DE VALIDAÇÃO ============
 
 export interface ValidationError {
   field: string;
@@ -398,7 +398,7 @@ export interface UseFetchResult<T = any> {
   refetch: () => Promise<void>;
 }
 
-// ============ TIPOS DE EXPORTAÃâ€¡ÃÆ’O ============
+// ============ TIPOS DE EXPORTAÇÃO ============
 
 export interface ExportOptions {
   format: 'excel' | 'pdf' | 'csv';

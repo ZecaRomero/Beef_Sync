@@ -42,7 +42,7 @@ async function criarReceptoras() {
     await client.query(`
       SELECT setval('animais_id_seq', COALESCE((SELECT MAX(id) FROM animais), 1))
     `);
-    console.log('�œ… Sequência de IDs corrigida\n');
+    console.log('✅ Sequência de IDs corrigida\n');
     
     // Buscar dados da NF
     const nfResult = await client.query(`
@@ -50,12 +50,12 @@ async function criarReceptoras() {
     `);
     
     if (nfResult.rows.length === 0) {
-      console.log('�Œ NF #2141 não encontrada!');
+      console.log('❌ NF #2141 não encontrada!');
       return;
     }
     
     const nf = nfResult.rows[0];
-    console.log(`�œ… NF encontrada: ${nf.numero_nf}`);
+    console.log(`✅ NF encontrada: ${nf.numero_nf}`);
     console.log(`Fornecedor: ${nf.fornecedor}`);
     console.log(`Data de chegada: ${nf.data_chegada_animais}`);
     console.log(`Data de TE: ${nf.data_te}`);
@@ -82,7 +82,7 @@ async function criarReceptoras() {
       `, [serie, rg]);
       
       if (existente.rows.length > 0) {
-        console.log(`�š�️  ${serie} já existe (ID: ${existente.rows[0].id})`);
+        console.log(`⚠️  ${serie} já existe (ID: ${existente.rows[0].id})`);
         jaExistiam++;
         
         // Atualizar data_chegada e data_dg_prevista
@@ -135,7 +135,7 @@ async function criarReceptoras() {
       ]);
       
       const animalId = result.rows[0].id;
-      console.log(`�œ… ${serie} criada (ID: ${animalId})`);
+      console.log(`✅ ${serie} criada (ID: ${animalId})`);
       criadas++;
       
       // Criar registro de TE
@@ -159,19 +159,19 @@ async function criarReceptoras() {
           `NF: ${nf.numero_nf} - DG agendado para ${dataDGFormatada}`,
           nf.numero_nf
         ]);
-        console.log(`   �Ÿ“… TE registrada para ${serie}`);
+        console.log(`   📅 TE registrada para ${serie}`);
       } catch (error) {
-        console.log(`   �š�️  Erro ao criar TE: ${error.message}`);
+        console.log(`   ⚠️  Erro ao criar TE: ${error.message}`);
       }
     }
     
     console.log(`\n=== RESUMO ===`);
-    console.log(`�œ… Receptoras criadas: ${criadas}`);
-    console.log(`�š�️  Já existiam: ${jaExistiam}`);
-    console.log(`�Ÿ“Š Total: ${receptoras.length}`);
+    console.log(`✅ Receptoras criadas: ${criadas}`);
+    console.log(`⚠️  Já existiam: ${jaExistiam}`);
+    console.log(`📊 Total: ${receptoras.length}`);
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
     console.error(error.stack);
   } finally {
     client.release();

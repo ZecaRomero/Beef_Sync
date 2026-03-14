@@ -24,7 +24,7 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
 
   useEffect(() => {
     if (isOpen) {
-      // Tentar inicializar piquetes se necessÃ¡rio
+      // Tentar inicializar piquetes se necessário
       inicializarPiquetes()
       carregarPiquetes()
       carregarAnimais()
@@ -38,38 +38,38 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
         method: 'POST'
       })
       if (response.ok) {
-        console.log('âÅ“â€¦ Piquetes inicializados com sucesso')
+        console.log('✅ Piquetes inicializados com sucesso')
       }
     } catch (error) {
-      console.warn('âÅ¡ ï¸� Erro ao inicializar piquetes (continuando...):', error)
-      // NÃ£o bloquear se falhar
+      console.warn('⚠️ Erro ao inicializar piquetes (continuando...):', error)
+      // Não bloquear se falhar
     }
   }
 
   const carregarPiquetes = async () => {
     setLoadingPiquetes(true)
     try {
-      console.log('ðÅ¸â€�â€ž Buscando piquetes...')
+      console.log('🔄 Buscando piquetes...')
       const response = await fetch('/api/localizacoes/piquetes')
-      console.log('ðÅ¸â€œ¡ Response status:', response.status)
+      console.log('📡 Response status:', response.status)
       
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
       
       const result = await response.json()
-      console.log('ðÅ¸â€œ¦ Resultado da API:', result)
+      console.log('📦 Resultado da API:', result)
       
       if (result.status === 'success' && result.data) {
         const piquetesList = result.data.piquetes || []
-        console.log('âÅ“â€¦ Piquetes encontrados:', piquetesList)
+        console.log('✅ Piquetes encontrados:', piquetesList)
         setPiquetes(piquetesList)
       } else {
-        console.warn('âÅ¡ ï¸� Formato de resposta inesperado:', result)
+        console.warn('⚠️ Formato de resposta inesperado:', result)
         setPiquetes([])
       }
     } catch (error) {
-      console.error('â�Å’ Erro ao carregar piquetes:', error)
+      console.error('❌ Erro ao carregar piquetes:', error)
       setError(`Erro ao carregar piquetes: ${error.message}`)
       setPiquetes([])
     } finally {
@@ -96,7 +96,7 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
 
   const adicionarAnimal = (animal) => {
     if (animaisSelecionados.find(a => a.id === animal.id)) {
-      return // JÃ¡ estÃ¡ adicionado
+      return // Já está adicionado
     }
 
     const animalComDados = {
@@ -114,17 +114,17 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
   const adicionarPorNumero = async () => {
     if (!numeroAnimal.trim()) return
 
-    // Separar por vÃ­rgula, quebra de linha, ponto e vÃ­rgula ou mÃºltiplos espaÃ§os
-    // Remover linhas vazias e espaÃ§os extras
+    // Separar por vírgula, quebra de linha, ponto e vírgula ou múltiplos espaços
+    // Remover linhas vazias e espaços extras
     const numeros = numeroAnimal
-      .split(/[,\n;]+|\s{2,}/) // Separar por vÃ­rgula, quebra de linha, ponto e vÃ­rgula ou mÃºltiplos espaÃ§os
+      .split(/[,\n;]+|\s{2,}/) // Separar por vírgula, quebra de linha, ponto e vírgula ou múltiplos espaços
       .map(n => n.trim())
       .filter(n => n && n.length > 0) // Remover strings vazias
     
-    console.log('ðÅ¸â€œ� NÃºmeros extraÃ­dos:', numeros)
+    console.log('📝 Números extraídos:', numeros)
     
     if (numeros.length === 0) {
-      setError('Digite pelo menos um nÃºmero de animal')
+      setError('Digite pelo menos um número de animal')
       return
     }
 
@@ -132,14 +132,14 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
     let encontrados = 0
     let naoEncontrados = []
 
-    // FunÃ§Ã£o auxiliar para buscar um animal com mÃºltiplas estratÃ©gias
+    // Função auxiliar para buscar um animal com múltiplas estratégias
     const buscarAnimalCompleto = async (numero) => {
-      // Extrair sÃ©rie e RG da entrada
+      // Extrair série e RG da entrada
       // Formato esperado: "CJCJ-16942" ou "CJCJ 16942" ou "CJCJ16942"
       let serie = ''
       let rg = ''
       
-      // Tentar separar por hÃ­fen primeiro
+      // Tentar separar por hífen primeiro
       if (numero.includes('-')) {
         const partes = numero.split('-').map(s => s.trim())
         if (partes.length >= 2) {
@@ -147,13 +147,13 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
           rg = partes.slice(1).join('-').trim()
         }
       } else {
-        // Tentar separar por espaÃ§o
+        // Tentar separar por espaço
         const partes = numero.trim().split(/\s+/).filter(Boolean)
         if (partes.length >= 2) {
           serie = partes[0].toUpperCase()
           rg = partes.slice(1).join(' ').trim()
         } else {
-          // Tentar extrair sÃ©rie do inÃ­cio (2-5 letras) e o resto Ã© RG
+          // Tentar extrair série do início (2-5 letras) e o resto é RG
           const match = numero.match(/^([A-Z]{2,5})(\d+.*)$/i)
           if (match) {
             serie = match[1].toUpperCase()
@@ -163,16 +163,16 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
       }
 
       if (!serie || !rg) {
-        console.log('â�Å’ NÃ£o foi possÃ­vel extrair sÃ©rie e RG de:', numero)
+        console.log('❌ Não foi possível extrair série e RG de:', numero)
         return null
       }
 
-      console.log('ðÅ¸â€�� Buscando animal:', { serie, rg, numero })
+      console.log('🔍 Buscando animal:', { serie, rg, numero })
 
-      // Tentar mÃºltiplas estratÃ©gias de busca
+      // Tentar múltiplas estratégias de busca
       let animais = []
       
-      // EstratÃ©gia 1: Busca exata com sÃ©rie e RG
+      // Estratégia 1: Busca exata com série e RG
       if (serie && rg) {
         const params1 = new URLSearchParams()
         params1.append('serie', serie)
@@ -183,14 +183,14 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
           if (response1.ok) {
             const data1 = await response1.json()
             animais = data1.data || []
-            console.log('ðÅ¸â€œÅ  Busca exata (serie + rg):', animais.length, 'resultados')
+            console.log('📊 Busca exata (serie + rg):', animais.length, 'resultados')
           }
         } catch (err) {
           console.error('Erro na busca exata:', err)
         }
       }
       
-      // EstratÃ©gia 2: Se nÃ£o encontrou, tentar sÃ³ com sÃ©rie e filtrar por RG
+      // Estratégia 2: Se não encontrou, tentar só com série e filtrar por RG
       if (animais.length === 0 && serie) {
         const params2 = new URLSearchParams()
         params2.append('serie', serie)
@@ -200,14 +200,14 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
           if (response2.ok) {
             const data2 = await response2.json()
             const animaisPorSerie = data2.data || []
-            console.log('ðÅ¸â€œÅ  Busca por sÃ©rie:', animaisPorSerie.length, 'resultados')
+            console.log('📊 Busca por série:', animaisPorSerie.length, 'resultados')
             
             // Filtrar pelo RG se tiver
             if (rg) {
               animais = animaisPorSerie.filter(a => {
                 const rgAnimal = a.rg?.toString().trim()
                 const rgBuscado = rg.toString().trim()
-                // Tentar comparaÃ§Ã£o numÃ©rica tambÃ©m
+                // Tentar comparação numérica também
                 const rgAnimalNum = parseInt(rgAnimal)
                 const rgBuscadoNum = parseInt(rgBuscado)
                 
@@ -216,17 +216,17 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
                        rgAnimal?.endsWith(rgBuscado) ||
                        rgBuscado?.endsWith(rgAnimal)
               })
-              console.log('ðÅ¸â€œÅ  ApÃ³s filtrar por RG:', animais.length, 'resultados')
+              console.log('📊 Após filtrar por RG:', animais.length, 'resultados')
             } else {
               animais = animaisPorSerie
             }
           }
         } catch (err) {
-          console.error('Erro na busca por sÃ©rie:', err)
+          console.error('Erro na busca por série:', err)
         }
       }
       
-      // EstratÃ©gia 3: Se ainda nÃ£o encontrou e tem RG, tentar sÃ³ com RG (buscando em todas as sÃ©ries)
+      // Estratégia 3: Se ainda não encontrou e tem RG, tentar só com RG (buscando em todas as séries)
       if (animais.length === 0 && rg) {
         const params3 = new URLSearchParams()
         params3.append('rg', rg)
@@ -236,14 +236,14 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
           if (response3.ok) {
             const data3 = await response3.json()
             const animaisPorRG = data3.data || []
-            console.log('ðÅ¸â€œÅ  Busca por RG:', animaisPorRG.length, 'resultados')
+            console.log('📊 Busca por RG:', animaisPorRG.length, 'resultados')
             
-            // Se sÃ©rie foi fornecida, filtrar por ela
+            // Se série foi fornecida, filtrar por ela
             if (serie) {
               animais = animaisPorRG.filter(a => 
                 a.serie?.toUpperCase().trim() === serie.toUpperCase().trim()
               )
-              console.log('ðÅ¸â€œÅ  ApÃ³s filtrar por sÃ©rie:', animais.length, 'resultados')
+              console.log('📊 Após filtrar por série:', animais.length, 'resultados')
             } else {
               animais = animaisPorRG
             }
@@ -255,11 +255,11 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
       
       // Se encontrou exatamente um animal, retornar
       if (animais.length === 1) {
-        console.log('âÅ“â€¦ Animal encontrado:', animais[0].serie, animais[0].rg)
+        console.log('✅ Animal encontrado:', animais[0].serie, animais[0].rg)
         return animais[0]
       }
       
-      // Se encontrou mÃºltiplos, tentar filtrar pelo RG completo se tiver
+      // Se encontrou múltiplos, tentar filtrar pelo RG completo se tiver
       if (rg && animais.length > 1) {
         const animalExato = animais.find(a => {
           const rgAnimal = a.rg?.toString().trim()
@@ -268,22 +268,22 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
                  parseInt(rgAnimal) === parseInt(rgBuscado)
         })
         if (animalExato) {
-          console.log('âÅ“â€¦ Animal exato encontrado:', animalExato.serie, animalExato.rg)
+          console.log('✅ Animal exato encontrado:', animalExato.serie, animalExato.rg)
           return animalExato
         }
       }
       
       // Se encontrou algum, retornar o primeiro
       if (animais.length > 0) {
-        console.log('âÅ¡ ï¸� MÃºltiplos animais encontrados, retornando o primeiro:', animais[0].serie, animais[0].rg)
+        console.log('⚠️ Múltiplos animais encontrados, retornando o primeiro:', animais[0].serie, animais[0].rg)
         return animais[0]
       }
       
-      console.log('â�Å’ Nenhum animal encontrado para:', { serie, rg, numero })
+      console.log('❌ Nenhum animal encontrado para:', { serie, rg, numero })
       return null
     }
 
-    // Processar cada nÃºmero - usar funÃ§Ã£o de atualizaÃ§Ã£o de estado para evitar problemas de closure
+    // Processar cada número - usar função de atualização de estado para evitar problemas de closure
     const novosAnimais = []
     const idsExistentes = new Set(animaisSelecionados.map(a => a.id))
     
@@ -292,7 +292,7 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
         const animal = await buscarAnimalCompleto(numero)
         
         if (animal) {
-          // Verificar se jÃ¡ existe na lista atual ou nos novos animais
+          // Verificar se já existe na lista atual ou nos novos animais
           if (!idsExistentes.has(animal.id) && !novosAnimais.find(a => a.id === animal.id)) {
             const animalComDados = {
               ...animal,
@@ -303,9 +303,9 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
             novosAnimais.push(animalComDados)
             idsExistentes.add(animal.id) // Adicionar ao set para evitar duplicatas
             encontrados++
-            console.log('âÅ“â€¦ Animal adicionado Ã  lista:', animal.serie, animal.rg)
+            console.log('✅ Animal adicionado à lista:', animal.serie, animal.rg)
           } else {
-            console.log('ââ€ž¹ï¸� Animal jÃ¡ estÃ¡ na lista:', animal.serie, animal.rg)
+            console.log('ℹ️ Animal já está na lista:', animal.serie, animal.rg)
           }
         } else {
           naoEncontrados.push(numero)
@@ -330,7 +330,7 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
     setNumeroAnimal('')
 
     if (naoEncontrados.length > 0) {
-      setError(`NÃ£o encontrados: ${naoEncontrados.join(' ')}`)
+      setError(`Não encontrados: ${naoEncontrados.join(' ')}`)
     } else if (encontrados > 0) {
       setError('') // Limpar erro se houver sucesso
     }
@@ -338,7 +338,7 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
 
   const removerAnimal = (animalId) => {
     setAnimaisSelecionados(animaisSelecionados.filter(a => a.id !== animalId))
-    // Remover do conjunto de expandidos tambÃ©m
+    // Remover do conjunto de expandidos também
     const novosExpandidos = new Set(animaisExpandidos)
     novosExpandidos.delete(animalId)
     setAnimaisExpandidos(novosExpandidos)
@@ -362,7 +362,7 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
 
   const animaisFiltrados = animais
     .filter(animal => {
-      // Excluir animais jÃ¡ selecionados da lista de busca
+      // Excluir animais já selecionados da lista de busca
       if (animaisSelecionados.find(a => a.id === animal.id)) {
         return false
       }
@@ -371,13 +371,13 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
       
       const busca = buscaAnimal.toLowerCase().trim()
       
-      // Criar variaÃ§Ãµes para busca flexÃ­vel
+      // Criar variações para busca flexível
       const serieRgHifen = `${animal.serie}-${animal.rg}`.toLowerCase()
       const serieRgEspaco = `${animal.serie} ${animal.rg}`.toLowerCase()
       const serieRgJunto = `${animal.serie}${animal.rg}`.toLowerCase()
       const nome = (animal.nome || '').toLowerCase()
       
-      // Busca normalizada (remove espaÃ§os e hÃ­fens da busca)
+      // Busca normalizada (remove espaços e hífens da busca)
       const buscaNormalizada = busca.replace(/[-\s]/g, '')
       
       return serieRgHifen.includes(busca) || 
@@ -415,7 +415,7 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
     setError('')
 
     if (!piquete) {
-      setError('Piquete Ã© obrigatÃ³rio')
+      setError('Piquete é obrigatório')
       return
     }
 
@@ -429,7 +429,7 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
       setLoading(true)
       const salvo = await salvarNovoPiquete(novoPiquete)
       if (!salvo) {
-        setError('Erro ao salvar novo piquete, mas continuando com o lanÃ§amento...')
+        setError('Erro ao salvar novo piquete, mas continuando com o lançamento...')
         // Continuar mesmo se falhar
       }
     }
@@ -443,7 +443,7 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
 
       for (const animal of animaisSelecionados) {
         try {
-          // Criar ocorrÃªncia de local (sempre)
+          // Criar ocorrência de local (sempre)
           const responseLocal = await fetch('/api/ocorrencias/rapida', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -462,7 +462,7 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
             erros++
           }
 
-          // Adicionar peso se informado (cria ocorrÃªncia separada)
+          // Adicionar peso se informado (cria ocorrência separada)
           if (animal.peso) {
             const responsePeso = await fetch('/api/ocorrencias/rapida', {
               method: 'POST',
@@ -483,7 +483,7 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
             }
           }
 
-          // Adicionar CE se for macho e informado (cria ocorrÃªncia separada)
+          // Adicionar CE se for macho e informado (cria ocorrência separada)
           if (animal.sexo === 'Macho' && animal.ce) {
             const responseCE = await fetch('/api/ocorrencias/rapida', {
               method: 'POST',
@@ -510,7 +510,7 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
         }
       }
 
-      alert(`âÅ“â€¦ Processamento concluÃ­do!\nSucessos: ${sucessos}\nErros: ${erros}`)
+      alert(`✅ Processamento concluído!\nSucessos: ${sucessos}\nErros: ${erros}`)
       
       if (onSuccess) {
         onSuccess({ sucessos, erros })
@@ -542,7 +542,7 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
       <div className="p-6 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-            ðÅ¸�â€ž LanÃ§amento em Lote
+            🐄 Lançamento em Lote
           </h2>
           <button
             onClick={handleClose}
@@ -556,7 +556,7 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
           {/* Dados Comuns */}
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
             <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-3">
-              ðÅ¸â€œâ€¹ Dados Comuns a Todos os Animais
+              📋 Dados Comuns a Todos os Animais
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -619,7 +619,7 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
                           }}
                           className="text-sm text-blue-600 dark:text-blue-400 hover:underline mt-1"
                         >
-                          ââ€ � Voltar para seleÃ§Ã£o
+                          ← Voltar para seleção
                         </button>
                       </>
                     )}
@@ -633,7 +633,7 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
           <div className="space-y-3">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Adicionar Animais por NÃºmero (SÃ©rie-RG)
+                Adicionar Animais por Número (Série-RG)
               </label>
               <div className="space-y-2">
                 <textarea
@@ -642,7 +642,7 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
                     setNumeroAnimal(e.target.value)
                     setError('')
                   }}
-                  placeholder="Digite os nÃºmeros dos animais, um por linha ou separados por vÃ­rgula:&#10;CJCJ-17065&#10;CJCJ-17066&#10;CJCJ-17067&#10;&#10;Ou: CJCJ-17065, CJCJ-17066, CJCJ-17067"
+                  placeholder="Digite os números dos animais, um por linha ou separados por vírgula:&#10;CJCJ-17065&#10;CJCJ-17066&#10;CJCJ-17067&#10;&#10;Ou: CJCJ-17065, CJCJ-17066, CJCJ-17067"
                   rows={4}
                   className="input-field w-full font-mono text-sm"
                 />
@@ -661,7 +661,7 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
                   </Button>
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  ðÅ¸â€™¡ VocÃª pode colar uma lista de nÃºmeros (um por linha) ou separados por vÃ­rgula
+                  💡 Você pode colar uma lista de números (um por linha) ou separados por vírgula
                 </p>
               </div>
             </div>
@@ -676,13 +676,13 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
                   type="text"
                   value={buscaAnimal}
                   onChange={(e) => setBuscaAnimal(e.target.value)}
-                  placeholder="Buscar por nome ou nÃºmero..."
+                  placeholder="Buscar por nome ou número..."
                   className="input-field w-full pl-10"
                 />
               </div>
             </div>
 
-            {/* Lista de animais disponÃ­veis */}
+            {/* Lista de animais disponíveis */}
             {loadingAnimais && !buscaAnimal ? (
               <div className="text-center py-4 text-gray-500">
                 Carregando lista de animais...
@@ -708,7 +708,7 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
                             </span>
                           )}
                           <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
-                            {animal.sexo} ââ‚¬¢ {animal.raca}
+                            {animal.sexo} • {animal.raca}
                           </span>
                         </div>
                         <PlusIcon className="h-5 w-5 text-blue-500" />
@@ -723,7 +723,7 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
                 </div>
               ) : (
                 <div className="text-sm text-gray-500 dark:text-gray-400 italic">
-                  {buscaAnimal ? 'Nenhum animal encontrado.' : 'Nenhum animal disponÃ­vel para seleÃ§Ã£o.'}
+                  {buscaAnimal ? 'Nenhum animal encontrado.' : 'Nenhum animal disponível para seleção.'}
                 </div>
               )
             )}
@@ -768,7 +768,7 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
                           : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-2'
                       }`}
                     >
-                      {/* CabeÃ§alho do Animal - Sempre VisÃ­vel */}
+                      {/* Cabeçalho do Animal - Sempre Visível */}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3 flex-1">
                           <span className="text-xs font-mono text-gray-400 dark:text-gray-500 w-8">
@@ -794,7 +794,7 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
                                 </span>
                               )}
                               <span className="text-xs px-2 py-0.5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-                                {animal.sexo} ââ‚¬¢ {animal.raca}
+                                {animal.sexo} • {animal.raca}
                               </span>
                               {temDados && !estaExpandido && (
                                 <span className="text-xs text-blue-600 dark:text-blue-400">
@@ -829,7 +829,7 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
 
                             {animal.sexo === 'Macho' && (
                               <Input
-                                label="CE - CircunferÃªncia Escrotal (cm)"
+                                label="CE - Circunferência Escrotal (cm)"
                                 type="number"
                                 step="0.1"
                                 value={animal.ce || ''}
@@ -840,14 +840,14 @@ export default function BatchOccurrenceForm({ isOpen, onClose, onSuccess }) {
 
                             <div className={animal.sexo === 'Macho' ? '' : 'md:col-span-2'}>
                               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                ObservaÃ§Ãµes (opcional)
+                                Observações (opcional)
                               </label>
                               <textarea
                                 value={animal.observacoes || ''}
                                 onChange={(e) => atualizarDadosAnimal(animal.id, 'observacoes', e.target.value)}
                                 rows={2}
                                 className="input-field w-full"
-                                placeholder="ObservaÃ§Ãµes especÃ­ficas deste animal..."
+                                placeholder="Observações específicas deste animal..."
                               />
                             </div>
                           </div>

@@ -54,7 +54,7 @@ export default function MaintenanceOverlay() {
     const hostname = window.location.hostname
     const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1'
 
-    // Localhost nunca precisa buscar ââ‚¬â€� sempre liberado
+    // Localhost nunca precisa buscar — sempre liberado
     if (isLocalhost) {
       setStatus({ maintenance_mode: false, block_access: false, isLocalhost: true })
       return
@@ -71,17 +71,17 @@ export default function MaintenanceOverlay() {
     setLoginError('')
     
     if (!loginData.nome.trim()) {
-      setLoginError('Nome Ã© obrigatÃ³rio')
+      setLoginError('Nome é obrigatório')
       return
     }
     if (!loginData.telefone.trim()) {
-      setLoginError('Telefone Ã© obrigatÃ³rio')
+      setLoginError('Telefone é obrigatório')
       return
     }
 
     setLoggingIn(true)
     try {
-      // Verificar se usuÃ¡rio estÃ¡ banido ou em espera
+      // Verificar se usuário está banido ou em espera
       const phoneNorm = loginData.telefone.replace(/\D/g, '')
       const checkRes = await fetch(`/api/usuarios-restricoes?check=1&phone=${encodeURIComponent(phoneNorm)}`)
       const checkData = await checkRes.json()
@@ -92,12 +92,12 @@ export default function MaintenanceOverlay() {
           return
         }
         if (checkData.data.em_espera) {
-          setLoginError('Seu acesso estÃ¡ pendente de aprovaÃ§Ã£o. Aguarde a liberaÃ§Ã£o do administrador.')
+          setLoginError('Seu acesso está pendente de aprovação. Aguarde a liberação do administrador.')
           setLoggingIn(false)
           return
         }
       }
-      // Salvar dados se usuÃ¡rio marcou "lembrar"
+      // Salvar dados se usuário marcou "lembrar"
       if (loginData.lembrar) {
         localStorage.setItem('maintenance_saved_data', JSON.stringify({
           nome: loginData.nome.trim(),
@@ -107,7 +107,7 @@ export default function MaintenanceOverlay() {
         localStorage.removeItem('maintenance_saved_data')
       }
 
-      // Salvar autenticaÃ§Ã£o com session_token
+      // Salvar autenticação com session_token
       const auth = {
         nome: loginData.nome.trim(),
         telefone: loginData.telefone.trim(),
@@ -115,7 +115,7 @@ export default function MaintenanceOverlay() {
         session_token: status.session_token || Date.now().toString()
       }
       localStorage.setItem('maintenance_auth', JSON.stringify(auth))
-      // TambÃ©m salvar em beef_usuario_identificado para o overlay mobile nÃ£o reaparecer
+      // Também salvar em beef_usuario_identificado para o overlay mobile não reaparecer
       localStorage.setItem('beef_usuario_identificado', JSON.stringify({
         nome: auth.nome,
         telefone: auth.telefone
@@ -132,11 +132,11 @@ export default function MaintenanceOverlay() {
           hostname: window.location.hostname,
           userAgent: navigator.userAgent,
           telefone: auth.telefone,
-          action: 'Login durante manutenÃ§Ã£o'
+          action: 'Login durante manutenção'
         })
       })
 
-      // Recarregar pÃ¡gina
+      // Recarregar página
       window.location.reload()
     } catch (e) {
       setLoginError('Erro ao fazer login. Tente novamente.')
@@ -146,7 +146,7 @@ export default function MaintenanceOverlay() {
 
   if (!mounted || !status) return null
 
-  // Localhost sempre pode acessar (para desativar manutenÃ§Ã£o/bloqueio)
+  // Localhost sempre pode acessar (para desativar manutenção/bloqueio)
   const blocked = status.block_access && !status.isLocalhost
   const maintenance = status.maintenance_mode && !status.isLocalhost
 
@@ -162,7 +162,7 @@ export default function MaintenanceOverlay() {
             </div>
             <h1 className="text-2xl font-bold text-white mb-2">Acesso bloqueado</h1>
             <p className="text-gray-400 mb-6">
-              O uso do sistema estÃ¡ temporariamente bloqueado. Entre em contato com o administrador.
+              O uso do sistema está temporariamente bloqueado. Entre em contato com o administrador.
             </p>
           </>
         ) : showLoginForm ? (
@@ -170,7 +170,7 @@ export default function MaintenanceOverlay() {
             <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-amber-500/20 flex items-center justify-center">
               <WrenchScrewdriverIcon className="h-12 w-12 text-amber-400" />
             </div>
-            <h1 className="text-2xl font-bold text-white mb-2">Acesso durante manutenÃ§Ã£o</h1>
+            <h1 className="text-2xl font-bold text-white mb-2">Acesso durante manutenção</h1>
             <p className="text-gray-400 mb-6 text-sm">
               Preencha seus dados para acessar o sistema
             </p>
@@ -183,8 +183,8 @@ export default function MaintenanceOverlay() {
                   type="text"
                   value={loginData.nome}
                   onChange={(e) => {
-                    // Permitir apenas letras (incluindo acentuadas) e espaÃ§os
-                    const value = e.target.value.replace(/[^a-zA-ZÃâ‚¬-Ã¿\s]/g, '')
+                    // Permitir apenas letras (incluindo acentuadas) e espaços
+                    const value = e.target.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '')
                     setLoginData(d => ({ ...d, nome: value }))
                   }}
                   placeholder="Digite seu nome"
@@ -200,7 +200,7 @@ export default function MaintenanceOverlay() {
                   type="tel"
                   value={loginData.telefone}
                   onChange={(e) => {
-                    // Permitir apenas nÃºmeros e formataÃ§Ã£o bÃ¡sica
+                    // Permitir apenas números e formatação básica
                     const value = e.target.value.replace(/[^\d\s\-\(\)]/g, '')
                     setLoginData(d => ({ ...d, telefone: value }))
                   }}
@@ -219,7 +219,7 @@ export default function MaintenanceOverlay() {
                   disabled={loggingIn}
                 />
                 <label htmlFor="lembrar" className="text-sm text-gray-300 cursor-pointer">
-                  Lembrar meus dados para prÃ³ximos acessos
+                  Lembrar meus dados para próximos acessos
                 </label>
               </div>
               {loginError && (
@@ -249,9 +249,9 @@ export default function MaintenanceOverlay() {
             <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-amber-500/20 flex items-center justify-center animate-pulse">
               <WrenchScrewdriverIcon className="h-12 w-12 text-amber-400" />
             </div>
-            <h1 className="text-2xl font-bold text-white mb-2">Em atualizaÃ§Ã£o</h1>
+            <h1 className="text-2xl font-bold text-white mb-2">Em atualização</h1>
             <p className="text-gray-400 mb-6">
-              {status.maintenance_message || 'Sistema em manutenÃ§Ã£o. Volte em alguns minutos.'}
+              {status.maintenance_message || 'Sistema em manutenção. Volte em alguns minutos.'}
             </p>
             <button
               onClick={() => setShowLoginForm(true)}
@@ -262,7 +262,7 @@ export default function MaintenanceOverlay() {
           </>
         )}
         <p className="text-sm text-gray-500 mt-6">
-          Beef-Sync ââ‚¬¢ {new Date().toLocaleString('pt-BR')}
+          Beef-Sync • {new Date().toLocaleString('pt-BR')}
         </p>
       </div>
     </div>

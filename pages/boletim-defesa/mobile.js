@@ -18,9 +18,9 @@ const LABELS_CAMPO = {
   quant: 'Qtd',
   sexo: 'Sexo',
   categoria: 'Categoria',
-  raca: 'RaÃ§a',
+  raca: 'Raça',
   era: 'Era',
-  observacao: 'ObservaÃ§Ã£o'
+  observacao: 'Observação'
 }
 
 export default function BoletimDefesaMobile() {
@@ -45,7 +45,7 @@ export default function BoletimDefesaMobile() {
   const [formMovimentacao, setFormMovimentacao] = useState({ novaQuant: '', sexo: '', era: '', raca: '', categoria: '', observacao: '', motivo: '' })
   const [opcoes, setOpcoes] = useState({ raca: [], categoria: [], era: [] })
   
-  // Contatos prÃ©-cadastrados
+  // Contatos pré-cadastrados
   const [contatos, setContatos] = useState([
     { nome: 'Zeca', telefone: '11969009621' },
     { nome: 'Nilson', telefone: '11969009198' }
@@ -160,7 +160,7 @@ export default function BoletimDefesaMobile() {
     }
   }
 
-  // ââ€�â‚¬ââ€�â‚¬ Medicamentos ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬
+  // ── Medicamentos ──────────────────────────────────────────────────────────
   const diasDesde = (dateStr) => {
     if (!dateStr) return null
     const d = new Date(dateStr)
@@ -202,7 +202,7 @@ export default function BoletimDefesaMobile() {
 
   const salvarMedicamento = async () => {
     if (!formMed.medicamento.trim() || !formMed.dataAplicacao) {
-      alert('Informe o nome do medicamento e a data de aplicaÃ§Ã£o')
+      alert('Informe o nome do medicamento e a data de aplicação')
       return
     }
     setSalvandoMed(true)
@@ -249,7 +249,7 @@ export default function BoletimDefesaMobile() {
       setExcluindoMedId(null)
     }
   }
-  // ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬
+  // ─────────────────────────────────────────────────────────────────────────
 
   const confirmarAlteracaoCompleta = async (registro, valorNovo, form) => {
     const valorAntigo = registro.quant || 0
@@ -307,14 +307,14 @@ export default function BoletimDefesaMobile() {
       carregarCampo()
     } catch (e) {
       console.error(e)
-      alert('Erro ao registrar movimentaÃ§Ã£o')
+      alert('Erro ao registrar movimentação')
     }
   }
 
   const salvarWhatsapp = async () => {
     const digits = (whatsappInput || '').replace(/\D/g, '')
     if (digits.length < 10) {
-      alert('Informe DDD + nÃºmero (ex: 11999999999)')
+      alert('Informe DDD + número (ex: 11999999999)')
       return
     }
     try {
@@ -389,7 +389,7 @@ export default function BoletimDefesaMobile() {
     }
     
     if (telefone.length < 10) {
-      alert('Digite um telefone vÃ¡lido (DDD + nÃºmero)')
+      alert('Digite um telefone válido (DDD + número)')
       return
     }
     
@@ -484,7 +484,7 @@ export default function BoletimDefesaMobile() {
           </button>
         </div>
 
-        {/* BotÃµes Adelso (Campo) */}
+        {/* Botões Adelso (Campo) */}
         {abaAtiva === 'campo' && isAdelso && (
           <div className="flex flex-wrap gap-2 mb-4">
             {alteracoesFeitas.length > 0 && !sugerirResumo && (
@@ -492,7 +492,7 @@ export default function BoletimDefesaMobile() {
                 onClick={() => setModalResumoAlteracoes(true)}
                 className="w-full py-2 rounded-xl bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-400/50 text-sm font-medium"
               >
-                Ver resumo das alteraÃ§Ãµes ({alteracoesFeitas.length})
+                Ver resumo das alterações ({alteracoesFeitas.length})
               </button>
             )}
             <button
@@ -511,10 +511,10 @@ export default function BoletimDefesaMobile() {
           </div>
         )}
 
-        {/* Busca por piquete/local (sÃ³ no Campo) */}
+        {/* Busca por piquete/local (só no Campo) */}
         {abaAtiva === 'campo' && (
           <div className="mb-4 space-y-3" ref={buscaRef}>
-            {/* Filtros por tipo - Piquetes, Projetos, etc. (sÃ³ locais com gado) */}
+            {/* Filtros por tipo - Piquetes, Projetos, etc. (só locais com gado) */}
             {(() => {
               const comGado = dadosCampo.filter(d => (parseInt(d.quant) || 0) > 0)
               const textoRow = (r) => [r.local, r.local_1, r.sub_local_2].map(v => (v || '').trim()).filter(Boolean).join(' ')
@@ -542,7 +542,7 @@ export default function BoletimDefesaMobile() {
                 </div>
               )
             })()}
-            {/* Campo de busca com sugestÃµes */}
+            {/* Campo de busca com sugestões */}
             <div className="relative">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
@@ -562,7 +562,7 @@ export default function BoletimDefesaMobile() {
                   <XMarkIcon className="w-5 h-5" />
                 </button>
               )}
-              {/* Dropdown de sugestÃµes ao digitar */}
+              {/* Dropdown de sugestões ao digitar */}
               {buscaFocada && dadosCampo.length > 0 && (
                 <div className="absolute top-full left-0 right-0 mt-1 max-h-48 overflow-y-auto rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-xl z-20">
                   {(() => {
@@ -589,7 +589,7 @@ export default function BoletimDefesaMobile() {
           </div>
         )}
 
-        {/* ConteÃºdo Campo (cards) */}
+        {/* Conteúdo Campo (cards) */}
         {abaAtiva === 'campo' && (
           <div className="space-y-4">
             {loadingCampo ? (
@@ -684,7 +684,7 @@ export default function BoletimDefesaMobile() {
                                   </button>
                                 )}
 
-                                {/* BotÃ£o de Medicamentos ââ‚¬â€� visÃ­vel para todos, ediÃ§Ã£o sÃ³ para Adelso */}
+                                {/* Botão de Medicamentos — visível para todos, edição só para Adelso */}
                                 {!isTotal && row.id && (() => {
                                   const ult = ultimoMed(row.id)
                                   const dias = ult ? diasDesde(ult.data_aplicacao) : null
@@ -711,10 +711,10 @@ export default function BoletimDefesaMobile() {
                                       {ult
                                         ? <>
                                             <span className="truncate max-w-[140px]">{ult.medicamento}</span>
-                                            <span className="shrink-0">Â·</span>
+                                            <span className="shrink-0">·</span>
                                             <span className="shrink-0">
-                                              {dias === 0 ? 'hoje' : `${dias}d atrÃ¡s`}
-                                              {vencida ? ' âÅ¡ ï¸� renovar' : proxima ? ` Â· prÃ³x. ${proxDias}d` : ''}
+                                              {dias === 0 ? 'hoje' : `${dias}d atrás`}
+                                              {vencida ? ' ⚠️ renovar' : proxima ? ` · próx. ${proxDias}d` : ''}
                                             </span>
                                           </>
                                         : 'Registrar medicamento'
@@ -764,19 +764,19 @@ export default function BoletimDefesaMobile() {
                     <p className="text-5xl font-bold bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent mb-3">{subtotais.total}</p>
                     <div className="flex justify-center gap-6">
                       <div className="text-center">
-                        <p className="text-xs text-blue-600 dark:text-blue-400 mb-1">ââ„¢â€š Machos</p>
+                        <p className="text-xs text-blue-600 dark:text-blue-400 mb-1">♂ Machos</p>
                         <span className="text-2xl font-bold text-blue-700 dark:text-blue-300">{subtotais.M}</span>
                       </div>
                       <div className="h-12 w-px bg-gray-300 dark:bg-gray-600"></div>
                       <div className="text-center">
-                        <p className="text-xs text-pink-600 dark:text-pink-400 mb-1">ââ„¢â‚¬ FÃªmeas</p>
+                        <p className="text-xs text-pink-600 dark:text-pink-400 mb-1">♀ Fêmeas</p>
                         <span className="text-2xl font-bold text-pink-700 dark:text-pink-300">{subtotais.F}</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Faixas etÃ¡rias */}
+                {/* Faixas etárias */}
                 <div className="p-4 space-y-3">
                   {[
                     { key: '0a3', label: '0 a 3 meses', colorClass: 'from-blue-600 to-blue-700' },
@@ -802,11 +802,11 @@ export default function BoletimDefesaMobile() {
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           <div className="bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/40 dark:to-blue-800/40 rounded-xl p-3 border border-blue-300 dark:border-blue-700">
-                            <p className="text-xs text-blue-700 dark:text-blue-300 mb-1 font-semibold">ââ„¢â€š Machos</p>
+                            <p className="text-xs text-blue-700 dark:text-blue-300 mb-1 font-semibold">♂ Machos</p>
                             <p className="text-2xl font-bold text-blue-800 dark:text-blue-200">{m}</p>
                           </div>
                           <div className="bg-gradient-to-br from-pink-100 to-pink-200 dark:from-pink-900/40 dark:to-pink-800/40 rounded-xl p-3 border border-pink-300 dark:border-pink-700">
-                            <p className="text-xs text-pink-700 dark:text-pink-300 mb-1 font-semibold">ââ„¢â‚¬ FÃªmeas</p>
+                            <p className="text-xs text-pink-700 dark:text-pink-300 mb-1 font-semibold">♀ Fêmeas</p>
                             <p className="text-2xl font-bold text-pink-800 dark:text-pink-200">{f}</p>
                           </div>
                         </div>
@@ -833,7 +833,7 @@ export default function BoletimDefesaMobile() {
         )}
       </div>
 
-      {/* Modal alterar quantidade - formulÃ¡rio completo (Adelso) */}
+      {/* Modal alterar quantidade - formulário completo (Adelso) */}
       {modalAlterarQtd && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6 my-4">
@@ -855,7 +855,7 @@ export default function BoletimDefesaMobile() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Sexo (entrada/saÃ­da) <span className="text-red-500">*</span></label>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Sexo (entrada/saída) <span className="text-red-500">*</span></label>
                 <select
                   value={formMovimentacao.sexo}
                   onChange={e => setFormMovimentacao(f => ({ ...f, sexo: e.target.value }))}
@@ -863,7 +863,7 @@ export default function BoletimDefesaMobile() {
                 >
                   <option value="">-</option>
                   <option value="M">Macho</option>
-                  <option value="F">FÃªmea</option>
+                  <option value="F">Fêmea</option>
                 </select>
               </div>
 
@@ -882,14 +882,14 @@ export default function BoletimDefesaMobile() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">RaÃ§a <span className="text-red-500">*</span></label>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Raça <span className="text-red-500">*</span></label>
                 <select
                   value={formMovimentacao.raca}
                   onChange={e => setFormMovimentacao(f => ({ ...f, raca: e.target.value }))}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="">-</option>
-                  {[...new Set([formMovimentacao.raca, ...(opcoes.raca.length ? opcoes.raca : ['Nelore', 'Angus', 'Brahman', 'MestiÃ§a', 'Receptora', 'NÃ£o informado'])])].filter(Boolean).sort().map(v => (
+                  {[...new Set([formMovimentacao.raca, ...(opcoes.raca.length ? opcoes.raca : ['Nelore', 'Angus', 'Brahman', 'Mestiça', 'Receptora', 'Não informado'])])].filter(Boolean).sort().map(v => (
                     <option key={v} value={v}>{v}</option>
                   ))}
                 </select>
@@ -910,11 +910,11 @@ export default function BoletimDefesaMobile() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">ObservaÃ§Ã£o</label>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Observação</label>
                 <textarea
                   value={formMovimentacao.observacao}
                   onChange={e => setFormMovimentacao(f => ({ ...f, observacao: e.target.value }))}
-                  placeholder="Alguma observaÃ§Ã£o..."
+                  placeholder="Alguma observação..."
                   rows={2}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
                 />
@@ -927,7 +927,7 @@ export default function BoletimDefesaMobile() {
                 if (isSaida) {
                   return (
                     <div>
-                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Motivo da saÃ­da</label>
+                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Motivo da saída</label>
                       <div className="flex gap-2">
                         {['piquete', 'morte', 'venda'].map(m => (
                           <button
@@ -985,7 +985,7 @@ export default function BoletimDefesaMobile() {
                       return
                     }
                     if (!formMovimentacao.raca?.trim()) {
-                      alert('Por favor, selecione a RaÃ§a')
+                      alert('Por favor, selecione a Raça')
                       return
                     }
                     if (!formMovimentacao.categoria?.trim()) {
@@ -1006,11 +1006,11 @@ export default function BoletimDefesaMobile() {
         </div>
       )}
 
-      {/* Banner: sugerir ver resumo das alteraÃ§Ãµes */}
+      {/* Banner: sugerir ver resumo das alterações */}
       {sugerirResumo && alteracoesFeitas.length > 0 && isAdelso && abaAtiva === 'campo' && (
         <div className="fixed bottom-20 left-4 right-4 z-40 bg-teal-600 text-white rounded-xl p-4 shadow-xl flex flex-col gap-3">
           <p className="font-semibold">
-            VocÃª fez {alteracoesFeitas.length} alteraÃ§Ã£o{alteracoesFeitas.length > 1 ? 'Ãµes' : ''}. Quer ver o resumo?
+            Você fez {alteracoesFeitas.length} alteração{alteracoesFeitas.length > 1 ? 'ões' : ''}. Quer ver o resumo?
           </p>
           <div className="flex gap-2">
             <button
@@ -1026,34 +1026,34 @@ export default function BoletimDefesaMobile() {
               onClick={() => setSugerirResumo(false)}
               className="flex-1 py-2 rounded-lg bg-teal-500/50 text-white font-medium"
             >
-              Agora nÃ£o
+              Agora não
             </button>
           </div>
         </div>
       )}
 
-      {/* Modal resumo das alteraÃ§Ãµes + opÃ§Ã£o de enviar */}
+      {/* Modal resumo das alterações + opção de enviar */}
       {modalResumoAlteracoes && alteracoesFeitas.length > 0 && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto my-4">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Resumo das alteraÃ§Ãµes</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Resumo das alterações</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-              AlteraÃ§Ãµes feitas nesta sessÃ£o:
+              Alterações feitas nesta sessão:
             </p>
             <div className="space-y-3 mb-6 max-h-64 overflow-y-auto">
               {alteracoesFeitas.map((alt, i) => (
                 <div key={i} className="p-3 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
                   <p className="font-semibold text-gray-900 dark:text-white">{alt.local}</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    {alt.valorAntigo} ââ€ â€™ {alt.valorNovo} ({alt.tipo === 'saida' ? 'SaÃ­da' : 'Entrada'} de {alt.quantidade})
+                    {alt.valorAntigo} → {alt.valorNovo} ({alt.tipo === 'saida' ? 'Saída' : 'Entrada'} de {alt.quantidade})
                   </p>
                   {(alt.sexo || alt.raca || alt.categoria) && (
                     <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
                       {[
-                        alt.sexo && `Sexo: ${alt.sexo === 'M' ? 'Macho' : alt.sexo === 'F' ? 'FÃªmea' : alt.sexo}`,
-                        alt.raca && `RaÃ§a: ${alt.raca}`,
+                        alt.sexo && `Sexo: ${alt.sexo === 'M' ? 'Macho' : alt.sexo === 'F' ? 'Fêmea' : alt.sexo}`,
+                        alt.raca && `Raça: ${alt.raca}`,
                         alt.categoria && `Cat: ${alt.categoria}`
-                      ].filter(Boolean).join(' ââ‚¬¢ ')}
+                      ].filter(Boolean).join(' • ')}
                     </p>
                   )}
                 </div>
@@ -1112,7 +1112,7 @@ export default function BoletimDefesaMobile() {
                     }}
                     className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
                   >
-                    ðÅ¸â€”â€˜ï¸�
+                    🗑️
                   </button>
                 </div>
               ))}
@@ -1159,7 +1159,7 @@ export default function BoletimDefesaMobile() {
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Enviar para WhatsApp</h3>
             
-            {/* SeleÃ§Ã£o de contato */}
+            {/* Seleção de contato */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Selecione o contato:
@@ -1228,13 +1228,13 @@ export default function BoletimDefesaMobile() {
         </div>
       )}
 
-      {/* Modal conferÃªncia antes de enviar WhatsApp */}
+      {/* Modal conferência antes de enviar WhatsApp */}
       {modalConferencia && contatoSelecionado && (
         <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">ConferÃªncia antes de enviar</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Conferência antes de enviar</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-              Revise os dados que serÃ£o enviados para <strong>{contatoSelecionado.nome}</strong> ({(contatoSelecionado.telefone || '').replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')})
+              Revise os dados que serão enviados para <strong>{contatoSelecionado.nome}</strong> ({(contatoSelecionado.telefone || '').replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')})
             </p>
             <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mb-4 space-y-2">
               <p className="font-semibold text-gray-700 dark:text-gray-300">Resumo do Boletim Campo</p>
@@ -1272,13 +1272,13 @@ export default function BoletimDefesaMobile() {
         </div>
       )}
 
-      {/* Modal escolher: Baixar ou Enviar (quando WhatsApp API nÃ£o configurada) */}
+      {/* Modal escolher: Baixar ou Enviar (quando WhatsApp API não configurada) */}
       {modalEscolhaEnvio && (
         <div className="fixed inset-0 bg-black/50 z-[70] flex items-center justify-center p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Arquivo pronto</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-              O link do WhatsApp nÃ£o permite anexar arquivos automaticamente. Baixe o arquivo e anexe manualmente no chat.
+              O link do WhatsApp não permite anexar arquivos automaticamente. Baixe o arquivo e anexe manualmente no chat.
             </p>
             <div className="space-y-3">
               <button
@@ -1313,7 +1313,7 @@ export default function BoletimDefesaMobile() {
         </div>
       )}
 
-      {/* ââ€¢�ââ€¢�ââ€¢�ââ€¢�ââ€¢�ââ€¢�ââ€¢�ââ€¢� Modal de Medicamentos ââ€¢�ââ€¢�ââ€¢�ââ€¢�ââ€¢�ââ€¢�ââ€¢�ââ€¢� */}
+      {/* ════════ Modal de Medicamentos ════════ */}
       {modalMedicamento && (
         <div className="fixed inset-0 bg-black/60 z-[80] flex items-end justify-center sm:items-center p-0 sm:p-4">
           <div className="bg-white dark:bg-gray-800 rounded-t-3xl sm:rounded-2xl shadow-2xl w-full max-w-lg max-h-[92vh] flex flex-col">
@@ -1342,10 +1342,10 @@ export default function BoletimDefesaMobile() {
 
             <div className="overflow-y-auto flex-1 p-5 space-y-5">
 
-              {/* HistÃ³rico de aplicaÃ§Ãµes */}
+              {/* Histórico de aplicações */}
               {medsDoRegistro(modalMedicamento.registro.id).length > 0 && (
                 <div>
-                  <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">HistÃ³rico de aplicaÃ§Ãµes</h4>
+                  <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Histórico de aplicações</h4>
                   <div className="space-y-2">
                     {medsDoRegistro(modalMedicamento.registro.id).map((m, idx) => {
                       const dias = diasDesde(m.data_aplicacao)
@@ -1365,23 +1365,23 @@ export default function BoletimDefesaMobile() {
                               <div className="flex items-center gap-2 flex-wrap">
                                 <p className="font-bold text-gray-900 dark:text-white text-sm">{m.medicamento}</p>
                                 {idx === 0 && (
-                                  <span className="text-xs bg-purple-100 dark:bg-purple-800 text-purple-700 dark:text-purple-200 px-2 py-0.5 rounded-full font-medium">Ãºltimo</span>
+                                  <span className="text-xs bg-purple-100 dark:bg-purple-800 text-purple-700 dark:text-purple-200 px-2 py-0.5 rounded-full font-medium">último</span>
                                 )}
                               </div>
                               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                                 Aplicado em {new Date(m.data_aplicacao + 'T12:00:00').toLocaleDateString('pt-BR')}
-                                {' Â· '}
+                                {' · '}
                                 <span className={`font-semibold ${idx === 0 ? 'text-purple-600 dark:text-purple-400' : ''}`}>
-                                  {dias === 0 ? 'hoje' : dias === 1 ? '1 dia atrÃ¡s' : `${dias} dias atrÃ¡s`}
+                                  {dias === 0 ? 'hoje' : dias === 1 ? '1 dia atrás' : `${dias} dias atrás`}
                                 </span>
                               </p>
                               {m.data_proxima_aplicacao && (
                                 <p className="text-xs mt-1 flex items-center gap-1">
                                   {vencida
-                                    ? <><ExclamationCircleIcon className="w-3.5 h-3.5 text-red-500" /><span className="text-red-600 dark:text-red-400 font-semibold">PrÃ³xima vencida hÃ¡ {Math.abs(proxDias)} dias ââ‚¬â€� renovar!</span></>
+                                    ? <><ExclamationCircleIcon className="w-3.5 h-3.5 text-red-500" /><span className="text-red-600 dark:text-red-400 font-semibold">Próxima vencida há {Math.abs(proxDias)} dias — renovar!</span></>
                                     : proxDias === 0
-                                    ? <><ClockOutlineIcon className="w-3.5 h-3.5 text-amber-500" /><span className="text-amber-600 font-semibold">PrÃ³xima: hoje</span></>
-                                    : <><CheckCircleOutlineIcon className="w-3.5 h-3.5 text-green-500" /><span className="text-green-600 dark:text-green-400">PrÃ³xima em {proxDias} dias ({new Date(m.data_proxima_aplicacao + 'T12:00:00').toLocaleDateString('pt-BR')})</span></>
+                                    ? <><ClockOutlineIcon className="w-3.5 h-3.5 text-amber-500" /><span className="text-amber-600 font-semibold">Próxima: hoje</span></>
+                                    : <><CheckCircleOutlineIcon className="w-3.5 h-3.5 text-green-500" /><span className="text-green-600 dark:text-green-400">Próxima em {proxDias} dias ({new Date(m.data_proxima_aplicacao + 'T12:00:00').toLocaleDateString('pt-BR')})</span></>
                                   }
                                 </p>
                               )}
@@ -1390,7 +1390,7 @@ export default function BoletimDefesaMobile() {
                               )}
                             </div>
                             <div className="flex flex-col gap-1 shrink-0">
-                              {/* BotÃ£o renovar (prÃ©-preenche o formulÃ¡rio) */}
+                              {/* Botão renovar (pré-preenche o formulário) */}
                               {isAdelso && idx === 0 && (
                                 <button
                                   onClick={() => setFormMed(f => ({ ...f, medicamento: m.medicamento, dataAplicacao: new Date().toISOString().split('T')[0] }))}
@@ -1417,11 +1417,11 @@ export default function BoletimDefesaMobile() {
                 </div>
               )}
 
-              {/* FormulÃ¡rio nova aplicaÃ§Ã£o */}
+              {/* Formulário nova aplicação */}
               {isAdelso ? (
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                   <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-                    {medsDoRegistro(modalMedicamento.registro.id).length === 0 ? 'Registrar medicamento' : 'Nova aplicaÃ§Ã£o'}
+                    {medsDoRegistro(modalMedicamento.registro.id).length === 0 ? 'Registrar medicamento' : 'Nova aplicação'}
                   </h4>
                   <div className="space-y-3">
                     <div>
@@ -1432,7 +1432,7 @@ export default function BoletimDefesaMobile() {
                         type="text"
                         value={formMed.medicamento}
                         onChange={e => setFormMed(f => ({ ...f, medicamento: e.target.value }))}
-                        placeholder="Ex: Ivermectina, Vacina Raiva, AntibiÃ³tico..."
+                        placeholder="Ex: Ivermectina, Vacina Raiva, Antibiótico..."
                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 text-sm"
                       />
                     </div>
@@ -1440,7 +1440,7 @@ export default function BoletimDefesaMobile() {
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Data de aplicaÃ§Ã£o <span className="text-red-500">*</span>
+                          Data de aplicação <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="date"
@@ -1451,7 +1451,7 @@ export default function BoletimDefesaMobile() {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          PrÃ³xima aplicaÃ§Ã£o
+                          Próxima aplicação
                         </label>
                         <input
                           type="date"
@@ -1464,7 +1464,7 @@ export default function BoletimDefesaMobile() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        ObservaÃ§Ã£o <span className="text-gray-400 text-xs">(dose, produto comercial...)</span>
+                        Observação <span className="text-gray-400 text-xs">(dose, produto comercial...)</span>
                       </label>
                       <textarea
                         value={formMed.observacao}
@@ -1481,7 +1481,7 @@ export default function BoletimDefesaMobile() {
                       className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold text-sm disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
                     >
                       <BeakerIcon className="w-4 h-4" />
-                      {salvandoMed ? 'Salvando...' : 'Salvar aplicaÃ§Ã£o'}
+                      {salvandoMed ? 'Salvando...' : 'Salvar aplicação'}
                     </button>
                   </div>
                 </div>

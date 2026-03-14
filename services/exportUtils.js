@@ -2,7 +2,7 @@ import ExcelJS from 'exceljs'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
-// Cache para dados de exportaÃ§Ã£o
+// Cache para dados de exportação
 const exportCache = new Map()
 const CACHE_DURATION = 5 * 60 * 1000 // 5 minutos
 
@@ -13,24 +13,24 @@ export const exportToExcel = async (data, filename = 'beef_sync_export') => {
     const worksheet = workbook.addWorksheet('Detalhes dos Animais')
 
 
-    // Definir as colunas com cabeÃ§alhos incluindo dados de morte
+    // Definir as colunas com cabeçalhos incluindo dados de morte
     worksheet.columns = [
-      { header: 'SÃ©rie', key: 'SÃ©rie', width: 10 },
+      { header: 'Série', key: 'Série', width: 10 },
       { header: 'RG', key: 'RG', width: 12 },
-      { header: 'RaÃ§a', key: 'RaÃ§a', width: 15 },
+      { header: 'Raça', key: 'Raça', width: 15 },
       { header: 'Sexo', key: 'Sexo', width: 10 },
       { header: 'Idade (meses)', key: 'Idade (meses)', width: 12 },
-      { header: 'SituaÃ§Ã£o', key: 'SituaÃ§Ã£o', width: 12 },
+      { header: 'Situação', key: 'Situação', width: 12 },
       { header: 'Custo Total', key: 'Custo Total (R$)', width: 15 },
       { header: 'Data Nascimento', key: 'Data Nascimento', width: 15 },
       { header: 'Peso', key: 'Peso', width: 10 },
-      { header: 'ObservaÃ§Ãµes', key: 'ObservaÃ§Ãµes', width: 20 },
+      { header: 'Observações', key: 'Observações', width: 20 },
       { header: 'Data Cadastro', key: 'Data Cadastro', width: 15 },
-      // Dados especÃ­ficos de morte
+      // Dados específicos de morte
       { header: 'Data da Morte', key: 'Data da Morte', width: 15 },
       { header: 'Causa da Morte', key: 'Causa da Morte', width: 15 },
       { header: 'Valor da Perda (R$)', key: 'Valor da Perda (R$)', width: 15 },
-      { header: 'ObservaÃ§Ãµes da Morte', key: 'ObservaÃ§Ãµes da Morte', width: 20 }
+      { header: 'Observações da Morte', key: 'Observações da Morte', width: 20 }
     ]
 
     // Adicionar os dados
@@ -38,7 +38,7 @@ export const exportToExcel = async (data, filename = 'beef_sync_export') => {
       worksheet.addRow(row)
     })
 
-    // Estilizar o cabeÃ§alho (linha 1) - Fundo roxo com texto branco
+    // Estilizar o cabeçalho (linha 1) - Fundo roxo com texto branco
     const headerRow = worksheet.getRow(1)
     headerRow.eachCell((cell) => {
       cell.fill = {
@@ -82,10 +82,10 @@ export const exportToExcel = async (data, filename = 'beef_sync_export') => {
             right: { style: 'thin', color: { argb: 'FF000000' } }
           }
           
-          // FormataÃ§Ã£o especÃ­fica por tipo de dado
+          // Formatação específica por tipo de dado
           const columnKey = cell.$col$row.split('$')[0]
           
-          // Formatar nÃºmeros monetÃ¡rios
+          // Formatar números monetários
           if (columnKey === 'Custo Total (R$)' || columnKey === 'Valor da Perda (R$)') {
             if (cell.value && cell.value !== 'N/A' && typeof cell.value === 'number') {
               cell.numFmt = '#,##0.00'
@@ -103,7 +103,7 @@ export const exportToExcel = async (data, filename = 'beef_sync_export') => {
             }
           }
           
-          // Formatar nÃºmeros inteiros
+          // Formatar números inteiros
           if (columnKey === 'Idade (meses)' || columnKey === 'Peso') {
             if (cell.value && cell.value !== 'N/A' && typeof cell.value === 'number') {
               cell.numFmt = '0'
@@ -141,7 +141,7 @@ export const formatAnimalDataForExport = async (animals) => {
   // Verificar cache primeiro
   const cacheKey = `animals_${animals.length}_${Date.now() - (Date.now() % CACHE_DURATION)}`
   if (exportCache.has(cacheKey)) {
-    console.log('ðÅ¸â€œ¦ Dados de exportaÃ§Ã£o carregados do cache')
+    console.log('📦 Dados de exportação carregados do cache')
     return exportCache.get(cacheKey)
   }
 
@@ -172,22 +172,22 @@ export const formatAnimalDataForExport = async (animals) => {
       }
       
       return {
-        'SÃ©rie': animal.serie,
+        'Série': animal.serie,
         'RG': animal.rg,
-        'RaÃ§a': animal.raca,
+        'Raça': animal.raca,
         'Sexo': animal.sexo,
         'Idade (meses)': animal.meses,
-        'SituaÃ§Ã£o': animal.situacao,
+        'Situação': animal.situacao,
         'Custo Total (R$)': parseFloat(animal.custo_total || 0),
         'Data Nascimento': animal.data_nascimento ? new Date(animal.data_nascimento) : 'N/A',
         'Peso': animal.peso || 'N/A',
-        'ObservaÃ§Ãµes': animal.observacoes || 'N/A',
+        'Observações': animal.observacoes || 'N/A',
         'Data Cadastro': animal.created_at ? new Date(animal.created_at) : 'N/A',
-        // Dados especÃ­ficos de morte
+        // Dados específicos de morte
         'Data da Morte': deathData?.data_morte ? new Date(deathData.data_morte) : 'N/A',
         'Causa da Morte': deathData?.causa_morte || 'N/A',
         'Valor da Perda (R$)': deathData?.valor_perda ? parseFloat(deathData.valor_perda) : 'N/A',
-        'ObservaÃ§Ãµes da Morte': deathData?.observacoes || 'N/A'
+        'Observações da Morte': deathData?.observacoes || 'N/A'
       }
     })
   )
@@ -211,12 +211,12 @@ export const exportCostsToExcel = async (animals, filename = 'beef_sync_custos')
     worksheet.columns = [
       { header: 'Animal ID', key: 'Animal ID', width: 10 },
       { header: 'Animal', key: 'Animal', width: 15 },
-      { header: 'RaÃ§a', key: 'RaÃ§a', width: 12 },
+      { header: 'Raça', key: 'Raça', width: 12 },
       { header: 'Tipo Custo', key: 'Tipo Custo', width: 15 },
       { header: 'Subtipo', key: 'Subtipo', width: 12 },
       { header: 'Valor (R$)', key: 'Valor (R$)', width: 12 },
       { header: 'Data', key: 'Data', width: 12 },
-      { header: 'ObservaÃ§Ãµes', key: 'ObservaÃ§Ãµes', width: 20 },
+      { header: 'Observações', key: 'Observações', width: 20 },
       { header: 'Fornecedor', key: 'Fornecedor', width: 15 },
       { header: 'Destino', key: 'Destino', width: 15 }
     ]
@@ -228,12 +228,12 @@ export const exportCostsToExcel = async (animals, filename = 'beef_sync_custos')
           costsData.push({
             'Animal ID': animal.id,
             'Animal': `${animal.serie} ${animal.rg}`,
-            'RaÃ§a': animal.raca,
+            'Raça': animal.raca,
             'Tipo Custo': custo.tipo,
             'Subtipo': custo.subtipo || 'N/A',
             'Valor (R$)': custo.valor,
             'Data': custo.data,
-            'ObservaÃ§Ãµes': custo.observacoes || 'N/A',
+            'Observações': custo.observacoes || 'N/A',
             'Fornecedor': custo.fornecedor || 'N/A',
             'Destino': custo.destino || 'N/A'
           })
@@ -245,7 +245,7 @@ export const exportCostsToExcel = async (animals, filename = 'beef_sync_custos')
       worksheet.addRow(row)
     })
 
-    // Aplicar formataÃ§Ã£o padrÃ£o com bordas e centralizaÃ§Ã£o
+    // Aplicar formatação padrão com bordas e centralização
     const headerRow = worksheet.getRow(1)
     headerRow.eachCell((cell) => {
       cell.fill = {
@@ -288,7 +288,7 @@ export const exportCostsToExcel = async (animals, filename = 'beef_sync_custos')
             right: { style: 'thin', color: { argb: 'FF000000' } }
           }
           
-          // Formatar nÃºmeros monetÃ¡rios
+          // Formatar números monetários
           if (cell.$col$row.includes('Valor (R$)')) {
             if (cell.value && cell.value !== 'N/A' && typeof cell.value === 'number') {
               cell.numFmt = '#,##0.00'
@@ -343,7 +343,7 @@ export const exportReportToExcel = async (reportData, filename = 'beef_sync_rela
       resumoSheet.addRow(row)
     })
 
-    // Aplicar formataÃ§Ã£o ao resumo
+    // Aplicar formatação ao resumo
     const resumoHeaderRow = resumoSheet.getRow(1)
     resumoHeaderRow.eachCell((cell) => {
       cell.fill = {
@@ -400,20 +400,20 @@ export const exportReportToExcel = async (reportData, filename = 'beef_sync_rela
 
     return true
   } catch (error) {
-    console.error('Erro ao exportar relatÃ³rio para Excel:', error)
+    console.error('Erro ao exportar relatório para Excel:', error)
     return false
   }
 }
 
-// FunÃ§Ã£o para formatar dados completos de animais com localizaÃ§Ã£o para exportaÃ§Ã£o
+// Função para formatar dados completos de animais com localização para exportação
 export const formatAnimalDataWithLocationForExport = (animals, getLocalizacaoAtual) => {
   const animalsWithFullData = animals.map((animal) => {
     const localizacaoAtual = getLocalizacaoAtual ? getLocalizacaoAtual(animal.id) : null
     
-    // Fallback: Se nÃ£o tem histÃ³rico de localizaÃ§Ã£o, usa o pasto_atual do cadastro
-    const piqueteAtual = localizacaoAtual?.piquete || animal.pasto_atual || animal.pastoAtual || 'NÃ£o localizado'
+    // Fallback: Se não tem histórico de localização, usa o pasto_atual do cadastro
+    const piqueteAtual = localizacaoAtual?.piquete || animal.pasto_atual || animal.pastoAtual || 'Não localizado'
     
-    // Determinar data de entrada (se for fallback, usa data de criaÃ§Ã£o ou nascimento)
+    // Determinar data de entrada (se for fallback, usa data de criação ou nascimento)
     let dataEntrada = 'N/A'
     if (localizacaoAtual?.data_entrada) {
       dataEntrada = new Date(localizacaoAtual.data_entrada).toLocaleDateString('pt-BR')
@@ -428,9 +428,9 @@ export const formatAnimalDataWithLocationForExport = (animals, getLocalizacaoAtu
       ((animal.pasto_atual || animal.pastoAtual) ? 'Cadastro Inicial' : 'N/A')
       
     return {
-      'SÃ©rie': animal.serie || 'N/A',
+      'Série': animal.serie || 'N/A',
       'RG': animal.rg || 'N/A',
-      'RaÃ§a': animal.raca || 'N/A',
+      'Raça': animal.raca || 'N/A',
       'Sexo': animal.sexo || 'N/A',
       'Data Nascimento': animal.data_nascimento 
         ? new Date(animal.data_nascimento).toLocaleDateString('pt-BR') 
@@ -438,24 +438,24 @@ export const formatAnimalDataWithLocationForExport = (animals, getLocalizacaoAtu
       'Idade (meses)': animal.meses || 0,
       'Piquete': piqueteAtual,
       'Data Entrada Piquete': dataEntrada,
-      'Motivo MovimentaÃ§Ã£o': motivoMovimentacao,
+      'Motivo Movimentação': motivoMovimentacao,
       'Pat (Pai)': animal.pai || 'N/A',
-      'MÃ£e': animal.mae || 'N/A',
+      'Mãe': animal.mae || 'N/A',
       'Receptora': animal.receptora || 'N/A',
       'Tatuagem': animal.tatuagem || 'N/A',
       'Peso': animal.peso ? parseFloat(animal.peso) : 'N/A',
       'Cor': animal.cor || 'N/A',
       'Tipo Nascimento': animal.tipo_nascimento || 'N/A',
       'Dificuldade Parto': animal.dificuldade_parto || 'N/A',
-      'FIV': animal.is_fiv ? 'Sim' : 'NÃ£o',
-      'SituaÃ§Ã£o': animal.situacao || 'N/A',
+      'FIV': animal.is_fiv ? 'Sim' : 'Não',
+      'Situação': animal.situacao || 'N/A',
       'Custo Total (R$)': parseFloat(animal.custo_total || 0),
       'Valor Venda (R$)': animal.valor_venda ? parseFloat(animal.valor_venda) : 'N/A',
       'Valor Real (R$)': animal.valor_real ? parseFloat(animal.valor_real) : 'N/A',
-      'VeterinÃ¡rio': animal.veterinario || 'N/A',
+      'Veterinário': animal.veterinario || 'N/A',
       'ABCZG': animal.abczg || 'N/A',
       'DECA': animal.deca || 'N/A',
-      'ObservaÃ§Ãµes': animal.observacoes || 'N/A',
+      'Observações': animal.observacoes || 'N/A',
       'Data Cadastro': animal.created_at 
         ? new Date(animal.created_at).toLocaleDateString('pt-BR') 
         : 'N/A'
@@ -465,25 +465,25 @@ export const formatAnimalDataWithLocationForExport = (animals, getLocalizacaoAtu
   return animalsWithFullData
 }
 
-// FunÃ§Ã£o para exportar animais com localizaÃ§Ã£o completa para Excel
+// Função para exportar animais com localização completa para Excel
 export const exportAnimalsWithLocationToExcel = async (animals, getLocalizacaoAtual, filename = 'animais_localizacao', piqueteFiltro = null, camposSelecionados = null) => {
   try {
     const workbook = new ExcelJS.Workbook()
-    const worksheet = workbook.addWorksheet('Animais e LocalizaÃ§Ã£o')
+    const worksheet = workbook.addWorksheet('Animais e Localização')
 
-    // Definir todos os campos disponÃ­veis
+    // Definir todos os campos disponíveis
     const todosOsCampos = [
-      { header: 'SÃ©rie', key: 'SÃ©rie', width: 12 },
+      { header: 'Série', key: 'Série', width: 12 },
       { header: 'RG', key: 'RG', width: 12 },
-      { header: 'RaÃ§a', key: 'RaÃ§a', width: 15 },
+      { header: 'Raça', key: 'Raça', width: 15 },
       { header: 'Sexo', key: 'Sexo', width: 10 },
       { header: 'Data Nascimento', key: 'Data Nascimento', width: 15 },
       { header: 'Idade (meses)', key: 'Idade (meses)', width: 12 },
       { header: 'Piquete', key: 'Piquete', width: 15 },
       { header: 'Data Entrada Piquete', key: 'Data Entrada Piquete', width: 18 },
-      { header: 'Motivo MovimentaÃ§Ã£o', key: 'Motivo MovimentaÃ§Ã£o', width: 20 },
+      { header: 'Motivo Movimentação', key: 'Motivo Movimentação', width: 20 },
       { header: 'Pat (Pai)', key: 'Pat (Pai)', width: 15 },
-      { header: 'MÃ£e', key: 'MÃ£e', width: 15 },
+      { header: 'Mãe', key: 'Mãe', width: 15 },
       { header: 'Receptora', key: 'Receptora', width: 15 },
       { header: 'Tatuagem', key: 'Tatuagem', width: 12 },
       { header: 'Peso', key: 'Peso', width: 10 },
@@ -491,14 +491,14 @@ export const exportAnimalsWithLocationToExcel = async (animals, getLocalizacaoAt
       { header: 'Tipo Nascimento', key: 'Tipo Nascimento', width: 15 },
       { header: 'Dificuldade Parto', key: 'Dificuldade Parto', width: 15 },
       { header: 'FIV', key: 'FIV', width: 8 },
-      { header: 'SituaÃ§Ã£o', key: 'SituaÃ§Ã£o', width: 12 },
+      { header: 'Situação', key: 'Situação', width: 12 },
       { header: 'Custo Total (R$)', key: 'Custo Total (R$)', width: 15 },
       { header: 'Valor Venda (R$)', key: 'Valor Venda (R$)', width: 15 },
       { header: 'Valor Real (R$)', key: 'Valor Real (R$)', width: 15 },
-      { header: 'VeterinÃ¡rio', key: 'VeterinÃ¡rio', width: 15 },
+      { header: 'Veterinário', key: 'Veterinário', width: 15 },
       { header: 'ABCZG', key: 'ABCZG', width: 12 },
       { header: 'DECA', key: 'DECA', width: 12 },
-      { header: 'ObservaÃ§Ãµes', key: 'ObservaÃ§Ãµes', width: 30 },
+      { header: 'Observações', key: 'Observações', width: 30 },
       { header: 'Data Cadastro', key: 'Data Cadastro', width: 15 }
     ]
 
@@ -522,7 +522,7 @@ export const exportAnimalsWithLocationToExcel = async (animals, getLocalizacaoAt
       worksheet.addRow(rowData)
     })
 
-    // Estilizar cabeÃ§alho
+    // Estilizar cabeçalho
     const headerRow = worksheet.getRow(1)
     headerRow.eachCell((cell) => {
       cell.fill = {
@@ -566,7 +566,7 @@ export const exportAnimalsWithLocationToExcel = async (animals, getLocalizacaoAt
             right: { style: 'thin', color: { argb: 'FF000000' } }
           }
           
-          // Formatar nÃºmeros monetÃ¡rios
+          // Formatar números monetários
           const header = worksheet.getRow(1).getCell(cell.col).value
           if (header && (header.includes('(R$)'))) {
             if (cell.value && cell.value !== 'N/A' && typeof cell.value === 'number') {
@@ -596,22 +596,22 @@ export const exportAnimalsWithLocationToExcel = async (animals, getLocalizacaoAt
 
     return true
   } catch (error) {
-    console.error('Erro ao exportar animais com localizaÃ§Ã£o para Excel:', error)
+    console.error('Erro ao exportar animais com localização para Excel:', error)
     return false
   }
 }
 
-// FunÃ§Ã£o para exportar animais com localizaÃ§Ã£o completa para PDF
+// Função para exportar animais com localização completa para PDF
 export const exportAnimalsWithLocationToPDF = async (animals, getLocalizacaoAtual, filename = 'animais_localizacao', piqueteFiltro = null, camposSelecionados = null) => {
   try {
-    // InicializaÃ§Ã£o robusta do jsPDF
+    // Inicialização robusta do jsPDF
     const JsPDFClass = jsPDF.jsPDF || jsPDF
     const doc = new JsPDFClass({ orientation: 'landscape' })
     
-    // TÃ­tulo do RelatÃ³rio
+    // Título do Relatório
     doc.setFontSize(18)
     doc.setTextColor(37, 99, 235) // Azul
-    doc.text('RelatÃ³rio de LocalizaÃ§Ã£o de Animais', 14, 22)
+    doc.text('Relatório de Localização de Animais', 14, 22)
     
     doc.setFontSize(10)
     doc.setTextColor(100, 100, 100) // Cinza
@@ -622,17 +622,17 @@ export const exportAnimalsWithLocationToPDF = async (animals, getLocalizacaoAtua
 
     // Definir colunas e dados
     const todosOsCampos = [
-      { header: 'SÃ©rie', dataKey: 'SÃ©rie' },
+      { header: 'Série', dataKey: 'Série' },
       { header: 'RG', dataKey: 'RG' },
-      { header: 'RaÃ§a', dataKey: 'RaÃ§a' },
+      { header: 'Raça', dataKey: 'Raça' },
       { header: 'Sexo', dataKey: 'Sexo' },
       { header: 'Nascimento', dataKey: 'Data Nascimento' },
       { header: 'Idade', dataKey: 'Idade (meses)' },
       { header: 'Piquete', dataKey: 'Piquete' },
       { header: 'Entrada', dataKey: 'Data Entrada Piquete' },
-      { header: 'Motivo', dataKey: 'Motivo MovimentaÃ§Ã£o' },
+      { header: 'Motivo', dataKey: 'Motivo Movimentação' },
       { header: 'Peso', dataKey: 'Peso' },
-      { header: 'SituaÃ§Ã£o', dataKey: 'SituaÃ§Ã£o' }
+      { header: 'Situação', dataKey: 'Situação' }
     ]
 
     let columns = todosOsCampos
@@ -670,7 +670,7 @@ export const exportAnimalsWithLocationToPDF = async (animals, getLocalizacaoAtua
       alternateRowStyles: { fillColor: [242, 242, 242] },
       margin: { top: 40 },
       didDrawPage: function (data) {
-        const str = 'PÃ¡gina ' + doc.internal.getNumberOfPages()
+        const str = 'Página ' + doc.internal.getNumberOfPages()
         doc.setFontSize(8)
         const pageSize = doc.internal.pageSize
         const pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight()

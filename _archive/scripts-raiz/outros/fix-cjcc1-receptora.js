@@ -7,7 +7,7 @@
 const { query } = require('./lib/database')
 
 async function fixCJCC1Receptora() {
-  console.log('�Ÿ”� Corrigindo campo receptora do animal CJCC 1...\n')
+  console.log('🔧 Corrigindo campo receptora do animal CJCC 1...\n')
 
   try {
     // 1. Verificar estado atual
@@ -21,7 +21,7 @@ async function fixCJCC1Receptora() {
     `)
     
     if (currentState.rows.length === 0) {
-      console.log('   �Œ Animal CJCC 1 não encontrado!')
+      console.log('   ❌ Animal CJCC 1 não encontrado!')
       return
     }
 
@@ -44,7 +44,7 @@ async function fixCJCC1Receptora() {
 
     if (updateResult.rows.length > 0) {
       const updatedAnimal = updateResult.rows[0]
-      console.log(`   �œ… Animal atualizado com sucesso!`)
+      console.log(`   ✅ Animal atualizado com sucesso!`)
       console.log(`   ID: ${updatedAnimal.id}`)
       console.log(`   Receptora atualizada: "${updatedAnimal.receptora}"`)
       console.log(`   Atualizado em: ${updatedAnimal.updated_at}`)
@@ -62,13 +62,13 @@ async function fixCJCC1Receptora() {
 
     if (verifyResult.rows.length > 0) {
       const verifiedAnimal = verifyResult.rows[0]
-      console.log(`   �œ… Verificação concluída:`)
+      console.log(`   ✅ Verificação concluída:`)
       console.log(`   Receptora: "${verifiedAnimal.receptora}"`)
       
       if (verifiedAnimal.receptora === 'RZE72304') {
-        console.log(`   �ŸŽ‰ Campo receptora corrigido com sucesso!`)
+        console.log(`   🎉 Campo receptora corrigido com sucesso!`)
       } else {
-        console.log(`   �Œ Erro: Campo não foi atualizado corretamente`)
+        console.log(`   ❌ Erro: Campo não foi atualizado corretamente`)
       }
     }
 
@@ -89,23 +89,23 @@ async function fixCJCC1Receptora() {
 
     if (apiTest.rows.length > 0) {
       const apiAnimal = apiTest.rows[0]
-      console.log(`   �œ… Dados como a API retornaria:`)
+      console.log(`   ✅ Dados como a API retornaria:`)
       console.log(`   ID: ${apiAnimal.id}`)
       console.log(`   Receptora: "${apiAnimal.receptora || 'VAZIO'}"`)
       console.log(`   Avô Materno: "${apiAnimal.avo_materno || 'VAZIO'}"`)
     }
 
-    console.log('\n�œ… Correção concluída!')
-    console.log('\n�ŸŽ� RESULTADO:')
-    console.log('�œ… O campo receptora do animal CJCC 1 foi corrigido para "RZE72304"')
-    console.log('�œ… Agora deve aparecer corretamente na ficha do animal')
-    console.log('\n�Ÿ“‹ PR�“XIMOS PASSOS:')
+    console.log('\n✅ Correção concluída!')
+    console.log('\n🎯 RESULTADO:')
+    console.log('✅ O campo receptora do animal CJCC 1 foi corrigido para "RZE72304"')
+    console.log('✅ Agora deve aparecer corretamente na ficha do animal')
+    console.log('\n📋 PRÓXIMOS PASSOS:')
     console.log('1. Acesse a ficha do animal CJCC 1 no sistema')
     console.log('2. Verifique se o campo "Receptora" agora mostra "RZE72304"')
     console.log('3. Se ainda não aparecer, pode ser cache do navegador - tente F5 ou Ctrl+F5')
 
   } catch (error) {
-    console.error('�Œ Erro durante correção:', error)
+    console.error('❌ Erro durante correção:', error)
   }
 }
 

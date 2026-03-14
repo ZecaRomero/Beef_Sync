@@ -2,7 +2,7 @@ const pool = require('../lib/database')
 
 async function testarCalendario() {
   try {
-    console.log('�Ÿ”� Testando query do calendário...\n')
+    console.log('🔍 Testando query do calendário...\n')
     
     const sqlReceptoras = `
       SELECT DISTINCT
@@ -32,7 +32,7 @@ async function testarCalendario() {
     
     const result = await pool.query(sqlReceptoras)
     
-    console.log(`�Ÿ“‹ Total de itens encontrados: ${result.rows.length}\n`)
+    console.log(`📋 Total de itens encontrados: ${result.rows.length}\n`)
     
     if (result.rows.length > 0) {
       console.log('Primeiros 5 itens:')
@@ -52,7 +52,7 @@ async function testarCalendario() {
         const dataTE = new Date(result.rows[0].data_te)
         const dataParto = new Date(dataTE)
         dataParto.setMonth(dataParto.getMonth() + 9)
-        console.log(`\n�Ÿ“… Exemplo de cálculo de parto:`)
+        console.log(`\n📅 Exemplo de cálculo de parto:`)
         console.log(`  Data TE: ${dataTE.toLocaleDateString('pt-BR')}`)
         console.log(`  Data Parto Previsto: ${dataParto.toLocaleDateString('pt-BR')}`)
       }
@@ -60,7 +60,7 @@ async function testarCalendario() {
     
     process.exit(0)
   } catch (error) {
-    console.error('�Œ Erro:', error)
+    console.error('❌ Erro:', error)
     console.error(error.stack)
     process.exit(1)
   }

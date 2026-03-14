@@ -14,7 +14,7 @@ const CORRECOES = [
 ]
 
 async function corrigir() {
-  console.log('�Ÿ”� Corrigindo IAs de prenhez (CJCJ 15959 e CJCJ 15668)\n')
+  console.log('🔧 Corrigindo IAs de prenhez (CJCJ 15959 e CJCJ 15668)\n')
 
   try {
     const cols = await query(`
@@ -48,12 +48,12 @@ async function corrigir() {
         [serie.toUpperCase(), rg]
       )
       if (animal.rows.length === 0) {
-        console.log(`   �š�️ Animal ${serie} ${rg} não encontrado.`)
+        console.log(`   ⚠️ Animal ${serie} ${rg} não encontrado.`)
         continue
       }
       const animalId = animal.rows[0].id
       const nome = animal.rows[0].nome || `${serie} ${rg}`
-      console.log(`\n   �Ÿ“Œ ${serie} ${rg} (${nome}) - ID ${animalId}`)
+      console.log(`\n   📌 ${serie} ${rg} (${nome}) - ID ${animalId}`)
 
       let ins
       try {
@@ -85,20 +85,20 @@ async function corrigir() {
         const touro = (row.touro || '').trim()
         if (touroPrenha(touro)) {
           await query(`UPDATE inseminacoes SET ${setPrenha}status_gestacao = 'Prenha', updated_at = CURRENT_TIMESTAMP WHERE id = $1`, [row.id])
-          console.log(`      �œ… IA ${row.id} (${touro}) �†’ Prenha`)
+          console.log(`      ✅ IA ${row.id} (${touro}) → Prenha`)
           totalAtualizados++
         } else {
           await query(`UPDATE inseminacoes SET ${setResultado}status_gestacao = 'Vazia', updated_at = CURRENT_TIMESTAMP WHERE id = $1`, [row.id])
-          console.log(`      �œ… IA ${row.id} (${touro}) �†’ Vazia`)
+          console.log(`      ✅ IA ${row.id} (${touro}) → Vazia`)
           totalAtualizados++
         }
       }
     }
 
-    console.log(`\n   �Ÿ“‹ Total: ${totalAtualizados} registro(s) atualizado(s).`)
-    console.log('\n   �Ÿ’� Recarregue as páginas de consulta para ver os touros corretos.')
+    console.log(`\n   📋 Total: ${totalAtualizados} registro(s) atualizado(s).`)
+    console.log('\n   💡 Recarregue as páginas de consulta para ver os touros corretos.')
   } catch (err) {
-    console.error('�Œ Erro:', err.message)
+    console.error('❌ Erro:', err.message)
     process.exit(1)
   }
   process.exit(0)

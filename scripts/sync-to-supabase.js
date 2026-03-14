@@ -1,6 +1,6 @@
 /**
- * SincronizaÃ§Ã£o Local ââ€ â€™ Supabase via REST API (HTTPS porta 443)
- * Usa a PostgREST API do Supabase ââ‚¬â€� nÃ£o precisa de conexÃ£o direta PostgreSQL
+ * Sincronização Local → Supabase via REST API (HTTPS porta 443)
+ * Usa a PostgREST API do Supabase — não precisa de conexão direta PostgreSQL
  */
 
 const { Pool } = require('pg')
@@ -68,18 +68,18 @@ async function syncToSupabase(onProgress) {
   }
 
   try {
-    if (!SUPABASE_SERVICE_KEY) throw new Error('SUPABASE_SERVICE_ROLE_KEY nÃ£o definida no .env')
+    if (!SUPABASE_SERVICE_KEY) throw new Error('SUPABASE_SERVICE_ROLE_KEY não definida no .env')
 
     log('Conectando ao banco local...')
     await localPool.query('SELECT 1')
-    log('âÅ“â€œ Banco local OK')
+    log('✓ Banco local OK')
 
     log('Conectando ao Supabase via HTTPS...')
     const testRes = await fetch(`${SUPABASE_URL}/rest/v1/animais?limit=1`, {
       headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}` }
     })
     if (!testRes.ok) throw new Error(`Supabase retornou ${testRes.status}`)
-    log('âÅ“â€œ Supabase OK')
+    log('✓ Supabase OK')
 
     const results = {}
 
@@ -91,7 +91,7 @@ async function syncToSupabase(onProgress) {
           [table]
         )
         if (!exists.rows[0].exists) {
-          log(`âÅ¡  ${table}: nÃ£o existe localmente, pulando`)
+          log(`⚠ ${table}: não existe localmente, pulando`)
           continue
         }
 
@@ -99,9 +99,9 @@ async function syncToSupabase(onProgress) {
         const { rows } = await localPool.query(`SELECT * FROM ${table}`)
 
         if (rows.length === 0) {
-          // Limpar tabela remota tambÃ©m
+          // Limpar tabela remota também
           await supabaseRequest('DELETE', table, null, '?id=gte.0').catch(() => {})
-          log(`  ââ€ â€™ ${table}: vazia`)
+          log(`  → ${table}: vazia`)
           results[table] = { inserted: 0 }
           continue
         }
@@ -122,18 +122,18 @@ async function syncToSupabase(onProgress) {
           inserted += batch.length
         }
 
-        log(`  âÅ“â€œ ${table}: ${inserted} registros`)
+        log(`  ✓ ${table}: ${inserted} registros`)
         results[table] = { inserted }
       } catch (err) {
-        log(`  âÅ“â€” ${table}: ${err.message}`)
+        log(`  ✗ ${table}: ${err.message}`)
         results[table] = { error: err.message }
       }
     }
 
-    log('\nâÅ“â€¦ SincronizaÃ§Ã£o concluÃ­da!')
+    log('\n✅ Sincronização concluída!')
     return { success: true, results }
   } catch (err) {
-    log(`\nâ�Å’ Erro: ${err.message}`)
+    log(`\n❌ Erro: ${err.message}`)
     return { success: false, error: err.message }
   } finally {
     await localPool.end().catch(() => {})

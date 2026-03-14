@@ -11,7 +11,7 @@ const pool = new Pool({
 
 async function verificarInseminacoes() {
   try {
-    console.log('�Ÿ”� Verificando estrutura da tabela inseminacoes...\n');
+    console.log('🔍 Verificando estrutura da tabela inseminacoes...\n');
 
     // Ver estrutura da tabela
     const estrutura = await pool.query(`
@@ -21,13 +21,13 @@ async function verificarInseminacoes() {
       ORDER BY ordinal_position
     `);
 
-    console.log('�Ÿ“‹ Estrutura da tabela inseminacoes:');
+    console.log('📋 Estrutura da tabela inseminacoes:');
     estrutura.rows.forEach(col => {
       console.log(`  ${col.column_name}: ${col.data_type} ${col.is_nullable === 'NO' ? 'NOT NULL' : ''}`);
     });
 
     // Buscar inseminações que aparecem na tela
-    console.log('\n\n�Ÿ”� Buscando inseminações da tela...\n');
+    console.log('\n\n🔍 Buscando inseminações da tela...\n');
     
     const inseminacoes = await pool.query(`
       SELECT *
@@ -47,14 +47,14 @@ async function verificarInseminacoes() {
       console.log(`   Touro: ${ia.touro_nome || 'N/A'}`);
       console.log(`   Status: ${ia.status_gestacao || 'N/A'}`);
       console.log(`   Criado em: ${ia.created_at}`);
-      console.log('   �”€'.repeat(40));
+      console.log('   ─'.repeat(40));
     });
 
     // Verificar se há campos serie/rg na tabela inseminacoes
     const temSerieRG = estrutura.rows.some(col => col.column_name === 'serie' || col.column_name === 'animal_serie');
     
     if (temSerieRG) {
-      console.log('\n�œ… A tabela inseminacoes TEM campos para série/RG');
+      console.log('\n✅ A tabela inseminacoes TEM campos para série/RG');
       
       // Buscar inseminações com série CJC
       const iasCJC = await pool.query(`
@@ -65,14 +65,14 @@ async function verificarInseminacoes() {
         LIMIT 5
       `);
       
-      console.log(`\n�Ÿ“Š Inseminações com série CJC: ${iasCJC.rows.length}`);
+      console.log(`\n📊 Inseminações com série CJC: ${iasCJC.rows.length}`);
     } else {
-      console.log('\n�š�️ A tabela inseminacoes N�ƒO tem campos para série/RG');
+      console.log('\n⚠️ A tabela inseminacoes NÃO tem campos para série/RG');
       console.log('   As inseminações dependem do animal_id para identificar o animal');
     }
 
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
   } finally {
     await pool.end();
   }

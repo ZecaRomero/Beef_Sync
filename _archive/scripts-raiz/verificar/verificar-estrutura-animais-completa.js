@@ -12,7 +12,7 @@ const pool = new Pool({
 
 async function verificarEstrutura() {
   try {
-    console.log('�Ÿ”� Verificando estrutura da tabela animais...\n');
+    console.log('🔍 Verificando estrutura da tabela animais...\n');
     
     const result = await pool.query(`
       SELECT column_name, data_type, is_nullable
@@ -21,20 +21,20 @@ async function verificarEstrutura() {
       ORDER BY ordinal_position
     `);
     
-    console.log('�Ÿ“‹ Colunas da tabela animais:');
+    console.log('📋 Colunas da tabela animais:');
     result.rows.forEach(col => {
       console.log(`- ${col.column_name} (${col.data_type}) ${col.is_nullable === 'NO' ? 'NOT NULL' : 'NULL'}`);
     });
     
     // Buscar receptora 8251
-    console.log('\n�Ÿ”� Buscando receptora 8251...');
+    console.log('\n🔍 Buscando receptora 8251...');
     const animal = await pool.query(`SELECT * FROM animais WHERE rg = '8251' LIMIT 1`);
     
     if (animal.rows.length > 0) {
-      console.log('\n�œ… Receptora encontrada:');
+      console.log('\n✅ Receptora encontrada:');
       console.log(JSON.stringify(animal.rows[0], null, 2));
     } else {
-      console.log('\n�Œ Receptora 8251 não encontrada');
+      console.log('\n❌ Receptora 8251 não encontrada');
       
       // Buscar RGs similares
       const similares = await pool.query(`
@@ -46,7 +46,7 @@ async function verificarEstrutura() {
       `);
       
       if (similares.rows.length > 0) {
-        console.log('\n�Ÿ“‹ RGs similares encontrados:');
+        console.log('\n📋 RGs similares encontrados:');
         similares.rows.forEach(a => {
           console.log(`- RG: ${a.rg}, Nome: ${a.nome || 'Sem nome'}, Sexo: ${a.sexo}, Tipo: ${a.tipo_animal}`);
         });
@@ -54,7 +54,7 @@ async function verificarEstrutura() {
     }
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
   } finally {
     await pool.end();
   }

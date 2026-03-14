@@ -1,45 +1,45 @@
 // Script para testar e debugar a importação de animais
 
-console.log('�Ÿ”� Verificando dados no localStorage...')
+console.log('🔍 Verificando dados no localStorage...')
 
 // Verificar se há animais no localStorage
 const animalsData = localStorage.getItem('animals')
-console.log('�Ÿ“� Dados brutos do localStorage:', animalsData)
+console.log('📦 Dados brutos do localStorage:', animalsData)
 
 if (animalsData) {
   try {
     const animals = JSON.parse(animalsData)
-    console.log('�Ÿ�„ Animais encontrados:', animals.length)
-    console.log('�Ÿ”� Primeiro animal:', animals[0])
-    console.log('�Ÿ”� �šltimos 3 animais:', animals.slice(-3))
+    console.log('🐄 Animais encontrados:', animals.length)
+    console.log('🔍 Primeiro animal:', animals[0])
+    console.log('🔍 Últimos 3 animais:', animals.slice(-3))
   } catch (error) {
-    console.error('�Œ Erro ao parsear dados:', error)
+    console.error('❌ Erro ao parsear dados:', error)
   }
 } else {
-  console.log('�š�️ Nenhum dado encontrado no localStorage')
+  console.log('⚠️ Nenhum dado encontrado no localStorage')
 }
 
 // Verificar se a API está funcionando
-console.log('�Ÿ”� Testando API...')
+console.log('🔍 Testando API...')
 fetch('/api/animals')
   .then(response => {
-    console.log('�Ÿ“� Status da API:', response.status)
+    console.log('📡 Status da API:', response.status)
     return response.json()
   })
   .then(data => {
-    console.log('�Ÿ“Š Resposta da API:', data)
+    console.log('📊 Resposta da API:', data)
     if (data.success && data.data) {
-      console.log('�œ… API funcionando, animais encontrados:', data.data.length)
+      console.log('✅ API funcionando, animais encontrados:', data.data.length)
     }
   })
   .catch(error => {
-    console.error('�Œ Erro na API:', error)
+    console.error('❌ Erro na API:', error)
   })
 
 // Função para limpar dados (se necessário)
 window.clearAnimalsData = () => {
   localStorage.removeItem('animals')
-  console.log('�Ÿ�� Dados do localStorage limpos')
+  console.log('🧹 Dados do localStorage limpos')
 }
 
 // Função para adicionar animal de teste
@@ -60,10 +60,10 @@ window.addTestAnimal = () => {
   existingAnimals.push(testAnimal)
   localStorage.setItem('animals', JSON.stringify(existingAnimals))
   
-  console.log('�œ… Animal de teste adicionado:', testAnimal)
-  console.log('�Ÿ“Š Total de animais agora:', existingAnimals.length)
+  console.log('✅ Animal de teste adicionado:', testAnimal)
+  console.log('📊 Total de animais agora:', existingAnimals.length)
 }
 
-console.log('�Ÿ›�️ Funções disponíveis:')
+console.log('🛠️ Funções disponíveis:')
 console.log('- clearAnimalsData() - Limpar dados')
 console.log('- addTestAnimal() - Adicionar animal de teste')

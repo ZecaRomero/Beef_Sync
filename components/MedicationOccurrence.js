@@ -46,14 +46,14 @@ export default function MedicationOccurrence() {
         setProtocolos(JSON.parse(customProtocolos))
         setMedicamentos(JSON.parse(customMedicamentos))
       } else {
-        // Fallback com dados bÃ¡sicos se nÃ£o conseguir carregar
+        // Fallback com dados básicos se não conseguir carregar
         try {
           const { default: costManager } = await import('../services/costManager')
           setProtocolos(costManager.protocolos || {})
           setMedicamentos(costManager.medicamentos || {})
         } catch (importError) {
-          console.warn('NÃ£o foi possÃ­vel carregar costManager, usando dados padrÃ£o:', importError)
-          // Dados padrÃ£o bÃ¡sicos
+          console.warn('Não foi possível carregar costManager, usando dados padrão:', importError)
+          // Dados padrão básicos
           setProtocolos({
             machos: {},
             femeas: {}
@@ -70,7 +70,7 @@ export default function MedicationOccurrence() {
         }
       }
 
-      // Simular lista de animais (vocÃª pode integrar com sua API)
+      // Simular lista de animais (você pode integrar com sua API)
       const mockAnimals = [
         { id: 1, brinco: 'BR001', sexo: 'macho', idade: '12 meses', peso: 450 },
         { id: 2, brinco: 'BR002', sexo: 'femea', idade: '8 meses', peso: 380 },
@@ -81,7 +81,7 @@ export default function MedicationOccurrence() {
       setAnimals(mockAnimals)
     } catch (error) {
       console.error('Erro ao carregar dados:', error)
-      // Garantir que sempre temos dados bÃ¡sicos
+      // Garantir que sempre temos dados básicos
       setProtocolos({
         machos: {},
         femeas: {}
@@ -109,7 +109,7 @@ export default function MedicationOccurrence() {
         setOccurrences(JSON.parse(saved))
       }
     } catch (error) {
-      console.error('Erro ao carregar ocorrÃªncias:', error)
+      console.error('Erro ao carregar ocorrências:', error)
       setOccurrences([])
     }
   }
@@ -122,7 +122,7 @@ export default function MedicationOccurrence() {
       }
 
       if (medicationForm.tipoAplicacao === 'individual' && selectedAnimals.length === 0) {
-        alert('Selecione pelo menos um animal para medicaÃ§Ã£o individual')
+        alert('Selecione pelo menos um animal para medicação individual')
         return
       }
 
@@ -133,7 +133,7 @@ export default function MedicationOccurrence() {
 
       const medicineInfo = medicamentos[medicationForm.medicamento]
       if (!medicineInfo) {
-        alert('Medicamento nÃ£o encontrado')
+        alert('Medicamento não encontrado')
         return
       }
 
@@ -180,10 +180,10 @@ export default function MedicationOccurrence() {
       setSelectedAnimals([])
       setShowForm(false)
       
-      alert('OcorrÃªncia registrada com sucesso!')
+      alert('Ocorrência registrada com sucesso!')
     } catch (error) {
-      console.error('Erro ao salvar ocorrÃªncia:', error)
-      alert('Erro ao registrar medicaÃ§Ã£o. Tente novamente.')
+      console.error('Erro ao salvar ocorrência:', error)
+      alert('Erro ao registrar medicação. Tente novamente.')
     }
   }
 
@@ -210,7 +210,7 @@ export default function MedicationOccurrence() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin text-4xl mb-4">âÅ¡â„¢ï¸�</div>
+          <div className="animate-spin text-4xl mb-4">⚙️</div>
           <p className="text-gray-600 dark:text-gray-400">Carregando dados...</p>
         </div>
       </div>
@@ -221,30 +221,30 @@ export default function MedicationOccurrence() {
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-gradient-to-r from-green-600 to-blue-600 rounded-2xl p-6 text-white">
-        <h1 className="text-3xl font-bold mb-2">ðÅ¸â€™â€° LanÃ§amento de MedicaÃ§Ã£o</h1>
-        <p className="text-green-100">Registre as ocorrÃªncias de medicaÃ§Ã£o aplicadas nos animais</p>
+        <h1 className="text-3xl font-bold mb-2">💉 Lançamento de Medicação</h1>
+        <p className="text-green-100">Registre as ocorrências de medicação aplicadas nos animais</p>
       </div>
 
-      {/* BotÃ£o para nova ocorrÃªncia */}
+      {/* Botão para nova ocorrência */}
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-          ðÅ¸â€œâ€¹ OcorrÃªncias de MedicaÃ§Ã£o
+          📋 Ocorrências de Medicação
         </h2>
         <button
           onClick={() => setShowForm(true)}
           className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
         >
           <PlusIcon className="h-5 w-5" />
-          <span>Nova MedicaÃ§Ã£o</span>
+          <span>Nova Medicação</span>
         </button>
       </div>
 
-      {/* Lista de ocorrÃªncias */}
+      {/* Lista de ocorrências */}
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
         {occurrences.length === 0 ? (
           <div className="text-center py-8">
             <BeakerIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500 dark:text-gray-400">Nenhuma medicaÃ§Ã£o registrada ainda</p>
+            <p className="text-gray-500 dark:text-gray-400">Nenhuma medicação registrada ainda</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -294,14 +294,14 @@ export default function MedicationOccurrence() {
 
                 {occurrence.observacoes && (
                   <div className="mb-3">
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">ObservaÃ§Ãµes:</p>
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Observações:</p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">{occurrence.observacoes}</p>
                   </div>
                 )}
 
                 {occurrence.responsavel && (
                   <div className="text-sm text-gray-500 dark:text-gray-400">
-                    ResponsÃ¡vel: {occurrence.responsavel}
+                    Responsável: {occurrence.responsavel}
                   </div>
                 )}
               </div>
@@ -310,14 +310,14 @@ export default function MedicationOccurrence() {
         )}
       </div>
 
-      {/* Modal do formulÃ¡rio */}
+      {/* Modal do formulário */}
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Nova MedicaÃ§Ã£o
+                  Nova Medicação
                 </h3>
                 <button
                   onClick={() => setShowForm(false)}
@@ -328,11 +328,11 @@ export default function MedicationOccurrence() {
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* FormulÃ¡rio */}
+                {/* Formulário */}
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      ðÅ¸â€™Å  Medicamento *
+                      💊 Medicamento *
                     </label>
                     <select
                       value={medicationForm.medicamento}
@@ -351,15 +351,15 @@ export default function MedicationOccurrence() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      ðÅ¸Å½¯ Tipo de AplicaÃ§Ã£o
+                      🎯 Tipo de Aplicação
                     </label>
                     <select
                       value={medicationForm.tipoAplicacao}
                       onChange={(e) => setMedicationForm({...medicationForm, tipoAplicacao: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     >
-                      <option value="individual">ðÅ¸�â€ž Individual (por animal)</option>
-                      <option value="lote">ðÅ¸â€œ¦ Em Lote (grupo)</option>
+                      <option value="individual">🐄 Individual (por animal)</option>
+                      <option value="lote">📦 Em Lote (grupo)</option>
                     </select>
                   </div>
 
@@ -367,7 +367,7 @@ export default function MedicationOccurrence() {
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          ðÅ¸â€œ¦ Nome do Lote
+                          📦 Nome do Lote
                         </label>
                         <input
                           type="text"
@@ -382,7 +382,7 @@ export default function MedicationOccurrence() {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          ðÅ¸â€œÅ  Qtd Animais
+                          📊 Qtd Animais
                         </label>
                         <input
                           type="number"
@@ -401,7 +401,7 @@ export default function MedicationOccurrence() {
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        ðÅ¸â€œâ€¦ Data da AplicaÃ§Ã£o
+                        📅 Data da Aplicação
                       </label>
                       <input
                         type="date"
@@ -412,7 +412,7 @@ export default function MedicationOccurrence() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        ðÅ¸â€¢� Hora da AplicaÃ§Ã£o
+                        🕐 Hora da Aplicação
                       </label>
                       <input
                         type="time"
@@ -425,37 +425,37 @@ export default function MedicationOccurrence() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      ðÅ¸â€˜¤ ResponsÃ¡vel
+                      👤 Responsável
                     </label>
                     <input
                       type="text"
                       value={medicationForm.responsavel}
                       onChange={(e) => setMedicationForm({...medicationForm, responsavel: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                      placeholder="Nome do responsÃ¡vel pela aplicaÃ§Ã£o"
+                      placeholder="Nome do responsável pela aplicação"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      ðÅ¸â€œ� ObservaÃ§Ãµes
+                      📝 Observações
                     </label>
                     <textarea
                       value={medicationForm.observacoes}
                       onChange={(e) => setMedicationForm({...medicationForm, observacoes: e.target.value})}
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                      placeholder="ObservaÃ§Ãµes sobre a aplicaÃ§Ã£o..."
+                      placeholder="Observações sobre a aplicação..."
                     />
                   </div>
                 </div>
 
-                {/* SeleÃ§Ã£o de animais (apenas para aplicaÃ§Ã£o individual) */}
+                {/* Seleção de animais (apenas para aplicação individual) */}
                 {medicationForm.tipoAplicacao === 'individual' && (
                   <div>
                     <div className="flex justify-between items-center mb-4">
                       <h4 className="text-lg font-medium text-gray-900 dark:text-white">
-                        ðÅ¸�â€ž Selecionar Animais ({selectedAnimals.length} selecionados)
+                        🐄 Selecionar Animais ({selectedAnimals.length} selecionados)
                       </h4>
                       <div className="space-x-2">
                         <button
@@ -490,7 +490,7 @@ export default function MedicationOccurrence() {
                                 {animal.brinco}
                               </div>
                               <div className="text-sm text-gray-600 dark:text-gray-400">
-                                {animal.sexo} ââ‚¬¢ {animal.idade} ââ‚¬¢ {animal.peso}kg
+                                {animal.sexo} • {animal.idade} • {animal.peso}kg
                               </div>
                             </div>
                             {selectedAnimals.find(a => a.id === animal.id) && (
@@ -507,7 +507,7 @@ export default function MedicationOccurrence() {
               {/* Resumo do custo */}
               {medicationForm.medicamento && medicamentos && medicamentos[medicationForm.medicamento] && (
                 <div className="mt-6 bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-                  <h4 className="font-medium text-green-800 dark:text-green-200 mb-2">ðÅ¸â€™° Resumo do Custo:</h4>
+                  <h4 className="font-medium text-green-800 dark:text-green-200 mb-2">💰 Resumo do Custo:</h4>
                   {medicationForm.tipoAplicacao === 'individual' ? (
                     <div className="text-sm text-green-700 dark:text-green-300">
                       <p>Custo por animal: R$ {(medicamentos[medicationForm.medicamento]?.porAnimal || 0).toFixed(2)}</p>
@@ -524,13 +524,13 @@ export default function MedicationOccurrence() {
                 </div>
               )}
 
-              {/* BotÃµes */}
+              {/* Botões */}
               <div className="flex space-x-3 mt-6">
                 <button
                   onClick={saveOccurrence}
                   className="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
                 >
-                  Registrar MedicaÃ§Ã£o
+                  Registrar Medicação
                 </button>
                 <button
                   onClick={() => setShowForm(false)}

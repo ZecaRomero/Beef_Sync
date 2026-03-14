@@ -2,7 +2,7 @@
 const { query } = require('./lib/database')
 
 async function checkGestacaoesTable() {
-  console.log('�Ÿ”� VERIFICANDO ESTRUTURA DA TABELA GESTACOES')
+  console.log('🔍 VERIFICANDO ESTRUTURA DA TABELA GESTACOES')
   console.log('=' .repeat(60))
   
   try {
@@ -19,7 +19,7 @@ async function checkGestacaoesTable() {
       ORDER BY ordinal_position
     `)
     
-    console.log('\n�Ÿ“‹ ESTRUTURA DA TABELA GESTACOES:')
+    console.log('\n📋 ESTRUTURA DA TABELA GESTACOES:')
     console.log('-'.repeat(80))
     console.log('COLUNA'.padEnd(20) + 'TIPO'.padEnd(15) + 'NULLABLE'.padEnd(10) + 'DEFAULT'.padEnd(15) + 'TAMANHO')
     console.log('-'.repeat(80))
@@ -50,7 +50,7 @@ async function checkGestacaoesTable() {
       ORDER BY tc.constraint_type, kcu.column_name
     `)
     
-    console.log('\n�Ÿ”’ CONSTRAINTS DA TABELA GESTACOES:')
+    console.log('\n🔒 CONSTRAINTS DA TABELA GESTACOES:')
     console.log('-'.repeat(80))
     console.log('CONSTRAINT'.padEnd(25) + 'TIPO'.padEnd(15) + 'COLUNA'.padEnd(20) + 'REGRA')
     console.log('-'.repeat(80))
@@ -65,7 +65,7 @@ async function checkGestacaoesTable() {
     })
     
     // Testar inserção simples
-    console.log('\n�Ÿ�� TESTANDO INSER�‡�ƒO SIMPLES:')
+    console.log('\n🧪 TESTANDO INSERÇÃO SIMPLES:')
     console.log('-'.repeat(40))
     
     try {
@@ -92,24 +92,24 @@ async function checkGestacaoesTable() {
         'Teste de inserção'
       ])
       
-      console.log('�œ… Inserção bem-sucedida! ID:', testResult.rows[0].id)
+      console.log('✅ Inserção bem-sucedida! ID:', testResult.rows[0].id)
       
       // Remover o registro de teste
       await query('DELETE FROM gestacoes WHERE id = $1', [testResult.rows[0].id])
-      console.log('�Ÿ—‘️ Registro de teste removido')
+      console.log('🗑️ Registro de teste removido')
       
     } catch (insertError) {
-      console.log('�Œ Erro na inserção:', insertError.message)
-      console.log('�Ÿ“� Detalhes:', insertError.detail || 'Sem detalhes adicionais')
+      console.log('❌ Erro na inserção:', insertError.message)
+      console.log('📝 Detalhes:', insertError.detail || 'Sem detalhes adicionais')
     }
     
     // Verificar registros existentes
     const count = await query('SELECT COUNT(*) as total FROM gestacoes')
-    console.log(`\n�Ÿ“Š Total de registros existentes: ${count.rows[0].total}`)
+    console.log(`\n📊 Total de registros existentes: ${count.rows[0].total}`)
     
     if (count.rows[0].total > 0) {
       const sample = await query('SELECT * FROM gestacoes LIMIT 3')
-      console.log('\n�Ÿ“‹ AMOSTRA DE REGISTROS EXISTENTES:')
+      console.log('\n📋 AMOSTRA DE REGISTROS EXISTENTES:')
       console.log('-'.repeat(80))
       sample.rows.forEach((row, index) => {
         console.log(`${index + 1}. ID: ${row.id}`)
@@ -123,14 +123,14 @@ async function checkGestacaoesTable() {
     }
     
   } catch (error) {
-    console.error('�Œ Erro ao verificar tabela:', error)
+    console.error('❌ Erro ao verificar tabela:', error)
   }
 }
 
 // Executar
 checkGestacaoesTable()
   .then(() => {
-    console.log('\n�œ… VERIFICA�‡�ƒO CONCLUÍDA!')
+    console.log('\n✅ VERIFICAÇÃO CONCLUÍDA!')
     process.exit(0)
   })
   .catch(error => {

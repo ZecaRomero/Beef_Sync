@@ -24,15 +24,15 @@ export default function NovaFazenda() {
       })
 
       if (response.ok) {
-        alert('âÅ“â€¦ Fazenda cadastrada com sucesso!')
+        alert('✅ Fazenda cadastrada com sucesso!')
         router.push('/boletim-defesa')
       } else {
         const error = await response.json()
-        alert(`â�Å’ Erro: ${error.message}`)
+        alert(`❌ Erro: ${error.message}`)
       }
     } catch (error) {
       console.error('Erro ao cadastrar fazenda:', error)
-      alert('â�Å’ Erro ao cadastrar fazenda')
+      alert('❌ Erro ao cadastrar fazenda')
     } finally {
       setLoading(false)
     }

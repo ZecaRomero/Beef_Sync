@@ -5,7 +5,7 @@ async function testarQueryResumoPardinho() {
   const client = await pool.connect()
   
   try {
-    console.log('�Ÿ”� Testando query do resumo Pardinho...\n')
+    console.log('🔍 Testando query do resumo Pardinho...\n')
     
     const pgStart = '2025-01-01'
     const pgEnd = '2026-12-31'
@@ -48,7 +48,7 @@ async function testarQueryResumoPardinho() {
         )
     `, [pgStart, pgEnd, cnpjDestinoPardinho, cnpjFornecedorPardinho])
     
-    console.log(`�Ÿ“Š Total de NFs encontradas: ${nfsResult.rows.length}\n`)
+    console.log(`📊 Total de NFs encontradas: ${nfsResult.rows.length}\n`)
     
     for (const nf of nfsResult.rows) {
       console.log(`NF ${nf.numero_nf} (ID: ${nf.id})`)
@@ -91,12 +91,12 @@ async function testarQueryResumoPardinho() {
     }
     
     // Verificar especificamente a NF 239
-    console.log('\n�Ÿ”� Verificando especificamente a NF 239:')
+    console.log('\n🔍 Verificando especificamente a NF 239:')
     const nf239 = nfsResult.rows.find(nf => nf.numero_nf === '239' || nf.numero_nf === 239)
     if (nf239) {
-      console.log('�œ… NF 239 ENCONTRADA na query!')
+      console.log('✅ NF 239 ENCONTRADA na query!')
     } else {
-      console.log('�Œ NF 239 N�ƒO encontrada na query')
+      console.log('❌ NF 239 NÃO encontrada na query')
       
       // Verificar por que não foi encontrada
       const nf239Check = await client.query(`
@@ -114,13 +114,13 @@ async function testarQueryResumoPardinho() {
       `)
       
       if (nf239Check.rows.length > 0) {
-        console.log('\n�Ÿ“‹ Dados da NF 239:')
+        console.log('\n📋 Dados da NF 239:')
         console.log(JSON.stringify(nf239Check.rows[0], null, 2))
       }
     }
     
   } catch (error) {
-    console.error('�Œ Erro:', error)
+    console.error('❌ Erro:', error)
     throw error
   } finally {
     client.release()
@@ -129,10 +129,10 @@ async function testarQueryResumoPardinho() {
 
 testarQueryResumoPardinho()
   .then(() => {
-    console.log('\n�œ… Teste concluído')
+    console.log('\n✅ Teste concluído')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n�Œ Erro fatal:', error)
+    console.error('\n❌ Erro fatal:', error)
     process.exit(1)
   })

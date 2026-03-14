@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * Script de otimizaÃ§Ã£o para produÃ§Ã£o
- * Remove console.logs desnecessÃ¡rios e otimiza o cÃ³digo
+ * Script de otimização para produção
+ * Remove console.logs desnecessários e otimiza o código
  */
 
 const fs = require('fs');
 const path = require('path');
 
-// DiretÃ³rios para otimizar
+// Diretórios para otimizar
 const DIRECTORIES = [
   'components',
   'pages',
@@ -17,11 +17,11 @@ const DIRECTORIES = [
   'services'
 ];
 
-// PadrÃµes de console.log para manter (importantes para debug)
+// Padrões de console.log para manter (importantes para debug)
 const KEEP_PATTERNS = [
   /console\.error/,
   /console\.warn/,
-  /console\.info.*crÃ­tico/i,
+  /console\.info.*crítico/i,
   /console\.log.*erro/i,
   /console\.log.*falha/i
 ];
@@ -37,10 +37,10 @@ function optimizeFile(filePath) {
     
     let modified = false;
     const optimizedLines = lines.map(line => {
-      // Remover console.log desnecessÃ¡rios
+      // Remover console.log desnecessários
       if (line.includes('console.log') && !shouldKeepConsoleLog(line)) {
         modified = true;
-        // Comentar ao invÃ©s de remover completamente
+        // Comentar ao invés de remover completamente
         return line.replace(/(\s*)console\.log/, '$1// console.log');
       }
       
@@ -49,13 +49,13 @@ function optimizeFile(filePath) {
     
     if (modified) {
       fs.writeFileSync(filePath, optimizedLines.join('\n'));
-      console.log(`âÅ“â€¦ Otimizado: ${filePath}`);
+      console.log(`✅ Otimizado: ${filePath}`);
       return 1;
     }
     
     return 0;
   } catch (error) {
-    console.error(`â�Å’ Erro ao otimizar ${filePath}:`, error.message);
+    console.error(`❌ Erro ao otimizar ${filePath}:`, error.message);
     return 0;
   }
 }
@@ -77,34 +77,34 @@ function optimizeDirectory(dirPath) {
       }
     }
   } catch (error) {
-    console.error(`â�Å’ Erro ao processar diretÃ³rio ${dirPath}:`, error.message);
+    console.error(`❌ Erro ao processar diretório ${dirPath}:`, error.message);
   }
   
   return optimizedCount;
 }
 
 function main() {
-  console.log('ðÅ¸Å¡â‚¬ Iniciando otimizaÃ§Ã£o para produÃ§Ã£o...\n');
+  console.log('🚀 Iniciando otimização para produção...\n');
   
   let totalOptimized = 0;
   
   for (const dir of DIRECTORIES) {
     if (fs.existsSync(dir)) {
-      console.log(`ðÅ¸â€œ� Otimizando diretÃ³rio: ${dir}`);
+      console.log(`📁 Otimizando diretório: ${dir}`);
       totalOptimized += optimizeDirectory(dir);
     } else {
-      console.log(`âÅ¡ ï¸�  DiretÃ³rio nÃ£o encontrado: ${dir}`);
+      console.log(`⚠️  Diretório não encontrado: ${dir}`);
     }
   }
   
-  console.log(`\nðÅ¸Å½â€° OtimizaÃ§Ã£o concluÃ­da!`);
-  console.log(`ðÅ¸â€œÅ  Total de arquivos otimizados: ${totalOptimized}`);
+  console.log(`\n🎉 Otimização concluída!`);
+  console.log(`📊 Total de arquivos otimizados: ${totalOptimized}`);
   
   if (totalOptimized > 0) {
-    console.log('\nðÅ¸â€™¡ Dicas:');
-    console.log('ââ‚¬¢ Console.logs foram comentados, nÃ£o removidos');
-    console.log('ââ‚¬¢ Console.error e console.warn foram mantidos');
-    console.log('ââ‚¬¢ Execute npm run build para gerar versÃ£o otimizada');
+    console.log('\n💡 Dicas:');
+    console.log('• Console.logs foram comentados, não removidos');
+    console.log('• Console.error e console.warn foram mantidos');
+    console.log('• Execute npm run build para gerar versão otimizada');
   }
 }
 

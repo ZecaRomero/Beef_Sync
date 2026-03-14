@@ -47,7 +47,7 @@ export default function Clients() {
       const response = await fetch('/api/notas-fiscais')
       if (response.ok) {
         const data = await response.json()
-        // Filtrar notas de saÃ­da do cliente especÃ­fico
+        // Filtrar notas de saída do cliente específico
         const notasFiltradas = (data.data || []).filter(nota => 
           nota.tipo === 'saida' && 
           nota.destino && 
@@ -99,7 +99,7 @@ export default function Clients() {
             Cadastro de Clientes
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-2">
-            Clientes extraÃ­dos das notas fiscais de saÃ­da (vendas)
+            Clientes extraídos das notas fiscais de saída (vendas)
           </p>
         </div>
         <Button onClick={() => setShowNewClient(true)} className="flex items-center gap-2">
@@ -159,7 +159,7 @@ export default function Clients() {
           type="text"
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
-          placeholder="Buscar cliente por nome, CNPJ ou municÃ­pio..."
+          placeholder="Buscar cliente por nome, CNPJ ou município..."
           className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
         />
       </Card>
@@ -177,7 +177,7 @@ export default function Clients() {
             Nenhum cliente encontrado
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
-            {busca ? 'Tente ajustar os filtros de busca' : 'Nenhum cliente registrado nas notas fiscais de saÃ­da'}
+            {busca ? 'Tente ajustar os filtros de busca' : 'Nenhum cliente registrado nas notas fiscais de saída'}
           </p>
         </Card>
       ) : (
@@ -193,7 +193,7 @@ export default function Clients() {
                     CNPJ/CPF
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    MunicÃ­pio
+                    Município
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Total de Vendas
@@ -202,10 +202,10 @@ export default function Clients() {
                     Valor Total
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    ÃÅ¡ltima Venda
+                    Última Venda
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    AÃ§Ãµes
+                    Ações
                   </th>
                 </tr>
               </thead>
@@ -281,7 +281,7 @@ export default function Clients() {
                 </div>
 
                 <div className="space-y-6">
-                  {/* InformaÃ§Ãµes Gerais */}
+                  {/* Informações Gerais */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
@@ -302,7 +302,7 @@ export default function Clients() {
                     {clienteSelecionado.endereco && (
                       <div className="col-span-2">
                         <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                          EndereÃ§o
+                          Endereço
                         </label>
                         <p className="text-base text-gray-900 dark:text-white">
                           {clienteSelecionado.endereco}
@@ -312,7 +312,7 @@ export default function Clients() {
                     {clienteSelecionado.municipio && (
                       <div>
                         <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                          MunicÃ­pio/Estado
+                          Município/Estado
                         </label>
                         <p className="text-base text-gray-900 dark:text-white">
                           {clienteSelecionado.municipio} {clienteSelecionado.estado ? `- ${clienteSelecionado.estado}` : ''}
@@ -341,10 +341,10 @@ export default function Clients() {
                     )}
                   </div>
 
-                  {/* EstatÃ­sticas */}
+                  {/* Estatísticas */}
                   <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                     <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-                      EstatÃ­sticas de Vendas
+                      Estatísticas de Vendas
                     </h4>
                     <div className="grid grid-cols-3 gap-4">
                       <div>
@@ -384,7 +384,7 @@ export default function Clients() {
                       {clienteSelecionado.ultima_venda && (
                         <div>
                           <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                            ÃÅ¡ltima Venda
+                            Última Venda
                           </label>
                           <p className="text-base text-gray-900 dark:text-white">
                             {new Date(clienteSelecionado.ultima_venda).toLocaleDateString('pt-BR')}
@@ -394,10 +394,10 @@ export default function Clients() {
                     </div>
                   </div>
 
-                  {/* HistÃ³rico de Notas Fiscais */}
+                  {/* Histórico de Notas Fiscais */}
                   <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                     <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-                      HistÃ³rico de Vendas ({notasCliente.length})
+                      Histórico de Vendas ({notasCliente.length})
                     </h4>
                     {loadingNotas ? (
                       <div className="text-center py-4">
@@ -463,7 +463,7 @@ export default function Clients() {
         </div>
       )}
 
-      {/* Modal Novo Cliente - manter funcionalidade existente se necessÃ¡rio */}
+      {/* Modal Novo Cliente - manter funcionalidade existente se necessário */}
     </div>
   )
 }

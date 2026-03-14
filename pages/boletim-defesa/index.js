@@ -73,10 +73,10 @@ export default function BoletimDefesa() {
     const fazenda = fazendas.find(f => f.id === fazendaId)
     const valorAntigo = fazenda?.quantidades[faixa]?.[sexo] || 0
     
-    // Se o valor nÃ£o mudou, nÃ£o fazer nada
+    // Se o valor não mudou, não fazer nada
     if (valorAntigo === valorNumerico) return
     
-    // Preparar informaÃ§Ãµes para confirmaÃ§Ã£o
+    // Preparar informações para confirmação
     const faixaLabels = {
       '0a3': '0 a 3 meses',
       '3a8': '3 a 8 meses',
@@ -86,7 +86,7 @@ export default function BoletimDefesa() {
       'acima36': 'Acima de 36 meses'
     }
     
-    const sexoLabel = sexo === 'M' ? 'Machos' : 'FÃªmeas'
+    const sexoLabel = sexo === 'M' ? 'Machos' : 'Fêmeas'
     
     setPendingChange({
       fazendaId,
@@ -152,9 +152,9 @@ export default function BoletimDefesa() {
       carregarDados()
     } catch (error) {
       console.error('Erro ao salvar:', error)
-      alert('â�Å’ Erro ao salvar alteraÃ§Ã£o')
+      alert('❌ Erro ao salvar alteração')
       
-      // Reverter alteraÃ§Ã£o localmente em caso de erro
+      // Reverter alteração localmente em caso de erro
       setFazendas(prev => prev.map(f => {
         if (f.id === fazendaId) {
           return {
@@ -179,7 +179,7 @@ export default function BoletimDefesa() {
   const cancelarAlteracao = () => {
     setShowConfirmModal(false)
     setPendingChange(null)
-    // Recarregar dados para reverter a mudanÃ§a visual
+    // Recarregar dados para reverter a mudança visual
     carregarDados()
   }
 
@@ -202,7 +202,7 @@ export default function BoletimDefesa() {
       if (data.success) {
         setHistorico(prev => prev.filter(h => h.id !== id))
       } else {
-        alert(data.message || 'NÃ£o foi possÃ­vel excluir')
+        alert(data.message || 'Não foi possível excluir')
       }
     } catch (err) {
       alert('Erro ao excluir')
@@ -245,7 +245,7 @@ export default function BoletimDefesa() {
       const q = fazenda.quantidades
       const subtotais = calcularSubtotais(q)
 
-      // TÃ­tulo
+      // Título
       sheet.mergeCells('A1:P1')
       const titleCell = sheet.getCell('A1')
       titleCell.value = `QUANTIDADES DE GADO NA DEFESA (${new Date().toLocaleDateString('pt-BR')})`
@@ -254,7 +254,7 @@ export default function BoletimDefesa() {
       titleCell.alignment = { horizontal: 'center', vertical: 'middle' }
       sheet.getRow(1).height = 25
 
-      // SubtÃ­tulo
+      // Subtítulo
       sheet.mergeCells('A2:P2')
       const subtitleCell = sheet.getCell('A2')
       subtitleCell.value = `${fazenda.nome} - ${fazenda.cnpj}`
@@ -263,7 +263,7 @@ export default function BoletimDefesa() {
       subtitleCell.alignment = { horizontal: 'center', vertical: 'middle' }
       sheet.getRow(2).height = 20
 
-      // CabeÃ§alho - Faixas etÃ¡rias
+      // Cabeçalho - Faixas etárias
       sheet.mergeCells('B3:C3')
       sheet.mergeCells('D3:E3')
       sheet.mergeCells('F3:G3')
@@ -297,7 +297,7 @@ export default function BoletimDefesa() {
         }
       })
 
-      // CabeÃ§alho - M/F
+      // Cabeçalho - M/F
       const row4 = sheet.getRow(4)
       const sexos = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
       sexos.forEach((col, idx) => {
@@ -371,7 +371,7 @@ export default function BoletimDefesa() {
     // Planilha consolidada
     const consolidado = workbook.addWorksheet('CONSOLIDADO')
 
-    // TÃ­tulo
+    // Título
     consolidado.mergeCells('A1:Q1')
     const titleCons = consolidado.getCell('A1')
     titleCons.value = `CONSOLIDADO - QUANTIDADES DE GADO NA DEFESA (${new Date().toLocaleDateString('pt-BR')})`
@@ -380,7 +380,7 @@ export default function BoletimDefesa() {
     titleCons.alignment = { horizontal: 'center', vertical: 'middle' }
     consolidado.getRow(1).height = 25
 
-    // CabeÃ§alho
+    // Cabeçalho
     consolidado.mergeCells('B3:C3')
     consolidado.mergeCells('D3:E3')
     consolidado.mergeCells('F3:G3')
@@ -582,7 +582,7 @@ export default function BoletimDefesa() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-400 text-sm">
-            {redirecionandoMobile ? 'Abrindo versÃ£o mobile...' : 'Carregando...'}
+            {redirecionandoMobile ? 'Abrindo versão mobile...' : 'Carregando...'}
           </p>
         </div>
       </div>
@@ -595,7 +595,7 @@ export default function BoletimDefesa() {
         <title>Boletim Defesa - Beef-Sync</title>
       </Head>
 
-      {/* Modal de ConfirmaÃ§Ã£o */}
+      {/* Modal de Confirmação */}
       {showConfirmModal && pendingChange && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 border-2 border-blue-500 dark:border-blue-600">
@@ -606,10 +606,10 @@ export default function BoletimDefesa() {
                 </svg>
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                Confirmar AlteraÃ§Ã£o
+                Confirmar Alteração
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                VocÃª estÃ¡ prestes a alterar uma quantidade
+                Você está prestes a alterar uma quantidade
               </p>
             </div>
 
@@ -622,7 +622,7 @@ export default function BoletimDefesa() {
                 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Faixa EtÃ¡ria:</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Faixa Etária:</p>
                     <p className="font-semibold text-gray-900 dark:text-white text-sm">{pendingChange.faixaLabel}</p>
                   </div>
                   <div>
@@ -656,13 +656,13 @@ export default function BoletimDefesa() {
                 onClick={cancelarAlteracao}
                 className="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-xl font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
               >
-                âÅ“â€¢ Cancelar
+                ✕ Cancelar
               </button>
               <button
                 onClick={confirmarAlteracao}
                 className="flex-1 px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl font-semibold hover:from-green-700 hover:to-green-800 transition-colors shadow-lg"
               >
-                âÅ“â€œ Confirmar
+                ✓ Confirmar
               </button>
             </div>
           </div>
@@ -671,7 +671,7 @@ export default function BoletimDefesa() {
 
       <ModernLayout
         title="Boletim Defesa"
-        subtitle={abaAtiva === 'defesa' ? 'Quantidades de gado na defesa por faixa etÃ¡ria' : 'Boletim Campo - LOCAL, QUANT., SEXO, CATEGORIA, RAÃâ€¡A, ERA'}
+        subtitle={abaAtiva === 'defesa' ? 'Quantidades de gado na defesa por faixa etária' : 'Boletim Campo - LOCAL, QUANT., SEXO, CATEGORIA, RAÇA, ERA'}
         icon={<DocumentTextIcon className="w-8 h-8 text-white" />}
       >
         <div className="space-y-6">
@@ -707,7 +707,7 @@ export default function BoletimDefesa() {
 
           {abaAtiva === 'defesa' && (
           <>
-          {/* BotÃµes de aÃ§Ã£o */}
+          {/* Botões de ação */}
           <div className="flex flex-wrap gap-3">
             <button
               onClick={exportarExcel}
@@ -733,7 +733,7 @@ export default function BoletimDefesa() {
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
-                  VersÃ£o Mobile
+                  Versão Mobile
                 </button>
               </>
             )}
@@ -879,14 +879,14 @@ export default function BoletimDefesa() {
             </div>
           )}
 
-          {/* HistÃ³rico de alteraÃ§Ãµes */}
+          {/* Histórico de alterações */}
           {historico.length > 0 && (
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
               <h3 className="px-4 py-3 bg-gray-100 dark:bg-gray-900 font-bold text-gray-900 dark:text-white flex items-center gap-2">
                 <svg className="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                HistÃ³rico de alteraÃ§Ãµes
+                Histórico de alterações
               </h3>
               <div className="max-h-64 overflow-y-auto">
                 <table className="w-full text-sm">
@@ -895,8 +895,8 @@ export default function BoletimDefesa() {
                       <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Data/Hora</th>
                       <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Fazenda</th>
                       <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Campo alterado</th>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">De ââ€ â€™ Para</th>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">UsuÃ¡rio</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">De → Para</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Usuário</th>
                       {currentUser && !isAdelso && <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase w-12">Excluir</th>}
                     </tr>
                   </thead>
@@ -921,7 +921,7 @@ export default function BoletimDefesa() {
                         </td>
                         <td className="px-3 py-2">
                           <span className="text-red-600 dark:text-red-400 font-medium">{h.valor_anterior}</span>
-                          <span className="mx-1 text-gray-400">ââ€ â€™</span>
+                          <span className="mx-1 text-gray-400">→</span>
                           <span className="text-green-600 dark:text-green-400 font-medium">{h.valor_novo}</span>
                         </td>
                         <td className="px-3 py-2 text-gray-500 dark:text-gray-400 text-xs">{h.usuario || '-'}</td>
@@ -941,7 +941,7 @@ export default function BoletimDefesa() {
                                 )}
                               </button>
                             ) : (
-                              <span className="text-gray-300 dark:text-gray-600" title="Somente o autor pode excluir">ââ‚¬â€�</span>
+                              <span className="text-gray-300 dark:text-gray-600" title="Somente o autor pode excluir">—</span>
                             )}
                           </td>
                         )}
@@ -960,7 +960,7 @@ export default function BoletimDefesa() {
                 Nenhuma fazenda cadastrada
               </h3>
               <p className="text-gray-500 dark:text-gray-400 mb-4">
-                Adicione uma fazenda para comeÃ§ar a registrar as quantidades
+                Adicione uma fazenda para começar a registrar as quantidades
               </p>
               <button
                 onClick={() => window.location.href = '/boletim-defesa/nova-fazenda'}

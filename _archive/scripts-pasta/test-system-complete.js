@@ -9,14 +9,14 @@ async function testDatabaseConnection() {
     const connection = await databaseService.testConnection()
     
     if (connection) {
-      logger.info('�œ… Conexão com banco de dados: OK')
+      logger.info('✅ Conexão com banco de dados: OK')
       return true
     } else {
-      logger.error('�Œ Conexão com banco de dados: FALHOU')
+      logger.error('❌ Conexão com banco de dados: FALHOU')
       return false
     }
   } catch (error) {
-    logger.error('�Œ Erro na conexão com banco de dados:', error)
+    logger.error('❌ Erro na conexão com banco de dados:', error)
     return false
   }
 }
@@ -39,13 +39,13 @@ async function testAPIs() {
       const response = await fetch(`http://localhost:3020${api}`)
       
       if (response.ok) {
-        logger.info(`�œ… ${api}: OK`)
+        logger.info(`✅ ${api}: OK`)
         successCount++
       } else {
-        logger.warn(`�š�️ ${api}: Status ${response.status}`)
+        logger.warn(`⚠️ ${api}: Status ${response.status}`)
       }
     } catch (error) {
-      logger.error(`�Œ ${api}: ${error.message}`)
+      logger.error(`❌ ${api}: ${error.message}`)
     }
   }
 
@@ -77,17 +77,17 @@ async function testDatabaseTables() {
     for (const table of tables) {
       try {
         const count = await databaseService.getTableCount(table)
-        logger.info(`�œ… Tabela ${table}: ${count} registro(s)`)
+        logger.info(`✅ Tabela ${table}: ${count} registro(s)`)
         successCount++
       } catch (error) {
-        logger.error(`�Œ Tabela ${table}: ${error.message}`)
+        logger.error(`❌ Tabela ${table}: ${error.message}`)
       }
     }
 
     logger.info(`Tabelas verificadas: ${successCount}/${tables.length}`)
     return successCount === tables.length
   } catch (error) {
-    logger.error('�Œ Erro ao verificar tabelas:', error)
+    logger.error('❌ Erro ao verificar tabelas:', error)
     return false
   }
 }
@@ -104,14 +104,14 @@ async function testSystemPerformance() {
     const queryTime = Date.now() - startTime
     
     if (queryTime < 1000) {
-      logger.info(`�œ… Performance: OK (${queryTime}ms)`)
+      logger.info(`✅ Performance: OK (${queryTime}ms)`)
       return true
     } else {
-      logger.warn(`�š�️ Performance: LENTA (${queryTime}ms)`)
+      logger.warn(`⚠️ Performance: LENTA (${queryTime}ms)`)
       return false
     }
   } catch (error) {
-    logger.error('�Œ Erro no teste de performance:', error)
+    logger.error('❌ Erro no teste de performance:', error)
     return false
   }
 }
@@ -122,7 +122,7 @@ async function generateSystemReport() {
     
     const stats = await databaseService.getSystemStats()
     
-    logger.info('�Ÿ“Š Estatísticas do Sistema:')
+    logger.info('📊 Estatísticas do Sistema:')
     logger.info(`   Animais: ${stats.totalAnimals || 0}`)
     logger.info(`   Nascimentos: ${stats.totalBirths || 0}`)
     logger.info(`   Custos: ${stats.totalCosts || 0}`)
@@ -130,13 +130,13 @@ async function generateSystemReport() {
     
     return true
   } catch (error) {
-    logger.error('�Œ Erro ao gerar relatório:', error)
+    logger.error('❌ Erro ao gerar relatório:', error)
     return false
   }
 }
 
 async function runCompleteTest() {
-  logger.info('�Ÿš€ Iniciando teste completo do sistema...')
+  logger.info('🚀 Iniciando teste completo do sistema...')
   logger.info('=' * 60)
 
   const tests = [
@@ -151,7 +151,7 @@ async function runCompleteTest() {
   const results = []
 
   for (const test of tests) {
-    logger.info(`\n�Ÿ“‹ Executando: ${test.name}`)
+    logger.info(`\n📋 Executando: ${test.name}`)
     logger.info('-' * 40)
     
     try {
@@ -160,18 +160,18 @@ async function runCompleteTest() {
       
       if (result) {
         passedTests++
-        logger.info(`�œ… ${test.name}: PASSOU`)
+        logger.info(`✅ ${test.name}: PASSOU`)
       } else {
-        logger.error(`�Œ ${test.name}: FALHOU`)
+        logger.error(`❌ ${test.name}: FALHOU`)
       }
     } catch (error) {
-      logger.error(`�Œ ${test.name}: ERRO - ${error.message}`)
+      logger.error(`❌ ${test.name}: ERRO - ${error.message}`)
       results.push({ name: test.name, passed: false, error: error.message })
     }
   }
 
   logger.info('\n' + '=' * 60)
-  logger.info('�Ÿ“Š RESULTADO FINAL DO TESTE')
+  logger.info('📊 RESULTADO FINAL DO TESTE')
   logger.info('=' * 60)
   
   logger.info(`Testes executados: ${tests.length}`)
@@ -179,14 +179,14 @@ async function runCompleteTest() {
   logger.info(`Taxa de sucesso: ${((passedTests / tests.length) * 100).toFixed(1)}%`)
 
   if (passedTests === tests.length) {
-    logger.info('�ŸŽ‰ TODOS OS TESTES PASSARAM! Sistema funcionando perfeitamente!')
+    logger.info('🎉 TODOS OS TESTES PASSARAM! Sistema funcionando perfeitamente!')
     process.exit(0)
   } else {
-    logger.error('�š�️ ALGUNS TESTES FALHARAM! Verifique os erros acima.')
+    logger.error('⚠️ ALGUNS TESTES FALHARAM! Verifique os erros acima.')
     
-    logger.info('\n�Ÿ“‹ Resumo dos resultados:')
+    logger.info('\n📋 Resumo dos resultados:')
     results.forEach(result => {
-      const status = result.passed ? '�œ…' : '�Œ'
+      const status = result.passed ? '✅' : '❌'
       logger.info(`   ${status} ${result.name}`)
       if (result.error) {
         logger.info(`      Erro: ${result.error}`)

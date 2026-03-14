@@ -18,13 +18,13 @@ async function debugMonthlySummary() {
       endDate: '2025-10-31'
     }
     
-    console.log('�Ÿ”� Debugando generateMonthlySummary...')
+    console.log('🔍 Debugando generateMonthlySummary...')
     console.log(`Período: ${period.startDate} a ${period.endDate}\n`)
     
     const summary = {}
     
     // 1. Nascimentos
-    console.log('�Ÿ‘� NASCIMENTOS:')
+    console.log('👶 NASCIMENTOS:')
     const nascimentosResult = await client.query(`
       SELECT 
         COUNT(*) as total,
@@ -40,7 +40,7 @@ async function debugMonthlySummary() {
     console.log('Resultado:', summary.nascimentos)
     
     // 2. Mortes
-    console.log('\n�Ÿ’€ MORTES:')
+    console.log('\n💀 MORTES:')
     const mortesResult = await client.query(`
       SELECT 
         COUNT(*) as total,
@@ -54,7 +54,7 @@ async function debugMonthlySummary() {
     console.log('Resultado:', summary.mortes)
     
     // 3. Vendas
-    console.log('\n�Ÿ’� VENDAS:')
+    console.log('\n💰 VENDAS:')
     const vendasResult = await client.query(`
       SELECT 
         COUNT(*) as total,
@@ -68,7 +68,7 @@ async function debugMonthlySummary() {
     console.log('Resultado:', summary.vendas)
     
     // 4. Compras
-    console.log('\n�Ÿ›’ COMPRAS:')
+    console.log('\n🛒 COMPRAS:')
     const comprasResult = await client.query(`
       SELECT 
         COUNT(*) as total,
@@ -81,7 +81,7 @@ async function debugMonthlySummary() {
     console.log('Resultado:', summary.compras)
     
     // 5. Estatísticas gerais
-    console.log('\n�Ÿ“Š ESTATÍSTICAS GERAIS:')
+    console.log('\n📊 ESTATÍSTICAS GERAIS:')
     const estatisticasResult = await client.query(`
       SELECT 
         COUNT(*) as total_rebanho,
@@ -94,11 +94,11 @@ async function debugMonthlySummary() {
     summary.estatisticas_gerais = estatisticasResult.rows[0]
     console.log('Resultado:', summary.estatisticas_gerais)
     
-    console.log('\n�Ÿ“‹ RESUMO COMPLETO:')
+    console.log('\n📋 RESUMO COMPLETO:')
     console.log(JSON.stringify(summary, null, 2))
     
     // Verificar se há dados no período
-    console.log('\n�Ÿ”� VERIFICA�‡�ƒO ADICIONAL:')
+    console.log('\n🔍 VERIFICAÇÃO ADICIONAL:')
     
     // Verificar se há nascimentos no período
     const nascimentosCheck = await client.query(`
@@ -115,7 +115,7 @@ async function debugMonthlySummary() {
     console.log('Mortes na base:', mortesCheck.rows[0])
     
   } catch (error) {
-    console.error('�Œ Erro ao debugar:', error.message)
+    console.error('❌ Erro ao debugar:', error.message)
   } finally {
     client.release()
     await pool.end()

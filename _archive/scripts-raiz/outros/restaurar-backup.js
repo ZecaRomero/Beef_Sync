@@ -23,15 +23,15 @@ const TABELAS_IMPORTANTES = [
 ];
 
 async function restaurarBackup() {
-  console.log('�Ÿ”„ Iniciando restauração do backup...\n');
+  console.log('🔄 Iniciando restauração do backup...\n');
 
   try {
     // 1. Restaurar SQL (PostgreSQL)
-    console.log('�Ÿ“Š Restaurando backup SQL do PostgreSQL...');
+    console.log('📊 Restaurando backup SQL do PostgreSQL...');
     const sqlFile = 'backup_completo_2026-02-10 (1).sql';
     
     if (!fs.existsSync(sqlFile)) {
-      console.error(`�Œ Arquivo SQL não encontrado: ${sqlFile}`);
+      console.error(`❌ Arquivo SQL não encontrado: ${sqlFile}`);
       return;
     }
 
@@ -51,15 +51,15 @@ async function restaurarBackup() {
       } catch (err) {
         // Ignorar erros de DELETE em tabelas vazias
         if (!err.message.includes('does not exist')) {
-          console.error(`   �š�️  Erro ao executar comando:`, err.message);
+          console.error(`   ⚠️  Erro ao executar comando:`, err.message);
         }
       }
     }
     
-    console.log('�œ… Backup SQL restaurado com sucesso!\n');
+    console.log('✅ Backup SQL restaurado com sucesso!\n');
 
     // 2. Verificar dados restaurados
-    console.log('�Ÿ”� Verificando dados restaurados do SQL...\n');
+    console.log('🔍 Verificando dados restaurados do SQL...\n');
     
     for (const tabela of TABELAS_IMPORTANTES) {
       try {
@@ -67,29 +67,29 @@ async function restaurarBackup() {
         const count = parseInt(result.rows[0].count);
         
         if (count > 0) {
-          console.log(`   �œ… ${tabela}: ${count} registros`);
+          console.log(`   ✅ ${tabela}: ${count} registros`);
         } else {
-          console.log(`   �š�️  ${tabela}: 0 registros (VAZIA)`);
+          console.log(`   ⚠️  ${tabela}: 0 registros (VAZIA)`);
         }
       } catch (err) {
-        console.log(`   �Œ ${tabela}: ${err.message}`);
+        console.log(`   ❌ ${tabela}: ${err.message}`);
       }
     }
 
     // 3. Verificar tabelas vazias importantes
-    console.log('\n�š�️  ATEN�‡�ƒO - Tabelas vazias encontradas:');
+    console.log('\n⚠️  ATENÇÃO - Tabelas vazias encontradas:');
     console.log('   - dna_envios: Nenhum envio de DNA registrado');
     console.log('   - exames_andrologicos: Nenhum exame andrológico registrado');
     console.log('   - abastecimento_nitrogenio: Tabela não existe no backup');
-    console.log('\n�Ÿ’� Esses dados não estão presentes em NENHUM backup disponível.');
+    console.log('\n💡 Esses dados não estão presentes em NENHUM backup disponível.');
     console.log('   Se você tinha esses dados antes, eles foram perdidos antes dos backups serem criados.');
 
-    console.log('\n�œ… Restauração SQL completa!');
-    console.log('\n�Ÿ“Š Resumo:');
+    console.log('\n✅ Restauração SQL completa!');
+    console.log('\n📊 Resumo:');
     console.log(`   - Backup SQL: ${sqlFile}`);
 
   } catch (error) {
-    console.error('\n�Œ Erro durante a restauração:', error);
+    console.error('\n❌ Erro durante a restauração:', error);
     throw error;
   } finally {
     await pool.end();
@@ -99,10 +99,10 @@ async function restaurarBackup() {
 // Executar restauração
 restaurarBackup()
   .then(() => {
-    console.log('\n�ŸŽ‰ Processo concluído!');
+    console.log('\n🎉 Processo concluído!');
     process.exit(0);
   })
   .catch((error) => {
-    console.error('\n�Ÿ’� Falha na restauração:', error);
+    console.error('\n💥 Falha na restauração:', error);
     process.exit(1);
   });

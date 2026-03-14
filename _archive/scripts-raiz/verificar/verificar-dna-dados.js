@@ -2,7 +2,7 @@ const { query } = require('./lib/database')
 
 async function verificarDNA() {
   try {
-    console.log('�Ÿ”� Verificando tabelas de DNA...\n')
+    console.log('🔍 Verificando tabelas de DNA...\n')
 
     // Verificar se as tabelas existem
     const tabelasResult = await query(`
@@ -13,13 +13,13 @@ async function verificarDNA() {
       ORDER BY table_name
     `)
 
-    console.log('�Ÿ“‹ Tabelas encontradas:')
+    console.log('📋 Tabelas encontradas:')
     tabelasResult.rows.forEach(row => {
-      console.log(`  �œ“ ${row.table_name}`)
+      console.log(`  ✓ ${row.table_name}`)
     })
 
     if (tabelasResult.rows.length === 0) {
-      console.log('\n�Œ Nenhuma tabela de DNA encontrada!')
+      console.log('\n❌ Nenhuma tabela de DNA encontrada!')
       console.log('Execute: node scripts/create-dna-tables.js')
       return
     }
@@ -41,7 +41,7 @@ async function verificarDNA() {
       LIMIT 10
     `)
 
-    console.log(`�Ÿ“� Envios de DNA: ${enviosResult.rows.length} registro(s)`)
+    console.log(`📦 Envios de DNA: ${enviosResult.rows.length} registro(s)`)
     if (enviosResult.rows.length > 0) {
       enviosResult.rows.forEach(envio => {
         console.log(`\n  ID: ${envio.id}`)
@@ -73,7 +73,7 @@ async function verificarDNA() {
       LIMIT 10
     `)
 
-    console.log(`�Ÿ�„ Animais vinculados: ${animaisResult.rows.length} registro(s)`)
+    console.log(`🐄 Animais vinculados: ${animaisResult.rows.length} registro(s)`)
     if (animaisResult.rows.length > 0) {
       animaisResult.rows.forEach(animal => {
         console.log(`\n  ID Vínculo: ${animal.id}`)
@@ -105,7 +105,7 @@ async function verificarDNA() {
       LIMIT 10
     `)
 
-    console.log(`�Ÿ’� Custos de DNA: ${custosResult.rows.length} registro(s)`)
+    console.log(`💰 Custos de DNA: ${custosResult.rows.length} registro(s)`)
     if (custosResult.rows.length > 0) {
       custosResult.rows.forEach(custo => {
         console.log(`\n  ID: ${custo.id}`)
@@ -120,10 +120,10 @@ async function verificarDNA() {
       console.log('  (Nenhum custo de DNA registrado)')
     }
 
-    console.log('\n�œ… Verificação concluída!')
+    console.log('\n✅ Verificação concluída!')
 
   } catch (error) {
-    console.error('�Œ Erro ao verificar DNA:', error)
+    console.error('❌ Erro ao verificar DNA:', error)
   } finally {
     process.exit(0)
   }

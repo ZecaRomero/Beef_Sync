@@ -42,10 +42,10 @@ const NotasFiscaisRecentesWidget = () => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-lg font-bold text-blue-800 dark:text-blue-200 flex items-center gap-2">
-              <span>ðÅ¸â€œâ€¹</span> Notas Fiscais Recentes
+              <span>📋</span> Notas Fiscais Recentes
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              ÃÅ¡ltimas movimentaÃ§Ãµes cadastradas
+              Últimas movimentações cadastradas
             </p>
           </div>
           <button
@@ -75,14 +75,14 @@ const NotasFiscaisRecentesWidget = () => {
                           ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300'
                           : 'bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300'
                       }`}>
-                        {isEntrada ? 'ðÅ¸â€œ¥ ENTRADA' : 'ðÅ¸â€œ¤ SAÃ�DA'}
+                        {isEntrada ? '📥 ENTRADA' : '📤 SAÍDA'}
                       </span>
                       <span className="text-sm font-bold text-gray-900 dark:text-white">
                         NF {nf.numero_nf}
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {isEntrada ? nf.fornecedor : nf.destino} ââ‚¬¢ {dataFormatada}
+                      {isEntrada ? nf.fornecedor : nf.destino} • {dataFormatada}
                     </p>
                     {nf.total_itens > 0 && (
                       <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
@@ -132,13 +132,13 @@ const ReceptorasNF2141Widget = () => {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-bold text-pink-800 dark:text-pink-200 flex items-center gap-2">
-                <span>ðÅ¸¤°</span> Receptoras NF 2141
+                <span>🤰</span> Receptoras NF 2141
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                {receptoras.length} receptoras chegaram ââ‚¬â€� clique no card para conferir a atividade
+                {receptoras.length} receptoras chegaram — clique no card para conferir a atividade
               </p>
             </div>
-            <div className="text-pink-500 text-2xl">âÅ¾â€�</div>
+            <div className="text-pink-500 text-2xl">➔</div>
           </div>
           
           {/* Resumo visual */}
@@ -146,7 +146,7 @@ const ReceptorasNF2141Widget = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="bg-pink-100 dark:bg-pink-900/40 rounded-full p-3">
-                  <span className="text-2xl">âÅ“â€¦</span>
+                  <span className="text-2xl">✅</span>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Status</p>
@@ -178,12 +178,12 @@ const LastAnimalWidget = () => {
         if (res.ok) {
           const data = await res.json()
           if (data.success && data.data && data.data.length > 0) {
-            // Agrupar por raÃ§a e pegar o Ãºltimo de cada
+            // Agrupar por raça e pegar o último de cada
             const animalsByRace = {}
             const racas = new Set()
             
             data.data.forEach(animal => {
-              const raca = animal.raca || 'Sem RaÃ§a'
+              const raca = animal.raca || 'Sem Raça'
               racas.add(raca)
               
               if (!animalsByRace[raca]) {
@@ -191,14 +191,14 @@ const LastAnimalWidget = () => {
               }
             })
             
-            // Adicionar "Todos" com o Ãºltimo animal geral
+            // Adicionar "Todos" com o último animal geral
             animalsByRace['all'] = data.data[0]
             
             setLastAnimals(animalsByRace)
           }
         }
       } catch (err) {
-        console.error('Erro ao buscar Ãºltimos animais:', err)
+        console.error('Erro ao buscar últimos animais:', err)
       } finally {
         setLoading(false)
       }
@@ -211,7 +211,7 @@ const LastAnimalWidget = () => {
       <Card className="mb-6 border-2 border-gray-300 dark:border-gray-700">
         <CardBody className="p-6 text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-          <p className="text-gray-600 dark:text-gray-400">Carregando Ãºltimos animais...</p>
+          <p className="text-gray-600 dark:text-gray-400">Carregando últimos animais...</p>
         </CardBody>
       </Card>
     )
@@ -227,19 +227,19 @@ const LastAnimalWidget = () => {
       <CardBody className="flex flex-col gap-3 p-4">
         <div className="flex flex-col md:flex-row items-center justify-between gap-2 border-b border-gray-700 pb-2">
           <div className="flex items-center gap-2">
-            <span className="text-2xl animate-bounce">ðÅ¸â€ â€¢</span>
+            <span className="text-2xl animate-bounce">🆕</span>
             <h3 className="text-xl font-black text-white uppercase tracking-wider">
-              ÃÅ¡ltimos Animais Cadastrados
+              Últimos Animais Cadastrados
             </h3>
           </div>
           <div className="bg-red-600 text-white px-4 py-1 rounded-full border border-red-400 shadow-[0_0_10px_rgba(239,68,68,0.5)] animate-pulse">
             <span className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
-              âÅ¡ ï¸� Verifique antes de cadastrar âÅ¡ ï¸�
+              ⚠️ Verifique antes de cadastrar ⚠️
             </span>
           </div>
         </div>
 
-        {/* Filtro por RaÃ§a */}
+        {/* Filtro por Raça */}
         <div className="flex flex-wrap gap-2 pb-2 border-b border-gray-700">
           <button
             onClick={() => setSelectedRace('all')}
@@ -249,7 +249,7 @@ const LastAnimalWidget = () => {
                 : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
             }`}
           >
-            ðÅ¸â€�¥ Todos
+            🔥 Todos
           </button>
           {racas.map(raca => (
             <button
@@ -261,11 +261,11 @@ const LastAnimalWidget = () => {
                   : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
               }`}
             >
-              {raca === 'Nelore' && 'ðÅ¸�â€š'}
-              {raca === 'Angus' && 'ðÅ¸�â€ž'}
-              {raca === 'Brahman' && 'ðÅ¸�Æ’'}
-              {raca === 'MestiÃ§a' && 'ðÅ¸�®'}
-              {!['Nelore', 'Angus', 'Brahman', 'MestiÃ§a'].includes(raca) && 'ðÅ¸�â€ž'}
+              {raca === 'Nelore' && '🐂'}
+              {raca === 'Angus' && '🐄'}
+              {raca === 'Brahman' && '🐃'}
+              {raca === 'Mestiça' && '🐮'}
+              {!['Nelore', 'Angus', 'Brahman', 'Mestiça'].includes(raca) && '🐄'}
               {' '}{raca}
             </button>
           ))}
@@ -277,7 +277,7 @@ const LastAnimalWidget = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="col-span-1 md:col-span-2 bg-gray-900 p-2 rounded-lg border border-gray-700">
                   <span className="text-gray-400 block text-xs font-bold uppercase tracking-widest mb-0.5">
-                    IdentificaÃ§Ã£o (SÃ©rie / RG)
+                    Identificação (Série / RG)
                   </span>
                   <span className="font-black text-yellow-400 text-3xl md:text-4xl tracking-tight leading-none drop-shadow-md">
                     {currentAnimal.serie} {currentAnimal.rg}
@@ -285,7 +285,7 @@ const LastAnimalWidget = () => {
                 </div>
                 
                 <div className="bg-gray-900 p-2 rounded-lg border border-gray-700">
-                  <span className="text-gray-400 block text-xs font-bold uppercase tracking-widest mb-0.5">RaÃ§a</span>
+                  <span className="text-gray-400 block text-xs font-bold uppercase tracking-widest mb-0.5">Raça</span>
                   <span className="font-bold text-white text-xl">{currentAnimal.raca}</span>
                 </div>
                 
@@ -297,13 +297,13 @@ const LastAnimalWidget = () => {
               
               <div className="mt-3 flex flex-col md:flex-row items-start md:items-center justify-between text-gray-400 text-xs border-t border-gray-700 pt-2 gap-2">
                 <div className="flex items-center gap-2">
-                  <span>ðÅ¸â€œâ€¦ Cadastrado em:</span>
+                  <span>📅 Cadastrado em:</span>
                   <span className="text-white font-bold text-base">
-                    {new Date(currentAnimal.created_at || Date.now()).toLocaleDateString('pt-BR')} Ã s {new Date(currentAnimal.created_at || Date.now()).toLocaleTimeString('pt-BR')}
+                    {new Date(currentAnimal.created_at || Date.now()).toLocaleDateString('pt-BR')} às {new Date(currentAnimal.created_at || Date.now()).toLocaleTimeString('pt-BR')}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span>ðÅ¸â€�¢ ID:</span>
+                  <span>🔢 ID:</span>
                   <span className="font-mono text-gray-500">{currentAnimal.id}</span>
                 </div>
               </div>
@@ -320,7 +320,7 @@ const LastAnimalWidget = () => {
           </div>
         )}
 
-        {/* Resumo por RaÃ§a */}
+        {/* Resumo por Raça */}
         <div className="mt-2 pt-2 border-t border-gray-700">
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
             {racas.map(raca => {
@@ -373,7 +373,7 @@ export default function Dashboard() {
   const [error, setError] = useState(null)
   const [darkMode, setDarkMode] = useState(false)
 
-  // Carregar preferÃªncia de tema
+  // Carregar preferência de tema
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme')
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -397,7 +397,7 @@ export default function Dashboard() {
     }
   }
 
-  // Redirecionar para mobile se acessar do celular (desabilitado - agora Ã© manual)
+  // Redirecionar para mobile se acessar do celular (desabilitado - agora é manual)
   // useEffect(() => {
   //   const isMobileUA = typeof navigator !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
   //   const isSmallScreen = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(max-width: 768px)').matches
@@ -408,14 +408,14 @@ export default function Dashboard() {
   //   }
   // }, [router])
 
-  // Carregar estatÃ­sticas do sistema
+  // Carregar estatísticas do sistema
   useEffect(() => {
     const loadStats = async () => {
       try {
         setLoading(true)
         setError(null)
 
-        // Carregar estatÃ­sticas da API (timeout 8s para falhar mais rÃ¡pido)
+        // Carregar estatísticas da API (timeout 8s para falhar mais rápido)
         try {
           const controller = new AbortController()
           const timeoutId = setTimeout(() => controller.abort('Timeout'), 8000)
@@ -427,16 +427,16 @@ export default function Dashboard() {
               setStats({
                 totalAnimals: statsData.data.totalAnimais || statsData.data.total_animais || 0,
                 activeAnimals: statsData.data.animaisAtivos || 0,
-                totalLocations: 0, // SerÃ¡ carregado separadamente se necessÃ¡rio
-                todayEvents: 0 // SerÃ¡ calculado se necessÃ¡rio
+                totalLocations: 0, // Será carregado separadamente se necessário
+                todayEvents: 0 // Será calculado se necessário
               })
             }
           } else {
-            throw new Error('API de estatÃ­sticas indisponÃ­vel')
+            throw new Error('API de estatísticas indisponível')
           }
         } catch (apiError) {
           if (apiError.name !== 'AbortError' && apiError !== 'Timeout') {
-            console.warn('API de estatÃ­sticas indisponÃ­vel, usando dados bÃ¡sicos:', apiError)
+            console.warn('API de estatísticas indisponível, usando dados básicos:', apiError)
           }
           
           // Fallback: tentar carregar animais diretamente (timeout 8s)
@@ -456,7 +456,7 @@ export default function Dashboard() {
                 todayEvents: 0
               })
             } else {
-              // ÃÅ¡ltimo fallback: localStorage
+              // Último fallback: localStorage
               const localAnimals = localStorage.getItem('animals')
               if (localAnimals) {
                 const animals = JSON.parse(localAnimals)
@@ -473,14 +473,14 @@ export default function Dashboard() {
           } catch (fallbackError) {
             if (fallbackError.name !== 'AbortError' && fallbackError !== 'Timeout') {
               console.error('Erro no fallback:', fallbackError)
-              setError('NÃ£o foi possÃ­vel carregar os dados do sistema')
+              setError('Não foi possível carregar os dados do sistema')
             }
           }
         }
 
       } catch (error) {
         if (error.name !== 'AbortError' && error !== 'Timeout') {
-          console.error('Erro ao carregar estatÃ­sticas:', error)
+          console.error('Erro ao carregar estatísticas:', error)
           setError('Erro ao carregar dados do dashboard')
         }
       } finally {
@@ -508,17 +508,17 @@ export default function Dashboard() {
   return (
     <div className="container mx-auto p-3 md:p-6 space-y-4 md:space-y-6">
 
-      {/* Painel do Desenvolvedor ââ‚¬â€� visÃ­vel sÃ³ para Zeca */}
+      {/* Painel do Desenvolvedor — visível só para Zeca */}
       {isDev && (
         <div className="rounded-xl bg-violet-950/60 border border-violet-500/30 overflow-hidden">
           {/* Barra principal */}
           <div className="flex items-center gap-3 px-4 py-3">
-            <span className="text-base">ðÅ¸â€º </span>
+            <span className="text-base">🛠</span>
             <span className="font-semibold text-violet-200 text-sm">Modo Desenvolvedor</span>
-            <span className="text-violet-500">Â·</span>
+            <span className="text-violet-500">·</span>
             <span className="text-violet-400 text-xs">Banco local ativo</span>
 
-            {/* PendÃªncias */}
+            {/* Pendências */}
             {diffLoading && (
               <span className="ml-1 text-xs text-violet-400/60 flex items-center gap-1">
                 <span className="w-3 h-3 border border-violet-400 border-t-transparent rounded-full animate-spin inline-block" />
@@ -553,7 +553,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Detalhes das tabelas com diferenÃ§a */}
+          {/* Detalhes das tabelas com diferença */}
           {!diffLoading && syncDiff?.supabaseOnline && syncDiff.diff.length > 0 && (
             <div className="px-4 pb-3 flex flex-wrap gap-2">
               {syncDiff.diff.map(({ key, label, local, remote, delta }) => (
@@ -562,7 +562,7 @@ export default function Dashboard() {
                   <span className="text-white/40">local {local}</span>
                   {remote !== null && (
                     <>
-                      <span className="text-white/30">Â·</span>
+                      <span className="text-white/30">·</span>
                       <span className={delta > 0 ? 'text-amber-400' : 'text-red-400'}>
                         {delta > 0 ? `+${delta}` : delta} vs Supabase
                       </span>
@@ -580,7 +580,7 @@ export default function Dashboard() {
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
           <div className="flex">
             <div className="flex-shrink-0">
-              <span className="text-red-400">âÅ¡ ï¸�</span>
+              <span className="text-red-400">⚠️</span>
             </div>
             <div className="ml-3">
               <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
@@ -594,28 +594,28 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* CabeÃ§alho Mobile-Friendly */}
+      {/* Cabeçalho Mobile-Friendly */}
       <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-lg p-4 md:p-8 text-white shadow-lg relative overflow-hidden">
         <div className="absolute inset-0 bg-white opacity-10 rounded-lg"></div>
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-2xl md:text-4xl font-bold mb-2 flex items-center space-x-2">
-                <span className="text-3xl md:text-5xl">ðÅ¸â€œÅ </span>
+                <span className="text-3xl md:text-5xl">📊</span>
                 <span>Beef Sync</span>
               </h1>
-              <p className="text-blue-100 text-sm md:text-lg">VisÃ£o geral do rebanho</p>
+              <p className="text-blue-100 text-sm md:text-lg">Visão geral do rebanho</p>
             </div>
             
-            {/* Controles de VisualizaÃ§Ã£o */}
+            {/* Controles de Visualização */}
             <div className="flex items-center gap-2">
-              {/* BotÃ£o Modo Mobile */}
+              {/* Botão Modo Mobile */}
               <button
                 onClick={() => router.push('/a')}
                 className="bg-white/20 hover:bg-white/30 backdrop-blur-sm p-2 md:p-3 rounded-lg transition-all"
                 title="Modo Mobile"
               >
-                <span className="text-xl md:text-2xl">ðÅ¸â€œ±</span>
+                <span className="text-xl md:text-2xl">📱</span>
               </button>
               
               {/* Toggle Tema Escuro */}
@@ -624,7 +624,7 @@ export default function Dashboard() {
                 className="bg-white/20 hover:bg-white/30 backdrop-blur-sm p-2 md:p-3 rounded-lg transition-all"
                 title={darkMode ? 'Modo Claro' : 'Modo Escuro'}
               >
-                <span className="text-xl md:text-2xl">{darkMode ? 'âËœâ‚¬ï¸�' : 'ðÅ¸Å’â„¢'}</span>
+                <span className="text-xl md:text-2xl">{darkMode ? '☀️' : '🌙'}</span>
               </button>
             </div>
           </div>
@@ -635,7 +635,7 @@ export default function Dashboard() {
               onClick={() => setShowInteractive(!showInteractive)}
               className="bg-white/20 hover:bg-white/30 backdrop-blur-sm px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-white text-sm md:text-base font-medium transition-all flex items-center space-x-1.5"
             >
-              <span>{showInteractive ? 'ðÅ¸â€œÅ ' : 'ðÅ¸â€œË†'}</span>
+              <span>{showInteractive ? '📊' : '📈'}</span>
               <span className="hidden sm:inline">{showInteractive ? 'Simples' : 'Interativo'}</span>
             </button>
           </div>
@@ -656,9 +656,9 @@ export default function Dashboard() {
               
               <div className="bg-white/10 rounded-lg p-3 backdrop-blur-md border border-white/10">
                 <p className="text-sm flex items-start gap-2">
-                  <span className="text-lg">ðÅ¸â€™¡</span>
+                  <span className="text-lg">💡</span>
                   <span className="leading-relaxed">
-                    Taxa de prenhez "Matrizes A" aumentou <span className="text-green-300 font-bold">5%</span> este mÃªs.
+                    Taxa de prenhez "Matrizes A" aumentou <span className="text-green-300 font-bold">5%</span> este mês.
                   </span>
                 </p>
               </div>
@@ -678,9 +678,9 @@ export default function Dashboard() {
               
               <div className="bg-white/10 rounded-lg p-3 backdrop-blur-md border border-white/10">
                 <p className="text-sm flex items-start gap-2">
-                  <span className="text-lg">ðÅ¸Å’¡ï¸�</span>
+                  <span className="text-lg">🌡️</span>
                   <span className="leading-relaxed">
-                    Alta temperatura amanhÃ£. Antecipe o manejo para a manhÃ£.
+                    Alta temperatura amanhã. Antecipe o manejo para a manhã.
                   </span>
                 </p>
               </div>
@@ -695,13 +695,13 @@ export default function Dashboard() {
       {/* Notas Fiscais Recentes */}
       <NotasFiscaisRecentesWidget />
 
-      {/* Receptoras NF 2141 - Acesso RÃ¡pido */}
+      {/* Receptoras NF 2141 - Acesso Rápido */}
       <ReceptorasNF2141Widget />
 
-      {/* Widget do ÃÅ¡ltimo Animal Cadastrado */}
+      {/* Widget do Último Animal Cadastrado */}
       <LastAnimalWidget />
 
-      {/* AÃ§Ãµes RÃ¡pidas */}
+      {/* Ações Rápidas */}
       <div className="grid grid-cols-1">
         <Card 
           className="hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border-l-4 border-indigo-500 bg-gradient-to-r from-white to-indigo-50 dark:from-gray-800 dark:to-indigo-900/20"
@@ -713,15 +713,15 @@ export default function Dashboard() {
             </div>
             <div className="flex-1">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                HistÃ³rico de LanÃ§amentos
-                <span className="text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-full dark:bg-indigo-900 dark:text-indigo-300">Acesso RÃ¡pido</span>
+                Histórico de Lançamentos
+                <span className="text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-full dark:bg-indigo-900 dark:text-indigo-300">Acesso Rápido</span>
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                Visualize e gerencie todas as operaÃ§Ãµes em lote realizadas no sistema (cadastros, movimentaÃ§Ãµes, etc.)
+                Visualize e gerencie todas as operações em lote realizadas no sistema (cadastros, movimentações, etc.)
               </p>
             </div>
             <div className="hidden md:block">
-              <span className="text-indigo-500 text-2xl">âÅ¾â€�</span>
+              <span className="text-indigo-500 text-2xl">➔</span>
             </div>
           </CardBody>
         </Card>
@@ -732,7 +732,7 @@ export default function Dashboard() {
         <InteractiveDashboard />
       ) : (
         <>
-          {/* Cards de EstatÃ­sticas - Mobile Optimized */}
+          {/* Cards de Estatísticas - Mobile Optimized */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             <Card>
               <CardBody className="flex flex-col items-center text-center p-3 md:p-4">
@@ -785,12 +785,12 @@ export default function Dashboard() {
             <AccessMonitor />
           </div>
 
-          {/* AÃ§Ãµes RÃ¡pidas - Mobile Optimized */}
+          {/* Ações Rápidas - Mobile Optimized */}
           <Card>
             <CardHeader>
               <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white flex items-center">
-                <span className="mr-2">âÅ¡¡</span>
-                AÃ§Ãµes RÃ¡pidas
+                <span className="mr-2">⚡</span>
+                Ações Rápidas
               </h2>
             </CardHeader>
             <CardBody>
@@ -799,7 +799,7 @@ export default function Dashboard() {
                   onClick={() => window.location.href = '/animals'}
                   className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 md:py-3 px-2 md:px-4 rounded-lg text-xs md:text-sm flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2"
                 >
-                  <span className="text-lg md:text-xl">ðÅ¸â€˜¥</span>
+                  <span className="text-lg md:text-xl">👥</span>
                   <span>Animais</span>
                 </Button>
 
@@ -807,15 +807,15 @@ export default function Dashboard() {
                   onClick={() => window.location.href = '/localizacao-animais'}
                   className="bg-purple-500 hover:bg-purple-600 text-white font-medium py-2 md:py-3 px-2 md:px-4 rounded-lg text-xs md:text-sm flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2"
                 >
-                  <span className="text-lg md:text-xl">ðÅ¸â€œ�</span>
-                  <span>LocalizaÃ§Ã£o</span>
+                  <span className="text-lg md:text-xl">📍</span>
+                  <span>Localização</span>
                 </Button>
 
                 <Button
                   onClick={() => window.location.href = '/protocolos'}
                   className="bg-red-500 hover:bg-red-600 text-white font-medium py-2 md:py-3 px-2 md:px-4 rounded-lg text-xs md:text-sm flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2"
                 >
-                  <span className="text-lg md:text-xl">ðÅ¸â€œâ€¹</span>
+                  <span className="text-lg md:text-xl">📋</span>
                   <span>Protocolos</span>
                 </Button>
 
@@ -823,7 +823,7 @@ export default function Dashboard() {
                   onClick={() => window.location.href = '/dados-teste'}
                   className="bg-green-500 hover:bg-green-600 text-white font-medium py-2 md:py-3 px-2 md:px-4 rounded-lg text-xs md:text-sm flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2"
                 >
-                  <span className="text-lg md:text-xl">ðÅ¸§ª</span>
+                  <span className="text-lg md:text-xl">🧪</span>
                   <span>Testes</span>
                 </Button>
 
@@ -831,15 +831,15 @@ export default function Dashboard() {
                   onClick={() => window.location.href = '/relatorios-lotes'}
                   className="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 md:py-3 px-2 md:px-4 rounded-lg text-xs md:text-sm flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2"
                 >
-                  <span className="text-lg md:text-xl">ðÅ¸â€œÅ </span>
-                  <span>LanÃ§amentos</span>
+                  <span className="text-lg md:text-xl">📊</span>
+                  <span>Lançamentos</span>
                 </Button>
 
                 <Button
                   onClick={() => window.location.href = '/teste-lotes'}
                   className="bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 md:py-3 px-2 md:px-4 rounded-lg text-xs md:text-sm flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2"
                 >
-                  <span className="text-lg md:text-xl">ðÅ¸â€�¬</span>
+                  <span className="text-lg md:text-xl">🔬</span>
                   <span>Teste Lotes</span>
                 </Button>
               </div>
@@ -851,14 +851,14 @@ export default function Dashboard() {
             <CardBody>
               <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-l-4 border-blue-500 p-6 rounded-lg">
                 <div className="flex items-center space-x-4">
-                  <div className="text-3xl animate-bounce">ââ€ž¹ï¸�</div>
+                  <div className="text-3xl animate-bounce">ℹ️</div>
                   <div className="flex-1">
                     <h3 className="font-bold text-blue-800 dark:text-blue-300 text-lg mb-2">Dashboard Simplificado</h3>
                     <p className="text-blue-700 dark:text-blue-400 mb-3">
-                      Esta Ã© uma versÃ£o simplificada do dashboard. Use os botÃµes acima para acessar as funcionalidades principais do sistema.
+                      Esta é uma versão simplificada do dashboard. Use os botões acima para acessar as funcionalidades principais do sistema.
                     </p>
                     <p className="text-blue-600 dark:text-blue-300 text-sm font-medium">
-                      ðÅ¸â€™¡ Dica: Clique em "Dashboard Interativo" no cabeÃ§alho para ver grÃ¡ficos avanÃ§ados e anÃ¡lises detalhadas!
+                      💡 Dica: Clique em "Dashboard Interativo" no cabeçalho para ver gráficos avançados e análises detalhadas!
                     </p>
                   </div>
                 </div>

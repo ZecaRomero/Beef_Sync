@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 async function createCompleteTestData() {
   try {
-    console.log('�Ÿ”� Criando dados completos de teste...');
+    console.log('🔍 Criando dados completos de teste...');
     
     // Criar mais nascimentos com dados variados
     const births = [
@@ -44,7 +44,7 @@ async function createCompleteTestData() {
       }
     ];
 
-    console.log('�Ÿ‘� Criando nascimentos variados...');
+    console.log('👶 Criando nascimentos variados...');
     for (const birth of births) {
       try {
         const response = await fetch('http://localhost:3020/api/births', {
@@ -56,13 +56,13 @@ async function createCompleteTestData() {
         });
 
         if (response.ok) {
-          console.log(`�œ… Nascimento de ${birth.sexo} (${birth.touro}) criado`);
+          console.log(`✅ Nascimento de ${birth.sexo} (${birth.touro}) criado`);
         } else {
           const error = await response.text();
-          console.log(`�Œ Erro ao criar nascimento:`, error);
+          console.log(`❌ Erro ao criar nascimento:`, error);
         }
       } catch (error) {
-        console.log(`�Œ Erro ao criar nascimento:`, error.message);
+        console.log(`❌ Erro ao criar nascimento:`, error.message);
       }
     }
 
@@ -86,11 +86,11 @@ async function createCompleteTestData() {
 
     if (reportResponse.ok) {
       const reportData = await reportResponse.json();
-      console.log('�Ÿ“Š Relatório completo gerado:', JSON.stringify(reportData, null, 2));
+      console.log('📊 Relatório completo gerado:', JSON.stringify(reportData, null, 2));
     }
 
     // Testar download em PDF
-    console.log('\n�Ÿ“„ Testando download em PDF...');
+    console.log('\n📄 Testando download em PDF...');
     const pdfResponse = await fetch('http://localhost:3020/api/reports/download', {
       method: 'POST',
       headers: {
@@ -109,13 +109,13 @@ async function createCompleteTestData() {
     if (pdfResponse.ok) {
       const fs = require('fs');
       const pdfBuffer = await pdfResponse.buffer();
-      console.log('�Ÿ“„ Tamanho do PDF:', pdfBuffer.length, 'bytes');
+      console.log('📄 Tamanho do PDF:', pdfBuffer.length, 'bytes');
       fs.writeFileSync('relatorio-completo-teste.pdf', pdfBuffer);
-      console.log('�Ÿ’� PDF salvo como relatorio-completo-teste.pdf');
+      console.log('💾 PDF salvo como relatorio-completo-teste.pdf');
     }
 
     // Testar download em Excel
-    console.log('\n�Ÿ“Š Testando download em Excel...');
+    console.log('\n📊 Testando download em Excel...');
     const excelResponse = await fetch('http://localhost:3020/api/reports/download', {
       method: 'POST',
       headers: {
@@ -134,13 +134,13 @@ async function createCompleteTestData() {
     if (excelResponse.ok) {
       const fs = require('fs');
       const excelBuffer = await excelResponse.buffer();
-      console.log('�Ÿ“Š Tamanho do Excel:', excelBuffer.length, 'bytes');
+      console.log('📊 Tamanho do Excel:', excelBuffer.length, 'bytes');
       fs.writeFileSync('relatorio-completo-teste.xlsx', excelBuffer);
-      console.log('�Ÿ’� Excel salvo como relatorio-completo-teste.xlsx');
+      console.log('💾 Excel salvo como relatorio-completo-teste.xlsx');
     }
 
   } catch (error) {
-    console.error('�Œ Erro geral:', error.message);
+    console.error('❌ Erro geral:', error.message);
   }
 }
 

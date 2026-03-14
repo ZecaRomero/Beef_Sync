@@ -1,6 +1,6 @@
 /**
  * Script para corrigir venda registrada no animal errado
- * A venda (NF 4145, CLEBER, R$ 28.800) pertence Ã  CJCJ 16013 (MANERA SANT ANNA),
+ * A venda (NF 4145, CLEBER, R$ 28.800) pertence à CJCJ 16013 (MANERA SANT ANNA),
  * mas foi importada incorretamente na CJCJ 17037 (JATAUBA SANT ANNA - filha).
  */
 const { Pool } = require('pg')
@@ -21,7 +21,7 @@ async function corrigirVenda() {
   try {
     await client.query('BEGIN')
     
-    console.log('ðÅ¸â€�� Buscando a baixa incorreta na CJCJ 17037...')
+    console.log('🔍 Buscando a baixa incorreta na CJCJ 17037...')
     
     // 1. Buscar a baixa com serie=CJCJ, rg=17037 que tem os dados da venda da 16013
     const baixaResult = await client.query(`
@@ -37,12 +37,12 @@ async function corrigirVenda() {
 
     const baixa = baixaResult.rows[0]
     if (!baixa) {
-      console.log('âÅ“â€¦ Nenhuma baixa encontrada para corrigir (jÃ¡ foi corrigida ou nÃ£o existe)')
+      console.log('✅ Nenhuma baixa encontrada para corrigir (já foi corrigida ou não existe)')
       await client.query('ROLLBACK')
       return
     }
 
-    console.log('ðÅ¸â€œâ€¹ Baixa encontrada:', {
+    console.log('📋 Baixa encontrada:', {
       id: baixa.id,
       serie_rg: `${baixa.serie} ${baixa.rg}`,
       valor: baixa.valor,
@@ -60,25 +60,25 @@ async function corrigirVenda() {
     let animalId16013 = animal16013.rows[0]?.id
     
     if (!animalId16013) {
-      console.log('âÅ¡ ï¸�  Animal CJCJ 16013 nÃ£o encontrado. Criando cadastro...')
+      console.log('⚠️  Animal CJCJ 16013 não encontrado. Criando cadastro...')
       
-      // Criar o animal CJCJ 16013 (mÃ£e da 17037)
+      // Criar o animal CJCJ 16013 (mãe da 17037)
       const insertResult = await client.query(`
         INSERT INTO animais (
           serie, rg, nome, sexo, raca, situacao, 
           created_at, updated_at
         ) VALUES (
-          'CJCJ', '16013', 'MANERA SANT ANNA', 'FÃªmea', 'Nelore', 'Vendido',
+          'CJCJ', '16013', 'MANERA SANT ANNA', 'Fêmea', 'Nelore', 'Vendido',
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
         RETURNING id, nome
       `)
       
       animalId16013 = insertResult.rows[0].id
-      console.log('âÅ“â€¦ Animal CJCJ 16013 criado com ID:', animalId16013)
+      console.log('✅ Animal CJCJ 16013 criado com ID:', animalId16013)
     }
 
-    console.log('ðÅ¸�â€ž Animal correto:', {
+    console.log('🐄 Animal correto:', {
       id: animalId16013,
       nome: animal16013.rows[0]?.nome || 'MANERA SANT ANNA'
     })
@@ -87,19 +87,19 @@ async function corrigirVenda() {
     let valorCorrigido = parseFloat(baixa.valor)
     if (valorCorrigido > 0 && valorCorrigido < 100) {
       valorCorrigido = valorCorrigido * 1000
-      console.log(`ðÅ¸â€™° Valor corrigido: R$ ${baixa.valor} ââ€ â€™ R$ ${valorCorrigido.toLocaleString('pt-BR')}`)
+      console.log(`💰 Valor corrigido: R$ ${baixa.valor} → R$ ${valorCorrigido.toLocaleString('pt-BR')}`)
     }
 
     // 4. Atualizar a baixa: mover para 16013
-    console.log('ðÅ¸â€œ� Movendo baixa para CJCJ 16013...')
+    console.log('📝 Movendo baixa para CJCJ 16013...')
     await client.query(`
       UPDATE baixas
       SET serie = 'CJCJ', rg = '16013', animal_id = $1, valor = $2
       WHERE id = $3
     `, [animalId16013, valorCorrigido, baixa.id])
 
-    // 5. Remover Vendido da CJCJ 17037 (a venda nÃ£o era dela)
-    console.log('ðÅ¸â€�â€ž Removendo status "Vendido" da CJCJ 17037...')
+    // 5. Remover Vendido da CJCJ 17037 (a venda não era dela)
+    console.log('🔄 Removendo status "Vendido" da CJCJ 17037...')
     await client.query(`
       UPDATE animais
       SET situacao = CASE WHEN situacao = 'Vendido' THEN 'Ativo' ELSE situacao END,
@@ -109,7 +109,7 @@ async function corrigirVenda() {
     `)
 
     // 6. Marcar CJCJ 16013 como Vendido
-    console.log('âÅ“â€¦ Marcando CJCJ 16013 como Vendido...')
+    console.log('✅ Marcando CJCJ 16013 como Vendido...')
     await client.query(`
       UPDATE animais
       SET situacao = 'Vendido', valor_venda = $1, updated_at = CURRENT_TIMESTAMP
@@ -118,17 +118,17 @@ async function corrigirVenda() {
 
     await client.query('COMMIT')
     
-    console.log('\nâÅ“â€¦ CORREÃâ€¡ÃÆ’O CONCLUÃ�DA COM SUCESSO!')
-    console.log('ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��')
-    console.log(`ðÅ¸â€œÅ’ Venda movida: CJCJ 17037 ââ€ â€™ CJCJ 16013`)
-    console.log(`ðÅ¸â€™µ Valor: R$ ${valorCorrigido.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)
-    console.log(`ðÅ¸â€œâ€ž NF: ${baixa.numero_nf}`)
-    console.log(`ðÅ¸â€˜¤ Comprador: ${baixa.comprador}`)
-    console.log('ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��')
+    console.log('\n✅ CORREÇÃO CONCLUÍDA COM SUCESSO!')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log(`📌 Venda movida: CJCJ 17037 → CJCJ 16013`)
+    console.log(`💵 Valor: R$ ${valorCorrigido.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)
+    console.log(`📄 NF: ${baixa.numero_nf}`)
+    console.log(`👤 Comprador: ${baixa.comprador}`)
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     
   } catch (error) {
     await client.query('ROLLBACK')
-    console.error('â�Å’ Erro ao corrigir venda:', error)
+    console.error('❌ Erro ao corrigir venda:', error)
     throw error
   } finally {
     client.release()
@@ -138,10 +138,10 @@ async function corrigirVenda() {
 
 corrigirVenda()
   .then(() => {
-    console.log('\nâÅ“¨ Script finalizado')
+    console.log('\n✨ Script finalizado')
     process.exit(0)
   })
   .catch(error => {
-    console.error('\nðÅ¸â€™¥ Erro fatal:', error)
+    console.error('\n💥 Erro fatal:', error)
     process.exit(1)
   })

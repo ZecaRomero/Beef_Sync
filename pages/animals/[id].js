@@ -41,7 +41,7 @@ import { animalDataCache } from '../../utils/animalDataCache'
 import { localizacaoValidaParaExibir } from '../../utils/formatters'
 import { extrairSerieRG } from '../../utils/animalUtils'
 
-// Modal para editar Data do DG, Resultado e VeterinÃ¡rio
+// Modal para editar Data do DG, Resultado e Veterinário
 function EditDGModal({ animal, onClose, onSave }) {
   const [dataDG, setDataDG] = useState(animal?.dataDG || animal?.data_dg ? (animal.dataDG || animal.data_dg).toString().slice(0, 10) : '')
   const [resultadoDG, setResultadoDG] = useState(animal?.resultadoDG || animal?.resultado_dg || '')
@@ -84,7 +84,7 @@ function EditDGModal({ animal, onClose, onSave }) {
   }
 
   return (
-    <Modal isOpen={true} onClose={onClose} title="Editar DG (DiagnÃ³stico de GestaÃ§Ã£o)" size="md">
+    <Modal isOpen={true} onClose={onClose} title="Editar DG (Diagnóstico de Gestação)" size="md">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data do DG</label>
@@ -107,17 +107,17 @@ function EditDGModal({ animal, onClose, onSave }) {
             <option value="Vazia">Vazia</option>
             <option value="Negativo">Negativo</option>
             <option value="Positivo">Positivo</option>
-            <option value="NÃ£o Realizado">NÃ£o Realizado</option>
+            <option value="Não Realizado">Não Realizado</option>
             <option value="Inconclusivo">Inconclusivo</option>
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">VeterinÃ¡rio</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Veterinário</label>
           <input
             type="text"
             value={veterinarioDG}
             onChange={(e) => setVeterinarioDG(e.target.value)}
-            placeholder="Nome do veterinÃ¡rio"
+            placeholder="Nome do veterinário"
             className="input-field w-full"
           />
         </div>
@@ -170,9 +170,9 @@ export default function AnimalDetail() {
   const [ocorrenciasRecentes, setOcorrenciasRecentes] = useState([])
   const [showUltimoEventoModal, setShowUltimoEventoModal] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const [coletasFIVMae, setColetasFIVMae] = useState(null) // Coletas FIV da mÃ£e
+  const [coletasFIVMae, setColetasFIVMae] = useState(null) // Coletas FIV da mãe
 
-  // Detectar se Ã© mobile e mostrar splash apenas em mobile
+  // Detectar se é mobile e mostrar splash apenas em mobile
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
@@ -182,7 +182,7 @@ export default function AnimalDetail() {
     checkMobile()
   }, [])
 
-  // Splash screen com animaÃ§Ã£o de progresso (apenas mobile)
+  // Splash screen com animação de progresso (apenas mobile)
   useEffect(() => {
     if (!showSplash) return
     
@@ -253,7 +253,7 @@ export default function AnimalDetail() {
     carregarUltimaIA()
   }, [animal?.id])
 
-  // Buscar posiÃ§Ã£o nos rankings (iABCZ e IQG) para exibir trofÃ©us
+  // Buscar posição nos rankings (iABCZ e IQG) para exibir troféus
   useEffect(() => {
     if (!animal?.id) return
     const matchAnimal = (r) => r.id === animal.id || (String(r.rg) === String(animal.rg) && String(r.serie || '').toUpperCase() === String(animal.serie || '').toUpperCase())
@@ -276,7 +276,7 @@ export default function AnimalDetail() {
     }).catch(() => {})
   }, [animal?.id, animal?.rg, animal?.serie])
 
-  // Calcular Ãºltimo serviÃ§o (IA, DG, Coleta FIV, TE, Exame AndrolÃ³gico, ocorrÃªncias) - sempre o mais recente
+  // Calcular último serviço (IA, DG, Coleta FIV, TE, Exame Andrológico, ocorrências) - sempre o mais recente
   useEffect(() => {
     if (!animal) {
       setUltimoEvento(null)
@@ -296,13 +296,13 @@ export default function AnimalDetail() {
       eventos.push({
         data: d,
         tipo: 'IA',
-        label: 'InseminaÃ§Ã£o Artificial',
+        label: 'Inseminação Artificial',
         id: ultimaIA.id,
         origem: 'inseminacao',
         raw: ultimaIA
       })
     }
-    // DG (DiagnÃ³stico de GestaÃ§Ã£o)
+    // DG (Diagnóstico de Gestação)
     if (animal.data_dg || animal.dataDG) {
       const d = animal.data_dg || animal.dataDG
       const res = animal.resultado_dg || animal.resultadoDG || ''
@@ -315,7 +315,7 @@ export default function AnimalDetail() {
         raw: { data_dg: d, resultado_dg: res }
       })
     }
-    // Coleta de OÃ³citos (FIV)
+    // Coleta de Oócitos (FIV)
     const fivs = animal.fivs || []
     fivs.forEach(fiv => {
       const d = fiv.data_fiv || fiv.data
@@ -323,14 +323,14 @@ export default function AnimalDetail() {
         eventos.push({
           data: d,
           tipo: 'Coleta FIV',
-          label: 'Coleta de OÃ³citos (FIV)',
+          label: 'Coleta de Oócitos (FIV)',
           id: fiv.id,
           origem: 'coleta_fiv',
           raw: fiv
         })
       }
     })
-    // TransferÃªncia de EmbriÃµes
+    // Transferência de Embriões
     transferenciasEmbrioes.forEach(te => {
       const d = te.data_te || te.data
       if (d) {
@@ -338,22 +338,22 @@ export default function AnimalDetail() {
         eventos.push({
           data: d,
           tipo: 'TE',
-          label: `TransferÃªncia de EmbriÃµes (${papel})`,
+          label: `Transferência de Embriões (${papel})`,
           id: te.id,
           origem: 'transferencia_embrioes',
           raw: te
         })
       }
     })
-    // Exame AndrolÃ³gico - apenas para machos (fÃªmeas nÃ£o fazem exame androlÃ³gico)
+    // Exame Andrológico - apenas para machos (fêmeas não fazem exame andrológico)
     if (isMacho) {
       examesAndrologicos.forEach(ex => {
         const d = ex.data_exame || ex.data
         if (d) {
           eventos.push({
             data: d,
-            tipo: 'Exame AndrolÃ³gico',
-            label: 'Exame AndrolÃ³gico',
+            tipo: 'Exame Andrológico',
+            label: 'Exame Andrológico',
             id: ex.id,
             origem: 'exame_andrologico',
             raw: ex
@@ -361,20 +361,20 @@ export default function AnimalDetail() {
         }
       })
     }
-    // OcorrÃªncias (historia_ocorrencias / ocorrencias_animais)
+    // Ocorrências (historia_ocorrencias / ocorrencias_animais)
     ocorrenciasRecentes.forEach(oc => {
       const dataOc = oc.data || oc.data_registro || oc.data_ultimo_peso
       if (!dataOc) return
       const tipoOc = (oc.tipo || '').toString().toLowerCase()
-      if (!isMacho && (tipoOc.includes('androlÃ³gico') || tipoOc.includes('andrologico'))) return
+      if (!isMacho && (tipoOc.includes('andrológico') || tipoOc.includes('andrologico'))) return
       let labelTipo = oc.tipo || (oc.peso != null && oc.peso !== '' ? 'Pesagem' : 'Evento')
       if (labelTipo === 'Pesagem') labelTipo = isMacho ? 'Pesado' : 'Pesada'
       else if (labelTipo === 'CE') labelTipo = 'CE'
       else if (labelTipo === 'DG') labelTipo = 'DG'
       else if (labelTipo === 'Local') labelTipo = 'Local'
-      else if (labelTipo.toLowerCase().includes('coleta') || labelTipo.toLowerCase().includes('oocito') || labelTipo.toLowerCase().includes('fiv')) labelTipo = 'Coleta de OÃ³citos'
-      else if (labelTipo.toLowerCase().includes('vacina')) labelTipo = 'VacinaÃ§Ã£o'
-      else if (labelTipo.toLowerCase().includes('medic')) labelTipo = 'MedicaÃ§Ã£o'
+      else if (labelTipo.toLowerCase().includes('coleta') || labelTipo.toLowerCase().includes('oocito') || labelTipo.toLowerCase().includes('fiv')) labelTipo = 'Coleta de Oócitos'
+      else if (labelTipo.toLowerCase().includes('vacina')) labelTipo = 'Vacinação'
+      else if (labelTipo.toLowerCase().includes('medic')) labelTipo = 'Medicação'
       eventos.push({
         data: dataOc,
         tipo: oc.tipo || labelTipo,
@@ -484,7 +484,7 @@ export default function AnimalDetail() {
         showToast(err?.message || 'Erro ao salvar', 'error')
       }
     } catch (err) {
-      showToast('Erro de conexÃ£o com a API', 'error')
+      showToast('Erro de conexão com a API', 'error')
     } finally {
       setSavingField(null)
     }
@@ -500,7 +500,7 @@ export default function AnimalDetail() {
           const ids = (result.data || result || []).map(a => a.id).filter(Boolean)
           setAllAnimalsIds(ids)
           
-          // Encontrar Ã­ndice do animal atual
+          // Encontrar índice do animal atual
           if (id) {
             const index = ids.findIndex(animalId => String(animalId) === String(id))
             setCurrentAnimalIndex(index)
@@ -526,7 +526,7 @@ export default function AnimalDetail() {
     setMaeSerieRg(null)
   }, [animal?.id])
 
-  // PersistÃªncia do estado de expansÃ£o dos cards
+  // Persistência do estado de expansão dos cards
   useEffect(() => {
     try {
       const saved = localStorage.getItem('animalDetailCardsExpanded')
@@ -569,7 +569,7 @@ export default function AnimalDetail() {
     return () => window.removeEventListener('keydown', onKey)
   }, [animal, custos, examesAndrologicos])
 
-  // Carregamento escalonado dos dados do animal (evita requisiÃ§Ãµes simultÃ¢neas)
+  // Carregamento escalonado dos dados do animal (evita requisições simultâneas)
   useEffect(() => {
     if (!id || !animal) return
 
@@ -602,11 +602,11 @@ export default function AnimalDetail() {
     if (!animal || (!animal.serie && !animal.rg && !animal.nome)) return
     
     try {
-      // Buscar coletas FIV por identificador (sÃ©rie+RG ou nome)
+      // Buscar coletas FIV por identificador (série+RG ou nome)
       let url = '/api/animals/doadora-coletas?'
       
       if (animal.serie && animal.rg) {
-        // Buscar por sÃ©rie e RG separadamente (mais preciso)
+        // Buscar por série e RG separadamente (mais preciso)
         url += `serie=${encodeURIComponent(animal.serie)}&rg=${encodeURIComponent(animal.rg)}`
       } else if (animal.nome) {
         // Buscar por nome
@@ -615,12 +615,12 @@ export default function AnimalDetail() {
         return
       }
       
-      console.log('ðÅ¸â€�� Buscando coletas FIV:', url)
+      console.log('🔍 Buscando coletas FIV:', url)
       const response = await fetch(url)
       
       if (response.ok) {
         const result = await response.json()
-        console.log('ðÅ¸â€œÅ  Resultado coletas FIV:', result)
+        console.log('📊 Resultado coletas FIV:', result)
         if (result.success && result.data) {
           // Adicionar coletas ao objeto animal
           setAnimal(prev => ({
@@ -628,57 +628,57 @@ export default function AnimalDetail() {
             fivs: result.data.coletas || [],
             resumoFIV: result.data.resumo
           }))
-          console.log('âÅ“â€¦ Coletas FIV adicionadas ao animal:', result.data.coletas?.length || 0)
+          console.log('✅ Coletas FIV adicionadas ao animal:', result.data.coletas?.length || 0)
         }
       } else {
-        console.warn('âÅ¡ ï¸� Erro ao buscar coletas FIV:', response.status)
+        console.warn('⚠️ Erro ao buscar coletas FIV:', response.status)
       }
     } catch (error) {
-      console.error('â�Å’ Erro ao carregar coletas FIV:', error)
+      console.error('❌ Erro ao carregar coletas FIV:', error)
     }
   }
 
-  // Carregar coletas FIV da mÃ£e (para mostrar histÃ³rico da doadora mesmo que nÃ£o esteja ativa)
+  // Carregar coletas FIV da mãe (para mostrar histórico da doadora mesmo que não esteja ativa)
   const carregarColetasFIVMae = async () => {
     if (!animal || !animal.mae) return
     
     try {
-      // Buscar coletas FIV da mÃ£e por nome ou sÃ©rie+RG
+      // Buscar coletas FIV da mãe por nome ou série+RG
       let url = '/api/animals/doadora-coletas?'
       
-      // Se tem sÃ©rie e RG da mÃ£e, usar isso (mais preciso)
+      // Se tem série e RG da mãe, usar isso (mais preciso)
       if (animal.serie_mae && animal.rg_mae) {
         url += `serie=${encodeURIComponent(animal.serie_mae)}&rg=${encodeURIComponent(animal.rg_mae)}`
       } else {
-        // SenÃ£o, buscar pelo nome da mÃ£e
+        // Senão, buscar pelo nome da mãe
         url += `identificador=${encodeURIComponent(animal.mae)}`
       }
       
-      console.log('ðÅ¸â€�� Buscando coletas FIV da mÃ£e:', url, 'Mae:', animal.mae)
+      console.log('🔍 Buscando coletas FIV da mãe:', url, 'Mae:', animal.mae)
       const response = await fetch(url)
       
       if (response.ok) {
         const result = await response.json()
-        console.log('ðÅ¸â€œÅ  Resultado coletas FIV da mÃ£e:', result)
+        console.log('📊 Resultado coletas FIV da mãe:', result)
         if (result.success && result.data && result.data.coletas && result.data.coletas.length > 0) {
           setColetasFIVMae({
             nome: result.data.doadora_nome || animal.mae,
             coletas: result.data.coletas,
             resumo: result.data.resumo
           })
-          console.log('âÅ“â€¦ Coletas FIV da mÃ£e encontradas:', result.data.coletas.length)
+          console.log('✅ Coletas FIV da mãe encontradas:', result.data.coletas.length)
         } else {
-          console.log('ââ€ž¹ï¸� Nenhuma coleta FIV encontrada para a mÃ£e')
+          console.log('ℹ️ Nenhuma coleta FIV encontrada para a mãe')
         }
       } else {
-        console.warn('âÅ¡ ï¸� Erro ao buscar coletas FIV da mÃ£e:', response.status)
+        console.warn('⚠️ Erro ao buscar coletas FIV da mãe:', response.status)
       }
     } catch (error) {
-      console.error('â�Å’ Erro ao carregar coletas FIV da mÃ£e:', error)
+      console.error('❌ Erro ao carregar coletas FIV da mãe:', error)
     }
   }
 
-  // Carregar informaÃ§Ãµes de venda quando custos estiverem disponÃ­veis
+  // Carregar informações de venda quando custos estiverem disponíveis
   useEffect(() => {
     if (id && animal && animal.situacao === 'Vendido' && custos.length >= 0) {
       carregarInfoVenda()
@@ -706,7 +706,7 @@ export default function AnimalDetail() {
         }
       }
     } catch (error) {
-      console.error('Erro ao carregar informaÃ§Ãµes de morte:', error)
+      console.error('Erro ao carregar informações de morte:', error)
     } finally {
       setLoadingMorte(false)
     }
@@ -715,7 +715,7 @@ export default function AnimalDetail() {
   const carregarInfoVenda = async () => {
     if (!id || !animal) return
     
-    console.log('ðÅ¸â€�� carregarInfoVenda - Iniciando busca de dados de venda')
+    console.log('🔍 carregarInfoVenda - Iniciando busca de dados de venda')
     console.log('Animal ID:', id)
     console.log('Animal:', animal)
     
@@ -737,36 +737,36 @@ export default function AnimalDetail() {
         calculado: true
       }
       
-      // Se jÃ¡ temos todos os dados necessÃ¡rios do animal, usar diretamente
+      // Se já temos todos os dados necessários do animal, usar diretamente
       if (infoVendaInicial.nfNumero && infoVendaInicial.dataVenda && infoVendaInicial.destino) {
-        console.log('âÅ“â€¦ Todos os dados de venda encontrados no prÃ³prio animal')
+        console.log('✅ Todos os dados de venda encontrados no próprio animal')
         setInfoVenda(infoVendaInicial)
         setLoadingVenda(false)
         return
       }
       
       // Se faltam dados (NF, data ou destino), buscar nas NFs mesmo que tenha valor_venda
-      console.log('âÅ¡ ï¸� Dados incompletos no animal, buscando nas NFs para completar...')
+      console.log('⚠️ Dados incompletos no animal, buscando nas NFs para completar...')
       console.log('   Dados atuais:', infoVendaInicial)
       
-      // Se nÃ£o tem valor_venda no animal, buscar nas notas fiscais
+      // Se não tem valor_venda no animal, buscar nas notas fiscais
       const response = await fetch(`/api/notas-fiscais?tipo=saida`)
       
-      console.log('ðÅ¸â€œ¡ Response NFs:', response.ok)
+      console.log('📡 Response NFs:', response.ok)
       
       if (response.ok) {
         const result = await response.json()
         const nfs = result.data || result || []
         
-        console.log(`ðÅ¸â€œâ€¹ Total de NFs de saÃ­da encontradas: ${nfs.length}`)
+        console.log(`📋 Total de NFs de saída encontradas: ${nfs.length}`)
         
-        // Procurar NF de saÃ­da que contenha este animal
+        // Procurar NF de saída que contenha este animal
         let nfVenda = null
         let itemVenda = null
         
         for (const nf of nfs) {
           try {
-            console.log(`ðÅ¸â€�� Verificando NF da lista:`, nf)
+            console.log(`🔍 Verificando NF da lista:`, nf)
             console.log(`   - id: ${nf.id}`)
             console.log(`   - numero_nf: ${nf.numero_nf}`)
             console.log(`   - data: ${nf.data}`)
@@ -777,8 +777,8 @@ export default function AnimalDetail() {
             if (nfResponse.ok) {
               const nfCompleta = await nfResponse.json()
               
-              console.log(`ðÅ¸â€œâ€ž NF Completa recebida (objeto inteiro):`, JSON.stringify(nfCompleta, null, 2))
-              console.log(`ðÅ¸â€œâ€ž Chaves do objeto:`, Object.keys(nfCompleta))
+              console.log(`📄 NF Completa recebida (objeto inteiro):`, JSON.stringify(nfCompleta, null, 2))
+              console.log(`📄 Chaves do objeto:`, Object.keys(nfCompleta))
               console.log(`   - numero_nf: ${nfCompleta.numero_nf}`)
               console.log(`   - numeroNF: ${nfCompleta.numeroNF}`)
               console.log(`   - data: ${nfCompleta.data}`)
@@ -788,7 +788,7 @@ export default function AnimalDetail() {
               
               const itens = nfCompleta.itens || []
               
-              console.log(`ðÅ¸â€�� Verificando NF ${nf.numero_nf || nf.numeroNF} com ${itens.length} itens`)
+              console.log(`🔍 Verificando NF ${nf.numero_nf || nf.numeroNF} com ${itens.length} itens`)
               
               // Verificar se algum item corresponde ao animal
               const itemEncontrado = itens.find(item => {
@@ -809,7 +809,7 @@ export default function AnimalDetail() {
                 )
                 
                 if (match) {
-                  console.log(`  âÅ“â€¦ MATCH ENCONTRADO!`)
+                  console.log(`  ✅ MATCH ENCONTRADO!`)
                 }
                 
                 return match
@@ -818,7 +818,7 @@ export default function AnimalDetail() {
               if (itemEncontrado) {
                 nfVenda = nf  // Usar o NF da lista original que tem os dados corretos!
                 itemVenda = itemEncontrado
-                console.log(`âÅ“â€¦ NF de venda encontrada: ${nf.numero_nf || nf.numeroNF}`)
+                console.log(`✅ NF de venda encontrada: ${nf.numero_nf || nf.numeroNF}`)
                 break
               }
             }
@@ -828,7 +828,7 @@ export default function AnimalDetail() {
         }
         
         if (nfVenda && itemVenda) {
-          console.log('ðÅ¸â€œ¦ Dados da NF encontrada:')
+          console.log('📦 Dados da NF encontrada:')
           console.log('   - nfVenda.numero_nf:', nfVenda.numero_nf)
           console.log('   - nfVenda.numeroNF:', nfVenda.numeroNF)
           console.log('   - nfVenda.data:', nfVenda.data)
@@ -838,11 +838,11 @@ export default function AnimalDetail() {
           console.log('   - itemVenda.valorUnitario:', itemVenda.valorUnitario)
           console.log('   - itemVenda.valor_unitario:', itemVenda.valor_unitario)
           
-          // Usar dados da NF para preencher campos faltantes, mas manter dados do animal se jÃ¡ existirem
+          // Usar dados da NF para preencher campos faltantes, mas manter dados do animal se já existirem
           const valorVendaNF = parseFloat(itemVenda.valorUnitario || itemVenda.valor_unitario || 0)
           
           const vendaInfo = {
-            valorVenda: valorVendaAnimal || valorVendaNF, // Preferir do animal, senÃ£o da NF
+            valorVenda: valorVendaAnimal || valorVendaNF, // Preferir do animal, senão da NF
             custosTotal: custosTotal,
             dataVenda: infoVendaInicial.dataVenda || nfVenda.data || nfVenda.data_compra,
             nfNumero: infoVendaInicial.nfNumero || nfVenda.numero_nf || nfVenda.numeroNF,
@@ -851,34 +851,34 @@ export default function AnimalDetail() {
             calculado: false
           }
           
-          console.log('âÅ“â€¦ infoVenda definido combinando dados do animal e NF:', vendaInfo)
+          console.log('✅ infoVenda definido combinando dados do animal e NF:', vendaInfo)
           setInfoVenda(vendaInfo)
         } else {
-          console.log('â�Å’ Nenhuma NF de venda encontrada para este animal')
-          // Se nÃ£o encontrou NF mas tem dados do animal, usar os dados do animal mesmo incompletos
+          console.log('❌ Nenhuma NF de venda encontrada para este animal')
+          // Se não encontrou NF mas tem dados do animal, usar os dados do animal mesmo incompletos
           if (valorVendaAnimal > 0) {
-            console.log('âÅ¡ ï¸� Usando dados do animal (incompletos):', infoVendaInicial)
+            console.log('⚠️ Usando dados do animal (incompletos):', infoVendaInicial)
             setInfoVenda(infoVendaInicial)
           }
         }
       } else {
-        console.log('â�Å’ Erro na resposta da API de NFs:', response.status)
+        console.log('❌ Erro na resposta da API de NFs:', response.status)
         // Se houve erro mas temos dados do animal, usar os dados do animal
         if (valorVendaAnimal > 0) {
-          console.log('âÅ¡ ï¸� Usando dados do animal devido a erro na API:', infoVendaInicial)
+          console.log('⚠️ Usando dados do animal devido a erro na API:', infoVendaInicial)
           setInfoVenda(infoVendaInicial)
         }
       }
     } catch (error) {
-      console.error('â�Å’ Erro ao carregar informaÃ§Ãµes de venda:', error)
+      console.error('❌ Erro ao carregar informações de venda:', error)
       // Se houve erro mas temos dados do animal, usar os dados do animal
       if (valorVendaAnimal > 0) {
-        console.log('âÅ¡ ï¸� Usando dados do animal devido a erro:', infoVendaInicial)
+        console.log('⚠️ Usando dados do animal devido a erro:', infoVendaInicial)
         setInfoVenda(infoVendaInicial)
       }
     } finally {
       setLoadingVenda(false)
-      console.log('ðÅ¸�� carregarInfoVenda - Finalizado')
+      console.log('🏁 carregarInfoVenda - Finalizado')
     }
   }
 
@@ -910,28 +910,28 @@ export default function AnimalDetail() {
                 const stats = {
                     total: transfers.length,
                     machos: transfers.filter(t => t.sexo_prenhez === 'M' || t.sexo_prenhez === 'Macho').length,
-                    femeas: transfers.filter(t => t.sexo_prenhez === 'F' || t.sexo_prenhez === 'FÃªmea').length,
-                    nascidos: transfers.filter(t => t.status === 'Nascido' || t.status === 'Parida' || t.status === 'ConcluÃ­da').length,
+                    femeas: transfers.filter(t => t.sexo_prenhez === 'F' || t.sexo_prenhez === 'Fêmea').length,
+                    nascidos: transfers.filter(t => t.status === 'Nascido' || t.status === 'Parida' || t.status === 'Concluída').length,
                     parceiros: {} // Bulls if animal is cow, Cows if animal is bull
                 }
 
                 transfers.forEach(t => {
                     const parceiroName = isMacho 
-                        ? (t.doadora_nome || 'NÃ£o Identificada')
-                        : (t.touro || 'NÃ£o Identificado')
+                        ? (t.doadora_nome || 'Não Identificada')
+                        : (t.touro || 'Não Identificado')
                     
                     if (!stats.parceiros[parceiroName]) {
                         stats.parceiros[parceiroName] = { total: 0, machos: 0, femeas: 0 }
                     }
                     stats.parceiros[parceiroName].total++
                     if (t.sexo_prenhez === 'M' || t.sexo_prenhez === 'Macho') stats.parceiros[parceiroName].machos++
-                    if (t.sexo_prenhez === 'F' || t.sexo_prenhez === 'FÃªmea') stats.parceiros[parceiroName].femeas++
+                    if (t.sexo_prenhez === 'F' || t.sexo_prenhez === 'Fêmea') stats.parceiros[parceiroName].femeas++
                 })
                 
                 // Calculate Active Pregnancies (not born, not failed)
                 const activePregnancies = transfers.filter(t => {
                     const status = (t.status || '').toLowerCase()
-                    const isFinished = ['nascido', 'parida', 'concluÃ­da', 'concluida', 'falha', 'negativo', 'aborto'].some(s => status.includes(s))
+                    const isFinished = ['nascido', 'parida', 'concluída', 'concluida', 'falha', 'negativo', 'aborto'].some(s => status.includes(s))
                     return !isFinished
                 }).map(t => {
                     // Calculate Due Date: TE Date + 283 days (approx gestation) - 7 days (embryo age) = +276 days
@@ -959,7 +959,7 @@ export default function AnimalDetail() {
             }
         }
     } catch (error) {
-        console.error('Erro ao carregar estatÃ­sticas reprodutivas:', error)
+        console.error('Erro ao carregar estatísticas reprodutivas:', error)
     } finally {
         setLoadingReproducao(false)
     }
@@ -970,11 +970,11 @@ export default function AnimalDetail() {
     
     setLoadingTransferencias(true)
     try {
-      // Buscar todas as transferÃªncias e filtrar no cliente (mesma lÃ³gica do PDF)
+      // Buscar todas as transferências e filtrar no cliente (mesma lógica do PDF)
       const resTodas = await fetch('/api/transferencias-embrioes').then(r => r.ok ? r.json() : { data: [] })
       const todasTE = resTodas.data || resTodas || []
       
-      // Filtrar no cliente para garantir que encontramos todas as correspondÃªncias
+      // Filtrar no cliente para garantir que encontramos todas as correspondências
       const transferenciasFiltradas = todasTE.filter(te => {
         // Verificar por ID (mais preciso)
         if (te.doadora_id === animal.id || te.receptora_id === animal.id || te.touro_id === animal.id) {
@@ -996,7 +996,7 @@ export default function AnimalDetail() {
           const receptoraNome = te.receptora_nome.toLowerCase()
           const serie = animal.serie ? animal.serie.toLowerCase() : ''
           const rg = animal.rg ? animal.rg.toString() : ''
-          // Para receptoras, verificar se contÃ©m o RG (formato "G RG" ou "SERIE RG")
+          // Para receptoras, verificar se contém o RG (formato "G RG" ou "SERIE RG")
           if ((rg && receptoraNome.includes(rg)) || (serie && receptoraNome.includes(serie))) {
             return true
           }
@@ -1025,7 +1025,7 @@ export default function AnimalDetail() {
       
       setTransferenciasEmbrioes(transferenciasUnicas)
     } catch (error) {
-      console.error('Erro ao buscar transferÃªncias de embriÃµes:', error)
+      console.error('Erro ao buscar transferências de embriões:', error)
       setTransferenciasEmbrioes([])
     } finally {
       setLoadingTransferencias(false)
@@ -1045,7 +1045,7 @@ export default function AnimalDetail() {
     const handleReloadCustos = () => {
       if (id) {
         setTimeout(() => {
-          loadCustos(true) // ForÃ§ar refresh para buscar dados atualizados
+          loadCustos(true) // Forçar refresh para buscar dados atualizados
         }, 1000) // Aguardar 1 segundo para garantir que o banco foi atualizado
       }
     }
@@ -1058,7 +1058,7 @@ export default function AnimalDetail() {
     }
   }, [animal, id])
   
-  // Efeito adicional para garantir que o avÃ´ materno seja atualizado quando o animal mudar
+  // Efeito adicional para garantir que o avô materno seja atualizado quando o animal mudar
   useEffect(() => {
     if (animal) {
       // Verificar diretamente no objeto do animal
@@ -1071,7 +1071,7 @@ export default function AnimalDetail() {
     }
   }, [animal])
 
-  // Buscar IDs do Pai e MÃ£e para links clicÃ¡veis
+  // Buscar IDs do Pai e Mãe para links clicáveis
   useEffect(() => {
     if (!animal) return
     const fetchParentIds = async () => {
@@ -1142,13 +1142,13 @@ export default function AnimalDetail() {
         return
       }
 
-      // Integrar com boletim (saÃ­da)
+      // Integrar com boletim (saída)
       if (nf.tipo === 'saida') {
         const result = await integrarNFSaida(nf)
         if (result.success) {
-          Toast.success(`âÅ“â€¦ ${result.message}`)
+          Toast.success(`✅ ${result.message}`)
         } else {
-          Toast.error(`â�Å’ ${result.message}`)
+          Toast.error(`❌ ${result.message}`)
         }
       }
     } catch (error) {
@@ -1167,22 +1167,22 @@ export default function AnimalDetail() {
         // Tentar buscar por ID primeiro
         let response = await fetch(`/api/animals/${id}`)
         
-        // Se nÃ£o encontrou e o ID parece ser um RG (nÃ£o numÃ©rico ou muito grande), tentar buscar por RG
+        // Se não encontrou e o ID parece ser um RG (não numérico ou muito grande), tentar buscar por RG
         if (!response.ok && response.status === 404) {
-          console.log(`âÅ¡ ï¸� Animal ${id} nÃ£o encontrado por ID, tentando buscar por RG...`)
+          console.log(`⚠️ Animal ${id} não encontrado por ID, tentando buscar por RG...`)
           
-          // Tentar buscar usando a API de verificaÃ§Ã£o que aceita RG
+          // Tentar buscar usando a API de verificação que aceita RG
           const verificarResponse = await fetch(`/api/animals/verificar?rg=${id}`)
           if (verificarResponse.ok) {
             const verificarResult = await verificarResponse.json()
             if (verificarResult.success && verificarResult.data) {
               // Se encontrou por RG, redirecionar para o ID correto
               const animalIdCorreto = verificarResult.data.id
-              console.log(`âÅ“â€¦ Animal encontrado por RG ${id}, ID correto: ${animalIdCorreto}`)
+              console.log(`✅ Animal encontrado por RG ${id}, ID correto: ${animalIdCorreto}`)
               
-              // Se o ID na URL Ã© diferente do ID correto, redirecionar
+              // Se o ID na URL é diferente do ID correto, redirecionar
               if (id !== String(animalIdCorreto)) {
-                console.log(`ðÅ¸â€�â€ž Redirecionando de /animals/${id} para /animals/${animalIdCorreto}`)
+                console.log(`🔄 Redirecionando de /animals/${id} para /animals/${animalIdCorreto}`)
                 router.replace(`/animals/${animalIdCorreto}`)
                 return
               }
@@ -1203,15 +1203,15 @@ export default function AnimalDetail() {
             return
           }
         } else if (response.status === 404) {
-          // Animal nÃ£o encontrado na API, continuar para localStorage
-          console.log(`âÅ¡ ï¸� Animal ${id} nÃ£o encontrado na API (404)`)
+          // Animal não encontrado na API, continuar para localStorage
+          console.log(`⚠️ Animal ${id} não encontrado na API (404)`)
         }
       } catch (apiError) {
-        console.error('â�Å’ Erro ao buscar na API:', apiError)
+        console.error('❌ Erro ao buscar na API:', apiError)
         // Continuar para tentar localStorage
       }
       
-      // Se nÃ£o encontrou na API, tentar no localStorage
+      // Se não encontrou na API, tentar no localStorage
       try {
         const animalsData = JSON.parse(localStorage.getItem('animals') || '[]')
         const animal = animalsData.find(a => a.id == id || a.id === parseInt(id))
@@ -1248,8 +1248,8 @@ export default function AnimalDetail() {
         console.error('Erro ao ler localStorage:', localStorageError)
       }
       
-      // Se chegou aqui, animal nÃ£o foi encontrado
-      setError('Animal nÃ£o encontrado')
+      // Se chegou aqui, animal não foi encontrado
+      setError('Animal não encontrado')
       
     } catch (error) {
       logger.error('Erro ao carregar animal:', error)
@@ -1274,7 +1274,7 @@ export default function AnimalDetail() {
       })
 
       if (response.ok) {
-        logger.info('Animal excluÃ­do com sucesso', { id })
+        logger.info('Animal excluído com sucesso', { id })
         router.push('/animals')
       } else {
         alert('Erro ao excluir animal')
@@ -1286,19 +1286,19 @@ export default function AnimalDetail() {
   }
 
   const formatDate = (dateString) => {
-    if (!dateString) return 'NÃ£o informado'
+    if (!dateString) return 'Não informado'
     try {
       const date = new Date(dateString)
-      if (isNaN(date.getTime())) return 'Data invÃ¡lida'
+      if (isNaN(date.getTime())) return 'Data inválida'
       return date.toLocaleDateString('pt-BR')
     } catch (error) {
       console.error('Erro ao formatar data:', error)
-      return 'Data invÃ¡lida'
+      return 'Data inválida'
     }
   }
 
   const formatCurrency = (value) => {
-    if (!value) return 'NÃ£o informado'
+    if (!value) return 'Não informado'
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
@@ -1325,7 +1325,7 @@ export default function AnimalDetail() {
         custos: custos || []
       }
 
-      // Criar objeto de exames por RG para a funÃ§Ã£o de PDF
+      // Criar objeto de exames por RG para a função de PDF
       const examesPorRG = {}
       examesPorRG[animal.rg] = examesAndrologicos
 
@@ -1335,7 +1335,7 @@ export default function AnimalDetail() {
         reproducaoStatsMap[animal.id] = reproducaoStats
       }
 
-      // Buscar todas as transferÃªncias de embriÃµes relacionadas ao animal
+      // Buscar todas as transferências de embriões relacionadas ao animal
       const transferenciasEmbrioesMap = {}
       try {
         // Buscar como doadora, receptora e touro (por ID e por nome)
@@ -1343,11 +1343,11 @@ export default function AnimalDetail() {
         const serieRG = `${animal.serie}${animal.rg}`
         const serieRGParenteses = `${animal.serie} (RG: ${animal.rg})`
         
-        // Buscar todas as transferÃªncias e filtrar no cliente (mais confiÃ¡vel)
+        // Buscar todas as transferências e filtrar no cliente (mais confiável)
         const resTodas = await fetch('/api/transferencias-embrioes').then(r => r.ok ? r.json() : { data: [] })
         const todasTE = resTodas.data || resTodas || []
         
-        // Filtrar no cliente para garantir que encontramos todas as correspondÃªncias
+        // Filtrar no cliente para garantir que encontramos todas as correspondências
         const transferenciasFiltradas = todasTE.filter(te => {
           // Verificar por ID (mais preciso)
           if (te.doadora_id === animal.id || te.receptora_id === animal.id || te.touro_id === animal.id) {
@@ -1369,7 +1369,7 @@ export default function AnimalDetail() {
             const receptoraNome = te.receptora_nome.toLowerCase()
             const serie = animal.serie ? animal.serie.toLowerCase() : ''
             const rg = animal.rg ? animal.rg.toString() : ''
-            // Para receptoras, verificar se contÃ©m o RG (formato "G RG" ou "SERIE RG")
+            // Para receptoras, verificar se contém o RG (formato "G RG" ou "SERIE RG")
             if ((rg && receptoraNome.includes(rg)) || (serie && receptoraNome.includes(serie))) {
               return true
             }
@@ -1397,8 +1397,8 @@ export default function AnimalDetail() {
           transferenciasEmbrioesMap[animal.id] = transferenciasUnicas
         }
       } catch (error) {
-        console.error('Erro ao buscar transferÃªncias de embriÃµes para PDF:', error)
-        // Continuar sem as transferÃªncias se houver erro
+        console.error('Erro ao buscar transferências de embriões para PDF:', error)
+        // Continuar sem as transferências se houver erro
       }
 
       // Gerar PDF
@@ -1422,13 +1422,13 @@ export default function AnimalDetail() {
   }
 
 
-  // Buscar sÃ©rie e RG da mÃ£e quando nÃ£o estÃ£o no cadastro (por nome no sistema)
+  // Buscar série e RG da mãe quando não estão no cadastro (por nome no sistema)
   const buscarSerieRgMae = async () => {
     if (!animal?.mae?.trim()) return
-    if (animal.serie_mae && animal.rg_mae) return // JÃ¡ tem no cadastro
+    if (animal.serie_mae && animal.rg_mae) return // Já tem no cadastro
     const { serie, rg } = extrairSerieRG(animal.mae, animal.serie)
     if (serie && rg) {
-      setMaeSerieRg({ serie, rg }) // ExtraÃ­do do formato "SERIE RG"
+      setMaeSerieRg({ serie, rg }) // Extraído do formato "SERIE RG"
       return
     }
     try {
@@ -1448,9 +1448,9 @@ export default function AnimalDetail() {
     }
   }
 
-  // Buscar avÃ´ materno - priorizar campo direto do animal
+  // Buscar avô materno - priorizar campo direto do animal
   const buscarAvoMaterno = async () => {
-    // 1) PRIMEIRO: Verificar se jÃ¡ vem no objeto do animal (campo direto do banco)
+    // 1) PRIMEIRO: Verificar se já vem no objeto do animal (campo direto do banco)
     if (animal && (animal.avo_materno || animal.avoMaterno)) {
       const avo = animal.avo_materno || animal.avoMaterno
       if (avo && avo.trim() !== '') {
@@ -1459,13 +1459,13 @@ export default function AnimalDetail() {
       }
     }
 
-    // 2) SEGUNDO: Tentar buscar atravÃ©s da mÃ£e (se mÃ£e estiver cadastrada)
+    // 2) SEGUNDO: Tentar buscar através da mãe (se mãe estiver cadastrada)
     if (animal && animal.mae) {
       try {
         const { serie, rg } = extrairSerieRG(animal.mae, animal.serie)
         
         if (serie && rg) {
-          // Buscar a mÃ£e no banco de dados
+          // Buscar a mãe no banco de dados
           const response = await fetch(`/api/animals?serie=${serie}&rg=${rg}`)
           
           if (response.ok) {
@@ -1479,22 +1479,22 @@ export default function AnimalDetail() {
               return
             }
             
-            // Se mÃ£e tem pai cadastrado, esse Ã© o avÃ´ materno
+            // Se mãe tem pai cadastrado, esse é o avô materno
             if (maeEncontrada && maeEncontrada.pai) {
               setAvoMaterno(maeEncontrada.pai)
               return
             }
           }
           
-          // Se mÃ£e nÃ£o encontrada, tentar buscar atravÃ©s de irmÃ£os (mesma mÃ£e)
-          // que tÃªm avÃ´ materno cadastrado
+          // Se mãe não encontrada, tentar buscar através de irmãos (mesma mãe)
+          // que têm avô materno cadastrado
           try {
             const irmaosResponse = await fetch(`/api/animals?serie=${animal.serie}`)
             if (irmaosResponse.ok) {
               const irmaosResult = await irmaosResponse.json()
               const irmaos = irmaosResult.success && irmaosResult.data ? irmaosResult.data : (irmaosResult.data || [])
               
-              // Encontrar irmÃ£o com mesma mÃ£e que tem avÃ´ materno
+              // Encontrar irmão com mesma mãe que tem avô materno
               const irmaoComAvo = irmaos.find(irmao => {
                 const irmaoMae = extrairSerieRG(irmao.mae || '', irmao.serie)
                 return irmaoMae.serie === serie && irmaoMae.rg === rg && 
@@ -1511,15 +1511,15 @@ export default function AnimalDetail() {
               }
             }
           } catch (irmaosError) {
-            // Ignorar erro ao buscar irmÃ£os
+            // Ignorar erro ao buscar irmãos
           }
         }
       } catch (error) {
-        console.error('Erro ao buscar avÃ´ materno atravÃ©s da mÃ£e:', error)
+        console.error('Erro ao buscar avô materno através da mãe:', error)
       }
     }
 
-    // 3) TERCEIRO: Tentar buscar em ocorrÃªncias registradas
+    // 3) TERCEIRO: Tentar buscar em ocorrências registradas
     await buscarAvoMaternoFallback()
   }
 
@@ -1569,9 +1569,9 @@ export default function AnimalDetail() {
   }
 
 
-  // Fallback para avÃ´ materno: buscar em ocorrÃªncias
+  // Fallback para avô materno: buscar em ocorrências
   const buscarAvoMaternoFallback = async () => {
-    // Tentar carregar de ocorrÃªncias registradas para este animal
+    // Tentar carregar de ocorrências registradas para este animal
     try {
       const res = await fetch(`/api/animals/ocorrencias?animalId=${id}&limit=10`)
       if (res.ok) {
@@ -1584,13 +1584,13 @@ export default function AnimalDetail() {
         }
       }
     } catch (err) {
-      console.warn('Falha ao buscar ocorrÃªncias para avÃ´ materno:', err)
+      console.warn('Falha ao buscar ocorrências para avô materno:', err)
     }
-    // 3) Se nada encontrado, manter como nÃ£o informado
+    // 3) Se nada encontrado, manter como não informado
     setAvoMaterno(null)
   }
 
-  // Carregar localizaÃ§Ã£o atual do animal
+  // Carregar localização atual do animal
   const carregarLocalizacao = async () => {
     if (!id) return
 
@@ -1603,8 +1603,8 @@ export default function AnimalDetail() {
         let localizacoes = result.data || []
         localizacaoAtiva = localizacoes.find(loc => !loc.data_saida) || localizacoes[0] || null
 
-        // Se nÃ£o encontrou ativa, buscar TODAS as localizaÃ§Ãµes e usar a mais recente como fallback
-        // (caso data_saida esteja preenchida por erro de importaÃ§Ã£o, ex: datas invertidas)
+        // Se não encontrou ativa, buscar TODAS as localizações e usar a mais recente como fallback
+        // (caso data_saida esteja preenchida por erro de importação, ex: datas invertidas)
         if (!localizacaoAtiva) {
           const resTodas = await fetch(`/api/localizacoes?animal_id=${id}`)
           if (resTodas.ok) {
@@ -1613,7 +1613,7 @@ export default function AnimalDetail() {
             if (maisRecente) {
               const dataEntrada = maisRecente.data_entrada ? new Date(maisRecente.data_entrada) : null
               const dataSaida = maisRecente.data_saida ? new Date(maisRecente.data_saida) : null
-              // Se data_saida < data_entrada (inconsistente) ou Ã© a Ãºnica localizaÃ§Ã£o, usar como atual
+              // Se data_saida < data_entrada (inconsistente) ou é a única localização, usar como atual
               if (!dataSaida || !dataEntrada || dataSaida < dataEntrada) {
                 localizacaoAtiva = maisRecente
               }
@@ -1622,20 +1622,20 @@ export default function AnimalDetail() {
         }
       }
       
-      // Fallback: Se nÃ£o encontrou na API de localizaÃ§Ãµes, usar o campo do cadastro do animal
-      // (importaÃ§Ã£o Excel usa piquete_atual; cadastro antigo pode usar pasto_atual)
+      // Fallback: Se não encontrou na API de localizações, usar o campo do cadastro do animal
+      // (importação Excel usa piquete_atual; cadastro antigo pode usar pasto_atual)
       const localDoAnimal = animal?.piquete_atual || animal?.piqueteAtual || animal?.pasto_atual || animal?.pastoAtual
       if (!localizacaoAtiva && animal && localDoAnimal) {
         localizacaoAtiva = {
           piquete: localDoAnimal,
           data_entrada: animal.data_entrada_piquete || animal.dataEntradaPiquete || animal.created_at || animal.data_nascimento || null,
-          motivo_movimentacao: 'ImportaÃ§Ã£o / Cadastro Inicial'
+          motivo_movimentacao: 'Importação / Cadastro Inicial'
         }
       }
 
       setLocalizacaoAtual(localizacaoAtiva)
     } catch (error) {
-      console.error('Erro ao carregar localizaÃ§Ã£o:', error)
+      console.error('Erro ao carregar localização:', error)
       
       // Fallback em caso de erro
       const localDoAnimal = animal?.piquete_atual || animal?.piqueteAtual || animal?.pasto_atual || animal?.pastoAtual
@@ -1643,7 +1643,7 @@ export default function AnimalDetail() {
         setLocalizacaoAtual({
           piquete: localDoAnimal,
           data_entrada: animal.data_entrada_piquete || animal.dataEntradaPiquete || animal.created_at || animal.data_nascimento || null,
-          motivo_movimentacao: 'ImportaÃ§Ã£o / Cadastro Inicial'
+          motivo_movimentacao: 'Importação / Cadastro Inicial'
         })
       } else {
         setLocalizacaoAtual(null)
@@ -1657,7 +1657,7 @@ export default function AnimalDetail() {
     try {
       setLoadingCustos(true)
       
-      // Usar custos jÃ¡ carregados no animal (evita requisiÃ§Ã£o duplicada) - exceto em refresh forÃ§ado
+      // Usar custos já carregados no animal (evita requisição duplicada) - exceto em refresh forçado
       if (!forceRefresh) {
         const custosDoAnimal = animal?.custos
         if (Array.isArray(custosDoAnimal) && custosDoAnimal.length > 0) {
@@ -1672,7 +1672,7 @@ export default function AnimalDetail() {
         }
       }
       
-      // Primeiro tentar buscar via API especÃ­fica de custos
+      // Primeiro tentar buscar via API específica de custos
       try {
         const response = await fetch(`/api/animals/${id}/custos`)
         
@@ -1680,7 +1680,7 @@ export default function AnimalDetail() {
           const result = await response.json()
           const custosData = result.success && result.data ? result.data : (result.data || [])
           
-          // Garantir que Ã© um array e ordenar por data (mais recente primeiro)
+          // Garantir que é um array e ordenar por data (mais recente primeiro)
           const custosArray = Array.isArray(custosData) ? custosData : []
           custosArray.sort((a, b) => {
             const dataA = new Date(a.data || a.data_custo || 0)
@@ -1688,8 +1688,8 @@ export default function AnimalDetail() {
             return dataB - dataA
           })
           
-          console.log(`âÅ“â€¦ Custos carregados para animal ${id}:`, custosArray.length, 'custos')
-          console.log('ðÅ¸â€œâ€¹ Detalhes dos custos:', custosArray.map(c => ({
+          console.log(`✅ Custos carregados para animal ${id}:`, custosArray.length, 'custos')
+          console.log('📋 Detalhes dos custos:', custosArray.map(c => ({
             tipo: c.tipo,
             subtipo: c.subtipo,
             valor: c.valor,
@@ -1699,7 +1699,7 @@ export default function AnimalDetail() {
           setCustos(custosArray)
           return
         } else {
-          console.warn(`âÅ¡ ï¸� API de custos retornou erro: ${response.status}`)
+          console.warn(`⚠️ API de custos retornou erro: ${response.status}`)
         }
       } catch (apiError) {
         console.error('Erro ao buscar custos via API:', apiError)
@@ -1719,7 +1719,7 @@ export default function AnimalDetail() {
             return dataB - dataA
           })
           
-          console.log(`âÅ“â€¦ Custos carregados via API geral:`, custosArray.length, 'custos')
+          console.log(`✅ Custos carregados via API geral:`, custosArray.length, 'custos')
           setCustos(custosArray)
           return
         }
@@ -1727,7 +1727,7 @@ export default function AnimalDetail() {
         console.error('Erro ao buscar custos via API geral:', apiError2)
       }
       
-      // Se nÃ£o encontrar via API especÃ­fica, tentar pegar do animal se jÃ¡ tiver
+      // Se não encontrar via API específica, tentar pegar do animal se já tiver
       if (animal && animal.custos) {
         const custosAnimal = Array.isArray(animal.custos) ? animal.custos : []
         if (custosAnimal.length > 0) {
@@ -1736,8 +1736,8 @@ export default function AnimalDetail() {
         }
       }
       
-      // Se nÃ£o encontrou nada, deixar vazio
-      console.warn(`âÅ¡ ï¸� Nenhum custo encontrado para animal ${id}`)
+      // Se não encontrou nada, deixar vazio
+      console.warn(`⚠️ Nenhum custo encontrado para animal ${id}`)
       setCustos([])
     } catch (error) {
       console.error('Erro ao carregar custos:', error)
@@ -1750,14 +1750,14 @@ export default function AnimalDetail() {
   const loadExamesAndrologicos = async () => {
     if (!animal || !animal.rg) return
     
-    // Verificar se o animal Ã© macho - exames androlÃ³gicos sÃ£o apenas para machos
+    // Verificar se o animal é macho - exames andrológicos são apenas para machos
     const isMacho = animal.sexo && (
       animal.sexo.toLowerCase().startsWith('m') || 
       animal.sexo === 'M' || 
       animal.sexo.toLowerCase().includes('macho')
     )
     
-    // Se nÃ£o for macho, nÃ£o carregar exames androlÃ³gicos
+    // Se não for macho, não carregar exames andrológicos
     if (!isMacho) {
       setExamesAndrologicos([])
       return
@@ -1766,7 +1766,7 @@ export default function AnimalDetail() {
     try {
       setLoadingExames(true)
       
-      // Buscar exames androlÃ³gicos pelo RG do animal
+      // Buscar exames andrológicos pelo RG do animal
       const response = await fetch(`/api/reproducao/exames-andrologicos?rg=${animal.rg}`)
       
       if (response.ok) {
@@ -1776,22 +1776,22 @@ export default function AnimalDetail() {
           ? result 
           : (result.data || result.exames || [])
         
-        // Normalizar identificaÃ§Ã£o do animal para comparaÃ§Ã£o
+        // Normalizar identificação do animal para comparação
         const animalIdentificacao = `${animal.serie || ''}-${animal.rg}`.replace(/-+/g, '-').toUpperCase()
         const animalIdentificacaoSemHifen = `${animal.serie || ''}${animal.rg}`.toUpperCase()
         
-        // Filtrar apenas exames deste animal (por RG e sÃ©rie se disponÃ­vel)
+        // Filtrar apenas exames deste animal (por RG e série se disponível)
         const examesDoAnimal = exames.filter(exame => {
           // Verificar RG primeiro (deve ser exato)
           if (String(exame.rg).trim() !== String(animal.rg).trim()) return false
           
-          // Se tiver sÃ©rie no exame, verificar tambÃ©m
+          // Se tiver série no exame, verificar também
           if (exame.touro && animal.serie) {
-            // Normalizar identificaÃ§Ã£o do touro no exame
+            // Normalizar identificação do touro no exame
             const touroNormalizado = exame.touro.replace(/-+/g, '-').toUpperCase()
             const touroSemHifen = exame.touro.replace(/-/g, '').toUpperCase()
             
-            // Verificar se corresponde (com ou sem hÃ­fen)
+            // Verificar se corresponde (com ou sem hífen)
             const matchComHifen = touroNormalizado.includes(animalIdentificacao) || 
                                   touroNormalizado === animalIdentificacao
             const matchSemHifen = touroSemHifen.includes(animalIdentificacaoSemHifen) ||
@@ -1823,7 +1823,7 @@ export default function AnimalDetail() {
         setExamesAndrologicos([])
       }
     } catch (error) {
-      console.error('Erro ao carregar exames androlÃ³gicos:', error)
+      console.error('Erro ao carregar exames andrológicos:', error)
       setExamesAndrologicos([])
     } finally {
       setLoadingExames(false)
@@ -1935,10 +1935,10 @@ export default function AnimalDetail() {
       <div className="max-w-4xl mx-auto p-6">
         <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 text-center">
           <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
-            Animal nÃ£o encontrado
+            Animal não encontrado
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            O animal solicitado nÃ£o foi encontrado no sistema.
+            O animal solicitado não foi encontrado no sistema.
           </p>
           <Button 
             variant="secondary"
@@ -1953,7 +1953,7 @@ export default function AnimalDetail() {
     )
   }
 
-  // Calcular estatÃ­sticas de doadora se houver coletas FIV
+  // Calcular estatísticas de doadora se houver coletas FIV
   let doadoraStats = null
   if (animal && animal.fivs && animal.fivs.length > 0) {
     const totalColetas = animal.fivs.length
@@ -1983,7 +1983,7 @@ export default function AnimalDetail() {
     }
   }
 
-  // VERSÃÆ’O MOBILE SIMPLIFICADA - APENAS CONSULTA
+  // VERSÃO MOBILE SIMPLIFICADA - APENAS CONSULTA
   if (isMobile && animal) {
     const totalCustos = (animal.custos || custos || []).reduce((s, c) => s + parseFloat(c.valor || 0), 0)
     const currentIdx = allAnimals.findIndex(a => a.id === animal.id)
@@ -2023,7 +2023,7 @@ export default function AnimalDetail() {
         </Head>
 
         <div className="min-h-screen bg-gray-900 text-white">
-          {/* Header Ultra Compacto - Apenas SÃ©rie e RG */}
+          {/* Header Ultra Compacto - Apenas Série e RG */}
           <div className={`p-3 shadow-lg ${
             animal.sexo?.toLowerCase().includes('macho') 
               ? 'bg-gradient-to-r from-blue-600 to-indigo-700'
@@ -2049,7 +2049,7 @@ export default function AnimalDetail() {
               </span>
             </div>
 
-            {/* NavegaÃ§Ã£o */}
+            {/* Navegação */}
             {allAnimals.length > 0 && currentIdx >= 0 && (
               <div className="flex items-center justify-center gap-2">
                 <span className="text-sm font-bold">
@@ -2097,7 +2097,7 @@ export default function AnimalDetail() {
             )}
           </div>
 
-          {/* Modo Consulta - Sem botÃµes de aÃ§Ã£o */}
+          {/* Modo Consulta - Sem botões de ação */}
 
           {/* Custos */}
           <div className="px-3 pb-3">
@@ -2117,7 +2117,7 @@ export default function AnimalDetail() {
                   <BeakerIcon className="h-5 w-5 text-pink-300" />
                   <h3 className="font-bold text-white">Animal Doadora</h3>
                 </div>
-                <p className="text-xs text-pink-200 mb-3">Possui histÃ³rico de coletas de oÃ³citos (FIV)</p>
+                <p className="text-xs text-pink-200 mb-3">Possui histórico de coletas de oócitos (FIV)</p>
                 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-3 gap-2">
@@ -2127,20 +2127,20 @@ export default function AnimalDetail() {
                   </div>
                   <div className="bg-black/20 rounded-lg p-2 text-center">
                     <p className="text-2xl font-bold text-purple-300">{statsDoadora.totalOocitos}</p>
-                    <p className="text-xs text-purple-200">OÃ³citos</p>
+                    <p className="text-xs text-purple-200">Oócitos</p>
                   </div>
                   <div className="bg-black/20 rounded-lg p-2 text-center">
                     <p className="text-2xl font-bold text-indigo-300">{statsDoadora.mediaOocitos}</p>
-                    <p className="text-xs text-indigo-200">MÃ©dia</p>
+                    <p className="text-xs text-indigo-200">Média</p>
                   </div>
                 </div>
 
                 {statsDoadora.ultimaColeta && (
                   <div className="mt-3 pt-3 border-t border-pink-700">
                     <p className="text-xs text-pink-200">
-                      ÃÅ¡ltima coleta: {new Date(statsDoadora.ultimaColeta.data_fiv).toLocaleDateString('pt-BR')}
+                      Última coleta: {new Date(statsDoadora.ultimaColeta.data_fiv).toLocaleDateString('pt-BR')}
                       {statsDoadora.ultimaColeta.quantidade_oocitos && 
-                        ` ââ‚¬¢ ${statsDoadora.ultimaColeta.quantidade_oocitos} oÃ³citos`
+                        ` • ${statsDoadora.ultimaColeta.quantidade_oocitos} oócitos`
                       }
                     </p>
                   </div>
@@ -2149,16 +2149,16 @@ export default function AnimalDetail() {
             </div>
           )}
 
-          {/* Card de Coletas FIV da MÃ£e */}
+          {/* Card de Coletas FIV da Mãe */}
           {coletasFIVMae && coletasFIVMae.resumo && (
             <div className="px-3 pb-3">
               <div className="bg-gradient-to-br from-indigo-900 to-blue-900 rounded-lg p-4 border-2 border-indigo-500">
                 <div className="flex items-center gap-2 mb-2">
                   <BeakerIcon className="h-5 w-5 text-indigo-300" />
-                  <h3 className="font-bold text-white">MÃ£e Doadora</h3>
+                  <h3 className="font-bold text-white">Mãe Doadora</h3>
                 </div>
                 <p className="text-sm font-semibold text-indigo-200 mb-3">{coletasFIVMae.nome}</p>
-                <p className="text-xs text-indigo-200 mb-3">HistÃ³rico de coletas de oÃ³citos (FIV)</p>
+                <p className="text-xs text-indigo-200 mb-3">Histórico de coletas de oócitos (FIV)</p>
                 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-3 gap-2 mb-2">
@@ -2168,23 +2168,23 @@ export default function AnimalDetail() {
                   </div>
                   <div className="bg-black/20 rounded-lg p-2 text-center">
                     <p className="text-xl font-bold text-blue-300">{coletasFIVMae.resumo.totalOocitos}</p>
-                    <p className="text-xs text-blue-200">OÃ³citos</p>
+                    <p className="text-xs text-blue-200">Oócitos</p>
                   </div>
                   <div className="bg-black/20 rounded-lg p-2 text-center">
                     <p className="text-xl font-bold text-cyan-300">{coletasFIVMae.resumo.mediaOocitos}</p>
-                    <p className="text-xs text-cyan-200">MÃ©dia</p>
+                    <p className="text-xs text-cyan-200">Média</p>
                   </div>
                 </div>
 
-                {/* Linha adicional com embriÃµes */}
+                {/* Linha adicional com embriões */}
                 <div className="grid grid-cols-3 gap-2">
                   <div className="bg-black/20 rounded-lg p-2 text-center">
                     <p className="text-xl font-bold text-purple-300">{coletasFIVMae.resumo.totalEmbrioesProduzidos}</p>
-                    <p className="text-xs text-purple-200">EmbriÃµes</p>
+                    <p className="text-xs text-purple-200">Embriões</p>
                   </div>
                   <div className="bg-black/20 rounded-lg p-2 text-center">
                     <p className="text-xl font-bold text-pink-300">{coletasFIVMae.resumo.mediaEmbrioesProduzidos}</p>
-                    <p className="text-xs text-pink-200">MÃ©dia Emb</p>
+                    <p className="text-xs text-pink-200">Média Emb</p>
                   </div>
                   <div className="bg-black/20 rounded-lg p-2 text-center">
                     <p className="text-xl font-bold text-green-300">{coletasFIVMae.resumo.totalEmbrioesTransferidos}</p>
@@ -2195,9 +2195,9 @@ export default function AnimalDetail() {
                 {coletasFIVMae.coletas && coletasFIVMae.coletas.length > 0 && (
                   <div className="mt-3 pt-3 border-t border-indigo-700">
                     <p className="text-xs text-indigo-200">
-                      ÃÅ¡ltima coleta: {new Date(coletasFIVMae.coletas[0].data_fiv).toLocaleDateString('pt-BR')}
+                      Última coleta: {new Date(coletasFIVMae.coletas[0].data_fiv).toLocaleDateString('pt-BR')}
                       {coletasFIVMae.coletas[0].quantidade_oocitos && 
-                        ` ââ‚¬¢ ${coletasFIVMae.coletas[0].quantidade_oocitos} oÃ³citos`
+                        ` • ${coletasFIVMae.coletas[0].quantidade_oocitos} oócitos`
                       }
                     </p>
                   </div>
@@ -2206,10 +2206,10 @@ export default function AnimalDetail() {
             </div>
           )}
 
-          {/* InformaÃ§Ãµes Resumidas */}
+          {/* Informações Resumidas */}
           <div className="px-3 pb-20">
             <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-              <h3 className="font-bold text-white text-base mb-3">ðÅ¸â€œâ€¹ InformaÃ§Ãµes</h3>
+              <h3 className="font-bold text-white text-base mb-3">📋 Informações</h3>
               
               <div className="space-y-2 text-sm">
                 {animal.nome && (
@@ -2220,7 +2220,7 @@ export default function AnimalDetail() {
                 )}
                 
                 <div className="flex justify-between py-2 border-b border-gray-700">
-                  <span className="text-gray-400">RaÃ§a</span>
+                  <span className="text-gray-400">Raça</span>
                   <span className="font-semibold text-white">{animal.raca || '-'}</span>
                 </div>
 
@@ -2259,7 +2259,7 @@ export default function AnimalDetail() {
 
                 {animal.mae && (
                   <div className="flex justify-between py-2 border-b border-gray-700">
-                    <span className="text-gray-400">MÃ£e</span>
+                    <span className="text-gray-400">Mãe</span>
                     {((animal.serie_mae && animal.rg_mae) || (maeSerieRg?.serie && maeSerieRg?.rg)) ? (
                       <Link
                         href={`/consulta-animal/${animal.serie_mae || maeSerieRg.serie}-${animal.rg_mae || maeSerieRg.rg}`}
@@ -2275,14 +2275,14 @@ export default function AnimalDetail() {
 
                 {localizacaoAtual && (
                   <div className="flex justify-between py-2 border-b border-gray-700">
-                    <span className="text-gray-400">LocalizaÃ§Ã£o</span>
-                    <span className="font-semibold text-white">{localizacaoValidaParaExibir(localizacaoAtual.piquete) || 'NÃ£o informado'}</span>
+                    <span className="text-gray-400">Localização</span>
+                    <span className="font-semibold text-white">{localizacaoValidaParaExibir(localizacaoAtual.piquete) || 'Não informado'}</span>
                   </div>
                 )}
 
                 {animal.observacoes && (
                   <div className="py-2">
-                    <p className="text-gray-400 text-xs mb-1">ObservaÃ§Ãµes</p>
+                    <p className="text-gray-400 text-xs mb-1">Observações</p>
                     <p className="text-white text-sm">{animal.observacoes}</p>
                   </div>
                 )}
@@ -2297,7 +2297,7 @@ export default function AnimalDetail() {
             animal={animal}
             onSuccess={() => {
               setShowQuickOccurrence(false)
-              alert('âÅ“â€¦ OcorrÃªncia registrada!')
+              alert('✅ Ocorrência registrada!')
             }}
           />
 
@@ -2306,7 +2306,7 @@ export default function AnimalDetail() {
             onClose={() => setShowBatchOccurrence(false)}
             onSuccess={() => {
               setShowBatchOccurrence(false)
-              alert('âÅ“â€¦ LanÃ§amento em lote realizado!')
+              alert('✅ Lançamento em lote realizado!')
             }}
           />
         </div>
@@ -2342,7 +2342,7 @@ export default function AnimalDetail() {
                 {animal.nome || animal.serie || 'Animal sem nome'}
               </h1>
               <p className="animal-id">
-                ID: {animal.id} ââ‚¬¢ {animal.serie}-{animal.rg}
+                ID: {animal.id} • {animal.serie}-{animal.rg}
               </p>
               {(() => {
                 const isMacho = animal.sexo && (animal.sexo.toLowerCase().includes('macho') || animal.sexo === 'M')
@@ -2354,9 +2354,9 @@ export default function AnimalDetail() {
                     return (
                       <p 
                         className="mt-1 text-sm font-semibold text-white"
-                        title={dataEx ? `Exame em ${new Date(dataEx).toLocaleDateString('pt-BR')}` : 'Exame androlÃ³gico'}
+                        title={dataEx ? `Exame em ${new Date(dataEx).toLocaleDateString('pt-BR')}` : 'Exame andrológico'}
                       >
-                        SituaÃ§Ã£o Reprodutiva: Apto
+                        Situação Reprodutiva: Apto
                       </p>
                     )
                   }
@@ -2364,9 +2364,9 @@ export default function AnimalDetail() {
                     return (
                       <p 
                         className="mt-1 text-sm font-semibold text-white"
-                        title={dataEx ? `Exame em ${new Date(dataEx).toLocaleDateString('pt-BR')}` : 'Exame androlÃ³gico'}
+                        title={dataEx ? `Exame em ${new Date(dataEx).toLocaleDateString('pt-BR')}` : 'Exame andrológico'}
                       >
-                        SituaÃ§Ã£o Reprodutiva: Inapto
+                        Situação Reprodutiva: Inapto
                       </p>
                     )
                   }
@@ -2378,10 +2378,10 @@ export default function AnimalDetail() {
                   const u = String(s).toUpperCase().trim()
                   return u === 'PRENHA' || u === 'P' || u.includes('PRENHA') || u.includes('POSITIVO')
                 }
-                const resultadoPrenha = (animal.resultadoDG === 'Prenha' || animal.resultado_dg === 'Prenha' || statusPrenha(animal.resultadoDG) || statusPrenha(animal.resultado_dg)) || (gestacaoAtual?.situacao === 'Em GestaÃ§Ã£o' || gestacaoAtual?.situacao === 'Ativa') || statusPrenha(ultimaIA?.status_gestacao) || statusPrenha(ultimaIA?.statusGestacao) || statusPrenha(ultimaIA?.resultado_dg) || statusPrenha(ultimaIA?.resultadoDg)
+                const resultadoPrenha = (animal.resultadoDG === 'Prenha' || animal.resultado_dg === 'Prenha' || statusPrenha(animal.resultadoDG) || statusPrenha(animal.resultado_dg)) || (gestacaoAtual?.situacao === 'Em Gestação' || gestacaoAtual?.situacao === 'Ativa') || statusPrenha(ultimaIA?.status_gestacao) || statusPrenha(ultimaIA?.statusGestacao) || statusPrenha(ultimaIA?.resultado_dg) || statusPrenha(ultimaIA?.resultadoDg)
                 const resultadoVazia = (() => {
                   const r = (animal.resultadoDG || animal.resultado_dg || '').toString().toLowerCase()
-                  return r.includes('nÃ£o') || r.includes('nao') || r.includes('negativo') || r.includes('vazia') || r === 'negativo' || r === 'vazia'
+                  return r.includes('não') || r.includes('nao') || r.includes('negativo') || r.includes('vazia') || r === 'negativo' || r === 'vazia'
                 })()
                 const teveNascimento = gestacaoAtual?.situacao === 'Nascido' || gestacaoAtual?.situacao === 'Parida'
                 const estaInseminada = !resultadoPrenha && !resultadoVazia && (ultimaIA?.data_ia || ultimaIA?.data_inseminacao) && !animal.data_dg && !animal.dataDG
@@ -2392,14 +2392,14 @@ export default function AnimalDetail() {
                     <p 
                       className="mt-1 text-sm font-semibold text-white cursor-pointer hover:text-blue-300 transition-colors"
                       onClick={() => setShowReproducaoModal(true)}
-                      title={`PrevisÃ£o de parto: ${previsao.toLocaleDateString('pt-BR')} (${diasRestantes} dias restantes) - Clique para ver detalhes`}
+                      title={`Previsão de parto: ${previsao.toLocaleDateString('pt-BR')} (${diasRestantes} dias restantes) - Clique para ver detalhes`}
                     >
-                      SituaÃ§Ã£o Reprodutiva: Prenha ââ‚¬¢ parto previsto {previsao.toLocaleDateString('pt-BR')} ââ‚¬¢ {diasRestantes} dias
+                      Situação Reprodutiva: Prenha • parto previsto {previsao.toLocaleDateString('pt-BR')} • {diasRestantes} dias
                     </p>
                   )
                 }
                 if (resultadoPrenha) {
-                  // Tentar calcular previsÃ£o de parto mesmo sem data de cobertura registrada
+                  // Tentar calcular previsão de parto mesmo sem data de cobertura registrada
                   // Buscar data da IA mais recente
                   const dataIARef = ultimaIA?.data_ia || ultimaIA?.data_inseminacao || animal.dataTE || animal.data_te
                   if (dataIARef) {
@@ -2410,9 +2410,9 @@ export default function AnimalDetail() {
                       <p 
                         className="mt-1 text-sm font-semibold text-white cursor-pointer hover:text-blue-300 transition-colors"
                         onClick={() => setShowReproducaoModal(true)}
-                        title={`PrevisÃ£o de parto: ${previsaoParto.toLocaleDateString('pt-BR')} (${diasRestantes} dias restantes)`}
+                        title={`Previsão de parto: ${previsaoParto.toLocaleDateString('pt-BR')} (${diasRestantes} dias restantes)`}
                       >
-                        SituaÃ§Ã£o Reprodutiva: Prenha
+                        Situação Reprodutiva: Prenha
                       </p>
                     )
                   }
@@ -2422,7 +2422,7 @@ export default function AnimalDetail() {
                       onClick={() => setShowReproducaoModal(true)}
                       title="Clique para ver detalhes"
                     >
-                      SituaÃ§Ã£o Reprodutiva: Prenha
+                      Situação Reprodutiva: Prenha
                     </p>
                   )
                 }
@@ -2434,7 +2434,7 @@ export default function AnimalDetail() {
                       onClick={() => setShowReproducaoModal(true)}
                       title="Clique para ver detalhes"
                     >
-                      SituaÃ§Ã£o Reprodutiva: Parida{data ? ` ââ‚¬¢ ${new Date(data).toLocaleDateString('pt-BR')}` : ''}
+                      Situação Reprodutiva: Parida{data ? ` • ${new Date(data).toLocaleDateString('pt-BR')}` : ''}
                     </p>
                   )
                 }
@@ -2447,9 +2447,9 @@ export default function AnimalDetail() {
                     <p 
                       className="mt-1 text-sm font-semibold text-white cursor-pointer hover:text-blue-300 transition-colors"
                       onClick={() => setShowReproducaoModal(true)}
-                      title={`PrevisÃ£o de parto: ${previsaoParto.toLocaleDateString('pt-BR')} (${diasRestantes} dias restantes) - IA em ${dataIA.toLocaleDateString('pt-BR')} ââ‚¬¢ Clique para ver detalhes`}
+                      title={`Previsão de parto: ${previsaoParto.toLocaleDateString('pt-BR')} (${diasRestantes} dias restantes) - IA em ${dataIA.toLocaleDateString('pt-BR')} • Clique para ver detalhes`}
                     >
-                      SituaÃ§Ã£o Reprodutiva: Inseminada ââ‚¬¢ aguardando DG ({dias} dias)
+                      Situação Reprodutiva: Inseminada • aguardando DG ({dias} dias)
                     </p>
                   )
                 }
@@ -2460,7 +2460,7 @@ export default function AnimalDetail() {
                       onClick={() => setShowReproducaoModal(true)}
                       title="Clique para ver detalhes"
                     >
-                      SituaÃ§Ã£o Reprodutiva: Vazia
+                      Situação Reprodutiva: Vazia
                     </p>
                   )
                 }
@@ -2468,11 +2468,11 @@ export default function AnimalDetail() {
                 if (idadeMeses && idadeMeses >= 15 && animal.sexo?.startsWith('F')) {
                   return (
                     <p className="mt-1 text-sm font-semibold text-white">
-                      SituaÃ§Ã£o Reprodutiva: Apta para reproduÃ§Ã£o
+                      Situação Reprodutiva: Apta para reprodução
                     </p>
                   )
                 }
-                // Machos com exame androlÃ³gico - considerar apenas exames jÃ¡ realizados (data <= hoje)
+                // Machos com exame andrológico - considerar apenas exames já realizados (data <= hoje)
                 const isMachoHeader = animal.sexo && (animal.sexo.toLowerCase().startsWith('m') || animal.sexo === 'M' || animal.sexo.toLowerCase().includes('macho'))
                 const hojeHeader = new Date()
                 hojeHeader.setHours(23, 59, 59, 999)
@@ -2483,9 +2483,9 @@ export default function AnimalDetail() {
                 if (isMachoHeader && examesRealizadosHeader.length > 0) {
                   const ultimoEx = examesRealizadosHeader[0]
                   const res = (ultimoEx.resultado || '').trim()
-                  if (res === 'Apto') return <p className="mt-1 text-sm font-semibold text-white">SituaÃ§Ã£o Reprodutiva: Apto conforme exame androlÃ³gico</p>
-                  if (res === 'Inapto') return <p className="mt-1 text-sm font-semibold text-white">SituaÃ§Ã£o Reprodutiva: Inapto conforme exame androlÃ³gico</p>
-                  if (res === 'Pendente') return <p className="mt-1 text-sm font-semibold text-white">SituaÃ§Ã£o Reprodutiva: Aguardando exame androlÃ³gico</p>
+                  if (res === 'Apto') return <p className="mt-1 text-sm font-semibold text-white">Situação Reprodutiva: Apto conforme exame andrológico</p>
+                  if (res === 'Inapto') return <p className="mt-1 text-sm font-semibold text-white">Situação Reprodutiva: Inapto conforme exame andrológico</p>
+                  if (res === 'Pendente') return <p className="mt-1 text-sm font-semibold text-white">Situação Reprodutiva: Aguardando exame andrológico</p>
                 }
                 return null
               })()}
@@ -2535,7 +2535,7 @@ export default function AnimalDetail() {
                     onClick={() => router.push(`/animals/${allAnimalsIds[currentAnimalIndex + 1]}`)}
                     disabled={currentAnimalIndex === allAnimalsIds.length - 1}
                     className="p-2 rounded-lg hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                    title="PrÃ³ximo animal"
+                    title="Próximo animal"
                   >
                     <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -2545,7 +2545,7 @@ export default function AnimalDetail() {
                     onClick={() => router.push(`/animals/${allAnimalsIds[allAnimalsIds.length - 1]}`)}
                     disabled={currentAnimalIndex === allAnimalsIds.length - 1}
                     className="p-2 rounded-lg hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                    title="ÃÅ¡ltimo animal"
+                    title="Último animal"
                   >
                     <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
@@ -2558,7 +2558,7 @@ export default function AnimalDetail() {
         </div>
       </div>
 
-      {/* BotÃµes de aÃ§Ã£o - ocultos no celular (modo consulta) */}
+      {/* Botões de ação - ocultos no celular (modo consulta) */}
       <div className="hidden md:flex flex-wrap items-center gap-3 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-5">
         <div className="flex flex-wrap items-center gap-2">
           <Button 
@@ -2569,7 +2569,7 @@ export default function AnimalDetail() {
             className="flex items-center gap-2"
           >
             <PlusCircleIcon className="h-4 w-4" />
-            LanÃ§ar OcorrÃªncia
+            Lançar Ocorrência
           </Button>
           <Button 
             variant="primary"
@@ -2579,7 +2579,7 @@ export default function AnimalDetail() {
             className="flex items-center gap-2"
           >
             <PlusCircleIcon className="h-4 w-4" />
-            LanÃ§amento em Lote
+            Lançamento em Lote
           </Button>
         </div>
         <div className="h-8 w-px bg-gray-200 dark:bg-gray-600 hidden sm:block" />
@@ -2605,7 +2605,7 @@ export default function AnimalDetail() {
           </Button>
         </div>
         
-        {/* BotÃ£o Marcar como Inativo */}
+        {/* Botão Marcar como Inativo */}
         {animal.situacao !== 'Inativo' && (
           <Button 
             variant="warning"
@@ -2621,14 +2621,14 @@ export default function AnimalDetail() {
                 })
                 
                 if (response.ok) {
-                  alert('âÅ“â€¦ Animal marcado como INATIVO')
+                  alert('✅ Animal marcado como INATIVO')
                   loadAnimal()
                 } else {
-                  alert('â�Å’ Erro ao atualizar animal')
+                  alert('❌ Erro ao atualizar animal')
                 }
               } catch (error) {
                 console.error('Erro:', error)
-                alert('â�Å’ Erro ao atualizar animal')
+                alert('❌ Erro ao atualizar animal')
               }
             }}
             className="flex items-center gap-2"
@@ -2638,7 +2638,7 @@ export default function AnimalDetail() {
           </Button>
         )}
 
-        {/* BotÃ£o Reativar Animal */}
+        {/* Botão Reativar Animal */}
         {animal.situacao === 'Inativo' && (
           <Button 
             variant="success"
@@ -2654,14 +2654,14 @@ export default function AnimalDetail() {
                 })
                 
                 if (response.ok) {
-                  alert('âÅ“â€¦ Animal REATIVADO com sucesso!')
+                  alert('✅ Animal REATIVADO com sucesso!')
                   loadAnimal()
                 } else {
-                  alert('â�Å’ Erro ao reativar animal')
+                  alert('❌ Erro ao reativar animal')
                 }
               } catch (error) {
                 console.error('Erro:', error)
-                alert('â�Å’ Erro ao reativar animal')
+                alert('❌ Erro ao reativar animal')
               }
             }}
             className="flex items-center gap-2"
@@ -2682,18 +2682,18 @@ export default function AnimalDetail() {
         </Button>
       </div>
 
-      {/* Speed Dial - AÃ§Ãµes RÃ¡pidas (oculto no celular - modo consulta) */}
+      {/* Speed Dial - Ações Rápidas (oculto no celular - modo consulta) */}
       <div className="hidden md:block fixed bottom-6 right-6 z-50">
         {/* Items */}
         {fabOpen && (
           <div className="flex flex-col items-end gap-3 mb-3 animate-slide-in-left">
             <button
               onClick={() => { setShowQuickOccurrence(true); setFabOpen(false) }}
-              title="LanÃ§ar OcorrÃªncia (O)"
+              title="Lançar Ocorrência (O)"
               className="flex items-center gap-2 px-3 py-2 rounded-xl bg-indigo-600 text-white shadow-lg hover:shadow-2xl hover:bg-indigo-500 transition-all"
             >
               <PlusCircleIcon className="h-5 w-5" />
-              <span className="text-sm font-semibold">OcorrÃªncia</span>
+              <span className="text-sm font-semibold">Ocorrência</span>
             </button>
             <button
               onClick={() => { handleGeneratePDF(); setFabOpen(false) }}
@@ -2724,17 +2724,17 @@ export default function AnimalDetail() {
         {/* Main FAB */}
         <button
           onClick={() => setFabOpen(prev => !prev)}
-          aria-label="AÃ§Ãµes rÃ¡pidas"
+          aria-label="Ações rápidas"
           className={`relative p-4 rounded-full shadow-2xl transition-all ${
             fabOpen ? 'bg-purple-700 hover:bg-purple-600' : 'bg-gradient-to-tr from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500'
           } text-white`}
-          title="AÃ§Ãµes rÃ¡pidas"
+          title="Ações rápidas"
         >
           <SparklesIcon className={`h-6 w-6 transition-transform ${fabOpen ? 'rotate-45' : ''}`} />
         </button>
       </div>
 
-      {/* EstatÃ­sticas rÃ¡pidas - apenas Custos e Valor Venda (Idade e Peso estÃ£o em InformaÃ§Ãµes) */}
+      {/* Estatísticas rápidas - apenas Custos e Valor Venda (Idade e Peso estão em Informações) */}
       <div className="stats-grid stats-grid-compact">
         <div className="stat-card stat-card-compact">
           <div className="stat-value stat-value-compact">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format((custos || []).reduce((s, c) => s + parseFloat(c.valor || 0), 0))}</div>
@@ -2746,7 +2746,7 @@ export default function AnimalDetail() {
         </div>
       </div>
 
-      {/* InformaÃ§Ãµes Gerais Unificadas */}
+      {/* Informações Gerais Unificadas */}
       <Card className="shadow-lg border-gray-200/50 dark:border-gray-700/50 overflow-hidden transition-all duration-300">
         <div 
           className="group flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/30 px-6 py-4 border-b border-gray-200 dark:border-gray-700 transition-colors"
@@ -2756,7 +2756,7 @@ export default function AnimalDetail() {
             <div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/30">
               <UserIcon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
             </div>
-            InformaÃ§Ãµes do Animal
+            Informações do Animal
           </h2>
           <div className="flex items-center gap-2">
             <button
@@ -2788,14 +2788,14 @@ export default function AnimalDetail() {
                       Animal Doadora
                     </h3>
                     <p className="text-xs text-pink-600 dark:text-pink-300">
-                      Possui histÃ³rico de coletas de oÃ³citos (FIV).
+                      Possui histórico de coletas de oócitos (FIV).
                     </p>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Linha 1: IdentificaÃ§Ã£o Principal */}
+            {/* Linha 1: Identificação Principal */}
             {animal.nome && (
               <div className="col-span-2 md:col-span-1">
                 <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">
@@ -2809,7 +2809,7 @@ export default function AnimalDetail() {
             
             <div>
               <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">
-                SÃ©rie
+                Série
               </label>
               <p className="text-sm font-medium text-gray-900 dark:text-white">{animal.serie || '-'}</p>
             </div>
@@ -2828,7 +2828,7 @@ export default function AnimalDetail() {
               <span className={`inline-flex px-2.5 py-1 rounded-lg text-sm font-semibold ${
                 animal.sexo && (animal.sexo.toLowerCase().startsWith('m') || animal.sexo === 'M' || animal.sexo.toLowerCase().includes('macho'))
                   ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200 border border-blue-200 dark:border-blue-700'
-                  : animal.sexo && (animal.sexo.toLowerCase().startsWith('f') || animal.sexo === 'F' || animal.sexo.toLowerCase().includes('fÃªmea') || animal.sexo.toLowerCase().includes('femea'))
+                  : animal.sexo && (animal.sexo.toLowerCase().startsWith('f') || animal.sexo === 'F' || animal.sexo.toLowerCase().includes('fêmea') || animal.sexo.toLowerCase().includes('femea'))
                     ? 'bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-200 border border-pink-200 dark:border-pink-700'
                     : 'text-gray-700 dark:text-gray-300'
               }`}>
@@ -2838,7 +2838,7 @@ export default function AnimalDetail() {
             
             <div>
               <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">
-                RaÃ§a
+                Raça
               </label>
               <p className="text-sm font-medium text-gray-900 dark:text-white">{animal.raca || '-'}</p>
             </div>
@@ -2860,7 +2860,7 @@ export default function AnimalDetail() {
                   <button onClick={() => salvarCampoRapido('cor', editValue)} disabled={savingField === 'cor'} className="text-xs bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700 disabled:opacity-50">
                     {savingField === 'cor' ? '...' : 'OK'}
                   </button>
-                  <button onClick={() => { setEditingField(null); setEditValue('') }} className="text-xs bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-600">âÅ“â€¢</button>
+                  <button onClick={() => { setEditingField(null); setEditValue('') }} className="text-xs bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-600">✕</button>
                 </div>
               ) : (
                 <p 
@@ -2869,7 +2869,7 @@ export default function AnimalDetail() {
                   title="Clique para editar"
                 >
                   {animal.cor ? (
-                    <span>{animal.cor} <span className="text-xs text-gray-400">âÅ“Å½</span></span>
+                    <span>{animal.cor} <span className="text-xs text-gray-400">✎</span></span>
                   ) : (
                     <span className="text-gray-400 italic">Clique para adicionar</span>
                   )}
@@ -2879,7 +2879,7 @@ export default function AnimalDetail() {
             
             <div>
               <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">
-                SituaÃ§Ã£o
+                Situação
               </label>
               {animal.situacao === 'Morto' ? (
                 <button
@@ -2887,28 +2887,28 @@ export default function AnimalDetail() {
                   className="inline-flex px-2 py-0.5 text-xs font-medium rounded-full cursor-pointer hover:opacity-80 transition-opacity bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300"
                   title="Ver detalhes da morte"
                 >
-                  {animal.situacao} ðÅ¸â€��
+                  {animal.situacao} 🔍
                 </button>
               ) : animal.situacao === 'Vendido' ? (
                 <div className="relative inline-block">
                   <span 
                     className="inline-flex px-2 py-0.5 text-xs font-medium rounded-full cursor-help bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300"
                     onMouseEnter={() => {
-                      console.log('ðÅ¸â€“±ï¸� Mouse entrou no badge Vendido')
+                      console.log('🖱️ Mouse entrou no badge Vendido')
                       console.log('infoVenda atual:', infoVenda)
                       console.log('loadingVenda:', loadingVenda)
                       if (!infoVenda && !loadingVenda) {
-                        console.log('âÅ¡¡ Chamando carregarInfoVenda()')
+                        console.log('⚡ Chamando carregarInfoVenda()')
                         carregarInfoVenda()
                       }
                       setShowTooltipVenda(true)
                     }}
                     onMouseLeave={() => {
-                      console.log('ðÅ¸â€“±ï¸� Mouse saiu do badge Vendido')
+                      console.log('🖱️ Mouse saiu do badge Vendido')
                       setShowTooltipVenda(false)
                     }}
                   >
-                    {animal.situacao} ðÅ¸â€™°
+                    {animal.situacao} 💰
                   </span>
                   {showTooltipVenda && (
                     <div className="absolute left-0 top-full mt-2 z-50 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border-2 border-orange-200 dark:border-orange-700 p-4">
@@ -2920,25 +2920,25 @@ export default function AnimalDetail() {
                       ) : infoVenda ? (
                         <div className="space-y-3">
                           <h4 className="text-sm font-bold text-gray-900 dark:text-white border-b pb-2">
-                            ðÅ¸â€œâ€¹ Dados da Venda
+                            📋 Dados da Venda
                           </h4>
                           <div className="space-y-2 text-sm">
                             <div className="flex justify-between">
                               <span className="text-gray-600 dark:text-gray-400">NF:</span>
                               <span className="font-semibold text-gray-900 dark:text-white">
-                                {infoVenda.nfNumero || 'NÃ£o informado'}
+                                {infoVenda.nfNumero || 'Não informado'}
                               </span>
                             </div>
                             <div className="flex justify-between">
                               <span className="text-gray-600 dark:text-gray-400">Data:</span>
                               <span className="font-semibold text-gray-900 dark:text-white">
-                                {infoVenda.dataVenda ? new Date(infoVenda.dataVenda).toLocaleDateString('pt-BR') : 'NÃ£o informado'}
+                                {infoVenda.dataVenda ? new Date(infoVenda.dataVenda).toLocaleDateString('pt-BR') : 'Não informado'}
                               </span>
                             </div>
                             <div className="flex justify-between">
                               <span className="text-gray-600 dark:text-gray-400">Destino:</span>
                               <span className="font-semibold text-gray-900 dark:text-white">
-                                {infoVenda.destino || 'NÃ£o informado'}
+                                {infoVenda.destino || 'Não informado'}
                               </span>
                             </div>
                             {infoVenda.peso && (
@@ -2976,10 +2976,10 @@ export default function AnimalDetail() {
                       ) : (
                         <div className="text-center py-3">
                           <p className="text-sm text-gray-600 dark:text-gray-400">
-                            âÅ¡ ï¸� Dados de venda nÃ£o encontrados
+                            ⚠️ Dados de venda não encontrados
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                            Verifique se a NF de saÃ­da foi cadastrada
+                            Verifique se a NF de saída foi cadastrada
                           </p>
                         </div>
                       )}
@@ -2993,7 +2993,7 @@ export default function AnimalDetail() {
               )}
             </div>
 
-            {/* Linha 2: Dados FÃ­sicos e Nascimento */}
+            {/* Linha 2: Dados Físicos e Nascimento */}
             <div>
               <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">
                 Nascimento
@@ -3021,10 +3021,10 @@ export default function AnimalDetail() {
                   
                   if (anos > 0) {
                     return mesesRestantes > 0 
-                      ? `${anos} ${anos === 1 ? 'ano' : 'anos'} e ${mesesRestantes} ${mesesRestantes === 1 ? 'mÃªs' : 'meses'}`
+                      ? `${anos} ${anos === 1 ? 'ano' : 'anos'} e ${mesesRestantes} ${mesesRestantes === 1 ? 'mês' : 'meses'}`
                       : `${anos} ${anos === 1 ? 'ano' : 'anos'}`
                   }
-                  return `${meses} ${meses === 1 ? 'mÃªs' : 'meses'}`
+                  return `${meses} ${meses === 1 ? 'mês' : 'meses'}`
                 })()}
               </p>
             </div>
@@ -3056,7 +3056,7 @@ export default function AnimalDetail() {
                         <button onClick={() => salvarCampoRapido('peso', editValue)} disabled={savingField === 'peso'} className="text-xs bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700 disabled:opacity-50">
                           {savingField === 'peso' ? '...' : 'OK'}
                         </button>
-                        <button onClick={() => { setEditingField(null); setEditValue('') }} className="text-xs bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-600">âÅ“â€¢</button>
+                        <button onClick={() => { setEditingField(null); setEditValue('') }} className="text-xs bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-600">✕</button>
                       </div>
                     ) : (
                       <p 
@@ -3065,7 +3065,7 @@ export default function AnimalDetail() {
                         title="Clique para editar"
                       >
                         {(animal.peso ?? ultimaPesagem?.peso) != null ? (
-                          <span>{animal.peso ?? ultimaPesagem?.peso} kg {ultimaPesagem?.peso && !animal.peso ? <span className="text-xs text-emerald-600 dark:text-emerald-400">(pesagem)</span> : <span className="text-xs text-gray-400">âÅ“Å½</span>}</span>
+                          <span>{animal.peso ?? ultimaPesagem?.peso} kg {ultimaPesagem?.peso && !animal.peso ? <span className="text-xs text-emerald-600 dark:text-emerald-400">(pesagem)</span> : <span className="text-xs text-gray-400">✎</span>}</span>
                         ) : (
                           <span className="text-gray-400 italic">Clique para adicionar</span>
                         )}
@@ -3090,23 +3090,23 @@ export default function AnimalDetail() {
               )
             })()}
 
-            {/* ÃÅ¡ltimo serviÃ§o - sempre exibido, clicÃ¡vel para ver mais */}
+            {/* Último serviço - sempre exibido, clicável para ver mais */}
             <div className="col-span-2">
               <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">
-                ÃÅ¡ltimo serviÃ§o
+                Último serviço
               </label>
               {ultimoEvento ? (
                 <button
                   type="button"
                   onClick={() => setShowUltimoEventoModal(true)}
                   className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline transition-colors text-left"
-                  title="Clique para ver detalhes e histÃ³rico"
+                  title="Clique para ver detalhes e histórico"
                 >
-                  {ultimoEvento.labelExibicao} ââ€ â€™
+                  {ultimoEvento.labelExibicao} →
                 </button>
               ) : (
                 <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-                  Nenhum serviÃ§o registrado
+                  Nenhum serviço registrado
                   {animal.updated_at && (
                     <span className="block text-xs mt-0.5">Cadastro atualizado em {formatDate(animal.updated_at)}</span>
                   )}
@@ -3116,18 +3116,18 @@ export default function AnimalDetail() {
 
             <div className="col-span-2 md:col-span-2 lg:col-span-2">
               <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5 flex items-center gap-1">
-                <MapPinIcon className="h-3 w-3" /> LocalizaÃ§Ã£o
+                <MapPinIcon className="h-3 w-3" /> Localização
               </label>
               {localizacaoAtual ? (
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                    {localizacaoValidaParaExibir(localizacaoAtual.piquete) || 'NÃ£o informado'}
+                    {localizacaoValidaParaExibir(localizacaoAtual.piquete) || 'Não informado'}
                   </span>
                   <button 
                     onClick={(e) => { e.stopPropagation(); router.push('/movimentacao/localizacao') }} 
                     className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium px-2 py-1 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
                   >
-                    Alterar ââ€ â€™
+                    Alterar →
                   </button>
                 </div>
               ) : (
@@ -3135,13 +3135,13 @@ export default function AnimalDetail() {
                   onClick={(e) => { e.stopPropagation(); router.push('/movimentacao/localizacao') }} 
                   className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium px-2 py-1 rounded border border-dashed border-blue-300 dark:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all"
                 >
-                  + Registrar LocalizaÃ§Ã£o
+                  + Registrar Localização
                 </button>
               )}
             </div>
             <div className="col-span-2 md:col-span-2 lg:col-span-2">
               <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">
-                ObservaÃ§Ãµes
+                Observações
               </label>
               {editingField === 'observacoes' ? (
                 <div className="flex gap-1 flex-col">
@@ -3149,7 +3149,7 @@ export default function AnimalDetail() {
                     value={editValue}
                     onChange={(e) => setEditValue(e.target.value)}
                     className="text-sm border rounded px-2 py-1 dark:bg-gray-700 dark:border-gray-600 w-full min-h-[60px]"
-                    placeholder="ObservaÃ§Ãµes do animal..."
+                    placeholder="Observações do animal..."
                     autoFocus
                     rows={3}
                   />
@@ -3169,9 +3169,9 @@ export default function AnimalDetail() {
                   {animal.observacoes ? (
                     <span className="whitespace-pre-wrap">{animal.observacoes}</span>
                   ) : (
-                    <span className="text-gray-400 italic">Nenhuma observaÃ§Ã£o</span>
+                    <span className="text-gray-400 italic">Nenhuma observação</span>
                   )}{' '}
-                  <span className="text-xs text-gray-400">âÅ“Å½</span>
+                  <span className="text-xs text-gray-400">✎</span>
                 </p>
               )}
             </div>
@@ -3180,7 +3180,7 @@ export default function AnimalDetail() {
                 type="button"
                 className="text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap"
               >
-                SituaÃ§Ã£o ABCZ
+                Situação ABCZ
               </button>
               {editingField === 'situacao_abcz' ? (
                 <div className="flex-1 flex gap-1 items-center">
@@ -3208,7 +3208,7 @@ export default function AnimalDetail() {
             </div>
             <div className="col-span-2 md:col-span-2 lg:col-span-2">
               <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">
-                SituaÃ§Ã£o Reprodutiva
+                Situação Reprodutiva
               </label>
               {(() => {
                 const dataCoberturaRef = gestacaoAtual?.data_cobertura || animal.dataTE || animal.data_te || ultimaIA?.data_ia || ultimaIA?.data_inseminacao
@@ -3218,14 +3218,14 @@ export default function AnimalDetail() {
                   const u = String(s).toUpperCase().trim()
                   return u === 'PRENHA' || u === 'P' || u.includes('PRENHA') || u.includes('POSITIVO')
                 }
-                const resultadoPrenha = (animal.resultadoDG === 'Prenha' || animal.resultado_dg === 'Prenha' || statusPrenha(animal.resultadoDG) || statusPrenha(animal.resultado_dg)) || (gestacaoAtual?.situacao === 'Em GestaÃ§Ã£o' || gestacaoAtual?.situacao === 'Ativa') || statusPrenha(ultimaIA?.status_gestacao) || statusPrenha(ultimaIA?.statusGestacao) || statusPrenha(ultimaIA?.resultado_dg) || statusPrenha(ultimaIA?.resultadoDg)
+                const resultadoPrenha = (animal.resultadoDG === 'Prenha' || animal.resultado_dg === 'Prenha' || statusPrenha(animal.resultadoDG) || statusPrenha(animal.resultado_dg)) || (gestacaoAtual?.situacao === 'Em Gestação' || gestacaoAtual?.situacao === 'Ativa') || statusPrenha(ultimaIA?.status_gestacao) || statusPrenha(ultimaIA?.statusGestacao) || statusPrenha(ultimaIA?.resultado_dg) || statusPrenha(ultimaIA?.resultadoDg)
                 const resultadoVazia = (() => {
                   const r = (animal.resultadoDG || animal.resultado_dg || '').toString().toLowerCase()
-                  return r.includes('nÃ£o') || r.includes('nao') || r.includes('negativo') || r.includes('vazia') || r === 'negativo' || r === 'vazia'
+                  return r.includes('não') || r.includes('nao') || r.includes('negativo') || r.includes('vazia') || r === 'negativo' || r === 'vazia'
                 })()
                 const teveNascimento = gestacaoAtual?.situacao === 'Nascido' || gestacaoAtual?.situacao === 'Parida'
                 const estaInseminada = !resultadoPrenha && !resultadoVazia && ultimaIA?.data_inseminacao && !animal.data_dg && !animal.dataDG
-                const touroNome = ultimaIA?.touro_nome || ultimaIA?.touro || gestacaoAtual?.touro_nome || animal.touro || 'NÃ£o informado'
+                const touroNome = ultimaIA?.touro_nome || ultimaIA?.touro || gestacaoAtual?.touro_nome || animal.touro || 'Não informado'
                 const tipoCobertura = ultimaIA?.tipo || gestacaoAtual?.tipo_cobertura || (animal.dataTE || animal.data_te ? 'TE' : 'IA')
                 if (resultadoPrenha && dataCobertura) {
                   const previsao = new Date(dataCobertura.getTime() + 285 * 24 * 60 * 60 * 1000)
@@ -3233,16 +3233,16 @@ export default function AnimalDetail() {
                   return (
                     <div className="relative inline-block group">
                       <p className="text-sm font-semibold text-green-700 dark:text-green-300">
-                        Prenha ââ‚¬¢ parto previsto {previsao.toLocaleDateString('pt-BR')} ââ‚¬¢ {diasRestantes} dias
+                        Prenha • parto previsto {previsao.toLocaleDateString('pt-BR')} • {diasRestantes} dias
                       </p>
                       <div className="absolute left-0 mt-1 w-72 hidden group-hover:block bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md p-3 shadow-lg z-20">
-                        <p className="text-xs text-gray-500 dark:text-gray-400">ðÅ¸¤° Detalhes Reprodutivos</p>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">ðÅ¸�â€š Touro: {touroNome}</p>
-                        <p className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸§¬ Tipo: {tipoCobertura}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">🤰 Detalhes Reprodutivos</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">🐂 Touro: {touroNome}</p>
+                        <p className="text-sm text-gray-700 dark:text-gray-300">🧬 Tipo: {tipoCobertura}</p>
                         {dataCobertura && (
-                          <p className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸â€œâ€¦ Data {tipoCobertura}: {dataCobertura.toLocaleDateString('pt-BR')}</p>
+                          <p className="text-sm text-gray-700 dark:text-gray-300">📅 Data {tipoCobertura}: {dataCobertura.toLocaleDateString('pt-BR')}</p>
                         )}
-                        <p className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸â€”â€œï¸� PrevisÃ£o de parto: {previsao.toLocaleDateString('pt-BR')} ({diasRestantes} dias)</p>
+                        <p className="text-sm text-gray-700 dark:text-gray-300">🗓️ Previsão de parto: {previsao.toLocaleDateString('pt-BR')} ({diasRestantes} dias)</p>
                       </div>
                     </div>
                   )
@@ -3255,22 +3255,22 @@ export default function AnimalDetail() {
                     <div className="relative inline-block group">
                       <p className="text-sm font-semibold text-green-700 dark:text-green-300">
                         {previsaoAlt ? (
-                          <>Prenha ââ‚¬¢ parto previsto {previsaoAlt.toLocaleDateString('pt-BR')} ââ‚¬¢ {diasRestantesAlt} dias</>
+                          <>Prenha • parto previsto {previsaoAlt.toLocaleDateString('pt-BR')} • {diasRestantesAlt} dias</>
                         ) : (
                           <>Prenha</>
                         )}
                       </p>
                       <div className="absolute left-0 mt-1 w-72 hidden group-hover:block bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md p-3 shadow-lg z-20">
-                        <p className="text-xs text-gray-500 dark:text-gray-400">ðÅ¸¤° Detalhes Reprodutivos</p>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">ðÅ¸�â€š Touro: {touroNome}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">🤰 Detalhes Reprodutivos</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">🐂 Touro: {touroNome}</p>
                         {dataCobertura && (
-                          <p className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸â€œâ€¦ Data {tipoCobertura}: {dataCobertura.toLocaleDateString('pt-BR')}</p>
+                          <p className="text-sm text-gray-700 dark:text-gray-300">📅 Data {tipoCobertura}: {dataCobertura.toLocaleDateString('pt-BR')}</p>
                         )}
                         {!dataCobertura && previsaoAlt && (
-                          <p className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸â€”â€œï¸� PrevisÃ£o de parto: {previsaoAlt.toLocaleDateString('pt-BR')} ({diasRestantesAlt} dias)</p>
+                          <p className="text-sm text-gray-700 dark:text-gray-300">🗓️ Previsão de parto: {previsaoAlt.toLocaleDateString('pt-BR')} ({diasRestantesAlt} dias)</p>
                         )}
                         {!dataCobertura && !previsaoAlt && (
-                          <p className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸â€”â€œï¸� PrevisÃ£o de parto: NÃ£o informado</p>
+                          <p className="text-sm text-gray-700 dark:text-gray-300">🗓️ Previsão de parto: Não informado</p>
                         )}
                       </div>
                     </div>
@@ -3281,15 +3281,15 @@ export default function AnimalDetail() {
                   return (
                     <div className="relative inline-block group">
                       <p className="text-sm font-semibold text-indigo-700 dark:text-indigo-300">
-                        Parida{data ? ` ââ‚¬¢ ${new Date(data).toLocaleDateString('pt-BR')}` : ''}
+                        Parida{data ? ` • ${new Date(data).toLocaleDateString('pt-BR')}` : ''}
                       </p>
                       <div className="absolute left-0 mt-1 w-72 hidden group-hover:block bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md p-3 shadow-lg z-20">
-                        <p className="text-xs text-gray-500 dark:text-gray-400">ðÅ¸â€˜¶ Detalhes do Parto</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">👶 Detalhes do Parto</p>
                         {touroNome && (
-                          <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">ðÅ¸�â€š Touro: {touroNome}</p>
+                          <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">🐂 Touro: {touroNome}</p>
                         )}
                         {data && (
-                          <p className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸â€œâ€¦ Data do parto: {new Date(data).toLocaleDateString('pt-BR')}</p>
+                          <p className="text-sm text-gray-700 dark:text-gray-300">📅 Data do parto: {new Date(data).toLocaleDateString('pt-BR')}</p>
                         )}
                       </div>
                     </div>
@@ -3303,14 +3303,14 @@ export default function AnimalDetail() {
                   return (
                     <div className="relative inline-block group">
                       <p className="text-sm font-semibold text-yellow-700 dark:text-yellow-300">
-                        Inseminada ââ‚¬¢ aguardando DG ({dias} dias)
+                        Inseminada • aguardando DG ({dias} dias)
                       </p>
                       <div className="absolute left-0 mt-1 w-72 hidden group-hover:block bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md p-3 shadow-lg z-20">
-                        <p className="text-xs text-gray-500 dark:text-gray-400">ðÅ¸â€™â€° Detalhes da IA</p>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">ðÅ¸�â€š Touro: {touroNome}</p>
-                        <p className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸â€œâ€¦ Data IA: {dataIA.toLocaleDateString('pt-BR')}</p>
-                        <p className="text-sm text-gray-700 dark:text-gray-300">â�±ï¸� Dias desde IA: {dias}</p>
-                        <p className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸â€”â€œï¸� PrevisÃ£o de parto: {previsaoParto.toLocaleDateString('pt-BR')} ({diasRestantes} dias)</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">💉 Detalhes da IA</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">🐂 Touro: {touroNome}</p>
+                        <p className="text-sm text-gray-700 dark:text-gray-300">📅 Data IA: {dataIA.toLocaleDateString('pt-BR')}</p>
+                        <p className="text-sm text-gray-700 dark:text-gray-300">⏱️ Dias desde IA: {dias}</p>
+                        <p className="text-sm text-gray-700 dark:text-gray-300">🗓️ Previsão de parto: {previsaoParto.toLocaleDateString('pt-BR')} ({diasRestantes} dias)</p>
                       </div>
                     </div>
                   )
@@ -3322,8 +3322,8 @@ export default function AnimalDetail() {
                         Vazia
                       </p>
                       <div className="absolute left-0 mt-1 w-64 hidden group-hover:block bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md p-3 shadow-lg z-20">
-                        <p className="text-xs text-gray-500 dark:text-gray-400">ââ€ž¹ï¸� Sem gestaÃ§Ã£o ativa</p>
-                        <p className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸â€œâ€¦ ÃÅ¡ltima cobertura: {dataCobertura ? dataCobertura.toLocaleDateString('pt-BR') : 'NÃ£o informada'}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">ℹ️ Sem gestação ativa</p>
+                        <p className="text-sm text-gray-700 dark:text-gray-300">📅 Última cobertura: {dataCobertura ? dataCobertura.toLocaleDateString('pt-BR') : 'Não informada'}</p>
                       </div>
                     </div>
                   )
@@ -3333,17 +3333,17 @@ export default function AnimalDetail() {
                   return (
                     <div className="relative inline-block group">
                       <p className="text-sm font-semibold text-blue-700 dark:text-blue-300">
-                        Apta para reproduÃ§Ã£o
+                        Apta para reprodução
                       </p>
                       <div className="absolute left-0 mt-1 w-64 hidden group-hover:block bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md p-3 shadow-lg z-20">
-                        <p className="text-xs text-gray-500 dark:text-gray-400">ââ€ž¹ï¸� InformaÃ§Ã£o</p>
-                        <p className="text-sm text-gray-700 dark:text-gray-300">â�³ Idade: {idadeMeses} meses</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">ℹ️ Informação</p>
+                        <p className="text-sm text-gray-700 dark:text-gray-300">⏳ Idade: {idadeMeses} meses</p>
                       </div>
                     </div>
                   )
                 }
-                // Machos com exame androlÃ³gico (ReproduÃ§Ã£o > Exames AndrolÃ³gicos)
-                // Considerar apenas exames jÃ¡ realizados (data <= hoje) - exames futuros nÃ£o definem situaÃ§Ã£o
+                // Machos com exame andrológico (Reprodução > Exames Andrológicos)
+                // Considerar apenas exames já realizados (data <= hoje) - exames futuros não definem situação
                 const isMacho = animal.sexo && (animal.sexo.toLowerCase().startsWith('m') || animal.sexo === 'M' || animal.sexo.toLowerCase().includes('macho'))
                 const hoje = new Date()
                 hoje.setHours(23, 59, 59, 999)
@@ -3358,12 +3358,12 @@ export default function AnimalDetail() {
                     return (
                       <div className="relative inline-block group">
                         <p className="text-sm font-semibold text-green-700 dark:text-green-300">
-                          Apto conforme exame androlÃ³gico
+                          Apto conforme exame andrológico
                         </p>
                         <div className="absolute left-0 mt-1 w-72 hidden group-hover:block bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md p-3 shadow-lg z-20">
-                          <p className="text-xs text-gray-500 dark:text-gray-400">ðÅ¸©º Exame AndrolÃ³gico</p>
-                          <p className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸â€œâ€¦ Data: {formatDate(ultimoExame.data_exame || ultimoExame.data)}</p>
-                          <p className="text-sm text-gray-700 dark:text-gray-300">âÅ“â€¦ Resultado: Apto</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">🩺 Exame Andrológico</p>
+                          <p className="text-sm text-gray-700 dark:text-gray-300">📅 Data: {formatDate(ultimoExame.data_exame || ultimoExame.data)}</p>
+                          <p className="text-sm text-gray-700 dark:text-gray-300">✅ Resultado: Apto</p>
                         </div>
                       </div>
                     )
@@ -3372,12 +3372,12 @@ export default function AnimalDetail() {
                     return (
                       <div className="relative inline-block group">
                         <p className="text-sm font-semibold text-red-700 dark:text-red-300">
-                          Inapto conforme exame androlÃ³gico
+                          Inapto conforme exame andrológico
                         </p>
                         <div className="absolute left-0 mt-1 w-72 hidden group-hover:block bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md p-3 shadow-lg z-20">
-                          <p className="text-xs text-gray-500 dark:text-gray-400">ðÅ¸©º Exame AndrolÃ³gico</p>
-                          <p className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸â€œâ€¦ Data: {formatDate(ultimoExame.data_exame || ultimoExame.data)}</p>
-                          <p className="text-sm text-gray-700 dark:text-gray-300">â�Å’ Resultado: Inapto</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">🩺 Exame Andrológico</p>
+                          <p className="text-sm text-gray-700 dark:text-gray-300">📅 Data: {formatDate(ultimoExame.data_exame || ultimoExame.data)}</p>
+                          <p className="text-sm text-gray-700 dark:text-gray-300">❌ Resultado: Inapto</p>
                         </div>
                       </div>
                     )
@@ -3386,11 +3386,11 @@ export default function AnimalDetail() {
                     return (
                       <div className="relative inline-block group">
                         <p className="text-sm font-semibold text-yellow-700 dark:text-yellow-300">
-                          Aguardando resultado do exame androlÃ³gico
+                          Aguardando resultado do exame andrológico
                         </p>
                         <div className="absolute left-0 mt-1 w-72 hidden group-hover:block bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md p-3 shadow-lg z-20">
-                          <p className="text-xs text-gray-500 dark:text-gray-400">ðÅ¸©º Exame AndrolÃ³gico</p>
-                          <p className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸â€œâ€¦ Data: {formatDate(ultimoExame.data_exame || ultimoExame.data)}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">🩺 Exame Andrológico</p>
+                          <p className="text-sm text-gray-700 dark:text-gray-300">📅 Data: {formatDate(ultimoExame.data_exame || ultimoExame.data)}</p>
                         </div>
                       </div>
                     )
@@ -3399,32 +3399,32 @@ export default function AnimalDetail() {
                 return (
                   <div className="relative inline-block group">
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      NÃ£o informado
+                      Não informado
                     </p>
                     <div className="absolute left-0 mt-1 w-64 hidden group-hover:block bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md p-3 shadow-lg z-20">
-                      <p className="text-xs text-gray-500 dark:text-gray-400">ââ€ž¹ï¸� Sem dados reprodutivos</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">ℹ️ Sem dados reprodutivos</p>
                     </div>
                   </div>
                 )
               })()}
             </div>
 
-            {/* InformaÃ§Ãµes especÃ­ficas por tipo de animal */}
-            {animal.raca && (animal.raca.toLowerCase().includes('mestiÃ§a') || animal.raca.toLowerCase().includes('mestica') || animal.raca.toLowerCase().includes('receptora')) ? (
+            {/* Informações específicas por tipo de animal */}
+            {animal.raca && (animal.raca.toLowerCase().includes('mestiça') || animal.raca.toLowerCase().includes('mestica') || animal.raca.toLowerCase().includes('receptora')) ? (
               <>
-                {/* Separador InformaÃ§Ãµes de Receptora - MELHORADO */}
+                {/* Separador Informações de Receptora - MELHORADO */}
                 <div className="col-span-full border-t-4 border-pink-400 dark:border-pink-600 my-2 pt-3 bg-gradient-to-r from-pink-50 via-purple-50 to-indigo-50 dark:from-pink-900/20 dark:via-purple-900/20 dark:to-indigo-900/20 -mx-4 px-4 py-3 rounded-lg shadow-sm">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-bold text-pink-700 dark:text-pink-300 uppercase tracking-wider flex items-center gap-2">
-                      ðÅ¸¤° InformaÃ§Ãµes de Receptora
+                      🤰 Informações de Receptora
                     </span>
                     <span className="text-xs bg-pink-200 dark:bg-pink-800 text-pink-800 dark:text-pink-200 px-3 py-1 rounded-full font-semibold">
-                      RaÃ§a: {animal.raca}
+                      Raça: {animal.raca}
                     </span>
                   </div>
                 </div>
 
-                {/* Grid de InformaÃ§Ãµes - 3 colunas */}
+                {/* Grid de Informações - 3 colunas */}
                 <div className="col-span-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {/* NF de Origem */}
                   <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
@@ -3473,19 +3473,19 @@ export default function AnimalDetail() {
                       </div>
                       <div>
                         <label className="block text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase">
-                          ðÅ¸â€œâ€¦ Data de Chegada
+                          📅 Data de Chegada
                         </label>
                         <p className="text-lg font-bold text-blue-900 dark:text-blue-100">
                           {animal.dataChegada || animal.data_chegada 
                             ? formatDate(animal.dataChegada || animal.data_chegada)
-                            : 'NÃ£o informado'}
+                            : 'Não informado'}
                         </p>
                       </div>
                     </div>
                     {(animal.dataChegada || animal.data_chegada) && (
                       <div className="mt-2 pt-2 border-t border-blue-200 dark:border-blue-700">
                         <p className="text-xs text-blue-700 dark:text-blue-300 font-semibold">
-                          â�±ï¸� HÃ¡ {Math.floor((new Date() - new Date(animal.dataChegada || animal.data_chegada)) / (24 * 60 * 60 * 1000))} dias na fazenda
+                          ⏱️ Há {Math.floor((new Date() - new Date(animal.dataChegada || animal.data_chegada)) / (24 * 60 * 60 * 1000))} dias na fazenda
                         </p>
                       </div>
                     )}
@@ -3501,29 +3501,29 @@ export default function AnimalDetail() {
                       </div>
                       <div>
                         <label className="block text-xs font-semibold text-purple-700 dark:text-purple-300 uppercase">
-                          ðÅ¸â€™â€° Data da TE
+                          💉 Data da TE
                         </label>
                         <p className="text-lg font-bold text-purple-900 dark:text-purple-100">
                           {animal.dataTE || animal.data_te 
                             ? formatDate(animal.dataTE || animal.data_te)
-                            : 'NÃ£o realizada'}
+                            : 'Não realizada'}
                         </p>
                       </div>
                     </div>
                     {(animal.dataTE || animal.data_te) && (
                       <div className="mt-2 pt-2 border-t border-purple-200 dark:border-purple-700">
                         <p className="text-xs text-purple-700 dark:text-purple-300 font-semibold">
-                          â�±ï¸� HÃ¡ {Math.floor((new Date() - new Date(animal.dataTE || animal.data_te)) / (24 * 60 * 60 * 1000))} dias
+                          ⏱️ Há {Math.floor((new Date() - new Date(animal.dataTE || animal.data_te)) / (24 * 60 * 60 * 1000))} dias
                         </p>
                       </div>
                     )}
                   </div>
 
-                  {/* Data do DG - ClicÃ¡vel para editar */}
+                  {/* Data do DG - Clicável para editar */}
                   <div 
                     className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 p-4 rounded-xl border-2 border-green-200 dark:border-green-700 shadow-sm hover:shadow-md transition-shadow cursor-pointer hover:ring-2 hover:ring-green-400 dark:hover:ring-green-500"
                     onClick={() => setEditCardModal({ open: true, field: 'dg' })}
-                    title="Clique para alterar Data do DG, Resultado e VeterinÃ¡rio"
+                    title="Clique para alterar Data do DG, Resultado e Veterinário"
                   >
                     <div className="flex items-center gap-3 mb-2">
                       <div className="p-2 bg-green-200 dark:bg-green-800 rounded-lg">
@@ -3533,12 +3533,12 @@ export default function AnimalDetail() {
                       </div>
                       <div>
                         <label className="block text-xs font-semibold text-green-700 dark:text-green-300 uppercase">
-                          âÅ“â€¦ Data do DG
+                          ✅ Data do DG
                         </label>
                         <p className="text-lg font-bold text-green-900 dark:text-green-100">
                           {animal.dataDG || animal.data_dg 
                             ? formatDate(animal.dataDG || animal.data_dg)
-                            : 'NÃ£o realizado'}
+                            : 'Não realizado'}
                         </p>
                       </div>
                     </div>
@@ -3555,7 +3555,7 @@ export default function AnimalDetail() {
                     )}
                   </div>
 
-                  {/* PrevisÃ£o de Parto */}
+                  {/* Previsão de Parto */}
                   {(animal.resultadoDG === 'Prenha' || animal.resultado_dg === 'Prenha') && (animal.dataTE || animal.data_te) && (
                     <div className="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/30 dark:to-rose-900/30 p-4 rounded-xl border-2 border-pink-300 dark:border-pink-700 shadow-sm hover:shadow-md transition-shadow">
                       <div className="flex items-center gap-3 mb-2">
@@ -3566,7 +3566,7 @@ export default function AnimalDetail() {
                         </div>
                         <div>
                           <label className="block text-xs font-semibold text-pink-700 dark:text-pink-300 uppercase">
-                            ðÅ¸�¼ PrevisÃ£o de Parto
+                            🍼 Previsão de Parto
                           </label>
                           <p className="text-lg font-bold text-pink-900 dark:text-pink-100">
                             {(() => {
@@ -3580,13 +3580,13 @@ export default function AnimalDetail() {
                       </div>
                       <div className="mt-2 pt-2 border-t border-pink-200 dark:border-pink-700">
                         <p className="text-xs text-pink-700 dark:text-pink-300 font-semibold">
-                          ðÅ¸¤° {Math.floor((new Date() - new Date(animal.dataTE || animal.data_te)) / (24 * 60 * 60 * 1000))} dias de gestaÃ§Ã£o
+                          🤰 {Math.floor((new Date() - new Date(animal.dataTE || animal.data_te)) / (24 * 60 * 60 * 1000))} dias de gestação
                         </p>
                       </div>
                     </div>
                   )}
 
-                  {/* VeterinÃ¡rio do DG */}
+                  {/* Veterinário do DG */}
                   {animal.veterinario_dg && (
                     <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 shadow-sm">
                       <div className="flex items-center gap-3">
@@ -3597,7 +3597,7 @@ export default function AnimalDetail() {
                         </div>
                         <div>
                           <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">
-                            ðÅ¸â€˜¨ââ‚¬�âÅ¡â€¢ï¸� VeterinÃ¡rio DG
+                            👨‍⚕️ Veterinário DG
                           </label>
                           <p className="text-sm font-bold text-gray-900 dark:text-white">
                             {animal.veterinario_dg}
@@ -3608,7 +3608,7 @@ export default function AnimalDetail() {
                   )}
                 </div>
 
-                {/* InformaÃ§Ãµes Financeiras */}
+                {/* Informações Financeiras */}
                 {(animal.data_compra || animal.custo_total > 0 || animal.custoTotal > 0) && (
                   <div className="col-span-full mt-2">
                     <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 p-4 rounded-xl border-2 border-amber-200 dark:border-amber-700">
@@ -3616,13 +3616,13 @@ export default function AnimalDetail() {
                         <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        InformaÃ§Ãµes Financeiras
+                        Informações Financeiras
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {animal.data_compra && (
                           <div>
                             <label className="block text-xs font-semibold text-amber-700 dark:text-amber-300 mb-1">
-                              ðÅ¸â€ºâ€™ Data de Compra
+                              🛒 Data de Compra
                             </label>
                             <p className="text-lg font-bold text-amber-900 dark:text-amber-100">
                               {formatDate(animal.data_compra)}
@@ -3632,7 +3632,7 @@ export default function AnimalDetail() {
                         {(animal.custo_total > 0 || animal.custoTotal > 0) && (
                           <div>
                             <label className="block text-xs font-semibold text-amber-700 dark:text-amber-300 mb-1">
-                              ðÅ¸â€™° Valor da Compra
+                              💰 Valor da Compra
                             </label>
                             <p className="text-lg font-bold text-amber-900 dark:text-amber-100">
                               {formatCurrency(animal.custo_total || animal.custoTotal)}
@@ -3668,13 +3668,13 @@ export default function AnimalDetail() {
                               </div>
                               <div className="flex-1 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border-l-4 border-blue-500">
                                 <div className="flex items-center justify-between mb-1">
-                                  <h4 className="font-bold text-blue-900 dark:text-blue-100">ðÅ¸â€œâ€¦ Chegada na Fazenda</h4>
+                                  <h4 className="font-bold text-blue-900 dark:text-blue-100">📅 Chegada na Fazenda</h4>
                                   <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">
                                     {formatDate(animal.data_chegada || animal.dataChegada)}
                                   </span>
                                 </div>
                                 <p className="text-sm text-blue-700 dark:text-blue-300">
-                                  HÃ¡ {Math.floor((new Date() - new Date(animal.data_chegada || animal.dataChegada)) / (24 * 60 * 60 * 1000))} dias
+                                  Há {Math.floor((new Date() - new Date(animal.data_chegada || animal.dataChegada)) / (24 * 60 * 60 * 1000))} dias
                                 </p>
                               </div>
                             </div>
@@ -3688,13 +3688,13 @@ export default function AnimalDetail() {
                               </div>
                               <div className="flex-1 bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg border-l-4 border-purple-500">
                                 <div className="flex items-center justify-between mb-1">
-                                  <h4 className="font-bold text-purple-900 dark:text-purple-100">ðÅ¸â€™â€° TransferÃªncia de EmbriÃ£o (TE)</h4>
+                                  <h4 className="font-bold text-purple-900 dark:text-purple-100">💉 Transferência de Embrião (TE)</h4>
                                   <span className="text-sm font-semibold text-purple-700 dark:text-purple-300">
                                     {formatDate(animal.dataTE || animal.data_te)}
                                   </span>
                                 </div>
                                 <p className="text-sm text-purple-700 dark:text-purple-300">
-                                  HÃ¡ {Math.floor((new Date() - new Date(animal.dataTE || animal.data_te)) / (24 * 60 * 60 * 1000))} dias
+                                  Há {Math.floor((new Date() - new Date(animal.dataTE || animal.data_te)) / (24 * 60 * 60 * 1000))} dias
                                 </p>
                               </div>
                             </div>
@@ -3719,7 +3719,7 @@ export default function AnimalDetail() {
                                       ? 'text-green-900 dark:text-green-100'
                                       : 'text-red-900 dark:text-red-100'
                                   }`}>
-                                    âÅ“â€¦ DiagnÃ³stico de GestaÃ§Ã£o (DG)
+                                    ✅ Diagnóstico de Gestação (DG)
                                   </h4>
                                   <span className={`text-sm font-semibold ${
                                     animal.resultadoDG === 'Prenha' || animal.resultado_dg === 'Prenha'
@@ -3746,8 +3746,8 @@ export default function AnimalDetail() {
                                 3
                               </div>
                               <div className="flex-1 bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border-l-4 border-gray-400 border-dashed">
-                                <h4 className="font-bold text-gray-600 dark:text-gray-400">â�³ DG Pendente</h4>
-                                <p className="text-sm text-gray-500 dark:text-gray-500">Aguardando diagnÃ³stico de gestaÃ§Ã£o</p>
+                                <h4 className="font-bold text-gray-600 dark:text-gray-400">⏳ DG Pendente</h4>
+                                <p className="text-sm text-gray-500 dark:text-gray-500">Aguardando diagnóstico de gestação</p>
                               </div>
                             </div>
                           )}
@@ -3760,7 +3760,7 @@ export default function AnimalDetail() {
                               </div>
                               <div className="flex-1 bg-pink-50 dark:bg-pink-900/20 p-4 rounded-lg border-l-4 border-pink-500">
                                 <div className="flex items-center justify-between mb-1">
-                                  <h4 className="font-bold text-pink-900 dark:text-pink-100">ðÅ¸�¼ PrevisÃ£o de Parto</h4>
+                                  <h4 className="font-bold text-pink-900 dark:text-pink-100">🍼 Previsão de Parto</h4>
                                   <span className="text-sm font-semibold text-pink-700 dark:text-pink-300">
                                     {(() => {
                                       const dataTE = new Date(animal.dataTE || animal.data_te)
@@ -3772,7 +3772,7 @@ export default function AnimalDetail() {
                                 </div>
                                 <div className="mt-2">
                                   <div className="flex items-center justify-between text-xs text-pink-700 dark:text-pink-300 mb-1">
-                                    <span>Progresso da GestaÃ§Ã£o</span>
+                                    <span>Progresso da Gestação</span>
                                     <span className="font-bold">
                                       {(() => {
                                         const diasGestacao = Math.floor((new Date() - new Date(animal.dataTE || animal.data_te)) / (24 * 60 * 60 * 1000))
@@ -3830,51 +3830,51 @@ export default function AnimalDetail() {
                           const diasGestacao = Math.floor((new Date() - new Date(animal.dataTE || animal.data_te)) / (24 * 60 * 60 * 1000))
                           const alertas = []
                           
-                          // Alerta DG pendente (15 dias apÃ³s chegada)
+                          // Alerta DG pendente (15 dias após chegada)
                           if (!animal.data_dg && !animal.dataDG && animal.data_chegada) {
                             const diasDesdeChegada = Math.floor((new Date() - new Date(animal.data_chegada)) / (24 * 60 * 60 * 1000))
                             if (diasDesdeChegada >= 15) {
                               alertas.push({
                                 tipo: 'urgente',
-                                mensagem: `âÅ¡ ï¸� DG atrasado! JÃ¡ se passaram ${diasDesdeChegada} dias desde a chegada.`
+                                mensagem: `⚠️ DG atrasado! Já se passaram ${diasDesdeChegada} dias desde a chegada.`
                               })
                             } else {
                               const diasRestantes = 15 - diasDesdeChegada
                               alertas.push({
                                 tipo: 'info',
-                                mensagem: `ðÅ¸â€œâ€¦ DG previsto em ${diasRestantes} dias (15 dias apÃ³s chegada).`
+                                mensagem: `📅 DG previsto em ${diasRestantes} dias (15 dias após chegada).`
                               })
                             }
                           }
                           
-                          // Alerta parto prÃ³ximo (prenha e faltam menos de 30 dias)
+                          // Alerta parto próximo (prenha e faltam menos de 30 dias)
                           if ((animal.resultadoDG === 'Prenha' || animal.resultado_dg === 'Prenha') && diasGestacao >= 240) {
                             const diasRestantes = Math.max(270 - diasGestacao, 0)
                             if (diasRestantes <= 30) {
                               alertas.push({
                                 tipo: 'urgente',
-                                mensagem: `ðÅ¸Å¡¨ Parto prÃ³ximo! Faltam apenas ${diasRestantes} dias. Prepare a maternidade.`
+                                mensagem: `🚨 Parto próximo! Faltam apenas ${diasRestantes} dias. Prepare a maternidade.`
                               })
                             } else if (diasRestantes <= 60) {
                               alertas.push({
                                 tipo: 'aviso',
-                                mensagem: `âÅ¡ ï¸� Parto se aproximando em ${diasRestantes} dias. Monitore a receptora.`
+                                mensagem: `⚠️ Parto se aproximando em ${diasRestantes} dias. Monitore a receptora.`
                               })
                             }
                           }
                           
-                          // Alerta gestaÃ§Ã£o avanÃ§ada
+                          // Alerta gestação avançada
                           if ((animal.resultadoDG === 'Prenha' || animal.resultado_dg === 'Prenha') && diasGestacao >= 180 && diasGestacao < 240) {
                             alertas.push({
                               tipo: 'info',
-                              mensagem: `ðÅ¸¤° GestaÃ§Ã£o avanÃ§ada (${diasGestacao} dias). Mantenha acompanhamento veterinÃ¡rio.`
+                              mensagem: `🤰 Gestação avançada (${diasGestacao} dias). Mantenha acompanhamento veterinário.`
                             })
                           }
                           
                           if (alertas.length === 0) {
                             alertas.push({
                               tipo: 'sucesso',
-                              mensagem: 'âÅ“â€¦ Nenhum alerta no momento. Tudo sob controle!'
+                              mensagem: '✅ Nenhum alerta no momento. Tudo sob controle!'
                             })
                           }
                           
@@ -3904,7 +3904,7 @@ export default function AnimalDetail() {
                   </div>
                 )}
 
-                {/* EstatÃ­sticas Visuais */}
+                {/* Estatísticas Visuais */}
                 {(animal.dataTE || animal.data_te) && (
                   <div className="col-span-full mt-4">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -3936,7 +3936,7 @@ export default function AnimalDetail() {
                         <p className="text-sm font-semibold opacity-90">Dias desde TE</p>
                       </div>
 
-                      {/* Status GestaÃ§Ã£o */}
+                      {/* Status Gestação */}
                       {(animal.resultadoDG === 'Prenha' || animal.resultado_dg === 'Prenha') ? (
                         <>
                           <div className="bg-gradient-to-br from-green-500 to-green-600 p-4 rounded-xl shadow-lg text-white">
@@ -3948,7 +3948,7 @@ export default function AnimalDetail() {
                                 {Math.floor((new Date() - new Date(animal.dataTE || animal.data_te)) / (24 * 60 * 60 * 1000))}
                               </span>
                             </div>
-                            <p className="text-sm font-semibold opacity-90">Dias de GestaÃ§Ã£o</p>
+                            <p className="text-sm font-semibold opacity-90">Dias de Gestação</p>
                           </div>
 
                           <div className="bg-gradient-to-br from-pink-500 to-pink-600 p-4 rounded-xl shadow-lg text-white">
@@ -3960,7 +3960,7 @@ export default function AnimalDetail() {
                                 {Math.max(270 - Math.floor((new Date() - new Date(animal.dataTE || animal.data_te)) / (24 * 60 * 60 * 1000)), 0)}
                               </span>
                             </div>
-                            <p className="text-sm font-semibold opacity-90">Dias atÃ© Parto</p>
+                            <p className="text-sm font-semibold opacity-90">Dias até Parto</p>
                           </div>
                         </>
                       ) : (animal.data_dg || animal.dataDG) ? (
@@ -3993,14 +3993,14 @@ export default function AnimalDetail() {
                   </div>
                 )}
 
-                {/* BotÃµes de AÃ§Ã£o RÃ¡pida */}
+                {/* Botões de Ação Rápida */}
                 <div className="col-span-full mt-4">
                   <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border-2 border-gray-200 dark:border-gray-700">
                     <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-3 flex items-center gap-2">
                       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
-                      AÃ§Ãµes RÃ¡pidas
+                      Ações Rápidas
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       {/* Registrar DG */}
@@ -4016,7 +4016,7 @@ export default function AnimalDetail() {
                         </button>
                       )}
 
-                      {/* Ver HistÃ³rico */}
+                      {/* Ver Histórico */}
                       <button
                         onClick={() => router.push(`/animals/${id}?history=true`)}
                         className="flex flex-col items-center gap-2 p-4 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg border-2 border-blue-300 dark:border-blue-700 hover:shadow-lg transition-all"
@@ -4024,7 +4024,7 @@ export default function AnimalDetail() {
                         <svg className="h-8 w-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span className="text-sm font-bold text-blue-800 dark:text-blue-200">Ver HistÃ³rico</span>
+                        <span className="text-sm font-bold text-blue-800 dark:text-blue-200">Ver Histórico</span>
                       </button>
 
                       {/* Adicionar Custo */}
@@ -4038,7 +4038,7 @@ export default function AnimalDetail() {
                         <span className="text-sm font-bold text-amber-800 dark:text-amber-200">Adicionar Custo</span>
                       </button>
 
-                      {/* Gerar RelatÃ³rio */}
+                      {/* Gerar Relatório */}
                       <button
                         onClick={handleGeneratePDF}
                         disabled={generatingPDF}
@@ -4068,8 +4068,8 @@ export default function AnimalDetail() {
                       <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
                         <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Status Atual</p>
                         <p className="text-lg font-bold text-gray-900 dark:text-white">
-                          {animal.resultadoDG === 'Prenha' || animal.resultado_dg === 'Prenha' ? 'ðÅ¸¤° Prenha' : 
-                           animal.data_dg || animal.dataDG ? 'â�Å’ Vazia' : 'â�³ Aguardando DG'}
+                          {animal.resultadoDG === 'Prenha' || animal.resultado_dg === 'Prenha' ? '🤰 Prenha' : 
+                           animal.data_dg || animal.dataDG ? '❌ Vazia' : '⏳ Aguardando DG'}
                         </p>
                       </div>
                       <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
@@ -4085,7 +4085,7 @@ export default function AnimalDetail() {
                         <p className="text-lg font-bold text-gray-900 dark:text-white">
                           {(animal.custo_total > 0 || animal.custoTotal > 0) 
                             ? formatCurrency(animal.custo_total || animal.custoTotal)
-                            : 'NÃ£o informado'
+                            : 'Não informado'
                           }
                         </p>
                       </div>
@@ -4129,7 +4129,7 @@ export default function AnimalDetail() {
                 
                 <div>
                   <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">
-                    MÃ£e
+                    Mãe
                   </label>
                   {(() => {
                     const s = animal.serie_mae || maeSerieRg?.serie
@@ -4139,7 +4139,7 @@ export default function AnimalDetail() {
                         <Link
                           href={`/consulta-animal/${s}-${r}`}
                           className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 truncate flex items-center gap-1 group hover:underline"
-                          title="Ver ficha da mÃ£e"
+                          title="Ver ficha da mãe"
                         >
                           {s} {r}
                           <ArrowTopRightOnSquareIcon className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
@@ -4154,10 +4154,10 @@ export default function AnimalDetail() {
                   })()}
                 </div>
 
-                {/* InformaÃ§Ãµes de Genealogia e GenÃ©tica para outros animais */}
+                {/* Informações de Genealogia e Genética para outros animais */}
                 <div>
                   <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">
-                    MÃ£e (SÃ©rie/RG)
+                    Mãe (Série/RG)
                   </label>
                   {(animal.serie_mae || maeSerieRg?.serie) && (animal.rg_mae || maeSerieRg?.rg) ? (
                     <Link
@@ -4173,7 +4173,7 @@ export default function AnimalDetail() {
 
                 <div>
                   <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">
-                    AvÃ´ Materno
+                    Avô Materno
                   </label>
                   <p className="text-sm font-medium text-gray-900 dark:text-white truncate" title={avoMaterno || animal?.avo_materno}>
                     {avoMaterno || animal?.avo_materno || animal?.avoMaterno || '-'}
@@ -4191,7 +4191,7 @@ export default function AnimalDetail() {
 
 
 
-                {/* Separador GenÃ©tica */}
+                {/* Separador Genética */}
                 <div className="col-span-full border-t-2 border-emerald-100 dark:border-emerald-900/30 my-4 pt-4">
                   <div className="flex items-center gap-2">
                     <div className="p-1.5 rounded-md bg-emerald-100 dark:bg-emerald-900/30">
@@ -4199,7 +4199,7 @@ export default function AnimalDetail() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                       </svg>
                     </div>
-                    <span className="text-sm font-bold text-emerald-800 dark:text-emerald-200 uppercase tracking-wider">GenÃ©tica</span>
+                    <span className="text-sm font-bold text-emerald-800 dark:text-emerald-200 uppercase tracking-wider">Genética</span>
                   </div>
                 </div>
                 
@@ -4220,10 +4220,10 @@ export default function AnimalDetail() {
                     <span>{animal.deca || '-'}</span>
                     {animal.ranking_iabcz && (
                       <span className="flex items-center gap-1">
-                        {animal.ranking_iabcz === 1 && <span className="text-xl">ðÅ¸¥â€¡</span>}
-                        {animal.ranking_iabcz === 2 && <span className="text-xl">ðÅ¸¥Ë†</span>}
-                        {animal.ranking_iabcz === 3 && <span className="text-xl">ðÅ¸¥â€°</span>}
-                        {animal.ranking_iabcz > 3 && <span className="text-amber-600">ðÅ¸�â€ </span>}
+                        {animal.ranking_iabcz === 1 && <span className="text-xl">🥇</span>}
+                        {animal.ranking_iabcz === 2 && <span className="text-xl">🥈</span>}
+                        {animal.ranking_iabcz === 3 && <span className="text-xl">🥉</span>}
+                        {animal.ranking_iabcz > 3 && <span className="text-amber-600">🏆</span>}
                         <span className="text-xs text-gray-500 dark:text-gray-400">#{animal.ranking_iabcz}</span>
                       </span>
                     )}
@@ -4247,10 +4247,10 @@ export default function AnimalDetail() {
                     <span>{(animal.pt_iqg ?? animal.decile_2) || '-'}</span>
                     {animal.ranking_iqg && (
                       <span className="flex items-center gap-1">
-                        {animal.ranking_iqg === 1 && <span className="text-xl">ðÅ¸¥â€¡</span>}
-                        {animal.ranking_iqg === 2 && <span className="text-xl">ðÅ¸¥Ë†</span>}
-                        {animal.ranking_iqg === 3 && <span className="text-xl">ðÅ¸¥â€°</span>}
-                        {animal.ranking_iqg > 3 && <span className="text-amber-600">ðÅ¸�â€ </span>}
+                        {animal.ranking_iqg === 1 && <span className="text-xl">🥇</span>}
+                        {animal.ranking_iqg === 2 && <span className="text-xl">🥈</span>}
+                        {animal.ranking_iqg === 3 && <span className="text-xl">🥉</span>}
+                        {animal.ranking_iqg > 3 && <span className="text-amber-600">🏆</span>}
                         <span className="text-xs text-gray-500 dark:text-gray-400">#{animal.ranking_iqg}</span>
                       </span>
                     )}
@@ -4264,7 +4264,7 @@ export default function AnimalDetail() {
         )}
       </Card>
 
-      {/* InformaÃ§Ãµes de Receptora - SeÃ§Ã£o Especial */}
+      {/* Informações de Receptora - Seção Especial */}
       {(animal.raca && animal.raca.toLowerCase().includes('receptora')) && (
         <Card className="border-2 border-pink-200 dark:border-pink-700">
           <CardHeader className="bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-900/20 dark:to-purple-900/20">
@@ -4272,7 +4272,7 @@ export default function AnimalDetail() {
               <svg className="h-6 w-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              InformaÃ§Ãµes de Receptora
+              Informações de Receptora
             </h2>
           </CardHeader>
           <CardBody>
@@ -4290,13 +4290,13 @@ export default function AnimalDetail() {
                     <p className="text-lg font-bold text-blue-900 dark:text-blue-100">
                       {animal.dataChegada || animal.data_chegada 
                         ? formatDate(animal.dataChegada || animal.data_chegada)
-                        : 'NÃ£o informado'}
+                        : 'Não informado'}
                     </p>
                   </div>
                 </div>
                 {(animal.dataChegada || animal.data_chegada) && (
                   <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">
-                    HÃ¡ {Math.floor((new Date() - new Date(animal.dataChegada || animal.data_chegada)) / (24 * 60 * 60 * 1000))} dias
+                    Há {Math.floor((new Date() - new Date(animal.dataChegada || animal.data_chegada)) / (24 * 60 * 60 * 1000))} dias
                   </p>
                 )}
               </div>
@@ -4314,13 +4314,13 @@ export default function AnimalDetail() {
                     <p className="text-lg font-bold text-purple-900 dark:text-purple-100">
                       {animal.dataTE || animal.data_te 
                         ? formatDate(animal.dataTE || animal.data_te)
-                        : 'NÃ£o realizada'}
+                        : 'Não realizada'}
                     </p>
                   </div>
                 </div>
                 {(animal.dataTE || animal.data_te) && (
                   <p className="text-xs text-purple-600 dark:text-purple-400 mt-2">
-                    HÃ¡ {Math.floor((new Date() - new Date(animal.dataTE || animal.data_te)) / (24 * 60 * 60 * 1000))} dias
+                    Há {Math.floor((new Date() - new Date(animal.dataTE || animal.data_te)) / (24 * 60 * 60 * 1000))} dias
                   </p>
                 )}
               </div>
@@ -4340,7 +4340,7 @@ export default function AnimalDetail() {
                     <p className="text-lg font-bold text-green-900 dark:text-green-100">
                       {animal.dataDG || animal.data_dg 
                         ? formatDate(animal.dataDG || animal.data_dg)
-                        : 'NÃ£o realizado'}
+                        : 'Não realizado'}
                     </p>
                   </div>
                 </div>
@@ -4357,16 +4357,16 @@ export default function AnimalDetail() {
                 )}
               </div>
 
-              {/* Dias de GestaÃ§Ã£o (se prenha) */}
+              {/* Dias de Gestação (se prenha) */}
               {(animal.resultadoDG === 'Prenha' || animal.resultado_dg === 'Prenha') && (animal.dataTE || animal.data_te) && (
                 <div className="bg-pink-50 dark:bg-pink-900/20 p-4 rounded-xl border-2 border-pink-200 dark:border-pink-700">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="p-2 bg-pink-100 dark:bg-pink-800 rounded-lg">
-                      <span className="text-2xl">ðÅ¸¤°</span>
+                      <span className="text-2xl">🤰</span>
                     </div>
                     <div>
                       <label className="block text-xs font-semibold text-pink-600 dark:text-pink-400 uppercase">
-                        Dias de GestaÃ§Ã£o
+                        Dias de Gestação
                       </label>
                       <p className="text-lg font-bold text-pink-900 dark:text-pink-100">
                         {Math.floor((new Date() - new Date(animal.dataTE || animal.data_te)) / (24 * 60 * 60 * 1000))} dias
@@ -4380,14 +4380,14 @@ export default function AnimalDetail() {
               )}
             </div>
 
-            {/* InformaÃ§Ãµes Adicionais */}
+            {/* Informações Adicionais */}
             {(animal.veterinario_dg || animal.observacoes_dg) && (
               <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {animal.veterinario_dg && (
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                        ðÅ¸â€˜¨ââ‚¬�âÅ¡â€¢ï¸� VeterinÃ¡rio do DG
+                        👨‍⚕️ Veterinário do DG
                       </label>
                       <p className="text-sm text-gray-900 dark:text-white">
                         {animal.veterinario_dg}
@@ -4397,7 +4397,7 @@ export default function AnimalDetail() {
                   {animal.observacoes_dg && (
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                        ðÅ¸â€œ� ObservaÃ§Ãµes do DG
+                        📝 Observações do DG
                       </label>
                       <p className="text-sm text-gray-900 dark:text-white">
                         {animal.observacoes_dg}
@@ -4411,7 +4411,7 @@ export default function AnimalDetail() {
         </Card>
       )}
 
-      {/* InformaÃ§Ãµes Financeiras */}
+      {/* Informações Financeiras */}
       <Card className="overflow-hidden transition-all duration-300">
         <div 
           className="group flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/30 px-6 py-4 border-b border-gray-200 dark:border-gray-700 transition-colors"
@@ -4419,7 +4419,7 @@ export default function AnimalDetail() {
         >
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
             <CurrencyDollarIcon className="h-5 w-5" />
-            InformaÃ§Ãµes Financeiras
+            Informações Financeiras
           </h2>
           {cardsExpanded.financeiro ? (
             <ChevronUpIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
@@ -4455,7 +4455,7 @@ export default function AnimalDetail() {
               </label>
               <p className="text-base font-semibold text-gray-900 dark:text-white">
                 {formatCurrency((() => {
-                  // Excluir custos com data futura - exames agendados nÃ£o contam ainda
+                  // Excluir custos com data futura - exames agendados não contam ainda
                   const hoje = new Date()
                   hoje.setHours(23, 59, 59, 999)
                   if (custos && custos.length > 0) {
@@ -4508,11 +4508,11 @@ export default function AnimalDetail() {
             </div>
           )}
 
-          {/* HistÃ³rico de Custos */}
+          {/* Histórico de Custos */}
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                HistÃ³rico de Custos
+                Histórico de Custos
               </h3>
               <Button
                 variant="ghost"
@@ -4534,21 +4534,21 @@ export default function AnimalDetail() {
               <div className="space-y-2">
                 {custos
                   .filter(custo => {
-                    // Filtrar exames androlÃ³gicos se o animal for fÃªmea
-                    const isAndrologico = custo.tipo === 'Exame' && custo.subtipo === 'AndrolÃ³gico'
+                    // Filtrar exames andrológicos se o animal for fêmea
+                    const isAndrologico = custo.tipo === 'Exame' && custo.subtipo === 'Andrológico'
                     const isFemea = animal.sexo && (
                       animal.sexo.toLowerCase().startsWith('f') || 
                       animal.sexo === 'F' || 
-                      animal.sexo.toLowerCase().includes('fÃªmea') ||
+                      animal.sexo.toLowerCase().includes('fêmea') ||
                       animal.sexo.toLowerCase().includes('femea')
                     )
-                    // Se for fÃªmea e o custo for exame androlÃ³gico, nÃ£o exibir
+                    // Se for fêmea e o custo for exame andrológico, não exibir
                     if (isFemea && isAndrologico) return false
                     return true
                   })
                   .map((custo, index) => {
-                  // Verificar se Ã© custo de exame androlÃ³gico
-                  const isAndrologico = custo.tipo === 'Exame' && custo.subtipo === 'AndrolÃ³gico'
+                  // Verificar se é custo de exame andrológico
+                  const isAndrologico = custo.tipo === 'Exame' && custo.subtipo === 'Andrológico'
                   
                   return (
                     <div 
@@ -4576,7 +4576,7 @@ export default function AnimalDetail() {
                             )}
                             {isAndrologico && (
                               <span className="px-1.5 py-0.5 rounded text-[10px] bg-pink-200 text-pink-800 dark:bg-pink-900 dark:text-pink-200 font-semibold">
-                                ðÅ¸â€�¬ AndrolÃ³gico
+                                🔬 Andrológico
                               </span>
                             )}
                           </div>
@@ -4619,13 +4619,13 @@ export default function AnimalDetail() {
         )}
       </Card>
 
-      {/* InformaÃ§Ãµes de DNA */}
+      {/* Informações de DNA */}
       {(animal.laboratorio_dna || animal.data_envio_dna || animal.custo_dna) && (
         <Card>
           <CardHeader>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
               <BeakerIcon className="h-5 w-5 text-indigo-600" />
-              AnÃ¡lise de DNA
+              Análise de DNA
             </h2>
           </CardHeader>
           <CardBody>
@@ -4634,7 +4634,7 @@ export default function AnimalDetail() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
                 <div>
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-0.5">
-                    LaboratÃ³rios
+                    Laboratórios
                   </label>
                   <p className="text-gray-900 dark:text-white">
                     {animal.laboratorio_dna?.split(',').map((lab, idx) => {
@@ -4654,7 +4654,7 @@ export default function AnimalDetail() {
                 
                 <div>
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-0.5">
-                    ÃÅ¡ltimo Envio
+                    Último Envio
                   </label>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
                     {formatDate(animal.data_envio_dna)}
@@ -4671,20 +4671,20 @@ export default function AnimalDetail() {
                 </div>
               </div>
 
-              {/* HistÃ³rico de Envios */}
+              {/* Histórico de Envios */}
               <DNAHistorySection animalId={animal.id} />
             </div>
           </CardBody>
         </Card>
       )}
 
-      {/* Card de Resumo - Doadora de OÃ³citos */}
+      {/* Card de Resumo - Doadora de Oócitos */}
       {doadoraStats && (
         <Card>
           <CardHeader>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
               <BeakerIcon className="h-5 w-5 text-pink-600" />
-              Doadora de OÃ³citos
+              Doadora de Oócitos
             </h2>
           </CardHeader>
           <CardBody>
@@ -4699,61 +4699,61 @@ export default function AnimalDetail() {
                 <p className="text-[10px] text-pink-600 dark:text-pink-400">vezes coletada</p>
               </div>
 
-              {/* Total de OÃ³citos ViÃ¡veis */}
+              {/* Total de Oócitos Viáveis */}
               <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/20 p-3 rounded-lg border border-purple-200 dark:border-purple-700/50">
                 <div className="flex items-center gap-1.5 mb-1">
                   <BeakerIcon className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                  <p className="text-xs font-medium text-purple-700 dark:text-purple-300">OÃ³citos ViÃ¡veis</p>
+                  <p className="text-xs font-medium text-purple-700 dark:text-purple-300">Oócitos Viáveis</p>
                 </div>
                 <p className="text-2xl font-bold text-purple-800 dark:text-purple-200">{doadoraStats.totalOocitos}</p>
-                <p className="text-[10px] text-purple-600 dark:text-purple-400">mÃ©dia {doadoraStats.mediaOocitos}/coleta</p>
+                <p className="text-[10px] text-purple-600 dark:text-purple-400">média {doadoraStats.mediaOocitos}/coleta</p>
               </div>
 
-              {/* EmbriÃµes Produzidos */}
+              {/* Embriões Produzidos */}
               <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/20 p-3 rounded-lg border border-blue-200 dark:border-blue-700/50">
                 <div className="flex items-center gap-1.5 mb-1">
                   <BeakerIcon className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  <p className="text-xs font-medium text-blue-700 dark:text-blue-300">EmbriÃµes Produzidos</p>
+                  <p className="text-xs font-medium text-blue-700 dark:text-blue-300">Embriões Produzidos</p>
                 </div>
                 <p className="text-2xl font-bold text-blue-800 dark:text-blue-200">{doadoraStats.totalEmbrioesProduzidos ?? 0}</p>
-                <p className="text-[10px] text-blue-600 dark:text-blue-400">mÃ©dia {doadoraStats.mediaEmbrioesProduzidos ?? 0}/coleta</p>
+                <p className="text-[10px] text-blue-600 dark:text-blue-400">média {doadoraStats.mediaEmbrioesProduzidos ?? 0}/coleta</p>
               </div>
 
-              {/* EmbriÃµes Transferidos */}
+              {/* Embriões Transferidos */}
               <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-800/20 p-3 rounded-lg border border-emerald-200 dark:border-emerald-700/50">
                 <div className="flex items-center gap-1.5 mb-1">
                   <BeakerIcon className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                  <p className="text-xs font-medium text-emerald-700 dark:text-emerald-300">EmbriÃµes Transferidos</p>
+                  <p className="text-xs font-medium text-emerald-700 dark:text-emerald-300">Embriões Transferidos</p>
                 </div>
                 <p className="text-2xl font-bold text-emerald-800 dark:text-emerald-200">{doadoraStats.totalEmbrioesTransferidos ?? 0}</p>
-                <p className="text-[10px] text-emerald-600 dark:text-emerald-400">mÃ©dia {doadoraStats.mediaEmbrioesTransferidos ?? 0}/coleta</p>
+                <p className="text-[10px] text-emerald-600 dark:text-emerald-400">média {doadoraStats.mediaEmbrioesTransferidos ?? 0}/coleta</p>
               </div>
 
               {/* Primeira Coleta */}
               <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/20 p-3 rounded-lg border border-green-200 dark:border-green-700/50">
                 <div className="flex items-center gap-1.5 mb-1">
                   <CalendarIcon className="h-4 w-4 text-green-600 dark:text-green-400" />
-                  <p className="text-xs font-medium text-green-700 dark:text-green-300">1Âª Coleta</p>
+                  <p className="text-xs font-medium text-green-700 dark:text-green-300">1ª Coleta</p>
                 </div>
                 <p className="text-sm font-bold text-green-800 dark:text-green-200 truncate">
                   {formatDate(doadoraStats.primeiraColeta.data_fiv)}
                 </p>
                 <p className="text-[10px] text-green-600 dark:text-green-400">
-                  {doadoraStats.primeiraColeta.quantidade_oocitos || 0} oÃ³citos
+                  {doadoraStats.primeiraColeta.quantidade_oocitos || 0} oócitos
                 </p>
               </div>
 
-              {/* ÃÅ¡ltima Coleta */}
+              {/* Última Coleta */}
               <div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/20 p-3 rounded-lg border border-orange-200 dark:border-orange-700/50">
                 <div className="flex items-center gap-1.5 mb-1">
                   <CalendarIcon className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-                  <p className="text-xs font-medium text-orange-700 dark:text-orange-300">ÃÅ¡ltima Coleta</p>
+                  <p className="text-xs font-medium text-orange-700 dark:text-orange-300">Última Coleta</p>
                 </div>
                 <p className="text-sm font-bold text-orange-800 dark:text-orange-200 truncate">
                   {formatDate(doadoraStats.ultimaColeta.data_fiv)}
                 </p>
                 <p className="text-[10px] text-orange-600 dark:text-orange-400">
-                  {doadoraStats.ultimaColeta.quantidade_oocitos || 0} oÃ³citos
+                  {doadoraStats.ultimaColeta.quantidade_oocitos || 0} oócitos
                 </p>
               </div>
             </div>
@@ -4761,13 +4761,13 @@ export default function AnimalDetail() {
         </Card>
       )}
 
-      {/* HistÃ³rico de Coletas FIV */}
+      {/* Histórico de Coletas FIV */}
       {animal.fivs && animal.fivs.length > 0 && (
         <Card>
           <CardHeader>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
               <BeakerIcon className="h-5 w-5 text-pink-600" />
-              HistÃ³rico de Coletas FIV
+              Histórico de Coletas FIV
             </h2>
           </CardHeader>
           <CardBody>
@@ -4776,11 +4776,11 @@ export default function AnimalDetail() {
                 <thead>
                   <tr className="bg-pink-50 dark:bg-pink-900/20">
                     <th className="px-3 py-2 text-left text-pink-800 dark:text-pink-300 font-semibold">Data FIV</th>
-                    <th className="px-3 py-2 text-left text-pink-800 dark:text-pink-300 font-semibold">VeterinÃ¡rio</th>
-                    <th className="px-3 py-2 text-left text-pink-800 dark:text-pink-300 font-semibold">LaboratÃ³rio</th>
+                    <th className="px-3 py-2 text-left text-pink-800 dark:text-pink-300 font-semibold">Veterinário</th>
+                    <th className="px-3 py-2 text-left text-pink-800 dark:text-pink-300 font-semibold">Laboratório</th>
                     <th className="px-3 py-2 text-left text-pink-800 dark:text-pink-300 font-semibold">Touro</th>
-                    <th className="px-3 py-2 text-center text-pink-800 dark:text-pink-300 font-semibold">OÃ³citos</th>
-                    <th className="px-3 py-2 text-center text-pink-800 dark:text-pink-300 font-semibold">EmbriÃµes</th>
+                    <th className="px-3 py-2 text-center text-pink-800 dark:text-pink-300 font-semibold">Oócitos</th>
+                    <th className="px-3 py-2 text-center text-pink-800 dark:text-pink-300 font-semibold">Embriões</th>
                     <th className="px-3 py-2 text-center text-pink-800 dark:text-pink-300 font-semibold">Transferidos</th>
                     <th className="px-3 py-2 text-left text-pink-800 dark:text-pink-300 font-semibold">Data Transf.</th>
                     <th className="px-3 py-2 text-center text-pink-800 dark:text-pink-300 font-semibold">TE</th>
@@ -4790,7 +4790,7 @@ export default function AnimalDetail() {
                   {animal.fivs.map((fiv, idx) => {
                     // Contar TEs relacionadas a esta coleta FIV
                     const tesRelacionadas = transferenciasEmbrioes.filter(te => {
-                      // Verificar se a TE estÃ¡ relacionada a esta coleta FIV
+                      // Verificar se a TE está relacionada a esta coleta FIV
                       // Por doadora_id e data_fiv
                       if (te.doadora_id === animal.id && te.data_fiv === fiv.data_fiv) {
                         return true
@@ -4854,7 +4854,7 @@ export default function AnimalDetail() {
           <CardHeader>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
               <BeakerIcon className="h-5 w-5 text-purple-600" />
-              Resumo Reprodutivo (TransferÃªncia de EmbriÃµes)
+              Resumo Reprodutivo (Transferência de Embriões)
             </h2>
           </CardHeader>
           <CardBody>
@@ -4864,7 +4864,7 @@ export default function AnimalDetail() {
                     <p className="text-2xl font-bold text-purple-800 dark:text-purple-300">{reproducaoStats.total}</p>
                 </div>
                 <div className="bg-pink-50 dark:bg-pink-900/20 p-3 rounded-lg">
-                    <p className="text-xs text-pink-600 dark:text-pink-400 font-medium">FÃªmeas</p>
+                    <p className="text-xs text-pink-600 dark:text-pink-400 font-medium">Fêmeas</p>
                     <p className="text-2xl font-bold text-pink-800 dark:text-pink-300">
                         {reproducaoStats.femeas}
                         <span className="text-[10px] ml-1 opacity-75">({reproducaoStats.total > 0 ? ((reproducaoStats.femeas/reproducaoStats.total)*100).toFixed(0) : 0}%)</span>
@@ -4897,7 +4897,7 @@ export default function AnimalDetail() {
                             <thead>
                                 <tr className="bg-green-50 dark:bg-green-900/20">
                                     <th className="px-4 py-3 text-left text-green-800 dark:text-green-300 font-semibold">Data TE</th>
-                                    <th className="px-4 py-3 text-left text-green-800 dark:text-green-300 font-semibold">PrevisÃ£o Parto</th>
+                                    <th className="px-4 py-3 text-left text-green-800 dark:text-green-300 font-semibold">Previsão Parto</th>
                                     <th className="px-4 py-3 text-center text-green-800 dark:text-green-300 font-semibold">Dias Restantes</th>
                                     <th className="px-4 py-3 text-left text-green-800 dark:text-green-300 font-semibold">Acasalamento</th>
                                     <th className="px-4 py-3 text-center text-green-800 dark:text-green-300 font-semibold">Sexo Previsto</th>
@@ -4927,14 +4927,14 @@ export default function AnimalDetail() {
                                         </td>
                                         <td className="px-4 py-3 text-gray-600 dark:text-gray-400">
                                             {animal.sexo && (animal.sexo.toLowerCase().startsWith('m') || animal.sexo === 'M') 
-                                                ? (prenhez.doadora_nome || 'NÃ£o Inf.') 
-                                                : (prenhez.touro || 'NÃ£o Inf.')}
+                                                ? (prenhez.doadora_nome || 'Não Inf.') 
+                                                : (prenhez.touro || 'Não Inf.')}
                                         </td>
                                         <td className="px-4 py-3 text-center">
                                             <span className={`px-2 py-1 rounded text-xs font-medium ${
                                                 (prenhez.sexo_prenhez === 'M' || prenhez.sexo_prenhez === 'Macho')
                                                     ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-100 dark:border-blue-800'
-                                                    : (prenhez.sexo_prenhez === 'F' || prenhez.sexo_prenhez === 'FÃªmea')
+                                                    : (prenhez.sexo_prenhez === 'F' || prenhez.sexo_prenhez === 'Fêmea')
                                                     ? 'bg-pink-50 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300 border border-pink-100 dark:border-pink-800'
                                                     : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
                                             }`}>
@@ -4959,7 +4959,7 @@ export default function AnimalDetail() {
                             <tr className="bg-gray-100 dark:bg-gray-700">
                                 <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-300">Nome</th>
                                 <th className="px-4 py-2 text-center text-gray-600 dark:text-gray-300">Total</th>
-                                <th className="px-4 py-2 text-center text-pink-600 dark:text-pink-400">FÃªmeas</th>
+                                <th className="px-4 py-2 text-center text-pink-600 dark:text-pink-400">Fêmeas</th>
                                 <th className="px-4 py-2 text-center text-blue-600 dark:text-blue-400">Machos</th>
                             </tr>
                         </thead>
@@ -4980,20 +4980,20 @@ export default function AnimalDetail() {
         </Card>
       )}
 
-      {/* TransferÃªncias de EmbriÃµes - Detalhado */}
+      {/* Transferências de Embriões - Detalhado */}
       {transferenciasEmbrioes.length > 0 && (
         <Card>
           <CardHeader>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
               <BeakerIcon className="h-5 w-5 text-pink-600" />
-              TransferÃªncias de EmbriÃµes
+              Transferências de Embriões
             </h2>
           </CardHeader>
           <CardBody>
             {loadingTransferencias ? (
               <div className="text-center py-8">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600"></div>
-                <p className="mt-2 text-gray-600 dark:text-gray-400">Carregando transferÃªncias...</p>
+                <p className="mt-2 text-gray-600 dark:text-gray-400">Carregando transferências...</p>
               </div>
             ) : (
               <>
@@ -5020,26 +5020,26 @@ export default function AnimalDetail() {
                           <div className="bg-pink-50 dark:bg-pink-900/20 p-4 rounded-lg border border-pink-200 dark:border-pink-700">
                             <p className="text-sm text-pink-600 dark:text-pink-400 font-medium">Como Doadora</p>
                             <p className="text-2xl font-bold text-pink-800 dark:text-pink-300">{comoDoadora.length}</p>
-                            <p className="text-xs text-pink-600 dark:text-pink-400 mt-1">transferÃªncia(s)</p>
+                            <p className="text-xs text-pink-600 dark:text-pink-400 mt-1">transferência(s)</p>
                           </div>
                         )}
                         {comoReceptora.length > 0 && (
                           <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-700">
                             <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">Como Receptora</p>
                             <p className="text-2xl font-bold text-purple-800 dark:text-purple-300">{comoReceptora.length}</p>
-                            <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">transferÃªncia(s)</p>
+                            <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">transferência(s)</p>
                           </div>
                         )}
                         {comoTouro.length > 0 && (
                           <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-700">
                             <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">Como Touro</p>
                             <p className="text-2xl font-bold text-blue-800 dark:text-blue-300">{comoTouro.length}</p>
-                            <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">transferÃªncia(s)</p>
+                            <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">transferência(s)</p>
                           </div>
                         )}
                       </div>
 
-                      {/* Tabela de TransferÃªncias como Doadora */}
+                      {/* Tabela de Transferências como Doadora */}
                       {comoDoadora.length > 0 && (
                         <div className="mb-6">
                           <h3 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center gap-2">
@@ -5065,7 +5065,7 @@ export default function AnimalDetail() {
                                     <td className="px-4 py-3 text-gray-800 dark:text-gray-200">{te.touro || '-'}</td>
                                     <td className="px-4 py-3 text-center">
                                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                        (te.status === 'Nascido' || te.status === 'Parida' || te.status === 'ConcluÃ­da') 
+                                        (te.status === 'Nascido' || te.status === 'Parida' || te.status === 'Concluída') 
                                           ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
                                           : (te.status === 'Negativo' || te.status === 'Falha' || te.status === 'Aborto')
                                           ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
@@ -5083,7 +5083,7 @@ export default function AnimalDetail() {
                         </div>
                       )}
 
-                      {/* Tabela de TransferÃªncias como Receptora */}
+                      {/* Tabela de Transferências como Receptora */}
                       {comoReceptora.length > 0 && (
                         <div className="mb-6">
                           <h3 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center gap-2">
@@ -5109,7 +5109,7 @@ export default function AnimalDetail() {
                                     <td className="px-4 py-3 text-gray-800 dark:text-gray-200">{te.touro || '-'}</td>
                                     <td className="px-4 py-3 text-center">
                                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                        (te.status === 'Nascido' || te.status === 'Parida' || te.status === 'ConcluÃ­da') 
+                                        (te.status === 'Nascido' || te.status === 'Parida' || te.status === 'Concluída') 
                                           ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
                                           : (te.status === 'Negativo' || te.status === 'Falha' || te.status === 'Aborto')
                                           ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
@@ -5127,7 +5127,7 @@ export default function AnimalDetail() {
                         </div>
                       )}
 
-                      {/* Tabela de TransferÃªncias como Touro */}
+                      {/* Tabela de Transferências como Touro */}
                       {comoTouro.length > 0 && (
                         <div className="mb-6">
                           <h3 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center gap-2">
@@ -5153,7 +5153,7 @@ export default function AnimalDetail() {
                                     <td className="px-4 py-3 text-gray-800 dark:text-gray-200">{te.receptora_nome || '-'}</td>
                                     <td className="px-4 py-3 text-center">
                                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                        (te.status === 'Nascido' || te.status === 'Parida' || te.status === 'ConcluÃ­da') 
+                                        (te.status === 'Nascido' || te.status === 'Parida' || te.status === 'Concluída') 
                                           ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
                                           : (te.status === 'Negativo' || te.status === 'Falha' || te.status === 'Aborto')
                                           ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
@@ -5179,14 +5179,14 @@ export default function AnimalDetail() {
         </Card>
       )}
 
-      {/* Exames AndrolÃ³gicos */}
+      {/* Exames Andrológicos */}
       {animal.sexo && (animal.sexo.toLowerCase().includes('macho') || animal.sexo === 'M') && (
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <BeakerIcon className="h-5 w-5 text-pink-600" />
-                Exames AndrolÃ³gicos
+                Exames Andrológicos
               </h2>
               <Button
                 variant="ghost"
@@ -5242,15 +5242,15 @@ export default function AnimalDetail() {
                             {precisaRefazer && (
                               <span className="px-2 py-0.5 rounded text-xs bg-orange-200 text-orange-800 dark:bg-orange-900 dark:text-orange-200 font-semibold">
                                 {diasRestantes < 0 
-                                  ? `âÅ¡ ï¸� Vencido hÃ¡ ${Math.abs(diasRestantes)}d` 
+                                  ? `⚠️ Vencido há ${Math.abs(diasRestantes)}d` 
                                   : diasRestantes === 0 
-                                  ? 'âÅ¡ ï¸� Hoje!' 
-                                  : `â�° Em ${diasRestantes}d`}
+                                  ? '⚠️ Hoje!' 
+                                  : `⏰ Em ${diasRestantes}d`}
                               </span>
                             )}
                             {exame.reagendado && (
                               <span className="px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                                ðÅ¸â€�â€ž Reagendado
+                                🔄 Reagendado
                               </span>
                             )}
                           </div>
@@ -5284,7 +5284,7 @@ export default function AnimalDetail() {
                             
                             {exame.observacoes && (
                               <div className="md:col-span-4">
-                                <span className="font-medium text-gray-700 dark:text-gray-300">ObservaÃ§Ãµes:</span>
+                                <span className="font-medium text-gray-700 dark:text-gray-300">Observações:</span>
                                 <p className="text-gray-600 dark:text-gray-400">{exame.observacoes}</p>
                               </div>
                             )}
@@ -5309,7 +5309,7 @@ export default function AnimalDetail() {
             ) : (
               <div className="text-center py-8">
                 <p className="text-gray-500 dark:text-gray-400">
-                  Nenhum exame androlÃ³gico registrado para este animal.
+                  Nenhum exame andrológico registrado para este animal.
                 </p>
               </div>
             )}
@@ -5317,16 +5317,16 @@ export default function AnimalDetail() {
         </Card>
       )}
 
-      {/* ObservaÃ§Ãµes e SituaÃ§Ã£o ABCZ */}
+      {/* Observações e Situação ABCZ */}
       <Card>
         <CardHeader>
           <div className="flex flex-wrap items-center justify-between gap-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-              ObservaÃ§Ãµes
+              Observações
             </h2>
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-500 dark:text-gray-400">SituaÃ§Ã£o ABCZ</span>
+                <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Situação ABCZ</span>
                 {editingField === 'situacao_abcz' ? (
                 <div className="flex gap-2 items-center">
                   <input
@@ -5362,7 +5362,7 @@ export default function AnimalDetail() {
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
                   className="w-full text-sm border rounded px-3 py-2 dark:bg-gray-700 dark:border-gray-600 min-h-[80px]"
-                  placeholder="Adicione observaÃ§Ãµes sobre o animal..."
+                  placeholder="Adicione observações sobre o animal..."
                   autoFocus
                 />
                 <div className="flex gap-2">
@@ -5378,21 +5378,21 @@ export default function AnimalDetail() {
                 onClick={() => { setEditingField('observacoes'); setEditValue(animal.observacoes || '') }}
                 title="Clique para editar"
               >
-                {animal.observacoes ? <>{animal.observacoes} <span className="text-xs text-gray-400">âÅ“Å½</span></> : <span className="text-gray-500 italic">Clique para adicionar observaÃ§Ãµes âÅ“Å½</span>}
+                {animal.observacoes ? <>{animal.observacoes} <span className="text-xs text-gray-400">✎</span></> : <span className="text-gray-500 italic">Clique para adicionar observações ✎</span>}
               </p>
             )}
           </div>
         </CardBody>
       </Card>
 
-      {/* Modal de InformaÃ§Ãµes de Morte */}
+      {/* Modal de Informações de Morte */}
       {showMorteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                <span className="text-red-600">ðÅ¸â€™â‚¬</span>
-                InformaÃ§Ãµes do Ãâ€œbito
+                <span className="text-red-600">💀</span>
+                Informações do Óbito
               </h3>
               <button
                 onClick={() => setShowMorteModal(false)}
@@ -5407,7 +5407,7 @@ export default function AnimalDetail() {
               {loadingMorte ? (
                 <div className="text-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-                  <p className="mt-4 text-gray-600 dark:text-gray-400">Carregando informaÃ§Ãµes...</p>
+                  <p className="mt-4 text-gray-600 dark:text-gray-400">Carregando informações...</p>
                 </div>
               ) : infoMorte ? (
                 <div className="space-y-4">
@@ -5415,10 +5415,10 @@ export default function AnimalDetail() {
                     <div className="space-y-3">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Data do Ãâ€œbito
+                          Data do Óbito
                         </label>
                         <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                          {infoMorte.data_morte ? formatDate(infoMorte.data_morte) : 'NÃ£o informado'}
+                          {infoMorte.data_morte ? formatDate(infoMorte.data_morte) : 'Não informado'}
                         </p>
                       </div>
                       
@@ -5427,7 +5427,7 @@ export default function AnimalDetail() {
                           Causa da Morte
                         </label>
                         <p className="text-lg font-semibold text-red-700 dark:text-red-400">
-                          {infoMorte.causa_morte || 'NÃ£o informado'}
+                          {infoMorte.causa_morte || 'Não informado'}
                         </p>
                       </div>
                       
@@ -5445,7 +5445,7 @@ export default function AnimalDetail() {
                       {infoMorte.observacoes && (
                         <div>
                           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            ObservaÃ§Ãµes
+                            Observações
                           </label>
                           <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
                             {infoMorte.observacoes}
@@ -5457,14 +5457,14 @@ export default function AnimalDetail() {
                   
                   {infoMorte.created_at && (
                     <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                      Registro criado em: {infoMorte.created_at ? formatDate(infoMorte.created_at) : 'NÃ£o informado'}
+                      Registro criado em: {infoMorte.created_at ? formatDate(infoMorte.created_at) : 'Não informado'}
                     </div>
                   )}
                 </div>
               ) : (
                 <div className="text-center py-8">
                   <p className="text-gray-600 dark:text-gray-400">
-                    InformaÃ§Ãµes de morte nÃ£o encontradas
+                    Informações de morte não encontradas
                   </p>
                 </div>
               )}
@@ -5481,7 +5481,7 @@ export default function AnimalDetail() {
         </div>
       )}
 
-      {/* Modal de EdiÃ§Ã£o do Card DG */}
+      {/* Modal de Edição do Card DG */}
       {editCardModal.open && editCardModal.field === 'dg' && (
         <EditDGModal
           animal={animal}
@@ -5495,7 +5495,7 @@ export default function AnimalDetail() {
         />
       )}
 
-      {/* Modal de OcorrÃªncia RÃ¡pida */}
+      {/* Modal de Ocorrência Rápida */}
       <QuickOccurrenceForm
         isOpen={showQuickOccurrence}
         onClose={() => setShowQuickOccurrence(false)}
@@ -5516,7 +5516,7 @@ export default function AnimalDetail() {
         initialAnimal={animal}
       />
 
-      {/* Modal de LanÃ§amento em Lote */}
+      {/* Modal de Lançamento em Lote */}
       <BatchOccurrenceForm
         isOpen={showBatchOccurrence}
         onClose={() => setShowBatchOccurrence(false)}
@@ -5526,12 +5526,12 @@ export default function AnimalDetail() {
         }}
       />
 
-      {/* Modal ÃÅ¡ltimo ServiÃ§o - ver detalhes e histÃ³rico */}
+      {/* Modal Último Serviço - ver detalhes e histórico */}
       {ultimoEvento && (
         <Modal
           isOpen={showUltimoEventoModal}
           onClose={() => setShowUltimoEventoModal(false)}
-          title="ÃÅ¡ltimo serviÃ§o e histÃ³rico"
+          title="Último serviço e histórico"
           size="md"
         >
           <div className="space-y-4">
@@ -5553,8 +5553,8 @@ export default function AnimalDetail() {
               {ultimoEvento.origem === 'coleta_fiv' && ultimoEvento.raw && (
                 <div className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
                   <p><span className="font-medium">Data:</span> {formatDate(ultimoEvento.raw.data_fiv || ultimoEvento.raw.data)}</p>
-                  {ultimoEvento.raw.quantidade_oocitos != null && <p><span className="font-medium">OÃ³citos:</span> {ultimoEvento.raw.quantidade_oocitos}</p>}
-                  {ultimoEvento.raw.laboratorio && <p><span className="font-medium">LaboratÃ³rio:</span> {ultimoEvento.raw.laboratorio}</p>}
+                  {ultimoEvento.raw.quantidade_oocitos != null && <p><span className="font-medium">Oócitos:</span> {ultimoEvento.raw.quantidade_oocitos}</p>}
+                  {ultimoEvento.raw.laboratorio && <p><span className="font-medium">Laboratório:</span> {ultimoEvento.raw.laboratorio}</p>}
                   {ultimoEvento.raw.observacoes && <p><span className="font-medium">Obs:</span> {ultimoEvento.raw.observacoes}</p>}
                 </div>
               )}
@@ -5580,14 +5580,14 @@ export default function AnimalDetail() {
                   {ultimoEvento.raw.ce != null && ultimoEvento.raw.ce !== '' && animal?.sexo === 'Macho' && (
                     <p><span className="font-medium">CE:</span> {ultimoEvento.raw.ce} cm</p>
                   )}
-                  {ultimoEvento.raw.descricao && <p><span className="font-medium">DescriÃ§Ã£o:</span> {ultimoEvento.raw.descricao}</p>}
+                  {ultimoEvento.raw.descricao && <p><span className="font-medium">Descrição:</span> {ultimoEvento.raw.descricao}</p>}
                   {ultimoEvento.raw.observacoes && <p><span className="font-medium">Obs:</span> {ultimoEvento.raw.observacoes}</p>}
                 </div>
               )}
             </div>
             {ultimoEvento.todosEventos && ultimoEvento.todosEventos.length > 1 && (
               <>
-                <h5 className="font-semibold text-gray-900 dark:text-white">ServiÃ§os recentes</h5>
+                <h5 className="font-semibold text-gray-900 dark:text-white">Serviços recentes</h5>
                 <ul className="space-y-2 max-h-48 overflow-y-auto">
                   {ultimoEvento.todosEventos.map((ev, i) => (
                     <li key={ev.id || i} className="text-sm flex justify-between items-center py-1 border-b border-gray-100 dark:border-gray-700 last:border-0">
@@ -5604,7 +5604,7 @@ export default function AnimalDetail() {
               <Button variant="secondary" onClick={() => setShowUltimoEventoModal(false)}>Fechar</Button>
               {ultimoEvento.origem === 'inseminacao' && (
                 <Button variant="primary" onClick={() => { setShowUltimoEventoModal(false); router.push('/reproducao/inseminacao') }}>
-                  Ir para InseminaÃ§Ãµes
+                  Ir para Inseminações
                 </Button>
               )}
               {ultimoEvento.origem === 'coleta_fiv' && (
@@ -5617,7 +5617,7 @@ export default function AnimalDetail() {
         </Modal>
       )}
 
-      {/* Link para RelatÃ³rio */}
+      {/* Link para Relatório */}
       <div className="mt-4 text-center">
         <Button
           variant="secondary"
@@ -5625,7 +5625,7 @@ export default function AnimalDetail() {
           className="flex items-center gap-2 mx-auto"
         >
           <DocumentArrowDownIcon className="h-4 w-4" />
-          Ver RelatÃ³rio de OcorrÃªncias
+          Ver Relatório de Ocorrências
         </Button>
       </div>
 
@@ -5640,13 +5640,13 @@ export default function AnimalDetail() {
         </div>
       )}
 
-      {/* Modal de Detalhes da ReproduÃ§Ã£o */}
+      {/* Modal de Detalhes da Reprodução */}
       {showReproducaoModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
           <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full border border-white/10">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-white">Detalhes da ReproduÃ§Ã£o</h3>
+                <h3 className="text-2xl font-bold text-white">Detalhes da Reprodução</h3>
                 <button
                   onClick={() => setShowReproducaoModal(false)}
                   className="text-gray-400 hover:text-white transition-colors"
@@ -5664,16 +5664,16 @@ export default function AnimalDetail() {
                   const u = String(s).toUpperCase().trim()
                   return u === 'PRENHA' || u === 'P' || u.includes('PRENHA') || u.includes('POSITIVO')
                 }
-                const resultadoPrenha = (animal.resultadoDG === 'Prenha' || animal.resultado_dg === 'Prenha' || statusPrenha(animal.resultadoDG) || statusPrenha(animal.resultado_dg)) || (gestacaoAtual?.situacao === 'Em GestaÃ§Ã£o' || gestacaoAtual?.situacao === 'Ativa') || statusPrenha(ultimaIA?.status_gestacao) || statusPrenha(ultimaIA?.statusGestacao) || statusPrenha(ultimaIA?.resultado_dg) || statusPrenha(ultimaIA?.resultadoDg)
-                  const touroNome = ultimaIA?.touro_nome || ultimaIA?.touro || gestacaoAtual?.touro_nome || animal.touro || 'NÃ£o informado'
+                const resultadoPrenha = (animal.resultadoDG === 'Prenha' || animal.resultado_dg === 'Prenha' || statusPrenha(animal.resultadoDG) || statusPrenha(animal.resultado_dg)) || (gestacaoAtual?.situacao === 'Em Gestação' || gestacaoAtual?.situacao === 'Ativa') || statusPrenha(ultimaIA?.status_gestacao) || statusPrenha(ultimaIA?.statusGestacao) || statusPrenha(ultimaIA?.resultado_dg) || statusPrenha(ultimaIA?.resultadoDg)
+                  const touroNome = ultimaIA?.touro_nome || ultimaIA?.touro || gestacaoAtual?.touro_nome || animal.touro || 'Não informado'
                   const tipoCobertura = ultimaIA?.tipo || gestacaoAtual?.tipo_cobertura || (animal.dataTE || animal.data_te ? 'TE' : 'IA')
 
                   return (
                     <>
-                      {/* SituaÃ§Ã£o Atual */}
+                      {/* Situação Atual */}
                       <div className="bg-white/5 rounded-xl p-4 border border-white/10">
                         <label className="block text-sm font-medium text-gray-400 mb-2">
-                          SituaÃ§Ã£o Atual
+                          Situação Atual
                         </label>
                         <p className="text-lg font-semibold text-white">
                           {(() => {
@@ -5712,11 +5712,11 @@ export default function AnimalDetail() {
                         </p>
                       </div>
 
-                      {/* PrevisÃ£o de Parto */}
+                      {/* Previsão de Parto */}
                       {resultadoPrenha && dataCobertura && (
                         <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl p-4 border border-blue-400/30">
                           <label className="block text-sm font-medium text-blue-300 mb-2">
-                            PrevisÃ£o de Parto
+                            Previsão de Parto
                           </label>
                           <p className="text-2xl font-bold text-white">
                             {new Date(dataCobertura.getTime() + 285 * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR')}
@@ -5731,7 +5731,7 @@ export default function AnimalDetail() {
                       {(animal.data_dg || animal.dataDG) && (
                         <div className="bg-white/5 rounded-xl p-4 border border-white/10">
                           <label className="block text-sm font-medium text-gray-400 mb-2">
-                            Data do DiagnÃ³stico de GestaÃ§Ã£o
+                            Data do Diagnóstico de Gestação
                           </label>
                           <p className="text-lg font-semibold text-white">
                             {new Date(animal.data_dg || animal.dataDG).toLocaleDateString('pt-BR')}
@@ -5745,7 +5745,7 @@ export default function AnimalDetail() {
                           Tipo de Cobertura
                         </label>
                         <p className="text-lg font-semibold text-white">
-                          {tipoCobertura === 'TE' ? 'TransferÃªncia de EmbriÃ£o' : 'InseminaÃ§Ã£o Artificial'}
+                          {tipoCobertura === 'TE' ? 'Transferência de Embrião' : 'Inseminação Artificial'}
                         </p>
                       </div>
                     </>

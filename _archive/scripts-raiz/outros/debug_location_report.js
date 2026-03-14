@@ -22,13 +22,13 @@ async function generateLocationReport(period, sections) {
   const report = {}
 
   try {
-    console.log('=== INICIANDO GERA�‡�ƒO DO RELAT�“RIO ===');
+    console.log('=== INICIANDO GERAÇÃO DO RELATÓRIO ===');
     console.log('Período:', period);
     console.log('Seções:', sections);
 
     // Localização atual dos animais
     if (!sections || sections.localizacao_atual !== false) {
-      console.log('\n�Ÿ“� Executando query de localização atual...');
+      console.log('\n📍 Executando query de localização atual...');
       const localizacaoAtualResult = await query(`
         SELECT 
           a.id,
@@ -52,7 +52,7 @@ async function generateLocationReport(period, sections) {
       
       // Mostrar alguns resultados
       localizacaoAtualResult.rows.slice(0, 5).forEach((animal, index) => {
-        console.log(`${index + 1}. ${animal.serie}-${animal.rg} -> ${animal.piquete || 'SEM LOCALIZA�‡�ƒO'}`);
+        console.log(`${index + 1}. ${animal.serie}-${animal.rg} -> ${animal.piquete || 'SEM LOCALIZAÇÃO'}`);
       });
 
       report.localizacao_atual = localizacaoAtualResult.rows
@@ -60,7 +60,7 @@ async function generateLocationReport(period, sections) {
 
     // Animais por piquete
     if (!sections || sections.animais_por_piquete !== false) {
-      console.log('\n�Ÿ“Š Executando query de animais por piquete...');
+      console.log('\n📊 Executando query de animais por piquete...');
       const porPiqueteResult = await query(`
         SELECT 
           l.piquete,
@@ -84,7 +84,7 @@ async function generateLocationReport(period, sections) {
     }
 
     // Estatísticas gerais de localização
-    console.log('\n�Ÿ“ˆ Executando query de estatísticas...');
+    console.log('\n📈 Executando query de estatísticas...');
     const estatisticasResult = await query(`
       SELECT 
         COUNT(DISTINCT a.id) as total_animais,
@@ -99,7 +99,7 @@ async function generateLocationReport(period, sections) {
     console.log('Estatísticas:', estatisticasResult.rows[0]);
     report.estatisticas = estatisticasResult.rows[0]
 
-    console.log('\n=== RELAT�“RIO FINAL ===');
+    console.log('\n=== RELATÓRIO FINAL ===');
     console.log('Seções geradas:', Object.keys(report));
     console.log('Total de dados:', JSON.stringify(report, null, 2).length, 'caracteres');
 
@@ -129,9 +129,9 @@ async function testLocationReport() {
     
     console.log('\n=== RESULTADO FINAL ===');
     if (Object.keys(report).length === 0) {
-      console.log('�Œ RELAT�“RIO VAZIO!');
+      console.log('❌ RELATÓRIO VAZIO!');
     } else {
-      console.log('�œ… RELAT�“RIO GERADO COM SUCESSO');
+      console.log('✅ RELATÓRIO GERADO COM SUCESSO');
       
       // Verificar especificamente o Piquete 4
       if (report.localizacao_atual) {
@@ -139,21 +139,21 @@ async function testLocationReport() {
           animal.piquete && animal.piquete.toLowerCase().includes('piquete 4')
         );
         
-        console.log('\n�Ÿ”� VERIFICA�‡�ƒO PIQUETE 4:');
+        console.log('\n🔍 VERIFICAÇÃO PIQUETE 4:');
         console.log('Animais encontrados no Piquete 4:', piquete4Animals.length);
         
         if (piquete4Animals.length > 0) {
           piquete4Animals.forEach(animal => {
-            console.log(`�œ… ${animal.serie}-${animal.rg} está no ${animal.piquete}`);
+            console.log(`✅ ${animal.serie}-${animal.rg} está no ${animal.piquete}`);
           });
         } else {
-          console.log('�Œ NENHUM ANIMAL DO PIQUETE 4 ENCONTRADO NO RELAT�“RIO');
+          console.log('❌ NENHUM ANIMAL DO PIQUETE 4 ENCONTRADO NO RELATÓRIO');
         }
       }
     }
 
   } catch (error) {
-    console.error('�Œ ERRO:', error.message);
+    console.error('❌ ERRO:', error.message);
   } finally {
     await pool.end();
   }

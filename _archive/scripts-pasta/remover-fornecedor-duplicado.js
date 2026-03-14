@@ -3,10 +3,10 @@ const { query, initDatabase } = require('../lib/database')
 
 async function removerDuplicado() {
   try {
-    console.log('�Ÿ”— Conectando ao banco de dados...')
+    console.log('🔗 Conectando ao banco de dados...')
     initDatabase()
     
-    console.log('\n�Ÿ“Š Verificando fornecedores duplicados...')
+    console.log('\n📊 Verificando fornecedores duplicados...')
     
     // Buscar todos os fornecedores com nome similar
     const todos = await query(`
@@ -39,20 +39,20 @@ async function removerDuplicado() {
     })
     
     if (incorreto && correto) {
-      console.log(`\n�Œ Fornecedor INCORRETO encontrado (ID: ${incorreto.id})`)
-      console.log(`�œ… Fornecedor CORRETO encontrado (ID: ${correto.id})`)
+      console.log(`\n❌ Fornecedor INCORRETO encontrado (ID: ${incorreto.id})`)
+      console.log(`✅ Fornecedor CORRETO encontrado (ID: ${correto.id})`)
       
-      console.log('\n�Ÿ—‘️ Removendo fornecedor duplicado incorreto...')
+      console.log('\n🗑️ Removendo fornecedor duplicado incorreto...')
       await query('DELETE FROM fornecedores_destinatarios WHERE id = $1', [incorreto.id])
-      console.log(`�œ… Fornecedor ID ${incorreto.id} removido com sucesso!`)
+      console.log(`✅ Fornecedor ID ${incorreto.id} removido com sucesso!`)
     } else {
-      console.log('\n�š�️ Não foi possível identificar claramente qual é o duplicado.')
+      console.log('\n⚠️ Não foi possível identificar claramente qual é o duplicado.')
       console.log('Por favor, verifique manualmente e remova o registro incorreto.')
     }
     
     process.exit(0)
   } catch (error) {
-    console.error('�Œ Erro:', error.message)
+    console.error('❌ Erro:', error.message)
     process.exit(1)
   }
 }

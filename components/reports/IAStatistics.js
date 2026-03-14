@@ -29,7 +29,7 @@ export default function IAStatistics() {
         setStats(result.data)
       }
     } catch (error) {
-      console.error('Erro ao carregar estatÃ­sticas de IA:', error)
+      console.error('Erro ao carregar estatísticas de IA:', error)
     } finally {
       setLoading(false)
     }
@@ -55,7 +55,7 @@ export default function IAStatistics() {
 
   return (
     <div className="space-y-6">
-      {/* Filtro de PerÃ­odo */}
+      {/* Filtro de Período */}
       <div className="flex gap-2">
         <button
           onClick={() => setPeriod('all')}
@@ -75,7 +75,7 @@ export default function IAStatistics() {
               : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
           }`}
         >
-          Este MÃªs
+          Este Mês
         </button>
         <button
           onClick={() => setPeriod('quarter')}
@@ -99,12 +99,12 @@ export default function IAStatistics() {
         </button>
       </div>
 
-      {/* Cards de EstatÃ­sticas */}
+      {/* Cards de Estatísticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total de InseminaÃ§Ãµes</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Total de Inseminações</p>
               <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
                 {stats.total_inseminacoes || 0}
               </p>
@@ -156,7 +156,7 @@ export default function IAStatistics() {
         </Card>
       </div>
 
-      {/* EstatÃ­sticas Detalhadas */}
+      {/* Estatísticas Detalhadas */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Touros */}
         <Card className="p-6">
@@ -171,7 +171,7 @@ export default function IAStatistics() {
                   <div>
                     <p className="font-medium text-gray-900 dark:text-white">{touro.nome || `${touro.serie}${touro.rg}`}</p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {touro.total_ias || 0} inseminaÃ§Ãµes
+                      {touro.total_ias || 0} inseminações
                     </p>
                   </div>
                   <div className="text-right">
@@ -186,17 +186,17 @@ export default function IAStatistics() {
               ))
             ) : (
               <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-                Nenhum dado disponÃ­vel
+                Nenhum dado disponível
               </p>
             )}
           </div>
         </Card>
 
-        {/* EstatÃ­sticas Mensais */}
+        {/* Estatísticas Mensais */}
         <Card className="p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
             <CalendarIcon className="h-5 w-5 text-blue-600" />
-            TendÃªncia Mensal
+            Tendência Mensal
           </h3>
           <div className="space-y-3">
             {stats.tendencia_mensal && stats.tendencia_mensal.length > 0 ? (
@@ -218,26 +218,26 @@ export default function IAStatistics() {
                       ></div>
                     </div>
                     <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      <span>âÅ“â€œ {mes.positivas || 0}</span>
-                      <span>âÅ“â€” {mes.negativas || 0}</span>
+                      <span>✓ {mes.positivas || 0}</span>
+                      <span>✗ {mes.negativas || 0}</span>
                     </div>
                   </div>
                 </div>
               ))
             ) : (
               <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-                Nenhum dado disponÃ­vel
+                Nenhum dado disponível
               </p>
             )}
           </div>
         </Card>
       </div>
 
-      {/* EstatÃ­sticas por RaÃ§a */}
+      {/* Estatísticas por Raça */}
       {stats.por_raca && stats.por_raca.length > 0 && (
         <Card className="p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            EstatÃ­sticas por RaÃ§a
+            Estatísticas por Raça
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {stats.por_raca.map((raca, idx) => (

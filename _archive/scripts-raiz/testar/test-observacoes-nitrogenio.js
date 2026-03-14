@@ -10,7 +10,7 @@ const pool = new Pool({
 })
 
 async function testObservacoesNitrogenio() {
-  console.log('�Ÿ”� Testando observações do sistema de nitrogênio...')
+  console.log('🔍 Testando observações do sistema de nitrogênio...')
   
   try {
     // Verificar se a tabela existe
@@ -23,11 +23,11 @@ async function testObservacoesNitrogenio() {
     `)
     
     if (!tableExists.rows[0].exists) {
-      console.log('�Œ Tabela abastecimento_nitrogenio não existe!')
+      console.log('❌ Tabela abastecimento_nitrogenio não existe!')
       return
     }
     
-    console.log('�œ… Tabela abastecimento_nitrogenio existe')
+    console.log('✅ Tabela abastecimento_nitrogenio existe')
     
     // Verificar estrutura da tabela
     const columns = await pool.query(`
@@ -37,7 +37,7 @@ async function testObservacoesNitrogenio() {
       ORDER BY ordinal_position;
     `)
     
-    console.log('\n�Ÿ“Š Estrutura da tabela:')
+    console.log('\n📊 Estrutura da tabela:')
     columns.rows.forEach(col => {
       console.log(`   - ${col.column_name}: ${col.data_type} ${col.is_nullable === 'NO' ? '(NOT NULL)' : ''} ${col.column_default ? `DEFAULT ${col.column_default}` : ''}`)
     })
@@ -45,11 +45,11 @@ async function testObservacoesNitrogenio() {
     // Verificar se existe coluna observacoes
     const hasObservacoes = columns.rows.some(col => col.column_name === 'observacoes')
     if (!hasObservacoes) {
-      console.log('\n�Œ Coluna "observacoes" não encontrada!')
+      console.log('\n❌ Coluna "observacoes" não encontrada!')
       return
     }
     
-    console.log('\n�œ… Coluna "observacoes" existe')
+    console.log('\n✅ Coluna "observacoes" existe')
     
     // Buscar registros com observações
     const withObservations = await pool.query(`
@@ -67,10 +67,10 @@ async function testObservacoesNitrogenio() {
       LIMIT 10
     `)
     
-    console.log(`\n�Ÿ“� Registros com observações: ${withObservations.rows.length}`)
+    console.log(`\n📝 Registros com observações: ${withObservations.rows.length}`)
     
     if (withObservations.rows.length > 0) {
-      console.log('\n�Ÿ”� Exemplos de observações:')
+      console.log('\n🔍 Exemplos de observações:')
       withObservations.rows.forEach((row, index) => {
         console.log(`\n   ${index + 1}. ID: ${row.id}`)
         console.log(`      Data: ${new Date(row.data_abastecimento).toLocaleDateString('pt-BR')}`)
@@ -79,10 +79,10 @@ async function testObservacoesNitrogenio() {
         console.log(`      Observação (${row.obs_length} chars): "${row.observacoes}"`)
       })
     } else {
-      console.log('\n�š�️  Nenhum registro com observações encontrado')
+      console.log('\n⚠️  Nenhum registro com observações encontrado')
       
       // Criar um registro de teste com observação
-      console.log('\n�Ÿ”� Criando registro de teste com observação...')
+      console.log('\n🔧 Criando registro de teste com observação...')
       
       const testRecord = await pool.query(`
         INSERT INTO abastecimento_nitrogenio 
@@ -98,7 +98,7 @@ async function testObservacoesNitrogenio() {
         955.25
       ])
       
-      console.log('�œ… Registro de teste criado:')
+      console.log('✅ Registro de teste criado:')
       console.log(`   ID: ${testRecord.rows[0].id}`)
       console.log(`   Observação: "${testRecord.rows[0].observacoes}"`)
     }
@@ -113,14 +113,14 @@ async function testObservacoesNitrogenio() {
     `)
     
     const stats = allRecords.rows[0]
-    console.log('\n�Ÿ“Š Estatísticas:')
+    console.log('\n📊 Estatísticas:')
     console.log(`   Total de registros: ${stats.total}`)
     console.log(`   Com observações: ${stats.com_observacoes}`)
     console.log(`   Sem observações: ${stats.sem_observacoes}`)
     console.log(`   Percentual com observações: ${stats.total > 0 ? ((stats.com_observacoes / stats.total) * 100).toFixed(1) : 0}%`)
     
     // Testar a API
-    console.log('\n�ŸŒ� Testando API /api/nitrogenio...')
+    console.log('\n🌐 Testando API /api/nitrogenio...')
     
     const fetch = require('node-fetch')
     
@@ -129,7 +129,7 @@ async function testObservacoesNitrogenio() {
       
       if (response.ok) {
         const data = await response.json()
-        console.log('�œ… API respondeu corretamente')
+        console.log('✅ API respondeu corretamente')
         console.log(`   Registros retornados: ${data.data?.length || 0}`)
         
         const recordsWithObs = data.data?.filter(item => 
@@ -139,20 +139,20 @@ async function testObservacoesNitrogenio() {
         console.log(`   Registros com observações na API: ${recordsWithObs.length}`)
         
         if (recordsWithObs.length > 0) {
-          console.log('\n�Ÿ“� Observações retornadas pela API:')
+          console.log('\n📝 Observações retornadas pela API:')
           recordsWithObs.forEach((item, index) => {
             console.log(`   ${index + 1}. ID ${item.id}: "${item.observacoes}"`)
           })
         }
       } else {
-        console.log(`�Œ API retornou erro: ${response.status} ${response.statusText}`)
+        console.log(`❌ API retornou erro: ${response.status} ${response.statusText}`)
       }
     } catch (apiError) {
-      console.log(`�š�️  Erro ao testar API (servidor pode estar offline): ${apiError.message}`)
+      console.log(`⚠️  Erro ao testar API (servidor pode estar offline): ${apiError.message}`)
     }
     
   } catch (error) {
-    console.error('�Œ Erro durante o teste:', error)
+    console.error('❌ Erro durante o teste:', error)
   } finally {
     await pool.end()
   }
@@ -161,9 +161,9 @@ async function testObservacoesNitrogenio() {
 // Executar o teste
 testObservacoesNitrogenio()
   .then(() => {
-    console.log('\n�ŸŽ‰ Teste concluído!')
+    console.log('\n🎉 Teste concluído!')
   })
   .catch(error => {
-    console.error('�Ÿ’� Erro fatal:', error)
+    console.error('💥 Erro fatal:', error)
     process.exit(1)
   })

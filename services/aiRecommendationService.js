@@ -1,4 +1,4 @@
-// Sistema de recomendaÃ§Ãµes inteligentes para Beef Sync
+// Sistema de recomendações inteligentes para Beef Sync
 import { query } from '../lib/database'
 
 class AIRecommendationService {
@@ -8,42 +8,42 @@ class AIRecommendationService {
     this.updateInterval = 60 * 60 * 1000 // 1 hora
   }
 
-  // Gerar recomendaÃ§Ãµes inteligentes
+  // Gerar recomendações inteligentes
   async generateRecommendations() {
     try {
-      console.log('ðÅ¸¤â€“ Gerando recomendaÃ§Ãµes inteligentes...')
+      console.log('🤖 Gerando recomendações inteligentes...')
       
       const recommendations = []
       
-      // 1. RecomendaÃ§Ãµes de venda baseadas em idade e custo
+      // 1. Recomendações de venda baseadas em idade e custo
       const saleRecommendations = await this.analyzeSaleOpportunities()
       recommendations.push(...saleRecommendations)
       
-      // 2. RecomendaÃ§Ãµes de protocolos sanitÃ¡rios
+      // 2. Recomendações de protocolos sanitários
       const protocolRecommendations = await this.analyzeProtocolNeeds()
       recommendations.push(...protocolRecommendations)
       
-      // 3. RecomendaÃ§Ãµes de reproduÃ§Ã£o
+      // 3. Recomendações de reprodução
       const breedingRecommendations = await this.analyzeBreedingOpportunities()
       recommendations.push(...breedingRecommendations)
       
-      // 4. RecomendaÃ§Ãµes de custos
+      // 4. Recomendações de custos
       const costRecommendations = await this.analyzeCostOptimization()
       recommendations.push(...costRecommendations)
       
-      // 5. RecomendaÃ§Ãµes de mercado
+      // 5. Recomendações de mercado
       const marketRecommendations = await this.analyzeMarketTrends()
       recommendations.push(...marketRecommendations)
 
       this.recommendations = recommendations
       this.lastUpdate = new Date()
       
-      console.log(`âÅ“â€¦ ${recommendations.length} recomendaÃ§Ãµes geradas`)
+      console.log(`✅ ${recommendations.length} recomendações geradas`)
       
       return recommendations
 
     } catch (error) {
-      console.error('â�Å’ Erro ao gerar recomendaÃ§Ãµes:', error)
+      console.error('❌ Erro ao gerar recomendações:', error)
       return []
     }
   }
@@ -64,8 +64,8 @@ class AIRecommendationService {
       `)
 
       const recommendations = []
-      const precoBoiGordo = 180.00 // PreÃ§o atual do boi gordo
-      const pesoMedio = 450 // Peso mÃ©dio em kg
+      const precoBoiGordo = 180.00 // Preço atual do boi gordo
+      const pesoMedio = 450 // Peso médio em kg
 
       animais.rows.forEach(animal => {
         const custoTotal = animal.total_custo || 0
@@ -99,11 +99,11 @@ class AIRecommendationService {
           recommendations.push({
             type: 'sale',
             priority: 'medium',
-            title: 'Alto Custo de ManutenÃ§Ã£o',
+            title: 'Alto Custo de Manutenção',
             message: `${animal.serie}${animal.rg} - Custo total: R$ ${custoTotal.toFixed(2)}`,
             animal: animal,
             data: { custoTotal, idadeMeses },
-            action: 'Avaliar viabilidade econÃ´mica',
+            action: 'Avaliar viabilidade econômica',
             confidence: 80
           })
         }
@@ -112,7 +112,7 @@ class AIRecommendationService {
       return recommendations
 
     } catch (error) {
-      console.error('â�Å’ Erro ao analisar oportunidades de venda:', error)
+      console.error('❌ Erro ao analisar oportunidades de venda:', error)
       return []
     }
   }
@@ -144,25 +144,25 @@ class AIRecommendationService {
           recommendations.push({
             type: 'protocol',
             priority: 'high',
-            title: 'Protocolo SanitÃ¡rio Pendente',
+            title: 'Protocolo Sanitário Pendente',
             message: `${animal.serie}${animal.rg} - Bezerro de ${idadeMeses} meses sem protocolo`,
             animal: animal,
             data: { idadeMeses, diasDesdeUltimoProtocolo },
-            action: 'Aplicar protocolo sanitÃ¡rio bÃ¡sico',
+            action: 'Aplicar protocolo sanitário básico',
             confidence: 95
           })
         }
 
-        // Animais sem protocolo hÃ¡ mais de 90 dias
+        // Animais sem protocolo há mais de 90 dias
         if (diasDesdeUltimoProtocolo > 90 && idadeMeses > 3) {
           recommendations.push({
             type: 'protocol',
             priority: 'medium',
             title: 'Protocolo em Atraso',
-            message: `${animal.serie}${animal.rg} - Sem protocolo hÃ¡ ${diasDesdeUltimoProtocolo} dias`,
+            message: `${animal.serie}${animal.rg} - Sem protocolo há ${diasDesdeUltimoProtocolo} dias`,
             animal: animal,
             data: { idadeMeses, diasDesdeUltimoProtocolo },
-            action: 'Renovar protocolo sanitÃ¡rio',
+            action: 'Renovar protocolo sanitário',
             confidence: 85
           })
         }
@@ -171,12 +171,12 @@ class AIRecommendationService {
       return recommendations
 
     } catch (error) {
-      console.error('â�Å’ Erro ao analisar necessidades de protocolos:', error)
+      console.error('❌ Erro ao analisar necessidades de protocolos:', error)
       return []
     }
   }
 
-  // Analisar oportunidades de reproduÃ§Ã£o
+  // Analisar oportunidades de reprodução
   async analyzeBreedingOpportunities() {
     try {
       const femeas = await query(`
@@ -187,7 +187,7 @@ class AIRecommendationService {
         LEFT JOIN gestacoes g ON a.id = g.animal_id
         LEFT JOIN nascimentos n ON a.id = n.animal_id
         WHERE a.situacao = 'Ativo' 
-          AND a.sexo = 'FÃªmea'
+          AND a.sexo = 'Fêmea'
           AND a.meses BETWEEN 18 AND 84
         GROUP BY a.id
         ORDER BY a.meses ASC
@@ -202,30 +202,30 @@ class AIRecommendationService {
         const diasDesdeUltimoNascimento = ultimoNascimento ? 
           Math.floor((new Date() - new Date(ultimoNascimento)) / (1000 * 60 * 60 * 24)) : 999
 
-        // FÃªmeas em idade reprodutiva sem gestaÃ§Ã£o recente
+        // Fêmeas em idade reprodutiva sem gestação recente
         if (idadeMeses >= 18 && idadeMeses <= 60 && diasDesdeUltimoNascimento > 365) {
           recommendations.push({
             type: 'breeding',
             priority: 'medium',
-            title: 'Oportunidade de ReproduÃ§Ã£o',
-            message: `${femea.serie}${femea.rg} - FÃªmea de ${idadeMeses} meses sem reproduÃ§Ã£o recente`,
+            title: 'Oportunidade de Reprodução',
+            message: `${femea.serie}${femea.rg} - Fêmea de ${idadeMeses} meses sem reprodução recente`,
             animal: femea,
             data: { idadeMeses, diasDesdeUltimoNascimento },
-            action: 'Considerar inseminaÃ§Ã£o ou monta natural',
+            action: 'Considerar inseminação ou monta natural',
             confidence: 75
           })
         }
 
-        // FÃªmeas jovens prontas para reproduÃ§Ã£o
+        // Fêmeas jovens prontas para reprodução
         if (idadeMeses >= 15 && idadeMeses <= 18 && !ultimaGestacao) {
           recommendations.push({
             type: 'breeding',
             priority: 'high',
-            title: 'FÃªmea Pronta para ReproduÃ§Ã£o',
-            message: `${femea.serie}${femea.rg} - Idade ideal para primeira reproduÃ§Ã£o`,
+            title: 'Fêmea Pronta para Reprodução',
+            message: `${femea.serie}${femea.rg} - Idade ideal para primeira reprodução`,
             animal: femea,
             data: { idadeMeses },
-            action: 'Planejar primeira inseminaÃ§Ã£o',
+            action: 'Planejar primeira inseminação',
             confidence: 90
           })
         }
@@ -234,12 +234,12 @@ class AIRecommendationService {
       return recommendations
 
     } catch (error) {
-      console.error('â�Å’ Erro ao analisar oportunidades de reproduÃ§Ã£o:', error)
+      console.error('❌ Erro ao analisar oportunidades de reprodução:', error)
       return []
     }
   }
 
-  // Analisar otimizaÃ§Ã£o de custos
+  // Analisar otimização de custos
   async analyzeCostOptimization() {
     try {
       const custos = await query(`
@@ -285,15 +285,15 @@ class AIRecommendationService {
       return recommendations
 
     } catch (error) {
-      console.error('â�Å’ Erro ao analisar otimizaÃ§Ã£o de custos:', error)
+      console.error('❌ Erro ao analisar otimização de custos:', error)
       return []
     }
   }
 
-  // Analisar tendÃªncias de mercado
+  // Analisar tendências de mercado
   async analyzeMarketTrends() {
     try {
-      // Simular anÃ¡lise de mercado (em produÃ§Ã£o seria integrado com APIs reais)
+      // Simular análise de mercado (em produção seria integrado com APIs reais)
       const recommendations = []
 
       // Simular dados de mercado
@@ -305,8 +305,8 @@ class AIRecommendationService {
         recommendations.push({
           type: 'market',
           priority: 'high',
-          title: 'Alta no PreÃ§o do Boi Gordo',
-          message: `PreÃ§o subiu ${variacao.toFixed(1)}% - R$ ${precoBoiGordo}`,
+          title: 'Alta no Preço do Boi Gordo',
+          message: `Preço subiu ${variacao.toFixed(1)}% - R$ ${precoBoiGordo}`,
           data: { precoAtual: precoBoiGordo, variacao },
           action: 'Considerar venda de animais prontos',
           confidence: 80
@@ -317,10 +317,10 @@ class AIRecommendationService {
         recommendations.push({
           type: 'market',
           priority: 'medium',
-          title: 'Queda no PreÃ§o do Boi Gordo',
-          message: `PreÃ§o caiu ${Math.abs(variacao).toFixed(1)}% - R$ ${precoBoiGordo}`,
+          title: 'Queda no Preço do Boi Gordo',
+          message: `Preço caiu ${Math.abs(variacao).toFixed(1)}% - R$ ${precoBoiGordo}`,
           data: { precoAtual: precoBoiGordo, variacao },
-          action: 'Aguardar recuperaÃ§Ã£o antes de vender',
+          action: 'Aguardar recuperação antes de vender',
           confidence: 75
         })
       }
@@ -328,22 +328,22 @@ class AIRecommendationService {
       return recommendations
 
     } catch (error) {
-      console.error('â�Å’ Erro ao analisar tendÃªncias de mercado:', error)
+      console.error('❌ Erro ao analisar tendências de mercado:', error)
       return []
     }
   }
 
-  // Obter recomendaÃ§Ãµes por tipo
+  // Obter recomendações por tipo
   getRecommendationsByType(type) {
     return this.recommendations.filter(rec => rec.type === type)
   }
 
-  // Obter recomendaÃ§Ãµes por prioridade
+  // Obter recomendações por prioridade
   getRecommendationsByPriority(priority) {
     return this.recommendations.filter(rec => rec.priority === priority)
   }
 
-  // Obter estatÃ­sticas das recomendaÃ§Ãµes
+  // Obter estatísticas das recomendações
   getRecommendationStats() {
     const stats = {
       total: this.recommendations.length,
@@ -360,7 +360,7 @@ class AIRecommendationService {
     return stats
   }
 
-  // Atualizar recomendaÃ§Ãµes periodicamente
+  // Atualizar recomendações periodicamente
   startAutoUpdate() {
     setInterval(async () => {
       await this.generateRecommendations()
@@ -368,7 +368,7 @@ class AIRecommendationService {
   }
 }
 
-// InstÃ¢ncia singleton
+// Instância singleton
 const aiRecommendationService = new AIRecommendationService()
 
 export default aiRecommendationService

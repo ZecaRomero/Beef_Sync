@@ -9,7 +9,7 @@ async function verificarItensZerados() {
   const client = await pool.connect();
   
   try {
-    console.log('�Ÿ”� Verificando notas fiscais com itens zerados...\n');
+    console.log('🔍 Verificando notas fiscais com itens zerados...\n');
     
     // Buscar NFs com total_itens = 0
     const result = await client.query(`
@@ -30,12 +30,12 @@ async function verificarItensZerados() {
     `);
     
     if (result.rows.length === 0) {
-      console.log('�œ… Todas as notas fiscais têm itens cadastrados!');
+      console.log('✅ Todas as notas fiscais têm itens cadastrados!');
     } else {
-      console.log(`�š�️ Encontradas ${result.rows.length} notas fiscais SEM itens:\n`);
+      console.log(`⚠️ Encontradas ${result.rows.length} notas fiscais SEM itens:\n`);
       
       result.rows.forEach(nf => {
-        console.log(`�Ÿ“‹ NF ${nf.numero_nf} (${nf.tipo})`);
+        console.log(`📋 NF ${nf.numero_nf} (${nf.tipo})`);
         console.log(`   ID: ${nf.id}`);
         console.log(`   Data: ${nf.data}`);
         console.log(`   Tipo Produto: ${nf.tipo_produto}`);
@@ -44,7 +44,7 @@ async function verificarItensZerados() {
         console.log('');
       });
       
-      console.log('\n�Ÿ’� Essas notas fiscais foram criadas mas não têm itens associados.');
+      console.log('\n💡 Essas notas fiscais foram criadas mas não têm itens associados.');
       console.log('   Você pode:');
       console.log('   1. Editar cada NF e adicionar os itens manualmente');
       console.log('   2. Excluir as NFs vazias se não forem mais necessárias');
@@ -63,14 +63,14 @@ async function verificarItensZerados() {
     `);
     
     if (orfaos.rows.length > 0) {
-      console.log(`\n�š�️ Encontrados ${orfaos.rows.length} itens órfãos (sem nota fiscal):`);
+      console.log(`\n⚠️ Encontrados ${orfaos.rows.length} itens órfãos (sem nota fiscal):`);
       orfaos.rows.forEach(item => {
         console.log(`   Item ID ${item.id} - NF ID ${item.nota_fiscal_id} (não existe)`);
       });
     }
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
   } finally {
     client.release();
     await pool.end();

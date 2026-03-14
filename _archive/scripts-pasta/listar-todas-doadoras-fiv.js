@@ -3,7 +3,7 @@ require('dotenv').config()
 
 async function listarTodasDoadorasFIV() {
   try {
-    console.log('�Ÿ”� Listando todas as doadoras com coletas FIV...\n')
+    console.log('🔍 Listando todas as doadoras com coletas FIV...\n')
     
     // Buscar todas as coletas FIV agrupadas por doadora
     const coletas = await query(`
@@ -24,7 +24,7 @@ async function listarTodasDoadorasFIV() {
         cf.data_fiv ASC
     `)
     
-    console.log(`�Ÿ“Š Total de coletas FIV: ${coletas.rows.length}\n`)
+    console.log(`📊 Total de coletas FIV: ${coletas.rows.length}\n`)
     
     // Agrupar por doadora
     const coletasPorDoadora = {}
@@ -45,9 +45,9 @@ async function listarTodasDoadorasFIV() {
       coletasPorDoadora[key].coletas.push(coleta)
     })
     
-    console.log(`�Ÿ“‹ Total de doadoras únicas: ${Object.keys(coletasPorDoadora).length}\n`)
-    console.log('�”€'.repeat(120))
-    console.log('�Ÿ“Š RESUMO POR DOADORA:\n')
+    console.log(`📋 Total de doadoras únicas: ${Object.keys(coletasPorDoadora).length}\n`)
+    console.log('─'.repeat(120))
+    console.log('📊 RESUMO POR DOADORA:\n')
     
     // Listar cada doadora com suas coletas
     Object.keys(coletasPorDoadora).sort().forEach((key, index) => {
@@ -65,9 +65,9 @@ async function listarTodasDoadorasFIV() {
         // Marcar datas suspeitas
         let suspeita = ''
         if (ano < 2020 || ano > 2030) {
-          suspeita = ' �š�️ DATA SUSPEITA'
+          suspeita = ' ⚠️ DATA SUSPEITA'
         } else if (ano === 2027 || ano === 2028 || ano === 2029) {
-          suspeita = ' �š�️ DATA FUTURA'
+          suspeita = ' ⚠️ DATA FUTURA'
         }
         
         console.log(`   ${idx + 1}. ID ${coleta.id} | Data FIV: ${dataFIV.toLocaleDateString('pt-BR')} (${ano}/${String(mes).padStart(2, '0')}/${String(dia).padStart(2, '0')})${suspeita} | Oócitos: ${coleta.quantidade_oocitos || 0}`)
@@ -77,7 +77,7 @@ async function listarTodasDoadorasFIV() {
       })
     })
     
-    console.log('\n' + '�”€'.repeat(120))
+    console.log('\n' + '─'.repeat(120))
     
     // Estatísticas
     const doadorasComDatasSuspeitas = Object.keys(coletasPorDoadora).filter(key => {
@@ -88,12 +88,12 @@ async function listarTodasDoadorasFIV() {
     })
     
     if (doadorasComDatasSuspeitas.length > 0) {
-      console.log(`\n�š�️  ${doadorasComDatasSuspeitas.length} doadoras com datas suspeitas (fora do intervalo 2020-2030):`)
+      console.log(`\n⚠️  ${doadorasComDatasSuspeitas.length} doadoras com datas suspeitas (fora do intervalo 2020-2030):`)
       doadorasComDatasSuspeitas.forEach(key => {
         console.log(`   - ${key}`)
       })
     } else {
-      console.log('\n�œ… Nenhuma doadora com datas fora do intervalo razoável (2020-2030)')
+      console.log('\n✅ Nenhuma doadora com datas fora do intervalo razoável (2020-2030)')
     }
     
     // Doadoras com mais coletas
@@ -105,13 +105,13 @@ async function listarTodasDoadorasFIV() {
       .sort((a, b) => b.total - a.total)
       .slice(0, 10)
     
-    console.log('\n�Ÿ“Š Top 10 doadoras com mais coletas:')
+    console.log('\n📊 Top 10 doadoras com mais coletas:')
     doadorasMaisColetas.forEach((doadora, index) => {
       console.log(`   ${index + 1}. ${doadora.nome}: ${doadora.total} coletas`)
     })
     
   } catch (error) {
-    console.error('�Œ Erro ao listar doadoras:', error)
+    console.error('❌ Erro ao listar doadoras:', error)
     throw error
   }
 }
@@ -119,10 +119,10 @@ async function listarTodasDoadorasFIV() {
 // Executar
 listarTodasDoadorasFIV()
   .then(() => {
-    console.log('\n�œ… Listagem concluída')
+    console.log('\n✅ Listagem concluída')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n�Œ Erro fatal:', error)
+    console.error('\n❌ Erro fatal:', error)
     process.exit(1)
   })

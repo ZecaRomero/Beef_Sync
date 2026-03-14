@@ -1,8 +1,8 @@
 const { query } = require('../lib/database');
 
 async function check() {
-  console.log('ğÅ¸â€ DATABASE_URL definida?', !!process.env.DATABASE_URL);
-  console.log('ğÅ¸â€ DATABASE_URL (primeiros 20 chars):', (process.env.DATABASE_URL || 'undefined').substring(0, 20));
+  console.log('ğŸ” DATABASE_URL definida?', !!process.env.DATABASE_URL);
+  console.log('ğŸ” DATABASE_URL (primeiros 20 chars):', (process.env.DATABASE_URL || 'undefined').substring(0, 20));
 
   try {
     const res = await query(`

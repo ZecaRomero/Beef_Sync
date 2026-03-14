@@ -6,7 +6,7 @@ export default function NotificationSystem() {
   const [notifications, setNotifications] = useState([])
   const [showNotifications, setShowNotifications] = useState(false)
 
-  // Gerar notificaÃ§Ãµes reais baseadas nos dados de nascimento
+  // Gerar notificações reais baseadas nos dados de nascimento
   useEffect(() => {
     const generateRealNotifications = () => {
       if (typeof window === 'undefined') return;
@@ -22,9 +22,9 @@ export default function NotificationSystem() {
           realNotifications.push({
             id: 'receptoras-atrasadas',
             type: 'warning',
-            icon: 'âÅ¡ ï¸�',
+            icon: '⚠️',
             title: 'Receptoras Atrasadas',
-            message: `${atrasadas.length} receptoras nÃ£o pariram: ${atrasadas.map(b => `RPT ${b.receptora.split(' ')[1]}`).join(', ')}`,
+            message: `${atrasadas.length} receptoras não pariram: ${atrasadas.map(b => `RPT ${b.receptora.split(' ')[1]}`).join(', ')}`,
             timestamp: new Date(),
             read: false,
             color: 'bg-yellow-500',
@@ -38,7 +38,7 @@ export default function NotificationSystem() {
           realNotifications.push({
             id: 'animais-descarte',
             type: 'alert',
-            icon: 'ðÅ¸Å¡¨',
+            icon: '🚨',
             title: 'Animais para Descarte',
             message: `${descartes.length} animal(is) com defeitos: 17144 (RABO BRANCO FIV nelore)`,
             timestamp: new Date(),
@@ -48,7 +48,7 @@ export default function NotificationSystem() {
           })
         }
 
-        // Nascimentos recentes (Ãºltimos 7 dias)
+        // Nascimentos recentes (últimos 7 dias)
         const nascimentosRecentes = births.filter(b => {
           if (!b.data || b.status !== 'nascido') return false
           const nascimento = new Date(b.data)
@@ -61,9 +61,9 @@ export default function NotificationSystem() {
           realNotifications.push({
             id: 'nascimentos-recentes',
             type: 'success',
-            icon: 'ðÅ¸�â€ž',
+            icon: '🐄',
             title: 'Nascimentos Recentes',
-            message: `${nascimentosRecentes.length} nascimento(s) nos Ãºltimos 7 dias`,
+            message: `${nascimentosRecentes.length} nascimento(s) nos últimos 7 dias`,
             timestamp: new Date(),
             read: false,
             color: 'bg-green-500',
@@ -77,7 +77,7 @@ export default function NotificationSystem() {
           realNotifications.push({
             id: 'perdas-registradas',
             type: 'error',
-            icon: 'ðÅ¸â€™â€�',
+            icon: '💔',
             title: 'Perdas Registradas',
             message: `${perdas.length} perda(s) registrada(s) - verificar causas`,
             timestamp: new Date(),
@@ -93,7 +93,7 @@ export default function NotificationSystem() {
           realNotifications.push({
             id: 'custos-dna',
             type: 'info',
-            icon: 'ðÅ¸â€™°',
+            icon: '💰',
             title: 'Custos de DNA',
             message: `R$ ${custoTotalDNA.toFixed(2)} em custos de DNA acumulados`,
             timestamp: new Date(),
@@ -111,10 +111,10 @@ export default function NotificationSystem() {
       setNotifications(realNotifications)
     }
 
-    // Gerar notificaÃ§Ãµes iniciais
+    // Gerar notificações iniciais
     generateRealNotifications()
 
-    // Atualizar notificaÃ§Ãµes a cada 30 segundos
+    // Atualizar notificações a cada 30 segundos
     const interval = setInterval(generateRealNotifications, 30000)
 
     return () => clearInterval(interval)
@@ -136,12 +136,12 @@ export default function NotificationSystem() {
 
   return (
     <div className="relative z-[9999]">
-      {/* BotÃ£o de NotificaÃ§Ãµes */}
+      {/* Botão de Notificações */}
       <button
         onClick={() => setShowNotifications(!showNotifications)}
         className="relative p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
       >
-        <div className="text-2xl">ðÅ¸â€�â€�</div>
+        <div className="text-2xl">🔔</div>
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
             {unreadCount}
@@ -157,17 +157,17 @@ export default function NotificationSystem() {
         />
       )}
 
-      {/* Painel de NotificaÃ§Ãµes */}
+      {/* Painel de Notificações */}
       {showNotifications && (
         <div className="absolute right-0 top-12 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 z-[9999]">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              NotificaÃ§Ãµes
+              Notificações
             </h3>
             <div className="flex items-center space-x-2">
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                {unreadCount} nÃ£o lidas
+                {unreadCount} não lidas
               </span>
               {notifications.length > 0 && (
                 <button
@@ -180,12 +180,12 @@ export default function NotificationSystem() {
             </div>
           </div>
 
-          {/* Lista de NotificaÃ§Ãµes */}
+          {/* Lista de Notificações */}
           <div className="max-h-96 overflow-y-auto">
             {notifications.length === 0 ? (
               <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                <div className="text-4xl mb-2">ðÅ¸â€œ­</div>
-                <div className="text-sm">Nenhuma notificaÃ§Ã£o</div>
+                <div className="text-4xl mb-2">📭</div>
+                <div className="text-sm">Nenhuma notificação</div>
               </div>
             ) : (
               notifications.map((notification) => (
@@ -229,7 +229,7 @@ export default function NotificationSystem() {
           {notifications.length > 0 && (
             <div className="p-3 border-t border-gray-200 dark:border-gray-700">
               <button className="w-full text-sm text-blue-600 dark:text-blue-400 hover:underline">
-                Ver todas as notificaÃ§Ãµes
+                Ver todas as notificações
               </button>
             </div>
           )}

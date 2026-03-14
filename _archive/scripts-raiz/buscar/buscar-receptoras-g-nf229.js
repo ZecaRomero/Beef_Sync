@@ -12,11 +12,11 @@ async function buscarReceptorasG() {
   const client = await pool.connect();
   
   try {
-    console.log('�Ÿ”� BUSCANDO RECEPTORAS G DA NF 229\n');
+    console.log('🔍 BUSCANDO RECEPTORAS G DA NF 229\n');
     console.log('='.repeat(80));
     
     // 1. Buscar na tabela animais
-    console.log('\n�Ÿ�� 1. BUSCA NA TABELA ANIMAIS:');
+    console.log('\n🐮 1. BUSCA NA TABELA ANIMAIS:');
     const animaisResult = await client.query(`
       SELECT id, serie, rg, nome, tatuagem, sexo, fornecedor, data_chegada
       FROM animais
@@ -41,11 +41,11 @@ async function buscarReceptorasG() {
         console.log('');
       });
     } else {
-      console.log('�Œ Nenhum animal encontrado com essas tatuagens');
+      console.log('❌ Nenhum animal encontrado com essas tatuagens');
     }
     
     // 2. Buscar todas as receptoras G (para ver o padrão)
-    console.log('\n�Ÿ”� 2. TODAS AS RECEPTORAS COM S�‰RIE G:');
+    console.log('\n🔍 2. TODAS AS RECEPTORAS COM SÉRIE G:');
     const todasGResult = await client.query(`
       SELECT id, serie, rg, tatuagem, fornecedor
       FROM animais
@@ -68,7 +68,7 @@ async function buscarReceptorasG() {
     }
     
     // 3. Buscar na tabela notas_fiscais_itens
-    console.log('\n\n�Ÿ“� 3. BUSCA NA TABELA notas_fiscais_itens:');
+    console.log('\n\n📦 3. BUSCA NA TABELA notas_fiscais_itens:');
     
     // Primeiro, pegar o ID da NF 229
     const nfResult = await client.query(`
@@ -89,7 +89,7 @@ async function buscarReceptorasG() {
       console.log(`Total de itens na NF 229: ${itensResult.rows.length}\n`);
       
       if (itensResult.rows.length > 0) {
-        console.log('�œ… Itens encontrados:');
+        console.log('✅ Itens encontrados:');
         itensResult.rows.forEach((item, idx) => {
           console.log(`\n${idx + 1}. Tipo: ${item.tipo_produto || 'N/A'}`);
           
@@ -103,19 +103,19 @@ async function buscarReceptorasG() {
               console.log(`   Sexo: ${dados.sexo || 'N/A'}`);
               console.log(`   Raça: ${dados.raca || 'N/A'}`);
             } catch (e) {
-              console.log(`   �š�️ Erro ao parsear dados_item`);
+              console.log(`   ⚠️ Erro ao parsear dados_item`);
             }
           }
         });
       } else {
-        console.log('�Œ Nenhum item cadastrado na NF 229');
+        console.log('❌ Nenhum item cadastrado na NF 229');
       }
     } else {
-      console.log('�Œ NF 229 não encontrada');
+      console.log('❌ NF 229 não encontrada');
     }
     
     // 4. Buscar itens com tatuagens G específicas em TODAS as NFs
-    console.log('\n\n�Ÿ”� 4. BUSCAR TATUAGENS G 355, G 338, G 354 EM TODAS AS NFs:');
+    console.log('\n\n🔍 4. BUSCAR TATUAGENS G 355, G 338, G 354 EM TODAS AS NFs:');
     const todasNFsResult = await client.query(`
       SELECT 
         nf.numero_nf,
@@ -146,17 +146,17 @@ async function buscarReceptorasG() {
             
             console.log(`   Tatuagem: ${dados.tatuagem || 'N/A'}`);
           } catch (e) {
-            console.log(`   �š�️ Erro ao parsear dados_item`);
+            console.log(`   ⚠️ Erro ao parsear dados_item`);
           }
         }
         console.log('');
       });
     } else {
-      console.log('�Œ Nenhuma tatuagem G 355, G 338 ou G 354 encontrada em nenhuma NF');
+      console.log('❌ Nenhuma tatuagem G 355, G 338 ou G 354 encontrada em nenhuma NF');
     }
     
     // 5. Buscar receptoras G com números próximos (350-360)
-    console.log('\n\n�Ÿ”� 5. RECEPTORAS G COM N�šMEROS ENTRE 350-360:');
+    console.log('\n\n🔍 5. RECEPTORAS G COM NÚMEROS ENTRE 350-360:');
     const proximasResult = await client.query(`
       SELECT 
         nf.numero_nf,
@@ -187,10 +187,10 @@ async function buscarReceptorasG() {
     }
     
     console.log('\n' + '='.repeat(80));
-    console.log('\n�œ… Busca concluída!');
+    console.log('\n✅ Busca concluída!');
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
     console.error(error);
   } finally {
     client.release();

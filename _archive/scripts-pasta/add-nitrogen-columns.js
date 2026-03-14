@@ -13,7 +13,7 @@ async function addNitrogenColumns() {
   const client = await pool.connect();
   
   try {
-    console.log('�Ÿš€ Adicionando colunas valor_unitario e valor_total à tabela abastecimento_nitrogenio...');
+    console.log('🚀 Adicionando colunas valor_unitario e valor_total à tabela abastecimento_nitrogenio...');
     
     // Adicionar coluna valor_unitario
     await client.query(`
@@ -27,7 +27,7 @@ async function addNitrogenColumns() {
       ADD COLUMN IF NOT EXISTS valor_total DECIMAL(12,2) DEFAULT 0
     `);
     
-    console.log('�œ… Colunas adicionadas com sucesso!');
+    console.log('✅ Colunas adicionadas com sucesso!');
     
     // Verificar se as colunas foram criadas
     const result = await client.query(`
@@ -38,13 +38,13 @@ async function addNitrogenColumns() {
       ORDER BY column_name
     `);
     
-    console.log('�Ÿ“‹ Colunas encontradas:');
+    console.log('📋 Colunas encontradas:');
     result.rows.forEach(row => {
       console.log(`   - ${row.column_name}: ${row.data_type} (default: ${row.column_default})`);
     });
     
   } catch (error) {
-    console.error('�Œ Erro ao adicionar colunas:', error);
+    console.error('❌ Erro ao adicionar colunas:', error);
     throw error;
   } finally {
     client.release();
@@ -54,9 +54,9 @@ async function addNitrogenColumns() {
 async function main() {
   try {
     await addNitrogenColumns();
-    console.log('�ŸŽ‰ Script executado com sucesso!');
+    console.log('🎉 Script executado com sucesso!');
   } catch (error) {
-    console.error('�Ÿ’� Erro na execução:', error);
+    console.error('💥 Erro na execução:', error);
     process.exit(1);
   } finally {
     await pool.end();

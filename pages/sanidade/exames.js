@@ -26,7 +26,7 @@ export default function ExamesLaboratoriais() {
             return;
           }
         } catch (apiError) {
-          console.warn('API nÃ£o disponÃ­vel, usando localStorage:', apiError);
+          console.warn('API não disponível, usando localStorage:', apiError);
         }
 
         // Fallback para localStorage
@@ -57,9 +57,9 @@ export default function ExamesLaboratoriais() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'ConcluÃ­do':
+      case 'Concluído':
         return 'bg-green-100 text-green-800';
-      case 'Em AnÃ¡lise':
+      case 'Em Análise':
         return 'bg-yellow-100 text-yellow-800';
       case 'Pendente':
         return 'bg-gray-100 text-gray-800';
@@ -130,10 +130,10 @@ export default function ExamesLaboratoriais() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <div className="flex-shrink-0">
-                          {exame.status === 'ConcluÃ­do' && (
+                          {exame.status === 'Concluído' && (
                             <CheckCircleIcon className="h-6 w-6 text-green-500" />
                           )}
-                          {exame.status === 'Em AnÃ¡lise' && (
+                          {exame.status === 'Em Análise' && (
                             <ClockIcon className="h-6 w-6 text-yellow-500" />
                           )}
                           {exame.status === 'Pendente' && (
@@ -151,7 +151,7 @@ export default function ExamesLaboratoriais() {
                             Coleta: {new Date(exame.dataColeta).toLocaleDateString('pt-BR')}
                             {exame.dataResultado && (
                               <>
-                                <span className="mx-2">ââ‚¬¢</span>
+                                <span className="mx-2">•</span>
                                 Resultado: {new Date(exame.dataResultado).toLocaleDateString('pt-BR')}
                               </>
                             )}

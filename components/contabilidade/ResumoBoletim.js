@@ -3,9 +3,9 @@
  */
 const ResumoBoletim = ({ resumo }) => {
   // Log para debug
-  console.log('ðÅ¸â€�� ResumoBoletim recebido:', resumo)
+  console.log('🔍 ResumoBoletim recebido:', resumo)
   
-  // Verificar se hÃ¡ animais mesmo que total seja 0 (pode haver problema no cÃ¡lculo)
+  // Verificar se há animais mesmo que total seja 0 (pode haver problema no cálculo)
   const temAnimais = resumo && (
     resumo.total > 0 || 
     (resumo.porSexo && (resumo.porSexo.femeas > 0 || resumo.porSexo.machos > 0)) ||
@@ -13,7 +13,7 @@ const ResumoBoletim = ({ resumo }) => {
   )
   
   if (!resumo || !temAnimais) {
-    console.log('âÅ¡ ï¸� ResumoBoletim: Nenhum animal encontrado', {
+    console.log('⚠️ ResumoBoletim: Nenhum animal encontrado', {
       resumo,
       temAnimais,
       total: resumo?.total,
@@ -23,13 +23,13 @@ const ResumoBoletim = ({ resumo }) => {
     return (
       <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
         <p className="text-sm text-yellow-800 dark:text-yellow-200">
-          âÅ¡ ï¸� Nenhum animal encontrado para este perÃ­odo
+          ⚠️ Nenhum animal encontrado para este período
         </p>
       </div>
     )
   }
   
-  // Recalcular total se necessÃ¡rio (caso tenha animais mas total seja 0)
+  // Recalcular total se necessário (caso tenha animais mas total seja 0)
   const totalRecalculado = resumo.total || 
     ((resumo.porSexo?.femeas || 0) + (resumo.porSexo?.machos || 0)) ||
     Object.values(resumo.porEra || {}).reduce((sum, val) => sum + (val || 0), 0)
@@ -37,7 +37,7 @@ const ResumoBoletim = ({ resumo }) => {
   const { total, porSexo, porEra } = resumo
   const totalFinal = totalRecalculado || total || 0
 
-  console.log('âÅ“â€¦ ResumoBoletim: Exibindo dados', {
+  console.log('✅ ResumoBoletim: Exibindo dados', {
     totalOriginal: total,
     totalRecalculado,
     totalFinal,
@@ -59,10 +59,10 @@ const ResumoBoletim = ({ resumo }) => {
 
       {/* Por Sexo - Lado a Lado */}
       <div className="grid grid-cols-2 gap-3">
-        {/* FÃªmeas */}
+        {/* Fêmeas */}
         <div className="p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">FÃªmeas</span>
+            <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Fêmeas</span>
             <span className="text-lg font-bold text-pink-600 dark:text-pink-400">
               {porSexo.femeas || 0}
             </span>

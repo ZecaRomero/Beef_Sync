@@ -8,12 +8,12 @@ export async function generatePDFReport(reportData, period) {
   // Header
   doc.setFontSize(20)
   doc.setTextColor(37, 99, 235) // Blue color
-  doc.text('ðÅ¸�â€ž Beef-Sync - RelatÃ³rio Gerencial', 20, yPosition)
+  doc.text('🐄 Beef-Sync - Relatório Gerencial', 20, yPosition)
   
   yPosition += 10
   doc.setFontSize(12)
   doc.setTextColor(0, 0, 0)
-  doc.text(`PerÃ­odo: ${formatPeriod(period)}`, 20, yPosition)
+  doc.text(`Período: ${formatPeriod(period)}`, 20, yPosition)
   doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 20, yPosition + 5)
   
   yPosition += 20
@@ -49,8 +49,8 @@ export async function generatePDFReport(reportData, period) {
     doc.setPage(i)
     doc.setFontSize(8)
     doc.setTextColor(128, 128, 128)
-    doc.text(`PÃ¡gina ${i} de ${pageCount}`, 20, 285)
-    doc.text('Â© Beef-Sync - Sistema de GestÃ£o PecuÃ¡ria', 150, 285)
+    doc.text(`Página ${i} de ${pageCount}`, 20, 285)
+    doc.text('© Beef-Sync - Sistema de Gestão Pecuária', 150, 285)
   }
 
   return Buffer.from(doc.output('arraybuffer'))
@@ -59,7 +59,7 @@ export async function generatePDFReport(reportData, period) {
 function addMonthlySummaryToPDF(doc, summary, yPosition) {
   doc.setFontSize(16)
   doc.setTextColor(37, 99, 235)
-  doc.text('ðÅ¸â€œÅ  Resumo Mensal', 20, yPosition)
+  doc.text('📊 Resumo Mensal', 20, yPosition)
   yPosition += 10
 
   doc.setFontSize(10)
@@ -69,8 +69,8 @@ function addMonthlySummaryToPDF(doc, summary, yPosition) {
     doc.text('Nascimentos:', 20, yPosition)
     doc.text(`Total: ${summary.nascimentos.total || 0}`, 30, yPosition + 5)
     doc.text(`Machos: ${summary.nascimentos.machos || 0}`, 30, yPosition + 10)
-    doc.text(`FÃªmeas: ${summary.nascimentos.femeas || 0}`, 30, yPosition + 15)
-    doc.text(`Peso MÃ©dio: ${parseFloat(summary.nascimentos.peso_medio || 0).toFixed(2)} kg`, 30, yPosition + 20)
+    doc.text(`Fêmeas: ${summary.nascimentos.femeas || 0}`, 30, yPosition + 15)
+    doc.text(`Peso Médio: ${parseFloat(summary.nascimentos.peso_medio || 0).toFixed(2)} kg`, 30, yPosition + 20)
     yPosition += 30
   }
 
@@ -78,7 +78,7 @@ function addMonthlySummaryToPDF(doc, summary, yPosition) {
     doc.text('Mortes:', 20, yPosition)
     doc.text(`Total: ${summary.mortes.total || 0}`, 30, yPosition + 5)
     doc.text(`Machos: ${summary.mortes.machos || 0}`, 30, yPosition + 10)
-    doc.text(`FÃªmeas: ${summary.mortes.femeas || 0}`, 30, yPosition + 15)
+    doc.text(`Fêmeas: ${summary.mortes.femeas || 0}`, 30, yPosition + 15)
     yPosition += 25
   }
 
@@ -86,22 +86,22 @@ function addMonthlySummaryToPDF(doc, summary, yPosition) {
     doc.text('Vendas:', 20, yPosition)
     doc.text(`Total: ${summary.vendas.total || 0}`, 30, yPosition + 5)
     doc.text(`Valor Total: R$ ${parseFloat(summary.vendas.valor_total || 0).toLocaleString('pt-BR')}`, 30, yPosition + 10)
-    doc.text(`Valor MÃ©dio: R$ ${parseFloat(summary.vendas.valor_medio || 0).toLocaleString('pt-BR')}`, 30, yPosition + 15)
+    doc.text(`Valor Médio: R$ ${parseFloat(summary.vendas.valor_medio || 0).toLocaleString('pt-BR')}`, 30, yPosition + 15)
     yPosition += 25
   }
 
   if (summary.gestacao) {
-    doc.text('GestaÃ§Ã£o:', 20, yPosition)
-    doc.text(`FÃªmeas Gestantes: ${summary.gestacao.femeas_gestantes || 0}`, 30, yPosition + 5)
-    doc.text(`Partos Previstos (prÃ³ximo mÃªs): ${summary.gestacao.partos_previstos_proximo_mes || 0}`, 30, yPosition + 10)
+    doc.text('Gestação:', 20, yPosition)
+    doc.text(`Fêmeas Gestantes: ${summary.gestacao.femeas_gestantes || 0}`, 30, yPosition + 5)
+    doc.text(`Partos Previstos (próximo mês): ${summary.gestacao.partos_previstos_proximo_mes || 0}`, 30, yPosition + 10)
     yPosition += 20
   }
 
   if (summary.estatisticas_gerais) {
-    doc.text('EstatÃ­sticas Gerais:', 20, yPosition)
+    doc.text('Estatísticas Gerais:', 20, yPosition)
     doc.text(`Total do Rebanho: ${summary.estatisticas_gerais.total_rebanho || 0}`, 30, yPosition + 5)
     doc.text(`Machos: ${summary.estatisticas_gerais.total_machos || 0}`, 30, yPosition + 10)
-    doc.text(`FÃªmeas: ${summary.estatisticas_gerais.total_femeas || 0}`, 30, yPosition + 15)
+    doc.text(`Fêmeas: ${summary.estatisticas_gerais.total_femeas || 0}`, 30, yPosition + 15)
     doc.text(`Ativos: ${summary.estatisticas_gerais.ativos || 0}`, 30, yPosition + 20)
     yPosition += 30
   }
@@ -118,14 +118,14 @@ function addBirthsAnalysisToPDF(doc, analysis, yPosition) {
 
   doc.setFontSize(16)
   doc.setTextColor(37, 99, 235)
-  doc.text('ðÅ¸â€˜¶ AnÃ¡lise de Nascimentos', 20, yPosition)
+  doc.text('👶 Análise de Nascimentos', 20, yPosition)
   yPosition += 10
 
   doc.setFontSize(10)
   doc.setTextColor(0, 0, 0)
 
   if (analysis.distribuicao_sexo && analysis.distribuicao_sexo.length > 0) {
-    doc.text('DistribuiÃ§Ã£o por Sexo:', 20, yPosition)
+    doc.text('Distribuição por Sexo:', 20, yPosition)
     analysis.distribuicao_sexo.forEach((item, index) => {
       doc.text(`${item.sexo}: ${item.total} (${item.percentual}%)`, 30, yPosition + 5 + (index * 5))
     })
@@ -133,15 +133,15 @@ function addBirthsAnalysisToPDF(doc, analysis, yPosition) {
   }
 
   if (analysis.media_peso) {
-    doc.text('MÃ©dias de Peso:', 20, yPosition)
+    doc.text('Médias de Peso:', 20, yPosition)
     doc.text(`Geral: ${parseFloat(analysis.media_peso.peso_medio_geral || 0).toFixed(2)} kg`, 30, yPosition + 5)
     doc.text(`Machos: ${parseFloat(analysis.media_peso.peso_medio_machos || 0).toFixed(2)} kg`, 30, yPosition + 10)
-    doc.text(`FÃªmeas: ${parseFloat(analysis.media_peso.peso_medio_femeas || 0).toFixed(2)} kg`, 30, yPosition + 15)
+    doc.text(`Fêmeas: ${parseFloat(analysis.media_peso.peso_medio_femeas || 0).toFixed(2)} kg`, 30, yPosition + 15)
     yPosition += 25
   }
 
   if (analysis.nascimentos_por_pai && analysis.nascimentos_por_pai.length > 0) {
-    doc.text('Top 5 Pais (por nÃºmero de filhos):', 20, yPosition)
+    doc.text('Top 5 Pais (por número de filhos):', 20, yPosition)
     analysis.nascimentos_por_pai.slice(0, 5).forEach((item, index) => {
       doc.text(`${item.pai}: ${item.total_filhos} filhos`, 30, yPosition + 5 + (index * 5))
     })
@@ -160,16 +160,16 @@ function addBreedingReportToPDF(doc, report, yPosition) {
 
   doc.setFontSize(16)
   doc.setTextColor(37, 99, 235)
-  doc.text('ðÅ¸�â€ž RelatÃ³rio de ReproduÃ§Ã£o', 20, yPosition)
+  doc.text('🐄 Relatório de Reprodução', 20, yPosition)
   yPosition += 10
 
   doc.setFontSize(10)
   doc.setTextColor(0, 0, 0)
 
   if (report.femeas_gestantes) {
-    doc.text('FÃªmeas Gestantes:', 20, yPosition)
+    doc.text('Fêmeas Gestantes:', 20, yPosition)
     doc.text(`Total: ${report.femeas_gestantes.total_gestantes || 0}`, 30, yPosition + 5)
-    doc.text(`Dias MÃ©dios de GestaÃ§Ã£o: ${parseFloat(report.femeas_gestantes.dias_medio_gestacao || 0).toFixed(0)}`, 30, yPosition + 10)
+    doc.text(`Dias Médios de Gestação: ${parseFloat(report.femeas_gestantes.dias_medio_gestacao || 0).toFixed(0)}`, 30, yPosition + 10)
     yPosition += 20
   }
 
@@ -182,7 +182,7 @@ function addBreedingReportToPDF(doc, report, yPosition) {
   }
 
   if (report.previsao_partos && report.previsao_partos.length > 0) {
-    doc.text('PrevisÃ£o de Partos (prÃ³ximos meses):', 20, yPosition)
+    doc.text('Previsão de Partos (próximos meses):', 20, yPosition)
     report.previsao_partos.forEach((item, index) => {
       const mes = new Date(item.mes).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
       doc.text(`${mes}: ${item.partos_previstos} partos`, 30, yPosition + 5 + (index * 5))
@@ -202,7 +202,7 @@ function addFinancialSummaryToPDF(doc, summary, yPosition) {
 
   doc.setFontSize(16)
   doc.setTextColor(37, 99, 235)
-  doc.text('ðÅ¸â€™° Resumo Financeiro', 20, yPosition)
+  doc.text('💰 Resumo Financeiro', 20, yPosition)
   yPosition += 10
 
   doc.setFontSize(10)
@@ -212,15 +212,15 @@ function addFinancialSummaryToPDF(doc, summary, yPosition) {
     doc.text('Receitas:', 20, yPosition)
     doc.text(`Total de Vendas: R$ ${parseFloat(summary.receitas.total_vendas || 0).toLocaleString('pt-BR')}`, 30, yPosition + 5)
     doc.text(`Animais Vendidos: ${summary.receitas.animais_vendidos || 0}`, 30, yPosition + 10)
-    doc.text(`Valor MÃ©dio: R$ ${parseFloat(summary.receitas.valor_medio_venda || 0).toLocaleString('pt-BR')}`, 30, yPosition + 15)
+    doc.text(`Valor Médio: R$ ${parseFloat(summary.receitas.valor_medio_venda || 0).toLocaleString('pt-BR')}`, 30, yPosition + 15)
     yPosition += 25
   }
 
   if (summary.custos) {
     doc.text('Custos:', 20, yPosition)
     doc.text(`Total: R$ ${parseFloat(summary.custos.total_custos || 0).toLocaleString('pt-BR')}`, 30, yPosition + 5)
-    doc.text(`Custo MÃ©dio: R$ ${parseFloat(summary.custos.custo_medio || 0).toLocaleString('pt-BR')}`, 30, yPosition + 10)
-    doc.text(`LanÃ§amentos: ${summary.custos.total_lancamentos || 0}`, 30, yPosition + 15)
+    doc.text(`Custo Médio: R$ ${parseFloat(summary.custos.custo_medio || 0).toLocaleString('pt-BR')}`, 30, yPosition + 10)
+    doc.text(`Lançamentos: ${summary.custos.total_lancamentos || 0}`, 30, yPosition + 15)
     yPosition += 25
   }
 
@@ -236,14 +236,14 @@ function addInventoryReportToPDF(doc, report, yPosition) {
 
   doc.setFontSize(16)
   doc.setTextColor(37, 99, 235)
-  doc.text('ðÅ¸â€œ¦ RelatÃ³rio de Estoque', 20, yPosition)
+  doc.text('📦 Relatório de Estoque', 20, yPosition)
   yPosition += 10
 
   doc.setFontSize(10)
   doc.setTextColor(0, 0, 0)
 
   if (report.estoque_semen) {
-    doc.text('Estoque de SÃªmen:', 20, yPosition)
+    doc.text('Estoque de Sêmen:', 20, yPosition)
     doc.text(`Total de Doses: ${report.estoque_semen.total_doses || 0}`, 30, yPosition + 5)
     doc.text(`Total de Touros: ${report.estoque_semen.total_touros || 0}`, 30, yPosition + 10)
     doc.text(`Alertas de Estoque Baixo: ${report.estoque_semen.alertas_estoque_baixo || 0}`, 30, yPosition + 15)
@@ -262,29 +262,29 @@ function addLocationReportToPDF(doc, report, yPosition) {
 
   doc.setFontSize(16)
   doc.setTextColor(37, 99, 235)
-  doc.text('RelatÃ³rio de LocalizaÃ§Ã£o', 20, yPosition)
+  doc.text('Relatório de Localização', 20, yPosition)
   yPosition += 15
 
   doc.setFontSize(10)
   doc.setTextColor(0, 0, 0)
 
-  // EstatÃ­sticas gerais
+  // Estatísticas gerais
   if (report.estatisticas) {
     doc.setFontSize(12)
     doc.setTextColor(37, 99, 235)
-    doc.text('EstatÃ­sticas Gerais:', 20, yPosition)
+    doc.text('Estatísticas Gerais:', 20, yPosition)
     yPosition += 8
     
     doc.setFontSize(10)
     doc.setTextColor(0, 0, 0)
     doc.text(`Total de Animais: ${report.estatisticas.total_animais || 0}`, 25, yPosition)
     doc.text(`Animais Localizados: ${report.estatisticas.animais_localizados || 0}`, 25, yPosition + 5)
-    doc.text(`Animais Sem LocalizaÃ§Ã£o: ${report.estatisticas.animais_sem_localizacao || 0}`, 25, yPosition + 10)
+    doc.text(`Animais Sem Localização: ${report.estatisticas.animais_sem_localizacao || 0}`, 25, yPosition + 10)
     doc.text(`Total de Piquetes: ${report.estatisticas.total_piquetes || 0}`, 25, yPosition + 15)
     yPosition += 25
   }
 
-  // NOVA SEÃâ€¡ÃÆ’O: LocalizaÃ§Ã£o Atual dos Animais
+  // NOVA SEÇÃO: Localização Atual dos Animais
   if (report.localizacao_atual && report.localizacao_atual.length > 0) {
     if (yPosition > 180) {
       doc.addPage()
@@ -293,19 +293,19 @@ function addLocationReportToPDF(doc, report, yPosition) {
     
     doc.setFontSize(12)
     doc.setTextColor(37, 99, 235)
-    doc.text('LocalizaÃ§Ã£o Atual dos Animais:', 20, yPosition)
+    doc.text('Localização Atual dos Animais:', 20, yPosition)
     yPosition += 10
     
     doc.setFontSize(9)
     doc.setTextColor(0, 0, 0)
     
-    // CabeÃ§alho da tabela com fundo
+    // Cabeçalho da tabela com fundo
     doc.setFillColor(240, 240, 240)
     doc.rect(20, yPosition - 2, 170, 6, 'F')
     
     doc.setTextColor(0, 0, 0)
     doc.text('Animal', 22, yPosition + 2)
-    doc.text('RaÃ§a', 55, yPosition + 2)
+    doc.text('Raça', 55, yPosition + 2)
     doc.text('Sexo', 85, yPosition + 2)
     doc.text('Piquete', 105, yPosition + 2)
     doc.text('Data Entrada', 145, yPosition + 2)
@@ -317,12 +317,12 @@ function addLocationReportToPDF(doc, report, yPosition) {
         doc.addPage()
         yPosition = 20
         
-        // Repetir cabeÃ§alho na nova pÃ¡gina
+        // Repetir cabeçalho na nova página
         doc.setFillColor(240, 240, 240)
         doc.rect(20, yPosition - 2, 170, 6, 'F')
         doc.setTextColor(0, 0, 0)
         doc.text('Animal', 22, yPosition + 2)
-        doc.text('RaÃ§a', 55, yPosition + 2)
+        doc.text('Raça', 55, yPosition + 2)
         doc.text('Sexo', 85, yPosition + 2)
         doc.text('Piquete', 105, yPosition + 2)
         doc.text('Data Entrada', 145, yPosition + 2)
@@ -342,7 +342,7 @@ function addLocationReportToPDF(doc, report, yPosition) {
       doc.text(`${animal.serie}-${animal.rg}`, 22, yPosition + 1)
       doc.text((animal.raca || 'N/A').substring(0, 12), 55, yPosition + 1)
       doc.text(animal.sexo || 'N/A', 85, yPosition + 1)
-      doc.text((animal.piquete || 'Sem localizaÃ§Ã£o').substring(0, 15), 105, yPosition + 1)
+      doc.text((animal.piquete || 'Sem localização').substring(0, 15), 105, yPosition + 1)
       doc.text(dataEntrada, 145, yPosition + 1)
       yPosition += 5
     })
@@ -370,13 +370,13 @@ function addLocationReportToPDF(doc, report, yPosition) {
         doc.rect(20, yPosition - 2, 170, 5, 'F')
       }
       
-      doc.text(`${item.piquete}: ${item.total_animais} animais (${item.machos || 0} machos, ${item.femeas || 0} fÃªmeas)`, 25, yPosition + 1)
+      doc.text(`${item.piquete}: ${item.total_animais} animais (${item.machos || 0} machos, ${item.femeas || 0} fêmeas)`, 25, yPosition + 1)
       yPosition += 5
     })
     yPosition += 10
   }
 
-  // Animais sem localizaÃ§Ã£o
+  // Animais sem localização
   if (report.animais_sem_localizacao && report.animais_sem_localizacao.length > 0) {
     if (yPosition > 200) {
       doc.addPage()
@@ -385,7 +385,7 @@ function addLocationReportToPDF(doc, report, yPosition) {
     
     doc.setFontSize(12)
     doc.setTextColor(220, 38, 38)
-    doc.text(`Animais Sem LocalizaÃ§Ã£o (${report.animais_sem_localizacao.length}):`, 20, yPosition)
+    doc.text(`Animais Sem Localização (${report.animais_sem_localizacao.length}):`, 20, yPosition)
     yPosition += 10
     
     doc.setFontSize(10)
@@ -414,9 +414,9 @@ export async function generateExcelReport(reportData, period) {
     workbook.creator = 'Beef-Sync'
     workbook.created = new Date()
     workbook.modified = new Date()
-    workbook.title = 'RelatÃ³rio Beef-Sync'
-    workbook.subject = 'RelatÃ³rio de GestÃ£o PecuÃ¡ria'
-    workbook.description = 'RelatÃ³rio gerado pelo sistema Beef-Sync'
+    workbook.title = 'Relatório Beef-Sync'
+    workbook.subject = 'Relatório de Gestão Pecuária'
+    workbook.description = 'Relatório gerado pelo sistema Beef-Sync'
 
     // Summary sheet
     const summarySheet = workbook.addWorksheet('Resumo')
@@ -426,8 +426,8 @@ export async function generateExcelReport(reportData, period) {
     summarySheet.views = [{ showGridLines: true }]
     
     // Header
-    summarySheet.addRow(['Beef-Sync - RelatÃ³rio Gerencial'])
-    summarySheet.addRow([`PerÃ­odo: ${formatPeriod(period)}`])
+    summarySheet.addRow(['Beef-Sync - Relatório Gerencial'])
+    summarySheet.addRow([`Período: ${formatPeriod(period)}`])
     summarySheet.addRow([`Gerado em: ${new Date().toLocaleString('pt-BR')}`])
     summarySheet.addRow([]) // Empty row
 
@@ -444,12 +444,12 @@ export async function generateExcelReport(reportData, period) {
     }
 
     if (reportData.data?.data?.births_analysis) {
-      const birthsSheet = workbook.addWorksheet('AnÃ¡lise de Nascimentos')
+      const birthsSheet = workbook.addWorksheet('Análise de Nascimentos')
       addBirthsAnalysisToExcel(birthsSheet, reportData.data.data.births_analysis)
     }
 
     if (reportData.data?.data?.breeding_report) {
-      const breedingSheet = workbook.addWorksheet('RelatÃ³rio de ReproduÃ§Ã£o')
+      const breedingSheet = workbook.addWorksheet('Relatório de Reprodução')
       addBreedingReportToExcel(breedingSheet, reportData.data.data.breeding_report)
     }
 
@@ -459,12 +459,12 @@ export async function generateExcelReport(reportData, period) {
     }
 
     if (reportData.data?.data?.inventory_report) {
-      const inventorySheet = workbook.addWorksheet('RelatÃ³rio de Estoque')
+      const inventorySheet = workbook.addWorksheet('Relatório de Estoque')
       addInventoryReportToExcel(inventorySheet, reportData.data.data.inventory_report)
     }
 
     if (reportData.data?.data?.location_report) {
-      const locationSheet = workbook.addWorksheet('LocalizaÃ§Ã£o')
+      const locationSheet = workbook.addWorksheet('Localização')
       addLocationReportToExcel(locationSheet, reportData.data.data.location_report, period)
     }
 
@@ -473,7 +473,7 @@ export async function generateExcelReport(reportData, period) {
       column.width = 20
     })
 
-    // Proteger a planilha contra alteraÃ§Ãµes acidentais
+    // Proteger a planilha contra alterações acidentais
     summarySheet.protect('beef-sync-2024', {
       selectLockedCells: true,
       selectUnlockedCells: true
@@ -483,7 +483,7 @@ export async function generateExcelReport(reportData, period) {
     return Buffer.from(buffer)
     
   } catch (error) {
-    console.error('Erro ao gerar relatÃ³rio Excel:', error)
+    console.error('Erro ao gerar relatório Excel:', error)
     throw new Error(`Erro ao gerar arquivo Excel: ${error.message}`)
   }
 }
@@ -501,8 +501,8 @@ function addMonthlySummaryToExcel(sheet, summary, startRow) {
     currentRow++
     sheet.addRow(['Total', summary.nascimentos.total || 0])
     sheet.addRow(['Machos', summary.nascimentos.machos || 0])
-    sheet.addRow(['FÃªmeas', summary.nascimentos.femeas || 0])
-    sheet.addRow(['Peso MÃ©dio (kg)', parseFloat(summary.nascimentos.peso_medio || 0).toFixed(2)])
+    sheet.addRow(['Fêmeas', summary.nascimentos.femeas || 0])
+    sheet.addRow(['Peso Médio (kg)', parseFloat(summary.nascimentos.peso_medio || 0).toFixed(2)])
     currentRow += 5
   }
 
@@ -512,7 +512,7 @@ function addMonthlySummaryToExcel(sheet, summary, startRow) {
     currentRow++
     sheet.addRow(['Total', summary.vendas.total || 0])
     sheet.addRow(['Valor Total (R$)', parseFloat(summary.vendas.valor_total || 0)])
-    sheet.addRow(['Valor MÃ©dio (R$)', parseFloat(summary.vendas.valor_medio || 0)])
+    sheet.addRow(['Valor Médio (R$)', parseFloat(summary.vendas.valor_medio || 0)])
     currentRow += 4
   }
 
@@ -522,7 +522,7 @@ function addMonthlySummaryToExcel(sheet, summary, startRow) {
     currentRow++
     sheet.addRow(['Total', summary.mortes.total || 0])
     sheet.addRow(['Machos', summary.mortes.machos || 0])
-    sheet.addRow(['FÃªmeas', summary.mortes.femeas || 0])
+    sheet.addRow(['Fêmeas', summary.mortes.femeas || 0])
     currentRow += 4
   }
 
@@ -530,13 +530,13 @@ function addMonthlySummaryToExcel(sheet, summary, startRow) {
 }
 
 function addBirthsAnalysisToExcel(sheet, analysis) {
-  sheet.addRow(['ANÃ�LISE DE NASCIMENTOS'])
+  sheet.addRow(['ANÁLISE DE NASCIMENTOS'])
   sheet.getRow(1).font = { size: 14, bold: true, color: { argb: '2563EB' } }
   
   let currentRow = 3
 
   if (analysis.distribuicao_sexo && analysis.distribuicao_sexo.length > 0) {
-    sheet.addRow(['DistribuiÃ§Ã£o por Sexo'])
+    sheet.addRow(['Distribuição por Sexo'])
     sheet.getRow(currentRow).font = { bold: true }
     currentRow++
     
@@ -556,7 +556,7 @@ function addBirthsAnalysisToExcel(sheet, analysis) {
     sheet.getRow(currentRow).font = { bold: true }
     currentRow++
     
-    sheet.addRow(['Pai', 'Total Filhos', 'Machos', 'FÃªmeas', 'Peso MÃ©dio'])
+    sheet.addRow(['Pai', 'Total Filhos', 'Machos', 'Fêmeas', 'Peso Médio'])
     sheet.getRow(currentRow).font = { bold: true }
     currentRow++
     
@@ -574,17 +574,17 @@ function addBirthsAnalysisToExcel(sheet, analysis) {
 }
 
 function addBreedingReportToExcel(sheet, report) {
-  sheet.addRow(['RELATÃâ€œRIO DE REPRODUÃâ€¡ÃÆ’O'])
+  sheet.addRow(['RELATÓRIO DE REPRODUÇÃO'])
   sheet.getRow(1).font = { size: 14, bold: true, color: { argb: '2563EB' } }
   
   let currentRow = 3
 
   if (report.femeas_gestantes) {
-    sheet.addRow(['FÃªmeas Gestantes'])
+    sheet.addRow(['Fêmeas Gestantes'])
     sheet.getRow(currentRow).font = { bold: true }
     currentRow++
     sheet.addRow(['Total Gestantes', report.femeas_gestantes.total_gestantes || 0])
-    sheet.addRow(['Dias MÃ©dios de GestaÃ§Ã£o', parseFloat(report.femeas_gestantes.dias_medio_gestacao || 0).toFixed(0)])
+    sheet.addRow(['Dias Médios de Gestação', parseFloat(report.femeas_gestantes.dias_medio_gestacao || 0).toFixed(0)])
     currentRow += 3
   }
 
@@ -599,11 +599,11 @@ function addBreedingReportToExcel(sheet, report) {
   }
 
   if (report.previsao_partos && report.previsao_partos.length > 0) {
-    sheet.addRow(['PrevisÃ£o de Partos'])
+    sheet.addRow(['Previsão de Partos'])
     sheet.getRow(currentRow).font = { bold: true }
     currentRow++
     
-    sheet.addRow(['MÃªs', 'Partos Previstos'])
+    sheet.addRow(['Mês', 'Partos Previstos'])
     sheet.getRow(currentRow).font = { bold: true }
     currentRow++
     
@@ -627,7 +627,7 @@ function addFinancialSummaryToExcel(sheet, summary) {
     currentRow++
     sheet.addRow(['Total de Vendas (R$)', parseFloat(summary.receitas.total_vendas || 0)])
     sheet.addRow(['Animais Vendidos', summary.receitas.animais_vendidos || 0])
-    sheet.addRow(['Valor MÃ©dio (R$)', parseFloat(summary.receitas.valor_medio_venda || 0)])
+    sheet.addRow(['Valor Médio (R$)', parseFloat(summary.receitas.valor_medio_venda || 0)])
     currentRow += 4
   }
 
@@ -636,17 +636,17 @@ function addFinancialSummaryToExcel(sheet, summary) {
     sheet.getRow(currentRow).font = { bold: true }
     currentRow++
     sheet.addRow(['Total (R$)', parseFloat(summary.custos.total_custos || 0)])
-    sheet.addRow(['Custo MÃ©dio (R$)', parseFloat(summary.custos.custo_medio || 0)])
-    sheet.addRow(['Total de LanÃ§amentos', summary.custos.total_lancamentos || 0])
+    sheet.addRow(['Custo Médio (R$)', parseFloat(summary.custos.custo_medio || 0)])
+    sheet.addRow(['Total de Lançamentos', summary.custos.total_lancamentos || 0])
     currentRow += 4
   }
 }
 
 function addInventoryReportToExcel(sheet, report) {
-  // TÃ­tulo principal
+  // Título principal
   sheet.mergeCells('A1:H1')
   const titleRow = sheet.getRow(1)
-  titleRow.getCell(1).value = 'ðÅ¸â€œ¦ RELATÃâ€œRIO DE ESTOQUE DE SÃÅ MEN'
+  titleRow.getCell(1).value = '📦 RELATÓRIO DE ESTOQUE DE SÊMEN'
   titleRow.font = { size: 16, bold: true, color: { argb: 'FFFFFF' } }
   titleRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '2563EB' } }
   titleRow.alignment = { vertical: 'middle', horizontal: 'center' }
@@ -654,11 +654,11 @@ function addInventoryReportToExcel(sheet, report) {
 
   let currentRow = 3
 
-  // EstatÃ­sticas Gerais
+  // Estatísticas Gerais
   if (report.estoque_semen) {
     sheet.mergeCells(`A${currentRow}:H${currentRow}`)
     const statsHeaderRow = sheet.getRow(currentRow)
-    statsHeaderRow.getCell(1).value = 'ðÅ¸â€œÅ  ESTATÃ�STICAS GERAIS'
+    statsHeaderRow.getCell(1).value = '📊 ESTATÍSTICAS GERAIS'
     statsHeaderRow.font = { size: 12, bold: true, color: { argb: 'FFFFFF' } }
     statsHeaderRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '3B82F6' } }
     statsHeaderRow.alignment = { vertical: 'middle', horizontal: 'center' }
@@ -668,10 +668,10 @@ function addInventoryReportToExcel(sheet, report) {
       ['Total de Registros', report.estoque_semen.total_registros || 0],
       ['Total de Touros', report.estoque_semen.total_touros || 0],
       ['Total de Doses', report.estoque_semen.total_doses || 0],
-      ['Doses DisponÃ­veis', report.estoque_semen.doses_disponiveis || 0],
+      ['Doses Disponíveis', report.estoque_semen.doses_disponiveis || 0],
       ['Doses Usadas', report.estoque_semen.doses_usadas || 0],
       ['Alertas Estoque Baixo', report.estoque_semen.alertas_estoque_baixo || 0],
-      ['Valor MÃ©dio por Dose', `R$ ${parseFloat(report.estoque_semen.valor_medio || 0).toFixed(2)}`],
+      ['Valor Médio por Dose', `R$ ${parseFloat(report.estoque_semen.valor_medio || 0).toFixed(2)}`],
       ['Valor Total do Estoque', `R$ ${parseFloat(report.estoque_semen.valor_total_estoque || 0).toFixed(2)}`]
     ]
 
@@ -695,14 +695,14 @@ function addInventoryReportToExcel(sheet, report) {
   if (report.detalhes_touros && report.detalhes_touros.length > 0) {
     sheet.mergeCells(`A${currentRow}:H${currentRow}`)
     const tourosHeaderRow = sheet.getRow(currentRow)
-    tourosHeaderRow.getCell(1).value = 'ðÅ¸�â€š DETALHES POR TOURO'
+    tourosHeaderRow.getCell(1).value = '🐂 DETALHES POR TOURO'
     tourosHeaderRow.font = { size: 12, bold: true, color: { argb: 'FFFFFF' } }
     tourosHeaderRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '3B82F6' } }
     tourosHeaderRow.alignment = { vertical: 'middle', horizontal: 'center' }
     currentRow++
 
-    // CabeÃ§alhos da tabela
-    const headers = ['Nome do Touro', 'RG', 'RaÃ§a', 'LocalizaÃ§Ã£o', 'Doses Totais', 'DisponÃ­veis', 'Usadas', 'Valor MÃ©dio']
+    // Cabeçalhos da tabela
+    const headers = ['Nome do Touro', 'RG', 'Raça', 'Localização', 'Doses Totais', 'Disponíveis', 'Usadas', 'Valor Médio']
     const headerRow = sheet.getRow(currentRow)
     headers.forEach((header, index) => {
       const cell = headerRow.getCell(index + 1)
@@ -751,18 +751,18 @@ function addInventoryReportToExcel(sheet, report) {
     currentRow++
   }
 
-  // MovimentaÃ§Ãµes no PerÃ­odo
+  // Movimentações no Período
   if (report.movimentacoes_periodo && report.movimentacoes_periodo.length > 0) {
     sheet.mergeCells(`A${currentRow}:H${currentRow}`)
     const movHeaderRow = sheet.getRow(currentRow)
-    movHeaderRow.getCell(1).value = 'ðÅ¸â€œË† MOVIMENTAÃâ€¡Ãâ€¢ES NO PERÃ�ODO'
+    movHeaderRow.getCell(1).value = '📈 MOVIMENTAÇÕES NO PERÍODO'
     movHeaderRow.font = { size: 12, bold: true, color: { argb: 'FFFFFF' } }
     movHeaderRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '3B82F6' } }
     movHeaderRow.alignment = { vertical: 'middle', horizontal: 'center' }
     currentRow++
 
-    // CabeÃ§alhos
-    const movHeaders = ['Nome do Touro', 'OperaÃ§Ã£o', 'Quantidade', 'Valor', 'Data', 'Fornecedor', 'NF']
+    // Cabeçalhos
+    const movHeaders = ['Nome do Touro', 'Operação', 'Quantidade', 'Valor', 'Data', 'Fornecedor', 'NF']
     const movHeaderRow2 = sheet.getRow(currentRow)
     movHeaders.forEach((header, index) => {
       const cell = movHeaderRow2.getCell(index + 1)
@@ -777,7 +777,7 @@ function addInventoryReportToExcel(sheet, report) {
     })
     currentRow++
 
-    // Dados das movimentaÃ§Ãµes
+    // Dados das movimentações
     report.movimentacoes_periodo.forEach((mov, index) => {
       const row = sheet.getRow(currentRow)
       const rowData = [
@@ -813,40 +813,40 @@ function addInventoryReportToExcel(sheet, report) {
   sheet.columns = [
     { width: 20 },  // Nome do Touro
     { width: 15 },  // RG
-    { width: 12 },  // RaÃ§a
-    { width: 15 },  // LocalizaÃ§Ã£o
+    { width: 12 },  // Raça
+    { width: 15 },  // Localização
     { width: 12 },  // Doses Totais
-    { width: 12 },  // DisponÃ­veis
+    { width: 12 },  // Disponíveis
     { width: 10 },  // Usadas
     { width: 15 }   // Valor
   ]
 }
 
 function addLocationReportToExcel(sheet, report, period) {
-  // TÃ­tulo principal
+  // Título principal
   sheet.mergeCells('A1:G1')
   const titleRow = sheet.getRow(1)
-  titleRow.getCell(1).value = 'ðÅ¸â€œ� RELATÃâ€œRIO DE LOCALIZAÃâ€¡ÃÆ’O DE ANIMAIS'
+  titleRow.getCell(1).value = '📍 RELATÓRIO DE LOCALIZAÇÃO DE ANIMAIS'
   titleRow.font = { size: 16, bold: true, color: { argb: 'FFFFFF' } }
   titleRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '2563EB' } }
   titleRow.alignment = { vertical: 'middle', horizontal: 'center' }
   titleRow.height = 30
 
-  // PerÃ­odo
+  // Período
   sheet.mergeCells('A2:G2')
   const periodRow = sheet.getRow(2)
-  periodRow.getCell(1).value = `PerÃ­odo: ${formatPeriod(period)} | Gerado em: ${new Date().toLocaleString('pt-BR')}`
+  periodRow.getCell(1).value = `Período: ${formatPeriod(period)} | Gerado em: ${new Date().toLocaleString('pt-BR')}`
   periodRow.font = { size: 11, italic: true }
   periodRow.alignment = { vertical: 'middle', horizontal: 'center' }
   periodRow.height = 25
 
   let currentRow = 4
 
-  // EstatÃ­sticas Gerais
+  // Estatísticas Gerais
   if (report.estatisticas) {
     sheet.mergeCells(`A${currentRow}:G${currentRow}`)
     const statsHeaderRow = sheet.getRow(currentRow)
-    statsHeaderRow.getCell(1).value = 'ðÅ¸â€œÅ  ESTATÃ�STICAS GERAIS'
+    statsHeaderRow.getCell(1).value = '📊 ESTATÍSTICAS GERAIS'
     statsHeaderRow.font = { size: 12, bold: true, color: { argb: 'FFFFFF' } }
     statsHeaderRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '3B82F6' } }
     statsHeaderRow.alignment = { vertical: 'middle', horizontal: 'center' }
@@ -855,7 +855,7 @@ function addLocationReportToExcel(sheet, report, period) {
     const statsData = [
       ['Total de Animais', report.estatisticas.total_animais || 0],
       ['Animais Localizados', report.estatisticas.animais_localizados || 0],
-      ['Animais Sem LocalizaÃ§Ã£o', report.estatisticas.animais_sem_localizacao || 0],
+      ['Animais Sem Localização', report.estatisticas.animais_sem_localizacao || 0],
       ['Total de Piquetes', report.estatisticas.total_piquetes || 0]
     ]
 
@@ -875,18 +875,18 @@ function addLocationReportToExcel(sheet, report, period) {
     currentRow++
   }
 
-  // LocalizaÃ§Ã£o Atual
+  // Localização Atual
   if (report.localizacao_atual && report.localizacao_atual.length > 0) {
     sheet.mergeCells(`A${currentRow}:G${currentRow}`)
     const locHeaderRow = sheet.getRow(currentRow)
-    locHeaderRow.getCell(1).value = 'ðÅ¸â€œ� LOCALIZAÃâ€¡ÃÆ’O ATUAL DOS ANIMAIS'
+    locHeaderRow.getCell(1).value = '📍 LOCALIZAÇÃO ATUAL DOS ANIMAIS'
     locHeaderRow.font = { size: 12, bold: true, color: { argb: 'FFFFFF' } }
     locHeaderRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '3B82F6' } }
     locHeaderRow.alignment = { vertical: 'middle', horizontal: 'center' }
     currentRow++
 
-    // CabeÃ§alhos da tabela
-    const headers = ['SÃ©rie', 'RG', 'RaÃ§a', 'Sexo', 'Piquete', 'Data Entrada', 'ResponsÃ¡vel']
+    // Cabeçalhos da tabela
+    const headers = ['Série', 'RG', 'Raça', 'Sexo', 'Piquete', 'Data Entrada', 'Responsável']
     const headerRow = sheet.getRow(currentRow)
     headers.forEach((header, index) => {
       const cell = headerRow.getCell(index + 1)
@@ -909,7 +909,7 @@ function addLocationReportToExcel(sheet, report, period) {
         animal.rg || '',
         animal.raca || '',
         animal.sexo || '',
-        animal.piquete || 'Sem localizaÃ§Ã£o',
+        animal.piquete || 'Sem localização',
         animal.data_entrada ? new Date(animal.data_entrada).toLocaleDateString('pt-BR') : '-',
         animal.usuario_responsavel || '-'
       ]
@@ -936,14 +936,14 @@ function addLocationReportToExcel(sheet, report, period) {
   if (report.animais_por_piquete && report.animais_por_piquete.length > 0) {
     sheet.mergeCells(`A${currentRow}:E${currentRow}`)
     const piqueteHeaderRow = sheet.getRow(currentRow)
-    piqueteHeaderRow.getCell(1).value = 'ðÅ¸â€œÅ  DISTRIBUIÃâ€¡ÃÆ’O POR PIQUETE'
+    piqueteHeaderRow.getCell(1).value = '📊 DISTRIBUIÇÃO POR PIQUETE'
     piqueteHeaderRow.font = { size: 12, bold: true, color: { argb: 'FFFFFF' } }
     piqueteHeaderRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '3B82F6' } }
     piqueteHeaderRow.alignment = { vertical: 'middle', horizontal: 'center' }
     currentRow++
 
-    // CabeÃ§alhos
-    const piqueteHeaders = ['Piquete', 'Total', 'Machos', 'FÃªmeas', 'RaÃ§as']
+    // Cabeçalhos
+    const piqueteHeaders = ['Piquete', 'Total', 'Machos', 'Fêmeas', 'Raças']
     const piqueteHeaderRow2 = sheet.getRow(currentRow)
     piqueteHeaders.forEach((header, index) => {
       const cell = piqueteHeaderRow2.getCell(index + 1)
@@ -989,18 +989,18 @@ function addLocationReportToExcel(sheet, report, period) {
     currentRow++
   }
 
-  // Animais Sem LocalizaÃ§Ã£o
+  // Animais Sem Localização
   if (report.animais_sem_localizacao && report.animais_sem_localizacao.length > 0) {
     sheet.mergeCells(`A${currentRow}:D${currentRow}`)
     const semLocHeaderRow = sheet.getRow(currentRow)
-    semLocHeaderRow.getCell(1).value = 'âÅ¡ ï¸� ANIMAIS SEM LOCALIZAÃâ€¡ÃÆ’O DEFINIDA'
+    semLocHeaderRow.getCell(1).value = '⚠️ ANIMAIS SEM LOCALIZAÇÃO DEFINIDA'
     semLocHeaderRow.font = { size: 12, bold: true, color: { argb: 'FFFFFF' } }
     semLocHeaderRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'EF4444' } }
     semLocHeaderRow.alignment = { vertical: 'middle', horizontal: 'center' }
     currentRow++
 
-    // CabeÃ§alhos
-    const semLocHeaders = ['SÃ©rie', 'RG', 'RaÃ§a', 'Sexo']
+    // Cabeçalhos
+    const semLocHeaders = ['Série', 'RG', 'Raça', 'Sexo']
     const semLocHeaderRow2 = sheet.getRow(currentRow)
     semLocHeaders.forEach((header, index) => {
       const cell = semLocHeaderRow2.getCell(index + 1)
@@ -1043,13 +1043,13 @@ function addLocationReportToExcel(sheet, report, period) {
 
   // Ajustar largura das colunas
   sheet.columns = [
-    { width: 12 },  // SÃ©rie
+    { width: 12 },  // Série
     { width: 12 },  // RG
-    { width: 18 },  // RaÃ§a
+    { width: 18 },  // Raça
     { width: 10 },  // Sexo
     { width: 20 },  // Piquete
     { width: 15 },  // Data
-    { width: 20 }   // ResponsÃ¡vel
+    { width: 20 }   // Responsável
   ]
 }
 

@@ -1,5 +1,5 @@
 /**
- * API para envio do Boletim ContÃ¡bil para contabilidade
+ * API para envio do Boletim Contábil para contabilidade
  */
 
 export default async function handler(req, res) {
@@ -11,10 +11,10 @@ export default async function handler(req, res) {
     const { periodo, formato, destinatarios } = req.body
 
     if (!periodo) {
-      return res.status(400).json({ message: 'PerÃ­odo Ã© obrigatÃ³rio' })
+      return res.status(400).json({ message: 'Período é obrigatório' })
     }
 
-    // Simular geraÃ§Ã£o do boletim (em produÃ§Ã£o, usar o serviÃ§o real)
+    // Simular geração do boletim (em produção, usar o serviço real)
     const boletimData = {
       empresa: 'Fazenda Beef Sync',
       periodo,
@@ -48,8 +48,8 @@ export default async function handler(req, res) {
       observacoes: 'Boletim enviado com sucesso para a contabilidade'
     }
 
-    // Log do envio (em produÃ§Ã£o, salvar no banco de dados)
-    console.log('ðÅ¸â€œ¤ Boletim enviado:', {
+    // Log do envio (em produção, salvar no banco de dados)
+    console.log('📤 Boletim enviado:', {
       periodo,
       formato,
       destinatarios,
@@ -63,7 +63,7 @@ export default async function handler(req, res) {
     })
 
   } catch (error) {
-    console.error('â�Å’ Erro ao enviar boletim:', error)
+    console.error('❌ Erro ao enviar boletim:', error)
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',

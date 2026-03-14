@@ -24,7 +24,7 @@ export default function LocalizacaoAnimais() {
   const [localizacoes, setLocalizacoes] = useState([])
   const [loading, setLoading] = useState(true)
   const [filtro, setFiltro] = useState('')
-  const [filtroModalAnimais, setFiltroModalAnimais] = useState('') // Filtro especÃ­fico para o modal de seleÃ§Ã£o
+  const [filtroModalAnimais, setFiltroModalAnimais] = useState('') // Filtro específico para o modal de seleção
   const [showModal, setShowModal] = useState(false)
   const [modalType, setModalType] = useState('nova') // 'nova', 'editar', 'transferir'
   const [selectedAnimal, setSelectedAnimal] = useState(null)
@@ -71,7 +71,7 @@ export default function LocalizacaoAnimais() {
   const [batchProgress, setBatchProgress] = useState(0)
   const [transferStatus, setTransferStatus] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage] = useState(12) // 12 animais por pÃ¡gina (4 colunas x 3 linhas)
+  const [itemsPerPage] = useState(12) // 12 animais por página (4 colunas x 3 linhas)
   const [showExportModal, setShowExportModal] = useState(false)
   const [exportType, setExportType] = useState(null) // 'geral' ou 'piquete'
   const [exportFormat, setExportFormat] = useState('excel') // 'excel' ou 'pdf'
@@ -102,17 +102,17 @@ export default function LocalizacaoAnimais() {
     })
   }, [])
   const [selectedFields, setSelectedFields] = useState({
-    'SÃ©rie': true,
+    'Série': true,
     'RG': true,
-    'RaÃ§a': true,
+    'Raça': true,
     'Sexo': true,
     'Data Nascimento': true,
     'Idade (meses)': true,
     'Piquete': true,
     'Data Entrada Piquete': true,
-    'Motivo MovimentaÃ§Ã£o': false,
+    'Motivo Movimentação': false,
     'Pat (Pai)': true,
-    'MÃ£e': false,
+    'Mãe': false,
     'Receptora': false,
     'Tatuagem': false,
     'Peso': false,
@@ -120,14 +120,14 @@ export default function LocalizacaoAnimais() {
     'Tipo Nascimento': false,
     'Dificuldade Parto': false,
     'FIV': false,
-    'SituaÃ§Ã£o': true,
+    'Situação': true,
     'Custo Total (R$)': true,
     'Valor Venda (R$)': false,
     'Valor Real (R$)': false,
-    'VeterinÃ¡rio': false,
+    'Veterinário': false,
     'ABCZG': false,
     'DECA': false,
-    'ObservaÃ§Ãµes': false,
+    'Observações': false,
     'Data Cadastro': false
   })
 
@@ -136,7 +136,7 @@ export default function LocalizacaoAnimais() {
     carregarLocais()
   }, [filtroAvancado.piquete, filtroAvancado.situacao, filtroAvancado.periodo])
 
-  // Resetar pÃ¡gina quando filtros mudarem
+  // Resetar página quando filtros mudarem
   useEffect(() => {
     setCurrentPage(1)
   }, [filtro, filtroAvancado])
@@ -146,16 +146,16 @@ export default function LocalizacaoAnimais() {
     if (showModal && modalType === 'lote') setModalListLimit(80)
   }, [showModal, modalType])
 
-  // FunÃ§Ã£o para formatar data sem problemas de timezone
+  // Função para formatar data sem problemas de timezone
   const formatarDataBR = (dataString) => {
     if (!dataString) return ''
     
-    // Se jÃ¡ estÃ¡ no formato DD/MM/YYYY, retornar
+    // Se já está no formato DD/MM/YYYY, retornar
     if (dataString.includes('/')) {
       return dataString
     }
     
-    // Se estÃ¡ no formato YYYY-MM-DD (formato ISO do input date)
+    // Se está no formato YYYY-MM-DD (formato ISO do input date)
     if (dataString.includes('-')) {
       const [ano, mes, dia] = dataString.split('-')
       return `${dia}/${mes}/${ano}`
@@ -170,7 +170,7 @@ export default function LocalizacaoAnimais() {
     }
   }
 
-  // Mapa animal_id -> localizaÃ§Ã£o atual (memoizado para performance com muitos animais)
+  // Mapa animal_id -> localização atual (memoizado para performance com muitos animais)
   const mapaLocalizacaoPorAnimal = useMemo(() => {
     const mapa = new Map()
     const porAnimal = {}
@@ -187,27 +187,27 @@ export default function LocalizacaoAnimais() {
     return mapa
   }, [localizacoes])
 
-  // FunÃ§Ã£o para obter a localizaÃ§Ã£o mais recente de um animal (usa mapa memoizado)
+  // Função para obter a localização mais recente de um animal (usa mapa memoizado)
   const getLocalizacaoAtual = useCallback((animalId, animal = null) => {
     const locDaTabela = mapaLocalizacaoPorAnimal.get(animalId)
     if (locDaTabela) return locDaTabela
-    // Fallback: localizaÃ§Ã£o do cadastro do animal (importaÃ§Ã£o Excel usa piquete_atual)
+    // Fallback: localização do cadastro do animal (importação Excel usa piquete_atual)
     const localDoAnimal = animal?.piquete_atual || animal?.piqueteAtual || animal?.pasto_atual || animal?.pastoAtual
     if (animal && localDoAnimal) {
       return {
         piquete: localDoAnimal,
         data_entrada: animal.data_entrada_piquete || animal.dataEntradaPiquete || animal.created_at || animal.data_nascimento || null,
-        motivo_movimentacao: 'ImportaÃ§Ã£o / Cadastro Inicial',
+        motivo_movimentacao: 'Importação / Cadastro Inicial',
         observacoes: animal.observacoes || null
       }
     }
     return null
   }, [mapaLocalizacaoPorAnimal])
 
-  // FunÃ§Ã£o para criar nova localizaÃ§Ã£o
+  // Função para criar nova localização
   const criarLocalizacao = async () => {
     if (!novaLocalizacao.animal_id || !novaLocalizacao.piquete || !novaLocalizacao.data_entrada) {
-      alert('âÅ¡ ï¸� Preencha todos os campos obrigatÃ³rios!')
+      alert('⚠️ Preencha todos os campos obrigatórios!')
       return
     }
 
@@ -219,7 +219,7 @@ export default function LocalizacaoAnimais() {
       })
 
       if (response.ok) {
-        alert('âÅ“â€¦ LocalizaÃ§Ã£o registrada com sucesso!')
+        alert('✅ Localização registrada com sucesso!')
         setShowModal(false)
         setNovaLocalizacao({
           animal_id: '',
@@ -232,34 +232,34 @@ export default function LocalizacaoAnimais() {
         await carregarDados()
       } else {
         const errorData = await response.json().catch(() => ({ error: 'Erro desconhecido' }))
-        alert(`â�Å’ Erro: ${errorData.error || 'Erro ao registrar localizaÃ§Ã£o'}`)
+        alert(`❌ Erro: ${errorData.error || 'Erro ao registrar localização'}`)
       }
     } catch (error) {
-      console.error('Erro ao criar localizaÃ§Ã£o:', error)
-      alert('â�Å’ Erro ao registrar localizaÃ§Ã£o. Verifique a conexÃ£o com o servidor.')
+      console.error('Erro ao criar localização:', error)
+      alert('❌ Erro ao registrar localização. Verifique a conexão com o servidor.')
     }
   }
 
-  // FunÃ§Ã£o para transferir animal com progresso
+  // Função para transferir animal com progresso
   const transferirAnimal = async (animalId, novoPiquete, motivo = '', animalInfo = null, dataEntrada = null) => {
     setTransferringAnimal(animalId)
     setTransferProgress(0)
-    setTransferStatus('ðÅ¸â€�â€ž Preparando transferÃªncia...')
+    setTransferStatus('🔄 Preparando transferência...')
 
     try {
-      // VerificaÃ§Ã£o de localizaÃ§Ã£o atual (inclui fallback piquete_atual do animal)
+      // Verificação de localização atual (inclui fallback piquete_atual do animal)
       const animalRef = animalInfo || animais.find(a => a.id === animalId)
       const localizacaoAtual = getLocalizacaoAtual(animalId, animalRef)
       
-      // ValidaÃ§Ãµes
+      // Validações
       if (localizacaoAtual && localizacaoAtual.piquete === novoPiquete) {
         setTransferringAnimal(null)
-        alert('âÅ¡ ï¸� O animal jÃ¡ estÃ¡ neste piquete!')
+        alert('⚠️ O animal já está neste piquete!')
         return
       }
 
       setTransferProgress(20)
-      setTransferStatus('ðÅ¸â€œ� Registrando movimentaÃ§Ã£o...')
+      setTransferStatus('📝 Registrando movimentação...')
 
       const controller = new AbortController()
       const timeout = setTimeout(() => controller.abort(), 30000)
@@ -275,7 +275,7 @@ export default function LocalizacaoAnimais() {
             animal_id: animalId,
             piquete: novoPiquete,
             data_entrada: dataParaRegistro,
-            motivo_movimentacao: motivo || 'TransferÃªncia',
+            motivo_movimentacao: motivo || 'Transferência',
             observacoes: `Transferido via sistema em ${new Date().toLocaleString('pt-BR')}`,
             usuario_responsavel: 'Sistema'
           }),
@@ -290,12 +290,12 @@ export default function LocalizacaoAnimais() {
         }
 
         setTransferProgress(90)
-        setTransferStatus('âÅ“â€¦ TransferÃªncia concluÃ­da!')
+        setTransferStatus('✅ Transferência concluída!')
 
         // Mostrar sucesso
         const animalNome = animalInfo ? `${animalInfo.serie} ${animalInfo.rg}` : 'Animal'
         setTimeout(() => {
-          alert(`âÅ“â€¦ ${animalNome} transferido para ${novoPiquete} com sucesso!`)
+          alert(`✅ ${animalNome} transferido para ${novoPiquete} com sucesso!`)
           setTransferringAnimal(null)
           setTransferProgress(0)
           setTransferStatus('')
@@ -310,9 +310,9 @@ export default function LocalizacaoAnimais() {
       console.error('Erro ao transferir animal:', error)
       
       if (error.name === 'AbortError') {
-        alert('â�±ï¸� Tempo de espera excedido. Tente novamente.')
+        alert('⏱️ Tempo de espera excedido. Tente novamente.')
       } else {
-        alert(`â�Å’ Erro ao transferir animal: ${error.message || 'Erro desconhecido'}`)
+        alert(`❌ Erro ao transferir animal: ${error.message || 'Erro desconhecido'}`)
       }
       
       setTransferringAnimal(null)
@@ -321,23 +321,23 @@ export default function LocalizacaoAnimais() {
     }
   }
 
-  // FunÃ§Ã£o para movimentaÃ§Ã£o em lote com progresso e preview
+  // Função para movimentação em lote com progresso e preview
   const moverAnimaisEmLote = async () => {
     if (selectedAnimalsForBatch.length === 0) {
-      alert('âÅ¡ ï¸� Selecione pelo menos um animal!')
+      alert('⚠️ Selecione pelo menos um animal!')
       return
     }
 
     if (!batchMoveData.piquete_destino) {
-      alert('âÅ¡ ï¸� Selecione o piquete de destino!')
+      alert('⚠️ Selecione o piquete de destino!')
       return
     }
 
-    // ConfirmaÃ§Ã£o com preview
+    // Confirmação com preview
     const animaisSelecionados = animais.filter(a => selectedAnimalsForBatch.includes(a.id))
-      const previewText = `ðÅ¸Å½¯ VocÃª estÃ¡ prestes a mover ${animaisSelecionados.length} animal(is):\n\n` +
-      animaisSelecionados.map(a => `ââ‚¬¢ ${a.serie} ${a.rg} (${a.raca})`).join('\n') +
-      `\n\nðÅ¸â€œ� Para: ${batchMoveData.piquete_destino}\nðÅ¸â€œâ€¦ Data: ${formatarDataBR(batchMoveData.data_movimentacao)}\n\nConfirma esta operaÃ§Ã£o?`
+      const previewText = `🎯 Você está prestes a mover ${animaisSelecionados.length} animal(is):\n\n` +
+      animaisSelecionados.map(a => `• ${a.serie} ${a.rg} (${a.raca})`).join('\n') +
+      `\n\n📍 Para: ${batchMoveData.piquete_destino}\n📅 Data: ${formatarDataBR(batchMoveData.data_movimentacao)}\n\nConfirma esta operação?`
 
     if (!confirm(previewText)) {
       return
@@ -345,7 +345,7 @@ export default function LocalizacaoAnimais() {
 
     setBatchMoving(true)
     setBatchProgress(0)
-    setTransferStatus(`ðÅ¸â€�â€ž Movendo ${selectedAnimalsForBatch.length} animais...`)
+    setTransferStatus(`🔄 Movendo ${selectedAnimalsForBatch.length} animais...`)
 
     try {
       const controller = new AbortController()
@@ -364,7 +364,7 @@ export default function LocalizacaoAnimais() {
 
       try {
         setBatchProgress(20)
-        setTransferStatus('ðÅ¸â€œ¤ Enviando dados ao servidor...')
+        setTransferStatus('📤 Enviando dados ao servidor...')
 
         const response = await fetch('/api/batch-move-animals', {
           method: 'POST',
@@ -373,7 +373,7 @@ export default function LocalizacaoAnimais() {
             animal_ids: selectedAnimalsForBatch,
             piquete_destino: batchMoveData.piquete_destino,
             data_movimentacao: batchMoveData.data_movimentacao,
-            motivo_movimentacao: batchMoveData.motivo_movimentacao || 'MovimentaÃ§Ã£o em lote',
+            motivo_movimentacao: batchMoveData.motivo_movimentacao || 'Movimentação em lote',
             observacoes: batchMoveData.observacoes,
             usuario_responsavel: 'Sistema'
           }),
@@ -381,18 +381,18 @@ export default function LocalizacaoAnimais() {
         })
 
         setBatchProgress(70)
-        setTransferStatus('ðÅ¸â€œ� Processando movimentaÃ§Ãµes...')
+        setTransferStatus('📝 Processando movimentações...')
 
         const result = await response.json()
 
         clearInterval(progressInterval)
         setBatchProgress(100)
-        setTransferStatus('âÅ“â€¦ MovimentaÃ§Ã£o concluÃ­da!')
+        setTransferStatus('✅ Movimentação concluída!')
 
         if (result.success) {
           setTimeout(() => {
-            alert(`âÅ“â€¦ ${result.message}`)
-            // Limpar seleÃ§Ã£o e fechar modal
+            alert(`✅ ${result.message}`)
+            // Limpar seleção e fechar modal
             setSelectedAnimalsForBatch([])
             setBatchMoveData({
               piquete_destino: '',
@@ -410,7 +410,7 @@ export default function LocalizacaoAnimais() {
         } else {
           clearInterval(progressInterval)
           const errorsText = result.errors ? result.errors.join('\n') : 'Erro desconhecido'
-          alert(`âÅ¡ ï¸� ${result.message}\n\nDetalhes:\n${errorsText}`)
+          alert(`⚠️ ${result.message}\n\nDetalhes:\n${errorsText}`)
           setBatchMoving(false)
           setBatchProgress(0)
           setTransferStatus('')
@@ -422,12 +422,12 @@ export default function LocalizacaoAnimais() {
       }
 
     } catch (error) {
-      console.error('Erro na movimentaÃ§Ã£o em lote:', error)
+      console.error('Erro na movimentação em lote:', error)
       
       if (error.name === 'AbortError') {
-        alert('â�±ï¸� Tempo de espera excedido. A operaÃ§Ã£o pode ter sido cancelada.')
+        alert('⏱️ Tempo de espera excedido. A operação pode ter sido cancelada.')
       } else {
-        alert(`â�Å’ Erro ao mover animais em lote: ${error.message || 'Erro desconhecido'}`)
+        alert(`❌ Erro ao mover animais em lote: ${error.message || 'Erro desconhecido'}`)
       }
       
       setBatchMoving(false)
@@ -436,7 +436,7 @@ export default function LocalizacaoAnimais() {
     }
   }
 
-  // FunÃ§Ã£o para selecionar/deselecionar animal para lote
+  // Função para selecionar/deselecionar animal para lote
   const toggleAnimalSelection = (animalId) => {
     setSelectedAnimalsForBatch(prev => 
       prev.includes(animalId) 
@@ -445,13 +445,13 @@ export default function LocalizacaoAnimais() {
     )
   }
 
-  // FunÃ§Ã£o para carregar locais do banco de dados
+  // Função para carregar locais do banco de dados
   const carregarLocais = async () => {
     try {
       const piquetesUsados = new Set()
       const piquetesList = []
 
-      // 1. Buscar piquetes jÃ¡ usados nas localizaÃ§Ãµes da API
+      // 1. Buscar piquetes já usados nas localizações da API
       try {
         const localizacoesResponse = await fetch('/api/localizacoes')
         if (localizacoesResponse.ok) {
@@ -466,10 +466,10 @@ export default function LocalizacaoAnimais() {
           })
         }
       } catch (error) {
-        console.warn('Erro ao buscar localizaÃ§Ãµes da API:', error)
+        console.warn('Erro ao buscar localizações da API:', error)
       }
 
-      // 2. Buscar piquetes cadastrados em "GestÃ£o de Piquetes" para complementar
+      // 2. Buscar piquetes cadastrados em "Gestão de Piquetes" para complementar
       try {
         const piquetesResponse = await fetch('/api/piquetes')
         if (piquetesResponse.ok) {
@@ -508,19 +508,19 @@ export default function LocalizacaoAnimais() {
         console.warn('Erro ao carregar locais da API:', error)
       }
 
-      // Whitelist: exibir APENAS locais que sÃ£o piquetes/projetos vÃ¡lidos.
-      // Nomes de touros (NACION 15397, NERO DO MORRO, NORTICO - CJCJ 15236, etc.) sÃ£o filtrados.
+      // Whitelist: exibir APENAS locais que são piquetes/projetos válidos.
+      // Nomes de touros (NACION 15397, NERO DO MORRO, NORTICO - CJCJ 15236, etc.) são filtrados.
       const ehPiqueteOuProjetoValido = (nome) => {
         if (!nome || typeof nome !== 'string') return false
         const n = nome.trim()
-        if (!n || /^(VAZIO|NÃÆ’O INFORMADO|NAO INFORMADO|-)$/i.test(n)) return false
+        if (!n || /^(VAZIO|NÃO INFORMADO|NAO INFORMADO|-)$/i.test(n)) return false
         // PIQUETE 1, PIQUETE 10, PIQUETE CABANHA, PIQUETE CONF, PIQUETE GUARITA, PIQUETE PISTA
         if (/^PIQUETE\s+(\d+|CABANHA|CONF|GUARITA|PISTA)$/i.test(n)) return true
         // PROJETO 10, PROJETO 5A, PROJETO 33/1, PROJETO CONF, etc.
         if (/^PROJETO\s+[\dA-Za-z\-/]+$/i.test(n)) return true
-        // CONFINA (confinamento - comum em observaÃ§Ãµes de pesagem)
+        // CONFINA (confinamento - comum em observações de pesagem)
         if (/^CONFINA$/i.test(n)) return true
-        // AbreviaÃ§Ãµes de importaÃ§Ã£o: CABANHA, GUARITA, PISTA, CONF
+        // Abreviações de importação: CABANHA, GUARITA, PISTA, CONF
         if (/^(CABANHA|GUARITA|PISTA|CONF)$/i.test(n)) return true
         return false
       }
@@ -537,12 +537,12 @@ export default function LocalizacaoAnimais() {
     }
   }
 
-  // FunÃ§Ã£o para adicionar novo local (conectado ao banco de dados via API de piquetes)
+  // Função para adicionar novo local (conectado ao banco de dados via API de piquetes)
   const adicionarLocal = async (dadosPiquete = null) => {
     const nomePiquete = dadosPiquete?.nome || newLocationName.trim()
     
     if (!nomePiquete) {
-      alert('âÅ¡ ï¸� Digite o nome do piquete!')
+      alert('⚠️ Digite o nome do piquete!')
       return
     }
 
@@ -564,31 +564,31 @@ export default function LocalizacaoAnimais() {
         const result = await response.json()
         setNewLocationName('')
         await carregarLocais() // Recarregar lista
-        alert(`âÅ“â€¦ Piquete "${nomePiquete}" cadastrado com sucesso!`)
+        alert(`✅ Piquete "${nomePiquete}" cadastrado com sucesso!`)
         // A API retorna { success: true, data: { piquete: {...} } }
         const piquete = result.data?.piquete || result.piquete || { nome: nomePiquete }
         return piquete
       } else {
         const error = await response.json()
-        alert(`â�Å’ Erro: ${error.message || error.error || 'Erro ao cadastrar piquete'}`)
+        alert(`❌ Erro: ${error.message || error.error || 'Erro ao cadastrar piquete'}`)
         return null
       }
     } catch (error) {
       console.error('Erro ao adicionar piquete:', error)
-      alert('â�Å’ Erro ao cadastrar piquete. Verifique a conexÃ£o com o servidor.')
+      alert('❌ Erro ao cadastrar piquete. Verifique a conexão com o servidor.')
       return null
     }
   }
 
-  // Handler otimizado para mudanÃ§as no formulÃ¡rio de piquete
+  // Handler otimizado para mudanças no formulário de piquete
   const handlePiqueteFieldChange = useCallback((field, value) => {
     setNovoPiqueteData(prev => ({ ...prev, [field]: value }))
   }, [])
 
-  // FunÃ§Ã£o para criar novo piquete via modal rÃ¡pido
+  // Função para criar novo piquete via modal rápido
   const criarNovoPiquete = async () => {
     if (!novoPiqueteData.nome.trim()) {
-      alert('âÅ¡ ï¸� Digite o nome do piquete!')
+      alert('⚠️ Digite o nome do piquete!')
       return
     }
 
@@ -603,7 +603,7 @@ export default function LocalizacaoAnimais() {
       })
 
       if (resultado) {
-        // Limpar formulÃ¡rio
+        // Limpar formulário
         setNovoPiqueteData({
           nome: '',
           area: '',
@@ -613,7 +613,7 @@ export default function LocalizacaoAnimais() {
         })
         setShowNovoPiqueteModal(false)
         
-        // Selecionar o piquete recÃ©m-criado no dropdown de destino
+        // Selecionar o piquete recém-criado no dropdown de destino
         if (modalType === 'lote') {
           setBatchMoveData(prev => ({ ...prev, piquete_destino: resultado.nome }))
         } else if (modalType === 'nova' || modalType === 'transferir') {
@@ -627,7 +627,7 @@ export default function LocalizacaoAnimais() {
     }
   }
 
-  // FunÃ§Ã£o para excluir local
+  // Função para excluir local
   const excluirLocal = async (localName) => {
     if (!permissions.canDelete) {
       alert(permissions.getPermissionMessage('excluir'))
@@ -645,14 +645,14 @@ export default function LocalizacaoAnimais() {
 
       if (response.ok) {
         await carregarLocais() // Recarregar lista
-        alert(`âÅ“â€¦ Local "${localName}" excluÃ­do com sucesso!`)
+        alert(`✅ Local "${localName}" excluído com sucesso!`)
       } else {
         const error = await response.json()
-        alert(`â�Å’ Erro: ${error.error}`)
+        alert(`❌ Erro: ${error.error}`)
       }
     } catch (error) {
       console.error('Erro ao excluir local:', error)
-      alert('â�Å’ Erro ao excluir local. Verifique a conexÃ£o com o servidor.')
+      alert('❌ Erro ao excluir local. Verifique a conexão com o servidor.')
     }
   }
 
@@ -670,7 +670,7 @@ export default function LocalizacaoAnimais() {
         setAnimais([])
       }
 
-      // Carregar localizaÃ§Ãµes com filtros
+      // Carregar localizações com filtros
       let url = '/api/localizacoes'
       const params = new URLSearchParams()
       
@@ -712,12 +712,12 @@ export default function LocalizacaoAnimais() {
         const localizacoesData = await localizacoesResponse.json()
         setLocalizacoes(localizacoesData.data || [])
       } else {
-        console.error('Erro ao carregar localizaÃ§Ãµes:', localizacoesResponse.status)
+        console.error('Erro ao carregar localizações:', localizacoesResponse.status)
         setLocalizacoes([])
       }
     } catch (error) {
       console.error('Erro ao carregar dados:', error)
-      alert('â�Å’ Erro ao carregar dados. Verifique a conexÃ£o com o servidor.')
+      alert('❌ Erro ao carregar dados. Verifique a conexão com o servidor.')
     } finally {
       setLoading(false)
     }
@@ -729,7 +729,7 @@ export default function LocalizacaoAnimais() {
       return
     }
     
-    if (!confirm('Tem certeza que deseja excluir esta localizaÃ§Ã£o?')) {
+    if (!confirm('Tem certeza que deseja excluir esta localização?')) {
       return
     }
 
@@ -739,16 +739,16 @@ export default function LocalizacaoAnimais() {
       })
 
       if (response.ok) {
-        // Recarregar dados apÃ³s exclusÃ£o
+        // Recarregar dados após exclusão
         await carregarDados()
-        alert('LocalizaÃ§Ã£o excluÃ­da com sucesso!')
+        alert('Localização excluída com sucesso!')
       } else {
         const error = await response.json()
-        alert(`Erro ao excluir localizaÃ§Ã£o: ${error.error}`)
+        alert(`Erro ao excluir localização: ${error.error}`)
       }
     } catch (error) {
-      console.error('Erro ao excluir localizaÃ§Ã£o:', error)
-      alert('Erro ao excluir localizaÃ§Ã£o')
+      console.error('Erro ao excluir localização:', error)
+      alert('Erro ao excluir localização')
     }
   }
 
@@ -776,7 +776,7 @@ export default function LocalizacaoAnimais() {
     })
   }, [animais, filtro, mapaLocalizacaoPorAnimal])
 
-  // Filtrar animais para o modal de seleÃ§Ã£o (memoizado para performance)
+  // Filtrar animais para o modal de seleção (memoizado para performance)
   const animaisFiltradosModal = useMemo(() => {
     if (!filtroModalAnimais || !filtroModalAnimais.trim()) return animais
     const termo = filtroModalAnimais.toLowerCase().trim()
@@ -802,27 +802,27 @@ export default function LocalizacaoAnimais() {
     })
   }, [animais, filtroModalAnimais, mapaLocalizacaoPorAnimal])
 
-  // PaginaÃ§Ã£o
+  // Paginação
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
   const animaisPaginados = animaisFiltrados.slice(indexOfFirstItem, indexOfLastItem)
   const totalPages = Math.ceil(animaisFiltrados.length / itemsPerPage)
 
-  // FunÃ§Ã£o para mudar de pÃ¡gina
+  // Função para mudar de página
   const handlePageChange = (page) => {
     setCurrentPage(page)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  // FunÃ§Ã£o para abrir modal de seleÃ§Ã£o de campos
+  // Função para abrir modal de seleção de campos
   const abrirModalExportacao = (tipo) => {
     if (tipo === 'geral' && animaisFiltrados.length === 0) {
-      alert('âÅ¡ ï¸� Nenhum animal encontrado para exportar!')
+      alert('⚠️ Nenhum animal encontrado para exportar!')
       return
     }
     
     setExportType(tipo)
-    // Se for exportaÃ§Ã£o por piquete e jÃ¡ tiver um selecionado no filtro, usar ele como padrÃ£o
+    // Se for exportação por piquete e já tiver um selecionado no filtro, usar ele como padrão
     if (tipo === 'piquete' && filtroAvancado.piquete) {
       setSelectedPiqueteExport(filtroAvancado.piquete)
     } else {
@@ -832,12 +832,12 @@ export default function LocalizacaoAnimais() {
     setShowExportModal(true)
   }
 
-  // FunÃ§Ã£o para confirmar exportaÃ§Ã£o com campos selecionados
+  // Função para confirmar exportação com campos selecionados
   const confirmarExportacao = async () => {
     const camposSelecionados = Object.keys(selectedFields).filter(campo => selectedFields[campo])
     
     if (camposSelecionados.length === 0) {
-      alert('âÅ¡ ï¸� Selecione pelo menos um campo para exportar!')
+      alert('⚠️ Selecione pelo menos um campo para exportar!')
       return
     }
 
@@ -851,7 +851,7 @@ export default function LocalizacaoAnimais() {
 
       if (exportType === 'piquete') {
         if (!selectedPiqueteExport) {
-          alert('âÅ¡ ï¸� Selecione um piquete para exportar!')
+          alert('⚠️ Selecione um piquete para exportar!')
           return
         }
 
@@ -865,7 +865,7 @@ export default function LocalizacaoAnimais() {
         nomeArquivo = 'animais_piquete'
         
         if (animaisParaExportar.length === 0) {
-          alert('âÅ¡ ï¸� Nenhum animal encontrado neste piquete!')
+          alert('⚠️ Nenhum animal encontrado neste piquete!')
           return
         }
       } else {
@@ -873,13 +873,13 @@ export default function LocalizacaoAnimais() {
         nomeArquivo = 'animais_geral'
       }
 
-      // Filtrar por perÃ­odo se selecionado
+      // Filtrar por período se selecionado
       if (exportDateRange.start || exportDateRange.end) {
         animaisParaExportar = animaisParaExportar.filter(animal => {
            const localizacaoAtual = getLocalizacaoAtual(animal.id, animal)
            if (!localizacaoAtual || !localizacaoAtual.data_entrada) return false
            
-           // Criar data de entrada e zerar horas para comparaÃ§Ã£o apenas por dia
+           // Criar data de entrada e zerar horas para comparação apenas por dia
            const dataEntrada = new Date(localizacaoAtual.data_entrada)
            dataEntrada.setHours(0, 0, 0, 0)
            
@@ -899,7 +899,7 @@ export default function LocalizacaoAnimais() {
         })
 
         if (animaisParaExportar.length === 0) {
-           alert('âÅ¡ ï¸� Nenhum animal encontrado no perÃ­odo selecionado!')
+           alert('⚠️ Nenhum animal encontrado no período selecionado!')
            setLoading(false)
            return
         }
@@ -933,19 +933,19 @@ export default function LocalizacaoAnimais() {
       }
       
       if (success) {
-        alert(`âÅ“â€¦ ExportaÃ§Ã£o concluÃ­da! ${animaisParaExportar.length} animal(is) exportado(s) com ${camposSelecionados.length} campo(s).`)
+        alert(`✅ Exportação concluída! ${animaisParaExportar.length} animal(is) exportado(s) com ${camposSelecionados.length} campo(s).`)
       } else {
-        alert('â�Å’ Erro ao exportar arquivo.')
+        alert('❌ Erro ao exportar arquivo.')
       }
     } catch (error) {
       console.error('Erro ao exportar:', error)
-      alert('â�Å’ Erro ao exportar animais. Tente novamente.')
+      alert('❌ Erro ao exportar animais. Tente novamente.')
     } finally {
       setLoading(false)
     }
   }
 
-  // FunÃ§Ã£o para selecionar/deselecionar todos os campos
+  // Função para selecionar/deselecionar todos os campos
   const toggleTodosCampos = () => {
     const todosSelecionados = Object.values(selectedFields).every(v => v)
     const novosCampos = {}
@@ -955,44 +955,44 @@ export default function LocalizacaoAnimais() {
     setSelectedFields(novosCampos)
   }
 
-  // FunÃ§Ã£o para exportar animais por piquete (deprecated - agora usa modal)
+  // Função para exportar animais por piquete (deprecated - agora usa modal)
   const exportarPorPiquete = () => {
     abrirModalExportacao('piquete')
   }
 
-  // FunÃ§Ã£o para exportar todos os animais (deprecated - agora usa modal)
+  // Função para exportar todos os animais (deprecated - agora usa modal)
   const exportarGeral = () => {
     abrirModalExportacao('geral')
   }
 
-  // Limpar todas as localizaÃ§Ãµes
+  // Limpar todas as localizações
   const limparTodasLocalizacoes = async () => {
     // Solicitar senha de desenvolvedor
-    const senha = prompt('ðÅ¸â€�â€™ Ã�REA RESTRITA - Digite a senha do desenvolvedor para continuar:')
+    const senha = prompt('🔒 ÁREA RESTRITA - Digite a senha do desenvolvedor para continuar:')
     
     if (!senha) {
-      return // UsuÃ¡rio cancelou
+      return // Usuário cancelou
     }
     
     if (senha !== 'bfzk26') {
-      alert('â�Å’ Senha incorreta! Acesso negado.')
+      alert('❌ Senha incorreta! Acesso negado.')
       return
     }
     
     const confirmacao = window.confirm(
-      'âÅ¡ ï¸� ATENÃâ€¡ÃÆ’O!\n\n' +
-      'Esta aÃ§Ã£o irÃ¡ REMOVER TODAS as localizaÃ§Ãµes de animais do sistema.\n\n' +
-      'VocÃª poderÃ¡ reimportar as localizaÃ§Ãµes corretas do Excel apÃ³s limpar.\n\n' +
+      '⚠️ ATENÇÃO!\n\n' +
+      'Esta ação irá REMOVER TODAS as localizações de animais do sistema.\n\n' +
+      'Você poderá reimportar as localizações corretas do Excel após limpar.\n\n' +
       'Deseja continuar?'
     )
     
     if (!confirmacao) return
 
-    // Segunda confirmaÃ§Ã£o para seguranÃ§a
+    // Segunda confirmação para segurança
     const segundaConfirmacao = window.confirm(
-      'ðÅ¸Å¡¨ ÃÅ¡LTIMA CONFIRMAÃâ€¡ÃÆ’O!\n\n' +
-      'Tem certeza absoluta que deseja limpar TODAS as localizaÃ§Ãµes?\n\n' +
-      'Esta aÃ§Ã£o NÃÆ’O pode ser desfeita!'
+      '🚨 ÚLTIMA CONFIRMAÇÃO!\n\n' +
+      'Tem certeza absoluta que deseja limpar TODAS as localizações?\n\n' +
+      'Esta ação NÃO pode ser desfeita!'
     )
     
     if (!segundaConfirmacao) return
@@ -1011,30 +1011,30 @@ export default function LocalizacaoAnimais() {
       const data = await response.json()
       
       if (response.ok && data.success) {
-        alert(`âÅ“â€¦ ${data.data.message}\n\nAgora vocÃª pode importar as localizaÃ§Ãµes corretas do Excel.`)
+        alert(`✅ ${data.data.message}\n\nAgora você pode importar as localizações corretas do Excel.`)
         await carregarDados()
         await carregarLocais()
       } else {
-        alert(`â�Å’ Erro: ${data.error || 'Falha ao limpar localizaÃ§Ãµes'}`)
+        alert(`❌ Erro: ${data.error || 'Falha ao limpar localizações'}`)
       }
     } catch (err) {
-      console.error('Erro ao limpar localizaÃ§Ãµes:', err)
-      alert('â�Å’ Erro ao limpar localizaÃ§Ãµes. Verifique a conexÃ£o.')
+      console.error('Erro ao limpar localizações:', err)
+      alert('❌ Erro ao limpar localizações. Verifique a conexão.')
     } finally {
       setLoading(false)
     }
   }
 
-  // Importar localizaÃ§Ãµes do Excel (SÃ©rie, RGN, LOCAL, OBSERVAÃâ€¡Ãâ€¢ES)
+  // Importar localizações do Excel (Série, RGN, LOCAL, OBSERVAÇÕES)
   const handleImportarExcel = async (e) => {
     const file = e?.target?.files?.[0]
     if (!file) return
     if (!file.name.match(/\.(xlsx|xls)$/i)) {
-      alert('âÅ¡ ï¸� Envie um arquivo Excel (.xlsx ou .xls)')
+      alert('⚠️ Envie um arquivo Excel (.xlsx ou .xls)')
       return
     }
     setImportandoExcel(true)
-    setImportProgressLocalizacao({ atual: 0, total: 0, etapa: 'Importando localizaÃ§Ãµes...' })
+    setImportProgressLocalizacao({ atual: 0, total: 0, etapa: 'Importando localizações...' })
     setResultadoImportacao(null)
     try {
       const formData = new FormData()
@@ -1049,18 +1049,18 @@ export default function LocalizacaoAnimais() {
         await carregarDados()
         await carregarLocais()
         const r = data.resultados || {}
-        const msg = `âÅ“â€¦ ${data.message || 'ImportaÃ§Ã£o concluÃ­da!'}\n\n` +
-          `ââ‚¬¢ Animais atualizados: ${r.animaisAtualizados || 0}\n` +
-          `ââ‚¬¢ LocalizaÃ§Ãµes registradas: ${r.localizacoesRegistradas || 0}\n` +
-          (r.naoEncontrados?.length > 0 ? `ââ‚¬¢ NÃ£o encontrados: ${r.naoEncontrados.length}\n` : '')
+        const msg = `✅ ${data.message || 'Importação concluída!'}\n\n` +
+          `• Animais atualizados: ${r.animaisAtualizados || 0}\n` +
+          `• Localizações registradas: ${r.localizacoesRegistradas || 0}\n` +
+          (r.naoEncontrados?.length > 0 ? `• Não encontrados: ${r.naoEncontrados.length}\n` : '')
         alert(msg)
       } else {
         const detalhes = data.details ? `\n\nDetalhes: ${data.details}` : ''
-        alert(`â�Å’ Erro: ${data.error || 'Falha na importaÃ§Ã£o'}${detalhes}`)
+        alert(`❌ Erro: ${data.error || 'Falha na importação'}${detalhes}`)
       }
     } catch (err) {
       console.error('Erro ao importar:', err)
-      alert('â�Å’ Erro ao importar. Verifique a conexÃ£o.')
+      alert('❌ Erro ao importar. Verifique a conexão.')
     } finally {
       setImportandoExcel(false)
       setImportProgressLocalizacao({ atual: 0, total: 0, etapa: '' })
@@ -1068,15 +1068,15 @@ export default function LocalizacaoAnimais() {
     }
   }
 
-  // Importar localizaÃ§Ãµes via texto colado (SÃ©rie RG LOCAL)
+  // Importar localizações via texto colado (Série RG LOCAL)
   const handleImportarTexto = async () => {
     if (!importText.trim()) {
-      alert('âÅ¡ ï¸� Cole os dados no campo de texto!')
+      alert('⚠️ Cole os dados no campo de texto!')
       return
     }
 
     setImportandoTexto(true)
-    setImportProgressLocalizacao({ atual: 0, total: 0, etapa: 'Importando localizaÃ§Ãµes...' })
+    setImportProgressLocalizacao({ atual: 0, total: 0, etapa: 'Importando localizações...' })
     setResultadoImportacao(null)
 
     try {
@@ -1085,22 +1085,22 @@ export default function LocalizacaoAnimais() {
       const dados = []
 
       for (const linha of linhas) {
-        // Tentar diferentes separadores: tabulaÃ§Ã£o, mÃºltiplos espaÃ§os, ou espaÃ§o Ãºnico
+        // Tentar diferentes separadores: tabulação, múltiplos espaços, ou espaço único
         let partes = linha.trim().split(/\t+/).filter(p => p.trim())
         
-        // Se nÃ£o encontrou tabulaÃ§Ã£o, tentar mÃºltiplos espaÃ§os
+        // Se não encontrou tabulação, tentar múltiplos espaços
         if (partes.length < 3) {
           partes = linha.trim().split(/\s{2,}/).filter(p => p.trim())
         }
         
-        // Se ainda nÃ£o encontrou, tentar espaÃ§o Ãºnico (assumindo que sÃ©rie e RG nÃ£o tÃªm espaÃ§os)
+        // Se ainda não encontrou, tentar espaço único (assumindo que série e RG não têm espaços)
         if (partes.length < 3) {
           partes = linha.trim().split(/\s+/).filter(p => p.trim())
         }
         
         if (partes.length >= 3) {
-          // Formato esperado: SÃâ€°RIE RG LOCAL [OBSERVAÃâ€¡Ãâ€¢ES]
-          // LOCAL pode ter espaÃ§o: "PIQUETE 10" ââ€ â€™ quando partes[2]=="PIQUETE" e partes[3] Ã© nÃºmero
+          // Formato esperado: SÉRIE RG LOCAL [OBSERVAÇÕES]
+          // LOCAL pode ter espaço: "PIQUETE 10" → quando partes[2]=="PIQUETE" e partes[3] é número
           let local = partes[2].trim()
           let observacoes = partes.slice(3).join(' ').trim() || ''
           if (partes.length >= 4 && /^\d+$/.test(partes[3]) && (/^(PIQUETE|PTO|P|PASTO|PTOUFTF)$/i.test(partes[2]) || /^[A-Za-z]+$/.test(partes[2]))) {
@@ -1125,13 +1125,13 @@ export default function LocalizacaoAnimais() {
       }
 
       if (dados.length === 0) {
-        alert('âÅ¡ ï¸� Nenhum dado vÃ¡lido encontrado. Formato esperado:\nSÃâ€°RIE RG LOCAL [OBSERVAÃâ€¡Ãâ€¢ES]')
+        alert('⚠️ Nenhum dado válido encontrado. Formato esperado:\nSÉRIE RG LOCAL [OBSERVAÇÕES]')
         setImportandoTexto(false)
         setImportProgressLocalizacao({ atual: 0, total: 0, etapa: '' })
         return
       }
 
-      console.log('Enviando dados para importaÃ§Ã£o:', dados.length, 'linhas')
+      console.log('Enviando dados para importação:', dados.length, 'linhas')
 
       // Criar timeout de 60 segundos
       const controller = new AbortController()
@@ -1168,16 +1168,16 @@ export default function LocalizacaoAnimais() {
           await carregarLocais()
           
           // Montar mensagem de resultado
-          let msg = `${r.animaisAtualizados > 0 ? 'âÅ“â€¦' : 'âÅ¡ ï¸�'} ImportaÃ§Ã£o concluÃ­da!\n\n`
-          msg += `ââ‚¬¢ Total de linhas: ${r.totalLinhas || 0}\n`
-          msg += `ââ‚¬¢ Animais atualizados: ${r.animaisAtualizados || 0}\n`
-          msg += `ââ‚¬¢ LocalizaÃ§Ãµes registradas: ${r.localizacoesRegistradas || 0}\n`
+          let msg = `${r.animaisAtualizados > 0 ? '✅' : '⚠️'} Importação concluída!\n\n`
+          msg += `• Total de linhas: ${r.totalLinhas || 0}\n`
+          msg += `• Animais atualizados: ${r.animaisAtualizados || 0}\n`
+          msg += `• Localizações registradas: ${r.localizacoesRegistradas || 0}\n`
           
           if (totalProblemas > 0) {
-            msg += `\nâÅ¡ ï¸� Problemas encontrados: ${totalProblemas}\n`
-            msg += `ââ‚¬¢ NÃ£o encontrados: ${r.naoEncontrados?.length || 0}\n`
-            msg += `ââ‚¬¢ Erros: ${r.erros?.length || 0}\n\n`
-            msg += `Um modal com os detalhes serÃ¡ exibido.`
+            msg += `\n⚠️ Problemas encontrados: ${totalProblemas}\n`
+            msg += `• Não encontrados: ${r.naoEncontrados?.length || 0}\n`
+            msg += `• Erros: ${r.erros?.length || 0}\n\n`
+            msg += `Um modal com os detalhes será exibido.`
           }
           
           // Sempre mostrar mensagem
@@ -1190,18 +1190,18 @@ export default function LocalizacaoAnimais() {
           }
         } else {
           const detalhes = data.details ? `\n\nDetalhes: ${data.details}` : ''
-          alert(`â�Å’ Erro: ${data.error || 'Falha na importaÃ§Ã£o'}${detalhes}`)
+          alert(`❌ Erro: ${data.error || 'Falha na importação'}${detalhes}`)
         }
       } catch (fetchError) {
         if (fetchError.name === 'AbortError') {
-          alert('â�±ï¸� Tempo limite excedido (60s). A importaÃ§Ã£o pode estar demorando muito. Tente com menos linhas por vez.')
+          alert('⏱️ Tempo limite excedido (60s). A importação pode estar demorando muito. Tente com menos linhas por vez.')
         } else {
           throw fetchError
         }
       }
     } catch (err) {
       console.error('Erro ao importar texto:', err)
-      alert(`â�Å’ Erro ao importar: ${err.message || 'Verifique a conexÃ£o.'}`)
+      alert(`❌ Erro ao importar: ${err.message || 'Verifique a conexão.'}`)
     } finally {
       setImportandoTexto(false)
       setImportProgressLocalizacao({ atual: 0, total: 0, etapa: '' })
@@ -1229,10 +1229,10 @@ export default function LocalizacaoAnimais() {
                   </div>
                   <div>
                     <h1 className="text-4xl font-bold text-white tracking-tight">
-                      LocalizaÃ§Ã£o de Animais
+                      Localização de Animais
                     </h1>
                     <p className="text-green-100 text-lg font-medium mt-1">
-                      Gerencie e monitore a localizaÃ§Ã£o do seu rebanho
+                      Gerencie e monitore a localização do seu rebanho
                     </p>
                   </div>
                 </div>
@@ -1242,10 +1242,10 @@ export default function LocalizacaoAnimais() {
                   onClick={exportarGeral}
                   disabled={loading || animaisFiltrados.length === 0}
                   className="group bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-6 py-3 rounded-2xl transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="Exportar todos os animais com todas as informaÃ§Ãµes"
+                  title="Exportar todos os animais com todas as informações"
                 >
                   <DocumentTextIcon className="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
-                  <span className="font-medium">ðÅ¸â€œÅ  Exportar Geral</span>
+                  <span className="font-medium">📊 Exportar Geral</span>
                 </button>
                 <button
                   onClick={exportarPorPiquete}
@@ -1254,29 +1254,29 @@ export default function LocalizacaoAnimais() {
                   title="Exportar animais do piquete selecionado"
                 >
                   <DocumentTextIcon className="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
-                  <span className="font-medium">ðÅ¸â€œ� Exportar por Piquete</span>
+                  <span className="font-medium">📍 Exportar por Piquete</span>
                 </button>
                 <button
                   onClick={() => setShowLocationModal(true)}
                   className="group bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-6 py-3 rounded-2xl transition-all duration-300 transform hover:scale-105 flex items-center space-x-2"
                 >
                   <MapPinIcon className="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
-                  <span className="font-medium">ðÅ¸�Å¾ï¸� Gerenciar Locais</span>
+                  <span className="font-medium">🏞️ Gerenciar Locais</span>
                 </button>
                 <button
                   onClick={() => {
                     setModalType('lote')
                     setShowModal(true)
-                    // Se jÃ¡ houver animais selecionados, manter a seleÃ§Ã£o
-                    // Se nÃ£o houver, o usuÃ¡rio pode selecionar no modal
+                    // Se já houver animais selecionados, manter a seleção
+                    // Se não houver, o usuário pode selecionar no modal
                   }}
                   className="group bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-6 py-3 rounded-2xl transition-all duration-300 transform hover:scale-105 flex items-center space-x-2"
                 >
                   <DocumentTextIcon className="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
                   <span className="font-medium">
                     {selectedAnimalsForBatch.length > 0 
-                      ? `ðÅ¸â€œ� LocalizaÃ§Ã£o em Lote (${selectedAnimalsForBatch.length} selecionados)`
-                      : 'ðÅ¸â€œ� LocalizaÃ§Ã£o em Lote'}
+                      ? `📍 Localização em Lote (${selectedAnimalsForBatch.length} selecionados)`
+                      : '📍 Localização em Lote'}
                   </span>
                 </button>
                 <button
@@ -1287,7 +1287,7 @@ export default function LocalizacaoAnimais() {
                   className="group bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-6 py-3 rounded-2xl transition-all duration-300 transform hover:scale-105 flex items-center space-x-2"
                 >
                   <PlusIcon className="h-5 w-5 group-hover:rotate-90 transition-transform duration-300" />
-                  <span className="font-medium">Nova LocalizaÃ§Ã£o</span>
+                  <span className="font-medium">Nova Localização</span>
                 </button>
                 <label className="group bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-6 py-3 rounded-2xl transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                   <input
@@ -1308,7 +1308,7 @@ export default function LocalizacaoAnimais() {
                   ) : (
                     <>
                       <DocumentTextIcon className="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
-                      <span className="font-medium">ðÅ¸â€œ¥ Importar Excel</span>
+                      <span className="font-medium">📥 Importar Excel</span>
                     </>
                   )}
                 </label>
@@ -1318,16 +1318,16 @@ export default function LocalizacaoAnimais() {
                   className="group bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-6 py-3 rounded-2xl transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <DocumentTextIcon className="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
-                  <span className="font-medium">ðÅ¸â€œ� Importar Texto</span>
+                  <span className="font-medium">📝 Importar Texto</span>
                 </button>
                 <button
                   onClick={limparTodasLocalizacoes}
                   disabled={loading}
                   className="group bg-red-500/80 backdrop-blur-sm hover:bg-red-600/90 text-white px-6 py-3 rounded-2xl transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="Limpar todas as localizaÃ§Ãµes para reimportar do Excel"
+                  title="Limpar todas as localizações para reimportar do Excel"
                 >
                   <TrashIcon className="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
-                  <span className="font-medium">ðÅ¸â€”â€˜ï¸� Limpar Todas</span>
+                  <span className="font-medium">🗑️ Limpar Todas</span>
                 </button>
               </div>
             </div>
@@ -1347,20 +1347,20 @@ export default function LocalizacaoAnimais() {
                   type="text"
                   value={filtro}
                   onChange={(e) => setFiltro(e.target.value)}
-                  placeholder="Buscar por sÃ©rie, RG, raÃ§a ou piquete..."
+                  placeholder="Buscar por série, RG, raça ou piquete..."
                   className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-gray-700/50 border-0 rounded-2xl focus:ring-2 focus:ring-green-500 focus:bg-white dark:focus:bg-gray-700 transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 shadow-inner"
                 />
               </div>
             </div>
 
-            {/* Filtros AvanÃ§ados */}
+            {/* Filtros Avançados */}
             <div className="flex flex-wrap gap-3">
               <select
                 value={filtroAvancado.piquete}
                 onChange={(e) => setFiltroAvancado(prev => ({ ...prev, piquete: e.target.value }))}
                 className="appearance-none bg-gradient-to-r from-green-50 to-emerald-50 dark:from-gray-700 dark:to-gray-600 border-0 rounded-2xl px-4 py-3 pr-10 focus:ring-2 focus:ring-green-500 transition-all duration-300 text-gray-900 dark:text-white font-medium shadow-sm hover:shadow-md cursor-pointer"
               >
-                <option value="">ðÅ¸�Å¾ï¸� Todos os Piquetes</option>
+                <option value="">🏞️ Todos os Piquetes</option>
                 {piquetesDisponiveis.map(piquete => (
                   <option key={piquete} value={piquete}>{piquete}</option>
                 ))}
@@ -1371,9 +1371,9 @@ export default function LocalizacaoAnimais() {
                 onChange={(e) => setFiltroAvancado(prev => ({ ...prev, situacao: e.target.value }))}
                 className="appearance-none bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-600 border-0 rounded-2xl px-4 py-3 pr-10 focus:ring-2 focus:ring-blue-500 transition-all duration-300 text-gray-900 dark:text-white font-medium shadow-sm hover:shadow-md cursor-pointer"
               >
-                <option value="todas">ðÅ¸â€œÅ  Todas</option>
-                <option value="ativas">âÅ“â€¦ Ativas</option>
-                <option value="finalizadas">â�Å’ Finalizadas</option>
+                <option value="todas">📊 Todas</option>
+                <option value="ativas">✅ Ativas</option>
+                <option value="finalizadas">❌ Finalizadas</option>
               </select>
 
               <select
@@ -1381,10 +1381,10 @@ export default function LocalizacaoAnimais() {
                 onChange={(e) => setFiltroAvancado(prev => ({ ...prev, periodo: e.target.value }))}
                 className="appearance-none bg-gradient-to-r from-purple-50 to-pink-50 dark:from-gray-700 dark:to-gray-600 border-0 rounded-2xl px-4 py-3 pr-10 focus:ring-2 focus:ring-purple-500 transition-all duration-300 text-gray-900 dark:text-white font-medium shadow-sm hover:shadow-md cursor-pointer"
               >
-                <option value="7dias">ðÅ¸â€œâ€¦ ÃÅ¡ltimos 7 dias</option>
-                <option value="30dias">ðÅ¸â€œâ€¦ ÃÅ¡ltimos 30 dias</option>
-                <option value="90dias">ðÅ¸â€œâ€¦ ÃÅ¡ltimos 90 dias</option>
-                <option value="todos">ðÅ¸â€œâ€¦ Todos</option>
+                <option value="7dias">📅 Últimos 7 dias</option>
+                <option value="30dias">📅 Últimos 30 dias</option>
+                <option value="90dias">📅 Últimos 90 dias</option>
+                <option value="todos">📅 Todos</option>
               </select>
             </div>
           </div>
@@ -1394,7 +1394,7 @@ export default function LocalizacaoAnimais() {
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {animaisFiltrados.length} animal(is) ââ‚¬¢ {localizacoes.length} localizaÃ§Ã£o(Ãµes)
+                {animaisFiltrados.length} animal(is) • {localizacoes.length} localização(ões)
               </span>
             </div>
             {(filtro || filtroAvancado.piquete || filtroAvancado.situacao !== 'todas' || filtroAvancado.periodo !== '30dias') && (
@@ -1409,26 +1409,26 @@ export default function LocalizacaoAnimais() {
                 }}
                 className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full transition-colors duration-200"
               >
-                Limpar filtros âÅ“â€¢
+                Limpar filtros ✕
               </button>
             )}
           </div>
         </div>
 
-        {/* Grid de Animais com LocalizaÃ§Ã£o Atual */}
+        {/* Grid de Animais com Localização Atual */}
         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-700/50 overflow-hidden">
           <div className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <div className="p-3 bg-white/20 backdrop-blur-sm rounded-2xl">
-                  <span className="text-3xl">ðÅ¸�â€ž</span>
+                  <span className="text-3xl">🐄</span>
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-white">
-                    Animais e LocalizaÃ§Ãµes
+                    Animais e Localizações
                   </h2>
                   <p className="text-green-100 mt-1">
-                    LocalizaÃ§Ã£o atual de cada animal
+                    Localização atual de cada animal
                   </p>
                 </div>
               </div>
@@ -1445,8 +1445,8 @@ export default function LocalizacaoAnimais() {
                   <div className="absolute inset-0 bg-gradient-to-br from-green-500/20 to-emerald-600/20 rounded-3xl animate-ping"></div>
                 </div>
                 <div className="mt-6 space-y-2">
-                  <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Carregando localizaÃ§Ãµes...</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Buscando animais e suas posiÃ§Ãµes</p>
+                  <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Carregando localizações...</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Buscando animais e suas posições</p>
                 </div>
               </div>
             ) : animaisFiltrados.length === 0 ? (
@@ -1456,7 +1456,7 @@ export default function LocalizacaoAnimais() {
                     <MagnifyingGlassIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
                   </div>
                   <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
-                    <span className="text-sm">ðÅ¸â€��</span>
+                    <span className="text-sm">🔍</span>
                   </div>
                 </div>
                 <div className="space-y-3">
@@ -1468,7 +1468,7 @@ export default function LocalizacaoAnimais() {
               </div>
             ) : (
               <>
-                {/* Controles de SeleÃ§Ã£o e PaginaÃ§Ã£o */}
+                {/* Controles de Seleção e Paginação */}
                 <div className="mb-4 flex items-center justify-between flex-wrap gap-4">
                   <div className="flex items-center space-x-3 flex-wrap gap-2">
                     <button
@@ -1476,11 +1476,11 @@ export default function LocalizacaoAnimais() {
                         const animaisAtivos = animaisPaginados.filter(animal => animal.situacao === 'Ativo')
                         const todosSelecionados = animaisAtivos.every(a => selectedAnimalsForBatch.includes(a.id))
                         if (todosSelecionados) {
-                          // Desmarcar todos da pÃ¡gina atual
+                          // Desmarcar todos da página atual
                           const idsParaRemover = animaisAtivos.map(a => a.id)
                           setSelectedAnimalsForBatch(prev => prev.filter(id => !idsParaRemover.includes(id)))
                         } else {
-                          // Selecionar todos da pÃ¡gina atual
+                          // Selecionar todos da página atual
                           const idsParaAdicionar = animaisAtivos.map(a => a.id)
                           setSelectedAnimalsForBatch(prev => [...new Set([...prev, ...idsParaAdicionar])])
                         }
@@ -1488,8 +1488,8 @@ export default function LocalizacaoAnimais() {
                       className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl text-sm font-medium transition-all duration-200 transform hover:scale-105"
                     >
                       {animaisPaginados.filter(animal => animal.situacao === 'Ativo').every(a => selectedAnimalsForBatch.includes(a.id))
-                        ? 'âËœâ€˜ï¸� Desmarcar PÃ¡gina'
-                        : 'âËœ� Selecionar PÃ¡gina'}
+                        ? '☑️ Desmarcar Página'
+                        : '☐ Selecionar Página'}
                     </button>
                     <button
                       onClick={() => {
@@ -1506,13 +1506,13 @@ export default function LocalizacaoAnimais() {
                       className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white rounded-xl text-sm font-medium transition-all duration-200 transform hover:scale-105"
                     >
                       {animaisFiltrados.filter(animal => animal.situacao === 'Ativo').every(a => selectedAnimalsForBatch.includes(a.id))
-                        ? 'âËœâ€˜ï¸� Desmarcar Todos'
-                        : 'âËœ� Selecionar Todos'}
+                        ? '☑️ Desmarcar Todos'
+                        : '☐ Selecionar Todos'}
                     </button>
                     {selectedAnimalsForBatch.length > 0 && (
                       <>
                         <span className="px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-xl text-sm font-bold border-2 border-green-400">
-                          âÅ“â€œ {selectedAnimalsForBatch.length} animal(is) selecionado(s)
+                          ✓ {selectedAnimalsForBatch.length} animal(is) selecionado(s)
                         </span>
                         <button
                           onClick={() => {
@@ -1522,20 +1522,20 @@ export default function LocalizacaoAnimais() {
                           className="px-6 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white rounded-xl text-sm font-bold transition-all duration-200 transform hover:scale-105 flex items-center space-x-2 shadow-lg"
                         >
                           <MapPinIcon className="h-5 w-5" />
-                          <span>ðÅ¸â€œ� Colocar {selectedAnimalsForBatch.length} em Local</span>
+                          <span>📍 Colocar {selectedAnimalsForBatch.length} em Local</span>
                         </button>
                         <button
                           onClick={() => setSelectedAnimalsForBatch([])}
                           className="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-medium transition-colors"
                         >
-                          ðÅ¸â€”â€˜ï¸� Limpar SeleÃ§Ã£o
+                          🗑️ Limpar Seleção
                         </button>
                       </>
                     )}
                   </div>
                   <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
                     <span>
-                      PÃ¡gina {currentPage} de {totalPages || 1} ââ‚¬¢ {animaisFiltrados.length} animal(is) total
+                      Página {currentPage} de {totalPages || 1} • {animaisFiltrados.length} animal(is) total
                     </span>
                   </div>
                 </div>
@@ -1555,7 +1555,7 @@ export default function LocalizacaoAnimais() {
                         } transform hover:scale-105`}
                         style={{ animationDelay: `${index * 100}ms` }}
                       >
-                        {/* Checkbox de SeleÃ§Ã£o */}
+                        {/* Checkbox de Seleção */}
                         {canSelect && (
                           <div className="absolute top-4 right-4 z-10">
                             <input
@@ -1572,7 +1572,7 @@ export default function LocalizacaoAnimais() {
                           <div className="flex items-center space-x-3">
                           <div className="w-12 h-12 bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-2xl flex items-center justify-center">
                             <span className="text-2xl">
-                              {animal.sexo === 'Macho' ? 'ðÅ¸�â€š' : 'ðÅ¸�â€ž'}
+                              {animal.sexo === 'Macho' ? '🐂' : '🐄'}
                             </span>
                           </div>
                           <div>
@@ -1580,7 +1580,7 @@ export default function LocalizacaoAnimais() {
                               {animal.serie} {animal.rg}
                             </h3>
                             <p className="text-sm text-gray-600 dark:text-gray-300">
-                              {animal.raca} ââ‚¬¢ {animal.sexo}
+                              {animal.raca} • {animal.sexo}
                             </p>
                           </div>
                         </div>
@@ -1593,16 +1593,16 @@ export default function LocalizacaoAnimais() {
                         </span>
                       </div>
 
-                      {/* LocalizaÃ§Ã£o Atual */}
+                      {/* Localização Atual */}
                       <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl border border-blue-200 dark:border-blue-800">
                         <div className="flex items-center space-x-2 mb-2">
                           <MapPinIcon className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                          <span className="text-sm font-medium text-blue-800 dark:text-blue-300">LocalizaÃ§Ã£o Atual</span>
+                          <span className="text-sm font-medium text-blue-800 dark:text-blue-300">Localização Atual</span>
                         </div>
                         {localizacaoAtual ? (
                           <div>
                             <p className="font-semibold text-blue-900 dark:text-blue-200">
-                              ðÅ¸â€œ� {localizacaoAtual.piquete}
+                              📍 {localizacaoAtual.piquete}
                             </p>
                             {localizacaoAtual.data_entrada && (
                               <p className="text-xs text-blue-700 dark:text-blue-400 mt-1">
@@ -1622,12 +1622,12 @@ export default function LocalizacaoAnimais() {
                           </div>
                         ) : (
                           <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-                            â�â€œ LocalizaÃ§Ã£o nÃ£o definida
+                            ❓ Localização não definida
                           </p>
                         )}
                       </div>
 
-                      {/* AÃ§Ãµes */}
+                      {/* Ações */}
                       <div className="flex space-x-2">
                         {canSelect && (
                           <button
@@ -1639,7 +1639,7 @@ export default function LocalizacaoAnimais() {
                             }`}
                             title={isSelected ? 'Desmarcar' : 'Selecionar'}
                           >
-                            {isSelected ? 'âÅ“â€œ' : 'âËœ�'}
+                            {isSelected ? '✓' : '☐'}
                           </button>
                         )}
                         <button
@@ -1680,7 +1680,7 @@ export default function LocalizacaoAnimais() {
                             setShowModal(true)
                           }}
                           className="bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 p-2 rounded-2xl transition-all duration-300 hover:scale-110"
-                          title="Ver histÃ³rico"
+                          title="Ver histórico"
                         >
                           <ClockIcon className="h-4 w-4" />
                         </button>
@@ -1690,7 +1690,7 @@ export default function LocalizacaoAnimais() {
                 })}
               </div>
 
-              {/* Controles de PaginaÃ§Ã£o */}
+              {/* Controles de Paginação */}
               {totalPages > 1 && (
                 <div className="mt-8 flex items-center justify-center space-x-2 flex-wrap gap-2">
                   <button
@@ -1698,7 +1698,7 @@ export default function LocalizacaoAnimais() {
                     disabled={currentPage === 1}
                     className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    ââ€ � Anterior
+                    ← Anterior
                   </button>
                   
                   <div className="flex space-x-1">
@@ -1735,7 +1735,7 @@ export default function LocalizacaoAnimais() {
                     disabled={currentPage === totalPages}
                     className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    PrÃ³xima ââ€ â€™
+                    Próxima →
                   </button>
                 </div>
               )}
@@ -1744,7 +1744,7 @@ export default function LocalizacaoAnimais() {
           </div>
         </div>
 
-        {/* HistÃ³rico de MovimentaÃ§Ãµes */}
+        {/* Histórico de Movimentações */}
         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-700/50 overflow-hidden">
           <div className="bg-gradient-to-r from-purple-500 via-violet-500 to-indigo-500 p-6">
             <div className="flex items-center justify-between">
@@ -1754,10 +1754,10 @@ export default function LocalizacaoAnimais() {
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-white">
-                    HistÃ³rico de MovimentaÃ§Ãµes
+                    Histórico de Movimentações
                   </h2>
                   <p className="text-purple-100 mt-1">
-                    Todas as movimentaÃ§Ãµes registradas
+                    Todas as movimentações registradas
                   </p>
                 </div>
               </div>
@@ -1783,7 +1783,7 @@ export default function LocalizacaoAnimais() {
                     </th>
                     <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                       <div className="flex items-center space-x-1">
-                        <span>PerÃ­odo</span>
+                        <span>Período</span>
                         <div className="w-1 h-1 bg-blue-500 rounded-full"></div>
                       </div>
                     </th>
@@ -1795,7 +1795,7 @@ export default function LocalizacaoAnimais() {
                     </th>
                     <th className="px-6 py-4 text-right text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                       <div className="flex items-center justify-end space-x-1">
-                        <span>AÃ§Ãµes</span>
+                        <span>Ações</span>
                         <div className="w-1 h-1 bg-red-500 rounded-full"></div>
                       </div>
                     </th>
@@ -1812,7 +1812,7 @@ export default function LocalizacaoAnimais() {
                         <div className="flex items-center space-x-3">
                           <div className="w-10 h-10 bg-gradient-to-br from-purple-100 to-indigo-100 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-2xl flex items-center justify-center">
                             <span className="text-lg">
-                              {localizacao.sexo === 'Macho' ? 'ðÅ¸�â€š' : 'ðÅ¸�â€ž'}
+                              {localizacao.sexo === 'Macho' ? '🐂' : '🐄'}
                             </span>
                           </div>
                           <div>
@@ -1828,18 +1828,18 @@ export default function LocalizacaoAnimais() {
                       <td className="px-6 py-5">
                         <div className="flex items-center">
                           <div className="text-sm font-semibold text-gray-900 dark:text-white bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 px-3 py-1 rounded-xl">
-                            ðÅ¸â€œ� {localizacao.piquete}
+                            📍 {localizacao.piquete}
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-5">
                         <div className="space-y-1">
                           <div className="text-sm font-medium text-gray-900 dark:text-white">
-                            ðÅ¸â€œâ€¦ {new Date(localizacao.data_entrada).toLocaleDateString('pt-BR')}
+                            📅 {new Date(localizacao.data_entrada).toLocaleDateString('pt-BR')}
                           </div>
                           {localizacao.data_saida && (
                             <div className="text-xs text-gray-500 dark:text-gray-400">
-                              atÃ© {new Date(localizacao.data_saida).toLocaleDateString('pt-BR')}
+                              até {new Date(localizacao.data_saida).toLocaleDateString('pt-BR')}
                             </div>
                           )}
                           {localizacao.motivo_movimentacao && (
@@ -1855,7 +1855,7 @@ export default function LocalizacaoAnimais() {
                             ? 'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 dark:from-red-900/30 dark:to-pink-900/30 dark:text-red-300' 
                             : 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 dark:from-green-900/30 dark:to-emerald-900/30 dark:text-green-300'
                         }`}>
-                          {localizacao.data_saida ? 'â�Å’ Finalizada' : 'âÅ“â€¦ Ativa'}
+                          {localizacao.data_saida ? '❌ Finalizada' : '✅ Ativa'}
                         </span>
                       </td>
                       <td className="px-6 py-5">
@@ -1890,9 +1890,9 @@ export default function LocalizacaoAnimais() {
                           <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-3xl mx-auto flex items-center justify-center">
                             <ClockIcon className="h-8 w-8 text-gray-400 dark:text-gray-500" />
                           </div>
-                          <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Nenhuma movimentaÃ§Ã£o encontrada</h3>
+                          <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Nenhuma movimentação encontrada</h3>
                           <p className="text-gray-500 dark:text-gray-400">
-                            Registre a primeira localizaÃ§Ã£o de um animal
+                            Registre a primeira localização de um animal
                           </p>
                         </div>
                       </td>
@@ -1904,7 +1904,7 @@ export default function LocalizacaoAnimais() {
           </div>
         </div>
 
-        {/* Modal para MovimentaÃ§Ã£o em Lote - MELHORADO */}
+        {/* Modal para Movimentação em Lote - MELHORADO */}
         {showModal && modalType === 'lote' && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-5xl w-full max-h-[95vh] overflow-y-auto">
@@ -1916,10 +1916,10 @@ export default function LocalizacaoAnimais() {
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold text-white">
-                        ðÅ¸Å¡â‚¬ LocalizaÃ§Ã£o em Lote
+                        🚀 Localização em Lote
                       </h3>
                       <p className="text-purple-100 text-sm">
-                        Registre vÃ¡rios animais em um local especÃ­fico com data personalizada
+                        Registre vários animais em um local específico com data personalizada
                       </p>
                     </div>
                   </div>
@@ -1938,20 +1938,20 @@ export default function LocalizacaoAnimais() {
                     }}
                     className="text-white/80 hover:text-white p-2 hover:bg-white/10 rounded-xl transition-colors"
                   >
-                    âÅ“â€¢
+                    ✕
                   </button>
                 </div>
               </div>
 
               <div className="p-6">
-                {/* Primeiro: ConfiguraÃ§Ã£o da LocalizaÃ§Ã£o */}
+                {/* Primeiro: Configuração da Localização */}
                 <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-6 mb-6 border border-green-200 dark:border-green-800">
                   <div className="flex items-center space-x-3 mb-4">
                     <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-xl">
                       <MapPinIcon className="h-5 w-5 text-green-600 dark:text-green-400" />
                     </div>
                     <h4 className="text-lg font-bold text-green-800 dark:text-green-200">
-                      ðÅ¸â€œ� Configurar LocalizaÃ§Ã£o
+                      📍 Configurar Localização
                     </h4>
                   </div>
                   
@@ -1967,9 +1967,9 @@ export default function LocalizacaoAnimais() {
                           className="flex-1 px-4 py-3 bg-white dark:bg-gray-700 border border-green-300 dark:border-green-600 rounded-xl focus:ring-2 focus:ring-green-500 text-gray-900 dark:text-white font-medium min-w-0"
                           required
                         >
-                          <option value="">ðÅ¸�Å¾ï¸� Selecione o local...</option>
+                          <option value="">🏞️ Selecione o local...</option>
                           {piquetesDisponiveis.map(piquete => (
-                            <option key={piquete} value={piquete}>ðÅ¸â€œ� {piquete}</option>
+                            <option key={piquete} value={piquete}>📍 {piquete}</option>
                           ))}
                         </select>
                         <button
@@ -1986,7 +1986,7 @@ export default function LocalizacaoAnimais() {
 
                     <div>
                       <label className="block text-sm font-medium text-green-700 dark:text-green-300 mb-2">
-                        Data da LocalizaÃ§Ã£o *
+                        Data da Localização *
                       </label>
                       <input
                         type="date"
@@ -2005,7 +2005,7 @@ export default function LocalizacaoAnimais() {
                         type="text"
                         value={batchMoveData.motivo_movimentacao}
                         onChange={(e) => setBatchMoveData(prev => ({ ...prev, motivo_movimentacao: e.target.value }))}
-                        placeholder="Ex: RotaÃ§Ã£o de pasto..."
+                        placeholder="Ex: Rotação de pasto..."
                         className="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-green-300 dark:border-green-600 rounded-xl focus:ring-2 focus:ring-green-500 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                       />
                     </div>
@@ -2013,24 +2013,24 @@ export default function LocalizacaoAnimais() {
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-green-700 dark:text-green-300 mb-2">
-                      ObservaÃ§Ãµes (Opcional)
+                      Observações (Opcional)
                     </label>
                     <textarea
                       value={batchMoveData.observacoes}
                       onChange={(e) => setBatchMoveData(prev => ({ ...prev, observacoes: e.target.value }))}
-                      placeholder="ObservaÃ§Ãµes sobre esta localizaÃ§Ã£o..."
+                      placeholder="Observações sobre esta localização..."
                       rows={2}
                       className="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-green-300 dark:border-green-600 rounded-xl focus:ring-2 focus:ring-green-500 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none"
                     />
                   </div>
 
-                  {/* Resumo da ConfiguraÃ§Ã£o */}
+                  {/* Resumo da Configuração */}
                   {batchMoveData.piquete_destino && (
                     <div className="mt-4 p-4 bg-green-100 dark:bg-green-900/30 rounded-xl border border-green-300 dark:border-green-700">
                       <div className="flex items-center space-x-2 text-green-800 dark:text-green-200">
-                        <span className="text-lg">âÅ“â€¦</span>
+                        <span className="text-lg">✅</span>
                         <span className="font-semibold">
-                          LocalizaÃ§Ã£o configurada: <strong>{batchMoveData.piquete_destino}</strong> em <strong>{formatarDataBR(batchMoveData.data_movimentacao)}</strong>
+                          Localização configurada: <strong>{batchMoveData.piquete_destino}</strong> em <strong>{formatarDataBR(batchMoveData.data_movimentacao)}</strong>
                         </span>
                       </div>
                     </div>
@@ -2038,11 +2038,11 @@ export default function LocalizacaoAnimais() {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* SeleÃ§Ã£o de Animais - MELHORADA */}
+                  {/* Seleção de Animais - MELHORADA */}
                   <div>
                     <div className="flex items-center justify-between mb-4">
                       <h4 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center space-x-2">
-                        <span className="text-2xl">ðÅ¸�â€ž</span>
+                        <span className="text-2xl">🐄</span>
                         <span>Selecionar Animais</span>
                         <span className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-2 py-1 rounded-full text-sm font-bold">
                           {selectedAnimalsForBatch.length}
@@ -2050,7 +2050,7 @@ export default function LocalizacaoAnimais() {
                       </h4>
                     </div>
 
-                    {/* Filtro rÃ¡pido de animais - MELHORADO */}
+                    {/* Filtro rápido de animais - MELHORADO */}
                     <div className="mb-4 space-y-2">
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -2058,7 +2058,7 @@ export default function LocalizacaoAnimais() {
                         </div>
                         <input
                           type="text"
-                          placeholder="Digite o nÃºmero (sÃ©rie/RG) e pressione Enter para incluir"
+                          placeholder="Digite o número (série/RG) e pressione Enter para incluir"
                           value={filtroModalAnimais}
                           onChange={(e) => setFiltroModalAnimais(e.target.value)}
                           onKeyDown={(e) => {
@@ -2084,13 +2084,13 @@ export default function LocalizacaoAnimais() {
                             onClick={() => setFiltroModalAnimais('')}
                             className="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300"
                           >
-                            âÅ“â€¢ Limpar busca
+                            ✕ Limpar busca
                           </button>
                         </div>
                       )}
                     </div>
 
-                    {/* Controles de seleÃ§Ã£o rÃ¡pida */}
+                    {/* Controles de seleção rápida */}
                     <div className="mb-4 flex items-center space-x-2 flex-wrap gap-2">
                       <button
                         onClick={() => {
@@ -2107,8 +2107,8 @@ export default function LocalizacaoAnimais() {
                         className="px-3 py-1.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg text-xs font-medium hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors"
                       >
                         {animaisFiltradosModal.filter(animal => animal.situacao === 'Ativo').every(a => selectedAnimalsForBatch.includes(a.id))
-                          ? 'âËœâ€˜ï¸� Desmarcar Filtrados'
-                          : 'âËœ� Selecionar Filtrados'}
+                          ? '☑️ Desmarcar Filtrados'
+                          : '☐ Selecionar Filtrados'}
                       </button>
                     </div>
 
@@ -2119,11 +2119,11 @@ export default function LocalizacaoAnimais() {
                         const restantes = ativos.length - modalListLimit
                         return ativos.length === 0 ? (
                         <div className="text-center py-8">
-                          <div className="text-4xl mb-2">ðÅ¸â€��</div>
+                          <div className="text-4xl mb-2">🔍</div>
                           <p className="text-gray-500 dark:text-gray-400">
                             {filtroModalAnimais 
                               ? `Nenhum animal encontrado com "${filtroModalAnimais}"`
-                              : 'Nenhum animal ativo disponÃ­vel'}
+                              : 'Nenhum animal ativo disponível'}
                           </p>
                           {filtroModalAnimais && (
                             <button
@@ -2156,12 +2156,12 @@ export default function LocalizacaoAnimais() {
                                   ? 'bg-purple-500 border-purple-500 scale-110' 
                                   : 'border-gray-300 dark:border-gray-600 hover:border-purple-400'
                               }`}>
-                                {isSelected && <span className="text-white text-sm font-bold">âÅ“â€œ</span>}
+                                {isSelected && <span className="text-white text-sm font-bold">✓</span>}
                               </div>
                               <div className="flex-1">
                                 <div className="flex items-center space-x-2">
                                   <span className="text-xl">
-                                    {animal.sexo === 'Macho' ? 'ðÅ¸�â€š' : 'ðÅ¸�â€ž'}
+                                    {animal.sexo === 'Macho' ? '🐂' : '🐄'}
                                   </span>
                                   <div>
                                     <div className="font-bold text-gray-900 dark:text-white">
@@ -2169,12 +2169,12 @@ export default function LocalizacaoAnimais() {
                                     </div>
                                     <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
                                       <div>
-                                        {animal.raca} {animal.sexo && `ââ‚¬¢ ${animal.sexo}`}
+                                        {animal.raca} {animal.sexo && `• ${animal.sexo}`}
                                       </div>
                                       <div className="flex items-center space-x-1">
                                         <MapPinIcon className="h-3 w-3 text-blue-500" />
                                         <span className="font-medium text-blue-600 dark:text-blue-400">
-                                          {localizacaoAtual?.piquete || 'â�â€œ NÃ£o definido'}
+                                          {localizacaoAtual?.piquete || '❓ Não definido'}
                                         </span>
                                       </div>
                                     </div>
@@ -2183,7 +2183,7 @@ export default function LocalizacaoAnimais() {
                               </div>
                               {isSelected && (
                                 <div className="text-purple-500 animate-pulse flex-shrink-0">
-                                  <span className="text-lg">ðÅ¸Å½¯</span>
+                                  <span className="text-lg">🎯</span>
                                 </div>
                               )}
                             </div>
@@ -2212,42 +2212,42 @@ export default function LocalizacaoAnimais() {
                         }}
                         className="px-4 py-2 bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-900/30 dark:to-indigo-900/30 text-purple-700 dark:text-purple-300 rounded-xl text-sm font-medium hover:from-purple-200 hover:to-indigo-200 dark:hover:from-purple-900/50 dark:hover:to-indigo-900/50 transition-all duration-200 transform hover:scale-105"
                       >
-                        âÅ“â€¦ Selecionar Todos ({animaisFiltrados.filter(animal => animal.situacao === 'Ativo').length})
+                        ✅ Selecionar Todos ({animaisFiltrados.filter(animal => animal.situacao === 'Ativo').length})
                       </button>
                       <button
                         onClick={() => setSelectedAnimalsForBatch([])}
                         className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                       >
-                        ðÅ¸â€”â€˜ï¸� Limpar SeleÃ§Ã£o
+                        🗑️ Limpar Seleção
                       </button>
                       {selectedAnimalsForBatch.length > 0 && (
                         <div className="px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-xl text-sm font-bold">
-                          ðÅ¸Å½¯ {selectedAnimalsForBatch.length} selecionado(s)
+                          🎯 {selectedAnimalsForBatch.length} selecionado(s)
                         </div>
                       )}
                     </div>
                   </div>
 
-                  {/* Resumo e AÃ§Ãµes - MELHORADO */}
+                  {/* Resumo e Ações - MELHORADO */}
                   <div>
                     <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
-                      <span className="text-2xl">ðÅ¸â€œâ€¹</span>
-                      <span>Resumo da OperaÃ§Ã£o</span>
+                      <span className="text-2xl">📋</span>
+                      <span>Resumo da Operação</span>
                     </h4>
                     
-                    {/* Status da ConfiguraÃ§Ã£o */}
+                    {/* Status da Configuração */}
                     <div className="space-y-4">
                       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-2xl border border-blue-200 dark:border-blue-800">
                         <h5 className="font-bold text-blue-800 dark:text-blue-200 mb-3 flex items-center space-x-2">
-                          <span>ðÅ¸â€œÅ </span>
-                          <span>Status da OperaÃ§Ã£o</span>
+                          <span>📊</span>
+                          <span>Status da Operação</span>
                         </h5>
                         
                         <div className="space-y-3">
                           {/* Local */}
                           <div className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-xl">
                             <div className="flex items-center space-x-2">
-                              <span className="text-lg">ðÅ¸â€œ�</span>
+                              <span className="text-lg">📍</span>
                               <span className="font-medium text-gray-700 dark:text-gray-300">Local:</span>
                             </div>
                             <div className={`px-3 py-1 rounded-full text-sm font-bold ${
@@ -2255,14 +2255,14 @@ export default function LocalizacaoAnimais() {
                                 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' 
                                 : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
                             }`}>
-                              {batchMoveData.piquete_destino || 'â�Å’ NÃ£o definido'}
+                              {batchMoveData.piquete_destino || '❌ Não definido'}
                             </div>
                           </div>
 
                           {/* Data */}
                           <div className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-xl">
                             <div className="flex items-center space-x-2">
-                              <span className="text-lg">ðÅ¸â€œâ€¦</span>
+                              <span className="text-lg">📅</span>
                               <span className="font-medium text-gray-700 dark:text-gray-300">Data:</span>
                             </div>
                             <input
@@ -2276,7 +2276,7 @@ export default function LocalizacaoAnimais() {
                           {/* Animais */}
                           <div className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-xl">
                             <div className="flex items-center space-x-2">
-                              <span className="text-lg">ðÅ¸�â€ž</span>
+                              <span className="text-lg">🐄</span>
                               <span className="font-medium text-gray-700 dark:text-gray-300">Animais:</span>
                             </div>
                             <div className={`px-3 py-1 rounded-full text-sm font-bold ${
@@ -2284,7 +2284,7 @@ export default function LocalizacaoAnimais() {
                                 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' 
                                 : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
                             }`}>
-                              {selectedAnimalsForBatch.length > 0 ? `${selectedAnimalsForBatch.length} selecionado(s)` : 'â�Å’ Nenhum selecionado'}
+                              {selectedAnimalsForBatch.length > 0 ? `${selectedAnimalsForBatch.length} selecionado(s)` : '❌ Nenhum selecionado'}
                             </div>
                           </div>
                         </div>
@@ -2295,7 +2295,7 @@ export default function LocalizacaoAnimais() {
                         <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-6 rounded-2xl border-2 border-green-300 dark:border-green-700 shadow-lg">
                           <div className="flex items-center space-x-3 mb-4">
                             <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-                              <span className="text-2xl">âÅ“â€¦</span>
+                              <span className="text-2xl">✅</span>
                             </div>
                             <div>
                               <h5 className="font-bold text-green-800 dark:text-green-200 text-lg">
@@ -2310,16 +2310,16 @@ export default function LocalizacaoAnimais() {
                           <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-green-200 dark:border-green-800">
                             <div className="text-green-800 dark:text-green-200 space-y-2">
                               <p className="flex items-center space-x-2">
-                                <span className="font-bold">ðÅ¸Å½¯ OperaÃ§Ã£o:</span>
+                                <span className="font-bold">🎯 Operação:</span>
                                 <span>Registrar <strong>{selectedAnimalsForBatch.length}</strong> animal(is) em <strong>{batchMoveData.piquete_destino}</strong></span>
                               </p>
                               <p className="flex items-center space-x-2">
-                                <span className="font-bold">ðÅ¸â€œâ€¦ Data:</span>
+                                <span className="font-bold">📅 Data:</span>
                                 <span><strong>{formatarDataBR(batchMoveData.data_movimentacao)}</strong></span>
                               </p>
                               {batchMoveData.motivo_movimentacao && (
                                 <p className="flex items-center space-x-2">
-                                  <span className="font-bold">ðÅ¸â€œ� Motivo:</span>
+                                  <span className="font-bold">📝 Motivo:</span>
                                   <span><strong>{batchMoveData.motivo_movimentacao}</strong></span>
                                 </p>
                               )}
@@ -2332,7 +2332,7 @@ export default function LocalizacaoAnimais() {
                       {selectedAnimalsForBatch.length > 0 && (
                         <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-2xl border border-gray-200 dark:border-gray-700">
                           <h6 className="font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center space-x-2">
-                            <span>ðÅ¸�â€ž</span>
+                            <span>🐄</span>
                             <span>Animais Selecionados ({selectedAnimalsForBatch.length})</span>
                           </h6>
                           <div className="max-h-32 overflow-y-auto space-y-1">
@@ -2342,7 +2342,7 @@ export default function LocalizacaoAnimais() {
                               return (
                                 <div key={animalId} className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-700 p-2 rounded-lg group">
                                   <div className="flex items-center space-x-2">
-                                    <span>{animal.sexo === 'Macho' ? 'ðÅ¸�â€š' : 'ðÅ¸�â€ž'}</span>
+                                    <span>{animal.sexo === 'Macho' ? '🐂' : '🐄'}</span>
                                     <span className="font-medium">{animal.serie} {animal.rg}</span>
                                     <span className="text-xs">({animal.raca})</span>
                                   </div>
@@ -2360,7 +2360,7 @@ export default function LocalizacaoAnimais() {
                         </div>
                       )}
 
-                      {/* BotÃµes de AÃ§Ã£o */}
+                      {/* Botões de Ação */}
                       <div className="flex space-x-3 pt-4">
                         <button
                           onClick={moverAnimaisEmLote}
@@ -2380,13 +2380,13 @@ export default function LocalizacaoAnimais() {
                               <span>Movendo {selectedAnimalsForBatch.length} animais...</span>
                             </span>
                           ) : selectedAnimalsForBatch.length === 0 || !batchMoveData.piquete_destino ? (
-                            <>ðÅ¸Å¡« Configure os dados acima</>
+                            <>🚫 Configure os dados acima</>
                           ) : (
-                            <>ðÅ¸Å¡â‚¬ Registrar {selectedAnimalsForBatch.length} Animal(is)</>
+                            <>🚀 Registrar {selectedAnimalsForBatch.length} Animal(is)</>
                           )}
                         </button>
                         
-                        {/* Progress Bar para MovimentaÃ§Ã£o em Lote */}
+                        {/* Progress Bar para Movimentação em Lote */}
                         {batchMoving && batchProgress > 0 && (
                           <div className="mt-4 space-y-2">
                             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
@@ -2416,7 +2416,7 @@ export default function LocalizacaoAnimais() {
                           }}
                           className="px-6 py-4 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-2xl font-bold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                         >
-                          â�Å’ Cancelar
+                          ❌ Cancelar
                         </button>
                       </div>
                     </div>
@@ -2427,7 +2427,7 @@ export default function LocalizacaoAnimais() {
           </div>
         )}
 
-        {/* Modal para Nova LocalizaÃ§Ã£o/TransferÃªncia */}
+        {/* Modal para Nova Localização/Transferência */}
         {showModal && (modalType === 'nova' || modalType === 'transferir') && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
@@ -2438,14 +2438,14 @@ export default function LocalizacaoAnimais() {
                       {modalType === 'nova' ? <PlusIcon className="h-6 w-6 text-white" /> : <ArrowRightIcon className="h-6 w-6 text-white" />}
                     </div>
                     <h3 className="text-xl font-bold text-white">
-                      {modalType === 'nova' ? 'Nova LocalizaÃ§Ã£o' : `Transferir ${selectedAnimal?.serie} ${selectedAnimal?.rg}`}
+                      {modalType === 'nova' ? 'Nova Localização' : `Transferir ${selectedAnimal?.serie} ${selectedAnimal?.rg}`}
                     </h3>
                   </div>
                   <button
                     onClick={() => setShowModal(false)}
                     className="text-white/80 hover:text-white p-2 hover:bg-white/10 rounded-xl transition-colors"
                   >
-                    âÅ“â€¢
+                    ✕
                   </button>
                 </div>
               </div>
@@ -2454,7 +2454,7 @@ export default function LocalizacaoAnimais() {
                 {modalType === 'nova' && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      ðÅ¸�â€ž Animal
+                      🐄 Animal
                     </label>
                     <select
                       value={novaLocalizacao.animal_id}
@@ -2474,7 +2474,7 @@ export default function LocalizacaoAnimais() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    ðÅ¸â€œ� Piquete de Destino
+                    📍 Piquete de Destino
                   </label>
                   <div className="flex gap-2 items-stretch">
                     <select
@@ -2506,7 +2506,7 @@ export default function LocalizacaoAnimais() {
                   <>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        ðÅ¸â€œâ€¦ Data de Entrada
+                        📅 Data de Entrada
                       </label>
                       <input
                         type="date"
@@ -2519,11 +2519,11 @@ export default function LocalizacaoAnimais() {
                     
                     {modalType === 'transferir' && selectedAnimal && novaLocalizacao.piquete && (
                       <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
-                        <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">ðÅ¸â€�� Preview da TransferÃªncia</h4>
+                        <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">🔍 Preview da Transferência</h4>
                         <div className="space-y-2 text-sm text-blue-700 dark:text-blue-300">
                           <p><strong>Animal:</strong> {selectedAnimal.serie} {selectedAnimal.rg}</p>
-                          <p><strong>LocalizaÃ§Ã£o Atual:</strong> {getLocalizacaoAtual(selectedAnimal.id, selectedAnimal)?.piquete || 'NÃ£o definida'}</p>
-                          <p><strong>Nova LocalizaÃ§Ã£o:</strong> {novaLocalizacao.piquete}</p>
+                          <p><strong>Localização Atual:</strong> {getLocalizacaoAtual(selectedAnimal.id, selectedAnimal)?.piquete || 'Não definida'}</p>
+                          <p><strong>Nova Localização:</strong> {novaLocalizacao.piquete}</p>
                           <p><strong>Data:</strong> {formatarDataBR(novaLocalizacao.data_entrada)}</p>
                         </div>
                       </div>
@@ -2531,25 +2531,25 @@ export default function LocalizacaoAnimais() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        ðÅ¸â€œ� Motivo da MovimentaÃ§Ã£o
+                        📝 Motivo da Movimentação
                       </label>
                       <input
                         type="text"
                         value={novaLocalizacao.motivo_movimentacao}
                         onChange={(e) => setNovaLocalizacao(prev => ({ ...prev, motivo_movimentacao: e.target.value }))}
-                        placeholder="Ex: RotaÃ§Ã£o de pasto, tratamento..."
+                        placeholder="Ex: Rotação de pasto, tratamento..."
                         className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border-0 rounded-2xl focus:ring-2 focus:ring-green-500 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                       />
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        ðÅ¸â€™¬ ObservaÃ§Ãµes
+                        💬 Observações
                       </label>
                       <textarea
                         value={novaLocalizacao.observacoes}
                         onChange={(e) => setNovaLocalizacao(prev => ({ ...prev, observacoes: e.target.value }))}
-                        placeholder="ObservaÃ§Ãµes adicionais..."
+                        placeholder="Observações adicionais..."
                         rows={3}
                         className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border-0 rounded-2xl focus:ring-2 focus:ring-green-500 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none"
                       />
@@ -2561,7 +2561,7 @@ export default function LocalizacaoAnimais() {
                           onClick={criarLocalizacao}
                           className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-3 rounded-2xl font-medium transition-all duration-300 transform hover:scale-105"
                         >
-                          âÅ“â€¦ Registrar LocalizaÃ§Ã£o
+                          ✅ Registrar Localização
                         </button>
                       ) : (
                         <button
@@ -2569,13 +2569,13 @@ export default function LocalizacaoAnimais() {
                             if (selectedAnimal && novaLocalizacao.piquete) {
                               const localizacaoAtual = getLocalizacaoAtual(selectedAnimal.id, selectedAnimal)
                               if (localizacaoAtual && localizacaoAtual.piquete === novaLocalizacao.piquete) {
-                                alert('âÅ¡ ï¸� O animal jÃ¡ estÃ¡ neste piquete!')
+                                alert('⚠️ O animal já está neste piquete!')
                                 return
                               }
                               transferirAnimal(
                                 selectedAnimal.id, 
                                 novaLocalizacao.piquete, 
-                                novaLocalizacao.motivo_movimentacao || 'TransferÃªncia via sistema',
+                                novaLocalizacao.motivo_movimentacao || 'Transferência via sistema',
                                 selectedAnimal,
                                 novaLocalizacao.data_entrada
                               )
@@ -2594,7 +2594,7 @@ export default function LocalizacaoAnimais() {
                               <span>Transferindo...</span>
                             </span>
                           ) : (
-                            'âÅ“â€¦ Confirmar TransferÃªncia'
+                            '✅ Confirmar Transferência'
                           )}
                         </button>
                       )}
@@ -2616,7 +2616,7 @@ export default function LocalizacaoAnimais() {
                       </button>
                     </div>
                     
-                    {/* Progress Bar para TransferÃªncia */}
+                    {/* Progress Bar para Transferência */}
                     {transferringAnimal === selectedAnimal?.id && transferProgress > 0 && (
                       <div className="mt-4 space-y-2">
                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
@@ -2639,7 +2639,7 @@ export default function LocalizacaoAnimais() {
           </div>
         )}
 
-        {/* Modal de HistÃ³rico */}
+        {/* Modal de Histórico */}
         {showModal && modalType === 'historico' && selectedAnimal && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -2651,10 +2651,10 @@ export default function LocalizacaoAnimais() {
                     </div>
                     <div>
                       <h3 className="text-xl font-bold text-white">
-                        HistÃ³rico de {selectedAnimal.serie} {selectedAnimal.rg}
+                        Histórico de {selectedAnimal.serie} {selectedAnimal.rg}
                       </h3>
                       <p className="text-blue-100 text-sm">
-                        {selectedAnimal.raca} ââ‚¬¢ {selectedAnimal.sexo}
+                        {selectedAnimal.raca} • {selectedAnimal.sexo}
                       </p>
                     </div>
                   </div>
@@ -2662,7 +2662,7 @@ export default function LocalizacaoAnimais() {
                     onClick={() => setShowModal(false)}
                     className="text-white/80 hover:text-white p-2 hover:bg-white/10 rounded-xl transition-colors"
                   >
-                    âÅ“â€¢
+                    ✕
                   </button>
                 </div>
               </div>
@@ -2680,7 +2680,7 @@ export default function LocalizacaoAnimais() {
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-2">
                             <h4 className="font-semibold text-gray-900 dark:text-white">
-                              ðÅ¸â€œ� {loc.piquete}
+                              📍 {loc.piquete}
                             </h4>
                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                               loc.data_saida 
@@ -2691,15 +2691,15 @@ export default function LocalizacaoAnimais() {
                             </span>
                           </div>
                           <div className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
-                            <p>ðÅ¸â€œâ€¦ Entrada: {new Date(loc.data_entrada).toLocaleDateString('pt-BR')}</p>
+                            <p>📅 Entrada: {new Date(loc.data_entrada).toLocaleDateString('pt-BR')}</p>
                             {loc.data_saida && (
-                              <p>ðÅ¸â€œâ€¦ SaÃ­da: {new Date(loc.data_saida).toLocaleDateString('pt-BR')}</p>
+                              <p>📅 Saída: {new Date(loc.data_saida).toLocaleDateString('pt-BR')}</p>
                             )}
                             {loc.motivo_movimentacao && (
-                              <p>ðÅ¸â€œ� Motivo: {loc.motivo_movimentacao}</p>
+                              <p>📝 Motivo: {loc.motivo_movimentacao}</p>
                             )}
                             {loc.observacoes && (
-                              <p>ðÅ¸â€™¬ Obs: {loc.observacoes}</p>
+                              <p>💬 Obs: {loc.observacoes}</p>
                             )}
                           </div>
                         </div>
@@ -2712,7 +2712,7 @@ export default function LocalizacaoAnimais() {
                         <MapPinIcon className="h-8 w-8 text-gray-400" />
                       </div>
                       <p className="text-gray-500 dark:text-gray-400">
-                        Nenhuma movimentaÃ§Ã£o registrada para este animal
+                        Nenhuma movimentação registrada para este animal
                       </p>
                     </div>
                   )}
@@ -2734,10 +2734,10 @@ export default function LocalizacaoAnimais() {
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold text-white">
-                        ðÅ¸�Å¾ï¸� Gerenciar Locais
+                        🏞️ Gerenciar Locais
                       </h3>
                       <p className="text-orange-100 text-sm">
-                        Adicione ou remova locais disponÃ­veis para localizaÃ§Ã£o
+                        Adicione ou remova locais disponíveis para localização
                       </p>
                     </div>
                   </div>
@@ -2749,7 +2749,7 @@ export default function LocalizacaoAnimais() {
                     }}
                     className="text-white/80 hover:text-white p-2 hover:bg-white/10 rounded-xl transition-colors"
                   >
-                    âÅ“â€¢
+                    ✕
                   </button>
                 </div>
               </div>
@@ -2763,7 +2763,7 @@ export default function LocalizacaoAnimais() {
                         <PlusIcon className="h-5 w-5 text-green-600 dark:text-green-400" />
                       </div>
                       <h4 className="text-lg font-bold text-green-800 dark:text-green-200">
-                        âÅ¾â€¢ Adicionar Novo Local
+                        ➕ Adicionar Novo Local
                       </h4>
                     </div>
                     
@@ -2791,18 +2791,18 @@ export default function LocalizacaoAnimais() {
                             : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                         }`}
                       >
-                        {newLocationName.trim() ? 'âÅ“â€¦ Adicionar Local' : 'ðÅ¸â€œ� Digite o nome do local'}
+                        {newLocationName.trim() ? '✅ Adicionar Local' : '📝 Digite o nome do local'}
                       </button>
                     </div>
 
                     <div className="mt-4 p-4 bg-green-100 dark:bg-green-900/30 rounded-xl border border-green-300 dark:border-green-700">
                       <div className="flex items-center space-x-2 text-green-800 dark:text-green-200 text-sm">
-                        <span className="text-lg">ðÅ¸â€™¡</span>
+                        <span className="text-lg">💡</span>
                         <div>
                           <p className="font-semibold">Dicas para nomes de locais:</p>
-                          <p>ââ‚¬¢ Use nomes descritivos (ex: "Piquete Norte", "Pasto da Aguada")</p>
-                          <p>ââ‚¬¢ Evite caracteres especiais</p>
-                          <p>ââ‚¬¢ Seja consistente com a numeraÃ§Ã£o</p>
+                          <p>• Use nomes descritivos (ex: "Piquete Norte", "Pasto da Aguada")</p>
+                          <p>• Evite caracteres especiais</p>
+                          <p>• Seja consistente com a numeração</p>
                         </div>
                       </div>
                     </div>
@@ -2815,7 +2815,7 @@ export default function LocalizacaoAnimais() {
                         <EyeIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                       </div>
                       <h4 className="text-lg font-bold text-blue-800 dark:text-blue-200">
-                        ðÅ¸â€œâ€¹ Locais Existentes ({piquetesDisponiveis.length})
+                        📋 Locais Existentes ({piquetesDisponiveis.length})
                       </h4>
                     </div>
                     
@@ -2838,16 +2838,16 @@ export default function LocalizacaoAnimais() {
                               </div>
                               <div>
                                 <div className="font-semibold text-gray-900 dark:text-white">
-                                  ðÅ¸â€œ� {local}
+                                  📍 {local}
                                 </div>
                                 <div className="text-xs text-gray-600 dark:text-gray-400">
                                   {animaisNoLocal > 0 ? (
                                     <span className="text-green-600 dark:text-green-400 font-medium">
-                                      ðÅ¸�â€ž {animaisNoLocal} animal(is) atual
+                                      🐄 {animaisNoLocal} animal(is) atual
                                     </span>
                                   ) : (
                                     <span className="text-gray-500">
-                                      ðÅ¸â€œ­ Vazio
+                                      📭 Vazio
                                     </span>
                                   )}
                                 </div>
@@ -2867,7 +2867,7 @@ export default function LocalizacaoAnimais() {
                                   !permissions.canDelete 
                                     ? permissions.getPermissionMessage('excluir')
                                     : animaisNoLocal > 0 
-                                    ? 'NÃ£o Ã© possÃ­vel excluir - hÃ¡ animais neste local' 
+                                    ? 'Não é possível excluir - há animais neste local' 
                                     : 'Excluir local'
                                 }
                               >
@@ -2881,26 +2881,26 @@ export default function LocalizacaoAnimais() {
 
                     <div className="mt-4 p-4 bg-blue-100 dark:bg-blue-900/30 rounded-xl border border-blue-300 dark:border-blue-700">
                       <div className="flex items-center space-x-2 text-blue-800 dark:text-blue-200 text-sm">
-                        <span className="text-lg">âÅ¡ ï¸�</span>
+                        <span className="text-lg">⚠️</span>
                         <div>
                           <p className="font-semibold">Importante:</p>
-                          <p>ââ‚¬¢ Locais com animais nÃ£o podem ser excluÃ­dos</p>
-                          <p>ââ‚¬¢ Transfira os animais antes de excluir um local</p>
-                          <p>ââ‚¬¢ A exclusÃ£o Ã© permanente e nÃ£o pode ser desfeita</p>
+                          <p>• Locais com animais não podem ser excluídos</p>
+                          <p>• Transfira os animais antes de excluir um local</p>
+                          <p>• A exclusão é permanente e não pode ser desfeita</p>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* EstatÃ­sticas */}
+                {/* Estatísticas */}
                 <div className="mt-6 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-6 border border-purple-200 dark:border-purple-800">
                   <div className="flex items-center space-x-3 mb-4">
                     <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
-                      <span className="text-lg">ðÅ¸â€œÅ </span>
+                      <span className="text-lg">📊</span>
                     </div>
                     <h4 className="text-lg font-bold text-purple-800 dark:text-purple-200">
-                      EstatÃ­sticas dos Locais
+                      Estatísticas dos Locais
                     </h4>
                   </div>
                   
@@ -2953,7 +2953,7 @@ export default function LocalizacaoAnimais() {
                   </div>
                 </div>
 
-                {/* BotÃ£o Fechar */}
+                {/* Botão Fechar */}
                 <div className="mt-6 flex justify-end">
                   <button
                     onClick={() => {
@@ -2963,7 +2963,7 @@ export default function LocalizacaoAnimais() {
                     }}
                     className="px-8 py-3 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white rounded-2xl font-bold transition-all duration-300 transform hover:scale-105"
                   >
-                    âÅ“â€¦ ConcluÃ­do
+                    ✅ Concluído
                   </button>
                 </div>
               </div>
@@ -2971,31 +2971,31 @@ export default function LocalizacaoAnimais() {
           </div>
         )}
 
-        {/* InformaÃ§Ãµes */}
+        {/* Informações */}
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-l-4 border-blue-400 p-6 rounded-2xl">
           <div className="flex items-start space-x-3">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
-                <span className="text-blue-600 dark:text-blue-400">ââ€ž¹ï¸�</span>
+                <span className="text-blue-600 dark:text-blue-400">ℹ️</span>
               </div>
             </div>
             <div>
               <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">
-                Sistema de LocalizaÃ§Ã£o Inteligente
+                Sistema de Localização Inteligente
               </h4>
               <div className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
-                <p>ââ‚¬¢ <strong>LocalizaÃ§Ã£o Atual:</strong> Sempre mostra a posiÃ§Ã£o mais recente de cada animal</p>
-                <p>ââ‚¬¢ <strong>HistÃ³rico Completo:</strong> Registra todas as movimentaÃ§Ãµes com data e motivo</p>
-                <p>ââ‚¬¢ <strong>TransferÃªncia RÃ¡pida:</strong> Mova animais entre piquetes com um clique</p>
-                <p>ââ‚¬¢ <strong>Filtros AvanÃ§ados:</strong> Encontre animais por localizaÃ§Ã£o, perÃ­odo ou status</p>
-                <p>ââ‚¬¢ <strong>Gerenciar Locais:</strong> Adicione ou remova locais conforme necessÃ¡rio</p>
+                <p>• <strong>Localização Atual:</strong> Sempre mostra a posição mais recente de cada animal</p>
+                <p>• <strong>Histórico Completo:</strong> Registra todas as movimentações com data e motivo</p>
+                <p>• <strong>Transferência Rápida:</strong> Mova animais entre piquetes com um clique</p>
+                <p>• <strong>Filtros Avançados:</strong> Encontre animais por localização, período ou status</p>
+                <p>• <strong>Gerenciar Locais:</strong> Adicione ou remova locais conforme necessário</p>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Modal de SeleÃ§Ã£o de Campos para ExportaÃ§Ã£o */}
+      {/* Modal de Seleção de Campos para Exportação */}
       {showExportModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
@@ -3004,7 +3004,7 @@ export default function LocalizacaoAnimais() {
               <div className="flex items-center space-x-3">
                 <DocumentTextIcon className="h-6 w-6 text-white" />
                 <h3 className="text-xl font-bold text-white">
-                  Selecionar Campos para ExportaÃ§Ã£o
+                  Selecionar Campos para Exportação
                 </h3>
               </div>
               <button
@@ -3015,11 +3015,11 @@ export default function LocalizacaoAnimais() {
               </button>
             </div>
 
-            {/* ConteÃºdo */}
+            {/* Conteúdo */}
             <div className="p-6 overflow-y-auto flex-1">
               <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-700">
                 <p className="text-sm text-blue-800 dark:text-blue-300">
-                  <strong>ââ€ž¹ï¸� Selecione os campos</strong> que deseja incluir no arquivo Excel. 
+                  <strong>ℹ️ Selecione os campos</strong> que deseja incluir no arquivo Excel. 
                   {exportType === 'piquete' && (selectedPiqueteExport ? ` Exportando animais do piquete: ${selectedPiqueteExport}` : ' Selecione um piquete abaixo.')}
                   {exportType === 'geral' && ' Exportando todos os animais filtrados.'}
                 </p>
@@ -3055,7 +3055,7 @@ export default function LocalizacaoAnimais() {
                 </div>
               </div>
 
-              {/* Seletor de Piquete (apenas se for exportaÃ§Ã£o por piquete) */}
+              {/* Seletor de Piquete (apenas se for exportação por piquete) */}
               {exportType === 'piquete' && (
                 <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-700">
                   <h4 className="text-sm font-bold text-green-800 dark:text-green-300 mb-3 flex items-center">
@@ -3075,7 +3075,7 @@ export default function LocalizacaoAnimais() {
                 </div>
               )}
 
-              {/* Filtro de PerÃ­odo para ExportaÃ§Ã£o */}
+              {/* Filtro de Período para Exportação */}
               <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-700">
                 <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
                   <ClockIcon className="h-4 w-4 mr-2" />
@@ -3095,7 +3095,7 @@ export default function LocalizacaoAnimais() {
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
-                      AtÃ©
+                      Até
                     </label>
                     <input
                       type="date"
@@ -3107,13 +3107,13 @@ export default function LocalizacaoAnimais() {
                 </div>
               </div>
 
-              {/* BotÃ£o Selecionar Todos */}
+              {/* Botão Selecionar Todos */}
               <div className="mb-4">
                 <button
                   onClick={toggleTodosCampos}
                   className="px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-medium transition-all duration-200"
                 >
-                  {Object.values(selectedFields).every(v => v) ? 'âËœ� Desmarcar Todos' : 'âËœâ€˜ Selecionar Todos'}
+                  {Object.values(selectedFields).every(v => v) ? '☐ Desmarcar Todos' : '☑ Selecionar Todos'}
                 </button>
                 <span className="ml-4 text-sm text-gray-600 dark:text-gray-400">
                   {Object.values(selectedFields).filter(v => v).length} de {Object.keys(selectedFields).length} campos selecionados
@@ -3167,14 +3167,14 @@ export default function LocalizacaoAnimais() {
                 disabled={Object.values(selectedFields).filter(v => v).length === 0}
                 className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl font-medium transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
-                âÅ“â€¦ Exportar ({Object.values(selectedFields).filter(v => v).length} campo(s))
+                ✅ Exportar ({Object.values(selectedFields).filter(v => v).length} campo(s))
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Modal de Cadastro RÃ¡pido de Piquete */}
+      {/* Modal de Cadastro Rápido de Piquete */}
       {showNovoPiqueteModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -3186,7 +3186,7 @@ export default function LocalizacaoAnimais() {
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-white">
-                      âÅ¾â€¢ Cadastrar Novo Piquete
+                      ➕ Cadastrar Novo Piquete
                     </h3>
                     <p className="text-green-100 text-sm">
                       Cadastre um novo piquete no banco de dados
@@ -3206,13 +3206,13 @@ export default function LocalizacaoAnimais() {
                   }}
                   className="text-white/80 hover:text-white p-2 hover:bg-white/10 rounded-xl transition-colors"
                 >
-                  âÅ“â€¢
+                  ✕
                 </button>
               </div>
             </div>
 
             <div className="p-6 space-y-4">
-              {/* Nome do Piquete (obrigatÃ³rio) */}
+              {/* Nome do Piquete (obrigatório) */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Nome do Piquete *
@@ -3230,10 +3230,10 @@ export default function LocalizacaoAnimais() {
 
               {/* Campos opcionais em grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Ã�rea */}
+                {/* Área */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Ã�rea (hectares)
+                    Área (hectares)
                   </label>
                   <input
                     type="number"
@@ -3249,7 +3249,7 @@ export default function LocalizacaoAnimais() {
                 {/* Capacidade */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Capacidade (cabeÃ§as)
+                    Capacidade (cabeças)
                   </label>
                   <input
                     type="number"
@@ -3271,20 +3271,20 @@ export default function LocalizacaoAnimais() {
                   type="text"
                   value={novoPiqueteData.tipo}
                   onChange={(e) => handlePiqueteFieldChange('tipo', e.target.value)}
-                  placeholder="Ex: Pastagem, RotaÃ§Ã£o, Repouso..."
+                  placeholder="Ex: Pastagem, Rotação, Repouso..."
                   className="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                 />
               </div>
 
-              {/* ObservaÃ§Ãµes */}
+              {/* Observações */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  ObservaÃ§Ãµes
+                  Observações
                 </label>
                 <textarea
                   value={novoPiqueteData.observacoes}
                   onChange={(e) => handlePiqueteFieldChange('observacoes', e.target.value)}
-                  placeholder="InformaÃ§Ãµes adicionais sobre o piquete..."
+                  placeholder="Informações adicionais sobre o piquete..."
                   rows={3}
                   className="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none"
                 />
@@ -3293,12 +3293,12 @@ export default function LocalizacaoAnimais() {
               {/* Dica */}
               <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
                 <div className="flex items-start space-x-2 text-green-800 dark:text-green-200 text-sm">
-                  <span className="text-lg">ðÅ¸â€™¡</span>
+                  <span className="text-lg">💡</span>
                   <div>
                     <p className="font-semibold mb-1">Dicas:</p>
-                    <p>ââ‚¬¢ Apenas o nome Ã© obrigatÃ³rio. Os demais campos sÃ£o opcionais.</p>
-                    <p>ââ‚¬¢ O piquete serÃ¡ automaticamente selecionado apÃ³s o cadastro.</p>
-                    <p>ââ‚¬¢ Todos os dados sÃ£o salvos no banco de dados PostgreSQL.</p>
+                    <p>• Apenas o nome é obrigatório. Os demais campos são opcionais.</p>
+                    <p>• O piquete será automaticamente selecionado após o cadastro.</p>
+                    <p>• Todos os dados são salvos no banco de dados PostgreSQL.</p>
                   </div>
                 </div>
               </div>
@@ -3329,7 +3329,7 @@ export default function LocalizacaoAnimais() {
               >
                 {criandoPiquete ? (
                   <>
-                    <span className="animate-spin">â�³</span>
+                    <span className="animate-spin">⏳</span>
                     <span>Cadastrando...</span>
                   </>
                 ) : (
@@ -3344,7 +3344,7 @@ export default function LocalizacaoAnimais() {
         </div>
       )}
 
-      {/* Modal de ImportaÃ§Ã£o de Texto */}
+      {/* Modal de Importação de Texto */}
       {showImportTextModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
@@ -3356,7 +3356,7 @@ export default function LocalizacaoAnimais() {
                     <DocumentTextIcon className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-white">Importar LocalizaÃ§Ãµes via Texto</h3>
+                    <h3 className="text-2xl font-bold text-white">Importar Localizações via Texto</h3>
                     <p className="text-green-100 text-sm mt-1">Cole os dados copiados do Excel</p>
                   </div>
                 </div>
@@ -3375,20 +3375,20 @@ export default function LocalizacaoAnimais() {
 
             {/* Body */}
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
-              {/* InstruÃ§Ãµes */}
+              {/* Instruções */}
               <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
                 <div className="flex items-start space-x-2 text-blue-800 dark:text-blue-200 text-sm">
-                  <span className="text-lg">ââ€ž¹ï¸�</span>
+                  <span className="text-lg">ℹ️</span>
                   <div>
                     <p className="font-semibold mb-2">Como usar:</p>
                     <ol className="list-decimal list-inside space-y-1">
-                      <li>Selecione as colunas no Excel: SÃâ€°RIE, RG, LOCAL (e opcionalmente OBSERVAÃâ€¡Ãâ€¢ES)</li>
+                      <li>Selecione as colunas no Excel: SÉRIE, RG, LOCAL (e opcionalmente OBSERVAÇÕES)</li>
                       <li>Copie os dados selecionados (Ctrl+C)</li>
                       <li>Cole no campo abaixo (Ctrl+V)</li>
                       <li>Clique em "Importar"</li>
                     </ol>
                     <p className="mt-2 font-medium">Formato esperado por linha:</p>
-                    <code className="block mt-1 p-2 bg-white dark:bg-gray-800 rounded">SÃâ€°RIE    RG    LOCAL    [OBSERVAÃâ€¡Ãâ€¢ES]</code>
+                    <code className="block mt-1 p-2 bg-white dark:bg-gray-800 rounded">SÉRIE    RG    LOCAL    [OBSERVAÇÕES]</code>
                   </div>
                 </div>
               </div>
@@ -3401,7 +3401,7 @@ export default function LocalizacaoAnimais() {
                 <textarea
                   value={importText}
                   onChange={(e) => setImportText(e.target.value)}
-                  placeholder="Cole aqui os dados copiados do Excel...&#10;&#10;Exemplo:&#10;NACION    15397    PIQUETE 1&#10;NERO    DO MORRO    PIQUETE 2    Animal em observaÃ§Ã£o"
+                  placeholder="Cole aqui os dados copiados do Excel...&#10;&#10;Exemplo:&#10;NACION    15397    PIQUETE 1&#10;NERO    DO MORRO    PIQUETE 2    Animal em observação"
                   rows={12}
                   className="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 font-mono text-sm resize-none"
                   disabled={importandoTexto}
@@ -3414,27 +3414,27 @@ export default function LocalizacaoAnimais() {
 
               {/* Exemplo visual */}
               <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-700">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Exemplo de dados vÃ¡lidos (copie do Excel):</p>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Exemplo de dados válidos (copie do Excel):</p>
                 <pre className="text-xs text-gray-600 dark:text-gray-400 font-mono overflow-x-auto">
 CJCJ 1    17207    PIQUETE 1
 CJCJ 2    17215    PIQUETE 1
 EAGB      6058     PIQUETE 1
                 </pre>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                  ðÅ¸â€™¡ Dica: Selecione as 3 colunas no Excel (SÃâ€°RIE, RG, LOCAL) e cole aqui com Ctrl+V
+                  💡 Dica: Selecione as 3 colunas no Excel (SÉRIE, RG, LOCAL) e cole aqui com Ctrl+V
                 </p>
               </div>
 
-              {/* Debug: mostrar como os dados serÃ£o parseados */}
+              {/* Debug: mostrar como os dados serão parseados */}
               {importText.trim() && (
                 <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-200 dark:border-purple-800">
-                  <p className="text-sm font-medium text-purple-700 dark:text-purple-300 mb-2">Preview do que serÃ¡ importado:</p>
+                  <p className="text-sm font-medium text-purple-700 dark:text-purple-300 mb-2">Preview do que será importado:</p>
                   <div className="max-h-40 overflow-y-auto">
                     <table className="w-full text-xs">
                       <thead className="bg-purple-100 dark:bg-purple-900/40 sticky top-0">
                         <tr>
                           <th className="px-2 py-1 text-left text-purple-900 dark:text-purple-100">Linha</th>
-                          <th className="px-2 py-1 text-left text-purple-900 dark:text-purple-100">SÃ©rie</th>
+                          <th className="px-2 py-1 text-left text-purple-900 dark:text-purple-100">Série</th>
                           <th className="px-2 py-1 text-left text-purple-900 dark:text-purple-100">RG</th>
                           <th className="px-2 py-1 text-left text-purple-900 dark:text-purple-100">Local</th>
                         </tr>
@@ -3444,15 +3444,15 @@ EAGB      6058     PIQUETE 1
                           let partes = linha.trim().split(/\t+/).filter(p => p.trim())
                           if (partes.length < 3) partes = linha.trim().split(/\s{2,}/).filter(p => p.trim())
                           if (partes.length < 3) partes = linha.trim().split(/\s+/).filter(p => p.trim())
-                          let localPreview = partes[2] || 'â�Å’'
+                          let localPreview = partes[2] || '❌'
                           if (partes.length >= 4 && /^\d+$/.test(partes[3]) && (/^(PIQUETE|PTO|P|PASTO|PTOUFTF)$/i.test(partes[2]) || /^[A-Za-z]+$/.test(partes[2]))) {
                             localPreview = `${partes[2]} ${partes[3]}`
                           }
                           return (
                             <tr key={idx} className={partes.length < 3 ? 'bg-red-50 dark:bg-red-900/20' : ''}>
                               <td className="px-2 py-1 text-purple-900 dark:text-purple-100">{idx + 1}</td>
-                              <td className="px-2 py-1 text-purple-900 dark:text-purple-100 font-semibold">{partes[0] || 'â�Å’'}</td>
-                              <td className="px-2 py-1 text-purple-900 dark:text-purple-100 font-semibold">{partes[1] || 'â�Å’'}</td>
+                              <td className="px-2 py-1 text-purple-900 dark:text-purple-100 font-semibold">{partes[0] || '❌'}</td>
+                              <td className="px-2 py-1 text-purple-900 dark:text-purple-100 font-semibold">{partes[1] || '❌'}</td>
                               <td className="px-2 py-1 text-purple-900 dark:text-purple-100">{localPreview}</td>
                             </tr>
                           )
@@ -3516,7 +3516,7 @@ EAGB      6058     PIQUETE 1
         </div>
       )}
 
-      {/* Modal de Erros de ImportaÃ§Ã£o */}
+      {/* Modal de Erros de Importação */}
       {showErrosImportacao && errosImportacao && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
@@ -3528,7 +3528,7 @@ EAGB      6058     PIQUETE 1
                     <DocumentTextIcon className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-white">Detalhes da ImportaÃ§Ã£o</h3>
+                    <h3 className="text-2xl font-bold text-white">Detalhes da Importação</h3>
                     <p className="text-orange-100 text-sm mt-1">
                       {errosImportacao.animaisAtualizados} importados, {(errosImportacao.naoEncontrados?.length || 0) + (errosImportacao.erros?.length || 0)} com problemas
                     </p>
@@ -3572,12 +3572,12 @@ EAGB      6058     PIQUETE 1
                 </div>
               </div>
 
-              {/* Animais nÃ£o encontrados */}
+              {/* Animais não encontrados */}
               {errosImportacao.naoEncontrados && errosImportacao.naoEncontrados.length > 0 && (
                 <div className="space-y-3">
                   <h4 className="text-lg font-bold text-gray-900 dark:text-white flex items-center space-x-2">
-                    <span>ðÅ¸â€��</span>
-                    <span>Animais NÃ£o Encontrados ({errosImportacao.naoEncontrados.length})</span>
+                    <span>🔍</span>
+                    <span>Animais Não Encontrados ({errosImportacao.naoEncontrados.length})</span>
                   </h4>
                   <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl border border-yellow-200 dark:border-yellow-800 overflow-hidden">
                     <div className="overflow-x-auto">
@@ -3601,11 +3601,11 @@ EAGB      6058     PIQUETE 1
                               />
                             </th>
                             <th className="px-4 py-3 text-left font-semibold text-yellow-900 dark:text-yellow-100">Linha</th>
-                            <th className="px-4 py-3 text-left font-semibold text-yellow-900 dark:text-yellow-100">SÃ©rie</th>
+                            <th className="px-4 py-3 text-left font-semibold text-yellow-900 dark:text-yellow-100">Série</th>
                             <th className="px-4 py-3 text-left font-semibold text-yellow-900 dark:text-yellow-100">RG</th>
                             <th className="px-4 py-3 text-left font-semibold text-yellow-900 dark:text-yellow-100">Local</th>
                             <th className="px-4 py-3 text-left font-semibold text-yellow-900 dark:text-yellow-100">Motivo</th>
-                            <th className="px-4 py-3 text-center font-semibold text-yellow-900 dark:text-yellow-100 w-24">AÃ§Ã£o</th>
+                            <th className="px-4 py-3 text-center font-semibold text-yellow-900 dark:text-yellow-100 w-24">Ação</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-yellow-200 dark:divide-yellow-800">
@@ -3638,7 +3638,7 @@ EAGB      6058     PIQUETE 1
                                   }}
                                   className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-medium"
                                 >
-                                  âÅ“�ï¸� Corrigir
+                                  ✏️ Corrigir
                                 </button>
                               </td>
                             </tr>
@@ -3649,7 +3649,7 @@ EAGB      6058     PIQUETE 1
                   </div>
                   <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                     <p className="text-sm text-blue-800 dark:text-blue-200">
-                      ðÅ¸â€™¡ <strong>Dica:</strong> Verifique se a SÃ©rie e RG estÃ£o corretos no banco de dados. A busca Ã© case-insensitive.
+                      💡 <strong>Dica:</strong> Verifique se a Série e RG estão corretos no banco de dados. A busca é case-insensitive.
                     </p>
                   </div>
                 </div>
@@ -3659,7 +3659,7 @@ EAGB      6058     PIQUETE 1
               {errosImportacao.erros && errosImportacao.erros.length > 0 && (
                 <div className="space-y-3">
                   <h4 className="text-lg font-bold text-gray-900 dark:text-white flex items-center space-x-2">
-                    <span>â�Å’</span>
+                    <span>❌</span>
                     <span>Erros de Processamento ({errosImportacao.erros.length})</span>
                   </h4>
                   <div className="bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800 overflow-hidden">
@@ -3684,11 +3684,11 @@ EAGB      6058     PIQUETE 1
                               />
                             </th>
                             <th className="px-4 py-3 text-left font-semibold text-red-900 dark:text-red-100">Linha</th>
-                            <th className="px-4 py-3 text-left font-semibold text-red-900 dark:text-red-100">SÃ©rie</th>
+                            <th className="px-4 py-3 text-left font-semibold text-red-900 dark:text-red-100">Série</th>
                             <th className="px-4 py-3 text-left font-semibold text-red-900 dark:text-red-100">RG</th>
                             <th className="px-4 py-3 text-left font-semibold text-red-900 dark:text-red-100">Local</th>
                             <th className="px-4 py-3 text-left font-semibold text-red-900 dark:text-red-100">Motivo</th>
-                            <th className="px-4 py-3 text-center font-semibold text-red-900 dark:text-red-100 w-24">AÃ§Ã£o</th>
+                            <th className="px-4 py-3 text-center font-semibold text-red-900 dark:text-red-100 w-24">Ação</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-red-200 dark:divide-red-800">
@@ -3721,7 +3721,7 @@ EAGB      6058     PIQUETE 1
                                   }}
                                   className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-medium"
                                 >
-                                  âÅ“�ï¸� Corrigir
+                                  ✏️ Corrigir
                                 </button>
                               </td>
                             </tr>
@@ -3733,11 +3733,11 @@ EAGB      6058     PIQUETE 1
                 </div>
               )}
 
-              {/* AÃ§Ãµes em lote e copiar */}
+              {/* Ações em lote e copiar */}
               {(errosImportacao.naoEncontrados?.length || 0) + (errosImportacao.erros?.length || 0) > 0 && (
                 <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800 space-y-3">
                   <p className="text-sm font-semibold text-amber-900 dark:text-amber-100">
-                    AÃ§Ãµes em lote ({itensFalhaSelecionados.size} selecionado(s))
+                    Ações em lote ({itensFalhaSelecionados.size} selecionado(s))
                   </p>
                   <div className="flex flex-wrap gap-2">
                     <button
@@ -3758,7 +3758,7 @@ EAGB      6058     PIQUETE 1
                       }}
                       className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg text-sm font-medium"
                     >
-                      âÅ“�ï¸� Corrigir selecionados
+                      ✏️ Corrigir selecionados
                     </button>
                     <button
                       type="button"
@@ -3808,7 +3808,7 @@ EAGB      6058     PIQUETE 1
                         }
                         setCadastrandoEmLote(false)
                         setItensFalhaSelecionados(new Set())
-                        alert(`âÅ“â€¦ ${ok} cadastrado(s) e importado(s). ${err > 0 ? `â�Å’ ${err} erro(s).` : ''}`)
+                        alert(`✅ ${ok} cadastrado(s) e importado(s). ${err > 0 ? `❌ ${err} erro(s).` : ''}`)
                         setErrosImportacao(prev => ({
                           ...prev,
                           animaisAtualizados: (prev?.animaisAtualizados || 0) + ok,
@@ -3820,7 +3820,7 @@ EAGB      6058     PIQUETE 1
                       }}
                       className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg text-sm font-medium"
                     >
-                      {cadastrandoEmLote ? 'â�³ Cadastrando...' : `âÅ¾â€¢ Cadastrar selecionados (SÃ©rie + RG)`}
+                      {cadastrandoEmLote ? '⏳ Cadastrando...' : `➕ Cadastrar selecionados (Série + RG)`}
                     </button>
                     <button
                       type="button"
@@ -3863,7 +3863,7 @@ EAGB      6058     PIQUETE 1
                         }
                         setCadastrandoEmLote(false)
                         setItensFalhaSelecionados(new Set())
-                        alert(`âÅ“â€¦ ${ok} cadastrado(s) e importado(s). ${err > 0 ? `â�Å’ ${err} erro(s).` : ''}`)
+                        alert(`✅ ${ok} cadastrado(s) e importado(s). ${err > 0 ? `❌ ${err} erro(s).` : ''}`)
                         setErrosImportacao(prev => ({
                           ...prev,
                           animaisAtualizados: (prev?.animaisAtualizados || 0) + ok,
@@ -3875,38 +3875,38 @@ EAGB      6058     PIQUETE 1
                       }}
                       className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white rounded-lg text-sm font-medium"
                     >
-                      {cadastrandoEmLote ? 'â�³ Adicionando...' : 'âÅ¾â€¢ Adicionar todos os que faltam'}
+                      {cadastrandoEmLote ? '⏳ Adicionando...' : '➕ Adicionar todos os que faltam'}
                     </button>
                     <button
                       type="button"
                       onClick={() => {
                         const todos = [
-                          ...(errosImportacao.naoEncontrados || []).map(i => ({ ...i, tipo: 'NÃ£o encontrado' })),
+                          ...(errosImportacao.naoEncontrados || []).map(i => ({ ...i, tipo: 'Não encontrado' })),
                           ...(errosImportacao.erros || []).map(i => ({ ...i, tipo: 'Erro' }))
                         ].sort((a, b) => (a.linha || 0) - (b.linha || 0))
-                        const texto = 'LINHA\tSÃâ€°RIE\tRG\tLOCAL\tMOTIVO\n' + todos.map(i => `${i.linha}\t${i.serie}\t${i.rg}\t${i.local}\t${(i.motivo || i.tipo || '').replace(/\t/g, ' ')}`).join('\n')
+                        const texto = 'LINHA\tSÉRIE\tRG\tLOCAL\tMOTIVO\n' + todos.map(i => `${i.linha}\t${i.serie}\t${i.rg}\t${i.local}\t${(i.motivo || i.tipo || '').replace(/\t/g, ' ')}`).join('\n')
                         navigator.clipboard.writeText(texto).then(() => {
-                          alert(`âÅ“â€¦ ${todos.length} registro(s) copiado(s)!`)
+                          alert(`✅ ${todos.length} registro(s) copiado(s)!`)
                         }).catch(() => alert('Erro ao copiar.'))
                       }}
                       className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-medium"
                     >
-                      ðÅ¸â€œâ€¹ Copiar lista
+                      📋 Copiar lista
                     </button>
                   </div>
                   <p className="text-xs text-amber-700 dark:text-amber-300">
-                    Cadastrar cria o animal com SÃ©rie e RG. Complemente os dados depois na tela de Animais.
+                    Cadastrar cria o animal com Série e RG. Complemente os dados depois na tela de Animais.
                   </p>
                 </div>
               )}
 
-              {/* Mensagem de sucesso se nÃ£o houver erros */}
+              {/* Mensagem de sucesso se não houver erros */}
               {(!errosImportacao.naoEncontrados || errosImportacao.naoEncontrados.length === 0) && 
                (!errosImportacao.erros || errosImportacao.erros.length === 0) && (
                 <div className="p-6 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800 text-center">
-                  <div className="text-6xl mb-4">âÅ“â€¦</div>
+                  <div className="text-6xl mb-4">✅</div>
                   <h4 className="text-xl font-bold text-green-900 dark:text-green-100 mb-2">
-                    ImportaÃ§Ã£o 100% ConcluÃ­da!
+                    Importação 100% Concluída!
                   </h4>
                   <p className="text-green-700 dark:text-green-300">
                     Todos os {errosImportacao.totalLinhas} animais foram importados com sucesso.
@@ -3919,7 +3919,7 @@ EAGB      6058     PIQUETE 1
             <div className="flex items-center justify-between p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
               <div className="text-sm text-gray-600 dark:text-gray-400">
                 {errosImportacao.animaisAtualizados > 0 && (
-                  <span>âÅ“â€¦ {errosImportacao.animaisAtualizados} animais foram atualizados com sucesso</span>
+                  <span>✅ {errosImportacao.animaisAtualizados} animais foram atualizados com sucesso</span>
                 )}
               </div>
               <button
@@ -3940,17 +3940,17 @@ EAGB      6058     PIQUETE 1
         </div>
       )}
 
-      {/* Modal Corrigir item nÃ£o importado */}
+      {/* Modal Corrigir item não importado */}
       {itemCorrigindo && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">âÅ“�ï¸� Corrigir e importar</h3>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">✏️ Corrigir e importar</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              Ajuste os dados ou cadastre o animal que nÃ£o foi encontrado.
+              Ajuste os dados ou cadastre o animal que não foi encontrado.
             </p>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">SÃ©rie</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Série</label>
                 <input
                   type="text"
                   value={correcaoDados.serie}
@@ -3996,7 +3996,7 @@ EAGB      6058     PIQUETE 1
                     const data = await res.json()
                     const r = data.data?.resultados || data.resultados || {}
                     if (r.animaisAtualizados > 0) {
-                      alert('âÅ“â€¦ Importado com sucesso!')
+                      alert('✅ Importado com sucesso!')
                       setErrosImportacao(prev => ({
                         ...prev,
                         animaisAtualizados: (prev?.animaisAtualizados || 0) + 1,
@@ -4007,18 +4007,18 @@ EAGB      6058     PIQUETE 1
                       await carregarDados()
                       await carregarLocais()
                     } else {
-                      const motivo = r.naoEncontrados?.[0]?.motivo || r.erros?.[0]?.motivo || 'Animal nÃ£o encontrado'
-                      alert(`â�Å’ NÃ£o foi possÃ­vel importar: ${motivo}\n\nTente "Cadastrar animal" se ele ainda nÃ£o existir no sistema.`)
+                      const motivo = r.naoEncontrados?.[0]?.motivo || r.erros?.[0]?.motivo || 'Animal não encontrado'
+                      alert(`❌ Não foi possível importar: ${motivo}\n\nTente "Cadastrar animal" se ele ainda não existir no sistema.`)
                     }
                   } catch (e) {
-                    alert('Erro ao importar: ' + (e?.message || 'Erro de conexÃ£o'))
+                    alert('Erro ao importar: ' + (e?.message || 'Erro de conexão'))
                   } finally {
                     setCorrigindo(false)
                   }
                 }}
                 className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-xl font-medium"
               >
-                {corrigindo ? 'â�³ Importando...' : 'ðÅ¸â€�â€ž Tentar importar com dados corrigidos'}
+                {corrigindo ? '⏳ Importando...' : '🔄 Tentar importar com dados corrigidos'}
               </button>
               <button
                 type="button"
@@ -4055,7 +4055,7 @@ EAGB      6058     PIQUETE 1
                       const r = dataLoc.data?.resultados || dataLoc.resultados || {}
                       importouLoc = (r.animaisAtualizados || 0) > 0
                     }
-                    alert(temLocal && importouLoc ? 'âÅ“â€¦ Animal cadastrado e localizaÃ§Ã£o importada com sucesso!' : 'âÅ“â€¦ Animal cadastrado com sucesso! Complemente os dados na tela de Animais.')
+                    alert(temLocal && importouLoc ? '✅ Animal cadastrado e localização importada com sucesso!' : '✅ Animal cadastrado com sucesso! Complemente os dados na tela de Animais.')
                     setErrosImportacao(prev => ({
                       ...prev,
                       animaisAtualizados: (prev?.animaisAtualizados || 0) + 1,
@@ -4073,7 +4073,7 @@ EAGB      6058     PIQUETE 1
                 }}
                 className="w-full px-4 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-xl font-medium"
               >
-                {corrigindo ? 'â�³ Cadastrando...' : 'âÅ¾â€¢ Cadastrar animal e importar localizaÃ§Ã£o'}
+                {corrigindo ? '⏳ Cadastrando...' : '➕ Cadastrar animal e importar localização'}
               </button>
               <a
                 href={`/animals?action=new`}
@@ -4081,7 +4081,7 @@ EAGB      6058     PIQUETE 1
                 rel="noopener noreferrer"
                 className="block w-full px-4 py-2 text-center border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-100 dark:hover:bg-gray-700"
               >
-                ðÅ¸â€œâ€¹ Abrir cadastro completo (nova aba)
+                📋 Abrir cadastro completo (nova aba)
               </a>
               <button
                 type="button"

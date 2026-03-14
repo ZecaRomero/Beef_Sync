@@ -39,7 +39,7 @@ const REPORT_TYPES = {
   monthly_summary: {
     id: 'monthly_summary',
     name: 'Resumo Mensal',
-    description: 'RelatÃ³rio completo das atividades do mÃªs',
+    description: 'Relatório completo das atividades do mês',
     icon: CalendarIcon,
     color: 'blue',
     sections: [
@@ -53,8 +53,8 @@ const REPORT_TYPES = {
   },
   births_analysis: {
     id: 'births_analysis',
-    name: 'AnÃ¡lise de Nascimentos',
-    description: 'Detalhamento dos nascimentos por perÃ­odo',
+    name: 'Análise de Nascimentos',
+    description: 'Detalhamento dos nascimentos por período',
     icon: UserGroupIcon,
     color: 'green',
     sections: [
@@ -67,8 +67,8 @@ const REPORT_TYPES = {
   },
   breeding_report: {
     id: 'breeding_report',
-    name: 'RelatÃ³rio de ReproduÃ§Ã£o',
-    description: 'AnÃ¡lise reprodutiva do rebanho',
+    name: 'Relatório de Reprodução',
+    description: 'Análise reprodutiva do rebanho',
     icon: ChartBarIcon,
     color: 'purple',
     sections: [
@@ -82,7 +82,7 @@ const REPORT_TYPES = {
   financial_summary: {
     id: 'financial_summary',
     name: 'Resumo Financeiro',
-    description: 'AnÃ¡lise financeira das operaÃ§Ãµes',
+    description: 'Análise financeira das operações',
     icon: DocumentTextIcon,
     color: 'yellow',
     sections: [
@@ -95,8 +95,8 @@ const REPORT_TYPES = {
   },
   productivity_report: {
     id: 'productivity_report',
-    name: 'RelatÃ³rio de Produtividade',
-    description: 'AnÃ¡lise detalhada da produtividade do rebanho com dados reais',
+    name: 'Relatório de Produtividade',
+    description: 'Análise detalhada da produtividade do rebanho com dados reais',
     icon: ChartBarIcon,
     color: 'emerald',
     sections: [
@@ -109,8 +109,8 @@ const REPORT_TYPES = {
   },
   cost_report: {
     id: 'cost_report',
-    name: 'RelatÃ³rio de Custos',
-    description: 'AnÃ¡lise detalhada dos custos operacionais sem dados fictÃ­cios',
+    name: 'Relatório de Custos',
+    description: 'Análise detalhada dos custos operacionais sem dados fictícios',
     icon: DocumentTextIcon,
     color: 'red',
     sections: [
@@ -123,8 +123,8 @@ const REPORT_TYPES = {
   },
   financial_analysis: {
     id: 'financial_analysis',
-    name: 'AnÃ¡lise Financeira Completa',
-    description: 'AnÃ¡lise financeira abrangente com mÃ©tricas de rentabilidade',
+    name: 'Análise Financeira Completa',
+    description: 'Análise financeira abrangente com métricas de rentabilidade',
     icon: CalculatorIcon,
     color: 'teal',
     sections: [
@@ -138,8 +138,8 @@ const REPORT_TYPES = {
   },
   inventory_report: {
     id: 'inventory_report',
-    name: 'RelatÃ³rio de Estoque',
-    description: 'Status do estoque e movimentaÃ§Ãµes',
+    name: 'Relatório de Estoque',
+    description: 'Status do estoque e movimentações',
     icon: DocumentArrowDownIcon,
     color: 'indigo',
     sections: [
@@ -151,8 +151,8 @@ const REPORT_TYPES = {
   },
   location_report: {
     id: 'location_report',
-    name: 'RelatÃ³rio de LocalizaÃ§Ã£o',
-    description: 'LocalizaÃ§Ã£o atual e histÃ³rico de movimentaÃ§Ã£o dos animais',
+    name: 'Relatório de Localização',
+    description: 'Localização atual e histórico de movimentação dos animais',
     icon: MapPinIcon,
     color: 'orange',
     sections: [
@@ -165,10 +165,10 @@ const REPORT_TYPES = {
   }
 }
 
-// DestinatÃ¡rios serÃ£o carregados do localStorage ou estado local
+// Destinatários serão carregados do localStorage ou estado local
 
 export default function ReportGenerator() {
-  // Estados principais para navegaÃ§Ã£o
+  // Estados principais para navegação
   const [currentView, setCurrentView] = useState('dashboard') // dashboard, templates, builder, scheduler, generator
   
   // Estados existentes do gerador
@@ -191,7 +191,7 @@ export default function ReportGenerator() {
   const [loading, setLoading] = useState(false)
   const [customSections, setCustomSections] = useState({})
   
-  // Novos estados para funcionalidades avanÃ§adas
+  // Novos estados para funcionalidades avançadas
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false)
   const [filters, setFilters] = useState({
     animalType: '',
@@ -222,7 +222,7 @@ export default function ReportGenerator() {
       type: 'monthly'
     })
 
-    // Carregar destinatÃ¡rios salvos
+    // Carregar destinatários salvos
     loadRecipients()
   }, [])
 
@@ -240,14 +240,14 @@ export default function ReportGenerator() {
 
   const addRecipient = () => {
     if (!newRecipient.name || !newRecipient.whatsapp) {
-      alert('âÅ¡ ï¸� AtenÃ§Ã£o: Nome e WhatsApp sÃ£o obrigatÃ³rios')
+      alert('⚠️ Atenção: Nome e WhatsApp são obrigatórios')
       return
     }
 
-    // Validar formato do WhatsApp (apenas nÃºmeros)
+    // Validar formato do WhatsApp (apenas números)
     const whatsappClean = newRecipient.whatsapp.replace(/\D/g, '')
     if (whatsappClean.length < 10) {
-      alert('âÅ¡ ï¸� AtenÃ§Ã£o: WhatsApp deve ter pelo menos 10 dÃ­gitos')
+      alert('⚠️ Atenção: WhatsApp deve ter pelo menos 10 dígitos')
       return
     }
 
@@ -263,14 +263,14 @@ export default function ReportGenerator() {
     
     setNewRecipient({ name: '', whatsapp: '', role: '' })
     setShowAddRecipient(false)
-    alert('âÅ“â€¦ Sucesso! DestinatÃ¡rio adicionado com sucesso!')
+    alert('✅ Sucesso! Destinatário adicionado com sucesso!')
   }
 
   const removeRecipient = (recipientId) => {
     const updatedRecipients = recipients.filter(r => r.id !== recipientId)
     saveRecipients(updatedRecipients)
     setSelectedRecipients(prev => prev.filter(id => id !== recipientId))
-    alert('âÅ“â€¦ Sucesso! DestinatÃ¡rio removido com sucesso!')
+    alert('✅ Sucesso! Destinatário removido com sucesso!')
   }
 
   const handleReportToggle = (reportId) => {
@@ -301,7 +301,7 @@ export default function ReportGenerator() {
 
   const generatePreview = async () => {
     if (selectedReports.length === 0) {
-      alert('âÅ¡ ï¸� AtenÃ§Ã£o: Selecione pelo menos um tipo de relatÃ³rio')
+      alert('⚠️ Atenção: Selecione pelo menos um tipo de relatório')
       return
     }
 
@@ -325,7 +325,7 @@ export default function ReportGenerator() {
       setPreviewData(data)
       setShowPreview(true)
     } catch (error) {
-      alert('â�Å’ Erro: NÃ£o foi possÃ­vel gerar o preview do relatÃ³rio')
+      alert('❌ Erro: Não foi possível gerar o preview do relatório')
     } finally {
       setLoading(false)
     }
@@ -333,19 +333,19 @@ export default function ReportGenerator() {
 
   const sendReports = async () => {
     if (selectedReports.length === 0) {
-      alert('âÅ¡ ï¸� AtenÃ§Ã£o: Selecione pelo menos um tipo de relatÃ³rio')
+      alert('⚠️ Atenção: Selecione pelo menos um tipo de relatório')
       return
     }
 
     if (selectedRecipients.length === 0) {
-      alert('âÅ¡ ï¸� AtenÃ§Ã£o: Selecione pelo menos um destinatÃ¡rio')
+      alert('⚠️ Atenção: Selecione pelo menos um destinatário')
       return
     }
 
     try {
       setLoading(true)
       
-      // Obter dados dos destinatÃ¡rios selecionados
+      // Obter dados dos destinatários selecionados
       const selectedRecipientsData = recipients.filter(r => 
         selectedRecipients.includes(r.id)
       )
@@ -361,16 +361,16 @@ export default function ReportGenerator() {
         })
       })
 
-      if (!response.ok) throw new Error('Erro ao enviar relatÃ³rios')
+      if (!response.ok) throw new Error('Erro ao enviar relatórios')
       
-      alert(`âÅ“â€¦ Sucesso! RelatÃ³rios enviados via WhatsApp para ${selectedRecipientsData.length} destinatÃ¡rio(s)!`)
+      alert(`✅ Sucesso! Relatórios enviados via WhatsApp para ${selectedRecipientsData.length} destinatário(s)!`)
       
       // Reset form
       setSelectedReports([])
       setSelectedRecipients([])
       setCustomSections({})
     } catch (error) {
-      alert('â�Å’ Erro: NÃ£o foi possÃ­vel enviar os relatÃ³rios via WhatsApp')
+      alert('❌ Erro: Não foi possível enviar os relatórios via WhatsApp')
     } finally {
       setLoading(false)
     }
@@ -378,14 +378,14 @@ export default function ReportGenerator() {
 
   const downloadReport = async (format = 'pdf') => {
     if (selectedReports.length === 0) {
-      alert('âÅ¡ ï¸� AtenÃ§Ã£o: Selecione pelo menos um tipo de relatÃ³rio')
+      alert('⚠️ Atenção: Selecione pelo menos um tipo de relatório')
       return
     }
 
     try {
       setLoading(true)
       
-      console.log('ðÅ¸â€œÅ  Iniciando download do relatÃ³rio...', { format, reports: selectedReports })
+      console.log('📊 Iniciando download do relatório...', { format, reports: selectedReports })
       
       const response = await fetch('/api/reports/download', {
         method: 'POST',
@@ -399,46 +399,46 @@ export default function ReportGenerator() {
         })
       })
 
-      console.log('ðÅ¸â€œ¡ Resposta da API:', response.status, response.statusText)
+      console.log('📡 Resposta da API:', response.status, response.statusText)
 
       if (!response.ok) {
         const errorText = await response.text()
-        console.error('â�Å’ Erro da API:', errorText)
+        console.error('❌ Erro da API:', errorText)
         throw new Error(`Erro ${response.status}: ${errorText}`)
       }
       
       const contentType = response.headers.get('content-type')
-      console.log('ðÅ¸â€œâ€¹ Content-Type:', contentType)
+      console.log('📋 Content-Type:', contentType)
       
       const blob = await response.blob()
-      console.log('ðÅ¸â€œ¦ Blob criado:', blob.size, 'bytes')
+      console.log('📦 Blob criado:', blob.size, 'bytes')
       
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
       
-      // Definir extensÃ£o correta baseada no formato
+      // Definir extensão correta baseada no formato
       const fileExtension = format === 'xlsx' || format === 'excel' ? 'xlsx' : format
       const filename = `relatorio-${reportPeriod.startDate}-${reportPeriod.endDate}.${fileExtension}`
       a.download = filename
       
-      console.log('ðÅ¸â€™¾ Baixando arquivo:', filename)
+      console.log('💾 Baixando arquivo:', filename)
       
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
       
-      alert('âÅ“â€¦ Sucesso! RelatÃ³rio baixado com sucesso!')
+      alert('✅ Sucesso! Relatório baixado com sucesso!')
     } catch (error) {
-      console.error('â�Å’ Erro completo:', error)
-      alert(`â�Å’ Erro: ${error.message || 'NÃ£o foi possÃ­vel baixar o relatÃ³rio'}`)
+      console.error('❌ Erro completo:', error)
+      alert(`❌ Erro: ${error.message || 'Não foi possível baixar o relatório'}`)
     } finally {
       setLoading(false)
     }
   }
 
-  // Novas funÃ§Ãµes para funcionalidades avanÃ§adas
+  // Novas funções para funcionalidades avançadas
   const resetFilters = () => {
     setFilters({
       animalType: '',
@@ -478,14 +478,14 @@ export default function ReportGenerator() {
         return (
           <div className="p-8 text-center">
             <p className="text-gray-600 dark:text-gray-400">
-              VisualizaÃ§Ã£o nÃ£o disponÃ­vel para este tipo de relatÃ³rio.
+              Visualização não disponível para este tipo de relatório.
             </p>
           </div>
         )
     }
   }
 
-  // Handlers para navegaÃ§Ã£o
+  // Handlers para navegação
   const handleCreateReport = () => {
     setCurrentView('generator')
   }
@@ -496,8 +496,8 @@ export default function ReportGenerator() {
     // Configurar o gerador com base no template
     if (template.sections) {
       const reportTypes = template.sections.map(section => {
-        // Mapear seÃ§Ãµes do template para tipos de relatÃ³rio
-        if (section.includes('LocalizaÃ§Ã£o') || section.includes('localizaÃ§Ã£o')) return 'location_report'
+        // Mapear seções do template para tipos de relatório
+        if (section.includes('Localização') || section.includes('localização')) return 'location_report'
         if (section.includes('Financeiro') || section.includes('financeiro')) return 'financial_summary'
         if (section.includes('Nascimento') || section.includes('nascimento')) return 'births_analysis'
         return 'monthly_summary'
@@ -511,7 +511,7 @@ export default function ReportGenerator() {
   }
 
   const handleSaveCustomReport = async (reportConfig) => {
-    // Salvar relatÃ³rio personalizado
+    // Salvar relatório personalizado
     const newReport = {
       ...reportConfig,
       id: Date.now().toString(),
@@ -523,7 +523,7 @@ export default function ReportGenerator() {
   }
 
   const handleViewReport = (report) => {
-    // Implementar visualizaÃ§Ã£o de relatÃ³rio
+    // Implementar visualização de relatório
     console.log('Viewing report:', report)
   }
 
@@ -562,21 +562,21 @@ export default function ReportGenerator() {
 
   const renderReportGenerator = () => (
     <div className="space-y-6">
-      {/* Header com navegaÃ§Ã£o */}
+      {/* Header com navegação */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Gerador de RelatÃ³rios
+            Gerador de Relatórios
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Crie e envie relatÃ³rios personalizados para sua equipe
+            Crie e envie relatórios personalizados para sua equipe
           </p>
         </div>
         <Button
           variant="secondary"
           onClick={() => setCurrentView('dashboard')}
         >
-          ââ€ � Voltar ao Dashboard
+          ← Voltar ao Dashboard
         </Button>
       </div>
 
@@ -588,7 +588,7 @@ export default function ReportGenerator() {
             <CardHeader>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
                 <CalendarIcon className="h-5 w-5 mr-2" />
-                PerÃ­odo do RelatÃ³rio
+                Período do Relatório
               </h3>
             </CardHeader>
             <CardBody>
@@ -655,7 +655,7 @@ export default function ReportGenerator() {
             <CardHeader>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
                 <DocumentTextIcon className="h-5 w-5 mr-2" />
-                Tipos de RelatÃ³rio
+                Tipos de Relatório
               </h3>
             </CardHeader>
             <CardBody>
@@ -684,7 +684,7 @@ export default function ReportGenerator() {
                                 {report.name}
                               </h4>
                               <div className="flex items-center space-x-2">
-                                {/* BotÃ£o de Visualizar para novos relatÃ³rios */}
+                                {/* Botão de Visualizar para novos relatórios */}
                                 {['productivity_report', 'cost_report', 'financial_analysis'].includes(report.id) && (
                                   <button
                                     onClick={(e) => {
@@ -692,7 +692,7 @@ export default function ReportGenerator() {
                                       openReportViewer(report.id)
                                     }}
                                     className="p-1 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/20 rounded transition-colors"
-                                    title="Visualizar RelatÃ³rio"
+                                    title="Visualizar Relatório"
                                   >
                                     <EyeIcon className="h-4 w-4" />
                                   </button>
@@ -720,7 +720,7 @@ export default function ReportGenerator() {
                       {isSelected && (
                         <div className="ml-6 space-y-2">
                           <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                            SeÃ§Ãµes do RelatÃ³rio:
+                            Seções do Relatório:
                           </h5>
                           <div className="grid grid-cols-2 gap-2">
                             {report.sections.map((section) => (
@@ -754,7 +754,7 @@ export default function ReportGenerator() {
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
                   <UserGroupIcon className="h-5 w-5 mr-2" />
-                  DestinatÃ¡rios
+                  Destinatários
                 </h3>
                 <Button
                   variant="secondary"
@@ -771,14 +771,14 @@ export default function ReportGenerator() {
                 <div className="text-center py-8">
                   <UserGroupIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-500 dark:text-gray-400 mb-4">
-                    Nenhum destinatÃ¡rio cadastrado
+                    Nenhum destinatário cadastrado
                   </p>
                   <Button
                     variant="primary"
                     onClick={() => setShowAddRecipient(true)}
                     leftIcon={<PlusIcon className="h-4 w-4" />}
                   >
-                    Adicionar Primeiro DestinatÃ¡rio
+                    Adicionar Primeiro Destinatário
                   </Button>
                 </div>
               ) : (
@@ -798,7 +798,7 @@ export default function ReportGenerator() {
                             {recipient.name}
                           </h4>
                           <p className="text-sm text-gray-600 dark:text-gray-400">
-                            ðÅ¸â€œ± +55 {recipient.whatsapp}
+                            📱 +55 {recipient.whatsapp}
                           </p>
                           <Badge variant="neutral" size="sm" className="mt-1">
                             {recipient.role}
@@ -814,7 +814,7 @@ export default function ReportGenerator() {
                           <button
                             onClick={() => removeRecipient(recipient.id)}
                             className="text-red-500 hover:text-red-700 p-1"
-                            title="Remover destinatÃ¡rio"
+                            title="Remover destinatário"
                           >
                             <TrashIcon className="h-4 w-4" />
                           </button>
@@ -827,13 +827,13 @@ export default function ReportGenerator() {
             </CardBody>
           </Card>
 
-          {/* Filtros AvanÃ§ados */}
+          {/* Filtros Avançados */}
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
                   <FunnelIcon className="h-5 w-5 mr-2" />
-                  Filtros AvanÃ§ados
+                  Filtros Avançados
                 </h3>
                 <Button
                   variant="ghost"
@@ -860,14 +860,14 @@ export default function ReportGenerator() {
                         <option value="">Todos os tipos</option>
                         <option value="bovino">Bovino</option>
                         <option value="equino">Equino</option>
-                        <option value="suino">SuÃ­no</option>
+                        <option value="suino">Suíno</option>
                         <option value="ovino">Ovino</option>
                       </select>
                     </div>
                     
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        RaÃ§a
+                        Raça
                       </label>
                       <input
                         type="text"
@@ -882,7 +882,7 @@ export default function ReportGenerator() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        LocalizaÃ§Ã£o
+                        Localização
                       </label>
                       <input
                         type="text"
@@ -904,8 +904,8 @@ export default function ReportGenerator() {
                       >
                         <option value="">Todas as categorias</option>
                         <option value="medicamentos">Medicamentos</option>
-                        <option value="veterinario">VeterinÃ¡rio</option>
-                        <option value="manutencao">ManutenÃ§Ã£o</option>
+                        <option value="veterinario">Veterinário</option>
+                        <option value="manutencao">Manutenção</option>
                         <option value="outros">Outros</option>
                       </select>
                     </div>
@@ -914,7 +914,7 @@ export default function ReportGenerator() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Faixa EtÃ¡ria (meses)
+                        Faixa Etária (meses)
                       </label>
                       <div className="flex space-x-2">
                         <input
@@ -981,7 +981,7 @@ export default function ReportGenerator() {
           <Card>
             <CardHeader>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                AÃ§Ãµes
+                Ações
               </h3>
             </CardHeader>
             <CardBody>
@@ -1003,7 +1003,7 @@ export default function ReportGenerator() {
                   onClick={sendReports}
                   loading={loading}
                 >
-                  ðÅ¸â€œ± Enviar via WhatsApp
+                  📱 Enviar via WhatsApp
                 </Button>
 
                 <div className="flex space-x-2">
@@ -1041,13 +1041,13 @@ export default function ReportGenerator() {
               <CardBody>
                 <div className="space-y-2 text-sm">
                   <p className="text-gray-600 dark:text-gray-400">
-                    <strong>RelatÃ³rios:</strong> {selectedReports.length} selecionados
+                    <strong>Relatórios:</strong> {selectedReports.length} selecionados
                   </p>
                   <p className="text-gray-600 dark:text-gray-400">
-                    <strong>DestinatÃ¡rios:</strong> {selectedRecipients.length} selecionados
+                    <strong>Destinatários:</strong> {selectedRecipients.length} selecionados
                   </p>
                   <p className="text-gray-600 dark:text-gray-400">
-                    <strong>PerÃ­odo:</strong> {reportPeriod.startDate} atÃ© {reportPeriod.endDate}
+                    <strong>Período:</strong> {reportPeriod.startDate} até {reportPeriod.endDate}
                   </p>
                 </div>
               </CardBody>
@@ -1067,14 +1067,14 @@ export default function ReportGenerator() {
       <Modal
         isOpen={showPreview}
         onClose={() => setShowPreview(false)}
-        title="Preview do RelatÃ³rio"
+        title="Preview do Relatório"
         size="xl"
       >
         {previewData && (
           <div className="space-y-4">
             <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
               <h4 className="font-medium text-gray-900 dark:text-white mb-2">
-                PerÃ­odo: {reportPeriod.startDate} atÃ© {reportPeriod.endDate}
+                Período: {reportPeriod.startDate} até {reportPeriod.endDate}
               </h4>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
@@ -1097,7 +1097,7 @@ export default function ReportGenerator() {
             </div>
             
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Este Ã© um preview simplificado. O relatÃ³rio completo serÃ¡ gerado com todos os dados detalhados.
+              Este é um preview simplificado. O relatório completo será gerado com todos os dados detalhados.
             </p>
           </div>
         )}
@@ -1110,20 +1110,20 @@ export default function ReportGenerator() {
           setShowAddRecipient(false)
           setNewRecipient({ name: '', whatsapp: '', role: '' })
         }}
-        title="Adicionar DestinatÃ¡rio"
+        title="Adicionar Destinatário"
         size="md"
       >
         <div className="space-y-4">
           <Input
-            label="ðÅ¸â€œ� Nome Completo"
+            label="📝 Nome Completo"
             value={newRecipient.name}
             onChange={(e) => setNewRecipient(prev => ({ ...prev, name: e.target.value }))}
-            placeholder="Ex: JoÃ£o Silva"
+            placeholder="Ex: João Silva"
             required
           />
           
           <Input
-            label="ðÅ¸â€œ± WhatsApp (apenas nÃºmeros)"
+            label="📱 WhatsApp (apenas números)"
             value={newRecipient.whatsapp}
             onChange={(e) => {
               const value = e.target.value.replace(/\D/g, '')
@@ -1135,16 +1135,16 @@ export default function ReportGenerator() {
           />
           
           <Input
-            label="ðÅ¸â€˜¤ FunÃ§Ã£o/Cargo"
+            label="👤 Função/Cargo"
             value={newRecipient.role}
             onChange={(e) => setNewRecipient(prev => ({ ...prev, role: e.target.value }))}
-            placeholder="Ex: ProprietÃ¡rio, VeterinÃ¡rio, Gerente"
+            placeholder="Ex: Proprietário, Veterinário, Gerente"
           />
 
           <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
             <p className="text-sm text-blue-800 dark:text-blue-200">
-              ðÅ¸â€™¡ <strong>Dica:</strong> Os relatÃ³rios serÃ£o enviados via WhatsApp para este nÃºmero.
-              Certifique-se de que o nÃºmero estÃ¡ correto e inclui o DDD.
+              💡 <strong>Dica:</strong> Os relatórios serão enviados via WhatsApp para este número.
+              Certifique-se de que o número está correto e inclui o DDD.
             </p>
           </div>
 
@@ -1154,7 +1154,7 @@ export default function ReportGenerator() {
               className="flex-1"
               onClick={addRecipient}
             >
-              Adicionar DestinatÃ¡rio
+              Adicionar Destinatário
             </Button>
             <Button
               variant="secondary"
@@ -1174,7 +1174,7 @@ export default function ReportGenerator() {
       <Modal
         isOpen={showReportViewer}
         onClose={() => setShowReportViewer(false)}
-        title={currentReportType ? REPORT_TYPES[currentReportType]?.name : 'RelatÃ³rio'}
+        title={currentReportType ? REPORT_TYPES[currentReportType]?.name : 'Relatório'}
         size="full"
       >
         {renderReportComponent()}

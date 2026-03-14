@@ -115,7 +115,7 @@ const ApiHealthMonitor = () => {
               Status das APIs
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Monitoramento em tempo real das conexÃµes do sistema
+              Monitoramento em tempo real das conexões do sistema
             </p>
           </div>
           
@@ -125,7 +125,7 @@ const ApiHealthMonitor = () => {
                 {healthyCount}/{totalCount} APIs
               </div>
               <div className="text-xs text-gray-500 dark:text-gray-400">
-                {lastCheck && `ÃÅ¡ltima verificaÃ§Ã£o: ${lastCheck.toLocaleTimeString()}`}
+                {lastCheck && `Última verificação: ${lastCheck.toLocaleTimeString()}`}
               </div>
             </div>
             
@@ -149,7 +149,7 @@ const ApiHealthMonitor = () => {
                   {healthyCount}
                 </div>
                 <div className="text-sm text-green-600 dark:text-green-400">
-                  APIs SaudÃ¡veis
+                  APIs Saudáveis
                 </div>
               </div>
             </div>
@@ -163,7 +163,7 @@ const ApiHealthMonitor = () => {
                   {criticalErrors}
                 </div>
                 <div className="text-sm text-red-600 dark:text-red-400">
-                  Erros CrÃ­ticos
+                  Erros Críticos
                 </div>
               </div>
             </div>
@@ -201,7 +201,7 @@ const ApiHealthMonitor = () => {
                       </span>
                       {api.critical && (
                         <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">
-                          CrÃ­tica
+                          Crítica
                         </span>
                       )}
                     </div>

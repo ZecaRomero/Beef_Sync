@@ -1,6 +1,6 @@
 const { Pool } = require('pg')
 
-// Configurar conexÃ£o com o banco
+// Configurar conexão com o banco
 const pool = new Pool({
   host: process.env.DB_HOST || 'localhost',
   port: process.env.DB_PORT || 5432,
@@ -16,7 +16,7 @@ async function createMissingTable() {
   const client = await pool.connect()
   
   try {
-    console.log('ðÅ¸â€�� Verificando tabela notas_fiscais_itens...')
+    console.log('🔍 Verificando tabela notas_fiscais_itens...')
     
     // Verificar se a tabela existe
     const tableExists = await client.query(`
@@ -28,9 +28,9 @@ async function createMissingTable() {
     `)
     
     if (tableExists.rows[0].exists) {
-      console.log('âÅ“â€¦ Tabela notas_fiscais_itens jÃ¡ existe!')
+      console.log('✅ Tabela notas_fiscais_itens já existe!')
     } else {
-      console.log('ðÅ¸â€œ¦ Criando tabela notas_fiscais_itens...')
+      console.log('📦 Criando tabela notas_fiscais_itens...')
       
       await client.query(`
         CREATE TABLE notas_fiscais_itens (
@@ -42,27 +42,27 @@ async function createMissingTable() {
         )
       `)
       
-      console.log('âÅ“â€¦ Tabela notas_fiscais_itens criada!')
+      console.log('✅ Tabela notas_fiscais_itens criada!')
     }
     
-    // Criar Ã­ndices se nÃ£o existirem
-    console.log('ðÅ¸â€�� Verificando Ã­ndices...')
+    // Criar índices se não existirem
+    console.log('🔍 Verificando índices...')
     
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_nf_itens_nota_id ON notas_fiscais_itens(nota_fiscal_id)
     `)
     
-    console.log('âÅ“â€¦ Ã�ndices criados/verificados!')
+    console.log('✅ Índices criados/verificados!')
     
     // Testar a tabela
-    console.log('ðÅ¸§ª Testando tabela...')
+    console.log('🧪 Testando tabela...')
     const testQuery = await client.query('SELECT COUNT(*) as count FROM notas_fiscais_itens')
-    console.log(`ðÅ¸â€œÅ  Registros na tabela: ${testQuery.rows[0].count}`)
+    console.log(`📊 Registros na tabela: ${testQuery.rows[0].count}`)
     
-    console.log('\nâÅ“â€¦ MigraÃ§Ã£o concluÃ­da com sucesso!')
+    console.log('\n✅ Migração concluída com sucesso!')
     
   } catch (error) {
-    console.error('â�Å’ Erro na migraÃ§Ã£o:', error.message)
+    console.error('❌ Erro na migração:', error.message)
     throw error
   } finally {
     client.release()
@@ -70,14 +70,14 @@ async function createMissingTable() {
   }
 }
 
-// Executar migraÃ§Ã£o
+// Executar migração
 createMissingTable()
   .then(() => {
-    console.log('\nðÅ¸Å½â€° Processo concluÃ­do!')
+    console.log('\n🎉 Processo concluído!')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\nðÅ¸â€™¥ Erro:', error.message)
+    console.error('\n💥 Erro:', error.message)
     process.exit(1)
   })
 

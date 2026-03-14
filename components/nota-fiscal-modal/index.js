@@ -18,11 +18,11 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
     numeroNF: '',
     serieNF: '',
     dataCompra: '',
-    dataChegadaAnimais: '', // Data de chegada dos animais (DG = 15 dias apÃ³s)
-    dataSaida: '', // Data de saÃ­da dos animais (para NF de saÃ­da)
-    motorista: '', // Nome do motorista (opcional, para NF de saÃ­da)
+    dataChegadaAnimais: '', // Data de chegada dos animais (DG = 15 dias após)
+    dataSaida: '', // Data de saída dos animais (para NF de saída)
+    motorista: '', // Nome do motorista (opcional, para NF de saída)
     origem: '', // Fornecedor
-    cnpjOrigemDestino: '', // CNPJ/CPF do Fornecedor ou DestinatÃ¡rio
+    cnpjOrigemDestino: '', // CNPJ/CPF do Fornecedor ou Destinatário
     endereco: '',
     bairro: '',
     cep: '',
@@ -31,11 +31,11 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
     telefone: '',
     incricao: '',
     tipo: tipo || 'entrada', // entrada ou saida - inicializa com a prop
-    naturezaOperacao: tipo === 'saida' ? 'Venda' : 'Compra', // Valor padrÃ£o baseado no tipo
+    naturezaOperacao: tipo === 'saida' ? 'Venda' : 'Compra', // Valor padrão baseado no tipo
     chaveAcesso: '',
     valorTotalNF: '',
     observacoes: '',
-    periodoBoletim: '', // Novo campo para seleÃ§Ã£o do boletim
+    periodoBoletim: '', // Novo campo para seleção do boletim
     // Campos para Receptoras
     ehReceptoras: false,
     receptoraLetra: '',
@@ -43,10 +43,10 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
     dataTE: ''
   });
 
-  // Estado para novo item (genÃ©rico, adaptÃ¡vel por aba)
+  // Estado para novo item (genérico, adaptável por aba)
   const [novoItem, setNovoItem] = useState({});
 
-  // Estados para busca de animais (Bovinos - SaÃ­da)
+  // Estados para busca de animais (Bovinos - Saída)
   const [buscaAnimais, setBuscaAnimais] = useState('');
   const [mostrarListaAnimais, setMostrarListaAnimais] = useState(false);
   const [animalSelecionado, setAnimalSelecionado] = useState(null);
@@ -83,7 +83,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
     }
   }, [isOpen, tipo]);
 
-  // Carregar boletins contÃ¡beis
+  // Carregar boletins contábeis
   useEffect(() => {
     if (isOpen) {
       const fetchBoletins = async () => {
@@ -93,12 +93,12 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
           if (response.ok) {
             const data = await response.json();
             const lista = data.success && data.data ? data.data : (Array.isArray(data) ? data : []);
-            console.log('ðÅ¸â€œâ€¹ Boletins carregados da API:', lista);
+            console.log('📋 Boletins carregados da API:', lista);
             setBoletins(lista);
           } else {
             // Fallback para localStorage
             const lista = await boletimContabilService.listarBoletins();
-            console.log('ðÅ¸â€œâ€¹ Boletins carregados do localStorage:', lista);
+            console.log('📋 Boletins carregados do localStorage:', lista);
             setBoletins(lista);
           }
         } catch (error) {
@@ -132,12 +132,12 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
         const fornecedorUpper = fornecedor.toUpperCase();
         const incricaoUpper = incricao.toUpperCase();
         
-        // Verificar se Ã© Pardinho
+        // Verificar se é Pardinho
         const ehPardinho = cnpjNormalizado === cnpjPardinho || 
                           fornecedorUpper.includes('PARDINHO') ||
                           incricaoUpper === 'PARDINHO';
         
-        // Verificar se Ã© Rancharia (SANT ANNA)
+        // Verificar se é Rancharia (SANT ANNA)
         const ehRancharia = incricaoUpper === 'SANT ANNA' || 
                            fornecedorUpper.includes('SANT ANNA') ||
                            fornecedorUpper.includes('RANCHARIA');
@@ -151,7 +151,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
       
       setLocalidadeBoletim(localidadeDetectada);
       
-      // Aplicar localidade automaticamente aos itens que nÃ£o tÃªm local definida
+      // Aplicar localidade automaticamente aos itens que não têm local definida
       if (localidadeDetectada) {
         setItens(prevItens => 
           prevItens.map(item => ({
@@ -171,20 +171,20 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
     const termo = dadosNF.origem.toLowerCase();
     return contatos.filter(c => 
       c.nome && c.nome.toLowerCase().includes(termo)
-    ).slice(0, 5); // Limitar a 5 sugestÃµes
+    ).slice(0, 5); // Limitar a 5 sugestões
   };
 
   // Filtrar contatos por CPF/CNPJ
   const filtrarContatosPorDocumento = () => {
     if (!dadosNF.cnpjOrigemDestino) return [];
-    const termo = dadosNF.cnpjOrigemDestino.replace(/\D/g, ''); // Remove formataÃ§Ã£o
-    if (termo.length < 3) return []; // MÃ­nimo 3 dÃ­gitos para buscar
+    const termo = dadosNF.cnpjOrigemDestino.replace(/\D/g, ''); // Remove formatação
+    if (termo.length < 3) return []; // Mínimo 3 dígitos para buscar
     
     return contatos.filter(c => {
       if (!c.documento) return false;
       const docLimpo = c.documento.replace(/\D/g, '');
       return docLimpo.includes(termo);
-    }).slice(0, 5); // Limitar a 5 sugestÃµes
+    }).slice(0, 5); // Limitar a 5 sugestões
   };
 
   const buscarCNPJ = async (cnpj) => {
@@ -198,7 +198,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
       if (response.ok) {
         const result = await response.json();
         
-        // Verificar se retornou dados vÃ¡lidos
+        // Verificar se retornou dados válidos
         if (result.success && result.data) {
           const data = result.data;
           
@@ -213,18 +213,18 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
             telefone: data.ddd_telefone_1 || data.ddd_telefone_2 || prev.telefone
           }));
           
-          console.log('âÅ“â€¦ CNPJ encontrado:', data.razao_social || data.nome_fantasia);
+          console.log('✅ CNPJ encontrado:', data.razao_social || data.nome_fantasia);
         } else {
-          console.warn('âÅ¡ ï¸� CNPJ nÃ£o retornou dados vÃ¡lidos');
+          console.warn('⚠️ CNPJ não retornou dados válidos');
         }
       } else {
         const errorData = await response.json().catch(() => ({}));
-        console.warn(`âÅ¡ ï¸� Erro ao buscar CNPJ: ${errorData.error || response.statusText}`);
+        console.warn(`⚠️ Erro ao buscar CNPJ: ${errorData.error || response.statusText}`);
       }
     } catch (error) {
-      console.error('â�Å’ Erro ao buscar CNPJ:', error.message);
-      // NÃ£o mostrar alerta para nÃ£o interromper o fluxo do usuÃ¡rio
-      // O usuÃ¡rio pode preencher manualmente se a busca falhar
+      console.error('❌ Erro ao buscar CNPJ:', error.message);
+      // Não mostrar alerta para não interromper o fluxo do usuário
+      // O usuário pode preencher manualmente se a busca falhar
     }
   };
 
@@ -258,7 +258,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
       setNovoItem(prev => ({
         ...prev,
         sexo: 'femea',
-        raca: 'MestiÃ§a',
+        raca: 'Mestiça',
         tatuagem: tatuagemReceptora
       }));
     }
@@ -305,10 +305,10 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
     setAnimalSelecionado(null);
   };
 
-  // Estado para sugestÃ£o de lote TE
+  // Estado para sugestão de lote TE
   const [loteSugerido, setLoteSugerido] = useState(null);
 
-  // Estado para modal de importaÃ§Ã£o em lote
+  // Estado para modal de importação em lote
   const [showBatchModal, setShowBatchModal] = useState(false);
   const numeroReceptoraInputRef = useRef(null);
 
@@ -363,7 +363,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
 
   const confirmarImportacaoLote = (itensSelecionados) => {
     const novosItens = itensSelecionados.map(te => {
-        // Tenta encontrar se jÃ¡ existe esse animal
+        // Tenta encontrar se já existe esse animal
         const animalExistente = animals.find(a => 
             (a.serie + a.rg) === te.receptora_nome || 
             a.nome === te.receptora_nome
@@ -386,14 +386,14 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
         };
     });
 
-    // Filtrar itens que jÃ¡ estÃ£o na lista para nÃ£o duplicar (pela tatuagem)
+    // Filtrar itens que já estão na lista para não duplicar (pela tatuagem)
     const itensFiltrados = novosItens.filter(novo => !itens.some(existente => existente.tatuagem === novo.tatuagem));
 
     if (itensFiltrados.length === 0) {
-        alert('Todos os animais selecionados jÃ¡ foram adicionados!');
+        alert('Todos os animais selecionados já foram adicionados!');
     } else {
         setItens([...itens, ...itensFiltrados]);
-        // NÃ£o mostrar alerta aqui, o modal jÃ¡ fecha
+        // Não mostrar alerta aqui, o modal já fecha
     }
     
     setShowBatchModal(false);
@@ -401,15 +401,15 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
   };
 
   const adicionarItem = () => {
-    // ValidaÃ§Ã£o bÃ¡sica
+    // Validação básica
     if (activeTab === 'bovinos') {
-      // Se for receptoras, usar lÃ³gica diferente
+      // Se for receptoras, usar lógica diferente
       if (dadosNF.ehReceptoras) {
         if (!dadosNF.receptoraNumero || !dadosNF.receptoraNumero.trim()) {
-          alert('Digite o nÃºmero da receptora');
+          alert('Digite o número da receptora');
           return;
         }
-        // Se jÃ¡ existe pelo menos um item, copiar era e valor unitÃ¡rio do primeiro automaticamente (podem ser editados)
+        // Se já existe pelo menos um item, copiar era e valor unitário do primeiro automaticamente (podem ser editados)
         if (itens.length > 0 && itens[0].tipoProduto === 'bovino') {
           const primeiroItem = itens[0];
           novoItem.era = novoItem.era || primeiroItem.era || '';
@@ -425,14 +425,14 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
         }
       } else if (novoItem.modoCadastro === 'categoria') {
         
-        // Aplicar localidade do boletim se nÃ£o estiver definida
+        // Aplicar localidade do boletim se não estiver definida
         if (!novoItem.local && localidadeBoletim) {
           novoItem.local = localidadeBoletim;
         }
       } else {
-        // Aplicar localidade do boletim se nÃ£o estiver definida
+        // Aplicar localidade do boletim se não estiver definida
         // Se for o primeiro item, usar localidade do boletim
-        // Se jÃ¡ existem itens, usar o local do primeiro item
+        // Se já existem itens, usar o local do primeiro item
         if (!novoItem.local) {
           if (itens.length === 0 && localidadeBoletim) {
             novoItem.local = localidadeBoletim;
@@ -445,7 +445,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
       }
     }
 
-    // Se for receptoras, usar letra + espaÃ§o + nÃºmero (ex: M 1815)
+    // Se for receptoras, usar letra + espaço + número (ex: M 1815)
     let tatuagemFinal = novoItem.tatuagem;
     if (activeTab === 'bovinos' && dadosNF.ehReceptoras) {
       const letra = (dadosNF.receptoraLetra || '').trim();
@@ -453,7 +453,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
       tatuagemFinal = letra ? `${letra} ${numero}`.trim() : numero;
     }
 
-    // Determinar o local final: se jÃ¡ existem itens, usar o local do primeiro item
+    // Determinar o local final: se já existem itens, usar o local do primeiro item
     let localFinal = novoItem.local || localidadeBoletim || null;
     if (itens.length > 0 && itens[0].local) {
       localFinal = itens[0].local;
@@ -473,10 +473,10 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
 
     setItens([...itens, item]);
     
-    // Resetar formulÃ¡rio mas manter alguns dados
+    // Resetar formulário mas manter alguns dados
     if (activeTab === 'bovinos') {
       if (dadosNF.ehReceptoras) {
-        // Para receptoras, copiar era e valor unitÃ¡rio do primeiro item automaticamente
+        // Para receptoras, copiar era e valor unitário do primeiro item automaticamente
         // Agora que o item foi adicionado, buscar o primeiro item da lista atualizada
         const itensAtualizados = [...itens, item];
         const primeiroItemBovino = itensAtualizados.find(i => i.tipoProduto === 'bovino');
@@ -485,10 +485,10 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
         let valorParaCopiar = '';
         
         if (primeiroItemBovino) {
-          // Sempre copiar era e valor unitÃ¡rio do primeiro item para os prÃ³ximos
+          // Sempre copiar era e valor unitário do primeiro item para os próximos
           eraParaCopiar = primeiroItemBovino.era || '';
           
-          // Converter valor unitÃ¡rio para formato de string no formato brasileiro
+          // Converter valor unitário para formato de string no formato brasileiro
           if (primeiroItemBovino.valorUnitario) {
             const valorNum = typeof primeiroItemBovino.valorUnitario === 'number' 
               ? primeiroItemBovino.valorUnitario 
@@ -501,12 +501,12 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
           }
         }
         
-        // Limpar nÃºmero para prÃ³xima receptora e focar no campo
+        // Limpar número para próxima receptora e focar no campo
         setDadosNF(prev => ({ ...prev, receptoraNumero: '' }));
         setNovoItem(prev => ({
           ...prev,
           sexo: 'femea',
-          raca: 'MestiÃ§a',
+          raca: 'Mestiça',
           era: eraParaCopiar || prev.era,
           valorUnitario: valorParaCopiar || prev.valorUnitario,
           peso: '',
@@ -568,25 +568,25 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
     }, 0);
   };
 
-  // FunÃ§Ãµes para busca de animais (Bovinos - SaÃ­da)
+  // Funções para busca de animais (Bovinos - Saída)
   const filtrarAnimais = () => {
     if (!buscaAnimais) return [];
     
     const termo = buscaAnimais.toLowerCase().trim();
     
-    // Normalizar o termo de busca (remover espaÃ§os e hÃ­fens)
+    // Normalizar o termo de busca (remover espaços e hífens)
     const termoNormalizado = termo.replace(/[-\s]/g, '');
     
-    // Debug: verificar se o animal CJCJ 16174 estÃ¡ na lista
+    // Debug: verificar se o animal CJCJ 16174 está na lista
     if (termo.includes('16174') || termo.includes('cjcj')) {
       const animalEncontrado = animals.find(a => 
         String(a.serie || '').toLowerCase() === 'cjcj' && 
         String(a.rg || '').trim() === '16174'
       );
       if (animalEncontrado) {
-        console.log('âÅ“â€¦ Animal CJCJ 16174 encontrado na lista:', animalEncontrado);
+        console.log('✅ Animal CJCJ 16174 encontrado na lista:', animalEncontrado);
       } else {
-        console.log('â�Å’ Animal CJCJ 16174 NÃÆ’O encontrado na lista. Total de animais:', animals.length);
+        console.log('❌ Animal CJCJ 16174 NÃO encontrado na lista. Total de animais:', animals.length);
         console.log('Primeiros 5 animais:', animals.slice(0, 5).map(a => `${a.serie} ${a.rg}`));
       }
     }
@@ -597,15 +597,15 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
       const rg = String(animal.rg || '').toLowerCase().trim();
       const nome = String(animal.nome || '').toLowerCase().trim();
       
-      // Criar variaÃ§Ãµes de identificaÃ§Ã£o
+      // Criar variações de identificação
       const identificacao = `${serie} ${rg}`.trim().toLowerCase();
       const identificacaoSemEspaco = `${serie}${rg}`.trim().toLowerCase();
       const identificacaoHifen = `${serie}-${rg}`.trim().toLowerCase();
       
-      // Normalizar identificaÃ§Ãµes (remover espaÃ§os e hÃ­fens)
+      // Normalizar identificações (remover espaços e hífens)
       const identificacaoNormalizada = identificacaoSemEspaco.replace(/[-\s]/g, '');
       
-      // Busca flexÃ­vel
+      // Busca flexível
       const encontrado = serie.includes(termo) || 
              rg.includes(termo) || 
              nome.includes(termo) ||
@@ -640,7 +640,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
 
     if (meses !== undefined && meses !== null) {
       if (sexoNormalizado === 'femea') {
-        // FÃÅ MEA: 0-7 / 7-12 / 12-18 / 18-24 / 24+
+        // FÊMEA: 0-7 / 7-12 / 12-18 / 18-24 / 24+
         if (meses <= 7) eraCalculada = '0/7';
         else if (meses <= 12) eraCalculada = '7/12';
         else if (meses <= 18) eraCalculada = '12/18';
@@ -661,13 +661,13 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
     if (itens.length === 0 && localidadeBoletim) {
       localAnimal = localidadeBoletim;
     } else if (itens.length > 0 && itens[0].local) {
-      // Se jÃ¡ existem itens, usar o local do primeiro item
+      // Se já existem itens, usar o local do primeiro item
       localAnimal = itens[0].local;
     }
 
     setNovoItem(prev => ({
       ...prev,
-      animalId: animal.id, // Armazenar ID para integraÃ§Ã£o
+      animalId: animal.id, // Armazenar ID para integração
       tatuagem: `${animal.serie || ''}${animal.rg || ''}`,
       sexo: sexoNormalizado,
       raca: animal.raca || '',
@@ -691,12 +691,12 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
     }
   }, [isOpen, initialAnimal]);
 
-  // Efeito para carregar dados da NF para ediÃ§Ã£o
+  // Efeito para carregar dados da NF para edição
   useEffect(() => {
     if (isOpen && nfEditando) {
-      console.log('ðÅ¸â€œ� Editando NF:', nfEditando);
+      console.log('📝 Editando NF:', nfEditando);
       
-      // Normalizar itens se necessÃ¡rio
+      // Normalizar itens se necessário
       const itensNormalizados = (nfEditando.itens || []).map(item => ({
         ...item,
         valorUnitario: item.valor_unitario || item.valorUnitario || 0,
@@ -753,7 +753,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
       else setActiveTab('bovinos');
       
     } else if (isOpen && !nfEditando && !initialAnimal) {
-      // Limpar formulÃ¡rio se for novo cadastro (apenas se nÃ£o estiver editando nem importando animal)
+      // Limpar formulário se for novo cadastro (apenas se não estiver editando nem importando animal)
       setDadosNF({
         numeroNF: '',
         serieNF: '',
@@ -783,27 +783,27 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
         dataChegadaAnimais: ''
       });
       setItens([]);
-      // NÃ£o resetar activeTab aqui para manter a escolha do usuÃ¡rio se ele fechar e abrir
-      // Mas resetar se quiser forÃ§ar bovinos
+      // Não resetar activeTab aqui para manter a escolha do usuário se ele fechar e abrir
+      // Mas resetar se quiser forçar bovinos
       // setActiveTab('bovinos'); 
     }
   }, [isOpen, nfEditando]);
 
   const handleSave = () => {
     if (!dadosNF.numeroNF || !dadosNF.origem || !dadosNF.dataCompra || !dadosNF.naturezaOperacao) {
-      alert('Preencha os dados obrigatÃ³rios da Nota Fiscal (NÃºmero, Origem, Data e Natureza da OperaÃ§Ã£o)');
+      alert('Preencha os dados obrigatórios da Nota Fiscal (Número, Origem, Data e Natureza da Operação)');
       return;
     }
 
     if (itens.length === 0) {
-      alert('Adicione pelo menos um item Ã  Nota Fiscal');
+      alert('Adicione pelo menos um item à Nota Fiscal');
       return;
     }
 
     // Determinar tipoProduto com base nos itens ou aba ativa
     const tipoProduto = itens.length > 0 ? (itens[0].tipoProduto || 'bovino') : 'bovino';
 
-    // Mapear origem para fornecedor ou destino baseado no tipo de operaÃ§Ã£o
+    // Mapear origem para fornecedor ou destino baseado no tipo de operação
     const fornecedor = dadosNF.tipo === 'entrada' ? dadosNF.origem : null;
     const destino = dadosNF.tipo === 'saida' ? dadosNF.origem : null;
 
@@ -812,11 +812,11 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
       data: dadosNF.dataCompra, // Mapear dataCompra para data (exigido pela API)
       dataChegadaAnimais: dadosNF.dataChegadaAnimais || null, // Data de chegada para DG + 15 dias
       itens,
-      tipoProduto, // Campo obrigatÃ³rio para API
+      tipoProduto, // Campo obrigatório para API
       fornecedor,  // Mapeado de origem
       destino,     // Mapeado de origem
       valorTotalCalculado: calcularValorTotal(),
-      // Se valor total da NF nÃ£o for informado, usa o calculado
+      // Se valor total da NF não for informado, usa o calculado
       valorTotal: dadosNF.valorTotalNF ? parseCurrencyValue(dadosNF.valorTotalNF) : calcularValorTotal()
     };
 
@@ -833,7 +833,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-4">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              ðÅ¸§¾ Cadastro de Nota Fiscal
+              🧾 Cadastro de Nota Fiscal
             </h3>
             <div className="bg-green-100 dark:bg-green-900/30 px-4 py-2 rounded-lg border border-green-300 dark:border-green-700">
               <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Valor Total:</span>
@@ -860,7 +860,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  NÃºmero NF *
+                  Número NF *
                 </label>
                 <input
                   type="text"
@@ -872,7 +872,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Data de EmissÃ£o *
+                  Data de Emissão *
                 </label>
                 <input
                   type="date"
@@ -893,7 +893,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                   />
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {dadosNF.ehReceptoras ? 'DG Ã© feito 15 dias apÃ³s esta data' : 'Opcional'}
+                    {dadosNF.ehReceptoras ? 'DG é feito 15 dias após esta data' : 'Opcional'}
                   </p>
                 </div>
               )}
@@ -901,7 +901,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
                 <>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Data de SaÃ­da
+                      Data de Saída
                     </label>
                     <input
                       type="date"
@@ -910,7 +910,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                     />
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Data em que os animais saÃ­ram da propriedade
+                      Data em que os animais saíram da propriedade
                     </p>
                   </div>
                   <div>
@@ -925,14 +925,14 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                     />
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Opcional - Nome do motorista responsÃ¡vel pelo transporte
+                      Opcional - Nome do motorista responsável pelo transporte
                     </p>
                   </div>
                 </>
               )}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Tipo de OperaÃ§Ã£o
+                  Tipo de Operação
                 </label>
                 <select
                   value={dadosNF.tipo}
@@ -948,30 +948,30 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="entrada">Entrada (Compra)</option>
-                  <option value="saida">SaÃ­da (Venda)</option>
+                  <option value="saida">Saída (Venda)</option>
                 </select>
                 {tipo && tipo !== '' && (
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Tipo fixo: {tipo === 'entrada' ? 'Entrada (Compra)' : 'SaÃ­da (Venda)'}
+                    Tipo fixo: {tipo === 'entrada' ? 'Entrada (Compra)' : 'Saída (Venda)'}
                   </p>
                 )}
               </div>
 
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Natureza da OperaÃ§Ã£o *
+                  Natureza da Operação *
                 </label>
                 <input
                   type="text"
                   value={dadosNF.naturezaOperacao}
                   onChange={(e) => setDadosNF({...dadosNF, naturezaOperacao: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                  placeholder="Ex: Venda, Compra, TransferÃªncia"
+                  placeholder="Ex: Venda, Compra, Transferência"
                 />
               </div>
               <div className="md:col-span-2 relative">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {dadosNF.tipo === 'saida' ? 'DestinatÃ¡rio *' : 'Origem/Fornecedor *'}
+                  {dadosNF.tipo === 'saida' ? 'Destinatário *' : 'Origem/Fornecedor *'}
                 </label>
                 <input
                   type="text"
@@ -983,11 +983,11 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
                   onFocus={() => setMostrarSugestoesContatos(true)}
                   onBlur={() => setTimeout(() => setMostrarSugestoesContatos(false), 200)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                  placeholder={dadosNF.tipo === 'saida' ? 'Nome do destinatÃ¡rio' : 'Nome do fornecedor'}
+                  placeholder={dadosNF.tipo === 'saida' ? 'Nome do destinatário' : 'Nome do fornecedor'}
                   autoComplete="off"
                 />
                 
-                {/* SugestÃµes de Contatos */}
+                {/* Sugestões de Contatos */}
                 {mostrarSugestoesContatos && dadosNF.origem && (
                   <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 rounded-md shadow-lg border border-gray-200 dark:border-gray-600 max-h-60 overflow-y-auto">
                     {filtrarContatos().map((contato, index) => (
@@ -1004,7 +1004,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
                     ))}
                     {filtrarContatos().length === 0 && dadosNF.origem.length > 2 && (
                       <div className="px-4 py-2 text-gray-500 dark:text-gray-400 text-sm italic">
-                        Nenhum contato encontrado. SerÃ¡ cadastrado como novo.
+                        Nenhum contato encontrado. Será cadastrado como novo.
                       </div>
                     )}
                   </div>
@@ -1021,13 +1021,13 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
                   onChange={(e) => {
                     const val = e.target.value;
                     setDadosNF({...dadosNF, cnpjOrigemDestino: val});
-                    setMostrarSugestoesDocumento(val.length >= 3); // Mostrar sugestÃµes apÃ³s 3 caracteres
+                    setMostrarSugestoesDocumento(val.length >= 3); // Mostrar sugestões após 3 caracteres
                     if (val.replace(/\D/g, '').length === 14) {
                       buscarCNPJ(val);
                     }
                   }}
                   onBlur={(e) => {
-                    // Delay para permitir clique na sugestÃ£o
+                    // Delay para permitir clique na sugestão
                     setTimeout(() => {
                       setMostrarSugestoesDocumento(false);
                       buscarCNPJ(e.target.value);
@@ -1042,7 +1042,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
                   placeholder="00.000.000/0000-00"
                 />
                 
-                {/* Dropdown de sugestÃµes de contatos por documento */}
+                {/* Dropdown de sugestões de contatos por documento */}
                 {mostrarSugestoesDocumento && filtrarContatosPorDocumento().length > 0 && (
                   <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                     {filtrarContatosPorDocumento().map((contato, idx) => (
@@ -1087,17 +1087,17 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
                 </div>
               </div>
 
-              {/* EndereÃ§o Completo */}
+              {/* Endereço Completo */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  EndereÃ§o
+                  Endereço
                 </label>
                 <input
                   type="text"
                   value={dadosNF.endereco}
                   onChange={(e) => setDadosNF({...dadosNF, endereco: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                  placeholder="Rua, nÃºmero, complemento"
+                  placeholder="Rua, número, complemento"
                 />
               </div>
 
@@ -1129,7 +1129,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  MunicÃ­pio
+                  Município
                 </label>
                 <input
                   type="text"
@@ -1169,7 +1169,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  InscriÃ§Ã£o Estadual
+                  Inscrição Estadual
                 </label>
                 <input
                   type="text"
@@ -1181,7 +1181,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Boletim ContÃ¡bil
+                  Boletim Contábil
                 </label>
                 <select
                   value={dadosNF.periodoBoletim}
@@ -1202,32 +1202,32 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
                 {localidadeBoletim && (
                   <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
                     <p className="text-sm text-blue-700 dark:text-blue-300 font-medium">
-                      ðÅ¸â€œ� <strong>Localidade:</strong> {localidadeBoletim}
+                      📍 <strong>Localidade:</strong> {localidadeBoletim}
                     </p>
                     {dadosNF.tipo === 'entrada' && (
                       <p className="mt-1 text-xs text-blue-600 dark:text-blue-400">
-                        Gado entrarÃ¡ em <strong>{localidadeBoletim}</strong>
+                        Gado entrará em <strong>{localidadeBoletim}</strong>
                       </p>
                     )}
                   </div>
                 )}
               </div>
-              {/* SeÃ§Ã£o ObservaÃ§Ãµes e Receptoras - Vinculadas */}
+              {/* Seção Observações e Receptoras - Vinculadas */}
               <div className="md:col-span-4 space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    ObservaÃ§Ãµes
+                    Observações
                   </label>
                   <textarea
                     value={dadosNF.observacoes}
                     onChange={(e) => setDadosNF({...dadosNF, observacoes: e.target.value})}
                     rows="2"
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white resize-none"
-                    placeholder="InformaÃ§Ãµes adicionais da nota fiscal..."
+                    placeholder="Informações adicionais da nota fiscal..."
                   />
                 </div>
 
-                {/* SeÃ§Ã£o Receptoras - Integrada ao formulÃ¡rio principal */}
+                {/* Seção Receptoras - Integrada ao formulário principal */}
                 {dadosNF.tipo === 'entrada' && (
                   <div className={`transition-all duration-300 ease-in-out ${
                     dadosNF.ehReceptoras 
@@ -1250,7 +1250,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
                             ...dadosNF,
                             ehReceptoras,
                             dataTE: ehReceptoras && !dadosNF.dataTE ? dadosNF.dataCompra : dadosNF.dataTE,
-                            // Se marcar como receptoras, sugerir data de chegada = data de emissÃ£o (DG = 15 dias apÃ³s)
+                            // Se marcar como receptoras, sugerir data de chegada = data de emissão (DG = 15 dias após)
                             dataChegadaAnimais: ehReceptoras && !dadosNF.dataChegadaAnimais ? dadosNF.dataCompra : dadosNF.dataChegadaAnimais
                           });
                         }}
@@ -1261,7 +1261,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
                           ? 'text-pink-700 dark:text-pink-300' 
                           : 'text-gray-700 dark:text-gray-300'
                       }`}>
-                        ðÅ¸¤° Ãâ€° Receptoras?
+                        🤰 É Receptoras?
                       </label>
                     </div>
 
@@ -1284,7 +1284,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                              NÃºmero da Receptora * <span className="font-normal text-gray-500">(formato: M 1815)</span>
+                              Número da Receptora * <span className="font-normal text-gray-500">(formato: M 1815)</span>
                             </label>
                             <div className="flex items-center gap-1 border-2 border-pink-300 dark:border-pink-600 rounded-lg overflow-hidden bg-white dark:bg-gray-700">
                               {dadosNF.receptoraLetra && (
@@ -1304,10 +1304,10 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
                                   }
                                 }}
                                 className="flex-1 min-w-0 px-3 py-2 bg-transparent text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 focus:outline-none"
-                                placeholder={dadosNF.receptoraLetra ? "digite o nÃºmero" : "Digite letra primeiro"}
+                                placeholder={dadosNF.receptoraLetra ? "digite o número" : "Digite letra primeiro"}
                               />
                             </div>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Digite o nÃºmero e pressione ENTER para adicionar a prÃ³xima</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Digite o número e pressione ENTER para adicionar a próxima</p>
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -1324,15 +1324,15 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
                         </div>
                         <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border-2 border-blue-200 dark:border-blue-700 rounded-lg">
                           <div className="flex items-start gap-2">
-                            <span className="text-xl">ââ€ž¹ï¸�</span>
+                            <span className="text-xl">ℹ️</span>
                             <div>
                               <p className="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-1">
-                                InformaÃ§Ãµes sobre Receptoras
+                                Informações sobre Receptoras
                               </p>
                               <p className="text-sm text-blue-700 dark:text-blue-300 leading-relaxed">
-                                Ao salvar esta NF de Receptoras, serÃ¡ gerado automaticamente um <strong>relatÃ³rio para DG</strong>. 
-                                As receptoras precisarÃ£o passar pelo <strong>DG 15 dias apÃ³s a data de chegada dos animais</strong>. 
-                                O app envia alerta e permite exportar em Excel as que ainda faltam dar DG. Se der prenha, serÃ£o movimentadas para <strong>ReproduÃ§Ã£o/Nascimentos</strong>.
+                                Ao salvar esta NF de Receptoras, será gerado automaticamente um <strong>relatório para DG</strong>. 
+                                As receptoras precisarão passar pelo <strong>DG 15 dias após a data de chegada dos animais</strong>. 
+                                O app envia alerta e permite exportar em Excel as que ainda faltam dar DG. Se der prenha, serão movimentadas para <strong>Reprodução/Nascimentos</strong>.
                               </p>
                             </div>
                           </div>
@@ -1353,7 +1353,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
                 <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg flex flex-col md:flex-row items-center justify-between gap-4 animate-fade-in">
                     <div>
                         <h4 className="font-semibold text-blue-800 dark:text-blue-200 flex items-center gap-2">
-                            ðÅ¸â€œâ€¹ Lote de TE Detectado
+                            📋 Lote de TE Detectado
                         </h4>
                         <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
                             Identificamos que o animal pertence a um lote de <strong>{loteSugerido.quantidade} receptoras</strong> da <strong>{loteSugerido.central}</strong> ({new Date(loteSugerido.data_te).toLocaleDateString()}).
@@ -1388,7 +1388,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
                 }`}
                 onClick={() => setActiveTab('bovinos')}
               >
-                ðÅ¸�â€ž Bovinos
+                🐄 Bovinos
               </button>
               <button
                 className={`px-4 py-2 font-medium text-sm transition-colors ${
@@ -1398,7 +1398,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
                 }`}
                 onClick={() => setActiveTab('semen')}
               >
-                ðÅ¸§¬ SÃªmen
+                🧬 Sêmen
               </button>
               <button
                 className={`px-4 py-2 font-medium text-sm transition-colors ${
@@ -1408,11 +1408,11 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
                 }`}
                 onClick={() => setActiveTab('embrioes')}
               >
-                ðÅ¸§« EmbriÃµes
+                🧫 Embriões
               </button>
             </div>
 
-            {/* FormulÃ¡rios por Aba */}
+            {/* Formulários por Aba */}
             {activeTab === 'bovinos' && (
               <FormularioBovino
                 novoItem={novoItem}
@@ -1479,7 +1479,7 @@ export default function NotaFiscalModal({ isOpen, onClose, onSave, animals = [],
         </div>
       </div>
 
-      {/* Modal de ImportaÃ§Ã£o em Lote */}
+      {/* Modal de Importação em Lote */}
       <BatchImportModal 
         isOpen={showBatchModal}
         onClose={() => setShowBatchModal(false)}

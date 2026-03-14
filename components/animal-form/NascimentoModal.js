@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import animalDataManager from '../../services/animalDataManager';
 
-// Modal especÃ­fico para dados de nascimento CJCJ
+// Modal específico para dados de nascimento CJCJ
 export default function NascimentoModal({ isOpen, onClose, onSave }) {
   const [dados, setDados] = useState({
     dataEntrada: "",
@@ -24,10 +24,10 @@ export default function NascimentoModal({ isOpen, onClose, onSave }) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Preparar dados completos incluindo informaÃ§Ãµes dos pais
+    // Preparar dados completos incluindo informações dos pais
     const dadosCompletos = {
       ...dados,
-      // Garantir que as informaÃ§Ãµes dos pais sejam salvas
+      // Garantir que as informações dos pais sejam salvas
       paiCompleto: dados.pai ? `${dados.paiSerie} ${dados.paiRg} ${dados.pai}`.trim() : '',
       maeCompleta: dados.mae ? `${dados.maeSerie} ${dados.maeRg} ${dados.mae}`.trim() : '',
       receptoraCompleta: dados.receptora ? `${dados.receptoraSerie} ${dados.receptoraRg} ${dados.receptoraCota} ${dados.receptora}`.trim() : '',
@@ -44,151 +44,151 @@ export default function NascimentoModal({ isOpen, onClose, onSave }) {
     onSave(dadosCompletos);
   };
 
-  // FunÃ§Ã£o para buscar e preencher automaticamente o nome do pai
+  // Função para buscar e preencher automaticamente o nome do pai
   const buscarNomePai = async (serie, rg) => {
     if (!serie || !rg) return;
 
     try {
       const animais = await animalDataManager.getAllAnimals();
 
-      // Buscar animal que tem a sÃ©rie e RG informados
+      // Buscar animal que tem a série e RG informados
       const paiEncontrado = animais.find(animal =>
         animal.serie === serie && animal.rg === rg
       );
 
       if (paiEncontrado) {
-        // Se encontrou o animal, usar o campo 'pai' que contÃ©m o nome completo
+        // Se encontrou o animal, usar o campo 'pai' que contém o nome completo
         let nomePai = paiEncontrado.pai;
 
-        // Se o campo pai estiver vazio, construir o nome com sÃ©rie e RG
+        // Se o campo pai estiver vazio, construir o nome com série e RG
         if (!nomePai || nomePai.trim() === '') {
           nomePai = `${serie} ${rg}`;
         }
 
-        // SÃ³ preenche automaticamente se o campo atual estiver vazio
+        // Só preenche automaticamente se o campo atual estiver vazio
         setDados(prev => {
           if (!prev.pai || prev.pai.trim() === '') {
-            console.log('âÅ“â€¦ Nome do pai preenchido automaticamente:', nomePai);
+            console.log('✅ Nome do pai preenchido automaticamente:', nomePai);
             return {
               ...prev,
               pai: nomePai.trim()
             };
           } else {
-            console.log('ââ€ž¹ï¸� Campo nome do pai jÃ¡ preenchido, mantendo valor atual');
+            console.log('ℹ️ Campo nome do pai já preenchido, mantendo valor atual');
             return prev;
           }
         });
       } else {
-        console.log('ââ€ž¹ï¸� Pai nÃ£o encontrado para sÃ©rie:', serie, 'RG:', rg, '- Continuando sem erro');
-        // NÃ£o mostrar erro, apenas continuar
+        console.log('ℹ️ Pai não encontrado para série:', serie, 'RG:', rg, '- Continuando sem erro');
+        // Não mostrar erro, apenas continuar
       }
     } catch (error) {
       console.error('Erro ao buscar pai:', error);
-      // NÃ£o bloquear o salvamento por erro de busca
+      // Não bloquear o salvamento por erro de busca
     }
   };
 
-  // FunÃ§Ã£o para buscar e preencher automaticamente o nome da mÃ£e
+  // Função para buscar e preencher automaticamente o nome da mãe
   const buscarNomeMae = async (serie, rg) => {
     if (!serie || !rg) return;
 
     try {
       const animais = await animalDataManager.getAllAnimals();
 
-      // Buscar animal que tem a sÃ©rie e RG informados
+      // Buscar animal que tem a série e RG informados
       const maeEncontrada = animais.find(animal =>
         animal.serie === serie && animal.rg === rg
       );
 
       if (maeEncontrada) {
-        // Se encontrou o animal, usar o campo 'mae' que contÃ©m o nome completo
+        // Se encontrou o animal, usar o campo 'mae' que contém o nome completo
         let nomeMae = maeEncontrada.mae;
 
-        // Se o campo mae estiver vazio, construir o nome com sÃ©rie e RG
+        // Se o campo mae estiver vazio, construir o nome com série e RG
         if (!nomeMae || nomeMae.trim() === '') {
           nomeMae = `${serie} ${rg}`;
         }
 
-        // SÃ³ preenche automaticamente se o campo atual estiver vazio
+        // Só preenche automaticamente se o campo atual estiver vazio
         setDados(prev => {
           if (!prev.mae || prev.mae.trim() === '') {
-            console.log('âÅ“â€¦ Nome da mÃ£e preenchido automaticamente:', nomeMae);
+            console.log('✅ Nome da mãe preenchido automaticamente:', nomeMae);
             return {
               ...prev,
               mae: nomeMae.trim()
             };
           } else {
-            console.log('ââ€ž¹ï¸� Campo nome da mÃ£e jÃ¡ preenchido, mantendo valor atual');
+            console.log('ℹ️ Campo nome da mãe já preenchido, mantendo valor atual');
             return prev;
           }
         });
       } else {
-        console.log('ââ€ž¹ï¸� MÃ£e nÃ£o encontrada para sÃ©rie:', serie, 'RG:', rg, '- Continuando sem erro');
-        // NÃ£o mostrar erro, apenas continuar
+        console.log('ℹ️ Mãe não encontrada para série:', serie, 'RG:', rg, '- Continuando sem erro');
+        // Não mostrar erro, apenas continuar
       }
     } catch (error) {
-      console.error('Erro ao buscar mÃ£e:', error);
-      // NÃ£o bloquear o salvamento por erro de busca
+      console.error('Erro ao buscar mãe:', error);
+      // Não bloquear o salvamento por erro de busca
     }
   };
 
-  // Efeito para autopreenchimento quando sÃ©rie e RG do pai mudarem
+  // Efeito para autopreenchimento quando série e RG do pai mudarem
   useEffect(() => {
     if (dados.paiSerie && dados.paiRg) {
       buscarNomePai(dados.paiSerie, dados.paiRg);
     }
   }, [dados.paiSerie, dados.paiRg]);
 
-  // Efeito para autopreenchimento quando sÃ©rie e RG da mÃ£e mudarem
+  // Efeito para autopreenchimento quando série e RG da mãe mudarem
   useEffect(() => {
     if (dados.maeSerie && dados.maeRg) {
       buscarNomeMae(dados.maeSerie, dados.maeRg);
     }
   }, [dados.maeSerie, dados.maeRg]);
 
-  // FunÃ§Ã£o para buscar e preencher automaticamente o nome da receptora
+  // Função para buscar e preencher automaticamente o nome da receptora
   const buscarNomeReceptora = async (serie, rg) => {
     if (!serie || !rg) return;
 
     try {
       const animais = await animalDataManager.getAllAnimals();
 
-      // Buscar animal que tem a sÃ©rie e RG informados
+      // Buscar animal que tem a série e RG informados
       const receptoraEncontrada = animais.find(animal =>
         animal.serie === serie && animal.rg === rg
       );
 
       if (receptoraEncontrada) {
-        // Se encontrou o animal, usar o campo 'receptora' que contÃ©m o nome completo
+        // Se encontrou o animal, usar o campo 'receptora' que contém o nome completo
         let nomeReceptora = receptoraEncontrada.receptora;
 
-        // Se o campo receptora estiver vazio, construir o nome com sÃ©rie e RG
+        // Se o campo receptora estiver vazio, construir o nome com série e RG
         if (!nomeReceptora || nomeReceptora.trim() === '') {
           nomeReceptora = `${serie} ${rg}`;
         }
 
-        // SÃ³ preenche automaticamente se o campo atual estiver vazio
+        // Só preenche automaticamente se o campo atual estiver vazio
         setDados(prev => {
           if (!prev.receptora || prev.receptora.trim() === '') {
-            console.log('âÅ“â€¦ Nome da receptora preenchido automaticamente:', nomeReceptora);
+            console.log('✅ Nome da receptora preenchido automaticamente:', nomeReceptora);
             return {
               ...prev,
               receptora: nomeReceptora.trim()
             };
           } else {
-            console.log('ââ€ž¹ï¸� Campo nome da receptora jÃ¡ preenchido, mantendo valor atual');
+            console.log('ℹ️ Campo nome da receptora já preenchido, mantendo valor atual');
             return prev;
           }
         });
       } else {
-        console.log('â�Å’ Receptora nÃ£o encontrada para sÃ©rie:', serie, 'RG:', rg);
+        console.log('❌ Receptora não encontrada para série:', serie, 'RG:', rg);
       }
     } catch (error) {
       console.error('Erro ao buscar receptora:', error);
     }
   };
 
-  // Efeito para autopreenchimento quando sÃ©rie e RG da receptora mudarem
+  // Efeito para autopreenchimento quando série e RG da receptora mudarem
   useEffect(() => {
     if (dados.receptoraSerie && dados.receptoraRg) {
       buscarNomeReceptora(dados.receptoraSerie, dados.receptoraRg);
@@ -201,7 +201,7 @@ export default function NascimentoModal({ isOpen, onClose, onSave }) {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto">
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-[800px] max-w-full m-4">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          âÅ“¨ Dados de Nascimento (CJCJ)
+          ✨ Dados de Nascimento (CJCJ)
         </h3>
         
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -239,7 +239,7 @@ export default function NascimentoModal({ isOpen, onClose, onSave }) {
             {/* Pai */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
               <div className="md:col-span-1">
-                <label className="block text-xs font-medium text-gray-500 mb-1">SÃ©rie Pai</label>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Série Pai</label>
                 <input
                   type="text"
                   value={dados.paiSerie}
@@ -270,10 +270,10 @@ export default function NascimentoModal({ isOpen, onClose, onSave }) {
               </div>
             </div>
 
-            {/* MÃ£e */}
+            {/* Mãe */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
               <div className="md:col-span-1">
-                <label className="block text-xs font-medium text-gray-500 mb-1">SÃ©rie MÃ£e</label>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Série Mãe</label>
                 <input
                   type="text"
                   value={dados.maeSerie}
@@ -283,7 +283,7 @@ export default function NascimentoModal({ isOpen, onClose, onSave }) {
                 />
               </div>
               <div className="md:col-span-1">
-                <label className="block text-xs font-medium text-gray-500 mb-1">RG MÃ£e</label>
+                <label className="block text-xs font-medium text-gray-500 mb-1">RG Mãe</label>
                 <input
                   type="text"
                   value={dados.maeRg}
@@ -293,26 +293,26 @@ export default function NascimentoModal({ isOpen, onClose, onSave }) {
                 />
               </div>
               <div className="md:col-span-1">
-                <label className="block text-xs font-medium text-gray-500 mb-1">Nome MÃ£e</label>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Nome Mãe</label>
                 <input
                   type="text"
                   value={dados.mae}
                   onChange={(e) => setDados({...dados, mae: e.target.value})}
                   className="input-field"
-                  placeholder="Nome da mÃ£e"
+                  placeholder="Nome da mãe"
                 />
               </div>
             </div>
 
-            {/* AvÃ´ Materno */}
+            {/* Avô Materno */}
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">AvÃ´ Materno</label>
+              <label className="block text-xs font-medium text-gray-500 mb-1">Avô Materno</label>
               <input
                 type="text"
                 value={dados.avoMaterno}
                 onChange={(e) => setDados({...dados, avoMaterno: e.target.value})}
                 className="input-field"
-                placeholder="Nome do avÃ´ materno"
+                placeholder="Nome do avô materno"
               />
             </div>
           </div>
@@ -326,7 +326,7 @@ export default function NascimentoModal({ isOpen, onClose, onSave }) {
                 onChange={(e) => setDados({...dados, isFiv: e.target.checked})}
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2"
               />
-              <span className="text-sm font-medium text-gray-900 dark:text-white">Animal Ã© de FIV?</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-white">Animal é de FIV?</span>
             </div>
 
             {dados.isFiv && (
@@ -334,7 +334,7 @@ export default function NascimentoModal({ isOpen, onClose, onSave }) {
                 <h5 className="text-sm font-medium text-gray-900 dark:text-white mb-2">Dados da Receptora</h5>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                   <div className="md:col-span-1">
-                    <label className="block text-xs font-medium text-gray-500 mb-1">SÃ©rie</label>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">Série</label>
                     <input
                       type="text"
                       value={dados.receptoraSerie}
@@ -364,7 +364,7 @@ export default function NascimentoModal({ isOpen, onClose, onSave }) {
                     />
                   </div>
                   <div className="md:col-span-1">
-                    <label className="block text-xs font-medium text-gray-500 mb-1">Nome/IdentificaÃ§Ã£o</label>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">Nome/Identificação</label>
                     <input
                       type="text"
                       value={dados.receptora}
@@ -380,7 +380,7 @@ export default function NascimentoModal({ isOpen, onClose, onSave }) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              ObservaÃ§Ãµes
+              Observações
             </label>
             <textarea
               value={dados.observacoes}

@@ -18,7 +18,7 @@ async function verificarEstrutura() {
       ORDER BY ordinal_position
     `)
 
-    console.log('�Ÿ“‹ Estrutura da tabela animais:')
+    console.log('📋 Estrutura da tabela animais:')
     estrutura.rows.forEach(col => {
       console.log(`  - ${col.column_name}: ${col.data_type}`)
     })
@@ -31,14 +31,14 @@ async function verificarEstrutura() {
     `)
 
     if (animal.rows.length > 0) {
-      console.log('\n�Ÿ“‹ Dados do animal 8251:')
+      console.log('\n📋 Dados do animal 8251:')
       console.log(JSON.stringify(animal.rows[0], null, 2))
     } else {
-      console.log('\n�Œ Animal 8251 não encontrado!')
+      console.log('\n❌ Animal 8251 não encontrado!')
     }
 
   } catch (error) {
-    console.error('�Œ Erro:', error.message)
+    console.error('❌ Erro:', error.message)
   } finally {
     await pool.end()
   }

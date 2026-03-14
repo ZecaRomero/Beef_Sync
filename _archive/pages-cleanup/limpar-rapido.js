@@ -85,7 +85,7 @@ export default function LimparRapido() {
           <>
             <CheckCircleIcon className="w-16 h-16 text-green-600 mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-green-800 dark:text-green-200 mb-2">
-              �œ… Dados Removidos!
+              ✅ Dados Removidos!
             </h1>
             <p className="text-green-700 dark:text-green-300 mb-4">
               Todos os dados fictícios foram removidos com sucesso.
@@ -98,18 +98,18 @@ export default function LimparRapido() {
           <>
             <TrashIcon className="w-16 h-16 text-red-600 mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-              �Ÿ�� Limpeza Rápida
+              🧹 Limpeza Rápida
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
               Remove todos os dados fictícios/mock do sistema, incluindo:
             </p>
             <ul className="text-left text-sm text-gray-600 dark:text-gray-400 mb-6 space-y-1">
-              <li>�€� Vendas (Nelore 001, Angus 045, etc.)</li>
-              <li>�€� Transferências (Vaca 001, Vaca 002, etc.)</li>
-              <li>�€� Equipamentos de teste</li>
-              <li>�€� Custos nutricionais fictícios</li>
-              <li>�€� Dietas de exemplo</li>
-              <li>�€� Outros dados de demonstração</li>
+              <li>• Vendas (Nelore 001, Angus 045, etc.)</li>
+              <li>• Transferências (Vaca 001, Vaca 002, etc.)</li>
+              <li>• Equipamentos de teste</li>
+              <li>• Custos nutricionais fictícios</li>
+              <li>• Dietas de exemplo</li>
+              <li>• Outros dados de demonstração</li>
             </ul>
             
             <button
@@ -132,13 +132,13 @@ export default function LimparRapido() {
                 href="/comercial/vendas" 
                 className="block text-blue-600 hover:text-blue-800 dark:text-blue-400 text-sm"
               >
-                �†’ Ver Página de Vendas
+                → Ver Página de Vendas
               </a>
               <a 
                 href="/dashboard" 
                 className="block text-gray-600 hover:text-gray-800 dark:text-gray-400 text-sm"
               >
-                �†’ Voltar ao Dashboard
+                → Voltar ao Dashboard
               </a>
             </div>
           </>

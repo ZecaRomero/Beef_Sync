@@ -1,6 +1,6 @@
 /**
  * Componente principal para formatar detalhes de lotes
- * Centraliza a lÃ³gica de exibiÃ§Ã£o usando subcomponentes especializados
+ * Centraliza a lógica de exibição usando subcomponentes especializados
  */
 import DetalhesAnimal from './DetalhesAnimal';
 import DetalhesNotaFiscal from './DetalhesNotaFiscal';
@@ -14,28 +14,28 @@ export default function FormatadorDetalhesLote({ detalhes }) {
   try {
     const dados = typeof detalhes === 'string' ? JSON.parse(detalhes) : detalhes;
 
-    // Se tem request_body, processar componentes especÃ­ficos
+    // Se tem request_body, processar componentes específicos
     if (dados.request_body) {
       const body = dados.request_body;
 
       return (
         <div className="space-y-3 text-sm">
-          {/* InformaÃ§Ãµes do Animal */}
+          {/* Informações do Animal */}
           <DetalhesAnimal body={body} />
 
-          {/* InformaÃ§Ãµes de Nota Fiscal */}
+          {/* Informações de Nota Fiscal */}
           <DetalhesNotaFiscal body={body} />
 
-          {/* InformaÃ§Ãµes de Custo */}
+          {/* Informações de Custo */}
           <DetalhesCusto body={body} />
 
-          {/* InformaÃ§Ãµes de SÃªmen */}
+          {/* Informações de Sêmen */}
           <DetalhesSemen body={body} />
 
-          {/* InformaÃ§Ãµes TÃ©cnicas */}
+          {/* Informações Técnicas */}
           <DetalhesInformacoesTecnicas dados={dados} />
 
-          {/* Dados Brutos (se houver muitos campos nÃ£o mapeados) */}
+          {/* Dados Brutos (se houver muitos campos não mapeados) */}
           {Object.keys(body).length > 20 && <DadosBrutos body={body} />}
         </div>
       );
@@ -44,7 +44,7 @@ export default function FormatadorDetalhesLote({ detalhes }) {
     // Fallback para outros tipos de dados
     return (
       <div className="bg-gray-700 p-3 rounded">
-        <h4 className="font-semibold text-gray-300 mb-2">ðÅ¸â€œâ€¹ Dados da OperaÃ§Ã£o</h4>
+        <h4 className="font-semibold text-gray-300 mb-2">📋 Dados da Operação</h4>
         <pre className="text-xs text-gray-300 whitespace-pre-wrap">
           {JSON.stringify(dados, null, 2)}
         </pre>
@@ -63,7 +63,7 @@ function DadosBrutos({ body }) {
   return (
     <div className="bg-gray-900/50 p-4 rounded-lg border border-gray-600/30">
       <h4 className="font-bold text-gray-400 mb-3 flex items-center gap-2">
-        ðÅ¸â€œÅ  DADOS BRUTOS COMPLETOS
+        📊 DADOS BRUTOS COMPLETOS
       </h4>
       <details className="cursor-pointer">
         <summary className="text-gray-300 hover:text-white">

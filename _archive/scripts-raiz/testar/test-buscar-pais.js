@@ -3,7 +3,7 @@ const { query } = require('./lib/database')
 
 async function testBuscarPais() {
   try {
-    console.log('�Ÿ”� Testando busca de pais...\n')
+    console.log('🔍 Testando busca de pais...\n')
     
     // Buscar um animal com pai e mãe
     const result = await query(`
@@ -13,10 +13,10 @@ async function testBuscarPais() {
       LIMIT 3
     `)
     
-    console.log(`�Ÿ“‹ Encontrados ${result.rows.length} animais com pai e mãe\n`)
+    console.log(`📋 Encontrados ${result.rows.length} animais com pai e mãe\n`)
     
     for (const animal of result.rows) {
-      console.log(`\n�Ÿ�„ Animal: ${animal.serie}-${animal.rg}`)
+      console.log(`\n🐄 Animal: ${animal.serie}-${animal.rg}`)
       console.log(`  Pai registrado: ${animal.pai}`)
       console.log(`  Mãe registrada: ${animal.mae}`)
       
@@ -34,9 +34,9 @@ async function testBuscarPais() {
         
         if (paiResult.rows.length > 0) {
           const pai = paiResult.rows[0]
-          console.log(`  �œ… Pai encontrado: ${pai.serie}-${pai.rg} (${pai.nome || 'sem nome'})`)
+          console.log(`  ✅ Pai encontrado: ${pai.serie}-${pai.rg} (${pai.nome || 'sem nome'})`)
         } else {
-          console.log(`  �Œ Pai N�ƒO encontrado`)
+          console.log(`  ❌ Pai NÃO encontrado`)
           
           // Tentar busca parcial
           const buscaParcial = await query(
@@ -49,7 +49,7 @@ async function testBuscarPais() {
           )
           
           if (buscaParcial.rows.length > 0) {
-            console.log(`  �Ÿ’� Sugestões:`)
+            console.log(`  💡 Sugestões:`)
             buscaParcial.rows.forEach(s => {
               console.log(`     - ${s.serie}-${s.rg} (${s.nome || 'sem nome'})`)
             })
@@ -71,9 +71,9 @@ async function testBuscarPais() {
         
         if (maeResult.rows.length > 0) {
           const mae = maeResult.rows[0]
-          console.log(`  �œ… Mãe encontrada: ${mae.serie}-${mae.rg} (${mae.nome || 'sem nome'})`)
+          console.log(`  ✅ Mãe encontrada: ${mae.serie}-${mae.rg} (${mae.nome || 'sem nome'})`)
         } else {
-          console.log(`  �Œ Mãe N�ƒO encontrada`)
+          console.log(`  ❌ Mãe NÃO encontrada`)
           
           // Tentar busca parcial
           const buscaParcial = await query(
@@ -86,7 +86,7 @@ async function testBuscarPais() {
           )
           
           if (buscaParcial.rows.length > 0) {
-            console.log(`  �Ÿ’� Sugestões:`)
+            console.log(`  💡 Sugestões:`)
             buscaParcial.rows.forEach(s => {
               console.log(`     - ${s.serie}-${s.rg} (${s.nome || 'sem nome'})`)
             })
@@ -95,10 +95,10 @@ async function testBuscarPais() {
       }
     }
     
-    console.log('\n�œ… Teste concluído!')
+    console.log('\n✅ Teste concluído!')
     
   } catch (error) {
-    console.error('�Œ Erro:', error)
+    console.error('❌ Erro:', error)
   } finally {
     process.exit(0)
   }

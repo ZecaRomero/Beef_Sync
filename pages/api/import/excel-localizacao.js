@@ -10,19 +10,19 @@ export const config = {
 };
 
 /**
- * Importa localizaÃ§Ã£o e observaÃ§Ãµes de animais a partir de Excel.
- * Formato esperado: SÃ©rie (A) | RGN/RG (B) | LOCAL (C) | OBSERVAÃâ€¡Ãâ€¢ES (D)
+ * Importa localização e observações de animais a partir de Excel.
+ * Formato esperado: Série (A) | RGN/RG (B) | LOCAL (C) | OBSERVAÇÕES (D)
  */
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' });
+    return res.status(405).json({ error: 'Método não permitido' });
   }
 
   const form = formidable({ multiples: false });
 
   form.parse(req, async (err, fields, files) => {
     if (err) {
-      console.error('Erro ao fazer parse do formulÃ¡rio:', err);
+      console.error('Erro ao fazer parse do formulário:', err);
       return res.status(500).json({ error: 'Erro ao processar arquivo', details: String(err?.message || err) });
     }
 
@@ -33,11 +33,11 @@ export default async function handler(req, res) {
 
     const filepath = file.filepath || file.path;
     if (!filepath) {
-      return res.status(400).json({ error: 'Arquivo invÃ¡lido' });
+      return res.status(400).json({ error: 'Arquivo inválido' });
     }
 
     try {
-      // Garantir que colunas existam (migraÃ§Ã£o silenciosa)
+      // Garantir que colunas existam (migração silenciosa)
       try {
         await query(`
           DO $$ BEGIN
@@ -50,7 +50,7 @@ export default async function handler(req, res) {
           END $$;
         `);
       } catch (migErr) {
-        console.warn('MigraÃ§Ã£o colunas:', migErr.message);
+        console.warn('Migração colunas:', migErr.message);
       }
 
       const workbook = new ExcelJS.Workbook();
@@ -68,20 +68,20 @@ export default async function handler(req, res) {
         erros: []
       };
 
-      // Detectar linha inicial (pular cabeÃ§alho se existir)
+      // Detectar linha inicial (pular cabeçalho se existir)
       let startRow = 1;
       try {
         const primeiraLinha = worksheet.getRow(1);
         const cellA1 = (primeiraLinha.getCell(1).value ?? '').toString().toUpperCase();
         const cellB1 = (primeiraLinha.getCell(2).value ?? '').toString().toUpperCase();
-        if (cellA1.includes('SÃâ€°RIE') || cellA1.includes('SERIE') || cellB1.includes('RGN') || cellB1.includes('RG')) {
+        if (cellA1.includes('SÉRIE') || cellA1.includes('SERIE') || cellB1.includes('RGN') || cellB1.includes('RG')) {
           startRow = 2;
         }
       } catch (e) {
-        console.warn('DetecÃ§Ã£o de cabeÃ§alho:', e.message);
+        console.warn('Detecção de cabeçalho:', e.message);
       }
 
-      console.log(`\nðÅ¸â€œÅ  Importando localizaÃ§Ãµes - processando a partir da linha ${startRow}...\n`);
+      console.log(`\n📊 Importando localizações - processando a partir da linha ${startRow}...\n`);
 
       for (let i = startRow; i <= worksheet.rowCount; i++) {
         const row = worksheet.getRow(i);
@@ -120,7 +120,7 @@ export default async function handler(req, res) {
               [local || null, dataEntrada, observacoes, animal.id]
             );
           } catch (updErr) {
-            // Fallback: tentar com pasto_atual (coluna alternativa) ou sÃ³ observacoes
+            // Fallback: tentar com pasto_atual (coluna alternativa) ou só observacoes
             const msg = String(updErr.message || '');
             if (msg.includes('piquete_atual') || msg.includes('data_entrada_piquete') || msg.includes('column')) {
               try {
@@ -156,12 +156,12 @@ export default async function handler(req, res) {
               );
               resultados.localizacoesRegistradas++;
             } catch (locErr) {
-              console.warn(`LocalizaÃ§Ã£o ${animal.serie}${animal.rg}: tabela localizacoes_animais -`, locErr.message);
+              console.warn(`Localização ${animal.serie}${animal.rg}: tabela localizacoes_animais -`, locErr.message);
             }
           }
 
           if (i <= startRow + 5 || i % 500 === 0) {
-            console.log(`  âÅ“â€¦ Linha ${i}: ${serie} ${rg} ââ€ â€™ ${local || '(sem local)'}`);
+            console.log(`  ✅ Linha ${i}: ${serie} ${rg} → ${local || '(sem local)'}`);
           }
         } catch (rowError) {
           console.error(`Erro linha ${i}:`, rowError);
@@ -176,19 +176,19 @@ export default async function handler(req, res) {
 
       try { fs.unlinkSync(filepath); } catch (e) { /* ignorar */ }
 
-      console.log(`\nâÅ“â€¦ ImportaÃ§Ã£o de localizaÃ§Ãµes concluÃ­da!`);
+      console.log(`\n✅ Importação de localizações concluída!`);
       console.log(`   Animais atualizados: ${resultados.animaisAtualizados}`);
-      console.log(`   LocalizaÃ§Ãµes registradas: ${resultados.localizacoesRegistradas}`);
-      console.log(`   NÃ£o encontrados: ${resultados.naoEncontrados.length}`);
+      console.log(`   Localizações registradas: ${resultados.localizacoesRegistradas}`);
+      console.log(`   Não encontrados: ${resultados.naoEncontrados.length}`);
       console.log(`   Erros: ${resultados.erros.length}\n`);
 
       return res.status(200).json({
         success: true,
-        message: `ImportaÃ§Ã£o concluÃ­da: ${resultados.animaisAtualizados} animais atualizados`,
+        message: `Importação concluída: ${resultados.animaisAtualizados} animais atualizados`,
         resultados
       });
     } catch (error) {
-      console.error('â�Å’ Erro ao processar Excel:', error);
+      console.error('❌ Erro ao processar Excel:', error);
       try { if (filepath) fs.unlinkSync(filepath); } catch (e) { /* ignorar */ }
       return res.status(500).json({
         error: 'Erro ao processar arquivo Excel',

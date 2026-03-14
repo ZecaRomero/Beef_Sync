@@ -1,5 +1,5 @@
 /**
- * API para gerar dados do Boletim ContÃ¡bil
+ * API para gerar dados do Boletim Contábil
  * Conectado ao PostgreSQL
  */
 
@@ -15,16 +15,16 @@ export default async function handler(req, res) {
     const { periodo } = req.body
 
     if (!periodo) {
-      return res.status(400).json({ message: 'PerÃ­odo Ã© obrigatÃ³rio' })
+      return res.status(400).json({ message: 'Período é obrigatório' })
     }
 
     // Carregar dados do PostgreSQL
     const boletim = await databaseService.obterBoletimPeriodo(periodo)
     
-    // Buscar movimentaÃ§Ãµes do perÃ­odo
+    // Buscar movimentações do período
     const movimentacoes = await databaseService.buscarMovimentacoes(periodo)
     
-    // Processar movimentaÃ§Ãµes por tipo
+    // Processar movimentações por tipo
     const entradas = movimentacoes.filter(m => m.tipo === 'entrada')
     const saidas = movimentacoes.filter(m => m.tipo === 'saida')
     const custos = movimentacoes.filter(m => m.tipo === 'custo')
@@ -69,7 +69,7 @@ export default async function handler(req, res) {
     })
 
   } catch (error) {
-    logger.error('â�Å’ Erro ao gerar boletim:', error)
+    logger.error('❌ Erro ao gerar boletim:', error)
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',

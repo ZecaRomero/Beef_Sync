@@ -13,7 +13,7 @@ export default async function handler(req, res) {
         res.status(405).end(`Method ${method} Not Allowed`)
     }
   } catch (error) {
-    console.error('Erro na API de geraÃ§Ã£o de notificaÃ§Ãµes:', error)
+    console.error('Erro na API de geração de notificações:', error)
     res.status(500).json({ message: 'Erro interno do servidor', error: error.message })
   }
 }
@@ -23,7 +23,7 @@ async function handlePost(req, res) {
     const { tipo } = req.body
 
     if (!tipo) {
-      return res.status(400).json({ message: 'Tipo de notificaÃ§Ã£o Ã© obrigatÃ³rio' })
+      return res.status(400).json({ message: 'Tipo de notificação é obrigatório' })
     }
 
     let notificationsCreated = []
@@ -58,25 +58,25 @@ async function handlePost(req, res) {
         notificationsCreated = await generateAllNotifications()
         break
       default:
-        return res.status(400).json({ message: 'Tipo de notificaÃ§Ã£o invÃ¡lido' })
+        return res.status(400).json({ message: 'Tipo de notificação inválido' })
     }
 
     res.status(200).json({ 
-      message: `${notificationsCreated.length} notificaÃ§Ãµes criadas`,
+      message: `${notificationsCreated.length} notificações criadas`,
       notifications: notificationsCreated
     })
   } catch (error) {
-    console.error('Erro ao gerar notificaÃ§Ãµes:', error)
+    console.error('Erro ao gerar notificações:', error)
     res.status(500).json({ message: 'Erro interno do servidor', error: error.message })
   }
 }
 
-// Gerar notificaÃ§Ãµes de nascimentos
+// Gerar notificações de nascimentos
 async function generateBirthNotifications() {
   const notifications = []
   
   try {
-    // Buscar nascimentos recentes (Ãºltimos 7 dias)
+    // Buscar nascimentos recentes (últimos 7 dias)
     const recentBirths = await query(`
       SELECT COUNT(*) as total, 
              COUNT(CASE WHEN data_nascimento >= CURRENT_DATE - INTERVAL '7 days' THEN 1 END) as recentes
@@ -94,7 +94,7 @@ async function generateBirthNotifications() {
       `, [
         'nascimento',
         'Novos Nascimentos',
-        `${recentes} nascimento(s) registrado(s) nos Ãºltimos 7 dias`,
+        `${recentes} nascimento(s) registrado(s) nos últimos 7 dias`,
         'medium',
         JSON.stringify({ total_nascimentos: parseInt(total), nascimentos_recentes: parseInt(recentes) })
       ])
@@ -102,7 +102,7 @@ async function generateBirthNotifications() {
       notifications.push(result.rows[0])
     }
 
-    // Verificar animais prÃ³ximos ao parto (280-290 dias de gestaÃ§Ã£o)
+    // Verificar animais próximos ao parto (280-290 dias de gestação)
     const nearBirth = await query(`
       SELECT COUNT(*) as total
       FROM animais 
@@ -119,8 +119,8 @@ async function generateBirthNotifications() {
         RETURNING *
       `, [
         'nascimento',
-        'Animais PrÃ³ximos ao Parto',
-        `${nearBirth.rows[0].total} animal(is) prÃ³ximo(s) ao parto (280-290 dias)`,
+        'Animais Próximos ao Parto',
+        `${nearBirth.rows[0].total} animal(is) próximo(s) ao parto (280-290 dias)`,
         'high',
         JSON.stringify({ animais_proximos_parto: parseInt(nearBirth.rows[0].total) })
       ])
@@ -129,18 +129,18 @@ async function generateBirthNotifications() {
     }
 
   } catch (error) {
-    console.error('Erro ao gerar notificaÃ§Ãµes de nascimento:', error)
+    console.error('Erro ao gerar notificações de nascimento:', error)
   }
 
   return notifications
 }
 
-// Gerar notificaÃ§Ãµes de estoque
+// Gerar notificações de estoque
 async function generateStockNotifications() {
   const notifications = []
   
   try {
-    // Verificar estoque de sÃªmen baixo
+    // Verificar estoque de sêmen baixo
     const semenStock = await query(`
       SELECT COUNT(*) as total, 
              COUNT(CASE WHEN quantidade <= 5 THEN 1 END) as baixo
@@ -155,8 +155,8 @@ async function generateStockNotifications() {
         RETURNING *
       `, [
         'estoque',
-        'Estoque de SÃªmen Baixo',
-        `${semenStock.rows[0].baixo} tipo(s) de sÃªmen com estoque baixo (ââ€°¤5 doses)`,
+        'Estoque de Sêmen Baixo',
+        `${semenStock.rows[0].baixo} tipo(s) de sêmen com estoque baixo (≤5 doses)`,
         'high',
         JSON.stringify({ tipos_baixo: parseInt(semenStock.rows[0].baixo) })
       ])
@@ -165,18 +165,18 @@ async function generateStockNotifications() {
     }
 
   } catch (error) {
-    console.error('Erro ao gerar notificaÃ§Ãµes de estoque:', error)
+    console.error('Erro ao gerar notificações de estoque:', error)
   }
 
   return notifications
 }
 
-// Gerar notificaÃ§Ãµes de gestaÃ§Ã£o
+// Gerar notificações de gestação
 async function generateGestationNotifications() {
   const notifications = []
   
   try {
-    // Verificar gestaÃ§Ãµes atrasadas (mais de 300 dias)
+    // Verificar gestações atrasadas (mais de 300 dias)
     const delayedGestation = await query(`
       SELECT COUNT(*) as total
       FROM animais 
@@ -192,8 +192,8 @@ async function generateGestationNotifications() {
         RETURNING *
       `, [
         'gestacao',
-        'GestaÃ§Ãµes Atrasadas',
-        `${delayedGestation.rows[0].total} animal(is) com gestaÃ§Ã£o atrasada (>300 dias)`,
+        'Gestações Atrasadas',
+        `${delayedGestation.rows[0].total} animal(is) com gestação atrasada (>300 dias)`,
         'high',
         JSON.stringify({ gestacoes_atrasadas: parseInt(delayedGestation.rows[0].total) })
       ])
@@ -202,18 +202,18 @@ async function generateGestationNotifications() {
     }
 
   } catch (error) {
-    console.error('Erro ao gerar notificaÃ§Ãµes de gestaÃ§Ã£o:', error)
+    console.error('Erro ao gerar notificações de gestação:', error)
   }
 
   return notifications
 }
 
-// Gerar notificaÃ§Ãµes de saÃºde
+// Gerar notificações de saúde
 async function generateHealthNotifications() {
   const notifications = []
   
   try {
-    // Verificar animais com problemas de saÃºde
+    // Verificar animais com problemas de saúde
     const healthIssues = await query(`
       SELECT COUNT(*) as total
       FROM animais 
@@ -227,8 +227,8 @@ async function generateHealthNotifications() {
         RETURNING *
       `, [
         'saude',
-        'Animais com Problemas de SaÃºde',
-        `${healthIssues.rows[0].total} animal(is) necessitam atenÃ§Ã£o mÃ©dica`,
+        'Animais com Problemas de Saúde',
+        `${healthIssues.rows[0].total} animal(is) necessitam atenção médica`,
         'high',
         JSON.stringify({ animais_doentes: parseInt(healthIssues.rows[0].total) })
       ])
@@ -237,13 +237,13 @@ async function generateHealthNotifications() {
     }
 
   } catch (error) {
-    console.error('Erro ao gerar notificaÃ§Ãµes de saÃºde:', error)
+    console.error('Erro ao gerar notificações de saúde:', error)
   }
 
   return notifications
 }
 
-// Gerar notificaÃ§Ãµes financeiras
+// Gerar notificações financeiras
 async function generateFinancialNotifications() {
   const notifications = []
   
@@ -266,8 +266,8 @@ async function generateFinancialNotifications() {
         RETURNING *
       `, [
         'financeiro',
-        'Custos de ManutenÃ§Ã£o',
-        `R$ ${custo_manutencao.toFixed(2)} em custos de manutenÃ§Ã£o acumulados`,
+        'Custos de Manutenção',
+        `R$ ${custo_manutencao.toFixed(2)} em custos de manutenção acumulados`,
         'medium',
         JSON.stringify({ 
           custo_aquisicao: parseFloat(custo_aquisicao),
@@ -280,18 +280,18 @@ async function generateFinancialNotifications() {
     }
 
   } catch (error) {
-    console.error('Erro ao gerar notificaÃ§Ãµes financeiras:', error)
+    console.error('Erro ao gerar notificações financeiras:', error)
   }
 
   return notifications
 }
 
-// Gerar notificaÃ§Ãµes do sistema
+// Gerar notificações do sistema
 async function generateSystemNotifications() {
   const notifications = []
   
   try {
-    // Verificar dados nÃ£o migrados do localStorage
+    // Verificar dados não migrados do localStorage
     const hasLocalStorageData = typeof window !== 'undefined' && (
       localStorage.getItem('nfsReceptoras') ||
       localStorage.getItem('naturezasOperacao') ||
@@ -305,7 +305,7 @@ async function generateSystemNotifications() {
         RETURNING *
       `, [
         'sistema',
-        'Dados NÃ£o Migrados',
+        'Dados Não Migrados',
         'Existem dados antigos no localStorage que precisam ser migrados para o banco',
         'medium',
         JSON.stringify({ migracao_pendente: true })
@@ -315,18 +315,18 @@ async function generateSystemNotifications() {
     }
 
   } catch (error) {
-    console.error('Erro ao gerar notificaÃ§Ãµes do sistema:', error)
+    console.error('Erro ao gerar notificações do sistema:', error)
   }
 
   return notifications
 }
 
-// Gerar notificaÃ§Ãµes de nitrogÃªnio
+// Gerar notificações de nitrogênio
 async function generateNitrogenNotifications() {
   const notifications = []
   
   try {
-    // Buscar abastecimentos que precisam de notificaÃ§Ã£o (5 dias antes de 1 mÃªs)
+    // Buscar abastecimentos que precisam de notificação (5 dias antes de 1 mês)
     const result = await query(`
       SELECT 
         id,
@@ -346,7 +346,7 @@ async function generateNitrogenNotifications() {
         (new Date(abastecimento.proximo_abastecimento) - new Date()) / (1000 * 60 * 60 * 24)
       )
 
-      // Criar notificaÃ§Ã£o
+      // Criar notificação
       const notificationResult = await query(`
         INSERT INTO notificacoes 
         (tipo, titulo, mensagem, prioridade, dados_extras)
@@ -354,8 +354,8 @@ async function generateNitrogenNotifications() {
         RETURNING *
       `, [
         'nitrogenio',
-        'Lembrete de Abastecimento de NitrogÃªnio',
-        `Ãâ€° hora de abastecer o nitrogÃªnio! ÃÅ¡ltimo abastecimento foi em ${new Date(abastecimento.data_abastecimento).toLocaleDateString('pt-BR')} com ${abastecimento.quantidade_litros}L pelo motorista ${abastecimento.motorista}. ${diasRestantes <= 0 ? 'Prazo vencido!' : `Restam ${diasRestantes} dias.`}`,
+        'Lembrete de Abastecimento de Nitrogênio',
+        `É hora de abastecer o nitrogênio! Último abastecimento foi em ${new Date(abastecimento.data_abastecimento).toLocaleDateString('pt-BR')} com ${abastecimento.quantidade_litros}L pelo motorista ${abastecimento.motorista}. ${diasRestantes <= 0 ? 'Prazo vencido!' : `Restam ${diasRestantes} dias.`}`,
         diasRestantes <= 0 ? 'high' : 'medium',
         JSON.stringify({
           abastecimento_id: abastecimento.id,
@@ -367,7 +367,7 @@ async function generateNitrogenNotifications() {
         })
       ])
 
-      // Marcar como notificaÃ§Ã£o enviada
+      // Marcar como notificação enviada
       await query(`
         UPDATE abastecimento_nitrogenio 
         SET notificacao_enviada = true, updated_at = CURRENT_TIMESTAMP
@@ -378,13 +378,13 @@ async function generateNitrogenNotifications() {
     }
 
   } catch (error) {
-    console.error('Erro ao gerar notificaÃ§Ãµes de nitrogÃªnio:', error)
+    console.error('Erro ao gerar notificações de nitrogênio:', error)
   }
 
   return notifications
 }
 
-// Gerar notificaÃ§Ãµes de exames androlÃ³gicos
+// Gerar notificações de exames andrológicos
 async function generateAndrologicoNotifications() {
   const notifications = []
   
@@ -399,7 +399,7 @@ async function generateAndrologicoNotifications() {
     `)
 
     if (!tableExists.rows[0].exists) {
-      console.log('Tabela exames_andrologicos nÃ£o existe, pulando geraÃ§Ã£o de notificaÃ§Ãµes')
+      console.log('Tabela exames_andrologicos não existe, pulando geração de notificações')
       return notifications
     }
 
@@ -407,7 +407,7 @@ async function generateAndrologicoNotifications() {
     hoje.setHours(0, 0, 0, 0)
 
     // Buscar exames que precisam ser refeitos (reagendados para inaptos)
-    // Exames pendentes que estÃ£o prÃ³ximos (3 dias) ou vencidos
+    // Exames pendentes que estão próximos (3 dias) ou vencidos
     const examesParaRefazer = await query(`
       SELECT 
         id,
@@ -426,7 +426,7 @@ async function generateAndrologicoNotifications() {
       ORDER BY data_exame ASC
     `)
 
-    // Agrupar por status (vencido, hoje, prÃ³ximos 3 dias)
+    // Agrupar por status (vencido, hoje, próximos 3 dias)
     const examesVencidos = []
     const examesHoje = []
     const examesProximos = []
@@ -445,7 +445,7 @@ async function generateAndrologicoNotifications() {
       }
     }
 
-    // Criar notificaÃ§Ã£o para exames vencidos (alta prioridade)
+    // Criar notificação para exames vencidos (alta prioridade)
     if (examesVencidos.length > 0) {
       const result = await query(`
         INSERT INTO notificacoes (tipo, titulo, mensagem, prioridade, dados_extras)
@@ -453,8 +453,8 @@ async function generateAndrologicoNotifications() {
         RETURNING *
       `, [
         'andrologico',
-        'âÅ¡ ï¸� Exames AndrolÃ³gicos Vencidos',
-        `${examesVencidos.length} exame(s) de touro(s) inapto(s) que precisam ser refeitos estÃ£o vencidos!`,
+        '⚠️ Exames Andrológicos Vencidos',
+        `${examesVencidos.length} exame(s) de touro(s) inapto(s) que precisam ser refeitos estão vencidos!`,
         'high',
         JSON.stringify({
           exames_vencidos: examesVencidos.length,
@@ -469,7 +469,7 @@ async function generateAndrologicoNotifications() {
       notifications.push(result.rows[0])
     }
 
-    // Criar notificaÃ§Ã£o para exames hoje (alta prioridade)
+    // Criar notificação para exames hoje (alta prioridade)
     if (examesHoje.length > 0) {
       const result = await query(`
         INSERT INTO notificacoes (tipo, titulo, mensagem, prioridade, dados_extras)
@@ -477,7 +477,7 @@ async function generateAndrologicoNotifications() {
         RETURNING *
       `, [
         'andrologico',
-        'â�° Exames AndrolÃ³gicos para Hoje',
+        '⏰ Exames Andrológicos para Hoje',
         `${examesHoje.length} exame(s) de touro(s) inapto(s) devem ser refeitos HOJE!`,
         'high',
         JSON.stringify({
@@ -493,7 +493,7 @@ async function generateAndrologicoNotifications() {
       notifications.push(result.rows[0])
     }
 
-    // Criar notificaÃ§Ã£o para exames prÃ³ximos (mÃ©dia prioridade)
+    // Criar notificação para exames próximos (média prioridade)
     if (examesProximos.length > 0) {
       const result = await query(`
         INSERT INTO notificacoes (tipo, titulo, mensagem, prioridade, dados_extras)
@@ -501,8 +501,8 @@ async function generateAndrologicoNotifications() {
         RETURNING *
       `, [
         'andrologico',
-        'ðÅ¸â€œâ€¦ Lembretes de Exames AndrolÃ³gicos',
-        `${examesProximos.length} exame(s) de touro(s) inapto(s) devem ser refeitos nos prÃ³ximos 3 dias`,
+        '📅 Lembretes de Exames Andrológicos',
+        `${examesProximos.length} exame(s) de touro(s) inapto(s) devem ser refeitos nos próximos 3 dias`,
         'medium',
         JSON.stringify({
           exames_proximos: examesProximos.length,
@@ -517,7 +517,7 @@ async function generateAndrologicoNotifications() {
       notifications.push(result.rows[0])
     }
 
-    // Verificar exames inaptos que ainda nÃ£o tÃªm reagendamento criado
+    // Verificar exames inaptos que ainda não têm reagendamento criado
     const examesInaptosSemReagendamento = await query(`
       SELECT COUNT(*) as total
       FROM exames_andrologicos e1
@@ -538,8 +538,8 @@ async function generateAndrologicoNotifications() {
         RETURNING *
       `, [
         'andrologico',
-        'ðÅ¸â€�¬ Exames Inaptos sem Reagendamento',
-        `${examesInaptosSemReagendamento.rows[0].total} exame(s) com resultado "Inapto" ainda nÃ£o tÃªm reagendamento criado`,
+        '🔬 Exames Inaptos sem Reagendamento',
+        `${examesInaptosSemReagendamento.rows[0].total} exame(s) com resultado "Inapto" ainda não têm reagendamento criado`,
         'medium',
         JSON.stringify({
           exames_sem_reagendamento: parseInt(examesInaptosSemReagendamento.rows[0].total)
@@ -549,14 +549,14 @@ async function generateAndrologicoNotifications() {
     }
 
   } catch (error) {
-    console.error('Erro ao gerar notificaÃ§Ãµes de exames androlÃ³gicos:', error)
-    // NÃ£o falhar completamente se a tabela nÃ£o existir ou houver erro
+    console.error('Erro ao gerar notificações de exames andrológicos:', error)
+    // Não falhar completamente se a tabela não existir ou houver erro
   }
 
   return notifications
 }
 
-// Gerar todas as notificaÃ§Ãµes
+// Gerar todas as notificações
 async function generateAllNotifications() {
   const allNotifications = []
   

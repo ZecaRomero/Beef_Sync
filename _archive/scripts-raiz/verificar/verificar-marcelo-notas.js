@@ -12,11 +12,11 @@ async function verificarMarceloNotas() {
   const client = await pool.connect();
   
   try {
-    console.log('�Ÿ”� INVESTIGANDO NOTAS DO MARCELO\n');
+    console.log('🔍 INVESTIGANDO NOTAS DO MARCELO\n');
     console.log('='.repeat(80));
     
     // 1. Buscar todas as notas fiscais do Marcelo
-    console.log('\n�Ÿ“‹ 1. NOTAS FISCAIS DO MARCELO:');
+    console.log('\n📋 1. NOTAS FISCAIS DO MARCELO:');
     const notasResult = await client.query(`
       SELECT 
         id,
@@ -45,7 +45,7 @@ async function verificarMarceloNotas() {
     });
     
     // 2. Buscar itens de cada nota
-    console.log('\n�Ÿ“� 2. ITENS DAS NOTAS FISCAIS:');
+    console.log('\n📦 2. ITENS DAS NOTAS FISCAIS:');
     for (const nf of notasResult.rows) {
       const itensResult = await client.query(`
         SELECT 
@@ -61,9 +61,9 @@ async function verificarMarceloNotas() {
       
       console.log(`\n   NF ${nf.numero_nf}:`);
       if (itensResult.rows.length === 0) {
-        console.log(`   �Œ Nenhum item cadastrado`);
+        console.log(`   ❌ Nenhum item cadastrado`);
       } else {
-        console.log(`   �œ… ${itensResult.rows.length} itens cadastrados:`);
+        console.log(`   ✅ ${itensResult.rows.length} itens cadastrados:`);
         itensResult.rows.forEach((item, idx) => {
           console.log(`      ${idx + 1}. Tipo: ${item.tipo_produto} | Qtd: ${item.quantidade} | Valor Unit: R$ ${item.valor_unitario} | Total: R$ ${item.valor_total}`);
           if (item.observacoes) {
@@ -74,7 +74,7 @@ async function verificarMarceloNotas() {
     }
     
     // 3. Buscar animais vinculados às notas
-    console.log('\n\n�Ÿ�� 3. ANIMAIS VINCULADOS �€S NOTAS:');
+    console.log('\n\n🐮 3. ANIMAIS VINCULADOS ÀS NOTAS:');
     for (const nf of notasResult.rows) {
       const animaisResult = await client.query(`
         SELECT 
@@ -93,9 +93,9 @@ async function verificarMarceloNotas() {
       
       console.log(`\n   NF ${nf.numero_nf}:`);
       if (animaisResult.rows.length === 0) {
-        console.log(`   �Œ Nenhum animal vinculado`);
+        console.log(`   ❌ Nenhum animal vinculado`);
       } else {
-        console.log(`   �œ… ${animaisResult.rows.length} animais vinculados:`);
+        console.log(`   ✅ ${animaisResult.rows.length} animais vinculados:`);
         
         // Contar por situação
         const porSituacao = {};
@@ -113,7 +113,7 @@ async function verificarMarceloNotas() {
           }
         });
         
-        console.log(`\n      �Ÿ“Š Resumo:`);
+        console.log(`\n      📊 Resumo:`);
         console.log(`         Total: ${animaisResult.rows.length} animais`);
         console.log(`         Ativos: ${ativos} | Inativos: ${inativos}`);
         console.log(`\n         Por Situação:`);
@@ -126,15 +126,15 @@ async function verificarMarceloNotas() {
         });
         
         // Mostrar alguns exemplos
-        console.log(`\n      �Ÿ“� Primeiros 5 animais:`);
+        console.log(`\n      📝 Primeiros 5 animais:`);
         animaisResult.rows.slice(0, 5).forEach((animal, idx) => {
-          console.log(`         ${idx + 1}. RG: ${animal.rg} | Nome: ${animal.nome || 'S/N'} | ${animal.sexo} | ${animal.categoria} | ${animal.situacao} | ${animal.inativo ? '�Ÿ”� INATIVO' : '�ŸŸ� ATIVO'}`);
+          console.log(`         ${idx + 1}. RG: ${animal.rg} | Nome: ${animal.nome || 'S/N'} | ${animal.sexo} | ${animal.categoria} | ${animal.situacao} | ${animal.inativo ? '🔴 INATIVO' : '🟢 ATIVO'}`);
         });
       }
     }
     
     // 4. Buscar todos os animais do Marcelo (independente de NF)
-    console.log('\n\n�Ÿ”� 4. BUSCA GERAL DE ANIMAIS DO MARCELO:');
+    console.log('\n\n🔍 4. BUSCA GERAL DE ANIMAIS DO MARCELO:');
     const todosAnimaisResult = await client.query(`
       SELECT 
         a.id,
@@ -165,7 +165,7 @@ async function verificarMarceloNotas() {
       porNF[nf].push(animal);
     });
     
-    console.log(`\n�Ÿ“Š Distribuição por NF:`);
+    console.log(`\n📊 Distribuição por NF:`);
     Object.entries(porNF).forEach(([nf, animais]) => {
       const ativos = animais.filter(a => !a.inativo).length;
       const inativos = animais.filter(a => a.inativo).length;
@@ -173,7 +173,7 @@ async function verificarMarceloNotas() {
     });
     
     // 5. Verificar se há animais sem NF mas com fornecedor Marcelo
-    console.log('\n\n�Ÿ”� 5. ANIMAIS SEM NF MAS COM FORNECEDOR MARCELO:');
+    console.log('\n\n🔍 5. ANIMAIS SEM NF MAS COM FORNECEDOR MARCELO:');
     const semNFResult = await client.query(`
       SELECT 
         id,
@@ -188,19 +188,19 @@ async function verificarMarceloNotas() {
     `);
     
     if (semNFResult.rows.length > 0) {
-      console.log(`\n�š�️ Encontrados ${semNFResult.rows.length} animais sem NF:`);
+      console.log(`\n⚠️ Encontrados ${semNFResult.rows.length} animais sem NF:`);
       semNFResult.rows.slice(0, 10).forEach((animal, idx) => {
-        console.log(`   ${idx + 1}. RG: ${animal.rg} | Fornecedor: ${animal.fornecedor} | ${animal.categoria} | ${animal.inativo ? '�Ÿ”� INATIVO' : '�ŸŸ� ATIVO'}`);
+        console.log(`   ${idx + 1}. RG: ${animal.rg} | Fornecedor: ${animal.fornecedor} | ${animal.categoria} | ${animal.inativo ? '🔴 INATIVO' : '🟢 ATIVO'}`);
       });
     } else {
-      console.log(`\n�œ… Todos os animais do Marcelo têm NF vinculada`);
+      console.log(`\n✅ Todos os animais do Marcelo têm NF vinculada`);
     }
     
     console.log('\n' + '='.repeat(80));
-    console.log('\n�œ… Análise concluída!');
+    console.log('\n✅ Análise concluída!');
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
     console.error(error);
   } finally {
     client.release();

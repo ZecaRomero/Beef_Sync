@@ -13,7 +13,7 @@ import {
   PrinterIcon
 } from './ui/Icons'
 import { useAutocomplete } from '../hooks/useAutocomplete'
-// ExcelJS serÃ¡ importado dinamicamente na funÃ§Ã£o de exportaÃ§Ã£o
+// ExcelJS será importado dinamicamente na função de exportação
 import DatabaseSync from './DatabaseSync'
 import { ViewSemenModal, EditSemenModal } from './SemenModals'
 import { AddEntradaModal, AddSaidaModal } from './SemenEntradaSaidaModals'
@@ -49,14 +49,14 @@ export default function SemenStock() {
   // Tipo de material: 'semen' ou 'embriao'
   const [tipoMaterial, setTipoMaterial] = useState('semen')
 
-  // Retirada de sÃªmen
+  // Retirada de sêmen
   const [retirarItens, setRetirarItens] = useState({}) // { [id]: quantidade }
 
-  // Modal de transferir localizaÃ§Ã£o
+  // Modal de transferir localização
   const [showTransferirModal, setShowTransferirModal] = useState(false)
   const [semenParaTransferir, setSemenParaTransferir] = useState(null)
 
-  // ImportaÃ§Ã£o Excel
+  // Importação Excel
   const [showImportModal, setShowImportModal] = useState(false)
   const [importFile, setImportFile] = useState(null)
   const [importPreview, setImportPreview] = useState([])
@@ -105,46 +105,46 @@ export default function SemenStock() {
         setSemenStock([])
       }
     } catch (error) {
-      console.error('Erro ao carregar estoque de sÃªmen:', error)
+      console.error('Erro ao carregar estoque de sêmen:', error)
       setSemenStock([])
     }
   }
 
   const handleAddSemen = async (dadosRecebidos = null) => {
-    // Se recebeu dados dos modais, usar eles; senÃ£o usar newSemen
+    // Se recebeu dados dos modais, usar eles; senão usar newSemen
     const semenData = dadosRecebidos || { ...newSemen }
     const tipoOperacao = semenData.tipoOperacao || (activeTab === 'entradas' ? 'entrada' : 'saida')
     
-    // ValidaÃ§Ã£o especÃ­fica para saÃ­da
+    // Validação específica para saída
     if (tipoOperacao === 'saida') {
       if (!semenData.entradaId) {
-        alert('Selecione um sÃªmen disponÃ­vel para registrar a saÃ­da')
+        alert('Selecione um sêmen disponível para registrar a saída')
         return
       }
       if (!semenData.quantidadeDoses || parseInt(semenData.quantidadeDoses) <= 0) {
-        alert('Informe a quantidade de doses para saÃ­da')
+        alert('Informe a quantidade de doses para saída')
         return
       }
       if (parseInt(semenData.quantidadeDoses) > parseInt(semenData.maxDoses)) {
-        alert(`Quantidade nÃ£o pode ser maior que ${semenData.maxDoses} doses disponÃ­veis`)
+        alert(`Quantidade não pode ser maior que ${semenData.maxDoses} doses disponíveis`)
         return
       }
       if (!semenData.destino) {
-        alert('Informe o destino da saÃ­da')
+        alert('Informe o destino da saída')
         return
       }
     }
 
-    // ValidaÃ§Ã£o para entrada - verificar se campos estÃ£o preenchidos (nÃ£o vazios e nÃ£o apenas espaÃ§os)
+    // Validação para entrada - verificar se campos estão preenchidos (não vazios e não apenas espaços)
     const camposObrigatorios = []
     
-    // FunÃ§Ã£o auxiliar para verificar se um campo estÃ¡ realmente preenchido
+    // Função auxiliar para verificar se um campo está realmente preenchido
     const isFieldEmpty = (value) => {
       return !value || (typeof value === 'string' && value.trim() === '')
     }
     
     if (isFieldEmpty(semenData.nomeTouro)) camposObrigatorios.push('Nome do Touro')
-    if (isFieldEmpty(semenData.localizacao)) camposObrigatorios.push('LocalizaÃ§Ã£o')
+    if (isFieldEmpty(semenData.localizacao)) camposObrigatorios.push('Localização')
     if (isFieldEmpty(semenData.quantidadeDoses) || parseInt(semenData.quantidadeDoses) <= 0) {
       camposObrigatorios.push('Quantidade de Doses')
     }
@@ -157,7 +157,7 @@ export default function SemenStock() {
     }
     
     if (camposObrigatorios.length > 0) {
-      alert(`Preencha os campos obrigatÃ³rios: ${camposObrigatorios.join(', ')}`)
+      alert(`Preencha os campos obrigatórios: ${camposObrigatorios.join(', ')}`)
       return
     }
 
@@ -170,7 +170,7 @@ export default function SemenStock() {
         body: JSON.stringify({
           ...semenData,
           dosesDisponiveis: tipoOperacao === 'entrada' ? semenData.quantidadeDoses : undefined,
-          // Garantir que campos vazios sejam null ou valores padrÃ£o
+          // Garantir que campos vazios sejam null ou valores padrão
           rgTouro: semenData.rgTouro || null,
           raca: semenData.raca || null,
           rackTouro: semenData.rackTouro || null,
@@ -190,28 +190,28 @@ export default function SemenStock() {
         resetForm()
         setShowAddEntradaModal(false)
         setShowAddSaidaModal(false)
-        alert(`${tipoOperacao === 'entrada' ? 'SÃªmen adicionado ao estoque' : 'SaÃ­da de sÃªmen registrada'} com sucesso!`)
+        alert(`${tipoOperacao === 'entrada' ? 'Sêmen adicionado ao estoque' : 'Saída de sêmen registrada'} com sucesso!`)
         loadSemenStock()
       } else {
         const errorData = await response.json()
         
-        // Melhorar mensagem de erro para o usuÃ¡rio
+        // Melhorar mensagem de erro para o usuário
         let errorMessage = errorData.message || 'Erro desconhecido'
         
-        // Tratar erro especÃ­fico de doses excedidas
-        if (errorMessage.includes('excede doses disponÃ­veis')) {
-          const match = errorMessage.match(/Quantidade solicitada \((\d+)\) excede doses disponÃ­veis \((\d+)\)/)
+        // Tratar erro específico de doses excedidas
+        if (errorMessage.includes('excede doses disponíveis')) {
+          const match = errorMessage.match(/Quantidade solicitada \((\d+)\) excede doses disponíveis \((\d+)\)/)
           if (match) {
             const [, solicitada, disponivel] = match
-            errorMessage = `NÃ£o Ã© possÃ­vel registrar saÃ­da de ${solicitada} doses.\nApenas ${disponivel} doses estÃ£o disponÃ­veis para este sÃªmen.`
+            errorMessage = `Não é possível registrar saída de ${solicitada} doses.\nApenas ${disponivel} doses estão disponíveis para este sêmen.`
           }
         }
         
-        alert(`Erro ao ${tipoOperacao === 'entrada' ? 'adicionar' : 'registrar saÃ­da de'} sÃªmen:\n\n${errorMessage}`)
+        alert(`Erro ao ${tipoOperacao === 'entrada' ? 'adicionar' : 'registrar saída de'} sêmen:\n\n${errorMessage}`)
       }
     } catch (error) {
-      console.error('Erro ao processar sÃªmen:', error)
-      alert('Erro ao processar sÃªmen. Tente novamente.')
+      console.error('Erro ao processar sêmen:', error)
+      alert('Erro ao processar sêmen. Tente novamente.')
     }
   }
 
@@ -243,7 +243,7 @@ export default function SemenStock() {
   }
 
   const handleDeleteSemen = async (semenId) => {
-    if (confirm('Tem certeza que deseja excluir este sÃªmen do estoque?')) {
+    if (confirm('Tem certeza que deseja excluir este sêmen do estoque?')) {
       try {
         const response = await fetch(`/api/semen/${semenId}`, {
           method: 'DELETE'
@@ -251,20 +251,20 @@ export default function SemenStock() {
 
         if (response.ok) {
           setSemenStock(prev => prev.filter(s => s.id !== semenId))
-          alert('SÃªmen excluÃ­do com sucesso!')
+          alert('Sêmen excluído com sucesso!')
         } else {
           const errorData = await response.json()
-          alert(`Erro ao excluir sÃªmen: ${errorData.message}`)
+          alert(`Erro ao excluir sêmen: ${errorData.message}`)
         }
       } catch (error) {
-        console.error('Erro ao excluir sÃªmen:', error)
-        alert('Erro ao excluir sÃªmen. Tente novamente.')
+        console.error('Erro ao excluir sêmen:', error)
+        alert('Erro ao excluir sêmen. Tente novamente.')
       }
     }
   }
 
   const handleTransferirParaSemen = async (semenId, nomeTouro) => {
-    if (!confirm(`Transferir "${nomeTouro}" para o Estoque de SÃªmen?\n\nO item deixarÃ¡ de aparecer em EmbriÃµes e passarÃ¡ a aparecer em SÃªmen.`)) return
+    if (!confirm(`Transferir "${nomeTouro}" para o Estoque de Sêmen?\n\nO item deixará de aparecer em Embriões e passará a aparecer em Sêmen.`)) return
     try {
       const response = await fetch('/api/semen/transferir', {
         method: 'PUT',
@@ -274,18 +274,18 @@ export default function SemenStock() {
       const data = await response.json()
       if (response.ok && data.success) {
         loadSemenStock()
-        alert(`"${nomeTouro}" transferido para o Estoque de SÃªmen com sucesso!`)
+        alert(`"${nomeTouro}" transferido para o Estoque de Sêmen com sucesso!`)
       } else {
         alert(`Erro ao transferir: ${data.message}`)
       }
     } catch (e) {
-      console.error('Erro ao transferir para sÃªmen:', e)
+      console.error('Erro ao transferir para sêmen:', e)
       alert('Erro ao transferir. Tente novamente.')
     }
   }
 
   const handleTransferirParaEmbriao = async (semenId, nomeTouro) => {
-    if (!confirm(`Transferir "${nomeTouro}" para o MÃ³dulo de EmbriÃµes?\n\nO item deixarÃ¡ de aparecer em SÃªmen e passarÃ¡ a aparecer em EmbriÃµes.`)) return
+    if (!confirm(`Transferir "${nomeTouro}" para o Módulo de Embriões?\n\nO item deixará de aparecer em Sêmen e passará a aparecer em Embriões.`)) return
     try {
       const response = await fetch('/api/semen/transferir', {
         method: 'PUT',
@@ -295,17 +295,17 @@ export default function SemenStock() {
       const data = await response.json()
       if (response.ok && data.success) {
         loadSemenStock()
-        alert(`"${nomeTouro}" transferido para o MÃ³dulo de EmbriÃµes com sucesso!`)
+        alert(`"${nomeTouro}" transferido para o Módulo de Embriões com sucesso!`)
       } else {
         alert(`Erro ao transferir: ${data.message}`)
       }
     } catch (e) {
-      console.error('Erro ao transferir para embriÃµes:', e)
+      console.error('Erro ao transferir para embriões:', e)
       alert('Erro ao transferir. Tente novamente.')
     }
   }
 
-  // FunÃ§Ãµes para exclusÃ£o mÃºltipla
+  // Funções para exclusão múltipla
   const handleSelectAll = (checked) => {
     if (checked) {
       setSelectedItems(paginatedStock.map(item => item.id))
@@ -325,7 +325,7 @@ export default function SemenStock() {
   const handleBulkDelete = async () => {
     if (selectedItems.length === 0) return
 
-    const confirmMessage = `Tem certeza que deseja excluir ${selectedItems.length} item(s) do estoque?\n\nEsta aÃ§Ã£o nÃ£o pode ser desfeita.`
+    const confirmMessage = `Tem certeza que deseja excluir ${selectedItems.length} item(s) do estoque?\n\nEsta ação não pode ser desfeita.`
     
     if (confirm(confirmMessage)) {
       try {
@@ -348,19 +348,19 @@ export default function SemenStock() {
           }
         }
 
-        // Atualizar a lista removendo os itens excluÃ­dos
+        // Atualizar a lista removendo os itens excluídos
         setSemenStock(prev => prev.filter(s => !selectedItems.includes(s.id)))
         setSelectedItems([])
         setShowBulkDeleteModal(false)
 
         if (errorCount === 0) {
-          alert(`âÅ“â€¦ ${successCount} item(s) excluÃ­do(s) com sucesso!`)
+          alert(`✅ ${successCount} item(s) excluído(s) com sucesso!`)
         } else {
-          alert(`âÅ¡ ï¸� ${successCount} item(s) excluÃ­do(s), ${errorCount} erro(s) encontrado(s).`)
+          alert(`⚠️ ${successCount} item(s) excluído(s), ${errorCount} erro(s) encontrado(s).`)
         }
       } catch (error) {
-        console.error('Erro na exclusÃ£o mÃºltipla:', error)
-        alert('â�Å’ Erro na exclusÃ£o mÃºltipla. Tente novamente.')
+        console.error('Erro na exclusão múltipla:', error)
+        alert('❌ Erro na exclusão múltipla. Tente novamente.')
       }
     }
   }
@@ -408,14 +408,14 @@ export default function SemenStock() {
         )
         setShowEditModal(false)
         setSelectedSemen(null)
-        alert('SÃªmen atualizado com sucesso!')
+        alert('Sêmen atualizado com sucesso!')
       } else {
         const errorData = await response.json()
-        alert(`Erro ao atualizar sÃªmen: ${errorData.message}`)
+        alert(`Erro ao atualizar sêmen: ${errorData.message}`)
       }
     } catch (error) {
-      console.error('Erro ao atualizar sÃªmen:', error)
-      alert('Erro ao atualizar sÃªmen. Tente novamente.')
+      console.error('Erro ao atualizar sêmen:', error)
+      alert('Erro ao atualizar sêmen. Tente novamente.')
     }
   }
 
@@ -424,7 +424,7 @@ export default function SemenStock() {
     if (!semen) return false
 
     // Filtrar por tipo de material (semen ou embriao)
-    // tipo explÃ­cito no banco tem precedÃªncia; sem tipo, usa detecÃ§Ã£o pelo nome
+    // tipo explícito no banco tem precedência; sem tipo, usa detecção pelo nome
     const tipoItem = semen.tipo
     const nome = (semen.nome_touro || semen.nomeTouro || '').toUpperCase()
     const isEmbriao = tipoItem === 'embriao' ||
@@ -432,7 +432,7 @@ export default function SemenStock() {
     if (tipoMaterial === 'semen' && isEmbriao) return false
     if (tipoMaterial === 'embriao' && !isEmbriao) return false
 
-    // Filtrar por tipo de operaÃ§Ã£o baseado na aba ativa
+    // Filtrar por tipo de operação baseado na aba ativa
     const dosesDisponiveis = semen.dosesDisponiveis || semen.doses_disponiveis || 0
     const isEntrada = semen.tipoOperacao === 'entrada' || semen.tipo_operacao === 'entrada'
     let matchesTab = false
@@ -459,12 +459,12 @@ export default function SemenStock() {
     return matchesTab && matchesSearch && matchesFilters
   })
 
-  // PaginaÃ§Ã£o
+  // Paginação
   const totalPages = Math.ceil(filteredStock.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const paginatedStock = filteredStock.slice(startIndex, startIndex + itemsPerPage)
 
-  // EstatÃ­sticas ââ‚¬â€� baseadas apenas em entradas do tipo de material selecionado
+  // Estatísticas — baseadas apenas em entradas do tipo de material selecionado
   const todasEntradas = (Array.isArray(semenStock) ? semenStock : []).filter(s => {
     const isEnt = s.tipoOperacao === 'entrada' || s.tipo_operacao === 'entrada'
     if (!isEnt) return false
@@ -495,14 +495,14 @@ export default function SemenStock() {
 
   const getStatusLabel = (status) => {
     switch (status) {
-      case 'disponivel': return 'DisponÃ­vel'
+      case 'disponivel': return 'Disponível'
       case 'esgotado': return 'Esgotado'
       case 'vencido': return 'Vencido'
       default: return status
     }
   }
 
-  // Filtrar dados por perÃ­odo se necessÃ¡rio
+  // Filtrar dados por período se necessário
   const filterByPeriod = (data, startDate, endDate) => {
     if (!startDate || !endDate) return data;
     
@@ -510,7 +510,7 @@ export default function SemenStock() {
       const rawDate = s.dataCompra || s.data_compra || s.created_at;
       if (!rawDate) return false;
       
-      // Converter para string YYYY-MM-DD para comparaÃ§Ã£o segura independente de fuso horÃ¡rio
+      // Converter para string YYYY-MM-DD para comparação segura independente de fuso horário
       let dateStr = '';
       if (typeof rawDate === 'string') {
         dateStr = rawDate.split('T')[0].substring(0, 10);
@@ -526,16 +526,16 @@ export default function SemenStock() {
     });
   }
 
-  // Imprimir relatÃ³rio no formato BEEF-SYNC (layout para impressÃ£o)
+  // Imprimir relatório no formato BEEF-SYNC (layout para impressão)
   const handlePrintReport = async () => {
     const data = selectedItems.length > 0
       ? (semenStock || []).filter(s => selectedItems.includes(s.id))
       : filteredStock;
     if (data.length === 0) {
-      alert('âÅ¡ ï¸� Nenhum dado para imprimir');
+      alert('⚠️ Nenhum dado para imprimir');
       return;
     }
-    const tipo = activeTab === 'saidas' ? 'SAÃ�DAS' : activeTab === 'entradas' ? 'ENTRADAS' : 'ESTOQUE REAL';
+    const tipo = activeTab === 'saidas' ? 'SAÍDAS' : activeTab === 'entradas' ? 'ENTRADAS' : 'ESTOQUE REAL';
     const { openSemenPrintReport } = await import('../utils/semenPrintReport');
     openSemenPrintReport(data, tipo);
   };
@@ -543,12 +543,12 @@ export default function SemenStock() {
   // Exportar apenas os itens selecionados
   const exportSelectedToExcel = async () => {
     if (selectedItems.length === 0) {
-      alert('âÅ¡ ï¸� Selecione pelo menos um item para exportar');
+      alert('⚠️ Selecione pelo menos um item para exportar');
       return;
     }
     const selected = (semenStock || []).filter(s => selectedItems.includes(s.id));
     if (selected.length === 0) {
-      alert('âÅ¡ ï¸� Nenhum item selecionado encontrado no estoque');
+      alert('⚠️ Nenhum item selecionado encontrado no estoque');
       return;
     }
     try {
@@ -560,14 +560,14 @@ export default function SemenStock() {
         return (s.tipoOperacao === 'entrada' || s.tipo_operacao === 'entrada') && doses > 0;
       });
       await exportSemenToExcel(selected, { entradas, saidas, estoqueReal }, null);
-      alert(`âÅ“â€¦ ${selected.length} item(ns) exportado(s) com sucesso!`);
+      alert(`✅ ${selected.length} item(ns) exportado(s) com sucesso!`);
     } catch (error) {
       console.error('Erro ao exportar selecionados:', error);
-      alert('â�Å’ Erro ao exportar: ' + error.message);
+      alert('❌ Erro ao exportar: ' + error.message);
     }
   }
 
-  // Exportar para Excel com formataÃ§Ã£o profissional
+  // Exportar para Excel com formatação profissional
   const exportToExcel = async (periodData = null) => {
     try {
       const { exportSemenToExcel } = await import('../utils/simpleExcelExporter');
@@ -576,22 +576,22 @@ export default function SemenStock() {
       
       // Decidir qual conjunto de dados exportar
       if (exportType === 'current_view') {
-        // Exportar EXATAMENTE o que estÃ¡ sendo visto (filtrado)
+        // Exportar EXATAMENTE o que está sendo visto (filtrado)
         stockToExport = filteredStock;
-        console.log('ðÅ¸â€œÅ  Exportando visualizaÃ§Ã£o atual:', stockToExport.length, 'registros');
+        console.log('📊 Exportando visualização atual:', stockToExport.length, 'registros');
       } else {
-        // Exportar TUDO (padrÃ£o)
+        // Exportar TUDO (padrão)
         stockToExport = semenStock;
         
-        // Aplicar filtro de perÃ­odo se fornecido (apenas se nÃ£o for visualizaÃ§Ã£o atual)
+        // Aplicar filtro de período se fornecido (apenas se não for visualização atual)
         if (periodData && periodData.usePeriod && periodData.startDate && periodData.endDate) {
           stockToExport = filterByPeriod(semenStock, periodData.startDate, periodData.endDate);
         }
-        console.log('ðÅ¸â€œÅ  Exportando completo:', stockToExport.length, 'registros');
+        console.log('📊 Exportando completo:', stockToExport.length, 'registros');
       }
       
-      // Separar dados por tipo para exportaÃ§Ã£o
-      // Entradas: apenas entradas que ainda tÃªm doses disponÃ­veis (nÃ£o esgotadas)
+      // Separar dados por tipo para exportação
+      // Entradas: apenas entradas que ainda têm doses disponíveis (não esgotadas)
       const entradas = (Array.isArray(stockToExport) ? stockToExport : []).filter(s => {
         const dosesDisponiveis = s.dosesDisponiveis || s.doses_disponiveis || 0;
         return (s.tipoOperacao === 'entrada' || s.tipo_operacao === 'entrada') && dosesDisponiveis > 0;
@@ -606,22 +606,22 @@ export default function SemenStock() {
       
       await exportSemenToExcel(stockToExport, { entradas, saidas, estoqueReal }, periodData);
       
-      const tipoMsg = exportType === 'current_view' ? '\nðÅ¸â€�� Filtro: VisualizaÃ§Ã£o Atual (Filtros da Tela)' : '';
+      const tipoMsg = exportType === 'current_view' ? '\n🔍 Filtro: Visualização Atual (Filtros da Tela)' : '';
       const periodoMsg = periodData && periodData.usePeriod 
-        ? `\nðÅ¸â€œâ€¦ PerÃ­odo: ${new Date(periodData.startDate).toLocaleDateString('pt-BR')} atÃ© ${new Date(periodData.endDate).toLocaleDateString('pt-BR')}`
+        ? `\n📅 Período: ${new Date(periodData.startDate).toLocaleDateString('pt-BR')} até ${new Date(periodData.endDate).toLocaleDateString('pt-BR')}`
         : '';
       
-      alert(`âÅ“â€¦ Estoque de sÃªmen exportado com sucesso!${periodoMsg}\n\nðÅ¸â€œÅ  Arquivo gerado com 3 abas separadas:\nââ‚¬¢ Entradas (apenas com doses disponÃ­veis)\nââ‚¬¢ SaÃ­das\nââ‚¬¢ Estoque Real`);
+      alert(`✅ Estoque de sêmen exportado com sucesso!${periodoMsg}\n\n📊 Arquivo gerado com 3 abas separadas:\n• Entradas (apenas com doses disponíveis)\n• Saídas\n• Estoque Real`);
       
       // Fechar modal se estiver aberto
       setShowExportModal(false);
     } catch (error) {
       console.error('Erro ao exportar:', error);
-      alert('â�Å’ Erro ao exportar estoque: ' + error.message);
+      alert('❌ Erro ao exportar estoque: ' + error.message);
     }
   }
 
-  // ââ€�â‚¬ââ€�â‚¬ Retirada de SÃªmen ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬
+  // ── Retirada de Sêmen ──────────────────────────────────────────────────────
   const handleRetirarChange = (id, value) => {
     const qtde = Math.max(0, parseInt(value) || 0)
     setRetirarItens(prev => ({ ...prev, [id]: qtde }))
@@ -639,14 +639,14 @@ export default function SemenStock() {
         return {
           'Touro': semen.nome_touro || semen.nomeTouro || '',
           'RG': semen.rg_touro || semen.rgTouro || '',
-          'RaÃ§a': semen.raca || '',
+          'Raça': semen.raca || '',
           'Rack': semen.rack_touro || semen.rackTouro || '',
-          'BotijÃ£o': semen.botijao || '',
+          'Botijão': semen.botijao || '',
           'Caneca': semen.caneca || '',
-          'LocalizaÃ§Ã£o': semen.localizacao || '',
-          'Doses DisponÃ­veis': semen.doses_disponiveis || semen.dosesDisponiveis || 0,
+          'Localização': semen.localizacao || '',
+          'Doses Disponíveis': semen.doses_disponiveis || semen.dosesDisponiveis || 0,
           'Qtde a Retirar': qtde,
-          'ObservaÃ§Ãµes': semen.observacoes || '',
+          'Observações': semen.observacoes || '',
         }
       })
       .filter(Boolean)
@@ -664,18 +664,18 @@ export default function SemenStock() {
         { wch: 10 }, { wch: 10 }, { wch: 16 }, { wch: 18 }, { wch: 16 }, { wch: 22 },
       ]
       const wb = XLSX.utils.book_new()
-      XLSX.utils.book_append_sheet(wb, ws, 'Retirada de SÃªmen')
+      XLSX.utils.book_append_sheet(wb, ws, 'Retirada de Sêmen')
       const date = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')
       XLSX.writeFile(wb, `Retirada_Semen_${date}.xlsx`)
-      alert(`âÅ“â€¦ RelatÃ³rio de retirada exportado!\n\n${itens.length} touros ââ‚¬¢ ${totalDosesRetirada} doses marcadas`)
+      alert(`✅ Relatório de retirada exportado!\n\n${itens.length} touros • ${totalDosesRetirada} doses marcadas`)
     } catch (err) {
-      alert('Erro ao gerar relatÃ³rio: ' + err.message)
+      alert('Erro ao gerar relatório: ' + err.message)
     }
   }
 
   const limparRetirada = () => setRetirarItens({})
 
-  // ââ€�â‚¬ââ€�â‚¬ ImportaÃ§Ã£o Excel ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬
+  // ── Importação Excel ────────────────────────────────────────────────────────
   const handleFileChange = async (e) => {
     const file = e.target.files[0]
     if (!file) return
@@ -687,7 +687,7 @@ export default function SemenStock() {
       const wb = XLSX.read(data)
       const ws = wb.Sheets[wb.SheetNames[0]]
       const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' })
-      setImportPreview(rows.slice(0, 11)) // cabeÃ§alho + 10 linhas
+      setImportPreview(rows.slice(0, 11)) // cabeçalho + 10 linhas
     } catch (err) {
       console.error('Erro no preview:', err)
     }
@@ -710,14 +710,14 @@ export default function SemenStock() {
       const result = await response.json()
 
       if (response.ok) {
-        const errosMsg = result.erros?.length ? `\n\nAtenÃ§Ã£o ââ‚¬â€� ${result.erros.length} linha(s) com erro:\n${result.erros.slice(0, 5).join('\n')}` : ''
-        alert(`âÅ“â€¦ ${result.message}${errosMsg}`)
+        const errosMsg = result.erros?.length ? `\n\nAtenção — ${result.erros.length} linha(s) com erro:\n${result.erros.slice(0, 5).join('\n')}` : ''
+        alert(`✅ ${result.message}${errosMsg}`)
         setShowImportModal(false)
         setImportFile(null)
         setImportPreview([])
         loadSemenStock()
       } else {
-        alert(`â�Å’ Erro: ${result.error}\n${result.details || ''}`)
+        alert(`❌ Erro: ${result.error}\n${result.details || ''}`)
       }
     } catch (err) {
       alert('Erro ao importar: ' + err.message)
@@ -726,14 +726,14 @@ export default function SemenStock() {
     }
   }
 
-  // Abrir modal de exportaÃ§Ã£o
+  // Abrir modal de exportação
   const handleExportClick = () => {
-    // Inicializar perÃ­odo com mÃªs atual
+    // Inicializar período com mês atual
     const now = new Date();
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     
-    setExportType('complete'); // Resetar para completo por padrÃ£o
+    setExportType('complete'); // Resetar para completo por padrão
     setExportPeriod({
       startDate: firstDay.toISOString().split('T')[0],
       endDate: lastDay.toISOString().split('T')[0],
@@ -744,7 +744,7 @@ export default function SemenStock() {
 
   return (
     <div className="space-y-6">
-      {/* SincronizaÃ§Ã£o de Dados */}
+      {/* Sincronização de Dados */}
       <DatabaseSync />
 
       {/* Seletor de tipo de material */}
@@ -757,7 +757,7 @@ export default function SemenStock() {
               : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-blue-400'
           }`}
         >
-          ðÅ¸§¬ SÃªmen
+          🧬 Sêmen
         </button>
         <button
           onClick={() => { setTipoMaterial('embriao'); setCurrentPage(1); setRetirarItens({}) }}
@@ -767,7 +767,7 @@ export default function SemenStock() {
               : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-purple-400'
           }`}
         >
-          ðÅ¸§¬ EmbriÃµes
+          🧬 Embriões
         </button>
       </div>
       
@@ -775,12 +775,12 @@ export default function SemenStock() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-            {tipoMaterial === 'embriao' ? 'ðÅ¸§¬ Estoque de EmbriÃµes' : 'ðÅ¸§¬ Estoque de SÃªmen'}
+            {tipoMaterial === 'embriao' ? '🧬 Estoque de Embriões' : '🧬 Estoque de Sêmen'}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
             {tipoMaterial === 'embriao'
-              ? 'Controle de embriÃµes (acasalamentos) do rebanho'
-              : 'Controle completo do material genÃ©tico do rebanho'}
+              ? 'Controle de embriões (acasalamentos) do rebanho'
+              : 'Controle completo do material genético do rebanho'}
           </p>
         </div>
         <div className="mt-4 sm:mt-0 flex space-x-3">
@@ -801,12 +801,12 @@ export default function SemenStock() {
           <button
             onClick={handlePrintReport}
             className="btn-secondary flex items-center"
-            title="Imprimir relatÃ³rio no formato BEEF-SYNC"
+            title="Imprimir relatório no formato BEEF-SYNC"
           >
             <PrinterIcon className="h-5 w-5 mr-2" />
             Imprimir
           </button>
-        {/* Abas de Entrada, SaÃ­da e Estoque Real */}
+        {/* Abas de Entrada, Saída e Estoque Real */}
         <div className="flex space-x-1 bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
           <button
             onClick={() => setActiveTab('entradas')}
@@ -816,7 +816,7 @@ export default function SemenStock() {
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
-            ðÅ¸â€œ¥ Entradas
+            📥 Entradas
           </button>
           <button
             onClick={() => setActiveTab('saidas')}
@@ -826,7 +826,7 @@ export default function SemenStock() {
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
-            ðÅ¸â€œ¤ SaÃ­das
+            📤 Saídas
           </button>
           <button
             onClick={() => setActiveTab('estoque')}
@@ -836,11 +836,11 @@ export default function SemenStock() {
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
-            ðÅ¸â€œ¦ Estoque Real
+            📦 Estoque Real
           </button>
         </div>
 
-        {/* BotÃµes de AÃ§Ã£o */}
+        {/* Botões de Ação */}
         <div className="flex space-x-3">
           {activeTab === 'entradas' && (
             <button
@@ -857,14 +857,14 @@ export default function SemenStock() {
               className="btn-primary flex items-center"
             >
               <PlusIcon className="h-5 w-5 mr-2" />
-              Registrar SaÃ­da
+              Registrar Saída
             </button>
           )}
         </div>
         </div>
       </div>
 
-      {/* EstatÃ­sticas */}
+      {/* Estatísticas */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
         <div className="card p-4 text-center">
           <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
@@ -876,7 +876,7 @@ export default function SemenStock() {
           <div className="text-2xl font-bold text-green-600 dark:text-green-400">
             {stats.disponivel}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">DisponÃ­veis</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">Disponíveis</div>
         </div>
         <div className="card p-4 text-center">
           <div className="text-2xl font-bold text-red-600 dark:text-red-400">
@@ -894,7 +894,7 @@ export default function SemenStock() {
           <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
             {stats.dosesDisponiveis}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">DisponÃ­veis</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">Disponíveis</div>
         </div>
         <div className="card p-4 text-center">
           <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
@@ -919,7 +919,7 @@ export default function SemenStock() {
       {/* Filtros */}
       <div className="card p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          ðÅ¸â€�� Filtros de Pesquisa
+          🔍 Filtros de Pesquisa
         </h3>
         <datalist id="datalist-semen-touro">{(acSemen?.nome_touro || []).map((v, i) => <option key={i} value={v} />)}</datalist>
         <datalist id="datalist-semen-fornecedor">{(acSemen?.fornecedor || []).map((v, i) => <option key={i} value={v} />)}</datalist>
@@ -966,12 +966,12 @@ export default function SemenStock() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              LocalizaÃ§Ã£o
+              Localização
             </label>
             <input
               type="text"
               list="datalist-semen-localizacao"
-              placeholder="LocalizaÃ§Ã£o"
+              placeholder="Localização"
               value={filters.localizacao}
               onChange={(e) => setFilters({ ...filters, localizacao: e.target.value })}
               className="input-field"
@@ -987,7 +987,7 @@ export default function SemenStock() {
               className="input-field"
             >
               <option value="">Todos</option>
-              <option value="disponivel">DisponÃ­vel</option>
+              <option value="disponivel">Disponível</option>
               <option value="esgotado">Esgotado</option>
               <option value="vencido">Vencido</option>
             </select>
@@ -1000,18 +1000,18 @@ export default function SemenStock() {
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Estoque de SÃªmen ({filteredStock.length} registros)
+              Estoque de Sêmen ({filteredStock.length} registros)
             </h3>
             {totalItensRetirada > 0 && (
               <div className="flex items-center space-x-3 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700 rounded-lg px-3 py-2">
                 <span className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                  ðÅ¸§Å  {totalItensRetirada} touro(s) ââ‚¬¢ {totalDosesRetirada} dose(s) marcadas para retirada
+                  🧊 {totalItensRetirada} touro(s) • {totalDosesRetirada} dose(s) marcadas para retirada
                 </span>
                 <button
                   onClick={exportarRetirada}
                   className="text-xs bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded-lg font-medium"
                 >
-                  ðÅ¸â€œ¥ Exportar Retirada
+                  📥 Exportar Retirada
                 </button>
                 <button
                   onClick={limparRetirada}
@@ -1047,13 +1047,13 @@ export default function SemenStock() {
         
         {filteredStock.length === 0 ? (
           <div className="p-12 text-center">
-            <div className="text-6xl mb-4">ðÅ¸§¬</div>
+            <div className="text-6xl mb-4">🧬</div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              Nenhum sÃªmen encontrado
+              Nenhum sêmen encontrado
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
               {semenStock.length === 0 
-                ? 'Comece adicionando sÃªmen ao seu estoque'
+                ? 'Comece adicionando sêmen ao seu estoque'
                 : 'Tente ajustar os filtros de pesquisa'
               }
             </p>
@@ -1061,7 +1061,7 @@ export default function SemenStock() {
               onClick={() => setShowAddEntradaModal(true)}
               className="btn-primary"
             >
-              Adicionar Primeiro SÃªmen
+              Adicionar Primeiro Sêmen
             </button>
           </div>
         ) : (
@@ -1081,7 +1081,7 @@ export default function SemenStock() {
                     Touro
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    LocalizaÃ§Ã£o
+                    Localização
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Doses
@@ -1098,7 +1098,7 @@ export default function SemenStock() {
                     </th>
                   )}
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    AÃ§Ãµes
+                    Ações
                   </th>
                 </tr>
               </thead>
@@ -1119,16 +1119,16 @@ export default function SemenStock() {
                           {semen.nomeTouro || semen.nome_touro || semen.serie || 'Sem nome'}
                         </div>
                         <div className="text-sm text-gray-500 dark:text-gray-400">
-                          RG: {semen.rgTouro || semen.rg_touro || semen.rg || 'N/A'} ââ‚¬¢ {semen.raca || 'N/A'}
+                          RG: {semen.rgTouro || semen.rg_touro || semen.rg || 'N/A'} • {semen.raca || 'N/A'}
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {/* Para saÃ­das, mostrar destino ao invÃ©s de localizaÃ§Ã£o fÃ­sica */}
+                      {/* Para saídas, mostrar destino ao invés de localização física */}
                       {(semen.tipoOperacao === 'saida' || semen.tipo_operacao === 'saida') ? (
                         <div>
                           <div className="text-sm text-gray-900 dark:text-white">
-                            <span className="text-orange-600 dark:text-orange-400 font-medium">ðÅ¸â€œ¤ SaÃ­da</span>
+                            <span className="text-orange-600 dark:text-orange-400 font-medium">📤 Saída</span>
                           </div>
                           <div className="text-sm text-gray-500 dark:text-gray-400">
                             Destino: {semen.destino || 'N/A'}
@@ -1141,9 +1141,9 @@ export default function SemenStock() {
                           </div>
                           <div className="text-sm text-gray-500 dark:text-gray-400">
                             {(semen.rackTouro || semen.rack_touro) && `Rack: ${semen.rackTouro || semen.rack_touro}`}
-                            {(semen.rackTouro || semen.rack_touro) && semen.botijao && ' ââ‚¬¢ '}
-                            {semen.botijao && `BotijÃ£o: ${semen.botijao}`}
-                            {((semen.rackTouro || semen.rack_touro) || semen.botijao) && semen.caneca && ' ââ‚¬¢ '}
+                            {(semen.rackTouro || semen.rack_touro) && semen.botijao && ' • '}
+                            {semen.botijao && `Botijão: ${semen.botijao}`}
+                            {((semen.rackTouro || semen.rack_touro) || semen.botijao) && semen.caneca && ' • '}
                             {semen.caneca && `Caneca: ${semen.caneca}`}
                           </div>
                         </div>
@@ -1190,7 +1190,7 @@ export default function SemenStock() {
                               setSemenParaTransferir(semen)
                               setShowTransferirModal(true)
                             }}
-                            title="Transferir LocalizaÃ§Ã£o"
+                            title="Transferir Localização"
                             className="p-1.5 rounded-lg text-purple-600 hover:text-purple-900 hover:bg-purple-100 dark:text-purple-400 dark:hover:text-purple-300 dark:hover:bg-purple-900/30 transition-colors"
                           >
                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1206,7 +1206,7 @@ export default function SemenStock() {
                           <button
                             type="button"
                             onClick={() => handleTransferirParaEmbriao(semen.id, semen.nome_touro || semen.nomeTouro)}
-                            title="Transferir para MÃ³dulo de EmbriÃµes"
+                            title="Transferir para Módulo de Embriões"
                             className="text-teal-600 hover:text-teal-900 dark:text-teal-400 dark:hover:text-teal-300"
                           >
                             <ArrowLeftIcon className="h-4 w-4" />
@@ -1216,7 +1216,7 @@ export default function SemenStock() {
                           <button
                             type="button"
                             onClick={() => handleTransferirParaSemen(semen.id, semen.nome_touro || semen.nomeTouro)}
-                            title="Transferir para Estoque de SÃªmen"
+                            title="Transferir para Estoque de Sêmen"
                             className="text-teal-600 hover:text-teal-900 dark:text-teal-400 dark:hover:text-teal-300"
                           >
                             <ArrowRightIcon className="h-4 w-4" />
@@ -1229,7 +1229,7 @@ export default function SemenStock() {
                             setSemenParaTransferir(semen)
                             setShowTransferirModal(true)
                           }}
-                          title="Transferir LocalizaÃ§Ã£o"
+                          title="Transferir Localização"
                           className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300"
                         >
                           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1269,7 +1269,7 @@ export default function SemenStock() {
           </div>
         )}
 
-        {/* PaginaÃ§Ã£o */}
+        {/* Paginação */}
         {totalPages > 1 && (
           <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
@@ -1285,14 +1285,14 @@ export default function SemenStock() {
                   Anterior
                 </button>
                 <span className="px-3 py-2 text-sm text-gray-700 dark:text-gray-300">
-                  PÃ¡gina {currentPage} de {totalPages}
+                  Página {currentPage} de {totalPages}
                 </span>
                 <button
                   onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
                   className="btn-secondary disabled:opacity-50"
                 >
-                  PrÃ³xima
+                  Próxima
                 </button>
               </div>
             </div>
@@ -1300,7 +1300,7 @@ export default function SemenStock() {
         )}
       </div>
 
-      {/* Modais de Entrada e SaÃ­da */}
+      {/* Modais de Entrada e Saída */}
       <AddEntradaModal
         showModal={showAddEntradaModal}
         setShowModal={setShowAddEntradaModal}
@@ -1319,28 +1319,28 @@ export default function SemenStock() {
         tipoMaterial={tipoMaterial}
       />
 
-      {/* Modal de ExportaÃ§Ã£o com PerÃ­odo */}
+      {/* Modal de Exportação com Período */}
       {showExportModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                  ðÅ¸â€œÅ  Exportar para Excel
+                  📊 Exportar para Excel
                 </h3>
                 <button
                   onClick={() => setShowExportModal(false)}
                   className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                 >
-                  âÅ“â€¢
+                  ✕
                 </button>
               </div>
               
               <div className="space-y-4">
-                {/* SeleÃ§Ã£o do Tipo de RelatÃ³rio */}
+                {/* Seleção do Tipo de Relatório */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Tipo de RelatÃ³rio
+                    Tipo de Relatório
                   </label>
                   <div className="space-y-2">
                     <label className="flex items-center p-3 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
@@ -1354,7 +1354,7 @@ export default function SemenStock() {
                       />
                       <div className="ml-3">
                         <span className="block text-sm font-medium text-gray-900 dark:text-white">
-                          RelatÃ³rio Completo
+                          Relatório Completo
                         </span>
                         <span className="block text-xs text-gray-500 dark:text-gray-400">
                           Exporta todos os registros do banco de dados (permite filtro por data)
@@ -1373,17 +1373,17 @@ export default function SemenStock() {
                       />
                       <div className="ml-3">
                         <span className="block text-sm font-medium text-gray-900 dark:text-white">
-                          VisualizaÃ§Ã£o Atual
+                          Visualização Atual
                         </span>
                         <span className="block text-xs text-gray-500 dark:text-gray-400">
-                          Exporta apenas o que vocÃª estÃ¡ vendo agora ({filteredStock.length} registros), respeitando filtros de busca, touro, etc.
+                          Exporta apenas o que você está vendo agora ({filteredStock.length} registros), respeitando filtros de busca, touro, etc.
                         </span>
                       </div>
                     </label>
                   </div>
                 </div>
 
-                {/* OpÃ§Ãµes de PerÃ­odo (apenas para relatÃ³rio completo) */}
+                {/* Opções de Período (apenas para relatório completo) */}
                 <div className={`transition-opacity duration-300 ${exportType === 'current_view' ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
                   <div className="flex items-center mb-2">
                     <input
@@ -1395,7 +1395,7 @@ export default function SemenStock() {
                       disabled={exportType === 'current_view'}
                     />
                     <label htmlFor="usePeriod" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Filtrar por perÃ­odo (Data de Compra/Entrada)
+                      Filtrar por período (Data de Compra/Entrada)
                     </label>
                   </div>
 
@@ -1429,10 +1429,10 @@ export default function SemenStock() {
 
                 <div className="text-xs text-gray-500 dark:text-gray-400 mt-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
                   {exportType === 'current_view'
-                    ? `ðÅ¸â€œâ€¹ Exportando ${filteredStock.length} registros filtrados na tela`
+                    ? `📋 Exportando ${filteredStock.length} registros filtrados na tela`
                     : exportPeriod.usePeriod 
-                      ? `ðÅ¸â€œâ€¦ Exportando registros de ${exportPeriod.startDate ? new Date(exportPeriod.startDate).toLocaleDateString('pt-BR') : '...'} atÃ© ${exportPeriod.endDate ? new Date(exportPeriod.endDate).toLocaleDateString('pt-BR') : '...'}`
-                      : 'ðÅ¸â€œÅ¡ Exportando base completa de sÃªmen'
+                      ? `📅 Exportando registros de ${exportPeriod.startDate ? new Date(exportPeriod.startDate).toLocaleDateString('pt-BR') : '...'} até ${exportPeriod.endDate ? new Date(exportPeriod.endDate).toLocaleDateString('pt-BR') : '...'}`
+                      : '📚 Exportando base completa de sêmen'
                   }
                 </div>
               </div>
@@ -1447,11 +1447,11 @@ export default function SemenStock() {
                 <button
                   onClick={() => {
                     if (exportPeriod.usePeriod && (!exportPeriod.startDate || !exportPeriod.endDate)) {
-                      alert('âÅ¡ ï¸� Por favor, selecione ambas as datas para filtrar por perÃ­odo.');
+                      alert('⚠️ Por favor, selecione ambas as datas para filtrar por período.');
                       return;
                     }
                     if (exportPeriod.usePeriod && new Date(exportPeriod.startDate) > new Date(exportPeriod.endDate)) {
-                      alert('âÅ¡ ï¸� A data inicial nÃ£o pode ser maior que a data final.');
+                      alert('⚠️ A data inicial não pode ser maior que a data final.');
                       return;
                     }
                     exportToExcel(exportPeriod.usePeriod ? exportPeriod : null);
@@ -1467,14 +1467,14 @@ export default function SemenStock() {
         </div>
       )}
 
-      {/* Modal de VisualizaÃ§Ã£o */}
+      {/* Modal de Visualização */}
       <ViewSemenModal
         showModal={showViewModal}
         setShowModal={setShowViewModal}
         selectedSemen={selectedSemen}
       />
 
-      {/* Modal de EdiÃ§Ã£o */}
+      {/* Modal de Edição */}
       <EditSemenModal
         showModal={showEditModal}
         setShowModal={setShowEditModal}
@@ -1482,7 +1482,7 @@ export default function SemenStock() {
         handleEditSemen={handleEditSemen}
       />
 
-      {/* Modal de Transferir LocalizaÃ§Ã£o */}
+      {/* Modal de Transferir Localização */}
       <TransferirLocalizacaoModal
         isOpen={showTransferirModal}
         onClose={() => {
@@ -1495,24 +1495,24 @@ export default function SemenStock() {
         }}
       />
 
-      {/* Modal de ConfirmaÃ§Ã£o para ExclusÃ£o MÃºltipla */}
+      {/* Modal de Confirmação para Exclusão Múltipla */}
       {showBulkDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
                 <TrashIcon className="h-6 w-6 mr-3 text-red-600" />
-                Confirmar ExclusÃ£o MÃºltipla
+                Confirmar Exclusão Múltipla
               </h2>
             </div>
             
             <div className="p-6">
               <div className="mb-4">
                 <p className="text-gray-700 dark:text-gray-300">
-                  VocÃª estÃ¡ prestes a excluir <strong>{selectedItems.length}</strong> item(s) do estoque de sÃªmen.
+                  Você está prestes a excluir <strong>{selectedItems.length}</strong> item(s) do estoque de sêmen.
                 </p>
                 <p className="text-sm text-red-600 dark:text-red-400 mt-2">
-                  âÅ¡ ï¸� Esta aÃ§Ã£o nÃ£o pode ser desfeita!
+                  ⚠️ Esta ação não pode ser desfeita!
                 </p>
               </div>
               
@@ -1525,7 +1525,7 @@ export default function SemenStock() {
                     const item = (Array.isArray(semenStock) ? semenStock : []).find(s => s.id === id)
                     return (
                       <div key={id} className="text-sm text-gray-700 dark:text-gray-300 py-1">
-                        ââ‚¬¢ {item?.nomeTouro || item?.nome_touro || item?.serie || 'Sem nome'} ({item?.raca || 'N/A'})
+                        • {item?.nomeTouro || item?.nome_touro || item?.serie || 'Sem nome'} ({item?.raca || 'N/A'})
                       </div>
                     )
                   })}
@@ -1552,19 +1552,19 @@ export default function SemenStock() {
         </div>
       )}
 
-      {/* Modal de ImportaÃ§Ã£o Excel */}
+      {/* Modal de Importação Excel */}
       {showImportModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
               <div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">ðÅ¸â€œ¤ Importar Estoque de SÃªmen</h3>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">📤 Importar Estoque de Sêmen</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  Importe sua planilha Excel com as colunas: COD RACK, TOURO, RAÃâ€¡A, BOTIJÃÆ’O, CANECA, OBS, ESTOQUE
+                  Importe sua planilha Excel com as colunas: COD RACK, TOURO, RAÇA, BOTIJÃO, CANECA, OBS, ESTOQUE
                 </p>
               </div>
               <button onClick={() => { setShowImportModal(false); setImportFile(null); setImportPreview([]) }}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl leading-none">âÅ“â€¢</button>
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl leading-none">✕</button>
             </div>
 
             <div className="p-6 overflow-y-auto space-y-4 flex-1">
@@ -1574,7 +1574,7 @@ export default function SemenStock() {
                   Arquivo Excel (.xlsx / .xls)
                 </label>
                 <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-blue-300 dark:border-blue-700 rounded-xl cursor-pointer bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
-                  <span className="text-3xl mb-1">ðÅ¸â€œ�</span>
+                  <span className="text-3xl mb-1">📁</span>
                   <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">
                     {importFile ? importFile.name : 'Clique para selecionar o arquivo'}
                   </span>
@@ -1586,7 +1586,7 @@ export default function SemenStock() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    LocalizaÃ§Ã£o (aplicada a todos)
+                    Localização (aplicada a todos)
                   </label>
                   <input
                     type="text"
@@ -1614,7 +1614,7 @@ export default function SemenStock() {
               {importPreview.length > 0 && (
                 <div>
                   <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    PrÃ©-visualizaÃ§Ã£o ({importPreview.length - 1} linhas de dados detectadas):
+                    Pré-visualização ({importPreview.length - 1} linhas de dados detectadas):
                   </p>
                   <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 max-h-48">
                     <table className="min-w-full text-xs">
@@ -1644,8 +1644,8 @@ export default function SemenStock() {
               )}
 
               <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg p-3 text-sm text-amber-800 dark:text-amber-200">
-                <strong>Mapeamento automÃ¡tico de colunas:</strong> O sistema detecta as colunas pelos cabeÃ§alhos.
-                A coluna <strong>ESTOQUE</strong> define a quantidade de doses disponÃ­veis.
+                <strong>Mapeamento automático de colunas:</strong> O sistema detecta as colunas pelos cabeçalhos.
+                A coluna <strong>ESTOQUE</strong> define a quantidade de doses disponíveis.
                 O campo <strong>TOURO</strong> no formato "NOME - RG" separa automaticamente o nome e o RG.
               </div>
             </div>
@@ -1663,7 +1663,7 @@ export default function SemenStock() {
                 className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg transition-colors flex items-center"
               >
                 {isImporting ? (
-                  <><span className="animate-spin mr-2">â�³</span> Importando...</>
+                  <><span className="animate-spin mr-2">⏳</span> Importando...</>
                 ) : (
                   <><DocumentArrowDownIcon className="h-4 w-4 mr-2 rotate-180" /> Importar Agora</>
                 )}

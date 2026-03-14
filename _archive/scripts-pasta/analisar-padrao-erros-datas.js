@@ -3,7 +3,7 @@ require('dotenv').config()
 
 async function analisarPadraoErros() {
   try {
-    console.log('�Ÿ”� Analisando padrões de erros nas datas FIV...\n')
+    console.log('🔍 Analisando padrões de erros nas datas FIV...\n')
     
     // Buscar todas as coletas FIV agrupadas por doadora
     const coletas = await query(`
@@ -22,7 +22,7 @@ async function analisarPadraoErros() {
       ORDER BY cf.doadora_nome, cf.data_fiv ASC
     `)
     
-    console.log(`�Ÿ“Š Total de coletas FIV: ${coletas.rows.length}\n`)
+    console.log(`📊 Total de coletas FIV: ${coletas.rows.length}\n`)
     
     // Agrupar por doadora
     const coletasPorDoadora = {}
@@ -98,20 +98,20 @@ async function analisarPadraoErros() {
       }
     })
     
-    console.log(`�š�️  Doadoras com possíveis problemas: ${doadorasComProblemas.length}\n`)
+    console.log(`⚠️  Doadoras com possíveis problemas: ${doadorasComProblemas.length}\n`)
     
     if (doadorasComProblemas.length > 0) {
-      console.log('�Ÿ“‹ Doadoras que precisam de verificação:')
-      console.log('�”€'.repeat(120))
+      console.log('📋 Doadoras que precisam de verificação:')
+      console.log('─'.repeat(120))
       
       doadorasComProblemas.slice(0, 20).forEach((item, index) => {
         console.log(`\n${index + 1}. ${item.doadora}${item.serie && item.rg ? ` (${item.serie} ${item.rg})` : ''}`)
         console.log(`   Total de coletas: ${item.totalColetas}`)
-        if (item.temData2027) console.log(`   �š�️  Tem datas em 2027`)
-        if (item.temDataAntiga) console.log(`   �š�️  Tem datas antes de 2020`)
-        if (item.temDataFutura) console.log(`   �š�️  Tem datas depois de 2027`)
+        if (item.temData2027) console.log(`   ⚠️  Tem datas em 2027`)
+        if (item.temDataAntiga) console.log(`   ⚠️  Tem datas antes de 2020`)
+        if (item.temDataFutura) console.log(`   ⚠️  Tem datas depois de 2027`)
         if (item.problemas.length > 0) {
-          console.log(`   �š�️  Problemas: ${item.problemas.join(', ')}`)
+          console.log(`   ⚠️  Problemas: ${item.problemas.join(', ')}`)
         }
         console.log(`   Datas: ${item.datas.map(d => `${d.data} (${d.ano})`).join(', ')}`)
       })
@@ -120,12 +120,12 @@ async function analisarPadraoErros() {
         console.log(`\n... e mais ${doadorasComProblemas.length - 20} doadoras`)
       }
     } else {
-      console.log('�œ… Nenhuma doadora com problemas aparentes encontrada')
+      console.log('✅ Nenhuma doadora com problemas aparentes encontrada')
     }
     
     // Estatísticas gerais
     console.log('\n' + '='.repeat(120))
-    console.log('�Ÿ“Š ESTATÍSTICAS GERAIS:')
+    console.log('📊 ESTATÍSTICAS GERAIS:')
     console.log(`   Total de doadoras: ${Object.keys(coletasPorDoadora).length}`)
     console.log(`   Total de coletas: ${coletas.rows.length}`)
     console.log(`   Doadoras com problemas: ${doadorasComProblemas.length}`)
@@ -140,17 +140,17 @@ async function analisarPadraoErros() {
     console.log('='.repeat(120))
     
   } catch (error) {
-    console.error('�Œ Erro:', error)
+    console.error('❌ Erro:', error)
     throw error
   }
 }
 
 analisarPadraoErros()
   .then(() => {
-    console.log('\n�œ… Análise concluída')
+    console.log('\n✅ Análise concluída')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n�Œ Erro fatal:', error)
+    console.error('\n❌ Erro fatal:', error)
     process.exit(1)
   })

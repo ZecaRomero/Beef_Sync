@@ -2,13 +2,13 @@
 const { query } = require('./lib/database')
 
 async function vincularIANascimentosCorrigido() {
-  console.log('�Ÿ”— VINCULANDO INSEMINA�‡�•ES ARTIFICIAIS COM NASCIMENTOS')
+  console.log('🔗 VINCULANDO INSEMINAÇÕES ARTIFICIAIS COM NASCIMENTOS')
   console.log('=' .repeat(70))
   console.log('')
 
   try {
     // 1. Verificar estrutura atual das tabelas
-    console.log('1️�ƒ� VERIFICANDO ESTRUTURA DAS TABELAS:')
+    console.log('1️⃣ VERIFICANDO ESTRUTURA DAS TABELAS:')
     console.log('-'.repeat(50))
     
     // Verificar se existe coluna tipo_cobertura na tabela gestacoes
@@ -25,9 +25,9 @@ async function vincularIANascimentosCorrigido() {
         ADD COLUMN tipo_cobertura VARCHAR(10) DEFAULT 'IA' 
         CHECK (tipo_cobertura IN ('IA', 'FIV', 'MN'))
       `)
-      console.log('�œ… Coluna tipo_cobertura adicionada na tabela gestacoes')
+      console.log('✅ Coluna tipo_cobertura adicionada na tabela gestacoes')
     } else {
-      console.log('�œ… Coluna tipo_cobertura já existe na tabela gestacoes')
+      console.log('✅ Coluna tipo_cobertura já existe na tabela gestacoes')
     }
     
     // Verificar se existe coluna inseminacao_id na tabela nascimentos
@@ -42,14 +42,14 @@ async function vincularIANascimentosCorrigido() {
         ALTER TABLE nascimentos 
         ADD COLUMN inseminacao_id INTEGER REFERENCES inseminacoes(id) ON DELETE SET NULL
       `)
-      console.log('�œ… Coluna inseminacao_id adicionada na tabela nascimentos')
+      console.log('✅ Coluna inseminacao_id adicionada na tabela nascimentos')
     } else {
-      console.log('�œ… Coluna inseminacao_id já existe na tabela nascimentos')
+      console.log('✅ Coluna inseminacao_id já existe na tabela nascimentos')
     }
     
     // 2. Atualizar gestações existentes de IA
     console.log('')
-    console.log('2️�ƒ� ATUALIZANDO GESTA�‡�•ES EXISTENTES:')
+    console.log('2️⃣ ATUALIZANDO GESTAÇÕES EXISTENTES:')
     console.log('-'.repeat(50))
     
     // Marcar gestações criadas a partir de inseminações como IA
@@ -66,7 +66,7 @@ async function vincularIANascimentosCorrigido() {
       AND (tipo_cobertura IS NULL OR tipo_cobertura = 'IA')
     `)
     
-    console.log(`�œ… ${gestacaoIA.rowCount} gestações marcadas como IA (Inseminação Artificial)`)
+    console.log(`✅ ${gestacaoIA.rowCount} gestações marcadas como IA (Inseminação Artificial)`)
     
     // Marcar gestações existentes que não são de IA como FIV
     const gestacaoFIV = await query(`
@@ -82,11 +82,11 @@ async function vincularIANascimentosCorrigido() {
       AND (tipo_cobertura IS NULL OR tipo_cobertura != 'IA')
     `)
     
-    console.log(`�œ… ${gestacaoFIV.rowCount} gestações marcadas como FIV (Fertilização In Vitro)`)
+    console.log(`✅ ${gestacaoFIV.rowCount} gestações marcadas como FIV (Fertilização In Vitro)`)
     
     // 3. Verificar nascimentos existentes
     console.log('')
-    console.log('3️�ƒ� CLASSIFICANDO NASCIMENTOS EXISTENTES:')
+    console.log('3️⃣ CLASSIFICANDO NASCIMENTOS EXISTENTES:')
     console.log('-'.repeat(50))
     
     // Buscar nascimentos existentes
@@ -96,7 +96,7 @@ async function vincularIANascimentosCorrigido() {
       LIMIT 10
     `)
     
-    console.log(`�Ÿ“Š Total de nascimentos encontrados: ${nascimentosExistentes.rows.length}`)
+    console.log(`📊 Total de nascimentos encontrados: ${nascimentosExistentes.rows.length}`)
     
     if (nascimentosExistentes.rows.length > 0) {
       console.log('')
@@ -131,7 +131,7 @@ async function vincularIANascimentosCorrigido() {
         )
       `)
       
-      console.log(`�œ… ${vinculacoes.rowCount} nascimentos vinculados com inseminações e marcados como IA`)
+      console.log(`✅ ${vinculacoes.rowCount} nascimentos vinculados com inseminações e marcados como IA`)
       
       // Marcar nascimentos restantes como FIV se têm touro
       const nascimentosFIV = await query(`
@@ -143,12 +143,12 @@ async function vincularIANascimentosCorrigido() {
         AND inseminacao_id IS NULL
       `)
       
-      console.log(`�œ… ${nascimentosFIV.rowCount} nascimentos marcados como FIV (baseado na presença de touro)`)
+      console.log(`✅ ${nascimentosFIV.rowCount} nascimentos marcados como FIV (baseado na presença de touro)`)
     }
     
     // 4. Estatísticas finais
     console.log('')
-    console.log('4️�ƒ� ESTATÍSTICAS FINAIS:')
+    console.log('4️⃣ ESTATÍSTICAS FINAIS:')
     console.log('-'.repeat(50))
     
     const stats = await Promise.all([
@@ -161,17 +161,17 @@ async function vincularIANascimentosCorrigido() {
       query(`SELECT COUNT(*) as total FROM nascimentos`)
     ])
     
-    console.log(`�Ÿ“Š Gestações por IA: ${stats[0].rows[0].total}`)
-    console.log(`�Ÿ“Š Gestações por FIV: ${stats[1].rows[0].total}`)
-    console.log(`�Ÿ“Š Nascimentos por IA: ${stats[2].rows[0].total}`)
-    console.log(`�Ÿ“Š Nascimentos por FIV: ${stats[3].rows[0].total}`)
-    console.log(`�Ÿ“Š Nascimentos vinculados com IA: ${stats[4].rows[0].total}`)
-    console.log(`�Ÿ“Š Total de inseminações: ${stats[5].rows[0].total}`)
-    console.log(`�Ÿ“Š Total de nascimentos: ${stats[6].rows[0].total}`)
+    console.log(`📊 Gestações por IA: ${stats[0].rows[0].total}`)
+    console.log(`📊 Gestações por FIV: ${stats[1].rows[0].total}`)
+    console.log(`📊 Nascimentos por IA: ${stats[2].rows[0].total}`)
+    console.log(`📊 Nascimentos por FIV: ${stats[3].rows[0].total}`)
+    console.log(`📊 Nascimentos vinculados com IA: ${stats[4].rows[0].total}`)
+    console.log(`📊 Total de inseminações: ${stats[5].rows[0].total}`)
+    console.log(`📊 Total de nascimentos: ${stats[6].rows[0].total}`)
     
     // 5. Exemplo de consulta para verificar vinculação
     console.log('')
-    console.log('5️�ƒ� EXEMPLO DE VINCULA�‡�ƒO:')
+    console.log('5️⃣ EXEMPLO DE VINCULAÇÃO:')
     console.log('-'.repeat(50))
     
     const exemplo = await query(`
@@ -209,10 +209,10 @@ async function vincularIANascimentosCorrigido() {
     }
     
     console.log('')
-    console.log('�œ… VINCULA�‡�ƒO CONCLUÍDA!')
+    console.log('✅ VINCULAÇÃO CONCLUÍDA!')
     
   } catch (error) {
-    console.error('�Œ Erro:', error)
+    console.error('❌ Erro:', error)
   }
 }
 
@@ -220,12 +220,12 @@ async function vincularIANascimentosCorrigido() {
 vincularIANascimentosCorrigido()
   .then(() => {
     console.log('')
-    console.log('�ŸŽ� RESULTADO FINAL:')
-    console.log('�€� Campo tipo_cobertura adicionado (IA/FIV/MN)')
-    console.log('�€� Gestações classificadas por tipo de cobertura')
-    console.log('�€� Nascimentos vinculados com inseminações quando possível')
-    console.log('�€� Sistema diferencia IA de FIV nos relatórios')
-    console.log('�€� Rastreabilidade completa da reprodução')
+    console.log('🎯 RESULTADO FINAL:')
+    console.log('• Campo tipo_cobertura adicionado (IA/FIV/MN)')
+    console.log('• Gestações classificadas por tipo de cobertura')
+    console.log('• Nascimentos vinculados com inseminações quando possível')
+    console.log('• Sistema diferencia IA de FIV nos relatórios')
+    console.log('• Rastreabilidade completa da reprodução')
     process.exit(0)
   })
   .catch(error => {

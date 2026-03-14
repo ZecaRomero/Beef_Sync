@@ -3,7 +3,7 @@ import React, { memo } from 'react'
 
 import Button from '../ui/Button'
 
-// Ã�cones temÃ¡ticos para pecuÃ¡ria
+// Ícones temáticos para pecuária
 const CattleIcon = ({ className }) => (
   <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
@@ -40,7 +40,7 @@ const QuickActions = memo(({ onQuickAction, onTestNotifications }) => {
     },
     {
       id: 'boletim-contabil',
-      label: 'Boletim ContÃ¡bil',
+      label: 'Boletim Contábil',
       color: 'indigo',
       onClick: () => onQuickAction('boletim-contabil')
     },
@@ -52,7 +52,7 @@ const QuickActions = memo(({ onQuickAction, onTestNotifications }) => {
     },
     {
       id: 'relatorio',
-      label: 'RelatÃ³rio',
+      label: 'Relatório',
       icon: ChartBarIcon,
       color: 'orange',
       onClick: () => onQuickAction('relatorio')
@@ -74,10 +74,10 @@ const QuickActions = memo(({ onQuickAction, onTestNotifications }) => {
         <div className="mb-6">
           <h3 className="text-xl font-bold text-gradient-primary flex items-center gap-2">
             <StarIcon className="h-6 w-6 text-yellow-500 animate-pulse" />
-            AÃ§Ãµes RÃ¡pidas Premium
+            Ações Rápidas Premium
           </h3>
           <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">
-            Acesso rÃ¡pido Ã s principais funcionalidades do sistema
+            Acesso rápido às principais funcionalidades do sistema
           </p>
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
@@ -112,9 +112,9 @@ const QuickActions = memo(({ onQuickAction, onTestNotifications }) => {
                   {Icon ? (
                     <Icon className={`h-8 w-8 ${iconColors[action.color]} transform transition-transform group-hover:scale-110 group-hover:rotate-6 relative z-10`} />
                   ) : action.id === 'boletim-contabil' ? (
-                    <span className="text-2xl relative z-10">ðÅ¸â€œÅ </span>
+                    <span className="text-2xl relative z-10">📊</span>
                   ) : (
-                    <span className="text-2xl relative z-10">ðÅ¸§ª</span>
+                    <span className="text-2xl relative z-10">🧪</span>
                   )}
                   <span className="text-sm font-medium relative z-10">{action.label}</span>
                 </Button>

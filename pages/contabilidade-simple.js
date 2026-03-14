@@ -76,7 +76,7 @@ export default function ContabilidadeSimple() {
         movimentacoes: nfsEntradas + nfsSaidas
       })
     } catch (error) {
-      console.error('Erro ao carregar estatÃ­sticas:', error)
+      console.error('Erro ao carregar estatísticas:', error)
     }
   }
 
@@ -92,7 +92,7 @@ export default function ContabilidadeSimple() {
           const result = await response.json()
           animalsData = result.success ? result.data : result
         } else {
-          throw new Error('API nÃ£o disponÃ­vel')
+          throw new Error('API não disponível')
         }
       } catch (apiError) {
         console.error('Erro ao conectar com API, usando localStorage:', apiError)
@@ -121,10 +121,10 @@ export default function ContabilidadeSimple() {
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
       
-      alert('âÅ“â€¦ Boletim de Gado baixado com sucesso!')
+      alert('✅ Boletim de Gado baixado com sucesso!')
     } catch (error) {
       console.error('Erro:', error)
-      alert('â�Å’ Erro: NÃ£o foi possÃ­vel gerar o boletim de gado')
+      alert('❌ Erro: Não foi possível gerar o boletim de gado')
     } finally {
       setLoading(false)
     }
@@ -136,17 +136,17 @@ export default function ContabilidadeSimple() {
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white shadow-2xl mb-8">
           <h1 className="text-3xl font-bold mb-2 flex items-center">
-            ðÅ¸â€œÅ  Contabilidade - Beef Sync
+            📊 Contabilidade - Beef Sync
           </h1>
-          <p className="text-blue-100">RelatÃ³rios contÃ¡beis e fiscais para seu rebanho</p>
+          <p className="text-blue-100">Relatórios contábeis e fiscais para seu rebanho</p>
         </div>
 
-        {/* PerÃ­odo */}
+        {/* Período */}
         <Card className="mb-8">
           <CardHeader>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
               <CalendarIcon className="h-6 w-6 mr-2" />
-              PerÃ­odo do RelatÃ³rio
+              Período do Relatório
             </h2>
           </CardHeader>
           <CardBody>
@@ -177,7 +177,7 @@ export default function ContabilidadeSimple() {
           </CardBody>
         </Card>
 
-        {/* EstatÃ­sticas */}
+        {/* Estatísticas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="hover:shadow-lg transition-shadow">
             <CardBody className="text-center">
@@ -205,7 +205,7 @@ export default function ContabilidadeSimple() {
               <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {stats.nfsSaidas}
               </div>
-              <div className="text-gray-600 dark:text-gray-400">NFs SaÃ­da</div>
+              <div className="text-gray-600 dark:text-gray-400">NFs Saída</div>
             </CardBody>
           </Card>
 
@@ -215,16 +215,16 @@ export default function ContabilidadeSimple() {
               <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {stats.movimentacoes}
               </div>
-              <div className="text-gray-600 dark:text-gray-400">Total MovimentaÃ§Ãµes</div>
+              <div className="text-gray-600 dark:text-gray-400">Total Movimentações</div>
             </CardBody>
           </Card>
         </div>
 
-        {/* AÃ§Ãµes */}
+        {/* Ações */}
         <Card>
           <CardHeader>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-              RelatÃ³rios DisponÃ­veis
+              Relatórios Disponíveis
             </h2>
           </CardHeader>
           <CardBody>
@@ -251,19 +251,19 @@ export default function ContabilidadeSimple() {
                 className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center"
               >
                 <ChartBarIcon className="h-5 w-5 mr-2" />
-                Boletim ContÃ¡bil
+                Boletim Contábil
               </Button>
             </div>
           </CardBody>
         </Card>
 
-        {/* NavegaÃ§Ã£o */}
+        {/* Navegação */}
         <div className="mt-8 flex justify-center">
           <Button
             onClick={() => router.push('/dashboard')}
             className="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
           >
-            ââ€ � Voltar ao Dashboard
+            ← Voltar ao Dashboard
           </Button>
         </div>
       </div>

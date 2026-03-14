@@ -21,14 +21,14 @@ async function ensureInfra() {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
-    // Verificar se a sequÃªncia existe, se nÃ£o, criar
+    // Verificar se a sequência existe, se não, criar
     await client.query(`
       DO $$
       BEGIN
         IF NOT EXISTS (SELECT 1 FROM pg_class WHERE relname = 'lotes_seq') THEN
           CREATE SEQUENCE lotes_seq START 1;
           
-          -- Sincronizar a sequÃªncia com o maior nÃºmero existente (apenas formato LOTE-XXXXX)
+          -- Sincronizar a sequência com o maior número existente (apenas formato LOTE-XXXXX)
           PERFORM setval('lotes_seq', (
             SELECT COALESCE(MAX(CAST(SUBSTRING(numero_lote FROM 'LOTE-(\\d+)') AS INTEGER)), 0)
             FROM lotes_operacoes
@@ -58,13 +58,13 @@ async function ensureInfra() {
   }
 }
 
-// Middleware para capturar operaÃ§Ãµes e gerar lotes automaticamente
+// Middleware para capturar operações e gerar lotes automaticamente
 export function withLoteTracking(handler, config = {}) {
   return async (req, res) => {
-    // Se config Ã© uma funÃ§Ã£o, executÃ¡-la para obter a configuraÃ§Ã£o
+    // Se config é uma função, executá-la para obter a configuração
     const actualConfig = typeof config === 'function' ? config(req) : config;
     
-    // Se nÃ£o hÃ¡ configuraÃ§Ã£o (ex: GET requests), apenas executar o handler
+    // Se não há configuração (ex: GET requests), apenas executar o handler
     if (!actualConfig) {
       return await handler(req, res);
     }
@@ -105,9 +105,9 @@ export function withLoteTracking(handler, config = {}) {
       await ensureInfra();
       const result = await handler(req, res);
 
-      // Se a operaÃ§Ã£o foi bem-sucedida e Ã© uma operaÃ§Ã£o de modificaÃ§Ã£o, criar o lote
+      // Se a operação foi bem-sucedida e é uma operação de modificação, criar o lote
       if (res.statusCode >= 200 && res.statusCode < 300 && tipo_operacao && modulo) {
-        // SÃ³ criar lotes para operaÃ§Ãµes que modificam dados (nÃ£o para GET)
+        // Só criar lotes para operações que modificam dados (não para GET)
         const isModifyingOperation = ['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method);
         
         if (isModifyingOperation) {
@@ -127,7 +127,7 @@ export function withLoteTracking(handler, config = {}) {
 
       return result;
     } catch (error) {
-      // Em caso de erro, ainda tentar criar o lote com status de erro (apenas para operaÃ§Ãµes de modificaÃ§Ã£o)
+      // Em caso de erro, ainda tentar criar o lote com status de erro (apenas para operações de modificação)
       if (tipo_operacao && modulo) {
         const isModifyingOperation = ['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method);
         
@@ -168,10 +168,10 @@ async function criarLoteAutomatico({
   const client = await pool.connect();
   
   try {
-    // Gerar descriÃ§Ã£o
-    let descricao = descricao_template || `OperaÃ§Ã£o ${tipo_operacao}`;
+    // Gerar descrição
+    let descricao = descricao_template || `Operação ${tipo_operacao}`;
     
-    // Substituir placeholders na descriÃ§Ã£o
+    // Substituir placeholders na descrição
     if (descricao_template && req.body) {
       descricao = descricao_template.replace(/\{(\w+)\}/g, (match, key) => {
         return req.body[key] || match;
@@ -199,7 +199,7 @@ async function criarLoteAutomatico({
       detalhes.response_data = responseData;
     }
 
-    // InformaÃ§Ãµes da requisiÃ§Ã£o
+    // Informações da requisição
     detalhes.method = req.method;
     detalhes.url = req.url;
     detalhes.timestamp = new Date().toISOString();
@@ -209,7 +209,7 @@ async function criarLoteAutomatico({
       detalhes.status_code = res.statusCode;
     }
 
-    // Capturar informaÃ§Ãµes do usuÃ¡rio (se disponÃ­vel)
+    // Capturar informações do usuário (se disponível)
     const usuario = req.headers['x-user'] || req.body?.usuario || 'sistema';
     const ip_origem = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
     const user_agent = req.headers['user-agent'];
@@ -234,17 +234,17 @@ async function criarLoteAutomatico({
       erro ? 'erro' : 'concluido'
     ]);
 
-    console.log(`âÅ“â€¦ Lote criado: ${result.rows[0].numero_lote} - ${descricao}`);
+    console.log(`✅ Lote criado: ${result.rows[0].numero_lote} - ${descricao}`);
 
   } catch (error) {
-    console.error('â�Å’ Erro ao criar lote automÃ¡tico:', error);
-    // NÃ£o propagar o erro para nÃ£o afetar a operaÃ§Ã£o principal
+    console.error('❌ Erro ao criar lote automático:', error);
+    // Não propagar o erro para não afetar a operação principal
   } finally {
     client.release();
   }
 }
 
-// FunÃ§Ã£o helper para criar lotes manuais em operaÃ§Ãµes especÃ­ficas
+// Função helper para criar lotes manuais em operações específicas
 export async function criarLoteManual({
   tipo_operacao,
   descricao,
@@ -258,7 +258,7 @@ export async function criarLoteManual({
   const client = await pool.connect();
   
   try {
-    // Capturar informaÃ§Ãµes da requisiÃ§Ã£o se disponÃ­vel
+    // Capturar informações da requisição se disponível
     const ip_origem = req?.headers['x-forwarded-for'] || req?.connection.remoteAddress;
     const user_agent = req?.headers['user-agent'];
 
@@ -286,7 +286,7 @@ export async function criarLoteManual({
   }
 }
 
-// ConfiguraÃ§Ãµes predefinidas para diferentes tipos de operaÃ§Ã£o
+// Configurações predefinidas para diferentes tipos de operação
 export const LOTE_CONFIGS = {
   // Animais
   CADASTRO_ANIMAL: {
@@ -307,7 +307,7 @@ export const LOTE_CONFIGS = {
   EXCLUSAO_ANIMAL: {
     tipo_operacao: 'EXCLUSAO_ANIMAL',
     modulo: 'ANIMAIS',
-    descricao_template: 'ExclusÃ£o de animal - ID: {id}',
+    descricao_template: 'Exclusão de animal - ID: {id}',
     capturar_body: true
   },
 
@@ -315,58 +315,58 @@ export const LOTE_CONFIGS = {
   ENTRADA_NF: {
     tipo_operacao: 'ENTRADA_NF',
     modulo: 'CONTABILIDADE',
-    descricao_template: 'Entrada de Nota Fiscal - NÃºmero: {numero}',
+    descricao_template: 'Entrada de Nota Fiscal - Número: {numero}',
     capturar_body: true
   },
 
   LANCAMENTO_CUSTO: {
     tipo_operacao: 'LANCAMENTO_CUSTO',
     modulo: 'CUSTOS',
-    descricao_template: 'LanÃ§amento de custo - Tipo: {tipo} - Valor: R$ {valor}',
+    descricao_template: 'Lançamento de custo - Tipo: {tipo} - Valor: R$ {valor}',
     capturar_body: true
   },
 
   ATUALIZACAO_CUSTO: {
     tipo_operacao: 'ATUALIZACAO_CUSTO',
     modulo: 'CUSTOS',
-    descricao_template: 'AtualizaÃ§Ã£o de custo - ID: {id}',
+    descricao_template: 'Atualização de custo - ID: {id}',
     capturar_body: true
   },
 
   EXCLUSAO_CUSTO: {
     tipo_operacao: 'EXCLUSAO_CUSTO',
     modulo: 'CUSTOS',
-    descricao_template: 'ExclusÃ£o de custo - ID: {id}',
+    descricao_template: 'Exclusão de custo - ID: {id}',
     capturar_body: true
   },
 
-  // GestaÃ§Ã£o
+  // Gestação
   CADASTRO_GESTACAO: {
     tipo_operacao: 'CADASTRO_GESTACAO',
     modulo: 'GESTACAO',
-    descricao_template: 'Cadastro de gestaÃ§Ã£o - Receptora: {receptora_nome}',
+    descricao_template: 'Cadastro de gestação - Receptora: {receptora_nome}',
     capturar_body: true
   },
 
   ATUALIZACAO_GESTACAO: {
     tipo_operacao: 'ATUALIZACAO_GESTACAO',
     modulo: 'GESTACAO',
-    descricao_template: 'AtualizaÃ§Ã£o de gestaÃ§Ã£o - ID: {id}',
+    descricao_template: 'Atualização de gestação - ID: {id}',
     capturar_body: true
   },
 
   EXCLUSAO_GESTACAO: {
     tipo_operacao: 'EXCLUSAO_GESTACAO',
     modulo: 'GESTACAO',
-    descricao_template: 'ExclusÃ£o de gestaÃ§Ã£o - ID: {id}',
+    descricao_template: 'Exclusão de gestação - ID: {id}',
     capturar_body: true
   },
 
-  // Estoque - NitrogÃªnio
+  // Estoque - Nitrogênio
   ABASTECIMENTO_NITROGENIO: {
     tipo_operacao: 'ABASTECIMENTO_NITROGENIO',
     modulo: 'ESTOQUE',
-    descricao_template: 'Abastecimento de nitrogÃªnio - {quantidade_litros}L - Motorista: {motorista}',
+    descricao_template: 'Abastecimento de nitrogênio - {quantidade_litros}L - Motorista: {motorista}',
     capturar_body: true
   },
 
@@ -381,7 +381,7 @@ export const LOTE_CONFIGS = {
   EXCLUSAO_NASCIMENTO: {
     tipo_operacao: 'EXCLUSAO_NASCIMENTO',
     modulo: 'NASCIMENTOS',
-    descricao_template: 'ExclusÃ£o de nascimento(s)',
+    descricao_template: 'Exclusão de nascimento(s)',
     capturar_body: true,
     quantidade_callback: (req, res) => req.query?.ids?.split(',').length || 1
   },
@@ -394,25 +394,25 @@ export const LOTE_CONFIGS = {
     capturar_body: true
   },
 
-  // SÃªmen
+  // Sêmen
   ENTRADA_SEMEN: {
     tipo_operacao: 'ENTRADA_SEMEN',
     modulo: 'SEMEN',
-    descricao_template: 'Entrada de sÃªmen - Touro: {nomeTouro} - RG: {rgTouro} - RaÃ§a: {raca} - Qtd: {quantidadeDoses} - Fornecedor: {fornecedor}',
+    descricao_template: 'Entrada de sêmen - Touro: {nomeTouro} - RG: {rgTouro} - Raça: {raca} - Qtd: {quantidadeDoses} - Fornecedor: {fornecedor}',
     capturar_body: true
   },
 
   SAIDA_SEMEN: {
     tipo_operacao: 'SAIDA_SEMEN',
     modulo: 'SEMEN',
-    descricao_template: 'SaÃ­da de sÃªmen - Destino: {destino} - Qtd: {quantidadeDoses}',
+    descricao_template: 'Saída de sêmen - Destino: {destino} - Qtd: {quantidadeDoses}',
     capturar_body: true
   },
 
   SAIDA_SEMEN_LOTE: {
     tipo_operacao: 'SAIDA_SEMEN_LOTE',
     modulo: 'SEMEN',
-    descricao_template: 'SaÃ­da de sÃªmen em lote',
+    descricao_template: 'Saída de sêmen em lote',
     capturar_body: true,
     quantidade_callback: (req, res) => Array.isArray(req.body?.saidas) ? req.body.saidas.length : 1
   },
@@ -430,7 +430,7 @@ export const LOTE_CONFIGS = {
   LANCAMENTO_PROTOCOLO: {
     tipo_operacao: 'LANCAMENTO_PROTOCOLO',
     modulo: 'PROTOCOLOS',
-    descricao_template: 'LanÃ§amento de protocolo/medicamento',
+    descricao_template: 'Lançamento de protocolo/medicamento',
     capturar_body: true,
     quantidade_callback: (req, res) => {
       // Contar quantos medicamentos/protocolos foram salvos
@@ -445,36 +445,36 @@ export const LOTE_CONFIGS = {
   ATUALIZACAO_PROTOCOLO: {
     tipo_operacao: 'ATUALIZACAO_PROTOCOLO',
     modulo: 'PROTOCOLOS',
-    descricao_template: 'AtualizaÃ§Ã£o de protocolo - ID: {id}',
+    descricao_template: 'Atualização de protocolo - ID: {id}',
     capturar_body: true
   },
 
   EXCLUSAO_PROTOCOLO: {
     tipo_operacao: 'EXCLUSAO_PROTOCOLO',
     modulo: 'PROTOCOLOS',
-    descricao_template: 'ExclusÃ£o de protocolo - ID: {id}',
+    descricao_template: 'Exclusão de protocolo - ID: {id}',
     capturar_body: true
   },
 
-  // Exames AndrolÃ³gicos
+  // Exames Andrológicos
   CADASTRO_EXAME_ANDROLOGICO: {
     tipo_operacao: 'CADASTRO_EXAME_ANDROLOGICO',
     modulo: 'REPRODUCAO',
-    descricao_template: 'Cadastro de exame androlÃ³gico - Touro: {touro} - Resultado: {resultado}',
+    descricao_template: 'Cadastro de exame andrológico - Touro: {touro} - Resultado: {resultado}',
     capturar_body: true
   },
 
   ATUALIZACAO_EXAME_ANDROLOGICO: {
     tipo_operacao: 'ATUALIZACAO_EXAME_ANDROLOGICO',
     modulo: 'REPRODUCAO',
-    descricao_template: 'AtualizaÃ§Ã£o de exame androlÃ³gico - Touro: {touro} - Resultado: {resultado}',
+    descricao_template: 'Atualização de exame andrológico - Touro: {touro} - Resultado: {resultado}',
     capturar_body: true
   },
 
   EXCLUSAO_EXAME_ANDROLOGICO: {
     tipo_operacao: 'EXCLUSAO_EXAME_ANDROLOGICO',
     modulo: 'REPRODUCAO',
-    descricao_template: 'ExclusÃ£o de exame androlÃ³gico - ID: {id}',
+    descricao_template: 'Exclusão de exame andrológico - ID: {id}',
     capturar_body: true
   }
 };

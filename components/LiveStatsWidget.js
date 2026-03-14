@@ -45,7 +45,7 @@ export default function LiveStatsWidget() {
       const animals = JSON.parse(localStorage.getItem('animals') || '[]')
       const births = JSON.parse(localStorage.getItem('birthData') || '[]')
       
-      // Calcular estatÃ­sticas reais
+      // Calcular estatísticas reais
       const totalAnimals = animals.length
       const activeAnimals = animals.filter(a => a.situacao === 'Ativo').length
       
@@ -59,7 +59,7 @@ export default function LiveStatsWidget() {
         return total + (animal.valorVenda || 0)
       }, 0)
       
-      // Nascimentos recentes (Ãºltimos 7 dias)
+      // Nascimentos recentes (últimos 7 dias)
       const lastWeek = new Date()
       lastWeek.setDate(lastWeek.getDate() - 7)
       const recentBirths = births.filter(b => {
@@ -94,7 +94,7 @@ export default function LiveStatsWidget() {
       setStats(baseStats)
       setLastUpdate(new Date().toLocaleTimeString())
     } catch (error) {
-      console.warn('Erro ao carregar estatÃ­sticas:', error)
+      console.warn('Erro ao carregar estatísticas:', error)
     } finally {
       setIsLoading(false)
     }
@@ -106,7 +106,7 @@ export default function LiveStatsWidget() {
       title: 'Rebanho Total',
       value: stats.totalAnimals,
       subtitle: `${stats.activeAnimals} ativos`,
-      icon: 'ðÅ¸�â€ž',
+      icon: '🐄',
       color: 'from-green-500 to-emerald-600',
       change: '+2',
       trend: 'up',
@@ -117,7 +117,7 @@ export default function LiveStatsWidget() {
       title: 'Total Investido',
       value: `R$ ${(stats.totalInvested / 1000).toFixed(0)}k`,
       subtitle: `R$ ${stats.avgCostPerAnimal.toFixed(0)} por animal`,
-      icon: 'ðÅ¸â€™°',
+      icon: '💰',
       color: 'from-red-500 to-pink-600',
       change: '+5.2%',
       trend: 'up',
@@ -128,7 +128,7 @@ export default function LiveStatsWidget() {
       title: 'Receita Total',
       value: `R$ ${(stats.totalRevenue / 1000).toFixed(0)}k`,
       subtitle: 'Vendas realizadas',
-      icon: 'ðÅ¸â€œË†',
+      icon: '📈',
       color: 'from-blue-500 to-indigo-600',
       change: '+8.1%',
       trend: 'up',
@@ -136,10 +136,10 @@ export default function LiveStatsWidget() {
     },
     {
       id: 'roi',
-      title: 'ROI MÃ©dio',
+      title: 'ROI Médio',
       value: `${stats.roi.toFixed(1)}%`,
-      subtitle: stats.roi >= 0 ? 'Lucro' : 'PrejuÃ­zo',
-      icon: stats.roi >= 0 ? 'ðÅ¸â€œÅ ' : 'ðÅ¸â€œâ€°',
+      subtitle: stats.roi >= 0 ? 'Lucro' : 'Prejuízo',
+      icon: stats.roi >= 0 ? '📊' : '📉',
       color: stats.roi >= 0 ? 'from-purple-500 to-violet-600' : 'from-orange-500 to-red-600',
       change: stats.roi >= 0 ? '+3.4%' : '-1.2%',
       trend: stats.roi >= 0 ? 'up' : 'down',
@@ -149,8 +149,8 @@ export default function LiveStatsWidget() {
       id: 'births',
       title: 'Nascimentos',
       value: stats.recentBirths,
-      subtitle: 'ÃÅ¡ltimos 7 dias',
-      icon: 'ðÅ¸�â€ž',
+      subtitle: 'Últimos 7 dias',
+      icon: '🐄',
       color: 'from-yellow-500 to-orange-600',
       change: stats.recentBirths > 0 ? `+${stats.recentBirths}` : '0',
       trend: stats.recentBirths > 0 ? 'up' : 'neutral',
@@ -161,7 +161,7 @@ export default function LiveStatsWidget() {
       title: 'Tarefas',
       value: stats.pendingTasks,
       subtitle: 'Pendentes',
-      icon: stats.pendingTasks > 5 ? 'âÅ¡ ï¸�' : 'âÅ“â€¦',
+      icon: stats.pendingTasks > 5 ? '⚠️' : '✅',
       color: stats.pendingTasks > 5 ? 'from-orange-500 to-red-600' : 'from-teal-500 to-cyan-600',
       change: stats.pendingTasks > 5 ? 'Alto' : 'OK',
       trend: stats.pendingTasks > 5 ? 'down' : 'up',
@@ -174,20 +174,20 @@ export default function LiveStatsWidget() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center">
-            ðÅ¸â€œÅ  EstatÃ­sticas em Tempo Real
+            📊 Estatísticas em Tempo Real
             {isLoading && (
               <div className="ml-2 w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
             )}
           </h3>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            ÃÅ¡ltima atualizaÃ§Ã£o: {lastUpdate}
+            Última atualização: {lastUpdate}
           </p>
         </div>
         <button
           onClick={loadStats}
           className="px-3 py-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors text-sm flex items-center"
         >
-          ðÅ¸â€�â€ž Atualizar
+          🔄 Atualizar
         </button>
       </div>
 
@@ -202,7 +202,7 @@ export default function LiveStatsWidget() {
             <div className={`absolute inset-0 bg-gradient-to-br ${card.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
             
             <div className="relative z-10">
-              {/* Ã�cone e valor */}
+              {/* Ícone e valor */}
               <div className="flex items-center justify-between mb-2">
                 <div className="text-2xl">{card.icon}</div>
                 <div className={`text-xs px-2 py-1 rounded-full ${
@@ -214,7 +214,7 @@ export default function LiveStatsWidget() {
                 </div>
               </div>
 
-              {/* TÃ­tulo */}
+              {/* Título */}
               <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">
                 {card.title}
               </div>
@@ -224,16 +224,16 @@ export default function LiveStatsWidget() {
                 {card.value}
               </div>
 
-              {/* SubtÃ­tulo */}
+              {/* Subtítulo */}
               <div className="text-xs text-gray-500 dark:text-gray-500">
                 {card.subtitle}
               </div>
 
-              {/* Indicador de tendÃªncia */}
+              {/* Indicador de tendência */}
               <div className="absolute top-2 right-2">
-                {card.trend === 'up' && <div className="text-green-500 text-xs">ââ€ â€”</div>}
-                {card.trend === 'down' && <div className="text-red-500 text-xs">ââ€ Ëœ</div>}
-                {card.trend === 'neutral' && <div className="text-gray-500 text-xs">ââ€ â€™</div>}
+                {card.trend === 'up' && <div className="text-green-500 text-xs">↗</div>}
+                {card.trend === 'down' && <div className="text-red-500 text-xs">↘</div>}
+                {card.trend === 'neutral' && <div className="text-gray-500 text-xs">→</div>}
               </div>
             </div>
 
@@ -243,12 +243,12 @@ export default function LiveStatsWidget() {
         ))}
       </div>
 
-      {/* Resumo rÃ¡pido */}
+      {/* Resumo rápido */}
       <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center space-x-4">
             <span className="text-gray-600 dark:text-gray-400">
-              ðÅ¸â€™¡ Dica: Clique nos cards para navegar
+              💡 Dica: Clique nos cards para navegar
             </span>
           </div>
           <div className="flex items-center space-x-2">

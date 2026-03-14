@@ -2,7 +2,7 @@ const { query } = require('./lib/database')
 
 async function limparCustosDNAOrfaos() {
   try {
-    console.log('�Ÿ”� Procurando custos de DNA órfãos...\n')
+    console.log('🔍 Procurando custos de DNA órfãos...\n')
 
     // Buscar todos os custos de DNA
     const custosResult = await query(`
@@ -21,10 +21,10 @@ async function limparCustosDNAOrfaos() {
       ORDER BY c.data DESC, c.created_at DESC
     `)
 
-    console.log(`�Ÿ’� Total de custos de DNA: ${custosResult.rows.length}`)
+    console.log(`💰 Total de custos de DNA: ${custosResult.rows.length}`)
 
     if (custosResult.rows.length === 0) {
-      console.log('�œ… Nenhum custo de DNA encontrado.')
+      console.log('✅ Nenhum custo de DNA encontrado.')
       return
     }
 
@@ -34,13 +34,13 @@ async function limparCustosDNAOrfaos() {
     `)
 
     const totalEnvios = parseInt(enviosResult.rows[0].total)
-    console.log(`�Ÿ“� Total de envios registrados: ${totalEnvios}\n`)
+    console.log(`📦 Total de envios registrados: ${totalEnvios}\n`)
 
     if (totalEnvios === 0) {
-      console.log('�š�️ Não há envios registrados, mas há custos de DNA.')
+      console.log('⚠️ Não há envios registrados, mas há custos de DNA.')
       console.log('Isso indica que os custos foram criados mas o envio falhou.\n')
       
-      console.log('�Ÿ“‹ Custos órfãos encontrados:')
+      console.log('📋 Custos órfãos encontrados:')
       custosResult.rows.forEach(custo => {
         console.log(`\n  ID: ${custo.id}`)
         console.log(`  Animal: ${custo.serie}-${custo.rg} (${custo.nome || 'sem nome'})`)
@@ -49,7 +49,7 @@ async function limparCustosDNAOrfaos() {
         console.log(`  Observações: ${custo.observacoes}`)
       })
 
-      console.log('\n�“ Deseja excluir esses custos órfãos? (y/n)')
+      console.log('\n❓ Deseja excluir esses custos órfãos? (y/n)')
       
       // Aguardar confirmação do usuário
       const readline = require('readline').createInterface({
@@ -59,7 +59,7 @@ async function limparCustosDNAOrfaos() {
 
       readline.question('', async (answer) => {
         if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes' || answer.toLowerCase() === 's' || answer.toLowerCase() === 'sim') {
-          console.log('\n�Ÿ—‘️ Excluindo custos órfãos...')
+          console.log('\n🗑️ Excluindo custos órfãos...')
           
           const deleteResult = await query(`
             DELETE FROM custos 
@@ -67,16 +67,16 @@ async function limparCustosDNAOrfaos() {
             AND id IN (${custosResult.rows.map(c => c.id).join(',')})
           `)
 
-          console.log(`�œ… ${deleteResult.rowCount} custo(s) excluído(s) com sucesso!`)
+          console.log(`✅ ${deleteResult.rowCount} custo(s) excluído(s) com sucesso!`)
         } else {
-          console.log('\n�Œ Operação cancelada.')
+          console.log('\n❌ Operação cancelada.')
         }
         
         readline.close()
         process.exit(0)
       })
     } else {
-      console.log('�œ… Há envios registrados. Verificando consistência...')
+      console.log('✅ Há envios registrados. Verificando consistência...')
       
       // Verificar se todos os custos têm envios correspondentes
       const custosOrfaos = []
@@ -96,21 +96,21 @@ async function limparCustosDNAOrfaos() {
       }
       
       if (custosOrfaos.length > 0) {
-        console.log(`\n�š�️ ${custosOrfaos.length} custo(s) órfão(s) encontrado(s):`)
+        console.log(`\n⚠️ ${custosOrfaos.length} custo(s) órfão(s) encontrado(s):`)
         custosOrfaos.forEach(custo => {
           console.log(`\n  ID: ${custo.id}`)
           console.log(`  Animal: ${custo.serie}-${custo.rg}`)
           console.log(`  Valor: R$ ${parseFloat(custo.valor).toFixed(2)}`)
         })
       } else {
-        console.log('�œ… Todos os custos têm envios correspondentes.')
+        console.log('✅ Todos os custos têm envios correspondentes.')
       }
       
       process.exit(0)
     }
 
   } catch (error) {
-    console.error('�Œ Erro:', error)
+    console.error('❌ Erro:', error)
     process.exit(1)
   }
 }

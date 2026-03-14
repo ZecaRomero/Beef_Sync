@@ -13,7 +13,7 @@ async function initLotesDatabase() {
   const client = await pool.connect();
   
   try {
-    console.log('ðÅ¸Å¡â‚¬ Iniciando criaÃ§Ã£o da tabela de lotes...');
+    console.log('🚀 Iniciando criação da tabela de lotes...');
 
     // Criar tabela de lotes
     await client.query(`
@@ -33,7 +33,7 @@ async function initLotesDatabase() {
       )
     `);
 
-    // Criar Ã­ndices para melhor performance
+    // Criar índices para melhor performance
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_lotes_numero ON lotes_operacoes(numero_lote);
       CREATE INDEX IF NOT EXISTS idx_lotes_data ON lotes_operacoes(data_criacao);
@@ -41,12 +41,12 @@ async function initLotesDatabase() {
       CREATE INDEX IF NOT EXISTS idx_lotes_tipo ON lotes_operacoes(tipo_operacao);
     `);
 
-    // Criar sequÃªncia para numeraÃ§Ã£o automÃ¡tica dos lotes
+    // Criar sequência para numeração automática dos lotes
     await client.query(`
       CREATE SEQUENCE IF NOT EXISTS seq_lote_numero START 1;
     `);
 
-    // FunÃ§Ã£o para gerar prÃ³ximo nÃºmero de lote
+    // Função para gerar próximo número de lote
     await client.query(`
       CREATE OR REPLACE FUNCTION gerar_proximo_lote()
       RETURNS VARCHAR(20) AS $$
@@ -61,9 +61,9 @@ async function initLotesDatabase() {
       $$ LANGUAGE plpgsql;
     `);
 
-    console.log('âÅ“â€¦ Tabela de lotes criada com sucesso!');
-    console.log('âÅ“â€¦ Ã�ndices criados com sucesso!');
-    console.log('âÅ“â€¦ FunÃ§Ã£o de geraÃ§Ã£o de lotes criada!');
+    console.log('✅ Tabela de lotes criada com sucesso!');
+    console.log('✅ Índices criados com sucesso!');
+    console.log('✅ Função de geração de lotes criada!');
 
     // Inserir alguns exemplos para teste
     const exemploLotes = [
@@ -89,10 +89,10 @@ async function initLotesDatabase() {
       `, [exemplo.tipo, exemplo.descricao, JSON.stringify(exemplo.detalhes), exemplo.modulo]);
     }
 
-    console.log('âÅ“â€¦ Exemplos de lotes inseridos!');
+    console.log('✅ Exemplos de lotes inseridos!');
 
   } catch (error) {
-    console.error('â�Å’ Erro ao criar tabela de lotes:', error);
+    console.error('❌ Erro ao criar tabela de lotes:', error);
     throw error;
   } finally {
     client.release();
@@ -102,11 +102,11 @@ async function initLotesDatabase() {
 if (require.main === module) {
   initLotesDatabase()
     .then(() => {
-      console.log('ðÅ¸Å½â€° InicializaÃ§Ã£o da base de lotes concluÃ­da!');
+      console.log('🎉 Inicialização da base de lotes concluída!');
       process.exit(0);
     })
     .catch((error) => {
-      console.error('ðÅ¸â€™¥ Erro na inicializaÃ§Ã£o:', error);
+      console.error('💥 Erro na inicialização:', error);
       process.exit(1);
     });
 }

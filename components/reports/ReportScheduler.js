@@ -18,30 +18,30 @@ import Badge from '../ui/Badge'
 import Modal from '../ui/Modal'
 
 const FREQUENCY_OPTIONS = [
-  { value: 'daily', label: 'DiÃ¡rio', description: 'Todo dia Ã s 08:00' },
-  { value: 'weekly', label: 'Semanal', description: 'Toda segunda-feira Ã s 08:00' },
+  { value: 'daily', label: 'Diário', description: 'Todo dia às 08:00' },
+  { value: 'weekly', label: 'Semanal', description: 'Toda segunda-feira às 08:00' },
   { value: 'biweekly', label: 'Quinzenal', description: 'A cada 15 dias' },
-  { value: 'monthly', label: 'Mensal', description: 'Todo dia 1Âº do mÃªs' },
+  { value: 'monthly', label: 'Mensal', description: 'Todo dia 1º do mês' },
   { value: 'quarterly', label: 'Trimestral', description: 'A cada 3 meses' },
-  { value: 'custom', label: 'Personalizado', description: 'Definir cronograma especÃ­fico' }
+  { value: 'custom', label: 'Personalizado', description: 'Definir cronograma específico' }
 ]
 
 const SCHEDULED_REPORTS = [
   {
     id: 1,
-    name: 'RelatÃ³rio Mensal de Performance',
+    name: 'Relatório Mensal de Performance',
     reportType: 'monthly_summary',
     frequency: 'monthly',
     nextRun: '2025-11-01T08:00:00Z',
     lastRun: '2025-10-01T08:00:00Z',
     status: 'active',
-    recipients: ['JoÃ£o Silva', 'Maria Santos'],
+    recipients: ['João Silva', 'Maria Santos'],
     format: 'pdf',
     createdAt: '2025-09-15T10:00:00Z'
   },
   {
     id: 2,
-    name: 'AnÃ¡lise Semanal de LocalizaÃ§Ã£o',
+    name: 'Análise Semanal de Localização',
     reportType: 'location_report',
     frequency: 'weekly',
     nextRun: '2025-11-04T08:00:00Z',
@@ -138,7 +138,7 @@ export default function ReportScheduler() {
 
   const createScheduledReport = () => {
     if (!newSchedule.name || !newSchedule.reportType) {
-      alert('âÅ¡ ï¸� Nome e tipo de relatÃ³rio sÃ£o obrigatÃ³rios')
+      alert('⚠️ Nome e tipo de relatório são obrigatórios')
       return
     }
 
@@ -166,12 +166,12 @@ export default function ReportScheduler() {
       format: 'pdf',
       enabled: true
     })
-    alert('âÅ“â€¦ Agendamento criado com sucesso!')
+    alert('✅ Agendamento criado com sucesso!')
   }
 
   const updateScheduledReport = () => {
     if (!newSchedule.name || !newSchedule.reportType) {
-      alert('âÅ¡ ï¸� Nome e tipo de relatÃ³rio sÃ£o obrigatÃ³rios')
+      alert('⚠️ Nome e tipo de relatório são obrigatórios')
       return
     }
 
@@ -192,7 +192,7 @@ export default function ReportScheduler() {
 
     setShowEditModal(false)
     setCurrentReport(null)
-    alert('âÅ“â€¦ Agendamento atualizado com sucesso!')
+    alert('✅ Agendamento atualizado com sucesso!')
   }
 
   const calculateNextRun = (frequency) => {
@@ -229,7 +229,7 @@ export default function ReportScheduler() {
     const diffHours = (runDate - now) / (1000 * 60 * 60)
 
     if (diffHours < 24) {
-      return { color: 'red', text: 'PrÃ³ximo' }
+      return { color: 'red', text: 'Próximo' }
     } else if (diffHours < 72) {
       return { color: 'yellow', text: 'Em breve' }
     } else {
@@ -243,10 +243,10 @@ export default function ReportScheduler() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-            â�° Agendamento de RelatÃ³rios
+            ⏰ Agendamento de Relatórios
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Configure relatÃ³rios automÃ¡ticos para sua equipe
+            Configure relatórios automáticos para sua equipe
           </p>
         </div>
         <Button
@@ -322,7 +322,7 @@ export default function ReportScheduler() {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  PrÃ³ximas 24h
+                  Próximas 24h
                 </p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {scheduledReports.filter(r => {
@@ -341,7 +341,7 @@ export default function ReportScheduler() {
       <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            ðÅ¸â€œâ€¹ RelatÃ³rios Agendados
+            📋 Relatórios Agendados
           </h3>
         </CardHeader>
         <CardBody>
@@ -349,10 +349,10 @@ export default function ReportScheduler() {
             <div className="text-center py-8">
               <ClockIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                Nenhum relatÃ³rio agendado
+                Nenhum relatório agendado
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Configure seu primeiro agendamento automÃ¡tico
+                Configure seu primeiro agendamento automático
               </p>
               <Button
                 variant="primary"
@@ -385,15 +385,15 @@ export default function ReportScheduler() {
                         
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600 dark:text-gray-400">
                           <div>
-                            <span className="font-medium">FrequÃªncia:</span>
+                            <span className="font-medium">Frequência:</span>
                             <div>{getFrequencyLabel(report.frequency)}</div>
                           </div>
                           <div>
-                            <span className="font-medium">PrÃ³xima execuÃ§Ã£o:</span>
+                            <span className="font-medium">Próxima execução:</span>
                             <div>{formatDate(report.nextRun)}</div>
                           </div>
                           <div>
-                            <span className="font-medium">DestinatÃ¡rios:</span>
+                            <span className="font-medium">Destinatários:</span>
                             <div>{report.recipients.length} pessoa(s)</div>
                           </div>
                           <div>
@@ -404,7 +404,7 @@ export default function ReportScheduler() {
 
                         {report.lastRun && (
                           <div className="mt-2 text-xs text-gray-500 dark:text-gray-500">
-                            ÃÅ¡ltima execuÃ§Ã£o: {formatDate(report.lastRun)}
+                            Última execução: {formatDate(report.lastRun)}
                           </div>
                         )}
                       </div>
@@ -461,13 +461,13 @@ export default function ReportScheduler() {
             label="Nome do Agendamento"
             value={newSchedule.name}
             onChange={(e) => setNewSchedule(prev => ({ ...prev, name: e.target.value }))}
-            placeholder="Ex: RelatÃ³rio Mensal de Performance"
+            placeholder="Ex: Relatório Mensal de Performance"
             required
           />
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Tipo de RelatÃ³rio
+              Tipo de Relatório
             </label>
             <select
               value={newSchedule.reportType}
@@ -477,17 +477,17 @@ export default function ReportScheduler() {
             >
               <option value="">Selecione um tipo</option>
               <option value="monthly_summary">Resumo Mensal</option>
-              <option value="location_report">RelatÃ³rio de LocalizaÃ§Ã£o</option>
+              <option value="location_report">Relatório de Localização</option>
               <option value="financial_summary">Resumo Financeiro</option>
-              <option value="births_analysis">AnÃ¡lise de Nascimentos</option>
-              <option value="breeding_report">RelatÃ³rio de ReproduÃ§Ã£o</option>
-              <option value="inventory_report">RelatÃ³rio de Estoque</option>
+              <option value="births_analysis">Análise de Nascimentos</option>
+              <option value="breeding_report">Relatório de Reprodução</option>
+              <option value="inventory_report">Relatório de Estoque</option>
             </select>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              FrequÃªncia
+              Frequência
             </label>
             <div className="space-y-2">
               {FREQUENCY_OPTIONS.map((option) => (
@@ -516,7 +516,7 @@ export default function ReportScheduler() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                HorÃ¡rio
+                Horário
               </label>
               <input
                 type="time"
@@ -559,11 +559,11 @@ export default function ReportScheduler() {
             <div className="flex items-start space-x-2">
               <InformationCircleIcon className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
               <div className="text-sm text-blue-800 dark:text-blue-200">
-                <p className="font-medium mb-1">InformaÃ§Ãµes importantes:</p>
+                <p className="font-medium mb-1">Informações importantes:</p>
                 <ul className="list-disc list-inside space-y-1">
-                  <li>Os relatÃ³rios serÃ£o enviados automaticamente via WhatsApp</li>
-                  <li>VocÃª pode pausar ou editar agendamentos a qualquer momento</li>
-                  <li>Os destinatÃ¡rios devem estar cadastrados no sistema</li>
+                  <li>Os relatórios serão enviados automaticamente via WhatsApp</li>
+                  <li>Você pode pausar ou editar agendamentos a qualquer momento</li>
+                  <li>Os destinatários devem estar cadastrados no sistema</li>
                 </ul>
               </div>
             </div>
@@ -601,7 +601,7 @@ export default function ReportScheduler() {
             label="Nome do Agendamento"
             value={newSchedule.name}
             onChange={(e) => setNewSchedule(prev => ({ ...prev, name: e.target.value }))}
-            placeholder="Ex: RelatÃ³rio Mensal de Performance"
+            placeholder="Ex: Relatório Mensal de Performance"
             required
           />
 
@@ -613,7 +613,7 @@ export default function ReportScheduler() {
               className="flex-1"
               onClick={updateScheduledReport}
             >
-              Salvar AlteraÃ§Ãµes
+              Salvar Alterações
             </Button>
             <Button
               variant="secondary"

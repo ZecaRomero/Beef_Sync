@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import * as XLSX from 'xlsx';
 import { XMarkIcon } from '../ui/Icons';
 
-// Modal de ImportaÃ§Ã£o Excel
+// Modal de Importação Excel
 export default function ImportModal({ isOpen, onClose, onSave, naturezasOperacao, setNaturezasOperacao }) {
   const [importData, setImportData] = useState({
     tipoOperacao: 'entrada',
@@ -43,18 +43,18 @@ export default function ImportModal({ isOpen, onClose, onSave, naturezasOperacao
 
   const processExcelData = (data, tipoOperacao) => {
     if (data.length < 2) {
-      throw new Error('Arquivo deve ter pelo menos 2 linhas (cabeÃ§alho + dados)');
+      throw new Error('Arquivo deve ter pelo menos 2 linhas (cabeçalho + dados)');
     }
 
     const headers = data[0];
     const rows = data.slice(1);
 
-    // Validar cabeÃ§alhos baseado no tipo de operaÃ§Ã£o
+    // Validar cabeçalhos baseado no tipo de operação
     const requiredHeaders = getRequiredHeaders(tipoOperacao);
     const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
 
     if (missingHeaders.length > 0) {
-      throw new Error(`Colunas obrigatÃ³rias ausentes: ${missingHeaders.join(', ')}`);
+      throw new Error(`Colunas obrigatórias ausentes: ${missingHeaders.join(', ')}`);
     }
 
     return rows.map((row, index) => {
@@ -62,7 +62,7 @@ export default function ImportModal({ isOpen, onClose, onSave, naturezasOperacao
       headers.forEach((header, colIndex) => {
         item[header] = row[colIndex] || '';
       });
-      item._rowIndex = index + 2; // +2 porque comeÃ§amos da linha 2 (pula cabeÃ§alho)
+      item._rowIndex = index + 2; // +2 porque começamos da linha 2 (pula cabeçalho)
       return item;
     });
   };
@@ -105,7 +105,7 @@ export default function ImportModal({ isOpen, onClose, onSave, naturezasOperacao
         await onSave(nf);
       }
 
-      alert('ImportaÃ§Ã£o concluÃ­da com sucesso!');
+      alert('Importação concluída com sucesso!');
       onClose();
 
       // Limpar dados
@@ -116,8 +116,8 @@ export default function ImportModal({ isOpen, onClose, onSave, naturezasOperacao
         erro: null
       });
     } catch (error) {
-      console.error('Erro na importaÃ§Ã£o:', error);
-      setImportData(prev => ({ ...prev, erro: 'Erro na importaÃ§Ã£o: ' + error.message }));
+      console.error('Erro na importação:', error);
+      setImportData(prev => ({ ...prev, erro: 'Erro na importação: ' + error.message }));
     } finally {
       setIsImporting(false);
     }
@@ -159,7 +159,7 @@ export default function ImportModal({ isOpen, onClose, onSave, naturezasOperacao
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-[900px] max-w-full m-4">
         <div className="flex items-center justify-between mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            ðÅ¸â€œÅ  Importar Dados via Excel
+            📊 Importar Dados via Excel
           </h3>
           <button
             onClick={onClose}
@@ -170,10 +170,10 @@ export default function ImportModal({ isOpen, onClose, onSave, naturezasOperacao
         </div>
 
         <div className="space-y-6">
-          {/* Tipo de OperaÃ§Ã£o */}
+          {/* Tipo de Operação */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Tipo de OperaÃ§Ã£o
+              Tipo de Operação
             </label>
             <div className="flex space-x-4">
               <label className="flex items-center cursor-pointer">
@@ -204,7 +204,7 @@ export default function ImportModal({ isOpen, onClose, onSave, naturezasOperacao
                   }))}
                   className="mr-2 text-blue-600 focus:ring-blue-500"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300">SaÃ­da (Venda/TransferÃªncia)</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">Saída (Venda/Transferência)</span>
               </label>
             </div>
           </div>
@@ -222,39 +222,39 @@ export default function ImportModal({ isOpen, onClose, onSave, naturezasOperacao
             />
           </div>
 
-          {/* InstruÃ§Ãµes */}
+          {/* Instruções */}
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
             <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-2">
-              ðÅ¸â€œâ€¹ Colunas ObrigatÃ³rias:
+              📋 Colunas Obrigatórias:
             </h4>
             {importData.tipoOperacao === 'entrada' ? (
               <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
-                <li>ââ‚¬¢ <strong>NumeroNF</strong> - NÃºmero da Nota Fiscal</li>
-                <li>ââ‚¬¢ <strong>DataCompra</strong> - Data da compra (DD/MM/AAAA)</li>
-                <li>ââ‚¬¢ <strong>Origem</strong> - Nome da fazenda/origem</li>
-                <li>ââ‚¬¢ <strong>Fornecedor</strong> - Nome do fornecedor</li>
-                <li>ââ‚¬¢ <strong>ValorTotal</strong> - Valor total da NF</li>
-                <li>ââ‚¬¢ <strong>QuantidadeAnimais</strong> - Quantidade de animais</li>
-                <li>ââ‚¬¢ <strong>Observacoes</strong> - ObservaÃ§Ãµes (opcional)</li>
+                <li>• <strong>NumeroNF</strong> - Número da Nota Fiscal</li>
+                <li>• <strong>DataCompra</strong> - Data da compra (DD/MM/AAAA)</li>
+                <li>• <strong>Origem</strong> - Nome da fazenda/origem</li>
+                <li>• <strong>Fornecedor</strong> - Nome do fornecedor</li>
+                <li>• <strong>ValorTotal</strong> - Valor total da NF</li>
+                <li>• <strong>QuantidadeAnimais</strong> - Quantidade de animais</li>
+                <li>• <strong>Observacoes</strong> - Observações (opcional)</li>
               </ul>
             ) : (
               <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
-                <li>ââ‚¬¢ <strong>NumeroNF</strong> - NÃºmero da Nota Fiscal</li>
-                <li>ââ‚¬¢ <strong>DataSaida</strong> - Data da saÃ­da (DD/MM/AAAA)</li>
-                <li>ââ‚¬¢ <strong>Destino</strong> - Destino da saÃ­da</li>
-                <li>ââ‚¬¢ <strong>NaturezaOperacao</strong> - Natureza da operaÃ§Ã£o</li>
-                <li>ââ‚¬¢ <strong>ValorTotal</strong> - Valor total da NF</li>
-                <li>ââ‚¬¢ <strong>QuantidadeAnimais</strong> - Quantidade de animais</li>
-                <li>ââ‚¬¢ <strong>Observacoes</strong> - ObservaÃ§Ãµes (opcional)</li>
+                <li>• <strong>NumeroNF</strong> - Número da Nota Fiscal</li>
+                <li>• <strong>DataSaida</strong> - Data da saída (DD/MM/AAAA)</li>
+                <li>• <strong>Destino</strong> - Destino da saída</li>
+                <li>• <strong>NaturezaOperacao</strong> - Natureza da operação</li>
+                <li>• <strong>ValorTotal</strong> - Valor total da NF</li>
+                <li>• <strong>QuantidadeAnimais</strong> - Quantidade de animais</li>
+                <li>• <strong>Observacoes</strong> - Observações (opcional)</li>
               </ul>
             )}
           </div>
 
-          {/* Gerenciar Naturezas de OperaÃ§Ã£o (apenas para saÃ­da) */}
+          {/* Gerenciar Naturezas de Operação (apenas para saída) */}
           {importData.tipoOperacao === 'saida' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Gerenciar Naturezas de OperaÃ§Ã£o
+                Gerenciar Naturezas de Operação
               </label>
               <div className="flex space-x-2 mb-2">
                 <input
@@ -262,7 +262,7 @@ export default function ImportModal({ isOpen, onClose, onSave, naturezasOperacao
                   value={novaNatureza}
                   onChange={(e) => setNovaNatureza(e.target.value)}
                   className="input-field flex-1"
-                  placeholder="Ex: Venda, TransferÃªncia, DoaÃ§Ã£o..."
+                  placeholder="Ex: Venda, Transferência, Doação..."
                 />
                 <button
                   type="button"
@@ -344,7 +344,7 @@ export default function ImportModal({ isOpen, onClose, onSave, naturezasOperacao
                 Importando...
               </>
             ) : (
-              <>ðÅ¸â€œ¥ Importar {importData.preview?.length || 0} Itens</>
+              <>📥 Importar {importData.preview?.length || 0} Itens</>
             )}
           </button>
         </div>

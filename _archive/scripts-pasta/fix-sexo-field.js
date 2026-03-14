@@ -13,7 +13,7 @@ async function fixSexoField() {
   const client = await pool.connect();
   
   try {
-    console.log('�Ÿ”� Corrigindo campo sexo...');
+    console.log('🔧 Corrigindo campo sexo...');
     
     // Verificar estrutura atual
     const checkResult = await client.query(`
@@ -28,21 +28,21 @@ async function fixSexoField() {
     `);
     
     if (checkResult.rows.length === 0) {
-      console.log('�Œ Tabela animais não encontrada!');
+      console.log('❌ Tabela animais não encontrada!');
       return;
     }
     
     const currentField = checkResult.rows[0];
-    console.log('�Ÿ“Š Campo sexo atual:', currentField);
+    console.log('📊 Campo sexo atual:', currentField);
     
     // Se já está correto, não precisa alterar
     if (currentField.data_type === 'character varying' && currentField.character_maximum_length >= 10) {
-      console.log('�œ… Campo sexo já está correto!');
+      console.log('✅ Campo sexo já está correto!');
       return;
     }
     
     // Alterar o campo sexo
-    console.log('�Ÿ”� Alterando campo sexo para VARCHAR(10)...');
+    console.log('🔨 Alterando campo sexo para VARCHAR(10)...');
     await client.query(`
       ALTER TABLE animais ALTER COLUMN sexo TYPE VARCHAR(10)
     `);
@@ -52,9 +52,9 @@ async function fixSexoField() {
       await client.query(`
         ALTER TABLE animais DROP CONSTRAINT IF EXISTS animais_sexo_check
       `);
-      console.log('�Ÿ—‘️ Constraint antiga removida');
+      console.log('🗑️ Constraint antiga removida');
     } catch (error) {
-      console.log('�„�️ Nenhuma constraint antiga encontrada');
+      console.log('ℹ️ Nenhuma constraint antiga encontrada');
     }
     
     // Adicionar nova constraint
@@ -62,7 +62,7 @@ async function fixSexoField() {
       ALTER TABLE animais ADD CONSTRAINT animais_sexo_check 
       CHECK (sexo IN ('Macho', 'Fêmea'))
     `);
-    console.log('�œ… Nova constraint adicionada');
+    console.log('✅ Nova constraint adicionada');
     
     // Verificar se a alteração foi aplicada
     const verifyResult = await client.query(`
@@ -77,30 +77,30 @@ async function fixSexoField() {
     `);
     
     const updatedField = verifyResult.rows[0];
-    console.log('�œ… Campo sexo atualizado:', updatedField);
+    console.log('✅ Campo sexo atualizado:', updatedField);
     
     // Testar com valores corretos
-    console.log('�Ÿ�� Testando com valores corretos...');
+    console.log('🧪 Testando com valores corretos...');
     try {
       await client.query(`
         INSERT INTO animais (serie, rg, sexo, raca, situacao) 
         VALUES ('TEST', '123456', 'Fêmea', 'Teste', 'Ativo')
         ON CONFLICT (serie, rg) DO NOTHING
       `);
-      console.log('�œ… Teste bem-sucedido! Campo sexo aceita "Fêmea".');
+      console.log('✅ Teste bem-sucedido! Campo sexo aceita "Fêmea".');
       
       // Limpar o teste
       await client.query(`
         DELETE FROM animais WHERE serie = 'TEST' AND rg = '123456'
       `);
-      console.log('�Ÿ�� Registro de teste removido.');
+      console.log('🧹 Registro de teste removido.');
       
     } catch (testError) {
-      console.log('�Œ Erro no teste:', testError.message);
+      console.log('❌ Erro no teste:', testError.message);
     }
     
   } catch (error) {
-    console.error('�Œ Erro ao corrigir campo sexo:', error);
+    console.error('❌ Erro ao corrigir campo sexo:', error);
     throw error;
   } finally {
     client.release();
@@ -112,11 +112,11 @@ async function fixSexoField() {
 if (require.main === module) {
   fixSexoField()
     .then(() => {
-      console.log('�ŸŽ‰ Correção do campo sexo concluída!');
+      console.log('🎉 Correção do campo sexo concluída!');
       process.exit(0);
     })
     .catch((error) => {
-      console.error('�Ÿ’� Falha na correção:', error);
+      console.error('💥 Falha na correção:', error);
       process.exit(1);
     });
 }

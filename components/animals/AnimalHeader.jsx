@@ -60,17 +60,17 @@ export default function AnimalHeader({
           ))}
           {animal.situacao_reprodutiva && (
             <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 dark:bg-green-900/30 border border-green-400 text-green-700 dark:text-green-300">
-              ðÅ¸©º {animal.situacao_reprodutiva}
+              🩺 {animal.situacao_reprodutiva}
             </span>
           )}
           {animal.prev_parto && (
             <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300">
-              ðÅ¸â€œâ€¦ Prev: {animal.prev_parto}
+              📅 Prev: {animal.prev_parto}
             </span>
           )}
           {animal.carimbo_leilao && (
             <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-900/30 border border-amber-400 text-amber-700 dark:text-amber-300">
-              ðÅ¸�·ï¸� {animal.carimbo_leilao}
+              🏷️ {animal.carimbo_leilao}
             </span>
           )}
           {(animal.abczg || animal.abczg === 0) && (
@@ -89,7 +89,7 @@ export default function AnimalHeader({
                   : 'bg-white border-gray-300 text-gray-800 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200'
               }`}
             >
-              iABCZ {animal.abczg}{filhoTopRanking ? ' ââ‚¬¢ MÃ£e do 1Âº' : rankingPosicao ? ` ââ‚¬¢ ${rankingPosicao}Âº` : ''}
+              iABCZ {animal.abczg}{filhoTopRanking ? ' • Mãe do 1º' : rankingPosicao ? ` • ${rankingPosicao}º` : ''}
             </button>
           )}
           {(animal.deca || animal.deca === 0) && (
@@ -107,7 +107,7 @@ export default function AnimalHeader({
                 ? 'bg-gradient-to-r from-indigo-100 to-purple-100 border-indigo-400 text-indigo-700 dark:from-indigo-900/30 dark:to-purple-900/30 dark:border-indigo-600 dark:text-indigo-300'
                 : 'bg-gradient-to-r from-purple-50 to-pink-50 border-purple-300 text-purple-700 dark:from-purple-900/20 dark:to-pink-900/20 dark:border-purple-600 dark:text-purple-300'
             }`}>
-              IQG {animal.iqg ?? animal.genetica_2}{filhoTopRankingIQG ? ' ââ‚¬¢ MÃ£e do 1Âº' : rankingPosicaoGenetica2 ? ` ââ‚¬¢ ${rankingPosicaoGenetica2}Âº` : ''}
+              IQG {animal.iqg ?? animal.genetica_2}{filhoTopRankingIQG ? ' • Mãe do 1º' : rankingPosicaoGenetica2 ? ` • ${rankingPosicaoGenetica2}º` : ''}
             </span>
           )}
           {((animal.pt_iqg ?? animal.decile_2) || (animal.pt_iqg ?? animal.decile_2) === 0) && (
@@ -127,7 +127,7 @@ export default function AnimalHeader({
                 ? 'bg-indigo-100 border-indigo-400 text-indigo-700 dark:bg-indigo-900/20 dark:border-indigo-700 dark:text-indigo-200'
                 : 'bg-indigo-100 dark:bg-indigo-900/30 border-indigo-400 text-indigo-700 dark:text-indigo-300'
             }`}>
-              MGTe {animal.mgte}{posicaoMGte ? ` ââ‚¬¢ ${posicaoMGte}Âº` : ''}
+              MGTe {animal.mgte}{posicaoMGte ? ` • ${posicaoMGte}º` : ''}
             </span>
           )}
           {(animal.top != null && animal.top !== '') && (

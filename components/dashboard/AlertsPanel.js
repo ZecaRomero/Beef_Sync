@@ -9,7 +9,7 @@ const AlertsPanel = ({ animals, costs }) => {
   const alerts = useMemo(() => {
     const alertsList = []
 
-    // Alertas de vacinaÃ§Ã£o pendente
+    // Alertas de vacinação pendente
     animals.forEach(animal => {
       if (animal.situacao !== 'Ativo') return
       
@@ -17,23 +17,23 @@ const AlertsPanel = ({ animals, costs }) => {
       const now = new Date()
       const ageInMonths = (now - birthDate) / (1000 * 60 * 60 * 24 * 30)
 
-      // Verificar se precisa de vacinaÃ§Ã£o baseado na ERA
+      // Verificar se precisa de vacinação baseado na ERA
       if (ageInMonths >= 4 && ageInMonths <= 8) {
         const hasVaccination = costs.some(cost => 
           cost.animalId === animal.id && 
           cost.tipo === 'Medicamentos' && 
-          cost.subtipo === 'Vacinas ObrigatÃ³rias'
+          cost.subtipo === 'Vacinas Obrigatórias'
         )
         
         if (!hasVaccination) {
           alertsList.push({
             type: 'vaccination',
             priority: 'high',
-            title: 'VacinaÃ§Ã£o Pendente',
-            message: `${animal.nome} precisa de vacinaÃ§Ã£o obrigatÃ³ria`,
+            title: 'Vacinação Pendente',
+            message: `${animal.nome} precisa de vacinação obrigatória`,
             animal: animal.nome,
-            action: 'Agendar vacinaÃ§Ã£o',
-            icon: 'ðÅ¸â€™â€°',
+            action: 'Agendar vacinação',
+            icon: '💉',
             color: 'red'
           })
         }
@@ -46,10 +46,10 @@ const AlertsPanel = ({ animals, costs }) => {
           type: 'weight',
           priority: 'medium',
           title: 'Peso Abaixo do Esperado',
-          message: `${animal.nome} estÃ¡ com peso baixo para a idade`,
+          message: `${animal.nome} está com peso baixo para a idade`,
           animal: animal.nome,
           action: 'Revisar manejo',
-          icon: 'âÅ¡â€“ï¸�',
+          icon: '⚖️',
           color: 'yellow'
         })
       }
@@ -58,19 +58,19 @@ const AlertsPanel = ({ animals, costs }) => {
       if (animal.sexo === 'Macho' && ageInMonths >= 24) {
         const hasAndrologico = costs.some(cost => 
           cost.animalId === animal.id && 
-          cost.tipo === 'VeterinÃ¡rios' && 
-          cost.subtipo === 'AndrolÃ³gico'
+          cost.tipo === 'Veterinários' && 
+          cost.subtipo === 'Andrológico'
         )
         
         if (!hasAndrologico) {
           alertsList.push({
             type: 'reproductive',
             priority: 'medium',
-            title: 'Exame AndrolÃ³gico Pendente',
+            title: 'Exame Andrológico Pendente',
             message: `${animal.nome} precisa de exame reprodutivo`,
             animal: animal.nome,
             action: 'Agendar exame',
-            icon: 'ðÅ¸â€�¬',
+            icon: '🔬',
             color: 'blue'
           })
         }
@@ -88,16 +88,16 @@ const AlertsPanel = ({ animals, costs }) => {
           type: 'cost',
           priority: 'low',
           title: 'Custo Elevado',
-          message: `${animal.nome} tem custos acima da mÃ©dia`,
+          message: `${animal.nome} tem custos acima da média`,
           animal: animal.nome,
           action: 'Revisar custos',
-          icon: 'ðÅ¸â€™¸',
+          icon: '💸',
           color: 'orange'
         })
       }
     })
 
-    // Adicionar alertas de exames androlÃ³gicos
+    // Adicionar alertas de exames andrológicos
     if (!examesLoading && examesAlerts.length > 0) {
       alertsList.push(...examesAlerts)
     }
@@ -110,7 +110,7 @@ const AlertsPanel = ({ animals, costs }) => {
   const getExpectedWeight = (sexo, ageInMonths) => {
     const weights = {
       'Macho': { 3: 120, 6: 180, 9: 240, 12: 300, 18: 420, 24: 520, 36: 650 },
-      'FÃªmea': { 3: 100, 6: 150, 9: 200, 12: 250, 18: 350, 24: 420, 36: 500 }
+      'Fêmea': { 3: 100, 6: 150, 9: 200, 12: 250, 18: 350, 24: 420, 36: 500 }
     }
     
     const animalWeights = weights[sexo] || weights['Macho']
@@ -141,7 +141,7 @@ const AlertsPanel = ({ animals, costs }) => {
       medium: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
       low: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
     }
-    const labels = { high: 'Alta', medium: 'MÃ©dia', low: 'Baixa' }
+    const labels = { high: 'Alta', medium: 'Média', low: 'Baixa' }
     
     return (
       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${badges[priority]}`}>
@@ -153,14 +153,14 @@ const AlertsPanel = ({ animals, costs }) => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-        ðÅ¸Å¡¨ Alertas e NotificaÃ§Ãµes
+        🚨 Alertas e Notificações
       </h3>
       
       {alerts.length === 0 ? (
         <div className="text-center py-8">
-          <div className="text-green-400 dark:text-green-500 text-4xl mb-2">âÅ“â€¦</div>
+          <div className="text-green-400 dark:text-green-500 text-4xl mb-2">✅</div>
           <p className="text-gray-500 dark:text-gray-400">Nenhum alerta no momento</p>
-          <p className="text-sm text-gray-400 dark:text-gray-500">Seu rebanho estÃ¡ em dia!</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500">Seu rebanho está em dia!</p>
         </div>
       ) : (
         <div className="space-y-3">

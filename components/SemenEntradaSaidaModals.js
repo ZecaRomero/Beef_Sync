@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 
-// DestinoSelector extraÃ­do para fora do modal - evita recriaÃ§Ã£o a cada digitaÃ§Ã£o (input travando)
+// DestinoSelector extraído para fora do modal - evita recriação a cada digitação (input travando)
 function DestinoSelector({ value, onChange, destinos, setDestinos, error }) {
   const [busca, setBusca] = useState(value || '')
   const [mostrarDropdown, setMostrarDropdown] = useState(false)
@@ -26,7 +26,7 @@ function DestinoSelector({ value, onChange, destinos, setDestinos, error }) {
 
   const handleCreate = async () => {
     if (!novoNome.trim()) {
-      alert('âÅ¡ ï¸� Digite o nome do destino')
+      alert('⚠️ Digite o nome do destino')
       return
     }
     try {
@@ -42,14 +42,14 @@ function DestinoSelector({ value, onChange, destinos, setDestinos, error }) {
         setNovoNome('')
         setMostrarCriar(false)
         setMostrarDropdown(false)
-        alert(`âÅ“â€¦ Destino "${result.data.nome}" criado!`)
+        alert(`✅ Destino "${result.data.nome}" criado!`)
       } else {
         const errorData = await response.json()
-        alert(`â�Å’ Erro: ${errorData.message || 'Erro desconhecido'}`)
+        alert(`❌ Erro: ${errorData.message || 'Erro desconhecido'}`)
       }
     } catch (error) {
       console.error('Erro ao criar destino:', error)
-      alert('â�Å’ Erro ao criar destino. Tente novamente.')
+      alert('❌ Erro ao criar destino. Tente novamente.')
     }
   }
 
@@ -115,7 +115,7 @@ function DestinoSelector({ value, onChange, destinos, setDestinos, error }) {
                 onMouseDown={(e) => { e.preventDefault(); setMostrarCriar(true); setNovoNome(busca || '') }}
                 className="w-full text-left px-3 py-2 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 cursor-pointer border-t border-gray-300 dark:border-gray-600 font-medium text-blue-600 dark:text-blue-400 sticky bottom-0"
               >
-                âÅ¾â€¢ Criar novo destino {busca && `"${busca}"`}
+                ➕ Criar novo destino {busca && `"${busca}"`}
               </button>
             </>
           ) : (
@@ -132,7 +132,7 @@ function DestinoSelector({ value, onChange, destinos, setDestinos, error }) {
               />
               <div className="flex gap-2">
                 <button type="button" onClick={handleCreate} disabled={!novoNome.trim()} className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded text-sm font-medium">
-                  âÅ“â€œ Criar
+                  ✓ Criar
                 </button>
                 <button type="button" onClick={() => { setMostrarCriar(false); setNovoNome('') }} className="px-3 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded text-sm font-medium">
                   Cancelar
@@ -152,14 +152,14 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
   const [fornecedores, setFornecedores] = useState([])
   const [autocomplete, setAutocomplete] = useState({})
 
-  // Carregar templates salvos, Ãºltimo cadastro, fornecedores e sugestÃµes do banco
+  // Carregar templates salvos, último cadastro, fornecedores e sugestões do banco
   useEffect(() => {
     if (showModal) {
       // Carregar templates salvos
       const templates = JSON.parse(localStorage.getItem('semenTemplates') || '[]')
       setSavedTemplates(templates)
 
-      // Buscar sugestÃµes de autocomplete do estoque (valores jÃ¡ cadastrados)
+      // Buscar sugestões de autocomplete do estoque (valores já cadastrados)
       const fetchAutocomplete = async () => {
         try {
           const res = await fetch('/api/autocomplete?tabela=estoque_semen&todos=1')
@@ -168,7 +168,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
             setAutocomplete(result.data || {})
           }
         } catch (e) {
-          console.error('Erro ao buscar sugestÃµes:', e)
+          console.error('Erro ao buscar sugestões:', e)
         }
       }
       fetchAutocomplete()
@@ -192,13 +192,13 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
 
       fetchFornecedores()
 
-      // Carregar dados do Ãºltimo cadastro
+      // Carregar dados do último cadastro
       const lastData = JSON.parse(localStorage.getItem('lastSemenEntry') || '{}')
       
-      console.log('ðÅ¸â€�â€ž Modal de entrada aberto - carregando dados...')
+      console.log('🔄 Modal de entrada aberto - carregando dados...')
       
       if (useLastData && lastData.fornecedor) {
-        // Usar dados do Ãºltimo cadastro, mas limpar campos especÃ­ficos do touro
+        // Usar dados do último cadastro, mas limpar campos específicos do touro
         setNewSemen(prev => ({
           ...prev,
           nomeTouro: '',
@@ -268,7 +268,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
       const updatedTemplates = [...savedTemplates, template]
       setSavedTemplates(updatedTemplates)
       localStorage.setItem('semenTemplates', JSON.stringify(updatedTemplates))
-      alert(`âÅ“â€¦ Template "${templateName}" salvo com sucesso!`)
+      alert(`✅ Template "${templateName}" salvo com sucesso!`)
     }
   }
 
@@ -285,7 +285,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
       certificado: template.certificado || '',
       origem: template.origem || ''
     }))
-    alert(`âÅ“â€¦ Template "${template.name}" carregado!`)
+    alert(`✅ Template "${template.name}" carregado!`)
   }
 
   // Deletar template
@@ -294,11 +294,11 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
       const updatedTemplates = savedTemplates.filter(t => t.id !== templateId)
       setSavedTemplates(updatedTemplates)
       localStorage.setItem('semenTemplates', JSON.stringify(updatedTemplates))
-      alert('âÅ“â€¦ Template excluÃ­do!')
+      alert('✅ Template excluído!')
     }
   }
 
-  // Componente de seleÃ§Ã£o de fornecedor
+  // Componente de seleção de fornecedor
   const FornecedorSelector = ({ value, onChange, error }) => {
     const [busca, setBusca] = useState(value || '')
     const [mostrarDropdown, setMostrarDropdown] = useState(false)
@@ -329,7 +329,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
 
     const handleCreate = async () => {
       if (!novoNome.trim()) {
-        alert('âÅ¡ ï¸� Digite o nome do fornecedor')
+        alert('⚠️ Digite o nome do fornecedor')
         return
       }
 
@@ -351,14 +351,14 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
           setNovoNome('')
           setMostrarCriar(false)
           setMostrarDropdown(false)
-          alert(`âÅ“â€¦ Fornecedor "${result.data.nome}" criado!`)
+          alert(`✅ Fornecedor "${result.data.nome}" criado!`)
         } else {
           const errorData = await response.json()
-          alert(`â�Å’ Erro: ${errorData.message || 'Erro desconhecido'}`)
+          alert(`❌ Erro: ${errorData.message || 'Erro desconhecido'}`)
         }
       } catch (error) {
         console.error('Erro ao criar fornecedor:', error)
-        alert('â�Å’ Erro ao criar fornecedor. Tente novamente.')
+        alert('❌ Erro ao criar fornecedor. Tente novamente.')
       }
     }
 
@@ -506,7 +506,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                   }}
                   className="w-full text-left px-3 py-2 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 cursor-pointer border-t border-gray-300 dark:border-gray-600 font-medium text-blue-600 dark:text-blue-400 sticky bottom-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  âÅ¾â€¢ Criar novo fornecedor {busca && `"${busca}"`}
+                  ➕ Criar novo fornecedor {busca && `"${busca}"`}
                 </button>
               </>
             ) : (
@@ -559,7 +559,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                     disabled={!novoNome.trim()}
                     className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded text-sm font-medium transition-colors"
                   >
-                    âÅ“â€œ Criar
+                    ✓ Criar
                   </button>
                   <button
                     type="button"
@@ -593,10 +593,10 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-            ðÅ¸â€œ¥ Entrada de SÃªmen no Estoque
+            📥 Entrada de Sêmen no Estoque
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            Registre a entrada de material genÃ©tico no estoque
+            Registre a entrada de material genético no estoque
           </p>
         </div>
         
@@ -604,7 +604,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
           {/* Controles de Template */}
           <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              âÅ¡¡ Agilizar Cadastro
+              ⚡ Agilizar Cadastro
             </h3>
             
             <div className="flex flex-wrap gap-3 mb-4">
@@ -616,7 +616,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span className="text-sm text-gray-700 dark:text-gray-300">
-                  ðÅ¸â€�â€ž Usar dados do Ãºltimo cadastro
+                  🔄 Usar dados do último cadastro
                 </span>
               </label>
               
@@ -625,7 +625,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                 className="btn-secondary text-xs"
                 disabled={!newSemen.fornecedor}
               >
-                ðÅ¸â€™¾ Salvar como Template
+                💾 Salvar como Template
               </button>
               
               <button
@@ -652,14 +652,14 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                 }}
                 className="btn-secondary text-xs text-red-600"
               >
-                ðÅ¸â€”â€˜ï¸� Limpar Tudo
+                🗑️ Limpar Tudo
               </button>
             </div>
 
             {savedTemplates.length > 0 && (
               <div>
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  ðÅ¸â€œâ€¹ Templates Salvos:
+                  📋 Templates Salvos:
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {savedTemplates.map(template => (
@@ -674,7 +674,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                         onClick={() => deleteTemplate(template.id)}
                         className="text-red-500 hover:text-red-700 text-xs"
                       >
-                        âÅ“â€¢
+                        ✕
                       </button>
                     </div>
                   ))}
@@ -683,10 +683,10 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
             )}
           </div>
 
-          {/* InformaÃ§Ãµes do Touro */}
+          {/* Informações do Touro */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              ðÅ¸�â€š InformaÃ§Ãµes do Touro
+              🐂 Informações do Touro
             </h3>
             <datalist id="datalist-nome-touro">
               {(autocomplete.nome_touro || []).map((v, i) => <option key={i} value={v} />)}
@@ -712,7 +712,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                   required
                 />
                 {!newSemen.nomeTouro?.trim() && (
-                  <p className="text-xs text-red-600 mt-1">âÅ¡ ï¸� Campo obrigatÃ³rio</p>
+                  <p className="text-xs text-red-600 mt-1">⚠️ Campo obrigatório</p>
                 )}
               </div>
               <div>
@@ -730,7 +730,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  RaÃ§a
+                  Raça
                 </label>
                 <input
                   type="text"
@@ -744,10 +744,10 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
             </div>
           </div>
 
-          {/* LocalizaÃ§Ã£o FÃ­sica */}
+          {/* Localização Física */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              ðÅ¸â€œ� LocalizaÃ§Ã£o FÃ­sica
+              📍 Localização Física
             </h3>
             <datalist id="datalist-localizacao">
               {(autocomplete.localizacao || []).map((v, i) => <option key={i} value={v} />)}
@@ -764,7 +764,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  LocalizaÃ§Ã£o *
+                  Localização *
                 </label>
                 <input
                   type="text"
@@ -776,7 +776,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                   required
                 />
                 {!newSemen.localizacao?.trim() && (
-                  <p className="text-xs text-red-600 mt-1">âÅ¡ ï¸� Campo obrigatÃ³rio</p>
+                  <p className="text-xs text-red-600 mt-1">⚠️ Campo obrigatório</p>
                 )}
               </div>
               <div>
@@ -794,12 +794,12 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  BotijÃ£o
+                  Botijão
                 </label>
                 <input
                   type="text"
                   list="datalist-botijao"
-                  placeholder="Ex: BotijÃ£o 3"
+                  placeholder="Ex: Botijão 3"
                   value={newSemen.botijao}
                   onChange={(e) => setNewSemen(prev => ({ ...prev, botijao: e.target.value }))}
                   className="input-field"
@@ -825,7 +825,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
           <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                ðÅ¸â€œ¦ Dados da Entrada
+                📦 Dados da Entrada
               </h3>
               <div className="flex space-x-2">
                 <button
@@ -833,13 +833,13 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                     setNewSemen(prev => ({
                       ...prev,
                       localizacao: 'Tanque A',
-                      fornecedor: 'Central de SÃªmen',
+                      fornecedor: 'Central de Sêmen',
                       valorCompra: '150.00'
                     }))
                   }}
                   className="text-xs btn-secondary"
                 >
-                  ðÅ¸�¢ Central PadrÃ£o
+                  🏢 Central Padrão
                 </button>
                 <button
                   onClick={() => {
@@ -852,7 +852,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                   }}
                   className="text-xs btn-secondary"
                 >
-                  ðÅ¸Å¡Å“ Fazenda Parceira
+                  🚜 Fazenda Parceira
                 </button>
               </div>
             </div>
@@ -862,7 +862,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                   Fornecedor *
                   {useLastData && newSemen.fornecedor && (
                     <span className="ml-2 text-xs text-blue-600 dark:text-blue-400">
-                      ðÅ¸â€�â€ž Reutilizado
+                      🔄 Reutilizado
                     </span>
                   )}
                 </label>
@@ -872,12 +872,12 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                   error={!newSemen.fornecedor?.trim()}
                 />
                 {!newSemen.fornecedor?.trim() && (
-                  <p className="text-xs text-red-600 mt-1">âÅ¡ ï¸� Campo obrigatÃ³rio</p>
+                  <p className="text-xs text-red-600 mt-1">⚠️ Campo obrigatório</p>
                 )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  NÃºmero da NF
+                  Número da NF
                 </label>
                 <input
                   type="text"
@@ -916,7 +916,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                   required
                 />
                 {(!newSemen.valorCompra || parseFloat(newSemen.valorCompra) <= 0) && (
-                  <p className="text-xs text-red-600 mt-1">âÅ¡ ï¸� Campo obrigatÃ³rio - valor deve ser maior que zero</p>
+                  <p className="text-xs text-red-600 mt-1">⚠️ Campo obrigatório - valor deve ser maior que zero</p>
                 )}
               </div>
               <div>
@@ -937,7 +937,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                   required
                 />
                 {(!newSemen.quantidadeDoses || parseInt(newSemen.quantidadeDoses) <= 0) && (
-                  <p className="text-xs text-red-600 mt-1">âÅ¡ ï¸� Campo obrigatÃ³rio - quantidade deve ser maior que zero</p>
+                  <p className="text-xs text-red-600 mt-1">⚠️ Campo obrigatório - quantidade deve ser maior que zero</p>
                 )}
               </div>
               <div>
@@ -954,10 +954,10 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
             </div>
           </div>
 
-          {/* InformaÃ§Ãµes Adicionais */}
+          {/* Informações Adicionais */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              ðÅ¸â€œ� InformaÃ§Ãµes Adicionais
+              📝 Informações Adicionais
             </h3>
             <datalist id="datalist-certificado">
               {(autocomplete.certificado || []).map((v, i) => <option key={i} value={v} />)}
@@ -976,7 +976,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                 <input
                   type="text"
                   list="datalist-certificado"
-                  placeholder="NÃºmero do certificado"
+                  placeholder="Número do certificado"
                   value={newSemen.certificado}
                   onChange={(e) => setNewSemen(prev => ({ ...prev, certificado: e.target.value }))}
                   className="input-field"
@@ -1002,7 +1002,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                 <input
                   type="text"
                   list="datalist-linhagem"
-                  placeholder="Linhagem genÃ©tica"
+                  placeholder="Linhagem genética"
                   value={newSemen.linhagem}
                   onChange={(e) => setNewSemen(prev => ({ ...prev, linhagem: e.target.value }))}
                   className="input-field"
@@ -1011,10 +1011,10 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
             </div>
             <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                ObservaÃ§Ãµes
+                Observações
               </label>
               <textarea
-                placeholder="ObservaÃ§Ãµes adicionais..."
+                placeholder="Observações adicionais..."
                 value={newSemen.observacoes}
                 onChange={(e) => setNewSemen(prev => ({ ...prev, observacoes: e.target.value }))}
                 className="input-field h-24 resize-none"
@@ -1025,7 +1025,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
 
         <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-between">
           <div className="text-sm text-gray-600 dark:text-gray-400">
-            * Campos obrigatÃ³rios
+            * Campos obrigatórios
           </div>
           <div className="flex space-x-3">
             <button
@@ -1036,14 +1036,14 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
             </button>
             <button
               onClick={() => {
-                // ValidaÃ§Ã£o no lado do cliente antes de enviar
+                // Validação no lado do cliente antes de enviar
                 const camposObrigatorios = []
                 
                 if (!newSemen.nomeTouro || newSemen.nomeTouro.trim() === '') {
                   camposObrigatorios.push('Nome do Touro')
                 }
                 if (!newSemen.localizacao || newSemen.localizacao.trim() === '') {
-                  camposObrigatorios.push('LocalizaÃ§Ã£o')
+                  camposObrigatorios.push('Localização')
                 }
                 if (!newSemen.quantidadeDoses || parseInt(newSemen.quantidadeDoses) <= 0) {
                   camposObrigatorios.push('Quantidade de Doses')
@@ -1056,11 +1056,11 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                 }
                 
                 if (camposObrigatorios.length > 0) {
-                  alert(`âÅ¡ ï¸� Preencha os campos obrigatÃ³rios:\n\nââ‚¬¢ ${camposObrigatorios.join('\nââ‚¬¢ ')}\n\nVerifique se todos os campos marcados com (*) estÃ£o preenchidos corretamente.`)
+                  alert(`⚠️ Preencha os campos obrigatórios:\n\n• ${camposObrigatorios.join('\n• ')}\n\nVerifique se todos os campos marcados com (*) estão preenchidos corretamente.`)
                   return
                 }
                 
-                // Salvar dados do Ãºltimo cadastro para reutilizaÃ§Ã£o
+                // Salvar dados do último cadastro para reutilização
                 const lastEntryData = {
                   localizacao: newSemen.localizacao,
                   rackTouro: newSemen.rackTouro,
@@ -1074,8 +1074,8 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
                 }
                 localStorage.setItem('lastSemenEntry', JSON.stringify(lastEntryData))
                 
-                console.log('âÅ“â€¦ ValidaÃ§Ã£o passou - enviando dados:', newSemen)
-                console.log('ðÅ¸â€™¾ Dados salvos para prÃ³ximo cadastro:', lastEntryData)
+                console.log('✅ Validação passou - enviando dados:', newSemen)
+                console.log('💾 Dados salvos para próximo cadastro:', lastEntryData)
                 handleAddSemen()
               }}
               className="btn-primary"
@@ -1089,7 +1089,7 @@ export function AddEntradaModal({ showModal, setShowModal, handleAddSemen, newSe
   )
 }
 
-const unidadeLabel = (tipo) => tipo === 'embriao' ? 'embriÃµes' : 'doses'
+const unidadeLabel = (tipo) => tipo === 'embriao' ? 'embriões' : 'doses'
 
 export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSemen, setNewSemen, semenStock, tipoMaterial = 'semen' }) {
   const [availableStock, setAvailableStock] = useState([])
@@ -1113,11 +1113,11 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
             const filtrado = raw.filter(s => (parseInt(s.doses_disponiveis ?? s.dosesDisponiveis) || 0) > 0);
             setAvailableStock(filtrado);
           } else {
-            console.error('Erro ao buscar entradas disponÃ­veis');
+            console.error('Erro ao buscar entradas disponíveis');
             setAvailableStock([]);
           }
         } catch (error) {
-          console.error('Erro ao buscar entradas disponÃ­veis:', error);
+          console.error('Erro ao buscar entradas disponíveis:', error);
           setAvailableStock([]);
         }
       };
@@ -1130,12 +1130,12 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
             setDestinos(result.data || []);
           } else {
             console.error('Erro ao buscar destinos:', response.status, response.statusText);
-            // Mesmo com erro, permite digitaÃ§Ã£o livre
+            // Mesmo com erro, permite digitação livre
             setDestinos([]);
           }
         } catch (error) {
           console.error('Erro ao buscar destinos:', error);
-          // Mesmo com erro, permite digitaÃ§Ã£o livre
+          // Mesmo com erro, permite digitação livre
           setDestinos([]);
         }
       };
@@ -1191,7 +1191,7 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
     if (saidasItems.length > 1) {
       setSaidasItems(prev => prev.filter(item => item.id !== itemId));
     } else {
-      alert('âÅ¡ ï¸� Ãâ€° necessÃ¡rio ter pelo menos um item na lista');
+      alert('⚠️ É necessário ter pelo menos um item na lista');
     }
   }
 
@@ -1200,7 +1200,7 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
       if (item.id === itemId) {
         const updated = { ...item, [field]: value };
         
-        // Se selecionou um sÃªmen, atualizar dados do touro
+        // Se selecionou um sêmen, atualizar dados do touro
         if (field === 'entradaId') {
           const selectedSemen = availableStock.find(s => s.id === parseInt(value));
           if (selectedSemen) {
@@ -1223,7 +1223,7 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
         if (field === 'quantidadeDoses') {
           const qtd = parseInt(value) || 0;
           if (qtd > updated.maxDoses) {
-            updated.errors = { ...updated.errors, quantidadeDoses: `MÃ¡ximo: ${updated.maxDoses} ${unidade}` };
+            updated.errors = { ...updated.errors, quantidadeDoses: `Máximo: ${updated.maxDoses} ${unidade}` };
           } else {
             updated.errors = { ...updated.errors, quantidadeDoses: null };
           }
@@ -1242,7 +1242,7 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
       const errors = {};
       
       if (!item.entradaId) {
-        errors.entradaId = tipoMaterial === 'embriao' ? 'Selecione um acasalamento' : 'Selecione um sÃªmen';
+        errors.entradaId = tipoMaterial === 'embriao' ? 'Selecione um acasalamento' : 'Selecione um sêmen';
         todosValidos = false;
       }
       
@@ -1252,7 +1252,7 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
       }
       
       if (parseInt(item.quantidadeDoses) > item.maxDoses) {
-        errors.quantidadeDoses = `MÃ¡ximo: ${item.maxDoses} ${unidade} disponÃ­veis`;
+        errors.quantidadeDoses = `Máximo: ${item.maxDoses} ${unidade} disponíveis`;
         todosValidos = false;
       }
       
@@ -1263,14 +1263,14 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
   }
 
   const handleRegistrarSaidas = async () => {
-    // Validar campos comuns obrigatÃ³rios
+    // Validar campos comuns obrigatórios
     if (!common.destino || common.destino.trim() === '') {
-      alert('âÅ¡ ï¸� Informe o Destino da saÃ­da');
+      alert('⚠️ Informe o Destino da saída');
       return;
     }
 
     if (!validarItens()) {
-      alert('âÅ¡ ï¸� Corrija os erros nos itens antes de continuar');
+      alert('⚠️ Corrija os erros nos itens antes de continuar');
       return;
     }
 
@@ -1287,7 +1287,7 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
     const saidas = Object.values(porEntrada);
     for (const item of saidas) {
       if (item.quantidadeDoses > (item.maxDoses || 0)) {
-        alert(`âÅ¡ ï¸� ${item.nomeTouro || 'Item'}: quantidade total (${item.quantidadeDoses}) excede o disponÃ­vel (${item.maxDoses} ${unidade})`);
+        alert(`⚠️ ${item.nomeTouro || 'Item'}: quantidade total (${item.quantidadeDoses}) excede o disponível (${item.maxDoses} ${unidade})`);
         return;
       }
     }
@@ -1302,16 +1302,16 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
     }));
 
     if (saidasPayload.length === 0) {
-      alert('âÅ¡ ï¸� Adicione pelo menos um item de saÃ­da');
+      alert('⚠️ Adicione pelo menos um item de saída');
       return;
     }
 
     const preview = saidasPayload.map((s, i) => {
       const item = saidasItems.find(it => it.entradaId == s.entradaId);
-      return `${i + 1}. ${item?.nomeTouro || 'N/A'} - ${s.quantidadeDoses} doses ââ€ â€™ ${common.destino}`;
+      return `${i + 1}. ${item?.nomeTouro || 'N/A'} - ${s.quantidadeDoses} doses → ${common.destino}`;
     }).join('\n');
 
-    if (!confirm(`ðÅ¸â€œ¦ Registrar ${saidasPayload.length} saÃ­da(s):\n\n${preview}\n\nConfirma?`)) {
+    if (!confirm(`📦 Registrar ${saidasPayload.length} saída(s):\n\n${preview}\n\nConfirma?`)) {
       return;
     }
 
@@ -1336,7 +1336,7 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
         const resultados = data.resultados || [];
 
         if (errors.length === 0) {
-          alert(`âÅ“â€¦ ${count} saÃ­da(s) registrada(s) com sucesso!`);
+          alert(`✅ ${count} saída(s) registrada(s) com sucesso!`);
           setShowModal(false);
           setSaidasItems([]);
           await new Promise(resolve => setTimeout(resolve, 500));
@@ -1345,9 +1345,9 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
           const mapaNome = Object.fromEntries(saidas.map(it => [String(it.entradaId), it.nomeTouro || 'N/A']));
           const detalhes = errors.map(e => {
             const nome = mapaNome[String(e.entradaId)] || `Entrada #${e.entradaId}`;
-            return `ââ‚¬¢ ${nome}: ${e.error || 'Erro desconhecido'}`;
+            return `• ${nome}: ${e.error || 'Erro desconhecido'}`;
           }).join('\n');
-          alert(`âÅ¡ ï¸� ${result.message || 'Resultado parcial'}\n\nFalhas:\n${detalhes}\n\nAs ${count} saÃ­da(s) bem-sucedida(s) jÃ¡ foram registradas.`);
+          alert(`⚠️ ${result.message || 'Resultado parcial'}\n\nFalhas:\n${detalhes}\n\nAs ${count} saída(s) bem-sucedida(s) já foram registradas.`);
           window.location.reload();
         }
       } else {
@@ -1356,11 +1356,11 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
         const detalhes = Array.isArray(errors) && errors.length > 0
           ? '\n\n' + errors.map(e => typeof e === 'object' ? (e.error || e.message) : e).join('\n')
           : '';
-        alert(`â�Å’ Erro ao registrar saÃ­das: ${msg}${detalhes}`);
+        alert(`❌ Erro ao registrar saídas: ${msg}${detalhes}`);
       }
     } catch (error) {
-      console.error('Erro ao registrar saÃ­das:', error);
-      alert('â�Å’ Erro ao registrar saÃ­das. Verifique a conexÃ£o e tente novamente.');
+      console.error('Erro ao registrar saídas:', error);
+      alert('❌ Erro ao registrar saídas. Verifique a conexão e tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -1373,22 +1373,22 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-            {tipoMaterial === 'embriao' ? 'ðÅ¸§¬ SaÃ­da de EmbriÃµes do Estoque' : 'ðÅ¸â€œ¤ SaÃ­da de SÃªmen do Estoque'}
+            {tipoMaterial === 'embriao' ? '🧬 Saída de Embriões do Estoque' : '📤 Saída de Sêmen do Estoque'}
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            {tipoMaterial === 'embriao' ? 'Registre a saÃ­da de embriÃµes do estoque' : 'Registre a saÃ­da de material genÃ©tico do estoque'}
+            {tipoMaterial === 'embriao' ? 'Registre a saída de embriões do estoque' : 'Registre a saída de material genético do estoque'}
           </p>
         </div>
         
         <div className="p-6 space-y-6">
-          {/* Campos comuns - Dados da SaÃ­da */}
+          {/* Campos comuns - Dados da Saída */}
           <div className="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Dados da SaÃ­da (Comum a todos os itens)</h3>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Dados da Saída (Comum a todos os itens)</h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">NÃºmero da NF</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Número da NF</label>
                 <input
                   type="text"
                   placeholder="Ex: 12345"
@@ -1407,7 +1407,7 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data da SaÃ­da *</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data da Saída *</label>
                 <input
                   type="date"
                   value={common.dataOperacao}
@@ -1416,10 +1416,10 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ObservaÃ§Ãµes</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Observações</label>
                 <input
                   type="text"
-                  placeholder="ObservaÃ§Ãµes da saÃ­da..."
+                  placeholder="Observações da saída..."
                   value={common.observacoes}
                   onChange={(e) => setCommon(prev => ({ ...prev, observacoes: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -1427,31 +1427,31 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
               </div>
             </div>
           </div>
-          {/* Header com botÃ£o de adicionar */}
+          {/* Header com botão de adicionar */}
           <div className="flex justify-between items-center">
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                ðÅ¸â€œ¤ Itens de SaÃ­da
+                📤 Itens de Saída
             </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                Adicione mÃºltiplos itens. Cada item pode ter destino diferente
+                Adicione múltiplos itens. Cada item pode ter destino diferente
               </p>
             </div>
             <button
               onClick={adicionarItem}
               className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
             >
-              âÅ¾â€¢ Adicionar Item
+              ➕ Adicionar Item
             </button>
           </div>
 
             {availableStock.length === 0 ? (
             <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-8 text-center">
               <p className="text-gray-600 dark:text-gray-400 font-medium">
-                  âÅ¡ ï¸� NÃ£o hÃ¡ sÃªmen disponÃ­vel para saÃ­da no estoque
+                  ⚠️ Não há sêmen disponível para saída no estoque
                 </p>
               <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
-                  Adicione entradas primeiro para poder registrar saÃ­das
+                  Adicione entradas primeiro para poder registrar saídas
                 </p>
               </div>
             ) : (
@@ -1470,22 +1470,22 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
                         onClick={() => removerItem(item.id)}
                         className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 text-sm font-medium"
                       >
-                        ðÅ¸â€”â€˜ï¸� Remover
+                        🗑️ Remover
                       </button>
                     )}
                     <button
                       onClick={() => duplicarItem(item.id)}
                       className="ml-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
                     >
-                      âÅ½Ëœ Duplicar
+                      ⎘ Duplicar
                     </button>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-4 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700 relative">
-                    {/* SeleÃ§Ã£o de SÃªmen */}
+                    {/* Seleção de Sêmen */}
                     <div className="md:col-span-9">
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        {tipoMaterial === 'embriao' ? 'Acasalamento' : 'SÃªmen'} * {item.errors?.entradaId && <span className="text-red-500 text-xs">({item.errors.entradaId})</span>}
+                        {tipoMaterial === 'embriao' ? 'Acasalamento' : 'Sêmen'} * {item.errors?.entradaId && <span className="text-red-500 text-xs">({item.errors.entradaId})</span>}
                       </label>
                       <select
                         value={item.entradaId || ''}
@@ -1494,19 +1494,19 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
                           item.errors?.entradaId ? 'border-red-300 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'
                         }`}
                       >
-                        <option value="">{tipoMaterial === 'embriao' ? 'Selecione um acasalamento...' : 'Selecione um sÃªmen...'}</option>
+                        <option value="">{tipoMaterial === 'embriao' ? 'Selecione um acasalamento...' : 'Selecione um sêmen...'}</option>
                         {availableStock.map(semen => (
                           <option key={semen.id} value={semen.id}>
                             {semen.nomeTouro || semen.nome_touro}
                             {semen.rgTouro || semen.rg_touro ? ` (${semen.rgTouro || semen.rg_touro})` : ''}
                             {' - '}
-                            {semen.doses_disponiveis || semen.dosesDisponiveis} {unidade} disponÃ­veis
+                            {semen.doses_disponiveis || semen.dosesDisponiveis} {unidade} disponíveis
                           </option>
                         ))}
                       </select>
                       {item.entradaId && (
                         <p className="text-xs text-gray-500 mt-1">
-                          {item.nomeTouro} - {item.raca} - MÃ¡x: {item.maxDoses} {unidade}
+                          {item.nomeTouro} - {item.raca} - Máx: {item.maxDoses} {unidade}
                         </p>
                       )}
                     </div>
@@ -1529,12 +1529,12 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
                       />
                       {item.maxDoses > 0 && (
                         <p className="text-xs text-gray-500 mt-1">
-                          MÃ¡x: {item.maxDoses} {unidade}
+                          Máx: {item.maxDoses} {unidade}
                         </p>
                       )}
                     </div>
                     
-                    {/* BotÃ£o de Remover (se houver mais de um item) */}
+                    {/* Botão de Remover (se houver mais de um item) */}
                     {saidasItems.length > 1 && (
                       <div className="absolute top-2 right-2">
                          <button
@@ -1558,14 +1558,14 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
           {saidasItems.length > 0 && saidasItems.some(item => item.entradaId) && (
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
               <h4 className="font-medium text-blue-900 dark:text-blue-200 mb-2">
-                ðÅ¸â€œÅ  Resumo
+                📊 Resumo
               </h4>
               <div className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
                 <p>
-                  ââ‚¬¢ <strong>{saidasItems.filter(item => item.entradaId).length}</strong> item(s) selecionado(s)
+                  • <strong>{saidasItems.filter(item => item.entradaId).length}</strong> item(s) selecionado(s)
                 </p>
                 <p>
-                  ââ‚¬¢ <strong>{saidasItems.reduce((sum, item) => sum + (parseInt(item.quantidadeDoses) || 0), 0)}</strong> {unidade} no total
+                  • <strong>{saidasItems.reduce((sum, item) => sum + (parseInt(item.quantidadeDoses) || 0), 0)}</strong> {unidade} no total
                 </p>
 
               </div>
@@ -1575,7 +1575,7 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
 
         <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
           <div className="text-sm text-gray-600 dark:text-gray-400">
-            * Campos obrigatÃ³rios | VocÃª pode registrar mÃºltiplas saÃ­das de uma vez
+            * Campos obrigatórios | Você pode registrar múltiplas saídas de uma vez
           </div>
           <div className="flex space-x-3">
             <button
@@ -1600,8 +1600,8 @@ export function AddSaidaModal({ showModal, setShowModal, handleAddSemen, newSeme
                 </>
               ) : (
                 <>
-                  <span>ðÅ¸â€œ¤</span>
-                  <span>Registrar {saidasItems.filter(item => item.entradaId).length} SaÃ­da(s)</span>
+                  <span>📤</span>
+                  <span>Registrar {saidasItems.filter(item => item.entradaId).length} Saída(s)</span>
                 </>
               )}
             </button>

@@ -1,5 +1,5 @@
 /**
- * Gera o workbook Excel do Boletim Campo com todas as abas e grÃ¡ficos
+ * Gera o workbook Excel do Boletim Campo com todas as abas e gráficos
  * Usado por download-excel e enviar-whatsapp
  */
 import ExcelJS from 'exceljs'
@@ -8,11 +8,11 @@ import { ChartJSNodeCanvas } from 'chartjs-node-canvas'
 
 Chart.register(...registerables)
 
-const HEADERS = ['LOCAL', 'LOCAL 1', 'SUB_LOCAL_2', 'QUANT.', 'SEXO', 'CATEGORIA', 'RAÃâ€¡A', 'ERA', 'OBSERVAÃâ€¡ÃÆ’O']
+const HEADERS = ['LOCAL', 'LOCAL 1', 'SUB_LOCAL_2', 'QUANT.', 'SEXO', 'CATEGORIA', 'RAÇA', 'ERA', 'OBSERVAÇÃO']
 const CHART_SIZE = { width: 700, height: 380 }
 const COLORS = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF', '#22c55e', '#ec4899']
 
-// Paleta de cores para o relatÃ³rio
+// Paleta de cores para o relatório
 const CORES = {
   titulo: { argb: 'FF1E3A5F' },
   header: { argb: 'FFFF8C42' },
@@ -47,7 +47,7 @@ export async function generateBoletimCampoWorkbook(dados, historico = []) {
   const dadosComQuant = dados.filter((r) => (r.quant || 0) > 0)
   const totalGeral = dadosComQuant.reduce((s, r) => s + (r.quant || 0), 0)
 
-  // PrÃ©-calcular agrupamentos para Resumo e demais abas
+  // Pré-calcular agrupamentos para Resumo e demais abas
   const categoriasAlvo = [
     { key: 'TOURO', matchCat: (c) => /^TOURO/i.test(c), matchRaca: () => false },
     { key: 'NOVILHA', matchCat: (c) => /^NOVILHA/i.test(c), matchRaca: () => false },
@@ -72,11 +72,11 @@ export async function generateBoletimCampoWorkbook(dados, historico = []) {
   workbook.creator = 'Beef-Sync'
   workbook.created = new Date()
 
-  // --- ABA 1: Boletim Campo (sÃ³ quant > 0 + TOTAL GERAL) ---
+  // --- ABA 1: Boletim Campo (só quant > 0 + TOTAL GERAL) ---
   const sheetPrincipal = workbook.addWorksheet('Boletim Campo')
   sheetPrincipal.properties.tabColor = { argb: 'FF059669' }
   sheetPrincipal.mergeCells('A1:I1')
-  sheetPrincipal.getCell('A1').value = `ðÅ¸�â€ž BOLETIM CAMPO - ${new Date().toLocaleDateString('pt-BR')}`
+  sheetPrincipal.getCell('A1').value = `🐄 BOLETIM CAMPO - ${new Date().toLocaleDateString('pt-BR')}`
   sheetPrincipal.getCell('A1').font = { size: 16, bold: true, color: { argb: 'FFFFFFFF' } }
   sheetPrincipal.getCell('A1').fill = { type: 'pattern', pattern: 'solid', fgColor: CORES.titulo }
   sheetPrincipal.getCell('A1').alignment = { horizontal: 'center', vertical: 'middle' }
@@ -138,13 +138,13 @@ export async function generateBoletimCampoWorkbook(dados, historico = []) {
   const sheetResumo = workbook.addWorksheet('Resumo')
   sheetResumo.properties.tabColor = { argb: 'FF3B82F6' }
   sheetResumo.mergeCells('A1:B1')
-  sheetResumo.getCell('A1').value = 'ðÅ¸â€œÅ  RESUMO EXECUTIVO'
+  sheetResumo.getCell('A1').value = '📊 RESUMO EXECUTIVO'
   sheetResumo.getCell('A1').font = { size: 14, bold: true, color: { argb: 'FFFFFFFF' } }
   sheetResumo.getCell('A1').fill = { type: 'pattern', pattern: 'solid', fgColor: CORES.titulo }
   sheetResumo.getCell('A1').alignment = { horizontal: 'center' }
   sheetResumo.getRow(1).height = 26
   const resumoCards = [
-    { label: 'Total de cabeÃ§as', valor: totalGeral, cor: CORES.resumoCard1 },
+    { label: 'Total de cabeças', valor: totalGeral, cor: CORES.resumoCard1 },
     { label: 'Registros (piquetes/locais)', valor: dadosComQuant.length, cor: CORES.resumoCard1 },
     { label: 'Data e hora', valor: new Date().toLocaleString('pt-BR'), cor: CORES.resumoCard2 },
     { label: 'Touros', valor: porCat.TOURO, cor: CORES.resumoCard3 },
@@ -196,15 +196,15 @@ export async function generateBoletimCampoWorkbook(dados, historico = []) {
   })
   sheetEra.columns = [{ width: 20 }, { width: 14 }]
 
-  // --- ABA 4: RAÃâ€¡A ---
+  // --- ABA 4: RAÇA ---
   const porRaca = {}
   dadosComQuant.forEach((r) => {
-    const raca = r.raca || '(sem raÃ§a)'
+    const raca = r.raca || '(sem raça)'
     porRaca[raca] = (porRaca[raca] || 0) + (r.quant || 0)
   })
-  const sheetRaca = workbook.addWorksheet('RaÃ§a')
+  const sheetRaca = workbook.addWorksheet('Raça')
   sheetRaca.properties.tabColor = { argb: 'FF7C3AED' }
-  addSheetHeader(sheetRaca, ['RAÃâ€¡A', 'QUANTIDADE'], CORES.raca)
+  addSheetHeader(sheetRaca, ['RAÇA', 'QUANTIDADE'], CORES.raca)
   Object.entries(porRaca)
     .sort((a, b) => b[1] - a[1])
     .forEach(([raca, qtd], i) => {
@@ -258,7 +258,7 @@ export async function generateBoletimCampoWorkbook(dados, historico = []) {
   })
   sheetSexo.columns = [{ width: 18 }, { width: 14 }]
 
-  // --- ABA 6: QUANTIDADE POR PIQUETE E TOTAL DE CABEÃâ€¡AS ---
+  // --- ABA 6: QUANTIDADE POR PIQUETE E TOTAL DE CABEÇAS ---
   const porPiquete = {}
   dadosComQuant.forEach((r) => {
     const piquete = r.local || r.local_1 || '(sem local)'
@@ -280,7 +280,7 @@ export async function generateBoletimCampoWorkbook(dados, historico = []) {
       })
     })
   const piqueteTotalRow = sheetPiquete.getRow(Object.keys(porPiquete).length + 2)
-  piqueteTotalRow.values = ['TOTAL DE CABEÃâ€¡AS', totalGeral]
+  piqueteTotalRow.values = ['TOTAL DE CABEÇAS', totalGeral]
   piqueteTotalRow.font = { bold: true }
   piqueteTotalRow.eachCell((c, col) => {
     c.fill = { type: 'pattern', pattern: 'solid', fgColor: CORES.total }
@@ -313,10 +313,10 @@ export async function generateBoletimCampoWorkbook(dados, historico = []) {
   })
   sheetCat.columns = [{ width: 18 }, { width: 14 }]
 
-  // --- ABA 8: HISTORICO DA ALTERAÃâ€¡Ãâ€¢ES FEITAS ---
-  const sheetHist = workbook.addWorksheet('HistÃ³rico AlteraÃ§Ãµes')
+  // --- ABA 8: HISTORICO DA ALTERAÇÕES FEITAS ---
+  const sheetHist = workbook.addWorksheet('Histórico Alterações')
   sheetHist.properties.tabColor = { argb: 'FF64748B' }
-  const histHeaders = ['Data', 'Tipo', 'Origem', 'Destino', 'Motivo', 'Qtd', 'UsuÃ¡rio', 'ObservaÃ§Ã£o']
+  const histHeaders = ['Data', 'Tipo', 'Origem', 'Destino', 'Motivo', 'Qtd', 'Usuário', 'Observação']
   addSheetHeader(sheetHist, histHeaders, CORES.historico)
   historico.forEach((m, i) => {
     const origem = [m.local, m.local_1, m.sub_local_2].filter(Boolean).join(' / ') || '-'
@@ -339,18 +339,18 @@ export async function generateBoletimCampoWorkbook(dados, historico = []) {
     })
   })
   if (historico.length === 0) {
-    sheetHist.getRow(2).values = ['Nenhuma alteraÃ§Ã£o registrada', '', '', '', '', '', '', '']
+    sheetHist.getRow(2).values = ['Nenhuma alteração registrada', '', '', '', '', '', '', '']
     sheetHist.getRow(2).eachCell((c) => {
       c.fill = { type: 'pattern', pattern: 'solid', fgColor: CORES.zebra2 }
     })
   }
   sheetHist.columns = [{ width: 18 }, { width: 10 }, { width: 22 }, { width: 22 }, { width: 12 }, { width: 8 }, { width: 14 }, { width: 24 }]
 
-  // --- ABA 10: GRÃ�FICOS ---
+  // --- ABA 10: GRÁFICOS ---
   if (totalGeral > 0) {
-    const sheetGraficos = workbook.addWorksheet('GrÃ¡ficos')
+    const sheetGraficos = workbook.addWorksheet('Gráficos')
     sheetGraficos.properties.tabColor = { argb: 'FF10B981' }
-    sheetGraficos.getCell('A1').value = 'ðÅ¸â€œË† GRÃ�FICOS DO BOLETIM CAMPO'
+    sheetGraficos.getCell('A1').value = '📈 GRÁFICOS DO BOLETIM CAMPO'
     sheetGraficos.getCell('A1').font = { size: 14, bold: true, color: { argb: 'FFFFFFFF' } }
     sheetGraficos.getCell('A1').fill = { type: 'pattern', pattern: 'solid', fgColor: CORES.titulo }
     sheetGraficos.mergeCells('A1:B1')
@@ -358,7 +358,7 @@ export async function generateBoletimCampoWorkbook(dados, historico = []) {
     const canvas = new ChartJSNodeCanvas({ ...CHART_SIZE, backgroundColour: 'white' })
     let rowOffset = 2
 
-    // GrÃ¡fico Pizza - Por RaÃ§a
+    // Gráfico Pizza - Por Raça
     const racaEntries = Object.entries(porRaca).sort((a, b) => b[1] - a[1]).slice(0, 8)
     if (racaEntries.length > 0) {
       const racaBuffer = await canvas.renderToBuffer({
@@ -369,7 +369,7 @@ export async function generateBoletimCampoWorkbook(dados, historico = []) {
         },
         options: {
           plugins: {
-            title: { display: true, text: 'Quantidade por RaÃ§a', font: { size: 14 } },
+            title: { display: true, text: 'Quantidade por Raça', font: { size: 14 } },
             legend: { position: 'bottom' }
           }
         }
@@ -379,7 +379,7 @@ export async function generateBoletimCampoWorkbook(dados, historico = []) {
       rowOffset += 20
     }
 
-    // GrÃ¡fico Pizza - Por Sexo
+    // Gráfico Pizza - Por Sexo
     const sexoEntries = Object.entries(porSexo)
     if (sexoEntries.length > 0) {
       const sexoBuffer = await canvas.renderToBuffer({
@@ -400,7 +400,7 @@ export async function generateBoletimCampoWorkbook(dados, historico = []) {
       rowOffset += 20
     }
 
-    // GrÃ¡fico Barras - Por Era
+    // Gráfico Barras - Por Era
     const eraEntries = Object.entries(porEra).sort((a, b) => b[1] - a[1]).slice(0, 10)
     if (eraEntries.length > 0) {
       const eraBuffer = await canvas.renderToBuffer({
@@ -422,14 +422,14 @@ export async function generateBoletimCampoWorkbook(dados, historico = []) {
       rowOffset += 20
     }
 
-    // GrÃ¡fico Barras - Por Piquete/Local
+    // Gráfico Barras - Por Piquete/Local
     const piqueteEntries = Object.entries(porPiquete).sort((a, b) => b[1] - a[1]).slice(0, 10)
     if (piqueteEntries.length > 0) {
       const piqueteBuffer = await canvas.renderToBuffer({
         type: 'bar',
         data: {
           labels: piqueteEntries.map(([l]) => l.length > 20 ? l.substring(0, 20) + '...' : l),
-          datasets: [{ label: 'CabeÃ§as', data: piqueteEntries.map(([, v]) => v), backgroundColor: '#f59e0b' }]
+          datasets: [{ label: 'Cabeças', data: piqueteEntries.map(([, v]) => v), backgroundColor: '#f59e0b' }]
         },
         options: {
           plugins: {
@@ -444,7 +444,7 @@ export async function generateBoletimCampoWorkbook(dados, historico = []) {
       rowOffset += 20
     }
 
-    // GrÃ¡fico Pizza - Touros, Novilhas, Receptoras, Bezerros, Bezerras
+    // Gráfico Pizza - Touros, Novilhas, Receptoras, Bezerros, Bezerras
     const catTotal = categoriasAlvo.reduce((s, { key }) => s + (porCat[key] || 0), 0)
     if (catTotal > 0) {
       const catLabels = categoriasAlvo.map(({ key }) => key.charAt(0) + key.slice(1).toLowerCase())
@@ -470,19 +470,19 @@ export async function generateBoletimCampoWorkbook(dados, historico = []) {
       rowOffset += 20
     }
 
-    // GrÃ¡fico Barras Horizontais - Top 12 RaÃ§as
+    // Gráfico Barras Horizontais - Top 12 Raças
     const racaBarEntries = Object.entries(porRaca).sort((a, b) => b[1] - a[1]).slice(0, 12)
     if (racaBarEntries.length > 0) {
       const racaBarBuffer = await canvas.renderToBuffer({
         type: 'bar',
         data: {
           labels: racaBarEntries.map(([l]) => l.length > 15 ? l.substring(0, 15) + '...' : l),
-          datasets: [{ label: 'CabeÃ§as', data: racaBarEntries.map(([, v]) => v), backgroundColor: '#6366f1' }]
+          datasets: [{ label: 'Cabeças', data: racaBarEntries.map(([, v]) => v), backgroundColor: '#6366f1' }]
         },
         options: {
           indexAxis: 'y',
           plugins: {
-            title: { display: true, text: 'Top RaÃ§as (barras)', font: { size: 14 } },
+            title: { display: true, text: 'Top Raças (barras)', font: { size: 14 } },
             legend: { display: false }
           },
           scales: { x: { beginAtZero: true } }
@@ -493,7 +493,7 @@ export async function generateBoletimCampoWorkbook(dados, historico = []) {
       rowOffset += 20
     }
 
-    // GrÃ¡fico Barras - Por Categoria (Touros, Novilhas, etc)
+    // Gráfico Barras - Por Categoria (Touros, Novilhas, etc)
     if (catTotal > 0) {
       const catBarBuffer = await canvas.renderToBuffer({
         type: 'bar',
@@ -518,7 +518,7 @@ export async function generateBoletimCampoWorkbook(dados, historico = []) {
       rowOffset += 20
     }
 
-    // GrÃ¡fico Rosca - Por Era
+    // Gráfico Rosca - Por Era
     const eraPieEntries = Object.entries(porEra).sort((a, b) => b[1] - a[1]).slice(0, 8)
     if (eraPieEntries.length > 0) {
       const eraPieBuffer = await canvas.renderToBuffer({
@@ -529,7 +529,7 @@ export async function generateBoletimCampoWorkbook(dados, historico = []) {
         },
         options: {
           plugins: {
-            title: { display: true, text: 'DistribuiÃ§Ã£o por Era', font: { size: 14 } },
+            title: { display: true, text: 'Distribuição por Era', font: { size: 14 } },
             legend: { position: 'bottom' }
           }
         }
@@ -539,14 +539,14 @@ export async function generateBoletimCampoWorkbook(dados, historico = []) {
       rowOffset += 20
     }
 
-    // GrÃ¡fico Barras Horizontais - Top 12 Piquetes/Locais
+    // Gráfico Barras Horizontais - Top 12 Piquetes/Locais
     const piqueteBarEntries = Object.entries(porPiquete).sort((a, b) => b[1] - a[1]).slice(0, 12)
     if (piqueteBarEntries.length > 0) {
       const piqueteBarBuffer = await canvas.renderToBuffer({
         type: 'bar',
         data: {
           labels: piqueteBarEntries.map(([l]) => l.length > 18 ? l.substring(0, 18) + '...' : l),
-          datasets: [{ label: 'CabeÃ§as', data: piqueteBarEntries.map(([, v]) => v), backgroundColor: '#0d9488' }]
+          datasets: [{ label: 'Cabeças', data: piqueteBarEntries.map(([, v]) => v), backgroundColor: '#0d9488' }]
         },
         options: {
           indexAxis: 'y',
@@ -562,7 +562,7 @@ export async function generateBoletimCampoWorkbook(dados, historico = []) {
       rowOffset += 20
     }
 
-    // GrÃ¡fico de Linha - EvoluÃ§Ã£o por Era (ordenado)
+    // Gráfico de Linha - Evolução por Era (ordenado)
     if (eraEntries.length > 0) {
       const eraLineBuffer = await canvas.renderToBuffer({
         type: 'line',
@@ -590,16 +590,16 @@ export async function generateBoletimCampoWorkbook(dados, historico = []) {
     }
   }
 
-  // Links interativos no Resumo (apÃ³s todas as abas criadas)
+  // Links interativos no Resumo (após todas as abas criadas)
   const resumoSheet = workbook.getWorksheet('Resumo')
   if (resumoSheet) {
     resumoSheet.getRow(11).height = 14
-    resumoSheet.getCell('A12').value = { formula: 'HYPERLINK("#\'Boletim Campo\'!A1","ðÅ¸â€œâ€¹ Ir para Boletim Campo")' }
+    resumoSheet.getCell('A12').value = { formula: 'HYPERLINK("#\'Boletim Campo\'!A1","📋 Ir para Boletim Campo")' }
     resumoSheet.getCell('A12').font = { color: { argb: 'FF2563EB' }, underline: true }
     resumoSheet.getCell('A12').fill = { type: 'pattern', pattern: 'solid', fgColor: CORES.resumoCard5 }
     resumoSheet.getCell('A12').border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-    if (totalGeral > 0 && workbook.getWorksheet('GrÃ¡ficos')) {
-      resumoSheet.getCell('A13').value = { formula: 'HYPERLINK("#\'GrÃ¡ficos\'!A1","ðÅ¸â€œÅ  Ir para GrÃ¡ficos")' }
+    if (totalGeral > 0 && workbook.getWorksheet('Gráficos')) {
+      resumoSheet.getCell('A13').value = { formula: 'HYPERLINK("#\'Gráficos\'!A1","📊 Ir para Gráficos")' }
       resumoSheet.getCell('A13').font = { color: { argb: 'FF2563EB' }, underline: true }
       resumoSheet.getCell('A13').fill = { type: 'pattern', pattern: 'solid', fgColor: CORES.resumoCard5 }
       resumoSheet.getCell('A13').border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }

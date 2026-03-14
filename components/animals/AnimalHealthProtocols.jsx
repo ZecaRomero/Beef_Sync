@@ -17,7 +17,7 @@ export default function AnimalHealthProtocols({ animal }) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ShieldCheckIcon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-            <h2 className="font-semibold text-gray-900 dark:text-white">Protocolos SanitÃ¡rios</h2>
+            <h2 className="font-semibold text-gray-900 dark:text-white">Protocolos Sanitários</h2>
           </div>
           {isExpanded ? <ChevronUpIcon className="h-5 w-5" /> : <ChevronDownIcon className="h-5 w-5" />}
         </div>
@@ -33,8 +33,8 @@ export default function AnimalHealthProtocols({ animal }) {
                 {p.nome_protocolo || p.protocolo || p.tipo || 'Protocolo'}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                InÃ­cio: {formatDate(p.data_inicio)}
-                {p.data_fim && ` ââ‚¬¢ Fim: ${formatDate(p.data_fim)}`}
+                Início: {formatDate(p.data_inicio)}
+                {p.data_fim && ` • Fim: ${formatDate(p.data_fim)}`}
               </p>
               {p.veterinario && (
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Vet: {p.veterinario}</p>

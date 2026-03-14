@@ -4,11 +4,11 @@ import { sendWhatsApp } from '../../../utils/whatsappService'
 
 async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' })
+    return res.status(405).json({ error: 'Método não permitido' })
   }
 
   try {
-    // Buscar abastecimentos que precisam de notificaÃ§Ã£o (2 dias antes)
+    // Buscar abastecimentos que precisam de notificação (2 dias antes)
     const abastecimentosResult = await query(`
       SELECT 
         id,
@@ -30,8 +30,8 @@ async function handler(req, res) {
     if (abastecimentos.length === 0) {
       return sendSuccess(res, {
         enviados: 0,
-        mensagem: 'Nenhum abastecimento precisa de notificaÃ§Ã£o no momento'
-      }, 'VerificaÃ§Ã£o concluÃ­da')
+        mensagem: 'Nenhum abastecimento precisa de notificação no momento'
+      }, 'Verificação concluída')
     }
 
     // Buscar contatos WhatsApp ativos
@@ -46,11 +46,11 @@ async function handler(req, res) {
     if (contatos.length === 0) {
       return sendSuccess(res, {
         enviados: 0,
-        mensagem: 'Nenhum contato WhatsApp cadastrado para receber notificaÃ§Ãµes'
+        mensagem: 'Nenhum contato WhatsApp cadastrado para receber notificações'
       }, 'Nenhum contato encontrado')
     }
 
-    // Enviar notificaÃ§Ãµes para cada abastecimento
+    // Enviar notificações para cada abastecimento
     const resultados = {
       sucessos: [],
       erros: [],
@@ -62,16 +62,16 @@ async function handler(req, res) {
         (new Date(abastecimento.proximo_abastecimento) - new Date()) / (1000 * 60 * 60 * 24)
       )
 
-      const mensagem = `ðÅ¸â€�â€� *LEMBRETE DE ABASTECIMENTO DE NITROGÃÅ NIO*
+      const mensagem = `🔔 *LEMBRETE DE ABASTECIMENTO DE NITROGÊNIO*
 
-âÅ¡ ï¸� Faltam apenas *${diasRestantes} dias* para o prÃ³ximo abastecimento!
+⚠️ Faltam apenas *${diasRestantes} dias* para o próximo abastecimento!
 
-ðÅ¸â€œâ€¦ *ÃÅ¡ltimo abastecimento:*
-ââ‚¬¢ Data: ${new Date(abastecimento.data_abastecimento).toLocaleDateString('pt-BR')}
-ââ‚¬¢ Quantidade: ${abastecimento.quantidade_litros}L
-ââ‚¬¢ Motorista: ${abastecimento.motorista}
+📅 *Último abastecimento:*
+• Data: ${new Date(abastecimento.data_abastecimento).toLocaleDateString('pt-BR')}
+• Quantidade: ${abastecimento.quantidade_litros}L
+• Motorista: ${abastecimento.motorista}
 
-ðÅ¸â€œâ€¦ *PrÃ³ximo abastecimento:*
+📅 *Próximo abastecimento:*
 ${new Date(abastecimento.proximo_abastecimento).toLocaleDateString('pt-BR', { 
   weekday: 'long', 
   year: 'numeric', 
@@ -79,7 +79,7 @@ ${new Date(abastecimento.proximo_abastecimento).toLocaleDateString('pt-BR', {
   day: 'numeric' 
 })}
 
-Por favor, programe o abastecimento para evitar falta de nitrogÃªnio.
+Por favor, programe o abastecimento para evitar falta de nitrogênio.
 
 _Sistema Beef-Sync_`
 
@@ -99,7 +99,7 @@ _Sistema Beef-Sync_`
           })
           resultados.total_enviados++
 
-          console.log(`âÅ“â€¦ NotificaÃ§Ã£o WhatsApp enviada para ${contato.nome} (${contato.whatsapp}) - Abastecimento ID ${abastecimento.id}`)
+          console.log(`✅ Notificação WhatsApp enviada para ${contato.nome} (${contato.whatsapp}) - Abastecimento ID ${abastecimento.id}`)
         } catch (error) {
           resultados.erros.push({
             abastecimento_id: abastecimento.id,
@@ -108,11 +108,11 @@ _Sistema Beef-Sync_`
             erro: error.message
           })
 
-          console.error(`â�Å’ Erro ao enviar WhatsApp para ${contato.nome}:`, error)
+          console.error(`❌ Erro ao enviar WhatsApp para ${contato.nome}:`, error)
         }
       }
 
-      // Marcar como notificaÃ§Ã£o enviada
+      // Marcar como notificação enviada
       await query(`
         UPDATE abastecimento_nitrogenio 
         SET notificacao_enviada_2dias = true, updated_at = CURRENT_TIMESTAMP
@@ -124,10 +124,10 @@ _Sistema Beef-Sync_`
       abastecimentos_processados: abastecimentos.length,
       contatos_notificados: contatos.length,
       resultados
-    }, `${resultados.total_enviados} notificaÃ§Ã£o(Ãµes) enviada(s) com sucesso`)
+    }, `${resultados.total_enviados} notificação(ões) enviada(s) com sucesso`)
   } catch (error) {
-    console.error('Erro ao enviar notificaÃ§Ãµes WhatsApp:', error)
-    return sendError(res, `Erro ao enviar notificaÃ§Ãµes: ${error.message}`, 500)
+    console.error('Erro ao enviar notificações WhatsApp:', error)
+    return sendError(res, `Erro ao enviar notificações: ${error.message}`, 500)
   }
 }
 

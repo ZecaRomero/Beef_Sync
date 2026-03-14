@@ -5,7 +5,7 @@ async function verificarNFsRecentes() {
   const client = await pool.connect()
   
   try {
-    console.log('�Ÿ”� Verificando Notas Fiscais recentes (últimos 30 dias)...\n')
+    console.log('🔍 Verificando Notas Fiscais recentes (últimos 30 dias)...\n')
     
     // Buscar todas as NFs de entrada dos últimos 30 dias
     const result = await client.query(`
@@ -27,7 +27,7 @@ async function verificarNFsRecentes() {
       LIMIT 20
     `)
     
-    console.log(`�Ÿ“Š Total de NFs encontradas (últimos 30 dias): ${result.rows.length}\n`)
+    console.log(`📊 Total de NFs encontradas (últimos 30 dias): ${result.rows.length}\n`)
     
     for (const nf of result.rows) {
       // Buscar itens da tabela separada
@@ -84,7 +84,7 @@ async function verificarNFsRecentes() {
     }
     
   } catch (error) {
-    console.error('�Œ Erro:', error)
+    console.error('❌ Erro:', error)
     throw error
   } finally {
     client.release()
@@ -93,10 +93,10 @@ async function verificarNFsRecentes() {
 
 verificarNFsRecentes()
   .then(() => {
-    console.log('\n�œ… Verificação concluída')
+    console.log('\n✅ Verificação concluída')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n�Œ Erro fatal:', error)
+    console.error('\n❌ Erro fatal:', error)
     process.exit(1)
   })

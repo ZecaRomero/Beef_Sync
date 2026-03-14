@@ -20,7 +20,7 @@ async function initDeathTables() {
   const client = await pool.connect();
   
   try {
-    console.log('ðÅ¸Å¡â‚¬ Inicializando tabelas de mortes...');
+    console.log('🚀 Inicializando tabelas de mortes...');
     
     await client.query('BEGIN');
 
@@ -32,7 +32,7 @@ async function initDeathTables() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
-    console.log('âÅ“â€¦ Tabela causas_morte criada/verificada');
+    console.log('✅ Tabela causas_morte criada/verificada');
 
     // Criar tabela de mortes
     await client.query(`
@@ -46,40 +46,40 @@ async function initDeathTables() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
-    console.log('âÅ“â€¦ Tabela mortes criada/verificada');
+    console.log('✅ Tabela mortes criada/verificada');
 
-    // Inserir causas de morte padrÃ£o
+    // Inserir causas de morte padrão
     await client.query(`
       INSERT INTO causas_morte (causa) VALUES 
-        ('DoenÃ§a'),
+        ('Doença'),
         ('Acidente'),
         ('Parto'),
-        ('PredaÃ§Ã£o'),
-        ('IntoxicaÃ§Ã£o'),
-        ('DesnutriÃ§Ã£o'),
-        ('Idade avanÃ§ada'),
-        ('Problemas cardÃ­acos'),
-        ('Problemas respiratÃ³rios'),
+        ('Predação'),
+        ('Intoxicação'),
+        ('Desnutrição'),
+        ('Idade avançada'),
+        ('Problemas cardíacos'),
+        ('Problemas respiratórios'),
         ('Outros')
       ON CONFLICT (causa) DO NOTHING
     `);
-    console.log('âÅ“â€¦ Causas de morte padrÃ£o inseridas');
+    console.log('✅ Causas de morte padrão inseridas');
 
-    // Criar Ã­ndices para performance
+    // Criar índices para performance
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_mortes_animal_id ON mortes(animal_id);
       CREATE INDEX IF NOT EXISTS idx_mortes_data_morte ON mortes(data_morte);
       CREATE INDEX IF NOT EXISTS idx_mortes_causa ON mortes(causa_morte);
       CREATE INDEX IF NOT EXISTS idx_causas_morte_causa ON causas_morte(causa);
     `);
-    console.log('âÅ“â€¦ Ã�ndices criados');
+    console.log('✅ Índices criados');
 
     await client.query('COMMIT');
-    console.log('ðÅ¸Å½â€° Tabelas de mortes inicializadas com sucesso!');
+    console.log('🎉 Tabelas de mortes inicializadas com sucesso!');
 
   } catch (error) {
     await client.query('ROLLBACK');
-    console.error('â�Å’ Erro ao inicializar tabelas de mortes:', error);
+    console.error('❌ Erro ao inicializar tabelas de mortes:', error);
     throw error;
   } finally {
     client.release();
@@ -91,7 +91,7 @@ async function main() {
     await initDeathTables();
     process.exit(0);
   } catch (error) {
-    console.error('Falha na inicializaÃ§Ã£o:', error);
+    console.error('Falha na inicialização:', error);
     process.exit(1);
   } finally {
     await pool.end();

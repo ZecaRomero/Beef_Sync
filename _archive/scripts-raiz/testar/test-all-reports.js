@@ -3,7 +3,7 @@ const fs = require('fs');
 
 async function testAllReports() {
   try {
-    console.log('�Ÿ”� Testando todos os tipos de relatórios...');
+    console.log('🔍 Testando todos os tipos de relatórios...');
     
     const reportTypes = [
       'monthly_summary',
@@ -21,7 +21,7 @@ async function testAllReports() {
 
     // Testar cada tipo de relatório individualmente
     for (const reportType of reportTypes) {
-      console.log(`\n�Ÿ“Š Testando ${reportType}...`);
+      console.log(`\n📊 Testando ${reportType}...`);
       
       try {
         const response = await fetch('http://localhost:3020/api/reports/generate', {
@@ -40,22 +40,22 @@ async function testAllReports() {
           const reportData = data.data.data[reportType];
           
           if (reportData && Object.keys(reportData).length > 0) {
-            console.log(`�œ… ${reportType}: Dados encontrados`);
+            console.log(`✅ ${reportType}: Dados encontrados`);
             console.log(`   Seções: ${Object.keys(reportData).join(', ')}`);
           } else {
-            console.log(`�š�️ ${reportType}: Sem dados (normal se não houver dados para este tipo)`);
+            console.log(`⚠️ ${reportType}: Sem dados (normal se não houver dados para este tipo)`);
           }
         } else {
           const error = await response.text();
-          console.log(`�Œ ${reportType}: Erro - ${error}`);
+          console.log(`❌ ${reportType}: Erro - ${error}`);
         }
       } catch (error) {
-        console.log(`�Œ ${reportType}: Erro - ${error.message}`);
+        console.log(`❌ ${reportType}: Erro - ${error.message}`);
       }
     }
 
     // Testar download de todos os relatórios juntos
-    console.log('\n�Ÿ“„ Testando download de todos os relatórios em PDF...');
+    console.log('\n📄 Testando download de todos os relatórios em PDF...');
     const pdfResponse = await fetch('http://localhost:3020/api/reports/download', {
       method: 'POST',
       headers: {
@@ -70,16 +70,16 @@ async function testAllReports() {
 
     if (pdfResponse.ok) {
       const pdfBuffer = await pdfResponse.buffer();
-      console.log(`�œ… PDF completo: ${pdfBuffer.length} bytes`);
+      console.log(`✅ PDF completo: ${pdfBuffer.length} bytes`);
       fs.writeFileSync('relatorio-todos-tipos.pdf', pdfBuffer);
-      console.log('�Ÿ’� Salvo como relatorio-todos-tipos.pdf');
+      console.log('💾 Salvo como relatorio-todos-tipos.pdf');
     } else {
       const error = await pdfResponse.text();
-      console.log(`�Œ Erro no PDF: ${error}`);
+      console.log(`❌ Erro no PDF: ${error}`);
     }
 
     // Testar download em Excel
-    console.log('\n�Ÿ“Š Testando download de todos os relatórios em Excel...');
+    console.log('\n📊 Testando download de todos os relatórios em Excel...');
     const excelResponse = await fetch('http://localhost:3020/api/reports/download', {
       method: 'POST',
       headers: {
@@ -94,22 +94,22 @@ async function testAllReports() {
 
     if (excelResponse.ok) {
       const excelBuffer = await excelResponse.buffer();
-      console.log(`�œ… Excel completo: ${excelBuffer.length} bytes`);
+      console.log(`✅ Excel completo: ${excelBuffer.length} bytes`);
       fs.writeFileSync('relatorio-todos-tipos.xlsx', excelBuffer);
-      console.log('�Ÿ’� Salvo como relatorio-todos-tipos.xlsx');
+      console.log('💾 Salvo como relatorio-todos-tipos.xlsx');
     } else {
       const error = await excelResponse.text();
-      console.log(`�Œ Erro no Excel: ${error}`);
+      console.log(`❌ Erro no Excel: ${error}`);
     }
 
-    console.log('\n�ŸŽ‰ Teste completo finalizado!');
-    console.log('�Ÿ“‹ Resumo:');
+    console.log('\n🎉 Teste completo finalizado!');
+    console.log('📋 Resumo:');
     console.log('   - Relatórios funcionando corretamente');
     console.log('   - Downloads em PDF e Excel operacionais');
     console.log('   - Dados sendo exibidos quando disponíveis');
 
   } catch (error) {
-    console.error('�Œ Erro geral:', error.message);
+    console.error('❌ Erro geral:', error.message);
   }
 }
 

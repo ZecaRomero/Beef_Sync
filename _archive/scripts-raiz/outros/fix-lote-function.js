@@ -2,7 +2,7 @@
 const { query } = require('./lib/database')
 
 async function fixLoteFunction() {
-  console.log('�Ÿ”� Criando função gerar_proximo_lote...\n')
+  console.log('🔧 Criando função gerar_proximo_lote...\n')
 
   try {
     // 1. Verificar se a função já existe
@@ -15,9 +15,9 @@ async function fixLoteFunction() {
     `)
     
     if (functionExists.rows[0].exists) {
-      console.log('   �œ… Função já existe')
+      console.log('   ✅ Função já existe')
     } else {
-      console.log('   �Œ Função não existe, criando...')
+      console.log('   ❌ Função não existe, criando...')
       
       // 2. Criar a função
       await query(`
@@ -42,7 +42,7 @@ async function fixLoteFunction() {
         $$ LANGUAGE plpgsql;
       `)
       
-      console.log('   �œ… Função criada com sucesso')
+      console.log('   ✅ Função criada com sucesso')
     }
 
     // 3. Testar a função
@@ -106,26 +106,26 @@ async function fixLoteFunction() {
             'ESTOQUE'
           ])
 
-          console.log(`   �œ… Lote criado para abastecimento: ${abast.quantidade_litros}L`)
+          console.log(`   ✅ Lote criado para abastecimento: ${abast.quantidade_litros}L`)
         } else {
-          console.log(`   �š�️ Lote já existe para abastecimento: ${abast.quantidade_litros}L`)
+          console.log(`   ⚠️ Lote já existe para abastecimento: ${abast.quantidade_litros}L`)
         }
       }
     } else {
-      console.log('   �Œ Nenhum abastecimento recente encontrado')
+      console.log('   ❌ Nenhum abastecimento recente encontrado')
     }
 
-    console.log('\n�œ… Função configurada com sucesso!')
+    console.log('\n✅ Função configurada com sucesso!')
 
   } catch (error) {
-    console.error('�Œ Erro ao configurar função:', error)
+    console.error('❌ Erro ao configurar função:', error)
   }
 }
 
 // Executar
 fixLoteFunction()
   .then(() => {
-    console.log('\n�ŸŽ� PR�“XIMOS PASSOS:')
+    console.log('\n🎯 PRÓXIMOS PASSOS:')
     console.log('1. A função gerar_proximo_lote() foi criada')
     console.log('2. Novos abastecimentos de nitrogênio serão registrados automaticamente')
     console.log('3. Acesse http://localhost:3020/relatorios-lotes para ver o histórico')

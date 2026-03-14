@@ -7,7 +7,7 @@
 const { query } = require('./lib/database')
 
 async function fixAllAnimalsPrenhezes() {
-  console.log('�Ÿ”� Corrigindo vinculação de prenhezes de todos os animais...\n')
+  console.log('🔧 Corrigindo vinculação de prenhezes de todos os animais...\n')
 
   try {
     // 1. Buscar todos os animais machos (touros)
@@ -19,7 +19,7 @@ async function fixAllAnimalsPrenhezes() {
       ORDER BY serie, rg
     `)
     
-    console.log(`   �œ… Encontrados ${touros.rows.length} touros`)
+    console.log(`   ✅ Encontrados ${touros.rows.length} touros`)
 
     // 2. Para cada touro, tentar encontrar correspondência nas transferências
     console.log('\n2. Analisando correspondências:')
@@ -28,7 +28,7 @@ async function fixAllAnimalsPrenhezes() {
     
     for (const touro of touros.rows) {
       const identificacao = `${touro.serie} ${touro.rg}`
-      console.log(`\n   �Ÿ”� Analisando ${identificacao} (ID: ${touro.id})`)
+      console.log(`\n   🔍 Analisando ${identificacao} (ID: ${touro.id})`)
       
       // Buscar transferências que possam corresponder a este touro
       const possiveisCorrespondencias = await query(`
@@ -45,14 +45,14 @@ async function fixAllAnimalsPrenhezes() {
       `)
       
       if (possiveisCorrespondencias.rows.length > 0) {
-        console.log(`      �œ… Possíveis correspondências:`)
+        console.log(`      ✅ Possíveis correspondências:`)
         
         for (const corresp of possiveisCorrespondencias.rows) {
           console.log(`         - "${corresp.touro}" (${corresp.total} transferências)`)
           
           // Se encontrou uma correspondência clara, fazer a correção
           if (corresp.total >= 5) { // Apenas se tiver pelo menos 5 transferências
-            console.log(`         �Ÿ”� Corrigindo vinculação...`)
+            console.log(`         🔧 Corrigindo vinculação...`)
             
             const updateResult = await query(`
               UPDATE transferencias_embrioes 
@@ -62,13 +62,13 @@ async function fixAllAnimalsPrenhezes() {
             `, [touro.id, corresp.touro])
             
             if (updateResult.rows.length > 0) {
-              console.log(`         �œ… ${updateResult.rows.length} transferências vinculadas ao ${identificacao}`)
+              console.log(`         ✅ ${updateResult.rows.length} transferências vinculadas ao ${identificacao}`)
               correcoes += updateResult.rows.length
             }
           }
         }
       } else {
-        console.log(`      �Œ Nenhuma correspondência encontrada`)
+        console.log(`      ❌ Nenhuma correspondência encontrada`)
       }
     }
 
@@ -81,7 +81,7 @@ async function fixAllAnimalsPrenhezes() {
       ORDER BY serie, rg
     `)
     
-    console.log(`   �œ… Encontradas ${femeas.rows.length} fêmeas`)
+    console.log(`   ✅ Encontradas ${femeas.rows.length} fêmeas`)
 
     // 4. Para cada fêmea, tentar encontrar correspondência nas transferências
     for (const femea of femeas.rows) {
@@ -112,7 +112,7 @@ async function fixAllAnimalsPrenhezes() {
             `, [femea.id, corresp.doadora_nome])
             
             if (updateResult.rows.length > 0) {
-              console.log(`   �œ… ${updateResult.rows.length} transferências vinculadas à doadora ${identificacao}`)
+              console.log(`   ✅ ${updateResult.rows.length} transferências vinculadas à doadora ${identificacao}`)
               correcoes += updateResult.rows.length
             }
           }
@@ -128,7 +128,7 @@ async function fixAllAnimalsPrenhezes() {
       WHERE touro_id = (SELECT id FROM animais WHERE serie = 'CJCA' AND rg = '6')
     `)
     
-    console.log(`   �Ÿ“Š CJCA6 agora tem ${cjca6Check.rows[0].prenhezes_vinculadas} prenhezes vinculadas`)
+    console.log(`   📊 CJCA6 agora tem ${cjca6Check.rows[0].prenhezes_vinculadas} prenhezes vinculadas`)
 
     // 6. Resumo geral
     console.log('\n6. Resumo das correções:')
@@ -143,31 +143,31 @@ async function fixAllAnimalsPrenhezes() {
     `)
     
     const stats = resumo.rows[0]
-    console.log(`   �Ÿ“Š Total de transferências: ${stats.total_transferencias}`)
-    console.log(`   �œ… Touros vinculados: ${stats.touros_vinculados}`)
-    console.log(`   �œ… Doadoras vinculadas: ${stats.doadoras_vinculadas}`)
-    console.log(`   �Œ Touros sem vínculo: ${stats.touros_sem_vinculo}`)
-    console.log(`   �Œ Doadoras sem vínculo: ${stats.doadoras_sem_vinculo}`)
-    console.log(`   �Ÿ”� Total de correções feitas: ${correcoes}`)
+    console.log(`   📊 Total de transferências: ${stats.total_transferencias}`)
+    console.log(`   ✅ Touros vinculados: ${stats.touros_vinculados}`)
+    console.log(`   ✅ Doadoras vinculadas: ${stats.doadoras_vinculadas}`)
+    console.log(`   ❌ Touros sem vínculo: ${stats.touros_sem_vinculo}`)
+    console.log(`   ❌ Doadoras sem vínculo: ${stats.doadoras_sem_vinculo}`)
+    console.log(`   🔧 Total de correções feitas: ${correcoes}`)
 
-    console.log('\n�œ… Correção concluída!')
+    console.log('\n✅ Correção concluída!')
     
     if (stats.touros_sem_vinculo > 0 || stats.doadoras_sem_vinculo > 0) {
-      console.log('\n�Ÿ’� PR�“XIMOS PASSOS:')
+      console.log('\n💡 PRÓXIMOS PASSOS:')
       console.log('1. Verifique os animais que ainda não foram vinculados')
       console.log('2. Pode ser necessário correção manual para casos específicos')
       console.log('3. Atualize a página do CJCA6 para ver as prenhezes ativas')
     }
 
   } catch (error) {
-    console.error('�Œ Erro durante correção:', error)
+    console.error('❌ Erro durante correção:', error)
   }
 }
 
 // Executar
 fixAllAnimalsPrenhezes()
   .then(() => {
-    console.log('\n�ŸŽ� CORRE�‡�ƒO AUTOMÁTICA CONCLUÍDA')
+    console.log('\n🎯 CORREÇÃO AUTOMÁTICA CONCLUÍDA')
     process.exit(0)
   })
   .catch(error => {

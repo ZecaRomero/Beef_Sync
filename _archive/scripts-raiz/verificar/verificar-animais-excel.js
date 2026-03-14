@@ -32,7 +32,7 @@ const animaisExcel = [
 ]
 
 async function verificarAnimais() {
-  console.log('�Ÿ”� Verificando animais do Excel no banco de dados...\n')
+  console.log('🔍 Verificando animais do Excel no banco de dados...\n')
   
   let encontrados = 0
   let naoEncontrados = []
@@ -51,29 +51,29 @@ async function verificarAnimais() {
       if (result.rows.length > 0) {
         encontrados++
         const animalDb = result.rows[0]
-        console.log(`�œ… ${animal.serie} ${animal.rg} - ID: ${animalDb.id}, Piquete: ${animalDb.piquete_atual || '(sem piquete)'}`)
+        console.log(`✅ ${animal.serie} ${animal.rg} - ID: ${animalDb.id}, Piquete: ${animalDb.piquete_atual || '(sem piquete)'}`)
       } else {
         naoEncontrados.push(animal)
-        console.log(`�Œ ${animal.serie} ${animal.rg} - N�ƒO ENCONTRADO`)
+        console.log(`❌ ${animal.serie} ${animal.rg} - NÃO ENCONTRADO`)
       }
     } catch (error) {
-      console.error(`�š�️ Erro ao buscar ${animal.serie} ${animal.rg}:`, error.message)
+      console.error(`⚠️ Erro ao buscar ${animal.serie} ${animal.rg}:`, error.message)
     }
   }
   
   console.log('\n' + '='.repeat(60))
-  console.log(`�Ÿ“Š RESUMO:`)
+  console.log(`📊 RESUMO:`)
   console.log(`   Total no Excel: ${animaisExcel.length}`)
   console.log(`   Encontrados: ${encontrados}`)
   console.log(`   Não encontrados: ${naoEncontrados.length}`)
   
   if (naoEncontrados.length > 0) {
-    console.log('\n�Œ ANIMAIS N�ƒO ENCONTRADOS NO BANCO:')
+    console.log('\n❌ ANIMAIS NÃO ENCONTRADOS NO BANCO:')
     naoEncontrados.forEach(a => {
-      console.log(`   �€� ${a.serie} ${a.rg}`)
+      console.log(`   • ${a.serie} ${a.rg}`)
     })
     
-    console.log('\n�Ÿ’� POSSÍVEIS CAUSAS:')
+    console.log('\n💡 POSSÍVEIS CAUSAS:')
     console.log('   1. Animal não foi cadastrado no sistema')
     console.log('   2. Série ou RG está diferente no banco (espaços, maiúsculas/minúsculas)')
     console.log('   3. Animal foi excluído do banco de dados')
@@ -85,6 +85,6 @@ async function verificarAnimais() {
 }
 
 verificarAnimais().catch(error => {
-  console.error('�Œ Erro fatal:', error)
+  console.error('❌ Erro fatal:', error)
   process.exit(1)
 })

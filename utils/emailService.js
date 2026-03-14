@@ -2,9 +2,9 @@ import nodemailer from 'nodemailer'
 
 // Configurar transporter de email
 const createTransporter = () => {
-  // Verificar se as variÃ¡veis de ambiente estÃ£o configuradas
+  // Verificar se as variáveis de ambiente estão configuradas
   if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
-    console.warn('âÅ¡ ï¸� VariÃ¡veis SMTP nÃ£o configuradas. Email desabilitado.')
+    console.warn('⚠️ Variáveis SMTP não configuradas. Email desabilitado.')
     return null
   }
 
@@ -17,7 +17,7 @@ const createTransporter = () => {
       pass: process.env.SMTP_PASS
     },
     tls: {
-      rejectUnauthorized: false // Para desenvolvimento, remover em produÃ§Ã£o
+      rejectUnauthorized: false // Para desenvolvimento, remover em produção
     }
   })
 }
@@ -27,7 +27,7 @@ export const sendEmail = async (recipient, subject, htmlContent, attachments = [
   const transporter = createTransporter()
   
   if (!transporter) {
-    throw new Error('ServiÃ§o de email nÃ£o configurado. Configure as variÃ¡veis SMTP_HOST, SMTP_USER e SMTP_PASS no arquivo .env')
+    throw new Error('Serviço de email não configurado. Configure as variáveis SMTP_HOST, SMTP_USER e SMTP_PASS no arquivo .env')
   }
 
   const mailOptions = {
@@ -44,26 +44,26 @@ export const sendEmail = async (recipient, subject, htmlContent, attachments = [
 
   try {
     const info = await transporter.sendMail(mailOptions)
-    console.log(`âÅ“â€¦ Email enviado para ${recipient.email}:`, info.messageId)
+    console.log(`✅ Email enviado para ${recipient.email}:`, info.messageId)
     return { success: true, messageId: info.messageId }
   } catch (error) {
-    console.error(`â�Å’ Erro ao enviar email para ${recipient.email}:`, error)
+    console.error(`❌ Erro ao enviar email para ${recipient.email}:`, error)
     throw error
   }
 }
 
-// Gerar conteÃºdo HTML do email
+// Gerar conteúdo HTML do email
 export const generateEmailContent = (recipient, period, reports) => {
   const reportNames = {
     boletim: 'Boletim de Gado',
-    notasFiscais: 'Notas Fiscais (Entradas e SaÃ­das)',
-    movimentacoes: 'MovimentaÃ§Ãµes do MÃªs',
-    nf_entrada_saida: 'RelatÃ³rio de NF de Entrada e SaÃ­da',
-    nascimentos: 'RelatÃ³rio de Nascimentos',
-    mortes: 'RelatÃ³rio de Mortes',
+    notasFiscais: 'Notas Fiscais (Entradas e Saídas)',
+    movimentacoes: 'Movimentações do Mês',
+    nf_entrada_saida: 'Relatório de NF de Entrada e Saída',
+    nascimentos: 'Relatório de Nascimentos',
+    mortes: 'Relatório de Mortes',
     receptoras_chegaram: 'Receptoras que Chegaram',
     receptoras_faltam_parir: 'Receptoras que Faltam Parir',
-    receptoras_faltam_diagnostico: 'Receptoras que Faltam DiagnÃ³stico de GestaÃ§Ã£o',
+    receptoras_faltam_diagnostico: 'Receptoras que Faltam Diagnóstico de Gestação',
     resumo_nascimentos: 'Resumo de Nascimentos',
     resumo_por_sexo: 'Resumo por Sexo',
     resumo_por_pai: 'Resumo por Pai'
@@ -90,30 +90,30 @@ export const generateEmailContent = (recipient, period, reports) => {
     <body>
       <div class="container">
         <div class="header">
-          <h1>ðÅ¸�â€ž Beef-Sync</h1>
-          <p>Sistema de GestÃ£o PecuÃ¡ria</p>
+          <h1>🐄 Beef-Sync</h1>
+          <p>Sistema de Gestão Pecuária</p>
         </div>
         <div class="content">
-          <h2>OlÃ¡ ${recipient.nome || recipient.name}!</h2>
-          <p>Segue em anexo os relatÃ³rios  solicitados:</p>
+          <h2>Olá ${recipient.nome || recipient.name}!</h2>
+          <p>Segue em anexo os relatórios  solicitados:</p>
           
           <div class="period">
-            <strong>ðÅ¸â€œâ€¦ PerÃ­odo:</strong> ${period.startDate} atÃ© ${period.endDate}
+            <strong>📅 Período:</strong> ${period.startDate} até ${period.endDate}
           </div>
           
           <div class="report-list">
-            <strong>ðÅ¸â€œÅ  RelatÃ³rios incluÃ­dos:</strong>
+            <strong>📊 Relatórios incluídos:</strong>
             <ul>
               ${reportsList}
             </ul>
           </div>
           
-          <p>Os arquivos estÃ£o em formato Excel (.xlsx) e podem ser abertos diretamente no Microsoft Excel, Google Sheets ou outros programas compatÃ­veis.</p>
+          <p>Os arquivos estão em formato Excel (.xlsx) e podem ser abertos diretamente no Microsoft Excel, Google Sheets ou outros programas compatíveis.</p>
           
-          <p>Qualquer dÃºvida, estamos Ã  disposiÃ§Ã£o.</p>
+          <p>Qualquer dúvida, estamos à disposição.</p>
         </div>
         <div class="footer">
-          <p><strong>Beef-Sync</strong> - Sistema de GestÃ£o PecuÃ¡ria</p>
+          <p><strong>Beef-Sync</strong> - Sistema de Gestão Pecuária</p>
           <p>Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
         </div>
       </div>

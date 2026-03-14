@@ -1,9 +1,9 @@
 /**
- * ConfiguraÃ§Ã£o e validaÃ§Ã£o de variÃ¡veis de ambiente
+ * Configuração e validação de variáveis de ambiente
  */
 
 /**
- * ObtÃ©m uma variÃ¡vel de ambiente ou retorna valor padrÃ£o
+ * Obtém uma variável de ambiente ou retorna valor padrão
  */
 function getEnv(key, defaultValue = '') {
   if (typeof process !== 'undefined' && process.env) {
@@ -13,7 +13,7 @@ function getEnv(key, defaultValue = '') {
 }
 
 /**
- * Valida se todas as variÃ¡veis obrigatÃ³rias estÃ£o presentes
+ * Valida se todas as variáveis obrigatórias estão presentes
  */
 function validateEnv() {
   const required = [];
@@ -22,8 +22,8 @@ function validateEnv() {
   
   if (missing.length > 0) {
     console.warn(
-      `âÅ¡ ï¸� VariÃ¡veis de ambiente faltando: ${missing.join(', ')}\n` +
-      'O aplicativo usarÃ¡ valores padrÃ£o, mas algumas funcionalidades podem nÃ£o funcionar corretamente.'
+      `⚠️ Variáveis de ambiente faltando: ${missing.join(', ')}\n` +
+      'O aplicativo usará valores padrão, mas algumas funcionalidades podem não funcionar corretamente.'
     );
   }
 }
@@ -33,7 +33,7 @@ if (typeof window === 'undefined') {
   validateEnv();
 }
 
-// ConfiguraÃ§Ãµes da aplicaÃ§Ã£o
+// Configurações da aplicação
 export const config = {
   app: {
     name: getEnv('NEXT_PUBLIC_APP_NAME', 'Beef Sync'),

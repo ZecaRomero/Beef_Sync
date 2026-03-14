@@ -88,7 +88,7 @@ export default function ColetaFiv() {
         setVetOptions(data.data.veterinarios || [])
       }
     } catch (error) {
-      console.error('Erro ao carregar sugestÃµes:', error)
+      console.error('Erro ao carregar sugestões:', error)
     }
   }
 
@@ -133,7 +133,7 @@ export default function ColetaFiv() {
       })
       if (res.ok) {
         await loadColetas()
-        alert('TE criada e vinculada Ã  coleta!')
+        alert('TE criada e vinculada à coleta!')
       } else {
         const err = await res.json()
         alert(`Erro ao criar TE: ${err.message}`)
@@ -175,7 +175,7 @@ export default function ColetaFiv() {
     e.preventDefault()
     
     if (formData.itens.length === 0) {
-      alert('Adicione pelo menos uma doadora Ã  lista')
+      alert('Adicione pelo menos uma doadora à lista')
       return
     }
     
@@ -272,7 +272,7 @@ export default function ColetaFiv() {
         const data = await response.json()
         const options = (data.data || []).map(animal => ({
           value: animal.nome || animal.rg || 'Sem Nome',
-          label: `${animal.nome || 'Sem Nome'} ${animal.rg ? `(RG: ${animal.rg})` : ''} - ${animal.raca || ''} ${animal.source === 'semen' ? '(SÃªmen)' : ''}`.trim()
+          label: `${animal.nome || 'Sem Nome'} ${animal.rg ? `(RG: ${animal.rg})` : ''} - ${animal.raca || ''} ${animal.source === 'semen' ? '(Sêmen)' : ''}`.trim()
         }))
         setTouroOptions(options)
         setShowTouroOptions(true)
@@ -300,9 +300,9 @@ export default function ColetaFiv() {
     setImportSuccess('')
   }
 
-  // FunÃ§Ã£o de filtro
+  // Função de filtro
   const filteredColetas = coletas.filter(coleta => {
-    // Filtro de busca (doadora, touro, laboratÃ³rio)
+    // Filtro de busca (doadora, touro, laboratório)
     const searchLower = searchTerm.toLowerCase()
     const matchesSearch = !searchTerm || 
       (coleta.doadora_nome && coleta.doadora_nome.toLowerCase().includes(searchLower)) ||
@@ -310,10 +310,10 @@ export default function ColetaFiv() {
       (coleta.laboratorio && coleta.laboratorio.toLowerCase().includes(searchLower)) ||
       (coleta.veterinario && coleta.veterinario.toLowerCase().includes(searchLower))
     
-    // Filtro de laboratÃ³rio
+    // Filtro de laboratório
     const matchesLab = !filterLab || coleta.laboratorio === filterLab
     
-    // Filtro de veterinÃ¡rio
+    // Filtro de veterinário
     const matchesVet = !filterVet || coleta.veterinario === filterVet
     
     // Filtro de data
@@ -324,7 +324,7 @@ export default function ColetaFiv() {
     return matchesSearch && matchesLab && matchesVet && matchesDateStart && matchesDateEnd
   })
 
-  // Obter listas Ãºnicas para os filtros
+  // Obter listas únicas para os filtros
   const uniqueLabs = [...new Set(coletas.map(c => c.laboratorio).filter(Boolean))].sort()
   const uniqueVets = [...new Set(coletas.map(c => c.veterinario).filter(Boolean))].sort()
 
@@ -335,7 +335,7 @@ export default function ColetaFiv() {
     }
 
     if (!importLaboratorio || !importVeterinario) {
-      setImportError('LaboratÃ³rio e veterinÃ¡rio sÃ£o obrigatÃ³rios')
+      setImportError('Laboratório e veterinário são obrigatórios')
       return
     }
 
@@ -343,7 +343,7 @@ export default function ColetaFiv() {
     setImportError('')
     setImportSuccess('')
 
-    console.log('ðÅ¸â€œ¤ Iniciando importaÃ§Ã£o...', { fileName: importFile.name, size: importFile.size })
+    console.log('📤 Iniciando importação...', { fileName: importFile.name, size: importFile.size })
 
     // Converter arquivo para base64 usando Promise
     const fileToBase64 = (file) => {
@@ -358,15 +358,15 @@ export default function ColetaFiv() {
               binary += String.fromCharCode(bytes[i])
             }
             const base64 = btoa(binary)
-            console.log('âÅ“â€¦ Arquivo convertido para base64, tamanho:', base64.length)
+            console.log('✅ Arquivo convertido para base64, tamanho:', base64.length)
             resolve(base64)
           } catch (error) {
-            console.error('â�Å’ Erro ao converter para base64:', error)
+            console.error('❌ Erro ao converter para base64:', error)
             reject(error)
           }
         }
         reader.onerror = (error) => {
-          console.error('â�Å’ Erro ao ler arquivo:', error)
+          console.error('❌ Erro ao ler arquivo:', error)
           reject(new Error('Erro ao ler arquivo'))
         }
         reader.readAsArrayBuffer(file)
@@ -374,10 +374,10 @@ export default function ColetaFiv() {
     }
 
     try {
-      console.log('ðÅ¸â€�â€ž Convertendo arquivo para base64...')
+      console.log('🔄 Convertendo arquivo para base64...')
       const base64 = await fileToBase64(importFile)
 
-      console.log('ðÅ¸â€œ¡ Enviando para API...')
+      console.log('📡 Enviando para API...')
       const response = await fetch('/api/reproducao/coleta-fiv/import-excel', {
         method: 'POST',
         headers: {
@@ -391,11 +391,11 @@ export default function ColetaFiv() {
         })
       })
 
-      console.log('ðÅ¸â€œ¥ Resposta recebida:', response.status, response.statusText)
+      console.log('📥 Resposta recebida:', response.status, response.statusText)
 
       if (!response.ok) {
         const errorText = await response.text()
-        console.error('â�Å’ Erro na resposta:', errorText)
+        console.error('❌ Erro na resposta:', errorText)
         let errorData
         try {
           errorData = JSON.parse(errorText)
@@ -408,20 +408,20 @@ export default function ColetaFiv() {
       }
 
       const data = await response.json()
-      console.log('âÅ“â€¦ Dados recebidos:', data)
+      console.log('✅ Dados recebidos:', data)
 
       if (data.success) {
         setImportSuccess(
-          `ImportaÃ§Ã£o concluÃ­da! ${data.data.created} de ${data.data.total} registros importados com sucesso.`
+          `Importação concluída! ${data.data.created} de ${data.data.total} registros importados com sucesso.`
         )
         if (data.data.warnings && data.data.warnings.length > 0) {
-          console.warn('âÅ¡ ï¸� Avisos na importaÃ§Ã£o:', data.data.warnings)
+          console.warn('⚠️ Avisos na importação:', data.data.warnings)
         }
         if (data.data.errors && data.data.errors.length > 0) {
-          console.error('â�Å’ Erros na importaÃ§Ã£o:', data.data.errors)
+          console.error('❌ Erros na importação:', data.data.errors)
         }
         
-        // Limpar formulÃ¡rio e recarregar dados
+        // Limpar formulário e recarregar dados
         setTimeout(() => {
           setImportFile(null)
           setImportLaboratorio('')
@@ -433,7 +433,7 @@ export default function ColetaFiv() {
         setImportError(data.message || 'Erro ao importar arquivo')
       }
     } catch (error) {
-      console.error('â�Å’ Erro ao importar:', error)
+      console.error('❌ Erro ao importar:', error)
       setImportError('Erro ao importar: ' + (error.message || 'Erro desconhecido'))
     } finally {
       setImportLoading(false)
@@ -444,7 +444,7 @@ export default function ColetaFiv() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <ImportProgressOverlay importando={importLoading} progress={{ etapa: 'Importando coletas FIV...' }} />
       <Head>
-        <title>Coleta de OÃ³citos (FIV) - Beef Sync</title>
+        <title>Coleta de Oócitos (FIV) - Beef Sync</title>
       </Head>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -452,10 +452,10 @@ export default function ColetaFiv() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
               <BeakerIcon className="h-8 w-8 mr-2 text-pink-600" />
-              Coleta de OÃ³citos (FIV)
+              Coleta de Oócitos (FIV)
             </h1>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              GestÃ£o de coletas para FertilizaÃ§Ã£o In Vitro
+              Gestão de coletas para Fertilização In Vitro
             </p>
           </div>
           <div className="flex gap-2">
@@ -487,10 +487,10 @@ export default function ColetaFiv() {
               
               {/* Common Data Section */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-6 border-b border-gray-200 dark:border-gray-700">
-                 {/* LaboratÃ³rio */}
+                 {/* Laboratório */}
                  <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    LaboratÃ³rio *
+                    Laboratório *
                   </label>
                   <input
                     type="text"
@@ -508,10 +508,10 @@ export default function ColetaFiv() {
                   </datalist>
                 </div>
 
-                {/* VeterinÃ¡rio */}
+                {/* Veterinário */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    VeterinÃ¡rio *
+                    Veterinário *
                   </label>
                   <input
                     type="text"
@@ -543,10 +543,10 @@ export default function ColetaFiv() {
                   />
                 </div>
 
-                {/* Data TransferÃªncia (Calculada) */}
+                {/* Data Transferência (Calculada) */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Data Prevista TransferÃªncia (D+7)
+                    Data Prevista Transferência (D+7)
                   </label>
                   <input
                     type="date"
@@ -559,7 +559,7 @@ export default function ColetaFiv() {
 
               {/* Itens List Section */}
               <div>
-                <h3 className="text-md font-medium text-gray-800 dark:text-gray-200 mb-2">Doadoras e OÃ³citos</h3>
+                <h3 className="text-md font-medium text-gray-800 dark:text-gray-200 mb-2">Doadoras e Oócitos</h3>
                 
                 {formData.itens.length > 0 && (
                   <div className="mb-4 overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
@@ -568,8 +568,8 @@ export default function ColetaFiv() {
                         <tr>
                           <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Doadora</th>
                           <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Touro</th>
-                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">OÃ³citos</th>
-                          <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">AÃ§Ãµes</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Oócitos</th>
+                          <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Ações</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
@@ -670,7 +670,7 @@ export default function ColetaFiv() {
                       )}
                     </div>
 
-                    {/* Qtd OÃ³citos */}
+                    {/* Qtd Oócitos */}
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Qtd.
@@ -700,10 +700,10 @@ export default function ColetaFiv() {
                 </div>
               </div>
 
-              {/* ObservaÃ§Ãµes */}
+              {/* Observações */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  ObservaÃ§Ãµes Gerais
+                  Observações Gerais
                 </label>
                 <textarea
                   value={formData.observacoes}
@@ -745,7 +745,7 @@ export default function ColetaFiv() {
                   <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Buscar por doadora, touro, laboratÃ³rio..."
+                    placeholder="Buscar por doadora, touro, laboratório..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pl-10 pr-10 py-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm"
@@ -761,28 +761,28 @@ export default function ColetaFiv() {
                 </div>
               </div>
 
-              {/* Filtro LaboratÃ³rio */}
+              {/* Filtro Laboratório */}
               <div>
                 <select
                   value={filterLab}
                   onChange={(e) => setFilterLab(e.target.value)}
                   className="w-full py-2 px-3 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm"
                 >
-                  <option value="">Todos os laboratÃ³rios</option>
+                  <option value="">Todos os laboratórios</option>
                   {uniqueLabs.map((lab, idx) => (
                     <option key={idx} value={lab}>{lab}</option>
                   ))}
                 </select>
               </div>
 
-              {/* Filtro VeterinÃ¡rio */}
+              {/* Filtro Veterinário */}
               <div>
                 <select
                   value={filterVet}
                   onChange={(e) => setFilterVet(e.target.value)}
                   className="w-full py-2 px-3 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm"
                 >
-                  <option value="">Todos os veterinÃ¡rios</option>
+                  <option value="">Todos os veterinários</option>
                   {uniqueVets.map((vet, idx) => (
                     <option key={idx} value={vet}>{vet}</option>
                   ))}
@@ -795,9 +795,9 @@ export default function ColetaFiv() {
                   type="date"
                   value={filterDateStart}
                   onChange={(e) => setFilterDateStart(e.target.value)}
-                  placeholder="Data inÃ­cio"
+                  placeholder="Data início"
                   className="w-full py-2 px-3 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm"
-                  title="Data inÃ­cio"
+                  title="Data início"
                 />
                 <input
                   type="date"
@@ -839,11 +839,11 @@ export default function ColetaFiv() {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Data FIV</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Doadora</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">LaboratÃ³rio</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">OÃ³citos</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Laboratório</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Oócitos</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Touro</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">TransferÃªncia</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">AÃ§Ãµes</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Transferência</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Ações</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -930,7 +930,7 @@ export default function ColetaFiv() {
           </div>
         </div>
 
-        {/* Modal de ImportaÃ§Ã£o Excel */}
+        {/* Modal de Importação Excel */}
         {showImportModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
@@ -985,14 +985,14 @@ export default function ColetaFiv() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        LaboratÃ³rio *
+                        Laboratório *
                       </label>
                       <input
                         type="text"
                         value={importLaboratorio}
                         onChange={(e) => setImportLaboratorio(e.target.value)}
                         className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                        placeholder="Digite o laboratÃ³rio..."
+                        placeholder="Digite o laboratório..."
                         list="import-lab-options"
                       />
                       <datalist id="import-lab-options">
@@ -1004,14 +1004,14 @@ export default function ColetaFiv() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        VeterinÃ¡rio *
+                        Veterinário *
                       </label>
                       <input
                         type="text"
                         value={importVeterinario}
                         onChange={(e) => setImportVeterinario(e.target.value)}
                         className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                        placeholder="Digite o veterinÃ¡rio..."
+                        placeholder="Digite o veterinário..."
                         list="import-vet-options"
                       />
                       <datalist id="import-vet-options">
@@ -1027,12 +1027,12 @@ export default function ColetaFiv() {
                       Formato esperado da planilha:
                     </h3>
                     <ul className="text-xs text-blue-800 dark:text-blue-400 space-y-1 list-disc list-inside">
-                      <li><strong>Rgd</strong> - Registro da doadora (obrigatÃ³rio)</li>
-                      <li><strong>Data</strong> - Data da FIV (obrigatÃ³rio)</li>
+                      <li><strong>Rgd</strong> - Registro da doadora (obrigatório)</li>
+                      <li><strong>Data</strong> - Data da FIV (obrigatório)</li>
                       <li><strong>Touro</strong> - Nome do touro (opcional)</li>
-                      <li><strong>Viaveis</strong> - Quantidade de oÃ³citos viÃ¡veis (usado como quantidade de oÃ³citos)</li>
-                      <li><strong>Cultivados</strong> - Quantidade cultivada (alternativa se Viaveis nÃ£o existir)</li>
-                      <li><strong>Embriao</strong>, <strong>%Emb</strong>, <strong>Cong.</strong>, <strong>NaoTe</strong>, <strong>Te</strong> - Dados adicionais (irÃ£o para observaÃ§Ãµes)</li>
+                      <li><strong>Viaveis</strong> - Quantidade de oócitos viáveis (usado como quantidade de oócitos)</li>
+                      <li><strong>Cultivados</strong> - Quantidade cultivada (alternativa se Viaveis não existir)</li>
+                      <li><strong>Embriao</strong>, <strong>%Emb</strong>, <strong>Cong.</strong>, <strong>NaoTe</strong>, <strong>Te</strong> - Dados adicionais (irão para observações)</li>
                     </ul>
                   </div>
 
@@ -1048,13 +1048,13 @@ export default function ColetaFiv() {
                     </div>
                   )}
 
-                  {/* Mensagem de validaÃ§Ã£o */}
+                  {/* Mensagem de validação */}
                   {!importFile || !importLaboratorio || !importVeterinario ? (
                     <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
                       <p className="text-sm text-yellow-800 dark:text-yellow-400">
                         {!importFile && 'Selecione um arquivo Excel para continuar.'}
-                        {importFile && !importLaboratorio && 'Preencha o campo LaboratÃ³rio para continuar.'}
-                        {importFile && importLaboratorio && !importVeterinario && 'Preencha o campo VeterinÃ¡rio para continuar.'}
+                        {importFile && !importLaboratorio && 'Preencha o campo Laboratório para continuar.'}
+                        {importFile && importLaboratorio && !importVeterinario && 'Preencha o campo Veterinário para continuar.'}
                       </p>
                     </div>
                   ) : null}
@@ -1078,7 +1078,7 @@ export default function ColetaFiv() {
                       onClick={handleImportExcel}
                       disabled={importLoading || !importFile || !importLaboratorio || !importVeterinario}
                       className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-                      title={!importFile || !importLaboratorio || !importVeterinario ? 'Preencha todos os campos obrigatÃ³rios' : ''}
+                      title={!importFile || !importLaboratorio || !importVeterinario ? 'Preencha todos os campos obrigatórios' : ''}
                     >
                       {importLoading ? (
                         <>

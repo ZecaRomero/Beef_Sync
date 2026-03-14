@@ -12,7 +12,7 @@ async function verificarConstraint() {
   const client = await pool.connect();
   
   try {
-    console.log('\n=== VERIFICANDO CONSTRAINT DE SITUA�‡�ƒO ===\n');
+    console.log('\n=== VERIFICANDO CONSTRAINT DE SITUAÇÃO ===\n');
     
     // Buscar constraint
     const result = await client.query(`
@@ -31,10 +31,10 @@ async function verificarConstraint() {
         console.log(`Definição: ${row.constraint_definition}`);
       });
     } else {
-      console.log('�Œ Nenhuma constraint de situação encontrada');
+      console.log('❌ Nenhuma constraint de situação encontrada');
     }
     
-    console.log('\n=== VALORES ATUAIS DE SITUA�‡�ƒO NO BANCO ===\n');
+    console.log('\n=== VALORES ATUAIS DE SITUAÇÃO NO BANCO ===\n');
     
     const situacoes = await client.query(`
       SELECT DISTINCT situacao, COUNT(*) as total
@@ -49,7 +49,7 @@ async function verificarConstraint() {
     });
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
   } finally {
     client.release();
     await pool.end();

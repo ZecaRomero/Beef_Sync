@@ -26,12 +26,12 @@ const SmartNotifications = ({ animals, costs }) => {
       const animalCosts = costs.filter(c => c.animalId === animal.id)
       const totalCost = animalCosts.reduce((sum, c) => sum + (parseFloat(c.valor) || 0), 0)
 
-      // 1. Alertas de VacinaÃ§Ã£o
+      // 1. Alertas de Vacinação
       const hasRecentVaccination = animalCosts.some(cost => {
-        if (cost.tipo !== 'Medicamentos' || cost.subtipo !== 'Vacinas ObrigatÃ³rias') return false
+        if (cost.tipo !== 'Medicamentos' || cost.subtipo !== 'Vacinas Obrigatórias') return false
         const costDate = new Date(cost.data)
         const daysSince = (now - costDate) / (1000 * 60 * 60 * 24)
-        return daysSince <= 365 // VacinaÃ§Ã£o nos Ãºltimos 12 meses
+        return daysSince <= 365 // Vacinação nos últimos 12 meses
       })
 
       if (ageInMonths >= 4 && !hasRecentVaccination) {
@@ -39,12 +39,12 @@ const SmartNotifications = ({ animals, costs }) => {
           id: `vaccination-${animal.id}`,
           type: 'vaccination',
           priority: 'high',
-          title: 'VacinaÃ§Ã£o Pendente',
-          message: `${animal.nome || animal.numero} precisa de vacinaÃ§Ã£o obrigatÃ³ria`,
+          title: 'Vacinação Pendente',
+          message: `${animal.nome || animal.numero} precisa de vacinação obrigatória`,
           animal: animal.nome || animal.numero,
           animalId: animal.id,
-          action: 'Agendar vacinaÃ§Ã£o',
-          icon: 'ðÅ¸â€™â€°',
+          action: 'Agendar vacinação',
+          icon: '💉',
           color: 'red',
           createdAt: now.toISOString()
         })
@@ -53,7 +53,7 @@ const SmartNotifications = ({ animals, costs }) => {
       // 2. Alertas de Peso
       const expectedWeights = {
         'Macho': { 6: 180, 12: 300, 18: 420, 24: 520, 36: 650 },
-        'FÃªmea': { 6: 150, 12: 250, 18: 350, 24: 420, 36: 500 }
+        'Fêmea': { 6: 150, 12: 250, 18: 350, 24: 420, 36: 500 }
       }
 
       const weights = expectedWeights[animal.sexo] || expectedWeights['Macho']
@@ -65,11 +65,11 @@ const SmartNotifications = ({ animals, costs }) => {
           type: 'weight',
           priority: 'medium',
           title: 'Peso Abaixo do Esperado',
-          message: `${animal.nome || animal.numero} estÃ¡ com ${animal.peso}kg (esperado: ${expectedWeight}kg)`,
+          message: `${animal.nome || animal.numero} está com ${animal.peso}kg (esperado: ${expectedWeight}kg)`,
           animal: animal.nome || animal.numero,
           animalId: animal.id,
           action: 'Revisar manejo',
-          icon: 'âÅ¡â€“ï¸�',
+          icon: '⚖️',
           color: 'yellow',
           createdAt: now.toISOString()
         })
@@ -83,11 +83,11 @@ const SmartNotifications = ({ animals, costs }) => {
           type: 'cost',
           priority: 'low',
           title: 'Custo Elevado',
-          message: `${animal.nome || animal.numero} tem custos de ${formatCurrency(totalCost)} (mÃ©dia: ${formatCurrency(avgCostPerAnimal)})`,
+          message: `${animal.nome || animal.numero} tem custos de ${formatCurrency(totalCost)} (média: ${formatCurrency(avgCostPerAnimal)})`,
           animal: animal.nome || animal.numero,
           animalId: animal.id,
           action: 'Revisar custos',
-          icon: 'ðÅ¸â€™¸',
+          icon: '💸',
           color: 'orange',
           createdAt: now.toISOString()
         })
@@ -96,7 +96,7 @@ const SmartNotifications = ({ animals, costs }) => {
       // 4. Alertas Reprodutivos
       if (animal.sexo === 'Macho' && ageInMonths >= 24) {
         const hasAndrologico = animalCosts.some(cost => 
-          cost.tipo === 'VeterinÃ¡rios' && cost.subtipo === 'AndrolÃ³gico'
+          cost.tipo === 'Veterinários' && cost.subtipo === 'Andrológico'
         )
         
         if (!hasAndrologico) {
@@ -105,18 +105,18 @@ const SmartNotifications = ({ animals, costs }) => {
             type: 'reproductive',
             priority: 'medium',
             title: 'Exame Reprodutivo Pendente',
-            message: `${animal.nome || animal.numero} precisa de exame androlÃ³gico`,
+            message: `${animal.nome || animal.numero} precisa de exame andrológico`,
             animal: animal.nome || animal.numero,
             animalId: animal.id,
             action: 'Agendar exame',
-            icon: 'ðÅ¸â€�¬',
+            icon: '🔬',
             color: 'blue',
             createdAt: now.toISOString()
           })
         }
       }
 
-      // 5. Alertas de Idade AvanÃ§ada
+      // 5. Alertas de Idade Avançada
       if (ageInMonths >= 120) { // 10 anos
         alerts.push({
           id: `age-${animal.id}`,
@@ -127,7 +127,7 @@ const SmartNotifications = ({ animals, costs }) => {
           animal: animal.nome || animal.numero,
           animalId: animal.id,
           action: 'Avaliar aposentadoria',
-          icon: 'ðÅ¸â€˜´',
+          icon: '👴',
           color: 'gray',
           createdAt: now.toISOString()
         })
@@ -178,7 +178,7 @@ const SmartNotifications = ({ animals, costs }) => {
       medium: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
       low: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
     }
-    const labels = { high: 'Alta', medium: 'MÃ©dia', low: 'Baixa' }
+    const labels = { high: 'Alta', medium: 'Média', low: 'Baixa' }
     
     return (
       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${badges[priority]}`}>
@@ -201,7 +201,7 @@ const SmartNotifications = ({ animals, costs }) => {
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-          ðÅ¸â€�â€� NotificaÃ§Ãµes Inteligentes
+          🔔 Notificações Inteligentes
         </h3>
         <div className="flex space-x-2">
           <button
@@ -232,19 +232,19 @@ const SmartNotifications = ({ animals, costs }) => {
                 : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
             }`}
           >
-            MÃ©dia ({priorityCounts.medium || 0})
+            Média ({priorityCounts.medium || 0})
           </button>
         </div>
       </div>
       
       {filteredNotifications.length === 0 ? (
         <div className="text-center py-8">
-          <div className="text-green-400 dark:text-green-500 text-4xl mb-2">âÅ“â€¦</div>
+          <div className="text-green-400 dark:text-green-500 text-4xl mb-2">✅</div>
           <p className="text-gray-500 dark:text-gray-400">
-            {filter === 'all' ? 'Nenhuma notificaÃ§Ã£o no momento' : `Nenhuma notificaÃ§Ã£o de prioridade ${filter}`}
+            {filter === 'all' ? 'Nenhuma notificação no momento' : `Nenhuma notificação de prioridade ${filter}`}
           </p>
           <p className="text-sm text-gray-400 dark:text-gray-500">
-            Seu rebanho estÃ¡ em dia!
+            Seu rebanho está em dia!
           </p>
         </div>
       ) : (

@@ -38,7 +38,7 @@ const LocationReport = ({ filters, period, onClose }) => {
         }
       }
 
-      console.log('LocationReport: Enviando requisiÃ§Ã£o:', requestData)
+      console.log('LocationReport: Enviando requisição:', requestData)
 
       const response = await fetch('/api/reports/generate', {
         method: 'POST',
@@ -62,10 +62,10 @@ const LocationReport = ({ filters, period, onClose }) => {
         setReportData(result.data.data.location_report)
       } else {
         console.error('LocationReport: Estrutura de dados inesperada:', result)
-        throw new Error('Dados do relatÃ³rio nÃ£o encontrados')
+        throw new Error('Dados do relatório não encontrados')
       }
     } catch (err) {
-      console.error('Erro ao carregar relatÃ³rio de localizaÃ§Ã£o:', err)
+      console.error('Erro ao carregar relatório de localização:', err)
       setError(err.message)
     } finally {
       setLoading(false)
@@ -78,18 +78,18 @@ const LocationReport = ({ filters, period, onClose }) => {
   }
 
   const tabs = [
-    { id: 'localizacao_atual', name: 'LocalizaÃ§Ã£o Atual', icon: MapPinIcon },
+    { id: 'localizacao_atual', name: 'Localização Atual', icon: MapPinIcon },
     { id: 'animais_por_piquete', name: 'Por Piquete', icon: ChartBarIcon },
-    { id: 'historico_movimentacoes', name: 'HistÃ³rico', icon: ClockIcon },
+    { id: 'historico_movimentacoes', name: 'Histórico', icon: ClockIcon },
     { id: 'movimentacoes_recentes', name: 'Recentes', icon: ArrowRightIcon },
-    { id: 'animais_sem_localizacao', name: 'Sem LocalizaÃ§Ã£o', icon: ExclamationTriangleIcon }
+    { id: 'animais_sem_localizacao', name: 'Sem Localização', icon: ExclamationTriangleIcon }
   ]
 
   if (loading) {
     return (
       <div className="p-8 text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p className="text-gray-600 dark:text-gray-400">Carregando relatÃ³rio de localizaÃ§Ã£o...</p>
+        <p className="text-gray-600 dark:text-gray-400">Carregando relatório de localização...</p>
       </div>
     )
   }
@@ -98,7 +98,7 @@ const LocationReport = ({ filters, period, onClose }) => {
     return (
       <div className="p-8 text-center">
         <ExclamationTriangleIcon className="h-12 w-12 text-red-500 mx-auto mb-4" />
-        <p className="text-red-600 dark:text-red-400 mb-4">Erro ao carregar relatÃ³rio: {error}</p>
+        <p className="text-red-600 dark:text-red-400 mb-4">Erro ao carregar relatório: {error}</p>
         <button
           onClick={fetchLocationReport}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -114,7 +114,7 @@ const LocationReport = ({ filters, period, onClose }) => {
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
           <MapPinIcon className="h-5 w-5 mr-2 text-orange-500" />
-          LocalizaÃ§Ã£o Atual dos Animais
+          Localização Atual dos Animais
         </h3>
         <span className="text-sm text-gray-500 dark:text-gray-400">
           {reportData?.localizacao_atual?.length || 0} animais
@@ -129,7 +129,7 @@ const LocationReport = ({ filters, period, onClose }) => {
                 Animal
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                RaÃ§a
+                Raça
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Sexo
@@ -141,7 +141,7 @@ const LocationReport = ({ filters, period, onClose }) => {
                 Data Entrada
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                ResponsÃ¡vel
+                Responsável
               </th>
             </tr>
           </thead>
@@ -164,7 +164,7 @@ const LocationReport = ({ filters, period, onClose }) => {
                     animal.piquete ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 
                     'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                   }`}>
-                    {animal.piquete || 'Sem localizaÃ§Ã£o'}
+                    {animal.piquete || 'Sem localização'}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
@@ -186,7 +186,7 @@ const LocationReport = ({ filters, period, onClose }) => {
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
           <ChartBarIcon className="h-5 w-5 mr-2 text-orange-500" />
-          DistribuiÃ§Ã£o por Piquete
+          Distribuição por Piquete
         </h3>
       </div>
       
@@ -207,7 +207,7 @@ const LocationReport = ({ filters, period, onClose }) => {
                 <span className="font-medium">{piquete.machos || 0}</span>
               </div>
               <div className="flex justify-between">
-                <span>FÃªmeas:</span>
+                <span>Fêmeas:</span>
                 <span className="font-medium">{piquete.femeas || 0}</span>
               </div>
             </div>
@@ -222,10 +222,10 @@ const LocationReport = ({ filters, period, onClose }) => {
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
           <ClockIcon className="h-5 w-5 mr-2 text-orange-500" />
-          HistÃ³rico de MovimentaÃ§Ãµes
+          Histórico de Movimentações
         </h3>
         <span className="text-sm text-gray-500 dark:text-gray-400">
-          {reportData?.historico_movimentacoes?.length || 0} movimentaÃ§Ãµes
+          {reportData?.historico_movimentacoes?.length || 0} movimentações
         </span>
       </div>
       
@@ -243,7 +243,7 @@ const LocationReport = ({ filters, period, onClose }) => {
                 Entrada
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                SaÃ­da
+                Saída
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Dias
@@ -289,10 +289,10 @@ const LocationReport = ({ filters, period, onClose }) => {
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
           <ArrowRightIcon className="h-5 w-5 mr-2 text-orange-500" />
-          MovimentaÃ§Ãµes Recentes
+          Movimentações Recentes
         </h3>
         <span className="text-sm text-gray-500 dark:text-gray-400">
-          {reportData?.movimentacoes_recentes?.length || 0} movimentaÃ§Ãµes
+          {reportData?.movimentacoes_recentes?.length || 0} movimentações
         </span>
       </div>
       
@@ -308,10 +308,10 @@ const LocationReport = ({ filters, period, onClose }) => {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {mov.serie}-{mov.rg} ââ€ â€™ {mov.piquete}
+                    {mov.serie}-{mov.rg} → {mov.piquete}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {mov.motivo_movimentacao || 'MovimentaÃ§Ã£o'}
+                    {mov.motivo_movimentacao || 'Movimentação'}
                   </p>
                 </div>
               </div>
@@ -335,7 +335,7 @@ const LocationReport = ({ filters, period, onClose }) => {
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
           <ExclamationTriangleIcon className="h-5 w-5 mr-2 text-red-500" />
-          Animais Sem LocalizaÃ§Ã£o
+          Animais Sem Localização
         </h3>
         <span className="text-sm text-red-500 dark:text-red-400">
           {reportData?.animais_sem_localizacao?.length || 0} animais
@@ -353,7 +353,7 @@ const LocationReport = ({ filters, period, onClose }) => {
                     {animal.serie}-{animal.rg}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {animal.raca} ââ‚¬¢ {animal.sexo}
+                    {animal.raca} • {animal.sexo}
                   </p>
                 </div>
               </div>
@@ -362,9 +362,9 @@ const LocationReport = ({ filters, period, onClose }) => {
         </div>
       ) : (
         <div className="text-center py-8">
-          <div className="text-green-500 text-4xl mb-2">âÅ“â€¦</div>
+          <div className="text-green-500 text-4xl mb-2">✅</div>
           <p className="text-gray-600 dark:text-gray-400">
-            Todos os animais possuem localizaÃ§Ã£o definida!
+            Todos os animais possuem localização definida!
           </p>
         </div>
       )}
@@ -395,17 +395,17 @@ const LocationReport = ({ filters, period, onClose }) => {
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
             <MapPinIcon className="h-8 w-8 mr-3 text-orange-500" />
-            RelatÃ³rio de LocalizaÃ§Ã£o
+            Relatório de Localização
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            PerÃ­odo: {formatDate(period.startDate)} atÃ© {formatDate(period.endDate)}
+            Período: {formatDate(period.startDate)} até {formatDate(period.endDate)}
           </p>
         </div>
         <button
           onClick={onClose}
           className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
         >
-          âÅ“â€¢ Fechar
+          ✕ Fechar
         </button>
       </div>
 

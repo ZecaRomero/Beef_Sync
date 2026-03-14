@@ -23,12 +23,12 @@ class ApiRefactor {
 
   // Escanear todas as rotas de API
   async scanApiRoutes() {
-    console.log('�Ÿ”� Escaneando rotas de API...')
+    console.log('🔍 Escaneando rotas de API...')
     
     const apiDir = path.join(process.cwd(), 'pages', 'api')
     await this.scanDirectory(apiDir, '/api')
     
-    console.log(`�Ÿ“Š Encontradas ${this.apiRoutes.length} rotas de API`)
+    console.log(`📊 Encontradas ${this.apiRoutes.length} rotas de API`)
     return this.apiRoutes
   }
 
@@ -59,7 +59,7 @@ class ApiRefactor {
 
   // Verificar conectividade das APIs
   async checkApiConnectivity() {
-    console.log('�Ÿ”Œ Verificando conectividade das APIs...')
+    console.log('🔌 Verificando conectividade das APIs...')
     
     const results = []
     
@@ -79,10 +79,10 @@ class ApiRefactor {
         
         if (isWorking) {
           this.stats.working++
-          console.log(`    �œ… OK (${responseTime}ms)`)
+          console.log(`    ✅ OK (${responseTime}ms)`)
         } else {
           this.stats.errors++
-          console.log(`    �Œ ERRO ${response.status}`)
+          console.log(`    ❌ ERRO ${response.status}`)
         }
         
         results.push({
@@ -95,7 +95,7 @@ class ApiRefactor {
         
       } catch (error) {
         this.stats.errors++
-        console.log(`    �Œ ERRO: ${error.message}`)
+        console.log(`    ❌ ERRO: ${error.message}`)
         
         results.push({
           ...api,
@@ -114,7 +114,7 @@ class ApiRefactor {
 
   // Verificar estrutura do banco de dados
   async checkDatabaseStructure() {
-    console.log('�Ÿ—„️  Verificando estrutura do banco de dados...')
+    console.log('🗄️  Verificando estrutura do banco de dados...')
     
     try {
       const dbStatus = await testConnection()
@@ -124,7 +124,7 @@ class ApiRefactor {
         return false
       }
       
-      console.log('  �œ… Conexão com banco OK')
+      console.log('  ✅ Conexão com banco OK')
       
       // Verificar tabelas principais
       const tables = [
@@ -136,10 +136,10 @@ class ApiRefactor {
       for (const table of tables) {
         try {
           const result = await query(`SELECT COUNT(*) as count FROM ${table}`)
-          console.log(`  �œ… Tabela ${table}: ${result.rows[0].count} registros`)
+          console.log(`  ✅ Tabela ${table}: ${result.rows[0].count} registros`)
         } catch (error) {
           this.errors.push(`Erro na tabela ${table}: ${error.message}`)
-          console.log(`  �Œ Tabela ${table}: ERRO`)
+          console.log(`  ❌ Tabela ${table}: ERRO`)
         }
       }
       
@@ -152,7 +152,7 @@ class ApiRefactor {
 
   // Refatorar APIs com problemas
   async refactorApis(apiResults) {
-    console.log('�Ÿ”� Refatorando APIs com problemas...')
+    console.log('🔧 Refatorando APIs com problemas...')
     
     const errorApis = apiResults.filter(api => api.status === 'error')
     
@@ -177,14 +177,14 @@ class ApiRefactor {
       if (!content.includes('try') || !content.includes('catch')) {
         const refactoredContent = this.addErrorHandling(content, api.name)
         fs.writeFileSync(api.file, refactoredContent)
-        console.log(`    �œ… Adicionado tratamento de erro`)
+        console.log(`    ✅ Adicionado tratamento de erro`)
       }
       
       // Verificar se tem validação de método HTTP
       if (!content.includes('req.method')) {
         const validatedContent = this.addMethodValidation(content)
         fs.writeFileSync(api.file, validatedContent)
-        console.log(`    �œ… Adicionada validação de método`)
+        console.log(`    ✅ Adicionada validação de método`)
       }
       
     } catch (error) {
@@ -262,24 +262,24 @@ export default async function handler(req, res) {
 
   // Gerar relatório de refatoração
   generateReport() {
-    console.log('\n�Ÿ“‹ RELAT�“RIO DE REFATORA�‡�ƒO')
+    console.log('\n📋 RELATÓRIO DE REFATORAÇÃO')
     console.log('=' .repeat(50))
     
-    console.log(`�Ÿ“Š Estatísticas:`)
+    console.log(`📊 Estatísticas:`)
     console.log(`  Total de APIs: ${this.stats.total}`)
     console.log(`  APIs funcionando: ${this.stats.working}`)
     console.log(`  APIs com erro: ${this.stats.errors}`)
     console.log(`  APIs refatoradas: ${this.stats.refactored}`)
     
     if (this.errors.length > 0) {
-      console.log(`\n�Œ Erros encontrados (${this.errors.length}):`)
+      console.log(`\n❌ Erros encontrados (${this.errors.length}):`)
       this.errors.forEach((error, index) => {
         console.log(`  ${index + 1}. ${error}`)
       })
     }
     
     if (this.warnings.length > 0) {
-      console.log(`\n�š�️  Avisos (${this.warnings.length}):`)
+      console.log(`\n⚠️  Avisos (${this.warnings.length}):`)
       this.warnings.forEach((warning, index) => {
         console.log(`  ${index + 1}. ${warning}`)
       })
@@ -289,26 +289,26 @@ export default async function handler(req, res) {
       ? ((this.stats.working / this.stats.total) * 100).toFixed(1)
       : 0
     
-    console.log(`\n�ŸŽ� Taxa de sucesso: ${successRate}%`)
+    console.log(`\n🎯 Taxa de sucesso: ${successRate}%`)
     
     if (successRate >= 90) {
-      console.log('�ŸŽ‰ Excelente! A maioria das APIs está funcionando corretamente.')
+      console.log('🎉 Excelente! A maioria das APIs está funcionando corretamente.')
     } else if (successRate >= 70) {
-      console.log('�š�️  Atenção: Algumas APIs precisam de correção.')
+      console.log('⚠️  Atenção: Algumas APIs precisam de correção.')
     } else {
-      console.log('�Ÿš� Crítico: Muitas APIs estão com problemas.')
+      console.log('🚨 Crítico: Muitas APIs estão com problemas.')
     }
   }
 
   // Executar refatoração completa
   async run() {
-    console.log('�Ÿš€ Iniciando refatoração das APIs do Beef Sync...\n')
+    console.log('🚀 Iniciando refatoração das APIs do Beef Sync...\n')
     
     try {
       // 1. Verificar banco de dados
       const dbOk = await this.checkDatabaseStructure()
       if (!dbOk) {
-        console.log('�Œ Falha na verificação do banco de dados')
+        console.log('❌ Falha na verificação do banco de dados')
         return
       }
       
@@ -316,15 +316,15 @@ export default async function handler(req, res) {
       await this.scanApiRoutes()
       
       // 3. Verificar conectividade (apenas se servidor estiver rodando)
-      console.log('�š�️  Para verificar conectividade, certifique-se de que o servidor está rodando na porta 3020')
+      console.log('⚠️  Para verificar conectividade, certifique-se de que o servidor está rodando na porta 3020')
       
       // 4. Gerar relatório
       this.generateReport()
       
-      console.log('\n�œ… Refatoração concluída!')
+      console.log('\n✅ Refatoração concluída!')
       
     } catch (error) {
-      console.error('�Œ Erro durante a refatoração:', error)
+      console.error('❌ Erro durante a refatoração:', error)
       process.exit(1)
     }
   }

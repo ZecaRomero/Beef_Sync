@@ -17,7 +17,7 @@ export default function DatabaseStatus() {
     } catch (error) {
       setStatus({
         status: 'error',
-        message: 'Erro ao testar conexÃ£o',
+        message: 'Erro ao testar conexão',
         connected: false,
         error: error.message
       })
@@ -41,7 +41,7 @@ export default function DatabaseStatus() {
                 Status do Banco de Dados PostgreSQL
               </h1>
               <p className="mt-1 text-sm text-gray-600">
-                Monitoramento da conectividade e configuraÃ§Ã£o do banco de dados
+                Monitoramento da conectividade e configuração do banco de dados
               </p>
             </div>
 
@@ -75,7 +75,7 @@ export default function DatabaseStatus() {
                       : 'bg-blue-600 text-white hover:bg-blue-700'
                   }`}
                 >
-                  {loading ? 'Testando...' : 'Testar ConexÃ£o'}
+                  {loading ? 'Testando...' : 'Testar Conexão'}
                 </button>
               </div>
 
@@ -83,7 +83,7 @@ export default function DatabaseStatus() {
                 <div className="space-y-4">
                   <div className="bg-gray-50 rounded-lg p-4">
                     <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      Status da ConexÃ£o
+                      Status da Conexão
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
@@ -93,7 +93,7 @@ export default function DatabaseStatus() {
                             ? 'bg-green-100 text-green-800' 
                             : 'bg-red-100 text-red-800'
                         }`}>
-                          {isConnected ? 'Sim' : 'NÃ£o'}
+                          {isConnected ? 'Sim' : 'Não'}
                         </span>
                       </div>
                       <div>
@@ -114,7 +114,7 @@ export default function DatabaseStatus() {
                       </div>
                       {lastTest && (
                         <div>
-                          <span className="text-sm text-gray-600">ÃÅ¡ltimo Teste:</span>
+                          <span className="text-sm text-gray-600">Último Teste:</span>
                           <span className="ml-2 text-sm text-gray-900">
                             {new Date(lastTest).toLocaleString('pt-BR')}
                           </span>
@@ -126,7 +126,7 @@ export default function DatabaseStatus() {
                   {status.config && (
                     <div className="bg-gray-50 rounded-lg p-4">
                       <h3 className="text-lg font-medium text-gray-900 mb-2">
-                        ConfiguraÃ§Ã£o da ConexÃ£o
+                        Configuração da Conexão
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -138,7 +138,7 @@ export default function DatabaseStatus() {
                           <span className="ml-2 text-sm text-gray-900">{status.config.database}</span>
                         </div>
                         <div>
-                          <span className="text-sm text-gray-600">UsuÃ¡rio:</span>
+                          <span className="text-sm text-gray-600">Usuário:</span>
                           <span className="ml-2 text-sm text-gray-900">{status.config.user}</span>
                         </div>
                         <div>
@@ -152,15 +152,15 @@ export default function DatabaseStatus() {
                   {status.poolInfo && (
                     <div className="bg-gray-50 rounded-lg p-4">
                       <h3 className="text-lg font-medium text-gray-900 mb-2">
-                        InformaÃ§Ãµes do Pool
+                        Informações do Pool
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                          <span className="text-sm text-gray-600">Total de ConexÃµes:</span>
+                          <span className="text-sm text-gray-600">Total de Conexões:</span>
                           <span className="ml-2 text-sm text-gray-900">{status.poolInfo.totalCount}</span>
                         </div>
                         <div>
-                          <span className="text-sm text-gray-600">ConexÃµes Idle:</span>
+                          <span className="text-sm text-gray-600">Conexões Idle:</span>
                           <span className="ml-2 text-sm text-gray-900">{status.poolInfo.idleCount}</span>
                         </div>
                         <div>
@@ -202,7 +202,7 @@ export default function DatabaseStatus() {
                   {status.suggestion && (
                     <div className="bg-yellow-50 rounded-lg p-4">
                       <h3 className="text-lg font-medium text-yellow-900 mb-2">
-                        SugestÃ£o
+                        Sugestão
                       </h3>
                       <p className="text-sm text-yellow-700">
                         {status.suggestion}
@@ -214,12 +214,12 @@ export default function DatabaseStatus() {
 
               {!status && !loading && (
                 <div className="text-center py-8">
-                  <p className="text-gray-500">Nenhum estado disponÃ­vel</p>
+                  <p className="text-gray-500">Nenhum estado disponível</p>
                   <button
                     onClick={testConnection}
                     className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                   >
-                    Testar ConexÃ£o
+                    Testar Conexão
                   </button>
                 </div>
               )}

@@ -10,7 +10,7 @@ const pool = new Pool({
 });
 
 async function criarBackupCompleto() {
-  console.log('�Ÿ”„ Criando backup completo de TODAS as tabelas...\n');
+  console.log('🔄 Criando backup completo de TODAS as tabelas...\n');
 
   try {
     // Listar TODAS as tabelas
@@ -22,7 +22,7 @@ async function criarBackupCompleto() {
     `);
 
     const tabelas = result.rows.map(r => r.table_name);
-    console.log(`�Ÿ“Š Total de tabelas encontradas: ${tabelas.length}\n`);
+    console.log(`📊 Total de tabelas encontradas: ${tabelas.length}\n`);
 
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
     const sqlFile = `backup_completo_TODAS_${timestamp}.sql`;
@@ -40,7 +40,7 @@ async function criarBackupCompleto() {
         const countResult = await pool.query(`SELECT COUNT(*) FROM ${tabela}`);
         const count = parseInt(countResult.rows[0].count);
 
-        console.log(`�Ÿ“� ${tabela}: ${count} registros`);
+        console.log(`📝 ${tabela}: ${count} registros`);
 
         // SQL Backup
         sqlContent += `-- Tabela: ${tabela} (${count} registros)\n`;
@@ -71,13 +71,13 @@ async function criarBackupCompleto() {
         sqlContent += `\n`;
 
       } catch (err) {
-        console.error(`   �Œ Erro ao processar ${tabela}:`, err.message);
+        console.error(`   ❌ Erro ao processar ${tabela}:`, err.message);
       }
     }
 
     // Salvar arquivos
     fs.writeFileSync(sqlFile, sqlContent, 'utf8');
-    console.log(`\n�œ… Backup SQL salvo: ${sqlFile}`);
+    console.log(`\n✅ Backup SQL salvo: ${sqlFile}`);
 
     jsonData.metadata = {
       tipo: 'completo_todas_tabelas',
@@ -89,14 +89,14 @@ async function criarBackupCompleto() {
     };
 
     fs.writeFileSync(jsonFile, JSON.stringify(jsonData, null, 2), 'utf8');
-    console.log(`�œ… Backup JSON salvo: ${jsonFile}`);
+    console.log(`✅ Backup JSON salvo: ${jsonFile}`);
 
-    console.log(`\n�Ÿ“Š Resumo:`);
+    console.log(`\n📊 Resumo:`);
     console.log(`   - Total de tabelas: ${tabelas.length}`);
     console.log(`   - Total de registros: ${totalRegistros}`);
 
   } catch (error) {
-    console.error('\n�Œ Erro:', error);
+    console.error('\n❌ Erro:', error);
   } finally {
     await pool.end();
   }

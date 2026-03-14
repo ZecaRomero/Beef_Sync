@@ -46,7 +46,7 @@ export default function ProductivityReport() {
         salesRes.json()
       ])
 
-      // Calcular mÃ©tricas de produtividade
+      // Calcular métricas de produtividade
       const productivity = calculateProductivityMetrics(animals, births, costs, sales, period)
       setData(productivity)
 
@@ -58,12 +58,12 @@ export default function ProductivityReport() {
     }
   }
 
-  // Calcular mÃ©tricas de produtividade
+  // Calcular métricas de produtividade
   const calculateProductivityMetrics = (animals, births, costs, sales, periodDays) => {
     const now = new Date()
     const periodStart = new Date(now.getTime() - (periodDays * 24 * 60 * 60 * 1000))
 
-    // Filtrar dados por perÃ­odo
+    // Filtrar dados por período
     const periodBirths = births.filter(birth => 
       new Date(birth.data_nascimento) >= periodStart
     )
@@ -76,7 +76,7 @@ export default function ProductivityReport() {
       new Date(sale.data_venda) >= periodStart
     )
 
-    // Calcular mÃ©tricas
+    // Calcular métricas
     const totalAnimals = animals.length
     const activeAnimals = animals.filter(a => a.status === 'ativo').length
     const birthRate = periodBirths.length
@@ -124,7 +124,7 @@ export default function ProductivityReport() {
     }
   }
 
-  // Calcular produtividade por raÃ§a
+  // Calcular produtividade por raça
   const calculateBreedProductivity = (animals, births, costs, sales) => {
     const breeds = [...new Set(animals.map(a => a.raca).filter(Boolean))]
     
@@ -155,7 +155,7 @@ export default function ProductivityReport() {
     })
   }
 
-  // Calcular produtividade por faixa etÃ¡ria
+  // Calcular produtividade por faixa etária
   const calculateAgeGroupProductivity = (animals, births, costs) => {
     const ageGroups = {
       'Bezerros (0-12m)': [],
@@ -191,7 +191,7 @@ export default function ProductivityReport() {
     })
   }
 
-  // Calcular produtividade por localizaÃ§Ã£o
+  // Calcular produtividade por localização
   const calculateLocationProductivity = (animals, births, costs) => {
     const locations = [...new Set(animals.map(a => a.localizacao).filter(Boolean))]
     
@@ -218,9 +218,9 @@ export default function ProductivityReport() {
     })
   }
 
-  // Calcular tendÃªncias
+  // Calcular tendências
   const calculateTrends = (births, costs, sales, periodDays) => {
-    const intervals = Math.min(periodDays / 7, 12) // MÃ¡ximo 12 intervalos
+    const intervals = Math.min(periodDays / 7, 12) // Máximo 12 intervalos
     const intervalDays = periodDays / intervals
     const now = new Date()
 
@@ -263,12 +263,12 @@ export default function ProductivityReport() {
     return Math.floor(diffTime / (1000 * 60 * 60 * 24 * 30.44)) // meses aproximados
   }
 
-  // Exportar relatÃ³rio
+  // Exportar relatório
   const exportReport = () => {
     if (!data) return
 
     const reportData = {
-      titulo: 'RelatÃ³rio de Produtividade',
+      titulo: 'Relatório de Produtividade',
       periodo: `${data.period} dias`,
       gerado_em: new Date().toLocaleString(),
       resumo: data.summary,
@@ -288,7 +288,7 @@ export default function ProductivityReport() {
     URL.revokeObjectURL(url)
   }
 
-  // Imprimir relatÃ³rio
+  // Imprimir relatório
   const printReport = () => {
     window.print()
   }
@@ -309,7 +309,7 @@ export default function ProductivityReport() {
     return (
       <EmptyState
         icon={ChartBarIcon}
-        title="Erro ao carregar relatÃ³rio"
+        title="Erro ao carregar relatório"
         description={error}
         action={
           <Button onClick={loadProductivityData}>
@@ -325,21 +325,21 @@ export default function ProductivityReport() {
       <EmptyState
         icon={ChartBarIcon}
         title="Nenhum dado encontrado"
-        description="NÃ£o hÃ¡ dados suficientes para gerar o relatÃ³rio de produtividade"
+        description="Não há dados suficientes para gerar o relatório de produtividade"
       />
     )
   }
 
   return (
     <div className="space-y-6">
-      {/* CabeÃ§alho */}
+      {/* Cabeçalho */}
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            RelatÃ³rio de Produtividade
+            Relatório de Produtividade
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
-            AnÃ¡lise detalhada da produtividade do rebanho
+            Análise detalhada da produtividade do rebanho
           </p>
         </div>
         <div className="flex gap-2">
@@ -348,10 +348,10 @@ export default function ProductivityReport() {
             onChange={(e) => setPeriod(e.target.value)}
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           >
-            <option value="7">ÃÅ¡ltimos 7 dias</option>
-            <option value="30">ÃÅ¡ltimos 30 dias</option>
-            <option value="90">ÃÅ¡ltimos 90 dias</option>
-            <option value="365">ÃÅ¡ltimo ano</option>
+            <option value="7">Últimos 7 dias</option>
+            <option value="30">Últimos 30 dias</option>
+            <option value="90">Últimos 90 dias</option>
+            <option value="365">Último ano</option>
           </select>
           <Button variant="outline" onClick={exportReport}>
             <DocumentArrowDownIcon className="h-4 w-4 mr-2" />
@@ -409,7 +409,7 @@ export default function ProductivityReport() {
                   {data.summary.birthRate}
                 </p>
                 <p className="text-xs text-blue-600">
-                  {data.productivity.birthsPerMonth.toFixed(1)}/mÃªs
+                  {data.productivity.birthsPerMonth.toFixed(1)}/mês
                 </p>
               </div>
               <CalendarDaysIcon className="h-8 w-8 text-purple-500" />
@@ -421,7 +421,7 @@ export default function ProductivityReport() {
           <CardBody className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Lucro LÃ­quido</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Lucro Líquido</p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   R$ {data.summary.netProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
@@ -435,11 +435,11 @@ export default function ProductivityReport() {
         </Card>
       </div>
 
-      {/* Produtividade por RaÃ§a */}
+      {/* Produtividade por Raça */}
       <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Produtividade por RaÃ§a
+            Produtividade por Raça
           </h3>
         </CardHeader>
         <CardBody>
@@ -447,7 +447,7 @@ export default function ProductivityReport() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left py-2">RaÃ§a</th>
+                  <th className="text-left py-2">Raça</th>
                   <th className="text-right py-2">Animais</th>
                   <th className="text-right py-2">Nascimentos</th>
                   <th className="text-right py-2">Custos</th>
@@ -480,11 +480,11 @@ export default function ProductivityReport() {
         </CardBody>
       </Card>
 
-      {/* Produtividade por Faixa EtÃ¡ria */}
+      {/* Produtividade por Faixa Etária */}
       <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            DistribuiÃ§Ã£o por Faixa EtÃ¡ria
+            Distribuição por Faixa Etária
           </h3>
         </CardHeader>
         <CardBody>
@@ -501,7 +501,7 @@ export default function ProductivityReport() {
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
                     R$ {group.avgCostPerAnimal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                   </p>
-                  <p className="text-xs text-gray-500">custo mÃ©dio/animal</p>
+                  <p className="text-xs text-gray-500">custo médio/animal</p>
                 </div>
               </div>
             ))}
@@ -509,11 +509,11 @@ export default function ProductivityReport() {
         </CardBody>
       </Card>
 
-      {/* Produtividade por LocalizaÃ§Ã£o */}
+      {/* Produtividade por Localização */}
       <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Produtividade por LocalizaÃ§Ã£o
+            Produtividade por Localização
           </h3>
         </CardHeader>
         <CardBody>
@@ -537,7 +537,7 @@ export default function ProductivityReport() {
                     <span className="font-medium">{location.birthRate.toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">Custo MÃ©dio:</span>
+                    <span className="text-gray-600 dark:text-gray-400">Custo Médio:</span>
                     <span className="font-medium">
                       R$ {location.avgCostPerAnimal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </span>

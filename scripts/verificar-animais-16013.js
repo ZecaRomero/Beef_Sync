@@ -14,9 +14,9 @@ async function verificar() {
   const client = await pool.connect()
   
   try {
-    console.log('ðÅ¸â€�� Buscando variaÃ§Ãµes de CJCJ 16013...\n')
+    console.log('🔍 Buscando variações de CJCJ 16013...\n')
     
-    // Buscar com diferentes variaÃ§Ãµes
+    // Buscar com diferentes variações
     const result = await client.query(`
       SELECT id, serie, rg, nome, situacao, valor_venda
       FROM animais
@@ -26,10 +26,10 @@ async function verificar() {
     `)
 
     if (result.rows.length === 0) {
-      console.log('â�Å’ Nenhum animal encontrado com RG 16013')
+      console.log('❌ Nenhum animal encontrado com RG 16013')
       
       // Buscar pelo nome
-      console.log('\nðÅ¸â€�� Buscando por nome MANERA...\n')
+      console.log('\n🔍 Buscando por nome MANERA...\n')
       const nomeResult = await client.query(`
         SELECT id, serie, rg, nome, situacao, valor_venda
         FROM animais
@@ -38,20 +38,20 @@ async function verificar() {
       `)
       
       if (nomeResult.rows.length > 0) {
-        console.log('ðÅ¸â€œâ€¹ Animais encontrados com MANERA:')
+        console.log('📋 Animais encontrados com MANERA:')
         nomeResult.rows.forEach(a => {
-          console.log(`  ââ‚¬¢ ID: ${a.id} | ${a.serie} ${a.rg} | ${a.nome} | ${a.situacao}`)
+          console.log(`  • ID: ${a.id} | ${a.serie} ${a.rg} | ${a.nome} | ${a.situacao}`)
         })
       }
     } else {
-      console.log('ðÅ¸â€œâ€¹ Animais encontrados:')
+      console.log('📋 Animais encontrados:')
       result.rows.forEach(a => {
-        console.log(`  ââ‚¬¢ ID: ${a.id} | ${a.serie} ${a.rg} | ${a.nome} | ${a.situacao} | Valor: R$ ${a.valor_venda || 0}`)
+        console.log(`  • ID: ${a.id} | ${a.serie} ${a.rg} | ${a.nome} | ${a.situacao} | Valor: R$ ${a.valor_venda || 0}`)
       })
     }
 
-    // Buscar tambÃ©m a CJCJ 17037
-    console.log('\nðÅ¸â€�� Verificando CJCJ 17037...\n')
+    // Buscar também a CJCJ 17037
+    console.log('\n🔍 Verificando CJCJ 17037...\n')
     const result17037 = await client.query(`
       SELECT id, serie, rg, nome, situacao, valor_venda
       FROM animais
@@ -59,14 +59,14 @@ async function verificar() {
     `)
     
     if (result17037.rows.length > 0) {
-      console.log('ðÅ¸â€œâ€¹ CJCJ 17037:')
+      console.log('📋 CJCJ 17037:')
       result17037.rows.forEach(a => {
-        console.log(`  ââ‚¬¢ ID: ${a.id} | ${a.serie} ${a.rg} | ${a.nome} | ${a.situacao} | Valor: R$ ${a.valor_venda || 0}`)
+        console.log(`  • ID: ${a.id} | ${a.serie} ${a.rg} | ${a.nome} | ${a.situacao} | Valor: R$ ${a.valor_venda || 0}`)
       })
     }
     
   } catch (error) {
-    console.error('â�Å’ Erro:', error)
+    console.error('❌ Erro:', error)
   } finally {
     client.release()
     await pool.end()

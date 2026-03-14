@@ -12,7 +12,7 @@ export default function FormularioEmbriao({ novoItem, setNovoItem, adicionarItem
   return (
     <div className="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg">
       <h4 className="font-semibold text-indigo-900 dark:text-indigo-100 mb-3">
-        ðÅ¸§« Adicionar EmbriÃ£o
+        🧫 Adicionar Embrião
       </h4>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
@@ -43,7 +43,7 @@ export default function FormularioEmbriao({ novoItem, setNovoItem, adicionarItem
 
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            RaÃ§a
+            Raça
           </label>
           <input
             type="text"
@@ -56,7 +56,7 @@ export default function FormularioEmbriao({ novoItem, setNovoItem, adicionarItem
 
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Quantidade de EmbriÃµes *
+            Quantidade de Embriões *
           </label>
           <input
             type="number"
@@ -69,7 +69,7 @@ export default function FormularioEmbriao({ novoItem, setNovoItem, adicionarItem
 
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Valor UnitÃ¡rio * (R$)
+            Valor Unitário * (R$)
           </label>
           <div className="relative">
             <span className="absolute left-3 top-2.5 text-gray-500 dark:text-gray-400">R$</span>
@@ -110,7 +110,7 @@ export default function FormularioEmbriao({ novoItem, setNovoItem, adicionarItem
 
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Tipo de EmbriÃ£o
+            Tipo de Embrião
           </label>
           <select
             value={novoItem.tipoEmbriao}
@@ -161,7 +161,7 @@ export default function FormularioEmbriao({ novoItem, setNovoItem, adicionarItem
           className="flex items-center space-x-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
         >
           <PlusIcon className="h-5 w-5" />
-          <span>Adicionar EmbriÃ£o</span>
+          <span>Adicionar Embrião</span>
         </button>
       </div>
     </div>

@@ -9,7 +9,7 @@ async function handler(req, res) {
   const { title, date, touros } = req.body
 
   if (!touros || !Array.isArray(touros) || touros.length === 0) {
-    return sendValidationError(res, 'Lista de touros Ã© obrigatÃ³ria')
+    return sendValidationError(res, 'Lista de touros é obrigatória')
   }
 
   try {
@@ -19,19 +19,19 @@ async function handler(req, res) {
     workbook.creator = 'Beef-Sync'
     workbook.created = new Date()
     workbook.modified = new Date()
-    workbook.title = 'RelatÃ³rio de Coleta de SÃªmen'
-    workbook.subject = 'Coleta de SÃªmen - Beef-Sync'
+    workbook.title = 'Relatório de Coleta de Sêmen'
+    workbook.subject = 'Coleta de Sêmen - Beef-Sync'
 
-    const worksheet = workbook.addWorksheet('Coleta de SÃªmen')
+    const worksheet = workbook.addWorksheet('Coleta de Sêmen')
 
-    // ConfiguraÃ§Ãµes da planilha
+    // Configurações da planilha
     worksheet.properties.defaultRowHeight = 20
     worksheet.views = [{ showGridLines: true }]
 
-    // TÃ­tulo principal
+    // Título principal
     worksheet.mergeCells('A1:G1')
     const titleRow = worksheet.getRow(1)
-    titleRow.getCell(1).value = 'RELATÃâ€œRIO DE COLETA DE SÃÅ MEN'
+    titleRow.getCell(1).value = 'RELATÓRIO DE COLETA DE SÊMEN'
     titleRow.font = { size: 18, bold: true, color: { argb: '2563EB' } }
     titleRow.alignment = { vertical: 'middle', horizontal: 'center' }
     titleRow.height = 35
@@ -53,7 +53,7 @@ async function handler(req, res) {
 
     worksheet.mergeCells('A4:G4')
     const summaryHeaderRow = worksheet.getRow(4)
-    summaryHeaderRow.getCell(1).value = 'ðÅ¸â€œÅ  RESUMO DA COLETA'
+    summaryHeaderRow.getCell(1).value = '📊 RESUMO DA COLETA'
     summaryHeaderRow.font = { size: 14, bold: true, color: { argb: 'FFFFFF' } }
     summaryHeaderRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '3B82F6' } }
     summaryHeaderRow.alignment = { vertical: 'middle', horizontal: 'center' }
@@ -63,7 +63,7 @@ async function handler(req, res) {
     const summaryData = [
       ['Total de Touros:', touros.length],
       ['Total de Doses a Coletar:', totalDoses],
-      ['MÃ©dia de Doses por Touro:', mediaDoses]
+      ['Média de Doses por Touro:', mediaDoses]
     ]
 
     let currentRow = 5
@@ -82,18 +82,18 @@ async function handler(req, res) {
     worksheet.getRow(currentRow).height = 10
     currentRow++
 
-    // CabeÃ§alho da tabela
+    // Cabeçalho da tabela
     worksheet.mergeCells(`A${currentRow}:G${currentRow}`)
     const tableHeaderRow = worksheet.getRow(currentRow)
-    tableHeaderRow.getCell(1).value = 'ðÅ¸�â€š TOUROS PARA COLETA'
+    tableHeaderRow.getCell(1).value = '🐂 TOUROS PARA COLETA'
     tableHeaderRow.font = { size: 14, bold: true, color: { argb: 'FFFFFF' } }
     tableHeaderRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '3B82F6' } }
     tableHeaderRow.alignment = { vertical: 'middle', horizontal: 'center' }
     tableHeaderRow.height = 30
     currentRow++
 
-    // CabeÃ§alhos das colunas
-    const headers = ['Nome do Touro', 'RG', 'RaÃ§a', 'LocalizaÃ§Ã£o', 'Rack', 'Doses a Coletar', 'ObservaÃ§Ãµes']
+    // Cabeçalhos das colunas
+    const headers = ['Nome do Touro', 'RG', 'Raça', 'Localização', 'Rack', 'Doses a Coletar', 'Observações']
     const headerRow = worksheet.getRow(currentRow)
     headers.forEach((header, index) => {
       const cell = headerRow.getCell(index + 1)
@@ -165,10 +165,10 @@ async function handler(req, res) {
     totalRow.getCell(6).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'DBEAFE' } }
     currentRow += 2
 
-    // SeÃ§Ã£o de assinaturas
+    // Seção de assinaturas
     worksheet.mergeCells(`A${currentRow}:G${currentRow}`)
     const signatureHeaderRow = worksheet.getRow(currentRow)
-    signatureHeaderRow.getCell(1).value = 'âÅ“�ï¸� CONTROLE DE EXECUÃâ€¡ÃÆ’O'
+    signatureHeaderRow.getCell(1).value = '✍️ CONTROLE DE EXECUÇÃO'
     signatureHeaderRow.font = { size: 14, bold: true, color: { argb: 'FFFFFF' } }
     signatureHeaderRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '3B82F6' } }
     signatureHeaderRow.alignment = { vertical: 'middle', horizontal: 'center' }
@@ -177,9 +177,9 @@ async function handler(req, res) {
 
     // Campos de assinatura
     const signatureFields = [
-      'ResponsÃ¡vel pela Coleta:',
+      'Responsável pela Coleta:',
       'Data/Hora da Coleta:',
-      'ObservaÃ§Ãµes Gerais:'
+      'Observações Gerais:'
     ]
 
     signatureFields.forEach((field, index) => {
@@ -194,7 +194,7 @@ async function handler(req, res) {
         cell.border = { bottom: { style: 'thin' } }
         row.height = 25
       } else {
-        // Campo de observaÃ§Ãµes (mÃºltiplas linhas)
+        // Campo de observações (múltiplas linhas)
         for (let i = 0; i < 3; i++) {
           const obsRow = worksheet.getRow(currentRow + i + 1)
           worksheet.mergeCells(`A${currentRow + i + 1}:G${currentRow + i + 1}`)
@@ -211,11 +211,11 @@ async function handler(req, res) {
     worksheet.columns = [
       { width: 25 },  // Nome do Touro
       { width: 15 },  // RG
-      { width: 15 },  // RaÃ§a
-      { width: 20 },  // LocalizaÃ§Ã£o
+      { width: 15 },  // Raça
+      { width: 20 },  // Localização
       { width: 12 },  // Rack
       { width: 15 },  // Doses
-      { width: 30 }   // ObservaÃ§Ãµes
+      { width: 30 }   // Observações
     ]
 
     // Gerar buffer
@@ -231,8 +231,8 @@ async function handler(req, res) {
     res.send(Buffer.from(buffer))
 
   } catch (error) {
-    console.error('Erro ao gerar relatÃ³rio de coleta:', error)
-    return sendError(res, `Erro ao gerar relatÃ³rio: ${error.message}`)
+    console.error('Erro ao gerar relatório de coleta:', error)
+    return sendError(res, `Erro ao gerar relatório: ${error.message}`)
   }
 }
 

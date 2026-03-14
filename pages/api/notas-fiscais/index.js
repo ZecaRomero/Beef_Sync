@@ -5,25 +5,25 @@ import ExcelJS from 'exceljs'
 import path from 'path'
 import fs from 'fs'
 
-// FunÃ§Ã£o para gerar relatÃ³rio DG em Excel
+// Função para gerar relatório DG em Excel
 async function gerarRelatorioDG(nfId, numeroNF, dataNF, dataDG, itens, letra, numero, dataTE) {
   try {
     const workbook = new ExcelJS.Workbook()
     workbook.creator = 'Beef-Sync'
     workbook.created = new Date()
-    workbook.title = `RelatÃ³rio DG - NF ${numeroNF}`
-    workbook.subject = 'RelatÃ³rio de DiagnÃ³stico de GestaÃ§Ã£o - Receptoras'
+    workbook.title = `Relatório DG - NF ${numeroNF}`
+    workbook.subject = 'Relatório de Diagnóstico de Gestação - Receptoras'
 
-    const worksheet = workbook.addWorksheet('RelatÃ³rio DG')
+    const worksheet = workbook.addWorksheet('Relatório DG')
 
-    // ConfiguraÃ§Ãµes da planilha
+    // Configurações da planilha
     worksheet.properties.defaultRowHeight = 20
     worksheet.views = [{ showGridLines: true }]
 
-    // TÃ­tulo principal
+    // Título principal
     worksheet.mergeCells('A1:F1')
     const titleRow = worksheet.getRow(1)
-    titleRow.getCell(1).value = 'RELATÃâ€œRIO DE DIAGNÃâ€œSTICO DE GESTAÃâ€¡ÃÆ’O (DG) - RECEPTORAS'
+    titleRow.getCell(1).value = 'RELATÓRIO DE DIAGNÓSTICO DE GESTAÇÃO (DG) - RECEPTORAS'
     titleRow.font = { size: 16, bold: true, color: { argb: 'FFFFFFFF' } }
     titleRow.fill = {
       type: 'pattern',
@@ -33,27 +33,27 @@ async function gerarRelatorioDG(nfId, numeroNF, dataNF, dataDG, itens, letra, nu
     titleRow.alignment = { vertical: 'middle', horizontal: 'center' }
     titleRow.height = 35
 
-    // InformaÃ§Ãµes da NF
+    // Informações da NF
     worksheet.addRow([])
     worksheet.addRow(['Nota Fiscal:', numeroNF])
     worksheet.addRow(['Data de Chegada dos Animais:', new Date(dataNF).toLocaleDateString('pt-BR')])
     worksheet.addRow(['Data de TE:', new Date(dataTE).toLocaleDateString('pt-BR')])
     worksheet.addRow(['Data Prevista para DG:', new Date(dataDG).toLocaleDateString('pt-BR')])
     worksheet.addRow(['Letra:', letra])
-    worksheet.addRow(['NÃºmero:', numero])
+    worksheet.addRow(['Número:', numero])
     worksheet.addRow([])
 
-    // CabeÃ§alhos da tabela
+    // Cabeçalhos da tabela
     const headerRow = worksheet.addRow([
       'Receptora',
       'Letra',
-      'NÃºmero',
+      'Número',
       'Data de TE',
       'Data Prevista DG',
       'Status'
     ])
 
-    // Estilizar cabeÃ§alho
+    // Estilizar cabeçalho
     headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } }
     headerRow.fill = {
       type: 'pattern',
@@ -85,7 +85,7 @@ async function gerarRelatorioDG(nfId, numeroNF, dataNF, dataDG, itens, letra, nu
     worksheet.columns = [
       { width: 20 }, // Receptora
       { width: 10 }, // Letra
-      { width: 15 }, // NÃºmero
+      { width: 15 }, // Número
       { width: 15 }, // Data de TE
       { width: 18 }, // Data Prevista DG
       { width: 15 }  // Status
@@ -101,11 +101,11 @@ async function gerarRelatorioDG(nfId, numeroNF, dataNF, dataDG, itens, letra, nu
     const filepath = path.join(reportsDir, filename)
 
     await workbook.xlsx.writeFile(filepath)
-    console.log(`âÅ“â€¦ RelatÃ³rio DG salvo em: ${filepath}`)
+    console.log(`✅ Relatório DG salvo em: ${filepath}`)
 
     return { filename, filepath }
   } catch (error) {
-    console.error('Erro ao gerar relatÃ³rio DG:', error)
+    console.error('Erro ao gerar relatório DG:', error)
     throw error
   }
 }
@@ -114,10 +114,10 @@ export const config = { api: { externalResolver: true } }
 export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {
-      // Testar conexÃ£o com PostgreSQL
+      // Testar conexão com PostgreSQL
       const connectionTest = await query('SELECT NOW() as timestamp, version() as version')
       
-      // Listar todas as notas fiscais com cÃ¡lculo correto do valor total
+      // Listar todas as notas fiscais com cálculo correto do valor total
       // IMPORTANTE: Incluir explicitamente o campo destino para garantir que seja retornado
       const result = await query(`
         SELECT 
@@ -198,18 +198,18 @@ export default async function handler(req, res) {
         dataChegadaAnimais
       } = req.body
       
-      // Usar dados do fornecedor selecionado se disponÃ­vel
+      // Usar dados do fornecedor selecionado se disponível
       const fornecedorFinal = fornecedorData?.nome || fornecedor
       // Priorizar CNPJ informado manualmente, depois do fornecedor selecionado
       const cnpjFornecedorFinal = cnpjOrigemDestino || fornecedorData?.cnpj_cpf || null
       
-      // Definir incriÃ§Ã£o automaticamente se nÃ£o fornecida
+      // Definir incrição automaticamente se não fornecida
       let incricaoFinal = incricao
       if (!incricaoFinal) {
-        // PadrÃ£o: SANT ANNA
+        // Padrão: SANT ANNA
         incricaoFinal = 'SANT ANNA'
         
-        // Verificar se Ã© Pardinho pelo CNPJ
+        // Verificar se é Pardinho pelo CNPJ
         const cnpjPardinho = '18978214000445'
         if (cnpjFornecedorFinal) {
           const cnpjNormalizado = cnpjFornecedorFinal.replace(/[.\-\/\s]/g, '').trim()
@@ -218,7 +218,7 @@ export default async function handler(req, res) {
           }
         }
         
-        // Verificar se Ã© Pardinho pelo nome do fornecedor/destino
+        // Verificar se é Pardinho pelo nome do fornecedor/destino
         const fornecedorUpper = (fornecedorFinal || '').toUpperCase()
         const destinoUpper = (destino || '').toUpperCase()
         
@@ -226,18 +226,18 @@ export default async function handler(req, res) {
           incricaoFinal = 'PARDINHO'
         }
         
-        console.log(`ðÅ¸â€œâ€¹ IncriÃ§Ã£o definida automaticamente: ${incricaoFinal}`)
+        console.log(`📋 Incrição definida automaticamente: ${incricaoFinal}`)
       }
       
-      // Validar dados obrigatÃ³rios
+      // Validar dados obrigatórios
       if (!numeroNF || !data || !naturezaOperacao || !tipo || !tipoProduto) {
         return res.status(400).json({ 
-          error: 'Dados obrigatÃ³rios nÃ£o fornecidos',
+          error: 'Dados obrigatórios não fornecidos',
           required: ['numeroNF', 'data', 'naturezaOperacao', 'tipo', 'tipoProduto']
         })
       }
 
-      // Verificar se NF jÃ¡ existe
+      // Verificar se NF já existe
       const existingNF = await query(
         'SELECT id FROM notas_fiscais WHERE numero_nf = $1',
         [numeroNF]
@@ -245,12 +245,12 @@ export default async function handler(req, res) {
 
       if (existingNF.rows.length > 0) {
         return res.status(409).json({ 
-          error: 'Nota fiscal jÃ¡ existe',
+          error: 'Nota fiscal já existe',
           numeroNF 
         })
       }
 
-      // Converter data para formato DATE se necessÃ¡rio
+      // Converter data para formato DATE se necessário
       let dataFormatada = data
       if (data && typeof data === 'string' && data.includes('/')) {
         // Converter de DD/MM/YYYY para YYYY-MM-DD
@@ -258,7 +258,7 @@ export default async function handler(req, res) {
         dataFormatada = `${ano}-${mes}-${dia}`
       }
       
-      // Verificar se a coluna incricao existe, se nÃ£o, adicionar
+      // Verificar se a coluna incricao existe, se não, adicionar
       try {
         await query(`
           ALTER TABLE notas_fiscais 
@@ -278,7 +278,7 @@ export default async function handler(req, res) {
           ADD COLUMN IF NOT EXISTS motorista VARCHAR(255)
         `)
       } catch (error) {
-        // Ignorar erro se coluna jÃ¡ existe
+        // Ignorar erro se coluna já existe
         console.log('Erro ao criar colunas na tabela notas_fiscais:', error.message)
       }
 
@@ -304,7 +304,7 @@ export default async function handler(req, res) {
         }
       }
 
-      // Data de saÃ­da dos animais (para NF de saÃ­da)
+      // Data de saída dos animais (para NF de saída)
       let dataSaidaFormatada = null
       if (req.body.dataSaida) {
         if (typeof req.body.dataSaida === 'string' && req.body.dataSaida.includes('/')) {
@@ -315,7 +315,7 @@ export default async function handler(req, res) {
         }
       }
 
-      // Inserir nota fiscal (com correÃ§Ã£o automÃ¡tica da sequÃªncia se houver conflito de id)
+      // Inserir nota fiscal (com correção automática da sequência se houver conflito de id)
       const insertParams = [
         numeroNF,
         dataFormatada,
@@ -379,13 +379,13 @@ export default async function handler(req, res) {
       let valorTotalCalculado = 0
       if (itens && itens.length > 0) {
         for (const item of itens) {
-          // Normalizar valor unitÃ¡rio (converter string "1.234,56" para number 1234.56)
+          // Normalizar valor unitário (converter string "1.234,56" para number 1234.56)
           if (item.valorUnitario && typeof item.valorUnitario === 'string') {
-            // Remove pontos de milhar e substitui vÃ­rgula decimal por ponto
+            // Remove pontos de milhar e substitui vírgula decimal por ponto
             const cleanValue = item.valorUnitario.replace(/\./g, '').replace(',', '.')
             item.valorUnitario = parseFloat(cleanValue) || 0
           } else if (typeof item.valorUnitario === 'number') {
-             // JÃ¡ Ã© nÃºmero, manter
+             // Já é número, manter
           } else {
              item.valorUnitario = 0
           }
@@ -426,7 +426,7 @@ export default async function handler(req, res) {
         await query(`
           ALTER TABLE notas_fiscais_itens ADD COLUMN IF NOT EXISTS dados_item JSONB
         `)
-      } catch (e) { /* coluna jÃ¡ existe ou tabela em outro schema */ }
+      } catch (e) { /* coluna já existe ou tabela em outro schema */ }
 
       // Inserir itens
       if (itens && itens.length > 0) {
@@ -439,7 +439,7 @@ export default async function handler(req, res) {
         }
       }
 
-      // Se for sÃªmen de entrada, adicionar ao estoque
+      // Se for sêmen de entrada, adicionar ao estoque
       if (tipo === 'entrada' && tipoProduto === 'semen' && itens) {
         for (const item of itens) {
           await query(`
@@ -482,14 +482,14 @@ export default async function handler(req, res) {
       // MODIFICADO: Criar animais SEMPRE, mesmo sem receptoraLetra/receptoraNumero/dataTE
       if (tipo === 'entrada' && ehReceptoras && itens && Array.isArray(itens) && itens.length > 0) {
         try {
-          console.log('ðÅ¸�â€ž Processando NF de Receptoras...')
+          console.log('🐄 Processando NF de Receptoras...')
           console.log('Dados:', { receptoraLetra, receptoraNumero, dataTEFormatada, itensCount: itens.length })
           
-          // Calcular data do DG (15 dias apÃ³s data de chegada dos animais; se nÃ£o informada, usa data da NF)
+          // Calcular data do DG (15 dias após data de chegada dos animais; se não informada, usa data da NF)
           const dataChegadaRef = dataChegadaFormatada || dataFormatada
           const dataChegadaDate = new Date(dataChegadaRef)
           if (isNaN(dataChegadaDate.getTime())) {
-            throw new Error('Data de chegada/NF invÃ¡lida')
+            throw new Error('Data de chegada/NF inválida')
           }
           const dataDG = new Date(dataChegadaDate)
           dataDG.setDate(dataDG.getDate() + 15)
@@ -507,7 +507,7 @@ export default async function handler(req, res) {
               serieReceptora = (tatuagemParts[1] || receptoraLetra || '').trim()
               rgReceptora = tatuagemParts[2] || receptoraNumero
             } else {
-              // Fallback: tatuagem pode vir como "M9775 9775" - extrair letras e nÃºmero
+              // Fallback: tatuagem pode vir como "M9775 9775" - extrair letras e número
               const parts = (item.tatuagem || '').split(/\s+/)
               if (parts.length >= 2) {
                 serieReceptora = (parts[0] || receptoraLetra || '').replace(/\d+$/, '').trim() || 'M'
@@ -518,10 +518,10 @@ export default async function handler(req, res) {
               }
             }
 
-            // Normalizar sÃ©rie: remover dÃ­gitos do final (M9775 -> M) para evitar duplicatas
+            // Normalizar série: remover dígitos do final (M9775 -> M) para evitar duplicatas
             serieReceptora = (serieReceptora || '').replace(/\d+$/, '').trim() || serieReceptora || 'M'
 
-            // Buscar animal existente - tambÃ©m por sÃ©rie+rg concatenado (evitar duplicatas M vs M9775)
+            // Buscar animal existente - também por série+rg concatenado (evitar duplicatas M vs M9775)
             const animalResult = await query(`
               SELECT id FROM animais 
               WHERE rg = $1 AND (serie = $2 OR serie = $2 || $1)
@@ -542,7 +542,7 @@ export default async function handler(req, res) {
                 UPDATE animais SET data_chegada = $1, data_dg_prevista = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3
               `, [dataChegadaAnimal, dataDGFormatada, animalId]).catch(() => {})
             } else {
-              // Criar animal receptora se nÃ£o existir (com data_chegada e data_dg_prevista para alertas)
+              // Criar animal receptora se não existir (com data_chegada e data_dg_prevista para alertas)
               const dataDGPrevista = dataDGFormatada
               await query(`
                 ALTER TABLE animais 
@@ -568,11 +568,11 @@ export default async function handler(req, res) {
                 dataDGPrevista
               ])
               animalId = novoAnimalResult.rows[0].id
-              console.log(`âÅ“â€¦ Receptora criada: ${serieReceptora} ${rgReceptora}`)
+              console.log(`✅ Receptora criada: ${serieReceptora} ${rgReceptora}`)
             }
 
-            // Criar registro de TransferÃªncia de EmbriÃ£o (TE) se nÃ£o existir E se tiver data de TE
-            // Usar serie+rg do item (cada receptora tem sua prÃ³pria TE)
+            // Criar registro de Transferência de Embrião (TE) se não existir E se tiver data de TE
+            // Usar serie+rg do item (cada receptora tem sua própria TE)
             if (dataTEFormatada && animalId) {
               const nomeReceptora = `${serieReceptora} ${rgReceptora}`.trim() || `${receptoraLetra} ${receptoraNumero}`
               const teExistente = await query(`
@@ -596,19 +596,19 @@ export default async function handler(req, res) {
                   animalId,
                   nomeReceptora,
                   dataTEFormatada,
-                  fornecedorFinal || 'NÃ£o informado',
+                  fornecedorFinal || 'Não informado',
                   'realizada',
                   `NF de Entrada: ${numeroNF} - DG agendado para ${dataDGFormatada}`,
                   numeroNF
                 ])
-                console.log(`âÅ“â€¦ TE criada para receptora: ${nomeReceptora} (data TE: ${dataTEFormatada})`)
+                console.log(`✅ TE criada para receptora: ${nomeReceptora} (data TE: ${dataTEFormatada})`)
               }
             }
 
-            // Criar alerta/agendamento de DG (15 dias apÃ³s chegada dos animais) - SOMENTE SE TIVER DATA DE TE
+            // Criar alerta/agendamento de DG (15 dias após chegada dos animais) - SOMENTE SE TIVER DATA DE TE
             if (dataTEFormatada && animalId) {
               try {
-                // Verificar se jÃ¡ existe inseminaÃ§Ã£o para este animal nesta data
+                // Verificar se já existe inseminação para este animal nesta data
                 const iaExistente = await query(`
                   SELECT id FROM inseminacoes
                   WHERE animal_id = $1 AND data_ia = $2
@@ -630,62 +630,62 @@ export default async function handler(req, res) {
                     1,
                     dataTEFormatada, // Data da TE como data de IA
                     dataDGFormatada, // Data do DG agendado
-                    `Receptora - NF ${numeroNF}. DG agendado automaticamente para 15 dias apÃ³s chegada dos animais.`,
+                    `Receptora - NF ${numeroNF}. DG agendado automaticamente para 15 dias após chegada dos animais.`,
                     'Pendente'
                   ])
                   const nomeReceptora = `${serieReceptora} ${rgReceptora}`.trim()
-                  console.log(`ðÅ¸â€œâ€¦ DG agendado para ${dataDGFormatada} - Receptora: ${nomeReceptora}`)
+                  console.log(`📅 DG agendado para ${dataDGFormatada} - Receptora: ${nomeReceptora}`)
                 } else {
                   const nomeReceptora = `${serieReceptora} ${rgReceptora}`.trim()
-                  console.log(`ââ€ž¹ï¸� InseminaÃ§Ã£o jÃ¡ existe para receptora ${nomeReceptora}`)
+                  console.log(`ℹ️ Inseminação já existe para receptora ${nomeReceptora}`)
                 }
               } catch (error) {
                 console.error('Erro ao criar agendamento de DG:', error.message)
-                // NÃ£o falhar o processo se o agendamento de DG falhar
+                // Não falhar o processo se o agendamento de DG falhar
               }
             }
           }
         }
 
-        console.log(`âÅ“â€¦ NF de Receptoras processada com sucesso!${dataTEFormatada ? ` DG agendado para ${dataDGFormatada}` : ''}`)
+        console.log(`✅ NF de Receptoras processada com sucesso!${dataTEFormatada ? ` DG agendado para ${dataDGFormatada}` : ''}`)
 
-          // Gerar relatÃ³rio DG em Excel - SOMENTE SE TIVER DATA DE TE
+          // Gerar relatório DG em Excel - SOMENTE SE TIVER DATA DE TE
           if (dataTEFormatada && receptoraLetra && receptoraNumero) {
             try {
               await gerarRelatorioDG(nfId, numeroNF, dataChegadaFormatada || dataFormatada, dataDGFormatada, itens, receptoraLetra, receptoraNumero, dataTEFormatada)
-              console.log(`ðÅ¸â€œÅ  RelatÃ³rio DG gerado para NF ${numeroNF}`)
+              console.log(`📊 Relatório DG gerado para NF ${numeroNF}`)
             } catch (error) {
-              console.error('Erro ao gerar relatÃ³rio DG:', error)
-              // NÃ£o falhar o salvamento da NF se o relatÃ³rio nÃ£o for gerado
+              console.error('Erro ao gerar relatório DG:', error)
+              // Não falhar o salvamento da NF se o relatório não for gerado
             }
           }
         } catch (error) {
-          console.error('â�Å’ Erro ao processar Receptoras:', error)
+          console.error('❌ Erro ao processar Receptoras:', error)
           console.error('Stack:', error.stack)
-          // NÃ£o falhar o salvamento da NF se o processamento de receptoras falhar
-          // A NF jÃ¡ foi salva, apenas o processamento adicional falhou
+          // Não falhar o salvamento da NF se o processamento de receptoras falhar
+          // A NF já foi salva, apenas o processamento adicional falhou
         }
       }
 
-      // Se for bovino de entrada, adicionar aos animais e registrar no boletim contÃ¡bil
+      // Se for bovino de entrada, adicionar aos animais e registrar no boletim contábil
       if (tipo === 'entrada' && tipoProduto === 'bovino' && itens) {
         const animaisIds = []
         
-        // FunÃ§Ã£o auxiliar para calcular meses a partir da era
+        // Função auxiliar para calcular meses a partir da era
         function calcularMesesDaEra(era) {
           if (!era) return null
           const eraLower = era.toLowerCase().trim()
-          // IMPORTANTE: Verificar faixas especÃ­ficas ANTES de verificar valores isolados
+          // IMPORTANTE: Verificar faixas específicas ANTES de verificar valores isolados
           if (eraLower.includes('24/36') || eraLower.includes('24-36')) {
-            return 30 // Idade mÃ©dia da faixa 24/36 meses
+            return 30 // Idade média da faixa 24/36 meses
           }
           if (eraLower.includes('0') && eraLower.includes('3')) return 1.5
           if (eraLower.includes('3') && eraLower.includes('8')) return 5.5
           if (eraLower.includes('8') && eraLower.includes('12')) return 10
           if (eraLower.includes('12') && eraLower.includes('24')) return 18
-          // IMPORTANTE: Verificar faixas especÃ­ficas ANTES de verificar valores isolados
+          // IMPORTANTE: Verificar faixas específicas ANTES de verificar valores isolados
           if (eraLower.includes('24/36') || eraLower.includes('24-36')) {
-            return 30 // Idade mÃ©dia da faixa 24/36 meses
+            return 30 // Idade média da faixa 24/36 meses
           }
           if (eraLower.includes('25') && eraLower.includes('36')) return 30.5
           if (eraLower.includes('acima') || (eraLower.includes('36') && !eraLower.includes('24'))) return 48
@@ -695,10 +695,10 @@ export default async function handler(req, res) {
         }
         
         for (const item of itens) {
-          // Se for modo categoria, nÃ£o criar animais individuais
+          // Se for modo categoria, não criar animais individuais
           if (item.modoCadastro === 'categoria') {
             // Para modo categoria, apenas adicionar ao array de IDs vazio
-            // A movimentaÃ§Ã£o serÃ¡ registrada no boletim com a quantidade total
+            // A movimentação será registrada no boletim com a quantidade total
             continue
           }
           
@@ -722,10 +722,10 @@ export default async function handler(req, res) {
             }
           }
           
-          // Preparar observaÃ§Ãµes com informaÃ§Ãµes da NF
+          // Preparar observações com informações da NF
           const observacoesNF = [
             `NF: ${numeroNF}`,
-            `Fornecedor: ${fornecedorFinal || fornecedor || 'NÃ£o informado'}`,
+            `Fornecedor: ${fornecedorFinal || fornecedor || 'Não informado'}`,
             `Valor compra: R$ ${parseFloat(item.valorUnitario || 0).toFixed(2)}`,
             item.peso ? `Peso entrada: ${item.peso} kg` : '',
             item.era ? `Era: ${item.era}` : ''
@@ -734,7 +734,7 @@ export default async function handler(req, res) {
           let animalId = null
           try {
             const sexoRaw = String(item.sexo || '').trim().toLowerCase()
-            const sexoTexto = sexoRaw === 'macho' || sexoRaw === 'm' || sexoRaw.startsWith('macho') ? 'Macho' : 'FÃªmea'
+            const sexoTexto = sexoRaw === 'macho' || sexoRaw === 'm' || sexoRaw.startsWith('macho') ? 'Macho' : 'Fêmea'
             const mesesVal = calcularMesesDaEra(item.era)
             const pesoVal = item.peso ? parseFloat(String(item.peso).replace(',', '.')) : null
             const tatuagemVal = `${serie} ${rg}`.trim()
@@ -755,7 +755,7 @@ export default async function handler(req, res) {
               rg || (item.tatuagem || '0'),
               tatuagemVal,
               sexoTexto,
-              item.raca || 'NÃ£o informado',
+              item.raca || 'Não informado',
               mesesVal,
               pesoVal,
               observacoesNF
@@ -772,11 +772,11 @@ export default async function handler(req, res) {
           }
         }
 
-        // Verificar se o fornecedor tem CNPJ da AGROPECUÃ�RIA PARDINHO (18.978.214/0004-45)
+        // Verificar se o fornecedor tem CNPJ da AGROPECUÁRIA PARDINHO (18.978.214/0004-45)
         let cnpjFornecedor = cnpjFornecedorFinal
         let nomeFornecedor = fornecedorFinal
         
-        // Se nÃ£o tiver CNPJ nos dados do fornecedor, buscar no banco
+        // Se não tiver CNPJ nos dados do fornecedor, buscar no banco
         if (!cnpjFornecedor && fornecedorFinal) {
           try {
             const fornecedorResult = await query(`
@@ -794,7 +794,7 @@ export default async function handler(req, res) {
           }
         }
         
-        // Normalizar CNPJ para comparaÃ§Ã£o (remover pontos, barras, hÃ­fens e espaÃ§os)
+        // Normalizar CNPJ para comparação (remover pontos, barras, hífens e espaços)
         const normalizarCNPJ = (cnpj) => {
           if (!cnpj) return null
           return cnpj.replace(/[.\-\/\s]/g, '').trim()
@@ -805,23 +805,23 @@ export default async function handler(req, res) {
         const nomeFornecedorUpper = nomeFornecedor?.toUpperCase() || ''
         const incricaoUpper = (incricao || '').toUpperCase()
         
-        // Registrar movimentaÃ§Ã£o no boletim contÃ¡bil se:
-        // 1. Fornecedor for AGROPECUÃ�RIA PARDINHO (por CNPJ ou nome contendo "PARDINHO")
-        // 2. OU se a incriÃ§Ã£o for "SANT ANNA" ou "PARDINHO"
+        // Registrar movimentação no boletim contábil se:
+        // 1. Fornecedor for AGROPECUÁRIA PARDINHO (por CNPJ ou nome contendo "PARDINHO")
+        // 2. OU se a incrição for "SANT ANNA" ou "PARDINHO"
         const ehPardinho = cnpjFornecedorNormalizado === cnpjPardinho || nomeFornecedorUpper.includes('PARDINHO')
         const incricaoValida = incricaoUpper === 'SANT ANNA' || incricaoUpper === 'PARDINHO'
         
         if (ehPardinho || incricaoValida) {
           try {
-            // Obter perÃ­odo atual (formato YYYY-MM)
+            // Obter período atual (formato YYYY-MM)
             const periodoAtual = new Date().toISOString().slice(0, 7)
             
-          // Registrar movimentaÃ§Ã£o para cada item
+          // Registrar movimentação para cada item
           let animalIndex = 0
           for (let i = 0; i < itens.length; i++) {
             const item = itens[i]
             
-            // Se for modo categoria, registrar uma movimentaÃ§Ã£o com quantidade
+            // Se for modo categoria, registrar uma movimentação com quantidade
             if (item.modoCadastro === 'categoria') {
               const quantidade = parseInt(item.quantidade) || 1
               const valorTotal = parseFloat(item.valorUnitario || 0) * quantidade
@@ -833,9 +833,9 @@ export default async function handler(req, res) {
                 dataMovimento: data,
                 animalId: null, // Sem animal individual no modo categoria
                 valor: valorTotal,
-                descricao: `Compra de ${quantidade} bovino(s) via NF ${numeroNF} - ${item.tipoAnimal === 'registrado' ? 'Registrado' : 'Cria/Recria'} - ${item.sexo === 'macho' ? 'Macho' : 'FÃªmea'} - ${item.era}`,
-                observacoes: `Quantidade: ${quantidade} | Tipo: ${item.tipoAnimal === 'registrado' ? 'Registrado' : 'Cria/Recria'} | ${item.raca || 'NÃ£o informado'} | Valor unitÃ¡rio: R$ ${parseFloat(item.valorUnitario || 0).toFixed(2)}`,
-                localidade: incricao || (ehPardinho ? 'AGROPECUÃ�RIA PARDINHO LTDA' : 'SANT ANNA'),
+                descricao: `Compra de ${quantidade} bovino(s) via NF ${numeroNF} - ${item.tipoAnimal === 'registrado' ? 'Registrado' : 'Cria/Recria'} - ${item.sexo === 'macho' ? 'Macho' : 'Fêmea'} - ${item.era}`,
+                observacoes: `Quantidade: ${quantidade} | Tipo: ${item.tipoAnimal === 'registrado' ? 'Registrado' : 'Cria/Recria'} | ${item.raca || 'Não informado'} | Valor unitário: R$ ${parseFloat(item.valorUnitario || 0).toFixed(2)}`,
+                localidade: incricao || (ehPardinho ? 'AGROPECUÁRIA PARDINHO LTDA' : 'SANT ANNA'),
                 dadosExtras: {
                   numeroNF: numeroNF,
                   fornecedor: nomeFornecedor,
@@ -862,8 +862,8 @@ export default async function handler(req, res) {
                 animalId: animalId,
                 valor: parseFloat(item.valorUnitario) || 0,
                 descricao: `Compra de bovino via NF ${numeroNF}`,
-                observacoes: `Animal: ${item.tatuagem} - ${item.raca || 'NÃ£o informado'} - ${item.sexo === 'macho' ? 'Macho' : 'FÃªmea'}`,
-                localidade: incricao || (ehPardinho ? 'AGROPECUÃ�RIA PARDINHO LTDA' : 'SANT ANNA'),
+                observacoes: `Animal: ${item.tatuagem} - ${item.raca || 'Não informado'} - ${item.sexo === 'macho' ? 'Macho' : 'Fêmea'}`,
+                localidade: incricao || (ehPardinho ? 'AGROPECUÁRIA PARDINHO LTDA' : 'SANT ANNA'),
                 dadosExtras: {
                   numeroNF: numeroNF,
                   fornecedor: nomeFornecedor,
@@ -877,19 +877,19 @@ export default async function handler(req, res) {
             }
           }
           } catch (error) {
-            console.error('Erro ao registrar movimentaÃ§Ã£o no boletim contÃ¡bil:', error)
-            // NÃ£o falhar a criaÃ§Ã£o da NF se houver erro no boletim
+            console.error('Erro ao registrar movimentação no boletim contábil:', error)
+            // Não falhar a criação da NF se houver erro no boletim
           }
         }
       }
 
-      // Registrar operaÃ§Ã£o no Sistema de Lotes
+      // Registrar operação no Sistema de Lotes
       try {
         const animaisEnvolvidos = itens ? itens.map(i => i.tatuagem || i.nomeTouro || i.rgTouro).filter(Boolean).join(', ') : '';
         
         await LoteTracker.registrarOperacao({
           tipo_operacao: tipo === 'entrada' ? 'ENTRADA_NF' : 'SAIDA_NF',
-          descricao: `Nota Fiscal ${numeroNF} - ${tipo === 'entrada' ? 'Entrada' : 'SaÃ­da'} - ${fornecedorFinal || destino || 'Sem identificaÃ§Ã£o'}${animaisEnvolvidos ? ` - Animais: ${animaisEnvolvidos}` : ''}`,
+          descricao: `Nota Fiscal ${numeroNF} - ${tipo === 'entrada' ? 'Entrada' : 'Saída'} - ${fornecedorFinal || destino || 'Sem identificação'}${animaisEnvolvidos ? ` - Animais: ${animaisEnvolvidos}` : ''}`,
           detalhes: {
             id: nfId,
             numero_nf: numeroNF,
@@ -936,16 +936,16 @@ export default async function handler(req, res) {
         incricao
       } = req.body
       
-      // Usar dados do fornecedor selecionado se disponÃ­vel
+      // Usar dados do fornecedor selecionado se disponível
       const fornecedorFinal = fornecedorData?.nome || fornecedor
       // Priorizar CNPJ informado manualmente, depois do fornecedor selecionado
       const cnpjFornecedorFinal = cnpjOrigemDestino || fornecedorData?.cnpj_cpf || null
 
       if (!id) {
-        return res.status(400).json({ error: 'ID da nota fiscal Ã© obrigatÃ³rio' })
+        return res.status(400).json({ error: 'ID da nota fiscal é obrigatório' })
       }
 
-      // Converter data para formato DATE se necessÃ¡rio
+      // Converter data para formato DATE se necessário
       let dataFormatada = data
       if (data && typeof data === 'string' && data.includes('/')) {
         const [dia, mes, ano] = data.split('/')
@@ -995,7 +995,7 @@ export default async function handler(req, res) {
         RETURNING *
       `, [
         numeroNF,
-        dataFormatada, // data_compra (obrigatÃ³rio)
+        dataFormatada, // data_compra (obrigatório)
         dataFormatada, // data (opcional, mas usando o mesmo valor)
         fornecedorFinal || null,
         destino || null,
@@ -1023,7 +1023,7 @@ export default async function handler(req, res) {
       ])
 
       if (result.rows.length === 0) {
-        return res.status(404).json({ error: 'Nota fiscal nÃ£o encontrada' })
+        return res.status(404).json({ error: 'Nota fiscal não encontrada' })
       }
 
       // Deletar itens antigos
@@ -1077,25 +1077,25 @@ export default async function handler(req, res) {
         }
       }
 
-      // Se for bovino de entrada OU saÃ­da, registrar no boletim contÃ¡bil
+      // Se for bovino de entrada OU saída, registrar no boletim contábil
       if (tipoProduto === 'bovino' && itens) {
         const animaisIds = []
         
-        // FunÃ§Ã£o auxiliar para calcular meses a partir da era
+        // Função auxiliar para calcular meses a partir da era
         function calcularMesesDaEra(era) {
           if (!era) return null
           const eraLower = era.toLowerCase().trim()
-          // IMPORTANTE: Verificar faixas especÃ­ficas ANTES de verificar valores isolados
+          // IMPORTANTE: Verificar faixas específicas ANTES de verificar valores isolados
           if (eraLower.includes('24/36') || eraLower.includes('24-36')) {
-            return 30 // Idade mÃ©dia da faixa 24/36 meses
+            return 30 // Idade média da faixa 24/36 meses
           }
           if (eraLower.includes('0') && eraLower.includes('3')) return 1.5
           if (eraLower.includes('3') && eraLower.includes('8')) return 5.5
           if (eraLower.includes('8') && eraLower.includes('12')) return 10
           if (eraLower.includes('12') && eraLower.includes('24')) return 18
-          // IMPORTANTE: Verificar faixas especÃ­ficas ANTES de verificar valores isolados
+          // IMPORTANTE: Verificar faixas específicas ANTES de verificar valores isolados
           if (eraLower.includes('24/36') || eraLower.includes('24-36')) {
-            return 30 // Idade mÃ©dia da faixa 24/36 meses
+            return 30 // Idade média da faixa 24/36 meses
           }
           if (eraLower.includes('25') && eraLower.includes('36')) return 30.5
           if (eraLower.includes('acima') || (eraLower.includes('36') && !eraLower.includes('24'))) return 48
@@ -1105,12 +1105,12 @@ export default async function handler(req, res) {
         }
         
         for (const item of itens) {
-          // Se for modo categoria, nÃ£o criar animais individuais
+          // Se for modo categoria, não criar animais individuais
           if (item.modoCadastro === 'categoria') {
             continue
           }
           
-          // Extrair sÃ©rie e RG da tatuagem
+          // Extrair série e RG da tatuagem
           let serie = ''
           let rg = ''
           if (item.tatuagem) {
@@ -1122,12 +1122,12 @@ export default async function handler(req, res) {
               serie = parts[0]
               rg = parts.slice(1).join('')
             } else {
-              // Se for apenas nÃºmeros, assume que Ã© RG sem sÃ©rie
+              // Se for apenas números, assume que é RG sem série
               if (/^\d+$/.test(tatuagemClean)) {
                   serie = ''
                   rg = tatuagemClean
               } else {
-                  // Fallback para lÃ³gica de 4 caracteres
+                  // Fallback para lógica de 4 caracteres
                   serie = tatuagemClean.substring(0, 4)
                   rg = tatuagemClean.substring(4)
               }
@@ -1136,19 +1136,19 @@ export default async function handler(req, res) {
             rg = rg ? rg.trim() : ''
           }
           
-          // Preparar observaÃ§Ãµes com informaÃ§Ãµes da NF
+          // Preparar observações com informações da NF
           const observacoesNF = [
             `NF: ${numeroNF}`,
-            `Fornecedor: ${fornecedorFinal || fornecedor || 'NÃ£o informado'}`,
+            `Fornecedor: ${fornecedorFinal || fornecedor || 'Não informado'}`,
             `Valor compra: R$ ${parseFloat(item.valorUnitario || 0).toFixed(2)}`,
             item.peso ? `Peso entrada: ${item.peso} kg` : '',
             item.era ? `Era: ${item.era}` : ''
           ].filter(Boolean).join(' | ')
           
-          // HABILITADO: Criar animais automaticamente se nÃ£o existirem
+          // HABILITADO: Criar animais automaticamente se não existirem
           let animalId = null
           try {
-            // Verificar se o animal jÃ¡ existe
+            // Verificar se o animal já existe
             const animalExistente = await query(`
               SELECT id FROM animais 
               WHERE serie = $1 AND rg = $2
@@ -1156,7 +1156,7 @@ export default async function handler(req, res) {
             `, [serie || 'NF', rg || item.tatuagem || '0'])
             
             if (animalExistente.rows.length > 0) {
-              // Animal jÃ¡ existe, apenas atualizar observaÃ§Ãµes se necessÃ¡rio
+              // Animal já existe, apenas atualizar observações se necessário
               animalId = animalExistente.rows[0].id
               await query(`
                 UPDATE animais SET
@@ -1165,8 +1165,8 @@ export default async function handler(req, res) {
                 WHERE id = $2
               `, [observacoesNF, animalId])
             } else {
-               // Animal nÃ£o existe, criar automaticamente
-               const sexoMap = item.sexo === 'macho' ? 'Macho' : (item.sexo === 'femea' ? 'FÃªmea' : item.sexo)
+               // Animal não existe, criar automaticamente
+               const sexoMap = item.sexo === 'macho' ? 'Macho' : (item.sexo === 'femea' ? 'Fêmea' : item.sexo)
                
                const novoAnimal = await query(`
                 INSERT INTO animais (
@@ -1185,7 +1185,7 @@ export default async function handler(req, res) {
                 serie || 'NF', 
                 rg || item.tatuagem || '0', 
                 sexoMap || 'Macho',
-                item.raca || 'NÃ£o informado',
+                item.raca || 'Não informado',
                 parseFloat(item.peso) || 0,
                 observacoesNF,
                 'Ativo'
@@ -1193,7 +1193,7 @@ export default async function handler(req, res) {
               
               if (novoAnimal.rows.length > 0) {
                 animalId = novoAnimal.rows[0].id
-                console.log(`âÅ“â€¦ Animal criado automaticamente: ${serie}${rg}`)
+                console.log(`✅ Animal criado automaticamente: ${serie}${rg}`)
               }
             }
           } catch (error) {
@@ -1205,7 +1205,7 @@ export default async function handler(req, res) {
           }
         }
 
-        // Verificar se o fornecedor tem CNPJ da AGROPECUÃ�RIA PARDINHO
+        // Verificar se o fornecedor tem CNPJ da AGROPECUÁRIA PARDINHO
         let cnpjFornecedor = cnpjFornecedorFinal
         let nomeFornecedor = fornecedorFinal
         
@@ -1226,7 +1226,7 @@ export default async function handler(req, res) {
           }
         }
         
-        // Para saÃ­da, buscar dados do destino
+        // Para saída, buscar dados do destino
         let cnpjDestino = cnpjFornecedorFinal
         let nomeDestino = destino || fornecedorFinal
         
@@ -1257,19 +1257,19 @@ export default async function handler(req, res) {
         const nomeFornecedorUpper = nomeFornecedor?.toUpperCase() || ''
         const incricaoUpper = (incricao || '').toUpperCase()
         
-        // Verificar se Ã© PARDINHO
+        // Verificar se é PARDINHO
         const ehPardinho = cnpjFornecedorNormalizado === cnpjPardinho || nomeFornecedorUpper.includes('PARDINHO')
         const incricaoValida = incricaoUpper === 'SANT ANNA' || incricaoUpper === 'PARDINHO'
         
-        // Registrar movimentaÃ§Ã£o no boletim contÃ¡bil
-        // Para entrada: se fornecedor for PARDINHO OU se incriÃ§Ã£o for SANT ANNA/PARDINHO
-        // Para saÃ­da: sempre registrar (venda)
+        // Registrar movimentação no boletim contábil
+        // Para entrada: se fornecedor for PARDINHO OU se incrição for SANT ANNA/PARDINHO
+        // Para saída: sempre registrar (venda)
         const deveRegistrarEntrada = tipo === 'entrada' && (ehPardinho || incricaoValida)
         const deveRegistrarSaida = tipo === 'saida'
         
         if (deveRegistrarEntrada || deveRegistrarSaida) {
           try {
-            // Remover movimentaÃ§Ãµes antigas desta NF antes de recriar
+            // Remover movimentações antigas desta NF antes de recriar
             // Isso garante que itens adicionados/removidos sejam refletidos corretamente
             try {
               await query(
@@ -1277,9 +1277,9 @@ export default async function handler(req, res) {
                  WHERE (dados_extras::jsonb->>'numeroNF' = $1 OR dados_extras::jsonb->>'numero_nf' = $1)`,
                 [String(numeroNF)]
               )
-              console.log(`ðÅ¸â€”â€˜ï¸� MovimentaÃ§Ãµes antigas (entrada e saÃ­da) da NF ${numeroNF} removidas antes de recriar`)
+              console.log(`🗑️ Movimentações antigas (entrada e saída) da NF ${numeroNF} removidas antes de recriar`)
             } catch (deleteError) {
-              console.warn(`âÅ¡ ï¸� Erro ao remover movimentaÃ§Ãµes antigas da NF ${numeroNF}:`, deleteError.message)
+              console.warn(`⚠️ Erro ao remover movimentações antigas da NF ${numeroNF}:`, deleteError.message)
             }
             
             const periodoAtual = new Date().toISOString().slice(0, 7)
@@ -1301,9 +1301,9 @@ export default async function handler(req, res) {
                     dataMovimento: dataFormatada,
                     animalId: null,
                     valor: valorTotal,
-                    descricao: `Compra de ${quantidade} bovino(s) via NF ${numeroNF} - ${item.tipoAnimal === 'registrado' ? 'Registrado' : 'Cria/Recria'} - ${item.sexo === 'macho' ? 'Macho' : 'FÃªmea'} - ${item.era}`,
-                    observacoes: `Quantidade: ${quantidade} | Tipo: ${item.tipoAnimal === 'registrado' ? 'Registrado' : 'Cria/Recria'} | ${item.raca || 'NÃ£o informado'} | Valor unitÃ¡rio: R$ ${parseFloat(item.valorUnitario || 0).toFixed(2)}`,
-                    localidade: incricao || (ehPardinho ? 'AGROPECUÃ�RIA PARDINHO LTDA' : 'SANT ANNA'),
+                    descricao: `Compra de ${quantidade} bovino(s) via NF ${numeroNF} - ${item.tipoAnimal === 'registrado' ? 'Registrado' : 'Cria/Recria'} - ${item.sexo === 'macho' ? 'Macho' : 'Fêmea'} - ${item.era}`,
+                    observacoes: `Quantidade: ${quantidade} | Tipo: ${item.tipoAnimal === 'registrado' ? 'Registrado' : 'Cria/Recria'} | ${item.raca || 'Não informado'} | Valor unitário: R$ ${parseFloat(item.valorUnitario || 0).toFixed(2)}`,
+                    localidade: incricao || (ehPardinho ? 'AGROPECUÁRIA PARDINHO LTDA' : 'SANT ANNA'),
                     dadosExtras: {
                       numeroNF: numeroNF,
                       numero_nf: numeroNF,
@@ -1330,8 +1330,8 @@ export default async function handler(req, res) {
                     animalId: animalId,
                     valor: parseFloat(item.valorUnitario) || 0,
                     descricao: `Compra de bovino via NF ${numeroNF}`,
-                    observacoes: `Animal: ${item.tatuagem} - ${item.raca || 'NÃ£o informado'} - ${item.sexo === 'macho' ? 'Macho' : 'FÃªmea'}`,
-                    localidade: incricao || (ehPardinho ? 'AGROPECUÃ�RIA PARDINHO LTDA' : 'SANT ANNA'),
+                    observacoes: `Animal: ${item.tatuagem} - ${item.raca || 'Não informado'} - ${item.sexo === 'macho' ? 'Macho' : 'Fêmea'}`,
+                    localidade: incricao || (ehPardinho ? 'AGROPECUÁRIA PARDINHO LTDA' : 'SANT ANNA'),
                     dadosExtras: {
                       numeroNF: numeroNF,
                       numero_nf: numeroNF,
@@ -1345,7 +1345,7 @@ export default async function handler(req, res) {
                   })
                 }
               } else if (tipo === 'saida') {
-                // REGISTRO DE SAÃ�DA (VENDA)
+                // REGISTRO DE SAÍDA (VENDA)
                 if (item.modoCadastro === 'categoria') {
                   const quantidade = parseInt(item.quantidade) || 1
                   const valorTotal = parseFloat(item.valorUnitario || 0) * quantidade
@@ -1357,9 +1357,9 @@ export default async function handler(req, res) {
                     dataMovimento: dataFormatada,
                     animalId: null,
                     valor: valorTotal,
-                    descricao: `Venda de ${quantidade} bovino(s) via NF ${numeroNF} - ${item.tipoAnimal === 'registrado' ? 'Registrado' : 'Cria/Recria'} - ${item.sexo === 'macho' ? 'Macho' : 'FÃªmea'} - ${item.era}`,
-                    observacoes: `Quantidade: ${quantidade} | Destino: ${nomeDestino || destino || 'NÃ£o informado'} | ${item.raca || 'NÃ£o informado'} | Valor unitÃ¡rio: R$ ${parseFloat(item.valorUnitario || 0).toFixed(2)}`,
-                    localidade: incricao || (ehPardinho ? 'AGROPECUÃ�RIA PARDINHO LTDA' : 'SANT ANNA'),
+                    descricao: `Venda de ${quantidade} bovino(s) via NF ${numeroNF} - ${item.tipoAnimal === 'registrado' ? 'Registrado' : 'Cria/Recria'} - ${item.sexo === 'macho' ? 'Macho' : 'Fêmea'} - ${item.era}`,
+                    observacoes: `Quantidade: ${quantidade} | Destino: ${nomeDestino || destino || 'Não informado'} | ${item.raca || 'Não informado'} | Valor unitário: R$ ${parseFloat(item.valorUnitario || 0).toFixed(2)}`,
+                    localidade: incricao || (ehPardinho ? 'AGROPECUÁRIA PARDINHO LTDA' : 'SANT ANNA'),
                     dadosExtras: {
                       numeroNF: numeroNF,
                       numero_nf: numeroNF,
@@ -1386,8 +1386,8 @@ export default async function handler(req, res) {
                     animalId: animalId,
                     valor: parseFloat(item.valorUnitario) || 0,
                     descricao: `Venda de bovino via NF ${numeroNF}`,
-                    observacoes: `Animal: ${item.tatuagem} - Destino: ${nomeDestino || destino || 'NÃ£o informado'} - ${item.raca || 'NÃ£o informado'} - ${item.sexo === 'macho' ? 'Macho' : 'FÃªmea'}`,
-                    localidade: incricao || (ehPardinho ? 'AGROPECUÃ�RIA PARDINHO LTDA' : 'SANT ANNA'),
+                    observacoes: `Animal: ${item.tatuagem} - Destino: ${nomeDestino || destino || 'Não informado'} - ${item.raca || 'Não informado'} - ${item.sexo === 'macho' ? 'Macho' : 'Fêmea'}`,
+                    localidade: incricao || (ehPardinho ? 'AGROPECUÁRIA PARDINHO LTDA' : 'SANT ANNA'),
                     dadosExtras: {
                       numeroNF: numeroNF,
                       numero_nf: numeroNF,
@@ -1403,20 +1403,20 @@ export default async function handler(req, res) {
               }
             }
             
-            console.log(`âÅ“â€¦ ${itens.length} movimentaÃ§Ã£o(Ãµes) criada(s) para NF ${numeroNF}`)
+            console.log(`✅ ${itens.length} movimentação(ões) criada(s) para NF ${numeroNF}`)
           } catch (error) {
-            console.error('Erro ao registrar movimentaÃ§Ã£o no boletim contÃ¡bil:', error)
+            console.error('Erro ao registrar movimentação no boletim contábil:', error)
           }
         }
       }
 
-      // Registrar operaÃ§Ã£o no Sistema de Lotes
+      // Registrar operação no Sistema de Lotes
       try {
         const animaisEnvolvidos = itens ? itens.map(i => i.tatuagem || i.nomeTouro || i.rgTouro).filter(Boolean).join(', ') : '';
         
         await LoteTracker.registrarOperacao({
           tipo_operacao: 'EDICAO_NF',
-          descricao: `EdiÃ§Ã£o de Nota Fiscal ${numeroNF} - ${tipo === 'entrada' ? 'Entrada' : 'SaÃ­da'} - ${fornecedorFinal || destino || 'Sem identificaÃ§Ã£o'}${animaisEnvolvidos ? ` - Animais: ${animaisEnvolvidos}` : ''}`,
+          descricao: `Edição de Nota Fiscal ${numeroNF} - ${tipo === 'entrada' ? 'Entrada' : 'Saída'} - ${fornecedorFinal || destino || 'Sem identificação'}${animaisEnvolvidos ? ` - Animais: ${animaisEnvolvidos}` : ''}`,
           detalhes: {
             id: id,
             numero_nf: numeroNF,
@@ -1443,9 +1443,9 @@ export default async function handler(req, res) {
       })
     }
 
-    return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' })
+    return res.status(405).json({ error: 'Método não permitido' })
   } catch (error) {
-    console.error('â�Å’ Erro na API de notas fiscais:', error)
+    console.error('❌ Erro na API de notas fiscais:', error)
     console.error('Stack trace:', error.stack)
     console.error('Request body:', JSON.stringify(req.body, null, 2))
     

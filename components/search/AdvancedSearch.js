@@ -11,7 +11,7 @@ import {
   CalendarIcon
 } from '../ui/Icons'
 
-// Ã�cone adicional que nÃ£o estÃ¡ no arquivo Icons.js
+// Ícone adicional que não está no arquivo Icons.js
 const AdjustmentsHorizontalIcon = ({ className = "h-6 w-6" }) => (
   <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m0 0a1.5 1.5 0 013 0m-3 0a1.5 1.5 0 00-3 0m0 0V18a1.5 1.5 0 001.5 1.5h9a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H7.5z" />
@@ -48,9 +48,9 @@ export default function AdvancedSearch({ onSearch, placeholder = "Buscar..." }) 
   const loadSearchHistory = () => {
     try {
       const history = JSON.parse(localStorage.getItem('beefsync_search_history') || '[]')
-      setSearchHistory(history.slice(0, 10)) // ÃÅ¡ltimas 10 buscas
+      setSearchHistory(history.slice(0, 10)) // Últimas 10 buscas
     } catch (error) {
-      console.error('Erro ao carregar histÃ³rico de busca:', error)
+      console.error('Erro ao carregar histórico de busca:', error)
     }
   }
 
@@ -113,14 +113,14 @@ export default function AdvancedSearch({ onSearch, placeholder = "Buscar..." }) 
 
       setSuggestions(suggestions)
     } catch (error) {
-      console.error('Erro ao gerar sugestÃµes:', error)
+      console.error('Erro ao gerar sugestões:', error)
     }
   }
 
   const handleSearch = (term = searchTerm) => {
     if (!term.trim()) return
 
-    // Salvar no histÃ³rico
+    // Salvar no histórico
     const newHistory = [term, ...searchHistory.filter(h => h !== term)].slice(0, 10)
     setSearchHistory(newHistory)
     localStorage.setItem('beefsync_search_history', JSON.stringify(newHistory))
@@ -190,7 +190,7 @@ export default function AdvancedSearch({ onSearch, placeholder = "Buscar..." }) 
         })
       }
 
-      // Buscar sÃªmen
+      // Buscar sêmen
       if (currentFilters.category === 'all' || currentFilters.category === 'semen') {
         const semen = JSON.parse(localStorage.getItem('estoqueSemen') || '[]')
         results.semen = semen.filter(s => {
@@ -268,7 +268,7 @@ export default function AdvancedSearch({ onSearch, placeholder = "Buscar..." }) 
         />
         
         <div className="absolute inset-y-0 right-0 flex items-center pr-2 space-x-1">
-          {/* BotÃ£o de Filtros */}
+          {/* Botão de Filtros */}
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={`p-1 rounded-md transition-colors ${
@@ -285,7 +285,7 @@ export default function AdvancedSearch({ onSearch, placeholder = "Buscar..." }) 
             )}
           </button>
           
-          {/* BotÃ£o de Buscar */}
+          {/* Botão de Buscar */}
           <button
             onClick={() => handleSearch()}
             className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
@@ -295,7 +295,7 @@ export default function AdvancedSearch({ onSearch, placeholder = "Buscar..." }) 
         </div>
       </div>
 
-      {/* SugestÃµes */}
+      {/* Sugestões */}
       {suggestions.length > 0 && (
         <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 max-h-64 overflow-y-auto">
           {suggestions.map((suggestion, index) => (
@@ -323,7 +323,7 @@ export default function AdvancedSearch({ onSearch, placeholder = "Buscar..." }) 
         <div className="absolute z-20 w-full mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Filtros AvanÃ§ados
+              Filtros Avançados
             </h3>
             <button
               onClick={clearFilters}
@@ -348,7 +348,7 @@ export default function AdvancedSearch({ onSearch, placeholder = "Buscar..." }) 
                 <option value="animals">Animais</option>
                 <option value="nascimentos">Nascimentos</option>
                 <option value="custos">Custos</option>
-                <option value="semen">SÃªmen</option>
+                <option value="semen">Sêmen</option>
                 <option value="notasfiscais">Notas Fiscais</option>
               </select>
             </div>
@@ -371,10 +371,10 @@ export default function AdvancedSearch({ onSearch, placeholder = "Buscar..." }) 
               </select>
             </div>
 
-            {/* RaÃ§a */}
+            {/* Raça */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                RaÃ§a
+                Raça
               </label>
               <select
                 value={filters.raca}
@@ -386,7 +386,7 @@ export default function AdvancedSearch({ onSearch, placeholder = "Buscar..." }) 
                 <option value="Angus">Angus</option>
                 <option value="Brahman">Brahman</option>
                 <option value="Gir">Gir</option>
-                <option value="GuzerÃ¡">GuzerÃ¡</option>
+                <option value="Guzerá">Guzerá</option>
               </select>
             </div>
 
@@ -402,14 +402,14 @@ export default function AdvancedSearch({ onSearch, placeholder = "Buscar..." }) 
               >
                 <option value="all">Todos</option>
                 <option value="M">Macho</option>
-                <option value="F">FÃªmea</option>
+                <option value="F">Fêmea</option>
               </select>
             </div>
 
-            {/* Valor MÃ­nimo */}
+            {/* Valor Mínimo */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Valor MÃ­nimo (R$)
+                Valor Mínimo (R$)
               </label>
               <input
                 type="number"
@@ -420,10 +420,10 @@ export default function AdvancedSearch({ onSearch, placeholder = "Buscar..." }) 
               />
             </div>
 
-            {/* Valor MÃ¡ximo */}
+            {/* Valor Máximo */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Valor MÃ¡ximo (R$)
+                Valor Máximo (R$)
               </label>
               <input
                 type="number"
@@ -455,7 +455,7 @@ export default function AdvancedSearch({ onSearch, placeholder = "Buscar..." }) 
         </div>
       )}
 
-      {/* HistÃ³rico de Busca */}
+      {/* Histórico de Busca */}
       {searchHistory.length > 0 && !searchTerm && (
         <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 max-h-48 overflow-y-auto">
           <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">

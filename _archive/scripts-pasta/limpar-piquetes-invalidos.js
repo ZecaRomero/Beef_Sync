@@ -17,7 +17,7 @@ const { query } = require('../lib/database')
 function ehPiqueteOuProjetoValido(nome) {
   if (!nome || typeof nome !== 'string') return false
   const n = nome.trim()
-  if (!n || /^(VAZIO|NÃÆ’O INFORMADO|NAO INFORMADO|-)$/i.test(n)) return false
+  if (!n || /^(VAZIO|NÃƒO INFORMADO|NAO INFORMADO|-)$/i.test(n)) return false
   if (/^PIQUETE\s+(\d+|CABANHA|CONF|GUARITA|PISTA)$/i.test(n)) return true
   if (/^PROJETO\s+[\dA-Za-z\-]+$/i.test(n)) return true
   if (/^CONFINA$/i.test(n)) return true
@@ -68,26 +68,26 @@ async function listarPiquetesInvalidos() {
 
 async function executarLimpeza(dryRun = true) {
   try {
-    console.log('ğÅ¸â€ Buscando piquetes/locais invÃ¡lidos...\n')
+    console.log('ğŸ” Buscando piquetes/locais invÃ¡lidos...\n')
 
     const invalidos = await listarPiquetesInvalidos()
 
     if (invalidos.length === 0) {
-      console.log('âÅ“â€¦ Nenhum piquete invÃ¡lido encontrado. Banco jÃ¡ estÃ¡ limpo!')
+      console.log('âœ… Nenhum piquete invÃ¡lido encontrado. Banco jÃ¡ estÃ¡ limpo!')
       return
     }
 
-    console.log(`ğÅ¸â€œâ€¹ Encontrados ${invalidos.length} piquete(s)/local(is) invÃ¡lido(s):`)
+    console.log(`ğŸ“‹ Encontrados ${invalidos.length} piquete(s)/local(is) invÃ¡lido(s):`)
     invalidos.sort().forEach((nome, i) => console.log(`   ${i + 1}. ${nome}`))
     console.log('')
 
     if (dryRun) {
-      console.log('ââ€¹ï¸  Modo --dry-run: nenhuma alteraÃ§Ã£o foi feita.')
+      console.log('â„¹ï¸  Modo --dry-run: nenhuma alteraÃ§Ã£o foi feita.')
       console.log('   Execute com --execute para aplicar a limpeza.')
       return
     }
 
-    console.log('ğÅ¸§¹ Executando limpeza...\n')
+    console.log('ğŸ§¹ Executando limpeza...\n')
 
     const valorPadrao = 'NÃ£o informado'
 
@@ -101,7 +101,7 @@ async function executarLimpeza(dryRun = true) {
           UPDATE localizacoes_animais SET piquete = $1, updated_at = CURRENT_TIMESTAMP WHERE piquete = $2
         `, [correto, abrev])
       }
-      console.log(`   âÅ“â€œ PIQ X ââ€ â€™ PIQUETE X: ${piqMatch.length} conversÃ£o(Ãµes)`)
+      console.log(`   âœ“ PIQ X â†’ PIQUETE X: ${piqMatch.length} conversÃ£o(Ãµes)`)
     }
 
     // 1. Atualizar localizacoes_animais
@@ -111,7 +111,7 @@ async function executarLimpeza(dryRun = true) {
       WHERE piquete = ANY($2) AND piquete IS NOT NULL
     `, [valorPadrao, invalidosParaLimpar]) : { rowCount: 0 }
     const locAfetados = locCount.rowCount || 0
-    console.log(`   âÅ“â€œ localizacoes_animais: ${locAfetados} registro(s) atualizado(s)`)
+    console.log(`   âœ“ localizacoes_animais: ${locAfetados} registro(s) atualizado(s)`)
 
     // 2. Desativar em piquetes
     try {
@@ -120,10 +120,10 @@ async function executarLimpeza(dryRun = true) {
         SET ativo = false, updated_at = NOW()
         WHERE nome = ANY($1) AND ativo = true
       `, [invalidosParaLimpar]) : { rowCount: 0 }
-      console.log(`   âÅ“â€œ piquetes: ${piqCount.rowCount || 0} registro(s) desativado(s)`)
+      console.log(`   âœ“ piquetes: ${piqCount.rowCount || 0} registro(s) desativado(s)`)
     } catch (e) {
       if (e.message?.includes('does not exist')) {
-        console.log('   ââ€”â€¹ piquetes: tabela nÃ£o existe')
+        console.log('   â—‹ piquetes: tabela nÃ£o existe')
       } else throw e
     }
 
@@ -134,16 +134,16 @@ async function executarLimpeza(dryRun = true) {
         SET ativo = false, updated_at = CURRENT_TIMESTAMP
         WHERE nome = ANY($1) AND ativo = true
       `, [invalidosParaLimpar]) : { rowCount: 0 }
-      console.log(`   âÅ“â€œ locais_disponiveis: ${locDispCount.rowCount || 0} registro(s) desativado(s)`)
+      console.log(`   âœ“ locais_disponiveis: ${locDispCount.rowCount || 0} registro(s) desativado(s)`)
     } catch (e) {
       if (e.message?.includes('does not exist')) {
-        console.log('   ââ€”â€¹ locais_disponiveis: tabela nÃ£o existe')
+        console.log('   â—‹ locais_disponiveis: tabela nÃ£o existe')
       } else throw e
     }
 
-    console.log('\nâÅ“â€¦ Limpeza concluÃ­da com sucesso!')
+    console.log('\nâœ… Limpeza concluÃ­da com sucesso!')
   } catch (error) {
-    console.error('\nâÅ’ Erro:', error.message)
+    console.error('\nâŒ Erro:', error.message)
     process.exit(1)
   }
 }
@@ -153,9 +153,9 @@ async function main() {
   const execute = args.includes('--execute')
   const dryRun = !execute
 
-  console.log('ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢')
+  console.log('â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•')
   console.log('  Limpeza de Piquetes/Locais InvÃ¡lidos - Beef-Sync')
-  console.log('ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢\n')
+  console.log('â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•\n')
 
   await executarLimpeza(dryRun)
 }

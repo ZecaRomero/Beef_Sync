@@ -22,9 +22,9 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
     filhoTopIABCZ, filhoTopDECA, filhoTopIQG, filhoTopPtIQG
   } = rankings || {}
 
-  // Helper: estilos e emoji de trofÃ©u por posiÃ§Ã£o (1Âº, 2Âº, 3Âº)
-  const getTrophy = (pos) => pos === 1 ? 'ðÅ¸¥â€¡' : pos === 2 ? 'ðÅ¸¥Ë†' : pos === 3 ? 'ðÅ¸¥â€°' : ''
-  const getRankLabel = (pos, filhoTop) => filhoTop ? 'MÃ£e do 1Âº' : pos ? (getTrophy(pos) ? `${getTrophy(pos)} ${pos}Âº` : `${pos}Âº ranking`) : ''
+  // Helper: estilos e emoji de troféu por posição (1º, 2º, 3º)
+  const getTrophy = (pos) => pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : ''
+  const getRankLabel = (pos, filhoTop) => filhoTop ? 'Mãe do 1º' : pos ? (getTrophy(pos) ? `${getTrophy(pos)} ${pos}º` : `${pos}º ranking`) : ''
 
   const {
     diasDesdeExame, isInapto, diasParaProximoExame,
@@ -35,7 +35,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
     isMacho, isFemea
   } = metrics
 
-  // Exibir previsÃ£o de parto apenas se estiver prenha
+  // Exibir previsão de parto apenas se estiver prenha
   const previsaoPartoExibir = isPrenha && diasParaParto != null
 
   const shadowAccent = getMetricsCardShadowClasses(sexTheme) // accent para cards neutros
@@ -46,7 +46,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
       {(animal.abczg || animal.abczg === 0) && (
         <button
           type="button"
-          onClick={() => onScrollTo?.('genÃ©tica')}
+          onClick={() => onScrollTo?.('genética')}
           className={`rounded-lg p-2.5 border text-center w-full text-left cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-sm hover:shadow-md ${
           filhoTopIABCZ
             ? 'bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40 border-2 border-emerald-400 dark:border-emerald-500'
@@ -89,7 +89,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
       {(animal.deca || animal.deca === 0) && (
         <button
           type="button"
-          onClick={() => onScrollTo?.('genÃ©tica')}
+          onClick={() => onScrollTo?.('genética')}
           className={`rounded-lg p-2.5 border text-center w-full text-left cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-sm hover:shadow-md ${
           filhoTopDECA
             ? 'bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40 border-2 border-emerald-400 dark:border-emerald-500'
@@ -132,7 +132,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
       {((animal.iqg ?? animal.genetica_2) || (animal.iqg ?? animal.genetica_2) === 0) && (
         <button
           type="button"
-          onClick={() => onScrollTo?.('genÃ©tica')}
+          onClick={() => onScrollTo?.('genética')}
           className={`rounded-lg p-2.5 border text-center w-full text-left cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-sm hover:shadow-md ${
           filhoTopIQG
             ? 'bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40 border-2 border-emerald-400 dark:border-emerald-500'
@@ -175,7 +175,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
       {((animal.pt_iqg ?? animal.decile_2) || (animal.pt_iqg ?? animal.decile_2) === 0) && (
         <button
           type="button"
-          onClick={() => onScrollTo?.('genÃ©tica')}
+          onClick={() => onScrollTo?.('genética')}
           className={`rounded-lg p-2.5 border text-center w-full text-left cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-sm hover:shadow-md ${
           filhoTopPtIQG
             ? 'bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40 border-2 border-emerald-400 dark:border-emerald-500'
@@ -218,7 +218,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
       {(animal.mgte || animal.mgte === 0) && (
         <button
           type="button"
-          onClick={() => onScrollTo?.('genÃ©tica')}
+          onClick={() => onScrollTo?.('genética')}
           className={`rounded-lg p-2.5 border text-center w-full text-left cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-sm hover:shadow-md ${
             posicaoMGte === 1
               ? 'bg-gradient-to-br from-amber-100 to-yellow-100 dark:from-amber-900/40 dark:to-yellow-900/40 border-2 border-amber-400 dark:border-amber-500'
@@ -248,7 +248,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
               posicaoMGte === 3 ? 'text-amber-700 dark:text-amber-400' :
               'text-indigo-600 dark:text-indigo-400'
             }`}>
-              {posicaoMGte === 1 ? 'ðÅ¸¥â€¡ 1Âº' : posicaoMGte === 2 ? 'ðÅ¸¥Ë† 2Âº' : posicaoMGte === 3 ? 'ðÅ¸¥â€° 3Âº' : `${posicaoMGte}Âº ranking`}
+              {posicaoMGte === 1 ? '🥇 1º' : posicaoMGte === 2 ? '🥈 2º' : posicaoMGte === 3 ? '🥉 3º' : `${posicaoMGte}º ranking`}
             </p>
           )}
         </button>
@@ -258,7 +258,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
       {(animal.top != null && animal.top !== '') && (
         <button
           type="button"
-          onClick={() => onScrollTo?.('genÃ©tica')}
+          onClick={() => onScrollTo?.('genética')}
           className="rounded-xl p-3 border text-center w-full text-left cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform bg-gradient-to-br from-sky-50 to-cyan-50 dark:from-sky-900/20 dark:to-cyan-900/20 border-2 border-sky-300 dark:border-sky-600"
         >
           <p className="text-2xl font-bold text-sky-600 dark:text-sky-400">{animal.top}</p>
@@ -266,7 +266,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
         </button>
       )}
 
-      {/* GestaÃ§Ã£o (FÃªmeas Prenhas) - Dias p/ Parto */}
+      {/* Gestação (Fêmeas Prenhas) - Dias p/ Parto */}
       {previsaoPartoExibir && (
         <div className="bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-lg p-3 border-2 border-emerald-400 dark:border-emerald-500 text-center transform transition-all duration-200 hover:scale-105">
           <div className="flex items-center justify-center mb-0.5">
@@ -277,7 +277,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
         </div>
       )}
 
-      {/* GestaÃ§Ã£o (FÃªmeas Prenhas) - Progresso */}
+      {/* Gestação (Fêmeas Prenhas) - Progresso */}
       {isPrenha && diasGestacao != null && (
         <div className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 rounded-lg p-3 border border-emerald-300 dark:border-emerald-600 text-center transform transition-all duration-200 hover:scale-105">
           <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{diasGestacao}d</p>
@@ -289,7 +289,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
               />
             </div>
           )}
-          <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">gestaÃ§Ã£o {gestacaoProgress}%</p>
+          <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">gestação {gestacaoProgress}%</p>
         </div>
       )}
 
@@ -308,7 +308,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
         </button>
       )}
 
-      {/* IAs (FÃªmeas) */}
+      {/* IAs (Fêmeas) */}
       {isFemea && totalIAs > 0 && (
         <div className="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 rounded-lg p-3 border border-pink-300 dark:border-pink-700 text-center transform transition-all duration-200 hover:scale-105">
           <div className="flex items-center justify-center mb-0.5">
@@ -330,7 +330,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
         </div>
       )}
 
-      {/* FIV (FÃªmeas) */}
+      {/* FIV (Fêmeas) */}
       {isFemea && animal.fivs?.length > 0 && (
         <button
           type="button"
@@ -363,7 +363,7 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
         </button>
       )}
 
-      {/* Dias Exame AndrolÃ³gico */}
+      {/* Dias Exame Andrológico */}
       {isMacho && diasDesdeExame != null && (
         <div className="bg-gradient-to-br from-cyan-50 to-sky-50 dark:from-cyan-900/20 dark:to-sky-900/20 rounded-lg p-3 border border-cyan-300 dark:border-cyan-700 text-center transform transition-all duration-200 hover:scale-105">
           <div className="flex items-center justify-center mb-0.5">
@@ -374,17 +374,17 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
         </div>
       )}
 
-      {/* PrÃ³ximo Exame (Inapto) */}
+      {/* Próximo Exame (Inapto) */}
       {isInapto && diasParaProximoExame != null && (
         <div className="bg-gradient-to-br from-red-100 to-rose-100 dark:from-red-900/30 dark:to-rose-900/30 rounded-lg p-3 border-2 border-red-400 dark:border-red-500 text-center transform transition-all duration-200 hover:scale-105">
           <div className="flex items-center justify-center mb-0.5">
             <ExclamationTriangleIcon className="h-4 w-4 text-red-600 dark:text-red-400 animate-pulse" />
           </div>
           <p className="text-2xl font-bold text-red-600 dark:text-red-400">
-            {diasParaProximoExame > 0 ? diasParaProximoExame : 'âÅ¡ ï¸�'}
+            {diasParaProximoExame > 0 ? diasParaProximoExame : '⚠️'}
           </p>
           <p className="text-xs text-gray-600 dark:text-gray-400">
-            {diasParaProximoExame > 0 ? 'prÃ³x. exame' : 'reagendar'}
+            {diasParaProximoExame > 0 ? 'próx. exame' : 'reagendar'}
           </p>
         </div>
       )}

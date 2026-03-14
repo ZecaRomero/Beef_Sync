@@ -1,6 +1,6 @@
 /**
- * Context da aplicaÃ§Ã£o otimizado
- * Usa PostgreSQL como fonte primÃ¡ria com cache inteligente
+ * Context da aplicação otimizado
+ * Usa PostgreSQL como fonte primária com cache inteligente
  */
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
@@ -28,7 +28,7 @@ interface OptimizedAppProviderProps {
 }
 
 /**
- * Provider otimizado do contexto da aplicaÃ§Ã£o
+ * Provider otimizado do contexto da aplicação
  * Usa PostgreSQL como fonte de dados com cache para performance
  */
 export function OptimizedAppProvider({ children }: OptimizedAppProviderProps) {
@@ -59,7 +59,7 @@ export function OptimizedAppProvider({ children }: OptimizedAppProviderProps) {
     try {
       setLoading(true);
       
-      // Verificar cache se nÃ£o for refresh forÃ§ado
+      // Verificar cache se não for refresh forçado
       if (!forceRefresh) {
         const cached = animalsCache.get('animals:all');
         if (cached) {
@@ -183,7 +183,7 @@ export function OptimizedAppProvider({ children }: OptimizedAppProviderProps) {
   }, [toast]);
 
   /**
-   * Carregar estatÃ­sticas do dashboard
+   * Carregar estatísticas do dashboard
    */
   const loadDashboardStats = useCallback(async (forceRefresh = false) => {
     try {
@@ -202,24 +202,24 @@ export function OptimizedAppProvider({ children }: OptimizedAppProviderProps) {
       
       return stats;
     } catch (err: any) {
-      console.error('Erro ao carregar estatÃ­sticas:', err);
+      console.error('Erro ao carregar estatísticas:', err);
       throw err;
     }
   }, []);
 
   /**
-   * Resetar todos os dados (com confirmaÃ§Ã£o)
+   * Resetar todos os dados (com confirmação)
    */
   const resetAllData = useCallback(() => {
     if (typeof window === 'undefined') return;
     
     const confirmed = window.confirm(
-      'ATENÃâ€¡ÃÆ’O: Esta aÃ§Ã£o irÃ¡ limpar TODOS os dados do banco de dados. Esta aÃ§Ã£o NÃÆ’O PODE ser desfeita. Tem certeza?'
+      'ATENÇÃO: Esta ação irá limpar TODOS os dados do banco de dados. Esta ação NÃO PODE ser desfeita. Tem certeza?'
     );
     
     if (confirmed) {
       const doubleConfirm = window.confirm(
-        'ÃÅ¡ltima chance! Confirma que deseja deletar TODOS os dados permanentemente?'
+        'Última chance! Confirma que deseja deletar TODOS os dados permanentemente?'
       );
       
       if (doubleConfirm) {
@@ -241,7 +241,7 @@ export function OptimizedAppProvider({ children }: OptimizedAppProviderProps) {
   }, [toast]);
 
   /**
-   * InicializaÃ§Ã£o - carregar dados do banco ao montar
+   * Inicialização - carregar dados do banco ao montar
    */
   useEffect(() => {
     const initializeApp = async () => {
@@ -250,7 +250,7 @@ export function OptimizedAppProvider({ children }: OptimizedAppProviderProps) {
         await loadAnimals();
         setIsInitialized(true);
       } catch (err) {
-        console.error('Erro ao inicializar aplicaÃ§Ã£o:', err);
+        console.error('Erro ao inicializar aplicação:', err);
       } finally {
         setLoading(false);
       }
@@ -262,8 +262,8 @@ export function OptimizedAppProvider({ children }: OptimizedAppProviderProps) {
   }, [isInitialized, loadAnimals]);
 
   /**
-   * EstatÃ­sticas computadas a partir dos dados locais
-   * Memoizadas para evitar recÃ¡lculos desnecessÃ¡rios
+   * Estatísticas computadas a partir dos dados locais
+   * Memoizadas para evitar recálculos desnecessários
    */
   const stats = useMemo(() => ({
     totalAnimals: Array.isArray(animals) ? animals.length : 0,
@@ -296,13 +296,13 @@ export function OptimizedAppProvider({ children }: OptimizedAppProviderProps) {
     setError,
     clearError,
     
-    // FunÃ§Ãµes
+    // Funções
     resetAllData,
     
-    // EstatÃ­sticas
+    // Estatísticas
     stats,
     
-    // FunÃ§Ãµes otimizadas
+    // Funções otimizadas
     loadAnimals,
     addAnimal,
     updateAnimal,

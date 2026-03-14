@@ -34,7 +34,7 @@ export function useServerEvents(onEvent) {
         })
 
         es.addEventListener('connected', () => {
-          // ConexÃ£o estabelecida ââ‚¬â€� limpa timer de reconexÃ£o se existir
+          // Conexão estabelecida — limpa timer de reconexão se existir
           if (reconnectTimer.current) {
             clearTimeout(reconnectTimer.current)
             reconnectTimer.current = null
@@ -45,7 +45,7 @@ export function useServerEvents(onEvent) {
           es.close()
           esRef.current = null
           if (mounted.current) {
-            // Reconectar apÃ³s 5s com backoff
+            // Reconectar após 5s com backoff
             reconnectTimer.current = setTimeout(connect, 5000)
           }
         }

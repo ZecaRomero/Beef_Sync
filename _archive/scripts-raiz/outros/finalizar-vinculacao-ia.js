@@ -2,24 +2,24 @@
 const { query } = require('./lib/database')
 
 async function finalizarVinculacaoIA() {
-  console.log('�ŸŽ� FINALIZANDO VINCULA�‡�ƒO IA-NASCIMENTOS')
+  console.log('🎯 FINALIZANDO VINCULAÇÃO IA-NASCIMENTOS')
   console.log('=' .repeat(70))
   console.log('')
 
   try {
     // 1. Expandir campo pai_rg para acomodar nomes longos de touros
-    console.log('1️�ƒ� AJUSTANDO ESTRUTURA DA TABELA:')
+    console.log('1️⃣ AJUSTANDO ESTRUTURA DA TABELA:')
     console.log('-'.repeat(50))
     
     await query(`
       ALTER TABLE gestacoes 
       ALTER COLUMN pai_rg TYPE VARCHAR(100)
     `)
-    console.log('�œ… Campo pai_rg expandido para VARCHAR(100)')
+    console.log('✅ Campo pai_rg expandido para VARCHAR(100)')
     
     // 2. Criar gestações para IAs que falharam antes
     console.log('')
-    console.log('2️�ƒ� CRIANDO GESTA�‡�•ES FALTANTES:')
+    console.log('2️⃣ CRIANDO GESTAÇÕES FALTANTES:')
     console.log('-'.repeat(50))
     
     const iasSemGestacao = await query(`
@@ -43,7 +43,7 @@ async function finalizarVinculacaoIA() {
       )
     `)
     
-    console.log(`�Ÿ“Š IAs prenhas sem gestação: ${iasSemGestacao.rows.length}`)
+    console.log(`📊 IAs prenhas sem gestação: ${iasSemGestacao.rows.length}`)
     
     let criadasComSucesso = 0
     let erros = 0
@@ -80,24 +80,24 @@ async function finalizarVinculacaoIA() {
         
         criadasComSucesso++
         if (criadasComSucesso <= 5) {
-          console.log(`�œ… Gestação criada para ${ia.serie} ${ia.rg} - Touro: ${ia.touro}`)
+          console.log(`✅ Gestação criada para ${ia.serie} ${ia.rg} - Touro: ${ia.touro}`)
         }
       } catch (error) {
         erros++
         if (erros <= 3) {
-          console.log(`�Œ Erro ao criar gestação para ${ia.serie} ${ia.rg}: ${error.message}`)
+          console.log(`❌ Erro ao criar gestação para ${ia.serie} ${ia.rg}: ${error.message}`)
         }
       }
     }
     
-    console.log(`�œ… ${criadasComSucesso} gestações criadas com sucesso`)
+    console.log(`✅ ${criadasComSucesso} gestações criadas com sucesso`)
     if (erros > 0) {
-      console.log(`�Œ ${erros} erros encontrados`)
+      console.log(`❌ ${erros} erros encontrados`)
     }
     
     // 3. Atualizar todas as gestações de IA
     console.log('')
-    console.log('3️�ƒ� ATUALIZANDO GESTA�‡�•ES EXISTENTES:')
+    console.log('3️⃣ ATUALIZANDO GESTAÇÕES EXISTENTES:')
     console.log('-'.repeat(50))
     
     const atualizacaoIA = await query(`
@@ -112,11 +112,11 @@ async function finalizarVinculacaoIA() {
       )
     `)
     
-    console.log(`�œ… ${atualizacaoIA.rowCount} gestações atualizadas para tipo IA`)
+    console.log(`✅ ${atualizacaoIA.rowCount} gestações atualizadas para tipo IA`)
     
     // 4. Preparar sistema para nascimentos futuros
     console.log('')
-    console.log('4️�ƒ� PREPARANDO SISTEMA PARA NASCIMENTOS:')
+    console.log('4️⃣ PREPARANDO SISTEMA PARA NASCIMENTOS:')
     console.log('-'.repeat(50))
     
     // Verificar se a tabela nascimentos tem as colunas necessárias
@@ -126,7 +126,7 @@ async function finalizarVinculacaoIA() {
       AND column_name IN ('tipo_cobertura', 'inseminacao_id')
     `)
     
-    console.log(`�œ… Colunas preparadas na tabela nascimentos: ${colunasNascimentos.rows.map(c => c.column_name).join(', ')}`)
+    console.log(`✅ Colunas preparadas na tabela nascimentos: ${colunasNascimentos.rows.map(c => c.column_name).join(', ')}`)
     
     // 5. Criar função para vincular nascimentos automaticamente
     await query(`
@@ -171,11 +171,11 @@ async function finalizarVinculacaoIA() {
         EXECUTE FUNCTION vincular_nascimento_ia();
     `)
     
-    console.log('�œ… Trigger criado para vincular nascimentos automaticamente')
+    console.log('✅ Trigger criado para vincular nascimentos automaticamente')
     
     // 6. Estatísticas finais
     console.log('')
-    console.log('5️�ƒ� ESTATÍSTICAS FINAIS:')
+    console.log('5️⃣ ESTATÍSTICAS FINAIS:')
     console.log('-'.repeat(50))
     
     const stats = await Promise.all([
@@ -198,16 +198,16 @@ async function finalizarVinculacaoIA() {
       query(`SELECT COUNT(*) as total FROM nascimentos`)
     ])
     
-    console.log(`�Ÿ“Š Gestações IA: ${stats[0].rows[0].total}`)
-    console.log(`�Ÿ“Š Gestações FIV: ${stats[1].rows[0].total}`)
-    console.log(`�Ÿ“Š Gestações sem tipo: ${stats[2].rows[0].total}`)
-    console.log(`�Ÿ“Š IAs com prenhez: ${stats[3].rows[0].total}`)
-    console.log(`�Ÿ“Š IAs com gestação vinculada: ${stats[4].rows[0].total}`)
-    console.log(`�Ÿ“Š Total de nascimentos: ${stats[5].rows[0].total}`)
+    console.log(`📊 Gestações IA: ${stats[0].rows[0].total}`)
+    console.log(`📊 Gestações FIV: ${stats[1].rows[0].total}`)
+    console.log(`📊 Gestações sem tipo: ${stats[2].rows[0].total}`)
+    console.log(`📊 IAs com prenhez: ${stats[3].rows[0].total}`)
+    console.log(`📊 IAs com gestação vinculada: ${stats[4].rows[0].total}`)
+    console.log(`📊 Total de nascimentos: ${stats[5].rows[0].total}`)
     
     // 7. Exemplo de consulta para relatórios
     console.log('')
-    console.log('6️�ƒ� EXEMPLO DE CONSULTA PARA RELAT�“RIOS:')
+    console.log('6️⃣ EXEMPLO DE CONSULTA PARA RELATÓRIOS:')
     console.log('-'.repeat(50))
     
     console.log('Query para relatório de reprodução por tipo:')
@@ -243,10 +243,10 @@ async function finalizarVinculacaoIA() {
     `)
     
     console.log('')
-    console.log('�œ… VINCULA�‡�ƒO FINALIZADA!')
+    console.log('✅ VINCULAÇÃO FINALIZADA!')
     
   } catch (error) {
-    console.error('�Œ Erro:', error)
+    console.error('❌ Erro:', error)
   }
 }
 
@@ -254,13 +254,13 @@ async function finalizarVinculacaoIA() {
 finalizarVinculacaoIA()
   .then(() => {
     console.log('')
-    console.log('�ŸŽ� SISTEMA COMPLETO:')
-    console.log('�€� �œ… Gestações de IA identificadas e marcadas')
-    console.log('�€� �œ… Gestações de FIV diferenciadas')
-    console.log('�€� �œ… Trigger automático para novos nascimentos')
-    console.log('�€� �œ… Rastreabilidade completa IA �†’ Gestação �†’ Nascimento')
-    console.log('�€� �œ… Relatórios podem diferenciar tipos de cobertura')
-    console.log('�€� �œ… Sistema pronto para produção')
+    console.log('🎯 SISTEMA COMPLETO:')
+    console.log('• ✅ Gestações de IA identificadas e marcadas')
+    console.log('• ✅ Gestações de FIV diferenciadas')
+    console.log('• ✅ Trigger automático para novos nascimentos')
+    console.log('• ✅ Rastreabilidade completa IA → Gestação → Nascimento')
+    console.log('• ✅ Relatórios podem diferenciar tipos de cobertura')
+    console.log('• ✅ Sistema pronto para produção')
     process.exit(0)
   })
   .catch(error => {

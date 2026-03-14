@@ -10,7 +10,7 @@ const pool = new Pool({
 
 async function syncNeloreirAnimals() {
   try {
-    console.log('�Ÿ”� Sincronizando animais NELOREGIR das notas fiscais...');
+    console.log('🔍 Sincronizando animais NELOREGIR das notas fiscais...');
     
     // Buscar todas as NFs que contêm animais com raça NELOREGIR
     const nfResult = await pool.query('SELECT id, numero_nf, fornecedor, data_compra, itens FROM notas_fiscais WHERE itens IS NOT NULL');
@@ -32,10 +32,10 @@ async function syncNeloreirAnimals() {
       }
     });
     
-    console.log(`\n�Ÿ“„ Encontrados ${animalsToSync.length} animais NELOREGIR para sincronizar:`);
+    console.log(`\n📄 Encontrados ${animalsToSync.length} animais NELOREGIR para sincronizar:`);
     
     for (const animal of animalsToSync) {
-      console.log(`\n�Ÿ”� Processando: ${animal.tatuagem} (${animal.raca})`);
+      console.log(`\n🔍 Processando: ${animal.tatuagem} (${animal.raca})`);
       
       // Verificar se já existe
       const existingAnimal = await pool.query(
@@ -44,7 +44,7 @@ async function syncNeloreirAnimals() {
       );
       
       if (existingAnimal.rows.length > 0) {
-        console.log(`  �œ… Animal ${animal.tatuagem} já existe na tabela animais`);
+        console.log(`  ✅ Animal ${animal.tatuagem} já existe na tabela animais`);
         continue;
       }
       
@@ -61,7 +61,7 @@ async function syncNeloreirAnimals() {
         serie = parts[0];
         rg = parts[1];
       } else {
-        console.log(`  �Œ Formato de tatuagem inválido: ${animal.tatuagem}`);
+        console.log(`  ❌ Formato de tatuagem inválido: ${animal.tatuagem}`);
         continue;
       }
       
@@ -89,17 +89,17 @@ async function syncNeloreirAnimals() {
         `Sincronizado da NF ${animal.nf} - Raça original: ${animal.raca}`
       ]);
       
-      console.log(`  �œ… Animal ${animal.tatuagem} inserido com ID: ${insertResult.rows[0].id}`);
+      console.log(`  ✅ Animal ${animal.tatuagem} inserido com ID: ${insertResult.rows[0].id}`);
     }
     
-    console.log('\n�œ… Sincronização concluída!');
+    console.log('\n✅ Sincronização concluída!');
     
     // Verificar resultado final
     const finalCheck = await pool.query('SELECT COUNT(*) as count FROM animais WHERE raca = \'Nelore\'');
-    console.log(`�Ÿ“Š Total de animais Nelore na tabela: ${finalCheck.rows[0].count}`);
+    console.log(`📊 Total de animais Nelore na tabela: ${finalCheck.rows[0].count}`);
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
   } finally {
     await pool.end();
   }

@@ -81,7 +81,7 @@ export default function Diagnostico() {
 
   return (
     <div style={{ padding: '20px', fontFamily: 'monospace', fontSize: '14px' }}>
-      <h1>�Ÿ”� Diagnóstico do Sistema</h1>
+      <h1>🔍 Diagnóstico do Sistema</h1>
       
       <div style={{ marginBottom: '30px' }}>
         <h2>Testes Interativos</h2>
@@ -125,7 +125,7 @@ export default function Diagnostico() {
                 <td style={{ padding: '8px' }}>
                   {typeof value === 'boolean' ? (
                     <span style={{ color: value ? 'green' : 'red' }}>
-                      {value ? '�œ… Sim' : '�Œ Não'}
+                      {value ? '✅ Sim' : '❌ Não'}
                     </span>
                   ) : Array.isArray(value) ? (
                     value.length > 0 ? (
@@ -135,7 +135,7 @@ export default function Diagnostico() {
                         ))}
                       </ul>
                     ) : (
-                      <span style={{ color: 'green' }}>�œ… Nenhum erro</span>
+                      <span style={{ color: 'green' }}>✅ Nenhum erro</span>
                     )
                   ) : (
                     String(value)
@@ -185,7 +185,7 @@ export default function Diagnostico() {
             maxWidth: '400px',
             width: '90%'
           }}>
-            <h3>�œ… Modal Funcionando!</h3>
+            <h3>✅ Modal Funcionando!</h3>
             <p>Se você está vendo isso, o React e os event handlers estão funcionando corretamente.</p>
             <button 
               onClick={() => setModalOpen(false)}
@@ -214,7 +214,7 @@ export default function Diagnostico() {
         <h3>Como usar este diagnóstico:</h3>
         <ol>
           <li>Acesse: <code>localhost:3020/diagnostico</code></li>
-          <li>Verifique se todos os itens estão marcados como �œ…</li>
+          <li>Verifique se todos os itens estão marcados como ✅</li>
           <li>Teste os botões interativos</li>
           <li>Se algum botão não funcionar, há problema no JavaScript/React</li>
           <li>Verifique o console do navegador para erros</li>

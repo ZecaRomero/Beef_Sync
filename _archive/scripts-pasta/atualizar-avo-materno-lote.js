@@ -27,8 +27,8 @@ async function atualizarAvoMaternoLote(arquivoCSV) {
     const caminhoArquivo = path.resolve(arquivoCSV)
     
     if (!fs.existsSync(caminhoArquivo)) {
-      console.error(`�Œ Arquivo não encontrado: ${caminhoArquivo}`)
-      console.log('\n�Ÿ’� Crie um arquivo CSV com o formato:')
+      console.error(`❌ Arquivo não encontrado: ${caminhoArquivo}`)
+      console.log('\n💡 Crie um arquivo CSV com o formato:')
       console.log('serie,rg,avo_materno')
       console.log('BENT,6167,CALVARIO SANT FIV 51')
       console.log('CJCJ,16173,NOME DO AVO MATERNO')
@@ -39,14 +39,14 @@ async function atualizarAvoMaternoLote(arquivoCSV) {
     const linhas = conteudo.split('\n').filter(linha => linha.trim() !== '')
     
     if (linhas.length < 2) {
-      console.error('�Œ Arquivo CSV deve ter pelo menos uma linha de cabeçalho e uma linha de dados')
+      console.error('❌ Arquivo CSV deve ter pelo menos uma linha de cabeçalho e uma linha de dados')
       process.exit(1)
     }
     
     // Remover cabeçalho
     const dados = linhas.slice(1)
     
-    console.log(`�Ÿ“‹ Processando ${dados.length} animais...\n`)
+    console.log(`📋 Processando ${dados.length} animais...\n`)
     
     const resultados = {
       sucessos: [],
@@ -62,7 +62,7 @@ async function atualizarAvoMaternoLote(arquivoCSV) {
       const campos = linha.split(',').map(c => c.trim())
       
       if (campos.length < 3) {
-        console.log(`�š�️ Linha ${i + 2} inválida (formato: serie,rg,avo_materno): ${linha}`)
+        console.log(`⚠️ Linha ${i + 2} inválida (formato: serie,rg,avo_materno): ${linha}`)
         resultados.erros.push({ linha: i + 2, motivo: 'Formato inválido', dados: linha })
         continue
       }
@@ -70,7 +70,7 @@ async function atualizarAvoMaternoLote(arquivoCSV) {
       const [serie, rg, avoMaterno] = campos
       
       if (!serie || !rg || !avoMaterno) {
-        console.log(`�š�️ Linha ${i + 2} com campos vazios: ${linha}`)
+        console.log(`⚠️ Linha ${i + 2} com campos vazios: ${linha}`)
         resultados.erros.push({ linha: i + 2, motivo: 'Campos vazios', dados: linha })
         continue
       }
@@ -84,7 +84,7 @@ async function atualizarAvoMaternoLote(arquivoCSV) {
         `, [serie, rg])
         
         if (animalResult.rows.length === 0) {
-          console.log(`�Œ Animal ${serie}-${rg} não encontrado`)
+          console.log(`❌ Animal ${serie}-${rg} não encontrado`)
           resultados.naoEncontrados.push({ serie, rg, avoMaterno })
           continue
         }
@@ -93,7 +93,7 @@ async function atualizarAvoMaternoLote(arquivoCSV) {
         
         // Verificar se já tem o mesmo valor
         if (animal.avo_materno === avoMaterno) {
-          console.log(`�„�️  ${serie}-${rg} já tem esse avô materno: "${avoMaterno}"`)
+          console.log(`ℹ️  ${serie}-${rg} já tem esse avô materno: "${avoMaterno}"`)
           resultados.sucessos.push({ 
             serie, 
             rg, 
@@ -111,7 +111,7 @@ async function atualizarAvoMaternoLote(arquivoCSV) {
           WHERE id = $2
         `, [avoMaterno, animal.id])
         
-        console.log(`�œ… ${serie}-${rg}: "${animal.avo_materno || 'NULL'}" �†’ "${avoMaterno}"`)
+        console.log(`✅ ${serie}-${rg}: "${animal.avo_materno || 'NULL'}" → "${avoMaterno}"`)
         resultados.sucessos.push({ 
           serie, 
           rg, 
@@ -122,7 +122,7 @@ async function atualizarAvoMaternoLote(arquivoCSV) {
         })
         
       } catch (error) {
-        console.error(`�Œ Erro ao processar ${serie}-${rg}:`, error.message)
+        console.error(`❌ Erro ao processar ${serie}-${rg}:`, error.message)
         resultados.erros.push({ 
           linha: i + 2, 
           serie, 
@@ -135,21 +135,21 @@ async function atualizarAvoMaternoLote(arquivoCSV) {
     
     // Resumo
     console.log('\n' + '='.repeat(60))
-    console.log('�Ÿ“Š RESUMO DA ATUALIZA�‡�ƒO')
+    console.log('📊 RESUMO DA ATUALIZAÇÃO')
     console.log('='.repeat(60))
-    console.log(`�œ… Sucessos: ${resultados.sucessos.length}`)
-    console.log(`�Œ Erros: ${resultados.erros.length}`)
-    console.log(`�š�️  Não encontrados: ${resultados.naoEncontrados.length}`)
+    console.log(`✅ Sucessos: ${resultados.sucessos.length}`)
+    console.log(`❌ Erros: ${resultados.erros.length}`)
+    console.log(`⚠️  Não encontrados: ${resultados.naoEncontrados.length}`)
     
     if (resultados.naoEncontrados.length > 0) {
-      console.log('\n�š�️  Animais não encontrados:')
+      console.log('\n⚠️  Animais não encontrados:')
       resultados.naoEncontrados.forEach(a => {
         console.log(`   - ${a.serie}-${a.rg}`)
       })
     }
     
     if (resultados.erros.length > 0) {
-      console.log('\n�Œ Erros:')
+      console.log('\n❌ Erros:')
       resultados.erros.forEach(e => {
         console.log(`   Linha ${e.linha}: ${e.motivo} - ${e.dados}`)
       })
@@ -158,10 +158,10 @@ async function atualizarAvoMaternoLote(arquivoCSV) {
     // Salvar log em arquivo
     const logFile = path.join(__dirname, `log-avo-materno-${Date.now()}.json`)
     fs.writeFileSync(logFile, JSON.stringify(resultados, null, 2))
-    console.log(`\n�Ÿ“„ Log salvo em: ${logFile}`)
+    console.log(`\n📄 Log salvo em: ${logFile}`)
     
   } catch (error) {
-    console.error('�Œ Erro fatal:', error.message)
+    console.error('❌ Erro fatal:', error.message)
     throw error
   } finally {
     client.release()
@@ -173,7 +173,7 @@ async function atualizarAvoMaternoLote(arquivoCSV) {
 const arquivoCSV = process.argv[2]
 
 if (!arquivoCSV) {
-  console.log('�Ÿ“‹ Script para atualizar avô materno de animais em lote\n')
+  console.log('📋 Script para atualizar avô materno de animais em lote\n')
   console.log('Uso:')
   console.log('  node scripts/atualizar-avo-materno-lote.js <arquivo.csv>\n')
   console.log('Formato do CSV:')
@@ -187,11 +187,11 @@ if (!arquivoCSV) {
 
 atualizarAvoMaternoLote(arquivoCSV)
   .then(() => {
-    console.log('\n�œ… Script concluído!')
+    console.log('\n✅ Script concluído!')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n�Œ Erro fatal:', error)
+    console.error('\n❌ Erro fatal:', error)
     process.exit(1)
   })
 

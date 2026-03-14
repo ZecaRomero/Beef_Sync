@@ -8,7 +8,7 @@ import {
 } from './Icons'
 
 /**
- * Componente para exibir as permissÃµes do usuÃ¡rio atual
+ * Componente para exibir as permissões do usuário atual
  */
 export default function PermissionsBadge({ className = '', compact = false }) {
   const permissions = usePermissions()
@@ -39,7 +39,7 @@ export default function PermissionsBadge({ className = '', compact = false }) {
     <div className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 ${className}`}>
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-          PermissÃµes do UsuÃ¡rio
+          Permissões do Usuário
         </h3>
         {permissions.isDeveloper ? (
           <span className="px-2 py-1 text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg">
@@ -47,19 +47,19 @@ export default function PermissionsBadge({ className = '', compact = false }) {
           </span>
         ) : (
           <span className="px-2 py-1 text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 rounded-lg">
-            UsuÃ¡rio da Rede
+            Usuário da Rede
           </span>
         )}
       </div>
 
       <div className="space-y-2">
-        {/* PermissÃµes BÃ¡sicas */}
+        {/* Permissões Básicas */}
         <div className="flex items-center justify-between py-1">
           <span className="text-sm text-gray-700 dark:text-gray-300 flex items-center space-x-2">
             <CheckCircleIcon className="h-4 w-4 text-green-500" />
             <span>Criar / Incluir</span>
           </span>
-          <span className="text-xs text-gray-500 dark:text-gray-400">âÅ“â€œ Permitido</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">✓ Permitido</span>
         </div>
 
         <div className="flex items-center justify-between py-1">
@@ -67,7 +67,7 @@ export default function PermissionsBadge({ className = '', compact = false }) {
             <CheckCircleIcon className="h-4 w-4 text-green-500" />
             <span>Ler / Visualizar</span>
           </span>
-          <span className="text-xs text-gray-500 dark:text-gray-400">âÅ“â€œ Permitido</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">✓ Permitido</span>
         </div>
 
         <div className="flex items-center justify-between py-1">
@@ -75,12 +75,12 @@ export default function PermissionsBadge({ className = '', compact = false }) {
             <CheckCircleIcon className="h-4 w-4 text-green-500" />
             <span>Alterar / Editar</span>
           </span>
-          <span className="text-xs text-gray-500 dark:text-gray-400">âÅ“â€œ Permitido</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">✓ Permitido</span>
         </div>
 
         <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
 
-        {/* PermissÃµes Restritas */}
+        {/* Permissões Restritas */}
         <div className="flex items-center justify-between py-1">
           <span className="text-sm text-gray-700 dark:text-gray-300 flex items-center space-x-2">
             {permissions.canDelete ? (
@@ -91,9 +91,9 @@ export default function PermissionsBadge({ className = '', compact = false }) {
             <span>Excluir</span>
           </span>
           {permissions.canDelete ? (
-            <span className="text-xs text-gray-500 dark:text-gray-400">âÅ“â€œ Permitido</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">✓ Permitido</span>
           ) : (
-            <span className="text-xs text-red-500 dark:text-red-400">âÅ“â€” Restrito</span>
+            <span className="text-xs text-red-500 dark:text-red-400">✗ Restrito</span>
           )}
         </div>
 
@@ -107,9 +107,9 @@ export default function PermissionsBadge({ className = '', compact = false }) {
             <span>Backup / Restaurar</span>
           </span>
           {permissions.canBackup ? (
-            <span className="text-xs text-gray-500 dark:text-gray-400">âÅ“â€œ Permitido</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">✓ Permitido</span>
           ) : (
-            <span className="text-xs text-red-500 dark:text-red-400">âÅ“â€” Restrito</span>
+            <span className="text-xs text-red-500 dark:text-red-400">✗ Restrito</span>
           )}
         </div>
 
@@ -118,7 +118,7 @@ export default function PermissionsBadge({ className = '', compact = false }) {
             <div className="flex items-start space-x-2">
               <InformationCircleIcon className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
               <p className="text-xs text-yellow-700 dark:text-yellow-300">
-                VocÃª estÃ¡ acessando via <strong>rede</strong>. Apenas aÃ§Ãµes de <strong>criaÃ§Ã£o e ediÃ§Ã£o</strong> estÃ£o permitidas.
+                Você está acessando via <strong>rede</strong>. Apenas ações de <strong>criação e edição</strong> estão permitidas.
               </p>
             </div>
           </div>

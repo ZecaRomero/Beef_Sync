@@ -35,7 +35,7 @@ const TaxReports = ({ animals, costs, sales }) => {
         endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0)
     }
 
-    // Filtrar dados por perÃ­odo
+    // Filtrar dados por período
     const periodCosts = costs?.filter(cost => {
       const costDate = new Date(cost.data)
       return costDate >= startDate && costDate <= endDate
@@ -51,8 +51,8 @@ const TaxReports = ({ animals, costs, sales }) => {
     const totalCosts = periodCosts.reduce((sum, cost) => sum + (parseFloat(cost.valor) || 0), 0)
     const netIncome = totalRevenue - totalCosts
 
-    // CÃ¡lculos tributÃ¡rios (valores aproximados para demonstraÃ§Ã£o)
-    const irpf = netIncome > 0 ? netIncome * 0.15 : 0 // 15% IR pessoa fÃ­sica
+    // Cálculos tributários (valores aproximados para demonstração)
+    const irpf = netIncome > 0 ? netIncome * 0.15 : 0 // 15% IR pessoa física
     const csll = netIncome > 0 ? netIncome * 0.09 : 0 // 9% CSLL
     const pis = totalRevenue * 0.0065 // 0.65% PIS
     const cofins = totalRevenue * 0.03 // 3% COFINS
@@ -86,7 +86,7 @@ const TaxReports = ({ animals, costs, sales }) => {
 
   const generateDARF = () => {
     const darfData = {
-      codigo_receita: '0190', // CÃ³digo para IR Pessoa FÃ­sica
+      codigo_receita: '0190', // Código para IR Pessoa Física
       periodo_apuracao: formatDate(taxData.period.startDate).slice(3), // MM/AAAA
       valor_principal: taxData.taxes.irpf,
       valor_multa: 0,
@@ -98,12 +98,12 @@ const TaxReports = ({ animals, costs, sales }) => {
     }
 
     const darfContent = `
-DOCUMENTO DE ARRECADAÃâ€¡ÃÆ’O DE RECEITAS FEDERAIS - DARF
+DOCUMENTO DE ARRECADAÇÃO DE RECEITAS FEDERAIS - DARF
 
-CÃ³digo da Receita: ${darfData.codigo_receita}
-PerÃ­odo de ApuraÃ§Ã£o: ${darfData.periodo_apuracao}
+Código da Receita: ${darfData.codigo_receita}
+Período de Apuração: ${darfData.periodo_apuracao}
 CNPJ/CPF: ${darfData.cnpj_cpf}
-Nome/RazÃ£o Social: ${darfData.nome_contribuinte}
+Nome/Razão Social: ${darfData.nome_contribuinte}
 
 Valor Principal: ${formatCurrency(darfData.valor_principal)}
 Multa: ${formatCurrency(darfData.valor_multa)}
@@ -112,11 +112,11 @@ Valor Total: ${formatCurrency(darfData.valor_total)}
 
 Data de Vencimento: ${formatDate(darfData.vencimento)}
 
-DETALHAMENTO DA APURAÃâ€¡ÃÆ’O:
+DETALHAMENTO DA APURAÇÃO:
 Receita Bruta: ${formatCurrency(taxData.revenue)}
-(-) Custos DedutÃ­veis: ${formatCurrency(taxData.costs)}
-(=) Base de CÃ¡lculo: ${formatCurrency(taxData.netIncome)}
-AlÃ­quota: 15%
+(-) Custos Dedutíveis: ${formatCurrency(taxData.costs)}
+(=) Base de Cálculo: ${formatCurrency(taxData.netIncome)}
+Alíquota: 15%
 Imposto Devido: ${formatCurrency(taxData.taxes.irpf)}
 
 Gerado automaticamente pelo Sistema Beef Sync
@@ -167,7 +167,7 @@ Data: ${formatDate(new Date())}
       ano_calendario: new Date().getFullYear() - 1,
       contribuinte: {
         cpf: '000.000.000-00',
-        nome: 'ProprietÃ¡rio da Fazenda'
+        nome: 'Proprietário da Fazenda'
       },
       rendimentos: {
         atividade_rural: {
@@ -210,32 +210,32 @@ Data: ${formatDate(new Date())}
       }
     }
 
-    const emailSubject = `Dados TributÃ¡rios - ${reportData.periodo}`
+    const emailSubject = `Dados Tributários - ${reportData.periodo}`
     const emailBody = `Prezado(a) Contador(a),
 
-Segue resumo tributÃ¡rio para o perÃ­odo de ${reportData.periodo}:
+Segue resumo tributário para o período de ${reportData.periodo}:
 
-ðÅ¸â€™° RESUMO FINANCEIRO:
-ââ‚¬¢ Receita Bruta: ${formatCurrency(taxData.revenue)}
-ââ‚¬¢ Custos DedutÃ­veis: ${formatCurrency(taxData.costs)}
-ââ‚¬¢ Resultado LÃ­quido: ${formatCurrency(taxData.netIncome)}
+💰 RESUMO FINANCEIRO:
+• Receita Bruta: ${formatCurrency(taxData.revenue)}
+• Custos Dedutíveis: ${formatCurrency(taxData.costs)}
+• Resultado Líquido: ${formatCurrency(taxData.netIncome)}
 
-ðÅ¸�â€ºï¸� IMPOSTOS CALCULADOS:
-ââ‚¬¢ IR Pessoa FÃ­sica: ${formatCurrency(taxData.taxes.irpf)}
-ââ‚¬¢ CSLL: ${formatCurrency(taxData.taxes.csll)}
-ââ‚¬¢ PIS: ${formatCurrency(taxData.taxes.pis)}
-ââ‚¬¢ COFINS: ${formatCurrency(taxData.taxes.cofins)}
-ââ‚¬¢ ICMS: ${formatCurrency(taxData.taxes.icms)}
-ââ‚¬¢ TOTAL: ${formatCurrency(taxData.taxes.total)}
+🏛️ IMPOSTOS CALCULADOS:
+• IR Pessoa Física: ${formatCurrency(taxData.taxes.irpf)}
+• CSLL: ${formatCurrency(taxData.taxes.csll)}
+• PIS: ${formatCurrency(taxData.taxes.pis)}
+• COFINS: ${formatCurrency(taxData.taxes.cofins)}
+• ICMS: ${formatCurrency(taxData.taxes.icms)}
+• TOTAL: ${formatCurrency(taxData.taxes.total)}
 
-ðÅ¸â€œÅ  PRINCIPAIS CATEGORIAS DE CUSTO:
+📊 PRINCIPAIS CATEGORIAS DE CUSTO:
 ${Object.entries(taxData.costsByCategory)
   .sort(([,a], [,b]) => b - a)
   .slice(0, 5)
-  .map(([cat, val]) => `ââ‚¬¢ ${cat}: ${formatCurrency(val)}`)
+  .map(([cat, val]) => `• ${cat}: ${formatCurrency(val)}`)
   .join('\n')}
 
-Por favor, revisar e proceder com as obrigaÃ§Ãµes fiscais.
+Por favor, revisar e proceder com as obrigações fiscais.
 
 Atenciosamente,
 Sistema Beef Sync`
@@ -243,7 +243,7 @@ Sistema Beef Sync`
     const mailtoLink = `mailto:?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`
     window.open(mailtoLink, '_blank')
 
-    // TambÃ©m baixar dados detalhados
+    // Também baixar dados detalhados
     const dataStr = JSON.stringify(reportData, null, 2)
     const blob = new Blob([dataStr], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
@@ -261,21 +261,21 @@ Sistema Beef Sync`
       {/* Controles */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          ðÅ¸�â€ºï¸� RelatÃ³rios Fiscais e TributÃ¡rios
+          🏛️ Relatórios Fiscais e Tributários
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              PerÃ­odo
+              Período
             </label>
             <select
               value={selectedPeriod}
               onChange={(e) => setSelectedPeriod(e.target.value)}
               className="input-field"
             >
-              <option value="current_month">MÃªs Atual</option>
-              <option value="last_month">MÃªs Anterior</option>
+              <option value="current_month">Mês Atual</option>
+              <option value="last_month">Mês Anterior</option>
               <option value="current_year">Ano Atual</option>
               <option value="last_year">Ano Anterior</option>
             </select>
@@ -283,7 +283,7 @@ Sistema Beef Sync`
           
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Tipo de RelatÃ³rio
+              Tipo de Relatório
             </label>
             <select
               value={reportType}
@@ -291,15 +291,15 @@ Sistema Beef Sync`
               className="input-field"
             >
               <option value="darf">DARF - Imposto de Renda</option>
-              <option value="dimob">DIMOB - OperaÃ§Ãµes ImobiliÃ¡rias</option>
-              <option value="dirpf">DIRPF - DeclaraÃ§Ã£o IR</option>
-              <option value="summary">Resumo TributÃ¡rio</option>
+              <option value="dimob">DIMOB - Operações Imobiliárias</option>
+              <option value="dirpf">DIRPF - Declaração IR</option>
+              <option value="summary">Resumo Tributário</option>
             </select>
           </div>
         </div>
       </div>
 
-      {/* Resumo TributÃ¡rio */}
+      {/* Resumo Tributário */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="text-center">
@@ -315,7 +315,7 @@ Sistema Beef Sync`
             <div className="text-2xl font-bold text-red-600 dark:text-red-400">
               {formatCurrency(taxData.costs)}
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Custos DedutÃ­veis</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Custos Dedutíveis</div>
           </div>
         </div>
 
@@ -324,7 +324,7 @@ Sistema Beef Sync`
             <div className={`text-2xl font-bold ${taxData.netIncome >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}>
               {formatCurrency(taxData.netIncome)}
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Resultado LÃ­quido</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Resultado Líquido</div>
           </div>
         </div>
 
@@ -341,7 +341,7 @@ Sistema Beef Sync`
       {/* Detalhamento dos Impostos */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-4">
-          ðÅ¸â€œÅ  Detalhamento dos Impostos
+          📊 Detalhamento dos Impostos
         </h4>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -375,14 +375,14 @@ Sistema Beef Sync`
         </div>
       </div>
 
-      {/* AÃ§Ãµes */}
+      {/* Ações */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <button
           onClick={generateDARF}
           className="bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-lg transition-colors"
         >
           <div className="text-center">
-            <div className="text-2xl mb-2">ðÅ¸â€œâ€ž</div>
+            <div className="text-2xl mb-2">📄</div>
             <div className="font-semibold text-sm">Gerar DARF</div>
           </div>
         </button>
@@ -392,7 +392,7 @@ Sistema Beef Sync`
           className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-lg transition-colors"
         >
           <div className="text-center">
-            <div className="text-2xl mb-2">ðÅ¸� </div>
+            <div className="text-2xl mb-2">🏠</div>
             <div className="font-semibold text-sm">Gerar DIMOB</div>
           </div>
         </button>
@@ -402,7 +402,7 @@ Sistema Beef Sync`
           className="bg-purple-500 hover:bg-purple-600 text-white p-4 rounded-lg transition-colors"
         >
           <div className="text-center">
-            <div className="text-2xl mb-2">ðÅ¸â€œâ€¹</div>
+            <div className="text-2xl mb-2">📋</div>
             <div className="font-semibold text-sm">Dados DIRPF</div>
           </div>
         </button>
@@ -412,7 +412,7 @@ Sistema Beef Sync`
           className="bg-orange-500 hover:bg-orange-600 text-white p-4 rounded-lg transition-colors"
         >
           <div className="text-center">
-            <div className="text-2xl mb-2">ðÅ¸â€œ§</div>
+            <div className="text-2xl mb-2">📧</div>
             <div className="font-semibold text-sm">Enviar p/ Contador</div>
           </div>
         </button>
@@ -421,11 +421,11 @@ Sistema Beef Sync`
       {/* Aviso Legal */}
       <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 p-4 rounded-lg">
         <div className="flex items-start space-x-3">
-          <span className="text-yellow-600 dark:text-yellow-400 text-lg">âÅ¡ ï¸�</span>
+          <span className="text-yellow-600 dark:text-yellow-400 text-lg">⚠️</span>
           <div className="text-sm text-yellow-800 dark:text-yellow-200">
-            <strong>Aviso Legal:</strong> Os cÃ¡lculos tributÃ¡rios sÃ£o estimativas baseadas em alÃ­quotas padrÃ£o. 
-            Sempre consulte seu contador para valores exatos e cumprimento das obrigaÃ§Ãµes fiscais. 
-            As alÃ­quotas podem variar conforme legislaÃ§Ã£o estadual e federal.
+            <strong>Aviso Legal:</strong> Os cálculos tributários são estimativas baseadas em alíquotas padrão. 
+            Sempre consulte seu contador para valores exatos e cumprimento das obrigações fiscais. 
+            As alíquotas podem variar conforme legislação estadual e federal.
           </div>
         </div>
       </div>

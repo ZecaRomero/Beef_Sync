@@ -30,9 +30,9 @@ async function addStatusGestacaoColumn() {
         ADD COLUMN tecnico VARCHAR(100),
         ADD COLUMN protocolo VARCHAR(50)
       `)
-      console.log('�œ… Colunas adicionadas com sucesso!')
+      console.log('✅ Colunas adicionadas com sucesso!')
     } else {
-      console.log('�œ… Coluna status_gestacao já existe')
+      console.log('✅ Coluna status_gestacao já existe')
     }
 
     // Verificar e adicionar tecnico se não existir
@@ -44,7 +44,7 @@ async function addStatusGestacaoColumn() {
     `)
     if (checkTecnico.rows.length === 0) {
       await client.query('ALTER TABLE inseminacoes ADD COLUMN tecnico VARCHAR(100)')
-      console.log('�œ… Coluna tecnico adicionada')
+      console.log('✅ Coluna tecnico adicionada')
     }
 
     // Verificar e adicionar protocolo se não existir
@@ -56,11 +56,11 @@ async function addStatusGestacaoColumn() {
     `)
     if (checkProtocolo.rows.length === 0) {
       await client.query('ALTER TABLE inseminacoes ADD COLUMN protocolo VARCHAR(50)')
-      console.log('�œ… Coluna protocolo adicionada')
+      console.log('✅ Coluna protocolo adicionada')
     }
 
   } catch (error) {
-    console.error('�Œ Erro:', error.message)
+    console.error('❌ Erro:', error.message)
   } finally {
     client.release()
     await pool.end()

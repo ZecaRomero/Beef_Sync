@@ -1,6 +1,6 @@
 /**
  * Importa Boletim Campo do Excel.
- * Colunas: LOCAL (A), LOCAL 1 (B), SUB_LOCAL_2 (C), QUANT. (D), SEXO (E), CATEGORIA (F), RAÃâ€¡A (G), ERA (H), OBSERVAÃâ€¡ÃÆ’O (I)
+ * Colunas: LOCAL (A), LOCAL 1 (B), SUB_LOCAL_2 (C), QUANT. (D), SEXO (E), CATEGORIA (F), RAÇA (G), ERA (H), OBSERVAÇÃO (I)
  */
 import { query } from '../../../lib/database'
 import formidable from 'formidable'
@@ -13,7 +13,7 @@ export const config = {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' })
+    return res.status(405).json({ error: 'Método não permitido' })
   }
 
   const form = formidable({ multiples: false })
@@ -29,7 +29,7 @@ export default async function handler(req, res) {
 
     const filepath = file.filepath || file.path
     if (!filepath) {
-      return res.status(400).json({ error: 'Arquivo invÃ¡lido' })
+      return res.status(400).json({ error: 'Arquivo inválido' })
     }
 
     try {
@@ -76,7 +76,7 @@ export default async function handler(req, res) {
 
       return res.status(200).json({
         success: true,
-        message: `ImportaÃ§Ã£o concluÃ­da: ${inseridos} registros`,
+        message: `Importação concluída: ${inseridos} registros`,
         inseridos
       })
     } catch (error) {

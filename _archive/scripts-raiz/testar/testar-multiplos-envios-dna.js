@@ -2,7 +2,7 @@ const { query } = require('./lib/database')
 
 async function testarMultiplosEnvios() {
   try {
-    console.log('�Ÿ�� Testando sistema de múltiplos envios de DNA...\n')
+    console.log('🧪 Testando sistema de múltiplos envios de DNA...\n')
 
     // Buscar um animal de teste
     const animalResult = await query(`
@@ -13,16 +13,16 @@ async function testarMultiplosEnvios() {
     `)
 
     if (animalResult.rows.length === 0) {
-      console.log('�Œ Nenhum animal encontrado para teste')
+      console.log('❌ Nenhum animal encontrado para teste')
       process.exit(1)
     }
 
     const animal = animalResult.rows[0]
-    console.log(`�œ… Animal selecionado: ${animal.serie}-${animal.rg} (${animal.nome})`)
+    console.log(`✅ Animal selecionado: ${animal.serie}-${animal.rg} (${animal.nome})`)
     console.log(`   ID: ${animal.id}\n`)
 
     // Simular envio para VRGEN
-    console.log('�Ÿ“� Simulando envio para VRGEN (R$ 50,00)...')
+    console.log('📤 Simulando envio para VRGEN (R$ 50,00)...')
     const envio1 = await query(`
       INSERT INTO dna_envios 
       (laboratorio, data_envio, custo_por_animal, custo_total, quantidade_animais, observacoes)
@@ -48,10 +48,10 @@ async function testarMultiplosEnvios() {
       VALUES ($1, 'DNA', 'Análise Genética', 50.00, CURRENT_DATE, 'Análise de DNA - VRGEN')
     `, [animal.id])
 
-    console.log('�œ… Envio VRGEN registrado\n')
+    console.log('✅ Envio VRGEN registrado\n')
 
     // Simular envio para NEOGEN
-    console.log('�Ÿ“� Simulando envio para NEOGEN (R$ 80,00)...')
+    console.log('📤 Simulando envio para NEOGEN (R$ 80,00)...')
     const envio2 = await query(`
       INSERT INTO dna_envios 
       (laboratorio, data_envio, custo_por_animal, custo_total, quantidade_animais, observacoes)
@@ -76,7 +76,7 @@ async function testarMultiplosEnvios() {
       VALUES ($1, 'DNA', 'Análise Genética', 80.00, CURRENT_DATE, 'Análise de DNA - NEOGEN')
     `, [animal.id])
 
-    console.log('�œ… Envio NEOGEN registrado\n')
+    console.log('✅ Envio NEOGEN registrado\n')
 
     // Verificar resultado
     const animalAtualizado = await query(`
@@ -115,19 +115,19 @@ async function testarMultiplosEnvios() {
       ORDER BY created_at
     `, [animal.id])
 
-    console.log('�Ÿ“Š RESULTADO FINAL:\n')
-    console.log('�Ÿ�„ Animal:')
+    console.log('📊 RESULTADO FINAL:\n')
+    console.log('🐄 Animal:')
     console.log(`   ${animalAtualizado.rows[0].serie}-${animalAtualizado.rows[0].rg}`)
     console.log(`   Laboratórios: ${animalAtualizado.rows[0].laboratorio_dna}`)
     console.log(`   Custo Total: R$ ${parseFloat(animalAtualizado.rows[0].custo_dna).toFixed(2)}\n`)
 
-    console.log(`�Ÿ“� Envios (${enviosAnimal.rows.length}):`)
+    console.log(`📦 Envios (${enviosAnimal.rows.length}):`)
     enviosAnimal.rows.forEach((envio, idx) => {
       console.log(`   ${idx + 1}. ${envio.laboratorio} - R$ ${parseFloat(envio.custo_por_animal).toFixed(2)}`)
       console.log(`      ${envio.observacoes}`)
     })
 
-    console.log(`\n�Ÿ’� Custos (${custosAnimal.rows.length}):`)
+    console.log(`\n💰 Custos (${custosAnimal.rows.length}):`)
     const custoTotal = custosAnimal.rows.reduce((sum, c) => sum + parseFloat(c.valor), 0)
     custosAnimal.rows.forEach((custo, idx) => {
       console.log(`   ${idx + 1}. ${custo.subtipo} - R$ ${parseFloat(custo.valor).toFixed(2)}`)
@@ -135,11 +135,11 @@ async function testarMultiplosEnvios() {
     })
     console.log(`   TOTAL: R$ ${custoTotal.toFixed(2)}`)
 
-    console.log('\n�œ… Teste concluído com sucesso!')
-    console.log('\n�Ÿ’� Acesse a ficha do animal para ver o histórico completo de envios.')
+    console.log('\n✅ Teste concluído com sucesso!')
+    console.log('\n💡 Acesse a ficha do animal para ver o histórico completo de envios.')
 
   } catch (error) {
-    console.error('�Œ Erro:', error)
+    console.error('❌ Erro:', error)
   } finally {
     process.exit(0)
   }

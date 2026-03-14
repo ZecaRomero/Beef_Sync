@@ -10,13 +10,13 @@ async function checkStructure() {
       ORDER BY ordinal_position
     `)
     
-    console.log('�Ÿ“‹ Estrutura da tabela animais:\n')
+    console.log('📋 Estrutura da tabela animais:\n')
     result.rows.forEach(col => {
       console.log(`  - ${col.column_name} (${col.data_type}) ${col.is_nullable === 'YES' ? 'NULL' : 'NOT NULL'}`)
     })
     
   } catch (error) {
-    console.error('�Œ Erro:', error)
+    console.error('❌ Erro:', error)
   } finally {
     process.exit(0)
   }

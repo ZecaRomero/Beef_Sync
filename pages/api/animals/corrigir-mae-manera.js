@@ -1,5 +1,5 @@
 /**
- * API para corrigir os dados da mÃ£e MANERA SANT ANNA
+ * API para corrigir os dados da mãe MANERA SANT ANNA
  * Atualiza serie_mae e rg_mae para CJCJ 16013
  */
 import { query } from '../../../lib/database'
@@ -7,13 +7,13 @@ import { sendSuccess, sendError } from '../../../utils/apiResponse'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, message: 'MÃ©todo nÃ£o permitido' })
+    return res.status(405).json({ success: false, message: 'Método não permitido' })
   }
 
   try {
-    console.log('ðÅ¸â€�§ Corrigindo dados da mÃ£e MANERA SANT ANNA...')
+    console.log('🔧 Corrigindo dados da mãe MANERA SANT ANNA...')
     
-    // Buscar todos os animais que tÃªm MANERA SANT ANNA como mÃ£e
+    // Buscar todos os animais que têm MANERA SANT ANNA como mãe
     const animais = await query(
       `SELECT id, serie, rg, nome, mae, serie_mae, rg_mae
        FROM animais
@@ -21,7 +21,7 @@ export default async function handler(req, res) {
           OR UPPER(mae) LIKE '%MANERA%16013%'`
     )
     
-    console.log(`ðÅ¸â€œâ€¹ Encontrados ${animais.rows.length} animais com MANERA SANT ANNA como mÃ£e`)
+    console.log(`📋 Encontrados ${animais.rows.length} animais com MANERA SANT ANNA como mãe`)
     
     if (animais.rows.length === 0) {
       return sendSuccess(res, { updated: 0 }, 'Nenhum animal encontrado')
@@ -30,7 +30,7 @@ export default async function handler(req, res) {
     // Atualizar cada animal
     const updated = []
     for (const animal of animais.rows) {
-      console.log(`ðÅ¸â€�â€ž Atualizando ${animal.serie} ${animal.rg}...`)
+      console.log(`🔄 Atualizando ${animal.serie} ${animal.rg}...`)
       
       await query(
         `UPDATE animais 
@@ -47,10 +47,10 @@ export default async function handler(req, res) {
         mae: animal.mae
       })
       
-      console.log(`   âÅ“â€¦ Atualizado: serie_mae = 'CJCJ', rg_mae = '16013'`)
+      console.log(`   ✅ Atualizado: serie_mae = 'CJCJ', rg_mae = '16013'`)
     }
     
-    console.log('âÅ“â€¦ CorreÃ§Ã£o concluÃ­da!')
+    console.log('✅ Correção concluída!')
     
     return sendSuccess(res, {
       updated: updated.length,
@@ -58,7 +58,7 @@ export default async function handler(req, res) {
     }, `${updated.length} animal(is) atualizado(s) com sucesso`)
     
   } catch (error) {
-    console.error('â�Å’ Erro ao corrigir:', error)
-    return sendError(res, 'Erro ao corrigir dados da mÃ£e', 500, error.message)
+    console.error('❌ Erro ao corrigir:', error)
+    return sendError(res, 'Erro ao corrigir dados da mãe', 500, error.message)
   }
 }

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import * as XLSX from 'xlsx'
 import ImportProgressOverlay from '../components/ImportProgressOverlay'
 
-// FunÃ§Ã£o auxiliar para formatar data
+// Função auxiliar para formatar data
 const formatDate = (date, formatStr) => {
   if (!date) return '';
   const d = new Date(date);
@@ -31,16 +31,16 @@ export default function Ocorrencias() {
     avoMaterno: '',
     maeBiologiaRg: '',
     receptora: '',
-    // Programa de melhoramento genÃ©tico
+    // Programa de melhoramento genético
     iabcz: '',
     deca: '',
     mgq: '',
     top: '',
     mgta: '',
     topPrograma: '',
-    // InclusÃ£o de serviÃ§o
+    // Inclusão de serviço
     dataServico: '',
-    numeroServicos: 1, // ComeÃ§ar com apenas 1 serviÃ§o
+    numeroServicos: 1, // Começar com apenas 1 serviço
     servicos: {
       servico1: { ativo: false, tipo: '', valor: '' },
       servico2: { ativo: false, tipo: '', valor: '' },
@@ -53,7 +53,7 @@ export default function Ocorrencias() {
     mostrarCE: false,
     // Aplicar local no lote
     aplicarLocalLote: false,
-    // Campos especÃ­ficos para fÃªmeas
+    // Campos específicos para fêmeas
     mostrarCamposFemea: false,
     quantidadeFilhos: '',
     quantidadeOocitos: '',
@@ -63,7 +63,7 @@ export default function Ocorrencias() {
     ativos: false,
     vendidos: false,
     baixados: false,
-    // ObservaÃ§Ãµes
+    // Observações
     observacoes: ''
   });
 
@@ -75,7 +75,7 @@ export default function Ocorrencias() {
 
   const fetchAnimals = async () => {
     try {
-      console.log('Fazendo requisiÃ§Ã£o para /api/animals...');
+      console.log('Fazendo requisição para /api/animals...');
       const response = await fetch('/api/animals');
       console.log('Resposta recebida:', response.status);
       
@@ -123,7 +123,7 @@ export default function Ocorrencias() {
     const { name, value, type, checked } = e.target;
     
     if (name.startsWith('servico') && name.includes('_')) {
-      // Lidar com campos de serviÃ§o (tipo e valor)
+      // Lidar com campos de serviço (tipo e valor)
       const [servicoName, field] = name.split('_');
       setFormData(prev => ({
         ...prev,
@@ -136,7 +136,7 @@ export default function Ocorrencias() {
         }
       }));
     } else if (name.startsWith('servico')) {
-      // Lidar com checkbox de serviÃ§o
+      // Lidar com checkbox de serviço
       setFormData(prev => ({
         ...prev,
         servicos: {
@@ -153,9 +153,9 @@ export default function Ocorrencias() {
         [name]: type === 'checkbox' ? checked : value
       }));
       
-      // ValidaÃ§Ã£o para RG (apenas nÃºmeros)
+      // Validação para RG (apenas números)
       if (name === 'rg') {
-        const numericValue = value.replace(/\D/g, ''); // Remove tudo que nÃ£o Ã© nÃºmero
+        const numericValue = value.replace(/\D/g, ''); // Remove tudo que não é número
         setFormData(prev => ({
           ...prev,
           [name]: numericValue
@@ -164,7 +164,7 @@ export default function Ocorrencias() {
         return;
       }
 
-      // Auto-preenchimento quando SÃ©rie ou RG sÃ£o alterados
+      // Auto-preenchimento quando Série ou RG são alterados
       if (name === 'serie') {
         autoFillAnimalData(value, formData.rg);
       }
@@ -172,7 +172,7 @@ export default function Ocorrencias() {
   };
 
   const autoFillAnimalData = (serie, rg) => {
-    // SÃ³ busca se ambos sÃ©rie e RG estÃ£o preenchidos
+    // Só busca se ambos série e RG estão preenchidos
     if (!serie || !rg) {
       // Se um dos campos foi limpo, limpar os dados preenchidos automaticamente
       if (formData.animalId) {
@@ -213,8 +213,8 @@ export default function Ocorrencias() {
                           calculatedMonths >= 9 && 
                           calculatedMonths <= 18;
 
-      // Verificar se deve mostrar campos para fÃªmeas
-      const shouldShowCamposFemea = foundAnimal.sexo === 'FÃªmea';
+      // Verificar se deve mostrar campos para fêmeas
+      const shouldShowCamposFemea = foundAnimal.sexo === 'Fêmea';
 
       setFormData(prev => ({
         ...prev,
@@ -228,9 +228,9 @@ export default function Ocorrencias() {
         maeBiologiaRg: foundAnimal.mae || '',
         receptora: foundAnimal.receptora || '',
         mostrarCE: shouldShowCE,
-        ce: shouldShowCE ? prev.ce : '', // Manter valor se jÃ¡ preenchido
+        ce: shouldShowCE ? prev.ce : '', // Manter valor se já preenchido
         mostrarCamposFemea: shouldShowCamposFemea,
-        // Manter valores dos campos de fÃªmea se jÃ¡ preenchidos
+        // Manter valores dos campos de fêmea se já preenchidos
         quantidadeFilhos: shouldShowCamposFemea ? prev.quantidadeFilhos : '',
         quantidadeOocitos: shouldShowCamposFemea ? prev.quantidadeOocitos : '',
         quantidadeFilhosVendidos: shouldShowCamposFemea ? prev.quantidadeFilhosVendidos : '',
@@ -238,10 +238,10 @@ export default function Ocorrencias() {
       }));
       
       // Mostrar mensagem de sucesso
-      setMessage(`âÅ“â€¦ Animal encontrado: ${foundAnimal.serie} (${foundAnimal.sexo}) - Dados preenchidos automaticamente!`);
+      setMessage(`✅ Animal encontrado: ${foundAnimal.serie} (${foundAnimal.sexo}) - Dados preenchidos automaticamente!`);
       setTimeout(() => setMessage(''), 4000);
     } else {
-      // Limpar campos se nÃ£o encontrar e mostrar mensagem
+      // Limpar campos se não encontrar e mostrar mensagem
       setFormData(prev => ({
         ...prev,
         animalId: '',
@@ -256,7 +256,7 @@ export default function Ocorrencias() {
       }));
       
       // Mostrar mensagem informativa
-      setMessage(`âÅ¡ ï¸� Animal com SÃ©rie "${serie}" e RG "${rg}" nÃ£o encontrado no cadastro.`);
+      setMessage(`⚠️ Animal com Série "${serie}" e RG "${rg}" não encontrado no cadastro.`);
       setTimeout(() => setMessage(''), 4000);
     }
   };
@@ -276,7 +276,7 @@ export default function Ocorrencias() {
     }
   }, [formData.nascimento]);
 
-  // FunÃ§Ã£o para importar dados do Excel
+  // Função para importar dados do Excel
   const handleExcelImport = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -294,7 +294,7 @@ export default function Ocorrencias() {
         if (jsonData.length > 0) {
           const firstRow = jsonData[0];
           
-          // Mapear os dados do Excel para os campos do formulÃ¡rio
+          // Mapear os dados do Excel para os campos do formulário
           setFormData(prev => ({
             ...prev,
             iabcz: firstRow['IABCZ'] || firstRow['iabcz'] || '',
@@ -305,14 +305,14 @@ export default function Ocorrencias() {
             topPrograma: firstRow['TOP_PROGRAMA'] || firstRow['TOP PROG'] || firstRow['topPrograma'] || ''
           }));
 
-          setMessage(`âÅ“â€¦ Dados do melhoramento genÃ©tico importados com sucesso! ${jsonData.length} registro(s) processado(s).`);
+          setMessage(`✅ Dados do melhoramento genético importados com sucesso! ${jsonData.length} registro(s) processado(s).`);
           setTimeout(() => setMessage(''), 4000);
         } else {
-          setMessage('âÅ¡ ï¸� Arquivo Excel estÃ¡ vazio ou nÃ£o contÃ©m dados vÃ¡lidos.');
+          setMessage('⚠️ Arquivo Excel está vazio ou não contém dados válidos.');
           setTimeout(() => setMessage(''), 4000);
         }
       } catch (error) {
-        setMessage(`â�Å’ Erro ao processar arquivo Excel: ${error.message}`);
+        setMessage(`❌ Erro ao processar arquivo Excel: ${error.message}`);
         setTimeout(() => setMessage(''), 4000);
       } finally {
         setImportandoExcel(false);
@@ -328,10 +328,10 @@ export default function Ocorrencias() {
     e.target.value = '';
   };
 
-  // FunÃ§Ã£o para baixar template do Excel
+  // Função para baixar template do Excel
   const downloadExcelTemplate = () => {
     try {
-      // Criar dados do template com instruÃ§Ãµes
+      // Criar dados do template com instruções
       const templateData = [
         {
           'SERIE': 'CJCJ001',
@@ -381,32 +381,32 @@ export default function Ocorrencias() {
         { width: 18 }  // TOP_PROGRAMA
       ];
 
-      // Adicionar comentÃ¡rios nas cÃ©lulas de cabeÃ§alho
+      // Adicionar comentários nas células de cabeçalho
       const headerComments = {
-        'A1': 'SÃ©rie do animal (ex: CJCJ001, BENT002)',
-        'B1': 'Registro GenealÃ³gico do animal',
-        'C1': 'CÃ³digo IABCZ - AssociaÃ§Ã£o Brasileira dos Criadores de Zebu',
-        'D1': 'DECA - DiferenÃ§a Esperada na Capacidade de Aleitamento',
-        'E1': 'MGQ - MÃ©rito GenÃ©tico Qualitativo',
-        'F1': 'TOP - Teste de ProgÃªnie (A, B, C, etc.)',
-        'G1': 'MGTA - MÃ©rito GenÃ©tico Total Agregado',
-        'H1': 'TOP Programa - ClassificaÃ§Ã£o no programa (Elite, Superior, etc.)'
+        'A1': 'Série do animal (ex: CJCJ001, BENT002)',
+        'B1': 'Registro Genealógico do animal',
+        'C1': 'Código IABCZ - Associação Brasileira dos Criadores de Zebu',
+        'D1': 'DECA - Diferença Esperada na Capacidade de Aleitamento',
+        'E1': 'MGQ - Mérito Genético Qualitativo',
+        'F1': 'TOP - Teste de Progênie (A, B, C, etc.)',
+        'G1': 'MGTA - Mérito Genético Total Agregado',
+        'H1': 'TOP Programa - Classificação no programa (Elite, Superior, etc.)'
       };
 
-      XLSX.utils.book_append_sheet(wb, ws, 'Melhoramento GenÃ©tico');
+      XLSX.utils.book_append_sheet(wb, ws, 'Melhoramento Genético');
       
       // Baixar arquivo
       XLSX.writeFile(wb, `template_melhoramento_genetico_${new Date().toISOString().split('T')[0]}.xlsx`);
       
-      setMessage('âÅ“â€¦ Template Excel baixado com sucesso! Preencha os dados e importe de volta.');
+      setMessage('✅ Template Excel baixado com sucesso! Preencha os dados e importe de volta.');
       setTimeout(() => setMessage(''), 4000);
     } catch (error) {
-      setMessage(`â�Å’ Erro ao gerar template: ${error.message}`);
+      setMessage(`❌ Erro ao gerar template: ${error.message}`);
       setTimeout(() => setMessage(''), 4000);
     }
   };
 
-  // FunÃ§Ã£o para limpar campos do melhoramento genÃ©tico
+  // Função para limpar campos do melhoramento genético
   const clearMelhoramentoFields = () => {
     setFormData(prev => ({
       ...prev,
@@ -418,11 +418,11 @@ export default function Ocorrencias() {
       topPrograma: ''
     }));
     
-    setMessage('ðÅ¸â€”â€˜ï¸� Campos do melhoramento genÃ©tico limpos.');
+    setMessage('🗑️ Campos do melhoramento genético limpos.');
     setTimeout(() => setMessage(''), 2000);
   };
 
-  // FunÃ§Ã£o para limpar campos reprodutivos de fÃªmea
+  // Função para limpar campos reprodutivos de fêmea
   const clearCamposFemea = () => {
     setFormData(prev => ({
       ...prev,
@@ -432,11 +432,11 @@ export default function Ocorrencias() {
       valorFilhosVendidos: ''
     }));
     
-    setMessage('ðÅ¸â€”â€˜ï¸� Campos reprodutivos da fÃªmea limpos.');
+    setMessage('🗑️ Campos reprodutivos da fêmea limpos.');
     setTimeout(() => setMessage(''), 2000);
   };
 
-  // FunÃ§Ã£o para adicionar mais serviÃ§os
+  // Função para adicionar mais serviços
   const adicionarServico = () => {
     if (formData.numeroServicos < 5) {
       setFormData(prev => ({
@@ -446,13 +446,13 @@ export default function Ocorrencias() {
     }
   };
 
-  // FunÃ§Ã£o para remover serviÃ§os
+  // Função para remover serviços
   const removerServico = () => {
     if (formData.numeroServicos > 1) {
       setFormData(prev => ({
         ...prev,
         numeroServicos: prev.numeroServicos - 1,
-        // Limpar o serviÃ§o removido
+        // Limpar o serviço removido
         servicos: {
           ...prev.servicos,
           [`servico${prev.numeroServicos}`]: { ativo: false, tipo: '', valor: '' }
@@ -476,12 +476,12 @@ export default function Ocorrencias() {
       });
 
       if (response.ok) {
-        setMessage('OcorrÃªncia registrada com sucesso!');
+        setMessage('Ocorrência registrada com sucesso!');
         // Reset form but keep animal data
         setFormData(prev => ({
           ...prev,
           dataServico: '',
-          numeroServicos: 1, // Resetar para 1 serviÃ§o
+          numeroServicos: 1, // Resetar para 1 serviço
           servicos: {
             servico1: { ativo: false, tipo: '', valor: '' },
             servico2: { ativo: false, tipo: '', valor: '' },
@@ -491,7 +491,7 @@ export default function Ocorrencias() {
           },
           ce: '',
           aplicarLocalLote: false,
-          // Manter campos de fÃªmea se animal for fÃªmea
+          // Manter campos de fêmea se animal for fêmea
           quantidadeFilhos: prev.mostrarCamposFemea ? prev.quantidadeFilhos : '',
           quantidadeOocitos: prev.mostrarCamposFemea ? prev.quantidadeOocitos : '',
           quantidadeFilhosVendidos: prev.mostrarCamposFemea ? prev.quantidadeFilhosVendidos : '',
@@ -524,24 +524,24 @@ export default function Ocorrencias() {
       <div className="w-full max-w-none mx-auto px-2 sm:px-4 lg:px-6">
         <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg border border-gray-200 dark:border-gray-700">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">LanÃ§amento de OcorrÃªncias</h1>
-            <p className="text-gray-600 dark:text-gray-400">Registre ocorrÃªncias e eventos dos animais</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Lançamento de Ocorrências</h1>
+            <p className="text-gray-600 dark:text-gray-400">Registre ocorrências e eventos dos animais</p>
             
-            {/* InstruÃ§Ãµes de uso */}
+            {/* Instruções de uso */}
             <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-600 rounded-lg">
               <div className="flex items-start">
-                <span className="text-blue-500 mr-2 text-lg">ðÅ¸â€™¡</span>
+                <span className="text-blue-500 mr-2 text-lg">💡</span>
                 <div>
                   <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-300">Como usar:</h3>
                   <p className="text-xs text-blue-700 dark:text-blue-400 mt-1">
-                    Digite apenas a <strong>SÃ©rie</strong> e <strong>RG</strong> do animal. 
-                    Todas as outras informaÃ§Ãµes serÃ£o preenchidas automaticamente. 
+                    Digite apenas a <strong>Série</strong> e <strong>RG</strong> do animal. 
+                    Todas as outras informações serão preenchidas automaticamente. 
                     <br />
                     <strong>Funcionalidades inteligentes:</strong>
-                    ââ‚¬¢ Machos de 9-18 meses: Campo CE aparece automaticamente
-                    ââ‚¬¢ FÃªmeas: Campos reprodutivos (filhos, oÃ³citos, vendas) aparecem automaticamente
-                    ââ‚¬¢ ServiÃ§os personalizÃ¡veis: Peso, Aparte, Piquete, Medicamentos, etc.
-                    ââ‚¬¢ OpÃ§Ã£o de aplicar local para todo o lote
+                    • Machos de 9-18 meses: Campo CE aparece automaticamente
+                    • Fêmeas: Campos reprodutivos (filhos, oócitos, vendas) aparecem automaticamente
+                    • Serviços personalizáveis: Peso, Aparte, Piquete, Medicamentos, etc.
+                    • Opção de aplicar local para todo o lote
                   </p>
                 </div>
               </div>
@@ -550,19 +550,19 @@ export default function Ocorrencias() {
 
           <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
             
-            {/* Busca RÃ¡pida - SÃ©rie e RG */}
+            {/* Busca Rápida - Série e RG */}
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-300 dark:border-blue-600 rounded-xl p-4 mb-4">
               <div className="flex items-center mb-3">
-                <span className="text-lg mr-2">ðÅ¸â€��</span>
+                <span className="text-lg mr-2">🔍</span>
                 <h3 className="text-sm font-bold text-blue-800 dark:text-blue-300 uppercase">
-                  Busca RÃ¡pida - Digite SÃ©rie e RG para auto-preenchimento
+                  Busca Rápida - Digite Série e RG para auto-preenchimento
                 </h3>
               </div>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 <div className="sm:col-span-1 md:col-span-2 lg:col-span-2">
                   <label className="block text-xs font-medium text-blue-700 dark:text-blue-300 mb-1 uppercase">
-                    SÃâ€°RIE * (mÃ¡x. 5 caracteres)
+                    SÉRIE * (máx. 5 caracteres)
                   </label>
                   <input
                     type="text"
@@ -577,7 +577,7 @@ export default function Ocorrencias() {
 
                 <div className="sm:col-span-1 md:col-span-2 lg:col-span-2">
                   <label className="block text-xs font-medium text-blue-700 dark:text-blue-300 mb-1 uppercase">
-                    RG * (mÃ¡x. 6 nÃºmeros)
+                    RG * (máx. 6 números)
                   </label>
                   <input
                     type="text"
@@ -594,7 +594,7 @@ export default function Ocorrencias() {
                 <div className="sm:col-span-2 md:col-span-4 lg:col-span-2 flex items-end">
                   <div className="w-full p-3 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-600 rounded-lg">
                     <p className="text-xs text-blue-700 dark:text-blue-400 text-center">
-                      <strong>ðÅ¸â€™¡ Dica:</strong> Digite apenas estes 2 campos para auto-preenchimento completo!
+                      <strong>💡 Dica:</strong> Digite apenas estes 2 campos para auto-preenchimento completo!
                     </p>
                   </div>
                 </div>
@@ -604,13 +604,13 @@ export default function Ocorrencias() {
               {formData.animalId && (
                 <div className="mt-3 p-3 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-600 rounded-lg">
                   <div className="flex items-center">
-                    <span className="text-green-600 mr-2 text-lg">âÅ“â€¦</span>
+                    <span className="text-green-600 mr-2 text-lg">✅</span>
                     <div>
                       <p className="text-sm font-semibold text-green-800 dark:text-green-300">
                         Animal Encontrado: {formData.nome} ({formData.sexo})
                       </p>
                       <p className="text-xs text-green-700 dark:text-green-400">
-                        {formData.meses} meses ââ‚¬¢ Nascimento: {formData.nascimento ? new Date(formData.nascimento).toLocaleDateString('pt-BR') : 'NÃ£o informado'}
+                        {formData.meses} meses • Nascimento: {formData.nascimento ? new Date(formData.nascimento).toLocaleDateString('pt-BR') : 'Não informado'}
                       </p>
                     </div>
                   </div>
@@ -652,7 +652,7 @@ export default function Ocorrencias() {
                 >
                   <option value="">Selecione</option>
                   <option value="Macho">Macho</option>
-                  <option value="FÃªmea">FÃªmea</option>
+                  <option value="Fêmea">Fêmea</option>
                 </select>
               </div>
             </div>
@@ -660,7 +660,7 @@ export default function Ocorrencias() {
             {/* Dados do Animal (preenchidos automaticamente) */}
             <div className="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600 rounded-xl p-4 mb-4">
               <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase flex items-center">
-                <span className="mr-2">ðÅ¸â€œâ€¹</span>
+                <span className="mr-2">📋</span>
                 Dados do Animal (Preenchidos automaticamente)
               </h3>
               
@@ -694,7 +694,7 @@ export default function Ocorrencias() {
 
                 <div className="xl:col-span-2">
                   <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1 uppercase">
-                    DATA ÃÅ¡LTIMO PESO
+                    DATA ÚLTIMO PESO
                   </label>
                   <input
                     type="date"
@@ -725,15 +725,15 @@ export default function Ocorrencias() {
             {formData.mostrarCE && (
               <div className="bg-orange-50 dark:bg-orange-900/20 border-2 border-orange-300 dark:border-orange-600 rounded-xl p-4 mb-4">
                 <div className="flex items-center mb-3">
-                  <span className="text-orange-600 mr-2 text-lg">ðÅ¸â€œ�</span>
+                  <span className="text-orange-600 mr-2 text-lg">📏</span>
                   <h3 className="text-sm font-bold text-orange-800 dark:text-orange-300 uppercase">
-                    MediÃ§Ã£o CE - Macho de {formData.meses} meses
+                    Medição CE - Macho de {formData.meses} meses
                   </h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-medium text-orange-700 dark:text-orange-300 mb-1 uppercase">
-                      CircunferÃªncia Escrotal (CE) em cm
+                      Circunferência Escrotal (CE) em cm
                     </label>
                     <input
                       type="number"
@@ -747,21 +747,21 @@ export default function Ocorrencias() {
                   </div>
                   <div className="flex items-end">
                     <div className="text-xs text-orange-700 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/30 p-3 rounded-lg">
-                      <strong>Importante:</strong> A mediÃ§Ã£o da CE Ã© fundamental para avaliaÃ§Ã£o reprodutiva de machos jovens.
+                      <strong>Importante:</strong> A medição da CE é fundamental para avaliação reprodutiva de machos jovens.
                     </div>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Campos especÃ­ficos para FÃªmeas */}
+            {/* Campos específicos para Fêmeas */}
             {formData.mostrarCamposFemea && (
               <div className="bg-pink-50 dark:bg-pink-900/20 border-2 border-pink-300 dark:border-pink-600 rounded-xl p-4 mb-4">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center">
-                    <span className="text-pink-600 mr-2 text-lg">ðÅ¸â€˜©ââ‚¬�ðÅ¸�¼</span>
+                    <span className="text-pink-600 mr-2 text-lg">👩‍🍼</span>
                     <h3 className="text-lg font-bold text-pink-800 dark:text-pink-300 uppercase">
-                      Dados Reprodutivos - FÃªmea
+                      Dados Reprodutivos - Fêmea
                     </h3>
                   </div>
                   
@@ -770,7 +770,7 @@ export default function Ocorrencias() {
                     onClick={clearCamposFemea}
                     className="flex items-center px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded-lg transition-colors"
                   >
-                    <span className="mr-1">ðÅ¸â€”â€˜ï¸�</span>
+                    <span className="mr-1">🗑️</span>
                     Limpar Campos
                   </button>
                 </div>
@@ -778,7 +778,7 @@ export default function Ocorrencias() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   <div className="bg-white dark:bg-gray-800 border-2 border-pink-300 dark:border-pink-600 rounded-xl p-4">
                     <div className="flex items-center justify-center mb-3">
-                      <span className="text-2xl mr-2">ðÅ¸â€˜¶</span>
+                      <span className="text-2xl mr-2">👶</span>
                       <label className="text-sm font-bold text-pink-700 dark:text-pink-300 uppercase text-center">
                         Quantidade de Filhos
                       </label>
@@ -793,15 +793,15 @@ export default function Ocorrencias() {
                       className="w-full px-4 py-3 border-2 border-pink-400 rounded-lg bg-pink-50 dark:bg-pink-900/20 text-gray-900 dark:text-white text-sm text-center font-semibold focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                     />
                     <p className="text-xs text-pink-600 dark:text-pink-400 text-center mt-2">
-                      Total de filhos que a fÃªmea jÃ¡ teve
+                      Total de filhos que a fêmea já teve
                     </p>
                   </div>
 
                   <div className="bg-white dark:bg-gray-800 border-2 border-pink-300 dark:border-pink-600 rounded-xl p-4">
                     <div className="flex items-center justify-center mb-3">
-                      <span className="text-2xl mr-2">ðÅ¸§¬</span>
+                      <span className="text-2xl mr-2">🧬</span>
                       <label className="text-sm font-bold text-pink-700 dark:text-pink-300 uppercase text-center">
-                        OÃ³citos Coletados
+                        Oócitos Coletados
                       </label>
                     </div>
                     <input
@@ -814,13 +814,13 @@ export default function Ocorrencias() {
                       className="w-full px-4 py-3 border-2 border-pink-400 rounded-lg bg-pink-50 dark:bg-pink-900/20 text-gray-900 dark:text-white text-sm text-center font-semibold focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                     />
                     <p className="text-xs text-pink-600 dark:text-pink-400 text-center mt-2">
-                      Quantidade total de oÃ³citos coletados
+                      Quantidade total de oócitos coletados
                     </p>
                   </div>
 
                   <div className="bg-white dark:bg-gray-800 border-2 border-pink-300 dark:border-pink-600 rounded-xl p-4">
                     <div className="flex items-center justify-center mb-3">
-                      <span className="text-2xl mr-2">ðÅ¸â€™°</span>
+                      <span className="text-2xl mr-2">💰</span>
                       <label className="text-sm font-bold text-pink-700 dark:text-pink-300 uppercase text-center">
                         Filhos Vendidos
                       </label>
@@ -835,13 +835,13 @@ export default function Ocorrencias() {
                       className="w-full px-4 py-3 border-2 border-pink-400 rounded-lg bg-pink-50 dark:bg-pink-900/20 text-gray-900 dark:text-white text-sm text-center font-semibold focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                     />
                     <p className="text-xs text-pink-600 dark:text-pink-400 text-center mt-2">
-                      Quantidade de filhos jÃ¡ vendidos
+                      Quantidade de filhos já vendidos
                     </p>
                   </div>
 
                   <div className="bg-white dark:bg-gray-800 border-2 border-pink-300 dark:border-pink-600 rounded-xl p-4">
                     <div className="flex items-center justify-center mb-3">
-                      <span className="text-2xl mr-2">ðÅ¸â€™µ</span>
+                      <span className="text-2xl mr-2">💵</span>
                       <label className="text-sm font-bold text-pink-700 dark:text-pink-300 uppercase text-center">
                         Valor Total Vendas
                       </label>
@@ -866,7 +866,7 @@ export default function Ocorrencias() {
                 {(formData.quantidadeFilhos || formData.quantidadeOocitos || formData.quantidadeFilhosVendidos || formData.valorFilhosVendidos) && (
                   <div className="mt-6 p-4 bg-pink-100 dark:bg-pink-900/30 border border-pink-300 dark:border-pink-600 rounded-lg">
                     <h4 className="text-sm font-bold text-pink-800 dark:text-pink-300 mb-3 flex items-center">
-                      <span className="mr-2">ðÅ¸â€œÅ </span>
+                      <span className="mr-2">📊</span>
                       Resumo Reprodutivo:
                     </h4>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
@@ -878,7 +878,7 @@ export default function Ocorrencias() {
                       )}
                       {formData.quantidadeOocitos && (
                         <div className="text-center">
-                          <p className="font-semibold text-pink-700 dark:text-pink-300">OÃ³citos Coletados</p>
+                          <p className="font-semibold text-pink-700 dark:text-pink-300">Oócitos Coletados</p>
                           <p className="text-lg font-bold text-pink-800 dark:text-pink-200">{formData.quantidadeOocitos}</p>
                         </div>
                       )}
@@ -898,11 +898,11 @@ export default function Ocorrencias() {
                       )}
                     </div>
                     
-                    {/* CÃ¡lculo de valor mÃ©dio por filho vendido */}
+                    {/* Cálculo de valor médio por filho vendido */}
                     {formData.quantidadeFilhosVendidos && formData.valorFilhosVendidos && parseFloat(formData.quantidadeFilhosVendidos) > 0 && (
                       <div className="mt-3 pt-3 border-t border-pink-300 dark:border-pink-600">
                         <p className="text-sm text-pink-700 dark:text-pink-300 text-center">
-                          <strong>Valor mÃ©dio por filho vendido:</strong> R$ {
+                          <strong>Valor médio por filho vendido:</strong> R$ {
                             (parseFloat(formData.valorFilhosVendidos) / parseFloat(formData.quantidadeFilhosVendidos))
                               .toLocaleString('pt-BR', { minimumFractionDigits: 2 })
                           }
@@ -914,10 +914,10 @@ export default function Ocorrencias() {
               </div>
             )}
 
-            {/* InclusÃ£o de ServiÃ§o Inteligente */}
+            {/* Inclusão de Serviço Inteligente */}
             <div className="bg-white dark:bg-gray-800 border-2 border-blue-500 rounded-3xl p-4 mb-4 relative">
               <div className="absolute -top-3 left-5 bg-white dark:bg-gray-800 px-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase">
-                INCLUSÃÆ’O DE SERVIÃâ€¡O
+                INCLUSÃO DE SERVIÇO
               </div>
               
               <div className="flex items-center justify-between mb-6">
@@ -934,7 +934,7 @@ export default function Ocorrencias() {
 
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-gray-600 dark:text-gray-400">
-                    ServiÃ§os: {formData.numeroServicos}/5
+                    Serviços: {formData.numeroServicos}/5
                   </span>
                   <button
                     type="button"
@@ -942,7 +942,7 @@ export default function Ocorrencias() {
                     disabled={formData.numeroServicos <= 1}
                     className="px-2 py-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white text-xs rounded transition-colors"
                   >
-                    âÅ¾â€“
+                    ➖
                   </button>
                   <button
                     type="button"
@@ -950,7 +950,7 @@ export default function Ocorrencias() {
                     disabled={formData.numeroServicos >= 5}
                     className="px-2 py-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white text-xs rounded transition-colors"
                   >
-                    âÅ¾â€¢
+                    ➕
                   </button>
                 </div>
               </div>
@@ -962,12 +962,12 @@ export default function Ocorrencias() {
                   
                   return (
                     <div key={num} className="border-2 border-blue-500 rounded-xl overflow-hidden">
-                      {/* Header do ServiÃ§o */}
+                      {/* Header do Serviço */}
                       <div className="bg-red-600 text-white py-2 px-4 text-xs font-semibold text-center">
-                        SERVIÃâ€¡O {num}
+                        SERVIÇO {num}
                       </div>
                       
-                      {/* Checkbox para ativar serviÃ§o */}
+                      {/* Checkbox para ativar serviço */}
                       <div className="p-3 bg-white dark:bg-gray-800 border-b border-blue-300">
                         <div className="flex items-center justify-center">
                           <input
@@ -984,13 +984,13 @@ export default function Ocorrencias() {
                         </div>
                       </div>
                       
-                      {/* Campos dinÃ¢micos quando serviÃ§o estÃ¡ ativo */}
+                      {/* Campos dinâmicos quando serviço está ativo */}
                       {servico.ativo && (
                         <div className="p-3 bg-blue-50 dark:bg-blue-900/20 space-y-3">
-                          {/* Seletor de tipo de serviÃ§o */}
+                          {/* Seletor de tipo de serviço */}
                           <div>
                             <label className="block text-xs font-medium text-blue-700 dark:text-blue-300 mb-1">
-                              Tipo de ServiÃ§o:
+                              Tipo de Serviço:
                             </label>
                             <select
                               name={`${servicoKey}_tipo`}
@@ -1004,22 +1004,22 @@ export default function Ocorrencias() {
                               <option value="piquete">Piquete/Local</option>
                               <option value="medicamento">Medicamento</option>
                               <option value="vacina">Vacina</option>
-                              <option value="inseminacao">InseminaÃ§Ã£o</option>
+                              <option value="inseminacao">Inseminação</option>
                               <option value="outro">Outro</option>
                             </select>
                           </div>
                           
-                          {/* Campo de valor dinÃ¢mico baseado no tipo */}
+                          {/* Campo de valor dinâmico baseado no tipo */}
                           {servico.tipo && (
                             <div>
                               <label className="block text-xs font-medium text-blue-700 dark:text-blue-300 mb-1">
                                 {servico.tipo === 'peso' && 'Peso (kg):'}
-                                {servico.tipo === 'aparte' && 'DescriÃ§Ã£o do Aparte:'}
+                                {servico.tipo === 'aparte' && 'Descrição do Aparte:'}
                                 {servico.tipo === 'piquete' && 'Nome do Piquete/Local:'}
                                 {servico.tipo === 'medicamento' && 'Nome do Medicamento:'}
                                 {servico.tipo === 'vacina' && 'Nome da Vacina:'}
-                                {servico.tipo === 'inseminacao' && 'Touro/SÃªmen:'}
-                                {servico.tipo === 'outro' && 'DescriÃ§Ã£o:'}
+                                {servico.tipo === 'inseminacao' && 'Touro/Sêmen:'}
+                                {servico.tipo === 'outro' && 'Descrição:'}
                               </label>
                               <input
                                 type={servico.tipo === 'peso' ? 'number' : 'text'}
@@ -1041,7 +1041,7 @@ export default function Ocorrencias() {
                             </div>
                           )}
                           
-                          {/* OpÃ§Ã£o para aplicar local no lote (apenas para piquete) */}
+                          {/* Opção para aplicar local no lote (apenas para piquete) */}
                           {servico.tipo === 'piquete' && servico.valor && (
                             <div className="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-600 rounded">
                               <div className="flex items-center">
@@ -1058,7 +1058,7 @@ export default function Ocorrencias() {
                                 </label>
                               </div>
                               <p className="text-xs text-yellow-700 dark:text-yellow-400 mt-1">
-                                Todos os animais do lote atual serÃ£o movidos para este local.
+                                Todos os animais do lote atual serão movidos para este local.
                               </p>
                             </div>
                           )}
@@ -1070,12 +1070,12 @@ export default function Ocorrencias() {
               </div>
             </div>
 
-            {/* Resumo dos ServiÃ§os Selecionados */}
+            {/* Resumo dos Serviços Selecionados */}
             {Object.values(formData.servicos).some(s => s.ativo) && (
               <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-600 rounded-xl p-4 mb-6">
                 <h3 className="text-sm font-bold text-indigo-800 dark:text-indigo-300 mb-3 uppercase flex items-center">
-                  <span className="mr-2">ðÅ¸â€œâ€¹</span>
-                  Resumo dos ServiÃ§os Selecionados
+                  <span className="mr-2">📋</span>
+                  Resumo dos Serviços Selecionados
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   {Object.entries(formData.servicos).map(([key, servico]) => {
@@ -1086,10 +1086,10 @@ export default function Ocorrencias() {
                       <div key={key} className="bg-white dark:bg-gray-800 border border-indigo-300 rounded-lg p-3">
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">
-                            ServiÃ§o {servicoNum}
+                            Serviço {servicoNum}
                           </span>
                           <span className="text-xs bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300 px-2 py-1 rounded">
-                            {servico.tipo || 'NÃ£o definido'}
+                            {servico.tipo || 'Não definido'}
                           </span>
                         </div>
                         {servico.valor && (
@@ -1105,8 +1105,8 @@ export default function Ocorrencias() {
                 {formData.aplicarLocalLote && (
                   <div className="mt-3 p-2 bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-600 rounded-lg">
                     <p className="text-xs font-semibold text-yellow-800 dark:text-yellow-300 flex items-center">
-                      <span className="mr-2">âÅ¡ ï¸�</span>
-                      Local serÃ¡ aplicado para todo o lote atual
+                      <span className="mr-2">⚠️</span>
+                      Local será aplicado para todo o lote atual
                     </p>
                   </div>
                 )}
@@ -1116,7 +1116,7 @@ export default function Ocorrencias() {
             {/* Genealogia (preenchida automaticamente) */}
             <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-600 rounded-xl p-4 mb-4">
               <h3 className="text-sm font-bold text-green-700 dark:text-green-300 mb-4 uppercase flex items-center">
-                <span className="mr-2">ðÅ¸§¬</span>
+                <span className="mr-2">🧬</span>
                 Genealogia (Preenchida automaticamente)
               </h3>
               
@@ -1137,7 +1137,7 @@ export default function Ocorrencias() {
 
                 <div className="xl:col-span-1">
                   <label className="block text-xs font-medium text-green-700 dark:text-green-300 mb-1 uppercase">
-                    AVÃâ€� MATERNO
+                    AVÔ MATERNO
                   </label>
                   <input
                     type="text"
@@ -1150,7 +1150,7 @@ export default function Ocorrencias() {
 
                 <div className="xl:col-span-2">
                   <label className="block text-xs font-medium text-green-700 dark:text-green-300 mb-1 uppercase">
-                    MÃÆ’E BIOLOGIA E RG
+                    MÃE BIOLOGIA E RG
                   </label>
                   <input
                     type="text"
@@ -1178,16 +1178,16 @@ export default function Ocorrencias() {
               </div>
             </div>
 
-            {/* Programa de Melhoramento GenÃ©tico - Apenas VisualizaÃ§Ã£o */}
+            {/* Programa de Melhoramento Genético - Apenas Visualização */}
             {(formData.iabcz || formData.deca || formData.mgq || formData.top || formData.mgta || formData.topPrograma) && (
               <div className="bg-purple-50 dark:bg-purple-900/20 border-2 border-purple-300 dark:border-purple-600 rounded-xl p-4 mb-4">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold text-purple-800 dark:text-purple-300 uppercase flex items-center">
-                    <span className="mr-2">ðÅ¸§¬</span>
-                    Dados de Melhoramento GenÃ©tico
+                    <span className="mr-2">🧬</span>
+                    Dados de Melhoramento Genético
                   </h3>
                   
-                  {/* BotÃµes de Importar Excel */}
+                  {/* Botões de Importar Excel */}
                   <div className="flex gap-2">
                     <input
                       type="file"
@@ -1201,7 +1201,7 @@ export default function Ocorrencias() {
                       onClick={() => document.getElementById('excelImport').click()}
                       className="flex items-center px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-lg transition-colors"
                     >
-                      <span className="mr-1">ðÅ¸â€œÅ </span>
+                      <span className="mr-1">📊</span>
                       Importar Excel
                     </button>
                     <button
@@ -1209,7 +1209,7 @@ export default function Ocorrencias() {
                       onClick={downloadExcelTemplate}
                       className="flex items-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-colors"
                     >
-                      <span className="mr-1">ðÅ¸â€œ¥</span>
+                      <span className="mr-1">📥</span>
                       Modelo Excel
                     </button>
                     <button
@@ -1217,7 +1217,7 @@ export default function Ocorrencias() {
                       onClick={clearMelhoramentoFields}
                       className="flex items-center px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded-lg transition-colors"
                     >
-                      <span className="mr-1">ðÅ¸â€”â€˜ï¸�</span>
+                      <span className="mr-1">🗑️</span>
                       Limpar
                     </button>
                   </div>
@@ -1226,12 +1226,12 @@ export default function Ocorrencias() {
                 {/* Resultados em formato compacto */}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                   {[
-                    { name: 'iabcz', label: 'IABCZ', desc: 'AssociaÃ§Ã£o Brasileira dos Criadores de Zebu', icon: 'ðÅ¸�â€ºï¸�' },
-                    { name: 'deca', label: 'DECA', desc: 'DiferenÃ§a Esperada na Capacidade de Aleitamento', icon: 'ðÅ¸�¼' },
-                    { name: 'mgq', label: 'MGQ', desc: 'MÃ©rito GenÃ©tico Qualitativo', icon: 'â­�' },
-                    { name: 'top', label: 'TOP', desc: 'Teste de ProgÃªnie', icon: 'ðÅ¸§ª' },
-                    { name: 'mgta', label: 'MGTA', desc: 'MÃ©rito GenÃ©tico Total Agregado', icon: 'ðÅ¸â€œÅ ' },
-                    { name: 'topPrograma', label: 'TOP PROG', desc: 'TOP Programa', icon: 'ðÅ¸�â€ ' }
+                    { name: 'iabcz', label: 'IABCZ', desc: 'Associação Brasileira dos Criadores de Zebu', icon: '🏛️' },
+                    { name: 'deca', label: 'DECA', desc: 'Diferença Esperada na Capacidade de Aleitamento', icon: '🍼' },
+                    { name: 'mgq', label: 'MGQ', desc: 'Mérito Genético Qualitativo', icon: '⭐' },
+                    { name: 'top', label: 'TOP', desc: 'Teste de Progênie', icon: '🧪' },
+                    { name: 'mgta', label: 'MGTA', desc: 'Mérito Genético Total Agregado', icon: '📊' },
+                    { name: 'topPrograma', label: 'TOP PROG', desc: 'TOP Programa', icon: '🏆' }
                   ].filter(field => formData[field.name]).map(field => (
                     <div key={field.name} className="bg-white dark:bg-gray-800 border border-purple-300 dark:border-purple-600 rounded-lg p-3 text-center">
                       <div className="flex items-center justify-center mb-1">
@@ -1254,7 +1254,7 @@ export default function Ocorrencias() {
                 <div className="mt-4 p-3 bg-purple-100 dark:bg-purple-900/30 border border-purple-300 dark:border-purple-600 rounded-lg">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-bold text-purple-800 dark:text-purple-300">
-                      ðÅ¸â€œË† Dados Importados: {[formData.iabcz, formData.deca, formData.mgq, formData.top, formData.mgta, formData.topPrograma].filter(Boolean).length}/6 campos
+                      📈 Dados Importados: {[formData.iabcz, formData.deca, formData.mgq, formData.top, formData.mgta, formData.topPrograma].filter(Boolean).length}/6 campos
                     </span>
                     <span className="text-xs text-purple-600 dark:text-purple-400">
                       Use "Importar Excel" para atualizar os dados
@@ -1264,17 +1264,17 @@ export default function Ocorrencias() {
               </div>
             )}
 
-            {/* BotÃ£o para mostrar seÃ§Ã£o de melhoramento genÃ©tico quando vazia */}
+            {/* Botão para mostrar seção de melhoramento genético quando vazia */}
             {!(formData.iabcz || formData.deca || formData.mgq || formData.top || formData.mgta || formData.topPrograma) && (
               <div className="bg-purple-50 dark:bg-purple-900/20 border-2 border-dashed border-purple-300 dark:border-purple-600 rounded-xl p-4 mb-4 text-center">
                 <div className="flex items-center justify-center mb-3">
-                  <span className="text-purple-600 mr-2 text-2xl">ðÅ¸§¬</span>
+                  <span className="text-purple-600 mr-2 text-2xl">🧬</span>
                   <h3 className="text-lg font-bold text-purple-800 dark:text-purple-300">
-                    Melhoramento GenÃ©tico
+                    Melhoramento Genético
                   </h3>
                 </div>
                 <p className="text-sm text-purple-700 dark:text-purple-400 mb-4">
-                  Nenhum dado de melhoramento genÃ©tico importado. Use o Excel para carregar os dados.
+                  Nenhum dado de melhoramento genético importado. Use o Excel para carregar os dados.
                 </p>
                 <div className="flex justify-center gap-2">
                   <input
@@ -1289,7 +1289,7 @@ export default function Ocorrencias() {
                     onClick={() => document.getElementById('excelImportEmpty').click()}
                     className="flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors"
                   >
-                    <span className="mr-2">ðÅ¸â€œÅ </span>
+                    <span className="mr-2">📊</span>
                     Importar Dados do Excel
                   </button>
                   <button
@@ -1297,14 +1297,14 @@ export default function Ocorrencias() {
                     onClick={downloadExcelTemplate}
                     className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
                   >
-                    <span className="mr-2">ðÅ¸â€œ¥</span>
+                    <span className="mr-2">📥</span>
                     Baixar Modelo Excel
                   </button>
                 </div>
               </div>
             )}
 
-            {/* Status e ObservaÃ§Ãµes */}
+            {/* Status e Observações */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
               {/* Status */}
               <div className="bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl p-4">
@@ -1348,11 +1348,11 @@ export default function Ocorrencias() {
                 </div>
               </div>
 
-              {/* ObservaÃ§Ãµes */}
+              {/* Observações */}
               <div className="lg:col-span-2">
                 <div className="bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl p-4 h-full">
                   <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 uppercase">
-                    OBSERVAÃâ€¡Ãâ€¢ES
+                    OBSERVAÇÕES
                   </label>
                   <textarea
                     name="observacoes"
@@ -1360,20 +1360,20 @@ export default function Ocorrencias() {
                     onChange={handleInputChange}
                     rows={6}
                     className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
-                    placeholder="Digite observaÃ§Ãµes sobre o animal ou ocorrÃªncia..."
+                    placeholder="Digite observações sobre o animal ou ocorrência..."
                   />
                 </div>
               </div>
             </div>
 
-            {/* BotÃµes */}
+            {/* Botões */}
             <div className="flex justify-between items-center pt-6 border-t-2 border-gray-200 dark:border-gray-700">
               <button
                 type="button"
                 onClick={() => window.location.href = '/relatorios-ocorrencias'}
                 className="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors"
               >
-                Ver RelatÃ³rios
+                Ver Relatórios
               </button>
               
               <div className="flex gap-4">
@@ -1390,7 +1390,7 @@ export default function Ocorrencias() {
                   disabled={loading}
                   className="px-8 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors disabled:cursor-not-allowed"
                 >
-                  {loading ? 'Salvando...' : 'Registrar OcorrÃªncia'}
+                  {loading ? 'Salvando...' : 'Registrar Ocorrência'}
                 </button>
               </div>
             </div>

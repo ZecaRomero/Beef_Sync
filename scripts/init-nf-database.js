@@ -2,7 +2,7 @@ const { Pool } = require('pg');
 const fs = require('fs');
 const path = require('path');
 
-// ConfiguraÃ§Ã£o do banco PostgreSQL
+// Configuração do banco PostgreSQL
 const pool = new Pool({
   user: process.env.POSTGRES_USER || 'postgres',
   host: process.env.POSTGRES_HOST || 'localhost',
@@ -13,17 +13,17 @@ const pool = new Pool({
 
 async function initNFTables() {
   try {
-    console.log('ðÅ¸â€�â€” Conectando ao PostgreSQL...');
+    console.log('🔗 Conectando ao PostgreSQL...');
     
     // Ler e executar o script SQL
     const sqlPath = path.join(__dirname, 'create-nf-tables.sql');
     const sqlContent = fs.readFileSync(sqlPath, 'utf8');
     
-    console.log('ðÅ¸â€œÅ  Criando tabelas de Notas Fiscais...');
+    console.log('📊 Criando tabelas de Notas Fiscais...');
     await pool.query(sqlContent);
     
-    console.log('âÅ“â€¦ Tabelas de Notas Fiscais criadas com sucesso!');
-    console.log('ðÅ¸â€œâ€¹ Tabelas criadas:');
+    console.log('✅ Tabelas de Notas Fiscais criadas com sucesso!');
+    console.log('📋 Tabelas criadas:');
     console.log('   - naturezas_operacao');
     console.log('   - fornecedores_clientes');
     console.log('   - notas_fiscais');
@@ -39,10 +39,10 @@ async function initNFTables() {
       ORDER BY table_name
     `);
     
-    console.log('ðÅ¸â€œÅ  Tabelas verificadas:', result.rows.map(row => row.table_name));
+    console.log('📊 Tabelas verificadas:', result.rows.map(row => row.table_name));
     
   } catch (error) {
-    console.error('â�Å’ Erro ao criar tabelas:', error.message);
+    console.error('❌ Erro ao criar tabelas:', error.message);
     throw error;
   } finally {
     await pool.end();
@@ -53,11 +53,11 @@ async function initNFTables() {
 if (require.main === module) {
   initNFTables()
     .then(() => {
-      console.log('ðÅ¸Å½â€° InicializaÃ§Ã£o concluÃ­da!');
+      console.log('🎉 Inicialização concluída!');
       process.exit(0);
     })
     .catch((error) => {
-      console.error('ðÅ¸â€™¥ Falha na inicializaÃ§Ã£o:', error);
+      console.error('💥 Falha na inicialização:', error);
       process.exit(1);
     });
 }

@@ -17,20 +17,20 @@ export default function NFSelectionSection({
             onClick={() => setShowImportModal(true)}
             className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200"
           >
-            ðÅ¸â€œÅ  Importar Excel
+            📊 Importar Excel
           </button>
           <button
             type="button"
             onClick={() => setShowNFModal(true)}
             className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200"
           >
-            âÅ¾â€¢ Nova NF
+            ➕ Nova NF
           </button>
         </div>
       </h4>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* SeleÃ§Ã£o de NF */}
+        {/* Seleção de NF */}
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Vincular Nota Fiscal

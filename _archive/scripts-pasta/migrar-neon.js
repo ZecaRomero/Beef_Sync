@@ -9,8 +9,8 @@ const { Pool } = require('pg')
 
 const DATABASE_URL = process.env.DATABASE_URL
 if (!DATABASE_URL || !DATABASE_URL.includes('neon.tech')) {
-  console.error('�Œ Configure DATABASE_URL com a connection string do Neon.')
-  console.error('   Copie em: console.neon.tech �†’ Connection details')
+  console.error('❌ Configure DATABASE_URL com a connection string do Neon.')
+  console.error('   Copie em: console.neon.tech → Connection details')
   console.error('   Exemplo: DATABASE_URL="postgresql://user:pass@ep-xxx.neon.tech/neondb?sslmode=require" node scripts/migrar-neon.js')
   process.exit(1)
 }
@@ -23,9 +23,9 @@ const pool = new Pool({
 async function run() {
   const client = await pool.connect()
   try {
-    console.log('�Ÿ”Œ Conectando ao Neon...')
+    console.log('🔌 Conectando ao Neon...')
     await client.query('SELECT 1')
-    console.log('�œ… Conectado!')
+    console.log('✅ Conectado!')
 
     // Verificar se tabela animais existe
     const tableCheck = await client.query(`
@@ -34,7 +34,7 @@ async function run() {
     const animaisExists = tableCheck.rows[0].exists
 
     if (!animaisExists) {
-      console.log('�Ÿ“‹ Criando tabela animais...')
+      console.log('📋 Criando tabela animais...')
       await client.query(`
         CREATE TABLE animais (
           id SERIAL PRIMARY KEY,
@@ -53,9 +53,9 @@ async function run() {
           UNIQUE(serie, rg)
         )
       `)
-      console.log('�œ… Tabela animais criada')
+      console.log('✅ Tabela animais criada')
     } else {
-      console.log('�Ÿ“‹ Tabela animais já existe, adicionando colunas faltantes...')
+      console.log('📋 Tabela animais já existe, adicionando colunas faltantes...')
       const cols = ['data_nascimento', 'situacao', 'laboratorio_dna', 'data_envio_dna', 'custo_dna', 'sexo', 'raca']
       const types = { data_nascimento: 'DATE', data_envio_dna: 'DATE', custo_dna: 'DECIMAL(12,2)', situacao: "VARCHAR(20) DEFAULT 'Ativo'", sexo: "VARCHAR(10) DEFAULT 'Fêmea'", raca: "VARCHAR(50) DEFAULT 'Nelore'", laboratorio_dna: 'VARCHAR(100)' }
       for (const col of cols) {
@@ -74,7 +74,7 @@ async function run() {
     }
 
     // Criar tabela custos
-    console.log('�Ÿ“‹ Criando tabela custos...')
+    console.log('📋 Criando tabela custos...')
     await client.query(`
       CREATE TABLE IF NOT EXISTS custos (
         id SERIAL PRIMARY KEY,
@@ -87,27 +87,27 @@ async function run() {
         data_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `)
-    console.log('�œ… Tabela custos OK')
+    console.log('✅ Tabela custos OK')
 
     // Inserir animal CJCJ 15563
     const check = await client.query('SELECT id FROM animais WHERE serie = $1 AND rg = $2', ['CJCJ', '15563'])
     if (check.rows.length === 0) {
-      console.log('�Ÿ“� Inserindo animal CJCJ 15563...')
+      console.log('📥 Inserindo animal CJCJ 15563...')
       await client.query(`
         INSERT INTO animais (nome, serie, rg, situacao, sexo, raca)
         VALUES ('CJ SANT ANNA 15563', 'CJCJ', '15563', 'Ativo', 'Fêmea', 'Nelore')
       `)
-      console.log('�œ… Animal CJCJ 15563 inserido!')
+      console.log('✅ Animal CJCJ 15563 inserido!')
     } else {
-      console.log('�œ… Animal CJCJ 15563 já existe')
+      console.log('✅ Animal CJCJ 15563 já existe')
     }
 
     const count = await client.query('SELECT COUNT(*) as total FROM animais')
     console.log('')
-    console.log(`�ŸŽ‰ Pronto! Total de animais no Neon: ${count.rows[0].total}`)
+    console.log(`🎉 Pronto! Total de animais no Neon: ${count.rows[0].total}`)
     console.log('   Teste em: https://beef-sync-2.vercel.app/a (Série: CJCJ, RG: 15563)')
   } catch (err) {
-    console.error('�Œ Erro:', err.message)
+    console.error('❌ Erro:', err.message)
     process.exit(1)
   } finally {
     client.release()

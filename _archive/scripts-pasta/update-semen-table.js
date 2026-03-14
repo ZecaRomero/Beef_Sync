@@ -13,7 +13,7 @@ async function updateSemenTable() {
   const client = await pool.connect();
   
   try {
-    console.log('�Ÿ”„ Atualizando estrutura da tabela estoque_semen...');
+    console.log('🔄 Atualizando estrutura da tabela estoque_semen...');
     
     // Primeiro, vamos verificar se a tabela existe e sua estrutura atual
     const checkTable = await client.query(`
@@ -23,17 +23,17 @@ async function updateSemenTable() {
       ORDER BY ordinal_position
     `);
     
-    console.log('�Ÿ“‹ Colunas atuais:', checkTable.rows.map(r => r.column_name));
+    console.log('📋 Colunas atuais:', checkTable.rows.map(r => r.column_name));
     
     // Se a tabela não tem as colunas novas, vamos recriar
     const hasNewColumns = checkTable.rows.some(r => r.column_name === 'nome_touro');
     
     if (!hasNewColumns) {
-      console.log('�Ÿ”„ Recriando tabela com nova estrutura...');
+      console.log('🔄 Recriando tabela com nova estrutura...');
       
       // Fazer backup dos dados existentes
       const backupData = await client.query('SELECT * FROM estoque_semen');
-      console.log(`�Ÿ’� Backup: ${backupData.rows.length} registros encontrados`);
+      console.log(`💾 Backup: ${backupData.rows.length} registros encontrados`);
       
       // Dropar a tabela antiga
       await client.query('DROP TABLE IF EXISTS estoque_semen CASCADE');
@@ -69,11 +69,11 @@ async function updateSemenTable() {
         )
       `);
       
-      console.log('�œ… Tabela recriada com sucesso!');
+      console.log('✅ Tabela recriada com sucesso!');
       
       // Restaurar dados do backup se existirem (adaptando para nova estrutura)
       if (backupData.rows.length > 0) {
-        console.log('�Ÿ”„ Restaurando dados do backup...');
+        console.log('🔄 Restaurando dados do backup...');
         for (const row of backupData.rows) {
           await client.query(`
             INSERT INTO estoque_semen (
@@ -92,10 +92,10 @@ async function updateSemenTable() {
             row.created_at || new Date()
           ]);
         }
-        console.log(`�œ… ${backupData.rows.length} registros restaurados!`);
+        console.log(`✅ ${backupData.rows.length} registros restaurados!`);
       }
     } else {
-      console.log('�œ… Tabela já possui a estrutura atualizada!');
+      console.log('✅ Tabela já possui a estrutura atualizada!');
     }
     
     // Verificar a estrutura final
@@ -106,11 +106,11 @@ async function updateSemenTable() {
       ORDER BY ordinal_position
     `);
     
-    console.log('�Ÿ“‹ Estrutura final:', finalCheck.rows.map(r => r.column_name));
-    console.log('�œ… Atualização concluída com sucesso!');
+    console.log('📋 Estrutura final:', finalCheck.rows.map(r => r.column_name));
+    console.log('✅ Atualização concluída com sucesso!');
     
   } catch (error) {
-    console.error('�Œ Erro ao atualizar tabela:', error);
+    console.error('❌ Erro ao atualizar tabela:', error);
   } finally {
     client.release();
     await pool.end();

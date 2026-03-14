@@ -29,7 +29,7 @@ export default function FinancialAnalysisReport() {
       setLoading(true)
       setError(null)
 
-      // Buscar todos os dados necessÃ¡rios
+      // Buscar todos os dados necessários
       const [animalsRes, costsRes, salesRes, birthsRes] = await Promise.all([
         fetch('/api/animals'),
         fetch('/api/custos'),
@@ -61,12 +61,12 @@ export default function FinancialAnalysisReport() {
     }
   }
 
-  // Realizar anÃ¡lise financeira completa
+  // Realizar análise financeira completa
   const performFinancialAnalysis = (animals, costs, sales, births, periodDays) => {
     const now = new Date()
     const periodStart = new Date(now.getTime() - (periodDays * 24 * 60 * 60 * 1000))
 
-    // Filtrar dados por perÃ­odo
+    // Filtrar dados por período
     const periodCosts = costs.filter(cost => 
       new Date(cost.data) >= periodStart
     )
@@ -79,33 +79,33 @@ export default function FinancialAnalysisReport() {
       new Date(birth.data_nascimento) >= periodStart
     )
 
-    // Calcular mÃ©tricas bÃ¡sicas
+    // Calcular métricas básicas
     const totalRevenue = periodSales.reduce((sum, sale) => sum + (sale.valor_venda || sale.valor || 0), 0)
     const totalCosts = periodCosts.reduce((sum, cost) => sum + (cost.valor || 0), 0)
     const grossProfit = totalRevenue - totalCosts
-    const netProfit = grossProfit // Simplificado - pode incluir impostos, depreciaÃ§Ã£o, etc.
+    const netProfit = grossProfit // Simplificado - pode incluir impostos, depreciação, etc.
 
-    // MÃ©tricas de rentabilidade
+    // Métricas de rentabilidade
     const grossMargin = totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0
     const netMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0
     const roi = totalCosts > 0 ? (netProfit / totalCosts) * 100 : 0
 
-    // AnÃ¡lise de fluxo de caixa
+    // Análise de fluxo de caixa
     const cashFlow = analyzeCashFlow(periodCosts, periodSales, periodDays)
     
-    // AnÃ¡lise de rentabilidade por animal
+    // Análise de rentabilidade por animal
     const animalProfitability = analyzeAnimalProfitability(animals, costs, sales)
     
-    // ProjeÃ§Ãµes financeiras
+    // Projeções financeiras
     const projections = calculateProjections(totalRevenue, totalCosts, periodDays)
     
-    // AnÃ¡lise de break-even
+    // Análise de break-even
     const breakEven = calculateBreakEven(costs, sales, animals)
     
     // Indicadores de performance
     const kpis = calculateKPIs(animals, costs, sales, births, periodDays)
     
-    // ComparaÃ§Ã£o com perÃ­odo anterior
+    // Comparação com período anterior
     const comparison = compareWithPreviousPeriod(costs, sales, periodDays)
 
     return {
@@ -206,7 +206,7 @@ export default function FinancialAnalysisReport() {
     }
   }
 
-  // Calcular projeÃ§Ãµes financeiras
+  // Calcular projeções financeiras
   const calculateProjections = (revenue, costs, periodDays) => {
     const dailyRevenue = revenue / periodDays
     const dailyCosts = costs / periodDays
@@ -231,7 +231,7 @@ export default function FinancialAnalysisReport() {
     }
   }
 
-  // Calcular ponto de equilÃ­brio
+  // Calcular ponto de equilíbrio
   const calculateBreakEven = (costs, sales, animals) => {
     const totalCosts = costs.reduce((sum, cost) => sum + (cost.valor || 0), 0)
     const totalRevenue = sales.reduce((sum, sale) => sum + (sale.valor_venda || sale.valor || 0), 0)
@@ -278,7 +278,7 @@ export default function FinancialAnalysisReport() {
     }
   }
 
-  // Comparar com perÃ­odo anterior
+  // Comparar com período anterior
   const compareWithPreviousPeriod = (allCosts, allSales, periodDays) => {
     const now = new Date()
     const currentPeriodStart = new Date(now.getTime() - (periodDays * 24 * 60 * 60 * 1000))
@@ -326,7 +326,7 @@ export default function FinancialAnalysisReport() {
     }
   }
 
-  // Analisar tendÃªncias
+  // Analisar tendências
   const analyzeTrends = (costs, sales, periodDays) => {
     const intervals = Math.min(periodDays / 7, 8)
     const intervalDays = periodDays / intervals
@@ -358,12 +358,12 @@ export default function FinancialAnalysisReport() {
     return trends
   }
 
-  // Exportar relatÃ³rio
+  // Exportar relatório
   const exportReport = () => {
     if (!data) return
 
     const reportData = {
-      titulo: 'AnÃ¡lise Financeira Completa',
+      titulo: 'Análise Financeira Completa',
       periodo: `${data.period} dias`,
       gerado_em: new Date().toLocaleString(),
       resumo: data.summary,
@@ -387,7 +387,7 @@ export default function FinancialAnalysisReport() {
     URL.revokeObjectURL(url)
   }
 
-  // Imprimir relatÃ³rio
+  // Imprimir relatório
   const printReport = () => {
     window.print()
   }
@@ -408,7 +408,7 @@ export default function FinancialAnalysisReport() {
     return (
       <EmptyState
         icon={ChartBarIcon}
-        title="Erro ao carregar anÃ¡lise financeira"
+        title="Erro ao carregar análise financeira"
         description={error}
         action={
           <Button onClick={loadFinancialData}>
@@ -424,21 +424,21 @@ export default function FinancialAnalysisReport() {
       <EmptyState
         icon={ChartBarIcon}
         title="Nenhum dado encontrado"
-        description="NÃ£o hÃ¡ dados suficientes para gerar a anÃ¡lise financeira"
+        description="Não há dados suficientes para gerar a análise financeira"
       />
     )
   }
 
   return (
     <div className="space-y-6">
-      {/* CabeÃ§alho */}
+      {/* Cabeçalho */}
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            AnÃ¡lise Financeira Completa
+            Análise Financeira Completa
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
-            AnÃ¡lise detalhada da performance financeira do negÃ³cio
+            Análise detalhada da performance financeira do negócio
           </p>
         </div>
         <div className="flex gap-2">
@@ -447,10 +447,10 @@ export default function FinancialAnalysisReport() {
             onChange={(e) => setPeriod(e.target.value)}
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           >
-            <option value="7">ÃÅ¡ltimos 7 dias</option>
-            <option value="30">ÃÅ¡ltimos 30 dias</option>
-            <option value="90">ÃÅ¡ltimos 90 dias</option>
-            <option value="365">ÃÅ¡ltimo ano</option>
+            <option value="7">Últimos 7 dias</option>
+            <option value="30">Últimos 30 dias</option>
+            <option value="90">Últimos 90 dias</option>
+            <option value="365">Último ano</option>
           </select>
           <Button variant="outline" onClick={exportReport}>
             <DocumentArrowDownIcon className="h-4 w-4 mr-2" />
@@ -517,7 +517,7 @@ export default function FinancialAnalysisReport() {
           <CardBody className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Lucro LÃ­quido</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Lucro Líquido</p>
                 <p className={`text-2xl font-bold ${data.summary.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                   R$ {data.summary.netProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
@@ -592,12 +592,12 @@ export default function FinancialAnalysisReport() {
         </CardBody>
       </Card>
 
-      {/* Ponto de EquilÃ­brio */}
+      {/* Ponto de Equilíbrio */}
       {data.breakEven && (
         <Card>
           <CardHeader>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              AnÃ¡lise de Ponto de EquilÃ­brio
+              Análise de Ponto de Equilíbrio
             </h3>
           </CardHeader>
           <CardBody>
@@ -612,13 +612,13 @@ export default function FinancialAnalysisReport() {
                 </p>
               </div>
               <div className="text-center">
-                <p className="text-sm text-gray-600 dark:text-gray-400">Receita de EquilÃ­brio</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Receita de Equilíbrio</p>
                 <p className="text-3xl font-bold text-green-600">
                   R$ {data.breakEven.revenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
               </div>
               <div className="text-center">
-                <p className="text-sm text-gray-600 dark:text-gray-400">Margem de ContribuiÃ§Ã£o</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Margem de Contribuição</p>
                 <p className="text-3xl font-bold text-purple-600">
                   R$ {data.breakEven.contributionMargin.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
@@ -629,11 +629,11 @@ export default function FinancialAnalysisReport() {
         </Card>
       )}
 
-      {/* ProjeÃ§Ãµes Financeiras */}
+      {/* Projeções Financeiras */}
       <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            ProjeÃ§Ãµes Financeiras
+            Projeções Financeiras
           </h3>
         </CardHeader>
         <CardBody>
@@ -641,7 +641,7 @@ export default function FinancialAnalysisReport() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left py-2">PerÃ­odo</th>
+                  <th className="text-left py-2">Período</th>
                   <th className="text-right py-2">Receita Projetada</th>
                   <th className="text-right py-2">Custos Projetados</th>
                   <th className="text-right py-2">Lucro Projetado</th>
@@ -695,7 +695,7 @@ export default function FinancialAnalysisReport() {
         <Card>
           <CardHeader>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Animais Mais RentÃ¡veis
+              Animais Mais Rentáveis
             </h3>
           </CardHeader>
           <CardBody>
@@ -747,7 +747,7 @@ export default function FinancialAnalysisReport() {
                       R$ {Math.abs(item.profit).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </p>
                     <p className="text-xs text-gray-500">
-                      prejuÃ­zo
+                      prejuízo
                     </p>
                   </div>
                 </div>

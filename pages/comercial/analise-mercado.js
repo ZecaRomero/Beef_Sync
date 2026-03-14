@@ -29,10 +29,10 @@ export default function AnaliseMercado() {
         const result = await response.json()
         setAnalysis(result.data)
       } else {
-        console.error('Erro ao carregar anÃ¡lise')
+        console.error('Erro ao carregar análise')
       }
     } catch (error) {
-      console.error('Erro ao carregar anÃ¡lise:', error)
+      console.error('Erro ao carregar análise:', error)
     } finally {
       setLoading(false)
     }
@@ -85,19 +85,19 @@ export default function AnaliseMercado() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <SparklesIcon className="h-8 w-8 text-purple-600" />
-            AnÃ¡lise de Mercado e ROI
+            Análise de Mercado e ROI
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            AnÃ¡lise inteligente de animais aptos para venda conforme condiÃ§Ãµes de mercado
+            Análise inteligente de animais aptos para venda conforme condições de mercado
           </p>
         </div>
         <Button onClick={loadAnalysis} className="flex items-center gap-2">
           <ArrowPathIcon className="h-5 w-5" />
-          Atualizar AnÃ¡lise
+          Atualizar Análise
         </Button>
       </div>
 
-      {/* EstatÃ­sticas Gerais */}
+      {/* Estatísticas Gerais */}
       {analysis && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card className="p-4">
@@ -139,7 +139,7 @@ export default function AnaliseMercado() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Taxa de AprovaÃ§Ã£o</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Taxa de Aprovação</p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {analysis.total_analisados > 0 
                     ? ((analysis.aptos_venda / analysis.total_analisados) * 100).toFixed(1)
@@ -192,11 +192,11 @@ export default function AnaliseMercado() {
               : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
           }`}
         >
-          NÃ£o Recomendados ({(analysis?.total_analisados || 0) - (analysis?.aptos_venda || 0)})
+          Não Recomendados ({(analysis?.total_analisados || 0) - (analysis?.aptos_venda || 0)})
         </button>
       </div>
 
-      {/* Lista de AnÃ¡lises */}
+      {/* Lista de Análises */}
       <div className="grid grid-cols-1 gap-4">
         {getFilteredAnalyses().map((item) => {
           const RecommendationIcon = getRecommendationIcon(item.recomendacao)
@@ -261,7 +261,7 @@ export default function AnaliseMercado() {
                             key={idx}
                             className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded text-xs"
                           >
-                            âÅ“â€œ {fator}
+                            ✓ {fator}
                           </span>
                         ))}
                       </div>
@@ -271,7 +271,7 @@ export default function AnaliseMercado() {
                   {item.justificativa.length > 0 && (
                     <div>
                       <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                        ObservaÃ§Ãµes:
+                        Observações:
                       </p>
                       <ul className="list-disc list-inside text-sm text-gray-600 dark:text-gray-400 space-y-1">
                         {item.justificativa.map((just, idx) => (
@@ -291,7 +291,7 @@ export default function AnaliseMercado() {
         <Card className="p-12 text-center">
           <ChartBarIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
           <p className="text-gray-600 dark:text-gray-400">
-            Nenhum animal encontrado para anÃ¡lise
+            Nenhum animal encontrado para análise
           </p>
         </Card>
       )}

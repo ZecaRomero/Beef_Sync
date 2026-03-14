@@ -1,7 +1,7 @@
 const { query } = require('../lib/database');
 
 async function testApiQuery() {
-  console.log('�Ÿ�� Testando query da API de inseminações...');
+  console.log('🧪 Testando query da API de inseminações...');
   
   // Simular a query original com JOIN em estoque_semen
   let sqlQuery = `
@@ -22,18 +22,18 @@ async function testApiQuery() {
   try {
     console.log('Trying original query (with estoque_semen join)...');
     const result = await query(sqlQuery);
-    console.log('�œ… Original query success!');
+    console.log('✅ Original query success!');
     console.table(result.rows.map(r => ({ 
       id: r.id, 
       touro_nome: r.touro_nome, 
       semen_nome_touro: r.semen_nome_touro 
     })));
   } catch (error) {
-    console.error('�Œ Original query failed:', error.message);
+    console.error('❌ Original query failed:', error.message);
     console.error('Error code:', error.code);
 
     if (error.code === '42P01') {
-      console.log('�š�️ Tabela não encontrada detected (42P01). Testing fallback query...');
+      console.log('⚠️ Tabela não encontrada detected (42P01). Testing fallback query...');
       
       let simpleQuery = `
         SELECT 
@@ -50,7 +50,7 @@ async function testApiQuery() {
       
       try {
         const result = await query(simpleQuery);
-        console.log('�œ… Fallback query success!');
+        console.log('✅ Fallback query success!');
         
         // Simular a lógica de mapeamento da API
         const isPiquete = (v) => {
@@ -74,10 +74,10 @@ async function testApiQuery() {
         console.table(rows.map(r => ({ 
           id: r.id, 
           touro_nome: r.touro_nome,
-          origem_db: r.touro_nome === 'Não informado' ? '�Œ' : '�œ…'
+          origem_db: r.touro_nome === 'Não informado' ? '❌' : '✅'
         })));
       } catch (fallbackError) {
-        console.error('�Œ Fallback query also failed:', fallbackError.message);
+        console.error('❌ Fallback query also failed:', fallbackError.message);
       }
     }
   }

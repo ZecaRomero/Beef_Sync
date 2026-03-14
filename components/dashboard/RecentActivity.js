@@ -7,7 +7,7 @@ const RecentActivity = ({ animals, costs, sales }) => {
   const recentActivities = useMemo(() => {
     const activities = []
 
-    // Nascimentos recentes (Ãºltimos 30 dias)
+    // Nascimentos recentes (últimos 30 dias)
     const recentBirths = animals.filter(animal => {
       if (!animal.dataNascimento) return false
       const birthDate = new Date(animal.dataNascimento)
@@ -21,13 +21,13 @@ const RecentActivity = ({ animals, costs, sales }) => {
         type: 'birth',
         date: animal.dataNascimento,
         title: `Nascimento: ${animal.nome}`,
-        description: `${animal.sexo} ââ‚¬¢ ${animal.raca} ââ‚¬¢ ${animal.peso}kg`,
-        icon: 'ðÅ¸�â€ž',
+        description: `${animal.sexo} • ${animal.raca} • ${animal.peso}kg`,
+        icon: '🐄',
         color: 'green'
       })
     })
 
-    // Custos recentes (Ãºltimos 15 dias)
+    // Custos recentes (últimos 15 dias)
     const recentCosts = costs.filter(cost => {
       if (!cost.data) return false
       const costDate = new Date(cost.data)
@@ -42,8 +42,8 @@ const RecentActivity = ({ animals, costs, sales }) => {
         type: 'cost',
         date: cost.data,
         title: `${cost.tipo}: ${formatCurrency(cost.valor)}`,
-        description: `${animal?.nome || 'Animal'} ââ‚¬¢ ${cost.descricao}`,
-        icon: 'ðÅ¸â€™°',
+        description: `${animal?.nome || 'Animal'} • ${cost.descricao}`,
+        icon: '💰',
         color: 'blue'
       })
     })
@@ -55,8 +55,8 @@ const RecentActivity = ({ animals, costs, sales }) => {
         type: 'sale',
         date: sale.data,
         title: `Venda: ${formatCurrency(sale.valor)}`,
-        description: `${animal?.nome || 'Animal'} ââ‚¬¢ ${sale.comprador}`,
-        icon: 'ðÅ¸â€™µ',
+        description: `${animal?.nome || 'Animal'} • ${sale.comprador}`,
+        icon: '💵',
         color: 'purple'
       })
     })
@@ -78,12 +78,12 @@ const RecentActivity = ({ animals, costs, sales }) => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-        ðÅ¸â€œâ€¹ Atividades Recentes
+        📋 Atividades Recentes
       </h3>
       
       {recentActivities.length === 0 ? (
         <div className="text-center py-8">
-          <div className="text-gray-400 dark:text-gray-500 text-4xl mb-2">ðÅ¸â€œÅ </div>
+          <div className="text-gray-400 dark:text-gray-500 text-4xl mb-2">📊</div>
           <p className="text-gray-500 dark:text-gray-400">Nenhuma atividade recente</p>
         </div>
       ) : (

@@ -25,7 +25,7 @@ async function cadastrarReceptorasNF229() {
   const client = await pool.connect();
   
   try {
-    console.log('�Ÿ”� CADASTRANDO RECEPTORAS NA NF 229\n');
+    console.log('🔍 CADASTRANDO RECEPTORAS NA NF 229\n');
     console.log('='.repeat(80));
     
     // 1. Verificar se NF 229 existe
@@ -36,24 +36,24 @@ async function cadastrarReceptorasNF229() {
     `);
     
     if (nfResult.rows.length === 0) {
-      console.log('�Œ NF 229 não encontrada!');
+      console.log('❌ NF 229 não encontrada!');
       return;
     }
     
     const nf = nfResult.rows[0];
-    console.log(`�œ… NF 229 encontrada (ID: ${nf.id})`);
+    console.log(`✅ NF 229 encontrada (ID: ${nf.id})`);
     console.log(`   Fornecedor: ${nf.fornecedor}`);
-    console.log(`   �‰ Receptoras: ${nf.eh_receptoras ? 'SIM' : 'N�ƒO'}`);
+    console.log(`   É Receptoras: ${nf.eh_receptoras ? 'SIM' : 'NÃO'}`);
     
     // 2. Se não está marcada como receptoras, marcar
     if (!nf.eh_receptoras) {
-      console.log('\n�š�️ Marcando NF 229 como receptoras...');
+      console.log('\n⚠️ Marcando NF 229 como receptoras...');
       await client.query(`
         UPDATE notas_fiscais
         SET eh_receptoras = true
         WHERE id = $1
       `, [nf.id]);
-      console.log('�œ… NF 229 marcada como receptoras');
+      console.log('✅ NF 229 marcada como receptoras');
     }
     
     // 3. Verificar quantos itens já existem
@@ -64,10 +64,10 @@ async function cadastrarReceptorasNF229() {
     `, [nf.id]);
     
     const totalExistente = parseInt(itensExistentesResult.rows[0].total);
-    console.log(`\n�Ÿ“� Itens já cadastrados: ${totalExistente}`);
+    console.log(`\n📦 Itens já cadastrados: ${totalExistente}`);
     
     // 4. Cadastrar as receptoras
-    console.log(`\n�Ÿ“� Cadastrando ${receptorasNF229.length} receptoras...\n`);
+    console.log(`\n📝 Cadastrando ${receptorasNF229.length} receptoras...\n`);
     
     let cadastrados = 0;
     let erros = 0;
@@ -100,16 +100,16 @@ async function cadastrarReceptorasNF229() {
         ]);
         
         cadastrados++;
-        console.log(`�œ… ${cadastrados}. ${receptora.tatuagem} cadastrada`);
+        console.log(`✅ ${cadastrados}. ${receptora.tatuagem} cadastrada`);
         
       } catch (error) {
         erros++;
-        console.error(`�Œ Erro ao cadastrar ${receptora.tatuagem}:`, error.message);
+        console.error(`❌ Erro ao cadastrar ${receptora.tatuagem}:`, error.message);
       }
     }
     
     console.log('\n' + '='.repeat(80));
-    console.log('\n�Ÿ“Š RESUMO:');
+    console.log('\n📊 RESUMO:');
     console.log(`   Total de receptoras: ${receptorasNF229.length}`);
     console.log(`   Cadastradas com sucesso: ${cadastrados}`);
     console.log(`   Erros: ${erros}`);
@@ -122,17 +122,17 @@ async function cadastrarReceptorasNF229() {
     `, [nf.id]);
     
     const totalFinal = parseInt(totalFinalResult.rows[0].total);
-    console.log(`\n�œ… Total de itens na NF 229 agora: ${totalFinal}`);
+    console.log(`\n✅ Total de itens na NF 229 agora: ${totalFinal}`);
     
     console.log('\n' + '='.repeat(80));
-    console.log('\n�œ… Cadastro concluído!');
-    console.log('\n�Ÿ’� PR�“XIMOS PASSOS:');
+    console.log('\n✅ Cadastro concluído!');
+    console.log('\n💡 PRÓXIMOS PASSOS:');
     console.log('   1. Atualize a página de Receptoras DG');
     console.log('   2. Verifique se as 18 receptoras aparecem no lote');
     console.log('   3. Se faltarem receptoras, adicione-as ao array receptorasNF229');
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
     console.error(error);
   } finally {
     client.release();
@@ -140,11 +140,11 @@ async function cadastrarReceptorasNF229() {
   }
 }
 
-// ATEN�‡�ƒO: Este script só cadastra 3 receptoras como exemplo
+// ATENÇÃO: Este script só cadastra 3 receptoras como exemplo
 // Você precisa fornecer a lista completa das 18 receptoras
-console.log('�š�️  ATEN�‡�ƒO: Este script está configurado para cadastrar apenas 3 receptoras como exemplo.');
-console.log('�š�️  Você precisa adicionar as outras 15 receptoras no array receptorasNF229.');
-console.log('�š�️  Deseja continuar mesmo assim? (Ctrl+C para cancelar)\n');
+console.log('⚠️  ATENÇÃO: Este script está configurado para cadastrar apenas 3 receptoras como exemplo.');
+console.log('⚠️  Você precisa adicionar as outras 15 receptoras no array receptorasNF229.');
+console.log('⚠️  Deseja continuar mesmo assim? (Ctrl+C para cancelar)\n');
 
 setTimeout(() => {
   cadastrarReceptorasNF229();

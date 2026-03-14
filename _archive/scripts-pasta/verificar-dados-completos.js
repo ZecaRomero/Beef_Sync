@@ -8,14 +8,14 @@ const { query } = require('../lib/database')
 
 async function verificarDadosCompletos() {
   try {
-    console.log('�Ÿ”� VERIFICANDO TODOS OS DADOS NO SISTEMA...')
+    console.log('🔍 VERIFICANDO TODOS OS DADOS NO SISTEMA...')
     
     // Verificar conexão
     const connectionTest = await query('SELECT NOW() as timestamp')
-    console.log('�œ… Conexão PostgreSQL OK:', connectionTest.rows[0].timestamp)
+    console.log('✅ Conexão PostgreSQL OK:', connectionTest.rows[0].timestamp)
     
     // 1. Verificar notas fiscais
-    console.log('\n�Ÿ“„ VERIFICANDO NOTAS FISCAIS:')
+    console.log('\n📄 VERIFICANDO NOTAS FISCAIS:')
     const nfs = await query('SELECT COUNT(*) as total FROM notas_fiscais')
     console.log(`Total de notas fiscais: ${nfs.rows[0].total}`)
     
@@ -37,7 +37,7 @@ async function verificarDadosCompletos() {
     })
     
     // 2. Verificar itens das notas fiscais
-    console.log('\n�Ÿ“� VERIFICANDO ITENS DAS NOTAS FISCAIS:')
+    console.log('\n📦 VERIFICANDO ITENS DAS NOTAS FISCAIS:')
     const itens = await query('SELECT COUNT(*) as total FROM notas_fiscais_itens')
     console.log(`Total de itens: ${itens.rows[0].total}`)
     
@@ -58,7 +58,7 @@ async function verificarDadosCompletos() {
     })
     
     // 3. Verificar tabelas de sincronização
-    console.log('\n�Ÿ”„ VERIFICANDO TABELAS DE SINCRONIZA�‡�ƒO:')
+    console.log('\n🔄 VERIFICANDO TABELAS DE SINCRONIZAÇÃO:')
     try {
       const sync = await query('SELECT COUNT(*) as total FROM notas_fiscais_sincronizadas')
       console.log(`Total de sincronizações: ${sync.rows[0].total}`)
@@ -67,7 +67,7 @@ async function verificarDadosCompletos() {
     }
     
     // 4. Verificar animais
-    console.log('\n�Ÿ�„ VERIFICANDO ANIMAIS:')
+    console.log('\n🐄 VERIFICANDO ANIMAIS:')
     try {
       const animais = await query('SELECT COUNT(*) as total FROM animais')
       console.log(`Total de animais: ${animais.rows[0].total}`)
@@ -85,7 +85,7 @@ async function verificarDadosCompletos() {
           LIMIT 5
         `)
         
-        console.log('\n�šltimos 5 animais:')
+        console.log('\nÚltimos 5 animais:')
         animaisDetalhes.rows.forEach((animal, index) => {
           console.log(`  ${index + 1}. ${animal.serie}-${animal.rg} | ${animal.situacao} | NF: ${animal.nota_fiscal || 'N/A'}`)
         })
@@ -95,7 +95,7 @@ async function verificarDadosCompletos() {
     }
     
     // 5. Verificar estoque de sêmen
-    console.log('\n�Ÿ�� VERIFICANDO ESTOQUE DE S�ŠMEN:')
+    console.log('\n🧪 VERIFICANDO ESTOQUE DE SÊMEN:')
     try {
       const semen = await query('SELECT COUNT(*) as total FROM estoque_semen')
       console.log(`Total de sêmen: ${semen.rows[0].total}`)
@@ -104,7 +104,7 @@ async function verificarDadosCompletos() {
     }
     
     // 6. Verificar custos
-    console.log('\n�Ÿ’� VERIFICANDO CUSTOS:')
+    console.log('\n💰 VERIFICANDO CUSTOS:')
     try {
       const custos = await query('SELECT COUNT(*) as total FROM custos')
       console.log(`Total de custos: ${custos.rows[0].total}`)
@@ -112,24 +112,24 @@ async function verificarDadosCompletos() {
       console.log('Tabela de custos não existe ou erro:', error.message)
     }
     
-    console.log('\n�œ… VERIFICA�‡�ƒO COMPLETA!')
-    console.log('\n�Ÿ“Š RESUMO:')
+    console.log('\n✅ VERIFICAÇÃO COMPLETA!')
+    console.log('\n📊 RESUMO:')
     console.log(`- Notas fiscais: ${nfs.rows[0].total}`)
     console.log(`- Itens: ${itens.rows[0].total}`)
     
     if (nfs.rows[0].total === 1) {
-      console.log('\n�ŸŽ� SITUA�‡�ƒO CORRETA:')
+      console.log('\n🎯 SITUAÇÃO CORRETA:')
       console.log('- PostgreSQL tem apenas 1 nota fiscal')
       console.log('- Se o frontend mostra mais, é problema de cache/estado')
       console.log('- Execute a limpeza completa do navegador')
     } else {
-      console.log('\n�š�️ PROBLEMA DETECTADO:')
+      console.log('\n⚠️ PROBLEMA DETECTADO:')
       console.log('- PostgreSQL tem mais de 1 nota fiscal')
       console.log('- Execute limpeza do banco de dados')
     }
     
   } catch (error) {
-    console.error('�Œ Erro na verificação:', error)
+    console.error('❌ Erro na verificação:', error)
     throw error
   }
 }
@@ -138,11 +138,11 @@ async function verificarDadosCompletos() {
 if (require.main === module) {
   verificarDadosCompletos()
     .then(() => {
-      console.log('\n�œ… VERIFICA�‡�ƒO EXECUTADA COM SUCESSO!')
+      console.log('\n✅ VERIFICAÇÃO EXECUTADA COM SUCESSO!')
       process.exit(0)
     })
     .catch((error) => {
-      console.error('\n�Œ Erro ao executar verificação:', error)
+      console.error('\n❌ Erro ao executar verificação:', error)
       process.exit(1)
     })
 }

@@ -50,7 +50,7 @@ export default function AnimalPerformance() {
                          valorVenda ? 'Ruim' : 'Em Andamento'
       
       const riskLevel = custoTotal > 5000 ? 'Alto' :
-                       custoTotal > 2000 ? 'MÃ©dio' : 'Baixo'
+                       custoTotal > 2000 ? 'Médio' : 'Baixo'
 
       return {
         ...animal,
@@ -69,7 +69,7 @@ export default function AnimalPerformance() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="text-2xl mb-2">â�³</div>
+          <div className="text-2xl mb-2">⏳</div>
           <p className="text-gray-600 dark:text-gray-400">Carregando performance...</p>
         </div>
       </div>
@@ -119,7 +119,7 @@ export default function AnimalPerformance() {
   const getRiskColor = (risk) => {
     switch (risk) {
       case 'Alto': return 'text-red-600 bg-red-100'
-      case 'MÃ©dio': return 'text-yellow-600 bg-yellow-100'
+      case 'Médio': return 'text-yellow-600 bg-yellow-100'
       case 'Baixo': return 'text-green-600 bg-green-100'
       default: return 'text-gray-600 bg-gray-100'
     }
@@ -129,7 +129,7 @@ export default function AnimalPerformance() {
     <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
-          <span className="mr-3 text-2xl">ðÅ¸�â€ </span>
+          <span className="mr-3 text-2xl">🏆</span>
           Performance dos Animais
         </h2>
         <div className="flex items-center space-x-2">
@@ -184,7 +184,7 @@ export default function AnimalPerformance() {
                     {animal.serie} {animal.rg}
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
-                    {animal.raca} ââ‚¬¢ {animal.sexo} ââ‚¬¢ {animal.meses} meses
+                    {animal.raca} • {animal.sexo} • {animal.meses} meses
                   </div>
                 </div>
               </div>
@@ -237,7 +237,7 @@ export default function AnimalPerformance() {
                     </div>
                   </div>
                   <div>
-                    <div className="text-gray-600 dark:text-gray-400">Custo/MÃªs</div>
+                    <div className="text-gray-600 dark:text-gray-400">Custo/Mês</div>
                     <div className="font-bold text-orange-600 dark:text-orange-400">
                       R$ {animal.costPerMonth.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </div>
@@ -245,7 +245,7 @@ export default function AnimalPerformance() {
                   <div>
                     <div className="text-gray-600 dark:text-gray-400">Potencial</div>
                     <div className="font-bold text-purple-600 dark:text-purple-400">
-                      {animal.custoTotal > 3000 ? 'Alto' : animal.custoTotal > 1500 ? 'MÃ©dio' : 'Baixo'}
+                      {animal.custoTotal > 3000 ? 'Alto' : animal.custoTotal > 1500 ? 'Médio' : 'Baixo'}
                     </div>
                   </div>
                 </>
@@ -273,7 +273,7 @@ export default function AnimalPerformance() {
         ))}
       </div>
 
-      {/* Resumo EstatÃ­stico */}
+      {/* Resumo Estatístico */}
       <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
         <div className="grid grid-cols-3 gap-4 text-center">
           <div>

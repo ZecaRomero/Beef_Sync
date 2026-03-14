@@ -9,12 +9,12 @@ import { ChartJSNodeCanvas } from 'chartjs-node-canvas'
 // Registrar todos os componentes do Chart.js
 Chart.register(...registerables)
 
-// Helper: adiciona aba Resumo ao inÃ­cio do workbook (chamar ANTES de adicionar a aba de dados)
+// Helper: adiciona aba Resumo ao início do workbook (chamar ANTES de adicionar a aba de dados)
 function addResumoSheet(workbook, { titulo, periodo, totalRegistros, linhas = [], corPrimaria = '4472C4' }) {
   const sheet = workbook.addWorksheet('Resumo', { properties: { outlineLevelCol: 0 } })
 
   sheet.mergeCells('A1:D1')
-  sheet.getCell('A1').value = `ðÅ¸â€œÅ  RESUMO - ${titulo}`
+  sheet.getCell('A1').value = `📊 RESUMO - ${titulo}`
   sheet.getCell('A1').font = { size: 18, bold: true }
   sheet.getCell('A1').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + corPrimaria } }
   sheet.getCell('A1').font = { size: 18, bold: true, color: { argb: 'FFFFFFFF' } }
@@ -23,7 +23,7 @@ function addResumoSheet(workbook, { titulo, periodo, totalRegistros, linhas = []
 
   sheet.addRow([])
   sheet.addRow(['Gerado em:', new Date().toLocaleString('pt-BR')])
-  if (periodo) sheet.addRow(['PerÃ­odo:', periodo])
+  if (periodo) sheet.addRow(['Período:', periodo])
   sheet.addRow(['Total de registros:', totalRegistros])
   sheet.addRow([])
 
@@ -39,7 +39,7 @@ function addResumoSheet(workbook, { titulo, periodo, totalRegistros, linhas = []
   sheet.columns = [{ width: 35 }, { width: 25 }]
 }
 
-// FunÃ§Ã£o auxiliar para normalizar datas
+// Função auxiliar para normalizar datas
 const toPgDate = (value) => {
   if (!value) return null
   if (value instanceof Date) return value.toISOString().split('T')[0]
@@ -56,12 +56,12 @@ const toPgDate = (value) => {
   return null
 }
 
-// Extrair local das observaÃ§Ãµes (igual ao dashboard de pesagem)
+// Extrair local das observações (igual ao dashboard de pesagem)
 function extrairLocalObservacoes(obs) {
   if (!obs || typeof obs !== 'string') return null
   const s = obs.trim()
   if (!s) return null
-  const sNorm = s.replace(/CONFINAÃâ€¡ÃÆ’O/gi, 'CONFINA').replace(/CONFINACAO/gi, 'CONFINA')
+  const sNorm = s.replace(/CONFINAÇÃO/gi, 'CONFINA').replace(/CONFINACAO/gi, 'CONFINA')
   const m = sNorm.match(/(PIQUETE\s*\d+|PROJETO\s*[\dA-Za-z\-]+|LOTE\s*\d+|CONFINA\w*|GUARITA|CABANHA|PISTA\s*\d*)/i)
   if (m) {
     let loc = m[1].trim().toUpperCase().replace(/\s+/g, ' ')
@@ -73,7 +73,7 @@ function extrairLocalObservacoes(obs) {
 
 // Normalizar PIQUETE X e PROJETO X para o mesmo grupo (ex: PROJETO X) - alinha com dashboard
 function normalizarPiqueteParaAgrupamento(piquete) {
-  if (!piquete || piquete === 'NÃ£o informado') return piquete || 'NÃ£o informado'
+  if (!piquete || piquete === 'Não informado') return piquete || 'Não informado'
   const s = String(piquete).trim().toUpperCase()
   const mPiq = s.match(/^PIQUETE\s*(\d+)$/i)
   const mProj = s.match(/^PROJETO\s*([\dA-Za-z\-]+)$/i)
@@ -82,12 +82,12 @@ function normalizarPiqueteParaAgrupamento(piquete) {
   return s
 }
 
-// FunÃ§Ã£o para formatar data no padrÃ£o brasileiro dd/mm/aaaa
+// Função para formatar data no padrão brasileiro dd/mm/aaaa
 const formatDateBR = (dateStr) => {
   if (!dateStr) return ''
-  // Se jÃ¡ estÃ¡ no formato dd/mm/aaaa, retorna como estÃ¡
+  // Se já está no formato dd/mm/aaaa, retorna como está
   if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) return dateStr
-  // Se estÃ¡ no formato aaaa-mm-dd, converte
+  // Se está no formato aaaa-mm-dd, converte
   if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
     const [y, m, d] = dateStr.split('-')
     return `${d}/${m}/${y}`
@@ -107,7 +107,7 @@ const formatDateBR = (dateStr) => {
   return dateStr
 }
 
-// Descobrir o nome da coluna de data em inseminacoes (compatÃ­vel com esquemas antigos/novos)
+// Descobrir o nome da coluna de data em inseminacoes (compatível com esquemas antigos/novos)
 let _iaDateColumnCache = null
 async function getIADataColumn() {
   if (_iaDateColumnCache) return _iaDateColumnCache
@@ -129,7 +129,7 @@ async function getIADataColumn() {
   return _iaDateColumnCache
 }
 
-// Gerar relatÃ³rio de NF Entrada e SaÃ­da
+// Gerar relatório de NF Entrada e Saída
 async function generateNFReport(period) {
   const pgStart = toPgDate(period.startDate)
   const pgEnd = toPgDate(period.endDate)
@@ -212,36 +212,36 @@ async function generateNFReport(period) {
   const totalItens = rows.reduce((s, n) => s + (n.quantidade_calculada || n.quantidade_receptoras || 0), 0)
 
   addResumoSheet(workbook, {
-    titulo: 'Notas Fiscais - Entrada e SaÃ­da',
-    periodo: `${formatDateBR(period.startDate)} atÃ© ${formatDateBR(period.endDate)}`,
+    titulo: 'Notas Fiscais - Entrada e Saída',
+    periodo: `${formatDateBR(period.startDate)} até ${formatDateBR(period.endDate)}`,
     totalRegistros: rows.length,
     linhas: [
       { label: 'Notas de Entrada', valor: entradas.length },
-      { label: 'Notas de SaÃ­da', valor: saidas.length },
+      { label: 'Notas de Saída', valor: saidas.length },
       { label: 'Valor Total Entradas (R$)', valor: valorEntradas.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) },
-      { label: 'Valor Total SaÃ­das (R$)', valor: valorSaidas.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) },
+      { label: 'Valor Total Saídas (R$)', valor: valorSaidas.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) },
       { label: 'Total de Itens/Animais', valor: totalItens }
     ]
   })
 
-  const sheet = workbook.addWorksheet('NF Entrada e SaÃ­da')
+  const sheet = workbook.addWorksheet('NF Entrada e Saída')
 
-  // CabeÃ§alho
+  // Cabeçalho
   sheet.mergeCells('A1:K1')
-  sheet.getCell('A1').value = 'ðÅ¸â€œâ€ž RELATÃâ€œRIO DE NOTAS FISCAIS - ENTRADA E SAÃ�DA'
+  sheet.getCell('A1').value = '📄 RELATÓRIO DE NOTAS FISCAIS - ENTRADA E SAÍDA'
   sheet.getCell('A1').font = { size: 16, bold: true }
   sheet.getCell('A1').alignment = { horizontal: 'center' }
   sheet.getRow(1).height = 30
 
   sheet.mergeCells('A2:K2')
-  sheet.getCell('A2').value = `PerÃ­odo: ${formatDateBR(period.startDate)} atÃ© ${formatDateBR(period.endDate)}`
+  sheet.getCell('A2').value = `Período: ${formatDateBR(period.startDate)} até ${formatDateBR(period.endDate)}`
   sheet.getCell('A2').font = { size: 12, bold: true }
   sheet.getCell('A2').alignment = { horizontal: 'center' }
 
-  // CabeÃ§alho da tabela
+  // Cabeçalho da tabela
   const headerRow = sheet.addRow([
-    'NÃºmero NF', 'Data', 'Tipo', 'Fornecedor/Cliente', 'Valor Total', 
-    'Quantidade', 'Animais/Itens', 'Natureza OperaÃ§Ã£o', 'ObservaÃ§Ãµes'
+    'Número NF', 'Data', 'Tipo', 'Fornecedor/Cliente', 'Valor Total', 
+    'Quantidade', 'Animais/Itens', 'Natureza Operação', 'Observações'
   ])
   headerRow.font = { bold: true }
   headerRow.eachCell((cell) => {
@@ -251,25 +251,25 @@ async function generateNFReport(period) {
 
   // Dados
   rows.forEach(nf => {
-    // Usar quantidade calculada se disponÃ­vel, senÃ£o usar quantidade_receptoras, senÃ£o 0
+    // Usar quantidade calculada se disponível, senão usar quantidade_receptoras, senão 0
     const quantidade = nf.quantidade_calculada || nf.quantidade_receptoras || 0
     
-    // Formatar identificaÃ§Ãµes dos itens (filtrar null/undefined/vazio)
+    // Formatar identificações dos itens (filtrar null/undefined/vazio)
     let identificacoes = ''
     if (nf.identificacoes_itens && Array.isArray(nf.identificacoes_itens)) {
       const itensValidos = nf.identificacoes_itens.filter(i => i && String(i).trim())
       identificacoes = itensValidos.join(', ')
     }
-    // Quando nÃ£o hÃ¡ identificaÃ§Ãµes individuais mas hÃ¡ quantidade (ex: modo categoria)
+    // Quando não há identificações individuais mas há quantidade (ex: modo categoria)
     if (!identificacoes && quantidade > 0) {
-      identificacoes = `${quantidade} item(ns) - identificaÃ§Ã£o por lote`
+      identificacoes = `${quantidade} item(ns) - identificação por lote`
     }
 
     const dataExibir = (nf.tipo === 'saida' && nf.data_saida) ? nf.data_saida : nf.data_compra
     sheet.addRow([
       nf.numero_nf || '',
       dataExibir ? new Date(dataExibir).toLocaleDateString('pt-BR') : '',
-      nf.tipo === 'entrada' ? 'Entrada' : 'SaÃ­da',
+      nf.tipo === 'entrada' ? 'Entrada' : 'Saída',
       nf.tipo === 'entrada' ? (nf.fornecedor || '') : (nf.destino || ''),
       nf.valor_total || 0,
       quantidade,
@@ -286,12 +286,12 @@ async function generateNFReport(period) {
   return Buffer.from(buffer)
 }
 
-// Gerar relatÃ³rio de Receptoras que Chegaram
+// Gerar relatório de Receptoras que Chegaram
 async function generateReceptorasChegaramReport(period) {
   const pgStart = toPgDate(period.startDate)
   const pgEnd = toPgDate(period.endDate)
 
-  // Buscar cada item individualmente para ter as informaÃ§Ãµes corretas de cada receptora
+  // Buscar cada item individualmente para ter as informações corretas de cada receptora
   const result = await query(`
     SELECT 
       nf.numero_nf,
@@ -322,7 +322,7 @@ async function generateReceptorasChegaramReport(period) {
   const rows = result.rows || []
   const porFornecedor = {}
   rows.forEach(r => {
-    const f = r.fornecedor || 'NÃ£o informado'
+    const f = r.fornecedor || 'Não informado'
     porFornecedor[f] = (porFornecedor[f] || 0) + 1
   })
   const nfsUnicas = new Set(rows.map(r => r.numero_nf)).size
@@ -330,7 +330,7 @@ async function generateReceptorasChegaramReport(period) {
   const workbook = new ExcelJS.Workbook()
   addResumoSheet(workbook, {
     titulo: 'Receptoras que Chegaram',
-    periodo: `${formatDateBR(period.startDate)} atÃ© ${formatDateBR(period.endDate)}`,
+    periodo: `${formatDateBR(period.startDate)} até ${formatDateBR(period.endDate)}`,
     totalRegistros: rows.length,
     linhas: [
       { label: 'Notas Fiscais distintas', valor: nfsUnicas },
@@ -344,7 +344,7 @@ async function generateReceptorasChegaramReport(period) {
   const sheet = workbook.addWorksheet('Receptoras que Chegaram')
 
   sheet.mergeCells('A1:G1')
-  sheet.getCell('A1').value = 'ðÅ¸�â€ž RECEPTORAS QUE CHEGARAM'
+  sheet.getCell('A1').value = '🐄 RECEPTORAS QUE CHEGARAM'
   sheet.getCell('A1').font = { size: 16, bold: true }
   sheet.getCell('A1').alignment = { horizontal: 'center' }
 
@@ -371,7 +371,7 @@ async function generateReceptorasChegaramReport(period) {
     const tatuagem = row.tatuagem || dadosItem?.tatuagem || ''
     let receptora = row.receptora_identificacao || ''
     
-    // Se tem tatuagem, usar como identificaÃ§Ã£o principal
+    // Se tem tatuagem, usar como identificação principal
     if (tatuagem) {
       receptora = tatuagem
     } else if (dadosItem?.serie && dadosItem?.rg) {
@@ -406,7 +406,7 @@ async function generateReceptorasChegaramReport(period) {
   return Buffer.from(buffer)
 }
 
-// Gerar relatÃ³rio de Agenda de Atividades (Brucelose + DGT) em Excel
+// Gerar relatório de Agenda de Atividades (Brucelose + DGT) em Excel
 async function generateAgendaAtividadesReport(baseUrl) {
   const res = await fetch(`${baseUrl}/api/planejamento/agenda-eventos`)
   if (!res.ok) {
@@ -423,8 +423,8 @@ async function generateAgendaAtividadesReport(baseUrl) {
     periodo: `Gerado em ${new Date().toLocaleDateString('pt-BR')}`,
     totalRegistros: brucelose.length + dgt.length,
     linhas: [
-      { label: 'Vacina Brucelose (fÃªmeas 3-8 meses)', valor: brucelose.length },
-      { label: 'AvaliaÃ§Ã£o DGT (330-640 dias)', valor: dgt.length }
+      { label: 'Vacina Brucelose (fêmeas 3-8 meses)', valor: brucelose.length },
+      { label: 'Avaliação DGT (330-640 dias)', valor: dgt.length }
     ],
     corPrimaria: 'F59E0B'
   })
@@ -432,10 +432,10 @@ async function generateAgendaAtividadesReport(baseUrl) {
   // Aba Brucelose
   const sheetBrucelose = workbook.addWorksheet('Brucelose')
   sheetBrucelose.mergeCells('A1:H1')
-  sheetBrucelose.getCell('A1').value = 'ðÅ¸â€º¡ï¸� Vacina Brucelose - FÃªmeas 3 a 8 meses (obrigatÃ³rio)'
+  sheetBrucelose.getCell('A1').value = '🛡️ Vacina Brucelose - Fêmeas 3 a 8 meses (obrigatório)'
   sheetBrucelose.getCell('A1').font = { size: 14, bold: true }
   sheetBrucelose.getCell('A1').alignment = { horizontal: 'center' }
-  const headerBrucelose = sheetBrucelose.addRow(['SÃ©rie', 'RG', 'RaÃ§a', 'Data Nasc.', 'Idade (meses)', 'Peso', 'Piquete'])
+  const headerBrucelose = sheetBrucelose.addRow(['Série', 'RG', 'Raça', 'Data Nasc.', 'Idade (meses)', 'Peso', 'Piquete'])
   headerBrucelose.font = { bold: true }
   headerBrucelose.eachCell((cell) => {
     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF59E0B' } }
@@ -449,7 +449,7 @@ async function generateAgendaAtividadesReport(baseUrl) {
       a.data_nascimento ? formatDateBR(a.data_nascimento) : '',
       a.idade_dias != null ? Math.floor(a.idade_dias / 30.44) : '',
       a.peso || '',
-      a.piquete || a.piquete_localizacao || a.piquete_atual || a.pasto_atual || 'NÃ£o informado'
+      a.piquete || a.piquete_localizacao || a.piquete_atual || a.pasto_atual || 'Não informado'
     ])
   })
   sheetBrucelose.columns.forEach((col, idx) => { col.width = idx === 6 ? 25 : 14 })
@@ -457,10 +457,10 @@ async function generateAgendaAtividadesReport(baseUrl) {
   // Aba DGT
   const sheetDGT = workbook.addWorksheet('DGT')
   sheetDGT.mergeCells('A1:I1')
-  sheetDGT.getCell('A1').value = 'ðÅ¸â€œÅ  AvaliaÃ§Ã£o DGT - Animais 330 a 640 dias'
+  sheetDGT.getCell('A1').value = '📊 Avaliação DGT - Animais 330 a 640 dias'
   sheetDGT.getCell('A1').font = { size: 14, bold: true }
   sheetDGT.getCell('A1').alignment = { horizontal: 'center' }
-  const headerDGT = sheetDGT.addRow(['SÃ©rie', 'RG', 'Sexo', 'RaÃ§a', 'Data Nasc.', 'Idade (dias)', 'Idade (meses)', 'Peso', 'Piquete'])
+  const headerDGT = sheetDGT.addRow(['Série', 'RG', 'Sexo', 'Raça', 'Data Nasc.', 'Idade (dias)', 'Idade (meses)', 'Peso', 'Piquete'])
   headerDGT.font = { bold: true }
   headerDGT.eachCell((cell) => {
     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF10B981' } }
@@ -476,7 +476,7 @@ async function generateAgendaAtividadesReport(baseUrl) {
       a.idade_dias ?? '',
       a.idade_dias != null ? Math.floor(a.idade_dias / 30.44) : '',
       a.peso || '',
-      a.piquete || a.piquete_localizacao || a.piquete_atual || a.pasto_atual || 'NÃ£o informado'
+      a.piquete || a.piquete_localizacao || a.piquete_atual || a.pasto_atual || 'Não informado'
     ])
   })
   sheetDGT.columns.forEach((col, idx) => { col.width = idx === 8 ? 25 : 14 })
@@ -485,7 +485,7 @@ async function generateAgendaAtividadesReport(baseUrl) {
   return Buffer.from(buffer)
 }
 
-// Gerar relatÃ³rio de Receptoras que Faltam Parir
+// Gerar relatório de Receptoras que Faltam Parir
 async function generateReceptorasFaltamParirReport() {
   const result = await query(`
     WITH gestacoes_te AS (
@@ -520,7 +520,7 @@ async function generateReceptorasFaltamParirReport() {
       (gt.data_te + INTERVAL '285 days')::date as previsao_parto,
       CASE 
         WHEN (gt.data_te + INTERVAL '285 days')::date < CURRENT_DATE THEN 'Atrasado'
-        WHEN (gt.data_te + INTERVAL '285 days')::date <= CURRENT_DATE + INTERVAL '30 days' THEN 'PrÃ³ximo'
+        WHEN (gt.data_te + INTERVAL '285 days')::date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Próximo'
         ELSE 'Normal'
       END as status
     FROM gestacoes_te gt
@@ -532,7 +532,7 @@ async function generateReceptorasFaltamParirReport() {
   `)
 
   const rows = result.rows || []
-  const porStatus = { Atrasado: 0, PrÃ³ximo: 0, Normal: 0 }
+  const porStatus = { Atrasado: 0, Próximo: 0, Normal: 0 }
   rows.forEach(r => {
     const s = r.status || 'Normal'
     if (porStatus[s] !== undefined) porStatus[s]++
@@ -545,8 +545,8 @@ async function generateReceptorasFaltamParirReport() {
     totalRegistros: rows.length,
     corPrimaria: 'E67E22',
     linhas: [
-      { label: 'Status: Atrasado (parto jÃ¡ passou)', valor: porStatus.Atrasado },
-      { label: 'Status: PrÃ³ximo (30 dias)', valor: porStatus.PrÃ³ximo },
+      { label: 'Status: Atrasado (parto já passou)', valor: porStatus.Atrasado },
+      { label: 'Status: Próximo (30 dias)', valor: porStatus.Próximo },
       { label: 'Status: Normal', valor: porStatus.Normal }
     ]
   })
@@ -554,12 +554,12 @@ async function generateReceptorasFaltamParirReport() {
   const sheet = workbook.addWorksheet('Receptoras Faltam Parir')
 
   sheet.mergeCells('A1:G1')
-  sheet.getCell('A1').value = 'â�° RECEPTORAS QUE FALTAM PARIR'
+  sheet.getCell('A1').value = '⏰ RECEPTORAS QUE FALTAM PARIR'
   sheet.getCell('A1').font = { size: 16, bold: true }
   sheet.getCell('A1').alignment = { horizontal: 'center' }
 
   const headerRow = sheet.addRow([
-    'NF', 'Receptora', 'Data TE', 'PrevisÃ£o Parto', 'Status', 'Dias Restantes'
+    'NF', 'Receptora', 'Data TE', 'Previsão Parto', 'Status', 'Dias Restantes'
   ])
   headerRow.font = { bold: true }
 
@@ -583,29 +583,29 @@ async function generateReceptorasFaltamParirReport() {
   return Buffer.from(buffer)
 }
 
-// Gerar relatÃ³rio de PrevisÃµes de Parto (FIV vs IA)
+// Gerar relatório de Previsões de Parto (FIV vs IA)
 async function generatePrevisoesPartoReport(data) {
   const { previsoesFIV = [], previsoesIA = [], totalFIV = 0, totalIA = 0 } = data
   const total = totalFIV + totalIA
 
   const workbook = new ExcelJS.Workbook()
   addResumoSheet(workbook, {
-    titulo: 'PrevisÃµes de Parto - FIV vs IA',
+    titulo: 'Previsões de Parto - FIV vs IA',
     totalRegistros: total,
     corPrimaria: '059669',
     linhas: [
       { label: 'Receptoras para parir de FIV', valor: totalFIV },
-      { label: 'FÃªmeas para parir de IA', valor: totalIA },
-      { label: 'Total de previsÃµes', valor: total }
+      { label: 'Fêmeas para parir de IA', valor: totalIA },
+      { label: 'Total de previsões', valor: total }
     ]
   })
 
-  const sheet = workbook.addWorksheet('PrevisÃµes FIV')
+  const sheet = workbook.addWorksheet('Previsões FIV')
   sheet.mergeCells('A1:F1')
-  sheet.getCell('A1').value = 'ðÅ¸â€�¬ RECEPTORAS PARA PARIR DE FIV'
+  sheet.getCell('A1').value = '🔬 RECEPTORAS PARA PARIR DE FIV'
   sheet.getCell('A1').font = { size: 14, bold: true }
   sheet.getCell('A1').alignment = { horizontal: 'center' }
-  sheet.addRow(['SÃ©rie', 'RG', 'Receptora', 'Data Prevista', 'Sexo']).font = { bold: true }
+  sheet.addRow(['Série', 'RG', 'Receptora', 'Data Prevista', 'Sexo']).font = { bold: true }
   previsoesFIV.forEach(p => {
     sheet.addRow([
       p.serie || '-',
@@ -616,12 +616,12 @@ async function generatePrevisoesPartoReport(data) {
     ])
   })
 
-  const sheetIA = workbook.addWorksheet('PrevisÃµes IA')
+  const sheetIA = workbook.addWorksheet('Previsões IA')
   sheetIA.mergeCells('A1:F1')
-  sheetIA.getCell('A1').value = 'ðÅ¸â€™â€° FÃÅ MEAS PARA PARIR DE IA'
+  sheetIA.getCell('A1').value = '💉 FÊMEAS PARA PARIR DE IA'
   sheetIA.getCell('A1').font = { size: 14, bold: true }
   sheetIA.getCell('A1').alignment = { horizontal: 'center' }
-  sheetIA.addRow(['SÃ©rie', 'RG', 'FÃªmea', 'Data Prevista', 'Touro']).font = { bold: true }
+  sheetIA.addRow(['Série', 'RG', 'Fêmea', 'Data Prevista', 'Touro']).font = { bold: true }
   previsoesIA.forEach(p => {
     sheetIA.addRow([
       p.serie || '-',
@@ -638,7 +638,7 @@ async function generatePrevisoesPartoReport(data) {
   return Buffer.from(buffer)
 }
 
-// Helper: conta receptoras que faltam DG (matching flexÃ­vel - exclui animais/TE/histÃ³ria com DG)
+// Helper: conta receptoras que faltam DG (matching flexível - exclui animais/TE/história com DG)
 async function countReceptorasFaltamDG(pgStart, pgEnd) {
   const result = await query(`
     SELECT nf.receptora_letra, nf.receptora_numero, item.dados_item
@@ -689,13 +689,13 @@ async function countReceptorasFaltamDG(pgStart, pgEnd) {
   return count
 }
 
-// Gerar relatÃ³rio de Receptoras que Faltam DiagnÃ³stico (por perÃ­odo de chegada)
-// Usa matching flexÃ­vel igual ao lista-dg/export-dg-pendentes para excluir receptoras jÃ¡ diagnosticadas
+// Gerar relatório de Receptoras que Faltam Diagnóstico (por período de chegada)
+// Usa matching flexível igual ao lista-dg/export-dg-pendentes para excluir receptoras já diagnosticadas
 async function generateReceptorasFaltamDGReport(period) {
   const pgStart = toPgDate(period.startDate)
   const pgEnd = toPgDate(period.endDate)
 
-  // 1) Buscar TODOS os itens de NF receptoras no perÃ­odo (sem filtrar por DG ainda)
+  // 1) Buscar TODOS os itens de NF receptoras no período (sem filtrar por DG ainda)
   const result = await query(`
     SELECT 
       nf.numero_nf,
@@ -706,7 +706,7 @@ async function generateReceptorasFaltamDGReport(period) {
       (COALESCE(nf.data_chegada_animais, nf.data_compra) + INTERVAL '15 days')::date as data_prevista_dg,
       CASE 
         WHEN (COALESCE(nf.data_chegada_animais, nf.data_compra) + INTERVAL '15 days')::date < CURRENT_DATE THEN 'Atrasado'
-        WHEN (COALESCE(nf.data_chegada_animais, nf.data_compra) + INTERVAL '15 days')::date <= CURRENT_DATE + INTERVAL '7 days' THEN 'PrÃ³ximo'
+        WHEN (COALESCE(nf.data_chegada_animais, nf.data_compra) + INTERVAL '15 days')::date <= CURRENT_DATE + INTERVAL '7 days' THEN 'Próximo'
         ELSE 'Normal'
       END as status,
       item.dados_item
@@ -721,7 +721,7 @@ async function generateReceptorasFaltamDGReport(period) {
     ORDER BY data_chegada ASC, nf.numero_nf, item.id
   `, [pgStart, pgEnd])
 
-  // 2) Set de chaves normalizadas de animais/receptoras que JÃ� tÃªm DG
+  // 2) Set de chaves normalizadas de animais/receptoras que JÁ têm DG
   const jaTemDGKeys = new Set()
   const addKey = (letra, numero) => {
     const l = String(letra || '').trim().toUpperCase()
@@ -756,7 +756,7 @@ async function generateReceptorasFaltamDGReport(period) {
   `)
   histDG.rows.forEach(a => { addKey(a.serie, a.rg) })
 
-  // 3) Filtrar: manter apenas itens cuja receptora ainda NÃÆ’O tem DG
+  // 3) Filtrar: manter apenas itens cuja receptora ainda NÃO tem DG
   const rows = []
   for (const r of result.rows || []) {
     let letra = r.receptora_letra || ''
@@ -785,7 +785,7 @@ async function generateReceptorasFaltamDGReport(period) {
 
     rows.push({ ...r, receptora_identificacao: tatuagem || `${letra} ${numero}`.trim() || `${l}${n}` })
   }
-  const porStatus = { Atrasado: 0, PrÃ³ximo: 0, Normal: 0 }
+  const porStatus = { Atrasado: 0, Próximo: 0, Normal: 0 }
   rows.forEach(r => {
     const s = r.status || 'Normal'
     if (porStatus[s] !== undefined) porStatus[s]++
@@ -793,19 +793,19 @@ async function generateReceptorasFaltamDGReport(period) {
   })
   const porFornecedor = {}
   rows.forEach(r => {
-    const f = r.fornecedor || 'NÃ£o informado'
+    const f = r.fornecedor || 'Não informado'
     porFornecedor[f] = (porFornecedor[f] || 0) + 1
   })
 
   const workbook = new ExcelJS.Workbook()
   addResumoSheet(workbook, {
     titulo: 'Receptoras que Faltam DG',
-    periodo: `${formatDateBR(period.startDate)} atÃ© ${formatDateBR(period.endDate)}`,
+    periodo: `${formatDateBR(period.startDate)} até ${formatDateBR(period.endDate)}`,
     totalRegistros: rows.length,
     corPrimaria: '9F7AEA',
     linhas: [
-      { label: 'Status: Atrasado (DG jÃ¡ passou)', valor: porStatus.Atrasado },
-      { label: 'Status: PrÃ³ximo (7 dias)', valor: porStatus.PrÃ³ximo },
+      { label: 'Status: Atrasado (DG já passou)', valor: porStatus.Atrasado },
+      { label: 'Status: Próximo (7 dias)', valor: porStatus.Próximo },
       { label: 'Status: Normal', valor: porStatus.Normal },
       ...Object.entries(porFornecedor)
         .sort((a, b) => b[1] - a[1])
@@ -817,12 +817,12 @@ async function generateReceptorasFaltamDGReport(period) {
   const sheet = workbook.addWorksheet('Receptoras Faltam DG')
 
   sheet.mergeCells('A1:G1')
-  sheet.getCell('A1').value = 'ðÅ¸â€�¬ RECEPTORAS QUE FALTAM DIAGNÃâ€œSTICO DE GESTAÃâ€¡ÃÆ’O'
+  sheet.getCell('A1').value = '🔬 RECEPTORAS QUE FALTAM DIAGNÓSTICO DE GESTAÇÃO'
   sheet.getCell('A1').font = { size: 16, bold: true }
   sheet.getCell('A1').alignment = { horizontal: 'center' }
 
   sheet.mergeCells('A2:G2')
-  sheet.getCell('A2').value = `PerÃ­odo de chegada: ${formatDateBR(period.startDate)} atÃ© ${formatDateBR(period.endDate)} ââ‚¬¢ DG previsto em 15 dias`
+  sheet.getCell('A2').value = `Período de chegada: ${formatDateBR(period.startDate)} até ${formatDateBR(period.endDate)} • DG previsto em 15 dias`
   sheet.getCell('A2').font = { size: 10 }
   sheet.getCell('A2').alignment = { horizontal: 'center' }
 
@@ -870,7 +870,7 @@ async function generateReceptorasFaltamDGReport(period) {
   return Buffer.from(buffer)
 }
 
-// Gerar relatÃ³rio de FÃªmeas que Fizeram IA
+// Gerar relatório de Fêmeas que Fizeram IA
 async function generateFemeasIAReport(period) {
   const pgStart = toPgDate(period.startDate)
   const pgEnd = toPgDate(period.endDate)
@@ -897,7 +897,7 @@ async function generateFemeasIAReport(period) {
     FROM inseminacoes i
     INNER JOIN animais a ON a.id = i.animal_id
     WHERE i.${iaDateCol} >= $1 AND i.${iaDateCol} <= $2
-      AND a.sexo = 'FÃªmea'
+      AND a.sexo = 'Fêmea'
     ORDER BY i.${iaDateCol} DESC, a.serie, a.rg
   `, [pgStart, pgEnd])
 
@@ -909,8 +909,8 @@ async function generateFemeasIAReport(period) {
 
   const workbook = new ExcelJS.Workbook()
   addResumoSheet(workbook, {
-    titulo: 'FÃªmeas que Fizeram IA',
-    periodo: `${formatDateBR(period.startDate)} atÃ© ${formatDateBR(period.endDate)}`,
+    titulo: 'Fêmeas que Fizeram IA',
+    periodo: `${formatDateBR(period.startDate)} até ${formatDateBR(period.endDate)}`,
     totalRegistros: rows.length,
     linhas: [
       { label: 'Prenhas', valor: prenhas },
@@ -920,21 +920,21 @@ async function generateFemeasIAReport(period) {
     ]
   })
 
-  const sheet = workbook.addWorksheet('FÃªmeas que Fizeram IA')
+  const sheet = workbook.addWorksheet('Fêmeas que Fizeram IA')
 
   sheet.mergeCells('A1:J1')
-  sheet.getCell('A1').value = 'ðÅ¸�â€ž RELATÃâ€œRIO DE FÃÅ MEAS QUE FIZERAM INSEMINAÃâ€¡ÃÆ’O ARTIFICIAL'
+  sheet.getCell('A1').value = '🐄 RELATÓRIO DE FÊMEAS QUE FIZERAM INSEMINAÇÃO ARTIFICIAL'
   sheet.getCell('A1').font = { size: 16, bold: true }
   sheet.getCell('A1').alignment = { horizontal: 'center' }
   sheet.getRow(1).height = 30
 
   sheet.mergeCells('A2:J2')
-  sheet.getCell('A2').value = `PerÃ­odo: ${formatDateBR(period.startDate)} atÃ© ${formatDateBR(period.endDate)}`
+  sheet.getCell('A2').value = `Período: ${formatDateBR(period.startDate)} até ${formatDateBR(period.endDate)}`
   sheet.getCell('A2').font = { size: 12, bold: true }
   sheet.getCell('A2').alignment = { horizontal: 'center' }
 
   const headerRow = sheet.addRow([
-    'Data IA', 'Animal', 'RaÃ§a', 'Idade (anos)', 'Touro', 'TÃ©cnico', 'Protocolo', 'Status GestaÃ§Ã£o', 'ObservaÃ§Ãµes'
+    'Data IA', 'Animal', 'Raça', 'Idade (anos)', 'Touro', 'Técnico', 'Protocolo', 'Status Gestação', 'Observações'
   ])
   headerRow.font = { bold: true }
   headerRow.eachCell((cell) => {
@@ -956,11 +956,11 @@ async function generateFemeasIAReport(period) {
     ])
   })
 
-  // EstatÃ­sticas resumidas (no rodapÃ© da aba de dados)
+  // Estatísticas resumidas (no rodapé da aba de dados)
   const totalIA = rows.length
   sheet.addRow([])
   sheet.mergeCells(`A${sheet.rowCount + 1}:J${sheet.rowCount + 1}`)
-  const statsRow = sheet.addRow(['RESUMO ESTATÃ�STICO'])
+  const statsRow = sheet.addRow(['RESUMO ESTATÍSTICO'])
   statsRow.font = { bold: true, size: 12 }
   statsRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'E7E6E6' } }
   
@@ -976,20 +976,20 @@ async function generateFemeasIAReport(period) {
   sheet.columns.forEach((col, idx) => {
     if (idx === 0) col.width = 12 // Data
     else if (idx === 1) col.width = 15 // Animal
-    else if (idx === 2) col.width = 15 // RaÃ§a
+    else if (idx === 2) col.width = 15 // Raça
     else if (idx === 3) col.width = 12 // Idade
     else if (idx === 4) col.width = 20 // Touro
-    else if (idx === 5) col.width = 20 // TÃ©cnico
+    else if (idx === 5) col.width = 20 // Técnico
     else if (idx === 6) col.width = 15 // Protocolo
     else if (idx === 7) col.width = 18 // Status
-    else col.width = 30 // ObservaÃ§Ãµes
+    else col.width = 30 // Observações
   })
 
   const buffer = await workbook.xlsx.writeBuffer()
   return Buffer.from(buffer)
 }
 
-// Gerar relatÃ³rio de Animais que Entraram nos Piquetes
+// Gerar relatório de Animais que Entraram nos Piquetes
 async function generateAnimaisPiquetesReport(period) {
   const pgStart = toPgDate(period.startDate)
   const pgEnd = toPgDate(period.endDate)
@@ -1038,19 +1038,19 @@ async function generateAnimaisPiquetesReport(period) {
   const sheet = workbook.addWorksheet('Animais nos Piquetes')
 
   sheet.mergeCells('A1:L1')
-  sheet.getCell('A1').value = 'ðÅ¸â€œ� RELATÃâ€œRIO DE ANIMAIS QUE ENTRARAM NOS PIQUETES'
+  sheet.getCell('A1').value = '📍 RELATÓRIO DE ANIMAIS QUE ENTRARAM NOS PIQUETES'
   sheet.getCell('A1').font = { size: 16, bold: true }
   sheet.getCell('A1').alignment = { horizontal: 'center' }
   sheet.getRow(1).height = 30
 
   sheet.mergeCells('A2:L2')
-  sheet.getCell('A2').value = `PerÃ­odo: ${formatDateBR(period.startDate)} atÃ© ${formatDateBR(period.endDate)}`
+  sheet.getCell('A2').value = `Período: ${formatDateBR(period.startDate)} até ${formatDateBR(period.endDate)}`
   sheet.getCell('A2').font = { size: 12, bold: true }
   sheet.getCell('A2').alignment = { horizontal: 'center' }
 
   const headerRow = sheet.addRow([
-    'Data Entrada', 'Piquete', 'Animal', 'RaÃ§a', 'Sexo', 'Idade (anos)', 
-    'Peso (kg)', 'CE (cm)', 'Motivo MovimentaÃ§Ã£o', 'Data SaÃ­da', 'Status', 'UsuÃ¡rio ResponsÃ¡vel', 'ObservaÃ§Ãµes'
+    'Data Entrada', 'Piquete', 'Animal', 'Raça', 'Sexo', 'Idade (anos)', 
+    'Peso (kg)', 'CE (cm)', 'Motivo Movimentação', 'Data Saída', 'Status', 'Usuário Responsável', 'Observações'
   ])
   headerRow.font = { bold: true }
   headerRow.eachCell((cell) => {
@@ -1077,10 +1077,10 @@ async function generateAnimaisPiquetesReport(period) {
     ])
   })
 
-  // EstatÃ­sticas resumidas por piquete
+  // Estatísticas resumidas por piquete
   const piquetesStats = {}
   result.rows.forEach(row => {
-    const piquete = row.piquete || 'NÃ£o informado'
+    const piquete = row.piquete || 'Não informado'
     if (!piquetesStats[piquete]) {
       piquetesStats[piquete] = { total: 0, ativos: 0, finalizados: 0, machos: 0, femeas: 0, pesoSum: 0, pesoCount: 0, pesoMin: Infinity, pesoMax: -Infinity, ceSum: 0, ceCount: 0 }
     }
@@ -1111,7 +1111,7 @@ async function generateAnimaisPiquetesReport(period) {
   statsRow.font = { bold: true, size: 12 }
   statsRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'E7E6E6' } }
   
-  sheet.addRow(['Piquete', 'FÃªmea', 'Macho', 'Total', 'MÃ©dia Peso', 'Peso Min', 'Peso Max', 'MÃ©dia CE', 'Ativos', 'Finalizados'])
+  sheet.addRow(['Piquete', 'Fêmea', 'Macho', 'Total', 'Média Peso', 'Peso Min', 'Peso Max', 'Média CE', 'Ativos', 'Finalizados'])
   Object.keys(piquetesStats).sort().forEach(piquete => {
     const stats = piquetesStats[piquete]
     const mediaPeso = stats.pesoCount > 0 ? (stats.pesoSum / stats.pesoCount) : null
@@ -1150,7 +1150,7 @@ async function generateAnimaisPiquetesReport(period) {
   return Buffer.from(buffer)
 }
 
-// Gerar relatÃ³rio de Pesagens
+// Gerar relatório de Pesagens
 async function generatePesagensReport(period) {
   const pgStart = toPgDate(period.startDate)
   const pgEnd = toPgDate(period.endDate)
@@ -1193,39 +1193,39 @@ async function generatePesagensReport(period) {
   const pesoMin = pesos.length ? Math.min(...pesos).toFixed(1) : '-'
   const pesoMax = pesos.length ? Math.max(...pesos).toFixed(1) : '-'
   const ceMedio = ces.length ? (ces.reduce((a, b) => a + b, 0) / ces.length).toFixed(1) : '-'
-  const piquetesDistintos = new Set(rows.map(r => r.piquete || 'NÃ£o informado')).size
+  const piquetesDistintos = new Set(rows.map(r => r.piquete || 'Não informado')).size
 
   const workbook = new ExcelJS.Workbook()
   addResumoSheet(workbook, {
     titulo: 'Pesagens',
-    periodo: `${formatDateBR(period.startDate)} atÃ© ${formatDateBR(period.endDate)}`,
+    periodo: `${formatDateBR(period.startDate)} até ${formatDateBR(period.endDate)}`,
     totalRegistros: rows.length,
     corPrimaria: '059669',
     linhas: [
-      { label: 'Animais Ãºnicos', valor: animaisUnicos },
+      { label: 'Animais únicos', valor: animaisUnicos },
       { label: 'Machos', valor: machos },
-      { label: 'FÃªmeas', valor: femeas },
+      { label: 'Fêmeas', valor: femeas },
       { label: 'Piquetes distintos', valor: piquetesDistintos },
-      { label: 'Peso mÃ©dio (kg)', valor: pesoMedio },
-      { label: 'Peso mÃ­nimo (kg)', valor: pesoMin },
-      { label: 'Peso mÃ¡ximo (kg)', valor: pesoMax },
-      { label: 'CE mÃ©dia (cm)', valor: ceMedio }
+      { label: 'Peso médio (kg)', valor: pesoMedio },
+      { label: 'Peso mínimo (kg)', valor: pesoMin },
+      { label: 'Peso máximo (kg)', valor: pesoMax },
+      { label: 'CE média (cm)', valor: ceMedio }
     ]
   })
 
   const sheet = workbook.addWorksheet('Pesagens')
   sheet.mergeCells('A1:H1')
-  sheet.getCell('A1').value = 'âÅ¡â€“ï¸� RELATÃâ€œRIO DE PESAGENS'
+  sheet.getCell('A1').value = '⚖️ RELATÓRIO DE PESAGENS'
   sheet.getCell('A1').font = { size: 16, bold: true }
   sheet.getCell('A1').alignment = { horizontal: 'center' }
   sheet.getRow(1).height = 30
 
   sheet.mergeCells('A2:H2')
-  sheet.getCell('A2').value = `PerÃ­odo: ${formatDateBR(period.startDate)} atÃ© ${formatDateBR(period.endDate)}`
+  sheet.getCell('A2').value = `Período: ${formatDateBR(period.startDate)} até ${formatDateBR(period.endDate)}`
   sheet.getCell('A2').font = { size: 12, bold: true }
   sheet.getCell('A2').alignment = { horizontal: 'center' }
 
-  const headerRow = sheet.addRow(['Data', 'Animal', 'Sexo', 'RaÃ§a', 'Piquete', 'Peso (kg)', 'CE (cm)', 'ObservaÃ§Ãµes'])
+  const headerRow = sheet.addRow(['Data', 'Animal', 'Sexo', 'Raça', 'Piquete', 'Peso (kg)', 'CE (cm)', 'Observações'])
   headerRow.font = { bold: true }
   headerRow.eachCell((cell) => {
     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '059669' } }
@@ -1260,11 +1260,11 @@ async function generatePesagensReport(period) {
   // Resumo por piquete
   const sheetResumo = workbook.addWorksheet('Resumo por Piquete')
   sheetResumo.mergeCells('A1:I1')
-  sheetResumo.getCell('A1').value = 'ðÅ¸â€œ� RESUMO DE PESAGENS POR PIQUETE'
+  sheetResumo.getCell('A1').value = '📍 RESUMO DE PESAGENS POR PIQUETE'
   sheetResumo.getCell('A1').font = { size: 14, bold: true }
   sheetResumo.getCell('A1').alignment = { horizontal: 'center' }
 
-  // Usar Ãºltima pesagem de cada animal (igual ao dashboard) + piquete de localizacoes OU observaÃ§Ãµes
+  // Usar última pesagem de cada animal (igual ao dashboard) + piquete de localizacoes OU observações
   const porAnimalUltimaPesagens = {}
   rows.forEach(r => {
     const aid = r.animal_id
@@ -1279,7 +1279,7 @@ async function generatePesagensReport(period) {
 
   const porPiquete = {}
   rowsUltimaPesagens.forEach(r => {
-    const piqueteBruto = r.piquete || extrairLocalObservacoes(r.observacoes) || 'NÃ£o informado'
+    const piqueteBruto = r.piquete || extrairLocalObservacoes(r.observacoes) || 'Não informado'
     const p = normalizarPiqueteParaAgrupamento(piqueteBruto)
     if (!porPiquete[p]) porPiquete[p] = { total: 0, machos: 0, femeas: 0, pesos: [], ces: [] }
     porPiquete[p].total++
@@ -1295,7 +1295,7 @@ async function generatePesagensReport(period) {
     }
   })
 
-  const headerResumo = sheetResumo.addRow(['Piquete', 'FÃªmeas', 'Machos', 'Total', 'MÃ©dia Peso', 'Peso Min', 'Peso Max', 'MÃ©dia CE'])
+  const headerResumo = sheetResumo.addRow(['Piquete', 'Fêmeas', 'Machos', 'Total', 'Média Peso', 'Peso Min', 'Peso Max', 'Média CE'])
   headerResumo.font = { bold: true }
   headerResumo.eachCell(cell => {
     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'E7E6E6' } }
@@ -1325,12 +1325,12 @@ async function generatePesagensReport(period) {
     else col.width = 12
   })
 
-  const sheetGraficos = workbook.addWorksheet('GrÃ¡ficos Pesagens')
+  const sheetGraficos = workbook.addWorksheet('Gráficos Pesagens')
   const canvas = new ChartJSNodeCanvas({ width: 900, height: 450, backgroundColour: 'white' })
   const sexoChartBuffer = await canvas.renderToBuffer({
     type: 'pie',
     data: {
-      labels: ['FÃªmeas', 'Machos'],
+      labels: ['Fêmeas', 'Machos'],
       datasets: [{ data: [femeas, machos], backgroundColor: ['#ec4899', '#3b82f6'] }]
     }
   })
@@ -1353,7 +1353,7 @@ async function generatePesagensReport(period) {
   const piqueteImageId = workbook.addImage({ buffer: piqueteChartBuffer, extension: 'png' })
   sheetGraficos.addImage(piqueteImageId, { tl: { col: 0.2, row: 18 }, ext: { width: 900, height: 450 } })
 
-  // TendÃªncia de peso mÃ©dio por dia (geral, machos, fÃªmeas)
+  // Tendência de peso médio por dia (geral, machos, fêmeas)
   const dailyAgg = {}
   rows.forEach(r => {
     const dstr = r.data ? new Date(r.data).toISOString().split('T')[0] : null
@@ -1376,9 +1376,9 @@ async function generatePesagensReport(period) {
     data: {
       labels: dailyLabels,
       datasets: [
-        { label: 'MÃ©dia Geral', data: dailyAvg, borderColor: '#0ea5e9', backgroundColor: '#0ea5e9', tension: 0.3 },
-        { label: 'MÃ©dia Machos', data: dailyAvgM, borderColor: '#3b82f6', backgroundColor: '#3b82f6', tension: 0.3 },
-        { label: 'MÃ©dia FÃªmeas', data: dailyAvgF, borderColor: '#ec4899', backgroundColor: '#ec4899', tension: 0.3 }
+        { label: 'Média Geral', data: dailyAvg, borderColor: '#0ea5e9', backgroundColor: '#0ea5e9', tension: 0.3 },
+        { label: 'Média Machos', data: dailyAvgM, borderColor: '#3b82f6', backgroundColor: '#3b82f6', tension: 0.3 },
+        { label: 'Média Fêmeas', data: dailyAvgF, borderColor: '#ec4899', backgroundColor: '#ec4899', tension: 0.3 }
       ]
     },
     options: { plugins: { legend: { position: 'bottom' } }, scales: { x: { ticks: { autoSkip: true } } } }
@@ -1407,7 +1407,7 @@ async function generatePesagensReport(period) {
   })
   const histBuffer = await canvas.renderToBuffer({
     type: 'bar',
-    data: { labels: binLabels, datasets: [{ label: 'DistribuiÃ§Ã£o de Peso (bins)', data: bins, backgroundColor: '#f59e0b' }] },
+    data: { labels: binLabels, datasets: [{ label: 'Distribuição de Peso (bins)', data: bins, backgroundColor: '#f59e0b' }] },
     options: { plugins: { legend: { display: false } } }
   })
   const histImageId = workbook.addImage({ buffer: histBuffer, extension: 'png' })
@@ -1427,9 +1427,9 @@ async function generatePesagensReport(period) {
     sheetGraficos.addImage(scatterImageId, { tl: { col: 0.2, row: 72 }, ext: { width: 900, height: 450 } })
   }
 
-  // Tabelas extras: TendÃªncia por dia e Top Pesos
-  const sheetTendencia = workbook.addWorksheet('TendÃªncia por Dia')
-  sheetTendencia.addRow(['Data', 'MÃ©dia Geral', 'MÃ©dia Machos', 'MÃ©dia FÃªmeas']).font = { bold: true }
+  // Tabelas extras: Tendência por dia e Top Pesos
+  const sheetTendencia = workbook.addWorksheet('Tendência por Dia')
+  sheetTendencia.addRow(['Data', 'Média Geral', 'Média Machos', 'Média Fêmeas']).font = { bold: true }
   dailyLabels.forEach((d, i) => {
     sheetTendencia.addRow([
       d,
@@ -1441,7 +1441,7 @@ async function generatePesagensReport(period) {
   sheetTendencia.columns.forEach((col, idx) => { if (idx === 0) col.width = 12; else col.width = 14 })
 
   const sheetTop = workbook.addWorksheet('Top Pesos (Top 20)')
-  sheetTop.addRow(['Data', 'Animal', 'Sexo', 'RaÃ§a', 'Piquete', 'Peso (kg)', 'CE (cm)']).font = { bold: true }
+  sheetTop.addRow(['Data', 'Animal', 'Sexo', 'Raça', 'Piquete', 'Peso (kg)', 'CE (cm)']).font = { bold: true }
   const topRows = [...rows].sort((a, b) => (parseFloat(b.peso || 0) - parseFloat(a.peso || 0))).slice(0, 20)
   topRows.forEach(r => {
     sheetTop.addRow([
@@ -1460,7 +1460,7 @@ async function generatePesagensReport(period) {
   return Buffer.from(buffer)
 }
 
-// Gerar relatÃ³rio de Resumo de Pesagens (por sexo e por piquete)
+// Gerar relatório de Resumo de Pesagens (por sexo e por piquete)
 async function generateResumoPesagensReport(period) {
   const pgStart = toPgDate(period.startDate)
   const pgEnd = toPgDate(period.endDate)
@@ -1501,22 +1501,22 @@ async function generateResumoPesagensReport(period) {
 
   const workbook = new ExcelJS.Workbook()
   
-  // Dashboard com cards coloridos e estatÃ­sticas visuais
-  const sheetDashboard = workbook.addWorksheet('ðÅ¸â€œÅ  Dashboard')
+  // Dashboard com cards coloridos e estatísticas visuais
+  const sheetDashboard = workbook.addWorksheet('📊 Dashboard')
   sheetDashboard.mergeCells('A1:H1')
-  sheetDashboard.getCell('A1').value = 'ðÅ¸â€œÅ  DASHBOARD DE PESAGENS'
+  sheetDashboard.getCell('A1').value = '📊 DASHBOARD DE PESAGENS'
   sheetDashboard.getCell('A1').font = { size: 18, bold: true, color: { argb: 'FFFFFF' } }
   sheetDashboard.getCell('A1').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '10B981' } }
   sheetDashboard.getCell('A1').alignment = { horizontal: 'center', vertical: 'middle' }
   sheetDashboard.getRow(1).height = 35
 
   sheetDashboard.mergeCells('A2:H2')
-  sheetDashboard.getCell('A2').value = `PerÃ­odo: ${formatDateBR(period.startDate)} atÃ© ${formatDateBR(period.endDate)}`
+  sheetDashboard.getCell('A2').value = `Período: ${formatDateBR(period.startDate)} até ${formatDateBR(period.endDate)}`
   sheetDashboard.getCell('A2').font = { size: 12, italic: true }
   sheetDashboard.getCell('A2').alignment = { horizontal: 'center' }
   sheetDashboard.getRow(2).height = 25
 
-  // Cards coloridos com estatÃ­sticas principais
+  // Cards coloridos com estatísticas principais
   const pesoMedio = pesos.length ? (pesos.reduce((a, b) => a + b, 0) / pesos.length).toFixed(1) : '0'
   const ceMedio = ces.length ? (ces.reduce((a, b) => a + b, 0) / ces.length).toFixed(1) : '0'
   const pesoMin = pesos.length ? Math.min(...pesos).toFixed(1) : '0'
@@ -1524,7 +1524,7 @@ async function generateResumoPesagensReport(period) {
 
   // Card 1: Total de Registros (Verde)
   sheetDashboard.mergeCells('A4:B5')
-  sheetDashboard.getCell('A4').value = 'ðÅ¸â€œ� TOTAL DE REGISTROS'
+  sheetDashboard.getCell('A4').value = '📝 TOTAL DE REGISTROS'
   sheetDashboard.getCell('A4').font = { size: 11, bold: true, color: { argb: 'FFFFFF' } }
   sheetDashboard.getCell('A4').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '10B981' } }
   sheetDashboard.getCell('A4').alignment = { horizontal: 'center', vertical: 'middle' }
@@ -1535,9 +1535,9 @@ async function generateResumoPesagensReport(period) {
   sheetDashboard.getCell('A6').alignment = { horizontal: 'center', vertical: 'middle' }
   sheetDashboard.getCell('A6').border = { top: {style:'thick'}, left: {style:'thick'}, bottom: {style:'thick'}, right: {style:'thick'} }
 
-  // Card 2: Animais ÃÅ¡nicos (Azul)
+  // Card 2: Animais Únicos (Azul)
   sheetDashboard.mergeCells('C4:D5')
-  sheetDashboard.getCell('C4').value = 'ðÅ¸�â€ž ANIMAIS ÃÅ¡NICOS'
+  sheetDashboard.getCell('C4').value = '🐄 ANIMAIS ÚNICOS'
   sheetDashboard.getCell('C4').font = { size: 11, bold: true, color: { argb: 'FFFFFF' } }
   sheetDashboard.getCell('C4').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '3B82F6' } }
   sheetDashboard.getCell('C4').alignment = { horizontal: 'center', vertical: 'middle' }
@@ -1550,7 +1550,7 @@ async function generateResumoPesagensReport(period) {
 
   // Card 3: Machos (Azul escuro)
   sheetDashboard.mergeCells('E4:F5')
-  sheetDashboard.getCell('E4').value = 'ââ„¢â€šï¸� MACHOS'
+  sheetDashboard.getCell('E4').value = '♂️ MACHOS'
   sheetDashboard.getCell('E4').font = { size: 11, bold: true, color: { argb: 'FFFFFF' } }
   sheetDashboard.getCell('E4').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '2563EB' } }
   sheetDashboard.getCell('E4').alignment = { horizontal: 'center', vertical: 'middle' }
@@ -1561,9 +1561,9 @@ async function generateResumoPesagensReport(period) {
   sheetDashboard.getCell('E6').alignment = { horizontal: 'center', vertical: 'middle' }
   sheetDashboard.getCell('E6').border = { top: {style:'thick'}, left: {style:'thick'}, bottom: {style:'thick'}, right: {style:'thick'} }
 
-  // Card 4: FÃªmeas (Rosa)
+  // Card 4: Fêmeas (Rosa)
   sheetDashboard.mergeCells('G4:H5')
-  sheetDashboard.getCell('G4').value = 'ââ„¢â‚¬ï¸� FÃÅ MEAS'
+  sheetDashboard.getCell('G4').value = '♀️ FÊMEAS'
   sheetDashboard.getCell('G4').font = { size: 11, bold: true, color: { argb: 'FFFFFF' } }
   sheetDashboard.getCell('G4').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'EC4899' } }
   sheetDashboard.getCell('G4').alignment = { horizontal: 'center', vertical: 'middle' }
@@ -1574,9 +1574,9 @@ async function generateResumoPesagensReport(period) {
   sheetDashboard.getCell('G6').alignment = { horizontal: 'center', vertical: 'middle' }
   sheetDashboard.getCell('G6').border = { top: {style:'thick'}, left: {style:'thick'}, bottom: {style:'thick'}, right: {style:'thick'} }
 
-  // Card 5: Peso MÃ©dio (Ãâ€šmbar)
+  // Card 5: Peso Médio (Âmbar)
   sheetDashboard.mergeCells('A9:B10')
-  sheetDashboard.getCell('A9').value = 'âÅ¡â€“ï¸� PESO MÃâ€°DIO (kg)'
+  sheetDashboard.getCell('A9').value = '⚖️ PESO MÉDIO (kg)'
   sheetDashboard.getCell('A9').font = { size: 11, bold: true, color: { argb: 'FFFFFF' } }
   sheetDashboard.getCell('A9').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'F59E0B' } }
   sheetDashboard.getCell('A9').alignment = { horizontal: 'center', vertical: 'middle' }
@@ -1587,9 +1587,9 @@ async function generateResumoPesagensReport(period) {
   sheetDashboard.getCell('A11').alignment = { horizontal: 'center', vertical: 'middle' }
   sheetDashboard.getCell('A11').border = { top: {style:'thick'}, left: {style:'thick'}, bottom: {style:'thick'}, right: {style:'thick'} }
 
-  // Card 6: CE MÃ©dia (Roxo)
+  // Card 6: CE Média (Roxo)
   sheetDashboard.mergeCells('C9:D10')
-  sheetDashboard.getCell('C9').value = 'ðÅ¸â€œ� CE MÃâ€°DIA (cm)'
+  sheetDashboard.getCell('C9').value = '📏 CE MÉDIA (cm)'
   sheetDashboard.getCell('C9').font = { size: 11, bold: true, color: { argb: 'FFFFFF' } }
   sheetDashboard.getCell('C9').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '8B5CF6' } }
   sheetDashboard.getCell('C9').alignment = { horizontal: 'center', vertical: 'middle' }
@@ -1600,9 +1600,9 @@ async function generateResumoPesagensReport(period) {
   sheetDashboard.getCell('C11').alignment = { horizontal: 'center', vertical: 'middle' }
   sheetDashboard.getCell('C11').border = { top: {style:'thick'}, left: {style:'thick'}, bottom: {style:'thick'}, right: {style:'thick'} }
 
-  // Card 7: Peso MÃ­nimo (Vermelho)
+  // Card 7: Peso Mínimo (Vermelho)
   sheetDashboard.mergeCells('E9:F10')
-  sheetDashboard.getCell('E9').value = 'â¬â€¡ï¸� PESO MÃ�NIMO (kg)'
+  sheetDashboard.getCell('E9').value = '⬇️ PESO MÍNIMO (kg)'
   sheetDashboard.getCell('E9').font = { size: 11, bold: true, color: { argb: 'FFFFFF' } }
   sheetDashboard.getCell('E9').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'EF4444' } }
   sheetDashboard.getCell('E9').alignment = { horizontal: 'center', vertical: 'middle' }
@@ -1613,9 +1613,9 @@ async function generateResumoPesagensReport(period) {
   sheetDashboard.getCell('E11').alignment = { horizontal: 'center', vertical: 'middle' }
   sheetDashboard.getCell('E11').border = { top: {style:'thick'}, left: {style:'thick'}, bottom: {style:'thick'}, right: {style:'thick'} }
 
-  // Card 8: Peso MÃ¡ximo (Verde escuro)
+  // Card 8: Peso Máximo (Verde escuro)
   sheetDashboard.mergeCells('G9:H10')
-  sheetDashboard.getCell('G9').value = 'â¬â€ ï¸� PESO MÃ�XIMO (kg)'
+  sheetDashboard.getCell('G9').value = '⬆️ PESO MÁXIMO (kg)'
   sheetDashboard.getCell('G9').font = { size: 11, bold: true, color: { argb: 'FFFFFF' } }
   sheetDashboard.getCell('G9').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '059669' } }
   sheetDashboard.getCell('G9').alignment = { horizontal: 'center', vertical: 'middle' }
@@ -1628,15 +1628,15 @@ async function generateResumoPesagensReport(period) {
 
   sheetDashboard.columns.forEach(col => { col.width = 15 })
 
-  const sheetSexo = workbook.addWorksheet('ââ„¢â€šï¸�ââ„¢â‚¬ï¸� Por Sexo')
+  const sheetSexo = workbook.addWorksheet('♂️♀️ Por Sexo')
   sheetSexo.mergeCells('A1:G1')
-  sheetSexo.getCell('A1').value = 'âÅ¡â€“ï¸� RESUMO DE PESAGENS POR SEXO'
+  sheetSexo.getCell('A1').value = '⚖️ RESUMO DE PESAGENS POR SEXO'
   sheetSexo.getCell('A1').font = { size: 16, bold: true, color: { argb: 'FFFFFF' } }
   sheetSexo.getCell('A1').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '6366F1' } }
   sheetSexo.getCell('A1').alignment = { horizontal: 'center', vertical: 'middle' }
   sheetSexo.getRow(1).height = 30
 
-  const headerSexo = sheetSexo.addRow(['Sexo', 'Qtde', 'MÃ©dia Peso', 'Peso MÃ­n', 'Peso MÃ¡x', 'MÃ©dia CE'])
+  const headerSexo = sheetSexo.addRow(['Sexo', 'Qtde', 'Média Peso', 'Peso Mín', 'Peso Máx', 'Média CE'])
   headerSexo.font = { bold: true, size: 11, color: { argb: 'FFFFFF' } }
   headerSexo.eachCell(cell => {
     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '475569' } }
@@ -1662,8 +1662,8 @@ async function generateResumoPesagensReport(period) {
   const mStats = calcStats(machos)
   const fStats = calcStats(femeas)
   
-  // Linha FÃªmeas (Rosa)
-  const rowF = sheetSexo.addRow(['ââ„¢â‚¬ï¸� FÃªmea', fStats.qtde, fStats.mediaPeso != null ? Number(fStats.mediaPeso.toFixed(1)) : '', fStats.minPeso != null ? Number(fStats.minPeso.toFixed(1)) : '', fStats.maxPeso != null ? Number(fStats.maxPeso.toFixed(1)) : '', fStats.mediaCE != null ? Number(fStats.mediaCE.toFixed(1)) : ''])
+  // Linha Fêmeas (Rosa)
+  const rowF = sheetSexo.addRow(['♀️ Fêmea', fStats.qtde, fStats.mediaPeso != null ? Number(fStats.mediaPeso.toFixed(1)) : '', fStats.minPeso != null ? Number(fStats.minPeso.toFixed(1)) : '', fStats.maxPeso != null ? Number(fStats.maxPeso.toFixed(1)) : '', fStats.mediaCE != null ? Number(fStats.mediaCE.toFixed(1)) : ''])
   rowF.font = { bold: true, size: 11 }
   rowF.eachCell((cell, colNum) => {
     if (colNum === 1) {
@@ -1683,7 +1683,7 @@ async function generateResumoPesagensReport(period) {
   sheetSexo.getRow(3).height = 25
 
   // Linha Machos (Azul)
-  const rowM = sheetSexo.addRow(['ââ„¢â€šï¸� Macho', mStats.qtde, mStats.mediaPeso != null ? Number(mStats.mediaPeso.toFixed(1)) : '', mStats.minPeso != null ? Number(mStats.minPeso.toFixed(1)) : '', mStats.maxPeso != null ? Number(mStats.maxPeso.toFixed(1)) : '', mStats.mediaCE != null ? Number(mStats.mediaCE.toFixed(1)) : ''])
+  const rowM = sheetSexo.addRow(['♂️ Macho', mStats.qtde, mStats.mediaPeso != null ? Number(mStats.mediaPeso.toFixed(1)) : '', mStats.minPeso != null ? Number(mStats.minPeso.toFixed(1)) : '', mStats.maxPeso != null ? Number(mStats.maxPeso.toFixed(1)) : '', mStats.mediaCE != null ? Number(mStats.mediaCE.toFixed(1)) : ''])
   rowM.font = { bold: true, size: 11 }
   rowM.eachCell((cell, colNum) => {
     if (colNum === 1) {
@@ -1704,15 +1704,15 @@ async function generateResumoPesagensReport(period) {
 
   sheetSexo.columns.forEach((col, idx) => { if (idx === 0) col.width = 14; else col.width = 14 })
 
-  const sheetPiquete = workbook.addWorksheet('ðÅ¸â€œ� Por Piquete')
+  const sheetPiquete = workbook.addWorksheet('📍 Por Piquete')
   sheetPiquete.mergeCells('A1:I1')
-  sheetPiquete.getCell('A1').value = 'ðÅ¸�â€  RESUMO DE PESAGENS POR PIQUETE'
+  sheetPiquete.getCell('A1').value = '🏆 RESUMO DE PESAGENS POR PIQUETE'
   sheetPiquete.getCell('A1').font = { size: 16, bold: true, color: { argb: 'FFFFFF' } }
   sheetPiquete.getCell('A1').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '10B981' } }
   sheetPiquete.getCell('A1').alignment = { horizontal: 'center', vertical: 'middle' }
   sheetPiquete.getRow(1).height = 30
 
-  const headerPiq = sheetPiquete.addRow(['Piquete', 'FÃªmeas', 'Machos', 'Total', 'MÃ©dia Peso', 'Peso Min', 'Peso Max', 'MÃ©dia CE'])
+  const headerPiq = sheetPiquete.addRow(['Piquete', 'Fêmeas', 'Machos', 'Total', 'Média Peso', 'Peso Min', 'Peso Max', 'Média CE'])
   headerPiq.font = { bold: true, size: 11, color: { argb: 'FFFFFF' } }
   headerPiq.eachCell(cell => { 
     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '475569' } }
@@ -1726,7 +1726,7 @@ async function generateResumoPesagensReport(period) {
   })
   sheetPiquete.getRow(2).height = 25
 
-  // Usar Ãºltima pesagem de cada animal (igual ao dashboard) + piquete de localizacoes OU observaÃ§Ãµes
+  // Usar última pesagem de cada animal (igual ao dashboard) + piquete de localizacoes OU observações
   const porAnimalUltima = {}
   rows.forEach(r => {
     const aid = r.animal_id
@@ -1741,7 +1741,7 @@ async function generateResumoPesagensReport(period) {
 
   const porPiquete = {}
   rowsUltima.forEach(r => {
-    const piqueteBruto = r.piquete || extrairLocalObservacoes(r.observacoes) || 'NÃ£o informado'
+    const piqueteBruto = r.piquete || extrairLocalObservacoes(r.observacoes) || 'Não informado'
     const p = normalizarPiqueteParaAgrupamento(piqueteBruto)
     if (!porPiquete[p]) porPiquete[p] = { total: 0, machos: 0, femeas: 0, pesos: [], ces: [] }
     porPiquete[p].total++
@@ -1787,9 +1787,9 @@ async function generateResumoPesagensReport(period) {
 
     // Adicionar medalhas para top 3
     let nomePiquete = p
-    if (idx === 0) nomePiquete = `ðÅ¸¥â€¡ ${p}`
-    else if (idx === 1) nomePiquete = `ðÅ¸¥Ë† ${p}`
-    else if (idx === 2) nomePiquete = `ðÅ¸¥â€° ${p}`
+    if (idx === 0) nomePiquete = `🥇 ${p}`
+    else if (idx === 1) nomePiquete = `🥈 ${p}`
+    else if (idx === 2) nomePiquete = `🥉 ${p}`
 
     const row = sheetPiquete.addRow([
       nomePiquete,
@@ -1828,7 +1828,7 @@ async function generateResumoPesagensReport(period) {
 
   // Linha de totais
   const rowTotal = sheetPiquete.addRow([
-    'ðÅ¸â€œÅ  TOTAIS',
+    '📊 TOTAIS',
     totalFemeas,
     totalMachos,
     totalGeral,
@@ -1856,7 +1856,7 @@ async function generateResumoPesagensReport(period) {
   const sexoChartBuffer = await canvas.renderToBuffer({
     type: 'pie',
     data: {
-      labels: ['FÃªmeas', 'Machos'],
+      labels: ['Fêmeas', 'Machos'],
       datasets: [{ data: [fStats.qtde || 0, mStats.qtde || 0], backgroundColor: ['#ec4899', '#3b82f6'] }]
     }
   })
@@ -1883,7 +1883,7 @@ async function generateResumoPesagensReport(period) {
   return Buffer.from(buffer)
 }
 
-// Gerar relatÃ³rio de Coleta FIV
+// Gerar relatório de Coleta FIV
 async function generateColetaFivReport(period) {
   const pgStart = toPgDate(period.startDate)
   const pgEnd = toPgDate(period.endDate)
@@ -1919,12 +1919,12 @@ async function generateColetaFivReport(period) {
   const workbook = new ExcelJS.Workbook()
   addResumoSheet(workbook, {
     titulo: 'Coleta FIV',
-    periodo: `${formatDateBR(period.startDate)} atÃ© ${formatDateBR(period.endDate)}`,
+    periodo: `${formatDateBR(period.startDate)} até ${formatDateBR(period.endDate)}`,
     totalRegistros: rows.length,
     linhas: [
       { label: 'Total de coletas', valor: rows.length },
-      { label: 'Doadoras Ãºnicas', valor: doadorasUnicas },
-      { label: 'Total de oÃ³citos', valor: totalOocitos }
+      { label: 'Doadoras únicas', valor: doadorasUnicas },
+      { label: 'Total de oócitos', valor: totalOocitos }
     ],
     corPrimaria: '7C3AED'
   })
@@ -1933,19 +1933,19 @@ async function generateColetaFivReport(period) {
 
   sheet.mergeCells('A1:K1')
   const titleCell = sheet.getCell('A1')
-  titleCell.value = 'ðÅ¸§ª RELATÃâ€œRIO DE COLETA DE OÃâ€œCITOS (FIV)'
+  titleCell.value = '🧪 RELATÓRIO DE COLETA DE OÓCITOS (FIV)'
   titleCell.font = { size: 16, bold: true, color: { argb: 'FFFFFFFF' } }
   titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF7C3AED' } }
   titleCell.alignment = { horizontal: 'center' }
   sheet.getRow(1).height = 30
 
   sheet.mergeCells('A2:K2')
-  sheet.getCell('A2').value = `PerÃ­odo: ${formatDateBR(period.startDate)} atÃ© ${formatDateBR(period.endDate)}`
+  sheet.getCell('A2').value = `Período: ${formatDateBR(period.startDate)} até ${formatDateBR(period.endDate)}`
   sheet.getCell('A2').font = { size: 12, bold: true }
   sheet.getCell('A2').alignment = { horizontal: 'center' }
 
   const headerRow = sheet.addRow([
-    'Data FIV', 'Data TransferÃªncia', 'Doadora', 'OÃ³citos', 'Touro', 'LaboratÃ³rio', 'VeterinÃ¡rio', 'TE Criada', 'ObservaÃ§Ãµes'
+    'Data FIV', 'Data Transferência', 'Doadora', 'Oócitos', 'Touro', 'Laboratório', 'Veterinário', 'TE Criada', 'Observações'
   ])
   headerRow.font = { bold: true }
   headerRow.eachCell((cell) => {
@@ -1963,7 +1963,7 @@ async function generateColetaFivReport(period) {
       row.touro || '',
       row.laboratorio || '',
       row.veterinario || '',
-      row.te_exists ? 'Sim' : 'NÃ£o',
+      row.te_exists ? 'Sim' : 'Não',
       row.observacoes || ''
     ])
     if (idx % 2 === 1) {
@@ -1982,12 +1982,12 @@ async function generateColetaFivReport(period) {
   return Buffer.from(buffer)
 }
 
-// Gerar relatÃ³rio de CalendÃ¡rio Reprodutivo
+// Gerar relatório de Calendário Reprodutivo
 async function generateCalendarioReprodutivoReport(period, baseUrl) {
   try {
     const res = await fetch(`${baseUrl}/api/calendario-reprodutivo?data_inicio=${period.startDate}&data_fim=${period.endDate}&limit=5000`)
     if (!res.ok) {
-      throw new Error(`Erro ao buscar calendÃ¡rio: ${res.status}`)
+      throw new Error(`Erro ao buscar calendário: ${res.status}`)
     }
     const data = await res.json()
     const eventos = Array.isArray(data) ? data : (data.data || data.eventos || [])
@@ -1999,33 +1999,33 @@ async function generateCalendarioReprodutivoReport(period, baseUrl) {
 
   const workbook = new ExcelJS.Workbook()
   addResumoSheet(workbook, {
-    titulo: 'CalendÃ¡rio Reprodutivo',
-    periodo: `${formatDateBR(period.startDate)} atÃ© ${formatDateBR(period.endDate)}`,
+    titulo: 'Calendário Reprodutivo',
+    periodo: `${formatDateBR(period.startDate)} até ${formatDateBR(period.endDate)}`,
     totalRegistros: eventosOrdenados.length,
     linhas: [
       { label: 'Eventos manuais', valor: eventosOrdenados.filter(e => e.origem === 'manual').length },
       { label: 'Eventos receptoras', valor: eventosOrdenados.filter(e => e.origem === 'receptora').length },
-      { label: 'Eventos androlÃ³gicos', valor: eventosOrdenados.filter(e => e.origem === 'andrologico').length }
+      { label: 'Eventos andrológicos', valor: eventosOrdenados.filter(e => e.origem === 'andrologico').length }
     ],
     corPrimaria: 'E11D48'
   })
 
-  const sheet = workbook.addWorksheet('CalendÃ¡rio Reprodutivo')
+  const sheet = workbook.addWorksheet('Calendário Reprodutivo')
 
   sheet.mergeCells('A1:J1')
   const titleCell = sheet.getCell('A1')
-  titleCell.value = 'ðÅ¸â€œâ€¦ CALENDÃ�RIO REPRODUTIVO'
+  titleCell.value = '📅 CALENDÁRIO REPRODUTIVO'
   titleCell.font = { size: 16, bold: true, color: { argb: 'FFFFFFFF' } }
   titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE11D48' } }
   titleCell.alignment = { horizontal: 'center' }
   sheet.getRow(1).height = 30
 
   sheet.mergeCells('A2:J2')
-  sheet.getCell('A2').value = `PerÃ­odo: ${formatDateBR(period.startDate)} atÃ© ${formatDateBR(period.endDate)} ââ‚¬¢ Gerado em: ${new Date().toLocaleString('pt-BR')}`
+  sheet.getCell('A2').value = `Período: ${formatDateBR(period.startDate)} até ${formatDateBR(period.endDate)} • Gerado em: ${new Date().toLocaleString('pt-BR')}`
   sheet.getCell('A2').font = { size: 10, italic: true }
   sheet.getCell('A2').alignment = { horizontal: 'center' }
 
-  const headers = ['Data', 'Tipo de Evento', 'TÃ­tulo', 'Animal', 'Tatuagem', 'Status', 'DescriÃ§Ã£o', 'NF', 'Fornecedor', 'Data TE']
+  const headers = ['Data', 'Tipo de Evento', 'Título', 'Animal', 'Tatuagem', 'Status', 'Descrição', 'NF', 'Fornecedor', 'Data TE']
   const headerRow = sheet.addRow(headers)
   headerRow.font = { bold: true }
   headerRow.eachCell((cell) => {
@@ -2052,7 +2052,7 @@ async function generateCalendarioReprodutivoReport(period, baseUrl) {
     ])
 
     const statusCell = dataRow.getCell(6)
-    if (status === 'ConcluÃ­do' || status === 'Prenha') {
+    if (status === 'Concluído' || status === 'Prenha') {
       statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4CAF50' } }
       statusCell.font = { color: { argb: 'FFFFFFFF' } }
     } else if (status === 'Vazia') {
@@ -2078,12 +2078,12 @@ async function generateCalendarioReprodutivoReport(period, baseUrl) {
   const buffer = await workbook.xlsx.writeBuffer()
   return Buffer.from(buffer)
   } catch (error) {
-    console.error('Erro ao gerar calendÃ¡rio reprodutivo:', error)
+    console.error('Erro ao gerar calendário reprodutivo:', error)
     throw error
   }
 }
 
-// Gerar relatÃ³rio de TransferÃªncias de EmbriÃµes
+// Gerar relatório de Transferências de Embriões
 async function generateTransferenciasEmbrioesReport(period) {
   const pgStart = toPgDate(period.startDate)
   const pgEnd = toPgDate(period.endDate)
@@ -2113,22 +2113,22 @@ async function generateTransferenciasEmbrioesReport(period) {
   `, [pgStart, pgEnd])
 
   const workbook = new ExcelJS.Workbook()
-  const sheet = workbook.addWorksheet('TransferÃªncias de EmbriÃµes')
+  const sheet = workbook.addWorksheet('Transferências de Embriões')
 
   sheet.mergeCells('A1:O1')
-  sheet.getCell('A1').value = 'ðÅ¸§ª RELATÃâ€œRIO DE TRANSFERÃÅ NCIAS DE EMBRIÃâ€¢ES'
+  sheet.getCell('A1').value = '🧪 RELATÓRIO DE TRANSFERÊNCIAS DE EMBRIÕES'
   sheet.getCell('A1').font = { size: 16, bold: true }
   sheet.getCell('A1').alignment = { horizontal: 'center' }
   sheet.getRow(1).height = 30
 
   sheet.mergeCells('A2:O2')
-  sheet.getCell('A2').value = `PerÃ­odo: ${formatDateBR(period.startDate)} atÃ© ${formatDateBR(period.endDate)}`
+  sheet.getCell('A2').value = `Período: ${formatDateBR(period.startDate)} até ${formatDateBR(period.endDate)}`
   sheet.getCell('A2').font = { size: 12, bold: true }
   sheet.getCell('A2').alignment = { horizontal: 'center' }
 
   const headerRow = sheet.addRow([
-    'NÂº TE', 'Data TE', 'Receptora', 'Doadora', 'Touro', 'Local TE', 'Data FIV', 
-    'RaÃ§a', 'TÃ©cnico', 'Status', 'Resultado', 'Data DiagnÃ³stico', 'ObservaÃ§Ãµes'
+    'Nº TE', 'Data TE', 'Receptora', 'Doadora', 'Touro', 'Local TE', 'Data FIV', 
+    'Raça', 'Técnico', 'Status', 'Resultado', 'Data Diagnóstico', 'Observações'
   ])
   headerRow.font = { bold: true }
   headerRow.eachCell((cell) => {
@@ -2154,7 +2154,7 @@ async function generateTransferenciasEmbrioesReport(period) {
     ])
   })
 
-  // EstatÃ­sticas
+  // Estatísticas
   const total = result.rows.length
   const gestantes = result.rows.filter(r => r.resultado === 'Gestante').length
   const vazias = result.rows.filter(r => r.resultado === 'Vazia').length
@@ -2162,7 +2162,7 @@ async function generateTransferenciasEmbrioesReport(period) {
 
   sheet.addRow([])
   sheet.mergeCells(`A${sheet.rowCount + 1}:O${sheet.rowCount + 1}`)
-  const statsRow = sheet.addRow(['RESUMO ESTATÃ�STICO'])
+  const statsRow = sheet.addRow(['RESUMO ESTATÍSTICO'])
   statsRow.font = { bold: true, size: 12 }
   statsRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'E7E6E6' } }
   
@@ -2172,26 +2172,26 @@ async function generateTransferenciasEmbrioesReport(period) {
   sheet.addRow(['Pendentes:', pendentes])
   if (total > 0) {
     const taxaGestacao = ((gestantes / total) * 100).toFixed(2)
-    sheet.addRow(['Taxa de GestaÃ§Ã£o:', `${taxaGestacao}%`])
+    sheet.addRow(['Taxa de Gestação:', `${taxaGestacao}%`])
   }
 
   sheet.columns.forEach((col, idx) => {
-    if (idx === 0) col.width = 12 // NÂº TE
+    if (idx === 0) col.width = 12 // Nº TE
     else if (idx === 1) col.width = 12 // Data TE
     else if (idx >= 2 && idx <= 4) col.width = 15 // Receptora, Doadora, Touro
     else if (idx === 5) col.width = 15 // Local
     else if (idx === 6) col.width = 12 // Data FIV
-    else if (idx === 7) col.width = 15 // RaÃ§a
-    else if (idx === 8) col.width = 20 // TÃ©cnico
+    else if (idx === 7) col.width = 15 // Raça
+    else if (idx === 8) col.width = 20 // Técnico
     else if (idx >= 9 && idx <= 11) col.width = 15 // Status, Resultado, Data DG
-    else col.width = 30 // ObservaÃ§Ãµes
+    else col.width = 30 // Observações
   })
 
   const buffer = await workbook.xlsx.writeBuffer()
   return Buffer.from(buffer)
 }
 
-// Gerar relatÃ³rio de GestaÃ§Ãµes
+// Gerar relatório de Gestações
 async function generateGestacoesReport(period) {
   const pgStart = toPgDate(period.startDate)
   const pgEnd = toPgDate(period.endDate)
@@ -2209,7 +2209,7 @@ async function generateGestacoesReport(period) {
       g.data_parto,
       g.observacoes,
       CASE 
-        WHEN g.situacao = 'Em GestaÃ§Ã£o' THEN 
+        WHEN g.situacao = 'Em Gestação' THEN 
           EXTRACT(DAYS FROM (CURRENT_DATE - g.data_cobertura::date))
         WHEN g.situacao = 'Nascido' AND g.data_parto IS NOT NULL THEN
           EXTRACT(DAYS FROM (g.data_parto::date - g.data_cobertura::date))
@@ -2222,22 +2222,22 @@ async function generateGestacoesReport(period) {
   `, [pgStart, pgEnd])
 
   const workbook = new ExcelJS.Workbook()
-  const sheet = workbook.addWorksheet('GestaÃ§Ãµes')
+  const sheet = workbook.addWorksheet('Gestações')
 
   sheet.mergeCells('A1:L1')
-  sheet.getCell('A1').value = 'ðÅ¸¤° RELATÃâ€œRIO DE GESTAÃâ€¡Ãâ€¢ES'
+  sheet.getCell('A1').value = '🤰 RELATÓRIO DE GESTAÇÕES'
   sheet.getCell('A1').font = { size: 16, bold: true }
   sheet.getCell('A1').alignment = { horizontal: 'center' }
   sheet.getRow(1).height = 30
 
   sheet.mergeCells('A2:L2')
-  sheet.getCell('A2').value = `PerÃ­odo: ${formatDateBR(period.startDate)} atÃ© ${formatDateBR(period.endDate)}`
+  sheet.getCell('A2').value = `Período: ${formatDateBR(period.startDate)} até ${formatDateBR(period.endDate)}`
   sheet.getCell('A2').font = { size: 12, bold: true }
   sheet.getCell('A2').alignment = { horizontal: 'center' }
 
   const headerRow = sheet.addRow([
-    'Data Cobertura', 'Tipo', 'Animal', 'RaÃ§a', 'Touro', 'SituaÃ§Ã£o', 
-    'PrevisÃ£o Parto', 'Data Parto', 'Dias GestaÃ§Ã£o', 'ObservaÃ§Ãµes'
+    'Data Cobertura', 'Tipo', 'Animal', 'Raça', 'Touro', 'Situação', 
+    'Previsão Parto', 'Data Parto', 'Dias Gestação', 'Observações'
   ])
   headerRow.font = { bold: true }
   headerRow.eachCell((cell) => {
@@ -2260,36 +2260,36 @@ async function generateGestacoesReport(period) {
     ])
   })
 
-  // EstatÃ­sticas
+  // Estatísticas
   const total = result.rows.length
-  const emGestacao = result.rows.filter(r => r.situacao === 'Em GestaÃ§Ã£o').length
+  const emGestacao = result.rows.filter(r => r.situacao === 'Em Gestação').length
   const nascidos = result.rows.filter(r => r.situacao === 'Nascido').length
   const abortos = result.rows.filter(r => r.situacao === 'Aborto').length
 
   sheet.addRow([])
   sheet.mergeCells(`A${sheet.rowCount + 1}:L${sheet.rowCount + 1}`)
-  const statsRow = sheet.addRow(['RESUMO ESTATÃ�STICO'])
+  const statsRow = sheet.addRow(['RESUMO ESTATÍSTICO'])
   statsRow.font = { bold: true, size: 12 }
   statsRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'E7E6E6' } }
   
-  sheet.addRow(['Total de GestaÃ§Ãµes:', total])
-  sheet.addRow(['Em GestaÃ§Ã£o:', emGestacao])
+  sheet.addRow(['Total de Gestações:', total])
+  sheet.addRow(['Em Gestação:', emGestacao])
   sheet.addRow(['Nascidos:', nascidos])
   sheet.addRow(['Abortos:', abortos])
 
   sheet.columns.forEach((col, idx) => {
     if (idx === 0 || idx === 6 || idx === 7) col.width = 12 // Datas
-    else if (idx === 1 || idx === 5) col.width = 15 // Tipo, SituaÃ§Ã£o
-    else if (idx >= 2 && idx <= 4) col.width = 18 // Animal, RaÃ§a, Touro
+    else if (idx === 1 || idx === 5) col.width = 15 // Tipo, Situação
+    else if (idx >= 2 && idx <= 4) col.width = 18 // Animal, Raça, Touro
     else if (idx === 8) col.width = 15 // Dias
-    else col.width = 30 // ObservaÃ§Ãµes
+    else col.width = 30 // Observações
   })
 
   const buffer = await workbook.xlsx.writeBuffer()
   return Buffer.from(buffer)
 }
 
-// Gerar relatÃ³rio de Exames AndrolÃ³gicos
+// Gerar relatório de Exames Andrológicos
 async function generateExamesAndrologicosReport(period) {
   try {
     const pgStart = toPgDate(period?.startDate) || toPgDate(new Date().toISOString().split('T')[0])
@@ -2310,7 +2310,7 @@ async function generateExamesAndrologicosReport(period) {
       ORDER BY ea.data_exame DESC
     `, [pgStart, pgEnd])
 
-    // Fallback: Ãºltimos 12 meses se perÃ­odo nÃ£o tiver exames
+    // Fallback: últimos 12 meses se período não tiver exames
     if (!result?.rows?.length) {
       const hoje = new Date()
       const dozeMesesAtras = new Date(hoje)
@@ -2328,21 +2328,21 @@ async function generateExamesAndrologicosReport(period) {
 
     const rows = result?.rows || []
     const workbook = new ExcelJS.Workbook()
-    const sheet = workbook.addWorksheet('Exames AndrolÃ³gicos')
+    const sheet = workbook.addWorksheet('Exames Andrológicos')
 
     sheet.mergeCells('A1:G1')
-    sheet.getCell('A1').value = 'ðÅ¸â€�¬ RELATÃâ€œRIO DE EXAMES ANDROLÃâ€œGICOS'
+    sheet.getCell('A1').value = '🔬 RELATÓRIO DE EXAMES ANDROLÓGICOS'
     sheet.getCell('A1').font = { size: 16, bold: true }
     sheet.getCell('A1').alignment = { horizontal: 'center' }
     sheet.getRow(1).height = 30
 
     sheet.mergeCells('A2:G2')
-    sheet.getCell('A2').value = `PerÃ­odo: ${period?.startDate || ''} atÃ© ${period?.endDate || ''}`
+    sheet.getCell('A2').value = `Período: ${period?.startDate || ''} até ${period?.endDate || ''}`
     sheet.getCell('A2').font = { size: 12, bold: true }
     sheet.getCell('A2').alignment = { horizontal: 'center' }
 
     const headerRow = sheet.addRow([
-      'Data Exame', 'Touro', 'RG', 'Resultado', 'CE', 'Defeitos', 'ObservaÃ§Ãµes'
+      'Data Exame', 'Touro', 'RG', 'Resultado', 'CE', 'Defeitos', 'Observações'
     ])
     headerRow.font = { bold: true }
     headerRow.eachCell((cell) => {
@@ -2368,7 +2368,7 @@ async function generateExamesAndrologicosReport(period) {
 
     sheet.addRow([])
     sheet.mergeCells(`A${sheet.rowCount + 1}:L${sheet.rowCount + 1}`)
-    const statsRow = sheet.addRow(['RESUMO ESTATÃ�STICO'])
+    const statsRow = sheet.addRow(['RESUMO ESTATÍSTICO'])
     statsRow.font = { bold: true, size: 12 }
     statsRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'E7E6E6' } }
     
@@ -2377,7 +2377,7 @@ async function generateExamesAndrologicosReport(period) {
     sheet.addRow(['Reprovados:', reprovados])
     if (total > 0) {
       const taxaAprovacao = ((aprovados / total) * 100).toFixed(2)
-      sheet.addRow(['Taxa de AprovaÃ§Ã£o:', `${taxaAprovacao}%`])
+      sheet.addRow(['Taxa de Aprovação:', `${taxaAprovacao}%`])
     }
 
     sheet.columns.forEach((col, idx) => {
@@ -2392,17 +2392,17 @@ async function generateExamesAndrologicosReport(period) {
     return Buffer.from(buffer)
   } catch (err) {
     console.error('Erro em generateExamesAndrologicosReport:', err)
-    // Retornar Excel mÃ­nimo com mensagem de erro para que o anexo seja enviado
+    // Retornar Excel mínimo com mensagem de erro para que o anexo seja enviado
     const workbook = new ExcelJS.Workbook()
-    const sheet = workbook.addWorksheet('Exames AndrolÃ³gicos')
-    sheet.addRow(['Erro ao gerar relatÃ³rio de Exames AndrolÃ³gicos'])
+    const sheet = workbook.addWorksheet('Exames Andrológicos')
+    sheet.addRow(['Erro ao gerar relatório de Exames Andrológicos'])
     sheet.addRow([err?.message || String(err)])
     const buffer = await workbook.xlsx.writeBuffer()
     return Buffer.from(buffer)
   }
 }
 
-// Gerar relatÃ³rio de Resumo Exames AndrolÃ³gicos (estatÃ­sticas)
+// Gerar relatório de Resumo Exames Andrológicos (estatísticas)
 async function generateResumoExamesAndrologicosReport(period) {
   const pgStart = toPgDate(period.startDate)
   const pgEnd = toPgDate(period.endDate)
@@ -2424,8 +2424,8 @@ async function generateResumoExamesAndrologicosReport(period) {
 
   const workbook = new ExcelJS.Workbook()
   addResumoSheet(workbook, {
-    titulo: 'Resumo Exames AndrolÃ³gicos',
-    periodo: `${formatDateBR(period.startDate)} atÃ© ${formatDateBR(period.endDate)}`,
+    titulo: 'Resumo Exames Andrológicos',
+    periodo: `${formatDateBR(period.startDate)} até ${formatDateBR(period.endDate)}`,
     totalRegistros: total,
     corPrimaria: '06B6D4',
     linhas: [
@@ -2433,7 +2433,7 @@ async function generateResumoExamesAndrologicosReport(period) {
       { label: 'Aprovados/Aptos', valor: aprovados },
       { label: 'Reprovados/Inaptos', valor: reprovados },
       { label: 'Pendentes', valor: pendentes },
-      { label: 'Taxa de AprovaÃ§Ã£o (%)', valor: `${taxaAprovacao}%` }
+      { label: 'Taxa de Aprovação (%)', valor: `${taxaAprovacao}%` }
     ]
   })
 
@@ -2441,7 +2441,7 @@ async function generateResumoExamesAndrologicosReport(period) {
   return Buffer.from(buffer)
 }
 
-// Gerar relatÃ³rio de Boletim de Gado
+// Gerar relatório de Boletim de Gado
 async function generateBoletimGadoReport(period) {
   // Usar API existente de boletim de gado
   const protocol = process.env.NEXTAUTH_URL?.includes('https') ? 'https' : 'http'
@@ -2461,12 +2461,12 @@ async function generateBoletimGadoReport(period) {
   return Buffer.from(await res.arrayBuffer())
 }
 
-// Gerar relatÃ³rio de MovimentaÃ§Ãµes Financeiras
+// Gerar relatório de Movimentações Financeiras
 async function generateMovimentacoesFinanceirasReport(period) {
   const pgStart = toPgDate(period.startDate)
   const pgEnd = toPgDate(period.endDate)
 
-  // Buscar receitas (NFs de saÃ­da)
+  // Buscar receitas (NFs de saída)
   const receitasResult = await query(`
     SELECT 
       SUM(valor_total) as total,
@@ -2484,7 +2484,7 @@ async function generateMovimentacoesFinanceirasReport(period) {
     WHERE tipo = 'entrada' AND data_compra >= $1 AND data_compra <= $2
   `, [pgStart, pgEnd])
 
-  // Buscar custos de inseminaÃ§Ã£o
+  // Buscar custos de inseminação
   const iaDateCol = await getIADataColumn()
   const custosIA = await query(`
     SELECT SUM(custo_dose) as total
@@ -2499,28 +2499,28 @@ async function generateMovimentacoesFinanceirasReport(period) {
 
   const workbook = new ExcelJS.Workbook()
   addResumoSheet(workbook, {
-    titulo: 'MovimentaÃ§Ãµes Financeiras',
-    periodo: `${formatDateBR(period.startDate)} atÃ© ${formatDateBR(period.endDate)}`,
+    titulo: 'Movimentações Financeiras',
+    periodo: `${formatDateBR(period.startDate)} até ${formatDateBR(period.endDate)}`,
     totalRegistros: (receitasResult.rows[0]?.quantidade || 0) + (despesasResult.rows[0]?.quantidade || 0) + 1,
     corPrimaria: '10B981',
     linhas: [
       { label: 'Receitas (Vendas):', valor: `R$ ${receitas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` },
       { label: 'Despesas (Compras):', valor: `R$ ${despesas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` },
       { label: 'Custos com IA:', valor: `R$ ${custosIAValor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` },
-      { label: 'SALDO LÃ�QUIDO:', valor: `R$ ${saldo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` }
+      { label: 'SALDO LÍQUIDO:', valor: `R$ ${saldo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` }
     ]
   })
 
-  const sheet = workbook.addWorksheet('MovimentaÃ§Ãµes Financeiras')
+  const sheet = workbook.addWorksheet('Movimentações Financeiras')
 
   sheet.mergeCells('A1:D1')
-  sheet.getCell('A1').value = 'ðÅ¸â€™° RELATÃâ€œRIO DE MOVIMENTAÃâ€¡Ãâ€¢ES FINANCEIRAS'
+  sheet.getCell('A1').value = '💰 RELATÓRIO DE MOVIMENTAÇÕES FINANCEIRAS'
   sheet.getCell('A1').font = { size: 16, bold: true }
   sheet.getCell('A1').alignment = { horizontal: 'center' }
   sheet.getRow(1).height = 30
 
   sheet.mergeCells('A2:D2')
-  sheet.getCell('A2').value = `PerÃ­odo: ${formatDateBR(period.startDate)} atÃ© ${formatDateBR(period.endDate)}`
+  sheet.getCell('A2').value = `Período: ${formatDateBR(period.startDate)} até ${formatDateBR(period.endDate)}`
   sheet.getCell('A2').font = { size: 12, bold: true }
   sheet.getCell('A2').alignment = { horizontal: 'center' }
 
@@ -2529,7 +2529,7 @@ async function generateMovimentacoesFinanceirasReport(period) {
   sheet.addRow(['Receitas (Vendas):', `R$ ${receitas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`])
   sheet.addRow(['Despesas (Compras):', `R$ ${despesas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`])
   sheet.addRow(['Custos com IA:', `R$ ${custosIAValor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`])
-  sheet.addRow(['SALDO LÃ�QUIDO:', `R$ ${saldo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`])
+  sheet.addRow(['SALDO LÍQUIDO:', `R$ ${saldo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`])
   sheet.getRow(sheet.rowCount).font = { bold: true, size: 12 }
   sheet.getRow(sheet.rowCount).getCell(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: saldo >= 0 ? 'C6F6D5' : 'FEE2E2' } }
 
@@ -2537,7 +2537,7 @@ async function generateMovimentacoesFinanceirasReport(period) {
   sheet.addRow(['DETALHAMENTO'])
   sheet.getRow(sheet.rowCount).font = { bold: true, size: 14 }
 
-  const headerRow = sheet.addRow(['Tipo', 'DescriÃ§Ã£o', 'Quantidade', 'Valor Total'])
+  const headerRow = sheet.addRow(['Tipo', 'Descrição', 'Quantidade', 'Valor Total'])
   headerRow.font = { bold: true }
   headerRow.eachCell((cell) => {
     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '10B981' } }
@@ -2546,7 +2546,7 @@ async function generateMovimentacoesFinanceirasReport(period) {
 
   sheet.addRow(['Receita', 'Vendas de Animais', receitasResult.rows[0]?.quantidade || 0, receitas])
   sheet.addRow(['Despesa', 'Compras de Animais', despesasResult.rows[0]?.quantidade || 0, despesas])
-  sheet.addRow(['Despesa', 'Custos com InseminaÃ§Ã£o Artificial', '-', custosIAValor])
+  sheet.addRow(['Despesa', 'Custos com Inseminação Artificial', '-', custosIAValor])
 
   sheet.columns.forEach((col, idx) => {
     if (idx === 0) col.width = 15
@@ -2559,12 +2559,12 @@ async function generateMovimentacoesFinanceirasReport(period) {
   return Buffer.from(buffer)
 }
 
-// Gerar relatÃ³rio de Estoque de SÃªmen
+// Gerar relatório de Estoque de Sêmen
 async function generateEstoqueSemenReport(period) {
   const pgStart = toPgDate(period.startDate)
   const pgEnd = toPgDate(period.endDate)
 
-  // Buscar entradas de sÃªmen
+  // Buscar entradas de sêmen
   const entradas = await query(`
     SELECT 
       es.id,
@@ -2581,7 +2581,7 @@ async function generateEstoqueSemenReport(period) {
     ORDER BY es.data_compra DESC
   `, [pgStart, pgEnd])
 
-  // Buscar saÃ­das de sÃªmen
+  // Buscar saídas de sêmen
   const saidas = await query(`
     SELECT 
       es.nome_touro,
@@ -2601,27 +2601,27 @@ async function generateEstoqueSemenReport(period) {
 
   const workbook = new ExcelJS.Workbook()
   addResumoSheet(workbook, {
-    titulo: 'Estoque de SÃªmen',
-    periodo: `${formatDateBR(period.startDate)} atÃ© ${formatDateBR(period.endDate)}`,
+    titulo: 'Estoque de Sêmen',
+    periodo: `${formatDateBR(period.startDate)} até ${formatDateBR(period.endDate)}`,
     totalRegistros: totalEntradas + totalSaidas,
     corPrimaria: '3B82F6',
     linhas: [
       { label: 'Registros de Entrada', valor: totalEntradas },
-      { label: 'Registros de SaÃ­da', valor: totalSaidas },
+      { label: 'Registros de Saída', valor: totalSaidas },
       { label: 'Total de doses (entradas)', valor: somaDosesEntradas },
-      { label: 'Total de doses (saÃ­das)', valor: somaDosesSaidas }
+      { label: 'Total de doses (saídas)', valor: somaDosesSaidas }
     ]
   })
 
   // Planilha de Entradas
   const sheetEntradas = workbook.addWorksheet('Entradas')
   sheetEntradas.mergeCells('A1:I1')
-  sheetEntradas.getCell('A1').value = 'ðÅ¸â€œ¦ ENTRADAS DE SÃÅ MEN'
+  sheetEntradas.getCell('A1').value = '📦 ENTRADAS DE SÊMEN'
   sheetEntradas.getCell('A1').font = { size: 16, bold: true }
   sheetEntradas.getCell('A1').alignment = { horizontal: 'center' }
 
   const headerEntradas = sheetEntradas.addRow([
-    'Data Compra', 'Touro', 'RaÃ§a', 'Quantidade', 'Custo/Dose', 'Valor Total', 'LocalizaÃ§Ã£o', 'Fornecedor', 'ObservaÃ§Ãµes'
+    'Data Compra', 'Touro', 'Raça', 'Quantidade', 'Custo/Dose', 'Valor Total', 'Localização', 'Fornecedor', 'Observações'
   ])
   headerEntradas.font = { bold: true }
   headerEntradas.eachCell((cell) => {
@@ -2644,14 +2644,14 @@ async function generateEstoqueSemenReport(period) {
     ])
   })
 
-  // Planilha de SaÃ­das
-  const sheetSaidas = workbook.addWorksheet('SaÃ­das')
+  // Planilha de Saídas
+  const sheetSaidas = workbook.addWorksheet('Saídas')
   sheetSaidas.mergeCells('A1:D1')
-  sheetSaidas.getCell('A1').value = 'ðÅ¸â€œ¤ SAÃ�DAS DE SÃÅ MEN'
+  sheetSaidas.getCell('A1').value = '📤 SAÍDAS DE SÊMEN'
   sheetSaidas.getCell('A1').font = { size: 16, bold: true }
   sheetSaidas.getCell('A1').alignment = { horizontal: 'center' }
 
-  const headerSaidas = sheetSaidas.addRow(['Touro', 'RaÃ§a', 'Total SaÃ­das'])
+  const headerSaidas = sheetSaidas.addRow(['Touro', 'Raça', 'Total Saídas'])
   headerSaidas.font = { bold: true }
   headerSaidas.eachCell((cell) => {
     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '3B82F6' } }
@@ -2682,7 +2682,7 @@ async function generateEstoqueSemenReport(period) {
   return Buffer.from(buffer)
 }
 
-// Gerar relatÃ³rio de VacinaÃ§Ãµes
+// Gerar relatório de Vacinações
 async function generateVacinacoesReport(period) {
   const pgStart = toPgDate(period.startDate)
   const pgEnd = toPgDate(period.endDate)
@@ -2707,21 +2707,21 @@ async function generateVacinacoesReport(period) {
   `, [pgStart, pgEnd])
 
   const workbook = new ExcelJS.Workbook()
-  const sheet = workbook.addWorksheet('VacinaÃ§Ãµes e Tratamentos')
+  const sheet = workbook.addWorksheet('Vacinações e Tratamentos')
 
   sheet.mergeCells('A1:J1')
-  sheet.getCell('A1').value = 'ðÅ¸â€™â€° RELATÃâ€œRIO DE VACINAÃâ€¡Ãâ€¢ES E TRATAMENTOS'
+  sheet.getCell('A1').value = '💉 RELATÓRIO DE VACINAÇÕES E TRATAMENTOS'
   sheet.getCell('A1').font = { size: 16, bold: true }
   sheet.getCell('A1').alignment = { horizontal: 'center' }
   sheet.getRow(1).height = 30
 
   sheet.mergeCells('A2:J2')
-  sheet.getCell('A2').value = `PerÃ­odo: ${formatDateBR(period.startDate)} atÃ© ${formatDateBR(period.endDate)}`
+  sheet.getCell('A2').value = `Período: ${formatDateBR(period.startDate)} até ${formatDateBR(period.endDate)}`
   sheet.getCell('A2').font = { size: 12, bold: true }
   sheet.getCell('A2').alignment = { horizontal: 'center' }
 
   const headerRow = sheet.addRow([
-    'Data', 'Animal', 'RaÃ§a', 'Tipo', 'DescriÃ§Ã£o', 'Medicamento', 'Dosagem', 'VeterinÃ¡rio', 'ObservaÃ§Ãµes'
+    'Data', 'Animal', 'Raça', 'Tipo', 'Descrição', 'Medicamento', 'Dosagem', 'Veterinário', 'Observações'
   ])
   headerRow.font = { bold: true }
   headerRow.eachCell((cell) => {
@@ -2743,19 +2743,19 @@ async function generateVacinacoesReport(period) {
     ])
   })
 
-  // EstatÃ­sticas
+  // Estatísticas
   const total = result.rows.length
   const vacinacoes = result.rows.filter(r => r.tipo_ocorrencia?.toLowerCase().includes('vacina')).length
   const tratamentos = result.rows.filter(r => r.tipo_ocorrencia?.toLowerCase().includes('tratamento')).length
 
   sheet.addRow([])
   sheet.mergeCells(`A${sheet.rowCount + 1}:J${sheet.rowCount + 1}`)
-  const statsRow = sheet.addRow(['RESUMO ESTATÃ�STICO'])
+  const statsRow = sheet.addRow(['RESUMO ESTATÍSTICO'])
   statsRow.font = { bold: true, size: 12 }
   statsRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'E7E6E6' } }
   
   sheet.addRow(['Total de Registros:', total])
-  sheet.addRow(['VacinaÃ§Ãµes:', vacinacoes])
+  sheet.addRow(['Vacinações:', vacinacoes])
   sheet.addRow(['Tratamentos:', tratamentos])
 
   sheet.columns.forEach((col, idx) => {
@@ -2771,12 +2771,12 @@ async function generateVacinacoesReport(period) {
   return Buffer.from(buffer)
 }
 
-// Gerar relatÃ³rio de Genealogia
+// Gerar relatório de Genealogia
 async function generateGenealogiaReport(period) {
   const pgStart = toPgDate(period.startDate)
   const pgEnd = toPgDate(period.endDate)
 
-  // Buscar animais nascidos no perÃ­odo com informaÃ§Ãµes de pais
+  // Buscar animais nascidos no período com informações de pais
   const result = await query(`
     SELECT 
       n.id,
@@ -2801,18 +2801,18 @@ async function generateGenealogiaReport(period) {
   const sheet = workbook.addWorksheet('Genealogia')
 
   sheet.mergeCells('A1:L1')
-  sheet.getCell('A1').value = 'ðÅ¸Å’³ RELATÃâ€œRIO DE GENEALOGIA'
+  sheet.getCell('A1').value = '🌳 RELATÓRIO DE GENEALOGIA'
   sheet.getCell('A1').font = { size: 16, bold: true }
   sheet.getCell('A1').alignment = { horizontal: 'center' }
   sheet.getRow(1).height = 30
 
   sheet.mergeCells('A2:L2')
-  sheet.getCell('A2').value = `PerÃ­odo: ${formatDateBR(period.startDate)} atÃ© ${formatDateBR(period.endDate)}`
+  sheet.getCell('A2').value = `Período: ${formatDateBR(period.startDate)} até ${formatDateBR(period.endDate)}`
   sheet.getCell('A2').font = { size: 12, bold: true }
   sheet.getCell('A2').alignment = { horizontal: 'center' }
 
   const headerRow = sheet.addRow([
-    'Data Nascimento', 'Animal', 'RaÃ§a', 'Sexo', 'Pai', 'MÃ£e', 'Receptora', 'Pai Registro', 'MÃ£e Registro', 'ObservaÃ§Ãµes'
+    'Data Nascimento', 'Animal', 'Raça', 'Sexo', 'Pai', 'Mãe', 'Receptora', 'Pai Registro', 'Mãe Registro', 'Observações'
   ])
   headerRow.font = { bold: true }
   headerRow.eachCell((cell) => {
@@ -2847,7 +2847,7 @@ async function generateGenealogiaReport(period) {
   return Buffer.from(buffer)
 }
 
-// Gerar grÃ¡fico resumido em texto para WhatsApp
+// Gerar gráfico resumido em texto para WhatsApp
 // Helper: DD/MM/AAAA
 function formatBR(dateStr) {
   const d = new Date(dateStr)
@@ -2862,28 +2862,28 @@ async function generateWhatsAppSummary(period, relatorios) {
   const pgStart = toPgDate(period.startDate)
   const pgEnd = toPgDate(period.endDate)
 
-  console.log(`\nðÅ¸â€œ� Gerando resumo WhatsApp para relatÃ³rios:`, relatorios)
+  console.log(`\n📝 Gerando resumo WhatsApp para relatórios:`, relatorios)
   
-  let summary = `ðÅ¸â€œ§ RelatÃ³rios completos enviados por email.\n\n`
-  summary += `ðÅ¸â€œÅ  *RESUMO DE RELATÃâ€œRIOS BEEF-SYNC*\n`
-  summary += `ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��\n`
-  summary += `ðÅ¸â€œâ€¦ *PerÃ­odo:* ${formatBR(period.startDate)} a ${formatBR(period.endDate)}\n\n`
+  let summary = `📧 Relatórios completos enviados por email.\n\n`
+  summary += `📊 *RESUMO DE RELATÓRIOS BEEF-SYNC*\n`
+  summary += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`
+  summary += `📅 *Período:* ${formatBR(period.startDate)} a ${formatBR(period.endDate)}\n\n`
 
   if (relatorios.includes('nascimentos') || relatorios.includes('resumo_nascimentos')) {
     const nascResult = await query(`
       SELECT 
         COUNT(*) as total,
         COUNT(CASE WHEN sexo IN ('M', 'Macho') THEN 1 END) as machos,
-        COUNT(CASE WHEN sexo IN ('F', 'FÃªmea') THEN 1 END) as femeas
+        COUNT(CASE WHEN sexo IN ('F', 'Fêmea') THEN 1 END) as femeas
       FROM nascimentos 
       WHERE data_nascimento >= $1 AND data_nascimento <= $2
     `, [pgStart, pgEnd])
     
     const nasc = nascResult.rows[0]
-    summary += `ðÅ¸â€˜¶ *NASCIMENTOS*\n`
+    summary += `👶 *NASCIMENTOS*\n`
     summary += `Total: ${nasc.total || 0}\n`
     summary += `Machos: ${nasc.machos || 0}\n`
-    summary += `FÃªmeas: ${nasc.femeas || 0}\n\n`
+    summary += `Fêmeas: ${nasc.femeas || 0}\n\n`
   }
 
   if (relatorios.includes('mortes') || relatorios.includes('resumo_mortes')) {
@@ -2893,7 +2893,7 @@ async function generateWhatsAppSummary(period, relatorios) {
       WHERE data_morte >= $1 AND data_morte <= $2
     `, [pgStart, pgEnd])
     
-    summary += `ðÅ¸â€™â‚¬ *MORTES*\n`
+    summary += `💀 *MORTES*\n`
     summary += `Total: ${mortesResult.rows[0]?.total || 0}\n\n`
   }
 
@@ -2908,7 +2908,7 @@ async function generateWhatsAppSummary(period, relatorios) {
       )
       SELECT COUNT(*) as total FROM animais a
       LEFT JOIN animais_com_brucelose b ON a.id = b.animal_id
-      WHERE a.situacao = 'Ativo' AND a.sexo = 'FÃªmea' AND a.data_nascimento IS NOT NULL
+      WHERE a.situacao = 'Ativo' AND a.sexo = 'Fêmea' AND a.data_nascimento IS NOT NULL
         AND b.animal_id IS NULL AND (CURRENT_DATE - a.data_nascimento::date) BETWEEN 90 AND 240
     `)
     const dgtResult = await query(`
@@ -2916,9 +2916,9 @@ async function generateWhatsAppSummary(period, relatorios) {
       WHERE a.situacao = 'Ativo' AND a.data_nascimento IS NOT NULL
         AND (CURRENT_DATE - a.data_nascimento::date) BETWEEN 330 AND 640
     `)
-    summary += `ðÅ¸â€œâ€¦ *AGENDA DE ATIVIDADES*\n`
-    summary += `ðÅ¸â€º¡ï¸� Brucelose (fÃªmeas 3-8 meses): ${bruceloseResult.rows[0]?.total || 0}\n`
-    summary += `ðÅ¸â€œÅ  DGT (330-640 dias): ${dgtResult.rows[0]?.total || 0}\n\n`
+    summary += `📅 *AGENDA DE ATIVIDADES*\n`
+    summary += `🛡️ Brucelose (fêmeas 3-8 meses): ${bruceloseResult.rows[0]?.total || 0}\n`
+    summary += `📊 DGT (330-640 dias): ${dgtResult.rows[0]?.total || 0}\n\n`
   }
 
   if (relatorios.includes('resumo_por_sexo')) {
@@ -2926,7 +2926,7 @@ async function generateWhatsAppSummary(period, relatorios) {
       SELECT 
         COUNT(*) as total,
         COUNT(CASE WHEN sexo IN ('M', 'Macho') THEN 1 END) as machos,
-        COUNT(CASE WHEN sexo IN ('F', 'FÃªmea') THEN 1 END) as femeas
+        COUNT(CASE WHEN sexo IN ('F', 'Fêmea') THEN 1 END) as femeas
       FROM nascimentos 
       WHERE data_nascimento >= $1 AND data_nascimento <= $2
     `, [pgStart, pgEnd])
@@ -2938,27 +2938,27 @@ async function generateWhatsAppSummary(period, relatorios) {
     const pM = total > 0 ? Math.round((machos / total) * 100) : 0
     const pF = total > 0 ? Math.round((femeas / total) * 100) : 0
     
-    summary += `ðÅ¸â€˜¶ *NASCIMENTOS POR SEXO*\n`
+    summary += `👶 *NASCIMENTOS POR SEXO*\n`
     summary += `Total: ${total}\n`
-    summary += `ââ„¢â€šï¸� Machos: ${machos} (${pM}%)\n`
-    summary += `ââ„¢â‚¬ï¸� FÃªmeas: ${femeas} (${pF}%)\n\n`
+    summary += `♂️ Machos: ${machos} (${pM}%)\n`
+    summary += `♀️ Fêmeas: ${femeas} (${pF}%)\n\n`
   }
 
   if (relatorios.includes('resumo_por_raca')) {
     const racaResult = await query(`
       SELECT 
-        COALESCE(raca, 'NÃ£o informada') as raca,
+        COALESCE(raca, 'Não informada') as raca,
         COUNT(*) as total,
         COUNT(CASE WHEN sexo IN ('M', 'Macho') THEN 1 END) as machos,
-        COUNT(CASE WHEN sexo IN ('F', 'FÃªmea') THEN 1 END) as femeas
+        COUNT(CASE WHEN sexo IN ('F', 'Fêmea') THEN 1 END) as femeas
       FROM nascimentos 
       WHERE data_nascimento >= $1 AND data_nascimento <= $2
-      GROUP BY COALESCE(raca, 'NÃ£o informada')
+      GROUP BY COALESCE(raca, 'Não informada')
       ORDER BY total DESC
       LIMIT 5
     `, [pgStart, pgEnd])
     
-    summary += `ðÅ¸�â€ž *TOP 5 RAÃâ€¡AS (NASCIMENTOS)*\n`
+    summary += `🐄 *TOP 5 RAÇAS (NASCIMENTOS)*\n`
     racaResult.rows.forEach((row, idx) => {
       summary += `${idx + 1}. ${row.raca}\n`
       summary += `   Total: ${row.total} | M: ${row.machos || 0} | F: ${row.femeas || 0}\n`
@@ -2976,7 +2976,7 @@ async function generateWhatsAppSummary(period, relatorios) {
         ) AS mae,
         COUNT(*) AS total,
         COUNT(CASE WHEN n.sexo IN ('M', 'Macho') THEN 1 END) AS machos,
-        COUNT(CASE WHEN n.sexo IN ('F', 'FÃªmea') THEN 1 END) AS femeas
+        COUNT(CASE WHEN n.sexo IN ('F', 'Fêmea') THEN 1 END) AS femeas
       FROM nascimentos n
       LEFT JOIN gestacoes g ON g.id = n.gestacao_id
       WHERE (n.data_nascimento >= $1 AND n.data_nascimento <= $2)
@@ -2989,7 +2989,7 @@ async function generateWhatsAppSummary(period, relatorios) {
       LIMIT 5
     `, [pgStart, pgEnd])
     
-    summary += `ðÅ¸�â€ž *TOP 5 MÃÆ’ES (NASCIMENTOS)*\n`
+    summary += `🐄 *TOP 5 MÃES (NASCIMENTOS)*\n`
     maeResult.rows.forEach((row, idx) => {
       summary += `${idx + 1}. ${row.mae}\n`
       summary += `   Total: ${row.total} | M: ${row.machos || 0} | F: ${row.femeas || 0}\n`
@@ -2998,7 +2998,7 @@ async function generateWhatsAppSummary(period, relatorios) {
   }
 
     if (relatorios.includes('nf_entrada_saida')) {
-    // Buscar NFs e seus itens para detalhamento (saÃ­da usa data_saida se existir)
+    // Buscar NFs e seus itens para detalhamento (saída usa data_saida se existir)
     const nfResult = await query(`
       SELECT 
         nf.id,
@@ -3063,43 +3063,43 @@ async function generateWhatsAppSummary(period, relatorios) {
         const sexo = item.sexo || item.genero
         if (sexo && (sexo === 'M' || sexo === 'Macho' || sexo.startsWith('M'))) {
           stats.machos += qtd
-        } else if (sexo && (sexo === 'F' || sexo === 'FÃªmea' || sexo.startsWith('F'))) {
+        } else if (sexo && (sexo === 'F' || sexo === 'Fêmea' || sexo.startsWith('F'))) {
           stats.femeas += qtd
         }
       })
     }
 
-    summary += `ðÅ¸â€œâ€ž *NOTAS FISCAIS*\n`
+    summary += `📄 *NOTAS FISCAIS*\n`
     
     // Entradas
-    summary += `ðÅ¸â€œ¥ *ENTRADAS*\n`
+    summary += `📥 *ENTRADAS*\n`
     summary += `NFs: ${entradas.total} | Valor: R$ ${entradas.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`
     summary += `Animais: ${entradas.qtd}\n`
     if (entradas.qtd > 0) {
       const pM = Math.round((entradas.machos / entradas.qtd) * 100) || 0
       const pF = Math.round((entradas.femeas / entradas.qtd) * 100) || 0
-      const barM = 'ââ€“Ë†'.repeat(Math.round(pM / 10))
-      const barF = 'ââ€“Ë†'.repeat(Math.round(pF / 10))
+      const barM = '█'.repeat(Math.round(pM / 10))
+      const barF = '█'.repeat(Math.round(pF / 10))
       
-      summary += `ââ„¢â€šï¸� Machos: ${entradas.machos} (${pM}%)\n${barM}\n`
-      summary += `ââ„¢â‚¬ï¸� FÃªmeas: ${entradas.femeas} (${pF}%)\n${barF}\n`
+      summary += `♂️ Machos: ${entradas.machos} (${pM}%)\n${barM}\n`
+      summary += `♀️ Fêmeas: ${entradas.femeas} (${pF}%)\n${barF}\n`
     }
     summary += `\n`
 
-    // SaÃ­das
-    summary += `ðÅ¸â€œ¤ *SAÃ�DAS*\n`
+    // Saídas
+    summary += `📤 *SAÍDAS*\n`
     summary += `NFs: ${saidas.total} | Valor: R$ ${saidas.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`
     summary += `Animais: ${saidas.qtd > 0 ? saidas.qtd : 'Nenhum animal registrado nos itens'}\n`
     if (saidas.qtd > 0) {
       const pM = Math.round((saidas.machos / saidas.qtd) * 100) || 0
       const pF = Math.round((saidas.femeas / saidas.qtd) * 100) || 0
-      const barM = 'ââ€“Ë†'.repeat(Math.round(pM / 10))
-      const barF = 'ââ€“Ë†'.repeat(Math.round(pF / 10))
+      const barM = '█'.repeat(Math.round(pM / 10))
+      const barF = '█'.repeat(Math.round(pF / 10))
       
-      summary += `ââ„¢â€šï¸� Machos: ${saidas.machos} (${pM}%)\n${barM}\n`
-      summary += `ââ„¢â‚¬ï¸� FÃªmeas: ${saidas.femeas} (${pF}%)\n${barF}\n`
+      summary += `♂️ Machos: ${saidas.machos} (${pM}%)\n${barM}\n`
+      summary += `♀️ Fêmeas: ${saidas.femeas} (${pF}%)\n${barF}\n`
     } else if (saidas.total > 0) {
-      summary += `âÅ¡ ï¸� *ATENÃâ€¡ÃÆ’O:* As NFs de saÃ­da nÃ£o tÃªm animais registrados nos itens.\n`
+      summary += `⚠️ *ATENÇÃO:* As NFs de saída não têm animais registrados nos itens.\n`
       summary += `Verifique se os itens foram cadastrados corretamente.\n`
     }
     summary += `\n`
@@ -3114,7 +3114,7 @@ async function generateWhatsAppSummary(period, relatorios) {
         ) AS pai,
         COUNT(*) AS total,
         COUNT(CASE WHEN n.sexo IN ('M', 'Macho') THEN 1 END) AS machos,
-        COUNT(CASE WHEN n.sexo IN ('F', 'FÃªmea') THEN 1 END) AS femeas
+        COUNT(CASE WHEN n.sexo IN ('F', 'Fêmea') THEN 1 END) AS femeas
       FROM nascimentos n
       LEFT JOIN gestacoes g ON g.id = n.gestacao_id
       WHERE (n.data_nascimento >= $1 AND n.data_nascimento <= $2)
@@ -3123,7 +3123,7 @@ async function generateWhatsAppSummary(period, relatorios) {
       LIMIT 5
     `, [pgStart, pgEnd])
     
-    summary += `ðÅ¸�â€š *TOP 5 PAIS*\n`
+    summary += `🐂 *TOP 5 PAIS*\n`
     paiResult.rows.forEach((row, idx) => {
       summary += `${idx + 1}. ${row.pai || 'N/A'}\n`
       summary += `   Total: ${row.total} | M: ${row.machos || 0} | F: ${row.femeas || 0}\n`
@@ -3146,7 +3146,7 @@ async function generateWhatsAppSummary(period, relatorios) {
         AND COALESCE(nf.data_chegada_animais, nf.data_compra) <= $2
     `, [pgStart, pgEnd])
     
-    summary += `ðÅ¸�â€ž *RECEPTORAS QUE CHEGARAM*\n`
+    summary += `🐄 *RECEPTORAS QUE CHEGARAM*\n`
     summary += `NFs: ${receptorasResult.rows[0]?.total_nfs || 0}\n`
     summary += `Receptoras: ${receptorasResult.rows[0]?.total_receptoras || 0}\n\n`
   }
@@ -3176,13 +3176,13 @@ async function generateWhatsAppSummary(period, relatorios) {
       )
     `)
     
-    summary += `â�° *RECEPTORAS QUE FALTAM PARIR*\n`
+    summary += `⏰ *RECEPTORAS QUE FALTAM PARIR*\n`
     summary += `Total: ${faltamParirResult.rows[0]?.total || 0}\n\n`
   }
 
   if (relatorios.includes('receptoras_faltam_diagnostico')) {
     const totalFaltamDG = await countReceptorasFaltamDG(pgStart, pgEnd)
-    summary += `ðÅ¸â€�¬ *RECEPTORAS QUE FALTAM DIAGNÃâ€œSTICO* (chegaram no perÃ­odo)\n`
+    summary += `🔬 *RECEPTORAS QUE FALTAM DIAGNÓSTICO* (chegaram no período)\n`
     summary += `Total: ${totalFaltamDG}\n\n`
   }
 
@@ -3197,11 +3197,11 @@ async function generateWhatsAppSummary(period, relatorios) {
       FROM inseminacoes i
       INNER JOIN animais a ON a.id = i.animal_id
       WHERE i.${iaDateCol} >= $1 AND i.${iaDateCol} <= $2
-        AND a.sexo = 'FÃªmea'
+        AND a.sexo = 'Fêmea'
     `, [pgStart, pgEnd])
     
     const stats = femeasIAResult.rows[0]
-    summary += `ðÅ¸�â€ž *FÃÅ MEAS QUE FIZERAM IA*\n`
+    summary += `🐄 *FÊMEAS QUE FIZERAM IA*\n`
     summary += `Total de IAs: ${stats.total || 0}\n`
     summary += `Prenhas: ${stats.prenhas || 0}\n`
     summary += `Vazias: ${stats.vazias || 0}\n`
@@ -3225,10 +3225,10 @@ async function generateWhatsAppSummary(period, relatorios) {
     `, [pgStart, pgEnd])
     
     const stats = piquetesResult.rows[0]
-    summary += `ðÅ¸â€œ� *ANIMAIS NOS PIQUETES*\n`
+    summary += `📍 *ANIMAIS NOS PIQUETES*\n`
     summary += `Total de Entradas: ${stats.total_entradas || 0}\n`
     summary += `Piquetes Diferentes: ${stats.total_piquetes || 0}\n`
-    summary += `Animais ÃÅ¡nicos: ${stats.total_animais || 0}\n`
+    summary += `Animais Únicos: ${stats.total_animais || 0}\n`
     summary += `Ainda Ativos: ${stats.ativos || 0}\n\n`
   }
 
@@ -3243,13 +3243,13 @@ async function generateWhatsAppSummary(period, relatorios) {
     `, [pgStart, pgEnd])
     
     const stats = teResult.rows[0]
-    summary += `ðÅ¸§ª *TRANSFERÃÅ NCIAS DE EMBRIÃâ€¢ES*\n`
+    summary += `🧪 *TRANSFERÊNCIAS DE EMBRIÕES*\n`
     summary += `Total de TEs: ${stats.total || 0}\n`
     summary += `Gestantes: ${stats.gestantes || 0}\n`
     summary += `Vazias: ${stats.vazias || 0}\n`
     if (stats.total > 0) {
       const taxaGestacao = ((stats.gestantes / stats.total) * 100).toFixed(1)
-      summary += `Taxa de GestaÃ§Ã£o: ${taxaGestacao}%\n`
+      summary += `Taxa de Gestação: ${taxaGestacao}%\n`
     }
     summary += `\n`
   }
@@ -3259,7 +3259,7 @@ async function generateWhatsAppSummary(period, relatorios) {
       const hojeStr = new Date().toISOString().split('T')[0]
       const [nascFut, gestAtivas, idsNasc] = await Promise.all([
         query(`SELECT COUNT(*) as c FROM nascimentos WHERE data_nascimento::date > $1::date`, [hojeStr]),
-        query(`SELECT g.* FROM gestacoes g WHERE (situacao = 'Em GestaÃ§Ã£o' OR situacao = 'Ativa')`, []),
+        query(`SELECT g.* FROM gestacoes g WHERE (situacao = 'Em Gestação' OR situacao = 'Ativa')`, []),
         query(`SELECT gestacao_id FROM nascimentos WHERE gestacao_id IS NOT NULL`).then(r => new Set(r.rows.map(x => x.gestacao_id)))
       ])
       let totalFIV = parseInt(nascFut.rows[0]?.c || 0)
@@ -3289,13 +3289,13 @@ async function generateWhatsAppSummary(period, relatorios) {
           if (listaIA.length < 5) listaIA.push(`${ia.serie || ''} ${ia.rg || ''}`.trim() || ia.animal_nome || '-')
         }
       })
-      summary += `ðÅ¸�â€ž *PREVISÃâ€¢ES PARA PARIR (FIV vs IA)*\n`
+      summary += `🐄 *PREVISÕES PARA PARIR (FIV vs IA)*\n`
       summary += `Receptoras FIV: ${totalFIV}\n`
-      summary += `FÃªmeas IA: ${totalIA}\n`
+      summary += `Fêmeas IA: ${totalIA}\n`
       if (listaIA.length > 0) summary += `IA: ${listaIA.slice(0, 5).join(', ')}\n`
       summary += `\n`
     } catch (e) {
-      console.warn('Erro ao buscar previsÃµes FIV/IA:', e.message)
+      console.warn('Erro ao buscar previsões FIV/IA:', e.message)
     }
   }
 
@@ -3303,7 +3303,7 @@ async function generateWhatsAppSummary(period, relatorios) {
     const gestacoesResult = await query(`
       SELECT 
         COUNT(*) as total,
-        COUNT(CASE WHEN situacao = 'Em GestaÃ§Ã£o' THEN 1 END) as em_gestacao,
+        COUNT(CASE WHEN situacao = 'Em Gestação' THEN 1 END) as em_gestacao,
         COUNT(CASE WHEN situacao = 'Nascido' THEN 1 END) as nascidos,
         COUNT(CASE WHEN situacao = 'Aborto' THEN 1 END) as abortos
       FROM gestacoes
@@ -3311,9 +3311,9 @@ async function generateWhatsAppSummary(period, relatorios) {
     `, [pgStart, pgEnd])
     
     const stats = gestacoesResult.rows[0]
-    summary += `ðÅ¸¤° *GESTAÃâ€¡Ãâ€¢ES*\n`
+    summary += `🤰 *GESTAÇÕES*\n`
     summary += `Total: ${stats.total || 0}\n`
-    summary += `Em GestaÃ§Ã£o: ${stats.em_gestacao || 0}\n`
+    summary += `Em Gestação: ${stats.em_gestacao || 0}\n`
     summary += `Nascidos: ${stats.nascidos || 0}\n`
     summary += `Abortos: ${stats.abortos || 0}\n\n`
   }
@@ -3329,13 +3329,13 @@ async function generateWhatsAppSummary(period, relatorios) {
     `, [pgStart, pgEnd])
     
     const stats = examesResult.rows[0]
-    summary += `ðÅ¸â€�¬ *EXAMES ANDROLÃâ€œGICOS*\n`
+    summary += `🔬 *EXAMES ANDROLÓGICOS*\n`
     summary += `Total: ${stats.total || 0}\n`
     summary += `Aprovados: ${stats.aprovados || 0}\n`
     summary += `Reprovados: ${stats.reprovados || 0}\n`
     if (stats.total > 0) {
       const taxaAprovacao = ((stats.aprovados / stats.total) * 100).toFixed(1)
-      summary += `Taxa de AprovaÃ§Ã£o: ${taxaAprovacao}%\n`
+      summary += `Taxa de Aprovação: ${taxaAprovacao}%\n`
     }
     summary += `\n`
   }
@@ -3365,7 +3365,7 @@ async function generateWhatsAppSummary(period, relatorios) {
     const custoIA = parseFloat(custosIA.rows[0]?.total || 0)
     const saldo = receita - despesa - custoIA
     
-    summary += `ðÅ¸â€™° *MOVIMENTAÃâ€¡Ãâ€¢ES FINANCEIRAS*\n`
+    summary += `💰 *MOVIMENTAÇÕES FINANCEIRAS*\n`
     summary += `Receitas: R$ ${receita.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`
     summary += `Despesas: R$ ${despesa.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`
     summary += `Custos IA: R$ ${custoIA.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`
@@ -3385,9 +3385,9 @@ async function generateWhatsAppSummary(period, relatorios) {
       WHERE so.data_saida >= $1 AND so.data_saida <= $2
     `, [pgStart, pgEnd])
     
-    summary += `ðÅ¸â€œ¦ *ESTOQUE DE SÃÅ MEN*\n`
+    summary += `📦 *ESTOQUE DE SÊMEN*\n`
     summary += `Entradas: ${entradas.rows[0]?.total || 0} (${entradas.rows[0]?.doses || 0} doses)\n`
-    summary += `SaÃ­das: ${saidas.rows[0]?.total || 0} doses\n\n`
+    summary += `Saídas: ${saidas.rows[0]?.total || 0} doses\n\n`
   }
 
   if (relatorios.includes('vacinacoes') || relatorios.includes('resumo_vacinacoes')) {
@@ -3398,7 +3398,7 @@ async function generateWhatsAppSummary(period, relatorios) {
         AND (tipo_ocorrencia ILIKE '%vacina%' OR tipo_ocorrencia ILIKE '%tratamento%')
     `, [pgStart, pgEnd])
     
-    summary += `ðÅ¸â€™â€° *VACINAÃâ€¡Ãâ€¢ES E TRATAMENTOS*\n`
+    summary += `💉 *VACINAÇÕES E TRATAMENTOS*\n`
     summary += `Total: ${vacinacoesResult.rows[0]?.total || 0}\n\n`
   }
 
@@ -3409,38 +3409,38 @@ async function generateWhatsAppSummary(period, relatorios) {
       WHERE data_nascimento >= $1 AND data_nascimento <= $2
     `, [pgStart, pgEnd])
     
-    summary += `ðÅ¸Å’³ *GENEALOGIA*\n`
+    summary += `🌳 *GENEALOGIA*\n`
     summary += `Animais com Genealogia: ${genealogiaResult.rows[0]?.total || 0}\n\n`
   }
 
-  // Se nÃ£o houver nenhum dado no resumo, adicionar mensagem
+  // Se não houver nenhum dado no resumo, adicionar mensagem
   if (summary.length < 100) {
-    summary += `âÅ¡ ï¸� *Nenhum dado encontrado para os relatÃ³rios selecionados neste perÃ­odo*\n\n`
-    summary += `RelatÃ³rios selecionados:\n`
+    summary += `⚠️ *Nenhum dado encontrado para os relatórios selecionados neste período*\n\n`
+    summary += `Relatórios selecionados:\n`
     relatorios.forEach(r => {
-      summary += `ââ‚¬¢ ${r}\n`
+      summary += `• ${r}\n`
     })
-    summary += `\nVerifique se hÃ¡ dados no perÃ­odo selecionado.\n`
+    summary += `\nVerifique se há dados no período selecionado.\n`
   }
   
-  summary += `\nââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��\n`
-  summary += `ðÅ¸â€œ§ RelatÃ³rio completo enviado por email\n`
+  summary += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`
+  summary += `📧 Relatório completo enviado por email\n`
   if (relatorios.length > 0) {
-    summary += `ðÅ¸â€œÅ  GrÃ¡fico visual incluÃ­do neste resumo\n`
+    summary += `📊 Gráfico visual incluído neste resumo\n`
   }
-  summary += `\n_Beef-Sync - Sistema de GestÃ£o PecuÃ¡ria_\n`
-  summary += `ðÅ¸â€œâ€¦ Gerado em: ${new Date().toLocaleString('pt-BR')}`
+  summary += `\n_Beef-Sync - Sistema de Gestão Pecuária_\n`
+  summary += `📅 Gerado em: ${new Date().toLocaleString('pt-BR')}`
 
-  console.log(`âÅ“â€¦ Resumo WhatsApp gerado: ${summary.length} caracteres`)
+  console.log(`✅ Resumo WhatsApp gerado: ${summary.length} caracteres`)
   return summary
 }
 
-// Gerar grÃ¡fico visual resumido dos relatÃ³rios
+// Gerar gráfico visual resumido dos relatórios
 async function generateSummaryChart(period, relatorios) {
   const pgStart = toPgDate(period.startDate)
   const pgEnd = toPgDate(period.endDate)
 
-  // Coletar dados para o grÃ¡fico
+  // Coletar dados para o gráfico
   const dados = {
     nascimentos: { total: 0, machos: 0, femeas: 0 },
     mortes: 0,
@@ -3459,7 +3459,7 @@ async function generateSummaryChart(period, relatorios) {
       SELECT 
         COUNT(*) as total,
         COUNT(CASE WHEN sexo IN ('M', 'Macho') THEN 1 END) as machos,
-        COUNT(CASE WHEN sexo IN ('F', 'FÃªmea') THEN 1 END) as femeas
+        COUNT(CASE WHEN sexo IN ('F', 'Fêmea') THEN 1 END) as femeas
       FROM nascimentos 
       WHERE data_nascimento >= $1 AND data_nascimento <= $2
     `, [pgStart, pgEnd])
@@ -3478,7 +3478,7 @@ async function generateSummaryChart(period, relatorios) {
     dados.mortes = parseInt(mortesResult.rows[0]?.total || 0)
   }
 
-  // Buscar NFs (saÃ­da usa data_saida se existir)
+  // Buscar NFs (saída usa data_saida se existir)
   if (relatorios.includes('nf_entrada_saida')) {
     const nfResult = await query(`
       SELECT tipo, COUNT(*) as total, SUM(valor_total) as valor_total
@@ -3573,7 +3573,7 @@ async function generateSummaryChart(period, relatorios) {
     dados.receptorasFaltamDG = await countReceptorasFaltamDG(pgStart, pgEnd)
   }
 
-  // Buscar fÃªmeas que fizeram IA
+  // Buscar fêmeas que fizeram IA
   if ((relatorios.includes('femeas_ia') || relatorios.includes('resumo_femeas_ia'))) {
     const iaDateCol = await getIADataColumn()
     const femeasIAResult = await query(`
@@ -3585,7 +3585,7 @@ async function generateSummaryChart(period, relatorios) {
       FROM inseminacoes i
       INNER JOIN animais a ON a.id = i.animal_id
       WHERE i.${iaDateCol} >= $1 AND i.${iaDateCol} <= $2
-        AND a.sexo = 'FÃªmea'
+        AND a.sexo = 'Fêmea'
     `, [pgStart, pgEnd])
     
     dados.femeasIA.total = parseInt(femeasIAResult.rows[0]?.total || 0)
@@ -3612,20 +3612,20 @@ async function generateSummaryChart(period, relatorios) {
     dados.animaisPiquetes.ativos = parseInt(piquetesResult.rows[0]?.ativos || 0)
   }
 
-  // Criar grÃ¡fico combinado com mÃºltiplos datasets
+  // Criar gráfico combinado com múltiplos datasets
   const width = 1200
   const height = 900
   const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height })
 
-  // Preparar datasets para grÃ¡fico combinado
+  // Preparar datasets para gráfico combinado
   const datasets = []
   const labels = []
   
   // Construir labels e dados de forma organizada
-  // Dataset 1: Valores de Notas Fiscais (Entrada vs SaÃ­da) - em R$
+  // Dataset 1: Valores de Notas Fiscais (Entrada vs Saída) - em R$
   if (relatorios.includes('nf_entrada_saida')) {
     if (dados.entradas.valor > 0 || dados.saidas.valor > 0) {
-      labels.push('NF Entrada', 'NF SaÃ­da')
+      labels.push('NF Entrada', 'NF Saída')
       datasets.push({
         label: 'Valor (R$)',
         data: [dados.entradas.valor, dados.saidas.valor],
@@ -3639,12 +3639,12 @@ async function generateSummaryChart(period, relatorios) {
     }
   }
 
-  // Dataset 2: Nascimentos por Sexo (Machos vs FÃªmeas)
+  // Dataset 2: Nascimentos por Sexo (Machos vs Fêmeas)
   if ((relatorios.includes('nascimentos') || relatorios.includes('resumo_nascimentos') || relatorios.includes('resumo_por_sexo')) && dados.nascimentos.total > 0) {
     if (labels.length === 0) {
-      labels.push('Machos', 'FÃªmeas')
+      labels.push('Machos', 'Fêmeas')
     } else {
-      labels.push('Machos', 'FÃªmeas')
+      labels.push('Machos', 'Fêmeas')
     }
     datasets.push({
       label: 'Nascimentos',
@@ -3661,7 +3661,7 @@ async function generateSummaryChart(period, relatorios) {
       order: 2
     })
     
-    // Ajustar primeiro dataset se necessÃ¡rio
+    // Ajustar primeiro dataset se necessário
     if (labels.length === 4 && datasets[0]) {
       datasets[0].data = [dados.entradas.valor, dados.saidas.valor, 0, 0]
       datasets[0].backgroundColor = ['rgba(54, 162, 235, 0.8)', 'rgba(255, 99, 132, 0.8)', 'rgba(0,0,0,0)', 'rgba(0,0,0,0)']
@@ -3748,15 +3748,15 @@ async function generateSummaryChart(period, relatorios) {
     })
   }
 
-  // Se nÃ£o houver dados, retornar null
+  // Se não houver dados, retornar null
   if (datasets.length === 0 || labels.length === 0) {
-    console.log('âÅ¡ ï¸� Nenhum dado para gerar grÃ¡fico')
-    console.log('   RelatÃ³rios selecionados:', relatorios)
+    console.log('⚠️ Nenhum dado para gerar gráfico')
+    console.log('   Relatórios selecionados:', relatorios)
     console.log('   Dados coletados:', JSON.stringify(dados, null, 2))
     return null
   }
   
-  console.log(`ðÅ¸â€œÅ  Gerando grÃ¡fico com ${datasets.length} dataset(s) e ${labels.length} label(s)`)
+  console.log(`📊 Gerando gráfico com ${datasets.length} dataset(s) e ${labels.length} label(s)`)
   console.log(`   Labels:`, labels)
   console.log(`   Datasets:`, datasets.map(d => ({ label: d.label, dataLength: d.data.length })))
 
@@ -3772,7 +3772,7 @@ async function generateSummaryChart(period, relatorios) {
       plugins: {
         title: {
           display: true,
-          text: `ðÅ¸â€œÅ  Resumo de RelatÃ³rios - ${period.startDate} a ${period.endDate}`,
+          text: `📊 Resumo de Relatórios - ${period.startDate} a ${period.endDate}`,
           font: { size: 22, weight: 'bold', color: '#333333' },
           padding: { top: 20, bottom: 30 }
         },
@@ -3853,10 +3853,10 @@ async function generateSummaryChart(period, relatorios) {
 
   try {
     const imageBuffer = await chartJSNodeCanvas.renderToBuffer(config)
-    console.log(`âÅ“â€¦ GrÃ¡fico combinado gerado: ${imageBuffer.length} bytes`)
+    console.log(`✅ Gráfico combinado gerado: ${imageBuffer.length} bytes`)
     return Buffer.from(imageBuffer)
   } catch (error) {
-    console.error('â�Å’ Erro ao gerar grÃ¡fico:', error)
+    console.error('❌ Erro ao gerar gráfico:', error)
     return null
   }
 }
@@ -3875,85 +3875,85 @@ export default async function handler(req, res) {
     const { destinatarios: destinatarioIds, relatorios, period } = req.body
 
     if (!destinatarioIds || !Array.isArray(destinatarioIds) || destinatarioIds.length === 0) {
-      return sendValidationError(res, 'Selecione pelo menos um destinatÃ¡rio')
+      return sendValidationError(res, 'Selecione pelo menos um destinatário')
     }
 
     if (!relatorios || !Array.isArray(relatorios) || relatorios.length === 0) {
-      return sendValidationError(res, 'Selecione pelo menos um relatÃ³rio')
+      return sendValidationError(res, 'Selecione pelo menos um relatório')
     }
 
     if (!period || !period.startDate || !period.endDate) {
-      return sendValidationError(res, 'PerÃ­odo Ã© obrigatÃ³rio')
+      return sendValidationError(res, 'Período é obrigatório')
     }
 
-    // Buscar destinatÃ¡rios
+    // Buscar destinatários
     const destinatariosResult = await query(`
       SELECT * FROM destinatarios_relatorios 
       WHERE id = ANY($1::int[]) AND ativo = true
     `, [destinatarioIds])
 
     if (destinatariosResult.rows.length === 0) {
-      return sendValidationError(res, 'Nenhum destinatÃ¡rio vÃ¡lido encontrado')
+      return sendValidationError(res, 'Nenhum destinatário válido encontrado')
     }
 
     const destinatarios = destinatariosResult.rows
     const results = []
 
-    // Verificar configuraÃ§Ãµes
+    // Verificar configurações
     const smtpConfigurado = !!(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS)
     const whatsappConfigurado = !!(process.env.EVOLUTION_API_URL && process.env.EVOLUTION_API_KEY) || 
                                  !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN)
-    // Apenas Evolution API suporta envio de arquivos (Excel, imagens); Twilio requer URL pÃºblica
+    // Apenas Evolution API suporta envio de arquivos (Excel, imagens); Twilio requer URL pública
     const whatsappMediaDisponivel = !!(process.env.EVOLUTION_API_URL && process.env.EVOLUTION_API_KEY)
     
-    console.log(`\nðÅ¸Å¡â‚¬ ========== INÃ�CIO DO ENVIO DE RELATÃâ€œRIOS ==========`)
-    console.log(`âÅ¡â„¢ï¸� ConfiguraÃ§Ãµes:`)
-    console.log(`   - SMTP configurado: ${smtpConfigurado ? 'âÅ“â€¦ Sim' : 'â�Å’ NÃ£o (configure SMTP_HOST, SMTP_USER, SMTP_PASS no .env)'}`)
-    console.log(`   - WhatsApp configurado: ${whatsappConfigurado ? 'âÅ“â€¦ Sim' : 'â�Å’ NÃ£o (configure Evolution API ou Twilio no .env)'}`)
-    console.log(`   - WhatsApp com arquivos (Excel): ${whatsappMediaDisponivel ? 'âÅ“â€¦ Sim (Evolution API)' : 'â�Å’ NÃ£o (use Evolution API para enviar Excel)'}`)
+    console.log(`\n🚀 ========== INÍCIO DO ENVIO DE RELATÓRIOS ==========`)
+    console.log(`⚙️ Configurações:`)
+    console.log(`   - SMTP configurado: ${smtpConfigurado ? '✅ Sim' : '❌ Não (configure SMTP_HOST, SMTP_USER, SMTP_PASS no .env)'}`)
+    console.log(`   - WhatsApp configurado: ${whatsappConfigurado ? '✅ Sim' : '❌ Não (configure Evolution API ou Twilio no .env)'}`)
+    console.log(`   - WhatsApp com arquivos (Excel): ${whatsappMediaDisponivel ? '✅ Sim (Evolution API)' : '❌ Não (use Evolution API para enviar Excel)'}`)
     
-    console.log(`\nðÅ¸â€œâ€¹ DestinatÃ¡rios encontrados: ${destinatarios.length}`)
+    console.log(`\n📋 Destinatários encontrados: ${destinatarios.length}`)
     if (destinatarios.length === 0) {
-      console.error(`â�Å’ ERRO: Nenhum destinatÃ¡rio encontrado!`)
-      return sendError(res, 'Nenhum destinatÃ¡rio encontrado. Cadastre destinatÃ¡rios antes de enviar.', 400)
+      console.error(`❌ ERRO: Nenhum destinatário encontrado!`)
+      return sendError(res, 'Nenhum destinatário encontrado. Cadastre destinatários antes de enviar.', 400)
     }
     
     destinatarios.forEach((d, idx) => {
       console.log(`   ${idx + 1}. ${d.nome}`)
-      console.log(`      ðÅ¸â€œ§ Email: ${d.email || 'â�Å’ nÃ£o informado'}`)
-      console.log(`      ðÅ¸â€™¬ WhatsApp: ${d.whatsapp || 'â�Å’ nÃ£o informado'}`)
-      console.log(`      âÅ“â€¦ Recebe Email: ${d.recebe_email ? 'SIM' : 'NÃÆ’O'}`)
-      console.log(`      âÅ“â€¦ Recebe WhatsApp: ${d.recebe_whatsapp ? 'SIM' : 'NÃÆ’O'}`)
+      console.log(`      📧 Email: ${d.email || '❌ não informado'}`)
+      console.log(`      💬 WhatsApp: ${d.whatsapp || '❌ não informado'}`)
+      console.log(`      ✅ Recebe Email: ${d.recebe_email ? 'SIM' : 'NÃO'}`)
+      console.log(`      ✅ Recebe WhatsApp: ${d.recebe_whatsapp ? 'SIM' : 'NÃO'}`)
     })
     
-    // Verificar se hÃ¡ pelo menos um destinatÃ¡rio configurado para receber
+    // Verificar se há pelo menos um destinatário configurado para receber
     const destinatariosComEmail = destinatarios.filter(d => d.recebe_email && d.email)
     const destinatariosComWhatsApp = destinatarios.filter(d => d.recebe_whatsapp && d.whatsapp)
     
-    console.log(`\nðÅ¸â€œÅ  AnÃ¡lise:`)
-    console.log(`   - DestinatÃ¡rios que recebem email: ${destinatariosComEmail.length}`)
-    console.log(`   - DestinatÃ¡rios que recebem WhatsApp: ${destinatariosComWhatsApp.length}`)
+    console.log(`\n📊 Análise:`)
+    console.log(`   - Destinatários que recebem email: ${destinatariosComEmail.length}`)
+    console.log(`   - Destinatários que recebem WhatsApp: ${destinatariosComWhatsApp.length}`)
     
     if (destinatariosComEmail.length === 0 && destinatariosComWhatsApp.length === 0) {
-      console.error(`â�Å’ ERRO: Nenhum destinatÃ¡rio estÃ¡ configurado para receber email ou WhatsApp!`)
+      console.error(`❌ ERRO: Nenhum destinatário está configurado para receber email ou WhatsApp!`)
       return sendError(res, 
-        'Nenhum destinatÃ¡rio estÃ¡ configurado para receber. ' +
-        'Marque "Recebe por Email" ou "Recebe por WhatsApp" nos destinatÃ¡rios selecionados.', 
+        'Nenhum destinatário está configurado para receber. ' +
+        'Marque "Recebe por Email" ou "Recebe por WhatsApp" nos destinatários selecionados.', 
         400
       )
     }
     
     if (destinatariosComEmail.length > 0 && !smtpConfigurado) {
-      console.warn(`âÅ¡ ï¸� AVISO: HÃ¡ destinatÃ¡rios configurados para email, mas SMTP nÃ£o estÃ¡ configurado!`)
+      console.warn(`⚠️ AVISO: Há destinatários configurados para email, mas SMTP não está configurado!`)
     }
     
     if (destinatariosComWhatsApp.length > 0 && !whatsappConfigurado) {
-      console.warn(`âÅ¡ ï¸� AVISO: HÃ¡ destinatÃ¡rios configurados para WhatsApp, mas WhatsApp nÃ£o estÃ¡ configurado!`)
+      console.warn(`⚠️ AVISO: Há destinatários configurados para WhatsApp, mas WhatsApp não está configurado!`)
     }
 
-    // Gerar relatÃ³rios em Excel para email
+    // Gerar relatórios em Excel para email
     const emailReports = []
-    console.log(`ðÅ¸â€œÅ  RelatÃ³rios selecionados: ${relatorios.join(', ')}`)
+    console.log(`📊 Relatórios selecionados: ${relatorios.join(', ')}`)
     const relatoriosCompletos = [
       'nf_entrada_saida',
       'nascimentos',
@@ -3981,48 +3981,48 @@ export default async function handler(req, res) {
     ]
 
     // Gerar resumo para retorno (frontend)
-    console.log(`\nðÅ¸â€œ� Gerando resumo para WhatsApp...`)
+    console.log(`\n📝 Gerando resumo para WhatsApp...`)
     let generalSummary
     try {
       generalSummary = await generateWhatsAppSummary(period, relatorios)
       if (!generalSummary || generalSummary.trim().length === 0) {
-        console.warn('âÅ¡ ï¸� Resumo vazio, gerando resumo bÃ¡sico...')
-        generalSummary = `ðÅ¸â€œ§ RelatÃ³rios completos enviados por email.\n\n` +
-                        `ðÅ¸â€œÅ  *RESUMO DE RELATÃâ€œRIOS BEEF-SYNC*\n` +
-                        `ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��\n` +
-                        `ðÅ¸â€œâ€¦ *PerÃ­odo:* ${formatBR(period.startDate)} a ${formatBR(period.endDate)}\n\n` +
-                        `RelatÃ³rios selecionados:\n` +
-                        relatorios.map(r => `ââ‚¬¢ ${r}`).join('\n') +
-                        `\n_Beef-Sync - Sistema de GestÃ£o PecuÃ¡ria_\n` +
-                        `ðÅ¸â€œâ€¦ Gerado em: ${new Date().toLocaleString('pt-BR')}`
+        console.warn('⚠️ Resumo vazio, gerando resumo básico...')
+        generalSummary = `📧 Relatórios completos enviados por email.\n\n` +
+                        `📊 *RESUMO DE RELATÓRIOS BEEF-SYNC*\n` +
+                        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                        `📅 *Período:* ${formatBR(period.startDate)} a ${formatBR(period.endDate)}\n\n` +
+                        `Relatórios selecionados:\n` +
+                        relatorios.map(r => `• ${r}`).join('\n') +
+                        `\n_Beef-Sync - Sistema de Gestão Pecuária_\n` +
+                        `📅 Gerado em: ${new Date().toLocaleString('pt-BR')}`
       }
-      console.log(`âÅ“â€¦ Resumo gerado (${generalSummary.length} caracteres)`)
-      console.log(`ðÅ¸â€œ� Preview do resumo:\n${generalSummary.substring(0, 200)}...`)
+      console.log(`✅ Resumo gerado (${generalSummary.length} caracteres)`)
+      console.log(`📝 Preview do resumo:\n${generalSummary.substring(0, 200)}...`)
     } catch (error) {
-      console.error('â�Å’ Erro ao gerar resumo:', error)
-      generalSummary = `ðÅ¸â€œ§ RelatÃ³rios completos enviados por email.\n\n` +
-                      `ðÅ¸â€œÅ  *RESUMO DE RELATÃâ€œRIOS BEEF-SYNC*\n` +
-                      `ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��\n` +
-                      `ðÅ¸â€œâ€¦ *PerÃ­odo:* ${formatBR(period.startDate)} a ${formatBR(period.endDate)}\n\n` +
-                      `RelatÃ³rios selecionados:\n` +
-                      relatorios.map(r => `ââ‚¬¢ ${r}`).join('\n') +
-                      `\n\nâÅ¡ ï¸� Erro ao gerar resumo detalhado.\n` +
-                      `\n_Beef-Sync - Sistema de GestÃ£o PecuÃ¡ria_\n` +
-                      `ðÅ¸â€œâ€¦ Gerado em: ${new Date().toLocaleString('pt-BR')}`
+      console.error('❌ Erro ao gerar resumo:', error)
+      generalSummary = `📧 Relatórios completos enviados por email.\n\n` +
+                      `📊 *RESUMO DE RELATÓRIOS BEEF-SYNC*\n` +
+                      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                      `📅 *Período:* ${formatBR(period.startDate)} a ${formatBR(period.endDate)}\n\n` +
+                      `Relatórios selecionados:\n` +
+                      relatorios.map(r => `• ${r}`).join('\n') +
+                      `\n\n⚠️ Erro ao gerar resumo detalhado.\n` +
+                      `\n_Beef-Sync - Sistema de Gestão Pecuária_\n` +
+                      `📅 Gerado em: ${new Date().toLocaleString('pt-BR')}`
     }
 
-    // Gerar grÃ¡fico resumido para WhatsApp
-    console.log(`\nðÅ¸â€œÅ  Gerando grÃ¡fico resumido para WhatsApp...`)
-    console.log(`   RelatÃ³rios para grÃ¡fico:`, relatorios)
+    // Gerar gráfico resumido para WhatsApp
+    console.log(`\n📊 Gerando gráfico resumido para WhatsApp...`)
+    console.log(`   Relatórios para gráfico:`, relatorios)
     const summaryChartBuffer = await generateSummaryChart(period, relatorios)
     if (summaryChartBuffer) {
-      console.log(`âÅ“â€¦ GrÃ¡fico gerado com sucesso (${summaryChartBuffer.length} bytes)`)
+      console.log(`✅ Gráfico gerado com sucesso (${summaryChartBuffer.length} bytes)`)
     } else {
-      console.warn(`âÅ¡ ï¸� Nenhum grÃ¡fico foi gerado`)
-      console.warn(`   PossÃ­veis causas:`)
-      console.warn(`   - Nenhum dado encontrado no perÃ­odo selecionado`)
-      console.warn(`   - RelatÃ³rios selecionados nÃ£o tÃªm dados para grÃ¡fico`)
-      console.warn(`   - Erro na geraÃ§Ã£o do grÃ¡fico`)
+      console.warn(`⚠️ Nenhum gráfico foi gerado`)
+      console.warn(`   Possíveis causas:`)
+      console.warn(`   - Nenhum dado encontrado no período selecionado`)
+      console.warn(`   - Relatórios selecionados não têm dados para gráfico`)
+      console.warn(`   - Erro na geração do gráfico`)
     }
 
     for (const relatorio of relatorios) {
@@ -4044,7 +4044,7 @@ export default async function handler(req, res) {
                 body: JSON.stringify({ period })
               })
               if (!nascRes.ok) {
-                throw new Error(`Erro ao gerar relatÃ³rio de nascimentos: ${nascRes.status}`)
+                throw new Error(`Erro ao gerar relatório de nascimentos: ${nascRes.status}`)
               }
               buffer = Buffer.from(await nascRes.arrayBuffer())
               filename = `nascimentos-${formatDateBR(period.startDate)}-${formatDateBR(period.endDate)}.xlsx`
@@ -4052,7 +4052,7 @@ export default async function handler(req, res) {
             case 'previsoes_parto':
               const previsoesRes = await fetch(`${baseUrl}/api/previsoes-parto`)
               if (!previsoesRes.ok) {
-                throw new Error(`Erro ao gerar relatÃ³rio de previsÃµes de parto: ${previsoesRes.status}`)
+                throw new Error(`Erro ao gerar relatório de previsões de parto: ${previsoesRes.status}`)
               }
               const previsoesData = await previsoesRes.json()
               buffer = await generatePrevisoesPartoReport(previsoesData.data || previsoesData)
@@ -4065,7 +4065,7 @@ export default async function handler(req, res) {
                 body: JSON.stringify({ period })
               })
               if (!mortesRes.ok) {
-                throw new Error(`Erro ao gerar relatÃ³rio de mortes: ${mortesRes.status}`)
+                throw new Error(`Erro ao gerar relatório de mortes: ${mortesRes.status}`)
               }
               buffer = Buffer.from(await mortesRes.arrayBuffer())
               filename = `mortes-${formatDateBR(period.startDate)}-${formatDateBR(period.endDate)}.xlsx`
@@ -4147,7 +4147,7 @@ export default async function handler(req, res) {
               filename = `agenda-atividades-brucelose-dgt-${new Date().toISOString().split('T')[0]}.xlsx`
               break
             default:
-              console.warn(`RelatÃ³rio nÃ£o implementado ou nÃ£o suporta envio completo: ${relatorio}`)
+              console.warn(`Relatório não implementado ou não suporta envio completo: ${relatorio}`)
           }
 
           if (buffer && filename) {
@@ -4158,19 +4158,19 @@ export default async function handler(req, res) {
             })
           }
         } catch (error) {
-          console.error(`Erro ao gerar relatÃ³rio ${relatorio}:`, error)
+          console.error(`Erro ao gerar relatório ${relatorio}:`, error)
         }
       }
     }
 
     // Enviar por email
-    console.log(`\nðÅ¸â€œ§ ========== INICIANDO ENVIO DE EMAILS ==========`)
-    console.log(`ðÅ¸â€œ§ Total de destinatÃ¡rios para processar: ${destinatarios.length}`)
-    console.log(`ðÅ¸â€œ§ RelatÃ³rios disponÃ­veis para envio: ${emailReports.length}`)
+    console.log(`\n📧 ========== INICIANDO ENVIO DE EMAILS ==========`)
+    console.log(`📧 Total de destinatários para processar: ${destinatarios.length}`)
+    console.log(`📧 Relatórios disponíveis para envio: ${emailReports.length}`)
     
     if (!smtpConfigurado) {
-      console.error(`\nâ�Å’ ERRO CRÃ�TICO: SMTP nÃ£o estÃ¡ configurado!`)
-      console.error(`   Configure as seguintes variÃ¡veis no arquivo .env:`)
+      console.error(`\n❌ ERRO CRÍTICO: SMTP não está configurado!`)
+      console.error(`   Configure as seguintes variáveis no arquivo .env:`)
       console.error(`   - SMTP_HOST (ex: smtp.gmail.com)`)
       console.error(`   - SMTP_USER (seu email)`)
       console.error(`   - SMTP_PASS (sua senha ou senha de app)`)
@@ -4179,36 +4179,36 @@ export default async function handler(req, res) {
     }
     
     if (emailReports.length === 0) {
-      console.warn(`âÅ¡ ï¸� AVISO: Nenhum relatÃ³rio completo foi gerado para envio por email!`)
-      console.warn(`   RelatÃ³rios selecionados: ${relatorios.join(', ')}`)
-      console.warn(`   RelatÃ³rios completos disponÃ­veis: ${relatoriosCompletos.join(', ')}`)
+      console.warn(`⚠️ AVISO: Nenhum relatório completo foi gerado para envio por email!`)
+      console.warn(`   Relatórios selecionados: ${relatorios.join(', ')}`)
+      console.warn(`   Relatórios completos disponíveis: ${relatoriosCompletos.join(', ')}`)
     }
     
     for (const destinatario of destinatarios) {
-      console.log(`\nðÅ¸â€œ§ Processando destinatÃ¡rio: ${destinatario.nome} (${destinatario.email})`)
+      console.log(`\n📧 Processando destinatário: ${destinatario.nome} (${destinatario.email})`)
       console.log(`   - recebe_email: ${destinatario.recebe_email}`)
       console.log(`   - recebe_whatsapp: ${destinatario.recebe_whatsapp}`)
-      console.log(`   - whatsapp: ${destinatario.whatsapp || 'nÃ£o informado'}`)
-      console.log(`   - emailReports disponÃ­veis: ${emailReports.length}`)
+      console.log(`   - whatsapp: ${destinatario.whatsapp || 'não informado'}`)
+      console.log(`   - emailReports disponíveis: ${emailReports.length}`)
       
       if (destinatario.recebe_email) {
         if (!smtpConfigurado) {
-          console.error(`â�Å’ NÃ£o Ã© possÃ­vel enviar email: SMTP nÃ£o configurado`)
+          console.error(`❌ Não é possível enviar email: SMTP não configurado`)
           results.push({
             destinatario: destinatario.nome,
-            email: 'erro: SMTP nÃ£o configurado. Configure SMTP_HOST, SMTP_USER e SMTP_PASS no arquivo .env',
-            whatsapp: 'nÃ£o enviado'
+            email: 'erro: SMTP não configurado. Configure SMTP_HOST, SMTP_USER e SMTP_PASS no arquivo .env',
+            whatsapp: 'não enviado'
           })
         } else if (emailReports.length === 0) {
-          console.warn(`âÅ¡ ï¸� NÃ£o Ã© possÃ­vel enviar email: Nenhum relatÃ³rio foi gerado`)
+          console.warn(`⚠️ Não é possível enviar email: Nenhum relatório foi gerado`)
           results.push({
             destinatario: destinatario.nome,
-            email: 'erro: Nenhum relatÃ³rio completo foi gerado para envio',
-            whatsapp: 'nÃ£o enviado'
+            email: 'erro: Nenhum relatório completo foi gerado para envio',
+            whatsapp: 'não enviado'
           })
         } else {
           try {
-            console.log(`ðÅ¸â€œ§ Tentando enviar email para ${destinatario.email}...`)
+            console.log(`📧 Tentando enviar email para ${destinatario.email}...`)
             const emailContent = generateEmailContent(
               destinatario,
               period,
@@ -4217,7 +4217,7 @@ export default async function handler(req, res) {
 
             await sendEmail(
               destinatario,
-              `RelatÃ³rios Beef-Sync - ${period.startDate} a ${period.endDate}`,
+              `Relatórios Beef-Sync - ${period.startDate} a ${period.endDate}`,
               emailContent,
               emailReports.map(r => ({
                 filename: r.filename,
@@ -4226,96 +4226,96 @@ export default async function handler(req, res) {
               }))
             )
 
-            console.log(`âÅ“â€¦ Email enviado com sucesso para ${destinatario.email}`)
+            console.log(`✅ Email enviado com sucesso para ${destinatario.email}`)
             results.push({
               destinatario: destinatario.nome,
               email: 'enviado',
-              whatsapp: 'nÃ£o enviado'
+              whatsapp: 'não enviado'
             })
           } catch (error) {
-            console.error(`â�Å’ Erro ao enviar email para ${destinatario.email}:`, error)
+            console.error(`❌ Erro ao enviar email para ${destinatario.email}:`, error)
             console.error(`   Detalhes do erro:`, error.message)
             results.push({
               destinatario: destinatario.nome,
               email: `erro: ${error.message}`,
-              whatsapp: 'nÃ£o enviado'
+              whatsapp: 'não enviado'
             })
           }
         }
       } else {
-        console.log(`âÅ¡ ï¸� Email nÃ£o enviado para ${destinatario.nome}: recebe_email estÃ¡ desabilitado`)
+        console.log(`⚠️ Email não enviado para ${destinatario.nome}: recebe_email está desabilitado`)
         if (!results.find(r => r.destinatario === destinatario.nome)) {
           results.push({
             destinatario: destinatario.nome,
-            email: 'nÃ£o enviado (recebe_email desabilitado)',
-            whatsapp: 'nÃ£o enviado'
+            email: 'não enviado (recebe_email desabilitado)',
+            whatsapp: 'não enviado'
           })
         }
       }
 
       // Enviar resumo + arquivos Excel por WhatsApp (igual ao email)
       if (destinatario.recebe_whatsapp && destinatario.whatsapp) {
-        console.log(`\nðÅ¸â€™¬ Processando WhatsApp para: ${destinatario.nome} (${destinatario.whatsapp})`)
+        console.log(`\n💬 Processando WhatsApp para: ${destinatario.nome} (${destinatario.whatsapp})`)
         try {
           const summary = await generateWhatsAppSummary(period, relatorios)
           const recipient = { whatsapp: destinatario.whatsapp, name: destinatario.nome }
           let whatsappStatus = 'enviado'
           
           if (whatsappConfigurado) {
-            // 1. Enviar resumo (grÃ¡fico se Evolution API, senÃ£o sÃ³ texto)
+            // 1. Enviar resumo (gráfico se Evolution API, senão só texto)
             if (whatsappMediaDisponivel && summaryChartBuffer) {
-              console.log(`ðÅ¸â€œÅ  Enviando grÃ¡fico resumo para ${destinatario.whatsapp}...`)
+              console.log(`📊 Enviando gráfico resumo para ${destinatario.whatsapp}...`)
               const chartFilename = `resumo-relatorios-${formatDateBR(period.startDate)}-${formatDateBR(period.endDate)}.png`
               await sendWhatsAppMedia(recipient, summaryChartBuffer, chartFilename, summary)
-              console.log(`âÅ“â€¦ GrÃ¡fico enviado`)
+              console.log(`✅ Gráfico enviado`)
             } else {
-              console.log(`ðÅ¸â€™¬ Enviando resumo texto para ${destinatario.whatsapp}...`)
+              console.log(`💬 Enviando resumo texto para ${destinatario.whatsapp}...`)
               await sendWhatsApp(recipient, summary)
             }
             
-            // 2. Enviar arquivos Excel por WhatsApp (igual ao email) - sÃ³ com Evolution API
+            // 2. Enviar arquivos Excel por WhatsApp (igual ao email) - só com Evolution API
             if (whatsappMediaDisponivel && emailReports.length > 0) {
-              console.log(`ðÅ¸â€œÅ½ Enviando ${emailReports.length} arquivo(s) Excel por WhatsApp...`)
+              console.log(`📎 Enviando ${emailReports.length} arquivo(s) Excel por WhatsApp...`)
               for (const report of emailReports) {
                 try {
-                  const caption = `ðÅ¸â€œÅ  ${report.filename}\nPerÃ­odo: ${formatDateBR(period.startDate)} a ${formatDateBR(period.endDate)}\n\nBeef-Sync - RelatÃ³rios`
+                  const caption = `📊 ${report.filename}\nPeríodo: ${formatDateBR(period.startDate)} a ${formatDateBR(period.endDate)}\n\nBeef-Sync - Relatórios`
                   await sendWhatsAppMedia(recipient, report.content, report.filename, caption)
-                  console.log(`   âÅ“â€¦ ${report.filename}`)
+                  console.log(`   ✅ ${report.filename}`)
                 } catch (fileErr) {
-                  console.error(`   â�Å’ Erro ao enviar ${report.filename}:`, fileErr.message)
+                  console.error(`   ❌ Erro ao enviar ${report.filename}:`, fileErr.message)
                   whatsappStatus = 'enviado (alguns arquivos com erro)'
                 }
               }
             }
           } else {
-            console.log(`ðÅ¸â€™¬ Enviando WhatsApp texto (API nÃ£o configurada - use Evolution para arquivos) para ${destinatario.whatsapp}...`)
+            console.log(`💬 Enviando WhatsApp texto (API não configurada - use Evolution para arquivos) para ${destinatario.whatsapp}...`)
             await sendWhatsApp(recipient, summary)
-            whatsappStatus = 'enviado (sem grÃ¡fico)'
+            whatsappStatus = 'enviado (sem gráfico)'
           }
           
           const existingResult = results.find(r => r.destinatario === destinatario.nome)
           if (existingResult) existingResult.whatsapp = whatsappStatus
-          else results.push({ destinatario: destinatario.nome, email: 'nÃ£o enviado', whatsapp: whatsappStatus })
+          else results.push({ destinatario: destinatario.nome, email: 'não enviado', whatsapp: whatsappStatus })
         } catch (error) {
-          console.error(`â�Å’ Erro ao enviar WhatsApp para ${destinatario.whatsapp}:`, error)
+          console.error(`❌ Erro ao enviar WhatsApp para ${destinatario.whatsapp}:`, error)
           const existingResult = results.find(r => r.destinatario === destinatario.nome)
           const msg = `erro: ${error.message}`
           if (existingResult) existingResult.whatsapp = msg
-          else results.push({ destinatario: destinatario.nome, email: 'nÃ£o enviado', whatsapp: msg })
+          else results.push({ destinatario: destinatario.nome, email: 'não enviado', whatsapp: msg })
         }
       } else {
-        console.log(`âÅ¡ ï¸� WhatsApp nÃ£o enviado para ${destinatario.nome}:`)
+        console.log(`⚠️ WhatsApp não enviado para ${destinatario.nome}:`)
         if (!destinatario.recebe_whatsapp) {
-          console.log(`   - recebe_whatsapp estÃ¡ desabilitado`)
+          console.log(`   - recebe_whatsapp está desabilitado`)
         }
         if (!destinatario.whatsapp) {
-          console.log(`   - WhatsApp nÃ£o informado`)
+          console.log(`   - WhatsApp não informado`)
         }
         if (!results.find(r => r.destinatario === destinatario.nome)) {
           results.push({
             destinatario: destinatario.nome,
-            email: 'nÃ£o enviado',
-            whatsapp: 'nÃ£o enviado (recebe_whatsapp desabilitado ou WhatsApp nÃ£o informado)'
+            email: 'não enviado',
+            whatsapp: 'não enviado (recebe_whatsapp desabilitado ou WhatsApp não informado)'
           })
         }
       }
@@ -4323,25 +4323,25 @@ export default async function handler(req, res) {
 
     // Verificar se houve algum envio bem-sucedido
     const emailsEnviados = results.filter(r => r.email === 'enviado').length
-    const whatsappsEnviados = results.filter(r => r.whatsapp === 'enviado' || r.whatsapp === 'enviado (sem grÃ¡fico)').length
+    const whatsappsEnviados = results.filter(r => r.whatsapp === 'enviado' || r.whatsapp === 'enviado (sem gráfico)').length
     const emailsComErro = results.filter(r => r.email && r.email.startsWith('erro')).length
     const whatsappsComErro = results.filter(r => r.whatsapp && r.whatsapp.startsWith('erro')).length
     
-    console.log(`\nðÅ¸â€œÅ  ========== RESUMO FINAL DO ENVIO ==========`)
-    console.log(`   âÅ“â€¦ Emails enviados: ${emailsEnviados}/${destinatarios.length}`)
-    console.log(`   âÅ“â€¦ WhatsApps enviados: ${whatsappsEnviados}/${destinatarios.length}`)
-    console.log(`   â�Å’ Emails com erro: ${emailsComErro}`)
-    console.log(`   â�Å’ WhatsApps com erro: ${whatsappsComErro}`)
-    console.log(`   ðÅ¸â€œâ€¹ Total de resultados: ${results.length}`)
+    console.log(`\n📊 ========== RESUMO FINAL DO ENVIO ==========`)
+    console.log(`   ✅ Emails enviados: ${emailsEnviados}/${destinatarios.length}`)
+    console.log(`   ✅ WhatsApps enviados: ${whatsappsEnviados}/${destinatarios.length}`)
+    console.log(`   ❌ Emails com erro: ${emailsComErro}`)
+    console.log(`   ❌ WhatsApps com erro: ${whatsappsComErro}`)
+    console.log(`   📋 Total de resultados: ${results.length}`)
     
-    // Atualizar Ãºltimo envio e relatÃ³rios enviados para destinatÃ¡rios com agendamento ativo
+    // Atualizar último envio e relatórios enviados para destinatários com agendamento ativo
     for (const destinatario of destinatarios) {
       if (destinatario.agendamento_ativo) {
         const emailEnviado = results.find(r => r.destinatario === destinatario.nome)?.email === 'enviado'
         const whatsappEnviado = results.find(r => r.destinatario === destinatario.nome)?.whatsapp === 'enviado' || 
-                                 results.find(r => r.destinatario === destinatario.nome)?.whatsapp === 'enviado (sem grÃ¡fico)'
+                                 results.find(r => r.destinatario === destinatario.nome)?.whatsapp === 'enviado (sem gráfico)'
         
-        // SÃ³ atualizar se pelo menos um envio foi bem-sucedido
+        // Só atualizar se pelo menos um envio foi bem-sucedido
         if (emailEnviado || whatsappEnviado) {
           const agora = new Date()
           const proximoEnvio = new Date(agora)
@@ -4361,38 +4361,38 @@ export default async function handler(req, res) {
             destinatario.id
           ])
           
-          console.log(`âÅ“â€¦ Agendamento atualizado para ${destinatario.nome}: prÃ³ximo envio em ${destinatario.intervalo_dias} dias`)
+          console.log(`✅ Agendamento atualizado para ${destinatario.nome}: próximo envio em ${destinatario.intervalo_dias} dias`)
         }
       }
     }
     
     if (emailsEnviados === 0 && whatsappsEnviados === 0) {
-      console.error(`\nâ�Å’ ========== NENHUM ENVIO REALIZADO ==========`)
-      console.error(`   PossÃ­veis causas:`)
+      console.error(`\n❌ ========== NENHUM ENVIO REALIZADO ==========`)
+      console.error(`   Possíveis causas:`)
       if (!smtpConfigurado && destinatariosComEmail.length > 0) {
-        console.error(`   - SMTP nÃ£o configurado (mas hÃ¡ destinatÃ¡rios para email)`)
+        console.error(`   - SMTP não configurado (mas há destinatários para email)`)
       }
       if (!whatsappConfigurado && destinatariosComWhatsApp.length > 0) {
-        console.error(`   - WhatsApp nÃ£o configurado (mas hÃ¡ destinatÃ¡rios para WhatsApp)`)
+        console.error(`   - WhatsApp não configurado (mas há destinatários para WhatsApp)`)
       }
       if (emailReports.length === 0) {
-        console.error(`   - Nenhum relatÃ³rio completo foi gerado`)
+        console.error(`   - Nenhum relatório completo foi gerado`)
       }
       console.error(`   ============================================\n`)
     } else {
-      console.log(`\nâÅ“â€¦ ========== ENVIO CONCLUÃ�DO COM SUCESSO ==========\n`)
+      console.log(`\n✅ ========== ENVIO CONCLUÍDO COM SUCESSO ==========\n`)
     }
     
-    let message = 'RelatÃ³rios processados'
+    let message = 'Relatórios processados'
     if (emailsEnviados > 0 || whatsappsEnviados > 0) {
-      message = `RelatÃ³rios enviados: ${emailsEnviados} email(s), ${whatsappsEnviados} WhatsApp(s)`
+      message = `Relatórios enviados: ${emailsEnviados} email(s), ${whatsappsEnviados} WhatsApp(s)`
     } else {
-      message = 'Nenhum relatÃ³rio foi enviado. Verifique as configuraÃ§Ãµes e os destinatÃ¡rios selecionados.'
+      message = 'Nenhum relatório foi enviado. Verifique as configurações e os destinatários selecionados.'
     }
 
-    console.log(`\nðÅ¸â€œ¤ Retornando resposta ao frontend:`)
-    console.log(`   - Resumo gerado: ${generalSummary ? 'Sim (' + generalSummary.length + ' caracteres)' : 'NÃ£o'}`)
-    console.log(`   - GrÃ¡fico gerado: ${summaryChartBuffer ? 'Sim (' + summaryChartBuffer.length + ' bytes)' : 'NÃ£o'}`)
+    console.log(`\n📤 Retornando resposta ao frontend:`)
+    console.log(`   - Resumo gerado: ${generalSummary ? 'Sim (' + generalSummary.length + ' caracteres)' : 'Não'}`)
+    console.log(`   - Gráfico gerado: ${summaryChartBuffer ? 'Sim (' + summaryChartBuffer.length + ' bytes)' : 'Não'}`)
     console.log(`   - Emails enviados: ${emailsEnviados}`)
     console.log(`   - WhatsApps enviados: ${whatsappsEnviados}`)
     
@@ -4400,7 +4400,7 @@ export default async function handler(req, res) {
       success: true,
       message,
       results,
-      summary: generalSummary || 'Nenhum resumo disponÃ­vel para os relatÃ³rios selecionados.',
+      summary: generalSummary || 'Nenhum resumo disponível para os relatórios selecionados.',
       chartImage: summaryChartBuffer ? `data:image/png;base64,${summaryChartBuffer.toString('base64')}` : null,
       stats: {
         totalDestinatarios: destinatarios.length,
@@ -4411,7 +4411,7 @@ export default async function handler(req, res) {
       }
     })
   } catch (error) {
-    console.error('Erro ao enviar relatÃ³rios:', error)
-    return sendError(res, `Erro ao enviar relatÃ³rios: ${error.message}`, 500)
+    console.error('Erro ao enviar relatórios:', error)
+    return sendError(res, `Erro ao enviar relatórios: ${error.message}`, 500)
   }
 }

@@ -23,7 +23,7 @@ export default function QuickProtocolEditor() {
         setProtocolos(JSON.parse(customProtocolos))
         setMedicamentos(JSON.parse(customMedicamentos))
       } else {
-        // Carregar dados padrÃ£o do costManager
+        // Carregar dados padrão do costManager
         const { default: costManager } = await import('../services/costManager')
         setProtocolos(costManager.protocolos)
         setMedicamentos(costManager.medicamentos)
@@ -66,40 +66,40 @@ export default function QuickProtocolEditor() {
 
   return (
     <>
-      {/* BotÃ£o Flutuante */}
+      {/* Botão Flutuante */}
       <button
         onClick={() => setIsVisible(!isVisible)}
         className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg z-40 transition-all duration-300 transform hover:scale-110"
-        title="Editor RÃ¡pido de Protocolos"
+        title="Editor Rápido de Protocolos"
       >
         <PencilIcon className="h-6 w-6" />
       </button>
 
-      {/* Modal de EdiÃ§Ã£o RÃ¡pida */}
+      {/* Modal de Edição Rápida */}
       {isVisible && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
             {/* Header */}
             <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
               <div className="flex items-center justify-between">
-                <h2 className="text-3xl font-bold">âÅ¡¡ Editor RÃ¡pido de Protocolos</h2>
+                <h2 className="text-3xl font-bold">⚡ Editor Rápido de Protocolos</h2>
                 <button
                   onClick={() => setIsVisible(false)}
                   className="bg-white/20 hover:bg-white/30 text-white rounded-full w-10 h-10 flex items-center justify-center text-xl font-bold transition-colors"
                 >
-                  Ãâ€”
+                  ×
                 </button>
               </div>
-              <p className="text-blue-100 mt-3 text-lg">ðÅ¸â€“±ï¸� Clique em qualquer medicamento para editar nome, quantidade e preÃ§o</p>
+              <p className="text-blue-100 mt-3 text-lg">🖱️ Clique em qualquer medicamento para editar nome, quantidade e preço</p>
             </div>
 
-            {/* ConteÃºdo */}
+            {/* Conteúdo */}
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Protocolos Machos */}
                 <div>
                   <h3 className="text-xl font-bold text-blue-600 dark:text-blue-400 mb-4 flex items-center">
-                    ðÅ¸�â€š Protocolos para Machos
+                    🐂 Protocolos para Machos
                   </h3>
                   
                   <div className="space-y-4">
@@ -107,7 +107,7 @@ export default function QuickProtocolEditor() {
                       <div key={era} className="border-2 border-blue-300 dark:border-blue-600 rounded-xl p-5 bg-blue-50 dark:bg-blue-900/30 shadow-md">
                         <div className="flex items-center justify-between mb-4">
                           <h4 className="font-bold text-blue-900 dark:text-blue-100 text-lg">
-                            ðÅ¸�â€š {protocolo.nome}
+                            🐂 {protocolo.nome}
                           </h4>
                           <button
                             onClick={() => addMedicineToProtocol('machos', era)}
@@ -135,10 +135,10 @@ export default function QuickProtocolEditor() {
                   </div>
                 </div>
 
-                {/* Protocolos FÃªmeas */}
+                {/* Protocolos Fêmeas */}
                 <div>
                   <h3 className="text-xl font-bold text-pink-600 dark:text-pink-400 mb-4 flex items-center">
-                    ðÅ¸�â€ž Protocolos para FÃªmeas
+                    🐄 Protocolos para Fêmeas
                   </h3>
                   
                   <div className="space-y-4">
@@ -146,7 +146,7 @@ export default function QuickProtocolEditor() {
                       <div key={era} className="border-2 border-pink-300 dark:border-pink-600 rounded-xl p-5 bg-pink-50 dark:bg-pink-900/30 shadow-md">
                         <div className="flex items-center justify-between mb-4">
                           <h4 className="font-bold text-pink-900 dark:text-pink-100 text-lg">
-                            ðÅ¸�â€ž {protocolo.nome}
+                            🐄 {protocolo.nome}
                           </h4>
                           <button
                             onClick={() => addMedicineToProtocol('femeas', era)}
@@ -179,17 +179,17 @@ export default function QuickProtocolEditor() {
             {/* Footer */}
             <div className="bg-gray-100 dark:bg-gray-800 p-6 flex items-center justify-between border-t-2 border-gray-200 dark:border-gray-600">
               <div className="text-base text-gray-800 dark:text-gray-200 font-medium">
-                ðÅ¸â€™¡ Dica: Clique nos botÃµes azuis/rosa para editar os medicamentos
+                💡 Dica: Clique nos botões azuis/rosa para editar os medicamentos
               </div>
               <button
                 onClick={() => {
                   setIsVisible(false)
-                  alert('âÅ“â€¦ AlteraÃ§Ãµes salvas automaticamente!')
+                  alert('✅ Alterações salvas automaticamente!')
                 }}
                 className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg flex items-center space-x-2 font-semibold text-lg shadow-lg transition-colors"
               >
                 <SaveIcon className="h-5 w-5" />
-                <span>âÅ“â€¦ Concluir</span>
+                <span>✅ Concluir</span>
               </button>
             </div>
           </div>

@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 
 /**
- * Script de verificaÃ§Ã£o de saÃºde do sistema Beef Sync
- * Verifica APIs, banco de dados, dependÃªncias e configuraÃ§Ãµes
+ * Script de verificação de saúde do sistema Beef Sync
+ * Verifica APIs, banco de dados, dependências e configurações
  */
 
 const fetch = require('node-fetch');
 const fs = require('fs');
 const path = require('path');
 
-// Carregar variÃ¡veis de ambiente
+// Carregar variáveis de ambiente
 require('dotenv').config();
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3020';
@@ -35,14 +35,14 @@ async function checkAPI(endpoint, name) {
     if (response.ok) {
       const data = await response.json();
       const count = Array.isArray(data) ? data.length : (data.data ? data.data.length : 'N/A');
-      log(`âÅ“â€¦ ${name}: OK (${count} registros)`, 'green');
+      log(`✅ ${name}: OK (${count} registros)`, 'green');
       return true;
     } else {
-      log(`â�Å’ ${name}: Status ${response.status}`, 'red');
+      log(`❌ ${name}: Status ${response.status}`, 'red');
       return false;
     }
   } catch (error) {
-    log(`â�Å’ ${name}: ${error.message}`, 'red');
+    log(`❌ ${name}: ${error.message}`, 'red');
     return false;
   }
 }
@@ -53,17 +53,17 @@ async function checkHealthEndpoint() {
     const data = await response.json();
     
     if (data.data) {
-      log(`âÅ“â€¦ Sistema: ${data.data.status}`, 'green');
-      log(`âÅ“â€¦ Banco: ${data.data.database.connected ? 'Conectado' : 'Desconectado'}`, 
+      log(`✅ Sistema: ${data.data.status}`, 'green');
+      log(`✅ Banco: ${data.data.database.connected ? 'Conectado' : 'Desconectado'}`, 
           data.data.database.connected ? 'green' : 'red');
-      log(`âÅ“â€¦ VersÃ£o: ${data.data.version}`, 'blue');
-      log(`âÅ“â€¦ Uptime: ${Math.round(data.data.uptime)}s`, 'blue');
-      log(`âÅ“â€¦ Tempo Resposta: ${data.data.responseTime}ms`, 'blue');
+      log(`✅ Versão: ${data.data.version}`, 'blue');
+      log(`✅ Uptime: ${Math.round(data.data.uptime)}s`, 'blue');
+      log(`✅ Tempo Resposta: ${data.data.responseTime}ms`, 'blue');
       return data.data.database.connected;
     }
     return false;
   } catch (error) {
-    log(`â�Å’ Health Check: ${error.message}`, 'red');
+    log(`❌ Health Check: ${error.message}`, 'red');
     return false;
   }
 }
@@ -81,9 +81,9 @@ function checkFiles() {
   
   for (const file of criticalFiles) {
     if (fs.existsSync(file)) {
-      log(`âÅ“â€¦ ${file}: Existe`, 'green');
+      log(`✅ ${file}: Existe`, 'green');
     } else {
-      log(`â�Å’ ${file}: NÃ£o encontrado`, 'red');
+      log(`❌ ${file}: Não encontrado`, 'red');
       allFilesExist = false;
     }
   }
@@ -104,9 +104,9 @@ function checkEnvironment() {
   
   for (const envVar of requiredEnvVars) {
     if (process.env[envVar]) {
-      log(`âÅ“â€¦ ${envVar}: Configurado`, 'green');
+      log(`✅ ${envVar}: Configurado`, 'green');
     } else {
-      log(`â�Å’ ${envVar}: NÃ£o configurado`, 'red');
+      log(`❌ ${envVar}: Não configurado`, 'red');
       allVarsSet = false;
     }
   }
@@ -124,55 +124,55 @@ function checkDuplicateAPIs() {
   
   for (const dup of duplicates) {
     if (fs.existsSync(dup.file1) && fs.existsSync(dup.file2)) {
-      log(`âÅ¡ ï¸�  Duplicata encontrada: ${dup.file1} e ${dup.file2}`, 'yellow');
+      log(`⚠️  Duplicata encontrada: ${dup.file1} e ${dup.file2}`, 'yellow');
       hasDuplicates = true;
     }
   }
   
   if (!hasDuplicates) {
-    log('âÅ“â€¦ Nenhuma duplicata de API encontrada', 'green');
+    log('✅ Nenhuma duplicata de API encontrada', 'green');
   }
   
   return !hasDuplicates;
 }
 
 async function main() {
-  log('ðÅ¸â€�� VERIFICAÃâ€¡ÃÆ’O DE SAÃÅ¡DE DO SISTEMA BEEF SYNC', 'bold');
+  log('🔍 VERIFICAÇÃO DE SAÚDE DO SISTEMA BEEF SYNC', 'bold');
   log('=' .repeat(50), 'blue');
   
   let overallHealth = true;
   
-  // 1. Verificar arquivos crÃ­ticos
-  log('\n1. ðÅ¸â€œ� ARQUIVOS CRÃ�TICOS', 'bold');
+  // 1. Verificar arquivos críticos
+  log('\n1. 📁 ARQUIVOS CRÍTICOS', 'bold');
   const filesOK = checkFiles();
   overallHealth = overallHealth && filesOK;
   
-  // 2. Verificar variÃ¡veis de ambiente
-  log('\n2. ðÅ¸â€�§ VARIÃ�VEIS DE AMBIENTE', 'bold');
+  // 2. Verificar variáveis de ambiente
+  log('\n2. 🔧 VARIÁVEIS DE AMBIENTE', 'bold');
   const envOK = checkEnvironment();
   overallHealth = overallHealth && envOK;
   
   // 3. Verificar duplicatas
-  log('\n3. ðÅ¸â€�� VERIFICAR DUPLICATAS', 'bold');
+  log('\n3. 🔍 VERIFICAR DUPLICATAS', 'bold');
   const noDuplicates = checkDuplicateAPIs();
   overallHealth = overallHealth && noDuplicates;
   
   // 4. Verificar health endpoint
-  log('\n4. ðÅ¸�¥ HEALTH CHECK', 'bold');
+  log('\n4. 🏥 HEALTH CHECK', 'bold');
   const healthOK = await checkHealthEndpoint();
   overallHealth = overallHealth && healthOK;
   
   // 5. Verificar APIs principais
-  log('\n5. ðÅ¸â€�Å’ APIS PRINCIPAIS', 'bold');
+  log('\n5. 🔌 APIS PRINCIPAIS', 'bold');
   const apis = [
     { endpoint: '/api/animals', name: 'Animais' },
-    { endpoint: '/api/semen', name: 'SÃªmen' },
+    { endpoint: '/api/semen', name: 'Sêmen' },
     { endpoint: '/api/births', name: 'Nascimentos' },
     { endpoint: '/api/deaths', name: 'Mortes' },
-    { endpoint: '/api/localizacoes', name: 'LocalizaÃ§Ãµes' },
+    { endpoint: '/api/localizacoes', name: 'Localizações' },
     { endpoint: '/api/custos', name: 'Custos' },
-    { endpoint: '/api/gestacoes', name: 'GestaÃ§Ãµes' },
-    { endpoint: '/api/notifications', name: 'NotificaÃ§Ãµes' }
+    { endpoint: '/api/gestacoes', name: 'Gestações' },
+    { endpoint: '/api/notifications', name: 'Notificações' }
   ];
   
   let apisOK = 0;
@@ -184,8 +184,8 @@ async function main() {
   const allAPIsOK = apisOK === apis.length;
   overallHealth = overallHealth && allAPIsOK;
   
-  // 6. Teste de relatÃ³rios
-  log('\n6. ðÅ¸â€œÅ  SISTEMA DE RELATÃâ€œRIOS', 'bold');
+  // 6. Teste de relatórios
+  log('\n6. 📊 SISTEMA DE RELATÓRIOS', 'bold');
   try {
     const reportResponse = await fetch(`${BASE_URL}/api/reports/generate`, {
       method: 'POST',
@@ -197,27 +197,27 @@ async function main() {
     });
     
     if (reportResponse.ok) {
-      log('âÅ“â€¦ GeraÃ§Ã£o de RelatÃ³rios: Funcionando', 'green');
+      log('✅ Geração de Relatórios: Funcionando', 'green');
     } else {
-      log(`â�Å’ GeraÃ§Ã£o de RelatÃ³rios: Status ${reportResponse.status}`, 'red');
+      log(`❌ Geração de Relatórios: Status ${reportResponse.status}`, 'red');
       overallHealth = false;
     }
   } catch (error) {
-    log(`â�Å’ GeraÃ§Ã£o de RelatÃ³rios: ${error.message}`, 'red');
+    log(`❌ Geração de Relatórios: ${error.message}`, 'red');
     overallHealth = false;
   }
   
   // Resumo final
   log('\n' + '=' .repeat(50), 'blue');
-  log('ðÅ¸â€œÅ  RESUMO FINAL', 'bold');
+  log('📊 RESUMO FINAL', 'bold');
   log(`APIs funcionando: ${apisOK}/${apis.length}`, apisOK === apis.length ? 'green' : 'yellow');
-  log(`Status geral: ${overallHealth ? 'SAUDÃ�VEL' : 'PROBLEMAS DETECTADOS'}`, 
+  log(`Status geral: ${overallHealth ? 'SAUDÁVEL' : 'PROBLEMAS DETECTADOS'}`, 
       overallHealth ? 'green' : 'red');
   
   if (overallHealth) {
-    log('\nðÅ¸Å½â€° Sistema funcionando perfeitamente!', 'green');
+    log('\n🎉 Sistema funcionando perfeitamente!', 'green');
   } else {
-    log('\nâÅ¡ ï¸�  Alguns problemas foram detectados. Verifique os itens marcados com â�Å’', 'yellow');
+    log('\n⚠️  Alguns problemas foram detectados. Verifique os itens marcados com ❌', 'yellow');
   }
   
   process.exit(overallHealth ? 0 : 1);
@@ -225,7 +225,7 @@ async function main() {
 
 if (require.main === module) {
   main().catch(error => {
-    log(`â�Å’ Erro crÃ­tico: ${error.message}`, 'red');
+    log(`❌ Erro crítico: ${error.message}`, 'red');
     process.exit(1);
   });
 }

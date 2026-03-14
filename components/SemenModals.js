@@ -1,10 +1,10 @@
-// Modais para o sistema de estoque de sÃªmen
+// Modais para o sistema de estoque de sêmen
 
 import React, { useState } from 'react'
 
 import { XMarkIcon } from './ui/Icons'
 
-// Modal de VisualizaÃ§Ã£o
+// Modal de Visualização
 export const ViewSemenModal = ({ 
   showModal, 
   setShowModal, 
@@ -23,7 +23,7 @@ export const ViewSemenModal = ({
 
   const getStatusLabel = (status) => {
     switch (status) {
-      case 'disponivel': return 'DisponÃ­vel'
+      case 'disponivel': return 'Disponível'
       case 'esgotado': return 'Esgotado'
       case 'vencido': return 'Vencido'
       default: return status
@@ -36,7 +36,7 @@ export const ViewSemenModal = ({
         <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
           <div>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-              ðÅ¸§¬ Visualizar SÃªmen
+              🧬 Visualizar Sêmen
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
               {selectedSemen.nomeTouro || selectedSemen.nome_touro || selectedSemen.serie || 'Sem nome'}
@@ -51,10 +51,10 @@ export const ViewSemenModal = ({
         </div>
         
         <div className="p-6 space-y-6">
-          {/* InformaÃ§Ãµes do Touro */}
+          {/* Informações do Touro */}
           <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              ðÅ¸�â€š InformaÃ§Ãµes do Touro
+              🐂 Informações do Touro
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
@@ -62,7 +62,7 @@ export const ViewSemenModal = ({
                   Nome do Touro
                 </label>
                 <p className="text-gray-900 dark:text-white font-medium">
-                  {selectedSemen.nomeTouro || selectedSemen.nome_touro || selectedSemen.serie || 'NÃ£o informado'}
+                  {selectedSemen.nomeTouro || selectedSemen.nome_touro || selectedSemen.serie || 'Não informado'}
                 </p>
               </div>
               <div>
@@ -70,32 +70,32 @@ export const ViewSemenModal = ({
                   RG do Touro
                 </label>
                 <p className="text-gray-900 dark:text-white">
-                  {selectedSemen.rgTouro || selectedSemen.rg_touro || selectedSemen.rg || 'NÃ£o informado'}
+                  {selectedSemen.rgTouro || selectedSemen.rg_touro || selectedSemen.rg || 'Não informado'}
                 </p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  RaÃ§a
+                  Raça
                 </label>
                 <p className="text-gray-900 dark:text-white">
-                  {selectedSemen.raca || 'NÃ£o informado'}
+                  {selectedSemen.raca || 'Não informado'}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* LocalizaÃ§Ã£o */}
+          {/* Localização */}
           <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              ðÅ¸â€œ� LocalizaÃ§Ã£o no Estoque
+              📍 Localização no Estoque
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  LocalizaÃ§Ã£o
+                  Localização
                 </label>
                 <p className="text-gray-900 dark:text-white">
-                  {selectedSemen.localizacao || 'NÃ£o informado'}
+                  {selectedSemen.localizacao || 'Não informado'}
                 </p>
               </div>
               <div>
@@ -103,15 +103,15 @@ export const ViewSemenModal = ({
                   Rack do Touro
                 </label>
                 <p className="text-gray-900 dark:text-white">
-                  {selectedSemen.rackTouro || selectedSemen.rack_touro || 'NÃ£o informado'}
+                  {selectedSemen.rackTouro || selectedSemen.rack_touro || 'Não informado'}
                 </p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  BotijÃ£o
+                  Botijão
                 </label>
                 <p className="text-gray-900 dark:text-white">
-                  {selectedSemen.botijao || 'NÃ£o informado'}
+                  {selectedSemen.botijao || 'Não informado'}
                 </p>
               </div>
               <div>
@@ -119,16 +119,16 @@ export const ViewSemenModal = ({
                   Caneca
                 </label>
                 <p className="text-gray-900 dark:text-white">
-                  {selectedSemen.caneca || 'NÃ£o informado'}
+                  {selectedSemen.caneca || 'Não informado'}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* InformaÃ§Ãµes de Compra/Venda */}
+          {/* Informações de Compra/Venda */}
           <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              ðÅ¸â€™° InformaÃ§Ãµes Financeiras
+              💰 Informações Financeiras
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
@@ -137,17 +137,17 @@ export const ViewSemenModal = ({
                 </label>
                 <p className="text-gray-900 dark:text-white">
                   {(selectedSemen.tipoOperacao || selectedSemen.tipo_operacao) === 'entrada' 
-                    ? (selectedSemen.fornecedor || 'NÃ£o informado')
-                    : (selectedSemen.destino || 'NÃ£o informado')
+                    ? (selectedSemen.fornecedor || 'Não informado')
+                    : (selectedSemen.destino || 'Não informado')
                   }
                 </p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  NÃºmero da NF
+                  Número da NF
                 </label>
                 <p className="text-gray-900 dark:text-white">
-                  {selectedSemen.numeroNF || selectedSemen.numero_nf || 'NÃ£o informado'}
+                  {selectedSemen.numeroNF || selectedSemen.numero_nf || 'Não informado'}
                 </p>
               </div>
               <div>
@@ -160,12 +160,12 @@ export const ViewSemenModal = ({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Data da OperaÃ§Ã£o
+                  Data da Operação
                 </label>
                 <p className="text-gray-900 dark:text-white">
                   {(selectedSemen.dataCompra || selectedSemen.data_compra)
                     ? new Date(selectedSemen.dataCompra || selectedSemen.data_compra).toLocaleDateString('pt-BR')
-                    : 'NÃ£o informado'
+                    : 'Não informado'
                   }
                 </p>
               </div>
@@ -175,7 +175,7 @@ export const ViewSemenModal = ({
           {/* Controle de Doses */}
           <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              ðÅ¸â€œÅ  Controle de Doses
+              📊 Controle de Doses
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
@@ -188,7 +188,7 @@ export const ViewSemenModal = ({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Doses DisponÃ­veis
+                  Doses Disponíveis
                 </label>
                 <p className="text-gray-900 dark:text-white font-bold text-lg text-green-600">
                   {selectedSemen.dosesDisponiveis || selectedSemen.doses_disponiveis || 0}
@@ -213,10 +213,10 @@ export const ViewSemenModal = ({
             </div>
           </div>
 
-          {/* InformaÃ§Ãµes Adicionais */}
+          {/* Informações Adicionais */}
           <div className="bg-gray-50 dark:bg-gray-900/20 rounded-lg p-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              ðÅ¸â€œâ€¹ InformaÃ§Ãµes Adicionais
+              📋 Informações Adicionais
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -224,7 +224,7 @@ export const ViewSemenModal = ({
                   Certificado
                 </label>
                 <p className="text-gray-900 dark:text-white">
-                  {selectedSemen.certificado || 'NÃ£o informado'}
+                  {selectedSemen.certificado || 'Não informado'}
                 </p>
               </div>
               <div>
@@ -234,7 +234,7 @@ export const ViewSemenModal = ({
                 <p className="text-gray-900 dark:text-white">
                   {(selectedSemen.dataValidade || selectedSemen.data_validade)
                     ? new Date(selectedSemen.dataValidade || selectedSemen.data_validade).toLocaleDateString('pt-BR')
-                    : 'NÃ£o informado'
+                    : 'Não informado'
                   }
                 </p>
               </div>
@@ -243,7 +243,7 @@ export const ViewSemenModal = ({
                   Origem
                 </label>
                 <p className="text-gray-900 dark:text-white">
-                  {selectedSemen.origem || 'NÃ£o informado'}
+                  {selectedSemen.origem || 'Não informado'}
                 </p>
               </div>
               <div>
@@ -251,14 +251,14 @@ export const ViewSemenModal = ({
                   Linhagem
                 </label>
                 <p className="text-gray-900 dark:text-white">
-                  {selectedSemen.linhagem || 'NÃ£o informado'}
+                  {selectedSemen.linhagem || 'Não informado'}
                 </p>
               </div>
             </div>
             {selectedSemen.observacoes && (
               <div className="mt-4">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  ObservaÃ§Ãµes
+                  Observações
                 </label>
                 <p className="text-gray-900 dark:text-white bg-white dark:bg-gray-800 p-3 rounded-lg border">
                   {selectedSemen.observacoes}
@@ -281,7 +281,7 @@ export const ViewSemenModal = ({
   )
 }
 
-// Modal de EdiÃ§Ã£o
+// Modal de Edição
 export const EditSemenModal = ({ 
   showModal, 
   setShowModal, 
@@ -317,7 +317,7 @@ export const EditSemenModal = ({
     const camposObrigatorios = []
     
     if (!editData.nomeTouro) camposObrigatorios.push('Nome do Touro')
-    if (!editData.localizacao) camposObrigatorios.push('LocalizaÃ§Ã£o')
+    if (!editData.localizacao) camposObrigatorios.push('Localização')
     if (!editData.quantidadeDoses) camposObrigatorios.push('Quantidade de Doses')
     if (editData.tipoOperacao === 'entrada') {
       if (!editData.fornecedor) camposObrigatorios.push('Fornecedor')
@@ -327,7 +327,7 @@ export const EditSemenModal = ({
     }
     
     if (camposObrigatorios.length > 0) {
-      alert(`Preencha os campos obrigatÃ³rios: ${camposObrigatorios.join(', ')}`)
+      alert(`Preencha os campos obrigatórios: ${camposObrigatorios.join(', ')}`)
       return
     }
 
@@ -340,7 +340,7 @@ export const EditSemenModal = ({
         <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
           <div>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-              âÅ“�ï¸� Editar SÃªmen
+              ✏️ Editar Sêmen
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
               {editData.nomeTouro || 'Sem nome'}
@@ -355,10 +355,10 @@ export const EditSemenModal = ({
         </div>
         
         <div className="p-6 space-y-8">
-          {/* Tipo de OperaÃ§Ã£o */}
+          {/* Tipo de Operação */}
           <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              ðÅ¸â€œâ€¹ Tipo de OperaÃ§Ã£o
+              📋 Tipo de Operação
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <label className="flex items-center space-x-3 cursor-pointer">
@@ -372,7 +372,7 @@ export const EditSemenModal = ({
                 />
                 <div>
                   <div className="font-medium text-gray-900 dark:text-white">Entrada</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">Compra ou recebimento de sÃªmen</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Compra ou recebimento de sêmen</div>
                 </div>
               </label>
               <label className="flex items-center space-x-3 cursor-pointer">
@@ -385,17 +385,17 @@ export const EditSemenModal = ({
                   className="w-4 h-4 text-blue-600"
                 />
                 <div>
-                  <div className="font-medium text-gray-900 dark:text-white">SaÃ­da</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">Venda ou transferÃªncia de sÃªmen</div>
+                  <div className="font-medium text-gray-900 dark:text-white">Saída</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Venda ou transferência de sêmen</div>
                 </div>
               </label>
             </div>
           </div>
 
-          {/* InformaÃ§Ãµes do Touro */}
+          {/* Informações do Touro */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              ðÅ¸�â€š InformaÃ§Ãµes do Touro
+              🐂 Informações do Touro
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
@@ -425,35 +425,35 @@ export const EditSemenModal = ({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  RaÃ§a
+                  Raça
                 </label>
                 <select
                   value={editData.raca}
                   onChange={(e) => setEditData(prev => ({ ...prev, raca: e.target.value }))}
                   className="input-field"
                 >
-                  <option value="">Selecione a raÃ§a</option>
+                  <option value="">Selecione a raça</option>
                   <option value="Nelore">Nelore</option>
                   <option value="Angus">Angus</option>
                   <option value="Brahman">Brahman</option>
                   <option value="Gir">Gir</option>
                   <option value="Simental">Simental</option>
-                  <option value="CharolÃªs">CharolÃªs</option>
+                  <option value="Charolês">Charolês</option>
                   <option value="Outros">Outros</option>
                 </select>
               </div>
             </div>
           </div>
 
-          {/* LocalizaÃ§Ã£o FÃ­sica */}
+          {/* Localização Física */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              ðÅ¸â€œ� LocalizaÃ§Ã£o FÃ­sica
+              📍 Localização Física
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  LocalizaÃ§Ã£o *
+                  Localização *
                 </label>
                 <input
                   type="text"
@@ -478,11 +478,11 @@ export const EditSemenModal = ({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  BotijÃ£o
+                  Botijão
                 </label>
                 <input
                   type="text"
-                  placeholder="Ex: BotijÃ£o 3"
+                  placeholder="Ex: Botijão 3"
                   value={editData.botijao}
                   onChange={(e) => setEditData(prev => ({ ...prev, botijao: e.target.value }))}
                   className="input-field"
@@ -503,10 +503,10 @@ export const EditSemenModal = ({
             </div>
           </div>
 
-          {/* OperaÃ§Ã£o (Entrada/SaÃ­da) */}
+          {/* Operação (Entrada/Saída) */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              {editData.tipoOperacao === 'entrada' ? 'ðÅ¸â€œ¥ Dados da Entrada' : 'ðÅ¸â€œ¤ Dados da SaÃ­da'}
+              {editData.tipoOperacao === 'entrada' ? '📥 Dados da Entrada' : '📤 Dados da Saída'}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
@@ -515,7 +515,7 @@ export const EditSemenModal = ({
                 </label>
                 <input
                   type="text"
-                  placeholder={editData.tipoOperacao === 'entrada' ? 'Ex: GenÃ©tica Premium' : 'Ex: Fazenda XYZ'}
+                  placeholder={editData.tipoOperacao === 'entrada' ? 'Ex: Genética Premium' : 'Ex: Fazenda XYZ'}
                   value={editData.tipoOperacao === 'entrada' ? editData.fornecedor : editData.destino}
                   onChange={(e) => setEditData(prev => ({ 
                     ...prev, 
@@ -527,7 +527,7 @@ export const EditSemenModal = ({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  NÃºmero da NF
+                  Número da NF
                 </label>
                 <input
                   type="text"
@@ -539,7 +539,7 @@ export const EditSemenModal = ({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Data da OperaÃ§Ã£o *
+                  Data da Operação *
                 </label>
                 <input
                   type="date"
@@ -555,7 +555,7 @@ export const EditSemenModal = ({
           {/* Quantidade e Valor */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              ðÅ¸â€™° Quantidade e Valor
+              💰 Quantidade e Valor
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
@@ -587,7 +587,7 @@ export const EditSemenModal = ({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Doses DisponÃ­veis
+                  Doses Disponíveis
                 </label>
                 <input
                   type="number"
@@ -600,10 +600,10 @@ export const EditSemenModal = ({
             </div>
           </div>
 
-          {/* InformaÃ§Ãµes Adicionais */}
+          {/* Informações Adicionais */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              ðÅ¸â€œâ€¹ InformaÃ§Ãµes Adicionais
+              📋 Informações Adicionais
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
@@ -644,10 +644,10 @@ export const EditSemenModal = ({
             </div>
             <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                ObservaÃ§Ãµes
+                Observações
               </label>
               <textarea
-                placeholder="InformaÃ§Ãµes adicionais sobre o sÃªmen..."
+                placeholder="Informações adicionais sobre o sêmen..."
                 value={editData.observacoes}
                 onChange={(e) => setEditData(prev => ({ ...prev, observacoes: e.target.value }))}
                 className="input-field h-24 resize-none"
@@ -658,7 +658,7 @@ export const EditSemenModal = ({
 
         <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-between">
           <div className="text-sm text-gray-600 dark:text-gray-400">
-            * Campos obrigatÃ³rios
+            * Campos obrigatórios
           </div>
           <div className="flex space-x-3">
             <button
@@ -671,7 +671,7 @@ export const EditSemenModal = ({
               onClick={handleSave}
               className="btn-primary"
             >
-              Salvar AlteraÃ§Ãµes
+              Salvar Alterações
             </button>
           </div>
         </div>
@@ -694,15 +694,15 @@ export const AddSemenModal = ({
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-            ðÅ¸§¬ Adicionar SÃªmen ao Estoque
+            🧬 Adicionar Sêmen ao Estoque
           </h2>
         </div>
         
         <div className="p-6 space-y-6">
-          {/* InformaÃ§Ãµes do Touro */}
+          {/* Informações do Touro */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              InformaÃ§Ãµes do Touro
+              Informações do Touro
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
@@ -732,7 +732,7 @@ export const AddSemenModal = ({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  RaÃ§a
+                  Raça
                 </label>
                 <input
                   type="text"
@@ -745,19 +745,19 @@ export const AddSemenModal = ({
             </div>
           </div>
 
-          {/* LocalizaÃ§Ã£o */}
+          {/* Localização */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              LocalizaÃ§Ã£o no Estoque
+              Localização no Estoque
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  LocalizaÃ§Ã£o Geral
+                  Localização Geral
                 </label>
                 <input
                   type="text"
-                  placeholder="Ex: GalpÃ£o A, Sala 1..."
+                  placeholder="Ex: Galpão A, Sala 1..."
                   value={newSemen.localizacao}
                   onChange={(e) => setNewSemen(prev => ({ ...prev, localizacao: e.target.value }))}
                   className="input"
@@ -765,11 +765,11 @@ export const AddSemenModal = ({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  BotijÃ£o
+                  Botijão
                 </label>
                 <input
                   type="text"
-                  placeholder="Ex: B001, BotijÃ£o 1..."
+                  placeholder="Ex: B001, Botijão 1..."
                   value={newSemen.botijao}
                   onChange={(e) => setNewSemen(prev => ({ ...prev, botijao: e.target.value }))}
                   className="input"
@@ -790,10 +790,10 @@ export const AddSemenModal = ({
             </div>
           </div>
 
-          {/* InformaÃ§Ãµes de Compra */}
+          {/* Informações de Compra */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              InformaÃ§Ãµes de Compra
+              Informações de Compra
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
@@ -810,7 +810,7 @@ export const AddSemenModal = ({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  NÃºmero da NF
+                  Número da NF
                 </label>
                 <input
                   type="text"
@@ -848,7 +848,7 @@ export const AddSemenModal = ({
             </div>
           </div>
 
-          {/* InformaÃ§Ãµes das Doses */}
+          {/* Informações das Doses */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Controle de Doses
@@ -876,7 +876,7 @@ export const AddSemenModal = ({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Doses DisponÃ­veis
+                  Doses Disponíveis
                 </label>
                 <input
                   type="number"
@@ -886,16 +886,16 @@ export const AddSemenModal = ({
                   className="input"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Se nÃ£o preenchido, serÃ¡ igual Ã  quantidade total
+                  Se não preenchido, será igual à quantidade total
                 </p>
               </div>
             </div>
           </div>
 
-          {/* InformaÃ§Ãµes Adicionais */}
+          {/* Informações Adicionais */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              InformaÃ§Ãµes Adicionais
+              Informações Adicionais
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
@@ -904,7 +904,7 @@ export const AddSemenModal = ({
                 </label>
                 <input
                   type="text"
-                  placeholder="NÃºmero do certificado"
+                  placeholder="Número do certificado"
                   value={newSemen.certificado}
                   onChange={(e) => setNewSemen(prev => ({ ...prev, certificado: e.target.value }))}
                   className="input"
@@ -927,7 +927,7 @@ export const AddSemenModal = ({
                 </label>
                 <input
                   type="text"
-                  placeholder="Ex: Central de SÃªmen XYZ"
+                  placeholder="Ex: Central de Sêmen XYZ"
                   value={newSemen.origem}
                   onChange={(e) => setNewSemen(prev => ({ ...prev, origem: e.target.value }))}
                   className="input"
@@ -948,11 +948,11 @@ export const AddSemenModal = ({
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                ObservaÃ§Ãµes
+                Observações
               </label>
               <textarea
                 rows={3}
-                placeholder="ObservaÃ§Ãµes adicionais sobre o sÃªmen..."
+                placeholder="Observações adicionais sobre o sêmen..."
                 value={newSemen.observacoes}
                 onChange={(e) => setNewSemen(prev => ({ ...prev, observacoes: e.target.value }))}
                 className="input"

@@ -70,7 +70,7 @@ async function simulateHandler() {
     }
   }
 
-  console.log('�Ÿ�� Simulando handler da API...')
+  console.log('🧪 Simulando handler da API...')
   console.log('Request body:', JSON.stringify(req.body, null, 2))
 
   const { reports, period, sections, preview } = req.body
@@ -79,7 +79,7 @@ async function simulateHandler() {
 
   // Generate each requested report
   for (const reportType of reports) {
-    console.log(`\n�Ÿ“Š Gerando relatório: ${reportType}`)
+    console.log(`\n📊 Gerando relatório: ${reportType}`)
     
     switch (reportType) {
       case 'monthly_summary':
@@ -90,7 +90,7 @@ async function simulateHandler() {
     }
   }
 
-  console.log('\n�Ÿ“‹ reportData completo:')
+  console.log('\n📋 reportData completo:')
   console.log(JSON.stringify(reportData, null, 2))
 
   // Simulando a resposta final
@@ -100,7 +100,7 @@ async function simulateHandler() {
     generatedAt: new Date().toISOString()
   }
 
-  console.log('\n�ŸŽ� Resposta final que seria enviada:')
+  console.log('\n🎯 Resposta final que seria enviada:')
   console.log(JSON.stringify(responseData, null, 2))
 
   process.exit(0)

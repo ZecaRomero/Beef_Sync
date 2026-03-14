@@ -9,14 +9,14 @@ require('dotenv').config()
 const { query, testConnection, closePool } = require('../lib/database')
 
 async function populateSampleData() {
-  console.log('�ŸŒ� Populando banco de dados com dados de teste...')
+  console.log('🌱 Populando banco de dados com dados de teste...')
   
   try {
     // Testar conexão
     await testConnection()
     
     // 1. Adicionar animais de teste
-    console.log('�Ÿ�„ Adicionando animais de teste...')
+    console.log('🐄 Adicionando animais de teste...')
     
     const animais = [
       {
@@ -80,14 +80,14 @@ async function populateSampleData() {
       `, [animal.serie, animal.rg, animal.sexo, animal.raca, animal.data_nascimento, animal.peso, animal.situacao, animal.observacoes])
       
       if (result.rows.length > 0) {
-        console.log(`  �œ… Animal adicionado: ${animal.serie} ${animal.rg}`)
+        console.log(`  ✅ Animal adicionado: ${animal.serie} ${animal.rg}`)
       } else {
-        console.log(`  �š�️  Animal já existe: ${animal.serie} ${animal.rg}`)
+        console.log(`  ⚠️  Animal já existe: ${animal.serie} ${animal.rg}`)
       }
     }
     
     // 2. Adicionar nascimentos de teste
-    console.log('�Ÿ‘� Adicionando nascimentos de teste...')
+    console.log('👶 Adicionando nascimentos de teste...')
     
     const nascimentos = [
       {
@@ -144,14 +144,14 @@ async function populateSampleData() {
       ])
       
       if (result.rows.length > 0) {
-        console.log(`  �œ… Nascimento adicionado: ${nascimento.serie} ${nascimento.rg}`)
+        console.log(`  ✅ Nascimento adicionado: ${nascimento.serie} ${nascimento.rg}`)
       } else {
-        console.log(`  �š�️  Nascimento já existe: ${nascimento.serie} ${nascimento.rg}`)
+        console.log(`  ⚠️  Nascimento já existe: ${nascimento.serie} ${nascimento.rg}`)
       }
     }
     
     // 3. Adicionar algumas mortes de teste
-    console.log('�Ÿ’€ Adicionando mortes de teste...')
+    console.log('💀 Adicionando mortes de teste...')
     
     const mortes = [
       {
@@ -189,33 +189,33 @@ async function populateSampleData() {
         `, [animalId, morte.data_morte, morte.causa_morte, morte.valor_perda, morte.observacoes])
         
         if (result.rows.length > 0) {
-          console.log(`  �œ… Morte adicionada: ${morte.animal_serie} ${morte.animal_rg}`)
+          console.log(`  ✅ Morte adicionada: ${morte.animal_serie} ${morte.animal_rg}`)
         } else {
-          console.log(`  �š�️  Morte já existe: ${morte.animal_serie} ${morte.animal_rg}`)
+          console.log(`  ⚠️  Morte já existe: ${morte.animal_serie} ${morte.animal_rg}`)
         }
       }
     }
     
     // 4. Pular vendas por enquanto (não há tabela de vendas no schema atual)
-    console.log('�Ÿ’� Pulando vendas (tabela não encontrada no schema atual)...')
+    console.log('💰 Pulando vendas (tabela não encontrada no schema atual)...')
     
     // 5. Verificar dados inseridos
-    console.log('\n�Ÿ“Š Verificando dados inseridos...')
+    console.log('\n📊 Verificando dados inseridos...')
     
     const animaisCount = await query('SELECT COUNT(*) as count FROM animais')
-    console.log(`�Ÿ�„ Total de animais: ${animaisCount.rows[0].count}`)
+    console.log(`🐄 Total de animais: ${animaisCount.rows[0].count}`)
     
     const nascimentosCount = await query('SELECT COUNT(*) as count FROM nascimentos')
-    console.log(`�Ÿ‘� Total de nascimentos: ${nascimentosCount.rows[0].count}`)
+    console.log(`👶 Total de nascimentos: ${nascimentosCount.rows[0].count}`)
     
     const mortesCount = await query('SELECT COUNT(*) as count FROM mortes')
-    console.log(`�Ÿ’€ Total de mortes: ${mortesCount.rows[0].count}`)
+    console.log(`💀 Total de mortes: ${mortesCount.rows[0].count}`)
     
-    console.log('\n�œ… Dados de teste inseridos com sucesso!')
-    console.log('�ŸŽ� Agora você pode testar a geração de relatórios com dados reais.')
+    console.log('\n✅ Dados de teste inseridos com sucesso!')
+    console.log('🎯 Agora você pode testar a geração de relatórios com dados reais.')
     
   } catch (error) {
-    console.error('�Œ Erro ao popular dados de teste:', error.message)
+    console.error('❌ Erro ao popular dados de teste:', error.message)
     throw error
   } finally {
     await closePool()
@@ -226,11 +226,11 @@ async function populateSampleData() {
 if (require.main === module) {
   populateSampleData()
     .then(() => {
-      console.log('�Ÿ�� Script concluído!')
+      console.log('🏁 Script concluído!')
       process.exit(0)
     })
     .catch((error) => {
-      console.error('�Ÿ’� Erro fatal:', error)
+      console.error('💥 Erro fatal:', error)
       process.exit(1)
     })
 }

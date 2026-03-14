@@ -4,7 +4,7 @@ import { sendSuccess, sendError, sendMethodNotAllowed, asyncHandler } from '../.
 function isMobileUserAgent(ua) {
   if (!ua || typeof ua !== 'string') return false
   const u = ua.toLowerCase()
-  // DetecÃ§Ã£o mais abrangente de dispositivos mobile
+  // Detecção mais abrangente de dispositivos mobile
   return /mobile|android|iphone|ipad|ipod|webos|blackberry|iemobile|opera mini|tablet|kindle|silk|fennec|mobile safari|windows phone|symbian|palm|nokia|samsung|lg|htc|motorola|xiaomi|huawei|oppo|vivo|realme|oneplus/i.test(u)
 }
 
@@ -66,7 +66,7 @@ async function handler(req, res) {
       try { await query(`ALTER TABLE access_logs ADD COLUMN IF NOT EXISTS telefone VARCHAR(20)`) } catch (_) {}
 
       if (stats === 'true') {
-        // Usar SQL para agregaÃ§Ã£o ââ‚¬â€� evita carregar 30K+ linhas em memÃ³ria
+        // Usar SQL para agregação — evita carregar 30K+ linhas em memória
         const statsResult = await query(`
           SELECT
             COUNT(*) FILTER (WHERE access_time >= CURRENT_DATE)                                          AS total_hoje,
@@ -106,7 +106,7 @@ async function handler(req, res) {
             desktop: n(s.total_mes) - n(s.mobile_mes),
             celulares_unicos: n(s.unicos_mes)
           }
-        }, 'EstatÃ­sticas de acesso')
+        }, 'Estatísticas de acesso')
       }
 
       const result = await query(`
@@ -129,7 +129,7 @@ async function handler(req, res) {
       const rows = result.rows.map(r => {
         const parsed = parseUserAgent(r.user_agent)
         const isMob = isMobileUserAgent(r.user_agent)
-        // Log para debug: registrar todos os user agents para anÃ¡lise
+        // Log para debug: registrar todos os user agents para análise
         if (process.env.NODE_ENV === 'development') {
           console.log('Access log:', {
             user: r.user_name,
@@ -159,7 +159,7 @@ async function handler(req, res) {
       if (tipo === 'localhost') {
         result = await query(`DELETE FROM access_logs WHERE ip_address IN ('localhost', '127.0.0.1', 'N/A') OR hostname IN ('localhost', '127.0.0.1')`)
       } else {
-        // Manter apenas os Ãºltimos 90 dias
+        // Manter apenas os últimos 90 dias
         result = await query(`DELETE FROM access_logs WHERE access_time < NOW() - INTERVAL '90 days'`)
       }
       return sendSuccess(res, { deleted: result.rowCount }, `${result.rowCount} registros removidos`)
@@ -179,7 +179,7 @@ async function handler(req, res) {
       action = 'Login' 
     } = req.body
 
-    // NÃ£o gravar acessos de desenvolvimento local para nÃ£o poluir o banco
+    // Não gravar acessos de desenvolvimento local para não poluir o banco
     const isLocalhost = ipAddress === 'localhost' || ipAddress === '127.0.0.1' ||
                         hostname === 'localhost' || hostname === '127.0.0.1'
     if (isLocalhost && process.env.NODE_ENV !== 'production') {

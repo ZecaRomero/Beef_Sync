@@ -15,15 +15,15 @@ async function addColumns() {
         )
       `, [col.name])
       if (exists.rows[0].exists) {
-        console.log(`�œ… Coluna ${col.name} já existe`)
+        console.log(`✅ Coluna ${col.name} já existe`)
       } else {
         await query(`ALTER TABLE inseminacoes ADD COLUMN ${col.name} ${col.type}`)
-        console.log(`�œ… Coluna ${col.name} adicionada com sucesso`)
+        console.log(`✅ Coluna ${col.name} adicionada com sucesso`)
       }
     }
     process.exit(0)
   } catch (err) {
-    console.error('�Œ Erro:', err.message)
+    console.error('❌ Erro:', err.message)
     process.exit(1)
   }
 }

@@ -80,9 +80,9 @@ async function handlePost(req, res) {
       usuario = 'Sistema' 
     } = req.body
 
-    // ValidaÃ§Ãµes
+    // Validações
     if (!nome) {
-      return sendValidationError(res, 'Nome do medicamento Ã© obrigatÃ³rio')
+      return sendValidationError(res, 'Nome do medicamento é obrigatório')
     }
 
     // Inserir medicamento
@@ -119,7 +119,7 @@ async function handlePost(req, res) {
 
     const novoMedicamento = result.rows[0]
 
-    // Registrar no histÃ³rico de lanÃ§amentos
+    // Registrar no histórico de lançamentos
     try {
       await LoteTracker.registrarOperacao({
         tipo_operacao: 'CADASTRO_MEDICAMENTO',
@@ -140,7 +140,7 @@ async function handlePost(req, res) {
       })
     } catch (trackError) {
       logger.error('Erro ao registrar no sistema de lotes:', trackError)
-      // NÃ£o falhar a operaÃ§Ã£o principal por erro no tracking
+      // Não falhar a operação principal por erro no tracking
     }
 
     logger.info(`Novo medicamento cadastrado: ${nome}`)
@@ -151,7 +151,7 @@ async function handlePost(req, res) {
 
   } catch (error) {
     if (error.code === '23505') { // Unique constraint violation
-      return sendValidationError(res, 'JÃ¡ existe um medicamento com este nome')
+      return sendValidationError(res, 'Já existe um medicamento com este nome')
     }
     logger.error('Erro ao cadastrar medicamento:', error)
     return sendError(res, 'Erro ao cadastrar medicamento', 500)
@@ -185,13 +185,13 @@ async function handlePut(req, res) {
     } = req.body
 
     if (!id) {
-      return sendValidationError(res, 'ID do medicamento Ã© obrigatÃ³rio')
+      return sendValidationError(res, 'ID do medicamento é obrigatório')
     }
 
     // Verificar se o medicamento existe
     const existingResult = await query('SELECT * FROM medicamentos WHERE id = $1', [id])
     if (existingResult.rows.length === 0) {
-      return sendError(res, 'Medicamento nÃ£o encontrado', 404)
+      return sendError(res, 'Medicamento não encontrado', 404)
     }
 
     const medicamentoAnterior = existingResult.rows[0]
@@ -247,13 +247,13 @@ async function handlePut(req, res) {
 
     const medicamentoAtualizado = result.rows[0]
 
-    // Registrar no histÃ³rico de lanÃ§amentos
+    // Registrar no histórico de lançamentos
     try {
       const alteracoes = []
-      if (nome && nome !== medicamentoAnterior.nome) alteracoes.push(`nome: ${medicamentoAnterior.nome} ââ€ â€™ ${nome}`)
-      if (preco && preco !== medicamentoAnterior.preco) alteracoes.push(`preÃ§o: R$ ${medicamentoAnterior.preco} ââ€ â€™ R$ ${preco}`)
-      if (unidade && unidade !== medicamentoAnterior.unidade) alteracoes.push(`unidade: ${medicamentoAnterior.unidade} ââ€ â€™ ${unidade}`)
-      if (ativo !== undefined && ativo !== medicamentoAnterior.ativo) alteracoes.push(`status: ${medicamentoAnterior.ativo ? 'ativo' : 'inativo'} ââ€ â€™ ${ativo ? 'ativo' : 'inativo'}`)
+      if (nome && nome !== medicamentoAnterior.nome) alteracoes.push(`nome: ${medicamentoAnterior.nome} → ${nome}`)
+      if (preco && preco !== medicamentoAnterior.preco) alteracoes.push(`preço: R$ ${medicamentoAnterior.preco} → R$ ${preco}`)
+      if (unidade && unidade !== medicamentoAnterior.unidade) alteracoes.push(`unidade: ${medicamentoAnterior.unidade} → ${unidade}`)
+      if (ativo !== undefined && ativo !== medicamentoAnterior.ativo) alteracoes.push(`status: ${medicamentoAnterior.ativo ? 'ativo' : 'inativo'} → ${ativo ? 'ativo' : 'inativo'}`)
 
       if (alteracoes.length > 0) {
         await LoteTracker.registrarOperacao({
@@ -285,7 +285,7 @@ async function handlePut(req, res) {
 
   } catch (error) {
     if (error.code === '23505') {
-      return sendValidationError(res, 'JÃ¡ existe um medicamento com este nome')
+      return sendValidationError(res, 'Já existe um medicamento com este nome')
     }
     logger.error('Erro ao atualizar medicamento:', error)
     return sendError(res, 'Erro ao atualizar medicamento', 500)
@@ -298,13 +298,13 @@ async function handleDelete(req, res) {
     const { usuario = 'Sistema' } = req.body
 
     if (!id) {
-      return sendValidationError(res, 'ID do medicamento Ã© obrigatÃ³rio')
+      return sendValidationError(res, 'ID do medicamento é obrigatório')
     }
 
     // Verificar se o medicamento existe
     const existingResult = await query('SELECT * FROM medicamentos WHERE id = $1', [id])
     if (existingResult.rows.length === 0) {
-      return sendError(res, 'Medicamento nÃ£o encontrado', 404)
+      return sendError(res, 'Medicamento não encontrado', 404)
     }
 
     const medicamento = existingResult.rows[0]
@@ -312,7 +312,7 @@ async function handleDelete(req, res) {
     // Remover medicamento (soft delete - marcar como inativo)
     await query('UPDATE medicamentos SET ativo = false, updated_at = CURRENT_TIMESTAMP WHERE id = $1', [id])
 
-    // Registrar no histÃ³rico de lanÃ§amentos
+    // Registrar no histórico de lançamentos
     try {
       await LoteTracker.registrarOperacao({
         tipo_operacao: 'EXCLUSAO_MEDICAMENTO',

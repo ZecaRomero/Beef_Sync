@@ -1,6 +1,6 @@
 /**
- * API para corrigir touro_nome nas inseminaÃ§Ãµes a partir de um Excel
- * Formato: SÃâ€°RIE, RG, LOCAL, LOCAL, TOURO_1Âª I.A, SÃâ€°RIE, RG, DATA I.A, DATA DG, Result
+ * API para corrigir touro_nome nas inseminações a partir de um Excel
+ * Formato: SÉRIE, RG, LOCAL, LOCAL, TOURO_1ª I.A, SÉRIE, RG, DATA I.A, DATA DG, Result
  */
 
 import { query } from '../../../lib/database'
@@ -37,7 +37,7 @@ function converterDataExcel(data) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' })
+    return res.status(405).json({ error: 'Método não permitido' })
   }
 
   const form = formidable({ multiples: false })
@@ -77,7 +77,7 @@ export default async function handler(req, res) {
         try {
           const animalRes = await query('SELECT id FROM animais WHERE serie = $1 AND rg = $2', [serie, rg])
           if (animalRes.rows.length === 0) {
-            erros.push({ linha: i, serie, rg, msg: 'Animal nÃ£o encontrado' })
+            erros.push({ linha: i, serie, rg, msg: 'Animal não encontrado' })
             continue
           }
           const animalId = animalRes.rows[0].id

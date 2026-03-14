@@ -2,7 +2,7 @@ const fetch = require('node-fetch')
 const fs = require('fs')
 
 async function testAPIExcelExport() {
-  console.log('�Ÿ�� Testando exportação Excel via API...')
+  console.log('🧪 Testando exportação Excel via API...')
   
   try {
     const response = await fetch('http://localhost:3020/api/reports/download', {
@@ -20,33 +20,33 @@ async function testAPIExcelExport() {
       })
     })
 
-    console.log(`�Ÿ“� Status da resposta: ${response.status}`)
-    console.log(`�Ÿ“‹ Content-Type: ${response.headers.get('content-type')}`)
+    console.log(`📡 Status da resposta: ${response.status}`)
+    console.log(`📋 Content-Type: ${response.headers.get('content-type')}`)
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('�Œ Erro na API:', errorText)
+      console.error('❌ Erro na API:', errorText)
       return false
     }
 
     const buffer = await response.buffer()
-    console.log(`�Ÿ“Š Tamanho do arquivo: ${buffer.length} bytes`)
+    console.log(`📊 Tamanho do arquivo: ${buffer.length} bytes`)
 
     // Salvar arquivo
     fs.writeFileSync('teste-api-excel.xlsx', buffer)
-    console.log('�Ÿ’� Arquivo salvo como: teste-api-excel.xlsx')
+    console.log('💾 Arquivo salvo como: teste-api-excel.xlsx')
 
     // Verificar se é um arquivo Excel válido
     if (buffer.length > 0 && buffer[0] === 0x50 && buffer[1] === 0x4B) {
-      console.log('�œ… Arquivo Excel válido (assinatura ZIP detectada)')
+      console.log('✅ Arquivo Excel válido (assinatura ZIP detectada)')
     } else {
-      console.log('�š�️ Arquivo pode não ser um Excel válido')
+      console.log('⚠️ Arquivo pode não ser um Excel válido')
     }
 
     return true
 
   } catch (error) {
-    console.error('�Œ Erro no teste:', error.message)
+    console.error('❌ Erro no teste:', error.message)
     return false
   }
 }
@@ -54,10 +54,10 @@ async function testAPIExcelExport() {
 // Executar teste
 testAPIExcelExport().then(success => {
   if (success) {
-    console.log('\n�ŸŽ‰ Teste da API concluído com sucesso!')
-    console.log('�Ÿ“� Agora você pode abrir o arquivo teste-api-excel.xlsx para verificar')
+    console.log('\n🎉 Teste da API concluído com sucesso!')
+    console.log('📝 Agora você pode abrir o arquivo teste-api-excel.xlsx para verificar')
   } else {
-    console.log('\n�Ÿ’� Teste da API falhou!')
-    console.log('�Ÿ”� Verifique se o servidor está rodando em localhost:3020')
+    console.log('\n💥 Teste da API falhou!')
+    console.log('🔧 Verifique se o servidor está rodando em localhost:3020')
   }
 })

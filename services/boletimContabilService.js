@@ -1,6 +1,6 @@
 /**
- * ServiÃ§o de Boletim ContÃ¡bil - Beef Sync
- * Gerencia automaticamente as operaÃ§Ãµes contÃ¡beis dos animais
+ * Serviço de Boletim Contábil - Beef Sync
+ * Gerencia automaticamente as operações contábeis dos animais
  */
 
 class BoletimContabilService {
@@ -10,7 +10,7 @@ class BoletimContabilService {
     this.periodoAtual = this.getPeriodoAtual()
   }
 
-  // Obter perÃ­odo atual (mÃªs/ano)
+  // Obter período atual (mês/ano)
   getPeriodoAtual() {
     const agora = new Date()
     const mes = String(agora.getMonth() + 1).padStart(2, '0')
@@ -18,7 +18,7 @@ class BoletimContabilService {
     return `${ano}-${mes}`
   }
 
-  // Inicializar boletim do perÃ­odo atual
+  // Inicializar boletim do período atual
   async inicializarBoletim(periodo = null) {
     const periodoBoletim = periodo || this.periodoAtual
     this.boletimAtual = await this.carregarBoletim(periodoBoletim)
@@ -30,7 +30,7 @@ class BoletimContabilService {
     return this.boletimAtual
   }
 
-  // Criar boletim vazio para novo perÃ­odo
+  // Criar boletim vazio para novo período
   async criarBoletimVazio(periodo) {
     const boletim = {
       id: `boletim_${periodo}`,
@@ -94,7 +94,7 @@ class BoletimContabilService {
     let boletim = this.boletimAtual
     
     if (periodo) {
-      // Se um perÃ­odo especÃ­fico foi solicitado
+      // Se um período específico foi solicitado
       if (!boletim || boletim.periodo !== periodo) {
         boletim = await this.carregarBoletim(periodo)
         if (!boletim) {
@@ -102,7 +102,7 @@ class BoletimContabilService {
         }
       }
     } else if (!boletim) {
-      // Se nÃ£o tem boletim carregado e nÃ£o foi especificado perÃ­odo, carrega o atual
+      // Se não tem boletim carregado e não foi especificado período, carrega o atual
       await this.inicializarBoletim()
       boletim = this.boletimAtual
     }
@@ -135,7 +135,7 @@ class BoletimContabilService {
     let boletim = this.boletimAtual
 
     if (periodo) {
-      // Se um perÃ­odo especÃ­fico foi solicitado
+      // Se um período específico foi solicitado
       if (!boletim || boletim.periodo !== periodo) {
         boletim = await this.carregarBoletim(periodo)
         if (!boletim) {
@@ -320,7 +320,7 @@ class BoletimContabilService {
     return nascimentos + compras + outras
   }
 
-  // Calcular total de saÃ­das
+  // Calcular total de saídas
   calcularTotalSaidas(boletim = null) {
     const boletimAlvo = boletim || this.boletimAtual
     if (!boletimAlvo) return 0
@@ -362,7 +362,7 @@ class BoletimContabilService {
     }
   }
 
-  // Gerar relatÃ³rio do boletim
+  // Gerar relatório do boletim
   async gerarRelatorio(periodo) {
     const boletim = await this.carregarBoletim(periodo)
     if (!boletim) return null
@@ -405,16 +405,16 @@ class BoletimContabilService {
 
   // Converter dados para CSV
   converterParaCSV(dados) {
-    let csv = 'Tipo,Data,DescriÃ§Ã£o,Valor,ObservaÃ§Ãµes\n'
+    let csv = 'Tipo,Data,Descrição,Valor,Observações\n'
     
     // Entradas
     Object.values(dados.movimentacoes.entradas).flat().forEach(item => {
       csv += `Entrada,${item.data},${item.tipo},${item.valor},"${item.observacoes}"\n`
     })
     
-    // SaÃ­das
+    // Saídas
     Object.values(dados.movimentacoes.saidas).flat().forEach(item => {
-      csv += `SaÃ­da,${item.data},${item.tipo},${item.valor},"${item.observacoes}"\n`
+      csv += `Saída,${item.data},${item.tipo},${item.valor},"${item.observacoes}"\n`
     })
     
     // Custos
@@ -430,7 +430,7 @@ class BoletimContabilService {
     return csv
   }
 
-  // Fechar boletim do perÃ­odo
+  // Fechar boletim do período
   async fecharBoletim(periodo) {
     const boletim = await this.carregarBoletim(periodo)
     if (!boletim) return false
@@ -441,7 +441,7 @@ class BoletimContabilService {
     return await this.salvarBoletim(boletim)
   }
 
-  // Adicionar listener para mudanÃ§as
+  // Adicionar listener para mudanças
   addListener(callback) {
     this.listeners.push(callback)
   }
@@ -462,7 +462,7 @@ class BoletimContabilService {
     })
   }
 
-  // Sincronizar com operaÃ§Ãµes existentes
+  // Sincronizar com operações existentes
   async sincronizarOperacoesExistentes() {
     try {
       // Carregar animais existentes
@@ -520,16 +520,16 @@ class BoletimContabilService {
         }
       }
 
-      console.log('âÅ“â€¦ SincronizaÃ§Ã£o de operaÃ§Ãµes concluÃ­da')
+      console.log('✅ Sincronização de operações concluída')
       return true
     } catch (error) {
-      console.error('â�Å’ Erro na sincronizaÃ§Ã£o:', error)
+      console.error('❌ Erro na sincronização:', error)
       return false
     }
   }
 }
 
-// InstÃ¢ncia singleton
+// Instância singleton
 const boletimContabilService = new BoletimContabilService()
 
 export default boletimContabilService

@@ -21,7 +21,7 @@ import Modal from '../ui/Modal'
 import ModernAnimalForm from './ModernAnimalForm'
 import { useAnimals } from '../../hooks/useAnimals'
 
-// Memoizar o componente AnimalCard para evitar re-renderizaÃ§Ãµes desnecessÃ¡rias
+// Memoizar o componente AnimalCard para evitar re-renderizações desnecessárias
 const AnimalCard = memo(({ animal, onView, onEdit, onDelete }) => {
   const getSituationBadge = useCallback((situacao) => {
     const variants = {
@@ -45,7 +45,7 @@ const AnimalCard = memo(({ animal, onView, onEdit, onDelete }) => {
     return diffMonths
   }, [animal.data_nascimento])
   
-  // Pegar localizaÃ§Ã£o
+  // Pegar localização
   const localizacao = animal.pasto_atual || animal.piquete_atual || animal.pastoAtual || animal.piqueteAtual
 
   return (
@@ -71,7 +71,7 @@ const AnimalCard = memo(({ animal, onView, onEdit, onDelete }) => {
             <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
               <div className="flex items-center gap-4">
                 <p><span className="font-medium">Sexo:</span> {animal.sexo}</p>
-                <p><span className="font-medium">RaÃ§a:</span> {animal.raca}</p>
+                <p><span className="font-medium">Raça:</span> {animal.raca}</p>
               </div>
               
               {idadeMeses !== null && (
@@ -84,14 +84,14 @@ const AnimalCard = memo(({ animal, onView, onEdit, onDelete }) => {
               
               {localizacao && (
                 <p className="flex items-center gap-1">
-                  <span className="font-medium">ðÅ¸â€œ� Local:</span> 
+                  <span className="font-medium">📍 Local:</span> 
                   <span className="text-amber-600 dark:text-amber-400 font-semibold">{localizacao}</span>
                 </p>
               )}
               
               {(animal.abczg || animal.abczg === 0) && (
                 <p className="flex items-center gap-1">
-                  <span className="font-medium">ðÅ¸�â€  iABCZ:</span> 
+                  <span className="font-medium">🏆 iABCZ:</span> 
                   <span className="text-blue-600 dark:text-blue-400 font-bold">{animal.abczg}</span>
                 </p>
               )}
@@ -235,28 +235,28 @@ const ModernAnimalList = memo(() => {
       }
 
       if (failCount === 0) {
-        alert(`âÅ“â€¦ Sucesso! ${successCount} animais importados com sucesso!`)
+        alert(`✅ Sucesso! ${successCount} animais importados com sucesso!`)
       } else if (successCount === 0) {
-        alert(`â�Å’ Erro! NÃ£o foi possÃ­vel importar nenhum animal. Verifique os dados e tente novamente.`)
+        alert(`❌ Erro! Não foi possível importar nenhum animal. Verifique os dados e tente novamente.`)
       } else {
-        alert(`âÅ¡ ï¸� ImportaÃ§Ã£o parcial: ${successCount} animais importados com sucesso, ${failCount} falharam.`)
+        alert(`⚠️ Importação parcial: ${successCount} animais importados com sucesso, ${failCount} falharam.`)
       }
 
       setShowAnimalForm(false)
     } catch (error) {
-      alert('â�Å’ Erro: NÃ£o foi possÃ­vel importar os animais')
-      console.error('Erro na importaÃ§Ã£o:', error)
+      alert('❌ Erro: Não foi possível importar os animais')
+      console.error('Erro na importação:', error)
     }
   }
 
   const confirmDelete = async () => {
     try {
       await deleteAnimal(selectedAnimal.id)
-      alert('âÅ“â€¦ Sucesso! Animal removido do rebanho com sucesso!')
+      alert('✅ Sucesso! Animal removido do rebanho com sucesso!')
       setShowDeleteModal(false)
       setSelectedAnimal(null)
     } catch (error) {
-      alert('â�Å’ Erro: NÃ£o foi possÃ­vel excluir o animal')
+      alert('❌ Erro: Não foi possível excluir o animal')
     }
   }
 
@@ -295,7 +295,7 @@ const ModernAnimalList = memo(() => {
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <Input
-                placeholder="Buscar por sÃ©rie, RG, raÃ§a, pai ou mÃ£e..."
+                placeholder="Buscar por série, RG, raça, pai ou mãe..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 leftIcon={<MagnifyingGlassIcon className="h-4 w-4" />}
@@ -308,7 +308,7 @@ const ModernAnimalList = memo(() => {
                 onChange={(e) => setFilterSituacao(e.target.value)}
                 className="input-field w-32"
               >
-                <option value="">Todas situaÃ§Ãµes</option>
+                <option value="">Todas situações</option>
                 <option value="Ativo">Ativo</option>
                 <option value="Vendido">Vendido</option>
                 <option value="Morto">Morto</option>
@@ -322,7 +322,7 @@ const ModernAnimalList = memo(() => {
               >
                 <option value="">Todos sexos</option>
                 <option value="Macho">Macho</option>
-                <option value="FÃªmea">FÃªmea</option>
+                <option value="Fêmea">Fêmea</option>
               </select>
               
               <Button
@@ -363,7 +363,7 @@ const ModernAnimalList = memo(() => {
               Mostrando {filteredAnimals.length} de {animals.length} animais
             </span>
             <div className="flex items-center space-x-2">
-              <span>VisualizaÃ§Ã£o:</span>
+              <span>Visualização:</span>
               <Button
                 variant={viewMode === 'grid' ? 'primary' : 'ghost'}
                 size="sm"
@@ -401,10 +401,10 @@ const ModernAnimalList = memo(() => {
                   <TableRow>
                     <TableHeaderCell>Animal</TableHeaderCell>
                     <TableHeaderCell>Sexo</TableHeaderCell>
-                    <TableHeaderCell>RaÃ§a</TableHeaderCell>
+                    <TableHeaderCell>Raça</TableHeaderCell>
                     <TableHeaderCell>Idade</TableHeaderCell>
-                    <TableHeaderCell>SituaÃ§Ã£o</TableHeaderCell>
-                    <TableHeaderCell>AÃ§Ãµes</TableHeaderCell>
+                    <TableHeaderCell>Situação</TableHeaderCell>
+                    <TableHeaderCell>Ações</TableHeaderCell>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -472,7 +472,7 @@ const ModernAnimalList = memo(() => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  IdentificaÃ§Ã£o
+                  Identificação
                 </label>
                 <p className="text-lg font-semibold">
                   {selectedAnimal.serie}{selectedAnimal.rg}
@@ -480,7 +480,7 @@ const ModernAnimalList = memo(() => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  SituaÃ§Ã£o
+                  Situação
                 </label>
                 <Badge variant={getSituationBadge(selectedAnimal.situacao)}>
                   {selectedAnimal.situacao}
@@ -497,7 +497,7 @@ const ModernAnimalList = memo(() => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  RaÃ§a
+                  Raça
                 </label>
                 <p>{selectedAnimal.raca}</p>
               </div>
@@ -515,7 +515,7 @@ const ModernAnimalList = memo(() => {
             {selectedAnimal.mae && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  MÃ£e
+                  Mãe
                 </label>
                 <p>{selectedAnimal.mae}</p>
               </div>
@@ -524,7 +524,7 @@ const ModernAnimalList = memo(() => {
             {selectedAnimal.observacoes && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  ObservaÃ§Ãµes
+                  Observações
                 </label>
                 <p>{selectedAnimal.observacoes}</p>
               </div>
@@ -546,14 +546,14 @@ const ModernAnimalList = memo(() => {
       <Modal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
-        title="Confirmar ExclusÃ£o"
+        title="Confirmar Exclusão"
       >
         {selectedAnimal && (
           <div className="space-y-4">
             <p className="text-gray-600 dark:text-gray-400">
               Tem certeza que deseja excluir o animal{' '}
               <strong>{selectedAnimal.serie}{selectedAnimal.rg}</strong>?
-              Esta aÃ§Ã£o nÃ£o pode ser desfeita.
+              Esta ação não pode ser desfeita.
             </p>
             
             <div className="flex justify-end space-x-3">

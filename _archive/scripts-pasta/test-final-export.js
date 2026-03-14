@@ -12,7 +12,7 @@ async function testFinalExport() {
   const client = await pool.connect()
   
   try {
-    console.log('�Ÿ”� Testando exportação final...')
+    console.log('🔍 Testando exportação final...')
     
     // Período do mês atual (igual ao frontend)
     const now = new Date()
@@ -24,7 +24,7 @@ async function testFinalExport() {
       endDate: lastDay.toISOString().split('T')[0]
     }
     
-    console.log(`�Ÿ“… Período: ${period.startDate} até ${period.endDate}`)
+    console.log(`📅 Período: ${period.startDate} até ${period.endDate}`)
     
     // Executar a mesma consulta da API
     const nfsEntradas = await client.query(`
@@ -35,7 +35,7 @@ async function testFinalExport() {
       ORDER BY data_compra DESC
     `, [period.startDate, period.endDate])
     
-    console.log(`\n�Ÿ“„ NFs de entrada encontradas: ${nfsEntradas.rows.length}`)
+    console.log(`\n📄 NFs de entrada encontradas: ${nfsEntradas.rows.length}`)
     
     nfsEntradas.rows.forEach((nf, index) => {
       console.log(`\n${index + 1}. NF: ${nf.numero_nf}`)
@@ -64,7 +64,7 @@ async function testFinalExport() {
     // Verificar especificamente a NF do Joaozinho
     const nfJoaozinho = nfsEntradas.rows.find(nf => nf.numero_nf === '1020')
     if (nfJoaozinho) {
-      console.log('\n�œ… NF do Joaozinho encontrada!')
+      console.log('\n✅ NF do Joaozinho encontrada!')
       console.log(`   Fornecedor: ${nfJoaozinho.fornecedor}`)
       console.log(`   Observações: ${nfJoaozinho.observacoes}`)
       
@@ -80,11 +80,11 @@ async function testFinalExport() {
         console.log(`     ${itemIndex + 1}. ${item.tatuagem} (${item.raca})`)
       })
     } else {
-      console.log('\n�Œ NF do Joaozinho N�ƒO encontrada!')
+      console.log('\n❌ NF do Joaozinho NÃO encontrada!')
     }
     
     // Verificar se os animais estão cadastrados
-    console.log('\n�Ÿ”� Verificando animais na tabela...')
+    console.log('\n🔍 Verificando animais na tabela...')
     const animaisResult = await client.query(`
       SELECT serie, rg, raca, situacao, observacoes
       FROM animais 
@@ -92,14 +92,14 @@ async function testFinalExport() {
       ORDER BY created_at DESC
     `)
     
-    console.log(`�Ÿ�„ Animais encontrados: ${animaisResult.rows.length}`)
+    console.log(`🐄 Animais encontrados: ${animaisResult.rows.length}`)
     animaisResult.rows.forEach((animal, index) => {
       console.log(`   ${index + 1}. ${animal.serie}${animal.rg} (${animal.raca}) - ${animal.situacao}`)
       console.log(`      Observações: ${animal.observacoes || 'Nenhuma'}`)
     })
     
   } catch (error) {
-    console.error('�Œ Erro no teste:', error)
+    console.error('❌ Erro no teste:', error)
     throw error
   } finally {
     client.release()
@@ -110,11 +110,11 @@ async function testFinalExport() {
 if (require.main === module) {
   testFinalExport()
     .then(() => {
-      console.log('�ŸŽ‰ Teste concluído!')
+      console.log('🎉 Teste concluído!')
       process.exit(0)
     })
     .catch((error) => {
-      console.error('�Ÿ’� Erro no teste:', error)
+      console.error('💥 Erro no teste:', error)
       process.exit(1)
     })
 }

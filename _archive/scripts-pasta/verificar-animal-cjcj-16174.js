@@ -2,7 +2,7 @@ const { query } = require('../lib/database')
 
 async function verificarAnimal() {
   try {
-    console.log('�Ÿ”� Verificando animal CJCJ 16174 no banco de dados...\n')
+    console.log('🔍 Verificando animal CJCJ 16174 no banco de dados...\n')
 
     // Buscar por diferentes variações
     const variacoes = [
@@ -20,7 +20,7 @@ async function verificarAnimal() {
     `, ['CJCJ', '16174'])
 
     if (busca1.rows.length > 0) {
-      console.log(`   �œ… Encontrado: ${busca1.rows.length} registro(s)`)
+      console.log(`   ✅ Encontrado: ${busca1.rows.length} registro(s)`)
       busca1.rows.forEach(animal => {
         console.log(`      ID: ${animal.id}`)
         console.log(`      Série: ${animal.serie}`)
@@ -33,7 +33,7 @@ async function verificarAnimal() {
         console.log('')
       })
     } else {
-      console.log('   �Œ Não encontrado por série e RG exatos')
+      console.log('   ❌ Não encontrado por série e RG exatos')
     }
 
     // Busca 2: Por RG apenas (caso a série esteja diferente)
@@ -47,12 +47,12 @@ async function verificarAnimal() {
     `, ['16174'])
 
     if (busca2.rows.length > 0) {
-      console.log(`   �œ… Encontrado: ${busca2.rows.length} registro(s)`)
+      console.log(`   ✅ Encontrado: ${busca2.rows.length} registro(s)`)
       busca2.rows.forEach(animal => {
         console.log(`      ID: ${animal.id}, Série: ${animal.serie}, RG: ${animal.rg}, Nome: ${animal.nome || 'N/A'}`)
       })
     } else {
-      console.log('   �Œ Não encontrado por RG')
+      console.log('   ❌ Não encontrado por RG')
     }
 
     // Busca 3: Busca parcial (caso tenha espaços ou formatação diferente)
@@ -68,12 +68,12 @@ async function verificarAnimal() {
     `)
 
     if (busca3.rows.length > 0) {
-      console.log(`   �œ… Encontrado: ${busca3.rows.length} registro(s)`)
+      console.log(`   ✅ Encontrado: ${busca3.rows.length} registro(s)`)
       busca3.rows.forEach(animal => {
         console.log(`      ID: ${animal.id}, Série: ${animal.serie}, RG: ${animal.rg}, Nome: ${animal.nome || 'N/A'}`)
       })
     } else {
-      console.log('   �Œ Não encontrado por busca parcial')
+      console.log('   ❌ Não encontrado por busca parcial')
     }
 
     // Busca 4: Verificar se está inativo ou com situação diferente
@@ -81,7 +81,7 @@ async function verificarAnimal() {
     if (busca1.rows.length > 0) {
       const animal = busca1.rows[0]
       console.log(`   Situação: ${animal.situacao || 'N/A'}`)
-      console.log(`   Está ativo: ${animal.situacao === 'Ativo' || animal.situacao === 'Ativa' ? '�œ… SIM' : '�Œ N�ƒO'}`)
+      console.log(`   Está ativo: ${animal.situacao === 'Ativo' || animal.situacao === 'Ativa' ? '✅ SIM' : '❌ NÃO'}`)
     }
 
     // Busca 5: Verificar em outras tabelas relacionadas
@@ -116,7 +116,7 @@ async function verificarAnimal() {
     }
 
   } catch (error) {
-    console.error('�Œ Erro:', error)
+    console.error('❌ Erro:', error)
     throw error
   }
 }
@@ -124,11 +124,11 @@ async function verificarAnimal() {
 if (require.main === module) {
   verificarAnimal()
     .then(() => {
-      console.log('\n�œ… Verificação concluída!')
+      console.log('\n✅ Verificação concluída!')
       process.exit(0)
     })
     .catch((error) => {
-      console.error('�Œ Erro:', error)
+      console.error('❌ Erro:', error)
       process.exit(1)
     })
 }

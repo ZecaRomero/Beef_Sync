@@ -70,17 +70,17 @@ export default function FutureProjections() {
           
           if (diff > 0) {
               strategies.push({
-                  title: `CenÃ¡rio de Alta: +${percentChange}%`,
-                  description: `Se a arroba atingir R$ ${boi.toFixed(2)}, sua margem lÃ­quida expande significativamente.`,
-                  action: 'EstratÃ©gia: Segurar animais prÃ³ximos do acabamento para aproveitar a alta, mas travar custos operacionais agora.',
+                  title: `Cenário de Alta: +${percentChange}%`,
+                  description: `Se a arroba atingir R$ ${boi.toFixed(2)}, sua margem líquida expande significativamente.`,
+                  action: 'Estratégia: Segurar animais próximos do acabamento para aproveitar a alta, mas travar custos operacionais agora.',
                   icon: 'trending_up',
                   color: 'green'
               })
           } else if (diff < 0) {
               strategies.push({
-                  title: `CenÃ¡rio de Baixa: ${percentChange}%`,
+                  title: `Cenário de Baixa: ${percentChange}%`,
                   description: `Com a arroba a R$ ${boi.toFixed(2)}, a margem fica comprimida.`,
-                  action: 'EstratÃ©gia: Acelerar vendas dos animais prontos antes da queda se concretizar. Considere hedge na B3.',
+                  action: 'Estratégia: Acelerar vendas dos animais prontos antes da queda se concretizar. Considere hedge na B3.',
                   icon: 'trending_down',
                   color: 'red'
               })
@@ -93,7 +93,7 @@ export default function FutureProjections() {
         sentiment = 'positive'
         strategies.push({
           title: 'Oportunidade de Confinamento',
-          description: `A relaÃ§Ã£o de troca estÃ¡ favorÃ¡vel (${relacaoTroca.toFixed(2)} sacas/@). O custo de produÃ§Ã£o estÃ¡ baixo em relaÃ§Ã£o ao preÃ§o de venda.`,
+          description: `A relação de troca está favorável (${relacaoTroca.toFixed(2)} sacas/@). O custo de produção está baixo em relação ao preço de venda.`,
           action: 'Recomendamos intensificar o manejo para acelerar o acabamento.',
           icon: 'trending_up',
           color: 'green'
@@ -102,16 +102,16 @@ export default function FutureProjections() {
         sentiment = 'negative'
         strategies.push({
     title: 'Custo Operacional Elevado',
-    description: `Insumos e manutenÃ§Ã£o estÃ£o impactando a margem. Margens operacionais apertadas.`,
-    action: 'Foque em eficiÃªncia de pastejo e otimizaÃ§Ã£o de recursos. Evite gastos desnecessÃ¡rios.',
+    description: `Insumos e manutenção estão impactando a margem. Margens operacionais apertadas.`,
+    action: 'Foque em eficiência de pastejo e otimização de recursos. Evite gastos desnecessários.',
           icon: 'trending_down',
           color: 'red'
         })
       } else {
         strategies.push({
-          title: 'Margens EstÃ¡veis',
-          description: 'RelaÃ§Ã£o de troca dentro da mÃ©dia histÃ³rica.',
-          action: 'Mantenha o planejamento operacional padrÃ£o e monitore oportunidades de compra de insumos.',
+          title: 'Margens Estáveis',
+          description: 'Relação de troca dentro da média histórica.',
+          action: 'Mantenha o planejamento operacional padrão e monitore oportunidades de compra de insumos.',
           icon: 'minus',
           color: 'blue'
         })
@@ -120,17 +120,17 @@ export default function FutureProjections() {
       // Logic 2: Boi Gordo Price Absolute
       if (boi > 280) {
         strategies.push({
-          title: 'Momento de Venda (PreÃ§o Alvo)',
-          description: 'PreÃ§o da arroba em patamares histÃ³ricos altos.',
-          action: 'Considere travar preÃ§os futuros ou vender animais prontos imediatamente para realizar lucro.',
+          title: 'Momento de Venda (Preço Alvo)',
+          description: 'Preço da arroba em patamares históricos altos.',
+          action: 'Considere travar preços futuros ou vender animais prontos imediatamente para realizar lucro.',
           icon: 'dollar',
           color: 'green'
         })
       } else if (boi < 220) {
         strategies.push({
           title: 'Segurar Vendas (Baixa)',
-          description: 'PreÃ§o da arroba pressionado.',
-          action: 'Se possÃ­vel, segure os animais em pastagem para aguardar recuperaÃ§Ã£o de preÃ§os na entressafra.',
+          description: 'Preço da arroba pressionado.',
+          action: 'Se possível, segure os animais em pastagem para aguardar recuperação de preços na entressafra.',
           icon: 'clock',
           color: 'yellow'
         })
@@ -140,18 +140,18 @@ export default function FutureProjections() {
       projection = {
         optimistic: {
           roi: (boi * 1.15 - 200).toFixed(2), // Mock ROI calculation
-          label: 'CenÃ¡rio Otimista (+15%)',
-          details: 'RecuperaÃ§Ã£o da demanda interna e exportaÃ§Ã£o aquecida.'
+          label: 'Cenário Otimista (+15%)',
+          details: 'Recuperação da demanda interna e exportação aquecida.'
         },
         realistic: {
           roi: (boi - 200).toFixed(2),
-          label: 'CenÃ¡rio Base',
-          details: 'ManutenÃ§Ã£o dos fundamentos atuais de oferta e demanda.'
+          label: 'Cenário Base',
+          details: 'Manutenção dos fundamentos atuais de oferta e demanda.'
         },
         pessimistic: {
           roi: (boi * 0.9 - 200).toFixed(2),
-          label: 'CenÃ¡rio Pessimista (-10%)',
-          details: 'PressÃ£o de oferta ou queda no consumo.'
+          label: 'Cenário Pessimista (-10%)',
+          details: 'Pressão de oferta ou queda no consumo.'
         }
       }
 
@@ -170,10 +170,10 @@ export default function FutureProjections() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
             <SparklesIcon className="h-8 w-8 text-violet-600" />
-            Planejamento EstratÃ©gico com IA
+            Planejamento Estratégico com IA
           </h1>
           <p className="text-gray-600 dark:text-gray-300 mt-2">
-            Simule cenÃ¡rios e receba insights inteligentes baseados em dados de mercado.
+            Simule cenários e receba insights inteligentes baseados em dados de mercado.
           </p>
         </div>
       </div>
@@ -183,7 +183,7 @@ export default function FutureProjections() {
         {/* Market Data */}
         <ModernCard className="lg:col-span-2 border-t-4 border-violet-500">
           <ModernCardHeader 
-            title="ParÃ¢metros de Mercado" 
+            title="Parâmetros de Mercado" 
             subtitle="Informe os indicadores atuais para a IA processar"
             icon={<PresentationChartLineIcon className="h-6 w-6 text-violet-600" />}
           />
@@ -231,7 +231,7 @@ export default function FutureProjections() {
                 {loading && !simulationMode ? 'Processando...' : (
                   <span className="flex items-center gap-2">
                     <SparklesIcon className="h-5 w-5" />
-                    Gerar AnÃ¡lise Atual
+                    Gerar Análise Atual
                   </span>
                 )}
               </Button>
@@ -242,15 +242,15 @@ export default function FutureProjections() {
         {/* Simulation Widget */}
         <ModernCard className="border-t-4 border-fuchsia-500 bg-gradient-to-b from-white to-fuchsia-50 dark:from-gray-800 dark:to-fuchsia-900/10">
             <ModernCardHeader
-                title="Simulador de CenÃ¡rios"
-                subtitle="O que acontece se o preÃ§o mudar?"
+                title="Simulador de Cenários"
+                subtitle="O que acontece se o preço mudar?"
                 icon={<ArrowPathIcon className="h-6 w-6 text-fuchsia-600" />}
             />
             <ModernCardBody>
                 <div className="space-y-6">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Simular PreÃ§o da @: <span className="text-fuchsia-600 font-bold text-lg">R$ {simulationPrice.toFixed(2)}</span>
+                            Simular Preço da @: <span className="text-fuchsia-600 font-bold text-lg">R$ {simulationPrice.toFixed(2)}</span>
                         </label>
                         <input 
                             type="range" 
@@ -272,7 +272,7 @@ export default function FutureProjections() {
 
                     <div className="bg-white/50 dark:bg-black/20 p-4 rounded-xl border border-fuchsia-100 dark:border-fuchsia-900/30">
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                            VariaÃ§Ã£o em relaÃ§Ã£o ao atual:
+                            Variação em relação ao atual:
                             <span className={`font-bold ml-1 ${
                                 simulationPrice > parseFloat(marketData.boiGordo) ? 'text-green-600' : 
                                 simulationPrice < parseFloat(marketData.boiGordo) ? 'text-red-600' : 'text-gray-600'
@@ -341,7 +341,7 @@ export default function FutureProjections() {
                   
                   <div className="bg-white/60 dark:bg-black/20 rounded-lg p-3 backdrop-blur-sm border border-white/20">
                     <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 flex gap-2">
-                      <span className="text-violet-600">ðÅ¸â€™¡ SugestÃ£o:</span>
+                      <span className="text-violet-600">💡 Sugestão:</span>
                       {strategy.action}
                     </p>
                   </div>
@@ -353,7 +353,7 @@ export default function FutureProjections() {
           {/* Projection Scenarios */}
           <ModernCard>
             <ModernCardHeader 
-              title="CenÃ¡rios Projetados (Margem Estimada / Animal)" 
+              title="Cenários Projetados (Margem Estimada / Animal)" 
               icon={<ChartBarIcon className="h-5 w-5 text-gray-500" />}
             />
             <ModernCardBody>

@@ -2,7 +2,7 @@ const fs = require('fs');
 
 const backupFile = 'backups/backup_completo_2025-12-16_14.sql';
 
-console.log(`�Ÿ“� Analisando: ${backupFile}\n`);
+console.log(`📦 Analisando: ${backupFile}\n`);
 
 const content = fs.readFileSync(backupFile, 'utf8');
 
@@ -22,21 +22,21 @@ for (const line of lines) {
   }
 }
 
-console.log('�Ÿ“Š Tabelas encontradas no backup:\n');
+console.log('📊 Tabelas encontradas no backup:\n');
 tabelas.forEach(t => {
   console.log(`  ${t.nome}: ${t.registros} registros`);
 });
 
-console.log(`\n�Ÿ“ˆ Total: ${tabelas.length} tabelas`);
+console.log(`\n📈 Total: ${tabelas.length} tabelas`);
 
 // Verificar tabelas importantes
 const importantes = ['dna_envios', 'abastecimento_nitrogenio', 'exames_andrologicos'];
-console.log('\n�Ÿ”� Tabelas importantes:');
+console.log('\n🔍 Tabelas importantes:');
 importantes.forEach(nome => {
   const tabela = tabelas.find(t => t.nome === nome);
   if (tabela) {
-    console.log(`  �œ… ${nome}: ${tabela.registros} registros`);
+    console.log(`  ✅ ${nome}: ${tabela.registros} registros`);
   } else {
-    console.log(`  �Œ ${nome}: N�ƒO ENCONTRADA`);
+    console.log(`  ❌ ${nome}: NÃO ENCONTRADA`);
   }
 });

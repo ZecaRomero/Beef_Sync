@@ -21,14 +21,14 @@ async function query(text, params) {
 
 async function generateLocationReport(period, sections) {
   const report = {};
-  console.log('�Ÿ”� Iniciando geração do relatório de localização...');
-  console.log('�Ÿ“… Período:', period);
-  console.log('�Ÿ“‹ Seções:', sections);
+  console.log('🔍 Iniciando geração do relatório de localização...');
+  console.log('📅 Período:', period);
+  console.log('📋 Seções:', sections);
 
   try {
     // Localização atual dos animais
     if (!sections || sections.localizacao_atual !== false) {
-      console.log('\n�Ÿ“� Consultando localização atual...');
+      console.log('\n📍 Consultando localização atual...');
       const localizacaoAtualResult = await query(`
         SELECT 
           a.id,
@@ -48,13 +48,13 @@ async function generateLocationReport(period, sections) {
         ORDER BY l.piquete, a.serie
       `);
 
-      console.log(`�œ… Localização atual: ${localizacaoAtualResult.rows.length} registros`);
+      console.log(`✅ Localização atual: ${localizacaoAtualResult.rows.length} registros`);
       report.localizacao_atual = localizacaoAtualResult.rows;
     }
 
     // Histórico de movimentações no período
     if (!sections || sections.historico_movimentacoes !== false) {
-      console.log('\n�Ÿ“œ Consultando histórico de movimentações...');
+      console.log('\n📜 Consultando histórico de movimentações...');
       const historicoResult = await query(`
         SELECT 
           a.serie,
@@ -73,13 +73,13 @@ async function generateLocationReport(period, sections) {
         ORDER BY l.data_entrada DESC
       `, [period.startDate, period.endDate]);
 
-      console.log(`�œ… Histórico: ${historicoResult.rows.length} registros`);
+      console.log(`✅ Histórico: ${historicoResult.rows.length} registros`);
       report.historico_movimentacoes = historicoResult.rows;
     }
 
     // Animais por piquete
     if (!sections || sections.animais_por_piquete !== false) {
-      console.log('\n�Ÿ�� Consultando animais por piquete...');
+      console.log('\n🏡 Consultando animais por piquete...');
       const porPiqueteResult = await query(`
         SELECT 
           l.piquete,
@@ -94,13 +94,13 @@ async function generateLocationReport(period, sections) {
         ORDER BY l.piquete
       `);
 
-      console.log(`�œ… Piquetes: ${porPiqueteResult.rows.length} registros`);
+      console.log(`✅ Piquetes: ${porPiqueteResult.rows.length} registros`);
       report.animais_por_piquete = porPiqueteResult.rows;
     }
 
     // Movimentações recentes (últimos 30 dias)
     if (!sections || sections.movimentacoes_recentes !== false) {
-      console.log('\n�Ÿ”„ Consultando movimentações recentes...');
+      console.log('\n🔄 Consultando movimentações recentes...');
       const recentesResult = await query(`
         SELECT 
           a.serie,
@@ -116,13 +116,13 @@ async function generateLocationReport(period, sections) {
         LIMIT 50
       `);
 
-      console.log(`�œ… Movimentações recentes: ${recentesResult.rows.length} registros`);
+      console.log(`✅ Movimentações recentes: ${recentesResult.rows.length} registros`);
       report.movimentacoes_recentes = recentesResult.rows;
     }
 
     // Animais sem localização
     if (!sections || sections.animais_sem_localizacao !== false) {
-      console.log('\n�“ Consultando animais sem localização...');
+      console.log('\n❓ Consultando animais sem localização...');
       const semLocalizacaoResult = await query(`
         SELECT 
           a.id,
@@ -138,12 +138,12 @@ async function generateLocationReport(period, sections) {
         ORDER BY a.serie
       `);
 
-      console.log(`�œ… Sem localização: ${semLocalizacaoResult.rows.length} registros`);
+      console.log(`✅ Sem localização: ${semLocalizacaoResult.rows.length} registros`);
       report.animais_sem_localizacao = semLocalizacaoResult.rows;
     }
 
-    console.log('\n�Ÿ“Š Relatório gerado com sucesso!');
-    console.log('�Ÿ“ˆ Resumo do relatório:', {
+    console.log('\n📊 Relatório gerado com sucesso!');
+    console.log('📈 Resumo do relatório:', {
       localizacao_atual: report.localizacao_atual?.length || 0,
       historico_movimentacoes: report.historico_movimentacoes?.length || 0,
       animais_por_piquete: report.animais_por_piquete?.length || 0,
@@ -153,13 +153,13 @@ async function generateLocationReport(period, sections) {
 
     return report;
   } catch (error) {
-    console.error('�Œ Erro ao gerar relatório de localização:', error);
+    console.error('❌ Erro ao gerar relatório de localização:', error);
     return {};
   }
 }
 
 async function testLocationReport() {
-  console.log('=== TESTE DO RELAT�“RIO DE LOCALIZA�‡�ƒO ===\n');
+  console.log('=== TESTE DO RELATÓRIO DE LOCALIZAÇÃO ===\n');
   
   const period = {
     startDate: '2025-10-01',
@@ -182,12 +182,12 @@ async function testLocationReport() {
   // Verificar especificamente o Piquete 4
   if (report.localizacao_atual) {
     const piquete4 = report.localizacao_atual.filter(animal => animal.piquete === 'Piquete 4');
-    console.log('\n�ŸŽ� Animais no Piquete 4:', piquete4);
+    console.log('\n🎯 Animais no Piquete 4:', piquete4);
   }
   
   if (report.animais_por_piquete) {
     const piquete4Stats = report.animais_por_piquete.find(p => p.piquete === 'Piquete 4');
-    console.log('�Ÿ“Š Estatísticas do Piquete 4:', piquete4Stats);
+    console.log('📊 Estatísticas do Piquete 4:', piquete4Stats);
   }
 
   await pool.end();

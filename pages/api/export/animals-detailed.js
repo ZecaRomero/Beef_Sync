@@ -8,35 +8,35 @@ async function handler(req, res) {
     return sendMethodNotAllowed(res, 'GET')
   }
 
-  logger.info('ðÅ¸â€œÅ  Gerando relatÃ³rio detalhado de animais...')
+  logger.info('📊 Gerando relatório detalhado de animais...')
 
   // Buscar todos os animais
   const animais = await databaseService.buscarAnimais()
   
   if (animais.length === 0) {
-    return sendNotFound(res, 'Nenhum animal encontrado para exportaÃ§Ã£o')
+    return sendNotFound(res, 'Nenhum animal encontrado para exportação')
   }
 
-  // Formatar dados incluindo informaÃ§Ãµes de morte
+  // Formatar dados incluindo informações de morte
   const dadosFormatados = await formatAnimalDataForExport(animais)
   
   // Preparar dados para Excel
   const dadosExcel = dadosFormatados.map(animal => ({
-    'SÃ©rie': animal['SÃ©rie'],
+    'Série': animal['Série'],
     'RG': animal['RG'],
-    'RaÃ§a': animal['RaÃ§a'],
+    'Raça': animal['Raça'],
     'Sexo': animal['Sexo'],
     'Idade (meses)': animal['Idade (meses)'],
-    'SituaÃ§Ã£o': animal['SituaÃ§Ã£o'],
+    'Situação': animal['Situação'],
     'Custo Total (R$)': animal['Custo Total (R$)'],
     'Data Nascimento': animal['Data Nascimento'],
     'Peso': animal['Peso'] || 'N/A',
-    'ObservaÃ§Ãµes': animal['ObservaÃ§Ãµes'] || 'N/A',
+    'Observações': animal['Observações'] || 'N/A',
     'Data Cadastro': animal['Data Cadastro'] || 'N/A',
     'Data da Morte': animal['Data da Morte'],
     'Causa da Morte': animal['Causa da Morte'],
     'Valor da Perda (R$)': animal['Valor da Perda (R$)'],
-    'ObservaÃ§Ãµes da Morte': animal['ObservaÃ§Ãµes da Morte']
+    'Observações da Morte': animal['Observações da Morte']
   }))
 
   // Gerar arquivo Excel
@@ -59,21 +59,21 @@ async function generateDetailedExcelReport(data) {
 
   // Definir colunas
   worksheet.columns = [
-    { header: 'SÃ©rie', key: 'SÃ©rie', width: 10 },
+    { header: 'Série', key: 'Série', width: 10 },
     { header: 'RG', key: 'RG', width: 12 },
-    { header: 'RaÃ§a', key: 'RaÃ§a', width: 15 },
+    { header: 'Raça', key: 'Raça', width: 15 },
     { header: 'Sexo', key: 'Sexo', width: 10 },
     { header: 'Idade (meses)', key: 'Idade (meses)', width: 12 },
-    { header: 'SituaÃ§Ã£o', key: 'SituaÃ§Ã£o', width: 12 },
+    { header: 'Situação', key: 'Situação', width: 12 },
     { header: 'Custo Total', key: 'Custo Total (R$)', width: 15 },
     { header: 'Data Nascimento', key: 'Data Nascimento', width: 15 },
     { header: 'Peso', key: 'Peso', width: 10 },
-    { header: 'ObservaÃ§Ãµes', key: 'ObservaÃ§Ãµes', width: 20 },
+    { header: 'Observações', key: 'Observações', width: 20 },
     { header: 'Data Cadastro', key: 'Data Cadastro', width: 15 },
     { header: 'Data da Morte', key: 'Data da Morte', width: 15 },
     { header: 'Causa da Morte', key: 'Causa da Morte', width: 15 },
     { header: 'Valor da Perda (R$)', key: 'Valor da Perda (R$)', width: 15 },
-    { header: 'ObservaÃ§Ãµes da Morte', key: 'ObservaÃ§Ãµes da Morte', width: 20 }
+    { header: 'Observações da Morte', key: 'Observações da Morte', width: 20 }
   ]
 
   // Adicionar dados
@@ -81,7 +81,7 @@ async function generateDetailedExcelReport(data) {
     worksheet.addRow(row)
   })
 
-  // FormataÃ§Ã£o do cabeÃ§alho - Fundo roxo com texto branco
+  // Formatação do cabeçalho - Fundo roxo com texto branco
   const headerRow = worksheet.getRow(1)
   headerRow.eachCell((cell) => {
     cell.fill = {
@@ -105,7 +105,7 @@ async function generateDetailedExcelReport(data) {
     }
   })
 
-  // FormataÃ§Ã£o das linhas de dados - Fundo cinza claro com texto centralizado
+  // Formatação das linhas de dados - Fundo cinza claro com texto centralizado
   worksheet.eachRow((row, rowNumber) => {
     if (rowNumber > 1) {
       row.eachCell((cell) => {
@@ -125,10 +125,10 @@ async function generateDetailedExcelReport(data) {
           right: { style: 'thin', color: { argb: 'FF000000' } }
         }
         
-        // FormataÃ§Ã£o especÃ­fica por tipo de dado
+        // Formatação específica por tipo de dado
         const columnKey = worksheet.columns[cell.col - 1].key
         
-        // Formatar nÃºmeros monetÃ¡rios
+        // Formatar números monetários
         if (columnKey === 'Custo Total (R$)' || columnKey === 'Valor da Perda (R$)') {
           if (cell.value && cell.value !== 'N/A' && typeof cell.value === 'number') {
             cell.numFmt = '#,##0.00'
@@ -144,7 +144,7 @@ async function generateDetailedExcelReport(data) {
           }
         }
         
-        // Formatar nÃºmeros inteiros
+        // Formatar números inteiros
         if (columnKey === 'Idade (meses)' || columnKey === 'Peso') {
           if (cell.value && cell.value !== 'N/A' && typeof cell.value === 'number') {
             cell.numFmt = '0'

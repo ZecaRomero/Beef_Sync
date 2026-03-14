@@ -77,7 +77,7 @@ export default function AnimalMainInfo({
   return (
     <div className={`bg-white/95 dark:bg-gray-800/95 rounded-xl border ${getCardBorderClasses(sexTheme)} dark:border-gray-600 overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 backdrop-blur-sm`}>
       <div className={`px-4 py-2.5 ${getCardHeaderClasses(sexTheme)}`}>
-        <p className={`text-[10px] uppercase tracking-wider font-semibold ${getIdentColorClasses(sexTheme)} opacity-90`}>IdentificaÃ§Ã£o</p>
+        <p className={`text-[10px] uppercase tracking-wider font-semibold ${getIdentColorClasses(sexTheme)} opacity-90`}>Identificação</p>
         <p className={`text-sm font-bold tracking-tight ${getIdentColorClasses(sexTheme)}`}>{animal.serie || '-'} {animal.rg || ''}</p>
       </div>
       <div className="p-3 sm:p-4 border-b border-gray-100 dark:border-gray-700">
@@ -93,7 +93,7 @@ export default function AnimalMainInfo({
             <div className="flex flex-wrap gap-2 mt-2">
               {isParidaEPrenha && (
                 <span className="px-3 py-1.5 rounded-full text-sm font-bold bg-gradient-to-r from-amber-100 to-emerald-100 dark:from-amber-900/40 dark:to-emerald-900/40 border-2 border-amber-400/50 dark:border-emerald-500/50 text-amber-900 dark:text-emerald-100 shadow-sm">
-                  ðÅ¸�â€ž PARIDA e PRENHA
+                  🐄 PARIDA e PRENHA
                 </span>
               )}
               {examesAndrologicos.length > 0 && (() => {
@@ -107,19 +107,19 @@ export default function AnimalMainInfo({
                       ? 'bg-white dark:bg-gray-700 border-2 border-red-500 text-red-800 dark:text-red-200'
                       : 'bg-white dark:bg-gray-700 border-2 border-amber-500 text-amber-900 dark:text-amber-200'
                   }`}>
-                    AndrolÃ³gico: {ult.resultado || 'Pendente'}
+                    Andrológico: {ult.resultado || 'Pendente'}
                   </span>
                 )
               })()}
               {animal.fivs?.length > 0 && (
                 <span className="px-3 py-1.5 rounded-full text-sm font-bold bg-white dark:bg-gray-700 border-2 border-violet-500 text-violet-900 dark:text-violet-100 shadow-sm">
-                  ðÅ¸§ª Doadora FIV ââ‚¬¢ {animal.fivs.length} coleta{animal.fivs.length > 1 ? 's' : ''} ââ‚¬¢ {totalOocitos} oÃ³citos
+                  🧪 Doadora FIV • {animal.fivs.length} coleta{animal.fivs.length > 1 ? 's' : ''} • {totalOocitos} oócitos
                 </span>
               )}
             </div>
             <div className="mt-3 flex items-center gap-2 flex-wrap">
               <button type="button" onClick={onCopyIdent} className="min-h-[40px] px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-600 text-xs font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 active:scale-[0.98] transition-all">
-                Copiar identificaÃ§Ã£o
+                Copiar identificação
               </button>
               <button type="button" onClick={onWhatsAppShare} className="min-h-[40px] px-3 py-2 rounded-lg bg-green-500/90 hover:bg-green-600 text-white border border-green-600 dark:border-green-500 text-xs font-semibold active:scale-[0.98] transition-all shadow-sm">
                 WhatsApp
@@ -132,9 +132,9 @@ export default function AnimalMainInfo({
         <BaixaSection baixaPropriaExibir={baixaPropriaExibir} animal={animal} baixasResumo={baixasResumo} />
         <ProleResumoSection baixasResumo={baixasResumo} onOpenProleModal={handleOpenProleModal} />
         <InfoRow label="Sexo" value={animal.sexo} />
-        <InfoRow label="RaÃ§a" value={animal.raca} />
+        <InfoRow label="Raça" value={animal.raca} />
         <InfoRow label="Pelagem" value={animal.pelagem} />
-        <InfoRow label="SituaÃ§Ã£o" value={animal.situacao} />
+        <InfoRow label="Situação" value={animal.situacao} />
         <button
           type="button"
           onClick={() => onScrollToLocation?.()}
@@ -142,10 +142,10 @@ export default function AnimalMainInfo({
         >
           <span className={`text-sm font-medium flex items-center gap-1 ${getLocationTextClasses(sexTheme)}`}>
             <MapPinIcon className="h-4 w-4" />
-            LocalizaÃ§Ã£o (Piquete)
+            Localização (Piquete)
           </span>
           <span className={`text-sm font-bold flex items-center gap-1 ${getIdentColorClasses(sexTheme)}`}>
-            {locAtual || 'NÃ£o informado'}
+            {locAtual || 'Não informado'}
             {onScrollToLocation && <ArrowTopRightOnSquareIcon className="h-3.5 w-3.5 opacity-70" />}
           </span>
         </button>
@@ -167,7 +167,7 @@ export default function AnimalMainInfo({
           <>
             <div className="px-4 py-2.5 flex justify-between items-center bg-pink-50/50 dark:bg-pink-900/20 border-t border-pink-100 dark:border-pink-800/30">
               <span className="text-sm font-medium text-pink-800 dark:text-pink-200">
-                {isPrenha ? 'Touro (IA prenha)' : 'Touro (Ãºltima IA)'}
+                {isPrenha ? 'Touro (IA prenha)' : 'Touro (última IA)'}
               </span>
               <span className="text-sm font-bold text-pink-600 dark:text-pink-400">
                 {ultimaIA.touro_nome || ultimaIA.touro || '-'}
@@ -175,7 +175,7 @@ export default function AnimalMainInfo({
             </div>
             {previsaoPartoExibir && (
               <div className="px-4 py-2.5 flex justify-between items-center bg-emerald-50/50 dark:bg-emerald-900/20 border-t border-emerald-100 dark:border-emerald-800/30">
-                <span className="text-sm font-medium text-emerald-800 dark:text-emerald-200">PrevisÃ£o de Parto</span>
+                <span className="text-sm font-medium text-emerald-800 dark:text-emerald-200">Previsão de Parto</span>
                 <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
                   {previsaoPartoExibir.toLocaleDateString('pt-BR')} ({diasParaParto != null ? diasParaParto : 0} dias)
                 </span>
@@ -196,25 +196,25 @@ export default function AnimalMainInfo({
             <div className="space-y-2 text-sm">
               {(animal.avo_materno || animal.avoMaterno) && (
                 <div className="flex justify-between pl-3 border-l-2 border-amber-300 dark:border-amber-700">
-                  <span className="text-gray-600 dark:text-gray-400 text-xs">AvÃ´ materno</span>
+                  <span className="text-gray-600 dark:text-gray-400 text-xs">Avô materno</span>
                   <span className="font-medium text-gray-900 dark:text-white text-xs">{animal.avo_materno || animal.avoMaterno}</span>
                 </div>
               )}
               {(animal.avo_materna || animal.avoMaterna) && (
                 <div className="flex justify-between pl-3 border-l-2 border-amber-300 dark:border-amber-700">
-                  <span className="text-gray-600 dark:text-gray-400 text-xs">AvÃ³ materna</span>
+                  <span className="text-gray-600 dark:text-gray-400 text-xs">Avó materna</span>
                   <span className="font-medium text-gray-900 dark:text-white text-xs">{animal.avo_materna || animal.avoMaterna}</span>
                 </div>
               )}
               {(animal.avo_paterno || animal.avoPaterno) && (
                 <div className="flex justify-between pl-3 border-l-2 border-blue-300 dark:border-blue-700 mt-3">
-                  <span className="text-gray-600 dark:text-gray-400 text-xs">AvÃ´ paterno</span>
+                  <span className="text-gray-600 dark:text-gray-400 text-xs">Avô paterno</span>
                   <span className="font-medium text-gray-900 dark:text-white text-xs">{animal.avo_paterno || animal.avoPaterno}</span>
                 </div>
               )}
               {(animal.avo_paterna || animal.avoPaterna) && (
                 <div className="flex justify-between pl-3 border-l-2 border-blue-300 dark:border-blue-700">
-                  <span className="text-gray-600 dark:text-gray-400 text-xs">AvÃ³ paterna</span>
+                  <span className="text-gray-600 dark:text-gray-400 text-xs">Avó paterna</span>
                   <span className="font-medium text-gray-900 dark:text-white text-xs">{animal.avo_paterna || animal.avoPaterna}</span>
                 </div>
               )}

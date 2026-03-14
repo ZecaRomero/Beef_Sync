@@ -19,7 +19,7 @@ async function buscarMae() {
       WHERE rg = '15179'
     `)
     
-    console.log(`�Ÿ“‹ Animais encontrados com RG 15179: ${result.rows.length}`)
+    console.log(`📋 Animais encontrados com RG 15179: ${result.rows.length}`)
     result.rows.forEach((animal, index) => {
       console.log(`\n${index + 1}. ${animal.serie}-${animal.rg}:`)
       console.log(`   Nome: ${animal.nome || 'N/A'}`)
@@ -35,7 +35,7 @@ async function buscarMae() {
       LIMIT 10
     `)
     
-    console.log(`\n�Ÿ“‹ Animais com "NESVASCA" no nome/mae/pai: ${resultNome.rows.length}`)
+    console.log(`\n📋 Animais com "NESVASCA" no nome/mae/pai: ${resultNome.rows.length}`)
     resultNome.rows.forEach((animal, index) => {
       console.log(`\n${index + 1}. ${animal.serie}-${animal.rg}:`)
       console.log(`   Nome: ${animal.nome || 'N/A'}`)
@@ -44,7 +44,7 @@ async function buscarMae() {
     })
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message)
+    console.error('❌ Erro:', error.message)
     throw error
   } finally {
     client.release()
@@ -54,11 +54,11 @@ async function buscarMae() {
 
 buscarMae()
   .then(() => {
-    console.log('\n�œ… Script concluído!')
+    console.log('\n✅ Script concluído!')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n�Œ Erro fatal:', error)
+    console.error('\n❌ Erro fatal:', error)
     process.exit(1)
   })
 

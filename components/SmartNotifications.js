@@ -21,7 +21,7 @@ export default function SmartNotifications() {
     const animals = JSON.parse(localStorage.getItem('animals') || '[]')
     const births = JSON.parse(localStorage.getItem('birthData') || '[]')
     
-    // Verificar nascimentos recentes (Ãºltimas 24 horas)
+    // Verificar nascimentos recentes (últimas 24 horas)
     const last24Hours = new Date()
     last24Hours.setHours(last24Hours.getHours() - 24)
     
@@ -34,9 +34,9 @@ export default function SmartNotifications() {
         id: 'recent-births',
         type: 'success',
         title: `${recentBirths.length} Nascimento(s) Recente(s)`,
-        message: `Registrados nas Ãºltimas 24 horas - Verificar protocolos`,
+        message: `Registrados nas últimas 24 horas - Verificar protocolos`,
         time: 'Recente',
-        icon: 'ðÅ¸�â€ž',
+        icon: '🐄',
         action: () => router.push('/nascimentos'),
         priority: 'high'
       })
@@ -52,9 +52,9 @@ export default function SmartNotifications() {
         id: 'young-animals',
         type: 'warning',
         title: 'Protocolos Pendentes',
-        message: `${youngAnimals.length} animais jovens precisam de atenÃ§Ã£o`,
+        message: `${youngAnimals.length} animais jovens precisam de atenção`,
         time: 'Pendente',
-        icon: 'ðÅ¸â€™Å ',
+        icon: '💊',
         action: () => router.push('/custos'),
         priority: 'medium'
       })
@@ -70,9 +70,9 @@ export default function SmartNotifications() {
         id: 'late-receptoras',
         type: 'warning',
         title: 'Receptoras Atrasadas',
-        message: `${lateReceptoras.length} receptoras nÃ£o pariram no prazo`,
+        message: `${lateReceptoras.length} receptoras não pariram no prazo`,
         time: 'Urgente',
-        icon: 'âÅ¡ ï¸�',
+        icon: '⚠️',
         action: () => router.push('/gestacao'),
         priority: 'high'
       })
@@ -87,22 +87,22 @@ export default function SmartNotifications() {
         type: 'warning',
         title: 'Animais para Descarte',
         message: `${animalsToDiscard.length} animais marcados para descarte`,
-        time: 'AÃ§Ã£o necessÃ¡ria',
-        icon: 'ðÅ¸Å¡¨',
+        time: 'Ação necessária',
+        icon: '🚨',
         action: () => router.push('/nascimentos'),
         priority: 'medium'
       })
     }
     
-    // Se nÃ£o hÃ¡ notificaÃ§Ãµes reais, mostrar status positivo
+    // Se não há notificações reais, mostrar status positivo
     if (newNotifications.length === 0) {
       newNotifications.push({
         id: 'all-good',
         type: 'success',
         title: 'Sistema em Ordem',
-        message: 'NÃ£o hÃ¡ alertas ou tarefas pendentes no momento',
+        message: 'Não há alertas ou tarefas pendentes no momento',
         time: 'Atualizado',
-        icon: 'âÅ“â€¦',
+        icon: '✅',
         action: () => router.push('/'),
         priority: 'low'
       })
@@ -145,13 +145,13 @@ export default function SmartNotifications() {
     return (
       <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
         <div className="flex items-center">
-          <div className="text-2xl mr-3">âÅ“â€¦</div>
+          <div className="text-2xl mr-3">✅</div>
           <div>
             <h4 className="font-semibold text-green-800 dark:text-green-200">
               Tudo em Ordem
             </h4>
             <p className="text-sm text-green-700 dark:text-green-300">
-              NÃ£o hÃ¡ notificaÃ§Ãµes pendentes no momento
+              Não há notificações pendentes no momento
             </p>
           </div>
         </div>
@@ -163,7 +163,7 @@ export default function SmartNotifications() {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center">
-          ðÅ¸â€�â€� NotificaÃ§Ãµes Inteligentes
+          🔔 Notificações Inteligentes
           <span className="ml-2 px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 text-xs rounded-full">
             {notifications.length}
           </span>
@@ -179,7 +179,7 @@ export default function SmartNotifications() {
             onClick={generateNotifications}
             className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors text-xs"
           >
-            ðÅ¸â€�â€ž
+            🔄
           </button>
         </div>
       </div>
@@ -214,7 +214,7 @@ export default function SmartNotifications() {
                         }}
                         className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-lg"
                       >
-                        Ãâ€”
+                        ×
                       </button>
                     </div>
                   </div>
@@ -226,7 +226,7 @@ export default function SmartNotifications() {
                       {notification.time}
                     </span>
                     <span className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200">
-                      Clique para ver ââ€ â€™
+                      Clique para ver →
                     </span>
                   </div>
                 </div>
@@ -241,7 +241,7 @@ export default function SmartNotifications() {
           onClick={() => setIsExpanded(true)}
           className="w-full p-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors text-sm text-gray-700 dark:text-gray-300"
         >
-          Ver mais {notifications.length - 2} notificaÃ§Ãµes
+          Ver mais {notifications.length - 2} notificações
         </button>
       )}
 
@@ -258,7 +258,7 @@ export default function SmartNotifications() {
             <div className="flex items-center space-x-1">
               <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
               <span className="text-gray-600 dark:text-gray-400">
-                {notifications.filter(n => n.priority === 'medium').length} mÃ©dias
+                {notifications.filter(n => n.priority === 'medium').length} médias
               </span>
             </div>
             <div className="flex items-center space-x-1">

@@ -12,9 +12,9 @@ async function updateNotasFiscaisTable() {
   const client = await pool.connect()
   
   try {
-    console.log('ðÅ¸â€�â€ž Atualizando estrutura da tabela notas_fiscais...')
+    console.log('🔄 Atualizando estrutura da tabela notas_fiscais...')
     
-    // Adicionar colunas que podem nÃ£o existir
+    // Adicionar colunas que podem não existir
     const alterQueries = [
       "ALTER TABLE notas_fiscais ADD COLUMN IF NOT EXISTS data DATE",
       "ALTER TABLE notas_fiscais ADD COLUMN IF NOT EXISTS natureza_operacao VARCHAR(100)",
@@ -27,22 +27,22 @@ async function updateNotasFiscaisTable() {
     for (const query of alterQueries) {
       try {
         await client.query(query)
-        console.log(`âÅ“â€¦ Executado: ${query}`)
+        console.log(`✅ Executado: ${query}`)
       } catch (error) {
-        console.log(`âÅ¡ ï¸� Ignorado (coluna jÃ¡ existe): ${query}`)
+        console.log(`⚠️ Ignorado (coluna já existe): ${query}`)
       }
     }
     
-    // Adicionar constraints se nÃ£o existirem
+    // Adicionar constraints se não existirem
     try {
       await client.query(`
         ALTER TABLE notas_fiscais 
         ADD CONSTRAINT IF NOT EXISTS check_tipo 
         CHECK (tipo IN ('entrada', 'saida'))
       `)
-      console.log('âÅ“â€¦ Constraint de tipo adicionada')
+      console.log('✅ Constraint de tipo adicionada')
     } catch (error) {
-      console.log('âÅ¡ ï¸� Constraint de tipo jÃ¡ existe')
+      console.log('⚠️ Constraint de tipo já existe')
     }
     
     try {
@@ -51,15 +51,15 @@ async function updateNotasFiscaisTable() {
         ADD CONSTRAINT IF NOT EXISTS check_tipo_produto 
         CHECK (tipo_produto IN ('bovino', 'semen', 'embriao'))
       `)
-      console.log('âÅ“â€¦ Constraint de tipo_produto adicionada')
+      console.log('✅ Constraint de tipo_produto adicionada')
     } catch (error) {
-      console.log('âÅ¡ ï¸� Constraint de tipo_produto jÃ¡ existe')
+      console.log('⚠️ Constraint de tipo_produto já existe')
     }
     
-    console.log('âÅ“â€¦ Estrutura da tabela notas_fiscais atualizada com sucesso!')
+    console.log('✅ Estrutura da tabela notas_fiscais atualizada com sucesso!')
     
   } catch (error) {
-    console.error('â�Å’ Erro ao atualizar tabela:', error)
+    console.error('❌ Erro ao atualizar tabela:', error)
     throw error
   } finally {
     client.release()
@@ -70,11 +70,11 @@ async function updateNotasFiscaisTable() {
 if (require.main === module) {
   updateNotasFiscaisTable()
     .then(() => {
-      console.log('ðÅ¸Å½â€° AtualizaÃ§Ã£o concluÃ­da!')
+      console.log('🎉 Atualização concluída!')
       process.exit(0)
     })
     .catch((error) => {
-      console.error('ðÅ¸â€™¥ Erro na atualizaÃ§Ã£o:', error)
+      console.error('💥 Erro na atualização:', error)
       process.exit(1)
     })
 }

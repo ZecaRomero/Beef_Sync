@@ -19,7 +19,7 @@ async function testarInsert() {
   const client = await pool.connect()
   
   try {
-    console.log('�Ÿ�� Testando INSERT simples...\n')
+    console.log('🧪 Testando INSERT simples...\n')
     
     // Dados de teste com o RG problemático
     const dadosAnimal = {
@@ -51,7 +51,7 @@ async function testarInsert() {
       observacoes: 'Teste de importação'
     }
     
-    console.log('�Ÿ“‹ Dados a serem inseridos:')
+    console.log('📋 Dados a serem inseridos:')
     console.log(JSON.stringify(dadosAnimal, null, 2))
     
     const query = `
@@ -96,7 +96,7 @@ async function testarInsert() {
       dadosAnimal.observacoes
     ]
     
-    console.log('\n�Ÿ“� Executando INSERT...')
+    console.log('\n📝 Executando INSERT...')
     console.log('Query:', query.replace(/\s+/g, ' ').trim())
     console.log('Valores:', values.slice(0, 5), '...')
     
@@ -104,15 +104,15 @@ async function testarInsert() {
     
     const result = await client.query(query, values)
     
-    console.log('\n�œ… INSERT executado com sucesso!')
+    console.log('\n✅ INSERT executado com sucesso!')
     console.log('Animal criado:', result.rows[0])
     
     await client.query('ROLLBACK')
-    console.log('\n�Ÿ�� Teste revertido (ROLLBACK)')
+    console.log('\n🧹 Teste revertido (ROLLBACK)')
     
   } catch (error) {
     await client.query('ROLLBACK')
-    console.error('\n�Œ Erro ao executar INSERT:')
+    console.error('\n❌ Erro ao executar INSERT:')
     console.error('Código:', error.code)
     console.error('Mensagem:', error.message)
     console.error('Posição:', error.position)

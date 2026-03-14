@@ -1,5 +1,5 @@
 /**
- * Componente para exibir informaÃ§Ãµes tÃ©cnicas da requisiÃ§Ã£o
+ * Componente para exibir informações técnicas da requisição
  */
 export default function DetalhesInformacoesTecnicas({ dados }) {
   if (!dados) return null;
@@ -7,7 +7,7 @@ export default function DetalhesInformacoesTecnicas({ dados }) {
   return (
     <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 p-4 rounded-lg border border-gray-500/30">
       <h4 className="font-bold text-gray-300 mb-3 flex items-center gap-2">
-        ðÅ¸â€�§ INFORMAÃâ€¡Ãâ€¢ES TÃâ€°CNICAS DETALHADAS
+        🔧 INFORMAÇÕES TÉCNICAS DETALHADAS
       </h4>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <SecaoRequisicao dados={dados} />
@@ -20,10 +20,10 @@ export default function DetalhesInformacoesTecnicas({ dados }) {
 function SecaoRequisicao({ dados }) {
   return (
     <div className="bg-gray-800/50 p-3 rounded">
-      <h5 className="text-gray-200 font-semibold mb-2">ðÅ¸Å’� RequisiÃ§Ã£o</h5>
+      <h5 className="text-gray-200 font-semibold mb-2">🌐 Requisição</h5>
       {dados.method && (
         <div className="mb-1">
-          <span className="text-gray-400">MÃ©todo HTTP:</span>{' '}
+          <span className="text-gray-400">Método HTTP:</span>{' '}
           <span className="text-white font-mono bg-gray-700 px-2 py-1 rounded">{dados.method}</span>
         </div>
       )}
@@ -48,7 +48,7 @@ function SecaoRequisicao({ dados }) {
 function SecaoTimestamp({ dados }) {
   return (
     <div className="bg-gray-800/50 p-3 rounded">
-      <h5 className="text-gray-200 font-semibold mb-2">â�° Timestamp</h5>
+      <h5 className="text-gray-200 font-semibold mb-2">⏰ Timestamp</h5>
       {dados.timestamp && (
         <div className="space-y-1">
           <div>

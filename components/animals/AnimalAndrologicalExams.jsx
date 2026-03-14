@@ -33,14 +33,14 @@ export default function AnimalAndrologicalExams({ examesAndrologicos }) {
           <div>
             <div className="flex items-center gap-2">
               <AcademicCapIcon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-              <h2 className="font-bold text-gray-900 dark:text-white">Exames AndrolÃ³gicos</h2>
+              <h2 className="font-bold text-gray-900 dark:text-white">Exames Andrológicos</h2>
             </div>
             <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
               {examesAndrologicos.length} exame(s) registrado(s)
-              {diasDesdeExame != null && ` ââ‚¬¢ ÃÅ¡ltimo hÃ¡ ${diasDesdeExame} dias`}
+              {diasDesdeExame != null && ` • Último há ${diasDesdeExame} dias`}
               {isInapto && dataProximoExame && (
                 <span className="block mt-1 font-semibold text-red-700 dark:text-red-300">
-                  PrÃ³ximo previsto: {formatDate(dataProximoExame)}
+                  Próximo previsto: {formatDate(dataProximoExame)}
                 </span>
               )}
             </p>
@@ -74,7 +74,7 @@ export default function AnimalAndrologicalExams({ examesAndrologicos }) {
                 </p>
                 {(ex.defeitos || ex.observacoes) && (
                   <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
-                    {[ex.defeitos, ex.observacoes].filter(Boolean).join(' ââ‚¬¢ ')}
+                    {[ex.defeitos, ex.observacoes].filter(Boolean).join(' • ')}
                   </p>
                 )}
                 {ex.veterinario && (

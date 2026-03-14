@@ -3,32 +3,32 @@ import { testConnection, initDatabase, getPoolInfo } from '../../../lib/database
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' })
+    return res.status(405).json({ error: 'Método não permitido' })
   }
 
   try {
-    console.log('ðÅ¸§ª Testando conexÃ£o com PostgreSQL...')
+    console.log('🧪 Testando conexão com PostgreSQL...')
     
-    // Inicializar conexÃ£o
+    // Inicializar conexão
     const pool = initDatabase()
     
     if (!pool) {
       return res.status(500).json({ 
         status: 'error',
-        message: 'Falha ao inicializar pool de conexÃµes',
+        message: 'Falha ao inicializar pool de conexões',
         connected: false,
         timestamp: new Date().toISOString()
       })
     }
 
-    // Testar conexÃ£o
+    // Testar conexão
     const testResult = await testConnection()
     
-    console.log('âÅ“â€¦ Teste de conexÃ£o bem-sucedido')
+    console.log('✅ Teste de conexão bem-sucedido')
     
     res.status(200).json({
       status: 'success',
-      message: 'ConexÃ£o com PostgreSQL estabelecida com sucesso',
+      message: 'Conexão com PostgreSQL estabelecida com sucesso',
       connected: true,
       timestamp: testResult.timestamp,
       version: testResult.version,
@@ -43,11 +43,11 @@ export default async function handler(req, res) {
     })
     
   } catch (error) {
-    console.error('â�Å’ Erro no teste de conexÃ£o:', error)
+    console.error('❌ Erro no teste de conexão:', error)
     
     res.status(500).json({
       status: 'error',
-      message: 'Falha na conexÃ£o com PostgreSQL',
+      message: 'Falha na conexão com PostgreSQL',
       connected: false,
       error: {
         message: error.message,
@@ -55,7 +55,7 @@ export default async function handler(req, res) {
         detail: error.detail
       },
       timestamp: new Date().toISOString(),
-      suggestion: 'Verifique se o PostgreSQL estÃ¡ rodando e as credenciais estÃ£o corretas'
+      suggestion: 'Verifique se o PostgreSQL está rodando e as credenciais estão corretas'
     })
   }
 }

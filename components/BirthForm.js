@@ -46,7 +46,7 @@ export default function BirthForm({ birth, onSave, onClose }) {
       if (formData.tipoCobertura === 'FIV') {
         custoDNA = 50.00 // DNA Paternidade para FIV
       } else if (formData.tipoCobertura === 'IA') {
-        custoDNA = 80.00 // DNA GenÃ´mica para IA
+        custoDNA = 80.00 // DNA Genômica para IA
       }
     }
     
@@ -79,7 +79,7 @@ export default function BirthForm({ birth, onSave, onClose }) {
     'ORIGINAL NATIMORTO',
     'ORIGINAL 16/1/24',
     'B2847 FIV SUPREMO',
-    'C1234 FIV CAMPEÃÆ’O',
+    'C1234 FIV CAMPEÃO',
     'D5678 FIV ELITE',
     ...(acInseminacoes?.touro_nome || [])
   ].filter(Boolean)
@@ -111,7 +111,7 @@ export default function BirthForm({ birth, onSave, onClose }) {
             {/* Dados da Receptora */}
             <div className="lg:col-span-3">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                ðÅ¸�â€ž Dados da Receptora
+                🐄 Dados da Receptora
               </h3>
             </div>
 
@@ -152,7 +152,7 @@ export default function BirthForm({ birth, onSave, onClose }) {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                RG/SÃ©rie
+                RG/Série
               </label>
               <select
                 value={formData.rg}
@@ -213,7 +213,7 @@ export default function BirthForm({ birth, onSave, onClose }) {
             {/* Dados do Nascimento */}
             <div className="lg:col-span-3 mt-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                ðÅ¸�â€ž Dados do Nascimento
+                🐄 Dados do Nascimento
               </h3>
             </div>
 
@@ -247,7 +247,7 @@ export default function BirthForm({ birth, onSave, onClose }) {
                 required
               >
                 <option value="FIV">FIV (Receptora)</option>
-                <option value="IA">IA (InseminaÃ§Ã£o Artificial)</option>
+                <option value="IA">IA (Inseminação Artificial)</option>
               </select>
             </div>
 
@@ -284,9 +284,9 @@ export default function BirthForm({ birth, onSave, onClose }) {
                 onChange={(e) => setFormData({...formData, sexo: e.target.value})}
                 className="input-field"
               >
-                <option value="">NÃ£o definido</option>
+                <option value="">Não definido</option>
                 <option value="M">Macho</option>
-                <option value="F">FÃªmea</option>
+                <option value="F">Fêmea</option>
               </select>
             </div>
 
@@ -386,20 +386,20 @@ export default function BirthForm({ birth, onSave, onClose }) {
                 <option value="normal">Normal</option>
                 <option value="assistido">Assistido</option>
                 <option value="cesariana">Cesariana</option>
-                <option value="dificil">DifÃ­cil</option>
+                <option value="dificil">Difícil</option>
               </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                VeterinÃ¡rio
+                Veterinário
               </label>
               <input
                 type="text"
                 value={formData.veterinario}
                 onChange={(e) => setFormData({...formData, veterinario: e.target.value})}
                 className="input-field"
-                placeholder="Nome do veterinÃ¡rio"
+                placeholder="Nome do veterinário"
               />
             </div>
 
@@ -413,16 +413,16 @@ export default function BirthForm({ birth, onSave, onClose }) {
                 value={formData.custoDNA}
                 onChange={(e) => setFormData({...formData, custoDNA: parseFloat(e.target.value) || 0})}
                 className="input-field"
-                placeholder="Custo automÃ¡tico baseado no tipo"
+                placeholder="Custo automático baseado no tipo"
               />
               <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                FIV: R$ 50,00 (Paternidade) | IA: R$ 80,00 (GenÃ´mica)
+                FIV: R$ 50,00 (Paternidade) | IA: R$ 80,00 (Genômica)
               </div>
             </div>
 
             <div className="lg:col-span-3">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                ObservaÃ§Ãµes
+                Observações
               </label>
               <textarea
                 value={formData.observacao}

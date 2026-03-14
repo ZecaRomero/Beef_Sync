@@ -1,4 +1,4 @@
-// UtilitÃ¡rio para limpar todos os dados mock do sistema
+// Utilitário para limpar todos os dados mock do sistema
 
 export const clearAllMockData = () => {
   try {
@@ -12,36 +12,36 @@ export const clearAllMockData = () => {
     localStorage.removeItem('animalCosts')
     localStorage.removeItem('costManager')
     
-    // Limpar configuraÃ§Ãµes customizadas (manter apenas as essenciais)
-    // localStorage.removeItem('customPrices') // Manter preÃ§os customizados
+    // Limpar configurações customizadas (manter apenas as essenciais)
+    // localStorage.removeItem('customPrices') // Manter preços customizados
     // localStorage.removeItem('customMedicamentos') // Manter medicamentos customizados
     // localStorage.removeItem('customProtocolos') // Manter protocolos customizados
     
-    console.log('âÅ“â€¦ Dados mock removidos com sucesso!')
+    console.log('✅ Dados mock removidos com sucesso!')
     return true
   } catch (error) {
-    console.error('â�Å’ Erro ao limpar dados mock:', error)
+    console.error('❌ Erro ao limpar dados mock:', error)
     return false
   }
 }
 
 export const resetToCleanState = () => {
-  if (confirm('âÅ¡ ï¸� ATENÃâ€¡ÃÆ’O: Isso irÃ¡ remover TODOS os dados do sistema.\n\nTem certeza que deseja continuar?\n\nEsta aÃ§Ã£o nÃ£o pode ser desfeita.')) {
+  if (confirm('⚠️ ATENÇÃO: Isso irá remover TODOS os dados do sistema.\n\nTem certeza que deseja continuar?\n\nEsta ação não pode ser desfeita.')) {
     clearAllMockData()
     
-    // Recarregar a pÃ¡gina para aplicar as mudanÃ§as
+    // Recarregar a página para aplicar as mudanças
     window.location.reload()
   }
 }
 
-// FunÃ§Ã£o para verificar se hÃ¡ dados mock
+// Função para verificar se há dados mock
 export const hasMockData = () => {
   const birthData = localStorage.getItem('birthData')
   const animals = localStorage.getItem('animals')
   
   if (birthData) {
     const births = JSON.parse(birthData)
-    // Verificar se hÃ¡ dados que parecem mock (muitos registros com padrÃµes similares)
+    // Verificar se há dados que parecem mock (muitos registros com padrões similares)
     if (births.length > 10) {
       return true
     }
@@ -57,15 +57,15 @@ export const hasMockData = () => {
   return false
 }
 
-// Executar limpeza automÃ¡tica se detectar dados mock
+// Executar limpeza automática se detectar dados mock
 if (typeof window !== 'undefined') {
-  // Adicionar funÃ§Ã£o global para limpeza manual
+  // Adicionar função global para limpeza manual
   window.clearMockData = clearAllMockData
   window.resetSystem = resetToCleanState
   window.checkMockData = hasMockData
   
-  console.log('ðÅ¸§¹ UtilitÃ¡rios de limpeza disponÃ­veis:')
+  console.log('🧹 Utilitários de limpeza disponíveis:')
   console.log('- window.clearMockData() - Remove dados mock')
   console.log('- window.resetSystem() - Reset completo do sistema')
-  console.log('- window.checkMockData() - Verifica se hÃ¡ dados mock')
+  console.log('- window.checkMockData() - Verifica se há dados mock')
 }

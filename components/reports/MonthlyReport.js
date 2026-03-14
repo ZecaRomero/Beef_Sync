@@ -3,7 +3,7 @@ import { apiAll } from '../../lib/apiClient'
 import logger from '../../utils/logger'
 
 const MONTHS = [
-  'Janeiro', 'Fevereiro', 'MarÃ§o', 'Abril', 'Maio', 'Junho',
+  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
   'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
 ]
 
@@ -95,7 +95,7 @@ export default function MonthlyReport() {
       const dataNascimento = new Date(animal.dataNascimento || animal.data_nascimento)
       const dataVenda = animal.situacao === 'Vendido' ? new Date(animal.updated_at) : null
       
-      // Adicionar custo total distribuÃ­do
+      // Adicionar custo total distribuído
       if (animal.custoTotal || animal.custo_total) {
         const custoTotal = parseFloat(animal.custoTotal || animal.custo_total || 0)
         const monthlyShare = custoTotal / 12
@@ -139,8 +139,8 @@ export default function MonthlyReport() {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
-          <div className="text-4xl mb-4">â�³</div>
-          <p className="text-gray-600 dark:text-gray-400">Carregando dados do relatÃ³rio...</p>
+          <div className="text-4xl mb-4">⏳</div>
+          <p className="text-gray-600 dark:text-gray-400">Carregando dados do relatório...</p>
         </div>
       </div>
     )
@@ -161,7 +161,7 @@ export default function MonthlyReport() {
 
   const renderSummaryView = () => (
     <div className="space-y-6">
-      {/* MÃ©tricas do MÃªs */}
+      {/* Métricas do Mês */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-gradient-to-br from-red-50 to-pink-100 dark:from-red-900/20 dark:to-pink-900/20 rounded-xl p-6 border border-red-200 dark:border-red-800">
           <div className="flex items-center justify-between">
@@ -171,7 +171,7 @@ export default function MonthlyReport() {
                 R$ {currentMonthData.costs.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </p>
             </div>
-            <div className="text-3xl">ðÅ¸â€™°</div>
+            <div className="text-3xl">💰</div>
           </div>
         </div>
 
@@ -183,7 +183,7 @@ export default function MonthlyReport() {
                 R$ {currentMonthData.revenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </p>
             </div>
-            <div className="text-3xl">ðÅ¸â€œË†</div>
+            <div className="text-3xl">📈</div>
           </div>
         </div>
 
@@ -195,7 +195,7 @@ export default function MonthlyReport() {
                 R$ {currentMonthData.profit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </p>
             </div>
-            <div className="text-3xl">{currentMonthData.profit >= 0 ? 'ðÅ¸Å½¯' : 'ðÅ¸â€œâ€°'}</div>
+            <div className="text-3xl">{currentMonthData.profit >= 0 ? '🎯' : '📉'}</div>
           </div>
         </div>
 
@@ -207,21 +207,21 @@ export default function MonthlyReport() {
                 {currentMonthData.revenue > 0 ? ((currentMonthData.profit / currentMonthData.revenue) * 100).toFixed(1) : 0}%
               </p>
             </div>
-            <div className="text-3xl">ðÅ¸â€œÅ </div>
+            <div className="text-3xl">📊</div>
           </div>
         </div>
       </div>
 
-      {/* MovimentaÃ§Ã£o de Animais */}
+      {/* Movimentação de Animais */}
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
         <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center">
-          <span className="mr-2">ðÅ¸�â€ž</span>
-          MovimentaÃ§Ã£o de Animais - {MONTHS[selectedMonth - 1]}
+          <span className="mr-2">🐄</span>
+          Movimentação de Animais - {MONTHS[selectedMonth - 1]}
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-            <div className="text-2xl mb-2">ðÅ¸�â€ž</div>
+            <div className="text-2xl mb-2">🐄</div>
             <div className="text-2xl font-bold text-green-600 dark:text-green-400">
               {currentMonthData.animals.born}
             </div>
@@ -229,7 +229,7 @@ export default function MonthlyReport() {
           </div>
           
           <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <div className="text-2xl mb-2">ðÅ¸â€™°</div>
+            <div className="text-2xl mb-2">💰</div>
             <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
               {currentMonthData.animals.sold}
             </div>
@@ -237,19 +237,19 @@ export default function MonthlyReport() {
           </div>
           
           <div className="text-center p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
-            <div className="text-2xl mb-2">ðÅ¸â€™â€�</div>
+            <div className="text-2xl mb-2">💔</div>
             <div className="text-2xl font-bold text-red-600 dark:text-red-400">
               {currentMonthData.animals.died}
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Ãâ€œbitos</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Óbitos</div>
           </div>
         </div>
       </div>
 
-      {/* Eventos do MÃªs */}
+      {/* Eventos do Mês */}
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
         <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center">
-          <span className="mr-2">ðÅ¸â€œâ€¦</span>
+          <span className="mr-2">📅</span>
           Eventos e Atividades
         </h3>
         
@@ -264,7 +264,7 @@ export default function MonthlyReport() {
           </div>
         ) : (
           <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-            Nenhum evento registrado para este mÃªs
+            Nenhum evento registrado para este mês
           </p>
         )}
       </div>
@@ -273,11 +273,11 @@ export default function MonthlyReport() {
 
   const renderChartView = () => (
     <div className="space-y-6">
-      {/* GrÃ¡fico de Linha - EvoluÃ§Ã£o Mensal */}
+      {/* Gráfico de Linha - Evolução Mensal */}
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
         <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center">
-          <span className="mr-2">ðÅ¸â€œË†</span>
-          EvoluÃ§Ã£o Mensal - {selectedYear}
+          <span className="mr-2">📈</span>
+          Evolução Mensal - {selectedYear}
         </h3>
         
         <div className="relative h-64">
@@ -352,7 +352,7 @@ export default function MonthlyReport() {
       {/* Comparativo Mensal */}
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
         <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center">
-          <span className="mr-2">ðÅ¸â€œÅ </span>
+          <span className="mr-2">📊</span>
           Comparativo Mensal
         </h3>
         
@@ -360,7 +360,7 @@ export default function MonthlyReport() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200 dark:border-gray-700">
-                <th className="text-left p-3 font-semibold text-gray-900 dark:text-white">MÃªs</th>
+                <th className="text-left p-3 font-semibold text-gray-900 dark:text-white">Mês</th>
                 <th className="text-center p-3 font-semibold text-gray-900 dark:text-white">Custos</th>
                 <th className="text-center p-3 font-semibold text-gray-900 dark:text-white">Receitas</th>
                 <th className="text-center p-3 font-semibold text-gray-900 dark:text-white">Lucro</th>
@@ -413,13 +413,13 @@ export default function MonthlyReport() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2 flex items-center">
-              ðÅ¸â€œâ€¦ RelatÃ³rio Mensal
+              📅 Relatório Mensal
               <span className="ml-3 px-3 py-1 bg-white/20 rounded-full text-sm font-medium">
                 {MONTHS[selectedMonth - 1]} {selectedYear}
               </span>
             </h1>
             <p className="text-purple-100 text-lg">
-              AnÃ¡lise detalhada da performance mensal do rebanho
+              Análise detalhada da performance mensal do rebanho
             </p>
           </div>
           <div className="text-right">
@@ -453,7 +453,7 @@ export default function MonthlyReport() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                MÃªs
+                Mês
               </label>
               <select
                 value={selectedMonth}
@@ -478,7 +478,7 @@ export default function MonthlyReport() {
                   : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
               }`}
             >
-              ðÅ¸â€œÅ  Resumo
+              📊 Resumo
             </button>
             <button
               onClick={() => setViewType('chart')}
@@ -488,19 +488,19 @@ export default function MonthlyReport() {
                   : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
               }`}
             >
-              ðÅ¸â€œË† GrÃ¡ficos
+              📈 Gráficos
             </button>
           </div>
         </div>
       </div>
 
-      {/* ConteÃºdo */}
+      {/* Conteúdo */}
       {viewType === 'summary' ? renderSummaryView() : renderChartView()}
 
       {/* Resumo Anual */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
-          <span className="mr-3">ðÅ¸â€œË†</span>
+          <span className="mr-3">📈</span>
           Resumo Anual {selectedYear}
         </h2>
 

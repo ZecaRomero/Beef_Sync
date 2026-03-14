@@ -12,7 +12,7 @@ async function criarAnimaisNF240() {
   const client = await pool.connect();
   
   try {
-    console.log('�Ÿ�� CRIANDO ANIMAIS DA NF 240 DO MARCELO\n');
+    console.log('🐮 CRIANDO ANIMAIS DA NF 240 DO MARCELO\n');
     console.log('='.repeat(80));
     
     // Buscar NF 240
@@ -23,12 +23,12 @@ async function criarAnimaisNF240() {
     `);
     
     if (nfResult.rows.length === 0) {
-      console.log('�Œ NF 240 não encontrada!');
+      console.log('❌ NF 240 não encontrada!');
       return;
     }
     
     const nf = nfResult.rows[0];
-    console.log(`�œ… NF 240 encontrada (ID: ${nf.id})`);
+    console.log(`✅ NF 240 encontrada (ID: ${nf.id})`);
     
     // Buscar itens
     const itensResult = await client.query(`
@@ -37,7 +37,7 @@ async function criarAnimaisNF240() {
       WHERE nota_fiscal_id = $1
     `, [nf.id]);
     
-    console.log(`�Ÿ“� Total de itens: ${itensResult.rows.length}\n`);
+    console.log(`📦 Total de itens: ${itensResult.rows.length}\n`);
     
     let criados = 0;
     let jaExistentes = 0;
@@ -96,15 +96,15 @@ async function criarAnimaisNF240() {
         ]);
         
         criados++;
-        console.log(`�œ… ${criados}. ${nome} criado`);
+        console.log(`✅ ${criados}. ${nome} criado`);
         
       } catch (error) {
-        console.error(`�Œ Erro:`, error.message);
+        console.error(`❌ Erro:`, error.message);
       }
     }
     
     console.log('\n' + '='.repeat(80));
-    console.log('\n�Ÿ“Š RESUMO:');
+    console.log('\n📊 RESUMO:');
     console.log(`   Criados: ${criados}`);
     console.log(`   Já existentes: ${jaExistentes}`);
     console.log(`   Total esperado: 33`);
@@ -116,11 +116,11 @@ async function criarAnimaisNF240() {
       WHERE LOWER(fornecedor) LIKE '%marcelo%'
     `);
     
-    console.log(`\n�œ… Total de animais do Marcelo: ${totalResult.rows[0].total}`);
-    console.log('\n�Ÿ’� Atualize a tela de Animais (F5) para ver todos!');
+    console.log(`\n✅ Total de animais do Marcelo: ${totalResult.rows[0].total}`);
+    console.log('\n💡 Atualize a tela de Animais (F5) para ver todos!');
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
   } finally {
     client.release();
     await pool.end();

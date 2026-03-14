@@ -37,14 +37,14 @@ export default function TrendAnalysis() {
       const custos = JSON.parse(localStorage.getItem('custosNutricionais') || '[]')
       const nascimentos = JSON.parse(localStorage.getItem('birthData') || '[]')
       
-      // Calcular mÃ©tricas reais
+      // Calcular métricas reais
       const totalAnimais = animals.length
       const animaisSaudaveis = animals.filter(a => a.situacao === 'Ativo').length
       const indiceSaude = totalAnimais > 0 ? Math.round((animaisSaudaveis / totalAnimais) * 100) : 0
       
       const custoTotal = custos.reduce((sum, c) => sum + (parseFloat(c.valor) || 0), 0)
       
-      const femeasGestantes = animals.filter(a => a.sexo === 'FÃªmea' && a.situacao === 'Ativo').length
+      const femeasGestantes = animals.filter(a => a.sexo === 'Fêmea' && a.situacao === 'Ativo').length
       const totalNascimentos = nascimentos.length
       const eficienciaReprodutiva = femeasGestantes > 0 ? Math.round((totalNascimentos / femeasGestantes) * 100) : 0
 
@@ -54,26 +54,26 @@ export default function TrendAnalysis() {
           title: 'Crescimento do Rebanho',
           current: totalAnimais,
           trend: totalAnimais > 0 ? 'up' : 'neutral',
-          percentage: 0, // Seria necessÃ¡rio dados histÃ³ricos para calcular
-          description: 'NÃºmero total de animais cadastrados'
+          percentage: 0, // Seria necessário dados históricos para calcular
+          description: 'Número total de animais cadastrados'
         },
         {
           id: 'saude',
-          title: 'Ã�ndice de SaÃºde',
+          title: 'Índice de Saúde',
           current: indiceSaude,
           unit: '%',
           trend: indiceSaude >= 90 ? 'up' : indiceSaude >= 70 ? 'neutral' : 'down',
-          percentage: 0, // Seria necessÃ¡rio dados histÃ³ricos para calcular
-          description: 'Percentual de animais ativos/saudÃ¡veis'
+          percentage: 0, // Seria necessário dados históricos para calcular
+          description: 'Percentual de animais ativos/saudáveis'
         },
         {
           id: 'reproducao',
-          title: 'EficiÃªncia Reprodutiva',
+          title: 'Eficiência Reprodutiva',
           current: eficienciaReprodutiva,
           unit: '%',
           trend: eficienciaReprodutiva >= 80 ? 'up' : eficienciaReprodutiva >= 60 ? 'neutral' : 'down',
-          percentage: 0, // Seria necessÃ¡rio dados histÃ³ricos para calcular
-          description: 'Nascimentos registrados por fÃªmea'
+          percentage: 0, // Seria necessário dados históricos para calcular
+          description: 'Nascimentos registrados por fêmea'
         },
         {
           id: 'custos',
@@ -81,14 +81,14 @@ export default function TrendAnalysis() {
           current: Math.round(custoTotal),
           unit: 'R$',
           trend: custoTotal > 0 ? 'neutral' : 'up',
-          percentage: 0, // Seria necessÃ¡rio dados histÃ³ricos para calcular
+          percentage: 0, // Seria necessário dados históricos para calcular
           description: 'Custos operacionais registrados'
         }
       ]
 
       setTrends(trendData)
     } catch (error) {
-      console.error('Erro ao carregar tendÃªncias:', error)
+      console.error('Erro ao carregar tendências:', error)
       setTrends([])
     } finally {
       setLoading(false)
@@ -100,7 +100,7 @@ export default function TrendAnalysis() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Carregando anÃ¡lise de tendÃªncias...</p>
+          <p className="text-gray-600 dark:text-gray-400">Carregando análise de tendências...</p>
         </div>
       </div>
     )
@@ -113,10 +113,10 @@ export default function TrendAnalysis() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <ChartBarIcon className="h-8 w-8 text-blue-600" />
-            AnÃ¡lise de TendÃªncias
+            Análise de Tendências
           </h1>
           <p className="text-gray-600 dark:text-gray-300 mt-2">
-            PrevisÃµes e anÃ¡lises preditivas do seu rebanho
+            Previsões e análises preditivas do seu rebanho
           </p>
         </div>
       </div>
@@ -174,7 +174,7 @@ export default function TrendAnalysis() {
       <Card className="p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
           <CalendarIcon className="h-5 w-5" />
-          PrevisÃµes para os PrÃ³ximos 30 Dias
+          Previsões para os Próximos 30 Dias
         </h2>
 
         <div className="space-y-4">
@@ -182,35 +182,35 @@ export default function TrendAnalysis() {
             <>
               <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                 <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
-                  ðÅ¸â€œË† Crescimento do Rebanho
+                  📈 Crescimento do Rebanho
                 </h3>
                 <p className="text-sm text-blue-800 dark:text-blue-200">
                   {trends.find(t => t.id === 'crescimento')?.current > 0 
                     ? `Rebanho atual: ${trends.find(t => t.id === 'crescimento')?.current} animais. Continue registrando nascimentos para acompanhar o crescimento.`
-                    : 'Cadastre animais no sistema para comeÃ§ar a acompanhar o crescimento do rebanho.'
+                    : 'Cadastre animais no sistema para começar a acompanhar o crescimento do rebanho.'
                   }
                 </p>
               </div>
 
               <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
                 <h3 className="font-semibold text-green-900 dark:text-green-100 mb-2">
-                  âÅ“â€œ SaÃºde do Rebanho
+                  ✓ Saúde do Rebanho
                 </h3>
                 <p className="text-sm text-green-800 dark:text-green-200">
                   {trends.find(t => t.id === 'saude')?.current > 0
-                    ? `Ã�ndice atual: ${trends.find(t => t.id === 'saude')?.current}%. Mantenha protocolos sanitÃ¡rios para preservar a saÃºde.`
-                    : 'Registre o status dos animais para monitorar a saÃºde do rebanho.'
+                    ? `Índice atual: ${trends.find(t => t.id === 'saude')?.current}%. Mantenha protocolos sanitários para preservar a saúde.`
+                    : 'Registre o status dos animais para monitorar a saúde do rebanho.'
                   }
                 </p>
               </div>
 
               <div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
                 <h3 className="font-semibold text-orange-900 dark:text-orange-100 mb-2">
-                  ðÅ¸â€œÅ  Custos Operacionais
+                  📊 Custos Operacionais
                 </h3>
                 <p className="text-sm text-orange-800 dark:text-orange-200">
                   {trends.find(t => t.id === 'custos')?.current > 0
-                    ? `Custos registrados: R$ ${trends.find(t => t.id === 'custos')?.current.toLocaleString('pt-BR')}. Continue registrando para anÃ¡lise de tendÃªncias.`
+                    ? `Custos registrados: R$ ${trends.find(t => t.id === 'custos')?.current.toLocaleString('pt-BR')}. Continue registrando para análise de tendências.`
                     : 'Registre custos operacionais para acompanhar os gastos.'
                   }
                 </p>
@@ -218,12 +218,12 @@ export default function TrendAnalysis() {
 
               <div className="p-4 bg-pink-50 dark:bg-pink-900/20 rounded-lg border border-pink-200 dark:border-pink-800">
                 <h3 className="font-semibold text-pink-900 dark:text-pink-100 mb-2">
-                  ðÅ¸�â€ž EficiÃªncia Reprodutiva
+                  🐄 Eficiência Reprodutiva
                 </h3>
                 <p className="text-sm text-pink-800 dark:text-pink-200">
                   {trends.find(t => t.id === 'reproducao')?.current > 0
-                    ? `EficiÃªncia atual: ${trends.find(t => t.id === 'reproducao')?.current}%. Continue registrando nascimentos para melhor anÃ¡lise.`
-                    : 'Registre nascimentos e dados reprodutivos para calcular a eficiÃªncia.'
+                    ? `Eficiência atual: ${trends.find(t => t.id === 'reproducao')?.current}%. Continue registrando nascimentos para melhor análise.`
+                    : 'Registre nascimentos e dados reprodutivos para calcular a eficiência.'
                   }
                 </p>
               </div>
@@ -232,10 +232,10 @@ export default function TrendAnalysis() {
             <div className="p-6 text-center">
               <ChartBarIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Dados Insuficientes para PrevisÃµes
+                Dados Insuficientes para Previsões
               </h3>
               <p className="text-gray-600 dark:text-gray-400">
-                Cadastre animais, registre nascimentos e custos para gerar anÃ¡lises preditivas.
+                Cadastre animais, registre nascimentos e custos para gerar análises preditivas.
               </p>
             </div>
           )}
@@ -245,29 +245,29 @@ export default function TrendAnalysis() {
       {/* Insights */}
       <Card className="p-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          ðÅ¸â€™¡ Insights e RecomendaÃ§Ãµes
+          💡 Insights e Recomendações
         </h2>
 
         <ul className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
           <li className="flex items-start gap-2">
-            <span className="text-blue-600 dark:text-blue-400 mt-1">ââ€ â€™</span>
-            <span>Registre dados consistentemente para obter anÃ¡lises mais precisas</span>
+            <span className="text-blue-600 dark:text-blue-400 mt-1">→</span>
+            <span>Registre dados consistentemente para obter análises mais precisas</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-600 dark:text-blue-400 mt-1">ââ€ â€™</span>
-            <span>Mantenha protocolos sanitÃ¡rios atualizados para preservar a saÃºde do rebanho</span>
+            <span className="text-blue-600 dark:text-blue-400 mt-1">→</span>
+            <span>Mantenha protocolos sanitários atualizados para preservar a saúde do rebanho</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-600 dark:text-blue-400 mt-1">ââ€ â€™</span>
+            <span className="text-blue-600 dark:text-blue-400 mt-1">→</span>
             <span>Monitore custos operacionais regularmente para otimizar gastos</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-600 dark:text-blue-400 mt-1">ââ€ â€™</span>
-            <span>Acompanhe indicadores reprodutivos para maximizar a eficiÃªncia</span>
+            <span className="text-blue-600 dark:text-blue-400 mt-1">→</span>
+            <span>Acompanhe indicadores reprodutivos para maximizar a eficiência</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-600 dark:text-blue-400 mt-1">ââ€ â€™</span>
-            <span>Use relatÃ³rios para tomar decisÃµes baseadas em dados reais</span>
+            <span className="text-blue-600 dark:text-blue-400 mt-1">→</span>
+            <span>Use relatórios para tomar decisões baseadas em dados reais</span>
           </li>
         </ul>
       </Card>

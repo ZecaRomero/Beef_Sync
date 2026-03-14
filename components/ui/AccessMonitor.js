@@ -14,7 +14,7 @@ export default function AccessMonitor({ className = '' }) {
   const [currentTime, setCurrentTime] = useState('')
 
   useEffect(() => {
-    // Atualizar horÃ¡rio a cada segundo
+    // Atualizar horário a cada segundo
     const updateTime = () => {
       setCurrentTime(new Date().toLocaleTimeString('pt-BR'))
     }
@@ -95,7 +95,7 @@ export default function AccessMonitor({ className = '' }) {
         </div>
       </div>
 
-      {/* UsuÃ¡rio Atual */}
+      {/* Usuário Atual */}
       <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -105,7 +105,7 @@ export default function AccessMonitor({ className = '' }) {
                 {userInfo?.name || 'Carregando...'}
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {userInfo?.role || 'Carregando...'} ââ‚¬¢ {userInfo?.ip || 'N/A'}
+                {userInfo?.role || 'Carregando...'} • {userInfo?.ip || 'N/A'}
               </p>
             </div>
           </div>
@@ -135,7 +135,7 @@ export default function AccessMonitor({ className = '' }) {
                     {access.user}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {access.ip} ââ‚¬¢ {access.action}
+                    {access.ip} • {access.action}
                   </p>
                 </div>
               </div>
@@ -147,7 +147,7 @@ export default function AccessMonitor({ className = '' }) {
         </div>
       </div>
 
-      {/* EstatÃ­sticas */}
+      {/* Estatísticas */}
       <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
         <div className="grid grid-cols-2 gap-4 text-center">
           <div>
@@ -163,7 +163,7 @@ export default function AccessMonitor({ className = '' }) {
               1
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              UsuÃ¡rio Rede
+              Usuário Rede
             </p>
           </div>
         </div>

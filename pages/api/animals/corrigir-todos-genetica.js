@@ -1,22 +1,22 @@
 /**
- * API para corrigir dados genÃ©ticos de TODOS os animais
+ * API para corrigir dados genéticos de TODOS os animais
  * Identifica animais onde:
- * - situacao_abcz contÃ©m um nÃºmero (deveria ser IQG)
- * - iqg contÃ©m um nÃºmero pequeno (deveria ser Pt IQG)
+ * - situacao_abcz contém um número (deveria ser IQG)
+ * - iqg contém um número pequeno (deveria ser Pt IQG)
  */
 import { query } from '../../../lib/database'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, message: 'MÃ©todo nÃ£o permitido' })
+    return res.status(405).json({ success: false, message: 'Método não permitido' })
   }
 
   try {
-    console.log('ðÅ¸â€�§ Iniciando correÃ§Ã£o em massa de dados genÃ©ticos...')
+    console.log('🔧 Iniciando correção em massa de dados genéticos...')
     
-    // Buscar TODOS os animais com situacao_abcz numÃ©rico
+    // Buscar TODOS os animais com situacao_abcz numérico
     // Isso indica que os dados foram importados nas colunas erradas
-    // TambÃ©m buscar animais onde IQG Ã© muito pequeno (< 10) e situacao_abcz tem valor
+    // Também buscar animais onde IQG é muito pequeno (< 10) e situacao_abcz tem valor
     const result = await query(`
       SELECT 
         id, serie, rg, nome, 
@@ -24,16 +24,16 @@ export default async function handler(req, res) {
         situacao_abcz, genetica_2, decile_2
       FROM animais 
       WHERE (
-        -- Caso 1: situacao_abcz Ã© numÃ©rico
+        -- Caso 1: situacao_abcz é numérico
         (situacao_abcz IS NOT NULL AND situacao_abcz ~ '^[0-9]+\\.?[0-9]*$')
         OR
-        -- Caso 2: IQG muito pequeno (< 10) E situacao_abcz tem valor numÃ©rico
+        -- Caso 2: IQG muito pequeno (< 10) E situacao_abcz tem valor numérico
         (iqg IS NOT NULL AND iqg < 10 AND situacao_abcz IS NOT NULL AND situacao_abcz ~ '^[0-9]+\\.?[0-9]*$')
       )
       ORDER BY serie, rg
     `)
     
-    console.log(`ðÅ¸â€œâ€¹ Encontrados ${result.rows.length} animais com dados incorretos`)
+    console.log(`📋 Encontrados ${result.rows.length} animais com dados incorretos`)
     
     if (result.rows.length === 0) {
       return res.status(200).json({
@@ -49,7 +49,7 @@ export default async function handler(req, res) {
     
     for (const animal of result.rows) {
       try {
-        console.log(`\nðÅ¸â€�� Corrigindo: ${animal.serie} ${animal.rg} (${animal.nome || 'Sem nome'})`)
+        console.log(`\n🔍 Corrigindo: ${animal.serie} ${animal.rg} (${animal.nome || 'Sem nome'})`)
         
         const antes = {
           abczg: animal.abczg,
@@ -59,10 +59,10 @@ export default async function handler(req, res) {
           situacao_abcz: animal.situacao_abcz
         }
         
-        // LÃ³gica de correÃ§Ã£o:
-        // situacao_abcz (nÃºmero) ââ€ â€™ iqg
-        // iqg (valor atual) ââ€ â€™ pt_iqg
-        // situacao_abcz ââ€ â€™ NULL
+        // Lógica de correção:
+        // situacao_abcz (número) → iqg
+        // iqg (valor atual) → pt_iqg
+        // situacao_abcz → NULL
         
         const novoIqg = parseFloat(animal.situacao_abcz) || null
         const novoPtIqg = animal.iqg || null
@@ -94,10 +94,10 @@ export default async function handler(req, res) {
           depois
         })
         
-        console.log(`   âÅ“â€¦ Corrigido: IQG ${antes.iqg} ââ€ â€™ ${novoIqg}, Pt IQG ${antes.pt_iqg} ââ€ â€™ ${novoPtIqg}`)
+        console.log(`   ✅ Corrigido: IQG ${antes.iqg} → ${novoIqg}, Pt IQG ${antes.pt_iqg} → ${novoPtIqg}`)
         
       } catch (error) {
-        console.error(`   â�Å’ Erro ao corrigir ${animal.serie} ${animal.rg}:`, error.message)
+        console.error(`   ❌ Erro ao corrigir ${animal.serie} ${animal.rg}:`, error.message)
         erros.push({
           serie: animal.serie,
           rg: animal.rg,
@@ -106,9 +106,9 @@ export default async function handler(req, res) {
       }
     }
     
-    console.log(`\nâÅ“â€¦ CorreÃ§Ã£o concluÃ­da! ${animaisCorrigidos.length} animais corrigidos.`)
+    console.log(`\n✅ Correção concluída! ${animaisCorrigidos.length} animais corrigidos.`)
     if (erros.length > 0) {
-      console.log(`âÅ¡ ï¸�  ${erros.length} erros encontrados.`)
+      console.log(`⚠️  ${erros.length} erros encontrados.`)
     }
     
     return res.status(200).json({
@@ -121,10 +121,10 @@ export default async function handler(req, res) {
     })
     
   } catch (error) {
-    console.error('â�Å’ Erro ao corrigir dados genÃ©ticos:', error)
+    console.error('❌ Erro ao corrigir dados genéticos:', error)
     return res.status(500).json({
       success: false,
-      message: 'Erro ao corrigir dados genÃ©ticos',
+      message: 'Erro ao corrigir dados genéticos',
       error: error.message
     })
   }

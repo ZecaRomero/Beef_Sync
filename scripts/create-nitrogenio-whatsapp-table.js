@@ -13,9 +13,9 @@ async function createNitrogenioWhatsAppTable() {
   const pool = new Pool(dbConfig)
   
   try {
-    console.log('ðÅ¸â€�§ Criando tabela nitrogenio_whatsapp_contatos...')
+    console.log('🔧 Criando tabela nitrogenio_whatsapp_contatos...')
     
-    // Criar tabela de contatos WhatsApp para nitrogÃªnio
+    // Criar tabela de contatos WhatsApp para nitrogênio
     await pool.query(`
       CREATE TABLE IF NOT EXISTS nitrogenio_whatsapp_contatos (
         id SERIAL PRIMARY KEY,
@@ -27,16 +27,16 @@ async function createNitrogenioWhatsAppTable() {
       )
     `)
 
-    // Criar Ã­ndice
+    // Criar índice
     await pool.query(`
       CREATE INDEX IF NOT EXISTS idx_nitrogenio_whatsapp_ativo 
       ON nitrogenio_whatsapp_contatos(ativo)
     `)
 
-    console.log('âÅ“â€¦ Tabela nitrogenio_whatsapp_contatos criada com sucesso!')
+    console.log('✅ Tabela nitrogenio_whatsapp_contatos criada com sucesso!')
     
     // Adicionar coluna notificacao_enviada_2dias na tabela abastecimento_nitrogenio
-    console.log('ðÅ¸â€�§ Adicionando coluna notificacao_enviada_2dias...')
+    console.log('🔧 Adicionando coluna notificacao_enviada_2dias...')
     
     await pool.query(`
       DO $$ 
@@ -52,7 +52,7 @@ async function createNitrogenioWhatsAppTable() {
       END $$;
     `)
 
-    console.log('âÅ“â€¦ Coluna notificacao_enviada_2dias adicionada com sucesso!')
+    console.log('✅ Coluna notificacao_enviada_2dias adicionada com sucesso!')
     
     // Verificar estrutura
     const result = await pool.query(`
@@ -62,15 +62,15 @@ async function createNitrogenioWhatsAppTable() {
       ORDER BY ordinal_position
     `)
     
-    console.log('\nðÅ¸â€œÅ  Estrutura da tabela nitrogenio_whatsapp_contatos:')
+    console.log('\n📊 Estrutura da tabela nitrogenio_whatsapp_contatos:')
     result.rows.forEach(col => {
       console.log(`   - ${col.column_name}: ${col.data_type} ${col.is_nullable === 'NO' ? '(NOT NULL)' : ''} ${col.column_default ? `DEFAULT ${col.column_default}` : ''}`)
     })
     
     await pool.end()
-    console.log('\nâÅ“â€¦ Script executado com sucesso!')
+    console.log('\n✅ Script executado com sucesso!')
   } catch (error) {
-    console.error('â�Å’ Erro ao executar script:', error)
+    console.error('❌ Erro ao executar script:', error)
     await pool.end()
     process.exit(1)
   }

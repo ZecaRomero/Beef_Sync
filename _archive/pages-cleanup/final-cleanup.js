@@ -16,7 +16,7 @@ export default function FinalCleanup() {
   const performFinalCleanup = async () => {
     try {
       setStep(1)
-      setStatus('�Ÿ”� Verificando PostgreSQL...')
+      setStatus('🔍 Verificando PostgreSQL...')
       
       // Verificar PostgreSQL
       try {
@@ -24,19 +24,19 @@ export default function FinalCleanup() {
         if (response.ok) {
           const data = await response.json()
           if (data.length === 0) {
-            setStatus('�œ… PostgreSQL está limpo (0 animais)')
+            setStatus('✅ PostgreSQL está limpo (0 animais)')
           } else {
-            setStatus(`�š�️ PostgreSQL tem ${data.length} animais`)
+            setStatus(`⚠️ PostgreSQL tem ${data.length} animais`)
           }
         }
       } catch (error) {
-        setStatus('�Œ Erro ao verificar PostgreSQL')
+        setStatus('❌ Erro ao verificar PostgreSQL')
       }
       
       await new Promise(resolve => setTimeout(resolve, 1000))
       
       setStep(2)
-      setStatus('�Ÿ�� Limpando localStorage...')
+      setStatus('🧹 Limpando localStorage...')
       
       // Limpar localStorage completamente
       if (typeof window !== 'undefined') {
@@ -55,7 +55,7 @@ export default function FinalCleanup() {
       await new Promise(resolve => setTimeout(resolve, 1000))
       
       setStep(3)
-      setStatus('�œ… Limpeza final concluída!')
+      setStatus('✅ Limpeza final concluída!')
       setCompleted(true)
       
       // Redirecionar após 3 segundos
@@ -64,7 +64,7 @@ export default function FinalCleanup() {
       }, 3000)
       
     } catch (error) {
-      setStatus('�Œ Erro na limpeza: ' + error.message)
+      setStatus('❌ Erro na limpeza: ' + error.message)
     }
   }
 
@@ -84,7 +84,7 @@ export default function FinalCleanup() {
             </div>
             
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              �œ… Limpeza Final
+              ✅ Limpeza Final
             </h1>
             
             <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -132,7 +132,7 @@ export default function FinalCleanup() {
           {completed && (
             <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
               <p className="text-green-700 dark:text-green-300 text-sm">
-                �œ… Sistema completamente limpo!<br/>
+                ✅ Sistema completamente limpo!<br/>
                 PostgreSQL: 0 animais<br/>
                 localStorage: limpo<br/>
                 Redirecionando...
@@ -145,7 +145,7 @@ export default function FinalCleanup() {
               onClick={() => router.push('/animals')}
               className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              �Ÿ‘€ Ver Lista de Animais
+              👀 Ver Lista de Animais
             </button>
           </div>
         </div>

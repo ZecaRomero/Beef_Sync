@@ -29,7 +29,7 @@ export default function TransferenciaEmbriones() {
   // Lista de receptoras para o lote
   const [recipients, setRecipients] = useState([])
   const [currentRecipient, setCurrentRecipient] = useState('')
-  const [currentRecipientSex, setCurrentRecipientSex] = useState('ND') // 'M', 'F', or 'ND' (NÃ£o Determinado)
+  const [currentRecipientSex, setCurrentRecipientSex] = useState('ND') // 'M', 'F', or 'ND' (Não Determinado)
 
   // Receptora Autocomplete State
   const [receptoraOptions, setReceptoraOptions] = useState([])
@@ -49,7 +49,7 @@ export default function TransferenciaEmbriones() {
     setIsRegistering(true)
     
     try {
-      const sexo = showQuickReg === 'doadora' ? 'FÃªmea' : 'Macho'
+      const sexo = showQuickReg === 'doadora' ? 'Fêmea' : 'Macho'
       const response = await fetch('/api/animals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -57,7 +57,7 @@ export default function TransferenciaEmbriones() {
           ...quickRegData,
           sexo,
           raca: 'Nelore', // Default
-          boletim: 'Cadastro RÃ¡pido TE',
+          boletim: 'Cadastro Rápido TE',
           pasto_atual: 'Indefinido'
         })
       })
@@ -83,8 +83,8 @@ export default function TransferenciaEmbriones() {
         alert(`Erro ao cadastrar: ${error.message}`)
       }
     } catch (error) {
-      console.error('Erro no cadastro rÃ¡pido:', error)
-      alert('Erro ao realizar cadastro rÃ¡pido')
+      console.error('Erro no cadastro rápido:', error)
+      alert('Erro ao realizar cadastro rápido')
     } finally {
       setIsRegistering(false)
     }
@@ -144,7 +144,7 @@ export default function TransferenciaEmbriones() {
         let successCount = 0
         let errors = []
 
-        // Como a API atual nÃ£o suporta delete em lote, vamos fazer um loop (nÃ£o Ã© o ideal para muitos dados, mas resolve agora)
+        // Como a API atual não suporta delete em lote, vamos fazer um loop (não é o ideal para muitos dados, mas resolve agora)
         // O ideal seria implementar um endpoint DELETE que aceita array de IDs
         for (const id of selectedItems) {
             const response = await fetch(`/api/transferencias-embrioes?id=${id}`, {
@@ -155,7 +155,7 @@ export default function TransferenciaEmbriones() {
         }
 
         if (successCount > 0) {
-            alert(`${successCount} registros excluÃ­dos com sucesso!`)
+            alert(`${successCount} registros excluídos com sucesso!`)
             setSelectedItems([])
             loadTransferencias()
         }
@@ -166,7 +166,7 @@ export default function TransferenciaEmbriones() {
 
     } catch (error) {
         console.error('Erro ao excluir em lote:', error)
-        alert('Erro ao realizar exclusÃ£o em lote')
+        alert('Erro ao realizar exclusão em lote')
     } finally {
         setIsLoading(false)
     }
@@ -191,7 +191,7 @@ export default function TransferenciaEmbriones() {
 
   const processExcelData = (rows) => {
     if (rows.length < 2) {
-      alert('Arquivo vazio ou sem cabeÃ§alho')
+      alert('Arquivo vazio ou sem cabeçalho')
       return
     }
     
@@ -204,8 +204,8 @@ export default function TransferenciaEmbriones() {
     headers.forEach((h, i) => {
       // Receptora / Cota logic
       if (h.includes('COTA')) cotaIdx = i
-      else if (h.includes('RECEPTORA') && (h.includes('LETRA') || h.includes('SERIE') || h.includes('SÃâ€°RIE'))) receptoraLetraIdx = i
-      else if (h.includes('RECEPTORA') && (h.includes('NUMERO') || h.includes('NÃÅ¡MERO') || h.includes('BRINCO'))) receptoraNumeroIdx = i
+      else if (h.includes('RECEPTORA') && (h.includes('LETRA') || h.includes('SERIE') || h.includes('SÉRIE'))) receptoraLetraIdx = i
+      else if (h.includes('RECEPTORA') && (h.includes('NUMERO') || h.includes('NÚMERO') || h.includes('BRINCO'))) receptoraNumeroIdx = i
       else if (h.includes('RECEPTORA') && !h.includes('LETRA') && !h.includes('SERIE')) receptoraNumeroIdx = i // Fallback
       
       // Doadora logic
@@ -221,7 +221,7 @@ export default function TransferenciaEmbriones() {
     })
 
     if (receptoraNumeroIdx === -1 && cotaIdx === -1) {
-      alert('Colunas de Receptora/Cota nÃ£o encontradas')
+      alert('Colunas de Receptora/Cota não encontradas')
       return
     }
 
@@ -301,7 +301,7 @@ export default function TransferenciaEmbriones() {
     }).filter(Boolean)
 
     if (parsed.length === 0) {
-      alert('Nenhum dado vÃ¡lido encontrado')
+      alert('Nenhum dado válido encontrado')
       return
     }
 
@@ -329,7 +329,7 @@ export default function TransferenciaEmbriones() {
                     central: item.central,
                     touro: item.touro,
                     sexo_prenhez: item.sexo_prenhez,
-                    tecnico_responsavel: 'ImportaÃ§Ã£o Excel', // Campo obrigatÃ³rio
+                    tecnico_responsavel: 'Importação Excel', // Campo obrigatório
                     observacoes: 'Importado via Excel',
                     status: item.status,
                     receptora_nome: item.receptora_nome,
@@ -389,7 +389,7 @@ export default function TransferenciaEmbriones() {
         const data = await response.json()
         const options = (data.data || []).map(animal => ({
           value: animal.nome || animal.rg || 'Sem Nome',
-          label: `${animal.nome || 'Sem Nome'} ${animal.rg ? `(RG: ${animal.rg})` : ''} - ${animal.raca || ''} ${animal.source === 'semen' ? '(SÃªmen)' : ''}`.trim()
+          label: `${animal.nome || 'Sem Nome'} ${animal.rg ? `(RG: ${animal.rg})` : ''} - ${animal.raca || ''} ${animal.source === 'semen' ? '(Sêmen)' : ''}`.trim()
         }))
         setTouroOptions(options)
         setShowTouroOptions(true)
@@ -445,7 +445,7 @@ export default function TransferenciaEmbriones() {
         const data = responseData.data || responseData
         setTransferencias(Array.isArray(data) ? data : [])
       } else {
-        console.error('Erro ao carregar transferÃªncias')
+        console.error('Erro ao carregar transferências')
         setTransferencias([])
       }
     } catch (error) {
@@ -465,7 +465,7 @@ export default function TransferenciaEmbriones() {
             sex: currentRecipientSex 
         }])
         setCurrentRecipient('')
-        // Mantemos o sexo selecionado para facilitar lanÃ§amentos em lote (ex: vÃ¡rias fÃªmeas seguidas)
+        // Mantemos o sexo selecionado para facilitar lançamentos em lote (ex: várias fêmeas seguidas)
       }
     }
   }
@@ -479,8 +479,8 @@ export default function TransferenciaEmbriones() {
   const calculateBirthDate = (dateString) => {
     if (!dateString) return ''
     const date = new Date(dateString)
-    // Adiciona 9 meses (aproximadamente 274 dias, mas gestaÃ§Ã£o bovina Ã© ~283-290 dias)
-    // O usuÃ¡rio pediu "daqui 9 meses", vamos somar 9 meses no objeto Date
+    // Adiciona 9 meses (aproximadamente 274 dias, mas gestação bovina é ~283-290 dias)
+    // O usuário pediu "daqui 9 meses", vamos somar 9 meses no objeto Date
     date.setMonth(date.getMonth() + 9)
     return date
   }
@@ -499,7 +499,7 @@ export default function TransferenciaEmbriones() {
     }
 
     if (!formData.doadora.trim()) {
-      alert('Preencha os campos obrigatÃ³rios (Doadora)')
+      alert('Preencha os campos obrigatórios (Doadora)')
       return
     }
 
@@ -520,7 +520,7 @@ export default function TransferenciaEmbriones() {
             central: formData.central,
             touro: formData.touro,
             sexo_prenhez: recipient.sex, // Use recipient specific sex
-            tecnico_responsavel: 'NÃ£o Informado',
+            tecnico_responsavel: 'Não Informado',
             observacoes: formData.observacoes,
             status: formData.status,
             receptora_nome: recipient.name,
@@ -540,54 +540,54 @@ export default function TransferenciaEmbriones() {
     }
 
     if (successCount > 0) {
-      alert(`${successCount} transferÃªncias registradas com sucesso!`)
+      alert(`${successCount} transferências registradas com sucesso!`)
       if (errors.length === 0) {
         setShowForm(false)
         setRecipients([])
-        // MantÃ©m os dados do formulÃ¡rio para facilitar o prÃ³ximo lanÃ§amento, exceto receptoras
-        // O usuÃ¡rio disse: "dai so repete pra nao errar"
+        // Mantém os dados do formulário para facilitar o próximo lançamento, exceto receptoras
+        // O usuário disse: "dai so repete pra nao errar"
       } else {
         alert(`Erro ao registrar para: ${errors.join(', ')}`)
-        setRecipients(errors) // MantÃ©m apenas as que deram erro
+        setRecipients(errors) // Mantém apenas as que deram erro
       }
       loadTransferencias()
     } else {
-      alert('Erro ao registrar transferÃªncias')
+      alert('Erro ao registrar transferências')
     }
   }
 
   const handleDelete = async (id) => {
-    if (confirm('Tem certeza que deseja excluir esta transferÃªncia?')) {
+    if (confirm('Tem certeza que deseja excluir esta transferência?')) {
       try {
         const response = await fetch(`/api/transferencias-embrioes?id=${id}`, {
           method: 'DELETE'
         })
 
         if (response.ok) {
-          alert('TransferÃªncia excluÃ­da com sucesso!')
+          alert('Transferência excluída com sucesso!')
           loadTransferencias()
         } else {
           const errorData = await response.json()
-          alert(`Erro ao excluir transferÃªncia: ${errorData.message}`)
+          alert(`Erro ao excluir transferência: ${errorData.message}`)
         }
       } catch (error) {
-        console.error('Erro ao excluir transferÃªncia:', error)
-        alert('Erro ao excluir transferÃªncia')
+        console.error('Erro ao excluir transferência:', error)
+        alert('Erro ao excluir transferência')
       }
     }
   }
 
   const exportReport = async () => {
     try {
-      // ImportaÃ§Ã£o dinÃ¢mica do ExcelJS para melhor performance
+      // Importação dinâmica do ExcelJS para melhor performance
       const ExcelJS = (await import('exceljs')).default
       const workbook = new ExcelJS.Workbook()
-      const worksheet = workbook.addWorksheet('TransferÃªncias')
+      const worksheet = workbook.addWorksheet('Transferências')
 
       // Configurar colunas com larguras adequadas
       worksheet.columns = [
         { header: 'Receptora Letra', key: 'receptora_letra', width: 10 },
-        { header: 'Receptora NÃºmero', key: 'receptora_numero', width: 15 },
+        { header: 'Receptora Número', key: 'receptora_numero', width: 15 },
         { header: 'Sexo Cria', key: 'sexo', width: 10 },
         { header: 'Cota ABCZ', key: 'cota', width: 15 },
         { header: 'Doadora', key: 'doadora', width: 25 },
@@ -654,7 +654,7 @@ export default function TransferenciaEmbriones() {
         })
       })
 
-      // Estilizar cabeÃ§alho (Fundo Rosa, Texto Branco, Negrito)
+      // Estilizar cabeçalho (Fundo Rosa, Texto Branco, Negrito)
       const headerRow = worksheet.getRow(1)
       headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } }
       headerRow.fill = {
@@ -664,7 +664,7 @@ export default function TransferenciaEmbriones() {
       }
       headerRow.alignment = { vertical: 'middle', horizontal: 'center' }
       
-      // Adicionar bordas em todas as cÃ©lulas preenchidas
+      // Adicionar bordas em todas as células preenchidas
       worksheet.eachRow((row) => {
         row.eachCell((cell) => {
           cell.border = {
@@ -673,8 +673,8 @@ export default function TransferenciaEmbriones() {
             bottom: { style: 'thin' },
             right: { style: 'thin' }
           }
-          // Centralizar colunas especÃ­ficas
-          if (cell.col >= 6) { // Central, Sexo, Status, PrevisÃ£o
+          // Centralizar colunas específicas
+          if (cell.col >= 6) { // Central, Sexo, Status, Previsão
              cell.alignment = { vertical: 'middle', horizontal: 'center' }
           } else {
              cell.alignment = { vertical: 'middle', horizontal: 'left' }
@@ -693,7 +693,7 @@ export default function TransferenciaEmbriones() {
       document.body.removeChild(link)
     } catch (error) {
       console.error('Erro ao exportar Excel:', error)
-      alert('Erro ao gerar relatÃ³rio Excel. Verifique o console para mais detalhes.')
+      alert('Erro ao gerar relatório Excel. Verifique o console para mais detalhes.')
     }
   }
 
@@ -708,7 +708,7 @@ export default function TransferenciaEmbriones() {
       const diffTime = birthDate - today
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
       
-      // Notificar se estiver atrasado ou nos prÃ³ximos 30 dias
+      // Notificar se estiver atrasado ou nos próximos 30 dias
       return diffDays <= 30
     })
   }
@@ -723,14 +723,14 @@ export default function TransferenciaEmbriones() {
     doadora: ''
   })
 
-  const uniqueTouros = [...new Set(transferencias.map(t => t.touro || 'NÃ£o Identificado'))].sort()
-  const uniqueDoadoras = [...new Set(transferencias.map(t => t.doadora_nome || t.doadora || 'NÃ£o Identificada'))].sort()
+  const uniqueTouros = [...new Set(transferencias.map(t => t.touro || 'Não Identificado'))].sort()
+  const uniqueDoadoras = [...new Set(transferencias.map(t => t.doadora_nome || t.doadora || 'Não Identificada'))].sort()
 
   const getStats = () => {
     const filteredTransferencias = transferencias.filter(t => {
         const date = t.data_te ? t.data_te.split('T')[0] : ''
-        const touro = t.touro || 'NÃ£o Identificado'
-        const doadora = t.doadora_nome || t.doadora || 'NÃ£o Identificada'
+        const touro = t.touro || 'Não Identificado'
+        const doadora = t.doadora_nome || t.doadora || 'Não Identificada'
 
         if (statsFilters.startDate && date < statsFilters.startDate) return false
         if (statsFilters.endDate && date > statsFilters.endDate) return false
@@ -743,25 +743,25 @@ export default function TransferenciaEmbriones() {
     const stats = {
         total: filteredTransferencias.length,
         machos: filteredTransferencias.filter(t => t.sexo_prenhez === 'M' || t.sexo_prenhez === 'Macho').length,
-        femeas: filteredTransferencias.filter(t => t.sexo_prenhez === 'F' || t.sexo_prenhez === 'FÃªmea').length,
+        femeas: filteredTransferencias.filter(t => t.sexo_prenhez === 'F' || t.sexo_prenhez === 'Fêmea').length,
         doadoras: {},
         touros: {}
     }
 
     filteredTransferencias.forEach(t => {
         // Stats Doadora
-        const doadora = t.doadora_nome || t.doadora || 'NÃ£o Identificada'
+        const doadora = t.doadora_nome || t.doadora || 'Não Identificada'
         if (!stats.doadoras[doadora]) stats.doadoras[doadora] = { total: 0, machos: 0, femeas: 0 }
         stats.doadoras[doadora].total++
         if (t.sexo_prenhez === 'M' || t.sexo_prenhez === 'Macho') stats.doadoras[doadora].machos++
-        if (t.sexo_prenhez === 'F' || t.sexo_prenhez === 'FÃªmea') stats.doadoras[doadora].femeas++
+        if (t.sexo_prenhez === 'F' || t.sexo_prenhez === 'Fêmea') stats.doadoras[doadora].femeas++
 
         // Stats Touro
-        const touro = t.touro || 'NÃ£o Identificado'
+        const touro = t.touro || 'Não Identificado'
         if (!stats.touros[touro]) stats.touros[touro] = { total: 0, machos: 0, femeas: 0 }
         stats.touros[touro].total++
         if (t.sexo_prenhez === 'M' || t.sexo_prenhez === 'Macho') stats.touros[touro].machos++
-        if (t.sexo_prenhez === 'F' || t.sexo_prenhez === 'FÃªmea') stats.touros[touro].femeas++
+        if (t.sexo_prenhez === 'F' || t.sexo_prenhez === 'Fêmea') stats.touros[touro].femeas++
     })
 
     return stats
@@ -786,9 +786,9 @@ export default function TransferenciaEmbriones() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <HeartIcon className="w-8 h-8 text-pink-600" />
-            TransferÃªncia de EmbriÃµes
+            Transferência de Embriões
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">Controle de TE e PrevisÃ£o de Partos</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">Controle de TE e Previsão de Partos</p>
         </div>
         <div className="flex gap-2">
           <input
@@ -831,21 +831,21 @@ export default function TransferenciaEmbriones() {
             className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
           >
             <BeakerIcon className="w-5 h-5" />
-            EstatÃ­sticas
+            Estatísticas
           </button>
           <button
             onClick={exportReport}
             className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
           >
             <ArrowDownTrayIcon className="w-5 h-5" />
-            RelatÃ³rio
+            Relatório
           </button>
           <button
             onClick={() => setShowForm(!showForm)}
             className="flex items-center gap-2 bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700 transition-colors"
           >
             <PlusIcon className="w-5 h-5" />
-            Nova TransferÃªncia
+            Nova Transferência
           </button>
         </div>
       </div>
@@ -857,7 +857,7 @@ export default function TransferenciaEmbriones() {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6 animate-fade-in-down">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                 <BeakerIcon className="w-6 h-6 text-purple-600" />
-                Resumo EstatÃ­stico
+                Resumo Estatístico
             </h2>
 
             {/* Filtros */}
@@ -873,7 +873,7 @@ export default function TransferenciaEmbriones() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
-                        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Data InÃ­cio</label>
+                        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Data Início</label>
                         <input 
                             type="date" 
                             value={statsFilters.startDate}
@@ -921,11 +921,11 @@ export default function TransferenciaEmbriones() {
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800">
-                    <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">Total de EmbriÃµes</p>
+                    <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">Total de Embriões</p>
                     <p className="text-3xl font-bold text-blue-800 dark:text-blue-300">{stats.total}</p>
                 </div>
                 <div className="bg-pink-50 dark:bg-pink-900/20 p-4 rounded-lg border border-pink-100 dark:border-pink-800">
-                    <p className="text-sm text-pink-600 dark:text-pink-400 font-medium">FÃªmeas (Sexado)</p>
+                    <p className="text-sm text-pink-600 dark:text-pink-400 font-medium">Fêmeas (Sexado)</p>
                     <p className="text-3xl font-bold text-pink-800 dark:text-pink-300">
                         {stats.femeas} 
                         <span className="text-sm ml-2 font-normal opacity-75">
@@ -954,7 +954,7 @@ export default function TransferenciaEmbriones() {
                                 <tr className="bg-gray-100 dark:bg-gray-700">
                                     <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-300">Doadora</th>
                                     <th className="px-4 py-2 text-center text-gray-600 dark:text-gray-300">Total</th>
-                                    <th className="px-4 py-2 text-center text-pink-600 dark:text-pink-400">FÃªmeas</th>
+                                    <th className="px-4 py-2 text-center text-pink-600 dark:text-pink-400">Fêmeas</th>
                                     <th className="px-4 py-2 text-center text-blue-600 dark:text-blue-400">Machos</th>
                                 </tr>
                             </thead>
@@ -985,7 +985,7 @@ export default function TransferenciaEmbriones() {
                                 <tr className="bg-gray-100 dark:bg-gray-700">
                                     <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-300">Touro</th>
                                     <th className="px-4 py-2 text-center text-gray-600 dark:text-gray-300">Total</th>
-                                    <th className="px-4 py-2 text-center text-pink-600 dark:text-pink-400">FÃªmeas</th>
+                                    <th className="px-4 py-2 text-center text-pink-600 dark:text-pink-400">Fêmeas</th>
                                     <th className="px-4 py-2 text-center text-blue-600 dark:text-blue-400">Machos</th>
                                 </tr>
                             </thead>
@@ -1018,19 +1018,19 @@ export default function TransferenciaEmbriones() {
             </div>
             <div className="ml-3">
               <p className="text-sm text-yellow-700">
-                AtenÃ§Ã£o: Existem {notifications.length} previsÃµes de parto prÃ³ximas ou atrasadas!
+                Atenção: Existem {notifications.length} previsões de parto próximas ou atrasadas!
               </p>
             </div>
           </div>
         </div>
       )}
 
-      {/* FormulÃ¡rio de Nova TransferÃªncia */}
+      {/* Formulário de Nova Transferência */}
       {showForm && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-              Nova TransferÃªncia de EmbriÃµes (Lote)
+              Nova Transferência de Embriões (Lote)
             </h2>
             <button
               onClick={() => setShowForm(false)}
@@ -1166,7 +1166,7 @@ export default function TransferenciaEmbriones() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Central/LaboratÃ³rio
+                    Central/Laboratório
                   </label>
                   <input
                     type="text"
@@ -1179,7 +1179,7 @@ export default function TransferenciaEmbriones() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Data da TransferÃªncia *
+                    Data da Transferência *
                   </label>
                   <input
                     type="date"
@@ -1189,7 +1189,7 @@ export default function TransferenciaEmbriones() {
                   />
                   {formData.data && (
                     <p className="text-xs text-gray-500 mt-1">
-                      PrevisÃ£o de Parto: {getBirthDateString(formData.data)}
+                      Previsão de Parto: {getBirthDateString(formData.data)}
                     </p>
                   )}
                 </div>
@@ -1197,7 +1197,7 @@ export default function TransferenciaEmbriones() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  ObservaÃ§Ãµes
+                  Observações
                 </label>
                 <textarea
                   value={formData.observacoes}
@@ -1272,7 +1272,7 @@ export default function TransferenciaEmbriones() {
                             }`}
                             title="Macho"
                         >
-                            ââ„¢â€š
+                            ♂
                         </button>
                         <button
                             type="button"
@@ -1282,9 +1282,9 @@ export default function TransferenciaEmbriones() {
                                 ? 'bg-pink-100 text-pink-700 dark:bg-pink-900 dark:text-pink-300 shadow-sm ring-1 ring-pink-500' 
                                 : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
                             }`}
-                            title="FÃªmea"
+                            title="Fêmea"
                         >
-                            ââ„¢â‚¬
+                            ♀
                         </button>
                          <button
                             type="button"
@@ -1294,7 +1294,7 @@ export default function TransferenciaEmbriones() {
                                 ? 'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-300 shadow-sm ring-1 ring-gray-400' 
                                 : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
                             }`}
-                            title="NÃ£o Determinado"
+                            title="Não Determinado"
                         >
                             ?
                         </button>
@@ -1325,7 +1325,7 @@ export default function TransferenciaEmbriones() {
                                 recipient.sex === 'F' ? 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200' :
                                 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-300'
                             }`}>
-                                {recipient.sex === 'M' ? 'ââ„¢â€š Macho' : recipient.sex === 'F' ? 'ââ„¢â‚¬ FÃªmea' : '? N/D'}
+                                {recipient.sex === 'M' ? '♂ Macho' : recipient.sex === 'F' ? '♀ Fêmea' : '? N/D'}
                             </span>
                         </div>
                         <button
@@ -1354,7 +1354,7 @@ export default function TransferenciaEmbriones() {
               onClick={handleSubmit}
               className="px-6 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 font-medium"
             >
-              Salvar Todas as TransferÃªncias
+              Salvar Todas as Transferências
             </button>
           </div>
         </div>
@@ -1368,17 +1368,17 @@ export default function TransferenciaEmbriones() {
         <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-12 text-center">
           <HeartIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            Nenhuma transferÃªncia registrada
+            Nenhuma transferência registrada
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            Comece registrando a primeira transferÃªncia de embriÃµes
+            Comece registrando a primeira transferência de embriões
           </p>
           <button
             onClick={() => setShowForm(true)}
             className="inline-flex items-center gap-2 bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700"
           >
             <PlusIcon className="w-5 h-5" />
-            Adicionar TransferÃªncia
+            Adicionar Transferência
           </button>
         </div>
       ) : (
@@ -1397,10 +1397,10 @@ export default function TransferenciaEmbriones() {
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Receptora</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Doadora/Touro</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Central</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Data TE / PrevisÃ£o</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Data TE / Previsão</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Sexo</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Status</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">AÃ§Ãµes</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -1478,11 +1478,11 @@ export default function TransferenciaEmbriones() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96 shadow-xl">
             <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">
-              Cadastrar {showQuickReg === 'doadora' ? 'Doadora' : 'Touro'} RÃ¡pido
+              Cadastrar {showQuickReg === 'doadora' ? 'Doadora' : 'Touro'} Rápido
             </h3>
             <form onSubmit={handleQuickRegister} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">SÃ©rie</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Série</label>
                 <input
                   type="text"
                   required
@@ -1535,13 +1535,13 @@ export default function TransferenciaEmbriones() {
         </div>
       )}
 
-      {/* Modal de ImportaÃ§Ã£o */}
+      {/* Modal de Importação */}
       {showImportModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-[90%] max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-xl">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                Confirmar ImportaÃ§Ã£o ({importData.length} registros)
+                Confirmar Importação ({importData.length} registros)
               </h3>
               <button
                 onClick={() => setShowImportModal(false)}
@@ -1593,7 +1593,7 @@ export default function TransferenciaEmbriones() {
                         >
                             <option value="ND">ND</option>
                             <option value="M">Macho</option>
-                            <option value="F">FÃªmea</option>
+                            <option value="F">Fêmea</option>
                         </select>
                       </td>
                     </tr>
@@ -1614,7 +1614,7 @@ export default function TransferenciaEmbriones() {
                 disabled={isImporting || !importData.some(d => d.selected)}
                 className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
               >
-                {isImporting ? 'Importando...' : 'Confirmar ImportaÃ§Ã£o'}
+                {isImporting ? 'Importando...' : 'Confirmar Importação'}
               </button>
             </div>
           </div>

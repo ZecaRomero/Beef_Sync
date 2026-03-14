@@ -7,7 +7,7 @@ import {
   XMarkIcon
 } from '@heroicons/react/24/outline'
 
-// Componente de NavegaÃ§Ã£o entre Animais
+// Componente de Navegação entre Animais
 export function AnimalNavigation({ currentIndex, totalAnimals, onNavigate, animalIds }) {
   const hasPrevious = currentIndex > 0
   const hasNext = currentIndex < totalAnimals - 1
@@ -44,7 +44,7 @@ export function AnimalNavigation({ currentIndex, totalAnimals, onNavigate, anima
         className="nav-btn nav-btn-prev" 
         onClick={handlePrevious}
         disabled={!hasPrevious}
-        title="Animal anterior (ââ€ �)"
+        title="Animal anterior (←)"
       >
         <ChevronLeftIcon />
         <span>Anterior</span>
@@ -58,16 +58,16 @@ export function AnimalNavigation({ currentIndex, totalAnimals, onNavigate, anima
         className="nav-btn nav-btn-next" 
         onClick={handleNext}
         disabled={!hasNext}
-        title="PrÃ³ximo animal (ââ€ â€™)"
+        title="Próximo animal (→)"
       >
-        <span>PrÃ³ximo</span>
+        <span>Próximo</span>
         <ChevronRightIcon />
       </button>
     </div>
   )
 }
 
-// Componente de Campo EditÃ¡vel
+// Componente de Campo Editável
 export function EditableField({ 
   value, 
   onSave, 
@@ -347,7 +347,7 @@ export function useToast() {
   return { showToast, ToastContainer }
 }
 
-// Componente de EstatÃ­stica Animada
+// Componente de Estatística Animada
 export function AnimatedStat({ value, label, icon, suffix = '', prefix = '' }) {
   const [displayValue, setDisplayValue] = useState(0)
 

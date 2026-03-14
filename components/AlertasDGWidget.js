@@ -52,12 +52,12 @@ export default function AlertasDGWidget() {
       <CardBody className="p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-2xl animate-pulse">âÅ¡ ï¸�</span>
+            <span className="text-2xl animate-pulse">⚠️</span>
             <div>
               <h3 className="text-xl font-bold text-orange-800 dark:text-orange-300">
-                Alertas de DiagnÃ³stico de GestaÃ§Ã£o
+                Alertas de Diagnóstico de Gestação
               </h3>
-              <p className="text-xs text-orange-700 dark:text-orange-400">DG Ã© feito 15 dias apÃ³s a chegada dos animais</p>
+              <p className="text-xs text-orange-700 dark:text-orange-400">DG é feito 15 dias após a chegada dos animais</p>
             </div>
           </div>
           <div className="bg-red-600 text-white px-4 py-1 rounded-full font-bold">
@@ -65,7 +65,7 @@ export default function AlertasDGWidget() {
           </div>
         </div>
 
-        {/* Resumo EstatÃ­stico */}
+        {/* Resumo Estatístico */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4 p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-orange-200 dark:border-orange-700">
           <button
             onClick={() => setMostrarAtrasados(!mostrarAtrasados)}
@@ -79,12 +79,12 @@ export default function AlertasDGWidget() {
             </div>
             {alertas.atrasados.length > 0 && (
               <div className="text-xs text-red-600 dark:text-red-400 mt-1">
-                AtÃ© {Math.max(...alertas.atrasados.map(a => a.dias_atraso))} dias de atraso
+                Até {Math.max(...alertas.atrasados.map(a => a.dias_atraso))} dias de atraso
               </div>
             )}
             {alertas.atrasados.length > 0 && (
               <div className="text-xs text-red-500 dark:text-red-400 mt-2 font-medium">
-                {mostrarAtrasados ? 'ââ€“² Ocultar lista' : 'ââ€“¼ Ver lista'}
+                {mostrarAtrasados ? '▲ Ocultar lista' : '▼ Ver lista'}
               </div>
             )}
           </button>
@@ -100,11 +100,11 @@ export default function AlertasDGWidget() {
               Urgente (0-2 dias)
             </div>
             <div className="text-xs text-orange-600 dark:text-orange-400 mt-1">
-              Requer atenÃ§Ã£o imediata
+              Requer atenção imediata
             </div>
             {alertas.proximos.length > 0 && (
               <div className="text-xs text-orange-500 dark:text-orange-400 mt-2 font-medium">
-                {mostrarProximos ? 'ââ€“² Ocultar lista' : 'ââ€“¼ Ver lista'}
+                {mostrarProximos ? '▲ Ocultar lista' : '▼ Ver lista'}
               </div>
             )}
           </button>
@@ -114,10 +114,10 @@ export default function AlertasDGWidget() {
               {alertas.proximos.filter(a => parseInt(a.dias_restantes) > 2).length}
             </div>
             <div className="text-xs font-medium text-yellow-700 dark:text-yellow-300 uppercase">
-              PrÃ³ximos (3-7 dias)
+              Próximos (3-7 dias)
             </div>
             <div className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
-              Planeje com antecedÃªncia
+              Planeje com antecedência
             </div>
           </div>
         </div>
@@ -126,7 +126,7 @@ export default function AlertasDGWidget() {
         {mostrarAtrasados && alertas.atrasados.length > 0 && (
           <div className="mb-4">
             <h4 className="text-lg font-bold text-red-700 dark:text-red-400 mb-2 flex items-center gap-2">
-              <span>ðÅ¸â€�´</span>
+              <span>🔴</span>
               <span>DG Atrasado ({alertas.atrasados.length})</span>
             </h4>
             <div className="space-y-2">
@@ -151,7 +151,7 @@ export default function AlertasDGWidget() {
                         DG previsto: {new Date(animal.data_dg_prevista).toLocaleDateString('pt-BR')}
                       </div>
                       <div className="text-xs font-bold text-red-900 dark:text-red-200">
-                        Atrasado hÃ¡ {animal.dias_atraso} {animal.dias_atraso === 1 ? 'dia' : 'dias'}
+                        Atrasado há {animal.dias_atraso} {animal.dias_atraso === 1 ? 'dia' : 'dias'}
                       </div>
                     </div>
                   </div>
@@ -161,12 +161,12 @@ export default function AlertasDGWidget() {
           </div>
         )}
 
-        {/* Alertas PrÃ³ximos - Mostrar apenas se clicar */}
+        {/* Alertas Próximos - Mostrar apenas se clicar */}
         {mostrarProximos && alertas.proximos.length > 0 && (
           <div>
             <h4 className="text-lg font-bold text-orange-700 dark:text-orange-400 mb-2 flex items-center gap-2">
-              <span>ðÅ¸Å¸¡</span>
-              <span>DG PrÃ³ximo - PrÃ³ximos 7 dias ({alertas.proximos.length})</span>
+              <span>🟡</span>
+              <span>DG Próximo - Próximos 7 dias ({alertas.proximos.length})</span>
             </h4>
             <div className="space-y-2">
               {alertas.proximos.map(animal => {

@@ -5,7 +5,7 @@ import { formatCurrency } from '../../utils/formatters'
 
 const AdvancedStats = ({ animals, costs, sales }) => {
   const stats = useMemo(() => {
-    // EstatÃ­sticas por raÃ§a
+    // Estatísticas por raça
     const racaStats = animals.reduce((acc, animal) => {
       if (!acc[animal.raca]) {
         acc[animal.raca] = { count: 0, totalWeight: 0, totalCost: 0 }
@@ -16,7 +16,7 @@ const AdvancedStats = ({ animals, costs, sales }) => {
       return acc
     }, {})
 
-    // EstatÃ­sticas por ERA
+    // Estatísticas por ERA
     const eraStats = animals.reduce((acc, animal) => {
       if (!acc[animal.era]) {
         acc[animal.era] = { count: 0, avgWeight: 0, totalCost: 0 }
@@ -26,22 +26,22 @@ const AdvancedStats = ({ animals, costs, sales }) => {
       return acc
     }, {})
 
-    // Calcular mÃ©dias de peso por ERA
+    // Calcular médias de peso por ERA
     Object.keys(eraStats).forEach(era => {
       const animalsInEra = animals.filter(a => a.era === era)
       const totalWeight = animalsInEra.reduce((sum, a) => sum + (a.peso || 0), 0)
       eraStats[era].avgWeight = animalsInEra.length > 0 ? totalWeight / animalsInEra.length : 0
     })
 
-    // ROI mÃ©dio
+    // ROI médio
     const totalInvestment = costs.reduce((sum, cost) => sum + (cost.valor || 0), 0)
     const totalRevenue = sales.reduce((sum, sale) => sum + (sale.valor || 0), 0)
     const avgROI = totalInvestment > 0 ? ((totalRevenue - totalInvestment) / totalInvestment) * 100 : 0
 
-    // Custo mÃ©dio por animal
+    // Custo médio por animal
     const avgCostPerAnimal = animals.length > 0 ? totalInvestment / animals.length : 0
 
-    // Peso mÃ©dio do rebanho
+    // Peso médio do rebanho
     const totalWeight = animals.reduce((sum, animal) => sum + (animal.peso || 0), 0)
     const avgWeight = animals.length > 0 ? totalWeight / animals.length : 0
 
@@ -58,10 +58,10 @@ const AdvancedStats = ({ animals, costs, sales }) => {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* EstatÃ­sticas por RaÃ§a */}
+      {/* Estatísticas por Raça */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          ðÅ¸â€œÅ  DistribuiÃ§Ã£o por RaÃ§a
+          📊 Distribuição por Raça
         </h3>
         <div className="space-y-3">
           {Object.entries(stats.racaStats).map(([raca, data]) => (
@@ -69,7 +69,7 @@ const AdvancedStats = ({ animals, costs, sales }) => {
               <div>
                 <div className="font-medium text-gray-900 dark:text-white">{raca}</div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">
-                  {data.count} animais ââ‚¬¢ Peso mÃ©dio: {Math.round(data.totalWeight / data.count)}kg
+                  {data.count} animais • Peso médio: {Math.round(data.totalWeight / data.count)}kg
                 </div>
               </div>
               <div className="text-right">
@@ -85,10 +85,10 @@ const AdvancedStats = ({ animals, costs, sales }) => {
         </div>
       </div>
 
-      {/* EstatÃ­sticas por ERA */}
+      {/* Estatísticas por ERA */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          ðÅ¸â€œË† DistribuiÃ§Ã£o por ERA
+          📈 Distribuição por ERA
         </h3>
         <div className="space-y-3">
           {Object.entries(stats.eraStats).map(([era, data]) => (
@@ -96,7 +96,7 @@ const AdvancedStats = ({ animals, costs, sales }) => {
               <div>
                 <div className="font-medium text-gray-900 dark:text-white">{era}</div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">
-                  {data.count} animais ââ‚¬¢ {Math.round(data.avgWeight)}kg mÃ©dio
+                  {data.count} animais • {Math.round(data.avgWeight)}kg médio
                 </div>
               </div>
               <div className="text-right">
@@ -112,17 +112,17 @@ const AdvancedStats = ({ animals, costs, sales }) => {
         </div>
       </div>
 
-      {/* MÃ©tricas Financeiras */}
+      {/* Métricas Financeiras */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          ðÅ¸â€™° MÃ©tricas Financeiras
+          💰 Métricas Financeiras
         </h3>
         <div className="grid grid-cols-2 gap-4">
           <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
             <div className="text-2xl font-bold text-green-600 dark:text-green-400">
               {stats.avgROI.toFixed(1)}%
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">ROI MÃ©dio</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">ROI Médio</div>
           </div>
           <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
             <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
@@ -140,7 +140,7 @@ const AdvancedStats = ({ animals, costs, sales }) => {
             <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
               {Math.round(stats.avgWeight)}kg
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Peso MÃ©dio</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Peso Médio</div>
           </div>
         </div>
       </div>
@@ -148,7 +148,7 @@ const AdvancedStats = ({ animals, costs, sales }) => {
       {/* Performance do Rebanho */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          ðÅ¸Å½¯ Performance do Rebanho
+          🎯 Performance do Rebanho
         </h3>
         <div className="space-y-4">
           <div className="flex justify-between items-center">

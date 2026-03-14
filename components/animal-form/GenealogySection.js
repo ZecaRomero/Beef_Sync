@@ -11,18 +11,18 @@ export default function GenealogySection({ formData, updateField, autocompleteDa
       {/* Pai */}
       <div className="space-y-2">
         <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
-          ðÅ¸�â€š Pai
+          🐂 Pai
         </h5>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
           <div className="md:col-span-1">
-            <label className="block text-xs text-gray-500 mb-1">SÃ©rie</label>
+            <label className="block text-xs text-gray-500 mb-1">Série</label>
             <input
               type="text"
               list="datalist-pai-serie"
               value={formData.paiSerie}
               onChange={(e) => updateField('paiSerie', e.target.value)}
               className="input-field"
-              placeholder="SÃ©rie"
+              placeholder="Série"
             />
             <datalist id="datalist-pai-serie">{(ac.serie || []).map((v, i) => <option key={i} value={v} />)}</datalist>
           </div>
@@ -53,21 +53,21 @@ export default function GenealogySection({ formData, updateField, autocompleteDa
         </div>
       </div>
 
-      {/* MÃ£e */}
+      {/* Mãe */}
       <div className="space-y-2">
         <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
-          ðÅ¸�â€ž MÃ£e
+          🐄 Mãe
         </h5>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
           <div className="md:col-span-1">
-            <label className="block text-xs text-gray-500 mb-1">SÃ©rie</label>
+            <label className="block text-xs text-gray-500 mb-1">Série</label>
             <input
               type="text"
               list="datalist-mae-serie"
               value={formData.maeSerie}
               onChange={(e) => updateField('maeSerie', e.target.value)}
               className="input-field"
-              placeholder="SÃ©rie"
+              placeholder="Série"
             />
             <datalist id="datalist-mae-serie">{(ac.serie || []).map((v, i) => <option key={i} value={v} />)}</datalist>
           </div>
@@ -91,17 +91,17 @@ export default function GenealogySection({ formData, updateField, autocompleteDa
               value={formData.mae}
               onChange={(e) => updateField('mae', e.target.value)}
               className="input-field"
-              placeholder="Nome da MÃ£e"
+              placeholder="Nome da Mãe"
             />
             <datalist id="datalist-mae-nome">{(ac.mae || []).map((v, i) => <option key={i} value={v} />)}</datalist>
           </div>
         </div>
       </div>
 
-      {/* SituaÃ§Ã£o ABCZ */}
+      {/* Situação ABCZ */}
       <div className="space-y-2">
         <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
-          SituaÃ§Ã£o ABCZ
+          Situação ABCZ
         </h5>
         <select
           value={formData.situacaoAbcz || ''}
@@ -113,7 +113,7 @@ export default function GenealogySection({ formData, updateField, autocompleteDa
           <option value="Possui RGD">Possui RGD</option>
           <option value="Possui RGN">Possui RGN</option>
           <option value="Pendente">Pendente</option>
-          <option value="NÃ£o informado">NÃ£o informado</option>
+          <option value="Não informado">Não informado</option>
         </select>
         <p className="text-xs text-gray-500 mt-1">Status do registro na ABCZ (RG, RGD, RGN)</p>
       </div>

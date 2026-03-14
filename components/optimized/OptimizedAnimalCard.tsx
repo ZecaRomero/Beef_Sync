@@ -15,7 +15,7 @@ interface OptimizedAnimalCardProps {
   onDelete?: (animal: Animal) => void;
 }
 
-// Badge otimizado para situaÃ§Ã£o
+// Badge otimizado para situação
 const SituacaoBadge = memo<{ situacao: string }>(({ situacao }) => {
   const colorMap: Record<string, string> = {
     'Ativo': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
@@ -76,7 +76,7 @@ export const OptimizedAnimalCard = memo<OptimizedAnimalCardProps>(({
 
       <CardContent>
         <InfoRow label="Sexo" value={animal.sexo} />
-        <InfoRow label="RaÃ§a" value={animal.raca} />
+        <InfoRow label="Raça" value={animal.raca} />
         {animal.data_nascimento && (
           <InfoRow label="Nascimento" value={formatDate(animal.data_nascimento)} />
         )}
@@ -90,7 +90,7 @@ export const OptimizedAnimalCard = memo<OptimizedAnimalCardProps>(({
         {animal.is_fiv && (
           <div className="mt-2">
             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-              ðÅ¸§¬ FIV
+              🧬 FIV
             </span>
           </div>
         )}

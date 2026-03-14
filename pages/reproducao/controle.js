@@ -32,7 +32,7 @@ export default function ReproducaoControle() {
         const data = await response.json()
         setReproductionData(data.data || [])
       } else {
-        console.error('Erro ao carregar dados de reproduÃ§Ã£o')
+        console.error('Erro ao carregar dados de reprodução')
       }
     } catch (error) {
       console.error('Erro ao carregar dados:', error)
@@ -78,12 +78,12 @@ export default function ReproducaoControle() {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Head>
-          <title>Controle de ReproduÃ§Ã£o - Beef Sync</title>
+          <title>Controle de Reprodução - Beef Sync</title>
         </Head>
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-400">Carregando dados de reproduÃ§Ã£o...</p>
+            <p className="text-gray-600 dark:text-gray-400">Carregando dados de reprodução...</p>
           </div>
         </div>
       </div>
@@ -93,7 +93,7 @@ export default function ReproducaoControle() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Head>
-        <title>Controle de ReproduÃ§Ã£o - Beef Sync</title>
+        <title>Controle de Reprodução - Beef Sync</title>
         <meta name="description" content="Sistema de controle reprodutivo do rebanho" />
       </Head>
 
@@ -104,7 +104,7 @@ export default function ReproducaoControle() {
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center">
                 <HeartIcon className="h-8 w-8 text-red-500 mr-3" />
-                Controle de ReproduÃ§Ã£o
+                Controle de Reprodução
               </h1>
               <p className="text-gray-600 dark:text-gray-400 mt-2">
                 Gerencie o programa reprodutivo do seu rebanho
@@ -256,16 +256,16 @@ export default function ReproducaoControle() {
                       Status
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      ÃÅ¡ltima InseminaÃ§Ã£o
+                      Última Inseminação
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      PrevisÃ£o Parto
+                      Previsão Parto
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      Touro/SÃªmen
+                      Touro/Sêmen
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      AÃ§Ãµes
+                      Ações
                     </th>
                   </tr>
                 </thead>
@@ -332,7 +332,7 @@ export default function ReproducaoControle() {
                 Novo Registro Reprodutivo
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Funcionalidade em desenvolvimento. Em breve vocÃª poderÃ¡ adicionar novos registros reprodutivos.
+                Funcionalidade em desenvolvimento. Em breve você poderá adicionar novos registros reprodutivos.
               </p>
               <div className="flex justify-end">
                 <button

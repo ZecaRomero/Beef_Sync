@@ -11,7 +11,7 @@ export default function NetworkSyncButton() {
       window.exportAllData()
       setShowMenu(false)
     } else {
-      alert('UtilitÃ¡rios de sincronizaÃ§Ã£o nÃ£o carregados')
+      alert('Utilitários de sincronização não carregados')
     }
   }
 
@@ -30,7 +30,7 @@ export default function NetworkSyncButton() {
               window.importAllData(data)
             }
           } catch (error) {
-            alert('Arquivo invÃ¡lido')
+            alert('Arquivo inválido')
           }
         }
         reader.readAsText(file)
@@ -43,14 +43,14 @@ export default function NetworkSyncButton() {
   const handleShowNetworkInfo = () => {
     if (window.showNetworkInfo) {
       window.showNetworkInfo()
-      alert('ââ€ž¹ï¸� InformaÃ§Ãµes de rede exibidas no console (F12)')
+      alert('ℹ️ Informações de rede exibidas no console (F12)')
     }
     setShowMenu(false)
   }
 
   return (
     <div className="fixed bottom-20 right-4 z-40">
-      {/* Menu de opÃ§Ãµes */}
+      {/* Menu de opções */}
       {showMenu && (
         <div className="mb-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 p-2 min-w-48">
           <button
@@ -82,11 +82,11 @@ export default function NetworkSyncButton() {
         </div>
       )}
 
-      {/* BotÃ£o principal */}
+      {/* Botão principal */}
       <button
         onClick={() => setShowMenu(!showMenu)}
         className="bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
-        title="SincronizaÃ§Ã£o de Rede"
+        title="Sincronização de Rede"
       >
         <ShareIcon className="h-5 w-5" />
       </button>

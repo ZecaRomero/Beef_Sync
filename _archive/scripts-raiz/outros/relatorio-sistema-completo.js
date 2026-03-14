@@ -2,13 +2,13 @@
 const { query } = require('./lib/database')
 
 async function relatorioSistemaCompleto() {
-  console.log('�Ÿ“Š RELAT�“RIO FINAL - SISTEMA DE REPRODU�‡�ƒO COMPLETO')
+  console.log('📊 RELATÓRIO FINAL - SISTEMA DE REPRODUÇÃO COMPLETO')
   console.log('=' .repeat(70))
   console.log('')
 
   try {
     // 1. Estatísticas gerais
-    console.log('1️�ƒ� ESTATÍSTICAS GERAIS:')
+    console.log('1️⃣ ESTATÍSTICAS GERAIS:')
     console.log('-'.repeat(50))
     
     const stats = await Promise.all([
@@ -20,16 +20,16 @@ async function relatorioSistemaCompleto() {
       query(`SELECT COUNT(*) as total FROM nascimentos`)
     ])
     
-    console.log(`�Ÿ“Š Total de fêmeas: ${stats[0].rows[0].total}`)
-    console.log(`�Ÿ“Š Total de machos: ${stats[1].rows[0].total}`)
-    console.log(`�Ÿ“Š Total de inseminações: ${stats[2].rows[0].total}`)
-    console.log(`�Ÿ“Š Gestações por IA: ${stats[3].rows[0].total}`)
-    console.log(`�Ÿ“Š Gestações por FIV: ${stats[4].rows[0].total}`)
-    console.log(`�Ÿ“Š Total de nascimentos: ${stats[5].rows[0].total}`)
+    console.log(`📊 Total de fêmeas: ${stats[0].rows[0].total}`)
+    console.log(`📊 Total de machos: ${stats[1].rows[0].total}`)
+    console.log(`📊 Total de inseminações: ${stats[2].rows[0].total}`)
+    console.log(`📊 Gestações por IA: ${stats[3].rows[0].total}`)
+    console.log(`📊 Gestações por FIV: ${stats[4].rows[0].total}`)
+    console.log(`📊 Total de nascimentos: ${stats[5].rows[0].total}`)
     
     // 2. Relatório de reprodução por tipo
     console.log('')
-    console.log('2️�ƒ� REPRODU�‡�ƒO POR TIPO DE COBERTURA:')
+    console.log('2️⃣ REPRODUÇÃO POR TIPO DE COBERTURA:')
     console.log('-'.repeat(50))
     
     const reproducao = await query(`
@@ -60,7 +60,7 @@ async function relatorioSistemaCompleto() {
     
     // 3. Top 10 touros mais utilizados em IA
     console.log('')
-    console.log('3️�ƒ� TOP 10 TOUROS MAIS UTILIZADOS EM IA:')
+    console.log('3️⃣ TOP 10 TOUROS MAIS UTILIZADOS EM IA:')
     console.log('-'.repeat(50))
     
     const topTouros = await query(`
@@ -94,7 +94,7 @@ async function relatorioSistemaCompleto() {
     
     // 4. Inseminações por mês
     console.log('')
-    console.log('4️�ƒ� INSEMINA�‡�•ES POR M�ŠS (2025):')
+    console.log('4️⃣ INSEMINAÇÕES POR MÊS (2025):')
     console.log('-'.repeat(50))
     
     const porMes = await query(`
@@ -109,7 +109,7 @@ async function relatorioSistemaCompleto() {
     `)
     
     if (porMes.rows.length > 0) {
-      console.log('M�ŠS'.padEnd(10) + 'IAs'.padEnd(8) + 'PRENHAS'.padEnd(10) + 'TAXA %')
+      console.log('MÊS'.padEnd(10) + 'IAs'.padEnd(8) + 'PRENHAS'.padEnd(10) + 'TAXA %')
       console.log('-'.repeat(35))
       porMes.rows.forEach(row => {
         const taxa = row.total_ias > 0 ? ((row.prenhas / row.total_ias) * 100).toFixed(1) : '0.0'
@@ -124,7 +124,7 @@ async function relatorioSistemaCompleto() {
     
     // 5. Verificar integridade do sistema
     console.log('')
-    console.log('5️�ƒ� VERIFICA�‡�ƒO DE INTEGRIDADE:')
+    console.log('5️⃣ VERIFICAÇÃO DE INTEGRIDADE:')
     console.log('-'.repeat(50))
     
     const integridade = await Promise.all([
@@ -158,42 +158,42 @@ async function relatorioSistemaCompleto() {
     const iasSemGestacao = integridade[1].rows[0].total
     const gestacoesSemTipo = integridade[2].rows[0].total
     
-    console.log(`�œ… Machos com IA: ${machosComIA} (deve ser 0)`)
-    console.log(`�œ… IAs prenhas sem gestação: ${iasSemGestacao} (deve ser 0)`)
-    console.log(`�œ… Gestações sem tipo: ${gestacoesSemTipo} (deve ser 0)`)
+    console.log(`✅ Machos com IA: ${machosComIA} (deve ser 0)`)
+    console.log(`✅ IAs prenhas sem gestação: ${iasSemGestacao} (deve ser 0)`)
+    console.log(`✅ Gestações sem tipo: ${gestacoesSemTipo} (deve ser 0)`)
     
     if (machosComIA === 0 && iasSemGestacao === 0 && gestacoesSemTipo === 0) {
-      console.log('�ŸŽ� SISTEMA 100% ÍNTEGRO!')
+      console.log('🎯 SISTEMA 100% ÍNTEGRO!')
     } else {
-      console.log('�š�️ Sistema precisa de ajustes')
+      console.log('⚠️ Sistema precisa de ajustes')
     }
     
     // 6. Funcionalidades implementadas
     console.log('')
-    console.log('6️�ƒ� FUNCIONALIDADES IMPLEMENTADAS:')
+    console.log('6️⃣ FUNCIONALIDADES IMPLEMENTADAS:')
     console.log('-'.repeat(50))
     
     const funcionalidades = [
-      '�œ… Importação de inseminações do Excel',
-      '�œ… Validação automática de sexo dos animais',
-      '�œ… Criação automática de gestações para prenhas',
-      '�œ… Diferenciação entre IA e FIV',
-      '�œ… Registro automático de custos',
-      '�œ… Prevenção de duplicações',
-      '�œ… Vinculação IA �†’ Gestação �†’ Nascimento',
-      '�œ… Trigger automático para novos nascimentos',
-      '�œ… Relatórios por tipo de cobertura',
-      '�œ… Rastreabilidade completa'
+      '✅ Importação de inseminações do Excel',
+      '✅ Validação automática de sexo dos animais',
+      '✅ Criação automática de gestações para prenhas',
+      '✅ Diferenciação entre IA e FIV',
+      '✅ Registro automático de custos',
+      '✅ Prevenção de duplicações',
+      '✅ Vinculação IA → Gestação → Nascimento',
+      '✅ Trigger automático para novos nascimentos',
+      '✅ Relatórios por tipo de cobertura',
+      '✅ Rastreabilidade completa'
     ]
     
     funcionalidades.forEach(func => console.log(func))
     
     // 7. Queries úteis para relatórios
     console.log('')
-    console.log('7️�ƒ� QUERIES �šTEIS PARA RELAT�“RIOS:')
+    console.log('7️⃣ QUERIES ÚTEIS PARA RELATÓRIOS:')
     console.log('-'.repeat(50))
     
-    console.log('�Ÿ“‹ Relatório de eficiência reprodutiva:')
+    console.log('📋 Relatório de eficiência reprodutiva:')
     console.log(`
 SELECT 
   DATE_TRUNC('month', i.data_inseminacao) as mes,
@@ -205,7 +205,7 @@ GROUP BY DATE_TRUNC('month', i.data_inseminacao)
 ORDER BY mes DESC;
     `)
     
-    console.log('�Ÿ“‹ Nascimentos vinculados com IAs:')
+    console.log('📋 Nascimentos vinculados com IAs:')
     console.log(`
 SELECT 
   n.rg as bezerro,
@@ -221,10 +221,10 @@ ORDER BY n.created_at DESC;
     `)
     
     console.log('')
-    console.log('�œ… RELAT�“RIO CONCLUÍDO!')
+    console.log('✅ RELATÓRIO CONCLUÍDO!')
     
   } catch (error) {
-    console.error('�Œ Erro:', error)
+    console.error('❌ Erro:', error)
   }
 }
 
@@ -232,13 +232,13 @@ ORDER BY n.created_at DESC;
 relatorioSistemaCompleto()
   .then(() => {
     console.log('')
-    console.log('�ŸŽ� SISTEMA BEEF-SYNC REPRODU�‡�ƒO:')
-    console.log('�€� Sistema completo e operacional')
-    console.log('�€� Importação Excel funcionando 100%')
-    console.log('�€� Diferenciação IA vs FIV implementada')
-    console.log('�€� Rastreabilidade completa da reprodução')
-    console.log('�€� Relatórios avançados disponíveis')
-    console.log('�€� Pronto para uso em produção')
+    console.log('🎯 SISTEMA BEEF-SYNC REPRODUÇÃO:')
+    console.log('• Sistema completo e operacional')
+    console.log('• Importação Excel funcionando 100%')
+    console.log('• Diferenciação IA vs FIV implementada')
+    console.log('• Rastreabilidade completa da reprodução')
+    console.log('• Relatórios avançados disponíveis')
+    console.log('• Pronto para uso em produção')
     process.exit(0)
   })
   .catch(error => {

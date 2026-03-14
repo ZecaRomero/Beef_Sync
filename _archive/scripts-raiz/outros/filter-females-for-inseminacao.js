@@ -2,7 +2,7 @@
 const { query } = require('./lib/database')
 
 async function filterFemalesForInseminacao() {
-  console.log('�Ÿ”� Identificando fêmeas disponíveis para inseminação...\n')
+  console.log('🔍 Identificando fêmeas disponíveis para inseminação...\n')
 
   try {
     // 1. Buscar todas as fêmeas do rebanho
@@ -24,7 +24,7 @@ async function filterFemalesForInseminacao() {
       ORDER BY serie, rg
     `)
 
-    console.log(`   �œ… Encontradas ${femeas.rows.length} fêmeas ativas`)
+    console.log(`   ✅ Encontradas ${femeas.rows.length} fêmeas ativas`)
 
     // 2. Categorizar fêmeas por idade reprodutiva
     console.log('\n2. Categorizando por idade reprodutiva...')
@@ -47,9 +47,9 @@ async function filterFemalesForInseminacao() {
       }
     })
 
-    console.log(`   �€� Bezerras (< 12 meses): ${femeasPorIdade.jovens.length}`)
-    console.log(`   �€� Novilhas (12-24 meses): ${femeasPorIdade.novilhas.length}`)
-    console.log(`   �€� Vacas (> 24 meses): ${femeasPorIdade.vacas.length}`)
+    console.log(`   • Bezerras (< 12 meses): ${femeasPorIdade.jovens.length}`)
+    console.log(`   • Novilhas (12-24 meses): ${femeasPorIdade.novilhas.length}`)
+    console.log(`   • Vacas (> 24 meses): ${femeasPorIdade.vacas.length}`)
 
     // 3. Verificar quais já têm inseminações
     console.log('\n3. Verificando histórico de inseminações...')
@@ -69,7 +69,7 @@ async function filterFemalesForInseminacao() {
       ORDER BY ultima_ia DESC
     `)
 
-    console.log(`   �œ… ${femeasComIA.rows.length} fêmeas já têm histórico de IA`)
+    console.log(`   ✅ ${femeasComIA.rows.length} fêmeas já têm histórico de IA`)
 
     // 4. Identificar fêmeas aptas para nova IA
     console.log('\n4. Identificando fêmeas aptas para nova inseminação...')
@@ -102,7 +102,7 @@ async function filterFemalesForInseminacao() {
             femeasAptas.push({
               ...femea,
               status: 'Apta para nova IA',
-              observacao: `�šltima IA há ${diasDesdeUltimaIA} dias`
+              observacao: `Última IA há ${diasDesdeUltimaIA} dias`
             })
           } else if (diasDesdeUltimaIA >= 30 && diasDesdeUltimaIA < 45) {
             // Pendente de diagnóstico
@@ -116,7 +116,7 @@ async function filterFemalesForInseminacao() {
       }
     }
 
-    console.log(`   �œ… ${femeasAptas.length} fêmeas aptas para inseminação`)
+    console.log(`   ✅ ${femeasAptas.length} fêmeas aptas para inseminação`)
     console.log(`   ⏳ ${femeasPendenteDG.length} fêmeas pendentes de diagnóstico`)
 
     // 5. Mostrar lista das fêmeas aptas (primeiras 20)
@@ -145,9 +145,9 @@ async function filterFemalesForInseminacao() {
       )
       
       if (encontrado) {
-        console.log(`   �œ… ${animal.serie} ${animal.rg}: �‰ fêmea, pode ser inseminada`)
+        console.log(`   ✅ ${animal.serie} ${animal.rg}: É fêmea, pode ser inseminada`)
       } else {
-        console.log(`   �Œ ${animal.serie} ${animal.rg}: �‰ macho, REMOVER da planilha`)
+        console.log(`   ❌ ${animal.serie} ${animal.rg}: É macho, REMOVER da planilha`)
       }
     }
 
@@ -162,27 +162,27 @@ async function filterFemalesForInseminacao() {
     ].join('\n')
 
     require('fs').writeFileSync('femeas-aptas-inseminacao.csv', csvContent, 'utf8')
-    console.log('   �œ… Arquivo criado: femeas-aptas-inseminacao.csv')
+    console.log('   ✅ Arquivo criado: femeas-aptas-inseminacao.csv')
 
-    console.log('\n�œ… Análise concluída!')
+    console.log('\n✅ Análise concluída!')
 
   } catch (error) {
-    console.error('�Œ Erro:', error)
+    console.error('❌ Erro:', error)
   }
 }
 
 // Executar
 filterFemalesForInseminacao()
   .then(() => {
-    console.log('\n�ŸŽ� RESUMO E RECOMENDA�‡�•ES:')
+    console.log('\n🎯 RESUMO E RECOMENDAÇÕES:')
     console.log('')
-    console.log('�Ÿ“‹ PARA CORRIGIR O ERRO DE IMPORTA�‡�ƒO:')
+    console.log('📋 PARA CORRIGIR O ERRO DE IMPORTAÇÃO:')
     console.log('1. Os animais CJCJ 16235, 16511 e 16635 são MACHOS')
     console.log('2. REMOVA estes animais da sua planilha Excel')
     console.log('3. Use apenas as fêmeas listadas acima')
     console.log('4. Consulte o arquivo femeas-aptas-inseminacao.csv')
     console.log('')
-    console.log('�Ÿ’� DICA: Filtre sua planilha para incluir apenas fêmeas')
+    console.log('💡 DICA: Filtre sua planilha para incluir apenas fêmeas')
     console.log('   com idade >= 15 meses e sem IA recente')
     process.exit(0)
   })

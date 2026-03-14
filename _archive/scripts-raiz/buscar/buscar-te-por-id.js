@@ -42,7 +42,7 @@ async function buscarTE() {
         console.log(`  Status: ${te.status || 'N/A'}`);
         console.log(`  Resultado: ${te.resultado || 'N/A'}`);
       } else {
-        console.log(`\n�Œ M ${receptora.rg} (ID: ${receptora.id}): Nenhuma TE encontrada`);
+        console.log(`\n❌ M ${receptora.rg} (ID: ${receptora.id}): Nenhuma TE encontrada`);
       }
     }
     
@@ -64,7 +64,7 @@ async function buscarTE() {
         console.log(`${te.serie || '?'} ${te.rg || '?'} | TE: ${new Date(te.data_te).toLocaleDateString('pt-BR')} | Status: ${te.status || 'N/A'}`);
       });
     } else {
-      console.log('�Œ Nenhuma TE encontrada com data 27/11/2025');
+      console.log('❌ Nenhuma TE encontrada com data 27/11/2025');
     }
     
     // Verificar se existe alguma TE para essas receptoras
@@ -88,7 +88,7 @@ async function buscarTE() {
     }
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
     console.error(error.stack);
   } finally {
     client.release();

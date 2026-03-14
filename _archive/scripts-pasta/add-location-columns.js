@@ -3,11 +3,11 @@ require('dotenv').config();
 const { query, closePool } = require('../lib/database');
 
 async function addLocationColumns() {
-  console.log('�Ÿš€ Iniciando migração de colunas de localização...');
+  console.log('🚀 Iniciando migração de colunas de localização...');
 
   try {
     // Verificar e adicionar colunas na tabela animais
-    console.log('�Ÿ“� Verificando tabela animais...');
+    console.log('📦 Verificando tabela animais...');
     
     await query(`
       DO $$ 
@@ -30,10 +30,10 @@ async function addLocationColumns() {
       END $$;
     `);
 
-    console.log('�œ… Migração concluída com sucesso!');
+    console.log('✅ Migração concluída com sucesso!');
 
   } catch (error) {
-    console.error('�Œ Erro na migração:', error);
+    console.error('❌ Erro na migração:', error);
   } finally {
     await closePool();
   }

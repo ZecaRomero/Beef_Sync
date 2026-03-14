@@ -24,14 +24,14 @@ export default asyncHandler(async function handler(req, res) {
   const { receptoras, usuario = 'sistema' } = req.body
 
   if (!receptoras || !Array.isArray(receptoras) || receptoras.length === 0) {
-    return sendValidationError(res, 'Lista de receptoras Ã© obrigatÃ³ria e deve conter pelo menos uma receptora')
+    return sendValidationError(res, 'Lista de receptoras é obrigatória e deve conter pelo menos uma receptora')
   }
 
   // Validar cada receptora
   for (let i = 0; i < receptoras.length; i++) {
     const receptora = receptoras[i]
     if (!receptora.brinco || !receptora.raca) {
-      return sendValidationError(res, `Receptora ${i + 1}: Brinco e raÃ§a sÃ£o obrigatÃ³rios`, {
+      return sendValidationError(res, `Receptora ${i + 1}: Brinco e raça são obrigatórios`, {
         required: ['brinco', 'raca'],
         receptora_index: i + 1
       })
@@ -66,9 +66,9 @@ export default asyncHandler(async function handler(req, res) {
       req
     })
 
-    console.log(`ðÅ¸Å¡â‚¬ Iniciando processamento do lote ${lote.numero_lote} com ${receptoras.length} receptoras`)
+    console.log(`🚀 Iniciando processamento do lote ${lote.numero_lote} com ${receptoras.length} receptoras`)
 
-    // Verificar se a tabela de receptoras existe, se nÃ£o, criar
+    // Verificar se a tabela de receptoras existe, se não, criar
     await client.query(`
       CREATE TABLE IF NOT EXISTS receptoras (
         id SERIAL PRIMARY KEY,
@@ -77,7 +77,7 @@ export default asyncHandler(async function handler(req, res) {
         idade INTEGER,
         peso DECIMAL(10,2),
         condicao_corporal INTEGER CHECK (condicao_corporal >= 1 AND condicao_corporal <= 5),
-        status VARCHAR(20) DEFAULT 'DisponÃ­vel',
+        status VARCHAR(20) DEFAULT 'Disponível',
         observacoes TEXT,
         data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         data_ultima_utilizacao TIMESTAMP,
@@ -109,7 +109,7 @@ export default asyncHandler(async function handler(req, res) {
           receptoraData.idade || null,
           receptoraData.peso || null,
           receptoraData.condicao_corporal || null,
-          receptoraData.status || 'DisponÃ­vel',
+          receptoraData.status || 'Disponível',
           receptoraData.observacoes || `Cadastrada via lote ${lote.numero_lote}`,
           receptoraData.proprietario || null,
           receptoraData.localizacao || null
@@ -126,7 +126,7 @@ export default asyncHandler(async function handler(req, res) {
         })
         resultados.total_sucessos++
 
-        console.log(`âÅ“â€¦ Receptora ${i + 1}/${receptoras.length} criada: ${receptora.brinco}`)
+        console.log(`✅ Receptora ${i + 1}/${receptoras.length} criada: ${receptora.brinco}`)
 
       } catch (error) {
         resultados.erros.push({
@@ -137,7 +137,7 @@ export default asyncHandler(async function handler(req, res) {
         })
         resultados.total_erros++
 
-        console.error(`â�Å’ Erro na receptora ${i + 1}/${receptoras.length} (${receptoraData.brinco}): ${error.message}`)
+        console.error(`❌ Erro na receptora ${i + 1}/${receptoras.length} (${receptoraData.brinco}): ${error.message}`)
       }
     }
 
@@ -148,9 +148,9 @@ export default asyncHandler(async function handler(req, res) {
       console.error(`Erro ao atualizar lote: ${updateError.message}`)
     }
 
-    const mensagem = `Processamento do lote ${lote.numero_lote} concluÃ­do: ${resultados.total_sucessos} sucessos, ${resultados.total_erros} erros`
+    const mensagem = `Processamento do lote ${lote.numero_lote} concluído: ${resultados.total_sucessos} sucessos, ${resultados.total_erros} erros`
     
-    console.log(`ðÅ¸Å½â€° ${mensagem}`)
+    console.log(`🎉 ${mensagem}`)
 
     return sendSuccess(res, {
       lote: lote.numero_lote,
@@ -179,7 +179,7 @@ export default asyncHandler(async function handler(req, res) {
   }
 })
 
-// FunÃ§Ã£o auxiliar para atualizar o lote com os resultados
+// Função auxiliar para atualizar o lote com os resultados
 async function atualizarLoteComResultados(numeroLote, resultados, client) {
   const status = resultados.total_erros > 0 ? 'parcial' : 'concluido'
   
@@ -206,7 +206,7 @@ async function atualizarLoteComResultados(numeroLote, resultados, client) {
   ])
 }
 
-// FunÃ§Ã£o auxiliar para marcar lote como erro
+// Função auxiliar para marcar lote como erro
 async function atualizarLoteComErro(numeroLote, mensagemErro, client) {
   await client.query(`
     UPDATE lotes_operacoes 

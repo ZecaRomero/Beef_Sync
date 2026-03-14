@@ -12,7 +12,7 @@ async function corrigir() {
        RETURNING id, serie, rg, nome, abczg, deca, iqg, pt_iqg`
     );
     if (res.rows.length > 0) {
-      console.log('�œ… Corrigido:', res.rows[0]);
+      console.log('✅ Corrigido:', res.rows[0]);
     } else {
       console.log('Animal CJCJ 17039 não encontrado.');
     }

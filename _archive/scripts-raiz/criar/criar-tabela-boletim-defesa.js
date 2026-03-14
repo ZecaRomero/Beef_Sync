@@ -11,9 +11,9 @@ async function criarTabelaBoletimDefesa() {
 
   try {
     await client.connect()
-    console.log('�œ… Conectado ao banco de dados\n')
+    console.log('✅ Conectado ao banco de dados\n')
 
-    console.log('�Ÿ“‹ Criando tabela boletim_defesa_fazendas...\n')
+    console.log('📋 Criando tabela boletim_defesa_fazendas...\n')
 
     await client.query(`
       CREATE TABLE IF NOT EXISTS boletim_defesa_fazendas (
@@ -33,10 +33,10 @@ async function criarTabelaBoletimDefesa() {
       )
     `)
 
-    console.log('�œ… Tabela boletim_defesa_fazendas criada com sucesso!\n')
+    console.log('✅ Tabela boletim_defesa_fazendas criada com sucesso!\n')
 
     // Criar índices
-    console.log('�Ÿ“‹ Criando índices...\n')
+    console.log('📋 Criando índices...\n')
 
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_boletim_defesa_cnpj 
@@ -48,10 +48,10 @@ async function criarTabelaBoletimDefesa() {
       ON boletim_defesa_fazendas(nome)
     `)
 
-    console.log('�œ… Índices criados com sucesso!\n')
+    console.log('✅ Índices criados com sucesso!\n')
 
     // Inserir dados de exemplo (baseado na imagem)
-    console.log('�Ÿ“‹ Inserindo dados de exemplo...\n')
+    console.log('📋 Inserindo dados de exemplo...\n')
 
     await client.query(`
       INSERT INTO boletim_defesa_fazendas (nome, cnpj, quantidades)
@@ -83,18 +83,18 @@ async function criarTabelaBoletimDefesa() {
       ON CONFLICT (cnpj) DO NOTHING
     `)
 
-    console.log('�œ… Dados de exemplo inseridos com sucesso!\n')
+    console.log('✅ Dados de exemplo inseridos com sucesso!\n')
 
     console.log('=' .repeat(60))
-    console.log('�œ… MIGRA�‡�ƒO CONCLUÍDA COM SUCESSO!')
+    console.log('✅ MIGRAÇÃO CONCLUÍDA COM SUCESSO!')
     console.log('=' .repeat(60))
-    console.log('\n�Ÿ“Š Estrutura criada:')
+    console.log('\n📊 Estrutura criada:')
     console.log('   - Tabela: boletim_defesa_fazendas')
     console.log('   - Índices: cnpj, nome')
     console.log('   - Dados de exemplo: 2 fazendas\n')
 
   } catch (error) {
-    console.error('�Œ Erro na migração:', error)
+    console.error('❌ Erro na migração:', error)
     throw error
   } finally {
     await client.end()
@@ -104,10 +104,10 @@ async function criarTabelaBoletimDefesa() {
 // Executar
 criarTabelaBoletimDefesa()
   .then(() => {
-    console.log('�œ… Script finalizado com sucesso!')
+    console.log('✅ Script finalizado com sucesso!')
     process.exit(0)
   })
   .catch(error => {
-    console.error('�Œ Erro ao executar script:', error)
+    console.error('❌ Erro ao executar script:', error)
     process.exit(1)
   })

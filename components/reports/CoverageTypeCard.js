@@ -40,7 +40,7 @@ export default function CoverageTypeCard() {
       setData(result)
     } catch (error) {
       console.error('Erro ao carregar dados de cobertura:', error)
-      // Dados de exemplo para demonstraÃ§Ã£o
+      // Dados de exemplo para demonstração
       setData({
         totalIA: 122,
         totalFIV: 45,
@@ -107,7 +107,7 @@ export default function CoverageTypeCard() {
     switch (status) {
       case 'Prenha':
         return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-      case 'NÃ£o Prenha':
+      case 'Não Prenha':
         return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
       default:
         return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
@@ -143,10 +143,10 @@ export default function CoverageTypeCard() {
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                ðÅ¸§¬ Coberturas por Tipo
+                🧬 Coberturas por Tipo
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                IA vs FIV - AnÃ¡lise temporal
+                IA vs FIV - Análise temporal
               </p>
             </div>
           </div>
@@ -157,10 +157,10 @@ export default function CoverageTypeCard() {
               onChange={(e) => setSelectedPeriod(e.target.value)}
               className="text-sm border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
             >
-              <option value="week">ÃÅ¡ltima Semana</option>
-              <option value="month">ÃÅ¡ltimo MÃªs</option>
-              <option value="quarter">ÃÅ¡ltimo Trimestre</option>
-              <option value="year">ÃÅ¡ltimo Ano</option>
+              <option value="week">Última Semana</option>
+              <option value="month">Último Mês</option>
+              <option value="quarter">Último Trimestre</option>
+              <option value="year">Último Ano</option>
             </select>
             
             <select
@@ -184,7 +184,7 @@ export default function CoverageTypeCard() {
               {data.totalIA}
             </div>
             <div className="text-sm text-blue-600 dark:text-blue-400 font-medium">
-              InseminaÃ§Ã£o Artificial
+              Inseminação Artificial
             </div>
             <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
               {iaPercentage}% do total
@@ -196,7 +196,7 @@ export default function CoverageTypeCard() {
               {data.totalFIV}
             </div>
             <div className="text-sm text-purple-600 dark:text-purple-400 font-medium">
-              FertilizaÃ§Ã£o In Vitro
+              Fertilização In Vitro
             </div>
             <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
               {fivPercentage}% do total
@@ -211,16 +211,16 @@ export default function CoverageTypeCard() {
               Total de Coberturas
             </div>
             <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-              PerÃ­odo selecionado
+              Período selecionado
             </div>
           </div>
         </div>
 
-        {/* GrÃ¡fico Temporal */}
+        {/* Gráfico Temporal */}
         <div className="mb-6">
           <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3 flex items-center">
             <ChartBarIcon className="h-4 w-4 mr-2" />
-            EvoluÃ§Ã£o Mensal
+            Evolução Mensal
           </h4>
           
           <div className="space-y-3">
@@ -295,7 +295,7 @@ export default function CoverageTypeCard() {
                       {coverage.animal}
                     </div>
                     <div className="text-xs text-gray-600 dark:text-gray-400">
-                      {coverage.bull} ââ‚¬¢ {coverage.location}
+                      {coverage.bull} • {coverage.location}
                     </div>
                   </div>
                 </div>
@@ -324,12 +324,12 @@ export default function CoverageTypeCard() {
           {data.recentCoverages.length === 0 && (
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
               <HeartIcon className="h-12 w-12 mx-auto mb-3 opacity-50" />
-              <p>Nenhuma cobertura encontrada no perÃ­odo selecionado</p>
+              <p>Nenhuma cobertura encontrada no período selecionado</p>
             </div>
           )}
         </div>
 
-        {/* AÃ§Ãµes */}
+        {/* Ações */}
         <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
@@ -338,7 +338,7 @@ export default function CoverageTypeCard() {
                 size="sm"
                 leftIcon={<FunnelIcon className="h-4 w-4" />}
               >
-                Filtros AvanÃ§ados
+                Filtros Avançados
               </Button>
               
               <Button
@@ -346,7 +346,7 @@ export default function CoverageTypeCard() {
                 size="sm"
                 leftIcon={<ArrowTrendingUpIcon className="h-4 w-4" />}
               >
-                AnÃ¡lise Detalhada
+                Análise Detalhada
               </Button>
             </div>
             
@@ -355,7 +355,7 @@ export default function CoverageTypeCard() {
               size="sm"
               leftIcon={<ChartBarIcon className="h-4 w-4" />}
             >
-              Gerar RelatÃ³rio
+              Gerar Relatório
             </Button>
           </div>
         </div>

@@ -18,7 +18,7 @@ export default function useAnimalForm(animal, isOpen, onClose, onSave) {
     sexo: '',
     raca: '',
     dataNascimento: '',
-    dataChegada: '', // Data de chegada para cÃ¡lculo de DG
+    dataChegada: '', // Data de chegada para cálculo de DG
     meses: 0,
     situacao: 'Ativo',
     pai: '',
@@ -52,7 +52,7 @@ export default function useAnimalForm(animal, isOpen, onClose, onSave) {
   const [formData, setFormData] = useState(initialFormState);
   const [availableLocations, setAvailableLocations] = useState([]);
 
-  // Load locations (usa utilitÃ¡rio que filtra nomes de touros cadastrados por engano como piquete)
+  // Load locations (usa utilitário que filtra nomes de touros cadastrados por engano como piquete)
   useEffect(() => {
     fetchAvailableLocations()
       .then(setAvailableLocations)
@@ -73,7 +73,7 @@ export default function useAnimalForm(animal, isOpen, onClose, onSave) {
         } else if (Array.isArray(data)) {
           nfsList = data;
         } else {
-          console.warn('Formato de dados de notas fiscais invÃ¡lido:', data);
+          console.warn('Formato de dados de notas fiscais inválido:', data);
           nfsList = [];
         }
 
@@ -84,7 +84,7 @@ export default function useAnimalForm(animal, isOpen, onClose, onSave) {
           numeroNF: nf.numero_nf || nf.numeroNF,
           origem: nf.fornecedor || nf.origem || 'Desconhecido',
           dataCompra: nf.data_compra || nf.dataCompra || nf.data,
-          valorPorReceptora: nf.valor_total // AproximaÃ§Ã£o, jÃ¡ que a API retorna o total
+          valorPorReceptora: nf.valor_total // Aproximação, já que a API retorna o total
         }));
 
         setNfsCadastradas(nfsMapeadas);
@@ -95,7 +95,7 @@ export default function useAnimalForm(animal, isOpen, onClose, onSave) {
     }
   }, []);
 
-  // Load naturezas de operaÃ§Ã£o
+  // Load naturezas de operação
   useEffect(() => {
     const fetchNaturezas = async () => {
       try {
@@ -174,17 +174,17 @@ export default function useAnimalForm(animal, isOpen, onClose, onSave) {
       newFormData.raca = racasPorSerie[serie];
     }
 
-    // Regras especÃ­ficas para RPT
+    // Regras específicas para RPT
     if (serie === 'RPT') {
-      newFormData.sexo = 'FÃªmea';
+      newFormData.sexo = 'Fêmea';
       newFormData.raca = 'Receptora';
       newFormData.meses = 30;
-      newFormData.dataNascimento = ''; // Receptoras geralmente nÃ£o tÃªm data nasc exata
+      newFormData.dataNascimento = ''; // Receptoras geralmente não têm data nasc exata
     }
     
-    // Regras especÃ­ficas para PA
+    // Regras específicas para PA
     if (serie === 'PA') {
-      newFormData.sexo = 'FÃªmea';
+      newFormData.sexo = 'Fêmea';
       newFormData.raca = 'Nelore PA';
     }
 
@@ -219,54 +219,54 @@ export default function useAnimalForm(animal, isOpen, onClose, onSave) {
     const camposObrigatorios = [];
 
     if (!formData.serie) {
-      newErrors.serie = "SÃ©rie Ã© obrigatÃ³ria";
-      camposObrigatorios.push("SÃ©rie");
+      newErrors.serie = "Série é obrigatória";
+      camposObrigatorios.push("Série");
     }
     
     if (!formData.boletim) {
-      newErrors.boletim = "Boletim Ã© obrigatÃ³rio";
+      newErrors.boletim = "Boletim é obrigatório";
       camposObrigatorios.push("Boletim");
     }
 
     if (!formData.rg) {
-      newErrors.rg = "RG Ã© obrigatÃ³rio";
+      newErrors.rg = "RG é obrigatório";
       camposObrigatorios.push("RG");
     }
     if (formData.rg && formData.rg.length > 20) {
-      newErrors.rg = "RG deve ter no mÃ¡ximo 20 dÃ­gitos";
+      newErrors.rg = "RG deve ter no máximo 20 dígitos";
     }
-    // ValidaÃ§Ã£o de formato para sÃ©rie PA (2 letras + 4 nÃºmeros)
+    // Validação de formato para série PA (2 letras + 4 números)
     if (formData.serie === 'PA' && formData.rg) {
-       // Remove espaÃ§os para validaÃ§Ã£o
+       // Remove espaços para validação
        const cleanRg = formData.rg.replace(/\s/g, '');
        const rgPattern = /^[A-Z]{2}[0-9]{4}$/;
        if (!rgPattern.test(cleanRg)) {
-          newErrors.rg = "RG PA deve ter 2 letras e 4 nÃºmeros (ex: AA1234 ou AA 1234)";
+          newErrors.rg = "RG PA deve ter 2 letras e 4 números (ex: AA1234 ou AA 1234)";
        }
     }
 
     if (!formData.sexo) {
-      newErrors.sexo = "Sexo Ã© obrigatÃ³rio";
+      newErrors.sexo = "Sexo é obrigatório";
       camposObrigatorios.push("Sexo");
     }
     if (!formData.raca) {
-      newErrors.raca = "RaÃ§a Ã© obrigatÃ³ria";
-      camposObrigatorios.push("RaÃ§a");
+      newErrors.raca = "Raça é obrigatória";
+      camposObrigatorios.push("Raça");
     }
     if (!formData.situacao) {
-      newErrors.situacao = "SituaÃ§Ã£o Ã© obrigatÃ³ria";
-      camposObrigatorios.push("SituaÃ§Ã£o");
+      newErrors.situacao = "Situação é obrigatória";
+      camposObrigatorios.push("Situação");
     }
 
     if (!formData.pastoAtual) {
-      newErrors.pastoAtual = "LocalizaÃ§Ã£o Atual (Piquete) Ã© obrigatÃ³ria";
-      camposObrigatorios.push("LocalizaÃ§Ã£o Atual");
+      newErrors.pastoAtual = "Localização Atual (Piquete) é obrigatória";
+      camposObrigatorios.push("Localização Atual");
     }
 
-    // ValidaÃ§Ã£o especÃ­fica para RPT (precisa de peso ou valor)
+    // Validação específica para RPT (precisa de peso ou valor)
     if (formData.serie === 'RPT' && !formData.pesoEntrada && !formData.valorCompra) {
       // newErrors.receptora = "Para receptoras, informe Peso de Entrada ou Valor de Compra";
-      // NÃ£o bloquear, mas idealmente avisar
+      // Não bloquear, mas idealmente avisar
     }
 
     setErrors(newErrors);
@@ -277,7 +277,7 @@ export default function useAnimalForm(animal, isOpen, onClose, onSave) {
     e.preventDefault();
 
     if (!validateForm()) {
-      alert("â�Å’ Erro de validaÃ§Ã£o: Verifique os campos obrigatÃ³rios");
+      alert("❌ Erro de validação: Verifique os campos obrigatórios");
       return;
     }
 
@@ -287,7 +287,7 @@ export default function useAnimalForm(animal, isOpen, onClose, onSave) {
       // Prepare data for submission
       const dataToSave = {
         ...formData,
-        // sexo: formData.sexo === 'Macho' ? 'M' : 'F', // REMOVED: Database expects 'Macho' or 'FÃªmea'
+        // sexo: formData.sexo === 'Macho' ? 'M' : 'F', // REMOVED: Database expects 'Macho' or 'Fêmea'
         // Clean up empty strings to null if backend expects
       };
 
@@ -305,8 +305,8 @@ export default function useAnimalForm(animal, isOpen, onClose, onSave) {
         const animalId = savedAnimal.id || (animal ? animal.id : null); // Fallback logic
         
         if (animalId) {
-           // SimulaÃ§Ã£o de aplicaÃ§Ã£o de custos (jÃ¡ que costManager pode nÃ£o ser async)
-           // Na prÃ¡tica, chamaria uma API ou mÃ©todo do costManager
+           // Simulação de aplicação de custos (já que costManager pode não ser async)
+           // Na prática, chamaria uma API ou método do costManager
            console.log('Aplicando custos para animal:', animalId);
            
            if (formData.aplicarProtocolo) {
@@ -317,12 +317,12 @@ export default function useAnimalForm(animal, isOpen, onClose, onSave) {
            }
            
            if (formData.aplicarDNA) {
-             // LÃ³gica de DNA
+             // Lógica de DNA
              if (formData.isFiv || formData.receptoraRg) {
                 costManager.adicionarCusto(animalId, {
                   tipo: 'Medicamentos',
                   subtipo: 'DNA',
-                  descricao: 'DNA Virgem (Paternidade) - ObrigatÃ³rio',
+                  descricao: 'DNA Virgem (Paternidade) - Obrigatório',
                   valor: costManager.medicamentos['DNA VIRGEM'].porAnimal,
                   data: new Date().toISOString().split('T')[0],
                   observacoes: 'Aplicado automaticamente no cadastro'
@@ -332,7 +332,7 @@ export default function useAnimalForm(animal, isOpen, onClose, onSave) {
                 costManager.adicionarCusto(animalId, {
                   tipo: 'Medicamentos',
                   subtipo: 'DNA',
-                  descricao: 'DNA GenÃ´mica - Bezerro',
+                  descricao: 'DNA Genômica - Bezerro',
                   valor: costManager.medicamentos['DNA GENOMICA'].porAnimal,
                   data: new Date().toISOString().split('T')[0],
                   observacoes: 'Aplicado automaticamente no cadastro'
@@ -342,7 +342,7 @@ export default function useAnimalForm(animal, isOpen, onClose, onSave) {
         }
       }
 
-      alert(`âÅ“â€¦ Sucesso! ${animal ? "Animal atualizado com sucesso!" : "Novo animal adicionado ao rebanho!"}`);
+      alert(`✅ Sucesso! ${animal ? "Animal atualizado com sucesso!" : "Novo animal adicionado ao rebanho!"}`);
       if (onSave) {
         const dataToNotify = savedAnimal || (animal?.id ? { ...formData, id: animal.id } : formData);
         await Promise.resolve(onSave(dataToNotify));
@@ -350,7 +350,7 @@ export default function useAnimalForm(animal, isOpen, onClose, onSave) {
       onClose();
     } catch (error) {
       console.error('Erro ao salvar:', error);
-      alert(`â�Å’ Erro: ${error.message || "Erro ao salvar animal"}`);
+      alert(`❌ Erro: ${error.message || "Erro ao salvar animal"}`);
     } finally {
       setLoading(false);
     }

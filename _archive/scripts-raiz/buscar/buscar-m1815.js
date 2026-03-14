@@ -29,7 +29,7 @@ async function buscarM1815() {
         console.log('---');
       });
     } else {
-      console.log('�Œ M 1815 N�ƒO ENCONTRADA!\n');
+      console.log('❌ M 1815 NÃO ENCONTRADA!\n');
     }
     
     console.log('\n=== BUSCANDO TODOS OS ANIMAIS M ===\n');

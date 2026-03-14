@@ -4,7 +4,7 @@
  */
 
 function limparDadosMock() {
-  console.log('�Ÿ�� Iniciando limpeza de dados mock...')
+  console.log('🧹 Iniciando limpeza de dados mock...')
   
   // Lista de dados mock conhecidos para remover
   const dadosMockParaRemover = [
@@ -46,23 +46,23 @@ function limparDadosMock() {
           
           if (contemMock || dadosParsed.length > 0) {
             localStorage.removeItem(chave)
-            console.log(`�œ… Removido: ${chave} (${dadosParsed.length} itens)`)
+            console.log(`✅ Removido: ${chave} (${dadosParsed.length} itens)`)
             dadosRemovidos++
           }
         }
       } catch (error) {
-        console.error(`�Œ Erro ao processar ${chave}:`, error)
+        console.error(`❌ Erro ao processar ${chave}:`, error)
       }
     }
   })
   
-  console.log(`�ŸŽ‰ Limpeza concluída! ${dadosRemovidos} tipos de dados removidos.`)
+  console.log(`🎉 Limpeza concluída! ${dadosRemovidos} tipos de dados removidos.`)
   
   if (dadosRemovidos > 0) {
-    console.log('�Ÿ”„ Recarregue a página para ver as mudanças.')
+    console.log('🔄 Recarregue a página para ver as mudanças.')
     return true
   } else {
-    console.log('�„�️ Nenhum dado mock foi encontrado.')
+    console.log('ℹ️ Nenhum dado mock foi encontrado.')
     return false
   }
 }
@@ -72,17 +72,17 @@ function limparVendas() {
   const vendas = localStorage.getItem('sales')
   if (vendas) {
     localStorage.removeItem('sales')
-    console.log('�œ… Vendas removidas com sucesso!')
+    console.log('✅ Vendas removidas com sucesso!')
     return true
   } else {
-    console.log('�„�️ Nenhuma venda encontrada.')
+    console.log('ℹ️ Nenhuma venda encontrada.')
     return false
   }
 }
 
 // Função para verificar dados sem remover
 function verificarDadosMock() {
-  console.log('�Ÿ”� Verificando dados mock no sistema...')
+  console.log('🔍 Verificando dados mock no sistema...')
   
   const chaves = Object.keys(localStorage)
   const dadosEncontrados = []
@@ -110,13 +110,13 @@ function verificarDadosMock() {
   })
   
   if (dadosEncontrados.length > 0) {
-    console.log('�Ÿ“Š Dados encontrados:')
+    console.log('📊 Dados encontrados:')
     dadosEncontrados.forEach(({ chave, quantidade, amostra }) => {
-      console.log(`  �€� ${chave}: ${quantidade} itens`)
+      console.log(`  • ${chave}: ${quantidade} itens`)
       console.log(`    Amostra:`, amostra)
     })
   } else {
-    console.log('�œ… Nenhum dado encontrado.')
+    console.log('✅ Nenhum dado encontrado.')
   }
   
   return dadosEncontrados
@@ -129,12 +129,12 @@ if (typeof window !== 'undefined') {
   window.verificarDadosMock = verificarDadosMock
   
   console.log(`
-�Ÿ�� Funções de limpeza disponíveis:
-  �€� limparDadosMock() - Remove todos os dados mock
-  �€� limparVendas() - Remove apenas vendas
-  �€� verificarDadosMock() - Verifica dados sem remover
+🧹 Funções de limpeza disponíveis:
+  • limparDadosMock() - Remove todos os dados mock
+  • limparVendas() - Remove apenas vendas
+  • verificarDadosMock() - Verifica dados sem remover
 
-�Ÿ’� Ou acesse: localhost:3020/limpar-dados-mock
+💡 Ou acesse: localhost:3020/limpar-dados-mock
   `)
 }
 

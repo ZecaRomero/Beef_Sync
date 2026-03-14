@@ -13,7 +13,7 @@ async function fixSemenFinal() {
   const client = await pool.connect();
   
   try {
-    console.log('�Ÿ”� Corrigindo estrutura final das tabelas de sêmen...');
+    console.log('🔧 Corrigindo estrutura final das tabelas de sêmen...');
     
     // 1. Remover restrição NOT NULL da coluna touro_nome
     await client.query('ALTER TABLE entradas_semen ALTER COLUMN touro_nome DROP NOT NULL');
@@ -26,7 +26,7 @@ async function fixSemenFinal() {
     `);
     
     // 3. Migrar dados novamente
-    console.log('�Ÿ“� Migrando dados...');
+    console.log('📦 Migrando dados...');
     
     // Limpar e migrar entradas
     await client.query('DELETE FROM entradas_semen');
@@ -36,7 +36,7 @@ async function fixSemenFinal() {
       WHERE tipo_operacao = 'entrada' OR tipo_operacao IS NULL
     `);
     
-    console.log(`�Ÿ“� Migrando ${entradas.rows.length} entradas...`);
+    console.log(`📥 Migrando ${entradas.rows.length} entradas...`);
     
     for (const entrada of entradas.rows) {
       await client.query(`
@@ -77,7 +77,7 @@ async function fixSemenFinal() {
       WHERE tipo_operacao = 'saida'
     `);
     
-    console.log(`�Ÿ“� Migrando ${saidas.rows.length} saídas...`);
+    console.log(`📤 Migrando ${saidas.rows.length} saídas...`);
     
     for (const saida of saidas.rows) {
       // Encontrar entrada correspondente
@@ -108,10 +108,10 @@ async function fixSemenFinal() {
       }
     }
     
-    console.log('�œ… Migração concluída com sucesso!');
+    console.log('✅ Migração concluída com sucesso!');
     
   } catch (error) {
-    console.error('�Œ Erro:', error);
+    console.error('❌ Erro:', error);
   } finally {
     client.release();
     await pool.end();

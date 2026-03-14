@@ -19,7 +19,7 @@ const itens = [
 ]
 
 async function executar() {
-  console.log('�Ÿ“� NF de Saída 18 - 4 itens - Data de saída:', dataFormatada)
+  console.log('📤 NF de Saída 18 - 4 itens - Data de saída:', dataFormatada)
   console.log('   Incrição: PARDINHO (Boletim de Pardinho)')
   console.log('')
 
@@ -57,7 +57,7 @@ async function executar() {
         throw new Error(data.error || data.message || `HTTP ${res.status}`)
       }
 
-      console.log('�œ… NF de Saída 18 atualizada com sucesso!')
+      console.log('✅ NF de Saída 18 atualizada com sucesso!')
       console.log('   ID:', nf18.id)
       console.log('   Data saída:', dataFormatada)
       console.log('   Itens:', itens.length)
@@ -88,16 +88,16 @@ async function executar() {
         throw new Error(data.error || data.message || `HTTP ${res.status}`)
       }
 
-      console.log('�œ… NF de Saída 18 criada com sucesso!')
+      console.log('✅ NF de Saída 18 criada com sucesso!')
       console.log('   ID:', data.data?.id)
       console.log('   Data saída:', dataFormatada)
       console.log('   Itens:', itens.length)
     }
 
     console.log('')
-    console.log('�š�️ Edite a NF no sistema para preencher tatuagens reais, valores e destino.')
+    console.log('⚠️ Edite a NF no sistema para preencher tatuagens reais, valores e destino.')
   } catch (err) {
-    console.error('�Œ Erro:', err.message)
+    console.error('❌ Erro:', err.message)
     process.exit(1)
   }
 }

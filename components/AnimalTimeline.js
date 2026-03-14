@@ -35,12 +35,12 @@ export default function AnimalTimeline({ isOpen, onClose, animal }) {
         setFullAnimalData(animalData);
         carregarTimeline(animalData);
       } else {
-        console.error('Erro ao buscar histÃ³rico do animal');
+        console.error('Erro ao buscar histórico do animal');
         // Fallback to basic animal data if API fails
         carregarTimeline(animal);
       }
     } catch (error) {
-      console.error('Erro de conexÃ£o:', error);
+      console.error('Erro de conexão:', error);
       carregarTimeline(animal);
     } finally {
       setLoading(false);
@@ -56,11 +56,11 @@ export default function AnimalTimeline({ isOpen, onClose, animal }) {
       eventos.push({
         tipo: 'nascimento',
         data: dadosAnimal.data_nascimento,
-        titulo: 'ðÅ¸�£ Nascimento',
+        titulo: '🐣 Nascimento',
         descricao: `Animal nasceu`,
         detalhes: [
-          `RaÃ§a: ${dadosAnimal.raca || 'N/A'}`,
-          `Sexo: ${dadosAnimal.sexo === 'M' ? 'Macho ââ„¢â€š' : dadosAnimal.sexo === 'F' ? 'FÃªmea ââ„¢â‚¬' : dadosAnimal.sexo}`,
+          `Raça: ${dadosAnimal.raca || 'N/A'}`,
+          `Sexo: ${dadosAnimal.sexo === 'M' ? 'Macho ♂' : dadosAnimal.sexo === 'F' ? 'Fêmea ♀' : dadosAnimal.sexo}`,
         ],
         cor: 'blue',
         icon: CalendarIcon,
@@ -72,7 +72,7 @@ export default function AnimalTimeline({ isOpen, onClose, animal }) {
       eventos.push({
         tipo: 'compra',
         data: dadosAnimal.dataCompra || dadosAnimal.data_compra,
-        titulo: 'ðÅ¸â€ºâ€™ Compra',
+        titulo: '🛒 Compra',
         descricao: `Adquirido de ${dadosAnimal.fornecedor || 'fornecedor'}`,
         detalhes: [
           `Valor: R$ ${(dadosAnimal.valorCompra || dadosAnimal.valor_compra || 0).toFixed(2)}`,
@@ -90,12 +90,12 @@ export default function AnimalTimeline({ isOpen, onClose, animal }) {
         eventos.push({
           tipo: 'protocolo',
           data: protocolo.data || protocolo.dataAplicacao || protocolo.data_inicio,
-          titulo: 'ðÅ¸â€™â€° Protocolo Aplicado',
-          descricao: protocolo.nome || protocolo.tipo || 'Protocolo SanitÃ¡rio',
+          titulo: '💉 Protocolo Aplicado',
+          descricao: protocolo.nome || protocolo.tipo || 'Protocolo Sanitário',
           detalhes: [
             protocolo.descricao,
             protocolo.custo ? `Custo: R$ ${parseFloat(protocolo.custo).toFixed(2)}` : null,
-            protocolo.veterinario ? `VeterinÃ¡rio: ${protocolo.veterinario}` : null,
+            protocolo.veterinario ? `Veterinário: ${protocolo.veterinario}` : null,
           ].filter(Boolean),
           cor: 'purple',
           icon: BeakerIcon,
@@ -117,7 +117,7 @@ export default function AnimalTimeline({ isOpen, onClose, animal }) {
         eventos.push({
           tipo: 'custo',
           data: custo.data,
-          titulo: 'ðÅ¸â€™° Custo Adicional',
+          titulo: '💰 Custo Adicional',
           descricao: custo.subtipo ? `${custo.tipo} - ${custo.subtipo}` : (custo.tipo || custo.descricao || 'Custo'),
           detalhes: [
             `Valor: R$ ${parseFloat(custo.valor || 0).toFixed(2)}`,
@@ -131,17 +131,17 @@ export default function AnimalTimeline({ isOpen, onClose, animal }) {
       });
     }
 
-    // 5. GestaÃ§Ãµes (se for fÃªmea/receptora)
+    // 5. Gestações (se for fêmea/receptora)
     if (dadosAnimal.gestacoes && dadosAnimal.gestacoes.length > 0) {
       dadosAnimal.gestacoes.forEach((gestacao) => {
         eventos.push({
           tipo: 'gestacao',
           data: gestacao.dataInicio || gestacao.data_inicio || gestacao.created_at,
-          titulo: 'ðÅ¸¤° GestaÃ§Ã£o Iniciada',
-          descricao: `GestaÃ§Ã£o #${gestacao.id}`,
+          titulo: '🤰 Gestação Iniciada',
+          descricao: `Gestação #${gestacao.id}`,
           detalhes: [
-            gestacao.embriao ? `EmbriÃ£o: ${gestacao.embriao}` : null,
-            gestacao.dataPrevisao || gestacao.data_previsao ? `PrevisÃ£o: ${new Date(gestacao.dataPrevisao || gestacao.data_previsao).toLocaleDateString('pt-BR')}` : null,
+            gestacao.embriao ? `Embrião: ${gestacao.embriao}` : null,
+            gestacao.dataPrevisao || gestacao.data_previsao ? `Previsão: ${new Date(gestacao.dataPrevisao || gestacao.data_previsao).toLocaleDateString('pt-BR')}` : null,
             gestacao.status ? `Status: ${gestacao.status}` : null,
           ].filter(Boolean),
           cor: 'pink',
@@ -153,10 +153,10 @@ export default function AnimalTimeline({ isOpen, onClose, animal }) {
           eventos.push({
             tipo: 'parto',
             data: gestacao.dataNascimento || gestacao.data_nascimento,
-            titulo: 'ðÅ¸â€˜¶ Parto',
+            titulo: '👶 Parto',
             descricao: `Nascimento do bezerro`,
             detalhes: [
-              gestacao.sexoBezerro ? `Sexo: ${gestacao.sexoBezerro === 'M' ? 'Macho ââ„¢â€š' : 'FÃªmea ââ„¢â‚¬'}` : null,
+              gestacao.sexoBezerro ? `Sexo: ${gestacao.sexoBezerro === 'M' ? 'Macho ♂' : 'Fêmea ♀'}` : null,
               gestacao.pesoBezerro ? `Peso: ${gestacao.pesoBezerro} kg` : null,
             ].filter(Boolean),
             cor: 'green',
@@ -172,7 +172,7 @@ export default function AnimalTimeline({ isOpen, onClose, animal }) {
         eventos.push({
           tipo: 'pesagem',
           data: pesagem.data,
-          titulo: 'âÅ¡â€“ï¸� Pesagem',
+          titulo: '⚖️ Pesagem',
           descricao: `${pesagem.peso} Kg`,
           detalhes: [
              pesagem.ce ? `CE: ${pesagem.ce} cm` : null,
@@ -184,7 +184,7 @@ export default function AnimalTimeline({ isOpen, onClose, animal }) {
       });
     }
 
-    // 7. InseminaÃ§Ãµes (preferir vÃ¡lidas; data_ia Ã© o nome da coluna no banco)
+    // 7. Inseminações (preferir válidas; data_ia é o nome da coluna no banco)
     const inseminacoesValidas = (dadosAnimal.inseminacoes || []).filter(ins => ins.valida !== false)
     const inseminacoesParaTimeline = inseminacoesValidas.length > 0 ? inseminacoesValidas : (dadosAnimal.inseminacoes || [])
     if (inseminacoesParaTimeline.length > 0) {
@@ -194,7 +194,7 @@ export default function AnimalTimeline({ isOpen, onClose, animal }) {
         eventos.push({
           tipo: 'inseminacao',
           data: dataIA,
-          titulo: 'ðÅ¸§¬ InseminaÃ§Ã£o (IA)',
+          titulo: '🧬 Inseminação (IA)',
           descricao: `Touro: ${ins.touro_nome || ins.touro || 'N/A'}`,
           detalhes: [
             ins.inseminador ? `Inseminador: ${ins.inseminador}` : null,
@@ -212,7 +212,7 @@ export default function AnimalTimeline({ isOpen, onClose, animal }) {
         eventos.push({
           tipo: 'parto',
           data: filho.data_nascimento || filho.dataNascimento,
-          titulo: 'ðÅ¸â€˜¶ Parto',
+          titulo: '👶 Parto',
           descricao: `Nasceu ${filho.serie || ''} ${filho.rg || ''}`,
           detalhes: [
             `Sexo: ${filho.sexo}`,
@@ -224,14 +224,14 @@ export default function AnimalTimeline({ isOpen, onClose, animal }) {
       });
     }
 
-    // 9. MovimentaÃ§Ãµes
+    // 9. Movimentações
     if (dadosAnimal.localizacoes && dadosAnimal.localizacoes.length > 0) {
       console.log('DEBUG: Processando localizacoes', dadosAnimal.localizacoes);
       dadosAnimal.localizacoes.forEach((loc) => {
         eventos.push({
           tipo: 'localizacao',
           data: loc.data_entrada,
-          titulo: 'ðÅ¸â€œ� MovimentaÃ§Ã£o',
+          titulo: '📍 Movimentação',
           descricao: `Entrada em ${loc.piquete}`,
           detalhes: [
             loc.motivo_movimentacao ? `Motivo: ${loc.motivo_movimentacao}` : null,
@@ -243,14 +243,14 @@ export default function AnimalTimeline({ isOpen, onClose, animal }) {
       });
     }
 
-    // 10. MudanÃ§as de SituaÃ§Ã£o
+    // 10. Mudanças de Situação
     if (dadosAnimal.historicoSituacao && dadosAnimal.historicoSituacao.length > 0) {
       dadosAnimal.historicoSituacao.forEach((mudanca) => {
         eventos.push({
           tipo: 'situacao',
           data: mudanca.data,
-          titulo: 'ðÅ¸â€œâ€¹ MudanÃ§a de SituaÃ§Ã£o',
-          descricao: `${mudanca.situacaoAnterior || 'Ativo'} ââ€ â€™ ${mudanca.situacaoNova}`,
+          titulo: '📋 Mudança de Situação',
+          descricao: `${mudanca.situacaoAnterior || 'Ativo'} → ${mudanca.situacaoNova}`,
           detalhes: [mudanca.motivo].filter(Boolean),
           cor: 'gray',
           icon: DocumentTextIcon,
@@ -263,7 +263,7 @@ export default function AnimalTimeline({ isOpen, onClose, animal }) {
       eventos.push({
         tipo: 'venda',
         data: dadosAnimal.dataVenda || dadosAnimal.data_venda,
-        titulo: 'ðÅ¸â€™µ Venda',
+        titulo: '💵 Venda',
         descricao: `Vendido para ${dadosAnimal.comprador || 'comprador'}`,
         detalhes: [
           dadosAnimal.valorVenda || dadosAnimal.valor_venda ? `Valor: R$ ${(dadosAnimal.valorVenda || dadosAnimal.valor_venda).toFixed(2)}` : null,
@@ -279,8 +279,8 @@ export default function AnimalTimeline({ isOpen, onClose, animal }) {
       eventos.push({
         tipo: 'morte',
         data: dadosAnimal.dataMorte || dadosAnimal.data_morte,
-        titulo: 'ðÅ¸â€™â‚¬ Ãâ€œbito',
-        descricao: dadosAnimal.causaMorte || dadosAnimal.causa_morte || 'Causa nÃ£o informada',
+        titulo: '💀 Óbito',
+        descricao: dadosAnimal.causaMorte || dadosAnimal.causa_morte || 'Causa não informada',
         detalhes: [
           dadosAnimal.valorPerda || dadosAnimal.valor_perda ? `Valor de Perda: R$ ${(dadosAnimal.valorPerda || dadosAnimal.valor_perda).toFixed(2)}` : null,
           dadosAnimal.observacoesMorte,
@@ -330,7 +330,7 @@ export default function AnimalTimeline({ isOpen, onClose, animal }) {
                   Timeline do Animal
                 </h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {animal?.serie} {animal?.rg} - HistÃ³rico completo de eventos
+                  {animal?.serie} {animal?.rg} - Histórico completo de eventos
                 </p>
               </div>
             </div>
@@ -367,12 +367,12 @@ export default function AnimalTimeline({ isOpen, onClose, animal }) {
                   const Icon = evento.icon;
                   return (
                     <div key={index} className="relative flex gap-6">
-                      {/* Ã�cone do evento */}
+                      {/* Ícone do evento */}
                       <div className={`relative z-10 flex items-center justify-center w-12 h-12 rounded-full ${getCorClasse(evento.cor)} text-white flex-shrink-0`}>
                         <Icon className="h-6 w-6" />
                       </div>
 
-                      {/* ConteÃºdo do evento */}
+                      {/* Conteúdo do evento */}
                       <div 
                         className={`flex-1 bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700 ${evento.expandable ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors' : ''}`}
                         onClick={() => evento.expandable && toggleEvent(index)}

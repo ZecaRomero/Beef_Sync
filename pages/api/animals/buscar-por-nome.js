@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     const { nome } = req.query
 
     if (!nome) {
-      return res.status(400).json({ message: 'Nome Ã© obrigatÃ³rio' })
+      return res.status(400).json({ message: 'Nome é obrigatório' })
     }
 
     const nomeTrim = nome.trim()
@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     const padraoContem = `%${termo}%`
     const termoUpper = termo.toUpperCase()
 
-    // Buscar por: nome, identificaÃ§Ã£o (serie + rg). Priorizar: exato > palavra > contÃ©m
+    // Buscar por: nome, identificação (serie + rg). Priorizar: exato > palavra > contém
     const result = await query(
       `SELECT id, serie, rg, nome, sexo, raca, situacao_reprodutiva, carimbo_leilao, prev_parto,
          CASE 
@@ -71,7 +71,7 @@ export default async function handler(req, res) {
       console.warn('Fallback coleta_fiv:', e?.message)
     }
 
-    // Mapa de nomes alternativos (doadora/receptora) para exibir quando cadastro estÃ¡ errado
+    // Mapa de nomes alternativos (doadora/receptora) para exibir quando cadastro está errado
     const nomeAlternativo = new Map()
     try {
       const cfNomes = await query(
@@ -86,8 +86,8 @@ export default async function handler(req, res) {
       }
     } catch (_) {}
 
-    // Fallback: buscar em gestacoes (receptora_nome) - ex: JALOUSIER, JATAUBA quando nome no cadastro estÃ¡ errado
-    // EstratÃ©gia em 2 passos: 1) achar gestacoes com receptora_nome; 2) buscar animais por serie+rg (evita JOIN complexo)
+    // Fallback: buscar em gestacoes (receptora_nome) - ex: JALOUSIER, JATAUBA quando nome no cadastro está errado
+    // Estratégia em 2 passos: 1) achar gestacoes com receptora_nome; 2) buscar animais por serie+rg (evita JOIN complexo)
     try {
       const gestNomes = await query(
         `SELECT receptora_serie, receptora_rg, receptora_nome
@@ -126,7 +126,7 @@ export default async function handler(req, res) {
       console.warn('Fallback gestacoes receptora_nome:', e?.message)
     }
 
-    // Fallback: buscar em transferencias_embrioes (receptora_nome) - quando nome no cadastro estÃ¡ errado
+    // Fallback: buscar em transferencias_embrioes (receptora_nome) - quando nome no cadastro está errado
     try {
       const teCols = await query(`SELECT column_name FROM information_schema.columns WHERE table_name = 'transferencias_embrioes' AND column_name = 'receptora_nome'`)
       if (teCols.rows.length > 0) {
@@ -158,7 +158,7 @@ export default async function handler(req, res) {
       console.warn('Fallback transferencias_embrioes receptora_nome:', e?.message)
     }
 
-    // OrdenaÃ§Ã£o final: termo como palavra primeiro (ex: JALOUSIER antes de JALOM quando busca "JALO")
+    // Ordenação final: termo como palavra primeiro (ex: JALOUSIER antes de JALOM quando busca "JALO")
     const nomeParaSort = (r) => (r.id ? nomeAlternativo.get(r.id) : null) || r.nome || ''
     const prioridade = (r) => {
       const n = nomeParaSort(r).toUpperCase()
@@ -175,7 +175,7 @@ export default async function handler(req, res) {
       return nomeParaSort(a).localeCompare(nomeParaSort(b))
     })
 
-    // ÃÅ¡ltimo recurso: busca simples por ILIKE (case-insensitive, pode pegar variaÃ§Ãµes)
+    // Último recurso: busca simples por ILIKE (case-insensitive, pode pegar variações)
     if (result.rows.length === 0) {
       try {
         const ilikeResult = await query(
@@ -194,7 +194,7 @@ export default async function handler(req, res) {
     }
 
     if (result.rows.length === 0) {
-      console.log(`â�Å’ Nenhum animal encontrado com: "${nomeTrim}"`)
+      console.log(`❌ Nenhum animal encontrado com: "${nomeTrim}"`)
       return res.status(200).json({ 
         success: true,
         data: [],
@@ -202,7 +202,7 @@ export default async function handler(req, res) {
       })
     }
 
-    console.log(`âÅ“â€¦ ${result.rows.length} animal(is) encontrado(s) com: "${nomeTrim}"`)
+    console.log(`✅ ${result.rows.length} animal(is) encontrado(s) com: "${nomeTrim}"`)
     
     res.status(200).json({
       success: true,

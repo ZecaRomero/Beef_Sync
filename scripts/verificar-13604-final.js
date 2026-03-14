@@ -14,30 +14,30 @@ async function verificar() {
   const client = await pool.connect()
   
   try {
-    console.log('ðÅ¸â€�� Verificando CJCJ 13604...\n')
+    console.log('🔍 Verificando CJCJ 13604...\n')
     
-    // Verificar se a mÃ£e existe
+    // Verificar se a mãe existe
     const maeResult = await client.query(`
       SELECT * FROM animais WHERE serie = 'CJCJ' AND rg = '13604'
     `)
     
     if (maeResult.rows.length === 0) {
-      console.log('â�Å’ CJCJ 13604 nÃ£o encontrada na tabela animais')
+      console.log('❌ CJCJ 13604 não encontrada na tabela animais')
       return
     }
     
-    console.log(`âÅ“â€¦ CJCJ 13604 encontrada (ID: ${maeResult.rows[0].id})`)
+    console.log(`✅ CJCJ 13604 encontrada (ID: ${maeResult.rows[0].id})`)
     console.log(`   Nome: ${maeResult.rows[0].nome}`)
-    console.log(`   SituaÃ§Ã£o: ${maeResult.rows[0].situacao}\n`)
+    console.log(`   Situação: ${maeResult.rows[0].situacao}\n`)
     
-    // Buscar baixas da mÃ£e
+    // Buscar baixas da mãe
     const baixasResult = await client.query(`
       SELECT * FROM baixas 
       WHERE serie_mae = 'CJCJ' AND rg_mae = '13604'
       ORDER BY data_baixa DESC
     `)
     
-    console.log(`ðÅ¸â€œÅ  Total de baixas (filhos): ${baixasResult.rows.length}`)
+    console.log(`📊 Total de baixas (filhos): ${baixasResult.rows.length}`)
     
     const vendas = baixasResult.rows.filter(b => b.tipo === 'VENDA')
     const mortes = baixasResult.rows.filter(b => b.tipo === 'MORTE/BAIXA')
@@ -45,16 +45,16 @@ async function verificar() {
     console.log(`   - Vendas: ${vendas.length}`)
     console.log(`   - Mortes/Baixas: ${mortes.length}\n`)
     
-    // Verificar quantos filhos tÃªm animal_id
+    // Verificar quantos filhos têm animal_id
     const comAnimalId = baixasResult.rows.filter(b => b.animal_id !== null)
     const semAnimalId = baixasResult.rows.filter(b => b.animal_id === null)
     
-    console.log(`ðÅ¸â€œâ€¹ Status dos animal_id:`)
+    console.log(`📋 Status dos animal_id:`)
     console.log(`   - Com animal_id: ${comAnimalId.length}`)
     console.log(`   - Sem animal_id: ${semAnimalId.length}\n`)
     
     if (semAnimalId.length > 0) {
-      console.log(`âÅ¡ ï¸� Filhos sem animal_id:`)
+      console.log(`⚠️ Filhos sem animal_id:`)
       for (const baixa of semAnimalId.slice(0, 5)) {
         console.log(`   - ${baixa.serie} ${baixa.rg} (${baixa.tipo})`)
       }
@@ -71,7 +71,7 @@ async function verificar() {
       ORDER BY data_nascimento DESC NULLS LAST
     `)
     
-    console.log(`ðÅ¸â€˜¶ Filhos cadastrados na tabela animais: ${filhosResult.rows.length}`)
+    console.log(`👶 Filhos cadastrados na tabela animais: ${filhosResult.rows.length}`)
     
     if (filhosResult.rows.length > 0) {
       console.log(`\nPrimeiros 5 filhos:`)
@@ -83,12 +83,12 @@ async function verificar() {
       }
     }
     
-    console.log(`\nââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��`)
-    console.log(`âÅ“â€¦ VERIFICAÃâ€¡ÃÆ’O CONCLUÃ�DA`)
-    console.log(`ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��`)
+    console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
+    console.log(`✅ VERIFICAÇÃO CONCLUÍDA`)
+    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
     
   } catch (error) {
-    console.error('â�Å’ Erro:', error)
+    console.error('❌ Erro:', error)
   } finally {
     client.release()
     await pool.end()
@@ -98,6 +98,6 @@ async function verificar() {
 verificar()
   .then(() => process.exit(0))
   .catch(error => {
-    console.error('ðÅ¸â€™¥ Erro fatal:', error)
+    console.error('💥 Erro fatal:', error)
     process.exit(1)
   })

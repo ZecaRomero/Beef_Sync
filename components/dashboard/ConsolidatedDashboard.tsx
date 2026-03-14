@@ -214,7 +214,7 @@ export default function ConsolidatedDashboard({
         // Implement search functionality
         break
       default:
-        console.log('AÃ§Ã£o rÃ¡pida nÃ£o implementada', { action })
+        console.log('Ação rápida não implementada', { action })
     }
   }, [router])
 
@@ -342,10 +342,10 @@ export default function ConsolidatedDashboard({
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            ðÅ¸Å¡â‚¬ Dashboard Beef Sync
+            🚀 Dashboard Beef Sync
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            VisÃ£o geral do seu rebanho ââ‚¬¢ {currentTime}
+            Visão geral do seu rebanho • {currentTime}
           </p>
         </div>
         <div className="flex gap-2">
@@ -405,7 +405,7 @@ export default function ConsolidatedDashboard({
             Dashboard Beef Sync
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            GestÃ£o inteligente do seu rebanho
+            Gestão inteligente do seu rebanho
           </p>
         </div>
         <div className="flex gap-3">
@@ -435,7 +435,7 @@ export default function ConsolidatedDashboard({
           gradient
         />
         <StatCard
-          title="Custo MÃ©dio"
+          title="Custo Médio"
           value={`R$ ${processedStats.avgCostPerAnimal.toLocaleString()}`}
           icon={CalculatorIcon}
           color="yellow"
@@ -488,7 +488,7 @@ export default function ConsolidatedDashboard({
             Dashboard Premium
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            AnÃ¡lise avanÃ§ada e insights inteligentes
+            Análise avançada e insights inteligentes
           </p>
         </div>
         <div className="flex gap-3">

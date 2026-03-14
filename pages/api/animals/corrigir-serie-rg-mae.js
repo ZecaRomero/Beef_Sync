@@ -1,6 +1,6 @@
 /**
- * API para importar SÃ©rie e RG da MÃ£e via Excel.
- * Formato esperado: SÃâ€°RIE (filho) | RG (filho) | SÃâ€°RIE MÃÆ’E | RG MÃÆ’E
+ * API para importar Série e RG da Mãe via Excel.
+ * Formato esperado: SÉRIE (filho) | RG (filho) | SÉRIE MÃE | RG MÃE
  * Atualiza serie_mae e rg_mae dos animais identificados por serie+rg.
  */
 import { query } from '../../../lib/database'
@@ -16,14 +16,14 @@ export const config = {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' })
+    return res.status(405).json({ error: 'Método não permitido' })
   }
 
   const form = formidable({ multiples: false })
 
   form.parse(req, async (err, fields, files) => {
     if (err) {
-      console.error('Erro ao processar formulÃ¡rio:', err)
+      console.error('Erro ao processar formulário:', err)
       return res.status(500).json({
         success: false,
         error: 'Erro ao processar arquivo',
@@ -43,7 +43,7 @@ export default async function handler(req, res) {
     if (!filepath) {
       return res.status(400).json({
         success: false,
-        error: 'Arquivo invÃ¡lido'
+        error: 'Arquivo inválido'
       })
     }
 
@@ -68,19 +68,19 @@ export default async function handler(req, res) {
         })
       }
 
-      // Detectar cabeÃ§alho
+      // Detectar cabeçalho
       const headers = (data[0] || []).map(h => String(h ?? '').trim().toLowerCase())
       const colSerie = headers.findIndex(h =>
-        (h.includes('sÃ©rie') || h.includes('serie')) && !h.includes('mae') && !h.includes('mÃ£e')
+        (h.includes('série') || h.includes('serie')) && !h.includes('mae') && !h.includes('mãe')
       )
       const colRg = headers.findIndex(h =>
-        h === 'rg' || (h.includes('rg') && !h.includes('rgd') && !h.includes('mae') && !h.includes('mÃ£e'))
+        h === 'rg' || (h.includes('rg') && !h.includes('rgd') && !h.includes('mae') && !h.includes('mãe'))
       )
       const colSerieMae = headers.findIndex(h =>
-        (h.includes('sÃ©rie') || h.includes('serie')) && (h.includes('mae') || h.includes('mÃ£e'))
+        (h.includes('série') || h.includes('serie')) && (h.includes('mae') || h.includes('mãe'))
       )
       const colRgMae = headers.findIndex(h =>
-        (h.includes('rg') || h.includes('rgn')) && (h.includes('mae') || h.includes('mÃ£e'))
+        (h.includes('rg') || h.includes('rgn')) && (h.includes('mae') || h.includes('mãe'))
       )
 
       const temCabecalho = colSerie >= 0 || colRg >= 0 || colSerieMae >= 0 || colRgMae >= 0
@@ -110,7 +110,7 @@ export default async function handler(req, res) {
             linha: i + 1,
             serie,
             rg,
-            erro: 'SÃ©rie MÃ£e e RG MÃ£e sÃ£o obrigatÃ³rios'
+            erro: 'Série Mãe e RG Mãe são obrigatórios'
           })
           continue
         }
@@ -146,7 +146,7 @@ export default async function handler(req, res) {
 
       return res.status(200).json({
         success: true,
-        message: `ImportaÃ§Ã£o concluÃ­da: ${resultados.atualizados} animal(is) atualizado(s) com sÃ©rie/RG da mÃ£e`,
+        message: `Importação concluída: ${resultados.atualizados} animal(is) atualizado(s) com série/RG da mãe`,
         resultados
       })
     } catch (error) {

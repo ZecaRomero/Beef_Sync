@@ -6,7 +6,7 @@ require('dotenv').config({ path: '.env.local' })
 const { query } = require('../lib/database')
 
 async function verificar() {
-  console.log('�Ÿ”� Verificando Situação ABCZ no banco...\n')
+  console.log('🔍 Verificando Situação ABCZ no banco...\n')
 
   try {
     // 1. Valores distintos e contagem
@@ -17,7 +17,7 @@ async function verificar() {
       GROUP BY situacao_abcz 
       ORDER BY total DESC
     `)
-    console.log('�Ÿ“Š Valores de situacao_abcz no banco:')
+    console.log('📊 Valores de situacao_abcz no banco:')
     dist.rows.forEach((r) => console.log(`   "${r.situacao_abcz}": ${r.total} animais`))
 
     // 2. Animais com "Ok para RGN" (possivelmente errado - deveriam ser "POSSUI RGN")
@@ -27,7 +27,7 @@ async function verificar() {
       WHERE UPPER(TRIM(situacao_abcz)) = 'OK PARA RGN'
       ORDER BY serie, rg::int
     `)
-    console.log(`\n�š�️ Animais com "Ok para RGN" (${okParaRgn.rows.length}):`)
+    console.log(`\n⚠️ Animais com "Ok para RGN" (${okParaRgn.rows.length}):`)
     if (okParaRgn.rows.length > 0) {
       okParaRgn.rows.slice(0, 30).forEach((r) => console.log(`   ${r.serie} ${r.rg} (ID ${r.id})`))
       if (okParaRgn.rows.length > 30) console.log(`   ... e mais ${okParaRgn.rows.length - 30}`)
@@ -42,7 +42,7 @@ async function verificar() {
         AND rg::int BETWEEN 16958 AND 16976
       ORDER BY rg::int
     `)
-    console.log(`\n�Ÿ“‹ Animais CJCJ 16958-16976 (faixa do Excel): ${cjcjFaixa.rows.length}`)
+    console.log(`\n📋 Animais CJCJ 16958-16976 (faixa do Excel): ${cjcjFaixa.rows.length}`)
     const comOk = cjcjFaixa.rows.filter((r) => (r.situacao_abcz || '').toUpperCase().includes('OK PARA RGN'))
     const comPossui = cjcjFaixa.rows.filter((r) => (r.situacao_abcz || '').toUpperCase().includes('POSSUI RGN'))
     console.log(`   Com "Ok para RGN": ${comOk.length}`)
@@ -53,9 +53,9 @@ async function verificar() {
 
     // 4. Total de animais no banco
     const total = await query('SELECT COUNT(*) as c FROM animais')
-    console.log(`\n�Ÿ“� Total de animais no banco: ${total.rows[0].c}`)
+    console.log(`\n📦 Total de animais no banco: ${total.rows[0].c}`)
   } catch (err) {
-    console.error('�Œ Erro:', err.message)
+    console.error('❌ Erro:', err.message)
     process.exit(1)
   }
   process.exit(0)

@@ -1,6 +1,6 @@
 /**
- * Consulta RÃ¡pida de Animal - Otimizada para celular
- * Acesse pelo celular: /a - sem sidebar, somente SÃ©rie e RG em inputs separados
+ * Consulta Rápida de Animal - Otimizada para celular
+ * Acesse pelo celular: /a - sem sidebar, somente Série e RG em inputs separados
  */
 import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
@@ -36,7 +36,7 @@ export default function ConsultaRapida() {
   const [showSugestoes, setShowSugestoes] = useState(false)
   const searchTimeoutRef = useRef(null)
 
-  // AutenticaÃ§Ã£o Unificada
+  // Autenticação Unificada
   useEffect(() => {
     if (typeof window === 'undefined') return
 
@@ -68,7 +68,7 @@ export default function ConsultaRapida() {
       return
     }
 
-    // 3. Fallback: Mobile Auth Legacy (mantido para compatibilidade, mas nÃ£o forÃ§ado)
+    // 3. Fallback: Mobile Auth Legacy (mantido para compatibilidade, mas não forçado)
     try {
       const authData = localStorage.getItem('mobile-auth')
       if (authData) {
@@ -81,13 +81,13 @@ export default function ConsultaRapida() {
       }
     } catch (_) {}
 
-    // 4. Redirecionar para Login Principal se nÃ£o autenticado
+    // 4. Redirecionar para Login Principal se não autenticado
     router.push('/login')
   }, [user, authLoading, router])
 
-  // Deslogar apÃ³s 10 min de inatividade (apenas para mobile-auth legacy)
+  // Deslogar após 10 min de inatividade (apenas para mobile-auth legacy)
   useEffect(() => {
-    // Se tiver usuÃ¡rio logado pelo sistema principal (user), nÃ£o aplica timeout
+    // Se tiver usuário logado pelo sistema principal (user), não aplica timeout
     if (typeof window === 'undefined' || identificado !== true || user) return
 
     const resetTimer = () => {
@@ -109,7 +109,7 @@ export default function ConsultaRapida() {
     }
   }, [identificado, user, router])
 
-  // Detectar se Ã© mobile e mostrar splash apenas em mobile, e sÃ³ apÃ³s identificaÃ§Ã£o
+  // Detectar se é mobile e mostrar splash apenas em mobile, e só após identificação
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
@@ -120,7 +120,7 @@ export default function ConsultaRapida() {
     checkMobile()
   }, [identificado])
 
-  // Splash screen com animaÃ§Ã£o de progresso (apenas mobile)
+  // Splash screen com animação de progresso (apenas mobile)
   useEffect(() => {
     if (!showSplash) return
     
@@ -159,23 +159,23 @@ export default function ConsultaRapida() {
             const d = data.data
             router.replace(`/consulta-animal/${d.serie && d.rg ? `${d.serie}-${d.rg}` : d.id}`)
           } else {
-            setError(data.message || (res.status === 500 ? 'ServiÃ§o indisponÃ­vel.' : 'Animal nÃ£o encontrado'))
+            setError(data.message || (res.status === 500 ? 'Serviço indisponível.' : 'Animal não encontrado'))
             setLoading(false)
           }
         })
         .catch(() => {
-          setError('Erro ao buscar. Verifique sua conexÃ£o.')
+          setError('Erro ao buscar. Verifique sua conexão.')
           setLoading(false)
         })
     }
   }, [router.isReady, router.query])
 
   useEffect(() => {
-    // Foco no campo principal (nome ou RG) para digitar nÃºmero direto
+    // Foco no campo principal (nome ou RG) para digitar número direto
     buscaPrincipalRef.current?.focus()
   }, [identificado])
 
-  // Buscar sugestÃµes: se digitar sÃ³ nÃºmero = busca por RG; se tiver letras = busca por nome
+  // Buscar sugestões: se digitar só número = busca por RG; se tiver letras = busca por nome
   useEffect(() => {
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current)
@@ -195,7 +195,7 @@ export default function ConsultaRapida() {
       try {
         let data = { success: false, data: [] }
         if (soNumeros) {
-          // Digitar sÃ³ nÃºmero = buscar por RG (preenche sÃ©rie e nome)
+          // Digitar só número = buscar por RG (preenche série e nome)
           const res = await fetch(`/api/animals/buscar-por-rg?rg=${encodeURIComponent(texto)}`)
           data = await res.json()
         } else {
@@ -207,7 +207,7 @@ export default function ConsultaRapida() {
         if (data.success && Array.isArray(data.data)) {
           setSugestoes(data.data)
           setShowSugestoes(data.data.length > 0)
-          // Se sÃ³ 1 resultado e digitou nÃºmero, preencher e ir direto
+          // Se só 1 resultado e digitou número, preencher e ir direto
           if (soNumeros && data.data.length === 1) {
             const animal = data.data[0]
             setSerie(animal.serie || '')
@@ -226,7 +226,7 @@ export default function ConsultaRapida() {
           setShowSugestoes(false)
         }
       } catch (err) {
-        console.error('Erro ao buscar sugestÃµes:', err)
+        console.error('Erro ao buscar sugestões:', err)
         setSugestoes([])
         setShowSugestoes(false)
       } finally {
@@ -241,14 +241,14 @@ export default function ConsultaRapida() {
     }
   }, [nomeAnimal, router])
 
-  // Busca automÃ¡tica por RG quando digitar apenas nÃºmeros
+  // Busca automática por RG quando digitar apenas números
   useEffect(() => {
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current)
     }
 
     const rgDigitado = rg.trim()
-    // SÃ³ busca se tiver pelo menos 3 dÃ­gitos e nÃ£o tiver sÃ©rie preenchida
+    // Só busca se tiver pelo menos 3 dígitos e não tiver série preenchida
     if (rgDigitado.length < 3 || serie.trim().length > 0) {
       return
     }
@@ -268,14 +268,14 @@ export default function ConsultaRapida() {
             setNomeAnimal(animal.nome || '')
             setTouched({ serie: true, rg: true })
             setError('')
-            // Redireciona automaticamente para a ficha do animal (usar serie-rg = mais confiÃ¡vel que ID)
+            // Redireciona automaticamente para a ficha do animal (usar serie-rg = mais confiável que ID)
             if (animal.serie && animal.rg) {
               router.push(`/consulta-animal/${animal.serie}-${animal.rg}`)
             } else if (animal.id) {
               router.push(`/consulta-animal/${animal.id}`)
             }
           } else if (data.data.length > 1) {
-            // Se encontrou mais de 1, mostra as sugestÃµes
+            // Se encontrou mais de 1, mostra as sugestões
             setSugestoes(data.data)
             setShowSugestoes(true)
           }
@@ -294,7 +294,7 @@ export default function ConsultaRapida() {
     }
   }, [rg, serie, router])
 
-  // Fechar sugestÃµes ao clicar fora
+  // Fechar sugestões ao clicar fora
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showSugestoes && !event.target.closest('.sugestoes-container')) {
@@ -306,7 +306,7 @@ export default function ConsultaRapida() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [showSugestoes])
 
-  // Selecionar animal da lista de sugestÃµes
+  // Selecionar animal da lista de sugestões
   const selecionarAnimal = (animal) => {
     setSerie(animal.serie || '')
     setRg(animal.rg || '')
@@ -323,7 +323,7 @@ export default function ConsultaRapida() {
     const r = rg.trim()
     
     if (!s || !r) {
-      setError('Preencha SÃ©rie e RG')
+      setError('Preencha Série e RG')
       setTouched({ serie: true, rg: true })
       return
     }
@@ -335,7 +335,7 @@ export default function ConsultaRapida() {
       const data = await res.json()
 
       if (!res.ok || !data.success) {
-        const msg = data.message || (res.status === 500 ? 'ServiÃ§o indisponÃ­vel. Tente novamente.' : 'Animal nÃ£o encontrado')
+        const msg = data.message || (res.status === 500 ? 'Serviço indisponível. Tente novamente.' : 'Animal não encontrado')
         throw new Error(msg)
       }
 
@@ -343,9 +343,9 @@ export default function ConsultaRapida() {
       if (d) {
         const linkId = (d.serie && d.rg) ? `${d.serie}-${d.rg}` : d.id
         if (linkId) router.push(`/consulta-animal/${linkId}`)
-        else throw new Error('Animal nÃ£o encontrado')
+        else throw new Error('Animal não encontrado')
       } else {
-        throw new Error('Animal nÃ£o encontrado')
+        throw new Error('Animal não encontrado')
       }
     } catch (err) {
       setError(err.message || 'Erro ao buscar.')
@@ -440,14 +440,14 @@ export default function ConsultaRapida() {
 
       <div className="min-h-screen flex flex-col items-center justify-center px-4 py-6 bg-gradient-to-br from-gray-50 via-amber-50/30 to-gray-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
         <div className="">
-          {/* Logo e Header - sÃ³ quando identificado (mobile-auth Ã© a Ãºnica tela de entrada) */}
+          {/* Logo e Header - só quando identificado (mobile-auth é a única tela de entrada) */}
           {identificado === true && (
           <>
           <div className="mb-8 text-center animate-fade-in">
             <div className="inline-flex items-center justify-center w-24 h-24 mb-4 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 shadow-lg shadow-amber-500/30 overflow-hidden p-2">
               <Image 
                 src="/Host_ico_rede.ico" 
-                alt="Ã�cone Nelore"
+                alt="Ícone Nelore"
                 width={100}
                 height={58}
                 className="object-contain"
@@ -458,7 +458,7 @@ export default function ConsultaRapida() {
                 Beef-Sync
               </h1>
               
-              {/* Controles de VisualizaÃ§Ã£o */}
+              {/* Controles de Visualização */}
               <div className="flex items-center gap-2">
                 {/* Toggle Tema Escuro */}
                 <button
@@ -479,20 +479,20 @@ export default function ConsultaRapida() {
                       html.classList.remove('dark')
                     }
                     
-                    // ForÃ§ar re-render da pÃ¡gina inteira
+                    // Forçar re-render da página inteira
                     window.location.reload()
                   }}
                   className="bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200 dark:hover:bg-amber-900/50 p-2 rounded-lg transition-all"
                   title={isDarkMode ? "Modo Claro" : "Modo Escuro"}
                 >
                   {isDarkMode ? (
-                    <span className="text-xl">âËœâ‚¬ï¸�</span>
+                    <span className="text-xl">☀️</span>
                   ) : (
-                    <span className="text-xl">ðÅ¸Å’â„¢</span>
+                    <span className="text-xl">🌙</span>
                   )}
                 </button>
 
-                {/* BotÃ£o Logout */}
+                {/* Botão Logout */}
                 <button
                   onClick={async () => {
                     if (confirm('Deseja realmente sair?')) {
@@ -504,7 +504,7 @@ export default function ConsultaRapida() {
                   className="bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 p-2 rounded-lg transition-all"
                   title="Sair"
                 >
-                  <span className="text-xl">ðÅ¸Å¡ª</span>
+                  <span className="text-xl">🚪</span>
                 </button>
               </div>
             </div>
@@ -513,17 +513,17 @@ export default function ConsultaRapida() {
             </p>
           </div>
 
-          {/* Card do FormulÃ¡rio */}
+          {/* Card do Formulário */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 mb-4 animate-slide-up">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
               <MagnifyingGlassIcon className="w-6 h-6 text-amber-600 dark:text-amber-500" />
               Consulta Animal
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-              Digite sÃ³ o nÃºmero (RG) ou o nome ââ‚¬â€� preenche automaticamente
+              Digite só o número (RG) ou o nome — preenche automaticamente
             </p>
 
-            {/* Links para Feedback e RelatÃ³rios - Grid 2 colunas */}
+            {/* Links para Feedback e Relatórios - Grid 2 colunas */}
             <div className="mb-5 grid grid-cols-2 gap-3">
               <Link
                 href="/mobile-feedback"
@@ -538,7 +538,7 @@ export default function ConsultaRapida() {
                 className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-semibold shadow-lg shadow-blue-500/30 hover:shadow-blue-600/40 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
               >
                 <ChartBarIcon className="h-5 w-5" />
-                <span className="text-sm">Ver RelatÃ³rios</span>
+                <span className="text-sm">Ver Relatórios</span>
               </Link>
             </div>
 
@@ -546,7 +546,7 @@ export default function ConsultaRapida() {
               {/* Campo de Busca por Nome */}
               <div className="relative sugestoes-container">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Buscar por Nome ou RG (digite o nÃºmero)
+                  Buscar por Nome ou RG (digite o número)
                 </label>
                 <div className="relative">
                   <input
@@ -560,7 +560,7 @@ export default function ConsultaRapida() {
                     onFocus={() => {
                       if (sugestoes.length > 0) setShowSugestoes(true)
                     }}
-                    placeholder="Digite o nÃºmero (RG) ou nome..."
+                    placeholder="Digite o número (RG) ou nome..."
                     className="w-full px-4 py-4 text-lg rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:border-amber-500 focus:ring-amber-500"
                     autoComplete="off"
                     disabled={loading}
@@ -572,7 +572,7 @@ export default function ConsultaRapida() {
                   )}
                 </div>
                 
-                {/* Lista de SugestÃµes */}
+                {/* Lista de Sugestões */}
                 {showSugestoes && sugestoes.length > 0 && (
                   <div className="absolute z-10 w-full mt-2 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-xl max-h-60 overflow-y-auto">
                     {sugestoes.map((animal, index) => (
@@ -583,10 +583,10 @@ export default function ConsultaRapida() {
                         className="w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-gray-700 transition-colors border-b border-gray-200 dark:border-gray-700 last:border-b-0"
                       >
                         <div className="font-semibold text-gray-900 dark:text-white">
-                          {animal.nome || `${animal.serie || ''} ${animal.rg || ''}`.trim() || 'ââ‚¬â€�'}
+                          {animal.nome || `${animal.serie || ''} ${animal.rg || ''}`.trim() || '—'}
                         </div>
                         <div className="text-sm text-gray-600 dark:text-gray-400">
-                          SÃ©rie: <span className="font-medium text-amber-600 dark:text-amber-500">{animal.serie}</span> ââ‚¬¢ RG: <span className="font-medium text-amber-600 dark:text-amber-500">{animal.rg}</span>
+                          Série: <span className="font-medium text-amber-600 dark:text-amber-500">{animal.serie}</span> • RG: <span className="font-medium text-amber-600 dark:text-amber-500">{animal.rg}</span>
                         </div>
                         {(animal.situacao_reprodutiva || animal.carimbo_leilao) && (
                           <div className="flex flex-wrap gap-1 mt-2">
@@ -597,7 +597,7 @@ export default function ConsultaRapida() {
                             )}
                             {animal.carimbo_leilao && (
                               <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300">
-                                ðÅ¸�·ï¸� {animal.carimbo_leilao}
+                                🏷️ {animal.carimbo_leilao}
                               </span>
                             )}
                           </div>
@@ -609,7 +609,7 @@ export default function ConsultaRapida() {
                 
                 {nomeAnimal.length >= 2 && !loadingSugestoes && sugestoes.length === 0 && (
                   <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    Nenhum animal encontrado. Dica: digite sÃ³ o RG (ex: 17037) para buscar diretamente.
+                    Nenhum animal encontrado. Dica: digite só o RG (ex: 17037) para buscar diretamente.
                   </p>
                 )}
               </div>
@@ -620,14 +620,14 @@ export default function ConsultaRapida() {
                   <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">ou busque por SÃ©rie e RG</span>
+                  <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">ou busque por Série e RG</span>
                 </div>
               </div>
 
-              {/* Campo SÃ©rie */}
+              {/* Campo Série */}
               <div className="relative">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  SÃ©rie
+                  Série
                 </label>
                 <div className="relative">
                   <input
@@ -638,14 +638,14 @@ export default function ConsultaRapida() {
                       const v = e.target.value
                       setSerie(v.toUpperCase())
                       setError('')
-                      // Se digitou sÃ³ nÃºmeros no campo SÃ©rie, tratar como RG e buscar
+                      // Se digitou só números no campo Série, tratar como RG e buscar
                       if (/^\d+$/.test(v) && v.length >= 3) {
                         setRg(v)
                         setNomeAnimal(v)
                       }
                     }}
                     onBlur={() => setTouched(prev => ({ ...prev, serie: true }))}
-                    placeholder="SÃ©rie (Ex: CJCJ)"
+                    placeholder="Série (Ex: CJCJ)"
                     className={getInputClass(isSerieValid, touched.serie)}
                     autoComplete="on"
                     autoCapitalize="characters"
@@ -664,7 +664,7 @@ export default function ConsultaRapida() {
                 </div>
                 {touched.serie && !isSerieValid && (
                   <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                    A sÃ©rie Ã© obrigatÃ³ria
+                    A série é obrigatória
                   </p>
                 )}
               </div>
@@ -683,7 +683,7 @@ export default function ConsultaRapida() {
                       setError('')
                     }}
                     onBlur={() => setTouched(prev => ({ ...prev, rg: true }))}
-                    placeholder="RG (digite os nÃºmeros)"
+                    placeholder="RG (digite os números)"
                     className={getInputClass(isRgValid, touched.rg)}
                     autoComplete="off"
                     inputMode="numeric"
@@ -701,12 +701,12 @@ export default function ConsultaRapida() {
                 </div>
                 {touched.rg && !isRgValid && (
                   <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                    O RG Ã© obrigatÃ³rio
+                    O RG é obrigatório
                   </p>
                 )}
               </div>
 
-              {/* BotÃ£o de Busca */}
+              {/* Botão de Busca */}
               <button
                 type="submit"
                 disabled={!canSubmit}
@@ -738,7 +738,7 @@ export default function ConsultaRapida() {
           {/* Dica de Exemplo */}
           <div className="text-center">
             <p className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-2 inline-block">
-              ðÅ¸â€™¡ Exemplo: SÃ©rie <span className="font-semibold text-amber-600 dark:text-amber-500">CJCJ</span> e RG <span className="font-semibold text-amber-600 dark:text-amber-500">12345</span>
+              💡 Exemplo: Série <span className="font-semibold text-amber-600 dark:text-amber-500">CJCJ</span> e RG <span className="font-semibold text-amber-600 dark:text-amber-500">12345</span>
             </p>
           </div>
           </>
@@ -796,7 +796,7 @@ export default function ConsultaRapida() {
   )
 }
 
-// Desabilitar layout padrÃ£o (sem sidebar)
+// Desabilitar layout padrão (sem sidebar)
 ConsultaRapida.getLayout = function getLayout(page) {
   return page
 }

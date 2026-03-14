@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log('ðÅ¸â€�� Buscando NF 4346 no banco de dados...')
+    console.log('🔍 Buscando NF 4346 no banco de dados...')
     
     // Buscar NF 4346
     const nfResult = await query(`
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       LIMIT 5
     `, ['4346', '%4346%'])
     
-    console.log(`ðÅ¸â€œâ€¹ Encontradas ${nfResult.rows?.length || 0} notas fiscais`)
+    console.log(`📋 Encontradas ${nfResult.rows?.length || 0} notas fiscais`)
     
     if (nfResult.rows?.length === 0) {
       // Buscar todas as NFs para ver quais existem
@@ -34,9 +34,9 @@ export default async function handler(req, res) {
       
       return res.status(200).json({
         encontrada: false,
-        mensagem: 'NF 4346 nÃ£o encontrada',
+        mensagem: 'NF 4346 não encontrada',
         nfs_similares: todasNFs.rows,
-        sugestao: 'Verifique se o nÃºmero da NF estÃ¡ correto ou se existe no banco'
+        sugestao: 'Verifique se o número da NF está correto ou se existe no banco'
       })
     }
     
@@ -58,7 +58,7 @@ export default async function handler(req, res) {
           }
         }
         
-        // Se nÃ£o encontrou itens no campo JSONB, buscar da tabela notas_fiscais_itens
+        // Se não encontrou itens no campo JSONB, buscar da tabela notas_fiscais_itens
         if ((!itens || itens.length === 0) && nf.id) {
           try {
             const itensTabelaResult = await query(`
@@ -127,7 +127,7 @@ export default async function handler(req, res) {
     })
     
   } catch (error) {
-    console.error('â�Å’ Erro ao buscar NF 4346:', error)
+    console.error('❌ Erro ao buscar NF 4346:', error)
     return res.status(500).json({
       erro: error.message,
       stack: process.env.NODE_ENV === 'development' ? error.stack : undefined

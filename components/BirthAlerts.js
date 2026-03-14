@@ -40,7 +40,7 @@ export default function BirthAlerts() {
       })
     }
 
-    // Gestantes prÃ³ximas do parto (prÃ³ximos 7 dias)
+    // Gestantes próximas do parto (próximos 7 dias)
     const gestantesProximas = birthData.filter(b => {
       if (b.status !== 'gestante' || !b.nascimento) return false
       
@@ -57,8 +57,8 @@ export default function BirthAlerts() {
         id: 'partos-proximos',
         type: 'info',
         priority: 'medium',
-        title: `${gestantesProximas.length} Partos Previstos nos PrÃ³ximos 7 Dias`,
-        message: `Receptoras prÃ³ximas do parto: ${gestantesProximas.map(b => b.receptora).join(', ')}`,
+        title: `${gestantesProximas.length} Partos Previstos nos Próximos 7 Dias`,
+        message: `Receptoras próximas do parto: ${gestantesProximas.map(b => b.receptora).join(', ')}`,
         icon: ClockIcon,
         color: 'bg-blue-500',
         count: gestantesProximas.length,
@@ -93,11 +93,11 @@ export default function BirthAlerts() {
         type: 'success',
         priority: 'low',
         title: `Excelentes Resultados: ${nascidos} Nascimentos`,
-        message: `Taxa de sucesso de ${(100 - taxaMortalidade).toFixed(1)}%. ParabÃ©ns!`,
+        message: `Taxa de sucesso de ${(100 - taxaMortalidade).toFixed(1)}%. Parabéns!`,
         icon: HeartIcon,
         color: 'bg-green-500',
         count: nascidos,
-        action: 'Manter estratÃ©gia'
+        action: 'Manter estratégia'
       })
     }
 
@@ -131,10 +131,10 @@ export default function BirthAlerts() {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
-          ðÅ¸�â€ž Alertas de Nascimentos
+          🐄 Alertas de Nascimentos
         </h2>
         <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-          <div className="text-4xl mb-2">âÅ“â€¦</div>
+          <div className="text-4xl mb-2">✅</div>
           <div className="text-sm">Nenhum alerta de nascimento</div>
           <div className="text-xs mt-1">Tudo sob controle!</div>
         </div>
@@ -146,7 +146,7 @@ export default function BirthAlerts() {
     <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
-          ðÅ¸�â€ž Alertas de Nascimentos
+          🐄 Alertas de Nascimentos
         </h2>
         <span className="text-sm text-gray-500 dark:text-gray-400">
           {alerts.length} alertas
@@ -174,7 +174,7 @@ export default function BirthAlerts() {
                       alert.priority === 'medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
                       'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                     }`}>
-                      {alert.priority === 'high' ? 'Alta' : alert.priority === 'medium' ? 'MÃ©dia' : 'Baixa'}
+                      {alert.priority === 'high' ? 'Alta' : alert.priority === 'medium' ? 'Média' : 'Baixa'}
                     </span>
                   </div>
                   <p className={`text-sm ${getAlertTextColor(alert.type)} opacity-90 mb-2`}>
@@ -195,7 +195,7 @@ export default function BirthAlerts() {
         ))}
       </div>
 
-      {/* Resumo rÃ¡pido */}
+      {/* Resumo rápido */}
       <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
         <div className="grid grid-cols-3 gap-4 text-center">
           <div>
@@ -208,7 +208,7 @@ export default function BirthAlerts() {
             <div className="text-lg font-bold text-yellow-600 dark:text-yellow-400">
               {alerts.filter(a => a.priority === 'medium').length}
             </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">MÃ©dia Prioridade</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Média Prioridade</div>
           </div>
           <div>
             <div className="text-lg font-bold text-green-600 dark:text-green-400">

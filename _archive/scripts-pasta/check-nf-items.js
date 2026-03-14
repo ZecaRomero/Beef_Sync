@@ -12,7 +12,7 @@ async function checkNFItems() {
   const client = await pool.connect()
   
   try {
-    console.log('�Ÿ”� Verificando itens das notas fiscais...')
+    console.log('🔍 Verificando itens das notas fiscais...')
     
     // Buscar todas as notas fiscais
     const nfsResult = await client.query(`
@@ -21,8 +21,8 @@ async function checkNFItems() {
       ORDER BY created_at DESC
     `)
     
-    console.log(`�Ÿ“„ Total de notas fiscais: ${nfsResult.rows.length}`)
-    console.log('\n�Ÿ“‹ Detalhes das notas fiscais:')
+    console.log(`📄 Total de notas fiscais: ${nfsResult.rows.length}`)
+    console.log('\n📋 Detalhes das notas fiscais:')
     
     nfsResult.rows.forEach((nf, index) => {
       console.log(`${index + 1}. NF: ${nf.numero_nf} (${nf.tipo})`)
@@ -54,7 +54,7 @@ async function checkNFItems() {
     })
     
     // Verificar se há animais nas NFs que não estão na tabela de animais
-    console.log('�Ÿ”� Verificando sincronização NF �†’ Animais...')
+    console.log('🔍 Verificando sincronização NF → Animais...')
     
     const animaisResult = await client.query('SELECT serie, rg FROM animais')
     const animaisExistentes = new Set(animaisResult.rows.map(a => `${a.serie}-${a.rg}`))
@@ -87,16 +87,16 @@ async function checkNFItems() {
     })
     
     if (animaisNaoSincronizados.length > 0) {
-      console.log(`�š�️ ${animaisNaoSincronizados.length} animais nas NFs não estão na tabela de animais:`)
+      console.log(`⚠️ ${animaisNaoSincronizados.length} animais nas NFs não estão na tabela de animais:`)
       animaisNaoSincronizados.forEach(animal => {
         console.log(`   - ${animal.tatuagem} (${animal.raca}) - NF: ${animal.nf}`)
       })
     } else {
-      console.log('�œ… Todos os animais das NFs estão sincronizados com a tabela de animais')
+      console.log('✅ Todos os animais das NFs estão sincronizados com a tabela de animais')
     }
     
   } catch (error) {
-    console.error('�Œ Erro na verificação:', error)
+    console.error('❌ Erro na verificação:', error)
     throw error
   } finally {
     client.release()
@@ -107,11 +107,11 @@ async function checkNFItems() {
 if (require.main === module) {
   checkNFItems()
     .then(() => {
-      console.log('�ŸŽ‰ Verificação concluída!')
+      console.log('🎉 Verificação concluída!')
       process.exit(0)
     })
     .catch((error) => {
-      console.error('�Ÿ’� Erro na verificação:', error)
+      console.error('💥 Erro na verificação:', error)
       process.exit(1)
     })
 }

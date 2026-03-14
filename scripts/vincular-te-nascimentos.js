@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 
 /**
- * Script para vincular transferÃªncias de embriÃµes com nascimentos esperados
- * e gerar alertas para receptoras que nÃ£o pariram na data esperada
+ * Script para vincular transferências de embriões com nascimentos esperados
+ * e gerar alertas para receptoras que não pariram na data esperada
  */
 
 const { query } = require('../lib/database')
 
 async function vincularTENascimentos() {
-  console.log('ðÅ¸â€�â€” Vinculando TransferÃªncias de EmbriÃµes com Nascimentos Esperados...\n')
+  console.log('🔗 Vinculando Transferências de Embriões com Nascimentos Esperados...\n')
 
   try {
-    // 1. Buscar todas as transferÃªncias de embriÃµes com data_te = 01/10/2025
-    console.log('1. Buscando transferÃªncias de embriÃµes de 01/10/2025:')
+    // 1. Buscar todas as transferências de embriões com data_te = 01/10/2025
+    console.log('1. Buscando transferências de embriões de 01/10/2025:')
     const transferencias = await query(`
       SELECT id, numero_te, data_te, receptora_nome, doadora_nome, touro, status, sexo_prenhez
       FROM transferencias_embrioes 
@@ -20,14 +20,14 @@ async function vincularTENascimentos() {
       ORDER BY id
     `)
     
-    console.log(`   âÅ“â€¦ Encontradas ${transferencias.rows.length} transferÃªncia(s)\n`)
+    console.log(`   ✅ Encontradas ${transferencias.rows.length} transferência(s)\n`)
 
     if (transferencias.rows.length === 0) {
-      console.log('   âÅ¡ ï¸�  Nenhuma transferÃªncia encontrada para a data 01/10/2025')
+      console.log('   ⚠️  Nenhuma transferência encontrada para a data 01/10/2025')
       return
     }
 
-    // 2. Para cada transferÃªncia, calcular data esperada de parto (9 meses = ~276 dias)
+    // 2. Para cada transferência, calcular data esperada de parto (9 meses = ~276 dias)
     const dataTE = new Date('2025-10-01')
     const dataEsperadaParto = new Date(dataTE)
     dataEsperadaParto.setDate(dataEsperadaParto.getDate() + 276) // 9 meses = ~276 dias
@@ -35,7 +35,7 @@ async function vincularTENascimentos() {
     console.log(`2. Data da TE: ${dataTE.toLocaleDateString('pt-BR')}`)
     console.log(`   Data esperada de parto: ${dataEsperadaParto.toLocaleDateString('pt-BR')}\n`)
 
-    // 3. Verificar se jÃ¡ existem gestaÃ§Ãµes criadas para essas transferÃªncias
+    // 3. Verificar se já existem gestações criadas para essas transferências
     let gestacoesCriadas = 0
     let gestacoesExistentes = 0
     let nascimentosEncontrados = 0
@@ -47,12 +47,12 @@ async function vincularTENascimentos() {
       console.log(`      Doadora: ${te.doadora_nome}`)
       console.log(`      Touro: ${te.touro}`)
 
-      // Extrair sÃ©rie e RG da receptora (formato "G 3028" ou "G-3028")
+      // Extrair série e RG da receptora (formato "G 3028" ou "G-3028")
       const receptoraMatch = te.receptora_nome.match(/G\s*[-]?\s*(\d+)/i)
       const receptoraRG = receptoraMatch ? receptoraMatch[1] : null
 
       if (!receptoraRG) {
-        console.log(`      âÅ¡ ï¸�  NÃ£o foi possÃ­vel extrair RG da receptora: ${te.receptora_nome}`)
+        console.log(`      ⚠️  Não foi possível extrair RG da receptora: ${te.receptora_nome}`)
         continue
       }
 
@@ -68,12 +68,12 @@ async function vincularTENascimentos() {
       let receptora = null
       if (receptoraAnimal.rows.length > 0) {
         receptora = receptoraAnimal.rows[0]
-        console.log(`      âÅ“â€¦ Receptora encontrada: ID ${receptora.id}, ${receptora.serie} ${receptora.rg}`)
+        console.log(`      ✅ Receptora encontrada: ID ${receptora.id}, ${receptora.serie} ${receptora.rg}`)
       } else {
-        console.log(`      ââ€ž¹ï¸�  Receptora G ${receptoraRG} nÃ£o cadastrada (receptora externa)`)
+        console.log(`      ℹ️  Receptora G ${receptoraRG} não cadastrada (receptora externa)`)
       }
 
-      // Verificar se jÃ¡ existe gestaÃ§Ã£o para esta TE
+      // Verificar se já existe gestação para esta TE
       const gestacaoExistente = await query(`
         SELECT id, situacao, data_cobertura
         FROM gestacoes 
@@ -88,13 +88,13 @@ async function vincularTENascimentos() {
 
       if (gestacaoExistente.rows.length > 0) {
         gestacaoId = gestacaoExistente.rows[0].id
-        console.log(`      ââ€ž¹ï¸�  GestaÃ§Ã£o jÃ¡ existe (ID: ${gestacaoId})`)
+        console.log(`      ℹ️  Gestação já existe (ID: ${gestacaoId})`)
         gestacoesExistentes++
       } else {
-        // Criar gestaÃ§Ã£o
+        // Criar gestação
         // Extrair dados do touro (formato "M5369 DA XARAES (MAGNATA) (RG: XRGM 5369)")
-        let touroSerie = 'NÃ£o Informado'
-        let touroRG = 'NÃ£o Informado'
+        let touroSerie = 'Não Informado'
+        let touroRG = 'Não Informado'
         if (te.touro) {
           const touroMatch = te.touro.match(/RG:\s*([A-Z]+)\s*(\d+)/i)
           if (touroMatch) {
@@ -110,15 +110,15 @@ async function vincularTENascimentos() {
         }
 
         // Extrair dados da doadora (formato "CJCJ (RG: 16418)")
-        let doadoraSerie = 'NÃ£o Informado'
-        let doadoraRG = 'NÃ£o Informado'
+        let doadoraSerie = 'Não Informado'
+        let doadoraRG = 'Não Informado'
         if (te.doadora_nome) {
           const doadoraMatch = te.doadora_nome.match(/([A-Z]+)\s*\(RG:\s*(\d+)\)/i)
           if (doadoraMatch) {
             doadoraSerie = doadoraMatch[1]
             doadoraRG = doadoraMatch[2]
           } else {
-            // Tentar extrair sÃ©rie do nome
+            // Tentar extrair série do nome
             const nomeMatch = te.doadora_nome.match(/^([A-Z]+)/)
             if (nomeMatch) {
               doadoraSerie = nomeMatch[1]
@@ -146,16 +146,16 @@ async function vincularTENascimentos() {
           receptora?.serie || 'G',
           receptora?.rg || receptoraRG,
           dataTE.toISOString().split('T')[0],
-          'Em GestaÃ§Ã£o',
-          `TransferÃªncia de EmbriÃ£o - TE ${te.numero_te}`
+          'Em Gestação',
+          `Transferência de Embrião - TE ${te.numero_te}`
         ])
 
         gestacaoId = novaGestacao.rows[0].id
-        console.log(`      âÅ“â€¦ GestaÃ§Ã£o criada (ID: ${gestacaoId})`)
+        console.log(`      ✅ Gestação criada (ID: ${gestacaoId})`)
         gestacoesCriadas++
       }
 
-      // Verificar se jÃ¡ existe nascimento registrado
+      // Verificar se já existe nascimento registrado
       // Verificar na tabela nascimentos (estrutura antiga) e na tabela animais
       const nascimentoExistente = await query(`
         SELECT id, data as data_nascimento
@@ -166,7 +166,7 @@ async function vincularTENascimentos() {
         LIMIT 1
       `, [te.receptora_nome])
       
-      // TambÃ©m verificar se hÃ¡ animal nascido com esta receptora como mÃ£e
+      // Também verificar se há animal nascido com esta receptora como mãe
       const animalNascido = await query(`
         SELECT id, data_nascimento
         FROM animais 
@@ -188,13 +188,13 @@ async function vincularTENascimentos() {
       
       if (temNascimento) {
         const dataNasc = nascimentoExistente.rows[0]?.data_nascimento || animalNascido.rows[0]?.data_nascimento
-        console.log(`      âÅ“â€¦ Nascimento jÃ¡ registrado em ${dataNasc}`)
+        console.log(`      ✅ Nascimento já registrado em ${dataNasc}`)
         nascimentosEncontrados++
       } else if (diasAposDataEsperada > 0) {
         // Gerar alerta - parto atrasado
-        console.log(`      âÅ¡ ï¸�  ALERTA: Parto esperado hÃ¡ ${diasAposDataEsperada} dia(s) - Nenhum nascimento registrado!`)
+        console.log(`      ⚠️  ALERTA: Parto esperado há ${diasAposDataEsperada} dia(s) - Nenhum nascimento registrado!`)
         
-        // Verificar se jÃ¡ existe notificaÃ§Ã£o para esta receptora
+        // Verificar se já existe notificação para esta receptora
         const receptoraIdentificacao = receptora ? `${receptora.serie} ${receptora.rg}` : te.receptora_nome
         const notificacaoExistente = await query(`
           SELECT id FROM notificacoes 
@@ -211,7 +211,7 @@ async function vincularTENascimentos() {
           `, [
             'nascimento',
             `Parto Atrasado - ${receptoraIdentificacao}`,
-            `Receptora ${receptoraIdentificacao} deveria ter parido em ${dataEsperadaParto.toLocaleDateString('pt-BR')} (${diasAposDataEsperada} dia(s) atrÃ¡s). TE realizada em ${dataTE.toLocaleDateString('pt-BR')}.`,
+            `Receptora ${receptoraIdentificacao} deveria ter parido em ${dataEsperadaParto.toLocaleDateString('pt-BR')} (${diasAposDataEsperada} dia(s) atrás). TE realizada em ${dataTE.toLocaleDateString('pt-BR')}.`,
             'high',
             JSON.stringify({
               receptora_id: receptora?.id || null,
@@ -226,13 +226,13 @@ async function vincularTENascimentos() {
             receptora?.id || null
           ])
           alertasGerados++
-          console.log(`      âÅ“â€¦ Alerta gerado`)
+          console.log(`      ✅ Alerta gerado`)
         } else {
-          console.log(`      ââ€ž¹ï¸�  Alerta jÃ¡ existe`)
+          console.log(`      ℹ️  Alerta já existe`)
         }
       } else {
         const diasRestantes = Math.abs(diasAposDataEsperada)
-        console.log(`      ââ€ž¹ï¸�  Parto esperado em ${diasRestantes} dia(s)`)
+        console.log(`      ℹ️  Parto esperado em ${diasRestantes} dia(s)`)
       }
 
       console.log('')
@@ -240,16 +240,16 @@ async function vincularTENascimentos() {
 
     // 4. Resumo
     console.log('='.repeat(60))
-    console.log('ðÅ¸â€œÅ  RESUMO:')
-    console.log(`   TransferÃªncias processadas: ${transferencias.rows.length}`)
-    console.log(`   GestaÃ§Ãµes criadas: ${gestacoesCriadas}`)
-    console.log(`   GestaÃ§Ãµes jÃ¡ existentes: ${gestacoesExistentes}`)
+    console.log('📊 RESUMO:')
+    console.log(`   Transferências processadas: ${transferencias.rows.length}`)
+    console.log(`   Gestações criadas: ${gestacoesCriadas}`)
+    console.log(`   Gestações já existentes: ${gestacoesExistentes}`)
     console.log(`   Nascimentos encontrados: ${nascimentosEncontrados}`)
     console.log(`   Alertas gerados: ${alertasGerados}`)
     console.log('='.repeat(60))
 
   } catch (error) {
-    console.error('â�Å’ Erro ao vincular TE com nascimentos:', error)
+    console.error('❌ Erro ao vincular TE com nascimentos:', error)
     throw error
   }
 }
@@ -258,11 +258,11 @@ async function vincularTENascimentos() {
 if (require.main === module) {
   vincularTENascimentos()
     .then(() => {
-      console.log('\nâÅ“â€¦ Script executado com sucesso!')
+      console.log('\n✅ Script executado com sucesso!')
       process.exit(0)
     })
     .catch((error) => {
-      console.error('\nâ�Å’ Erro ao executar script:', error)
+      console.error('\n❌ Erro ao executar script:', error)
       process.exit(1)
     })
 }

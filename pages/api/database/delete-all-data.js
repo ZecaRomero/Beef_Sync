@@ -5,39 +5,39 @@ import logger from '../../../utils/logger'
 /**
  * Endpoint para excluir TODOS os dados do banco de dados
  * 
- * âÅ¡ ï¸� ATENÃâ€¡ÃÆ’O: Esta Ã© uma operaÃ§Ã£o DESTRUTIVA e IRREVERSÃ�VEL!
+ * ⚠️ ATENÇÃO: Esta é uma operação DESTRUTIVA e IRREVERSÍVEL!
  * 
  * Deleta dados de TODAS as tabelas:
  * - Animais e dados relacionados
  * - Notas fiscais e itens
- * - Boletim contÃ¡bil e movimentaÃ§Ãµes
- * - InseminaÃ§Ãµes
- * - GestaÃ§Ãµes e diagnÃ³sticos
+ * - Boletim contábil e movimentações
+ * - Inseminações
+ * - Gestações e diagnósticos
  * - Nascimentos
- * - SÃªmen
+ * - Sêmen
  * - Custos
  * - Mortes
- * - LocalizaÃ§Ãµes
+ * - Localizações
  * - E todas as outras tabelas
  */
 export default asyncHandler(async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, message: 'MÃ©todo nÃ£o permitido' })
+    return res.status(405).json({ success: false, message: 'Método não permitido' })
   }
 
   const { confirmacao } = req.body
 
-  // ValidaÃ§Ã£o de seguranÃ§a - requer confirmaÃ§Ã£o explÃ­cita
+  // Validação de segurança - requer confirmação explícita
   if (!confirmacao || confirmacao !== 'LIMPAR TUDO DO ZERO') {
     return sendValidationError(res, 
-      'ConfirmaÃ§Ã£o obrigatÃ³ria. Envie { confirmacao: "LIMPAR TUDO DO ZERO" } no body da requisiÃ§Ã£o.',
+      'Confirmação obrigatória. Envie { confirmacao: "LIMPAR TUDO DO ZERO" } no body da requisição.',
       { required: ['confirmacao'] }
     )
   }
 
   let client = null
 
-  // Inicializar variÃ¡veis antes do try para garantir que existam
+  // Inicializar variáveis antes do try para garantir que existam
   let totalExcluido = 0
   let totalRestante = 0
   let resultados = {}
@@ -49,9 +49,9 @@ export default asyncHandler(async function handler(req, res) {
 
   try {
     client = await pool.connect()
-    logger.info('ðÅ¸Å¡¨ INICIANDO LIMPEZA COMPLETA DO BANCO DE DADOS...')
+    logger.info('🚨 INICIANDO LIMPEZA COMPLETA DO BANCO DE DADOS...')
     
-    // Lista de todas as tabelas para limpar (em ordem de dependÃªncia)
+    // Lista de todas as tabelas para limpar (em ordem de dependência)
     tabelas = [
       // Tabelas dependentes primeiro
       'notas_fiscais_itens',
@@ -85,8 +85,8 @@ export default asyncHandler(async function handler(req, res) {
     resultados = {}
     erros = []
 
-    // Contar registros antes da exclusÃ£o
-    logger.info('ðÅ¸â€œÅ  Contando registros antes da exclusÃ£o...')
+    // Contar registros antes da exclusão
+    logger.info('📊 Contando registros antes da exclusão...')
     contagensAntes = {}
     
     for (const tabela of tabelas) {
@@ -95,14 +95,14 @@ export default asyncHandler(async function handler(req, res) {
         contagensAntes[tabela] = parseInt(result.rows[0].total, 10)
         logger.info(`   ${tabela}: ${contagensAntes[tabela]} registros`)
       } catch (error) {
-        // Tabela pode nÃ£o existir, ignorar
+        // Tabela pode não existir, ignorar
         contagensAntes[tabela] = 0
-        logger.info(`   â�­ï¸�  Tabela ${tabela} nÃ£o existe ou nÃ£o acessÃ­vel`)
+        logger.info(`   ⏭️  Tabela ${tabela} não existe ou não acessível`)
       }
     }
 
     // Excluir dados de cada tabela
-    logger.info('ðÅ¸â€”â€˜ï¸� Excluindo dados de todas as tabelas...')
+    logger.info('🗑️ Excluindo dados de todas as tabelas...')
     
     // Desabilitar temporariamente constraints
     await client.query('SET session_replication_role = replica')
@@ -120,7 +120,7 @@ export default asyncHandler(async function handler(req, res) {
           `, [tabela])
           
           if (!tableExists.rows[0].exists) {
-            logger.info(`   â�­ï¸�  Tabela ${tabela} nÃ£o existe, pulando...`)
+            logger.info(`   ⏭️  Tabela ${tabela} não existe, pulando...`)
             resultados[tabela] = { excluidos: 0, antes: 0, status: 'tabela_nao_existe' }
             continue
           }
@@ -135,9 +135,9 @@ export default asyncHandler(async function handler(req, res) {
             status: 'sucesso'
           }
           
-          logger.info(`   âÅ“â€¦ ${tabela}: ${excluidos} registros excluÃ­dos`)
+          logger.info(`   ✅ ${tabela}: ${excluidos} registros excluídos`)
         } catch (error) {
-          logger.error(`   â�Å’ Erro ao excluir ${tabela}:`, error.message)
+          logger.error(`   ❌ Erro ao excluir ${tabela}:`, error.message)
           erros.push({
             tabela,
             erro: error.message
@@ -159,8 +159,8 @@ export default asyncHandler(async function handler(req, res) {
       }
     }
 
-    // Resetar sequÃªncias
-    logger.info('ðÅ¸â€�â€ž Resetando sequÃªncias...')
+    // Resetar sequências
+    logger.info('🔄 Resetando sequências...')
     const sequencias = [
       'animais_id_seq',
       'custos_id_seq',
@@ -194,13 +194,13 @@ export default asyncHandler(async function handler(req, res) {
         await client.query(`ALTER SEQUENCE IF EXISTS ${seq} RESTART WITH 1`)
         sequenciasResetadas.push(seq)
       } catch (error) {
-        // SequÃªncia pode nÃ£o existir, ignorar
-        logger.debug(`SequÃªncia ${seq} nÃ£o existe ou nÃ£o pode ser resetada`)
+        // Sequência pode não existir, ignorar
+        logger.debug(`Sequência ${seq} não existe ou não pode ser resetada`)
       }
     }
 
     // Verificar contagens finais
-    logger.info('ðÅ¸â€œÅ  Verificando contagens finais...')
+    logger.info('📊 Verificando contagens finais...')
     contagensDepois = {}
     
     for (const tabela of tabelas) {
@@ -229,24 +229,24 @@ export default asyncHandler(async function handler(req, res) {
     }
 
     if (totalRestante > 0) {
-      logger.warn(`âÅ¡ ï¸� ATENÃâ€¡ÃÆ’O: Ainda restam ${totalRestante} registros no banco!`)
+      logger.warn(`⚠️ ATENÇÃO: Ainda restam ${totalRestante} registros no banco!`)
     } else {
-      logger.info('âÅ“â€¦ LIMPEZA COMPLETA CONCLUÃ�DA COM SUCESSO!')
-      logger.info(`ðÅ¸â€œÅ  Total excluÃ­do: ${totalExcluido} registros`)
+      logger.info('✅ LIMPEZA COMPLETA CONCLUÍDA COM SUCESSO!')
+      logger.info(`📊 Total excluído: ${totalExcluido} registros`)
     }
 
     return sendSuccess(res, resultado, 
       totalRestante === 0 
-        ? `Limpeza completa realizada! ${totalExcluido} registros excluÃ­dos de ${tabelas.length} tabelas. O banco estÃ¡ limpo e pronto para comeÃ§ar do zero.`
-        : `Limpeza parcial realizada. ${totalExcluido} registros excluÃ­dos, mas ainda restam ${totalRestante} registros.`,
+        ? `Limpeza completa realizada! ${totalExcluido} registros excluídos de ${tabelas.length} tabelas. O banco está limpo e pronto para começar do zero.`
+        : `Limpeza parcial realizada. ${totalExcluido} registros excluídos, mas ainda restam ${totalRestante} registros.`,
       totalRestante === 0 ? HTTP_STATUS.OK : HTTP_STATUS.MULTI_STATUS
     )
 
   } catch (error) {
-    logger.error('â�Å’ Erro na limpeza completa:', error)
-    logger.error('ðÅ¸â€œâ€¹ Stack trace:', error.stack)
+    logger.error('❌ Erro na limpeza completa:', error)
+    logger.error('📋 Stack trace:', error.stack)
     
-    // Retornar resposta de erro com dados parciais se disponÃ­veis
+    // Retornar resposta de erro com dados parciais se disponíveis
     const erroResponse = {
       total_excluido: totalExcluido || 0,
       total_restante: totalRestante || 0,
@@ -269,7 +269,7 @@ export default asyncHandler(async function handler(req, res) {
   } finally {
     if (client) {
       client.release()
-      logger.info('ðÅ¸â€�Å’ ConexÃ£o liberada')
+      logger.info('🔌 Conexão liberada')
     }
   }
 })

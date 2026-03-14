@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   const { id, serie, rg } = req.query
 
   // Log para debug
-  console.log('ðÅ¸â€�� Verificar animal:', { id, serie, rg })
+  console.log('🔍 Verificar animal:', { id, serie, rg })
 
   try {
     let result
@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     if (id) {
       const animalId = parseInt(id, 10)
       if (isNaN(animalId)) {
-        // Se nÃ£o Ã© nÃºmero, pode ser RG
+        // Se não é número, pode ser RG
         result = await query(
           `SELECT id, serie, rg, nome, data_nascimento, situacao 
            FROM animais 
@@ -40,7 +40,7 @@ export default async function handler(req, res) {
         [rg]
       )
     } else if (serie && rg) {
-      // Busca flexÃ­vel: sÃ©rie case-insensitive, rg aceita texto ou nÃºmero
+      // Busca flexível: série case-insensitive, rg aceita texto ou número
       result = await query(
         `SELECT id, serie, rg, nome, data_nascimento, situacao 
          FROM animais 
@@ -51,12 +51,12 @@ export default async function handler(req, res) {
     } else {
       return res.status(400).json({ 
         success: false, 
-        message: 'ForneÃ§a id, rg ou serie+rg' 
+        message: 'Forneça id, rg ou serie+rg' 
       })
     }
 
     if (result.rows.length === 0) {
-      // Verificar se existe algum animal com ID prÃ³ximo ou similar
+      // Verificar se existe algum animal com ID próximo ou similar
       let sugestoes = []
       
       if (id) {
@@ -74,7 +74,7 @@ export default async function handler(req, res) {
 
       return res.status(404).json({
         success: false,
-        message: 'Animal nÃ£o encontrado',
+        message: 'Animal não encontrado',
         busca: id ? { id } : { serie, rg },
         sugestoes: sugestoes.length > 0 ? sugestoes : null,
         total_animais: (await query('SELECT COUNT(*) as total FROM animais')).rows[0].total
@@ -94,7 +94,7 @@ export default async function handler(req, res) {
         quantidade: parseInt(custos.rows[0]?.total || 0),
         total: parseFloat(custos.rows[0]?.total_valor || 0)
       }
-    } catch (_) { /* tabela custos pode nÃ£o existir */ }
+    } catch (_) { /* tabela custos pode não existir */ }
 
     try {
       const dna = await query(
@@ -108,7 +108,7 @@ export default async function handler(req, res) {
           custo: parseFloat(dna.rows[0].custo_dna || 0)
         }
       }
-    } catch (_) { /* colunas dna podem nÃ£o existir */ }
+    } catch (_) { /* colunas dna podem não existir */ }
 
     res.status(200).json({
       success: true,
@@ -127,7 +127,7 @@ export default async function handler(req, res) {
     const isTableMissing = msg.includes('relation') && msg.includes('does not exist')
     let hint = 'Erro ao verificar animal'
     if (isConnRefused || isNoDatabase) {
-      hint = 'Configure DATABASE_URL no Vercel (Settings ââ€ â€™ Environment Variables) e faÃ§a Redeploy'
+      hint = 'Configure DATABASE_URL no Vercel (Settings → Environment Variables) e faça Redeploy'
     } else if (isTableMissing) {
       hint = 'Execute o script scripts/neon-migracao-minima.sql no Neon Console'
     }

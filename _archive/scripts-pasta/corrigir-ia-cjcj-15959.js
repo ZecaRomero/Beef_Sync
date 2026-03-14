@@ -1,7 +1,7 @@
 /**
  * Corrige IAs da CJCJ 15959 (MOSCA SANT ANNA):
- * - IA com IDEAL GUADALUPE �†’ Prenha (gestação atual)
- * - IA com REM 11627, JAMANTA, LANDROVES DA XARAES ou qualquer outro �†’ Vazia
+ * - IA com IDEAL GUADALUPE → Prenha (gestação atual)
+ * - IA com REM 11627, JAMANTA, LANDROVES DA XARAES ou qualquer outro → Vazia
  *
  * Adiciona coluna resultado_dg na inseminacoes se não existir.
  * Uso: node scripts/corrigir-ia-cjcj-15959.js
@@ -13,7 +13,7 @@ const SERIE = 'CJCJ'
 const RG = '15959'
 
 async function corrigir() {
-  console.log('�Ÿ”� Corrigindo IAs da CJCJ 15959 (MOSCA SANT ANNA)\n')
+  console.log('🔧 Corrigindo IAs da CJCJ 15959 (MOSCA SANT ANNA)\n')
 
   try {
     const cols = await query(`
@@ -26,13 +26,13 @@ async function corrigir() {
     if (!temResultadoDg) {
       console.log('   Adicionando coluna resultado_dg em inseminacoes...')
       await query('ALTER TABLE inseminacoes ADD COLUMN IF NOT EXISTS resultado_dg VARCHAR(50)')
-      console.log('   �œ… Coluna resultado_dg adicionada.')
+      console.log('   ✅ Coluna resultado_dg adicionada.')
       temResultadoDg = true
     }
     if (!temStatusGestacao) {
       console.log('   Adicionando coluna status_gestacao em inseminacoes...')
       await query('ALTER TABLE inseminacoes ADD COLUMN IF NOT EXISTS status_gestacao VARCHAR(20)')
-      console.log('   �œ… Coluna status_gestacao adicionada.')
+      console.log('   ✅ Coluna status_gestacao adicionada.')
       temStatusGestacao = true
     }
     console.log('')
@@ -43,7 +43,7 @@ async function corrigir() {
       [SERIE.toUpperCase(), RG]
     )
     if (animal.rows.length === 0) {
-      console.log('�Œ Animal CJCJ 15959 não encontrado.')
+      console.log('❌ Animal CJCJ 15959 não encontrado.')
       process.exit(1)
     }
     const animalId = animal.rows[0].id
@@ -78,7 +78,7 @@ async function corrigir() {
     }
 
     if (ins.rows.length === 0) {
-      console.log('   �š�️ Nenhuma inseminação encontrada.')
+      console.log('   ⚠️ Nenhuma inseminação encontrada.')
       process.exit(0)
     }
 
@@ -107,28 +107,28 @@ async function corrigir() {
           `UPDATE inseminacoes SET ${setPrenha}status_gestacao = 'Prenha', updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
           [row.id]
         )
-        console.log(`   �œ… IA ${row.id} (${touro}) �†’ Prenha`)
+        console.log(`   ✅ IA ${row.id} (${touro}) → Prenha`)
         atualizados++
       } else {
         await query(
           `UPDATE inseminacoes SET ${setResultado}status_gestacao = 'Vazia', updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
           [row.id]
         )
-        console.log(`   �œ… IA ${row.id} (${touro}) �†’ Vazia`)
+        console.log(`   ✅ IA ${row.id} (${touro}) → Vazia`)
         atualizados++
       }
     }
 
     if (atualizados === 0) {
-      console.log('   �„�️ Nenhuma IA com IDEAL GUADALUPE ou touros REM/JAMANTA/LANDROVES encontrada.')
+      console.log('   ℹ️ Nenhuma IA com IDEAL GUADALUPE ou touros REM/JAMANTA/LANDROVES encontrada.')
       console.log('   Verifique os nomes dos touros no banco.')
     } else {
-      console.log(`\n   �Ÿ“‹ ${atualizados} registro(s) atualizado(s).`)
+      console.log(`\n   📋 ${atualizados} registro(s) atualizado(s).`)
     }
 
-    console.log('\n   �Ÿ’� Acesse /consulta-animal/293 ou busque CJCJ 15959 para ver o touro correto (IDEAL GUADALUPE) e a previsão de parto.')
+    console.log('\n   💡 Acesse /consulta-animal/293 ou busque CJCJ 15959 para ver o touro correto (IDEAL GUADALUPE) e a previsão de parto.')
   } catch (err) {
-    console.error('�Œ Erro:', err.message)
+    console.error('❌ Erro:', err.message)
     process.exit(1)
   }
   process.exit(0)

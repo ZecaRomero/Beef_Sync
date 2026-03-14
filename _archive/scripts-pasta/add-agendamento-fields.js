@@ -14,7 +14,7 @@ async function addAgendamentoFields() {
   const client = await pool.connect()
   
   try {
-    console.log('�Ÿ”� Adicionando campos de agendamento na tabela destinatarios_relatorios...')
+    console.log('🔧 Adicionando campos de agendamento na tabela destinatarios_relatorios...')
     
     // Verificar se as colunas já existem
     const checkColumns = await client.query(`
@@ -32,9 +32,9 @@ async function addAgendamentoFields() {
         ALTER TABLE destinatarios_relatorios 
         ADD COLUMN intervalo_dias INTEGER DEFAULT NULL
       `)
-      console.log('�œ… Coluna intervalo_dias adicionada')
+      console.log('✅ Coluna intervalo_dias adicionada')
     } else {
-      console.log('�„�️  Coluna intervalo_dias já existe')
+      console.log('ℹ️  Coluna intervalo_dias já existe')
     }
     
     // Adicionar coluna ultimo_envio
@@ -43,9 +43,9 @@ async function addAgendamentoFields() {
         ALTER TABLE destinatarios_relatorios 
         ADD COLUMN ultimo_envio TIMESTAMP DEFAULT NULL
       `)
-      console.log('�œ… Coluna ultimo_envio adicionada')
+      console.log('✅ Coluna ultimo_envio adicionada')
     } else {
-      console.log('�„�️  Coluna ultimo_envio já existe')
+      console.log('ℹ️  Coluna ultimo_envio já existe')
     }
     
     // Adicionar coluna proximo_envio
@@ -54,9 +54,9 @@ async function addAgendamentoFields() {
         ALTER TABLE destinatarios_relatorios 
         ADD COLUMN proximo_envio TIMESTAMP DEFAULT NULL
       `)
-      console.log('�œ… Coluna proximo_envio adicionada')
+      console.log('✅ Coluna proximo_envio adicionada')
     } else {
-      console.log('�„�️  Coluna proximo_envio já existe')
+      console.log('ℹ️  Coluna proximo_envio já existe')
     }
     
     // Adicionar coluna ultimos_relatorios (JSONB para armazenar array de relatórios)
@@ -65,9 +65,9 @@ async function addAgendamentoFields() {
         ALTER TABLE destinatarios_relatorios 
         ADD COLUMN ultimos_relatorios JSONB DEFAULT '[]'::jsonb
       `)
-      console.log('�œ… Coluna ultimos_relatorios adicionada')
+      console.log('✅ Coluna ultimos_relatorios adicionada')
     } else {
-      console.log('�„�️  Coluna ultimos_relatorios já existe')
+      console.log('ℹ️  Coluna ultimos_relatorios já existe')
     }
     
     // Adicionar coluna agendamento_ativo
@@ -76,9 +76,9 @@ async function addAgendamentoFields() {
         ALTER TABLE destinatarios_relatorios 
         ADD COLUMN agendamento_ativo BOOLEAN DEFAULT false
       `)
-      console.log('�œ… Coluna agendamento_ativo adicionada')
+      console.log('✅ Coluna agendamento_ativo adicionada')
     } else {
-      console.log('�„�️  Coluna agendamento_ativo já existe')
+      console.log('ℹ️  Coluna agendamento_ativo já existe')
     }
     
     // Criar índice para melhorar performance nas consultas de agendamento
@@ -87,12 +87,12 @@ async function addAgendamentoFields() {
       ON destinatarios_relatorios(proximo_envio) 
       WHERE agendamento_ativo = true
     `)
-    console.log('�œ… Índice criado para otimizar consultas de agendamento')
+    console.log('✅ Índice criado para otimizar consultas de agendamento')
     
-    console.log('�œ… Migração concluída com sucesso!')
+    console.log('✅ Migração concluída com sucesso!')
     
   } catch (error) {
-    console.error('�Œ Erro ao adicionar campos:', error)
+    console.error('❌ Erro ao adicionar campos:', error)
     throw error
   } finally {
     client.release()
@@ -102,10 +102,10 @@ async function addAgendamentoFields() {
 
 addAgendamentoFields()
   .then(() => {
-    console.log('�ŸŽ‰ Migração finalizada!')
+    console.log('🎉 Migração finalizada!')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('�Ÿ’� Erro fatal:', error)
+    console.error('💥 Erro fatal:', error)
     process.exit(1)
   })

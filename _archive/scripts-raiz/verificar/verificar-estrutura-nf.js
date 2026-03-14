@@ -12,7 +12,7 @@ async function verificarEstrutura() {
   const client = await pool.connect();
   
   try {
-    console.log('≈∏‚Äùç ESTRUTURA DA TABELA notas_fiscais:\n');
+    console.log('üîç ESTRUTURA DA TABELA notas_fiscais:\n');
     
     const result = await client.query(`
       SELECT column_name, data_type, is_nullable
@@ -26,7 +26,7 @@ async function verificarEstrutura() {
     });
     
   } catch (error) {
-    console.error('‚ù≈í Erro:', error.message);
+    console.error('‚ùå Erro:', error.message);
   } finally {
     client.release();
     await pool.end();

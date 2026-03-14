@@ -24,13 +24,13 @@ export default function AnimalGestations({ gestacoes }) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <HeartIcon className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
-            <h2 className="font-bold text-gray-900 dark:text-white">GestaÃ§Ãµes</h2>
+            <h2 className="font-bold text-gray-900 dark:text-white">Gestações</h2>
           </div>
           {isExpanded ? <ChevronUpIcon className="h-5 w-5" /> : <ChevronDownIcon className="h-5 w-5" />}
         </div>
         <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
-          {gestacoes.length} gestaÃ§Ã£o(Ãµes)
-          {(concluidas > 0 || emAndamento > 0) && ` ââ‚¬¢ ${concluidas} parto(s) ââ‚¬¢ ${emAndamento} em andamento`}
+          {gestacoes.length} gestação(ões)
+          {(concluidas > 0 || emAndamento > 0) && ` • ${concluidas} parto(s) • ${emAndamento} em andamento`}
         </p>
       </button>
       <div className={`overflow-hidden transition-all ${isExpanded ? 'max-h-[999px]' : 'max-h-0'}`}>
@@ -41,7 +41,7 @@ export default function AnimalGestations({ gestacoes }) {
                 {g.situacao || 'Em andamento'}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                {formatDate(g.data_cobertura || g.data_cobertura_mae)} ââ‚¬¢ {g.touro_nome || g.touro || '-'}
+                {formatDate(g.data_cobertura || g.data_cobertura_mae)} • {g.touro_nome || g.touro || '-'}
               </p>
               {(g.data_nascimento || g.data_parto) && (
                 <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5 font-medium">

@@ -2,7 +2,7 @@ const pool = require('../lib/database')
 
 async function addDGFields() {
   try {
-    console.log('�Ÿ”� Adicionando campos de DG na tabela animais...')
+    console.log('🔧 Adicionando campos de DG na tabela animais...')
 
     // Verificar se os campos já existem
     const checkQuery = `
@@ -15,7 +15,7 @@ async function addDGFields() {
     const existingColumns = await pool.query(checkQuery)
     const existingColumnNames = existingColumns.rows.map(row => row.column_name)
     
-    console.log('�Ÿ“‹ Campos existentes:', existingColumnNames)
+    console.log('📋 Campos existentes:', existingColumnNames)
 
     // Adicionar campos que não existem
     const fieldsToAdd = []
@@ -38,11 +38,11 @@ async function addDGFields() {
 
     if (fieldsToAdd.length > 0) {
       const alterQuery = `ALTER TABLE animais ${fieldsToAdd.join(', ')}`
-      console.log('�Ÿ”� Executando:', alterQuery)
+      console.log('🔧 Executando:', alterQuery)
       await pool.query(alterQuery)
-      console.log('�œ… Campos adicionados com sucesso!')
+      console.log('✅ Campos adicionados com sucesso!')
     } else {
-      console.log('�œ… Todos os campos já existem!')
+      console.log('✅ Todos os campos já existem!')
     }
 
     // Verificar resultado
@@ -55,15 +55,15 @@ async function addDGFields() {
     `
     
     const result = await pool.query(verifyQuery)
-    console.log('\n�Ÿ“‹ Campos de DG na tabela animais:')
+    console.log('\n📋 Campos de DG na tabela animais:')
     result.rows.forEach(row => {
       console.log(`  - ${row.column_name}: ${row.data_type}`)
     })
 
-    console.log('\n�œ… Processo concluído!')
+    console.log('\n✅ Processo concluído!')
     process.exit(0)
   } catch (error) {
-    console.error('�Œ Erro:', error)
+    console.error('❌ Erro:', error)
     process.exit(1)
   }
 }

@@ -1,4 +1,4 @@
-// Sistema de GestÃ£o de Custos Individuais por Animal - Refatorado para PostgreSQL
+// Sistema de Gestão de Custos Individuais por Animal - Refatorado para PostgreSQL
 class CostManager {
   constructor() {
     this.protocolos = this.initializeProtocolos()
@@ -7,15 +7,15 @@ class CostManager {
     this.useLocalStorage = false
     this.dbChecked = false
     
-    // NÃ£o verificar conexÃ£o no constructor para evitar problemas no build
-    // A verificaÃ§Ã£o serÃ¡ feita na primeira chamada de mÃ©todo que precisar do banco
+    // Não verificar conexão no constructor para evitar problemas no build
+    // A verificação será feita na primeira chamada de método que precisar do banco
   }
 
-  // Verificar conexÃ£o com banco de dados (lazy loading)
+  // Verificar conexão com banco de dados (lazy loading)
   async checkDatabaseConnection() {
     if (this.dbChecked) return
     
-    // SÃ³ verificar se estiver no browser
+    // Só verificar se estiver no browser
     if (typeof window === 'undefined') {
       this.dbChecked = true
       return
@@ -26,16 +26,16 @@ class CostManager {
       const result = await response.json()
       
       if (result.connected) {
-        console.log('âÅ“â€¦ CostManager: ConexÃ£o com PostgreSQL OK')
+        console.log('✅ CostManager: Conexão com PostgreSQL OK')
         this.useLocalStorage = false
       } else {
         throw new Error('Database not connected')
       }
     } catch (error) {
-      console.error('â�Å’ CostManager: Erro na conexÃ£o PostgreSQL:', error)
-      // Fallback desativado - garantir que o erro seja visÃ­vel mas nÃ£o use localStorage para escrita
+      console.error('❌ CostManager: Erro na conexão PostgreSQL:', error)
+      // Fallback desativado - garantir que o erro seja visível mas não use localStorage para escrita
       this.useLocalStorage = false 
-      console.error('âÅ¡ ï¸� CostManager: Sistema operando sem persistÃªncia local para garantir integridade do PostgreSQL')
+      console.error('⚠️ CostManager: Sistema operando sem persistência local para garantir integridade do PostgreSQL')
     } finally {
       this.dbChecked = true
     }
@@ -94,7 +94,7 @@ class CostManager {
       },
       femeas: {
         '0/7': {
-          nome: 'ERA 0/7 - FÃÅ MEAS',
+          nome: 'ERA 0/7 - FÊMEAS',
           medicamentos: [
             { nome: 'PANACOXX', quantidade: 7, unidade: 'ML' },
             { nome: 'BOVILIS', quantidade: 5, unidade: 'ML' },
@@ -105,7 +105,7 @@ class CostManager {
           ]
         },
         '7/12': {
-          nome: 'ERA 7/12 - FÃÅ MEAS',
+          nome: 'ERA 7/12 - FÊMEAS',
           medicamentos: [
             { nome: 'CONTROLE ABCZ', quantidade: 1, unidade: 'DOSE' },
             { nome: 'RGNiveloir', quantidade: 1, unidade: 'DOSE' },
@@ -115,7 +115,7 @@ class CostManager {
           ]
         },
         '12/18': {
-          nome: 'ERA 12/18 - FÃÅ MEAS',
+          nome: 'ERA 12/18 - FÊMEAS',
           medicamentos: [
             { nome: 'CONTROLE ABCZ', quantidade: 1, unidade: 'DOSE' },
             { nome: 'RGNiveloir', quantidade: 1, unidade: 'DOSE' },
@@ -124,29 +124,29 @@ class CostManager {
           ]
         },
         '18/24': {
-          nome: 'ERA 18/24 - FÃÅ MEAS',
+          nome: 'ERA 18/24 - FÊMEAS',
           medicamentos: [
             { nome: 'CASQUEAR', quantidade: 1, unidade: 'APLICACAO' },
             { nome: 'INSEMINACAO', quantidade: 1, unidade: 'PROCEDIMENTO' }
           ]
         },
         '24_acima': {
-          nome: '24 ACIMA - FÃÅ MEAS',
+          nome: '24 ACIMA - FÊMEAS',
           medicamentos: []
         },
         '25/36': {
-          nome: 'ERA 25/36 - FÃÅ MEAS',
+          nome: 'ERA 25/36 - FÊMEAS',
           medicamentos: []
         },
         'acima_36': {
-          nome: 'ERA ACIMA 36 - FÃÅ MEAS',
+          nome: 'ERA ACIMA 36 - FÊMEAS',
           medicamentos: []
         }
       }
     }
   }
 
-  // Medicamentos com preÃ§os baseados na planilha
+  // Medicamentos com preços baseados na planilha
   initializeMedicamentos() {
     return {
       'TREO ACE': { preco: 470.00, unidade: 'FRASCO_500ML', porAnimal: 5.64 },
@@ -201,13 +201,13 @@ class CostManager {
 
   // Determinar era do animal baseado na idade em meses e sexo
   determinarEra(idadeMeses, sexo) {
-    if (!idadeMeses || idadeMeses <= 0) return 'NÃ£o informado'
+    if (!idadeMeses || idadeMeses <= 0) return 'Não informado'
     
-    const isFemea = sexo && (sexo.toLowerCase().includes('fÃªmea') || sexo.toLowerCase().includes('femea') || sexo === 'F' || sexo === 'FÃªmea')
+    const isFemea = sexo && (sexo.toLowerCase().includes('fêmea') || sexo.toLowerCase().includes('femea') || sexo === 'F' || sexo === 'Fêmea')
     const isMacho = sexo && (sexo.toLowerCase().includes('macho') || sexo === 'M' || sexo === 'Macho')
     
     if (isFemea) {
-      // FÃÅ MEA: 0-7 / 7-12 / 12-18 / 18-24 / 24+
+      // FÊMEA: 0-7 / 7-12 / 12-18 / 18-24 / 24+
       if (idadeMeses <= 7) return '0/7'
       if (idadeMeses <= 12) return '7/12'
       if (idadeMeses <= 18) return '12/18'
@@ -222,7 +222,7 @@ class CostManager {
       return '22+'
     }
     
-    // Se nÃ£o tem sexo definido, usar padrÃ£o
+    // Se não tem sexo definido, usar padrão
     if (idadeMeses <= 7) return '0/7'
     if (idadeMeses <= 12) return '7/12'
     if (idadeMeses <= 18) return '12/18'
@@ -241,7 +241,7 @@ class CostManager {
     let total = 0
 
     protocolo.medicamentos.forEach(med => {
-      // Verificar condiÃ§Ãµes especiais
+      // Verificar condições especiais
       if (med.condicional) {
         if (med.condicional === 'FIV' && !animal.isFiv) return
         if (med.condicional === 'FIV_OU_RECEPTORA' && !animal.isFiv && !animal.receptoraRg) return
@@ -272,11 +272,11 @@ class CostManager {
       
       if (resultado.total > 0) {
         const custoProtocolo = {
-          tipo: 'Protocolo SanitÃ¡rio',
+          tipo: 'Protocolo Sanitário',
           subtipo: resultado.protocolo,
           valor: resultado.total,
           data: new Date().toISOString().split('T')[0],
-          observacoes: observacoes || `AplicaÃ§Ã£o automÃ¡tica do protocolo ${resultado.protocolo}`,
+          observacoes: observacoes || `Aplicação automática do protocolo ${resultado.protocolo}`,
           detalhes: resultado.custos
         }
 
@@ -286,7 +286,7 @@ class CostManager {
 
       return null
     } catch (error) {
-      console.error('â�Å’ Erro ao aplicar protocolo:', error)
+      console.error('❌ Erro ao aplicar protocolo:', error)
       throw error
     }
   }
@@ -315,13 +315,13 @@ class CostManager {
           throw new Error('Erro ao salvar custo no banco');
         }
 
-        console.log('âÅ“â€¦ Custo salvo no PostgreSQL para o animal:', animalId);
+        console.log('✅ Custo salvo no PostgreSQL para o animal:', animalId);
         return true;
       }
       
-      throw new Error('PostgreSQL indisponÃ­vel para salvar custos.');
+      throw new Error('PostgreSQL indisponível para salvar custos.');
     } catch (error) {
-      console.error('â�Å’ Erro ao salvar custo:', error);
+      console.error('❌ Erro ao salvar custo:', error);
       throw error;
     }
   }
@@ -340,10 +340,10 @@ class CostManager {
         return result.data || []
       }
       
-      console.warn('âÅ¡ ï¸� CostManager: PostgreSQL indisponÃ­vel, tentando ler do localStorage (obsoleto)')
+      console.warn('⚠️ CostManager: PostgreSQL indisponível, tentando ler do localStorage (obsoleto)')
       return this.custosPorAnimal.get(animalId) || []
     } catch (error) {
-      console.error('â�Å’ Erro ao buscar custos:', error)
+      console.error('❌ Erro ao buscar custos:', error)
       return []
     }
   }
@@ -354,7 +354,7 @@ class CostManager {
       const custos = await this.getCustosAnimal(animalId)
       return custos.reduce((total, custo) => total + (parseFloat(custo.valor || 0) || 0), 0)
     } catch (error) {
-      console.error('â�Å’ Erro ao calcular custo total:', error)
+      console.error('❌ Erro ao calcular custo total:', error)
       return 0
     }
   }
@@ -364,29 +364,29 @@ class CostManager {
     try {
       const custos = []
 
-      // DNA Virgem - para animais de FIV OU quando hÃ¡ receptora
+      // DNA Virgem - para animais de FIV OU quando há receptora
       if (animal.isFiv || animal.receptoraRg) {
-        const motivo = animal.receptoraRg ? 'ObrigatÃ³rio quando hÃ¡ receptora' : 'ObrigatÃ³rio para animais FIV'
+        const motivo = animal.receptoraRg ? 'Obrigatório quando há receptora' : 'Obrigatório para animais FIV'
         const dnaVirgem = {
           id: Date.now(),
           tipo: 'DNA',
           subtipo: 'DNA Virgem (Paternidade)',
           valor: this.medicamentos['DNA VIRGEM'].porAnimal,
           data: animal.dataNascimento || new Date().toISOString().split('T')[0],
-          observacoes: `DNA Virgem - ${motivo} - ConfirmaÃ§Ã£o de paternidade`
+          observacoes: `DNA Virgem - ${motivo} - Confirmação de paternidade`
         }
         custos.push(dnaVirgem)
       }
 
-      // DNA GenÃ´mica - para todos os bezerros de 0 a 7 meses
+      // DNA Genômica - para todos os bezerros de 0 a 7 meses
       if (animal.meses <= 7) {
         const dnaGenomica = {
           id: Date.now() + 1,
           tipo: 'DNA',
-          subtipo: 'DNA GenÃ´mica',
+          subtipo: 'DNA Genômica',
           valor: this.medicamentos['DNA GENOMICA'].porAnimal,
           data: animal.dataNascimento || new Date().toISOString().split('T')[0],
-          observacoes: 'DNA GenÃ´mica para bezerros de 0 a 7 meses - AnÃ¡lise genÃ©tica completa'
+          observacoes: 'DNA Genômica para bezerros de 0 a 7 meses - Análise genética completa'
         }
         custos.push(dnaGenomica)
       }
@@ -398,12 +398,12 @@ class CostManager {
       
       return custos
     } catch (error) {
-      console.error('â�Å’ Erro ao adicionar custo DNA:', error)
+      console.error('❌ Erro ao adicionar custo DNA:', error)
       throw error
     }
   }
 
-  // RelatÃ³rio de custos por animal
+  // Relatório de custos por animal
   async getRelatorioCustos(animalId) {
     try {
       const custos = await this.getCustosAnimal(animalId)
@@ -426,7 +426,7 @@ class CostManager {
         quantidadeItens: custos.length
       }
     } catch (error) {
-      console.error('â�Å’ Erro ao gerar relatÃ³rio de custos:', error)
+      console.error('❌ Erro ao gerar relatório de custos:', error)
       return {
         animalId,
         custos: [],
@@ -437,7 +437,7 @@ class CostManager {
     }
   }
 
-  // RelatÃ³rio geral de custos
+  // Relatório geral de custos
   async getRelatorioGeral() {
     try {
       if (!this.useLocalStorage) {
@@ -504,7 +504,7 @@ class CostManager {
         mediaPorAnimal: todosOsCustos.length > 0 ? totalGeral / todosOsCustos.length : 0
       }
     } catch (error) {
-      console.error('â�Å’ Erro ao gerar relatÃ³rio geral:', error)
+      console.error('❌ Erro ao gerar relatório geral:', error)
       return {
         animaisComCustos: 0,
         totalGeral: 0,
@@ -553,7 +553,7 @@ class CostManager {
   }
 }
 
-// InstÃ¢ncia singleton
+// Instância singleton
 const costManager = new CostManager()
 
 export default costManager

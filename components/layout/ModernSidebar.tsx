@@ -35,11 +35,11 @@ import { usePermissions } from '../../hooks/usePermissions'
 
 const navigation: NavigationItem[] = [
   {
-    name: 'ImportaÃ§Ãµes',
+    name: 'Importações',
     icon: ArrowUpTrayIcon,
     color: 'text-blue-600 dark:text-blue-400',
     children: [
-      { name: 'Central de ImportaÃ§Ãµes', href: '/importacoes', description: 'IA, Nascimentos, TE, iABCZ, DECA, IQG, Pt IQG, LocalizaÃ§Ã£o, Piquetes, Ãâ€œbitos, ObservaÃ§Ãµes, Pesagens' },
+      { name: 'Central de Importações', href: '/importacoes', description: 'IA, Nascimentos, TE, iABCZ, DECA, IQG, Pt IQG, Localização, Piquetes, Óbitos, Observações, Pesagens' },
       { name: 'Excel Universal', href: '/importacao-excel', description: 'Animais, IA, FIV, Nascimentos, DG, Notas Fiscais' }
     ]
   },
@@ -49,13 +49,13 @@ const navigation: NavigationItem[] = [
     color: 'text-green-600 dark:text-green-400',
     children: [
       { name: 'Lista de Animais', href: '/animals', description: 'Gerenciar rebanho' },
-      { name: 'ðÅ¸â€�� Consulta RÃ¡pida', href: '/a', description: 'Buscar por SÃ©rie e RG (celular)' },
-      { name: 'ðÅ¸â€œ± Mobile + Ranking iABCZ', href: '/mobile-animal', description: 'Consulta mobile com importaÃ§Ã£o e ranking' },
+      { name: '🔍 Consulta Rápida', href: '/a', description: 'Buscar por Série e RG (celular)' },
+      { name: '📱 Mobile + Ranking iABCZ', href: '/mobile-animal', description: 'Consulta mobile com importação e ranking' },
       { name: 'Nascimentos', href: '/nascimentos', description: 'Registrar nascimentos' },
-      { name: 'GestaÃ§Ã£o', href: '/gestacao', description: 'Controle reprodutivo' },
-      { name: 'OcorrÃªncias', href: '/ocorrencias', description: 'Eventos do rebanho' },
-      { name: 'Mortes', href: '/movimentacoes/mortes', description: 'Registro de Ã³bitos' },
-      { name: 'ðÅ¸â€”â€˜ï¸� Limpar Todos os Animais', href: '/limpar-animais', description: 'Excluir todos os animais do banco', danger: true }
+      { name: 'Gestação', href: '/gestacao', description: 'Controle reprodutivo' },
+      { name: 'Ocorrências', href: '/ocorrencias', description: 'Eventos do rebanho' },
+      { name: 'Mortes', href: '/movimentacoes/mortes', description: 'Registro de óbitos' },
+      { name: '🗑️ Limpar Todos os Animais', href: '/limpar-animais', description: 'Excluir todos os animais do banco', danger: true }
     ]
   },
   {
@@ -64,7 +64,7 @@ const navigation: NavigationItem[] = [
     color: 'text-teal-600 dark:text-teal-400',
     children: [
       { name: 'Dashboard', href: '/boletim-defesa', description: 'Boletim Defesa + Boletim Campo (Excel)' },
-      { name: 'Acesso Adelso', href: '/adelso', description: 'Login Adelso - RelatÃ³rios ou Boletim' }
+      { name: 'Acesso Adelso', href: '/adelso', description: 'Login Adelso - Relatórios ou Boletim' }
     ]
   },
   {
@@ -72,20 +72,20 @@ const navigation: NavigationItem[] = [
     icon: TruckIcon,
     color: 'text-cyan-600 dark:text-cyan-400',
     children: [
-      { name: 'Dashboard', href: '/comercial', description: 'VisÃ£o geral comercial' },
-      { name: 'AnÃ¡lise de Mercado & ROI', href: '/comercial/analise-mercado', description: 'AnÃ¡lise inteligente de vendas' },
+      { name: 'Dashboard', href: '/comercial', description: 'Visão geral comercial' },
+      { name: 'Análise de Mercado & ROI', href: '/comercial/analise-mercado', description: 'Análise inteligente de vendas' },
       { name: 'Clientes', href: '/comercial/clientes', description: 'Cadastro de clientes' },
-      { name: 'Fornecedores', href: '/comercial/fornecedores', description: 'GestÃ£o de fornecedores' },
+      { name: 'Fornecedores', href: '/comercial/fornecedores', description: 'Gestão de fornecedores' },
       { name: 'Contratos', href: '/comercial/contratos', description: 'Contratos comerciais' }
     ]
   },
   {
-    name: 'LeilÃ£o',
+    name: 'Leilão',
     icon: BanknotesIcon,
     color: 'text-amber-600 dark:text-amber-400',
     children: [
-      { name: 'Dashboard LeilÃ£o', href: '/leilao', description: 'Custo atual, sugestÃ£o de venda e ROI', new: true },
-      { name: 'Importar Excel', href: '/leilao/importar', description: 'Pesagens, IA, pariÃ§Ãµes e dados para leilÃ£o', new: true }
+      { name: 'Dashboard Leilão', href: '/leilao', description: 'Custo atual, sugestão de venda e ROI', new: true },
+      { name: 'Importar Excel', href: '/leilao/importar', description: 'Pesagens, IA, parições e dados para leilão', new: true }
     ]
   },
   {
@@ -93,7 +93,7 @@ const navigation: NavigationItem[] = [
     icon: ClipboardDocumentListIcon,
     color: 'text-indigo-600 dark:text-indigo-400',
     children: [
-      { name: 'RelatÃ³rios ContÃ¡beis', href: '/contabilidade', description: 'AnÃ¡lise financeira' }
+      { name: 'Relatórios Contábeis', href: '/contabilidade', description: 'Análise financeira' }
     ]
   },
   {
@@ -113,8 +113,8 @@ const navigation: NavigationItem[] = [
     icon: BeakerIcon,
     color: 'text-indigo-600 dark:text-indigo-400',
     children: [
-      { name: 'Envio para LaboratÃ³rio', href: '/dna', description: 'Enviar animais para anÃ¡lise de DNA' },
-      { name: 'HistÃ³rico de Envios', href: '/dna/historico', description: 'HistÃ³rico de anÃ¡lises de DNA' }
+      { name: 'Envio para Laboratório', href: '/dna', description: 'Enviar animais para análise de DNA' },
+      { name: 'Histórico de Envios', href: '/dna/historico', description: 'Histórico de análises de DNA' }
     ]
   },
   {
@@ -122,22 +122,22 @@ const navigation: NavigationItem[] = [
     icon: CubeIcon,
     color: 'text-purple-600 dark:text-purple-400',
     children: [
-      { name: 'Estoque de SÃªmen', href: '/estoque-semen', description: 'Controle de sÃªmen' },
-      { name: 'NitrogÃªnio', href: '/nitrogenio', description: 'GestÃ£o de nitrogÃªnio' }
+      { name: 'Estoque de Sêmen', href: '/estoque-semen', description: 'Controle de sêmen' },
+      { name: 'Nitrogênio', href: '/nitrogenio', description: 'Gestão de nitrogênio' }
     ]
   },
   {
-    name: 'ManutenÃ§Ã£o',
+    name: 'Manutenção',
     icon: WrenchScrewdriverIcon,
     color: 'text-yellow-600 dark:text-yellow-400',
     children: [
-      { name: 'DiagnÃ³stico', href: '/diagnostico-animais', description: 'DiagnÃ³stico do sistema' },
+      { name: 'Diagnóstico', href: '/diagnostico-animais', description: 'Diagnóstico do sistema' },
       { name: 'Teste Animais', href: '/test-animals', description: 'Testar funcionalidades' },
       { name: 'Debug Animais', href: '/debug-animals', description: 'Debug do sistema' },
       { name: 'Teste Boletim', href: '/test-boletim', description: 'Testar boletins' },
       { name: 'Limpeza Animais', href: '/cleanup-animals', description: 'Limpeza de dados' },
-      { name: 'ðÅ¸â€”â€˜ï¸� Limpar Todos os Animais', href: '/limpar-animais', description: 'Excluir todos os animais do banco', danger: true },
-      { name: 'ðÅ¸â€�¥ Limpar Banco Completo', href: '/limpar-banco-completo', description: 'Excluir TODOS os dados (NFs, Boletim, etc)', danger: true }
+      { name: '🗑️ Limpar Todos os Animais', href: '/limpar-animais', description: 'Excluir todos os animais do banco', danger: true },
+      { name: '🔥 Limpar Banco Completo', href: '/limpar-banco-completo', description: 'Excluir TODOS os dados (NFs, Boletim, etc)', danger: true }
     ]
   },
   {
@@ -145,21 +145,21 @@ const navigation: NavigationItem[] = [
     icon: EyeIcon,
     color: 'text-violet-600 dark:text-violet-400',
     children: [
-      { name: 'Acessos ao Sistema', href: '/monitoramento/acessos', description: 'Acessos, mobile, bloquear e manutenÃ§Ã£o' },
-      { name: 'Alertas Inteligentes', href: '/monitoramento/alertas', description: 'NotificaÃ§Ãµes automÃ¡ticas' },
+      { name: 'Acessos ao Sistema', href: '/monitoramento/acessos', description: 'Acessos, mobile, bloquear e manutenção' },
+      { name: 'Alertas Inteligentes', href: '/monitoramento/alertas', description: 'Notificações automáticas' },
       { name: 'Performance do Rebanho', href: '/monitoramento/performance', description: 'Indicadores de performance' },
-      { name: 'AnÃ¡lise de TendÃªncias', href: '/monitoramento/tendencias', description: 'AnÃ¡lise preditiva' },
-      { name: 'Dashboard Executivo', href: '/monitoramento/dashboard-executivo', description: 'VisÃ£o gerencial' }
+      { name: 'Análise de Tendências', href: '/monitoramento/tendencias', description: 'Análise preditiva' },
+      { name: 'Dashboard Executivo', href: '/monitoramento/dashboard-executivo', description: 'Visão gerencial' }
     ]
   },
   {
-    name: 'MovimentaÃ§Ã£o',
+    name: 'Movimentação',
     icon: ArrowPathIcon,
     color: 'text-purple-600 dark:text-purple-400',
     children: [
-      { name: 'LocalizaÃ§Ã£o de Animais', href: '/movimentacao/localizacao', description: 'Onde estÃ£o os animais' },
-      { name: 'HistÃ³rico de MovimentaÃ§Ãµes', href: '/movimentacao/historico', description: 'HistÃ³rico de transferÃªncias' },
-      { name: 'GestÃ£o de Piquetes', href: '/movimentacao/piquetes', description: 'Gerenciar piquetes' }
+      { name: 'Localização de Animais', href: '/movimentacao/localizacao', description: 'Onde estão os animais' },
+      { name: 'Histórico de Movimentações', href: '/movimentacao/historico', description: 'Histórico de transferências' },
+      { name: 'Gestão de Piquetes', href: '/movimentacao/piquetes', description: 'Gerenciar piquetes' }
     ]
   },
   {
@@ -167,8 +167,8 @@ const navigation: NavigationItem[] = [
     icon: DocumentTextIcon,
     color: 'text-orange-600 dark:text-orange-400',
     children: [
-      { name: 'Gerenciar NFs', href: '/notas-fiscais', description: 'Entradas e SaÃ­das (Vendas)' },
-      { name: 'RelatÃ³rio Fiscal', href: '/notas-fiscais/relatorio', description: 'RelatÃ³rios fiscais' }
+      { name: 'Gerenciar NFs', href: '/notas-fiscais', description: 'Entradas e Saídas (Vendas)' },
+      { name: 'Relatório Fiscal', href: '/notas-fiscais/relatorio', description: 'Relatórios fiscais' }
     ]
   },
   {
@@ -177,8 +177,8 @@ const navigation: NavigationItem[] = [
     color: 'text-amber-600 dark:text-amber-400',
     children: [
       { name: 'Pesagem', href: '/manejo/pesagem', description: 'Controle de peso' },
-      { name: 'Lotes', href: '/manejo/lotes', description: 'OrganizaÃ§Ã£o em lotes' },
-      { name: 'Rastreabilidade', href: '/manejo/rastreabilidade', description: 'HistÃ³rico de movimentos' }
+      { name: 'Lotes', href: '/manejo/lotes', description: 'Organização em lotes' },
+      { name: 'Rastreabilidade', href: '/manejo/rastreabilidade', description: 'Histórico de movimentos' }
     ]
   },
   {
@@ -187,10 +187,10 @@ const navigation: NavigationItem[] = [
     color: 'text-rose-600 dark:text-rose-400',
     children: [
       { name: 'Agenda de Atividades', href: '/planejamento/agenda', description: 'Cronograma de atividades' },
-      { name: 'Envio de RelatÃ³rios', href: '/relatorios-envio', description: 'Enviar relatÃ³rios por email e WhatsApp' },
+      { name: 'Envio de Relatórios', href: '/relatorios-envio', description: 'Enviar relatórios por email e WhatsApp' },
       { name: 'Metas e Objetivos', href: '/planejamento/metas', description: 'Definir metas' },
-      { name: 'OrÃ§amento', href: '/planejamento/orcamento', description: 'Planejamento financeiro' },
-      { name: 'ProjeÃ§Ãµes', href: '/planejamento/projecoes', description: 'ProjeÃ§Ãµes futuras' }
+      { name: 'Orçamento', href: '/planejamento/orcamento', description: 'Planejamento financeiro' },
+      { name: 'Projeções', href: '/planejamento/projecoes', description: 'Projeções futuras' }
     ]
   },
   {
@@ -200,31 +200,31 @@ const navigation: NavigationItem[] = [
     color: 'text-pink-600 dark:text-pink-400'
   },
   {
-    name: 'RelatÃ³rios',
+    name: 'Relatórios',
     icon: ChartBarIcon,
     color: 'text-teal-600 dark:text-teal-400',
     children: [
-      { name: 'Visualizar RelatÃ³rios', href: '/reports', description: 'Consultar relatÃ³rios' },
-      { name: 'Gerador de RelatÃ³rios', href: '/reports-manager', description: 'Criar relatÃ³rios' },
-      { name: 'RelatÃ³rios de OcorrÃªncias', href: '/relatorios-ocorrencias', description: 'AnÃ¡lise de eventos' },
-      { name: 'HistÃ³rico de LanÃ§amentos', href: '/relatorios-lotes', description: 'Rastreamento de operaÃ§Ãµes' },
-      { name: 'RelatÃ³rios Personalizados', href: '/relatorios-personalizados', description: 'RelatÃ³rios customizados' }
+      { name: 'Visualizar Relatórios', href: '/reports', description: 'Consultar relatórios' },
+      { name: 'Gerador de Relatórios', href: '/reports-manager', description: 'Criar relatórios' },
+      { name: 'Relatórios de Ocorrências', href: '/relatorios-ocorrencias', description: 'Análise de eventos' },
+      { name: 'Histórico de Lançamentos', href: '/relatorios-lotes', description: 'Rastreamento de operações' },
+      { name: 'Relatórios Personalizados', href: '/relatorios-personalizados', description: 'Relatórios customizados' }
     ]
   },
   {
-    name: 'ReproduÃ§Ã£o',
+    name: 'Reprodução',
     icon: HeartIcon,
     color: 'text-pink-600 dark:text-pink-400',
     children: [
-      { name: 'Controle Reprodutivo', href: '/reproducao/controle', description: 'GestÃ£o reprodutiva' },
-      { name: 'InseminaÃ§Ã£o Artificial', href: '/reproducao/inseminacao', description: 'Registro de IA' },
-      { name: 'TransferÃªncia de EmbriÃµes', href: '/reproducao/transferencia-embrioes', description: 'Controle de TE' },
-      { name: 'Receptoras para DG', href: '/reproducao/receptoras-dg', description: 'Lista de receptoras para DiagnÃ³stico de GestaÃ§Ã£o' },
+      { name: 'Controle Reprodutivo', href: '/reproducao/controle', description: 'Gestão reprodutiva' },
+      { name: 'Inseminação Artificial', href: '/reproducao/inseminacao', description: 'Registro de IA' },
+      { name: 'Transferência de Embriões', href: '/reproducao/transferencia-embrioes', description: 'Controle de TE' },
+      { name: 'Receptoras para DG', href: '/reproducao/receptoras-dg', description: 'Lista de receptoras para Diagnóstico de Gestação' },
       { name: 'Nascimentos', href: '/reproducao/nascimentos', description: 'Controle de nascimentos e alertas' },
-      { name: 'Coleta de OÃ³citos (FIV)', href: '/reproducao/coleta-fiv', description: 'Coleta para FIV' },
-      { name: 'Exames AndrolÃ³gicos', href: '/reproducao/exames-andrologicos', description: 'Exames de touros' },
-      { name: 'CalendÃ¡rio Reprodutivo', href: '/reproducao/calendario', description: 'Agenda reprodutiva' },
-      { name: 'Genealogia', href: '/reproducao/genealogia', description: 'Ã�rvore genealÃ³gica' }
+      { name: 'Coleta de Oócitos (FIV)', href: '/reproducao/coleta-fiv', description: 'Coleta para FIV' },
+      { name: 'Exames Andrológicos', href: '/reproducao/exames-andrologicos', description: 'Exames de touros' },
+      { name: 'Calendário Reprodutivo', href: '/reproducao/calendario', description: 'Agenda reprodutiva' },
+      { name: 'Genealogia', href: '/reproducao/genealogia', description: 'Árvore genealógica' }
     ]
   },
   {
@@ -232,12 +232,12 @@ const navigation: NavigationItem[] = [
     icon: ShieldCheckIcon,
     color: 'text-emerald-600 dark:text-emerald-400',
     children: [
-      { name: 'Protocolos SanitÃ¡rios', href: '/sanidade/protocolos', description: 'Protocolos de saÃºde' },
-      { name: 'VacinaÃ§Ã£o', href: '/sanidade/vacinacao', description: 'Controle de vacinas' },
+      { name: 'Protocolos Sanitários', href: '/sanidade/protocolos', description: 'Protocolos de saúde' },
+      { name: 'Vacinação', href: '/sanidade/vacinacao', description: 'Controle de vacinas' },
       { name: 'Medicamentos', href: '/sanidade/medicamentos', description: 'Estoque de medicamentos' },
       { name: 'Exames Laboratoriais', href: '/sanidade/exames', description: 'Resultados de exames' },
       { name: 'Quarentena', href: '/sanidade/quarentena', description: 'Animais em quarentena' },
-      { name: 'HistÃ³rico SanitÃ¡rio', href: '/sanidade/historico', description: 'HistÃ³rico de saÃºde' }
+      { name: 'Histórico Sanitário', href: '/sanidade/historico', description: 'Histórico de saúde' }
     ]
   },
   {
@@ -245,11 +245,11 @@ const navigation: NavigationItem[] = [
     icon: CogIcon,
     color: 'text-gray-600 dark:text-gray-400',
     children: [
-      { name: 'ConfiguraÃ§Ãµes', href: '/settings', description: 'Configurar sistema' },
+      { name: 'Configurações', href: '/settings', description: 'Configurar sistema' },
       { name: 'Backup', href: '/backup', description: 'Backup de dados' },
-      { name: 'UsuÃ¡rios', href: '/sistema/usuarios', description: 'GestÃ£o de usuÃ¡rios' },
-      { name: 'PermissÃµes', href: '/sistema/permissoes', description: 'Controle de acesso' },
-      { name: 'ðÅ¸â€™¬ Feedbacks', href: '/admin/feedbacks', description: 'Feedbacks dos usuÃ¡rios mobile' }
+      { name: 'Usuários', href: '/sistema/usuarios', description: 'Gestão de usuários' },
+      { name: 'Permissões', href: '/sistema/permissoes', description: 'Controle de acesso' },
+      { name: '💬 Feedbacks', href: '/admin/feedbacks', description: 'Feedbacks dos usuários mobile' }
     ]
   }
 ]
@@ -264,12 +264,12 @@ const ModernSidebar: React.FC<SidebarProps> = ({ isOpen, isCollapsed, onToggleCo
     setMounted(true)
   }, [])
 
-  // Filtrar itens de navegaÃ§Ã£o baseado em permissÃµes
+  // Filtrar itens de navegação baseado em permissões
   const filteredNavigation = useMemo(() => {
     return navigation.filter(item => {
-      // Ocultar "Sistema" e "ManutenÃ§Ã£o" para usuÃ¡rios de rede
+      // Ocultar "Sistema" e "Manutenção" para usuários de rede
       if (!permissions.isDeveloper) {
-        if (item.name === 'Sistema' || item.name === 'ManutenÃ§Ã£o') {
+        if (item.name === 'Sistema' || item.name === 'Manutenção') {
           return false
         }
       }
@@ -329,7 +329,7 @@ const ModernSidebar: React.FC<SidebarProps> = ({ isOpen, isCollapsed, onToggleCo
               </div>
               <div>
                 <h1 className="text-lg font-bold">Beef-Sync</h1>
-                <p className="text-xs text-blue-100">Sistema de GestÃ£o</p>
+                <p className="text-xs text-blue-100">Sistema de Gestão</p>
               </div>
             </div>
           )}
@@ -464,7 +464,7 @@ const ModernSidebar: React.FC<SidebarProps> = ({ isOpen, isCollapsed, onToggleCo
                               )} />
 
                               {/* Special icon for History */}
-                              {child.name === 'HistÃ³rico de LanÃ§amentos' && (
+                              {child.name === 'Histórico de Lançamentos' && (
                                 <ClockIcon className={cn(
                                   'w-3.5 h-3.5 mr-2 flex-shrink-0',
                                   isActive(child.href)
@@ -504,17 +504,17 @@ const ModernSidebar: React.FC<SidebarProps> = ({ isOpen, isCollapsed, onToggleCo
               <NetworkStatusIndicator />
             </div>
             
-            {/* HistÃ³rico de LanÃ§amentos - Compacto */}
+            {/* Histórico de Lançamentos - Compacto */}
             <Link href="/relatorios-lotes">
               <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 rounded-lg p-2.5 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-colors cursor-pointer">
                 <div className="flex items-center space-x-2">
                   <ClockIcon className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
-                      HistÃ³rico de LanÃ§amentos
+                      Histórico de Lançamentos
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                      Ver operaÃ§Ãµes
+                      Ver operações
                     </p>
                   </div>
                 </div>

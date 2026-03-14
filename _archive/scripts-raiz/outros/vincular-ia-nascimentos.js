@@ -2,13 +2,13 @@
 const { query } = require('./lib/database')
 
 async function vincularIANascimentos() {
-  console.log('�Ÿ”— VINCULANDO INSEMINA�‡�•ES ARTIFICIAIS COM NASCIMENTOS')
+  console.log('🔗 VINCULANDO INSEMINAÇÕES ARTIFICIAIS COM NASCIMENTOS')
   console.log('=' .repeat(70))
   console.log('')
 
   try {
     // 1. Verificar estrutura atual das tabelas
-    console.log('1️�ƒ� VERIFICANDO ESTRUTURA DAS TABELAS:')
+    console.log('1️⃣ VERIFICANDO ESTRUTURA DAS TABELAS:')
     console.log('-'.repeat(50))
     
     // Verificar se existe coluna tipo_cobertura na tabela gestacoes
@@ -40,7 +40,7 @@ async function vincularIANascimentos() {
     
     // 2. Adicionar coluna tipo_cobertura se não existir
     console.log('')
-    console.log('2️�ƒ� ADICIONANDO CAMPO TIPO_COBERTURA:')
+    console.log('2️⃣ ADICIONANDO CAMPO TIPO_COBERTURA:')
     console.log('-'.repeat(50))
     
     const temTipoCobertura = gestacoesCols.rows.some(col => col.column_name === 'tipo_cobertura')
@@ -52,9 +52,9 @@ async function vincularIANascimentos() {
         ADD COLUMN tipo_cobertura VARCHAR(10) DEFAULT 'IA' 
         CHECK (tipo_cobertura IN ('IA', 'FIV', 'MN'))
       `)
-      console.log('�œ… Coluna tipo_cobertura adicionada (IA=Inseminação Artificial, FIV=Fertilização In Vitro, MN=Monta Natural)')
+      console.log('✅ Coluna tipo_cobertura adicionada (IA=Inseminação Artificial, FIV=Fertilização In Vitro, MN=Monta Natural)')
     } else {
-      console.log('�œ… Coluna tipo_cobertura já existe na tabela gestacoes')
+      console.log('✅ Coluna tipo_cobertura já existe na tabela gestacoes')
     }
     
     const temTipoCoberturaNasc = nascimentosCols.rows.some(col => col.column_name === 'tipo_cobertura')
@@ -66,9 +66,9 @@ async function vincularIANascimentos() {
         ADD COLUMN tipo_cobertura VARCHAR(10) DEFAULT 'IA'
         CHECK (tipo_cobertura IN ('IA', 'FIV', 'MN'))
       `)
-      console.log('�œ… Coluna tipo_cobertura adicionada na tabela nascimentos')
+      console.log('✅ Coluna tipo_cobertura adicionada na tabela nascimentos')
     } else {
-      console.log('�œ… Coluna tipo_cobertura já existe na tabela nascimentos')
+      console.log('✅ Coluna tipo_cobertura já existe na tabela nascimentos')
     }
     
     // 3. Adicionar coluna inseminacao_id para vincular nascimentos com IAs
@@ -80,14 +80,14 @@ async function vincularIANascimentos() {
         ALTER TABLE nascimentos 
         ADD COLUMN inseminacao_id INTEGER REFERENCES inseminacoes(id) ON DELETE SET NULL
       `)
-      console.log('�œ… Coluna inseminacao_id adicionada para vincular nascimentos com inseminações')
+      console.log('✅ Coluna inseminacao_id adicionada para vincular nascimentos com inseminações')
     } else {
-      console.log('�œ… Coluna inseminacao_id já existe na tabela nascimentos')
+      console.log('✅ Coluna inseminacao_id já existe na tabela nascimentos')
     }
     
     // 4. Atualizar gestações existentes de IA
     console.log('')
-    console.log('3️�ƒ� ATUALIZANDO GESTA�‡�•ES EXISTENTES:')
+    console.log('3️⃣ ATUALIZANDO GESTAÇÕES EXISTENTES:')
     console.log('-'.repeat(50))
     
     // Marcar gestações criadas a partir de inseminações como IA
@@ -106,7 +106,7 @@ async function vincularIANascimentos() {
       AND (tipo_cobertura IS NULL OR tipo_cobertura = 'IA')
     `)
     
-    console.log(`�œ… ${gestacaoIA.rowCount} gestações marcadas como IA (Inseminação Artificial)`)
+    console.log(`✅ ${gestacaoIA.rowCount} gestações marcadas como IA (Inseminação Artificial)`)
     
     // Marcar gestações existentes que não são de IA como FIV (assumindo que são FIV se não são IA)
     const gestacaoFIV = await query(`
@@ -124,11 +124,11 @@ async function vincularIANascimentos() {
       AND (tipo_cobertura IS NULL OR tipo_cobertura != 'IA')
     `)
     
-    console.log(`�œ… ${gestacaoFIV.rowCount} gestações marcadas como FIV (Fertilização In Vitro)`)
+    console.log(`✅ ${gestacaoFIV.rowCount} gestações marcadas como FIV (Fertilização In Vitro)`)
     
     // 5. Verificar nascimentos existentes e classificá-los
     console.log('')
-    console.log('4️�ƒ� CLASSIFICANDO NASCIMENTOS EXISTENTES:')
+    console.log('4️⃣ CLASSIFICANDO NASCIMENTOS EXISTENTES:')
     console.log('-'.repeat(50))
     
     // Buscar nascimentos existentes
@@ -139,7 +139,7 @@ async function vincularIANascimentos() {
       ORDER BY n.data_nascimento DESC
     `)
     
-    console.log(`�Ÿ“Š Total de nascimentos encontrados: ${nascimentosExistentes.rows.length}`)
+    console.log(`📊 Total de nascimentos encontrados: ${nascimentosExistentes.rows.length}`)
     
     if (nascimentosExistentes.rows.length > 0) {
       // Atualizar tipo_cobertura dos nascimentos baseado na gestação
@@ -159,8 +159,8 @@ async function vincularIANascimentos() {
         )
       `)
       
-      console.log(`�œ… ${nascimentosIA.rowCount} nascimentos marcados como IA`)
-      console.log(`�œ… ${nascimentosFIV.rowCount} nascimentos marcados como FIV`)
+      console.log(`✅ ${nascimentosIA.rowCount} nascimentos marcados como IA`)
+      console.log(`✅ ${nascimentosFIV.rowCount} nascimentos marcados como FIV`)
       
       // Vincular nascimentos de IA com inseminações
       const vinculacoes = await query(`
@@ -181,12 +181,12 @@ async function vincularIANascimentos() {
         AND inseminacao_id IS NULL
       `)
       
-      console.log(`�œ… ${vinculacoes.rowCount} nascimentos vinculados com suas inseminações`)
+      console.log(`✅ ${vinculacoes.rowCount} nascimentos vinculados com suas inseminações`)
     }
     
     // 6. Estatísticas finais
     console.log('')
-    console.log('5️�ƒ� ESTATÍSTICAS FINAIS:')
+    console.log('5️⃣ ESTATÍSTICAS FINAIS:')
     console.log('-'.repeat(50))
     
     const stats = await Promise.all([
@@ -198,16 +198,16 @@ async function vincularIANascimentos() {
       query(`SELECT COUNT(*) as total FROM inseminacoes`)
     ])
     
-    console.log(`�Ÿ“Š Gestações por IA: ${stats[0].rows[0].total}`)
-    console.log(`�Ÿ“Š Gestações por FIV: ${stats[1].rows[0].total}`)
-    console.log(`�Ÿ“Š Nascimentos por IA: ${stats[2].rows[0].total}`)
-    console.log(`�Ÿ“Š Nascimentos por FIV: ${stats[3].rows[0].total}`)
-    console.log(`�Ÿ“Š Nascimentos vinculados com IA: ${stats[4].rows[0].total}`)
-    console.log(`�Ÿ“Š Total de inseminações: ${stats[5].rows[0].total}`)
+    console.log(`📊 Gestações por IA: ${stats[0].rows[0].total}`)
+    console.log(`📊 Gestações por FIV: ${stats[1].rows[0].total}`)
+    console.log(`📊 Nascimentos por IA: ${stats[2].rows[0].total}`)
+    console.log(`📊 Nascimentos por FIV: ${stats[3].rows[0].total}`)
+    console.log(`📊 Nascimentos vinculados com IA: ${stats[4].rows[0].total}`)
+    console.log(`📊 Total de inseminações: ${stats[5].rows[0].total}`)
     
     // 7. Exemplo de consulta para verificar vinculação
     console.log('')
-    console.log('6️�ƒ� EXEMPLO DE VINCULA�‡�ƒO:')
+    console.log('6️⃣ EXEMPLO DE VINCULAÇÃO:')
     console.log('-'.repeat(50))
     
     const exemplo = await query(`
@@ -243,10 +243,10 @@ async function vincularIANascimentos() {
     }
     
     console.log('')
-    console.log('�œ… VINCULA�‡�ƒO CONCLUÍDA!')
+    console.log('✅ VINCULAÇÃO CONCLUÍDA!')
     
   } catch (error) {
-    console.error('�Œ Erro:', error)
+    console.error('❌ Erro:', error)
   }
 }
 
@@ -254,12 +254,12 @@ async function vincularIANascimentos() {
 vincularIANascimentos()
   .then(() => {
     console.log('')
-    console.log('�ŸŽ� RESULTADO FINAL:')
-    console.log('�€� Campo tipo_cobertura adicionado (IA/FIV/MN)')
-    console.log('�€� Gestações classificadas por tipo de cobertura')
-    console.log('�€� Nascimentos vinculados com inseminações')
-    console.log('�€� Sistema diferencia IA de FIV nos relatórios')
-    console.log('�€� Rastreabilidade completa da reprodução')
+    console.log('🎯 RESULTADO FINAL:')
+    console.log('• Campo tipo_cobertura adicionado (IA/FIV/MN)')
+    console.log('• Gestações classificadas por tipo de cobertura')
+    console.log('• Nascimentos vinculados com inseminações')
+    console.log('• Sistema diferencia IA de FIV nos relatórios')
+    console.log('• Rastreabilidade completa da reprodução')
     process.exit(0)
   })
   .catch(error => {

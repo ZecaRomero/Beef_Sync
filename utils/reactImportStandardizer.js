@@ -1,20 +1,20 @@
 /**
- * UtilitÃ¡rio para padronizar importaÃ§Ãµes React em todo o projeto
- * PadrÃ£o: import React, { hooks } from 'react'
+ * Utilitário para padronizar importações React em todo o projeto
+ * Padrão: import React, { hooks } from 'react'
  */
 
 const fs = require('fs')
 const path = require('path')
 
-// PadrÃ£o de importaÃ§Ã£o React recomendado
+// Padrão de importação React recomendado
 const STANDARD_REACT_IMPORT = "import React, { "
 
-// FunÃ§Ã£o para padronizar importaÃ§Ã£o React em um arquivo
+// Função para padronizar importação React em um arquivo
 function standardizeReactImport(filePath) {
   try {
     const content = fs.readFileSync(filePath, 'utf8')
     
-    // Regex para encontrar diferentes padrÃµes de importaÃ§Ã£o React
+    // Regex para encontrar diferentes padrões de importação React
     const reactImportRegex = /^import\s+(?:React\s*,\s*)?(?:\{\s*([^}]+)\s*\}\s+from\s+['"]react['"]|React\s+from\s+['"]react['"])/gm
     
     let updatedContent = content
@@ -27,27 +27,27 @@ function standardizeReactImport(filePath) {
     matches.forEach(match => {
       hasReactImport = true
       if (match[1]) {
-        // Extrair hooks da importaÃ§Ã£o
+        // Extrair hooks da importação
         const importedHooks = match[1].split(',').map(h => h.trim()).filter(h => h)
         importedHooks.forEach(hook => hooks.add(hook))
       }
     })
     
     if (hasReactImport) {
-      // Remover todas as importaÃ§Ãµes React existentes
+      // Remover todas as importações React existentes
       updatedContent = updatedContent.replace(reactImportRegex, '')
       
-      // Adicionar importaÃ§Ã£o padronizada no inÃ­cio
+      // Adicionar importação padronizada no início
       const hooksArray = Array.from(hooks).sort()
       const standardImport = hooksArray.length > 0 
         ? `import React, { ${hooksArray.join(', ')} } from 'react'\n`
         : `import React from 'react'\n`
       
-      // Inserir no inÃ­cio do arquivo, apÃ³s comentÃ¡rios iniciais
+      // Inserir no início do arquivo, após comentários iniciais
       const lines = updatedContent.split('\n')
       let insertIndex = 0
       
-      // Pular comentÃ¡rios iniciais e imports de outros mÃ³dulos
+      // Pular comentários iniciais e imports de outros módulos
       while (insertIndex < lines.length && 
              (lines[insertIndex].trim().startsWith('//') || 
               lines[insertIndex].trim().startsWith('/*') ||
@@ -63,7 +63,7 @@ function standardizeReactImport(filePath) {
       updatedContent = updatedContent.replace(/\n\n\n+/g, '\n\n')
       
       fs.writeFileSync(filePath, updatedContent)
-      console.log(`âÅ“â€œ Padronizado: ${filePath}`)
+      console.log(`✓ Padronizado: ${filePath}`)
       return true
     }
     
@@ -74,7 +74,7 @@ function standardizeReactImport(filePath) {
   }
 }
 
-// FunÃ§Ã£o para processar todos os arquivos JS/JSX/TS/TSX
+// Função para processar todos os arquivos JS/JSX/TS/TSX
 function standardizeAllReactImports(directory) {
   const extensions = ['.js', '.jsx', '.ts', '.tsx']
   let processedCount = 0
@@ -97,7 +97,7 @@ function standardizeAllReactImports(directory) {
   }
   
   processDirectory(directory)
-  console.log(`\nâÅ“â€¦ Processados ${processedCount} arquivos com importaÃ§Ãµes React padronizadas`)
+  console.log(`\n✅ Processados ${processedCount} arquivos com importações React padronizadas`)
 }
 
 module.exports = {
@@ -108,6 +108,6 @@ module.exports = {
 // Se executado diretamente
 if (require.main === module) {
   const projectRoot = process.argv[2] || process.cwd()
-  console.log(`Padronizando importaÃ§Ãµes React em: ${projectRoot}`)
+  console.log(`Padronizando importações React em: ${projectRoot}`)
   standardizeAllReactImports(projectRoot)
 }

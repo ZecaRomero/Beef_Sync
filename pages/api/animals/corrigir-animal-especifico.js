@@ -1,21 +1,21 @@
 /**
- * API para corrigir dados genÃ©ticos de um animal especÃ­fico
+ * API para corrigir dados genéticos de um animal específico
  */
 import { query } from '../../../lib/database'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, message: 'MÃ©todo nÃ£o permitido' })
+    return res.status(405).json({ success: false, message: 'Método não permitido' })
   }
 
   const { serie, rg, iqg, pt_iqg } = req.body
 
   if (!serie || !rg) {
-    return res.status(400).json({ success: false, message: 'SÃ©rie e RG sÃ£o obrigatÃ³rios' })
+    return res.status(400).json({ success: false, message: 'Série e RG são obrigatórios' })
   }
 
   try {
-    console.log(`ðÅ¸â€�§ Corrigindo animal: ${serie} ${rg}`)
+    console.log(`🔧 Corrigindo animal: ${serie} ${rg}`)
     
     // Buscar animal atual
     const result = await query(
@@ -28,7 +28,7 @@ export default async function handler(req, res) {
     if (result.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'Animal nÃ£o encontrado'
+        message: 'Animal não encontrado'
       })
     }
     
@@ -80,7 +80,7 @@ export default async function handler(req, res) {
     })
     
   } catch (error) {
-    console.error('â�Å’ Erro ao corrigir animal:', error)
+    console.error('❌ Erro ao corrigir animal:', error)
     return res.status(500).json({
       success: false,
       message: 'Erro ao corrigir animal',

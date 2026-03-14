@@ -5,7 +5,7 @@ async function corrigirDatasFuturasFIV() {
   const client = await pool.connect()
   
   try {
-    console.log('�Ÿ”� Verificando coletas FIV com datas futuras suspeitas (2027+)...\n')
+    console.log('🔍 Verificando coletas FIV com datas futuras suspeitas (2027+)...\n')
     
     // Buscar coletas com datas em 2027 ou depois (suspeitas)
     const coletasSuspeitas = await query(`
@@ -24,10 +24,10 @@ async function corrigirDatasFuturasFIV() {
       ORDER BY cf.doadora_nome, cf.data_fiv ASC
     `)
     
-    console.log(`�Ÿ“Š Total de coletas com datas em 2027 ou depois: ${coletasSuspeitas.rows.length}\n`)
+    console.log(`📊 Total de coletas com datas em 2027 ou depois: ${coletasSuspeitas.rows.length}\n`)
     
     if (coletasSuspeitas.rows.length === 0) {
-      console.log('�œ… Nenhuma coleta com data futura suspeita encontrada')
+      console.log('✅ Nenhuma coleta com data futura suspeita encontrada')
       return
     }
     
@@ -44,11 +44,11 @@ async function corrigirDatasFuturasFIV() {
       coletasPorDoadora[key].push(coleta)
     })
     
-    console.log(`�Ÿ“‹ Doadoras com datas futuras: ${Object.keys(coletasPorDoadora).length}\n`)
+    console.log(`📋 Doadoras com datas futuras: ${Object.keys(coletasPorDoadora).length}\n`)
     
     // Mostrar resumo
-    console.log('�Ÿ“‹ Coletas com datas futuras (2027+):')
-    console.log('�”€'.repeat(120))
+    console.log('📋 Coletas com datas futuras (2027+):')
+    console.log('─'.repeat(120))
     
     Object.keys(coletasPorDoadora).sort().forEach(key => {
       const coletas = coletasPorDoadora[key]
@@ -60,8 +60,8 @@ async function corrigirDatasFuturasFIV() {
       })
     })
     
-    console.log('\n' + '�”€'.repeat(120))
-    console.log('\n�š�️  ATEN�‡�ƒO: Este script irá subtrair 1 ano das datas em 2027+')
+    console.log('\n' + '─'.repeat(120))
+    console.log('\n⚠️  ATENÇÃO: Este script irá subtrair 1 ano das datas em 2027+')
     console.log('   Isso corrige datas que foram importadas incorretamente como 2027 quando deveriam ser 2026')
     console.log('   ou datas que foram interpretadas incorretamente durante a importação.\n')
     
@@ -69,13 +69,13 @@ async function corrigirDatasFuturasFIV() {
     const autoConfirm = args.includes('--yes') || args.includes('-y')
     
     if (!autoConfirm) {
-      console.log('�š�️  Para executar a correção, execute novamente com --yes ou -y')
+      console.log('⚠️  Para executar a correção, execute novamente com --yes ou -y')
       console.log('   Exemplo: node scripts/corrigir-datas-futuras-fiv.js --yes\n')
       return
     }
     
     // Corrigir: subtrair 1 ano das datas em 2027+
-    console.log('�Ÿ”� Iniciando correção (subtraindo 1 ano das datas em 2027+)...\n')
+    console.log('🔧 Iniciando correção (subtraindo 1 ano das datas em 2027+)...\n')
     let corrigidas = 0
     let erros = 0
     
@@ -119,34 +119,34 @@ async function corrigirDatasFuturasFIV() {
             const atualizado = result.rows[0]
             const dataFIVAntiga = new Date(coleta.data_fiv).toLocaleDateString('pt-BR')
             const dataFIVNova = new Date(atualizado.data_fiv).toLocaleDateString('pt-BR')
-            console.log(`�œ… Corrigido ID ${atualizado.id} | ${atualizado.doadora_nome || 'N/A'}`)
-            console.log(`   ${dataFIVAntiga} �†’ ${dataFIVNova}`)
+            console.log(`✅ Corrigido ID ${atualizado.id} | ${atualizado.doadora_nome || 'N/A'}`)
+            console.log(`   ${dataFIVAntiga} → ${dataFIVNova}`)
             corrigidas++
           } else {
-            console.log(`�š�️  Coleta ID ${coleta.id} não encontrada para atualização`)
+            console.log(`⚠️  Coleta ID ${coleta.id} não encontrada para atualização`)
             erros++
           }
         } catch (error) {
-          console.error(`�Œ Erro ao corrigir coleta ID ${coleta.id}:`, error.message)
+          console.error(`❌ Erro ao corrigir coleta ID ${coleta.id}:`, error.message)
           erros++
         }
       }
       
       await client.query('COMMIT')
       console.log('\n' + '='.repeat(100))
-      console.log(`�œ… Correção concluída!`)
+      console.log(`✅ Correção concluída!`)
       console.log(`   Corrigidas: ${corrigidas}`)
       console.log(`   Erros: ${erros}`)
       console.log('='.repeat(100))
       
     } catch (error) {
       await client.query('ROLLBACK')
-      console.error('\n�Œ Erro durante a correção. Rollback executado.')
+      console.error('\n❌ Erro durante a correção. Rollback executado.')
       throw error
     }
     
     // Verificar novamente após correção
-    console.log('\n�Ÿ”� Verificando novamente após correção...\n')
+    console.log('\n🔍 Verificando novamente após correção...\n')
     const verificacao = await query(`
       SELECT COUNT(*) as total
       FROM coleta_fiv
@@ -155,13 +155,13 @@ async function corrigirDatasFuturasFIV() {
     
     const restantes = parseInt(verificacao.rows[0].total)
     if (restantes === 0) {
-      console.log('�œ… Todas as datas futuras foram corrigidas!')
+      console.log('✅ Todas as datas futuras foram corrigidas!')
     } else {
-      console.log(`�š�️  Ainda existem ${restantes} coletas com datas em 2027 ou depois`)
+      console.log(`⚠️  Ainda existem ${restantes} coletas com datas em 2027 ou depois`)
     }
     
   } catch (error) {
-    console.error('�Œ Erro ao executar correção:', error)
+    console.error('❌ Erro ao executar correção:', error)
     throw error
   } finally {
     client.release()
@@ -171,10 +171,10 @@ async function corrigirDatasFuturasFIV() {
 // Executar
 corrigirDatasFuturasFIV()
   .then(() => {
-    console.log('\n�œ… Script finalizado')
+    console.log('\n✅ Script finalizado')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n�Œ Erro fatal:', error)
+    console.error('\n❌ Erro fatal:', error)
     process.exit(1)
   })

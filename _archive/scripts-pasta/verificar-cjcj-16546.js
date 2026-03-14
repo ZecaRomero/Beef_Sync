@@ -3,7 +3,7 @@ require('dotenv').config()
 
 async function verificarCJCJ16546() {
   try {
-    console.log('�Ÿ”� Verificando coletas FIV para CJCJ 16546...\n')
+    console.log('🔍 Verificando coletas FIV para CJCJ 16546...\n')
     
     const coletas = await query(`
       SELECT 
@@ -24,21 +24,21 @@ async function verificarCJCJ16546() {
       ORDER BY cf.data_fiv ASC
     `)
     
-    console.log(`�Ÿ“Š Total de coletas encontradas: ${coletas.rows.length}\n`)
+    console.log(`📊 Total de coletas encontradas: ${coletas.rows.length}\n`)
     
     if (coletas.rows.length === 0) {
-      console.log('�Œ Nenhuma coleta encontrada para CJCJ 16546')
+      console.log('❌ Nenhuma coleta encontrada para CJCJ 16546')
       return
     }
     
-    console.log('�Ÿ“‹ Coletas atuais no banco:')
+    console.log('📋 Coletas atuais no banco:')
     coletas.rows.forEach((coleta, index) => {
       const dataFIV = new Date(coleta.data_fiv)
       const dataTransf = coleta.data_transferencia ? new Date(coleta.data_transferencia) : null
       console.log(`${index + 1}. ID: ${coleta.id} | Data FIV: ${dataFIV.toLocaleDateString('pt-BR')} | Data Transf: ${dataTransf ? dataTransf.toLocaleDateString('pt-BR') : 'N/A'} | Oócitos: ${coleta.quantidade_oocitos || 0}`)
     })
     
-    console.log('\n�Ÿ“‹ Datas corretas (conforme planilha Excel):')
+    console.log('\n📋 Datas corretas (conforme planilha Excel):')
     const datasCorretas = [
       '18/06/2025',
       '23/07/2025',
@@ -54,17 +54,17 @@ async function verificarCJCJ16546() {
     })
     
   } catch (error) {
-    console.error('�Œ Erro:', error)
+    console.error('❌ Erro:', error)
     throw error
   }
 }
 
 verificarCJCJ16546()
   .then(() => {
-    console.log('\n�œ… Verificação concluída')
+    console.log('\n✅ Verificação concluída')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n�Œ Erro fatal:', error)
+    console.error('\n❌ Erro fatal:', error)
     process.exit(1)
   })

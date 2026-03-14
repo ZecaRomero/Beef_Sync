@@ -13,9 +13,9 @@ const { Pool } = require('pg')
 
 const DATABASE_URL = process.env.DATABASE_URL
 if (!DATABASE_URL || !DATABASE_URL.includes('supabase')) {
-  console.error('�Œ Configure DATABASE_URL com a connection string do Supabase.')
+  console.error('❌ Configure DATABASE_URL com a connection string do Supabase.')
   console.error('')
-  console.error('   Onde encontrar: Supabase Dashboard �†’ Settings �†’ Database �†’ Connection string (URI)')
+  console.error('   Onde encontrar: Supabase Dashboard → Settings → Database → Connection string (URI)')
   console.error('   Formato: postgresql://postgres.[ref]:[senha]@aws-0-[regiao].pooler.supabase.com:6543/postgres?pgbouncer=true')
   console.error('')
   console.error('   Adicione no .env e execute: npm run db:migrar-supabase')
@@ -30,9 +30,9 @@ const pool = new Pool({
 async function run() {
   const client = await pool.connect()
   try {
-    console.log('�Ÿ”Œ Conectando ao Supabase...')
+    console.log('🔌 Conectando ao Supabase...')
     await client.query('SELECT 1')
-    console.log('�œ… Conectado ao Supabase!')
+    console.log('✅ Conectado ao Supabase!')
     console.log('')
 
     // Verificar se tabela animais existe
@@ -43,17 +43,17 @@ async function run() {
 
     if (animaisExists) {
       const count = await client.query('SELECT COUNT(*) FROM animais')
-      console.log(`�Ÿ“Š Banco já possui dados: ${count.rows[0].count} animais`)
+      console.log(`📊 Banco já possui dados: ${count.rows[0].count} animais`)
       console.log('')
-      console.log('�œ… Migração concluída. O Beef-Sync está pronto para usar o Supabase.')
+      console.log('✅ Migração concluída. O Beef-Sync está pronto para usar o Supabase.')
       console.log('')
-      console.log('�Ÿ’� Para acessar pelo celular com PC desligado:')
+      console.log('💡 Para acessar pelo celular com PC desligado:')
       console.log('   - Faça deploy na Vercel (vercel.com)')
       console.log('   - Adicione DATABASE_URL nas variáveis de ambiente')
       return
     }
 
-    console.log('�Ÿ“‹ Banco vazio. Execute os passos abaixo para migrar os dados:')
+    console.log('📋 Banco vazio. Execute os passos abaixo para migrar os dados:')
     console.log('')
     console.log('   1. Com o banco LOCAL ativo, faça backup:')
     console.log('      npm run backup:completo')
@@ -68,7 +68,7 @@ async function run() {
     console.log('')
     console.log('   Ou consulte: docs/guides/MIGRAR-SUPABASE.md')
   } catch (err) {
-    console.error('�Œ Erro:', err.message)
+    console.error('❌ Erro:', err.message)
     if (err.code === '28P01') {
       console.error('   Senha incorreta. Verifique a connection string.')
     } else if (err.code === 'ENOTFOUND') {

@@ -14,20 +14,20 @@ export const useContabilidade = () => {
   })
   const [resumoAnimais, setResumoAnimais] = useState({
     totalAnimais: 0,
-    porSexo: { Macho: 0, FÃªmea: 0 },
+    porSexo: { Macho: 0, Fêmea: 0 },
     porRaca: {}
   })
   const [animaisData, setAnimaisData] = useState([])
   const [nfsEntradasData, setNfsEntradasData] = useState([])
   const [nfsSaidasData, setNfsSaidasData] = useState([])
 
-  // FunÃ§Ã£o para carregar estatÃ­sticas
+  // Função para carregar estatísticas
   const loadStats = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
       
-      // Limpar localStorage para evitar inconsistÃªncias
+      // Limpar localStorage para evitar inconsistências
       localStorage.removeItem('nfsEntradas')
       localStorage.removeItem('nfsSaidas')
       localStorage.removeItem('notasFiscais')
@@ -92,14 +92,14 @@ export const useContabilidade = () => {
       setNfsEntradasData(nfsEntradasData)
       setNfsSaidasData(nfsSaidasData)
     } catch (error) {
-      console.error('Erro ao carregar estatÃ­sticas:', error)
+      console.error('Erro ao carregar estatísticas:', error)
       setError('Erro ao carregar dados')
     } finally {
       setLoading(false)
     }
   }, [])
 
-  // FunÃ§Ã£o para carregar resumo dos animais
+  // Função para carregar resumo dos animais
   const loadResumoAnimais = useCallback(async () => {
     try {
       // Primeiro tentar carregar da API (PostgreSQL)
@@ -112,13 +112,13 @@ export const useContabilidade = () => {
           setAnimaisData(animals)
           
           const porSexo = animals.reduce((acc, animal) => {
-            const sexo = animal.sexo || 'NÃ£o informado'
+            const sexo = animal.sexo || 'Não informado'
             acc[sexo] = (acc[sexo] || 0) + 1
             return acc
           }, {})
 
           const porRaca = animals.reduce((acc, animal) => {
-            const raca = animal.raca || 'NÃ£o informado'
+            const raca = animal.raca || 'Não informado'
             acc[raca] = (acc[raca] || 0) + 1
             return acc
           }, {})
@@ -129,11 +129,11 @@ export const useContabilidade = () => {
             porRaca
           })
           
-          console.log('âÅ“â€¦ Resumo carregado da API:', animals.length, 'animais')
+          console.log('✅ Resumo carregado da API:', animals.length, 'animais')
           return
         }
       } catch (apiError) {
-        console.error('â�Å’ Erro ao conectar com API:', apiError)
+        console.error('❌ Erro ao conectar com API:', apiError)
       }
       
       // Fallback para localStorage
@@ -141,13 +141,13 @@ export const useContabilidade = () => {
       setAnimaisData(animals)
       
       const porSexo = animals.reduce((acc, animal) => {
-        const sexo = animal.sexo || 'NÃ£o informado'
+        const sexo = animal.sexo || 'Não informado'
         acc[sexo] = (acc[sexo] || 0) + 1
         return acc
       }, {})
 
       const porRaca = animals.reduce((acc, animal) => {
-        const raca = animal.raca || 'NÃ£o informado'
+        const raca = animal.raca || 'Não informado'
         acc[raca] = (acc[raca] || 0) + 1
         return acc
       }, {})
@@ -158,7 +158,7 @@ export const useContabilidade = () => {
         porRaca
       })
       
-      console.log('âÅ¡ ï¸� Resumo carregado do localStorage:', animals.length, 'animais')
+      console.log('⚠️ Resumo carregado do localStorage:', animals.length, 'animais')
     } catch (error) {
       console.error('Erro ao carregar resumo dos animais:', error)
       setError('Erro ao carregar resumo dos animais')

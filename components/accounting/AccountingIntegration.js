@@ -18,45 +18,45 @@ const AccountingIntegration = ({ animals, costs, sales = [] }) => {
   
   const [emailTemplates, setEmailTemplates] = useState({
     monthly: {
-      subject: 'RelatÃ³rio Mensal - GestÃ£o Bovina - [MES/ANO]',
+      subject: 'Relatório Mensal - Gestão Bovina - [MES/ANO]',
       body: `Prezado(a) Contador(a),
 
-Segue em anexo o relatÃ³rio mensal da atividade pecuÃ¡ria referente ao perÃ­odo de [PERIODO].
+Segue em anexo o relatório mensal da atividade pecuária referente ao período de [PERIODO].
 
-Resumo do perÃ­odo:
+Resumo do período:
 - Total de animais: [TOTAL_ANIMAIS]
 - Receita bruta: [RECEITA_BRUTA]
 - Custos totais: [CUSTOS_TOTAIS]
-- Resultado lÃ­quido: [RESULTADO_LIQUIDO]
+- Resultado líquido: [RESULTADO_LIQUIDO]
 
 Documentos em anexo:
-- RelatÃ³rio detalhado de custos
-- RelatÃ³rio de vendas e receitas
+- Relatório detalhado de custos
+- Relatório de vendas e receitas
 - Planilha de controle de estoque (animais)
-- Notas fiscais do perÃ­odo (se aplicÃ¡vel)
+- Notas fiscais do período (se aplicável)
 
 Atenciosamente,
 Zeca
 Gerado pelo Sistema Beef Sync`
     },
     nf: {
-      subject: 'Dados para EmissÃ£o de NF - Venda de Gado - [DATA]',
+      subject: 'Dados para Emissão de NF - Venda de Gado - [DATA]',
       body: `Prezado(a) Contador(a),
 
-Solicito a emissÃ£o de Nota Fiscal referente Ã  venda de gado realizada em [DATA_VENDA].
+Solicito a emissão de Nota Fiscal referente à venda de gado realizada em [DATA_VENDA].
 
 Dados da venda:
 - Comprador: [COMPRADOR]
 - Valor total: [VALOR_TOTAL]
 - Animais vendidos: [QTD_ANIMAIS]
-- DescriÃ§Ã£o: [DESCRICAO_ANIMAIS]
+- Descrição: [DESCRICAO_ANIMAIS]
 
-Dados fiscais necessÃ¡rios:
+Dados fiscais necessários:
 - CNPJ/CPF do comprador: [A CONFIRMAR]
-- ClassificaÃ§Ã£o fiscal: [CODIGO_NCM]
-- AlÃ­quota de ICMS: [ALIQUOTA]
+- Classificação fiscal: [CODIGO_NCM]
+- Alíquota de ICMS: [ALIQUOTA]
 
-Por favor, proceder com a emissÃ£o da NF e me informar quando estiver disponÃ­vel.
+Por favor, proceder com a emissão da NF e me informar quando estiver disponível.
 
 Atenciosamente,
 Sistema Beef Sync`
@@ -68,7 +68,7 @@ Sistema Beef Sync`
   const toast = useToast()
 
   useEffect(() => {
-    // Carregar configuraÃ§Ãµes salvas
+    // Carregar configurações salvas
     const savedSettings = localStorage.getItem('accountingSettings')
     if (savedSettings) {
       setAccountingSettings(JSON.parse(savedSettings))
@@ -84,7 +84,7 @@ Sistema Beef Sync`
     }))
     setPendingNFs(pending)
 
-    // Simular histÃ³rico de relatÃ³rios
+    // Simular histórico de relatórios
     setReportHistory([
       {
         id: 1,
@@ -107,7 +107,7 @@ Sistema Beef Sync`
 
   const saveSettings = () => {
     localStorage.setItem('accountingSettings', JSON.stringify(accountingSettings))
-    toast.success('ConfiguraÃ§Ãµes de contabilidade salvas!')
+    toast.success('Configurações de contabilidade salvas!')
   }
 
   const generateMonthlyReport = () => {
@@ -115,7 +115,7 @@ Sistema Beef Sync`
     const currentMonth = now.getMonth()
     const currentYear = now.getFullYear()
     
-    // Filtrar dados do mÃªs atual
+    // Filtrar dados do mês atual
     const monthlyData = {
       costs: costs.filter(cost => {
         const costDate = new Date(cost.data)
@@ -176,7 +176,7 @@ Sistema Beef Sync`
 
     // Simular envio de email
     try {
-      toast.info('Preparando relatÃ³rio mensal...')
+      toast.info('Preparando relatório mensal...')
       
       // Simular delay de processamento
       await new Promise(resolve => setTimeout(resolve, 2000))
@@ -195,7 +195,7 @@ Sistema Beef Sync`
       link.click()
       URL.revokeObjectURL(url)
 
-      // Adicionar ao histÃ³rico
+      // Adicionar ao histórico
       const newReport = {
         id: Date.now(),
         type: 'monthly',
@@ -206,9 +206,9 @@ Sistema Beef Sync`
       }
       setReportHistory(prev => [newReport, ...prev])
 
-      toast.success('RelatÃ³rio mensal enviado! Outlook aberto e arquivo baixado.')
+      toast.success('Relatório mensal enviado! Outlook aberto e arquivo baixado.')
     } catch (error) {
-      toast.error('Erro ao enviar relatÃ³rio mensal')
+      toast.error('Erro ao enviar relatório mensal')
     }
   }
 
@@ -222,14 +222,14 @@ Sistema Beef Sync`
       .replace('[VALOR_TOTAL]', formatCurrency(saleData.valor))
       .replace('[QTD_ANIMAIS]', '1')
       .replace('[DESCRICAO_ANIMAIS]', `${animal?.raca} - ${animal?.sexo} - ${animal?.peso}kg`)
-      .replace('[CODIGO_NCM]', '0102.90.00') // CÃ³digo NCM para bovinos vivos
-      .replace('[ALIQUOTA]', '12%') // AlÃ­quota padrÃ£o ICMS
+      .replace('[CODIGO_NCM]', '0102.90.00') // Código NCM para bovinos vivos
+      .replace('[ALIQUOTA]', '12%') // Alíquota padrão ICMS
 
     const emailSubject = template.subject
       .replace('[DATA]', formatDate(saleData.data))
 
     try {
-      toast.info('Preparando solicitaÃ§Ã£o de NF...')
+      toast.info('Preparando solicitação de NF...')
       
       await new Promise(resolve => setTimeout(resolve, 1000))
 
@@ -242,9 +242,9 @@ Sistema Beef Sync`
         nf.id === saleData.id ? { ...nf, status: 'requested' } : nf
       ))
 
-      toast.success('SolicitaÃ§Ã£o de NF enviada! Outlook aberto.')
+      toast.success('Solicitação de NF enviada! Outlook aberto.')
     } catch (error) {
-      toast.error('Erro ao enviar solicitaÃ§Ã£o de NF')
+      toast.error('Erro ao enviar solicitação de NF')
     }
   }
 
@@ -253,7 +253,7 @@ Sistema Beef Sync`
       empresa: {
         nome: 'Fazenda Sant Anna',
         cnpj: '00.000.000/0001-00',
-        atividade: 'CriaÃ§Ã£o de bovinos'
+        atividade: 'Criação de bovinos'
       },
       periodo: new Date().getFullYear(),
       receitas: sales.map(sale => ({
@@ -295,13 +295,13 @@ Sistema Beef Sync`
 
   const getCategoriaFiscal = (tipoCusto) => {
     const categorias = {
-      'Medicamentos': 'Custo de ProduÃ§Ã£o',
-      'VeterinÃ¡rios': 'ServiÃ§os Terceirizados',
-      'DNA': 'ServiÃ§os Terceirizados',
-      'Manejo': 'Custo de ProduÃ§Ã£o',
-      'Infraestrutura': 'Investimento/DepreciaÃ§Ã£o',
-      'ReproduÃ§Ã£o': 'Custo de ProduÃ§Ã£o',
-      'AquisiÃ§Ã£o': 'AquisiÃ§Ã£o de Estoque',
+      'Medicamentos': 'Custo de Produção',
+      'Veterinários': 'Serviços Terceirizados',
+      'DNA': 'Serviços Terceirizados',
+      'Manejo': 'Custo de Produção',
+      'Infraestrutura': 'Investimento/Depreciação',
+      'Reprodução': 'Custo de Produção',
+      'Aquisição': 'Aquisição de Estoque',
       'Outros': 'Despesas Operacionais'
     }
     return categorias[tipoCusto] || 'Despesas Operacionais'
@@ -309,10 +309,10 @@ Sistema Beef Sync`
 
   return (
     <div className="space-y-6">
-      {/* ConfiguraÃ§Ãµes de Contabilidade */}
+      {/* Configurações de Contabilidade */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          ðÅ¸â€œÅ  ConfiguraÃ§Ãµes de Contabilidade
+          📊 Configurações de Contabilidade
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -345,7 +345,7 @@ Sistema Beef Sync`
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                FrequÃªncia de RelatÃ³rios
+                Frequência de Relatórios
               </label>
               <select
                 value={accountingSettings.sendFrequency}
@@ -363,10 +363,10 @@ Sistema Beef Sync`
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-sm font-medium text-gray-900 dark:text-white">
-                  Envio AutomÃ¡tico de RelatÃ³rios
+                  Envio Automático de Relatórios
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400">
-                  Enviar relatÃ³rios automaticamente
+                  Enviar relatórios automaticamente
                 </div>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
@@ -386,7 +386,7 @@ Sistema Beef Sync`
                   Incluir Dados de NF
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400">
-                  Incluir informaÃ§Ãµes para emissÃ£o de notas fiscais
+                  Incluir informações para emissão de notas fiscais
                 </div>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
@@ -404,20 +404,20 @@ Sistema Beef Sync`
 
         <div className="mt-6 flex justify-end">
           <button onClick={saveSettings} className="btn-primary">
-            ðÅ¸â€™¾ Salvar ConfiguraÃ§Ãµes
+            💾 Salvar Configurações
           </button>
         </div>
       </div>
 
-      {/* AÃ§Ãµes RÃ¡pidas */}
+      {/* Ações Rápidas */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <button
           onClick={sendMonthlyReport}
           className="bg-blue-500 hover:bg-blue-600 text-white p-6 rounded-lg transition-colors"
         >
           <div className="text-center">
-            <div className="text-3xl mb-2">ðÅ¸â€œÅ </div>
-            <div className="font-semibold">Enviar RelatÃ³rio Mensal</div>
+            <div className="text-3xl mb-2">📊</div>
+            <div className="font-semibold">Enviar Relatório Mensal</div>
             <div className="text-sm opacity-90">Abre Outlook + Download</div>
           </div>
         </button>
@@ -427,7 +427,7 @@ Sistema Beef Sync`
           className="bg-green-500 hover:bg-green-600 text-white p-6 rounded-lg transition-colors"
         >
           <div className="text-center">
-            <div className="text-3xl mb-2">ðÅ¸â€œâ€¹</div>
+            <div className="text-3xl mb-2">📋</div>
             <div className="font-semibold">Exportar Dados Fiscais</div>
             <div className="text-sm opacity-90">JSON para contabilidade</div>
           </div>
@@ -435,13 +435,13 @@ Sistema Beef Sync`
 
         <button
           onClick={() => {
-            const mailtoLink = `mailto:${accountingSettings.contadorEmail}?subject=DÃºvida sobre Contabilidade Rural`
+            const mailtoLink = `mailto:${accountingSettings.contadorEmail}?subject=Dúvida sobre Contabilidade Rural`
             window.open(mailtoLink, '_blank')
           }}
           className="bg-purple-500 hover:bg-purple-600 text-white p-6 rounded-lg transition-colors"
         >
           <div className="text-center">
-            <div className="text-3xl mb-2">âÅ“â€°ï¸�</div>
+            <div className="text-3xl mb-2">✉️</div>
             <div className="font-semibold">Contatar Contador</div>
             <div className="text-sm opacity-90">Abrir Outlook</div>
           </div>
@@ -451,12 +451,12 @@ Sistema Beef Sync`
       {/* Notas Fiscais Pendentes */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-4">
-          ðÅ¸â€œâ€ž Notas Fiscais Pendentes
+          📄 Notas Fiscais Pendentes
         </h4>
         
         {pendingNFs.length === 0 ? (
           <div className="text-center py-8">
-            <div className="text-green-400 dark:text-green-500 text-4xl mb-2">âÅ“â€¦</div>
+            <div className="text-green-400 dark:text-green-500 text-4xl mb-2">✅</div>
             <p className="text-gray-500 dark:text-gray-400">Nenhuma NF pendente</p>
           </div>
         ) : (
@@ -468,7 +468,7 @@ Sistema Beef Sync`
                     Venda para {nf.sale.comprador}
                   </div>
                   <div className="text-sm text-gray-500 dark:text-gray-400">
-                    {formatDate(nf.sale.data)} ââ‚¬¢ {formatCurrency(nf.sale.valor)} ââ‚¬¢ {nf.animal?.raca}
+                    {formatDate(nf.sale.data)} • {formatCurrency(nf.sale.valor)} • {nf.animal?.raca}
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -483,7 +483,7 @@ Sistema Beef Sync`
                       onClick={() => sendNFRequest(nf.sale)}
                       className="btn-primary text-sm"
                     >
-                      ðÅ¸â€œ§ Solicitar NF
+                      📧 Solicitar NF
                     </button>
                   )}
                 </div>
@@ -493,10 +493,10 @@ Sistema Beef Sync`
         )}
       </div>
 
-      {/* HistÃ³rico de Envios */}
+      {/* Histórico de Envios */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-4">
-          ðÅ¸â€œË† HistÃ³rico de Envios
+          📈 Histórico de Envios
         </h4>
         
         <div className="space-y-3">
@@ -504,14 +504,14 @@ Sistema Beef Sync`
             <div key={report.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <div className="flex items-center space-x-3">
                 <span className="text-lg">
-                  {report.type === 'monthly' ? 'ðÅ¸â€œÅ ' : 'ðÅ¸â€œâ€ž'}
+                  {report.type === 'monthly' ? '📊' : '📄'}
                 </span>
                 <div>
                   <div className="font-medium text-gray-900 dark:text-white">
-                    {report.type === 'monthly' ? 'RelatÃ³rio Mensal' : 'SolicitaÃ§Ã£o de NF'}
+                    {report.type === 'monthly' ? 'Relatório Mensal' : 'Solicitação de NF'}
                   </div>
                   <div className="text-sm text-gray-500 dark:text-gray-400">
-                    {formatDate(report.sentAt)} ââ‚¬¢ Para: {report.recipient}
+                    {formatDate(report.sentAt)} • Para: {report.recipient}
                   </div>
                 </div>
               </div>

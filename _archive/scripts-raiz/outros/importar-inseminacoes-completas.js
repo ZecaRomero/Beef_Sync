@@ -2,7 +2,7 @@
 const { query } = require('./lib/database')
 
 async function importarInseminacoesCompletas() {
-  console.log('�Ÿ”„ IMPORTANDO INSEMINA�‡�•ES COM DIAGN�“STICOS DE GESTA�‡�ƒO')
+  console.log('🔄 IMPORTANDO INSEMINAÇÕES COM DIAGNÓSTICOS DE GESTAÇÃO')
   console.log('=' .repeat(70))
   console.log('')
 
@@ -87,7 +87,7 @@ async function importarInseminacoesCompletas() {
       { serie: 'CJCJ', rg: '16201', local: 'PIQ 13', touro: 'MALCOM SANT ANNA', serie_touro: 'CJCJ', rg_touro: '16141', data_ia: '13/11/25', data_dg: '16/12/25', resultado: 'P' }
     ]
 
-    console.log(`�Ÿ“Š Total de registros para importar: ${dadosInseminacao.length}`)
+    console.log(`📊 Total de registros para importar: ${dadosInseminacao.length}`)
     console.log('')
 
     // Função para converter data DD/MM/YY para YYYY-MM-DD
@@ -104,7 +104,7 @@ async function importarInseminacoesCompletas() {
       if (!resultado) return null
       const r = resultado.toString().toUpperCase().trim()
       if (r === 'P' || r === 'PRENHA' || r === 'POSITIVO') return 'Prenha'
-      if (r === 'N' || r === 'N�ƒO PRENHA' || r === 'NEGATIVO') return 'Não Prenha'
+      if (r === 'N' || r === 'NÃO PRENHA' || r === 'NEGATIVO') return 'Não Prenha'
       return r
     }
 
@@ -112,7 +112,7 @@ async function importarInseminacoesCompletas() {
     let erros = 0
     const errosDetalhes = []
 
-    console.log('�Ÿ”„ Processando registros...')
+    console.log('🔄 Processando registros...')
     console.log('')
 
     for (let i = 0; i < dadosInseminacao.length; i++) {
@@ -132,7 +132,7 @@ async function importarInseminacoesCompletas() {
         if (animalResult.rows.length === 0) {
           erros++
           errosDetalhes.push(`${registro.serie} ${registro.rg}: Animal não encontrado`)
-          console.log(`   �Œ Animal não encontrado`)
+          console.log(`   ❌ Animal não encontrado`)
           continue
         }
 
@@ -141,8 +141,8 @@ async function importarInseminacoesCompletas() {
         // 2. Validar se é fêmea
         if (animal.sexo !== 'Fêmea' && animal.sexo !== 'F') {
           erros++
-          errosDetalhes.push(`${registro.serie} ${registro.rg}: �‰ ${animal.sexo}, não pode ser inseminado`)
-          console.log(`   �Œ �‰ ${animal.sexo}, não pode ser inseminado`)
+          errosDetalhes.push(`${registro.serie} ${registro.rg}: É ${animal.sexo}, não pode ser inseminado`)
+          console.log(`   ❌ É ${animal.sexo}, não pode ser inseminado`)
           continue
         }
 
@@ -153,7 +153,7 @@ async function importarInseminacoesCompletas() {
         if (!dataIA) {
           erros++
           errosDetalhes.push(`${registro.serie} ${registro.rg}: Data IA inválida: ${registro.data_ia}`)
-          console.log(`   �Œ Data IA inválida`)
+          console.log(`   ❌ Data IA inválida`)
           continue
         }
 
@@ -180,7 +180,7 @@ async function importarInseminacoesCompletas() {
         `, [animal.id, dataIA])
 
         if (iaExistente.rows.length > 0) {
-          console.log(`   �š�️ IA já existe para esta data, pulando...`)
+          console.log(`   ⚠️ IA já existe para esta data, pulando...`)
           continue
         }
 
@@ -284,27 +284,27 @@ async function importarInseminacoesCompletas() {
         }
 
         sucessos++
-        console.log(`   �œ… Importado com sucesso`)
+        console.log(`   ✅ Importado com sucesso`)
 
       } catch (error) {
         erros++
         errosDetalhes.push(`${registro.serie} ${registro.rg}: ${error.message}`)
-        console.log(`   �Œ Erro: ${error.message}`)
+        console.log(`   ❌ Erro: ${error.message}`)
       }
     }
 
     // Relatório final
     console.log('')
-    console.log('�Ÿ“Š RELAT�“RIO FINAL')
+    console.log('📊 RELATÓRIO FINAL')
     console.log('=' .repeat(50))
-    console.log(`�œ… Sucessos: ${sucessos}`)
-    console.log(`�Œ Erros: ${erros}`)
-    console.log(`�Ÿ“Š Total processado: ${dadosInseminacao.length}`)
-    console.log(`�Ÿ“ˆ Taxa de sucesso: ${((sucessos / dadosInseminacao.length) * 100).toFixed(1)}%`)
+    console.log(`✅ Sucessos: ${sucessos}`)
+    console.log(`❌ Erros: ${erros}`)
+    console.log(`📊 Total processado: ${dadosInseminacao.length}`)
+    console.log(`📈 Taxa de sucesso: ${((sucessos / dadosInseminacao.length) * 100).toFixed(1)}%`)
 
     if (erros > 0) {
       console.log('')
-      console.log('�Œ DETALHES DOS ERROS:')
+      console.log('❌ DETALHES DOS ERROS:')
       errosDetalhes.forEach((erro, index) => {
         console.log(`${index + 1}. ${erro}`)
       })
@@ -312,7 +312,7 @@ async function importarInseminacoesCompletas() {
 
     // Estatísticas adicionais
     console.log('')
-    console.log('�Ÿ“ˆ ESTATÍSTICAS ADICIONAIS:')
+    console.log('📈 ESTATÍSTICAS ADICIONAIS:')
     
     const totalIAs = await query('SELECT COUNT(*) as total FROM inseminacoes')
     const totalPrenhas = await query(`SELECT COUNT(*) as total FROM inseminacoes WHERE status_gestacao = 'Prenha'`)
@@ -323,10 +323,10 @@ async function importarInseminacoesCompletas() {
     console.log(`Total de gestações: ${totalGestacoes.rows[0].total}`)
 
     console.log('')
-    console.log('�œ… IMPORTA�‡�ƒO CONCLUÍDA!')
+    console.log('✅ IMPORTAÇÃO CONCLUÍDA!')
 
   } catch (error) {
-    console.error('�Œ Erro geral:', error)
+    console.error('❌ Erro geral:', error)
   }
 }
 
@@ -334,11 +334,11 @@ async function importarInseminacoesCompletas() {
 importarInseminacoesCompletas()
   .then(() => {
     console.log('')
-    console.log('�ŸŽ� RESULTADO FINAL:')
-    console.log('�€� Inseminações importadas com diagnósticos')
-    console.log('�€� Custos criados automaticamente')
-    console.log('�€� Gestações criadas para prenhas confirmadas')
-    console.log('�€� Sistema atualizado e pronto para uso')
+    console.log('🎯 RESULTADO FINAL:')
+    console.log('• Inseminações importadas com diagnósticos')
+    console.log('• Custos criados automaticamente')
+    console.log('• Gestações criadas para prenhas confirmadas')
+    console.log('• Sistema atualizado e pronto para uso')
     process.exit(0)
   })
   .catch(error => {

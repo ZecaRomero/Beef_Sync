@@ -63,7 +63,7 @@ export default function Rastreabilidade() {
             <MapPinIcon className="w-8 h-8 text-amber-600" />
             Rastreabilidade
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">HistÃ³rico completo de movimentos dos animais</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">Histórico completo de movimentos dos animais</p>
         </div>
       </div>
 
@@ -79,7 +79,7 @@ export default function Rastreabilidade() {
 
       {isLoading ? (
         <div className="text-center py-12">
-          <div className="text-gray-500">Carregando histÃ³rico...</div>
+          <div className="text-gray-500">Carregando histórico...</div>
         </div>
       ) : historiaData.length === 0 ? (
         <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-12 text-center">
@@ -99,7 +99,7 @@ export default function Rastreabilidade() {
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-gray-900 dark:text-white">{item.animal || 'Animal nÃ£o identificado'}</span>
+                      <span className="font-semibold text-gray-900 dark:text-white">{item.animal || 'Animal não identificado'}</span>
                       {item.rg && (
                         <span className="text-sm text-gray-500 dark:text-gray-400">RG: {item.rg}</span>
                       )}
@@ -110,7 +110,7 @@ export default function Rastreabilidade() {
                       <MapPinIcon className="w-4 h-4" />
                       <span>De: {item.origem || '-'}</span>
                     </div>
-                    <span>ââ€ â€™</span>
+                    <span>→</span>
                     <div className="flex items-center gap-1">
                       <MapPinIcon className="w-4 h-4" />
                       <span>Para: {item.destino || '-'}</span>

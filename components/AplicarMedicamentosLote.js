@@ -14,9 +14,9 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
   const [piqueteSelecionado, setPiqueteSelecionado] = useState('')
   const [animaisPiquete, setAnimaisPiquete] = useState([])
   const [animaisSelecionadosManual, setAnimaisSelecionadosManual] = useState([]) // Animais adicionados manualmente
-  const [serieInput, setSerieInput] = useState('') // Campo para digitar sÃ©rie
-  const [serieFixa, setSerieFixa] = useState('') // SÃ©rie fixada (prefixo)
-  const [fixarSerie, setFixarSerie] = useState(false) // Checkbox para fixar sÃ©rie
+  const [serieInput, setSerieInput] = useState('') // Campo para digitar série
+  const [serieFixa, setSerieFixa] = useState('') // Série fixada (prefixo)
+  const [fixarSerie, setFixarSerie] = useState(false) // Checkbox para fixar série
   const [buscandoAnimal, setBuscandoAnimal] = useState(false)
   const [medicamentos, setMedicamentos] = useState([])
   const [medicamentosSelecionados, setMedicamentosSelecionados] = useState([])
@@ -117,7 +117,7 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
 
   const adicionarMedicamento = () => {
     if (medicamentos.length === 0) {
-      alert('Nenhum medicamento disponÃ­vel. Cadastre medicamentos primeiro.')
+      alert('Nenhum medicamento disponível. Cadastre medicamentos primeiro.')
       return
     }
 
@@ -149,7 +149,7 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
         medicamento.nome = medSelecionado.nome
         medicamento.unidade = medSelecionado.unidade || 'UNIDADE'
         
-        // Calcular custo baseado no tipo de aplicaÃ§Ã£o
+        // Calcular custo baseado no tipo de aplicação
         medicamento.precoFrasco = medSelecionado.preco || 0
         medicamento.quantidadeFrasco = medSelecionado.quantidadeEstoque || null
         
@@ -162,7 +162,7 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
           medicamento.tipoAplicacao = 'individual'
           // Se tiver quantidade do frasco, calcular proporcionalmente
           if (medicamento.quantidadeFrasco && medicamento.quantidadeFrasco > 0 && medicamento.precoFrasco > 0) {
-            // Usar quantidade padrÃ£o de 1 se nÃ£o especificada
+            // Usar quantidade padrão de 1 se não especificada
             medicamento.quantidadeAplicada = medicamento.quantidadeAplicada || 1
             medicamento.custoPorAnimal = (medicamento.precoFrasco / medicamento.quantidadeFrasco) * medicamento.quantidadeAplicada
           } else {
@@ -173,7 +173,7 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
     } else {
       medicamento[campo] = valor
       
-      // Recalcular custo por animal se necessÃ¡rio
+      // Recalcular custo por animal se necessário
       if (campo === 'quantidadeAplicada' || campo === 'quantidadeFrasco') {
         // Se tiver quantidade aplicada e quantidade do frasco, calcular proporcionalmente
         if (medicamento.quantidadeAplicada && medicamento.quantidadeFrasco && medicamento.precoFrasco) {
@@ -192,46 +192,46 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
     setMedicamentosSelecionados(novosMedicamentos)
   }
 
-  // Buscar animal por sÃ©rie completa ou parcial
+  // Buscar animal por série completa ou parcial
   const buscarAnimalPorSerie = async (serieCompleta) => {
     if (!serieCompleta || serieCompleta.trim() === '') return null
 
     setBuscandoAnimal(true)
     try {
-      // Extrair sÃ©rie e RG da entrada
-      // Formato esperado: "CJCJ 17372" ou "CJCJ17372" ou apenas "17372" (se sÃ©rie fixada)
+      // Extrair série e RG da entrada
+      // Formato esperado: "CJCJ 17372" ou "CJCJ17372" ou apenas "17372" (se série fixada)
       let serie = ''
       let rg = ''
       
       if (serieFixa) {
-        // Se sÃ©rie estÃ¡ fixada, o input Ã© sÃ³ o RG
+        // Se série está fixada, o input é só o RG
         serie = serieFixa.trim().toUpperCase()
         rg = serieCompleta.trim()
       } else {
-        // Tentar separar sÃ©rie e RG
+        // Tentar separar série e RG
         const partes = serieCompleta.trim().split(/\s+/)
         if (partes.length >= 2) {
           serie = partes[0].toUpperCase()
           rg = partes.slice(1).join(' ').trim()
         } else {
-          // Tentar extrair sÃ©rie do inÃ­cio (2-5 letras) e o resto Ã© RG
+          // Tentar extrair série do início (2-5 letras) e o resto é RG
           const match = serieCompleta.match(/^([A-Z]{2,5})(\d+.*)$/i)
           if (match) {
             serie = match[1].toUpperCase()
             rg = match[2].trim()
           } else {
-            // Se nÃ£o conseguir separar, tentar buscar diretamente
+            // Se não conseguir separar, tentar buscar diretamente
             serie = serieCompleta.trim().toUpperCase()
           }
         }
       }
 
-      console.log('ðÅ¸â€�� Buscando animal:', { serie, rg, serieCompleta, serieFixa })
+      console.log('🔍 Buscando animal:', { serie, rg, serieCompleta, serieFixa })
 
-      // Tentar mÃºltiplas estratÃ©gias de busca
+      // Tentar múltiplas estratégias de busca
       let animais = []
       
-      // EstratÃ©gia 1: Busca exata com sÃ©rie e RG
+      // Estratégia 1: Busca exata com série e RG
       if (serie && rg) {
         const params1 = new URLSearchParams()
         params1.append('serie', serie)
@@ -241,11 +241,11 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
         if (response1.ok) {
           const data1 = await response1.json()
           animais = data1.data || []
-          console.log('ðÅ¸â€œÅ  Busca exata (serie + rg):', animais.length, 'resultados')
+          console.log('📊 Busca exata (serie + rg):', animais.length, 'resultados')
         }
       }
       
-      // EstratÃ©gia 2: Se nÃ£o encontrou, tentar sÃ³ com sÃ©rie
+      // Estratégia 2: Se não encontrou, tentar só com série
       if (animais.length === 0 && serie) {
         const params2 = new URLSearchParams()
         params2.append('serie', serie)
@@ -254,14 +254,14 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
         if (response2.ok) {
           const data2 = await response2.json()
           const animaisPorSerie = data2.data || []
-          console.log('ðÅ¸â€œÅ  Busca por sÃ©rie:', animaisPorSerie.length, 'resultados')
+          console.log('📊 Busca por série:', animaisPorSerie.length, 'resultados')
           
           // Filtrar pelo RG se tiver
           if (rg) {
             animais = animaisPorSerie.filter(a => {
               const rgAnimal = a.rg?.toString().trim()
               const rgBuscado = rg.toString().trim()
-              // Tentar comparaÃ§Ã£o numÃ©rica tambÃ©m
+              // Tentar comparação numérica também
               const rgAnimalNum = parseInt(rgAnimal)
               const rgBuscadoNum = parseInt(rgBuscado)
               
@@ -270,14 +270,14 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
                      rgAnimal?.endsWith(rgBuscado) ||
                      rgBuscado?.endsWith(rgAnimal)
             })
-            console.log('ðÅ¸â€œÅ  ApÃ³s filtrar por RG:', animais.length, 'resultados')
+            console.log('📊 Após filtrar por RG:', animais.length, 'resultados')
           } else {
             animais = animaisPorSerie
           }
         }
       }
       
-      // EstratÃ©gia 3: Se ainda nÃ£o encontrou e tem RG, tentar sÃ³ com RG (buscando em todas as sÃ©ries)
+      // Estratégia 3: Se ainda não encontrou e tem RG, tentar só com RG (buscando em todas as séries)
       if (animais.length === 0 && rg) {
         const params3 = new URLSearchParams()
         params3.append('rg', rg)
@@ -286,14 +286,14 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
         if (response3.ok) {
           const data3 = await response3.json()
           const animaisPorRG = data3.data || []
-          console.log('ðÅ¸â€œÅ  Busca por RG:', animaisPorRG.length, 'resultados')
+          console.log('📊 Busca por RG:', animaisPorRG.length, 'resultados')
           
-          // Se sÃ©rie foi fornecida, filtrar por ela
+          // Se série foi fornecida, filtrar por ela
           if (serie) {
             animais = animaisPorRG.filter(a => 
               a.serie?.toUpperCase() === serie.toUpperCase()
             )
-            console.log('ðÅ¸â€œÅ  ApÃ³s filtrar por sÃ©rie:', animais.length, 'resultados')
+            console.log('📊 Após filtrar por série:', animais.length, 'resultados')
           } else {
             animais = animaisPorRG
           }
@@ -302,11 +302,11 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
       
       // Se encontrou exatamente um animal, retornar
       if (animais.length === 1) {
-        console.log('âÅ“â€¦ Animal encontrado:', animais[0].serie, animais[0].rg)
+        console.log('✅ Animal encontrado:', animais[0].serie, animais[0].rg)
         return animais[0]
       }
       
-      // Se encontrou mÃºltiplos, tentar filtrar pelo RG completo se tiver
+      // Se encontrou múltiplos, tentar filtrar pelo RG completo se tiver
       if (rg && animais.length > 1) {
         const animalExato = animais.find(a => {
           const rgAnimal = a.rg?.toString().trim()
@@ -315,35 +315,35 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
                  parseInt(rgAnimal) === parseInt(rgBuscado)
         })
         if (animalExato) {
-          console.log('âÅ“â€¦ Animal exato encontrado:', animalExato.serie, animalExato.rg)
+          console.log('✅ Animal exato encontrado:', animalExato.serie, animalExato.rg)
           return animalExato
         }
       }
       
       // Se encontrou algum, retornar o primeiro
       if (animais.length > 0) {
-        console.log('âÅ¡ ï¸� MÃºltiplos animais encontrados, retornando o primeiro:', animais[0].serie, animais[0].rg)
+        console.log('⚠️ Múltiplos animais encontrados, retornando o primeiro:', animais[0].serie, animais[0].rg)
         return animais[0]
       }
       
-      console.log('â�Å’ Nenhum animal encontrado para:', { serie, rg, serieCompleta })
+      console.log('❌ Nenhum animal encontrado para:', { serie, rg, serieCompleta })
       return null
     } catch (error) {
-      console.error('â�Å’ Erro ao buscar animal:', error)
+      console.error('❌ Erro ao buscar animal:', error)
       return null
     } finally {
       setBuscandoAnimal(false)
     }
   }
 
-  // Adicionar animal Ã  lista manual
+  // Adicionar animal à lista manual
   const adicionarAnimalManual = async (e) => {
     e?.preventDefault()
     
     const serieCompleta = serieInput.trim()
     if (!serieCompleta) return
 
-    // Se sÃ©rie estÃ¡ fixada e sÃ³ tem nÃºmero, combinar
+    // Se série está fixada e só tem número, combinar
     const serieCompletaFinal = serieFixa && /^\d+$/.test(serieCompleta) 
       ? `${serieFixa} ${serieCompleta}` 
       : serieCompleta
@@ -352,30 +352,30 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
     
     if (!animal) {
       const mensagemErro = serieFixa 
-        ? `Animal nÃ£o encontrado: ${serieFixa} ${serieCompleta}\n\nVerifique se:\n- O nÃºmero estÃ¡ correto\n- O animal existe no sistema\n- O animal estÃ¡ ativo`
-        : `Animal nÃ£o encontrado: ${serieCompletaFinal}\n\nVerifique se:\n- A sÃ©rie e nÃºmero estÃ£o corretos\n- O animal existe no sistema\n- O animal estÃ¡ ativo`
+        ? `Animal não encontrado: ${serieFixa} ${serieCompleta}\n\nVerifique se:\n- O número está correto\n- O animal existe no sistema\n- O animal está ativo`
+        : `Animal não encontrado: ${serieCompletaFinal}\n\nVerifique se:\n- A série e número estão corretos\n- O animal existe no sistema\n- O animal está ativo`
       alert(mensagemErro)
       return
     }
 
-    // Verificar se jÃ¡ foi adicionado
+    // Verificar se já foi adicionado
     const jaAdicionado = animaisSelecionadosManual.some(a => a.id === animal.id)
     if (jaAdicionado) {
-      alert(`Animal ${animal.serie} ${animal.rg} jÃ¡ foi adicionado`)
+      alert(`Animal ${animal.serie} ${animal.rg} já foi adicionado`)
       setSerieInput('')
       return
     }
 
-    // Adicionar Ã  lista
+    // Adicionar à lista
     setAnimaisSelecionadosManual([...animaisSelecionadosManual, animal])
     setSerieInput('')
     
-    // Se foi a primeira sÃ©rie completa digitada e nÃ£o tem sÃ©rie fixada, perguntar
+    // Se foi a primeira série completa digitada e não tem série fixada, perguntar
     if (!serieFixa && !fixarSerie && animal.serie) {
-      // Detectar se a sÃ©rie tem padrÃ£o (ex: 4 letras)
+      // Detectar se a série tem padrão (ex: 4 letras)
       const serieParte = animal.serie
       if (serieParte && serieParte.length >= 2) {
-        // NÃ£o perguntar automaticamente, deixar o usuÃ¡rio decidir
+        // Não perguntar automaticamente, deixar o usuário decidir
       }
     }
   }
@@ -385,7 +385,7 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
     setAnimaisSelecionadosManual(animaisSelecionadosManual.filter(a => a.id !== animalId))
   }
 
-  // Quando fixar sÃ©rie, atualizar a sÃ©rie fixa
+  // Quando fixar série, atualizar a série fixa
   useEffect(() => {
     if (fixarSerie && animaisSelecionadosManual.length > 0) {
       const primeiraSerie = animaisSelecionadosManual[0].serie
@@ -401,13 +401,13 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
   const animaisFinais = () => {
     const todosAnimais = [...animaisPiquete]
     
-    // Adicionar animais manuais que nÃ£o estÃ£o no piquete
+    // Adicionar animais manuais que não estão no piquete
     animaisSelecionadosManual.forEach(animalManual => {
       const jaExiste = todosAnimais.some(a => a.id === animalManual.id || 
         (a.animal_id === animalManual.id) ||
         (a.serie === animalManual.serie && a.rg === animalManual.rg))
       if (!jaExiste) {
-        // Formatar como objeto de localizaÃ§Ã£o para compatibilidade
+        // Formatar como objeto de localização para compatibilidade
         todosAnimais.push({
           animal_id: animalManual.id,
           serie: animalManual.serie,
@@ -448,7 +448,7 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
     // Validar medicamentos
     for (const med of medicamentosSelecionados) {
       if (!med.id || !med.nome) {
-        alert(`Medicamento "${med.nome || 'nÃ£o selecionado'}" estÃ¡ incompleto`)
+        alert(`Medicamento "${med.nome || 'não selecionado'}" está incompleto`)
         return
       }
       if (med.custoPorAnimal <= 0) {
@@ -494,7 +494,7 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
           detalhes: data.data
         })
         
-        // Limpar formulÃ¡rio apÃ³s sucesso
+        // Limpar formulário após sucesso
         setTimeout(() => {
           setMedicamentosSelecionados([])
           setObservacoes('')
@@ -553,7 +553,7 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
 
           <ModernCardBody>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* SeleÃ§Ã£o de Piquete */}
+              {/* Seleção de Piquete */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <MapPinIcon className="h-5 w-5 inline mr-1" />
@@ -576,23 +576,23 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
                   <p className="text-sm text-gray-500 mt-2">Carregando animais...</p>
                 ) : animaisPiquete.length > 0 ? (
                   <p className="text-sm text-green-600 dark:text-green-400 mt-2">
-                    âÅ“â€œ {animaisPiquete.length} animal(is) encontrado(s) neste piquete
+                    ✓ {animaisPiquete.length} animal(is) encontrado(s) neste piquete
                   </p>
                 ) : piqueteSelecionado ? (
                   <p className="text-sm text-yellow-600 dark:text-yellow-400 mt-2">
-                    âÅ¡  Nenhum animal encontrado neste piquete
+                    ⚠ Nenhum animal encontrado neste piquete
                   </p>
                 ) : null}
               </div>
 
-              {/* SeleÃ§Ã£o Manual de Animais */}
+              {/* Seleção Manual de Animais */}
               <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  ðÅ¸�â€ž Adicionar Animais Manualmente
+                  🐄 Adicionar Animais Manualmente
                 </label>
                 
                 <div className="space-y-3">
-                  {/* Campo de input para sÃ©rie */}
+                  {/* Campo de input para série */}
                   <form onSubmit={adicionarAnimalManual} className="flex gap-2">
                     <div className="flex-1">
                       <input
@@ -605,7 +605,7 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
                             adicionarAnimalManual(e)
                           }
                         }}
-                        placeholder={serieFixa ? `Digite o nÃºmero (sÃ©rie fixada: ${serieFixa})` : "Digite a sÃ©rie completa (ex: CJCJ 17372)"}
+                        placeholder={serieFixa ? `Digite o número (série fixada: ${serieFixa})` : "Digite a série completa (ex: CJCJ 17372)"}
                         className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500"
                         disabled={buscandoAnimal}
                       />
@@ -619,7 +619,7 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
                     </button>
                   </form>
 
-                  {/* Checkbox para fixar sÃ©rie */}
+                  {/* Checkbox para fixar série */}
                   {animaisSelecionadosManual.length > 0 && (
                     <div className="flex items-center space-x-2">
                       <input
@@ -637,7 +637,7 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
                         className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                       />
                       <label htmlFor="fixarSerie" className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
-                        Fixar sÃ©rie "{serieFixa || animaisSelecionadosManual[0]?.serie || ''}" 
+                        Fixar série "{serieFixa || animaisSelecionadosManual[0]?.serie || ''}" 
                         {fixarSerie && serieFixa && (
                           <span className="ml-2 text-purple-600 font-medium">(Ativo)</span>
                         )}
@@ -675,10 +675,10 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
                 </div>
               </div>
 
-              {/* Data de AplicaÃ§Ã£o */}
+              {/* Data de Aplicação */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Data de AplicaÃ§Ã£o <span className="text-red-500">*</span>
+                  Data de Aplicação <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="date"
@@ -708,7 +708,7 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
 
                 {medicamentosSelecionados.length === 0 ? (
                   <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 text-center text-gray-500 dark:text-gray-400">
-                    Nenhum medicamento adicionado. Clique em "Adicionar Medicamento" para comeÃ§ar.
+                    Nenhum medicamento adicionado. Clique em "Adicionar Medicamento" para começar.
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -808,7 +808,7 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
                               placeholder="Ex: 60"
                             />
                             <p className="text-xs text-gray-500 mt-1">
-                              Quantidade total do frasco para cÃ¡lculo proporcional
+                              Quantidade total do frasco para cálculo proporcional
                             </p>
                           </div>
 
@@ -845,10 +845,10 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
                           <div className="md:col-span-2">
                             <div className="bg-blue-50 dark:bg-blue-900/30 p-2 rounded text-xs">
                               <span className="text-blue-800 dark:text-blue-200">
-                                ðÅ¸â€™¡ Custo calculado por animal: R$ {med.custoPorAnimal?.toFixed(2) || '0.00'}
+                                💡 Custo calculado por animal: R$ {med.custoPorAnimal?.toFixed(2) || '0.00'}
                                 {med.quantidadeAplicada && med.quantidadeFrasco && med.precoFrasco && (
                                   <span className="block mt-1 text-blue-600">
-                                    FÃ³rmula: (R$ {med.precoFrasco.toFixed(2)} / {med.quantidadeFrasco} {med.unidade}) Ãâ€” {med.quantidadeAplicada} {med.unidade} = R$ {med.custoPorAnimal?.toFixed(2)}
+                                    Fórmula: (R$ {med.precoFrasco.toFixed(2)} / {med.quantidadeFrasco} {med.unidade}) × {med.quantidadeAplicada} {med.unidade} = R$ {med.custoPorAnimal?.toFixed(2)}
                                   </span>
                                 )}
                               </span>
@@ -861,17 +861,17 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
                 )}
               </div>
 
-              {/* ObservaÃ§Ãµes */}
+              {/* Observações */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  ObservaÃ§Ãµes
+                  Observações
                 </label>
                 <textarea
                   value={observacoes}
                   onChange={(e) => setObservacoes(e.target.value)}
                   rows="3"
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-                  placeholder="ObservaÃ§Ãµes adicionais sobre a aplicaÃ§Ã£o..."
+                  placeholder="Observações adicionais sobre a aplicação..."
                 />
               </div>
 
@@ -888,13 +888,13 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
                     </div>
                     {animaisPiquete.length > 0 && (
                       <div className="flex justify-between text-xs text-blue-700 dark:text-blue-300">
-                        <span>ââ‚¬¢ Do piquete:</span>
+                        <span>• Do piquete:</span>
                         <span>{animaisPiquete.length}</span>
                       </div>
                     )}
                     {animaisSelecionadosManual.length > 0 && (
                       <div className="flex justify-between text-xs text-blue-700 dark:text-blue-300">
-                        <span>ââ‚¬¢ Adicionados manualmente:</span>
+                        <span>• Adicionados manualmente:</span>
                         <span>{animaisSelecionadosManual.length}</span>
                       </div>
                     )}
@@ -928,7 +928,7 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
                         : 'text-red-900 dark:text-red-200'
                     }`}
                   >
-                    {resultado.sucesso ? 'âÅ“â€œ' : 'âÅ“â€”'} {resultado.mensagem}
+                    {resultado.sucesso ? '✓' : '✗'} {resultado.mensagem}
                   </p>
                   {resultado.detalhes && (
                     <div className="mt-2 text-sm text-gray-700 dark:text-gray-300">
@@ -942,7 +942,7 @@ export default function AplicarMedicamentosLote({ isOpen, onClose }) {
                 </div>
               )}
 
-              {/* BotÃµes */}
+              {/* Botões */}
               <div className="flex space-x-3 pt-4">
                 <Button
                   type="submit"

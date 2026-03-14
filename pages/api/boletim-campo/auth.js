@@ -12,7 +12,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    // (createTablesIfNotExist removido â€” tabelas criadas automaticamente no primeiro uso)
+    // (createTablesIfNotExist removido — tabelas criadas automaticamente no primeiro uso)
     const { nome, senha, novaSenha, acao } = req.body
 
     if (!nome || !senha) {

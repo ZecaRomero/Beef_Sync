@@ -11,7 +11,7 @@ async function testarConsulta() {
   })
 
   try {
-    console.log('ðÅ¸â€�Å’ Conectando...\n')
+    console.log('🔌 Conectando...\n')
     
     // Consulta que a API usa
     const resultado = await pool.query(`
@@ -29,14 +29,14 @@ async function testarConsulta() {
       LIMIT 300
     `)
 
-    console.log(`ðÅ¸â€œÅ  Total de registros: ${resultado.rows.length}\n`)
+    console.log(`📊 Total de registros: ${resultado.rows.length}\n`)
     
     // Filtrar por 14785
     const com14785 = resultado.rows.filter(r => r.nome_touro && r.nome_touro.includes('14785'))
-    console.log(`ðÅ¸â€�� Registros com "14785": ${com14785.length}\n`)
+    console.log(`🔍 Registros com "14785": ${com14785.length}\n`)
     
     if (com14785.length > 0) {
-      console.log('ðÅ¸â€œâ€¹ Detalhes:')
+      console.log('📋 Detalhes:')
       com14785.forEach(r => {
         console.log(`  ID ${r.id}: ${r.nome_touro}`)
         console.log(`    tipo: ${r.tipo}`)
@@ -45,8 +45,8 @@ async function testarConsulta() {
         console.log('')
       })
     } else {
-      console.log('âÅ¡ ï¸�  Nenhum registro encontrado com "14785"')
-      console.log('\nðÅ¸â€�� Vamos verificar TODOS os registros com 14785 (sem filtros):')
+      console.log('⚠️  Nenhum registro encontrado com "14785"')
+      console.log('\n🔍 Vamos verificar TODOS os registros com 14785 (sem filtros):')
       
       const todos = await pool.query(`
         SELECT id, nome_touro, tipo, tipo_operacao, doses_disponiveis, quantidade_doses
@@ -55,7 +55,7 @@ async function testarConsulta() {
         ORDER BY id
       `)
       
-      console.log(`\nðÅ¸â€œ¦ Total encontrado: ${todos.rows.length}\n`)
+      console.log(`\n📦 Total encontrado: ${todos.rows.length}\n`)
       todos.rows.forEach(r => {
         console.log(`  ID ${r.id}: ${r.nome_touro}`)
         console.log(`    tipo: ${r.tipo}`)
@@ -67,7 +67,7 @@ async function testarConsulta() {
     }
 
   } catch (error) {
-    console.error('â�Å’ Erro:', error.message)
+    console.error('❌ Erro:', error.message)
   } finally {
     await pool.end()
   }

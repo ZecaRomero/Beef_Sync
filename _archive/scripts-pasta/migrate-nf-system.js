@@ -18,7 +18,7 @@ async function runMigration() {
   const client = await pool.connect()
   
   try {
-    console.log('�Ÿš€ Iniciando migração do sistema de Notas Fiscais...')
+    console.log('🚀 Iniciando migração do sistema de Notas Fiscais...')
     
     // Ler arquivo SQL
     const sqlPath = path.join(__dirname, 'create-nf-tables.sql')
@@ -27,10 +27,10 @@ async function runMigration() {
     // Executar SQL
     await client.query(sql)
     
-    console.log('�œ… Tabelas criadas com sucesso!')
+    console.log('✅ Tabelas criadas com sucesso!')
     
     // Migrar dados existentes se houver
-    console.log('�Ÿ“� Verificando dados existentes...')
+    console.log('📦 Verificando dados existentes...')
     
     // Verificar se existe tabela antiga de NFs
     const checkTable = await client.query(`
@@ -42,7 +42,7 @@ async function runMigration() {
     `)
     
     if (checkTable.rows[0].exists) {
-      console.log('�Ÿ”„ Migrando dados da tabela antiga...')
+      console.log('🔄 Migrando dados da tabela antiga...')
       
       // Migrar dados (adaptar conforme estrutura antiga)
       await client.query(`
@@ -74,12 +74,12 @@ async function runMigration() {
         )
       `)
       
-      console.log('�œ… Dados migrados com sucesso!')
+      console.log('✅ Dados migrados com sucesso!')
     }
     
-    console.log('�œ� Migração concluída com sucesso!')
+    console.log('✨ Migração concluída com sucesso!')
     console.log('')
-    console.log('�Ÿ“‹ Resumo:')
+    console.log('📋 Resumo:')
     
     const stats = await client.query('SELECT COUNT(*) as total FROM notas_fiscais')
     console.log(`   - Total de notas fiscais: ${stats.rows[0].total}`)
@@ -88,7 +88,7 @@ async function runMigration() {
     console.log(`   - Total de itens: ${statsItens.rows[0].total}`)
     
   } catch (error) {
-    console.error('�Œ Erro na migração:', error)
+    console.error('❌ Erro na migração:', error)
     throw error
   } finally {
     client.release()
@@ -99,11 +99,11 @@ async function runMigration() {
 // Executar migração
 runMigration()
   .then(() => {
-    console.log('\n�œ… Processo concluído!')
+    console.log('\n✅ Processo concluído!')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n�Œ Erro:', error)
+    console.error('\n❌ Erro:', error)
     process.exit(1)
   })
 

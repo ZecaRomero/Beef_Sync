@@ -1,4 +1,4 @@
-// Sistema de backup automÃ¡tico para Beef Sync
+// Sistema de backup automático para Beef Sync
 import { query } from '../lib/database'
 
 class AutoBackupService {
@@ -10,36 +10,36 @@ class AutoBackupService {
     this.intervalId = null
   }
 
-  // Inicializar serviÃ§o de backup automÃ¡tico
+  // Inicializar serviço de backup automático
   async initialize() {
     if (!this.isEnabled) return
 
-    console.log('ðÅ¸â€�â€ž Iniciando serviÃ§o de backup automÃ¡tico...')
+    console.log('🔄 Iniciando serviço de backup automático...')
     
     // Executar backup inicial
     await this.performBackup()
     
-    // Configurar backup periÃ³dico
+    // Configurar backup periódico
     this.intervalId = setInterval(async () => {
       await this.performBackup()
     }, this.backupInterval)
 
-    console.log('âÅ“â€¦ ServiÃ§o de backup automÃ¡tico iniciado')
+    console.log('✅ Serviço de backup automático iniciado')
   }
 
-  // Parar serviÃ§o de backup
+  // Parar serviço de backup
   stop() {
     if (this.intervalId) {
       clearInterval(this.intervalId)
       this.intervalId = null
-      console.log('â�¹ï¸� ServiÃ§o de backup automÃ¡tico parado')
+      console.log('⏹️ Serviço de backup automático parado')
     }
   }
 
   // Executar backup completo
   async performBackup() {
     try {
-      console.log('ðÅ¸â€œ¦ Iniciando backup automÃ¡tico...')
+      console.log('📦 Iniciando backup automático...')
       
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
       const backupData = await this.collectBackupData()
@@ -62,13 +62,13 @@ class AutoBackupService {
 
       // Salvar arquivo localmente (simulado)
       const filename = `backup_auto_${timestamp}.json`
-      console.log(`ðÅ¸â€™¾ Backup salvo: ${filename}`)
+      console.log(`💾 Backup salvo: ${filename}`)
       
       // Limpar backups antigos
       await this.cleanupOldBackups()
       
       // Log de sucesso
-      console.log('âÅ“â€¦ Backup automÃ¡tico concluÃ­do com sucesso')
+      console.log('✅ Backup automático concluído com sucesso')
       
       return {
         success: true,
@@ -78,7 +78,7 @@ class AutoBackupService {
       }
 
     } catch (error) {
-      console.error('â�Å’ Erro no backup automÃ¡tico:', error)
+      console.error('❌ Erro no backup automático:', error)
       return {
         success: false,
         error: error.message,
@@ -90,7 +90,7 @@ class AutoBackupService {
   // Coletar todos os dados para backup
   async collectBackupData() {
     try {
-      console.log('ðÅ¸â€œÅ  Coletando dados para backup...')
+      console.log('📊 Coletando dados para backup...')
       
       const tables = [
         'animais',
@@ -111,9 +111,9 @@ class AutoBackupService {
         try {
           const result = await query(`SELECT * FROM ${table} ORDER BY id`)
           backupData[table] = result.rows || []
-          console.log(`âÅ“â€¦ ${table}: ${backupData[table].length} registros`)
+          console.log(`✅ ${table}: ${backupData[table].length} registros`)
         } catch (error) {
-          console.warn(`âÅ¡ ï¸� Erro ao coletar dados da tabela ${table}:`, error.message)
+          console.warn(`⚠️ Erro ao coletar dados da tabela ${table}:`, error.message)
           backupData[table] = []
         }
       }
@@ -121,7 +121,7 @@ class AutoBackupService {
       return backupData
 
     } catch (error) {
-      console.error('â�Å’ Erro ao coletar dados para backup:', error)
+      console.error('❌ Erro ao coletar dados para backup:', error)
       throw error
     }
   }
@@ -129,25 +129,25 @@ class AutoBackupService {
   // Limpar backups antigos
   async cleanupOldBackups() {
     try {
-      console.log('ðÅ¸§¹ Limpando backups antigos...')
+      console.log('🧹 Limpando backups antigos...')
       
       // Simular limpeza de arquivos antigos
-      // Em produÃ§Ã£o, isso seria implementado com fs
-      console.log(`ðÅ¸â€”â€˜ï¸� Mantendo apenas os Ãºltimos ${this.maxBackups} backups`)
+      // Em produção, isso seria implementado com fs
+      console.log(`🗑️ Mantendo apenas os últimos ${this.maxBackups} backups`)
       
     } catch (error) {
-      console.error('â�Å’ Erro ao limpar backups antigos:', error)
+      console.error('❌ Erro ao limpar backups antigos:', error)
     }
   }
 
   // Verificar integridade dos dados
   async verifyDataIntegrity() {
     try {
-      console.log('ðÅ¸â€�� Verificando integridade dos dados...')
+      console.log('🔍 Verificando integridade dos dados...')
       
       const checks = []
       
-      // Verificar animais Ã³rfÃ£os (sem custos)
+      // Verificar animais órfãos (sem custos)
       const animaisSemCustos = await query(`
         SELECT a.id, a.serie, a.rg 
         FROM animais a 
@@ -163,7 +163,7 @@ class AutoBackupService {
         })
       }
 
-      // Verificar custos Ã³rfÃ£os (sem animal)
+      // Verificar custos órfãos (sem animal)
       const custosOrfaos = await query(`
         SELECT c.id, c.animal_id, c.tipo, c.valor
         FROM custos c 
@@ -174,12 +174,12 @@ class AutoBackupService {
       if (custosOrfaos.rows.length > 0) {
         checks.push({
           type: 'error',
-          message: `${custosOrfaos.rows.length} custos Ã³rfÃ£os encontrados`,
+          message: `${custosOrfaos.rows.length} custos órfãos encontrados`,
           data: custosOrfaos.rows
         })
       }
 
-      // Verificar gestaÃ§Ãµes sem nascimento
+      // Verificar gestações sem nascimento
       const gestacoesSemNascimento = await query(`
         SELECT g.id, g.animal_id, g.data_gestacao
         FROM gestacoes g 
@@ -190,12 +190,12 @@ class AutoBackupService {
       if (gestacoesSemNascimento.rows.length > 0) {
         checks.push({
           type: 'warning',
-          message: `${gestacoesSemNascimento.rows.length} gestaÃ§Ãµes antigas sem nascimento registrado`,
+          message: `${gestacoesSemNascimento.rows.length} gestações antigas sem nascimento registrado`,
           data: gestacoesSemNascimento.rows
         })
       }
 
-      console.log(`âÅ“â€¦ VerificaÃ§Ã£o de integridade concluÃ­da: ${checks.length} problemas encontrados`)
+      console.log(`✅ Verificação de integridade concluída: ${checks.length} problemas encontrados`)
       
       return {
         success: true,
@@ -204,7 +204,7 @@ class AutoBackupService {
       }
 
     } catch (error) {
-      console.error('â�Å’ Erro na verificaÃ§Ã£o de integridade:', error)
+      console.error('❌ Erro na verificação de integridade:', error)
       return {
         success: false,
         error: error.message,
@@ -213,7 +213,7 @@ class AutoBackupService {
     }
   }
 
-  // EstatÃ­sticas do sistema de backup
+  // Estatísticas do sistema de backup
   async getBackupStats() {
     try {
       const stats = {
@@ -221,15 +221,15 @@ class AutoBackupService {
         nextBackup: this.intervalId ? new Date(Date.now() + this.backupInterval).toISOString() : null,
         backupInterval: this.backupInterval,
         maxBackups: this.maxBackups,
-        lastBackup: null, // Seria implementado com persistÃªncia
-        totalBackups: 0, // Seria implementado com persistÃªncia
-        backupSize: 0 // Seria implementado com persistÃªncia
+        lastBackup: null, // Seria implementado com persistência
+        totalBackups: 0, // Seria implementado com persistência
+        backupSize: 0 // Seria implementado com persistência
       }
 
       return stats
 
     } catch (error) {
-      console.error('â�Å’ Erro ao obter estatÃ­sticas de backup:', error)
+      console.error('❌ Erro ao obter estatísticas de backup:', error)
       return null
     }
   }
@@ -248,7 +248,7 @@ class AutoBackupService {
       this.maxBackups = options.maxBackups
     }
 
-    console.log('âÅ¡â„¢ï¸� ConfiguraÃ§Ãµes de backup atualizadas:', {
+    console.log('⚙️ Configurações de backup atualizadas:', {
       enabled: this.isEnabled,
       interval: this.backupInterval,
       maxBackups: this.maxBackups
@@ -256,7 +256,7 @@ class AutoBackupService {
   }
 }
 
-// InstÃ¢ncia singleton
+// Instância singleton
 const autoBackupService = new AutoBackupService()
 
 export default autoBackupService

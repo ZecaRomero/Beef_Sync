@@ -23,7 +23,7 @@ function processarTexto(texto) {
   
   // Remover cabeçalho se tiver
   const primeiraLinha = linhas[0].toUpperCase();
-  const temCabecalho = primeiraLinha.includes('S�‰RIE') || primeiraLinha.includes('SERIE') || primeiraLinha.includes('LOCAL') || primeiraLinha.includes('ACASALAMENTO') || primeiraLinha.includes('TOURO');
+  const temCabecalho = primeiraLinha.includes('SÉRIE') || primeiraLinha.includes('SERIE') || primeiraLinha.includes('LOCAL') || primeiraLinha.includes('ACASALAMENTO') || primeiraLinha.includes('TOURO');
   
   let mapaColunas = null;
   let dadosLinhas = linhas;
@@ -53,7 +53,7 @@ function processarTexto(texto) {
       cols.forEach((col, idx) => {
         if (!col) return;
         const c = col.toUpperCase();
-        if (c.includes('S�‰RIE') || c.includes('SERIE')) mapaColunas.serie = idx;
+        if (c.includes('SÉRIE') || c.includes('SERIE')) mapaColunas.serie = idx;
         else if (c === 'RG') mapaColunas.rg = idx;
         else if (c.includes('LOCAL') || c.includes('PIQUETE')) mapaColunas.local = idx;
         else if (c.includes('TOURO') || c.includes('ACASALAMENTO') || c.includes('REPRODUTOR')) mapaColunas.touro = idx;
@@ -61,7 +61,7 @@ function processarTexto(texto) {
         else if (c.includes('DATA DG') || c.includes('DIAG') || c.includes('PREVISAO')) mapaColunas.dataDG = idx;
         else if (c.includes('RESULT')) mapaColunas.resultado = idx;
       });
-      console.log('�Ÿ—�️ Mapa de colunas:', mapaColunas);
+      console.log('🗺️ Mapa de colunas:', mapaColunas);
     }
   } else {
      dadosLinhas = linhas;
@@ -84,7 +84,7 @@ function processarTexto(texto) {
       if (colunas.length <= 1) {
         const colsEspacos = linha.split(/\s{2,}/).map(c => c.trim());
         if (colsEspacos.length > colunas.length) {
-          console.log(`  �š�️ Linha ${numeroLinha}: Tabs não encontrados, usando espaços.`);
+          console.log(`  ⚠️ Linha ${numeroLinha}: Tabs não encontrados, usando espaços.`);
           colunas = colsEspacos;
           usouFallbackEspacos = true;
         }
@@ -125,7 +125,7 @@ function processarTexto(texto) {
         if (local && local.length > 2 && !local.includes('/') && isNaN(local.replace(/\s/g, '')) && /[a-zA-Z]{2,}/.test(local)) {
            // Heurística: Piquetes geralmente têm "Piquete", "Local" ou são curtos. Touros são nomes.
            if (!/^(PIQUETE|LOCAL|PASTO|RETIRO|MANGUEIRO|CURRAL)/i.test(local)) {
-               console.log(`  �†’ Touro estava no campo Local (realocando): "${local}"`);
+               console.log(`  → Touro estava no campo Local (realocando): "${local}"`);
                touroIA = local;
                local = ''; // Reset local, será preenchido com padrão depois
            }
@@ -139,7 +139,7 @@ function processarTexto(texto) {
             // Critérios para ser touro: texto longo, ou "DA/DE/DO", ou hífen, ou não numérico e não data
             // E que tenha pelo menos 3 letras
             if (col.length > 2 && !col.includes('/') && isNaN(col.replace(/\s/g, '')) && /[a-zA-Z]{2,}/.test(col)) {
-              console.log(`  �†’ Touro não encontrado no índice, tentando usar: "${col}"`);
+              console.log(`  → Touro não encontrado no índice, tentando usar: "${col}"`);
               touroIA = col;
               break; 
             }
@@ -158,6 +158,6 @@ function processarTexto(texto) {
 console.log('\n--- TESTE 6: Local vazio causando deslocamento (Touro no lugar do Local) ---');
 // Header: SERIE, RG, LOCAL, TOURO
 // Data: 123, 456, Touro A (Local was empty so spaces collapsed)
-const texto6 = `S�‰RIE\tRG\tLOCAL\tACASALAMENTO
+const texto6 = `SÉRIE\tRG\tLOCAL\tACASALAMENTO
 123    456    Touro A`; 
 console.table(processarTexto(texto6));

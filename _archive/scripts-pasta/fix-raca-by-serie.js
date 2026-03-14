@@ -20,7 +20,7 @@ async function fixRacaBySerie() {
   const client = await pool.connect()
   
   try {
-    console.log('�Ÿ”„ Corrigindo raças baseadas na série...')
+    console.log('🔄 Corrigindo raças baseadas na série...')
     
     // Buscar animais com raça incorreta baseada na série
     const series = Object.keys(racasPorSerie)
@@ -32,7 +32,7 @@ async function fixRacaBySerie() {
       ORDER BY serie, rg
     `, series)
     
-    console.log(`�Ÿ“Š Encontrados ${animaisResult.rows.length} animais para verificar...`)
+    console.log(`📊 Encontrados ${animaisResult.rows.length} animais para verificar...`)
     
     let animaisAtualizados = 0
     let animaisCorretos = 0
@@ -48,20 +48,20 @@ async function fixRacaBySerie() {
           WHERE id = $2
         `, [racaCorreta, animal.id])
         
-        console.log(`�œ… ${animal.serie}-${animal.rg}: ${animal.raca} �†’ ${racaCorreta}`)
+        console.log(`✅ ${animal.serie}-${animal.rg}: ${animal.raca} → ${racaCorreta}`)
         animaisAtualizados++
       } else {
         animaisCorretos++
       }
     }
     
-    console.log(`\n�Ÿ“ˆ Resumo:`)
-    console.log(`   �œ… Animais atualizados: ${animaisAtualizados}`)
-    console.log(`   �œ“ Animais já corretos: ${animaisCorretos}`)
-    console.log(`   �Ÿ“Š Total processado: ${animaisResult.rows.length}`)
+    console.log(`\n📈 Resumo:`)
+    console.log(`   ✅ Animais atualizados: ${animaisAtualizados}`)
+    console.log(`   ✓ Animais já corretos: ${animaisCorretos}`)
+    console.log(`   📊 Total processado: ${animaisResult.rows.length}`)
     
     // Verificar resultado final por série
-    console.log('\n�Ÿ“‹ Distribuição por série após correção:')
+    console.log('\n📋 Distribuição por série após correção:')
     for (const [serie, racaEsperada] of Object.entries(racasPorSerie)) {
       const result = await client.query(`
         SELECT COUNT(*) as total 
@@ -90,7 +90,7 @@ async function fixRacaBySerie() {
         `, [serie, racaEsperada])
         
         if (incorretos.rows.length > 0) {
-          console.log(`      �š�️ Ainda há ${total - totalCorreto} incorretos (exemplos):`)
+          console.log(`      ⚠️ Ainda há ${total - totalCorreto} incorretos (exemplos):`)
           incorretos.rows.forEach(a => {
             console.log(`         ${a.serie}-${a.rg}: ${a.raca}`)
           })
@@ -98,10 +98,10 @@ async function fixRacaBySerie() {
       }
     }
     
-    console.log(`\n�ŸŽ‰ Correção concluída! ${animaisAtualizados} animais atualizados.`)
+    console.log(`\n🎉 Correção concluída! ${animaisAtualizados} animais atualizados.`)
     
   } catch (error) {
-    console.error('�Œ Erro na correção:', error)
+    console.error('❌ Erro na correção:', error)
     throw error
   } finally {
     client.release()
@@ -112,11 +112,11 @@ async function fixRacaBySerie() {
 if (require.main === module) {
   fixRacaBySerie()
     .then(() => {
-      console.log('\n�œ… Script finalizado com sucesso!')
+      console.log('\n✅ Script finalizado com sucesso!')
       process.exit(0)
     })
     .catch((error) => {
-      console.error('\n�Ÿ’� Erro ao executar script:', error)
+      console.error('\n💥 Erro ao executar script:', error)
       process.exit(1)
     })
 }

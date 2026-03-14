@@ -14,9 +14,9 @@ async function verificar() {
   const client = await pool.connect()
   
   try {
-    console.log('ðÅ¸â€�� Verificando baixas com serie_mae/rg_mae = CJCJ 13604...\n')
+    console.log('🔍 Verificando baixas com serie_mae/rg_mae = CJCJ 13604...\n')
     
-    // Buscar todas as baixas que tÃªm CJCJ 13604 como mÃ£e
+    // Buscar todas as baixas que têm CJCJ 13604 como mãe
     const baixas = await client.query(`
       SELECT b.id, b.serie, b.rg, b.tipo, b.valor, b.comprador, b.numero_nf, b.data_baixa,
              b.serie_mae, b.rg_mae, b.animal_id
@@ -25,10 +25,10 @@ async function verificar() {
       ORDER BY b.tipo, b.serie, b.rg
     `)
     
-    console.log(`ðÅ¸â€œÅ  Total de baixas encontradas: ${baixas.rows.length}\n`)
+    console.log(`📊 Total de baixas encontradas: ${baixas.rows.length}\n`)
     
     if (baixas.rows.length === 0) {
-      console.log('â�Å’ Nenhuma baixa encontrada com serie_mae/rg_mae = CJCJ 13604')
+      console.log('❌ Nenhuma baixa encontrada com serie_mae/rg_mae = CJCJ 13604')
       return
     }
     
@@ -36,12 +36,12 @@ async function verificar() {
     const vendas = baixas.rows.filter(b => b.tipo === 'VENDA')
     const mortes = baixas.rows.filter(b => b.tipo === 'MORTE/BAIXA')
     
-    console.log(`ðÅ¸â€™° VENDAS: ${vendas.length}`)
-    console.log(`âËœ ï¸�  MORTES/BAIXAS: ${mortes.length}\n`)
+    console.log(`💰 VENDAS: ${vendas.length}`)
+    console.log(`☠️  MORTES/BAIXAS: ${mortes.length}\n`)
     
-    console.log('ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��')
-    console.log('ðÅ¸â€œâ€¹ LISTA DE VENDAS:')
-    console.log('ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��\n')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('📋 LISTA DE VENDAS:')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n')
     
     vendas.forEach((b, i) => {
       console.log(`${i + 1}. ${b.serie} ${b.rg}`)
@@ -49,29 +49,29 @@ async function verificar() {
       console.log(`   NF: ${b.numero_nf || 'N/A'}`)
       console.log(`   Comprador: ${b.comprador || 'N/A'}`)
       console.log(`   Data: ${b.data_baixa ? new Date(b.data_baixa).toLocaleDateString('pt-BR') : 'N/A'}`)
-      console.log(`   MÃ£e: ${b.serie_mae} ${b.rg_mae}`)
+      console.log(`   Mãe: ${b.serie_mae} ${b.rg_mae}`)
       console.log(`   Animal ID: ${b.animal_id || 'NULL'}`)
       console.log(`   Baixa ID: ${b.id}`)
       console.log('')
     })
     
     if (mortes.length > 0) {
-      console.log('\nââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��')
-      console.log('âËœ ï¸�  LISTA DE MORTES/BAIXAS:')
-      console.log('ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��\n')
+      console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.log('☠️  LISTA DE MORTES/BAIXAS:')
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n')
       
       mortes.forEach((b, i) => {
         console.log(`${i + 1}. ${b.serie} ${b.rg}`)
         console.log(`   Data: ${b.data_baixa ? new Date(b.data_baixa).toLocaleDateString('pt-BR') : 'N/A'}`)
-        console.log(`   MÃ£e: ${b.serie_mae} ${b.rg_mae}`)
+        console.log(`   Mãe: ${b.serie_mae} ${b.rg_mae}`)
         console.log(`   Baixa ID: ${b.id}`)
         console.log('')
       })
     }
     
-    // Verificar se esses animais estÃ£o cadastrados
-    console.log('\nââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��')
-    console.log('ðÅ¸â€�� Verificando se os animais estÃ£o cadastrados...\n')
+    // Verificar se esses animais estão cadastrados
+    console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('🔍 Verificando se os animais estão cadastrados...\n')
     
     const seriesRgs = vendas.map(b => `('${b.serie}', '${b.rg}')`).join(', ')
     
@@ -82,12 +82,12 @@ async function verificar() {
         WHERE (serie, rg) IN (${seriesRgs})
       `)
       
-      console.log(`âÅ“â€¦ Animais cadastrados: ${animaisCadastrados.rows.length}/${vendas.length}`)
+      console.log(`✅ Animais cadastrados: ${animaisCadastrados.rows.length}/${vendas.length}`)
       
       if (animaisCadastrados.rows.length > 0) {
         console.log('\nAnimais encontrados:')
         animaisCadastrados.rows.forEach(a => {
-          console.log(`  ââ‚¬¢ ${a.serie} ${a.rg} | ${a.nome || 'sem nome'} | MÃ£e: ${a.serie_mae || ''} ${a.rg_mae || ''}`)
+          console.log(`  • ${a.serie} ${a.rg} | ${a.nome || 'sem nome'} | Mãe: ${a.serie_mae || ''} ${a.rg_mae || ''}`)
         })
       }
       
@@ -96,15 +96,15 @@ async function verificar() {
       )
       
       if (naoEncontrados.length > 0) {
-        console.log(`\nâÅ¡ ï¸�  Animais NÃÆ’O cadastrados: ${naoEncontrados.length}`)
+        console.log(`\n⚠️  Animais NÃO cadastrados: ${naoEncontrados.length}`)
         naoEncontrados.forEach(a => {
-          console.log(`  ââ‚¬¢ ${a.serie} ${a.rg}`)
+          console.log(`  • ${a.serie} ${a.rg}`)
         })
       }
     }
     
   } catch (error) {
-    console.error('â�Å’ Erro:', error)
+    console.error('❌ Erro:', error)
   } finally {
     client.release()
     await pool.end()

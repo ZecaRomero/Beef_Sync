@@ -1,15 +1,15 @@
 /**
  * Script de debug para verificar animais que aparecem para brucelose
- * Verifica se hÃ¡ animais com menos de 90 dias sendo retornados
+ * Verifica se há animais com menos de 90 dias sendo retornados
  */
 
 const databaseService = require('./services/databaseService')
 
 async function debugBrucelose() {
   try {
-    console.log('ðÅ¸â€�� Verificando animais para brucelose...\n')
+    console.log('🔍 Verificando animais para brucelose...\n')
 
-    // Query corrigida (verifica custos E histÃ³rico de ocorrÃªncias)
+    // Query corrigida (verifica custos E histórico de ocorrências)
     const result = await databaseService.query(`
       WITH animais_com_brucelose AS (
         SELECT DISTINCT c.animal_id
@@ -32,7 +32,7 @@ async function debugBrucelose() {
       FROM animais a
       LEFT JOIN animais_com_brucelose b ON a.id = b.animal_id
       WHERE a.situacao = 'Ativo'
-        AND a.sexo = 'FÃªmea'
+        AND a.sexo = 'Fêmea'
         AND a.data_nascimento IS NOT NULL
         AND b.animal_id IS NULL
         AND (CURRENT_DATE - a.data_nascimento::date) BETWEEN 90 AND 240
@@ -41,38 +41,38 @@ async function debugBrucelose() {
 
     console.log(`Total de animais encontrados: ${result.rows.length}\n`)
 
-    // Verificar se hÃ¡ animais com menos de 90 dias
+    // Verificar se há animais com menos de 90 dias
     const animaisComMenosDe90Dias = result.rows.filter(a => a.idade_dias < 90)
     if (animaisComMenosDe90Dias.length > 0) {
-      console.log('âÅ¡ ï¸�  PROBLEMA ENCONTRADO: Animais com menos de 90 dias (menos de 3 meses):')
+      console.log('⚠️  PROBLEMA ENCONTRADO: Animais com menos de 90 dias (menos de 3 meses):')
       animaisComMenosDe90Dias.forEach(a => {
         console.log(`  - ${a.serie} ${a.rg}: ${a.idade_dias} dias (${a.idade_meses} meses)`)
       })
       console.log('')
     } else {
-      console.log('âÅ“â€¦ Nenhum animal com menos de 90 dias encontrado\n')
+      console.log('✅ Nenhum animal com menos de 90 dias encontrado\n')
     }
 
     // Mostrar os primeiros 10 animais
-    console.log('ðÅ¸â€œâ€¹ Primeiros 10 animais (ordenados por idade crescente):')
+    console.log('📋 Primeiros 10 animais (ordenados por idade crescente):')
     result.rows.slice(0, 10).forEach(a => {
       console.log(`  - ${a.serie} ${a.rg}: ${a.idade_dias} dias (${a.idade_meses_decimal} meses)`)
     })
 
-    // Verificar se hÃ¡ animais com mais de 240 dias
+    // Verificar se há animais com mais de 240 dias
     const animaisComMaisDe240Dias = result.rows.filter(a => a.idade_dias > 240)
     if (animaisComMaisDe240Dias.length > 0) {
-      console.log('\nâÅ¡ ï¸�  PROBLEMA ENCONTRADO: Animais com mais de 240 dias (mais de 8 meses):')
+      console.log('\n⚠️  PROBLEMA ENCONTRADO: Animais com mais de 240 dias (mais de 8 meses):')
       animaisComMaisDe240Dias.forEach(a => {
         console.log(`  - ${a.serie} ${a.rg}: ${a.idade_dias} dias (${a.idade_meses} meses)`)
       })
     } else {
-      console.log('\nâÅ“â€¦ Nenhum animal com mais de 240 dias encontrado')
+      console.log('\n✅ Nenhum animal com mais de 240 dias encontrado')
     }
 
     process.exit(0)
   } catch (error) {
-    console.error('â�Å’ Erro:', error)
+    console.error('❌ Erro:', error)
     process.exit(1)
   }
 }

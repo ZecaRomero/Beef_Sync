@@ -11,19 +11,19 @@ const pool = new Pool({
 });
 
 async function sincronizarDados(arquivoJson) {
-  console.log('�Ÿ”„ SINCRONIZANDO DADOS DO LOCALSTORAGE COM POSTGRESQL\n');
+  console.log('🔄 SINCRONIZANDO DADOS DO LOCALSTORAGE COM POSTGRESQL\n');
   console.log('='.repeat(60));
 
   try {
     // 1. Ler arquivo JSON
-    console.log('\n�Ÿ“‚ 1. Lendo arquivo JSON...');
+    console.log('\n📂 1. Lendo arquivo JSON...');
     if (!fs.existsSync(arquivoJson)) {
       throw new Error(`Arquivo não encontrado: ${arquivoJson}`);
     }
 
     const dados = JSON.parse(fs.readFileSync(arquivoJson, 'utf8'));
-    console.log(`�œ… Arquivo lido: ${arquivoJson}`);
-    console.log(`�Ÿ“… Data do backup: ${dados.timestamp}`);
+    console.log(`✅ Arquivo lido: ${arquivoJson}`);
+    console.log(`📅 Data do backup: ${dados.timestamp}`);
 
     const stats = {
       animais: { total: 0, novos: 0, atualizados: 0, erros: 0 },
@@ -36,7 +36,7 @@ async function sincronizarDados(arquivoJson) {
 
     // 2. Sincronizar Animais
     if (dados.animals && dados.animals.length > 0) {
-      console.log(`\n�Ÿ�„ 2. Sincronizando ${dados.animals.length} animais...`);
+      console.log(`\n🐄 2. Sincronizando ${dados.animals.length} animais...`);
       stats.animais.total = dados.animals.length;
 
       for (const animal of dados.animals) {
@@ -62,7 +62,7 @@ async function sincronizarDados(arquivoJson) {
               animal.serie, animal.rg
             ]);
             stats.animais.atualizados++;
-            console.log(`   �œ… Atualizado: ${animal.serie}-${animal.rg}`);
+            console.log(`   ✅ Atualizado: ${animal.serie}-${animal.rg}`);
           } else {
             // Inserir novo animal
             await pool.query(`
@@ -80,18 +80,18 @@ async function sincronizarDados(arquivoJson) {
               animal.valorVenda || null, animal.isFiv || false
             ]);
             stats.animais.novos++;
-            console.log(`   �œ… Novo: ${animal.serie}-${animal.rg}`);
+            console.log(`   ✅ Novo: ${animal.serie}-${animal.rg}`);
           }
         } catch (error) {
           stats.animais.erros++;
-          console.error(`   �Œ Erro ao sincronizar ${animal.serie}-${animal.rg}:`, error.message);
+          console.error(`   ❌ Erro ao sincronizar ${animal.serie}-${animal.rg}:`, error.message);
         }
       }
     }
 
     // 3. Sincronizar Mortes
     if (dados.deaths && dados.deaths.length > 0) {
-      console.log(`\n�Ÿ’€ 3. Sincronizando ${dados.deaths.length} mortes...`);
+      console.log(`\n💀 3. Sincronizando ${dados.deaths.length} mortes...`);
       stats.mortes.total = dados.deaths.length;
 
       for (const morte of dados.deaths) {
@@ -103,7 +103,7 @@ async function sincronizarDados(arquivoJson) {
           );
 
           if (animal.rows.length === 0) {
-            console.warn(`   �š�️ Animal não encontrado: ${morte.serie}-${morte.rg}`);
+            console.warn(`   ⚠️ Animal não encontrado: ${morte.serie}-${morte.rg}`);
             stats.mortes.erros++;
             continue;
           }
@@ -137,20 +137,20 @@ async function sincronizarDados(arquivoJson) {
             );
 
             stats.mortes.novos++;
-            console.log(`   �œ… Morte registrada: ${morte.serie}-${morte.rg}`);
+            console.log(`   ✅ Morte registrada: ${morte.serie}-${morte.rg}`);
           } else {
-            console.log(`   �š�️ Morte já existe: ${morte.serie}-${morte.rg}`);
+            console.log(`   ⚠️ Morte já existe: ${morte.serie}-${morte.rg}`);
           }
         } catch (error) {
           stats.mortes.erros++;
-          console.error(`   �Œ Erro ao sincronizar morte:`, error.message);
+          console.error(`   ❌ Erro ao sincronizar morte:`, error.message);
         }
       }
     }
 
     // 4. Sincronizar DNA
     if (dados.dna && dados.dna.length > 0) {
-      console.log(`\n�Ÿ�� 4. Sincronizando ${dados.dna.length} registros de DNA...`);
+      console.log(`\n🧬 4. Sincronizando ${dados.dna.length} registros de DNA...`);
       stats.dna.total = dados.dna.length;
 
       for (const dna of dados.dna) {
@@ -172,18 +172,18 @@ async function sincronizarDados(arquivoJson) {
               dna.custo, dna.observacoes
             ]);
             stats.dna.novos++;
-            console.log(`   �œ… DNA registrado: ${dna.serie}-${dna.rg}`);
+            console.log(`   ✅ DNA registrado: ${dna.serie}-${dna.rg}`);
           }
         } catch (error) {
           stats.dna.erros++;
-          console.error(`   �Œ Erro ao sincronizar DNA:`, error.message);
+          console.error(`   ❌ Erro ao sincronizar DNA:`, error.message);
         }
       }
     }
 
     // 5. Sincronizar Nitrogênio
     if (dados.nitrogenio && dados.nitrogenio.length > 0) {
-      console.log(`\n�„️ 5. Sincronizando ${dados.nitrogenio.length} registros de nitrogênio...`);
+      console.log(`\n❄️ 5. Sincronizando ${dados.nitrogenio.length} registros de nitrogênio...`);
       stats.nitrogenio.total = dados.nitrogenio.length;
 
       for (const n of dados.nitrogenio) {
@@ -196,17 +196,17 @@ async function sincronizarDados(arquivoJson) {
             n.data, n.quantidade, n.fornecedor, n.valor, n.observacoes
           ]);
           stats.nitrogenio.novos++;
-          console.log(`   �œ… Nitrogênio registrado: ${n.data}`);
+          console.log(`   ✅ Nitrogênio registrado: ${n.data}`);
         } catch (error) {
           stats.nitrogenio.erros++;
-          console.error(`   �Œ Erro ao sincronizar nitrogênio:`, error.message);
+          console.error(`   ❌ Erro ao sincronizar nitrogênio:`, error.message);
         }
       }
     }
 
     // 6. Sincronizar Exames
     if (dados.exames && dados.exames.length > 0) {
-      console.log(`\n�Ÿ”� 6. Sincronizando ${dados.exames.length} exames andrológicos...`);
+      console.log(`\n🔬 6. Sincronizando ${dados.exames.length} exames andrológicos...`);
       stats.exames.total = dados.exames.length;
 
       for (const exame of dados.exames) {
@@ -224,17 +224,17 @@ async function sincronizarDados(arquivoJson) {
             exame.resultado, exame.observacoes
           ]);
           stats.exames.novos++;
-          console.log(`   �œ… Exame registrado: ${exame.touro}`);
+          console.log(`   ✅ Exame registrado: ${exame.touro}`);
         } catch (error) {
           stats.exames.erros++;
-          console.error(`   �Œ Erro ao sincronizar exame:`, error.message);
+          console.error(`   ❌ Erro ao sincronizar exame:`, error.message);
         }
       }
     }
 
     // 7. Sincronizar Custos
     if (dados.custos && dados.custos.length > 0) {
-      console.log(`\n�Ÿ’� 7. Sincronizando ${dados.custos.length} custos...`);
+      console.log(`\n💰 7. Sincronizando ${dados.custos.length} custos...`);
       stats.custos.total = dados.custos.length;
 
       for (const custo of dados.custos) {
@@ -246,7 +246,7 @@ async function sincronizarDados(arquivoJson) {
           );
 
           if (animal.rows.length === 0) {
-            console.warn(`   �š�️ Animal não encontrado: ${custo.serie}-${custo.rg}`);
+            console.warn(`   ⚠️ Animal não encontrado: ${custo.serie}-${custo.rg}`);
             stats.custos.erros++;
             continue;
           }
@@ -261,45 +261,45 @@ async function sincronizarDados(arquivoJson) {
             JSON.stringify(custo.detalhes || {})
           ]);
           stats.custos.novos++;
-          console.log(`   �œ… Custo registrado: ${custo.tipo}`);
+          console.log(`   ✅ Custo registrado: ${custo.tipo}`);
         } catch (error) {
           stats.custos.erros++;
-          console.error(`   �Œ Erro ao sincronizar custo:`, error.message);
+          console.error(`   ❌ Erro ao sincronizar custo:`, error.message);
         }
       }
     }
 
     // Resumo final
     console.log('\n' + '='.repeat(60));
-    console.log('�œ… SINCRONIZA�‡�ƒO CONCLUÍDA!\n');
-    console.log('�Ÿ“Š RESUMO:');
-    console.log(`\n�Ÿ�„ Animais:`);
+    console.log('✅ SINCRONIZAÇÃO CONCLUÍDA!\n');
+    console.log('📊 RESUMO:');
+    console.log(`\n🐄 Animais:`);
     console.log(`   Total: ${stats.animais.total}`);
     console.log(`   Novos: ${stats.animais.novos}`);
     console.log(`   Atualizados: ${stats.animais.atualizados}`);
     console.log(`   Erros: ${stats.animais.erros}`);
     
-    console.log(`\n�Ÿ’€ Mortes:`);
+    console.log(`\n💀 Mortes:`);
     console.log(`   Total: ${stats.mortes.total}`);
     console.log(`   Novos: ${stats.mortes.novos}`);
     console.log(`   Erros: ${stats.mortes.erros}`);
     
-    console.log(`\n�Ÿ�� DNA:`);
+    console.log(`\n🧬 DNA:`);
     console.log(`   Total: ${stats.dna.total}`);
     console.log(`   Novos: ${stats.dna.novos}`);
     console.log(`   Erros: ${stats.dna.erros}`);
     
-    console.log(`\n�„️ Nitrogênio:`);
+    console.log(`\n❄️ Nitrogênio:`);
     console.log(`   Total: ${stats.nitrogenio.total}`);
     console.log(`   Novos: ${stats.nitrogenio.novos}`);
     console.log(`   Erros: ${stats.nitrogenio.erros}`);
     
-    console.log(`\n�Ÿ”� Exames:`);
+    console.log(`\n🔬 Exames:`);
     console.log(`   Total: ${stats.exames.total}`);
     console.log(`   Novos: ${stats.exames.novos}`);
     console.log(`   Erros: ${stats.exames.erros}`);
     
-    console.log(`\n�Ÿ’� Custos:`);
+    console.log(`\n💰 Custos:`);
     console.log(`   Total: ${stats.custos.total}`);
     console.log(`   Novos: ${stats.custos.novos}`);
     console.log(`   Erros: ${stats.custos.erros}`);
@@ -307,7 +307,7 @@ async function sincronizarDados(arquivoJson) {
     console.log('\n' + '='.repeat(60));
 
   } catch (error) {
-    console.error('\n�Œ Erro durante sincronização:', error);
+    console.error('\n❌ Erro durante sincronização:', error);
     console.error('Detalhes:', error.message);
   } finally {
     await pool.end();
@@ -317,7 +317,7 @@ async function sincronizarDados(arquivoJson) {
 // Verificar argumentos
 const args = process.argv.slice(2);
 if (args.length === 0) {
-  console.log('�Œ Uso: node sincronizar-localStorage.js <arquivo.json>');
+  console.log('❌ Uso: node sincronizar-localStorage.js <arquivo.json>');
   console.log('\nExemplo:');
   console.log('  node sincronizar-localStorage.js localStorage-backup-2026-02-11.json');
   process.exit(1);

@@ -2,7 +2,7 @@ const { query } = require('./lib/database')
 
 async function testarBuscaAnimal() {
   try {
-    console.log('�Ÿ”� Testando busca de dados do animal para PDF...\n')
+    console.log('🔍 Testando busca de dados do animal para PDF...\n')
 
     // Buscar um animal de teste
     const animalResult = await query(`
@@ -26,13 +26,13 @@ async function testarBuscaAnimal() {
     `)
 
     if (animalResult.rows.length === 0) {
-      console.log('�Œ Nenhum animal encontrado')
+      console.log('❌ Nenhum animal encontrado')
       process.exit(1)
     }
 
     const animal = animalResult.rows[0]
     
-    console.log('�œ… Dados do Animal:\n')
+    console.log('✅ Dados do Animal:\n')
     console.log(`ID: ${animal.id}`)
     console.log(`Série: ${animal.serie}`)
     console.log(`RG: ${animal.rg}`)
@@ -71,10 +71,10 @@ async function testarBuscaAnimal() {
     }
     console.log(`\nRaça Automática: ${racaAuto}`)
     
-    console.log('\n�œ… Teste concluído!')
+    console.log('\n✅ Teste concluído!')
 
   } catch (error) {
-    console.error('�Œ Erro:', error)
+    console.error('❌ Erro:', error)
   } finally {
     process.exit(0)
   }

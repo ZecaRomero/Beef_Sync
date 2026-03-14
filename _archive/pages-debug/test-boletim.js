@@ -15,7 +15,7 @@ export default function TestBoletim() {
     try {
       const animalsData = JSON.parse(localStorage.getItem('animals') || '[]')
       setAnimals(animalsData)
-      console.log('�Ÿ”� Animais carregados:', animalsData.length)
+      console.log('🔍 Animais carregados:', animalsData.length)
     } catch (error) {
       console.error('Erro ao carregar animais:', error)
     } finally {
@@ -29,7 +29,7 @@ export default function TestBoletim() {
       
       // Verificar se animals é um array válido
       if (!Array.isArray(animals) || animals.length === 0) {
-        alert('�Œ Nenhum animal encontrado. Carregue alguns animais primeiro.')
+        alert('❌ Nenhum animal encontrado. Carregue alguns animais primeiro.')
         return
       }
       
@@ -38,7 +38,7 @@ export default function TestBoletim() {
         endDate: '2025-10-30'
       }
       
-      console.log('�Ÿ�� Testando boletim com dados:', {
+      console.log('🧪 Testando boletim com dados:', {
         totalAnimais: animals.length,
         animais: animals.map(a => ({
           serie: a.serie,
@@ -73,11 +73,11 @@ export default function TestBoletim() {
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
       
-      alert('�œ… Boletim de teste gerado com sucesso!')
+      alert('✅ Boletim de teste gerado com sucesso!')
       
     } catch (error) {
       console.error('Erro ao testar boletim:', error)
-      alert('�Œ Erro ao gerar boletim de teste: ' + error.message)
+      alert('❌ Erro ao gerar boletim de teste: ' + error.message)
     } finally {
       setLoading(false)
     }
@@ -141,7 +141,7 @@ export default function TestBoletim() {
     })
 
     setTestResults(analysis)
-    console.log('�Ÿ”� Análise dos animais:', analysis)
+    console.log('🔍 Análise dos animais:', analysis)
   }
 
   if (loading) {
@@ -160,17 +160,17 @@ export default function TestBoletim() {
       <div className="max-w-6xl mx-auto px-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-            �Ÿ�� Teste - Boletim de Gado
+            🧪 Teste - Boletim de Gado
           </h1>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
               <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-200 mb-2">
-                �Ÿ“Š Status Atual
+                📊 Status Atual
               </h3>
               <div className="space-y-2 text-sm">
                 <p><strong>Total de Animais:</strong> {animals.length}</p>
-                <p><strong>Raças �šnicas:</strong> {new Set(animals.map(a => a.raca)).size}</p>
+                <p><strong>Raças Únicas:</strong> {new Set(animals.map(a => a.raca)).size}</p>
                 <p><strong>Com Data Nascimento:</strong> {animals.filter(a => a.dataNascimento || a.data_nascimento).length}</p>
               </div>
             </div>
@@ -182,7 +182,7 @@ export default function TestBoletim() {
               </div>
               
               <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold text-green-800 dark:text-green-200">Raças �šnicas</h3>
+                <h3 className="text-lg font-semibold text-green-800 dark:text-green-200">Raças Únicas</h3>
                 <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                   {Array.isArray(animals) ? new Set(animals.map(a => a.raca)).size : 0}
                 </p>
@@ -198,7 +198,7 @@ export default function TestBoletim() {
             
             <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
               <h3 className="text-lg font-semibold text-green-800 dark:text-green-200 mb-2">
-                �ŸŽ� Ações
+                🎯 Ações
               </h3>
               <div className="space-y-2 text-sm">
                 <p>Teste o boletim com dados reais</p>
@@ -208,7 +208,7 @@ export default function TestBoletim() {
             
             <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
               <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
-                �š�️ Problema
+                ⚠️ Problema
               </h3>
               <div className="space-y-2 text-sm">
                 <p><strong>Receptora:</strong> Não aparece no boletim</p>
@@ -223,28 +223,28 @@ export default function TestBoletim() {
               disabled={loading}
               className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              �Ÿ�� Gerar Boletim de Teste
+              🧪 Gerar Boletim de Teste
             </button>
             
             <button
               onClick={analyzeAnimals}
               className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              �Ÿ”� Analisar Dados
+              🔍 Analisar Dados
             </button>
             
             <button
               onClick={loadAnimals}
               className="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              �Ÿ”„ Recarregar Dados
+              🔄 Recarregar Dados
             </button>
             
             <a
               href="/contabilidade"
               className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-center"
             >
-              �Ÿ‘€ Voltar para Contabilidade
+              👀 Voltar para Contabilidade
             </a>
           </div>
         </div>
@@ -253,7 +253,7 @@ export default function TestBoletim() {
         {animals.length > 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              �Ÿ“‹ Animais Cadastrados ({animals.length})
+              📋 Animais Cadastrados ({animals.length})
             </h2>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -301,12 +301,12 @@ export default function TestBoletim() {
         {testResults && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              �Ÿ”� Resultados da Análise
+              🔍 Resultados da Análise
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">�Ÿ“Š Resumo</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">📊 Resumo</h3>
                 <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg text-sm">
                   <p><strong>Total:</strong> {testResults.total} animais</p>
                   <p><strong>Com Data:</strong> {testResults.comDataNascimento.length}</p>
@@ -315,7 +315,7 @@ export default function TestBoletim() {
               </div>
               
               <div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">�Ÿ��️ Por Raça</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">🏷️ Por Raça</h3>
                 <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg text-sm">
                   {Object.entries(testResults.racas).map(([raca, count]) => (
                     <p key={raca}><strong>{raca}:</strong> {count} animais</p>
@@ -326,7 +326,7 @@ export default function TestBoletim() {
 
             {testResults.semDataNascimento.length > 0 && (
               <div className="mb-6">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">�š�️ Animais Sem Data de Nascimento</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">⚠️ Animais Sem Data de Nascimento</h3>
                 <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
                   {testResults.semDataNascimento.map((animal, index) => (
                     <p key={index} className="text-sm text-red-700 dark:text-red-300">
@@ -338,7 +338,7 @@ export default function TestBoletim() {
             )}
 
             <div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">�Ÿ“… Idades Calculadas</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">📅 Idades Calculadas</h3>
               <div className="space-y-4">
                 {Object.entries(testResults.idades).map(([raca, animais]) => (
                   <div key={raca} className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg">

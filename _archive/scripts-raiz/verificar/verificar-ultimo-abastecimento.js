@@ -12,7 +12,7 @@ const pool = new Pool({
 
 async function verificarUltimoAbastecimento() {
   try {
-    console.log('�Ÿ”� Verificando últimos abastecimentos no banco de dados...\n');
+    console.log('🔍 Verificando últimos abastecimentos no banco de dados...\n');
     
     // Buscar os últimos 5 abastecimentos
     const result = await pool.query(`
@@ -32,11 +32,11 @@ async function verificarUltimoAbastecimento() {
     `);
     
     if (result.rows.length === 0) {
-      console.log('�Œ Nenhum abastecimento encontrado no banco de dados!');
+      console.log('❌ Nenhum abastecimento encontrado no banco de dados!');
       return;
     }
     
-    console.log(`�œ… Encontrados ${result.rows.length} abastecimento(s):\n`);
+    console.log(`✅ Encontrados ${result.rows.length} abastecimento(s):\n`);
     
     result.rows.forEach((row, index) => {
       console.log(`--- Abastecimento ${index + 1} ---`);
@@ -54,10 +54,10 @@ async function verificarUltimoAbastecimento() {
     
     // Verificar o total de abastecimentos
     const countResult = await pool.query('SELECT COUNT(*) as total FROM abastecimento_nitrogenio');
-    console.log(`�Ÿ“Š Total de abastecimentos no banco: ${countResult.rows[0].total}`);
+    console.log(`📊 Total de abastecimentos no banco: ${countResult.rows[0].total}`);
     
   } catch (error) {
-    console.error('�Œ Erro ao verificar abastecimentos:', error.message);
+    console.error('❌ Erro ao verificar abastecimentos:', error.message);
   } finally {
     await pool.end();
   }

@@ -1,5 +1,5 @@
 /**
- * UtilitÃ¡rio para migrar dados do localStorage para PostgreSQL
+ * Utilitário para migrar dados do localStorage para PostgreSQL
  * Use este script no navegador ou em um componente React
  */
 
@@ -16,14 +16,14 @@ export async function migrateLocalStorageToDatabase() {
       origensReceptoras: origensReceptoras ? JSON.parse(origensReceptoras) : []
     };
 
-    // Verificar se hÃ¡ dados para migrar
+    // Verificar se há dados para migrar
     const totalItens = 
       dadosParaMigrar.nfsReceptoras.length +
       dadosParaMigrar.naturezasOperacao.length +
       dadosParaMigrar.origensReceptoras.length;
 
     if (totalItens === 0) {
-      console.log('âÅ“â€¦ Nenhum dado para migrar');
+      console.log('✅ Nenhum dado para migrar');
       return {
         success: true,
         message: 'Nenhum dado encontrado no localStorage',
@@ -31,12 +31,12 @@ export async function migrateLocalStorageToDatabase() {
       };
     }
 
-    console.log(`ðÅ¸â€œ¦ Encontrados ${totalItens} itens para migrar:`);
+    console.log(`📦 Encontrados ${totalItens} itens para migrar:`);
     console.log(`   - Notas Fiscais: ${dadosParaMigrar.nfsReceptoras.length}`);
-    console.log(`   - Naturezas de OperaÃ§Ã£o: ${dadosParaMigrar.naturezasOperacao.length}`);
+    console.log(`   - Naturezas de Operação: ${dadosParaMigrar.naturezasOperacao.length}`);
     console.log(`   - Origens de Receptoras: ${dadosParaMigrar.origensReceptoras.length}`);
 
-    // Enviar para API de migraÃ§Ã£o
+    // Enviar para API de migração
     const response = await fetch('/api/migrate-localstorage', {
       method: 'POST',
       headers: {
@@ -46,18 +46,18 @@ export async function migrateLocalStorageToDatabase() {
     });
 
     if (!response.ok) {
-      throw new Error(`Erro na migraÃ§Ã£o: ${response.statusText}`);
+      throw new Error(`Erro na migração: ${response.statusText}`);
     }
 
     const result = await response.json();
 
-    console.log('\nâÅ“â€¦ MigraÃ§Ã£o concluÃ­da com sucesso!');
+    console.log('\n✅ Migração concluída com sucesso!');
     console.log(`   - NFs migradas: ${result.results.nfsMigradas}`);
     console.log(`   - Naturezas migradas: ${result.results.naturezasMigradas}`);
     console.log(`   - Origens migradas: ${result.results.origensMigradas}`);
 
     if (result.results.erros.length > 0) {
-      console.warn(`\nâÅ¡ ï¸� ${result.results.erros.length} erros durante a migraÃ§Ã£o:`);
+      console.warn(`\n⚠️ ${result.results.erros.length} erros durante a migração:`);
       result.results.erros.forEach(erro => {
         console.warn(`   - ${erro.tipo}: ${erro.nome || erro.nf} - ${erro.erro}`);
       });
@@ -65,10 +65,10 @@ export async function migrateLocalStorageToDatabase() {
 
     // Perguntar se deseja limpar localStorage
     const limpar = window.confirm(
-      `MigraÃ§Ã£o concluÃ­da!\n\n` +
-      `âÅ“â€¦ ${result.results.nfsMigradas} notas fiscais\n` +
-      `âÅ“â€¦ ${result.results.naturezasMigradas} naturezas de operaÃ§Ã£o\n` +
-      `âÅ“â€¦ ${result.results.origensMigradas} origens de receptoras\n\n` +
+      `Migração concluída!\n\n` +
+      `✅ ${result.results.nfsMigradas} notas fiscais\n` +
+      `✅ ${result.results.naturezasMigradas} naturezas de operação\n` +
+      `✅ ${result.results.origensMigradas} origens de receptoras\n\n` +
       `Deseja limpar os dados do localStorage?`
     );
 
@@ -76,17 +76,17 @@ export async function migrateLocalStorageToDatabase() {
       localStorage.removeItem('nfsReceptoras');
       localStorage.removeItem('naturezasOperacao');
       localStorage.removeItem('origensReceptoras');
-      console.log('ðÅ¸§¹ localStorage limpo com sucesso!');
+      console.log('🧹 localStorage limpo com sucesso!');
     }
 
     return {
       success: true,
-      message: 'MigraÃ§Ã£o concluÃ­da com sucesso',
+      message: 'Migração concluída com sucesso',
       results: result.results
     };
 
   } catch (error) {
-    console.error('â�Å’ Erro durante a migraÃ§Ã£o:', error);
+    console.error('❌ Erro durante a migração:', error);
     return {
       success: false,
       message: error.message,
@@ -95,7 +95,7 @@ export async function migrateLocalStorageToDatabase() {
   }
 }
 
-// FunÃ§Ã£o para verificar se hÃ¡ dados no localStorage
+// Função para verificar se há dados no localStorage
 export function checkLocalStorageData() {
   const nfsReceptoras = localStorage.getItem('nfsReceptoras');
   const naturezasOperacao = localStorage.getItem('naturezasOperacao');
@@ -120,7 +120,7 @@ export function checkLocalStorageData() {
 if (typeof window !== 'undefined') {
   window.migrateLocalStorageToDatabase = migrateLocalStorageToDatabase;
   window.checkLocalStorageData = checkLocalStorageData;
-  console.log('ðÅ¸â€™¡ FunÃ§Ãµes disponÃ­veis:');
+  console.log('💡 Funções disponíveis:');
   console.log('   - migrateLocalStorageToDatabase() - Migrar dados para PostgreSQL');
   console.log('   - checkLocalStorageData() - Verificar dados no localStorage');
 }

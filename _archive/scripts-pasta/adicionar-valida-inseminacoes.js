@@ -40,10 +40,10 @@ async function run() {
             updated_at = CURRENT_TIMESTAMP
         WHERE id = $1
       `, [ia.id])
-      console.log(`  IA ${ia.id} (animal ${animal_id}) �†’ inválida (anterior)`)
+      console.log(`  IA ${ia.id} (animal ${animal_id}) → inválida (anterior)`)
     }
     await query(`UPDATE inseminacoes SET valida = true WHERE id = $1`, [maisRecente.id])
-    console.log(`  IA ${maisRecente.id} (animal ${animal_id}) �†’ válida (mais recente)`)
+    console.log(`  IA ${maisRecente.id} (animal ${animal_id}) → válida (mais recente)`)
   }
 
   console.log('Concluído.')

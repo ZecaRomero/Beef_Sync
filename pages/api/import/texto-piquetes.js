@@ -1,6 +1,6 @@
 import { query } from '../../../lib/database';
 
-// FunÃ§Ã£o para converter data - VERSÃÆ’O ROBUSTA
+// Função para converter data - VERSÃO ROBUSTA
 function converterData(data) {
   if (!data) return null;
   
@@ -19,7 +19,7 @@ function converterData(data) {
     mes = mes.trim();
     ano = ano.trim();
     
-    // Se ano tem 2 dÃ­gitos, converter para 4
+    // Se ano tem 2 dígitos, converter para 4
     if (ano.length === 2) {
       const anoNum = parseInt(ano);
       ano = anoNum >= 50 ? `19${ano}` : `20${ano}`;
@@ -32,40 +32,40 @@ function converterData(data) {
     
     if (diaNum >= 1 && diaNum <= 31 && mesNum >= 1 && mesNum <= 12 && anoNum >= 1900 && anoNum <= 2100) {
       const resultado = `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
-      console.log(`  ââ€ â€™ Convertido para: ${resultado}`);
+      console.log(`  → Convertido para: ${resultado}`);
       return resultado;
     } else {
-      console.log(`  ââ€ â€™ Valores invÃ¡lidos: dia=${diaNum}, mes=${mesNum}, ano=${anoNum}`);
+      console.log(`  → Valores inválidos: dia=${diaNum}, mes=${mesNum}, ano=${anoNum}`);
     }
   }
   
   // Tentar formato YYYY-MM-DD
   if (/^\d{4}-\d{2}-\d{2}$/.test(data)) {
-    console.log(`  ââ€ â€™ JÃ¡ estÃ¡ no formato ISO: ${data}`);
+    console.log(`  → Já está no formato ISO: ${data}`);
     return data;
   }
   
-  console.log(`  ââ€ â€™ Formato nÃ£o reconhecido`);
+  console.log(`  → Formato não reconhecido`);
   return null;
 }
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' });
+    return res.status(405).json({ error: 'Método não permitido' });
   }
 
   const { texto, modo } = req.body;
 
   if (!texto) {
-    return res.status(400).json({ error: 'Texto nÃ£o fornecido' });
+    return res.status(400).json({ error: 'Texto não fornecido' });
   }
 
   try {
     const linhas = texto.split('\n').filter(l => l.trim());
     
-    // Remover cabeÃ§alho se existir
+    // Remover cabeçalho se existir
     const primeiraLinha = linhas[0].toUpperCase();
-    const temCabecalho = primeiraLinha.includes('SÃâ€°RIE') || primeiraLinha.includes('SERIE');
+    const temCabecalho = primeiraLinha.includes('SÉRIE') || primeiraLinha.includes('SERIE');
     const dadosLinhas = temCabecalho ? linhas.slice(1) : linhas;
 
     const dadosProcessados = [];
@@ -78,7 +78,7 @@ export default async function handler(req, res) {
 
       const numeroLinha = i + (temCabecalho ? 2 : 1);
 
-      // Separar por TAB ou mÃºltiplos espaÃ§os
+      // Separar por TAB ou múltiplos espaços
       const colunas = linha.split(/\t+/).map(c => c.trim());
 
       console.log(`Linha ${numeroLinha}: ${colunas.length} colunas`, colunas);
@@ -86,7 +86,7 @@ export default async function handler(req, res) {
       if (colunas.length < 3) {
         errosValidacao.push({
           linha: numeroLinha,
-          erro: `Linha com poucas colunas (${colunas.length}). Esperado: pelo menos 3 (SÃâ€°RIE, RG, LOCAL)`
+          erro: `Linha com poucas colunas (${colunas.length}). Esperado: pelo menos 3 (SÉRIE, RG, LOCAL)`
         });
         continue;
       }
@@ -101,9 +101,9 @@ export default async function handler(req, res) {
       const dataDG = colunas[8] || '';
       const resultado = colunas[9] || '';
 
-      // ValidaÃ§Ãµes
+      // Validações
       if (!serie) {
-        errosValidacao.push({ linha: numeroLinha, erro: 'SÃâ€°RIE vazia' });
+        errosValidacao.push({ linha: numeroLinha, erro: 'SÉRIE vazia' });
         continue;
       }
       if (!rg) {
@@ -122,7 +122,7 @@ export default async function handler(req, res) {
       if (dataIA) {
         dataIAFormatada = converterData(dataIA);
         if (!dataIAFormatada) {
-          // Tentar remover espaÃ§os e caracteres especiais
+          // Tentar remover espaços e caracteres especiais
           const dataLimpa = dataIA.replace(/\s+/g, '').trim();
           dataIAFormatada = converterData(dataLimpa);
         }
@@ -139,14 +139,14 @@ export default async function handler(req, res) {
       if (dataIA && !dataIAFormatada) {
         errosValidacao.push({ 
           linha: numeroLinha, 
-          erro: `Data IA invÃ¡lida: "${dataIA}". Use formato DD/MM/AAAA ou DD/MM/AA` 
+          erro: `Data IA inválida: "${dataIA}". Use formato DD/MM/AAAA ou DD/MM/AA` 
         });
       }
 
       if (dataDG && !dataDGFormatada) {
         errosValidacao.push({ 
           linha: numeroLinha, 
-          erro: `Data DG invÃ¡lida: "${dataDG}". Use formato DD/MM/AAAA ou DD/MM/AA` 
+          erro: `Data DG inválida: "${dataDG}". Use formato DD/MM/AAAA ou DD/MM/AA` 
         });
       }
 
@@ -165,7 +165,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // Se modo for "validar", apenas retornar validaÃ§Ã£o
+    // Se modo for "validar", apenas retornar validação
     if (modo === 'validar') {
       return res.status(200).json({
         success: true,
@@ -182,7 +182,7 @@ export default async function handler(req, res) {
       if (errosValidacao.length > 0) {
         return res.status(400).json({
           success: false,
-          error: 'Existem erros de validaÃ§Ã£o. Corrija antes de importar.',
+          error: 'Existem erros de validação. Corrija antes de importar.',
           erros: errosValidacao
         });
       }
@@ -216,7 +216,7 @@ export default async function handler(req, res) {
             resultados.piquetesProcessados++;
           }
 
-          // 2. Criar/atualizar animal - SEMPRE FÃÅ MEA
+          // 2. Criar/atualizar animal - SEMPRE FÊMEA
           const animalExiste = await query(
             'SELECT id FROM animais WHERE serie = $1 AND rg = $2',
             [dado.serie, dado.rg]
@@ -230,7 +230,7 @@ export default async function handler(req, res) {
                 serie, rg, tatuagem, nome, sexo, situacao, 
                 piquete_atual, data_entrada_piquete, created_at, updated_at
               ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
-              [dado.serie, dado.rg, dado.tatuagem, dado.tatuagem, 'FÃªmea', 'Ativo', dado.local, dataEntrada]
+              [dado.serie, dado.rg, dado.tatuagem, dado.tatuagem, 'Fêmea', 'Ativo', dado.local, dataEntrada]
             );
             resultados.animaisCriados++;
           } else {
@@ -238,7 +238,7 @@ export default async function handler(req, res) {
               `UPDATE animais 
                SET piquete_atual = $1, data_entrada_piquete = $2, sexo = $3, updated_at = CURRENT_TIMESTAMP
                WHERE serie = $4 AND rg = $5`,
-              [dado.local, dataEntrada, 'FÃªmea', dado.serie, dado.rg]
+              [dado.local, dataEntrada, 'Fêmea', dado.serie, dado.rg]
             );
             resultados.animaisAtualizados++;
           }
@@ -287,7 +287,7 @@ export default async function handler(req, res) {
       });
     }
 
-    return res.status(400).json({ error: 'Modo invÃ¡lido. Use "validar" ou "importar"' });
+    return res.status(400).json({ error: 'Modo inválido. Use "validar" ou "importar"' });
 
   } catch (error) {
     console.error('Erro ao processar texto:', error);

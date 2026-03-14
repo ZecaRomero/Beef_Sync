@@ -32,15 +32,15 @@ async function atualizarAvoMaternoExcel(arquivoExcel) {
     const fs = require('fs')
     
     if (!fs.existsSync(caminhoArquivo)) {
-      console.error(`�Œ Arquivo não encontrado: ${caminhoArquivo}`)
-      console.log('\n�Ÿ’� Dicas:')
+      console.error(`❌ Arquivo não encontrado: ${caminhoArquivo}`)
+      console.log('\n💡 Dicas:')
       console.log('   - Use o caminho completo do arquivo')
       console.log('   - Ou coloque o arquivo na pasta scripts/')
       console.log('   - Formato esperado: .xlsx (Excel)')
       process.exit(1)
     }
     
-    console.log(`�Ÿ“‚ Lendo arquivo: ${caminhoArquivo}\n`)
+    console.log(`📂 Lendo arquivo: ${caminhoArquivo}\n`)
     
     // Ler arquivo Excel
     const workbook = new ExcelJS.Workbook()
@@ -48,8 +48,8 @@ async function atualizarAvoMaternoExcel(arquivoExcel) {
     
     // Pegar primeira planilha
     const worksheet = workbook.worksheets[0]
-    console.log(`�Ÿ“Š Planilha: ${worksheet.name}`)
-    console.log(`�Ÿ“� Total de linhas: ${worksheet.rowCount}\n`)
+    console.log(`📊 Planilha: ${worksheet.name}`)
+    console.log(`📏 Total de linhas: ${worksheet.rowCount}\n`)
     
     // Detectar onde começam os dados (pular cabeçalho se houver)
     let linhaInicio = 1
@@ -62,7 +62,7 @@ async function atualizarAvoMaternoExcel(arquivoExcel) {
       if (textoCabeçalho.includes('serie') || textoCabeçalho.includes('série') || 
           textoCabeçalho.includes('rg') || textoCabeçalho.includes('avo')) {
         linhaInicio = 2
-        console.log('�Ÿ“‹ Cabeçalho detectado, pulando primeira linha\n')
+        console.log('📋 Cabeçalho detectado, pulando primeira linha\n')
       }
     }
     
@@ -113,14 +113,14 @@ async function atualizarAvoMaternoExcel(arquivoExcel) {
       dados.push({ serieStr, rgStr, avoMaternoStr, rowNumber })
     })
     
-    console.log(`�Ÿ“‹ Total de linhas válidas para processar: ${dados.length}\n`)
+    console.log(`📋 Total de linhas válidas para processar: ${dados.length}\n`)
     
     // Processar sequencialmente
     for (const dado of dados) {
       try {
         await processarAnimal(client, dado.serieStr, dado.rgStr, dado.avoMaternoStr, dado.rowNumber, resultados)
       } catch (error) {
-        console.error(`�Œ Erro na linha ${dado.rowNumber}:`, error.message)
+        console.error(`❌ Erro na linha ${dado.rowNumber}:`, error.message)
         resultados.erros.push({ 
           linha: dado.rowNumber, 
           serie: dado.serieStr,
@@ -134,16 +134,16 @@ async function atualizarAvoMaternoExcel(arquivoExcel) {
     
     // Resumo
     console.log('\n' + '='.repeat(60))
-    console.log('�Ÿ“Š RESUMO DA ATUALIZA�‡�ƒO')
+    console.log('📊 RESUMO DA ATUALIZAÇÃO')
     console.log('='.repeat(60))
-    console.log(`�Ÿ“‹ Total processado: ${totalProcessados}`)
-    console.log(`�œ… Atualizados: ${resultados.sucessos.length}`)
-    console.log(`�„�️  Já corretos: ${resultados.jaCorretos.length}`)
-    console.log(`�Œ Erros: ${resultados.erros.length}`)
-    console.log(`�š�️  Não encontrados: ${resultados.naoEncontrados.length}`)
+    console.log(`📋 Total processado: ${totalProcessados}`)
+    console.log(`✅ Atualizados: ${resultados.sucessos.length}`)
+    console.log(`ℹ️  Já corretos: ${resultados.jaCorretos.length}`)
+    console.log(`❌ Erros: ${resultados.erros.length}`)
+    console.log(`⚠️  Não encontrados: ${resultados.naoEncontrados.length}`)
     
     if (resultados.sucessos.length > 0) {
-      console.log('\n�œ… Animais atualizados:')
+      console.log('\n✅ Animais atualizados:')
       resultados.sucessos.slice(0, 10).forEach(r => {
         console.log(`   - ${r.serie}-${r.rg}: "${r.avoMaterno}"`)
       })
@@ -153,14 +153,14 @@ async function atualizarAvoMaternoExcel(arquivoExcel) {
     }
     
     if (resultados.naoEncontrados.length > 0) {
-      console.log('\n�š�️  Animais não encontrados:')
+      console.log('\n⚠️  Animais não encontrados:')
       resultados.naoEncontrados.forEach(a => {
         console.log(`   - ${a.serie}-${a.rg}`)
       })
     }
     
     if (resultados.erros.length > 0) {
-      console.log('\n�Œ Erros:')
+      console.log('\n❌ Erros:')
       resultados.erros.slice(0, 5).forEach(e => {
         console.log(`   Linha ${e.linha}: ${e.motivo} - ${e.serie}-${e.rg}`)
       })
@@ -172,12 +172,12 @@ async function atualizarAvoMaternoExcel(arquivoExcel) {
     // Salvar log
     const logFile = path.join(__dirname, `log-avo-materno-${Date.now()}.json`)
     fs.writeFileSync(logFile, JSON.stringify(resultados, null, 2))
-    console.log(`\n�Ÿ“„ Log detalhado salvo em: ${logFile}`)
+    console.log(`\n📄 Log detalhado salvo em: ${logFile}`)
     
   } catch (error) {
-    console.error('�Œ Erro fatal:', error.message)
+    console.error('❌ Erro fatal:', error.message)
     if (error.message.includes('Cannot find module')) {
-      console.log('\n�Ÿ’� Certifique-se de que o arquivo Excel existe e está acessível')
+      console.log('\n💡 Certifique-se de que o arquivo Excel existe e está acessível')
     }
     throw error
   } finally {
@@ -220,7 +220,7 @@ async function processarAnimal(client, serie, rg, avoMaterno, linhaNumero, resul
       WHERE id = $2
     `, [avoMaterno, animal.id])
     
-    console.log(`�œ… ${serie}-${rg}: "${animal.avo_materno || 'NULL'}" �†’ "${avoMaterno}"`)
+    console.log(`✅ ${serie}-${rg}: "${animal.avo_materno || 'NULL'}" → "${avoMaterno}"`)
     resultados.sucessos.push({ 
       serie, 
       rg, 
@@ -238,7 +238,7 @@ async function processarAnimal(client, serie, rg, avoMaterno, linhaNumero, resul
 const arquivoExcel = process.argv[2]
 
 if (!arquivoExcel) {
-  console.log('�Ÿ“‹ Script para atualizar avô materno de animais em lote (Excel)\n')
+  console.log('📋 Script para atualizar avô materno de animais em lote (Excel)\n')
   console.log('Uso:')
   console.log('  node scripts/atualizar-avo-materno-excel.js <arquivo.xlsx>\n')
   console.log('Formato do Excel:')
@@ -247,17 +247,17 @@ if (!arquivoExcel) {
   console.log('  Coluna C: Avô Materno (ex: CALVARIO SANT FIV 51)\n')
   console.log('Exemplo:')
   console.log('  node scripts/atualizar-avo-materno-excel.js avo-materno.xlsx\n')
-  console.log('�Ÿ’� Você pode ter cabeçalho na primeira linha ou começar direto com os dados')
+  console.log('💡 Você pode ter cabeçalho na primeira linha ou começar direto com os dados')
   process.exit(1)
 }
 
 atualizarAvoMaternoExcel(arquivoExcel)
   .then(() => {
-    console.log('\n�œ… Script concluído!')
+    console.log('\n✅ Script concluído!')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n�Œ Erro fatal:', error)
+    console.error('\n❌ Erro fatal:', error)
     process.exit(1)
   })
 

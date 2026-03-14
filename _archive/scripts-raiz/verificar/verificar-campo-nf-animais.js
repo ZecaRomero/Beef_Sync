@@ -9,7 +9,7 @@ const pool = new Pool({
 })
 
 async function verificarCampoNF() {
-  console.log('�Ÿ”� VERIFICANDO CAMPO DE NOTA FISCAL NOS ANIMAIS\n')
+  console.log('🔍 VERIFICANDO CAMPO DE NOTA FISCAL NOS ANIMAIS\n')
   console.log('=' .repeat(80))
   
   try {
@@ -22,11 +22,11 @@ async function verificarCampoNF() {
       ORDER BY ordinal_position
     `)
     
-    console.log('\n�Ÿ“‹ COLUNAS RELACIONADAS A NOTA FISCAL:\n')
+    console.log('\n📋 COLUNAS RELACIONADAS A NOTA FISCAL:\n')
     console.log('-'.repeat(80))
     
     if (colunas.rows.length === 0) {
-      console.log('�š�️  Nenhuma coluna relacionada a nota fiscal encontrada!')
+      console.log('⚠️  Nenhuma coluna relacionada a nota fiscal encontrada!')
     } else {
       colunas.rows.forEach(col => {
         console.log(`  ${col.column_name.padEnd(30)} | ${col.data_type}`)
@@ -42,7 +42,7 @@ async function verificarCampoNF() {
       FROM animais
     `)
     
-    console.log('\n�Ÿ“Š ESTATÍSTICAS:\n')
+    console.log('\n📊 ESTATÍSTICAS:\n')
     console.log('-'.repeat(80))
     console.log(`  Total de animais: ${comNF.rows[0].total}`)
     console.log(`  Com NF preenchida: ${comNF.rows[0].com_nf}`)
@@ -58,7 +58,7 @@ async function verificarCampoNF() {
     `)
     
     if (exemplos.rows.length > 0) {
-      console.log('\n�Ÿ“‹ EXEMPLOS DE ANIMAIS COM NF:\n')
+      console.log('\n📋 EXEMPLOS DE ANIMAIS COM NF:\n')
       console.log('-'.repeat(80))
       exemplos.rows.forEach((animal, idx) => {
         console.log(`  ${idx + 1}. ${animal.serie}-${animal.rg} | NF: ${animal.numero_nf} | ${animal.sexo} | ${animal.raca}`)
@@ -80,7 +80,7 @@ async function verificarCampoNF() {
     `)
     
     if (porNF.rows.length > 0) {
-      console.log('\n�Ÿ“Š TOP 10 NFs COM MAIS ANIMAIS:\n')
+      console.log('\n📊 TOP 10 NFs COM MAIS ANIMAIS:\n')
       console.log('-'.repeat(80))
       porNF.rows.forEach((nf, idx) => {
         console.log(`  ${idx + 1}. NF ${nf.numero_nf}: ${nf.quantidade} animais (${nf.machos}M + ${nf.femeas}F)`)
@@ -90,7 +90,7 @@ async function verificarCampoNF() {
     // 5. Verificar NFs específicas do relatório
     const nfsEspecificas = ['2141', '4397', '4396', '050.558.282', '2076', '231', '229']
     
-    console.log('\n�Ÿ”� VERIFICANDO NFs ESPECÍFICAS DO RELAT�“RIO:\n')
+    console.log('\n🔍 VERIFICANDO NFs ESPECÍFICAS DO RELATÓRIO:\n')
     console.log('-'.repeat(80))
     
     for (const nf of nfsEspecificas) {
@@ -102,17 +102,17 @@ async function verificarCampoNF() {
       
       const total = parseInt(animais.rows[0].total)
       if (total > 0) {
-        console.log(`  �œ… NF ${nf}: ${total} animais encontrados`)
+        console.log(`  ✅ NF ${nf}: ${total} animais encontrados`)
       } else {
-        console.log(`  �š�️  NF ${nf}: 0 animais encontrados`)
+        console.log(`  ⚠️  NF ${nf}: 0 animais encontrados`)
       }
     }
     
     console.log('\n' + '='.repeat(80))
-    console.log('�œ… Verificação concluída!')
+    console.log('✅ Verificação concluída!')
     
   } catch (error) {
-    console.error('\n�Œ ERRO:', error.message)
+    console.error('\n❌ ERRO:', error.message)
     console.error('\nDetalhes:', error)
   } finally {
     await pool.end()

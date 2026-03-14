@@ -1,13 +1,13 @@
 import { query } from '../../../lib/database';
 
 /**
- * Limpa TODOS os dados genÃ©ticos: abczg, deca, iqg, pt_iqg, situacao_abcz.
- * ÃÅ¡til antes de reimportar dados do Excel.
+ * Limpa TODOS os dados genéticos: abczg, deca, iqg, pt_iqg, situacao_abcz.
+ * Útil antes de reimportar dados do Excel.
  * POST /api/import/limpar-situacao-abcz
  */
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' });
+    return res.status(405).json({ error: 'Método não permitido' });
   }
 
   try {
@@ -37,13 +37,13 @@ export default async function handler(req, res) {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
     return res.status(200).json({
       success: true,
-      message: `${total} animais tiveram todos os dados genÃ©ticos limpos (iABCZ, DECA, IQG, Pt IQG, SituaÃ§Ã£o ABCZ). Agora vocÃª pode importar novamente.`,
+      message: `${total} animais tiveram todos os dados genéticos limpos (iABCZ, DECA, IQG, Pt IQG, Situação ABCZ). Agora você pode importar novamente.`,
       total,
     });
   } catch (error) {
-    console.error('â�Å’ Erro ao limpar dados genÃ©ticos:', error);
+    console.error('❌ Erro ao limpar dados genéticos:', error);
     return res.status(500).json({
-      error: 'Erro ao limpar dados genÃ©ticos',
+      error: 'Erro ao limpar dados genéticos',
       details: String(error?.message || error),
     });
   }

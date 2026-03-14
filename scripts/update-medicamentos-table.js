@@ -13,13 +13,13 @@ async function updateMedicamentosTable() {
   const pool = new Pool(dbConfig)
   
   try {
-    console.log('ðÅ¸â€�§ Atualizando estrutura da tabela medicamentos...\n')
+    console.log('🔧 Atualizando estrutura da tabela medicamentos...\n')
     
     // Adicionar colunas que faltam
     await pool.query(`
       DO $$ 
       BEGIN
-        -- PrincÃ­pio Ativo
+        -- Princípio Ativo
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'medicamentos' AND column_name = 'principio_ativo') THEN
           ALTER TABLE medicamentos ADD COLUMN principio_ativo VARCHAR(200);
           RAISE NOTICE 'Coluna principio_ativo adicionada';
@@ -55,31 +55,31 @@ async function updateMedicamentosTable() {
           RAISE NOTICE 'Coluna quantidade_estoque adicionada';
         END IF;
         
-        -- Quantidade MÃ­nima
+        -- Quantidade Mínima
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'medicamentos' AND column_name = 'quantidade_minima') THEN
           ALTER TABLE medicamentos ADD COLUMN quantidade_minima DECIMAL(12,2) DEFAULT 0;
           RAISE NOTICE 'Coluna quantidade_minima adicionada';
         END IF;
         
-        -- PrescriÃ§Ã£o VeterinÃ¡ria
+        -- Prescrição Veterinária
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'medicamentos' AND column_name = 'prescricao_veterinaria') THEN
           ALTER TABLE medicamentos ADD COLUMN prescricao_veterinaria BOOLEAN DEFAULT false;
           RAISE NOTICE 'Coluna prescricao_veterinaria adicionada';
         END IF;
         
-        -- CarÃªncia Leite
+        -- Carência Leite
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'medicamentos' AND column_name = 'carencia_leite') THEN
           ALTER TABLE medicamentos ADD COLUMN carencia_leite INTEGER;
           RAISE NOTICE 'Coluna carencia_leite adicionada';
         END IF;
         
-        -- CarÃªncia Carne
+        -- Carência Carne
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'medicamentos' AND column_name = 'carencia_carne') THEN
           ALTER TABLE medicamentos ADD COLUMN carencia_carne INTEGER;
           RAISE NOTICE 'Coluna carencia_carne adicionada';
         END IF;
         
-        -- IndicaÃ§Ãµes
+        -- Indicações
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'medicamentos' AND column_name = 'indicacoes') THEN
           ALTER TABLE medicamentos ADD COLUMN indicacoes TEXT;
           RAISE NOTICE 'Coluna indicacoes adicionada';
@@ -91,13 +91,13 @@ async function updateMedicamentosTable() {
           RAISE NOTICE 'Coluna dosagem adicionada';
         END IF;
         
-        -- Via de AplicaÃ§Ã£o
+        -- Via de Aplicação
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'medicamentos' AND column_name = 'via_aplicacao') THEN
           ALTER TABLE medicamentos ADD COLUMN via_aplicacao VARCHAR(100);
           RAISE NOTICE 'Coluna via_aplicacao adicionada';
         END IF;
         
-        -- ObservaÃ§Ãµes (se ainda nÃ£o existir, jÃ¡ que pode ter o campo descricao)
+        -- Observações (se ainda não existir, já que pode ter o campo descricao)
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'medicamentos' AND column_name = 'observacoes') THEN
           ALTER TABLE medicamentos ADD COLUMN observacoes TEXT;
           RAISE NOTICE 'Coluna observacoes adicionada';
@@ -105,7 +105,7 @@ async function updateMedicamentosTable() {
       END $$;
     `)
     
-    console.log('âÅ“â€¦ Estrutura da tabela atualizada com sucesso!')
+    console.log('✅ Estrutura da tabela atualizada com sucesso!')
     
     // Mostrar estrutura final
     const columns = await pool.query(`
@@ -115,14 +115,14 @@ async function updateMedicamentosTable() {
       ORDER BY ordinal_position
     `)
     
-    console.log('\nðÅ¸â€œÅ  Nova estrutura da tabela:')
+    console.log('\n📊 Nova estrutura da tabela:')
     columns.rows.forEach(col => {
       console.log(`  - ${col.column_name}: ${col.data_type}`)
     })
     
     await pool.end()
   } catch (error) {
-    console.error('â�Å’ Erro:', error.message)
+    console.error('❌ Erro:', error.message)
     await pool.end()
     process.exit(1)
   }

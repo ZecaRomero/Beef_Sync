@@ -50,9 +50,9 @@ export default function Animals() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-  const [selectedAnimals, setSelectedAnimals] = useState([]); // Para seleÃ§Ã£o mÃºltipla
-  const [selectMode, setSelectMode] = useState(false); // Modo de seleÃ§Ã£o ativo
-  const [showBulkSexModal, setShowBulkSexModal] = useState(false); // Modal para alteraÃ§Ã£o de sexo em lote
+  const [selectedAnimals, setSelectedAnimals] = useState([]); // Para seleção múltipla
+  const [selectMode, setSelectMode] = useState(false); // Modo de seleção ativo
+  const [showBulkSexModal, setShowBulkSexModal] = useState(false); // Modal para alteração de sexo em lote
   const [tooltipVenda, setTooltipVenda] = useState({ animalId: null, info: null, loading: false }); // Tooltip de venda
   
   useEffect(() => {
@@ -91,11 +91,11 @@ export default function Animals() {
     }
   }
 
-  // FunÃ§Ã£o para filtrar animais
+  // Função para filtrar animais
   const filteredAnimals = animals.filter(animal => {
     if (!animal) return false;
     
-    // Filtro de busca - busca em sÃ©rie, RG, nome, raÃ§a
+    // Filtro de busca - busca em série, RG, nome, raça
     if (filters.search) {
       const searchLower = filters.search.toLowerCase().trim();
       if (searchLower === '') return true;
@@ -126,37 +126,37 @@ export default function Animals() {
   })
 
   // Debug: Log dos animais e filtros
-  console.log('ðÅ¸â€�� Debug - Total de animais:', animals.length)
-  console.log('ðÅ¸â€�� Debug - Filtros ativos:', filters)
-  console.log('ðÅ¸â€�� Debug - Animais filtrados:', filteredAnimals.length)
+  console.log('🔍 Debug - Total de animais:', animals.length)
+  console.log('🔍 Debug - Filtros ativos:', filters)
+  console.log('🔍 Debug - Animais filtrados:', filteredAnimals.length)
   if (filteredAnimals.length > 0) {
-    console.log('ðÅ¸â€�� Debug - Primeiro animal filtrado:', filteredAnimals[0])
+    console.log('🔍 Debug - Primeiro animal filtrado:', filteredAnimals[0])
   }
 
-  // PaginaÃ§Ã£o
+  // Paginação
   const totalPages = Math.ceil(filteredAnimals.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
   const currentAnimals = filteredAnimals.slice(startIndex, endIndex)
 
-  // FunÃ§Ã£o para mudar pÃ¡gina
+  // Função para mudar página
   const handlePageChange = (page) => {
     setCurrentPage(page)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  // FunÃ§Ã£o para calcular quais pÃ¡ginas mostrar (mÃ¡ximo 10)
+  // Função para calcular quais páginas mostrar (máximo 10)
   const getVisiblePages = () => {
     const maxVisible = 10;
     if (totalPages <= maxVisible) {
       return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
     
-    // Sempre mostrar os primeiros 10 nÃºmeros de pÃ¡gina
+    // Sempre mostrar os primeiros 10 números de página
     return Array.from({ length: Math.min(maxVisible, totalPages) }, (_, i) => i + 1);
   }
 
-  // FunÃ§Ã£o para carregar informaÃ§Ãµes de venda do animal
+  // Função para carregar informações de venda do animal
   const carregarInfoVenda = async (animal) => {
     if (!animal) {
       setTooltipVenda({ animalId: null, info: null, loading: false })
@@ -167,7 +167,7 @@ export default function Animals() {
     try {
       setTooltipVenda({ animalId: animal.id, info: null, loading: true })
       
-      // Primeiro, tentar usar dados do prÃ³prio animal
+      // Primeiro, tentar usar dados do próprio animal
       if (animal.valor_venda || animal.valorVenda) {
         setTooltipVenda({
           animalId: animal.id,
@@ -182,14 +182,14 @@ export default function Animals() {
         return
       }
       
-      // Se nÃ£o tem valor_venda no animal, buscar nas notas fiscais
+      // Se não tem valor_venda no animal, buscar nas notas fiscais
       const response = await fetch(`/api/notas-fiscais?tipo=saida`)
       
       if (response.ok) {
         const result = await response.json()
         const nfs = result.data || result || []
         
-        // Procurar NF de saÃ­da que contenha este animal
+        // Procurar NF de saída que contenha este animal
         let nfVenda = null
         let itemVenda = null
         
@@ -244,52 +244,52 @@ export default function Animals() {
         }
       }
     } catch (error) {
-      console.error('Erro ao carregar informaÃ§Ãµes de venda:', error)
+      console.error('Erro ao carregar informações de venda:', error)
       setTooltipVenda({ animalId: animal.id, info: null, loading: false })
     }
   }
 
-  // FunÃ§Ã£o para exportar animais para Excel
+  // Função para exportar animais para Excel
   const handleExportAnimals = async () => {
     try {
       setLoading(true)
       
-      // Se hÃ¡ animais selecionados, exportar apenas eles
+      // Se há animais selecionados, exportar apenas eles
       let animaisParaExportar = [];
       if (selectedAnimals.length > 0) {
         animaisParaExportar = animals.filter(a => selectedAnimals.includes(a.id));
-        console.log(`ðÅ¸â€œÅ  Exportando ${animaisParaExportar.length} animais selecionados`);
+        console.log(`📊 Exportando ${animaisParaExportar.length} animais selecionados`);
       } else {
-        // Caso contrÃ¡rio, exportar todos os animais filtrados
+        // Caso contrário, exportar todos os animais filtrados
         animaisParaExportar = filteredAnimals;
-        console.log(`ðÅ¸â€œÅ  Exportando todos os ${animaisParaExportar.length} animais filtrados`);
+        console.log(`📊 Exportando todos os ${animaisParaExportar.length} animais filtrados`);
       }
       
       if (animaisParaExportar.length === 0) {
-        alert('âÅ¡ ï¸� Nenhum animal para exportar');
+        alert('⚠️ Nenhum animal para exportar');
         setLoading(false);
         return;
       }
       
-      // Se hÃ¡ animais selecionados, fazer exportaÃ§Ã£o direta via Excel no cliente
+      // Se há animais selecionados, fazer exportação direta via Excel no cliente
       if (selectedAnimals.length > 0) {
         const XLSX = (await import('xlsx')).default;
         
-        // Preparar dados para exportaÃ§Ã£o
+        // Preparar dados para exportação
         const dadosParaExportar = animaisParaExportar.map(animal => ({
           'ID': animal.id,
-          'SÃ©rie': animal.serie,
+          'Série': animal.serie,
           'RG': animal.rg,
           'Sexo': animal.sexo,
-          'RaÃ§a': animal.raca,
+          'Raça': animal.raca,
           'Data de Nascimento': animal.dataNascimento || animal.data_nascimento || '',
           'Idade (meses)': animal.meses || 0,
           'Peso': animal.peso || '',
-          'SituaÃ§Ã£o': animal.situacao,
+          'Situação': animal.situacao,
           'Valor de Venda': animal.valorVenda || animal.valor_venda || 0,
           'Pai': animal.pai || '',
-          'MÃ£e': animal.mae || '',
-          'ObservaÃ§Ãµes': animal.observacoes || ''
+          'Mãe': animal.mae || '',
+          'Observações': animal.observacoes || ''
         }));
         
         // Criar workbook e worksheet
@@ -303,16 +303,16 @@ export default function Animals() {
         // Download
         XLSX.writeFile(wb, nomeArquivo);
         
-        alert(`âÅ“â€¦ ${animaisParaExportar.length} animais exportados com sucesso!`);
+        alert(`✅ ${animaisParaExportar.length} animais exportados com sucesso!`);
         setLoading(false);
         return;
       }
       
-      // Caso contrÃ¡rio, usar a API de exportaÃ§Ã£o detalhada
+      // Caso contrário, usar a API de exportação detalhada
       const response = await fetch(`/api/export/animals-detailed?v=${Date.now()}`)
       
       if (!response.ok) {
-        throw new Error('Erro ao gerar arquivo de exportaÃ§Ã£o')
+        throw new Error('Erro ao gerar arquivo de exportação')
       }
       
       // Obter o blob do arquivo
@@ -332,17 +332,17 @@ export default function Animals() {
       // Limpar URL
       window.URL.revokeObjectURL(url)
       
-      alert('âÅ“â€¦ Arquivo Excel exportado com sucesso!')
+      alert('✅ Arquivo Excel exportado com sucesso!')
       
     } catch (error) {
       console.error('Erro ao exportar animais:', error)
-      alert('â�Å’ Erro ao exportar animais para Excel: ' + (error.message || 'Erro desconhecido'))
+      alert('❌ Erro ao exportar animais para Excel: ' + (error.message || 'Erro desconhecido'))
     } finally {
       setLoading(false)
     }
   }
 
-  // Detectar parÃ¢metros na URL
+  // Detectar parâmetros na URL
   useEffect(() => {
     if (router.query.openImporter === 'true') {
       setShowImporter(true);
@@ -370,13 +370,13 @@ export default function Animals() {
         setSelectedAnimal(animal);
         setShowForm(true);
       } else {
-        console.warn('âÅ¡ ï¸� Animal nÃ£o encontrado para ediÃ§Ã£o. ID:', animalId);
+        console.warn('⚠️ Animal não encontrado para edição. ID:', animalId);
       }
       router.replace('/animals', undefined, { shallow: true });
     }
   }, [router.query, animals]);
 
-  // Resetar pÃ¡gina quando filtros mudarem
+  // Resetar página quando filtros mudarem
   useEffect(() => {
     setCurrentPage(1)
   }, [filters])
@@ -384,7 +384,7 @@ export default function Animals() {
 
   const handleSaveAnimal = async (animalData) => {
     try {
-      // Form jÃ¡ salvou via animalDataManager - atualizar estado e recarregar lista
+      // Form já salvou via animalDataManager - atualizar estado e recarregar lista
       const savedId = animalData?.id ?? selectedAnimal?.id
       if (savedId) {
         setSelectedAnimal(null)
@@ -406,7 +406,7 @@ export default function Animals() {
         const savedAnimal = await response.json()
         const data = savedAnimal.data || savedAnimal
         setAnimals(prev => prev.map(a => a.id === selectedAnimal.id ? { ...a, ...data } : a))
-        alert('âÅ“â€¦ Animal atualizado com sucesso!')
+        alert('✅ Animal atualizado com sucesso!')
       } else {
         const response = await fetch('/api/animals', {
           method: 'POST',
@@ -420,16 +420,16 @@ export default function Animals() {
         const savedAnimal = await response.json()
         const newAnimalData = savedAnimal.data || savedAnimal
         setAnimals(prev => [...prev, newAnimalData])
-        alert('âÅ“â€¦ Novo animal adicionado com sucesso!')
+        alert('✅ Novo animal adicionado com sucesso!')
       }
       setSelectedAnimal(null);
       setShowForm(false);
       
-      // Recarregar animais para garantir sincronizaÃ§Ã£o
+      // Recarregar animais para garantir sincronização
       await loadAnimals()
     } catch (error) {
       console.error('Erro ao salvar animal:', error)
-      alert('â�Å’ Erro ao salvar animal: ' + error.message)
+      alert('❌ Erro ao salvar animal: ' + error.message)
     }
   };
 
@@ -445,7 +445,7 @@ export default function Animals() {
   const handleDeleteAnimal = async (animal) => {
     const animalName = `${animal.serie} ${animal.rg}`;
     
-    if (confirm(`âÅ¡ ï¸� Tem certeza que deseja excluir o animal "${animalName}"?\n\nEsta aÃ§Ã£o nÃ£o pode ser desfeita!`)) {
+    if (confirm(`⚠️ Tem certeza que deseja excluir o animal "${animalName}"?\n\nEsta ação não pode ser desfeita!`)) {
       try {
         // Tentar excluir da API primeiro
         try {
@@ -454,26 +454,26 @@ export default function Animals() {
           });
           
           if (response.ok) {
-            console.log('âÅ“â€¦ Animal excluÃ­do da API:', animalName);
+            console.log('✅ Animal excluído da API:', animalName);
           } else {
-            console.log('âÅ¡ ï¸� Erro ao excluir da API, continuando com localStorage');
+            console.log('⚠️ Erro ao excluir da API, continuando com localStorage');
           }
         } catch (apiError) {
-          console.error('â�Å’ Erro ao conectar com API:', apiError);
+          console.error('❌ Erro ao conectar com API:', apiError);
         }
         
         setAnimals(prev => prev.filter((a) => a.id !== animal.id));
-        alert(`âÅ“â€¦ Animal "${animalName}" excluÃ­do com sucesso!`);
+        alert(`✅ Animal "${animalName}" excluído com sucesso!`);
         await loadAnimals();
         
       } catch (error) {
         console.error('Erro ao excluir animal:', error);
-        alert('â�Å’ Erro ao excluir animal: ' + error.message);
+        alert('❌ Erro ao excluir animal: ' + error.message);
       }
     }
   };
 
-  // FunÃ§Ã£o genÃ©rica para atualizaÃ§Ã£o em lote
+  // Função genérica para atualização em lote
   const handleBulkUpdate = async (updates) => {
     if (selectedAnimals.length === 0) return;
     
@@ -492,47 +492,47 @@ export default function Animals() {
       
       if (result.success) {
          const summary = result.data.summary;
-         let msg = `âÅ“â€¦ Processamento concluÃ­do!\n\n`;
+         let msg = `✅ Processamento concluído!\n\n`;
          msg += `Sucessos: ${summary.successful}\n`;
          if (summary.failed > 0) msg += `Falhas: ${summary.failed}\n`;
          
          alert(msg);
          
-         // Limpar seleÃ§Ã£o e recarregar
+         // Limpar seleção e recarregar
          setSelectedAnimals([]);
          setSelectMode(false);
          await loadAnimals();
       } else {
-         alert('â�Å’ Erro ao atualizar animais: ' + (result.message || 'Erro desconhecido'));
+         alert('❌ Erro ao atualizar animais: ' + (result.message || 'Erro desconhecido'));
       }
     } catch (error) {
-      console.error('Erro na atualizaÃ§Ã£o em lote:', error);
-      alert('â�Å’ Erro ao conectar com o servidor: ' + error.message);
+      console.error('Erro na atualização em lote:', error);
+      alert('❌ Erro ao conectar com o servidor: ' + error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // FunÃ§Ã£o para abrir modal de alteraÃ§Ã£o de sexo em lote
+  // Função para abrir modal de alteração de sexo em lote
   const handleBulkSexChange = () => {
      if (selectedAnimals.length === 0) return;
      setShowBulkSexModal(true);
   };
 
-  // FunÃ§Ã£o para confirmar alteraÃ§Ã£o de sexo em lote
+  // Função para confirmar alteração de sexo em lote
   const confirmBulkSexChange = (newSex) => {
     if (!newSex) return;
     
-    if (confirm(`âÅ¡ ï¸� Tem certeza que deseja alterar o sexo de ${selectedAnimals.length} animais para "${newSex}"?\n\nEsta aÃ§Ã£o atualizarÃ¡ o banco de dados.`)) {
+    if (confirm(`⚠️ Tem certeza que deseja alterar o sexo de ${selectedAnimals.length} animais para "${newSex}"?\n\nEsta ação atualizará o banco de dados.`)) {
       handleBulkUpdate({ sexo: newSex });
       setShowBulkSexModal(false);
     }
   };
 
-  // FunÃ§Ã£o para excluir mÃºltiplos animais
+  // Função para excluir múltiplos animais
   const handleDeleteMultipleAnimals = async () => {
     if (selectedAnimals.length === 0) {
-      alert('âÅ¡ ï¸� Selecione pelo menos um animal para excluir');
+      alert('⚠️ Selecione pelo menos um animal para excluir');
       return;
     }
 
@@ -541,7 +541,7 @@ export default function Animals() {
       return animal ? `${animal.serie} ${animal.rg}` : `ID: ${id}`;
     }).join(', ');
 
-    if (confirm(`âÅ¡ ï¸� Tem certeza que deseja excluir ${selectedAnimals.length} animal(is)?\n\nAnimais: ${animalNames}\n\nEsta aÃ§Ã£o nÃ£o pode ser desfeita!`)) {
+    if (confirm(`⚠️ Tem certeza que deseja excluir ${selectedAnimals.length} animal(is)?\n\nAnimais: ${animalNames}\n\nEsta ação não pode ser desfeita!`)) {
       try {
         setLoading(true);
         let successCount = 0;
@@ -557,12 +557,12 @@ export default function Animals() {
               });
               
               if (response.ok) {
-                console.log('âÅ“â€¦ Animal excluÃ­do da API:', animalId);
+                console.log('✅ Animal excluído da API:', animalId);
               } else {
-                console.log('âÅ¡ ï¸� Erro ao excluir da API, continuando com localStorage');
+                console.log('⚠️ Erro ao excluir da API, continuando com localStorage');
               }
             } catch (apiError) {
-              console.error('â�Å’ Erro ao conectar com API:', apiError);
+              console.error('❌ Erro ao conectar com API:', apiError);
             }
             
             successCount++;
@@ -574,36 +574,36 @@ export default function Animals() {
 
         setAnimals(prev => prev.filter(animal => !selectedAnimals.includes(animal.id)));
 
-        // Limpar seleÃ§Ã£o e sair do modo de seleÃ§Ã£o
+        // Limpar seleção e sair do modo de seleção
         setSelectedAnimals([]);
         setSelectMode(false);
 
         // Mostrar resultado
         if (errorCount === 0) {
-          alert(`âÅ“â€¦ ${successCount} animal(is) excluÃ­do(s) com sucesso!`);
+          alert(`✅ ${successCount} animal(is) excluído(s) com sucesso!`);
         } else {
-          alert(`âÅ¡ ï¸� ${successCount} animal(is) excluÃ­do(s) com sucesso, ${errorCount} com erro.`);
+          alert(`⚠️ ${successCount} animal(is) excluído(s) com sucesso, ${errorCount} com erro.`);
         }
 
-        // Recarregar animais para garantir sincronizaÃ§Ã£o
+        // Recarregar animais para garantir sincronização
         await loadAnimals();
 
       } catch (error) {
         console.error('Erro ao excluir animais:', error);
-        alert('â�Å’ Erro ao excluir animais: ' + error.message);
+        alert('❌ Erro ao excluir animais: ' + error.message);
       } finally {
         setLoading(false);
       }
     }
   };
 
-  // FunÃ§Ã£o para alternar seleÃ§Ã£o de um animal
+  // Função para alternar seleção de um animal
   const toggleAnimalSelection = (animalId) => {
     setSelectedAnimals(prev => {
       const newSelection = prev.includes(animalId)
         ? prev.filter(id => id !== animalId)
         : [...prev, animalId];
-      console.log('ðÅ¸â€�â€ž SeleÃ§Ã£o atualizada:', {
+      console.log('🔄 Seleção atualizada:', {
         animalId,
         antes: prev,
         depois: newSelection,
@@ -613,43 +613,43 @@ export default function Animals() {
     });
   };
 
-  // FunÃ§Ã£o para selecionar todos os animais visÃ­veis
+  // Função para selecionar todos os animais visíveis
   const selectAllAnimals = () => {
     const allCurrentIds = currentAnimals.map(animal => animal.id);
     setSelectedAnimals(allCurrentIds);
   };
 
-  // FunÃ§Ã£o para desselecionar todos os animais
+  // Função para desselecionar todos os animais
   const deselectAllAnimals = () => {
     setSelectedAnimals([]);
   };
 
-  // FunÃ§Ã£o para alternar modo de seleÃ§Ã£o
+  // Função para alternar modo de seleção
   const toggleSelectMode = () => {
     setSelectMode(!selectMode);
     if (selectMode) {
-      setSelectedAnimals([]); // Limpar seleÃ§Ã£o ao sair do modo
+      setSelectedAnimals([]); // Limpar seleção ao sair do modo
     }
   };
 
   const handleViewAnimal = (animal) => {
     if (!animal || !animal.id) {
-      console.error('Animal invÃ¡lido:', animal);
-      alert('Erro: Animal invÃ¡lido para visualizaÃ§Ã£o');
+      console.error('Animal inválido:', animal);
+      alert('Erro: Animal inválido para visualização');
       return;
     }
     try {
       setAnimalToView(animal);
       setShowAnimalModal(true);
     } catch (error) {
-      console.error('Erro ao abrir modal de visualizaÃ§Ã£o:', error);
+      console.error('Erro ao abrir modal de visualização:', error);
       alert('Erro ao abrir detalhes do animal');
     }
   };
 
   const handlePrint = (animal = null) => {
     if (animal) {
-      // Imprimir um animal especÃ­fico
+      // Imprimir um animal específico
       setAnimalToPrint(animal);
       setShowPrintModal(true);
     } else if (selectedAnimals.length > 0) {
@@ -683,11 +683,11 @@ export default function Animals() {
         return
       }
 
-      // Carregar exames androlÃ³gicos e custos para todos os animais
+      // Carregar exames andrológicos e custos para todos os animais
       const examesPorRG = {}
       
       for (const animal of animaisParaPDF) {
-        // Carregar exames androlÃ³gicos
+        // Carregar exames andrológicos
         if (animal.rg) {
           try {
             const response = await fetch(`/api/reproducao/exames-andrologicos?rg=${animal.rg}`)
@@ -755,7 +755,7 @@ export default function Animals() {
       
       doc.save(filename)
       
-      alert(`âÅ“â€¦ PDF gerado com sucesso! ${animaisParaPDF.length} animal(is) incluÃ­do(s).`)
+      alert(`✅ PDF gerado com sucesso! ${animaisParaPDF.length} animal(is) incluído(s).`)
     } catch (error) {
       console.error('Erro ao gerar PDF:', error)
       alert('Erro ao gerar PDF das fichas')
@@ -766,9 +766,9 @@ export default function Animals() {
 
   const handleImportAnimals = async (importedAnimals) => {
     try {
-      console.log('ðÅ¸â€�â€ž Iniciando importaÃ§Ã£o de', importedAnimals.length, 'animais')
-      console.log('ðÅ¸â€�� Animais atuais antes da importaÃ§Ã£o:', animals.length)
-      console.log('ðÅ¸â€�� Primeiro animal importado:', importedAnimals[0])
+      console.log('🔄 Iniciando importação de', importedAnimals.length, 'animais')
+      console.log('🔍 Animais atuais antes da importação:', animals.length)
+      console.log('🔍 Primeiro animal importado:', importedAnimals[0])
       
       // Mostrar feedback visual
       const loadingMessage = `Importando ${importedAnimals.length} animais... Por favor, aguarde.`;
@@ -794,9 +794,9 @@ export default function Animals() {
       
       // Preparar dados para API (garantir formato correto)
       const animaisParaAPI = importedAnimals.map((animal, index) => {
-        // Remover campos que nÃ£o devem ser enviados para a API
+        // Remover campos que não devem ser enviados para a API
         const {
-          id, // REMOVER id temporÃ¡rio - serÃ¡ gerado pelo banco
+          id, // REMOVER id temporário - será gerado pelo banco
           ...animalSemId
         } = animal
 
@@ -806,22 +806,22 @@ export default function Animals() {
           sexoNormalizado = sexoNormalizado.toString().trim()
           if (sexoNormalizado === 'M' || sexoNormalizado.toUpperCase() === 'MACHO') {
             sexoNormalizado = 'Macho'
-          } else if (sexoNormalizado === 'F' || sexoNormalizado.toUpperCase() === 'FEMEA' || sexoNormalizado.toUpperCase() === 'FÃÅ MEA') {
-            sexoNormalizado = 'FÃªmea'
+          } else if (sexoNormalizado === 'F' || sexoNormalizado.toUpperCase() === 'FEMEA' || sexoNormalizado.toUpperCase() === 'FÊMEA') {
+            sexoNormalizado = 'Fêmea'
           }
         }
 
         // Validar e sanitizar campo meses (INTEGER no PostgreSQL: -2147483648 a 2147483647)
         let mesesSanitizado = null
         if (animalSemId.meses !== null && animalSemId.meses !== undefined) {
-          // Garantir que nÃ£o Ã© um timestamp ou valor muito grande
+          // Garantir que não é um timestamp ou valor muito grande
           const mesesValue = parseInt(animalSemId.meses, 10)
-          // Validar se Ã© um nÃºmero vÃ¡lido e estÃ¡ dentro do range de INTEGER
-          // Valores acima de 9999 sÃ£o suspeitos (muito grande para idade em meses)
+          // Validar se é um número válido e está dentro do range de INTEGER
+          // Valores acima de 9999 são suspeitos (muito grande para idade em meses)
           if (!isNaN(mesesValue) && mesesValue >= 0 && mesesValue <= 9999) {
             mesesSanitizado = mesesValue
           } else {
-            console.warn(`âÅ¡ ï¸� Valor invÃ¡lido para meses no animal ${index + 1} (${animalSemId.serie}-${animalSemId.rg}): ${animalSemId.meses}. Usando null.`)
+            console.warn(`⚠️ Valor inválido para meses no animal ${index + 1} (${animalSemId.serie}-${animalSemId.rg}): ${animalSemId.meses}. Usando null.`)
             mesesSanitizado = null
           }
         }
@@ -844,20 +844,20 @@ export default function Animals() {
           }
         }
 
-        // Verificar se Ã© modo de atualizaÃ§Ã£o
-        // Se sexo e raÃ§a nÃ£o estÃ£o presentes mas hÃ¡ dados de pai/mÃ£e/receptora, Ã© modo de atualizaÃ§Ã£o
+        // Verificar se é modo de atualização
+        // Se sexo e raça não estão presentes mas há dados de pai/mãe/receptora, é modo de atualização
         const temDadosAtualizacao = (animalSemId.pai && animalSemId.pai.trim() !== '') || 
                                      (animalSemId.mae && animalSemId.mae.trim() !== '') || 
                                      (animalSemId.receptora && animalSemId.receptora.trim() !== '')
         const isModoAtualizacao = !animalSemId.sexo && !animalSemId.raca && temDadosAtualizacao
 
-        // Criar objeto limpo apenas com campos vÃ¡lidos
+        // Criar objeto limpo apenas com campos válidos
         const animalLimpo = {
           serie: animalSemId.serie,
           rg: animalSemId.rg ? animalSemId.rg.toString() : null,
-          // No modo de atualizaÃ§Ã£o, nÃ£o enviar campos que nÃ£o devem ser atualizados
-          sexo: isModoAtualizacao ? undefined : (sexoNormalizado || 'Macho'), // Default se nÃ£o especificado
-          raca: isModoAtualizacao ? undefined : (animalSemId.raca || 'Nelore'), // Garantir que raÃ§a estÃ¡ presente
+          // No modo de atualização, não enviar campos que não devem ser atualizados
+          sexo: isModoAtualizacao ? undefined : (sexoNormalizado || 'Macho'), // Default se não especificado
+          raca: isModoAtualizacao ? undefined : (animalSemId.raca || 'Nelore'), // Garantir que raça está presente
           nome: isModoAtualizacao ? undefined : (animalSemId.nome || null),
           tatuagem: isModoAtualizacao ? undefined : (animalSemId.tatuagem || null),
           dataNascimento: isModoAtualizacao ? undefined : (animalSemId.dataNascimento || null),
@@ -865,8 +865,8 @@ export default function Animals() {
           peso: isModoAtualizacao ? undefined : pesoSanitizado,
           situacao: isModoAtualizacao ? undefined : (animalSemId.situacao || 'Ativo'),
           // SEMPRE incluir campos de genealogia se estiverem presentes
-          // Estes campos sÃ£o crÃ­ticos e devem ser atualizados sempre que fornecidos
-          // Se o campo tem valor (nÃ£o Ã© null/undefined/string vazia), sempre incluir
+          // Estes campos são críticos e devem ser atualizados sempre que fornecidos
+          // Se o campo tem valor (não é null/undefined/string vazia), sempre incluir
           pai: (animalSemId.pai && String(animalSemId.pai).trim() !== '') ? animalSemId.pai : null,
           mae: (animalSemId.mae && String(animalSemId.mae).trim() !== '') ? animalSemId.mae : null,
           avoMaterno: (animalSemId.avoMaterno && String(animalSemId.avoMaterno).trim() !== '') ? animalSemId.avoMaterno : null,
@@ -881,58 +881,58 @@ export default function Animals() {
           atualizarApenasVazios: animalSemId.atualizarApenasVazios || isModoAtualizacao // Garantir que a flag seja enviada
         }
 
-        // Remover campos undefined para nÃ£o enviÃ¡-los na requisiÃ§Ã£o
+        // Remover campos undefined para não enviá-los na requisição
         Object.keys(animalLimpo).forEach(key => {
           if (animalLimpo[key] === undefined) {
             delete animalLimpo[key]
           }
         })
 
-        // Validar campos obrigatÃ³rios
+        // Validar campos obrigatórios
         if (!animalLimpo.serie || !animalLimpo.rg) {
-          console.error(`â�Å’ Animal ${index + 1} invÃ¡lido - faltam campos obrigatÃ³rios (SÃ©rie e RG):`, animalLimpo)
+          console.error(`❌ Animal ${index + 1} inválido - faltam campos obrigatórios (Série e RG):`, animalLimpo)
         }
 
-        // No modo de atualizaÃ§Ã£o, verificar se pelo menos um campo de atualizaÃ§Ã£o foi fornecido
+        // No modo de atualização, verificar se pelo menos um campo de atualização foi fornecido
         if (isModoAtualizacao) {
           const temPai = animalLimpo.pai && animalLimpo.pai.trim() !== ''
           const temMae = animalLimpo.mae && animalLimpo.mae.trim() !== ''
           const temReceptora = animalLimpo.receptora && animalLimpo.receptora.trim() !== ''
           
           if (!temPai && !temMae && !temReceptora) {
-            console.warn(`âÅ¡ ï¸� Animal ${index + 1} (${animalLimpo.serie}-${animalLimpo.rg}) nÃ£o tem nenhum campo para atualizar (Pai, MÃ£e ou Receptora)`)
+            console.warn(`⚠️ Animal ${index + 1} (${animalLimpo.serie}-${animalLimpo.rg}) não tem nenhum campo para atualizar (Pai, Mãe ou Receptora)`)
           }
         } else {
-          // Modo normal: validar campos obrigatÃ³rios
+          // Modo normal: validar campos obrigatórios
           if (!animalLimpo.sexo || !animalLimpo.raca) {
-            console.error(`â�Å’ Animal ${index + 1} invÃ¡lido - faltam campos obrigatÃ³rios:`, animalLimpo)
+            console.error(`❌ Animal ${index + 1} inválido - faltam campos obrigatórios:`, animalLimpo)
           }
         }
 
         return animalLimpo
       }).filter(animal => {
-        // Filtrar animais que nÃ£o tÃªm campos obrigatÃ³rios
+        // Filtrar animais que não têm campos obrigatórios
         if (animal.modoAtualizacao) {
-          // Modo atualizaÃ§Ã£o: apenas SÃ©rie e RG sÃ£o obrigatÃ³rios
+          // Modo atualização: apenas Série e RG são obrigatórios
           return animal.serie && animal.rg
         } else {
-          // Modo normal: SÃ©rie, RG, Sexo e RaÃ§a sÃ£o obrigatÃ³rios
+          // Modo normal: Série, RG, Sexo e Raça são obrigatórios
           return animal.serie && animal.rg && animal.sexo && animal.raca
         }
       })
 
       // Tentar salvar na API usando batch import (mais eficiente)
       try {
-        console.log('ðÅ¸Å’� Iniciando sincronizaÃ§Ã£o em lote com API...')
-        console.log(`ðÅ¸â€œÅ  Total de animais para importar: ${animaisParaAPI.length}`)
-        console.log('ðÅ¸â€�� Primeiro animal preparado:', JSON.stringify(animaisParaAPI[0], null, 2))
+        console.log('🌐 Iniciando sincronização em lote com API...')
+        console.log(`📊 Total de animais para importar: ${animaisParaAPI.length}`)
+        console.log('🔍 Primeiro animal preparado:', JSON.stringify(animaisParaAPI[0], null, 2))
         
-        // Verificar se hÃ¡ algum valor suspeito antes de enviar
+        // Verificar se há algum valor suspeito antes de enviar
         animaisParaAPI.forEach((animal, idx) => {
           Object.keys(animal).forEach(key => {
             const value = animal[key]
             if (typeof value === 'number' && value > 2147483647) {
-              console.error(`â�Å’ ATENÃâ€¡ÃÆ’O: Animal ${idx + 1} tem valor muito grande no campo "${key}": ${value}`)
+              console.error(`❌ ATENÇÃO: Animal ${idx + 1} tem valor muito grande no campo "${key}": ${value}`)
             }
           })
         })
@@ -946,47 +946,47 @@ export default function Animals() {
         
         if (batchResponse.ok) {
           const batchResult = await batchResponse.json();
-          console.log('âÅ“â€¦ ImportaÃ§Ã£o em lote concluÃ­da via API batch:', batchResult);
+          console.log('✅ Importação em lote concluída via API batch:', batchResult);
           
           if (batchResult.data && batchResult.data.resumo) {
             const resumo = batchResult.data.resumo
-            console.log(`ðÅ¸â€œÅ  Resumo da importaÃ§Ã£o:`)
+            console.log(`📊 Resumo da importação:`)
             console.log(`  - Sucessos: ${resumo.total_sucessos}`)
             console.log(`  - Erros: ${resumo.total_erros}`)
             console.log(`  - Total antes: ${resumo.total_antes || 'N/A'}`)
             console.log(`  - Total depois: ${resumo.total_depois || 'N/A'}`)
-            console.log(`  - DiferenÃ§a (adicionados): ${resumo.diferenca || 'N/A'}`)
+            console.log(`  - Diferença (adicionados): ${resumo.diferenca || 'N/A'}`)
             
-            // VALIDAÃâ€¡ÃÆ’O CRÃ�TICA: Verificar se realmente foram salvos
+            // VALIDAÇÃO CRÍTICA: Verificar se realmente foram salvos
             if (resumo.total_sucessos === 0) {
-              throw new Error('Nenhum animal foi salvo. Todos falharam na importaÃ§Ã£o.')
+              throw new Error('Nenhum animal foi salvo. Todos falharam na importação.')
             }
             
             // Verificar se o total realmente aumentou
             if (resumo.total_antes !== undefined && resumo.total_depois !== undefined) {
               const diferenca = resumo.total_depois - resumo.total_antes
               if (diferenca === 0 && resumo.total_sucessos > 0) {
-                console.error(`â�Å’ ERRO CRÃ�TICO: ${resumo.total_sucessos} animais processados mas nenhum foi adicionado!`)
-                throw new Error(`ImportaÃ§Ã£o falhou: ${resumo.total_sucessos} animais processados mas o total nÃ£o aumentou (${resumo.total_antes} ââ€ â€™ ${resumo.total_depois})`)
+                console.error(`❌ ERRO CRÍTICO: ${resumo.total_sucessos} animais processados mas nenhum foi adicionado!`)
+                throw new Error(`Importação falhou: ${resumo.total_sucessos} animais processados mas o total não aumentou (${resumo.total_antes} → ${resumo.total_depois})`)
               }
               
               if (diferenca < resumo.total_sucessos) {
-                console.warn(`âÅ¡ ï¸� ATENÃâ€¡ÃÆ’O: Apenas ${diferenca} de ${resumo.total_sucessos} animais foram realmente adicionados ao banco`)
+                console.warn(`⚠️ ATENÇÃO: Apenas ${diferenca} de ${resumo.total_sucessos} animais foram realmente adicionados ao banco`)
               }
             }
             
             if (resumo.total_erros > 0) {
-              console.warn('âÅ¡ ï¸� Alguns animais tiveram erro na importaÃ§Ã£o. Verifique os logs do servidor.')
-              // NÃ£o lanÃ§ar erro, apenas avisar - alguns animais foram salvos com sucesso
+              console.warn('⚠️ Alguns animais tiveram erro na importação. Verifique os logs do servidor.')
+              // Não lançar erro, apenas avisar - alguns animais foram salvos com sucesso
             }
           } else {
-            console.warn('âÅ¡ ï¸� Resposta da API nÃ£o contÃ©m resumo. Pode haver problema.')
+            console.warn('⚠️ Resposta da API não contém resumo. Pode haver problema.')
           }
         } else {
           const errorText = await batchResponse.text();
-          console.error('â�Å’ Erro na API batch:', errorText);
+          console.error('❌ Erro na API batch:', errorText);
           
-          // Tentar parsear a resposta JSON para ver se hÃ¡ informaÃ§Ãµes Ãºteis
+          // Tentar parsear a resposta JSON para ver se há informações úteis
           let errorMessage = `Erro ${batchResponse.status} na API batch`
           try {
             const errorJson = JSON.parse(errorText)
@@ -996,28 +996,28 @@ export default function Animals() {
             
             // Se o erro menciona um valor muito grande, pode ser que alguns animais tenham sido salvos
             if (errorText.includes('fora do intervalo') || errorText.includes('out of range')) {
-              console.warn('âÅ¡ ï¸� Erro de validaÃ§Ã£o detectado. Alguns animais podem ter sido salvos antes do erro.')
-              // NÃ£o lanÃ§ar erro fatal - continuar com o processo
-              // Os animais vÃ¡lidos jÃ¡ foram salvos
+              console.warn('⚠️ Erro de validação detectado. Alguns animais podem ter sido salvos antes do erro.')
+              // Não lançar erro fatal - continuar com o processo
+              // Os animais válidos já foram salvos
             } else {
               throw new Error(`Batch API retornou erro: ${batchResponse.status} - ${errorMessage}`)
             }
           } catch (parseError) {
-            // Se nÃ£o conseguir parsear, pode ser erro crÃ­tico
+            // Se não conseguir parsear, pode ser erro crítico
             if (batchResponse.status >= 500) {
               throw new Error(`Erro do servidor: ${errorMessage}`)
             }
             // Para outros erros, continuar (pode ser que alguns animais foram salvos)
-            console.warn('âÅ¡ ï¸� Erro ao processar resposta da API, mas continuando...')
+            console.warn('⚠️ Erro ao processar resposta da API, mas continuando...')
           }
         }
         
-        console.log('ðÅ¸Å’� SincronizaÃ§Ã£o com API concluÃ­da')
+        console.log('🌐 Sincronização com API concluída')
       } catch (apiError) {
-        console.error('â�Å’ Erro ao sincronizar com API:', apiError)
-        console.error('ðÅ¸â€œâ€¹ Detalhes do erro:', apiError.message)
-        // NÃ£o bloquear a importaÃ§Ã£o, mas avisar o usuÃ¡rio
-        alert(`âÅ¡ ï¸� ImportaÃ§Ã£o concluÃ­da localmente, mas houve erro ao sincronizar com o banco de dados: ${apiError.message}\n\nVerifique o console para mais detalhes.`)
+        console.error('❌ Erro ao sincronizar com API:', apiError)
+        console.error('📋 Detalhes do erro:', apiError.message)
+        // Não bloquear a importação, mas avisar o usuário
+        alert(`⚠️ Importação concluída localmente, mas houve erro ao sincronizar com o banco de dados: ${apiError.message}\n\nVerifique o console para mais detalhes.`)
       }
       
       // Remover loading
@@ -1027,47 +1027,47 @@ export default function Animals() {
       // Aguardar um pouco para garantir que o banco foi atualizado
       await new Promise(resolve => setTimeout(resolve, 500))
       
-      // Recarregar animais do banco para garantir sincronizaÃ§Ã£o
-      console.log('ðÅ¸â€�â€ž Recarregando animais do banco de dados...')
+      // Recarregar animais do banco para garantir sincronização
+      console.log('🔄 Recarregando animais do banco de dados...')
       await loadAnimals()
       
       // Aguardar um pouco mais para o estado ser atualizado
       await new Promise(resolve => setTimeout(resolve, 300))
       
-      // Verificar se os animais foram realmente salvos fazendo uma nova requisiÃ§Ã£o
+      // Verificar se os animais foram realmente salvos fazendo uma nova requisição
       try {
         const verifyResponse = await fetch('/api/animals')
         if (verifyResponse.ok) {
           const verifyResult = await verifyResponse.json()
           const animaisAtuais = Array.isArray(verifyResult.data) ? verifyResult.data : (Array.isArray(verifyResult) ? verifyResult : [])
-          console.log('âÅ“â€¦ Animais recarregados. Total no banco:', animaisAtuais.length)
+          console.log('✅ Animais recarregados. Total no banco:', animaisAtuais.length)
           
           if (animaisAtuais.length > 0) {
-            // Verificar se foi modo de atualizaÃ§Ã£o
+            // Verificar se foi modo de atualização
             const isModoAtualizacao = importedAnimals.some(a => !a.sexo && !a.raca && (a.pai || a.mae || a.receptora))
             const tipoOperacao = isModoAtualizacao ? 'atualizados' : 'importados'
             
-            console.log(`âÅ“â€¦ ${tipoOperacao === 'atualizados' ? 'AtualizaÃ§Ã£o' : 'ImportaÃ§Ã£o'} concluÃ­da! Total de animais no sistema: ${animaisAtuais.length}`)
-            alert(`âÅ“â€¦ ${importedAnimals.length} animais ${tipoOperacao} com sucesso!\n\nTotal de animais no sistema: ${animaisAtuais.length}`);
+            console.log(`✅ ${tipoOperacao === 'atualizados' ? 'Atualização' : 'Importação'} concluída! Total de animais no sistema: ${animaisAtuais.length}`)
+            alert(`✅ ${importedAnimals.length} animais ${tipoOperacao} com sucesso!\n\nTotal de animais no sistema: ${animaisAtuais.length}`);
           } else {
-            console.warn('âÅ¡ ï¸� Nenhum animal encontrado apÃ³s importaÃ§Ã£o. Pode haver problema de sincronizaÃ§Ã£o.')
-            alert(`âÅ¡ ï¸� ImportaÃ§Ã£o concluÃ­da, mas nenhum animal foi encontrado ao recarregar.\n\nPor favor, recarregue a pÃ¡gina manualmente.`);
+            console.warn('⚠️ Nenhum animal encontrado após importação. Pode haver problema de sincronização.')
+            alert(`⚠️ Importação concluída, mas nenhum animal foi encontrado ao recarregar.\n\nPor favor, recarregue a página manualmente.`);
           }
         }
       } catch (verifyError) {
-        console.error('â�Å’ Erro ao verificar animais:', verifyError)
-        alert(`âÅ“â€¦ ${importedAnimals.length} animais importados!\n\nA importaÃ§Ã£o foi concluÃ­da. Por favor, recarregue a pÃ¡gina para ver os animais.`);
+        console.error('❌ Erro ao verificar animais:', verifyError)
+        alert(`✅ ${importedAnimals.length} animais importados!\n\nA importação foi concluída. Por favor, recarregue a página para ver os animais.`);
       }
       
       setShowImporter(false);
     } catch (error) {
-      console.error('â�Å’ Erro ao importar animais:', error)
+      console.error('❌ Erro ao importar animais:', error)
       
       // Remover loading em caso de erro
       const loadingEl = document.getElementById('import-loading');
       if (loadingEl) loadingEl.remove();
       
-      alert(`â�Å’ Erro ao importar animais: ${error.message || 'Erro desconhecido'}. Verifique o console para mais detalhes.`)
+      alert(`❌ Erro ao importar animais: ${error.message || 'Erro desconhecido'}. Verifique o console para mais detalhes.`)
     }
   };
 
@@ -1077,7 +1077,7 @@ export default function Animals() {
       const updatedAnimals = [...animals, ...savedReceptoras];
       setAnimals(updatedAnimals);
       
-      // Aplicar custos se necessÃ¡rio
+      // Aplicar custos se necessário
       for (const receptora of savedReceptoras) {
         const animalId = `RPT${receptora.rg}`;
         
@@ -1091,11 +1091,11 @@ export default function Animals() {
       
       setShowBatchReceptora(false);
       
-      // Recarregar animais para garantir sincronizaÃ§Ã£o
+      // Recarregar animais para garantir sincronização
       await loadAnimals();
     } catch (error) {
       console.error('Erro ao processar receptoras:', error);
-      alert('â�Å’ Erro ao processar receptoras: ' + error.message);
+      alert('❌ Erro ao processar receptoras: ' + error.message);
     }
   };
 
@@ -1103,7 +1103,7 @@ export default function Animals() {
   const clearFilters = () => {
     setFilters({});
     setCurrentPage(1);
-    console.log('âÅ“â€¦ Filtros limpos. Todos os animais serÃ£o exibidos.');
+    console.log('✅ Filtros limpos. Todos os animais serão exibidos.');
   };
 
   return (
@@ -1112,31 +1112,31 @@ export default function Animals() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-              ðÅ¸�â€ž GestÃ£o de Animais
+              🐄 Gestão de Animais
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              {animals.length} animais cadastrados ââ‚¬¢ {filteredAnimals.length} exibidos
+              {animals.length} animais cadastrados • {filteredAnimals.length} exibidos
               {selectMode && selectedAnimals.length > 0 && (
                 <span className="ml-2 text-blue-600 dark:text-blue-400 font-medium">
-                  ââ‚¬¢ {selectedAnimals.length} selecionado(s)
+                  • {selectedAnimals.length} selecionado(s)
                 </span>
               )}
               {filteredAnimals.length < animals.length && Object.keys(filters).some(key => filters[key]) && (
                 <span className="ml-2 text-orange-600 dark:text-orange-400 font-medium">
-                  âÅ¡ ï¸� Filtros ativos - <button onClick={clearFilters} className="underline hover:text-orange-700 dark:hover:text-orange-300">Limpar filtros</button>
+                  ⚠️ Filtros ativos - <button onClick={clearFilters} className="underline hover:text-orange-700 dark:hover:text-orange-300">Limpar filtros</button>
                 </span>
               )}
               {animals.length === 0 && !loading && (
                 <span className="ml-2">
                   <button onClick={loadAnimals} className="text-blue-600 dark:text-blue-400 underline hover:text-blue-700 dark:hover:text-blue-300">
-                    ðÅ¸â€�â€ž Recarregar animais
+                    🔄 Recarregar animais
                   </button>
                 </span>
               )}
             </p>
           </div>
           <div className="mt-4 sm:mt-0 flex flex-wrap gap-2">
-            {/* Controles de SeleÃ§Ã£o MÃºltipla */}
+            {/* Controles de Seleção Múltipla */}
             {selectMode ? (
               <>
                 <button
@@ -1144,14 +1144,14 @@ export default function Animals() {
                   className="btn-secondary flex items-center text-sm"
                   disabled={selectedAnimals.length === currentAnimals.length}
                 >
-                  âÅ“â€¦ Selecionar Todos
+                  ✅ Selecionar Todos
                 </button>
                 <button
                   onClick={deselectAllAnimals}
                   className="btn-secondary flex items-center text-sm"
                   disabled={selectedAnimals.length === 0}
                 >
-                  â�Å’ Desselecionar Todos
+                  ❌ Desselecionar Todos
                 </button>
                 <button
                   onClick={() => handlePrint(null)}
@@ -1160,7 +1160,7 @@ export default function Animals() {
                   title="Imprimir animais selecionados"
                 >
                   <PrinterIcon className="h-4 w-4 mr-1" />
-                  {selectedAnimals.length > 0 ? `ðÅ¸â€œâ€ž Imprimir (${selectedAnimals.length})` : 'ðÅ¸â€œâ€ž Imprimir'}
+                  {selectedAnimals.length > 0 ? `📄 Imprimir (${selectedAnimals.length})` : '📄 Imprimir'}
                 </button>
                 <button
                   onClick={handleGeneratePDF}
@@ -1169,7 +1169,7 @@ export default function Animals() {
                   title="Gerar PDF das fichas dos animais selecionados"
                 >
                   <DocumentArrowDownIcon className="h-4 w-4 mr-1" />
-                  {loading ? 'â�³ Gerando PDF...' : selectedAnimals.length > 0 ? `ðÅ¸â€œâ€ž PDF (${selectedAnimals.length})` : 'ðÅ¸â€œâ€ž Gerar PDF'}
+                  {loading ? '⏳ Gerando PDF...' : selectedAnimals.length > 0 ? `📄 PDF (${selectedAnimals.length})` : '📄 Gerar PDF'}
                 </button>
                 <button
                   onClick={handleBulkSexChange}
@@ -1177,7 +1177,7 @@ export default function Animals() {
                   disabled={selectedAnimals.length === 0 || loading}
                 >
                   <UserGroupIcon className="h-4 w-4 mr-1" />
-                  {loading ? 'â�³ Alterando Sexo...' : `ðÅ¸â€�â€ž Alterar Sexo (${selectedAnimals.length})`}
+                  {loading ? '⏳ Alterando Sexo...' : `🔄 Alterar Sexo (${selectedAnimals.length})`}
                 </button>
                 <button
                   onClick={handleExportAnimals}
@@ -1186,7 +1186,7 @@ export default function Animals() {
                   title="Exportar animais selecionados para Excel"
                 >
                   <DocumentArrowDownIcon className="h-4 w-4 mr-1" />
-                  {loading ? 'â�³ Exportando...' : `ðÅ¸â€œÅ  Exportar Excel ${selectedAnimals.length > 0 ? `(${selectedAnimals.length})` : ''}`}
+                  {loading ? '⏳ Exportando...' : `📊 Exportar Excel ${selectedAnimals.length > 0 ? `(${selectedAnimals.length})` : ''}`}
                 </button>
                 <button
                   onClick={handleDeleteMultipleAnimals}
@@ -1194,13 +1194,13 @@ export default function Animals() {
                   disabled={selectedAnimals.length === 0 || loading}
                 >
                   <TrashIcon className="h-4 w-4 mr-1" />
-                  {loading ? 'â�³ Excluindo...' : `ðÅ¸â€”â€˜ï¸� Excluir ${selectedAnimals.length > 0 ? `(${selectedAnimals.length})` : ''}`}
+                  {loading ? '⏳ Excluindo...' : `🗑️ Excluir ${selectedAnimals.length > 0 ? `(${selectedAnimals.length})` : ''}`}
                 </button>
                 <button
                   onClick={toggleSelectMode}
                   className="btn-secondary flex items-center text-sm"
                 >
-                  â�Å’ Cancelar SeleÃ§Ã£o
+                  ❌ Cancelar Seleção
                 </button>
               </>
             ) : (
@@ -1210,13 +1210,13 @@ export default function Animals() {
                   className="btn-secondary flex items-center text-sm"
                   disabled={filteredAnimals.length === 0}
                 >
-                  âËœâ€˜ï¸� SeleÃ§Ã£o MÃºltipla
+                  ☑️ Seleção Múltipla
                 </button>
                 <button
                   onClick={() => setViewMode(viewMode === 'cards' ? 'table' : 'cards')}
                   className="btn-secondary flex items-center"
                 >
-                  {viewMode === 'cards' ? 'ðÅ¸â€œâ€¹' : 'ðÅ¸Å½´'} {viewMode === 'cards' ? 'Tabela' : 'Cards'}
+                  {viewMode === 'cards' ? '📋' : '🎴'} {viewMode === 'cards' ? 'Tabela' : 'Cards'}
                 </button>
                 <button
                   onClick={handleExportAnimals}
@@ -1224,21 +1224,21 @@ export default function Animals() {
                   disabled={loading}
                 >
                   <DocumentArrowDownIcon className="h-5 w-5 mr-2" />
-                  {loading ? 'â�³ Exportando...' : 'ðÅ¸â€œ¤ Exportar Excel'}
+                  {loading ? '⏳ Exportando...' : '📤 Exportar Excel'}
                 </button>
                 <button
                   onClick={() => setShowImporter(true)}
                   className="btn-secondary flex items-center"
                 >
                   <DocumentArrowDownIcon className="h-5 w-5 mr-2" />
-                  ðÅ¸â€œ¥ Importar Animais
+                  📥 Importar Animais
                 </button>
                 <button
                   onClick={() => setShowUniversalImporter(true)}
                   className="btn-primary flex items-center bg-green-600 hover:bg-green-700"
                 >
                   <DocumentArrowUpIcon className="h-5 w-5 mr-2" />
-                  ðÅ¸Å’� ImportaÃ§Ã£o Universal
+                  🌐 Importação Universal
                 </button>
                 <button
                   onClick={() => handlePrint(null)}
@@ -1255,7 +1255,7 @@ export default function Animals() {
                   className="btn-secondary flex items-center"
                 >
                   <PlusIcon className="h-5 w-5 mr-2" />
-                  ðÅ¸�â€ž Receptoras em Lote
+                  🐄 Receptoras em Lote
                 </button>
                 <button
                   onClick={() => {
@@ -1280,12 +1280,12 @@ export default function Animals() {
           animals={animals}
         />
 
-        {/* ConteÃºdo Principal */}
+        {/* Conteúdo Principal */}
         {animals.length === 0 ? (
           <EmptyState
             title="Nenhum animal cadastrado"
-            description="Comece adicionando seu primeiro animal para comeÃ§ar a gerenciar seu rebanho."
-            icon="ðÅ¸�â€ž"
+            description="Comece adicionando seu primeiro animal para começar a gerenciar seu rebanho."
+            icon="🐄"
             actionLabel="Cadastrar Primeiro Animal"
             onAction={() => {
               setSelectedAnimal(null);
@@ -1294,7 +1294,7 @@ export default function Animals() {
           />
         ) : filteredAnimals.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-gray-400 dark:text-gray-500 text-4xl mb-4">ðÅ¸â€��</div>
+            <div className="text-gray-400 dark:text-gray-500 text-4xl mb-4">🔍</div>
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
               Nenhum animal encontrado
             </h3>
@@ -1334,7 +1334,7 @@ export default function Animals() {
               ))}
             </div>
             
-            {/* PaginaÃ§Ã£o */}
+            {/* Paginação */}
             {totalPages > 1 && (
               <div className="flex items-center justify-between mt-8 px-4 py-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex-1 flex justify-between sm:hidden">
@@ -1350,19 +1350,19 @@ export default function Animals() {
                     disabled={currentPage === totalPages}
                     className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    PrÃ³ximo
+                    Próximo
                   </button>
                 </div>
                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm text-gray-700 dark:text-gray-300">
-                      Mostrando <span className="font-medium">{startIndex + 1}</span> atÃ©{' '}
+                      Mostrando <span className="font-medium">{startIndex + 1}</span> até{' '}
                       <span className="font-medium">{Math.min(endIndex, filteredAnimals.length)}</span> de{' '}
                       <span className="font-medium">{filteredAnimals.length}</span> animais
                     </p>
                   </div>
                   <div>
-                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="PaginaÃ§Ã£o">
+                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Paginação">
                       <button
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 1}
@@ -1374,7 +1374,7 @@ export default function Animals() {
                         </svg>
                       </button>
                       
-                      {/* PÃ¡ginas */}
+                      {/* Páginas */}
                       {getVisiblePages().map((page) => (
                         <button
                           key={page}
@@ -1399,7 +1399,7 @@ export default function Animals() {
                         disabled={currentPage === totalPages}
                         className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <span className="sr-only">PrÃ³ximo</span>
+                        <span className="sr-only">Próximo</span>
                         <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                           <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                         </svg>
@@ -1439,13 +1439,13 @@ export default function Animals() {
                       Detalhes
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      SituaÃ§Ã£o
+                      Situação
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Financeiro
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      AÃ§Ãµes
+                      Ações
                     </th>
                   </tr>
                 </thead>
@@ -1459,11 +1459,11 @@ export default function Animals() {
                           : ''
                       }`}
                       onClick={(e) => {
-                        // NÃ£o fazer nada se clicar nos botÃµes de aÃ§Ã£o ou no checkbox
+                        // Não fazer nada se clicar nos botões de ação ou no checkbox
                         if (e.target.closest('button') || e.target.closest('input[type="checkbox"]')) {
                           return;
                         }
-                        // Se estiver no modo de seleÃ§Ã£o, alternar seleÃ§Ã£o
+                        // Se estiver no modo de seleção, alternar seleção
                         if (selectMode) {
                           e.preventDefault();
                           e.stopPropagation();
@@ -1493,7 +1493,7 @@ export default function Animals() {
                           <div className="flex-shrink-0 h-10 w-10">
                             <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
                               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {animal.sexo === "Macho" ? "ðÅ¸�â€š" : "ðÅ¸�â€ž"}
+                                {animal.sexo === "Macho" ? "🐂" : "🐄"}
                               </span>
                             </div>
                           </div>
@@ -1538,7 +1538,7 @@ export default function Animals() {
                             {(tooltipVenda.animalId === animal.id && (tooltipVenda.loading || tooltipVenda.info)) && (
                               <div className="absolute left-0 top-full mt-2 z-50 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border-2 border-blue-200 dark:border-blue-700 p-4"
                                 onMouseEnter={() => {
-                                  // Manter tooltip visÃ­vel quando mouse estiver sobre ele
+                                  // Manter tooltip visível quando mouse estiver sobre ele
                                 }}
                               >
                                 {tooltipVenda.loading ? (
@@ -1549,13 +1549,13 @@ export default function Animals() {
                                 ) : tooltipVenda.info ? (
                                   <div className="space-y-3">
                                     <h4 className="text-sm font-bold text-gray-900 dark:text-white border-b pb-2">
-                                      ðÅ¸â€œâ€¹ Dados da Venda
+                                      📋 Dados da Venda
                                     </h4>
                                     <div className="space-y-2 text-sm">
                                       <div className="flex justify-between">
                                         <span className="text-gray-600 dark:text-gray-400">NF:</span>
                                         <span className="font-semibold text-gray-900 dark:text-white">
-                                          {tooltipVenda.info.nfNumero || 'NÃ£o informado'}
+                                          {tooltipVenda.info.nfNumero || 'Não informado'}
                                         </span>
                                       </div>
                                       <div className="flex justify-between">
@@ -1563,13 +1563,13 @@ export default function Animals() {
                                         <span className="font-semibold text-gray-900 dark:text-white">
                                           {tooltipVenda.info.dataVenda 
                                             ? new Date(tooltipVenda.info.dataVenda).toLocaleDateString('pt-BR') 
-                                            : 'NÃ£o informado'}
+                                            : 'Não informado'}
                                         </span>
                                       </div>
                                       <div className="flex justify-between">
                                         <span className="text-gray-600 dark:text-gray-400">Vendido:</span>
                                         <span className="font-semibold text-gray-900 dark:text-white">
-                                          {tooltipVenda.info.destino || 'NÃ£o informado'}
+                                          {tooltipVenda.info.destino || 'Não informado'}
                                         </span>
                                       </div>
                                       {tooltipVenda.info.valorVenda > 0 && (
@@ -1587,7 +1587,7 @@ export default function Animals() {
                                   </div>
                                 ) : (
                                   <div className="text-center py-3">
-                                    <p className="text-sm text-gray-600 dark:text-gray-400">Dados de venda nÃ£o encontrados</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400">Dados de venda não encontrados</p>
                                   </div>
                                 )}
                               </div>
@@ -1656,8 +1656,8 @@ export default function Animals() {
                                   setSelectedAnimal(animal);
                                   setShowForm(true);
                                 } catch (error) {
-                                  console.error('Erro ao abrir ediÃ§Ã£o:', error);
-                                  alert('Erro ao abrir formulÃ¡rio de ediÃ§Ã£o');
+                                  console.error('Erro ao abrir edição:', error);
+                                  alert('Erro ao abrir formulário de edição');
                                 }
                               }}
                               className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
@@ -1707,7 +1707,7 @@ export default function Animals() {
                                   handlePrint(animal);
                                 } catch (error) {
                                   console.error('Erro ao imprimir:', error);
-                                  alert('Erro ao abrir impressÃ£o');
+                                  alert('Erro ao abrir impressão');
                                 }
                               }}
                               className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
@@ -1753,7 +1753,7 @@ export default function Animals() {
                                   : 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 hover:bg-purple-200 dark:hover:bg-purple-800'
                               }`}
                             >
-                              {selectedAnimals.includes(animal.id) ? 'âÅ“â€¦ Selecionado' : 'âËœâ€˜ï¸� Selecionar'}
+                              {selectedAnimals.includes(animal.id) ? '✅ Selecionado' : '☑️ Selecionar'}
                             </button>
                           </div>
                         )}
@@ -1778,7 +1778,7 @@ export default function Animals() {
               </table>
             </div>
             
-            {/* PaginaÃ§Ã£o para tabela */}
+            {/* Paginação para tabela */}
             {totalPages > 1 && (
               <div className="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex-1 flex justify-between sm:hidden">
@@ -1794,19 +1794,19 @@ export default function Animals() {
                     disabled={currentPage === totalPages}
                     className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    PrÃ³ximo
+                    Próximo
                   </button>
                 </div>
                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm text-gray-700 dark:text-gray-300">
-                      Mostrando <span className="font-medium">{startIndex + 1}</span> atÃ©{' '}
+                      Mostrando <span className="font-medium">{startIndex + 1}</span> até{' '}
                       <span className="font-medium">{Math.min(endIndex, filteredAnimals.length)}</span> de{' '}
                       <span className="font-medium">{filteredAnimals.length}</span> animais
                     </p>
                   </div>
                   <div>
-                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="PaginaÃ§Ã£o">
+                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Paginação">
                       <button
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 1}
@@ -1818,7 +1818,7 @@ export default function Animals() {
                         </svg>
                       </button>
                       
-                      {/* PÃ¡ginas */}
+                      {/* Páginas */}
                       {getVisiblePages().map((page) => (
                         <button
                           key={page}
@@ -1843,7 +1843,7 @@ export default function Animals() {
                         disabled={currentPage === totalPages}
                         className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <span className="sr-only">PrÃ³ximo</span>
+                        <span className="sr-only">Próximo</span>
                         <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                           <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                         </svg>
@@ -1918,7 +1918,7 @@ export default function Animals() {
           animal={animalForTimeline}
         />
 
-        {/* Modal de AlteraÃ§Ã£o de Sexo em Lote */}
+        {/* Modal de Alteração de Sexo em Lote */}
         {showBulkSexModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full p-6 animate-fade-in-up">
@@ -1938,7 +1938,7 @@ export default function Animals() {
               <p className="text-gray-600 dark:text-gray-300 mb-6">
                 Selecione o novo sexo para os <strong className="text-purple-600 dark:text-purple-400">{selectedAnimals.length} animais</strong> selecionados.
                 <br/>
-                <span className="text-sm text-red-500 mt-2 block">âÅ¡ ï¸� Esta aÃ§Ã£o atualizarÃ¡ o banco de dados imediatamente.</span>
+                <span className="text-sm text-red-500 mt-2 block">⚠️ Esta ação atualizará o banco de dados imediatamente.</span>
               </p>
 
               <div className="grid grid-cols-2 gap-4">
@@ -1946,16 +1946,16 @@ export default function Animals() {
                   onClick={() => confirmBulkSexChange('Macho')}
                   className="flex flex-col items-center justify-center p-6 rounded-xl border-2 border-blue-100 hover:border-blue-500 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:border-blue-800 dark:hover:border-blue-400 transition-all group"
                 >
-                  <span className="text-4xl mb-2 group-hover:scale-110 transition-transform">ðÅ¸�â€š</span>
+                  <span className="text-4xl mb-2 group-hover:scale-110 transition-transform">🐂</span>
                   <span className="font-bold text-blue-700 dark:text-blue-300">Macho</span>
                 </button>
 
                 <button
-                  onClick={() => confirmBulkSexChange('FÃªmea')}
+                  onClick={() => confirmBulkSexChange('Fêmea')}
                   className="flex flex-col items-center justify-center p-6 rounded-xl border-2 border-pink-100 hover:border-pink-500 bg-pink-50 hover:bg-pink-100 dark:bg-pink-900/20 dark:border-pink-800 dark:hover:border-pink-400 transition-all group"
                 >
-                  <span className="text-4xl mb-2 group-hover:scale-110 transition-transform">ðÅ¸�â€ž</span>
-                  <span className="font-bold text-pink-700 dark:text-pink-300">FÃªmea</span>
+                  <span className="text-4xl mb-2 group-hover:scale-110 transition-transform">🐄</span>
+                  <span className="font-bold text-pink-700 dark:text-pink-300">Fêmea</span>
                 </button>
               </div>
 
@@ -1971,7 +1971,7 @@ export default function Animals() {
           </div>
         )}
 
-        {/* Modal de VisualizaÃ§Ã£o do Animal */}
+        {/* Modal de Visualização do Animal */}
         {showAnimalModal && animalToView && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
@@ -1990,13 +1990,13 @@ export default function Animals() {
                 </button>
               </div>
               <div className="p-6 space-y-6">
-                {/* InformaÃ§Ãµes Gerais Unificadas */}
+                {/* Informações Gerais Unificadas */}
                 <div className="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg">
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 uppercase tracking-wide">InformaÃ§Ãµes Gerais</h3>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 uppercase tracking-wide">Informações Gerais</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                     {/* Linha 1 */}
                     <div>
-                      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">SÃ©rie/RG</label>
+                      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Série/RG</label>
                       <p className="text-sm font-bold text-gray-900 dark:text-white">
                         {animalToView.serie || ''} {animalToView.rg || ''}
                       </p>
@@ -2006,7 +2006,7 @@ export default function Animals() {
                       <p className="text-sm font-medium text-gray-900 dark:text-white">{animalToView.sexo || '-'}</p>
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">RaÃ§a</label>
+                      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Raça</label>
                       <p className="text-sm font-medium text-gray-900 dark:text-white truncate" title={animalToView.raca}>{animalToView.raca || '-'}</p>
                     </div>
                     <div>
@@ -2014,7 +2014,7 @@ export default function Animals() {
                       <p className="text-sm font-medium text-gray-900 dark:text-white">{animalToView.meses || 0} meses</p>
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">SituaÃ§Ã£o</label>
+                      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Situação</label>
                       <span className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full ${
                         animalToView.situacao === 'Ativo' 
                           ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
@@ -2044,7 +2044,7 @@ export default function Animals() {
                   </div>
                 </div>
 
-                {/* InformaÃ§Ãµes Financeiras e Adicionais (Lado a Lado) */}
+                {/* Informações Financeiras e Adicionais (Lado a Lado) */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Financeiro */}
                   <div className="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg">
@@ -2078,7 +2078,7 @@ export default function Animals() {
                         <p className="text-sm font-medium text-gray-900 dark:text-white truncate" title={animalToView.pai}>{animalToView.pai || '-'}</p>
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">MÃ£e</label>
+                        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Mãe</label>
                         {(animalToView.serie_mae && animalToView.rg_mae) ? (
                           <Link
                             href={`/consulta-animal/${animalToView.serie_mae}-${animalToView.rg_mae}`}
@@ -2095,15 +2095,15 @@ export default function Animals() {
                   </div>
                 </div>
 
-                {/* ObservaÃ§Ãµes */}
+                {/* Observações */}
                 {animalToView.observacoes && (
                   <div className="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg">
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">ObservaÃ§Ãµes</h3>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 uppercase tracking-wide">Observações</h3>
                     <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{animalToView.observacoes}</p>
                   </div>
                 )}
 
-                {/* BotÃµes de AÃ§Ã£o */}
+                {/* Botões de Ação */}
                 <div className="flex justify-end gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
                   <button
                     onClick={() => {

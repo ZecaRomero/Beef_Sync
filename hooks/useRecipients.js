@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 
 /**
- * Hook customizado para gerenciar destinatÃ¡rios
+ * Hook customizado para gerenciar destinatários
  */
 export const useRecipients = () => {
   const [recipients, setRecipients] = useState([])
@@ -14,7 +14,7 @@ export const useRecipients = () => {
     role: 'Contador'
   })
 
-  // Carregar destinatÃ¡rios do localStorage
+  // Carregar destinatários do localStorage
   const loadRecipients = useCallback(() => {
     const saved = localStorage.getItem('contabilidadeRecipients')
     if (saved) {
@@ -22,16 +22,16 @@ export const useRecipients = () => {
     }
   }, [])
 
-  // Salvar destinatÃ¡rios no localStorage
+  // Salvar destinatários no localStorage
   const saveRecipients = useCallback((newRecipients) => {
     localStorage.setItem('contabilidadeRecipients', JSON.stringify(newRecipients))
     setRecipients(newRecipients)
   }, [])
 
-  // Adicionar novo destinatÃ¡rio
+  // Adicionar novo destinatário
   const addRecipient = useCallback(() => {
     if (!newRecipient.name || (!newRecipient.email && !newRecipient.whatsapp)) {
-      alert('âÅ¡ ï¸� AtenÃ§Ã£o: Nome e Email ou WhatsApp sÃ£o obrigatÃ³rios')
+      alert('⚠️ Atenção: Nome e Email ou WhatsApp são obrigatórios')
       return false
     }
 
@@ -45,19 +45,19 @@ export const useRecipients = () => {
     
     setNewRecipient({ name: '', email: '', whatsapp: '', role: 'Contador' })
     setShowAddRecipient(false)
-    alert('âÅ“â€¦ Sucesso! DestinatÃ¡rio adicionado com sucesso!')
+    alert('✅ Sucesso! Destinatário adicionado com sucesso!')
     return true
   }, [newRecipient, recipients, saveRecipients])
 
-  // Remover destinatÃ¡rio
+  // Remover destinatário
   const removeRecipient = useCallback((recipientId) => {
     const updatedRecipients = recipients.filter(r => r.id !== recipientId)
     saveRecipients(updatedRecipients)
     setSelectedRecipients(prev => prev.filter(id => id !== recipientId))
-    alert('âÅ“â€¦ Sucesso! DestinatÃ¡rio removido com sucesso!')
+    alert('✅ Sucesso! Destinatário removido com sucesso!')
   }, [recipients, saveRecipients])
 
-  // Toggle seleÃ§Ã£o de destinatÃ¡rio
+  // Toggle seleção de destinatário
   const handleRecipientToggle = useCallback((recipientId) => {
     setSelectedRecipients(prev => 
       prev.includes(recipientId) 
@@ -66,13 +66,13 @@ export const useRecipients = () => {
     )
   }, [])
 
-  // Resetar formulÃ¡rio
+  // Resetar formulário
   const resetForm = useCallback(() => {
     setNewRecipient({ name: '', email: '', whatsapp: '', role: 'Contador' })
     setShowAddRecipient(false)
   }, [])
 
-  // Carregar dados na inicializaÃ§Ã£o
+  // Carregar dados na inicialização
   useEffect(() => {
     loadRecipients()
   }, [loadRecipients])

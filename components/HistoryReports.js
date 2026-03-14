@@ -22,14 +22,14 @@ export default function HistoryReports() {
   const [selectedMonth, setSelectedMonth] = useState('')
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString())
 
-  // Tipos de relatÃ³rios disponÃ­veis
+  // Tipos de relatórios disponíveis
   const reportTypes = [
-    { id: 'leilao', label: 'RelatÃ³rio de LeilÃ£o', icon: 'ðÅ¸�â€ ', description: 'Animais separados para leilÃ£o' },
-    { id: 'parto', label: 'RelatÃ³rio de Partos', icon: 'ðÅ¸�â€ž', description: 'Partos registrados no perÃ­odo' },
-    { id: 'pesagem', label: 'RelatÃ³rio de Pesagens', icon: 'âÅ¡â€“ï¸�', description: 'Controle de peso dos animais' },
-    { id: 'medicacao', label: 'RelatÃ³rio de MedicaÃ§Ãµes', icon: 'ðÅ¸â€™Å ', description: 'Tratamentos e medicaÃ§Ãµes aplicadas' },
-    { id: 'vendas', label: 'RelatÃ³rio de Vendas', icon: 'ðÅ¸â€™°', description: 'Vendas realizadas no perÃ­odo' },
-    { id: 'geral', label: 'RelatÃ³rio Geral', icon: 'ðÅ¸â€œÅ ', description: 'Todas as ocorrÃªncias do perÃ­odo' }
+    { id: 'leilao', label: 'Relatório de Leilão', icon: '🏆', description: 'Animais separados para leilão' },
+    { id: 'parto', label: 'Relatório de Partos', icon: '🐄', description: 'Partos registrados no período' },
+    { id: 'pesagem', label: 'Relatório de Pesagens', icon: '⚖️', description: 'Controle de peso dos animais' },
+    { id: 'medicacao', label: 'Relatório de Medicações', icon: '💊', description: 'Tratamentos e medicações aplicadas' },
+    { id: 'vendas', label: 'Relatório de Vendas', icon: '💰', description: 'Vendas realizadas no período' },
+    { id: 'geral', label: 'Relatório Geral', icon: '📊', description: 'Todas as ocorrências do período' }
   ]
 
   useEffect(() => {
@@ -47,7 +47,7 @@ export default function HistoryReports() {
         const eventsData = await eventsResponse.json()
         setEvents(eventsData)
       } else {
-        throw new Error('Erro ao carregar ocorrÃªncias')
+        throw new Error('Erro ao carregar ocorrências')
       }
       
       // Carregar animais do PostgreSQL
@@ -69,7 +69,7 @@ export default function HistoryReports() {
 
   const getAnimalName = (animalId) => {
     const animal = animals.find(a => a.id === parseInt(animalId))
-    return animal ? `${animal.serie} ${animal.rg}` : 'Animal nÃ£o encontrado'
+    return animal ? `${animal.serie} ${animal.rg}` : 'Animal não encontrado'
   }
 
   const getAnimalDetails = (animalId) => {
@@ -77,11 +77,11 @@ export default function HistoryReports() {
     return animal || {}
   }
 
-  // Filtrar eventos baseado no tipo de relatÃ³rio e perÃ­odo
+  // Filtrar eventos baseado no tipo de relatório e período
   const getFilteredEvents = () => {
     let filtered = events
 
-    // Filtrar por tipo de relatÃ³rio
+    // Filtrar por tipo de relatório
     if (reportType !== 'geral') {
       if (reportType === 'vendas') {
         filtered = filtered.filter(e => e.tipo === 'venda' || e.tipo === 'leilao')
@@ -90,7 +90,7 @@ export default function HistoryReports() {
       }
     }
 
-    // Filtrar por perÃ­odo
+    // Filtrar por período
     if (dateRange.inicio && dateRange.fim) {
       const startDate = new Date(dateRange.inicio + 'T00:00:00')
       const endDate = new Date(dateRange.fim + 'T23:59:59')
@@ -114,7 +114,7 @@ export default function HistoryReports() {
     return filtered.sort((a, b) => new Date(b.data) - new Date(a.data))
   }
 
-  // Gerar estatÃ­sticas do relatÃ³rio
+  // Gerar estatísticas do relatório
   const generateStats = (filteredEvents) => {
     const stats = {
       total: filteredEvents.length,
@@ -127,7 +127,7 @@ export default function HistoryReports() {
     }
 
     filteredEvents.forEach(event => {
-      // Por mÃªs
+      // Por mês
       const month = new Date(event.data).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
       stats.porMes[month] = (stats.porMes[month] || 0) + 1
 
@@ -144,7 +144,7 @@ export default function HistoryReports() {
         stats.totalPeso += parseFloat(event.peso)
       }
 
-      // Animais Ãºnicos
+      // Animais únicos
       stats.animaisUnicos.add(event.animalId)
 
       // Medicamentos
@@ -160,18 +160,18 @@ export default function HistoryReports() {
     }
   }
 
-  // Estado para controle de exportaÃ§Ã£o
+  // Estado para controle de exportação
   const [exporting, setExporting] = useState(false)
   const [exportProgress, setExportProgress] = useState(0)
 
-  // Exportar relatÃ³rio especÃ­fico
+  // Exportar relatório específico
   const exportReport = () => {
     const filteredEvents = getFilteredEvents()
     const stats = generateStats(filteredEvents)
     const reportInfo = reportTypes.find(r => r.id === reportType)
 
     if (filteredEvents.length === 0) {
-      alert('ðÅ¸â€œ­ Nenhum dado encontrado para o perÃ­odo selecionado')
+      alert('📭 Nenhum dado encontrado para o período selecionado')
       return
     }
 
@@ -181,7 +181,7 @@ export default function HistoryReports() {
     let progressInterval = null
 
     try {
-      // Simular progresso durante a exportaÃ§Ã£o
+      // Simular progresso durante a exportação
       progressInterval = setInterval(() => {
         setExportProgress(prev => {
           if (prev >= 90) {
@@ -214,9 +214,9 @@ export default function HistoryReports() {
       })
 
       const headers = [
-        'Data', 'Animal', 'RaÃ§a', 'Sexo', 'DescriÃ§Ã£o', 'ObservaÃ§Ãµes',
+        'Data', 'Animal', 'Raça', 'Sexo', 'Descrição', 'Observações',
         'Peso (kg)', 'Valor (R$)', 'Medicamento', 'Dosagem',
-        'VeterinÃ¡rio', 'Local', 'ResponsÃ¡vel', 'Data Registro'
+        'Veterinário', 'Local', 'Responsável', 'Data Registro'
       ]
 
       // Criar workbook
@@ -230,7 +230,7 @@ export default function HistoryReports() {
         { wch: 15 }, { wch: 15 }, { wch: 12 }
       ]
 
-      // Aplicar formataÃ§Ã£o ao cabeÃ§alho (linha 1) - Azul escuro com texto branco
+      // Aplicar formatação ao cabeçalho (linha 1) - Azul escuro com texto branco
       const headerRange = XLSX.utils.decode_range(ws['!ref'])
       for (let col = headerRange.s.c; col <= headerRange.e.c; col++) {
         const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col })
@@ -249,7 +249,7 @@ export default function HistoryReports() {
         }
       }
 
-      // Aplicar bordas Ã s cÃ©lulas de dados
+      // Aplicar bordas às células de dados
       for (let row = 1; row <= headerRange.e.r; row++) {
         for (let col = headerRange.s.c; col <= headerRange.e.c; col++) {
           const cellAddress = XLSX.utils.encode_cell({ r: row, c: col })
@@ -268,18 +268,18 @@ export default function HistoryReports() {
         }
       }
 
-      XLSX.utils.book_append_sheet(wb, ws, reportInfo.label.replace('RelatÃ³rio de ', ''))
+      XLSX.utils.book_append_sheet(wb, ws, reportInfo.label.replace('Relatório de ', ''))
 
       // Planilha de resumo
       const resumoData = [
-        ['MÃ©trica', 'Valor'],
-        ['PerÃ­odo do RelatÃ³rio', `${dateRange.inicio || selectedMonth + '/' + selectedYear || selectedYear}`],
-        ['Total de OcorrÃªncias', stats.total],
+        ['Métrica', 'Valor'],
+        ['Período do Relatório', `${dateRange.inicio || selectedMonth + '/' + selectedYear || selectedYear}`],
+        ['Total de Ocorrências', stats.total],
         ['Animais Envolvidos', stats.animaisUnicos],
         ['Valor Total', `R$ ${stats.totalValor.toFixed(2)}`],
         ['Peso Total', `${stats.totalPeso.toFixed(1)} kg`],
-        ['Peso MÃ©dio', stats.total > 0 ? `${(stats.totalPeso / stats.total).toFixed(1)} kg` : '0 kg'],
-        ['Valor MÃ©dio', stats.total > 0 ? `R$ ${(stats.totalValor / stats.total).toFixed(2)}` : 'R$ 0,00']
+        ['Peso Médio', stats.total > 0 ? `${(stats.totalPeso / stats.total).toFixed(1)} kg` : '0 kg'],
+        ['Valor Médio', stats.total > 0 ? `R$ ${(stats.totalValor / stats.total).toFixed(2)}` : 'R$ 0,00']
       ]
 
       if (stats.medicamentosUsados.length > 0) {
@@ -289,7 +289,7 @@ export default function HistoryReports() {
       const wsResumo = XLSX.utils.aoa_to_sheet(resumoData)
       wsResumo['!cols'] = [{ wch: 25 }, { wch: 30 }]
       
-      // Aplicar formataÃ§Ã£o ao cabeÃ§alho da planilha de resumo
+      // Aplicar formatação ao cabeçalho da planilha de resumo
       const resumoHeaderRange = XLSX.utils.decode_range(wsResumo['!ref'])
       for (let col = resumoHeaderRange.s.c; col <= resumoHeaderRange.e.c; col++) {
         const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col })
@@ -329,13 +329,13 @@ export default function HistoryReports() {
       
       XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo')
 
-      // Planilha por mÃªs (se houver dados suficientes)
+      // Planilha por mês (se houver dados suficientes)
       if (Object.keys(stats.porMes).length > 1) {
         const porMesData = Object.entries(stats.porMes).map(([mes, count]) => [mes, count])
-        const wsPorMes = XLSX.utils.aoa_to_sheet([['MÃªs', 'Quantidade'], ...porMesData])
+        const wsPorMes = XLSX.utils.aoa_to_sheet([['Mês', 'Quantidade'], ...porMesData])
         wsPorMes['!cols'] = [{ wch: 20 }, { wch: 12 }]
         
-        // Aplicar formataÃ§Ã£o ao cabeÃ§alho
+        // Aplicar formatação ao cabeçalho
         const porMesHeaderRange = XLSX.utils.decode_range(wsPorMes['!ref'])
         for (let col = porMesHeaderRange.s.c; col <= porMesHeaderRange.e.c; col++) {
           const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col })
@@ -373,7 +373,7 @@ export default function HistoryReports() {
           }
         }
         
-        XLSX.utils.book_append_sheet(wb, wsPorMes, 'Por MÃªs')
+        XLSX.utils.book_append_sheet(wb, wsPorMes, 'Por Mês')
       }
 
       // Salvar arquivo
@@ -386,14 +386,14 @@ export default function HistoryReports() {
       setTimeout(() => {
         setExporting(false)
         setExportProgress(0)
-        alert(`âÅ“â€¦ ${reportInfo.label} exportado com sucesso!\n\nðÅ¸â€œÅ  Resumo:\nââ‚¬¢ ${stats.total} ocorrÃªncias\nââ‚¬¢ ${stats.animaisUnicos} animais\nââ‚¬¢ Valor total: R$ ${stats.totalValor.toFixed(2)}`)
+        alert(`✅ ${reportInfo.label} exportado com sucesso!\n\n📊 Resumo:\n• ${stats.total} ocorrências\n• ${stats.animaisUnicos} animais\n• Valor total: R$ ${stats.totalValor.toFixed(2)}`)
       }, 500)
     } catch (error) {
       if (progressInterval) clearInterval(progressInterval)
-      console.error('Erro ao exportar relatÃ³rio:', error)
+      console.error('Erro ao exportar relatório:', error)
       setExporting(false)
       setExportProgress(0)
-      alert(`â�Å’ Erro ao exportar relatÃ³rio: ${error.message || 'Erro desconhecido'}`)
+      alert(`❌ Erro ao exportar relatório: ${error.message || 'Erro desconhecido'}`)
     }
   }
 
@@ -416,7 +416,7 @@ export default function HistoryReports() {
     return (
       <div className="card p-6">
         <div className="text-center text-red-600 dark:text-red-400">
-          <p className="text-xl font-semibold mb-2">â�Å’ Erro ao carregar dados</p>
+          <p className="text-xl font-semibold mb-2">❌ Erro ao carregar dados</p>
           <p className="mb-4">{error}</p>
           <button onClick={loadData} className="btn-primary">
             Tentar Novamente
@@ -432,10 +432,10 @@ export default function HistoryReports() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-            ðÅ¸â€œÅ  RelatÃ³rios de OcorrÃªncias
+            📊 Relatórios de Ocorrências
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Gere relatÃ³rios especÃ­ficos por tipo de ocorrÃªncia e perÃ­odo
+            Gere relatórios específicos por tipo de ocorrência e período
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -448,9 +448,9 @@ export default function HistoryReports() {
                 />
               </div>
               <span className="text-sm text-gray-600 dark:text-gray-400">
-                {exportProgress < 50 ? 'ðÅ¸â€œÅ  Preparando dados...' : 
-                 exportProgress < 80 ? 'ðÅ¸â€œ� Gerando planilha...' : 
-                 'ðÅ¸â€™¾ Salvando arquivo...'}
+                {exportProgress < 50 ? '📊 Preparando dados...' : 
+                 exportProgress < 80 ? '📝 Gerando planilha...' : 
+                 '💾 Salvando arquivo...'}
               </span>
             </div>
           )}
@@ -470,18 +470,18 @@ export default function HistoryReports() {
             ) : (
               <>
                 <DocumentArrowDownIcon className="h-5 w-5 mr-2" />
-                Exportar RelatÃ³rio
+                Exportar Relatório
               </>
             )}
           </button>
         </div>
       </div>
 
-      {/* SeleÃ§Ã£o de Tipo de RelatÃ³rio */}
+      {/* Seleção de Tipo de Relatório */}
       <div className="card p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
           <ChartBarIcon className="h-5 w-5 mr-2" />
-          Tipo de RelatÃ³rio
+          Tipo de Relatório
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {reportTypes.map(type => (
@@ -508,17 +508,17 @@ export default function HistoryReports() {
         </div>
       </div>
 
-      {/* Filtros de PerÃ­odo */}
+      {/* Filtros de Período */}
       <div className="card p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
           <CalendarIcon className="h-5 w-5 mr-2" />
-          PerÃ­odo do RelatÃ³rio
+          Período do Relatório
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Data InÃ­cio
+              Data Início
             </label>
             <input
               type="date"
@@ -550,7 +550,7 @@ export default function HistoryReports() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              MÃªs
+              Mês
             </label>
             <select
               value={selectedMonth}
@@ -563,7 +563,7 @@ export default function HistoryReports() {
               <option value="">Todos os meses</option>
               <option value="1">Janeiro</option>
               <option value="2">Fevereiro</option>
-              <option value="3">MarÃ§o</option>
+              <option value="3">Março</option>
               <option value="4">Abril</option>
               <option value="5">Maio</option>
               <option value="6">Junho</option>
@@ -618,12 +618,12 @@ export default function HistoryReports() {
             }}
             className="btn-secondary text-sm"
           >
-            MÃªs Atual
+            Mês Atual
           </button>
         </div>
       </div>
 
-      {/* Resumo do RelatÃ³rio */}
+      {/* Resumo do Relatório */}
       <div className="card p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
           <span className="mr-2">{currentReport.icon}</span>
@@ -632,24 +632,24 @@ export default function HistoryReports() {
 
         {filteredEvents.length === 0 ? (
           <div className="text-center py-8">
-            <div className="text-4xl mb-4">ðÅ¸â€œ­</div>
+            <div className="text-4xl mb-4">📭</div>
             <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
               Nenhum dado encontrado
             </h4>
             <p className="text-gray-600 dark:text-gray-400">
-              NÃ£o hÃ¡ ocorrÃªncias do tipo "{currentReport.label}" no perÃ­odo selecionado.
+              Não há ocorrências do tipo "{currentReport.label}" no período selecionado.
             </p>
           </div>
         ) : (
           <>
-            {/* EstatÃ­sticas Principais */}
+            {/* Estatísticas Principais */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                 <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {stats.total}
                 </div>
                 <div className="text-sm text-blue-800 dark:text-blue-200">
-                  Total de OcorrÃªncias
+                  Total de Ocorrências
                 </div>
               </div>
 
@@ -697,7 +697,7 @@ export default function HistoryReports() {
                       Animal
                     </th>
                     <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      DescriÃ§Ã£o
+                      Descrição
                     </th>
                     {(reportType === 'pesagem' || reportType === 'leilao') && (
                       <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
@@ -752,7 +752,7 @@ export default function HistoryReports() {
             {filteredEvents.length > 10 && (
               <div className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
                 Mostrando 10 de {filteredEvents.length} registros. 
-                <span className="font-medium"> Exporte o relatÃ³rio para ver todos os dados.</span>
+                <span className="font-medium"> Exporte o relatório para ver todos os dados.</span>
               </div>
             )}
           </>

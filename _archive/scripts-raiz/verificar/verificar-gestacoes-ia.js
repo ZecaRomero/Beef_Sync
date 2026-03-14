@@ -2,13 +2,13 @@
 const { query } = require('./lib/database')
 
 async function verificarGestacoesIA() {
-  console.log('�Ÿ”� VERIFICANDO GESTA�‡�•ES DE INSEMINA�‡�ƒO ARTIFICIAL')
+  console.log('🔍 VERIFICANDO GESTAÇÕES DE INSEMINAÇÃO ARTIFICIAL')
   console.log('=' .repeat(70))
   console.log('')
 
   try {
     // 1. Verificar gestações existentes
-    console.log('1️�ƒ� GESTA�‡�•ES EXISTENTES:')
+    console.log('1️⃣ GESTAÇÕES EXISTENTES:')
     console.log('-'.repeat(50))
     
     const gestacoes = await query(`
@@ -29,7 +29,7 @@ async function verificarGestacoesIA() {
       LIMIT 10
     `)
     
-    console.log(`�Ÿ“Š Total de gestações: ${gestacoes.rows.length}`)
+    console.log(`📊 Total de gestações: ${gestacoes.rows.length}`)
     
     if (gestacoes.rows.length > 0) {
       console.log('')
@@ -45,7 +45,7 @@ async function verificarGestacoesIA() {
     }
     
     // 2. Forçar atualização das gestações que têm IA correspondente
-    console.log('2️�ƒ� FOR�‡ANDO ATUALIZA�‡�ƒO DAS GESTA�‡�•ES:')
+    console.log('2️⃣ FORÇANDO ATUALIZAÇÃO DAS GESTAÇÕES:')
     console.log('-'.repeat(50))
     
     const atualizacao = await query(`
@@ -60,11 +60,11 @@ async function verificarGestacoesIA() {
       )
     `)
     
-    console.log(`�œ… ${atualizacao.rowCount} gestações atualizadas para IA`)
+    console.log(`✅ ${atualizacao.rowCount} gestações atualizadas para IA`)
     
     // 3. Verificar inseminações e suas gestações correspondentes
     console.log('')
-    console.log('3️�ƒ� INSEMINA�‡�•ES E SUAS GESTA�‡�•ES:')
+    console.log('3️⃣ INSEMINAÇÕES E SUAS GESTAÇÕES:')
     console.log('-'.repeat(50))
     
     const iaComGestacao = await query(`
@@ -89,7 +89,7 @@ async function verificarGestacoesIA() {
       LIMIT 10
     `)
     
-    console.log(`�Ÿ“Š Inseminações verificadas: ${iaComGestacao.rows.length}`)
+    console.log(`📊 Inseminações verificadas: ${iaComGestacao.rows.length}`)
     
     if (iaComGestacao.rows.length > 0) {
       console.log('')
@@ -100,16 +100,16 @@ async function verificarGestacoesIA() {
         console.log(`   Touro: ${ia.touro}`)
         console.log(`   Status IA: ${ia.status_gestacao}`)
         if (ia.gestacao_id) {
-          console.log(`   �œ… Gestação ID: ${ia.gestacao_id} - Tipo: ${ia.tipo_cobertura} - Situação: ${ia.situacao_gestacao}`)
+          console.log(`   ✅ Gestação ID: ${ia.gestacao_id} - Tipo: ${ia.tipo_cobertura} - Situação: ${ia.situacao_gestacao}`)
         } else {
-          console.log(`   �Œ Sem gestação correspondente`)
+          console.log(`   ❌ Sem gestação correspondente`)
         }
         console.log('')
       })
     }
     
     // 4. Estatísticas finais
-    console.log('4️�ƒ� ESTATÍSTICAS FINAIS:')
+    console.log('4️⃣ ESTATÍSTICAS FINAIS:')
     console.log('-'.repeat(50))
     
     const stats = await Promise.all([
@@ -130,15 +130,15 @@ async function verificarGestacoesIA() {
       `)
     ])
     
-    console.log(`�Ÿ“Š Gestações IA: ${stats[0].rows[0].total}`)
-    console.log(`�Ÿ“Š Gestações FIV: ${stats[1].rows[0].total}`)
-    console.log(`�Ÿ“Š Gestações sem tipo: ${stats[2].rows[0].total}`)
-    console.log(`�Ÿ“Š IAs com prenhez: ${stats[3].rows[0].total}`)
-    console.log(`�Ÿ“Š IAs com gestação correspondente: ${stats[4].rows[0].total}`)
+    console.log(`📊 Gestações IA: ${stats[0].rows[0].total}`)
+    console.log(`📊 Gestações FIV: ${stats[1].rows[0].total}`)
+    console.log(`📊 Gestações sem tipo: ${stats[2].rows[0].total}`)
+    console.log(`📊 IAs com prenhez: ${stats[3].rows[0].total}`)
+    console.log(`📊 IAs com gestação correspondente: ${stats[4].rows[0].total}`)
     
     // 5. Criar gestações para IAs que não têm
     console.log('')
-    console.log('5️�ƒ� CRIANDO GESTA�‡�•ES FALTANTES:')
+    console.log('5️⃣ CRIANDO GESTAÇÕES FALTANTES:')
     console.log('-'.repeat(50))
     
     const iasSemGestacao = await query(`
@@ -161,7 +161,7 @@ async function verificarGestacoesIA() {
       )
     `)
     
-    console.log(`�Ÿ“Š IAs prenhas sem gestação: ${iasSemGestacao.rows.length}`)
+    console.log(`📊 IAs prenhas sem gestação: ${iasSemGestacao.rows.length}`)
     
     if (iasSemGestacao.rows.length > 0) {
       console.log('Criando gestações faltantes...')
@@ -196,18 +196,18 @@ async function verificarGestacoesIA() {
             `Gestação criada automaticamente para IA ID ${ia.id}`
           ])
           
-          console.log(`�œ… Gestação criada para ${ia.serie} ${ia.rg}`)
+          console.log(`✅ Gestação criada para ${ia.serie} ${ia.rg}`)
         } catch (error) {
-          console.log(`�Œ Erro ao criar gestação para ${ia.serie} ${ia.rg}: ${error.message}`)
+          console.log(`❌ Erro ao criar gestação para ${ia.serie} ${ia.rg}: ${error.message}`)
         }
       }
     }
     
     console.log('')
-    console.log('�œ… VERIFICA�‡�ƒO CONCLUÍDA!')
+    console.log('✅ VERIFICAÇÃO CONCLUÍDA!')
     
   } catch (error) {
-    console.error('�Œ Erro:', error)
+    console.error('❌ Erro:', error)
   }
 }
 
@@ -215,11 +215,11 @@ async function verificarGestacoesIA() {
 verificarGestacoesIA()
   .then(() => {
     console.log('')
-    console.log('�ŸŽ� RESULTADO:')
-    console.log('�€� Gestações verificadas e atualizadas')
-    console.log('�€� Tipo de cobertura IA aplicado corretamente')
-    console.log('�€� Gestações faltantes criadas')
-    console.log('�€� Sistema pronto para vincular nascimentos')
+    console.log('🎯 RESULTADO:')
+    console.log('• Gestações verificadas e atualizadas')
+    console.log('• Tipo de cobertura IA aplicado corretamente')
+    console.log('• Gestações faltantes criadas')
+    console.log('• Sistema pronto para vincular nascimentos')
     process.exit(0)
   })
   .catch(error => {

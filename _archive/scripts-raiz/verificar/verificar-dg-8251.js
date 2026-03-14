@@ -12,7 +12,7 @@ const pool = new Pool({
 
 async function verificarDG8251() {
   try {
-    console.log('�Ÿ”� Verificando DG da receptora 8251...\n');
+    console.log('🔍 Verificando DG da receptora 8251...\n');
     
     // Verificar na tabela animais
     const animalResult = await pool.query(`
@@ -26,21 +26,21 @@ async function verificarDG8251() {
     
     if (animalResult.rows.length > 0) {
       const animal = animalResult.rows[0];
-      console.log('�Ÿ“‹ Dados do Animal na tabela ANIMAIS:');
+      console.log('📋 Dados do Animal na tabela ANIMAIS:');
       console.log(`ID: ${animal.id}`);
       console.log(`RG: ${animal.rg}`);
       console.log(`Série: ${animal.serie}`);
       console.log(`Nome: ${animal.nome}`);
       console.log(`Sexo: ${animal.sexo}`);
       console.log(`Situação: ${animal.situacao}`);
-      console.log(`\n�Ÿ“Š Dados do DG:`);
-      console.log(`Data DG: ${animal.data_dg || 'N�ƒO REGISTRADO'}`);
-      console.log(`Veterinário: ${animal.veterinario_dg || 'N�ƒO REGISTRADO'}`);
-      console.log(`Resultado: ${animal.resultado_dg || 'N�ƒO REGISTRADO'}`);
+      console.log(`\n📊 Dados do DG:`);
+      console.log(`Data DG: ${animal.data_dg || 'NÃO REGISTRADO'}`);
+      console.log(`Veterinário: ${animal.veterinario_dg || 'NÃO REGISTRADO'}`);
+      console.log(`Resultado: ${animal.resultado_dg || 'NÃO REGISTRADO'}`);
       console.log(`Observações: ${animal.observacoes_dg || 'Nenhuma'}`);
       
       // Verificar inseminações
-      console.log('\n�Ÿ”� Verificando INSEMINA�‡�•ES...');
+      console.log('\n🔍 Verificando INSEMINAÇÕES...');
       const inseminacaoResult = await pool.query(`
         SELECT 
           id, data_ia, touro_nome, tecnico,
@@ -51,23 +51,23 @@ async function verificarDG8251() {
       `, [animal.id]);
       
       if (inseminacaoResult.rows.length > 0) {
-        console.log(`\n�œ… Encontradas ${inseminacaoResult.rows.length} inseminação(ões):`);
+        console.log(`\n✅ Encontradas ${inseminacaoResult.rows.length} inseminação(ões):`);
         inseminacaoResult.rows.forEach((ins, idx) => {
           console.log(`\n--- Inseminação ${idx + 1} ---`);
           console.log(`ID: ${ins.id}`);
           console.log(`Data IA: ${ins.data_ia ? new Date(ins.data_ia).toLocaleDateString('pt-BR') : '-'}`);
           console.log(`Touro: ${ins.touro_nome || '-'}`);
           console.log(`Técnico: ${ins.tecnico || '-'}`);
-          console.log(`Data DG: ${ins.data_dg ? new Date(ins.data_dg).toLocaleDateString('pt-BR') : 'N�ƒO REGISTRADO'}`);
-          console.log(`Status Gestação: ${ins.status_gestacao || 'N�ƒO REGISTRADO'}`);
+          console.log(`Data DG: ${ins.data_dg ? new Date(ins.data_dg).toLocaleDateString('pt-BR') : 'NÃO REGISTRADO'}`);
+          console.log(`Status Gestação: ${ins.status_gestacao || 'NÃO REGISTRADO'}`);
           console.log(`Observações: ${ins.observacoes || 'Nenhuma'}`);
         });
       } else {
-        console.log('�Œ Nenhuma inseminação encontrada');
+        console.log('❌ Nenhuma inseminação encontrada');
       }
       
       // Verificar gestações
-      console.log('\n�Ÿ”� Verificando GESTA�‡�•ES...');
+      console.log('\n🔍 Verificando GESTAÇÕES...');
       const gestacaoResult = await pool.query(`
         SELECT 
           id, data_inicio, data_prevista_parto, status
@@ -77,7 +77,7 @@ async function verificarDG8251() {
       `, [animal.id]);
       
       if (gestacaoResult.rows.length > 0) {
-        console.log(`\n�œ… Encontradas ${gestacaoResult.rows.length} gestação(ões):`);
+        console.log(`\n✅ Encontradas ${gestacaoResult.rows.length} gestação(ões):`);
         gestacaoResult.rows.forEach((gest, idx) => {
           console.log(`\n--- Gestação ${idx + 1} ---`);
           console.log(`ID: ${gest.id}`);
@@ -86,11 +86,11 @@ async function verificarDG8251() {
           console.log(`Status: ${gest.status || '-'}`);
         });
       } else {
-        console.log('�Œ Nenhuma gestação encontrada');
+        console.log('❌ Nenhuma gestação encontrada');
       }
       
       // Verificar alertas DG
-      console.log('\n�Ÿ”� Verificando ALERTAS DG...');
+      console.log('\n🔍 Verificando ALERTAS DG...');
       const alertaResult = await pool.query(`
         SELECT 
           id, animal_id, tipo, mensagem, data_prevista, status, created_at
@@ -100,7 +100,7 @@ async function verificarDG8251() {
       `, [animal.id]);
       
       if (alertaResult.rows.length > 0) {
-        console.log(`\n�œ… Encontrados ${alertaResult.rows.length} alerta(s):`);
+        console.log(`\n✅ Encontrados ${alertaResult.rows.length} alerta(s):`);
         alertaResult.rows.forEach((alerta, idx) => {
           console.log(`\n--- Alerta ${idx + 1} ---`);
           console.log(`ID: ${alerta.id}`);
@@ -111,15 +111,15 @@ async function verificarDG8251() {
           console.log(`Criado em: ${new Date(alerta.created_at).toLocaleString('pt-BR')}`);
         });
       } else {
-        console.log('�Œ Nenhum alerta encontrado');
+        console.log('❌ Nenhum alerta encontrado');
       }
       
     } else {
-      console.log('�Œ Animal 8251 não encontrado na tabela animais');
+      console.log('❌ Animal 8251 não encontrado na tabela animais');
     }
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
   } finally {
     await pool.end();
   }

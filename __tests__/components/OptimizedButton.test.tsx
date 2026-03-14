@@ -61,9 +61,9 @@ describe('OptimizedButton', () => {
     expect(button).toHaveClass('w-full');
   });
 
-  it('deve renderizar Ã­cones', () => {
-    const LeftIcon = () => <span data-testid="left-icon">ââ€ �</span>;
-    const RightIcon = () => <span data-testid="right-icon">ââ€ â€™</span>;
+  it('deve renderizar ícones', () => {
+    const LeftIcon = () => <span data-testid="left-icon">←</span>;
+    const RightIcon = () => <span data-testid="right-icon">→</span>;
 
     render(
       <Button leftIcon={<LeftIcon />} rightIcon={<RightIcon />}>

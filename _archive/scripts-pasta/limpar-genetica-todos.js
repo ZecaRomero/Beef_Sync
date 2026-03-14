@@ -31,7 +31,7 @@ async function limpar() {
           situacao_abcz = NULL,
           updated_at = CURRENT_TIMESTAMP
       `);
-      console.log('�œ… Limpeza concluída (iqg/pt_iqg).');
+      console.log('✅ Limpeza concluída (iqg/pt_iqg).');
     } catch (e) {
       if (/column.*does not exist/i.test(e?.message || '')) {
         await query(`
@@ -41,7 +41,7 @@ async function limpar() {
             situacao_abcz = NULL,
             updated_at = CURRENT_TIMESTAMP
         `);
-        console.log('�œ… Limpeza concluída (genetica_2/decile_2).');
+        console.log('✅ Limpeza concluída (genetica_2/decile_2).');
       } else throw e;
     }
   } catch (err) {

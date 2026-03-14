@@ -5,7 +5,7 @@ import * as XLSX from 'xlsx'
 import { ExclamationTriangleIcon, PlusIcon, TrashIcon, MagnifyingGlassIcon, XMarkIcon, PencilIcon, UserGroupIcon } from '../../components/ui/Icons'
 import ImportProgressOverlay from '../../components/ImportProgressOverlay'
 
-// Componentes simples inline para evitar problemas de importaÃ§Ã£o
+// Componentes simples inline para evitar problemas de importação
 const Card = ({ children, className = '' }) => (
   <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 ${className}`}>
     {children}
@@ -118,7 +118,7 @@ export default function Mortes() {
   const [novaCausaInput, setNovaCausaInput] = useState('')
   const [mostrarInputNovaCausa, setMostrarInputNovaCausa] = useState(false)
   
-  // Estados para importaÃ§Ã£o
+  // Estados para importação
   const [importData, setImportData] = useState([])
   const [importStep, setImportStep] = useState('upload') // upload, preview, processing, result
   const [importSummary, setImportSummary] = useState(null)
@@ -191,7 +191,7 @@ export default function Mortes() {
 
   const adicionarCausaMorte = async () => {
     if (!newCausa.trim()) {
-      alert('âÅ¡ ï¸� Informe uma causa de morte')
+      alert('⚠️ Informe uma causa de morte')
       return
     }
 
@@ -209,19 +209,19 @@ export default function Mortes() {
         setCausasMorte(prev => [...prev, data.data])
         setNewCausa('')
         setShowCausaModal(false)
-        alert('âÅ“â€¦ Causa de morte adicionada com sucesso!')
+        alert('✅ Causa de morte adicionada com sucesso!')
       } else {
         const errorData = await response.json()
-        alert(`â�Å’ Erro: ${errorData.message}`)
+        alert(`❌ Erro: ${errorData.message}`)
       }
     } catch (error) {
       console.error('Erro ao adicionar causa:', error)
-      alert('â�Å’ Erro ao adicionar causa de morte')
+      alert('❌ Erro ao adicionar causa de morte')
     }
   }
 
   const sincronizarComBoletim = async () => {
-    if (!confirm('âÅ¡ ï¸� Deseja sincronizar todas as mortes registradas com o boletim contÃ¡bil?')) {
+    if (!confirm('⚠️ Deseja sincronizar todas as mortes registradas com o boletim contábil?')) {
       return
     }
 
@@ -237,15 +237,15 @@ export default function Mortes() {
 
       if (response.ok) {
         const data = await response.json()
-        alert(`âÅ“â€¦ SincronizaÃ§Ã£o concluÃ­da! ${data.sincronizadas} morte(s) registrada(s) no boletim contÃ¡bil.`)
+        alert(`✅ Sincronização concluída! ${data.sincronizadas} morte(s) registrada(s) no boletim contábil.`)
         loadMortes() // Recarregar a lista
       } else {
         const errorData = await response.json()
-        alert(`â�Å’ Erro na sincronizaÃ§Ã£o: ${errorData.message}`)
+        alert(`❌ Erro na sincronização: ${errorData.message}`)
       }
     } catch (error) {
-      console.error('Erro na sincronizaÃ§Ã£o:', error)
-      alert('â�Å’ Erro ao sincronizar com o boletim contÃ¡bil')
+      console.error('Erro na sincronização:', error)
+      alert('❌ Erro ao sincronizar com o boletim contábil')
     } finally {
       setLoading(false)
     }
@@ -265,13 +265,13 @@ export default function Mortes() {
         const data = XLSX.utils.sheet_to_json(ws)
 
         if (data.length === 0) {
-          alert('O arquivo estÃ¡ vazio')
+          alert('O arquivo está vazio')
           return
         }
 
         // Processar e normalizar dados
         const processedData = data.map((row, index) => {
-          // Tentar identificar colunas com vÃ¡rias possibilidades (case insensitive)
+          // Tentar identificar colunas com várias possibilidades (case insensitive)
           const getCol = (possibleNames) => {
             for (const name of possibleNames) {
               if (row[name] !== undefined) return row[name]
@@ -279,16 +279,16 @@ export default function Mortes() {
             return ''
           }
 
-          const serie = getCol(['SÃ©rie', 'Serie', 'serie', 'SERIE', 'SERE', 'Sere'])
+          const serie = getCol(['Série', 'Serie', 'serie', 'SERIE', 'SERE', 'Sere'])
           const rg = getCol(['RG', 'Rg', 'rg', 'animal_rg'])
           const animalId = getCol(['ID', 'id', 'Animal ID', 'animal_id'])
           
           // Data
           let dataMorte = getCol(['Data', 'Data Morte', 'data_morte', 'DATA', 'DATA MORTE'])
           if (dataMorte && typeof dataMorte === 'number') {
-            // Converter data do Excel (nÃºmero serial para data JS)
+            // Converter data do Excel (número serial para data JS)
             const date = new Date(Math.round((dataMorte - 25569) * 86400 * 1000))
-            // Ajustar fuso horÃ¡rio para pegar a data correta
+            // Ajustar fuso horário para pegar a data correta
             date.setMinutes(date.getMinutes() + date.getTimezoneOffset())
             dataMorte = date.toISOString().split('T')[0]
           } else if (dataMorte && typeof dataMorte === 'string') {
@@ -302,7 +302,7 @@ export default function Mortes() {
           }
 
           const causaMorte = getCol(['Causa', 'Causa Morte', 'causa_morte', 'CAUSA', 'CAUSA MORTE'])
-          const observacoes = getCol(['ObservaÃ§Ãµes', 'Observacoes', 'observacoes', 'OBSERVACOES', 'OBSERVAÃâ€¡Ãâ€¢ES'])
+          const observacoes = getCol(['Observações', 'Observacoes', 'observacoes', 'OBSERVACOES', 'OBSERVAÇÕES'])
           const valorPerda = getCol(['Valor', 'Valor Perda', 'valor_perda', 'VALOR', 'VALOR PERDA'])
 
           return {
@@ -340,12 +340,12 @@ export default function Mortes() {
     }))
 
     if (deathsToImport.length === 0) {
-      alert('Nenhum registro vÃ¡lido para importar')
+      alert('Nenhum registro válido para importar')
       return
     }
 
     setImportandoMortes(true)
-    setImportProgressMortes({ atual: 0, total: deathsToImport.length, etapa: 'Importando Ã³bitos...' })
+    setImportProgressMortes({ atual: 0, total: deathsToImport.length, etapa: 'Importando óbitos...' })
     setLoading(true)
     try {
       const response = await fetch('/api/deaths/bulk', {
@@ -359,18 +359,18 @@ export default function Mortes() {
       const result = await response.json()
 
       if (response.ok) {
-        setImportProgressMortes(prev => ({ ...prev, atual: deathsToImport.length, etapa: 'ImportaÃ§Ã£o concluÃ­da!' }))
+        setImportProgressMortes(prev => ({ ...prev, atual: deathsToImport.length, etapa: 'Importação concluída!' }))
         setImportSummary(result.data.summary)
         setImportErrors(result.data.errors || [])
         setImportStep('result')
         loadMortes() // Recarregar lista
         loadAnimais()
       } else {
-        alert(`Erro na importaÃ§Ã£o: ${result.message}`)
+        alert(`Erro na importação: ${result.message}`)
       }
     } catch (error) {
-      console.error('Erro na importaÃ§Ã£o:', error)
-      alert('Erro interno ao processar importaÃ§Ã£o')
+      console.error('Erro na importação:', error)
+      alert('Erro interno ao processar importação')
     } finally {
       setLoading(false)
       setImportandoMortes(false)
@@ -381,11 +381,11 @@ export default function Mortes() {
   const downloadTemplate = () => {
     const ws = XLSX.utils.json_to_sheet([
       {
-        'SÃ©rie': 'CJCJ',
+        'Série': 'CJCJ',
         'RG': '1234',
         'Data Morte': '2024-01-01',
-        'Causa Morte': 'DoenÃ§a X',
-        'ObservaÃ§Ãµes': 'ObservaÃ§Ã£o opcional',
+        'Causa Morte': 'Doença X',
+        'Observações': 'Observação opcional',
         'Valor Perda': '1500.00'
       }
     ])
@@ -424,12 +424,12 @@ export default function Mortes() {
     setAnimaisSelecionados([])
   }
 
-  // FunÃ§Ã£o para buscar animal por nÃºmero (similar ao BatchOccurrenceForm)
+  // Função para buscar animal por número (similar ao BatchOccurrenceForm)
   const buscarAnimalPorNumero = async (numero) => {
     let serie = ''
     let rg = ''
     
-    // Tentar separar por hÃ­fen primeiro
+    // Tentar separar por hífen primeiro
     if (numero.includes('-')) {
       const partes = numero.split('-').map(s => s.trim())
       if (partes.length >= 2) {
@@ -437,13 +437,13 @@ export default function Mortes() {
         rg = partes.slice(1).join('-').trim()
       }
     } else {
-      // Tentar separar por espaÃ§o
+      // Tentar separar por espaço
       const partes = numero.trim().split(/\s+/).filter(Boolean)
       if (partes.length >= 2) {
         serie = partes[0].toUpperCase()
         rg = partes.slice(1).join(' ').trim()
       } else {
-        // Tentar extrair sÃ©rie do inÃ­cio (2-5 letras) e o resto Ã© RG
+        // Tentar extrair série do início (2-5 letras) e o resto é RG
         const match = numero.match(/^([A-Z]{2,5})(\d+.*)$/i)
         if (match) {
           serie = match[1].toUpperCase()
@@ -456,10 +456,10 @@ export default function Mortes() {
       return null
     }
 
-    // Tentar mÃºltiplas estratÃ©gias de busca
+    // Tentar múltiplas estratégias de busca
     let animais = []
     
-    // EstratÃ©gia 1: Busca exata com sÃ©rie e RG
+    // Estratégia 1: Busca exata com série e RG
     if (serie && rg) {
       const params1 = new URLSearchParams()
       params1.append('serie', serie)
@@ -476,7 +476,7 @@ export default function Mortes() {
       }
     }
     
-    // EstratÃ©gia 2: Se nÃ£o encontrou, tentar sÃ³ com sÃ©rie e filtrar por RG
+    // Estratégia 2: Se não encontrou, tentar só com série e filtrar por RG
     if (animais.length === 0 && serie) {
       const params2 = new URLSearchParams()
       params2.append('serie', serie)
@@ -504,11 +504,11 @@ export default function Mortes() {
           }
         }
       } catch (err) {
-        console.error('Erro na busca por sÃ©rie:', err)
+        console.error('Erro na busca por série:', err)
       }
     }
     
-    // EstratÃ©gia 3: Se ainda nÃ£o encontrou e tem RG, tentar sÃ³ com RG
+    // Estratégia 3: Se ainda não encontrou e tem RG, tentar só com RG
     if (animais.length === 0 && rg) {
       const params3 = new URLSearchParams()
       params3.append('rg', rg)
@@ -543,14 +543,14 @@ export default function Mortes() {
   const adicionarPorNumero = async () => {
     if (!numeroAnimal.trim()) return
 
-    // Separar por vÃ­rgula, quebra de linha, ponto e vÃ­rgula ou mÃºltiplos espaÃ§os
+    // Separar por vírgula, quebra de linha, ponto e vírgula ou múltiplos espaços
     const numeros = numeroAnimal
       .split(/[,\n;]+|\s{2,}/)
       .map(n => n.trim())
       .filter(n => n && n.length > 0)
     
     if (numeros.length === 0) {
-      alert('âÅ¡ ï¸� Digite pelo menos um nÃºmero de animal')
+      alert('⚠️ Digite pelo menos um número de animal')
       return
     }
 
@@ -590,15 +590,15 @@ export default function Mortes() {
     setNumeroAnimal('')
 
     if (naoEncontrados.length > 0) {
-      alert(`âÅ¡ ï¸� NÃ£o encontrados: ${naoEncontrados.join(', ')}`)
+      alert(`⚠️ Não encontrados: ${naoEncontrados.join(', ')}`)
     } else if (novosAnimais.length > 0) {
-      alert(`âÅ“â€¦ ${novosAnimais.length} animal(is) adicionado(s) com sucesso!`)
+      alert(`✅ ${novosAnimais.length} animal(is) adicionado(s) com sucesso!`)
     }
   }
 
   const adicionarNovaCausaInline = async () => {
     if (!novaCausaInput.trim()) {
-      alert('âÅ¡ ï¸� Informe uma causa de morte')
+      alert('⚠️ Informe uma causa de morte')
       return
     }
 
@@ -617,14 +617,14 @@ export default function Mortes() {
         setNewMorte(prev => ({ ...prev, causaMorte: data.data.causa }))
         setNovaCausaInput('')
         setMostrarInputNovaCausa(false)
-        alert('âÅ“â€¦ Causa de morte adicionada com sucesso!')
+        alert('✅ Causa de morte adicionada com sucesso!')
       } else {
         const errorData = await response.json()
-        alert(`â�Å’ Erro: ${errorData.message}`)
+        alert(`❌ Erro: ${errorData.message}`)
       }
     } catch (error) {
       console.error('Erro ao adicionar causa:', error)
-      alert('â�Å’ Erro ao adicionar causa de morte')
+      alert('❌ Erro ao adicionar causa de morte')
     }
   }
 
@@ -634,7 +634,7 @@ export default function Mortes() {
     }
 
     if (!newMorte.animalId || !newMorte.dataMorte || !newMorte.causaMorte) {
-      alert('âÅ¡ ï¸� Preencha todos os campos obrigatÃ³rios')
+      alert('⚠️ Preencha todos os campos obrigatórios')
       return
     }
 
@@ -656,7 +656,7 @@ export default function Mortes() {
 
       if (response.ok) {
         const data = await response.json()
-        alert('âÅ“â€¦ Morte registrada com sucesso!')
+        alert('✅ Morte registrada com sucesso!')
         setNewMorte({
           animalId: '',
           dataMorte: '',
@@ -667,14 +667,14 @@ export default function Mortes() {
         setAnimalSelecionado(null)
         setShowAddModal(false)
         loadMortes()
-        loadAnimais() // Recarregar animais para atualizar situaÃ§Ã£o
+        loadAnimais() // Recarregar animais para atualizar situação
       } else {
         const errorData = await response.json()
-        alert(`â�Å’ Erro: ${errorData.message}`)
+        alert(`❌ Erro: ${errorData.message}`)
       }
     } catch (error) {
       console.error('Erro ao registrar morte:', error)
-      alert('â�Å’ Erro ao registrar morte')
+      alert('❌ Erro ao registrar morte')
     } finally {
       setLoading(false)
     }
@@ -682,11 +682,11 @@ export default function Mortes() {
 
   const registrarMortesMultiplas = async () => {
     if (animaisSelecionados.length === 0 || !newMorte.dataMorte || !newMorte.causaMorte) {
-      alert('âÅ¡ ï¸� Selecione pelo menos um animal e preencha todos os campos obrigatÃ³rios')
+      alert('⚠️ Selecione pelo menos um animal e preencha todos os campos obrigatórios')
       return
     }
 
-    if (!confirm(`âÅ¡ ï¸� Confirma o registro de morte para ${animaisSelecionados.length} animais?`)) {
+    if (!confirm(`⚠️ Confirma o registro de morte para ${animaisSelecionados.length} animais?`)) {
       return
     }
 
@@ -727,10 +727,10 @@ export default function Mortes() {
       }
 
       // Mostrar resultado
-      let mensagem = `âÅ“â€¦ Processamento concluÃ­do:\n`
-      mensagem += `ââ‚¬¢ ${sucessos} mortes registradas com sucesso\n`
+      let mensagem = `✅ Processamento concluído:\n`
+      mensagem += `• ${sucessos} mortes registradas com sucesso\n`
       if (erros > 0) {
-        mensagem += `ââ‚¬¢ ${erros} erros encontrados\n\n`
+        mensagem += `• ${erros} erros encontrados\n\n`
         mensagem += `Detalhes dos erros:\n`
         resultados.filter(r => r.status === 'erro').forEach(r => {
           mensagem += `- ${r.animal}: ${r.erro}\n`
@@ -739,7 +739,7 @@ export default function Mortes() {
 
       alert(mensagem)
 
-      // Limpar formulÃ¡rio
+      // Limpar formulário
       setNewMorte({
         animalId: '',
         dataMorte: '',
@@ -754,8 +754,8 @@ export default function Mortes() {
       loadAnimais()
 
     } catch (error) {
-      console.error('Erro ao registrar mortes mÃºltiplas:', error)
-      alert('â�Å’ Erro ao registrar mortes mÃºltiplas')
+      console.error('Erro ao registrar mortes múltiplas:', error)
+      alert('❌ Erro ao registrar mortes múltiplas')
     } finally {
       setLoading(false)
     }
@@ -775,7 +775,7 @@ export default function Mortes() {
 
   const salvarEdicaoMorte = async () => {
     if (!newMorte.dataMorte || !newMorte.causaMorte) {
-      alert('âÅ¡ ï¸� Preencha todos os campos obrigatÃ³rios')
+      alert('⚠️ Preencha todos os campos obrigatórios')
       return
     }
 
@@ -795,7 +795,7 @@ export default function Mortes() {
       })
 
       if (response.ok) {
-        alert('âÅ“â€¦ Registro de morte atualizado com sucesso!')
+        alert('✅ Registro de morte atualizado com sucesso!')
         setNewMorte({
           animalId: '',
           dataMorte: '',
@@ -808,11 +808,11 @@ export default function Mortes() {
         loadMortes()
       } else {
         const errorData = await response.json()
-        alert(`â�Å’ Erro: ${errorData.message}`)
+        alert(`❌ Erro: ${errorData.message}`)
       }
     } catch (error) {
       console.error('Erro ao atualizar morte:', error)
-      alert('â�Å’ Erro ao atualizar registro de morte')
+      alert('❌ Erro ao atualizar registro de morte')
     } finally {
       setLoading(false)
     }
@@ -833,18 +833,18 @@ export default function Mortes() {
       })
 
       if (response.ok) {
-        alert('âÅ“â€¦ Registro de morte excluÃ­do com sucesso!')
+        alert('✅ Registro de morte excluído com sucesso!')
         setDeletingMorte(null)
         setShowDeleteModal(false)
         loadMortes()
-        loadAnimais() // Recarregar animais para restaurar situaÃ§Ã£o se necessÃ¡rio
+        loadAnimais() // Recarregar animais para restaurar situação se necessário
       } else {
         const errorData = await response.json()
-        alert(`â�Å’ Erro: ${errorData.message}`)
+        alert(`❌ Erro: ${errorData.message}`)
       }
     } catch (error) {
       console.error('Erro ao excluir morte:', error)
-      alert('â�Å’ Erro ao excluir registro de morte')
+      alert('❌ Erro ao excluir registro de morte')
     } finally {
       setLoading(false)
     }
@@ -866,7 +866,7 @@ export default function Mortes() {
 
   const handleExportExcel = () => {
     if (mortes.length === 0) {
-      alert('âÅ¡ ï¸� NÃ£o hÃ¡ dados para exportar')
+      alert('⚠️ Não há dados para exportar')
       return
     }
 
@@ -874,11 +874,11 @@ export default function Mortes() {
     const detalhadoData = mortes.map(m => ({
       'Animal': `${m.serie} ${m.rg}`,
       'Sexo': m.sexo,
-      'RaÃ§a': m.raca,
+      'Raça': m.raca,
       'Data Morte': formatDate(m.data_morte),
       'Causa': m.causa_morte,
       'Valor Perda': m.valor_perda,
-      'ObservaÃ§Ãµes': m.observacoes
+      'Observações': m.observacoes
     }))
 
     const wsDetalhado = XLSX.utils.json_to_sheet(detalhadoData)
@@ -887,7 +887,7 @@ export default function Mortes() {
     // Agrupar por Causa
     const causasCount = {}
     mortes.forEach(m => {
-      const causa = m.causa_morte || 'NÃ£o informada'
+      const causa = m.causa_morte || 'Não informada'
       causasCount[causa] = (causasCount[causa] || 0) + 1
     })
 
@@ -899,7 +899,7 @@ export default function Mortes() {
       }))
       .sort((a, b) => b.Quantidade - a.Quantidade)
 
-    // Agrupar por MÃªs/Ano
+    // Agrupar por Mês/Ano
     const periodoCount = {}
     mortes.forEach(m => {
       if (m.data_morte) {
@@ -911,16 +911,16 @@ export default function Mortes() {
 
     const resumoPeriodo = Object.entries(periodoCount)
       .map(([periodo, qtd]) => ({
-        'PerÃ­odo': periodo,
+        'Período': periodo,
         'Quantidade': qtd
       }))
       .sort((a, b) => {
-        const [mesA, anoA] = a['PerÃ­odo'].split('/')
-        const [mesB, anoB] = b['PerÃ­odo'].split('/')
+        const [mesA, anoA] = a['Período'].split('/')
+        const [mesB, anoB] = b['Período'].split('/')
         return new Date(anoB, mesB - 1) - new Date(anoA, mesA - 1)
       })
 
-    // Criar planilha de resumo com mÃºltiplas tabelas
+    // Criar planilha de resumo com múltiplas tabelas
     const wb = XLSX.utils.book_new()
     
     // Adicionar Detalhado
@@ -930,10 +930,10 @@ export default function Mortes() {
     const wsResumo = XLSX.utils.json_to_sheet([{ 'RESUMO POR CAUSA': '' }])
     XLSX.utils.sheet_add_json(wsResumo, resumoCausas, { origin: 'A2' })
     
-    XLSX.utils.sheet_add_json(wsResumo, [{ 'RESUMO POR PERÃ�ODO': '' }], { origin: 'E1' })
+    XLSX.utils.sheet_add_json(wsResumo, [{ 'RESUMO POR PERÍODO': '' }], { origin: 'E1' })
     XLSX.utils.sheet_add_json(wsResumo, resumoPeriodo, { origin: 'E2' })
 
-    XLSX.utils.book_append_sheet(wb, wsResumo, "Resumo e EstatÃ­sticas")
+    XLSX.utils.book_append_sheet(wb, wsResumo, "Resumo e Estatísticas")
 
     // Salvar
     XLSX.writeFile(wb, "Relatorio_Obitos_Completo.xlsx")
@@ -960,10 +960,10 @@ export default function Mortes() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
               <ExclamationTriangleIcon className="h-7 w-7 text-red-600 mr-2" />
-              Ãâ€œbitos (Mortes)
+              Óbitos (Mortes)
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Registre Ã³bitos do rebanho com seleÃ§Ã£o de animais e causas especÃ­ficas
+              Registre óbitos do rebanho com seleção de animais e causas específicas
             </p>
           </div>
           <div className="flex space-x-3">
@@ -1008,7 +1008,7 @@ export default function Mortes() {
               }}
               disabled={loading}
             >
-              MÃºltiplos Ãâ€œbitos
+              Múltiplos Óbitos
             </Button>
             <Button
               variant="primary"
@@ -1019,7 +1019,7 @@ export default function Mortes() {
               }}
               disabled={loading}
             >
-              Registrar Ãâ€œbito
+              Registrar Óbito
             </Button>
           </div>
       </div>
@@ -1031,7 +1031,7 @@ export default function Mortes() {
           <div className="relative">
             <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <Input
-              placeholder="Buscar por sÃ©rie, RG, causa ou observaÃ§Ãµes..."
+              placeholder="Buscar por série, RG, causa ou observações..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -1053,7 +1053,7 @@ export default function Mortes() {
         <CardHeader>
           <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Registros de Ãâ€œbito ({mortesFiltradas.length})
+              Registros de Óbito ({mortesFiltradas.length})
           </h3>
             {loading && (
               <div className="text-sm text-gray-500">Carregando...</div>
@@ -1065,7 +1065,7 @@ export default function Mortes() {
             <div className="text-center py-8">
               <ExclamationTriangleIcon className="h-10 w-10 text-gray-400 mx-auto mb-3" />
               <p className="text-gray-600 dark:text-gray-400">
-                {searchTerm ? 'Nenhum Ã³bito encontrado para a busca' : 'Nenhum Ã³bito registrado'}
+                {searchTerm ? 'Nenhum óbito encontrado para a busca' : 'Nenhum óbito registrado'}
               </p>
             </div>
           ) : (
@@ -1077,8 +1077,8 @@ export default function Mortes() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Data</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Causa</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Valor Perda</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ObservaÃ§Ãµes</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">AÃ§Ãµes</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Observações</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Ações</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -1131,7 +1131,7 @@ export default function Mortes() {
         </CardBody>
       </Card>
 
-      {/* Modal de Registro de Ãâ€œbito */}
+      {/* Modal de Registro de Óbito */}
       <Modal
         isOpen={showAddModal}
         onClose={() => {
@@ -1146,14 +1146,14 @@ export default function Mortes() {
             valorPerda: ''
           })
         }}
-        title={modoSelecaoMultipla ? "Registrar MÃºltiplos Ãâ€œbitos" : "Registrar Ãâ€œbito"}
+        title={modoSelecaoMultipla ? "Registrar Múltiplos Óbitos" : "Registrar Óbito"}
         size="xl"
       >
         <div className="space-y-4">
-          {/* Toggle para modo de seleÃ§Ã£o mÃºltipla */}
+          {/* Toggle para modo de seleção múltipla */}
           <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Registrar mÃºltiplos Ã³bitos
+              Registrar múltiplos óbitos
             </span>
             <button
               type="button"
@@ -1175,7 +1175,7 @@ export default function Mortes() {
             </button>
           </div>
 
-          {/* SeleÃ§Ã£o de Animal(is) */}
+          {/* Seleção de Animal(is) */}
           {!modoSelecaoMultipla ? (
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -1196,16 +1196,16 @@ export default function Mortes() {
             </div>
           ) : (
             <div className="space-y-3">
-              {/* Campo para digitar nÃºmeros de animais */}
+              {/* Campo para digitar números de animais */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Adicionar Animais por NÃºmero (SÃ©rie-RG)
+                  Adicionar Animais por Número (Série-RG)
                 </label>
                 <div className="space-y-2">
                   <textarea
                     value={numeroAnimal}
                     onChange={(e) => setNumeroAnimal(e.target.value)}
-                    placeholder="Digite os nÃºmeros dos animais, um por linha ou separados por vÃ­rgula:&#10;CJCJ-16942&#10;CJCJ-16926&#10;CJCJ-16970&#10;&#10;Ou: CJCJ-16942, CJCJ-16926, CJCJ-16970"
+                    placeholder="Digite os números dos animais, um por linha ou separados por vírgula:&#10;CJCJ-16942&#10;CJCJ-16926&#10;CJCJ-16970&#10;&#10;Ou: CJCJ-16942, CJCJ-16926, CJCJ-16970"
                     rows={4}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white font-mono text-sm"
                   />
@@ -1221,12 +1221,12 @@ export default function Mortes() {
                     })()}
                   </button>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    ðÅ¸â€™¡ VocÃª pode colar uma lista de nÃºmeros (um por linha) ou separados por vÃ­rgula
+                    💡 Você pode colar uma lista de números (um por linha) ou separados por vírgula
                   </p>
                 </div>
               </div>
 
-              {/* SeÃ§Ã£o de Animais Selecionados - DESTACADA */}
+              {/* Seção de Animais Selecionados - DESTACADA */}
               {animaisSelecionados.length > 0 && (
                 <div className="bg-green-50 dark:bg-green-900/20 border-2 border-green-400 dark:border-green-600 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-3">
@@ -1250,17 +1250,17 @@ export default function Mortes() {
                   <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto">
                     {animaisSelecionados.map((animal, index) => {
                       // Calcular idade se tiver data de nascimento
-                      let idadeTexto = 'NÃ£o informado'
+                      let idadeTexto = 'Não informado'
                       if (animal.data_nascimento || animal.dataNascimento) {
                         const dataNasc = new Date(animal.data_nascimento || animal.dataNascimento)
                         const hoje = new Date()
                         const meses = (hoje.getFullYear() - dataNasc.getFullYear()) * 12 + (hoje.getMonth() - dataNasc.getMonth())
                         if (meses < 12) {
-                          idadeTexto = `${meses} mÃªs(es)`
+                          idadeTexto = `${meses} mês(es)`
                         } else {
                           const anos = Math.floor(meses / 12)
                           const mesesRestantes = meses % 12
-                          idadeTexto = mesesRestantes > 0 ? `${anos} ano(s) e ${mesesRestantes} mÃªs(es)` : `${anos} ano(s)`
+                          idadeTexto = mesesRestantes > 0 ? `${anos} ano(s) e ${mesesRestantes} mês(es)` : `${anos} ano(s)`
                         }
                       }
                       
@@ -1289,11 +1289,11 @@ export default function Mortes() {
                                 <div className="grid grid-cols-2 gap-2 text-sm">
                                   <div>
                                     <span className="text-gray-500 dark:text-gray-400">Sexo:</span>
-                                    <span className="ml-1 font-medium text-gray-900 dark:text-white">{animal.sexo || 'NÃ£o informado'}</span>
+                                    <span className="ml-1 font-medium text-gray-900 dark:text-white">{animal.sexo || 'Não informado'}</span>
                                   </div>
                                   <div>
-                                    <span className="text-gray-500 dark:text-gray-400">RaÃ§a:</span>
-                                    <span className="ml-1 font-medium text-gray-900 dark:text-white">{animal.raca || 'NÃ£o informado'}</span>
+                                    <span className="text-gray-500 dark:text-gray-400">Raça:</span>
+                                    <span className="ml-1 font-medium text-gray-900 dark:text-white">{animal.raca || 'Não informado'}</span>
                                   </div>
                                   <div>
                                     <span className="text-gray-500 dark:text-gray-400">Idade:</span>
@@ -1323,7 +1323,7 @@ export default function Mortes() {
                               type="button"
                               onClick={() => toggleAnimalSelecao(animal)}
                               className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded p-2 transition-colors flex-shrink-0 ml-2"
-                              title="Remover da seleÃ§Ã£o"
+                              title="Remover da seleção"
                             >
                               <TrashIcon className="h-5 w-5" />
                             </button>
@@ -1349,7 +1349,7 @@ export default function Mortes() {
                 </div>
               )}
 
-              {/* SeÃ§Ã£o de SeleÃ§Ã£o de Animais */}
+              {/* Seção de Seleção de Animais */}
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -1391,7 +1391,7 @@ export default function Mortes() {
                         </div>
                         {estaSelecionado && (
                           <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full font-medium">
-                            âÅ“â€œ
+                            ✓
                           </span>
                         )}
                       </div>
@@ -1404,7 +1404,7 @@ export default function Mortes() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
-              label="Data do Ãâ€œbito *"
+              label="Data do Óbito *"
             type="date"
               value={newMorte.dataMorte}
               onChange={(e) => setNewMorte(prev => ({ ...prev, dataMorte: e.target.value }))}
@@ -1442,7 +1442,7 @@ export default function Mortes() {
                     className="px-3"
                     title="Gerenciar causas"
                   >
-                    âÅ¡â„¢ï¸�
+                    ⚙️
                   </Button>
                 </div>
               ) : (
@@ -1480,7 +1480,7 @@ export default function Mortes() {
                     </Button>
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    ðÅ¸â€™¡ A causa serÃ¡ salva automaticamente no banco de dados
+                    💡 A causa será salva automaticamente no banco de dados
                   </p>
                 </div>
               )}
@@ -1504,7 +1504,7 @@ export default function Mortes() {
                     <span className="font-medium">Custo Total do Animal:</span> R$ {parseFloat(animalSelecionado.custo_total || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                   </p>
                   <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                    Este valor serÃ¡ usado automaticamente como perda
+                    Este valor será usado automaticamente como perda
                   </p>
                 </div>
               )}
@@ -1513,7 +1513,7 @@ export default function Mortes() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              ObservaÃ§Ãµes
+              Observações
             </label>
             <textarea
             value={newMorte.observacoes}
@@ -1524,7 +1524,7 @@ export default function Mortes() {
           />
           </div>
 
-          {/* BotÃµes de AÃ§Ã£o - Sempre visÃ­veis no final */}
+          {/* Botões de Ação - Sempre visíveis no final */}
           <div className="bg-white dark:bg-gray-800 pt-4 mt-6 border-t-2 border-gray-200 dark:border-gray-700 -mx-6 -mb-6 px-6 pb-6">
             <div className="flex space-x-3">
               <Button 
@@ -1535,17 +1535,17 @@ export default function Mortes() {
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
-                    <span className="animate-spin">â�³</span>
+                    <span className="animate-spin">⏳</span>
                     Registrando...
                   </span>
                 ) : (
                   modoSelecaoMultipla ? (
                     <span className="flex items-center justify-center gap-2">
-                      ðÅ¸â€™¾ Registrar {animaisSelecionados.length} Ãâ€œbito{animaisSelecionados.length !== 1 ? 's' : ''}
+                      💾 Registrar {animaisSelecionados.length} Óbito{animaisSelecionados.length !== 1 ? 's' : ''}
                     </span>
                   ) : (
                     <span className="flex items-center justify-center gap-2">
-                      ðÅ¸â€™¾ Registrar Ãâ€œbito
+                      💾 Registrar Óbito
                     </span>
                   )
                 )}
@@ -1574,12 +1574,12 @@ export default function Mortes() {
             </div>
             {(modoSelecaoMultipla && animaisSelecionados.length === 0) && (
               <p className="text-sm text-red-600 dark:text-red-400 mt-2 text-center">
-                âÅ¡ ï¸� Selecione pelo menos um animal
+                ⚠️ Selecione pelo menos um animal
               </p>
             )}
             {(!newMorte.dataMorte || !newMorte.causaMorte) && (
               <p className="text-sm text-red-600 dark:text-red-400 mt-2 text-center">
-                âÅ¡ ï¸� Preencha a data e a causa da morte
+                ⚠️ Preencha a data e a causa da morte
               </p>
             )}
           </div>
@@ -1602,7 +1602,7 @@ export default function Mortes() {
               <Input
                 value={newCausa}
                 onChange={(e) => setNewCausa(e.target.value)}
-                placeholder="Ex: DoenÃ§a, Acidente, Parto..."
+                placeholder="Ex: Doença, Acidente, Parto..."
                 className="flex-1"
               />
               <Button
@@ -1639,7 +1639,7 @@ export default function Mortes() {
         </div>
       </Modal>
 
-      {/* Modal de EdiÃ§Ã£o de Ãâ€œbito */}
+      {/* Modal de Edição de Óbito */}
       <Modal
         isOpen={showEditModal}
         onClose={() => {
@@ -1655,7 +1655,7 @@ export default function Mortes() {
             valorPerda: ''
           })
         }}
-        title="Editar Registro de Ãâ€œbito"
+        title="Editar Registro de Óbito"
         size="lg"
       >
         <div className="space-y-4">
@@ -1669,7 +1669,7 @@ export default function Mortes() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
-              label="Data do Ãâ€œbito *"
+              label="Data do Óbito *"
               type="date"
               value={newMorte.dataMorte}
               onChange={(e) => setNewMorte(prev => ({ ...prev, dataMorte: e.target.value }))}
@@ -1734,7 +1734,7 @@ export default function Mortes() {
                     </Button>
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    ðÅ¸â€™¡ A causa serÃ¡ salva automaticamente no banco de dados
+                    💡 A causa será salva automaticamente no banco de dados
                   </p>
                 </div>
               )}
@@ -1752,7 +1752,7 @@ export default function Mortes() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              ObservaÃ§Ãµes
+              Observações
             </label>
             <textarea
               value={newMorte.observacoes}
@@ -1770,7 +1770,7 @@ export default function Mortes() {
               onClick={salvarEdicaoMorte}
               disabled={loading}
             >
-              {loading ? 'Salvando...' : 'Salvar AlteraÃ§Ãµes'}
+              {loading ? 'Salvando...' : 'Salvar Alterações'}
             </Button>
             <Button 
               variant="secondary" 
@@ -1793,14 +1793,14 @@ export default function Mortes() {
         </div>
       </Modal>
 
-      {/* Modal de ConfirmaÃ§Ã£o de ExclusÃ£o */}
+      {/* Modal de Confirmação de Exclusão */}
       <Modal
         isOpen={showDeleteModal}
         onClose={() => {
           setShowDeleteModal(false)
           setDeletingMorte(null)
         }}
-        title="Confirmar ExclusÃ£o"
+        title="Confirmar Exclusão"
         size="md"
       >
         <div className="space-y-4">
@@ -1812,10 +1812,10 @@ export default function Mortes() {
               
               <div className="text-center">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                  Excluir Registro de Ãâ€œbito
+                  Excluir Registro de Óbito
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  Tem certeza que deseja excluir o registro de Ã³bito do animal:
+                  Tem certeza que deseja excluir o registro de óbito do animal:
                 </p>
                 <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
                   <p className="font-medium text-gray-900 dark:text-white">
@@ -1825,14 +1825,14 @@ export default function Mortes() {
                     {deletingMorte.sexo} - {deletingMorte.raca}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Ãâ€œbito em: {formatDate(deletingMorte.data_morte)}
+                    Óbito em: {formatDate(deletingMorte.data_morte)}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Causa: {deletingMorte.causa_morte}
                   </p>
                 </div>
                 <p className="text-sm text-red-600 dark:text-red-400 mt-3">
-                  âÅ¡ ï¸� Esta aÃ§Ã£o nÃ£o pode ser desfeita e o animal voltarÃ¡ ao status "Ativo".
+                  ⚠️ Esta ação não pode ser desfeita e o animal voltará ao status "Ativo".
                 </p>
               </div>
             </>
@@ -1861,7 +1861,7 @@ export default function Mortes() {
         </div>
       </Modal>
 
-      {/* Modal de ImportaÃ§Ã£o */}
+      {/* Modal de Importação */}
       <Modal
         isOpen={showImportModal}
         onClose={() => {
@@ -1870,19 +1870,19 @@ export default function Mortes() {
           setImportStep('upload')
           setImportSummary(null)
         }}
-        title="Importar Ãâ€œbitos em Lote"
+        title="Importar Óbitos em Lote"
         size="xl"
       >
         <div className="space-y-6">
           {importStep === 'upload' && (
             <div className="space-y-4">
               <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-                <h4 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">InstruÃ§Ãµes</h4>
+                <h4 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">Instruções</h4>
                 <ul className="list-disc list-inside text-sm text-blue-700 dark:text-blue-400 space-y-1">
                   <li>O arquivo deve ser Excel (.xlsx ou .xls)</li>
-                  <li>Deve conter as colunas: <strong>SÃ©rie, RG, Data Morte, Causa Morte</strong></li>
-                  <li>Opcionais: ObservaÃ§Ãµes, Valor Perda</li>
-                  <li>Use o modelo abaixo para garantir a formataÃ§Ã£o correta</li>
+                  <li>Deve conter as colunas: <strong>Série, RG, Data Morte, Causa Morte</strong></li>
+                  <li>Opcionais: Observações, Valor Perda</li>
+                  <li>Use o modelo abaixo para garantir a formatação correta</li>
                 </ul>
               </div>
 
@@ -1903,7 +1903,7 @@ export default function Mortes() {
 
               <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700">
                 <Button variant="secondary" onClick={downloadTemplate}>
-                  ðÅ¸â€œ¥ Baixar Modelo
+                  📥 Baixar Modelo
                 </Button>
                 <Button variant="secondary" onClick={() => setShowImportModal(false)}>
                   Cancelar
@@ -1916,14 +1916,14 @@ export default function Mortes() {
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <h4 className="font-semibold text-gray-900 dark:text-white">
-                  PrÃ©-visualizaÃ§Ã£o ({importData.length} registros)
+                  Pré-visualização ({importData.length} registros)
                 </h4>
                 <div className="text-sm">
                   <span className="text-green-600 font-medium mr-3">
-                    âÅ“â€¦ {importData.filter(d => d.isValid).length} VÃ¡lidos
+                    ✅ {importData.filter(d => d.isValid).length} Válidos
                   </span>
                   <span className="text-red-600 font-medium">
-                    â�Å’ {importData.filter(d => !d.isValid).length} InvÃ¡lidos
+                    ❌ {importData.filter(d => !d.isValid).length} Inválidos
                   </span>
                 </div>
               </div>
@@ -1943,9 +1943,9 @@ export default function Mortes() {
                       <tr key={idx} className={!row.isValid ? 'bg-red-50 dark:bg-red-900/10' : ''}>
                         <td className="px-4 py-2 whitespace-nowrap">
                           {row.isValid ? (
-                            <span className="text-green-600">âÅ“â€¦</span>
+                            <span className="text-green-600">✅</span>
                           ) : (
-                            <span className="text-red-600" title="Dados incompletos">âÅ¡ ï¸�</span>
+                            <span className="text-red-600" title="Dados incompletos">⚠️</span>
                           )}
                         </td>
                         <td className="px-4 py-2 text-sm text-gray-900 dark:text-white">

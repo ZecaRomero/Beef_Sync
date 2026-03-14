@@ -11,32 +11,32 @@ class SmartCacheService {
       deletes: 0,
       size: 0
     }
-    this.maxSize = 1000 // MÃ¡ximo 1000 itens no cache
-    this.defaultTTL = 5 * 60 * 1000 // 5 minutos por padrÃ£o
+    this.maxSize = 1000 // Máximo 1000 itens no cache
+    this.defaultTTL = 5 * 60 * 1000 // 5 minutos por padrão
     this.cleanupInterval = 60 * 1000 // Limpeza a cada minuto
     this.cleanupTimer = null
   }
 
-  // Inicializar serviÃ§o de cache
+  // Inicializar serviço de cache
   initialize() {
-    console.log('ðÅ¸Å¡â‚¬ Iniciando serviÃ§o de cache inteligente...')
+    console.log('🚀 Iniciando serviço de cache inteligente...')
     
-    // Iniciar limpeza automÃ¡tica
+    // Iniciar limpeza automática
     this.cleanupTimer = setInterval(() => {
       this.cleanup()
     }, this.cleanupInterval)
 
-    console.log('âÅ“â€¦ ServiÃ§o de cache inicializado')
+    console.log('✅ Serviço de cache inicializado')
   }
 
-  // Parar serviÃ§o de cache
+  // Parar serviço de cache
   stop() {
     if (this.cleanupTimer) {
       clearInterval(this.cleanupTimer)
       this.cleanupTimer = null
     }
     this.cache.clear()
-    console.log('â�¹ï¸� ServiÃ§o de cache parado')
+    console.log('⏹️ Serviço de cache parado')
   }
 
   // Gerar chave de cache
@@ -111,7 +111,7 @@ class SmartCacheService {
     this.stats.size = this.cache.size
 
     if (cleaned > 0) {
-      console.log(`ðÅ¸§¹ Cache limpo: ${cleaned} itens expirados removidos`)
+      console.log(`🧹 Cache limpo: ${cleaned} itens expirados removidos`)
     }
   }
 
@@ -129,7 +129,7 @@ class SmartCacheService {
 
     if (oldestKey) {
       this.cache.delete(oldestKey)
-      console.log(`ðÅ¸â€”â€˜ï¸� Item mais antigo removido do cache: ${oldestKey}`)
+      console.log(`🗑️ Item mais antigo removido do cache: ${oldestKey}`)
     }
   }
 
@@ -140,7 +140,7 @@ class SmartCacheService {
     // Tentar obter do cache
     const cached = this.get(key)
     if (cached !== null) {
-      console.log('ðÅ¸â€œ¦ Query carregada do cache')
+      console.log('📦 Query carregada do cache')
       return cached
     }
 
@@ -148,10 +148,10 @@ class SmartCacheService {
     try {
       const result = await query(sql, params)
       this.set(key, result, ttl)
-      console.log('ðÅ¸â€™¾ Query armazenada no cache')
+      console.log('💾 Query armazenada no cache')
       return result
     } catch (error) {
-      console.error('â�Å’ Erro na query:', error)
+      console.error('❌ Erro na query:', error)
       throw error
     }
   }
@@ -185,12 +185,12 @@ class SmartCacheService {
 
       return result.rows
     } catch (error) {
-      console.error('â�Å’ Erro ao buscar animais:', error)
+      console.error('❌ Erro ao buscar animais:', error)
       throw error
     }
   }
 
-  // Cache para estatÃ­sticas do dashboard
+  // Cache para estatísticas do dashboard
   async getDashboardStats(forceRefresh = false) {
     const key = 'dashboard:stats'
     
@@ -221,7 +221,7 @@ class SmartCacheService {
       return stats
 
     } catch (error) {
-      console.error('â�Å’ Erro ao buscar estatÃ­sticas:', error)
+      console.error('❌ Erro ao buscar estatísticas:', error)
       throw error
     }
   }
@@ -238,7 +238,7 @@ class SmartCacheService {
     }
 
     try {
-      // Simular dados de mercado (em produÃ§Ã£o seria API real)
+      // Simular dados de mercado (em produção seria API real)
       const marketData = {
         boiGordo: { preco: 180.50, variacao: 2.3 },
         vacaGorda: { preco: 165.20, variacao: -1.1 },
@@ -253,12 +253,12 @@ class SmartCacheService {
       return marketData
 
     } catch (error) {
-      console.error('â�Å’ Erro ao buscar dados de mercado:', error)
+      console.error('❌ Erro ao buscar dados de mercado:', error)
       throw error
     }
   }
 
-  // Invalidar cache por padrÃ£o
+  // Invalidar cache por padrão
   invalidatePattern(pattern) {
     let invalidated = 0
     
@@ -270,7 +270,7 @@ class SmartCacheService {
     }
 
     this.stats.size = this.cache.size
-    console.log(`ðÅ¸â€”â€˜ï¸� ${invalidated} itens invalidados (padrÃ£o: ${pattern})`)
+    console.log(`🗑️ ${invalidated} itens invalidados (padrão: ${pattern})`)
     return invalidated
   }
 
@@ -289,11 +289,11 @@ class SmartCacheService {
       totalInvalidated += this.invalidatePattern(pattern)
     })
 
-    console.log(`ðÅ¸â€”â€˜ï¸� Cache invalidado para animal ${animalId}: ${totalInvalidated} itens`)
+    console.log(`🗑️ Cache invalidado para animal ${animalId}: ${totalInvalidated} itens`)
     return totalInvalidated
   }
 
-  // Obter estatÃ­sticas do cache
+  // Obter estatísticas do cache
   getStats() {
     const hitRate = this.stats.hits + this.stats.misses > 0 ? 
       (this.stats.hits / (this.stats.hits + this.stats.misses)) * 100 : 0
@@ -307,7 +307,7 @@ class SmartCacheService {
     }
   }
 
-  // Obter itens do cache por padrÃ£o
+  // Obter itens do cache por padrão
   getItemsByPattern(pattern) {
     const items = []
     
@@ -330,7 +330,7 @@ class SmartCacheService {
   clear() {
     this.cache.clear()
     this.stats.size = 0
-    console.log('ðÅ¸â€”â€˜ï¸� Cache completamente limpo')
+    console.log('🗑️ Cache completamente limpo')
   }
 
   // Exportar dados do cache
@@ -365,15 +365,15 @@ class SmartCacheService {
       })
 
       this.stats.size = this.cache.size
-      console.log(`ðÅ¸â€œ¥ Cache importado: ${data.items.length} itens`)
+      console.log(`📥 Cache importado: ${data.items.length} itens`)
       
     } catch (error) {
-      console.error('â�Å’ Erro ao importar cache:', error)
+      console.error('❌ Erro ao importar cache:', error)
     }
   }
 }
 
-// InstÃ¢ncia singleton
+// Instância singleton
 const smartCacheService = new SmartCacheService()
 
 export default smartCacheService

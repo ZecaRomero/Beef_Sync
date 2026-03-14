@@ -45,11 +45,11 @@ export default function GestationManager() {
         const gestacoesArray = Array.isArray(data) ? data : (data.data || [])
         setGestacoes(gestacoesArray)
       } else {
-        console.error('Erro ao carregar gestaÃ§Ãµes:', response.status)
+        console.error('Erro ao carregar gestações:', response.status)
         setGestacoes([])
       }
     } catch (error) {
-      console.error('Erro ao carregar gestaÃ§Ãµes:', error)
+      console.error('Erro ao carregar gestações:', error)
       setGestacoes([])
     }
   }
@@ -65,7 +65,7 @@ export default function GestationManager() {
   const calcularPrevisaoNascimento = (dataInseminacao) => {
     if (!dataInseminacao) return ''
     const inseminacao = new Date(dataInseminacao)
-    inseminacao.setDate(inseminacao.getDate() + 280) // GestaÃ§Ã£o bovina ~280 dias
+    inseminacao.setDate(inseminacao.getDate() + 280) // Gestação bovina ~280 dias
     return inseminacao.toISOString().split('T')[0]
   }
 
@@ -79,7 +79,7 @@ export default function GestationManager() {
 
   const registrarGestacao = () => {
     if (!selectedReceptora || !dadosGestacao.dataInseminacao) {
-      alert('Selecione uma receptora e informe a data de T.E EmbriÃ£o')
+      alert('Selecione uma receptora e informe a data de T.E Embrião')
       return
     }
 
@@ -89,7 +89,7 @@ export default function GestationManager() {
       receptoraId: receptora.id,
       receptoraNome: `${receptora.serie} ${receptora.rg}`,
       ...dadosGestacao,
-      status: 'Em GestaÃ§Ã£o',
+      status: 'Em Gestação',
       isFiv: true,
       custoAcumulado: receptora.custoTotal,
       diasGestacao: calcularDiasGestacao(dadosGestacao.dataInseminacao)
@@ -123,7 +123,7 @@ export default function GestationManager() {
     tipoNascimento: 'Normal',
     observacoes: '',
     custoNascimento: 150.00,
-    custoDNA: 120.00, // DNA Paternidade + GenÃ´mica
+    custoDNA: 120.00, // DNA Paternidade + Genômica
     veterinario: '',
     dificuldadeParto: 'Normal'
   })
@@ -146,11 +146,11 @@ export default function GestationManager() {
     if (!dadosNascimento.rg) camposFaltando.push('RG');
     
     if (camposFaltando.length > 0) {
-      let mensagem = 'â�Å’ Campos obrigatÃ³rios nÃ£o preenchidos:\n\n';
+      let mensagem = '❌ Campos obrigatórios não preenchidos:\n\n';
       camposFaltando.forEach((campo, index) => {
         mensagem += `${index + 1}. ${campo}\n`;
       });
-      mensagem += '\nPor favor, preencha todos os campos obrigatÃ³rios antes de registrar o nascimento.';
+      mensagem += '\nPor favor, preencha todos os campos obrigatórios antes de registrar o nascimento.';
       alert(mensagem);
       return;
     }
@@ -166,7 +166,7 @@ export default function GestationManager() {
       rg: dadosNascimento.rg,
       tatuagem: dadosNascimento.tatuagem,
       sexo: dadosNascimento.sexo,
-      raca: 'Nelore', // PadrÃ£o para FIV
+      raca: 'Nelore', // Padrão para FIV
       dataNascimento: dadosNascimento.dataNascimento,
       horaNascimento: dadosNascimento.horaNascimento,
       peso: parseFloat(dadosNascimento.peso),
@@ -194,10 +194,10 @@ export default function GestationManager() {
         {
           id: Date.now() + 1,
           tipo: 'DNA',
-          subtipo: 'Paternidade + GenÃ´mica',
+          subtipo: 'Paternidade + Genômica',
           valor: dadosNascimento.custoDNA,
           data: dadosNascimento.dataNascimento,
-          observacoes: 'FIV - ConfirmaÃ§Ã£o paternidade e anÃ¡lise genÃ´mica'
+          observacoes: 'FIV - Confirmação paternidade e análise genômica'
         },
         {
           id: Date.now() + 2,
@@ -209,7 +209,7 @@ export default function GestationManager() {
       ]
     }
 
-    // Atualizar status da gestaÃ§Ã£o
+    // Atualizar status da gestação
     const gestacoesAtualizadas = (gestacoes || []).map(g => 
       g.id === gestacao.id 
         ? { 
@@ -232,22 +232,22 @@ export default function GestationManager() {
     const bezerroRegistrado = animalDataManager.registrarNascimento(gestacao, dadosNascimento)
     console.log('Novo bezerro registrado:', bezerroRegistrado)
     
-    alert(`âÅ“â€¦ Bezerro registrado com sucesso!
+    alert(`✅ Bezerro registrado com sucesso!
     
-ðÅ¸â€œâ€¹ Dados:
-ââ‚¬¢ IdentificaÃ§Ã£o: ${novoBezerro.serie} ${novoBezerro.rg}
-ââ‚¬¢ Tatuagem: ${novoBezerro.tatuagem}
-ââ‚¬¢ Sexo: ${novoBezerro.sexo}
-ââ‚¬¢ Peso: ${novoBezerro.peso}kg
-ââ‚¬¢ Cor: ${novoBezerro.cor}
+📋 Dados:
+• Identificação: ${novoBezerro.serie} ${novoBezerro.rg}
+• Tatuagem: ${novoBezerro.tatuagem}
+• Sexo: ${novoBezerro.sexo}
+• Peso: ${novoBezerro.peso}kg
+• Cor: ${novoBezerro.cor}
 
-ðÅ¸â€™° Custos Iniciais:
-ââ‚¬¢ Nascimento: R$ ${dadosNascimento.custoNascimento.toFixed(2)}
-ââ‚¬¢ DNA: R$ ${dadosNascimento.custoDNA.toFixed(2)}
-ââ‚¬¢ Receptora (30%): R$ ${custoReceptora.toFixed(2)}
-ââ‚¬¢ Total: R$ ${custoTotalInicial.toFixed(2)}`)
+💰 Custos Iniciais:
+• Nascimento: R$ ${dadosNascimento.custoNascimento.toFixed(2)}
+• DNA: R$ ${dadosNascimento.custoDNA.toFixed(2)}
+• Receptora (30%): R$ ${custoReceptora.toFixed(2)}
+• Total: R$ ${custoTotalInicial.toFixed(2)}`)
 
-    // Resetar formulÃ¡rio
+    // Resetar formulário
     setShowNascimentoForm(false)
     setGestacaoSelecionada(null)
     setDadosNascimento({
@@ -270,7 +270,7 @@ export default function GestationManager() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Em GestaÃ§Ã£o': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+      case 'Em Gestação': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
       case 'Nascido': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
       case 'Atrasado': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
       default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
@@ -287,34 +287,34 @@ export default function GestationManager() {
 
   return (
     <div className="space-y-6">
-      {/* EstatÃ­sticas de DiagnÃ³stico de GestaÃ§Ã£o */}
+      {/* Estatísticas de Diagnóstico de Gestação */}
       <DGStatistics />
 
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            ðÅ¸�â€ž GestÃ£o de GestaÃ§Ãµes
+            🐄 Gestão de Gestações
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
-            Controle de receptoras, gestaÃ§Ãµes e nascimentos FIV
+            Controle de receptoras, gestações e nascimentos FIV
           </p>
         </div>
         <button
           onClick={() => setShowNewGestacao(true)}
           className="btn-primary flex items-center"
         >
-          âÅ¾â€¢ Nova GestaÃ§Ã£o
+          ➕ Nova Gestação
         </button>
       </div>
 
-      {/* EstatÃ­sticas RÃ¡pidas */}
+      {/* Estatísticas Rápidas */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="card p-4">
           <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-            {(gestacoes || []).filter(g => g.status === 'Em GestaÃ§Ã£o').length}
+            {(gestacoes || []).filter(g => g.status === 'Em Gestação').length}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">Em GestaÃ§Ã£o</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">Em Gestação</div>
         </div>
         <div className="card p-4">
           <div className="text-2xl font-bold text-green-600 dark:text-green-400">
@@ -336,11 +336,11 @@ export default function GestationManager() {
         </div>
       </div>
 
-      {/* Lista de GestaÃ§Ãµes */}
+      {/* Lista de Gestações */}
       <div className="card">
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            GestaÃ§Ãµes em Andamento
+            Gestações em Andamento
           </h3>
         </div>
         <div className="p-6">
@@ -357,13 +357,13 @@ export default function GestationManager() {
                 >
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-3">
-                      <div className="text-2xl">ðÅ¸�â€ž</div>
+                      <div className="text-2xl">🐄</div>
                       <div>
                         <div className="font-semibold text-gray-900 dark:text-white">
                           Receptora: {gestacao.receptoraNome}
                         </div>
                         <div className="text-sm text-gray-600 dark:text-gray-400">
-                          Pai: {gestacao.paiSerie} {gestacao.paiRg} ââ‚¬¢ MÃ£e: {gestacao.maeSerie} {gestacao.maeRg}
+                          Pai: {gestacao.paiSerie} {gestacao.paiRg} • Mãe: {gestacao.maeSerie} {gestacao.maeRg}
                         </div>
                       </div>
                     </div>
@@ -371,22 +371,22 @@ export default function GestationManager() {
                       <span className={`px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(gestacao.status)}`}>
                         {gestacao.status}
                       </span>
-                      {gestacao.status === 'Em GestaÃ§Ã£o' && (
+                      {gestacao.status === 'Em Gestação' && (
                         <button
                           onClick={() => abrirFormNascimento(gestacao)}
                           className="btn-success text-sm"
                         >
-                          ðÅ¸�¼ Registrar Nascimento
+                          🍼 Registrar Nascimento
                         </button>
                       )}
                     </div>
                   </div>
 
-                  {gestacao.status === 'Em GestaÃ§Ã£o' && (
+                  {gestacao.status === 'Em Gestação' && (
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600 dark:text-gray-400">
-                          Progresso da GestaÃ§Ã£o: {diasGestacao}/280 dias
+                          Progresso da Gestação: {diasGestacao}/280 dias
                         </span>
                         <span className={`font-medium ${
                           diasRestantes > 0 
@@ -410,19 +410,19 @@ export default function GestationManager() {
 
                   <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
-                      <div className="text-gray-600 dark:text-gray-400">T.E EmbriÃ£o</div>
+                      <div className="text-gray-600 dark:text-gray-400">T.E Embrião</div>
                       <div className="font-medium text-gray-900 dark:text-white">
                         {gestacao.dataInseminacao 
                           ? new Date(gestacao.dataInseminacao).toLocaleDateString('pt-BR')
-                          : 'NÃ£o informado'}
+                          : 'Não informado'}
                       </div>
                     </div>
                     <div>
-                      <div className="text-gray-600 dark:text-gray-400">PrevisÃ£o Nascimento</div>
+                      <div className="text-gray-600 dark:text-gray-400">Previsão Nascimento</div>
                       <div className="font-medium text-gray-900 dark:text-white">
                         {gestacao.previsaoNascimento 
                           ? new Date(gestacao.previsaoNascimento).toLocaleDateString('pt-BR')
-                          : 'NÃ£o informado'}
+                          : 'Não informado'}
                       </div>
                     </div>
                     <div>
@@ -445,13 +445,13 @@ export default function GestationManager() {
         </div>
       </div>
 
-      {/* Modal Nova GestaÃ§Ã£o */}
+      {/* Modal Nova Gestação */}
       {showNewGestacao && (
         <div className="modal-overlay">
           <div className="modal-content">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Registrar Nova GestaÃ§Ã£o
+                Registrar Nova Gestação
               </h3>
             </div>
             <div className="p-6 space-y-4">
@@ -476,7 +476,7 @@ export default function GestationManager() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Data da T.E EmbriÃ£o
+                    Data da T.E Embrião
                   </label>
                   <input
                     type="date"
@@ -487,7 +487,7 @@ export default function GestationManager() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    PrevisÃ£o Nascimento
+                    Previsão Nascimento
                   </label>
                   <input
                     type="date"
@@ -501,13 +501,13 @@ export default function GestationManager() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Pai - SÃ©rie
+                    Pai - Série
                   </label>
                   <input
                     type="text"
                     value={dadosGestacao.paiSerie}
                     onChange={(e) => setDadosGestacao({...dadosGestacao, paiSerie: e.target.value})}
-                    placeholder="SÃ©rie MÃ£e"
+                    placeholder="Série Mãe"
                     className="input-field"
                   />
                 </div>
@@ -528,7 +528,7 @@ export default function GestationManager() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    MÃ£e - SÃ©rie
+                    Mãe - Série
                   </label>
                   <input
                     type="text"
@@ -540,7 +540,7 @@ export default function GestationManager() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    MÃ£e - RG
+                    Mãe - RG
                   </label>
                   <input
                     type="text"
@@ -554,14 +554,14 @@ export default function GestationManager() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  ObservaÃ§Ãµes
+                  Observações
                 </label>
                 <textarea
                   value={dadosGestacao.observacoes}
                   onChange={(e) => setDadosGestacao({...dadosGestacao, observacoes: e.target.value})}
                   rows={3}
                   className="input-field"
-                  placeholder="ObservaÃ§Ãµes sobre a gestaÃ§Ã£o..."
+                  placeholder="Observações sobre a gestação..."
                 />
               </div>
             </div>
@@ -576,7 +576,7 @@ export default function GestationManager() {
                 onClick={registrarGestacao}
                 className="btn-primary"
               >
-                Registrar GestaÃ§Ã£o
+                Registrar Gestação
               </button>
             </div>
           </div>
@@ -589,20 +589,20 @@ export default function GestationManager() {
           <div className="modal-content max-w-4xl">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                ðÅ¸�¼ Registrar Nascimento - {gestacaoSelecionada.receptoraNome}
+                🍼 Registrar Nascimento - {gestacaoSelecionada.receptoraNome}
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                Pai: {gestacaoSelecionada.paiSerie} {gestacaoSelecionada.paiRg} ââ‚¬¢ 
-                MÃ£e: {gestacaoSelecionada.maeSerie} {gestacaoSelecionada.maeRg}
+                Pai: {gestacaoSelecionada.paiSerie} {gestacaoSelecionada.paiRg} • 
+                Mãe: {gestacaoSelecionada.maeSerie} {gestacaoSelecionada.maeRg}
               </p>
             </div>
             
             <div className="p-6 space-y-6">
-              {/* Dados BÃ¡sicos */}
+              {/* Dados Básicos */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <h4 className="font-semibold text-gray-900 dark:text-white border-b pb-2">
-                    ðÅ¸â€œâ€¹ Dados BÃ¡sicos do Bezerro
+                    📋 Dados Básicos do Bezerro
                   </h4>
                   
                   <div className="grid grid-cols-2 gap-4">
@@ -633,7 +633,7 @@ export default function GestationManager() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        SÃ©rie *
+                        Série *
                       </label>
                       <select
                         value={dadosNascimento.serie}
@@ -684,8 +684,8 @@ export default function GestationManager() {
                         className="input-field"
                       >
                         <option value="">Selecione</option>
-                        <option value="Macho">ðÅ¸�â€š Macho</option>
-                        <option value="FÃªmea">ðÅ¸�â€ž FÃªmea</option>
+                        <option value="Macho">🐂 Macho</option>
+                        <option value="Fêmea">🐄 Fêmea</option>
                       </select>
                     </div>
                     <div>
@@ -726,7 +726,7 @@ export default function GestationManager() {
 
                 <div className="space-y-4">
                   <h4 className="font-semibold text-gray-900 dark:text-white border-b pb-2">
-                    ðÅ¸�¥ Dados do Parto
+                    🏥 Dados do Parto
                   </h4>
 
                   <div>
@@ -763,27 +763,27 @@ export default function GestationManager() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      VeterinÃ¡rio ResponsÃ¡vel
+                      Veterinário Responsável
                     </label>
                     <input
                       type="text"
                       value={dadosNascimento.veterinario}
                       onChange={(e) => setDadosNascimento({...dadosNascimento, veterinario: e.target.value})}
                       className="input-field"
-                      placeholder="Nome do veterinÃ¡rio"
+                      placeholder="Nome do veterinário"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      ObservaÃ§Ãµes do Nascimento
+                      Observações do Nascimento
                     </label>
                     <textarea
                       value={dadosNascimento.observacoes}
                       onChange={(e) => setDadosNascimento({...dadosNascimento, observacoes: e.target.value})}
                       rows={4}
                       className="input-field"
-                      placeholder="ObservaÃ§Ãµes sobre o parto, condiÃ§Ãµes do bezerro, etc..."
+                      placeholder="Observações sobre o parto, condições do bezerro, etc..."
                     />
                   </div>
                 </div>
@@ -792,7 +792,7 @@ export default function GestationManager() {
               {/* Custos */}
               <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-4">
-                  ðÅ¸â€™° Custos do Nascimento
+                  💰 Custos do Nascimento
                 </h4>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -843,7 +843,7 @@ export default function GestationManager() {
                     </span>
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Este serÃ¡ o custo inicial do bezerro, incluindo rateio da receptora
+                    Este será o custo inicial do bezerro, incluindo rateio da receptora
                   </div>
                 </div>
               </div>
@@ -851,13 +851,13 @@ export default function GestationManager() {
               {/* Preview dos Dados */}
               <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-4">
-                  ðÅ¸â€˜�ï¸� Preview do Registro
+                  👁️ Preview do Registro
                 </h4>
                 
                 <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
-                      <span className="text-gray-600 dark:text-gray-400">IdentificaÃ§Ã£o:</span>
+                      <span className="text-gray-600 dark:text-gray-400">Identificação:</span>
                       <div className="font-medium text-gray-900 dark:text-white">
                         {dadosNascimento.serie} {dadosNascimento.rg}
                       </div>
@@ -865,13 +865,13 @@ export default function GestationManager() {
                     <div>
                       <span className="text-gray-600 dark:text-gray-400">Sexo/Peso:</span>
                       <div className="font-medium text-gray-900 dark:text-white">
-                        {dadosNascimento.sexo} ââ‚¬¢ {dadosNascimento.peso}kg
+                        {dadosNascimento.sexo} • {dadosNascimento.peso}kg
                       </div>
                     </div>
                     <div>
                       <span className="text-gray-600 dark:text-gray-400">Cor:</span>
                       <div className="font-medium text-gray-900 dark:text-white">
-                        {dadosNascimento.cor || 'NÃ£o informada'}
+                        {dadosNascimento.cor || 'Não informada'}
                       </div>
                     </div>
                     <div>
@@ -900,7 +900,7 @@ export default function GestationManager() {
                 className="btn-success flex items-center"
                 disabled={!dadosNascimento.sexo || !dadosNascimento.peso || !dadosNascimento.rg}
               >
-                ðÅ¸�¼ Registrar Nascimento
+                🍼 Registrar Nascimento
               </button>
             </div>
           </div>

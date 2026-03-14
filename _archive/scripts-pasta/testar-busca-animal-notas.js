@@ -2,7 +2,7 @@ const { query } = require('../lib/database')
 
 async function testarBusca() {
   try {
-    console.log('�Ÿ”� Testando busca do animal CJCJ 16174...\n')
+    console.log('🔍 Testando busca do animal CJCJ 16174...\n')
 
     // Teste 1: Busca direta no banco
     console.log('1. Busca direta no banco:')
@@ -13,7 +13,7 @@ async function testarBusca() {
     `)
     console.log(`   Resultado: ${busca1.rows.length} animal(s) encontrado(s)`)
     if (busca1.rows.length > 0) {
-      console.log(`   �œ… Animal encontrado:`, busca1.rows[0])
+      console.log(`   ✅ Animal encontrado:`, busca1.rows[0])
     }
 
     // Teste 2: Busca como a API faz (sem filtros)
@@ -27,7 +27,7 @@ async function testarBusca() {
     `)
     console.log(`   Resultado: ${busca2.rows.length} animal(s) encontrado(s)`)
     if (busca2.rows.length > 0) {
-      console.log(`   �œ… Animal encontrado na query da API`)
+      console.log(`   ✅ Animal encontrado na query da API`)
     }
 
     // Teste 3: Verificar se está na lista completa
@@ -77,13 +77,13 @@ async function testarBusca() {
           AND (TRIM(rg::text) = $2 OR rg = $3)
       `, [variacao.serie, String(variacao.rg).trim(), parseInt(variacao.rg)])
       
-      console.log(`   Busca "${variacao.serie}" + "${variacao.rg}": ${result.rows.length > 0 ? '�œ… Encontrado' : '�Œ Não encontrado'}`)
+      console.log(`   Busca "${variacao.serie}" + "${variacao.rg}": ${result.rows.length > 0 ? '✅ Encontrado' : '❌ Não encontrado'}`)
     }
 
-    console.log('\n�œ… Testes concluídos!')
+    console.log('\n✅ Testes concluídos!')
 
   } catch (error) {
-    console.error('�Œ Erro:', error)
+    console.error('❌ Erro:', error)
     throw error
   }
 }
@@ -92,7 +92,7 @@ if (require.main === module) {
   testarBusca()
     .then(() => process.exit(0))
     .catch((error) => {
-      console.error('�Œ Erro:', error)
+      console.error('❌ Erro:', error)
       process.exit(1)
     })
 }

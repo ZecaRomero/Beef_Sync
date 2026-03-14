@@ -1,9 +1,9 @@
-// UtilitÃ¡rio para exportaÃ§Ã£o Excel com formataÃ§Ã£o profissional usando HTML
+// Utilitário para exportação Excel com formatação profissional usando HTML
 export const exportToExcelWithFormatting = (births, stats, statsByTouro) => {
   try {
-    // FunÃ§Ã£o para gerar HTML da tabela principal
+    // Função para gerar HTML da tabela principal
     const generateMainTableHTML = () => {
-      const headers = ['Receptora', 'Doador', 'RG', 'Prev Parto', 'Nascimento', 'Tatuagem', 'CC', 'PS1', 'PS2', 'Sexo', 'Status', 'Touro', 'Data Real', 'ObservaÃ§Ãµes', 'Tipo Cobertura', 'Custo DNA', 'Descarte', 'Morte']
+      const headers = ['Receptora', 'Doador', 'RG', 'Prev Parto', 'Nascimento', 'Tatuagem', 'CC', 'PS1', 'PS2', 'Sexo', 'Status', 'Touro', 'Data Real', 'Observações', 'Tipo Cobertura', 'Custo DNA', 'Descarte', 'Morte']
       
       let html = `
         <table border="1" style="border-collapse: collapse; width: 100%;">
@@ -27,14 +27,14 @@ export const exportToExcelWithFormatting = (births, stats, statsByTouro) => {
             <td style="padding: 4px; border: 1px solid black;">${birth.cc || ''}</td>
             <td style="padding: 4px; border: 1px solid black;">${birth.ps1 || ''}</td>
             <td style="padding: 4px; border: 1px solid black;">${birth.ps2 || ''}</td>
-            <td style="padding: 4px; border: 1px solid black;">${birth.sexo === 'M' ? 'Macho' : birth.sexo === 'F' ? 'FÃªmea' : ''}</td>
+            <td style="padding: 4px; border: 1px solid black;">${birth.sexo === 'M' ? 'Macho' : birth.sexo === 'F' ? 'Fêmea' : ''}</td>
             <td style="padding: 4px; border: 1px solid black;">${birth.status === 'nascido' ? 'Nascido' : birth.status === 'morto' ? 'Morto' : birth.status === 'aborto' ? 'Aborto' : birth.status === 'gestante_atrasada' ? 'Atrasada' : birth.status}</td>
             <td style="padding: 4px; border: 1px solid black;">${birth.touro}</td>
             <td style="padding: 4px; border: 1px solid black;">${birth.data || ''}</td>
             <td style="padding: 4px; border: 1px solid black;">${birth.observacao}</td>
             <td style="padding: 4px; border: 1px solid black;">${birth.tipoCobertura}</td>
             <td style="padding: 4px; border: 1px solid black;">${birth.custoDNA ? `R$ ${parseFloat(birth.custoDNA).toFixed(2)}` : ''}</td>
-            <td style="padding: 4px; border: 1px solid black;">${birth.descarte ? 'SIM' : 'NÃÆ’O'}</td>
+            <td style="padding: 4px; border: 1px solid black;">${birth.descarte ? 'SIM' : 'NÃO'}</td>
             <td style="padding: 4px; border: 1px solid black;">${birth.morte || ''}</td>
           </tr>
         `
@@ -48,13 +48,13 @@ export const exportToExcelWithFormatting = (births, stats, statsByTouro) => {
       return html
     }
 
-    // FunÃ§Ã£o para gerar HTML da tabela de resumo
+    // Função para gerar HTML da tabela de resumo
     const generateResumoTableHTML = () => {
       const resumoData = [
         ['Total de Registros', stats.total],
         ['Nascimentos', stats.nascidos],
         ['Machos', stats.machos],
-        ['FÃªmeas', stats.femeas],
+        ['Fêmeas', stats.femeas],
         ['Perdas Totais', stats.totalPerdas],
         ['Mortos', stats.mortos],
         ['Abortos', stats.abortos],
@@ -70,7 +70,7 @@ export const exportToExcelWithFormatting = (births, stats, statsByTouro) => {
         <table border="1" style="border-collapse: collapse; width: 100%; margin-top: 20px;">
           <thead>
             <tr style="background-color: #1F4E79; color: white; font-weight: bold; text-align: center;">
-              <th style="padding: 8px; border: 1px solid black;">MÃ©trica</th>
+              <th style="padding: 8px; border: 1px solid black;">Métrica</th>
               <th style="padding: 8px; border: 1px solid black;">Valor</th>
             </tr>
           </thead>
@@ -94,7 +94,7 @@ export const exportToExcelWithFormatting = (births, stats, statsByTouro) => {
       return html
     }
 
-    // FunÃ§Ã£o para gerar HTML da tabela de touros
+    // Função para gerar HTML da tabela de touros
     const generateTourosTableHTML = () => {
       let html = `
         <table border="1" style="border-collapse: collapse; width: 100%; margin-top: 20px;">
@@ -104,7 +104,7 @@ export const exportToExcelWithFormatting = (births, stats, statsByTouro) => {
               <th style="padding: 8px; border: 1px solid black;">Total</th>
               <th style="padding: 8px; border: 1px solid black;">Nascidos</th>
               <th style="padding: 8px; border: 1px solid black;">Machos</th>
-              <th style="padding: 8px; border: 1px solid black;">FÃªmeas</th>
+              <th style="padding: 8px; border: 1px solid black;">Fêmeas</th>
               <th style="padding: 8px; border: 1px solid black;">Taxa Sucesso</th>
             </tr>
           </thead>
@@ -148,15 +148,15 @@ export const exportToExcelWithFormatting = (births, stats, statsByTouro) => {
           </style>
         </head>
         <body>
-          <h1 style="color: #1F4E79; text-align: center;">ðÅ¸â€œÅ  Planilha de Nascimentos - Beef-Sync</h1>
+          <h1 style="color: #1F4E79; text-align: center;">📊 Planilha de Nascimentos - Beef-Sync</h1>
           
-          <h2>ðÅ¸�£ Dados de Nascimentos</h2>
+          <h2>🐣 Dados de Nascimentos</h2>
           ${generateMainTableHTML()}
           
-          <h2>ðÅ¸â€œË† Resumo EstatÃ­stico</h2>
+          <h2>📈 Resumo Estatístico</h2>
           ${generateResumoTableHTML()}
           
-          <h2>ðÅ¸�â€š Performance por Touro</h2>
+          <h2>🐂 Performance por Touro</h2>
           ${generateTourosTableHTML()}
           
           <p style="margin-top: 30px; text-align: center; color: #666;">

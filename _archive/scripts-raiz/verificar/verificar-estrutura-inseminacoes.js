@@ -12,7 +12,7 @@ const pool = new Pool({
 
 async function verificarEstrutura() {
   try {
-    console.log('�Ÿ”� Verificando estrutura da tabela inseminacoes...\n');
+    console.log('🔍 Verificando estrutura da tabela inseminacoes...\n');
     
     const result = await pool.query(`
       SELECT column_name, data_type, is_nullable
@@ -21,13 +21,13 @@ async function verificarEstrutura() {
       ORDER BY ordinal_position
     `);
     
-    console.log('�Ÿ“‹ Colunas da tabela inseminacoes:');
+    console.log('📋 Colunas da tabela inseminacoes:');
     result.rows.forEach(col => {
       console.log(`- ${col.column_name} (${col.data_type}) ${col.is_nullable === 'NO' ? 'NOT NULL' : 'NULL'}`);
     });
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
   } finally {
     await pool.end();
   }

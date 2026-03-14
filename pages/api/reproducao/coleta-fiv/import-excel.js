@@ -16,49 +16,49 @@ export default async function importExcelHandler(req, res) {
   }
 
   try {
-    logger.info('ðÅ¸â€œ¥ Iniciando processamento de importaÃ§Ã£o Excel')
+    logger.info('📥 Iniciando processamento de importação Excel')
     
-    // Verificar se hÃ¡ arquivo no body (serÃ¡ enviado como base64 ou buffer)
+    // Verificar se há arquivo no body (será enviado como base64 ou buffer)
     const { fileData, fileName, laboratorio, veterinario } = req.body
 
     if (!fileData) {
-      logger.warn('â�Å’ Arquivo Excel nÃ£o fornecido')
-      return sendValidationError(res, 'Arquivo Excel Ã© obrigatÃ³rio')
+      logger.warn('❌ Arquivo Excel não fornecido')
+      return sendValidationError(res, 'Arquivo Excel é obrigatório')
     }
 
     if (!laboratorio || !veterinario) {
-      logger.warn('â�Å’ LaboratÃ³rio ou veterinÃ¡rio nÃ£o fornecido')
-      return sendValidationError(res, 'LaboratÃ³rio e veterinÃ¡rio sÃ£o obrigatÃ³rios para importaÃ§Ã£o')
+      logger.warn('❌ Laboratório ou veterinário não fornecido')
+      return sendValidationError(res, 'Laboratório e veterinário são obrigatórios para importação')
     }
 
-    logger.info(`ðÅ¸â€œâ€ž Processando arquivo: ${fileName}, tamanho base64: ${typeof fileData === 'string' ? fileData.length : 'buffer'}`)
+    logger.info(`📄 Processando arquivo: ${fileName}, tamanho base64: ${typeof fileData === 'string' ? fileData.length : 'buffer'}`)
 
-    // Converter base64 para buffer se necessÃ¡rio
+    // Converter base64 para buffer se necessário
     let buffer
     try {
       if (typeof fileData === 'string') {
         // Remover prefixo data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64, se existir
         const base64Data = fileData.replace(/^data:.*,/, '')
         buffer = Buffer.from(base64Data, 'base64')
-        logger.info(`âÅ“â€¦ Base64 convertido para buffer, tamanho: ${buffer.length} bytes`)
+        logger.info(`✅ Base64 convertido para buffer, tamanho: ${buffer.length} bytes`)
       } else {
         buffer = Buffer.from(fileData)
-        logger.info(`âÅ“â€¦ Buffer criado, tamanho: ${buffer.length} bytes`)
+        logger.info(`✅ Buffer criado, tamanho: ${buffer.length} bytes`)
       }
     } catch (error) {
-      logger.error('â�Å’ Erro ao converter base64 para buffer:', error)
+      logger.error('❌ Erro ao converter base64 para buffer:', error)
       return sendError(res, `Erro ao processar arquivo: ${error.message}`)
     }
 
     if (!buffer || buffer.length === 0) {
-      logger.error('â�Å’ Buffer vazio apÃ³s conversÃ£o')
-      return sendError(res, 'Arquivo invÃ¡lido ou vazio')
+      logger.error('❌ Buffer vazio após conversão')
+      return sendError(res, 'Arquivo inválido ou vazio')
     }
 
     // Ler o arquivo Excel
     let workbook, sheetName, worksheet
     try {
-      logger.info('ðÅ¸â€œâ€“ Lendo arquivo Excel...')
+      logger.info('📖 Lendo arquivo Excel...')
       workbook = XLSX.read(buffer, { 
         type: 'buffer',
         cellDates: true, // Importante: ler datas como objetos Date
@@ -67,28 +67,28 @@ export default async function importExcelHandler(req, res) {
       })
       sheetName = workbook.SheetNames[0]
       worksheet = workbook.Sheets[sheetName]
-      logger.info(`âÅ“â€¦ Arquivo Excel lido, planilha: ${sheetName}`)
+      logger.info(`✅ Arquivo Excel lido, planilha: ${sheetName}`)
     } catch (error) {
-      logger.error('â�Å’ Erro ao ler arquivo Excel:', error)
+      logger.error('❌ Erro ao ler arquivo Excel:', error)
       return sendError(res, `Erro ao ler arquivo Excel: ${error.message}`)
     }
     
-    // Converter para JSON - usar raw: true para manter nÃºmeros e datas como estÃ£o
-    logger.info('ðÅ¸â€�â€ž Convertendo planilha para JSON...')
+    // Converter para JSON - usar raw: true para manter números e datas como estão
+    logger.info('🔄 Convertendo planilha para JSON...')
     const data = XLSX.utils.sheet_to_json(worksheet, { 
       header: 1,
       defval: null,
-      raw: true // Manter valores originais (nÃºmeros, datas)
+      raw: true // Manter valores originais (números, datas)
     })
 
-    logger.info(`ðÅ¸â€œÅ  Planilha convertida, ${data.length} linhas encontradas`)
+    logger.info(`📊 Planilha convertida, ${data.length} linhas encontradas`)
 
     if (data.length < 2) {
-      logger.warn('â�Å’ Planilha vazia ou sem dados suficientes')
+      logger.warn('❌ Planilha vazia ou sem dados suficientes')
       return sendValidationError(res, 'Planilha vazia ou sem dados')
     }
 
-    // Encontrar linha de cabeÃ§alho (primeira linha nÃ£o vazia)
+    // Encontrar linha de cabeçalho (primeira linha não vazia)
     let headerRowIndex = 0
     for (let i = 0; i < Math.min(5, data.length); i++) {
       if (data[i] && data[i].some(cell => cell !== null && cell !== '')) {
@@ -97,21 +97,21 @@ export default async function importExcelHandler(req, res) {
       }
     }
 
-    logger.info(`ðÅ¸â€œâ€¹ Linha de cabeÃ§alho encontrada na linha ${headerRowIndex + 1}`)
+    logger.info(`📋 Linha de cabeçalho encontrada na linha ${headerRowIndex + 1}`)
     const headers = data[headerRowIndex].map(h => String(h || '').trim().toLowerCase())
-    logger.info(`ðÅ¸â€œâ€¹ CabeÃ§alhos encontrados: ${headers.filter(h => h).join(', ')}`)
+    logger.info(`📋 Cabeçalhos encontrados: ${headers.filter(h => h).join(', ')}`)
     
-    // Mapear Ã­ndices das colunas (apenas as colunas do cabeÃ§alho especificado)
+    // Mapear índices das colunas (apenas as colunas do cabeçalho especificado)
     // Rqd = Registro da doadora (comum em planilhas ZebuEmbryo)
     const columnMap = {
-      serie: headers.findIndex(h => h.includes('sÃ©rie') || h.includes('serie')),
+      serie: headers.findIndex(h => h.includes('série') || h.includes('serie')),
       rg: headers.findIndex(h => h === 'rg' || (h.includes('rg') && !h.includes('rgd') && !h.includes('rqd'))),
       rgd: headers.findIndex(h => h.includes('rgd') || h.includes('registro') || h === 'rqd' || h.includes('rqd') || h.includes('doadora')),
       data: headers.findIndex(h => (h.includes('data') || h === 'data') && !h.includes('transf')),
       touro: headers.findIndex(h => h.includes('touro')),
-      viaveis: headers.findIndex(h => h.includes('viavei') || h.includes('viaveis') || h.includes('viÃ¡veis')),
+      viaveis: headers.findIndex(h => h.includes('viavei') || h.includes('viaveis') || h.includes('viáveis')),
       cultivados: headers.findIndex(h => h.includes('cultivad')),
-      embriao: headers.findIndex(h => h.includes('embria') || h.includes('embriao') || h.includes('embriÃ£o')),
+      embriao: headers.findIndex(h => h.includes('embria') || h.includes('embriao') || h.includes('embrião')),
       pctemb: headers.findIndex(h => h.includes('%emb') || h.includes('percent') || h.includes('porcent')),
       te: headers.findIndex(h => {
         const hLower = h.toLowerCase().trim()
@@ -128,17 +128,17 @@ export default async function importExcelHandler(req, res) {
       })
     }
     
-    // Se nÃ£o encontrou RG diretamente, usar RGD como fallback
+    // Se não encontrou RG diretamente, usar RGD como fallback
     if (columnMap.rg === -1 && columnMap.rgd !== -1) {
       columnMap.rg = columnMap.rgd
     }
     
-    // Se nÃ£o encontrou RGD mas encontrou RG, usar RG como RGD
+    // Se não encontrou RGD mas encontrou RG, usar RG como RGD
     if (columnMap.rgd === -1 && columnMap.rg !== -1) {
       columnMap.rgd = columnMap.rg
     }
 
-    // Fallback: se rgd nÃ£o encontrado, tentar colunas comuns (Rqd, Doadora, etc.)
+    // Fallback: se rgd não encontrado, tentar colunas comuns (Rqd, Doadora, etc.)
     if (columnMap.rgd === -1 && columnMap.rg === -1) {
       const firstDataCol = headers.findIndex(h => h && (h.includes('rqd') || h.includes('doadora') || h.includes('registro') || h.includes('ident')))
       if (firstDataCol !== -1) {
@@ -148,30 +148,30 @@ export default async function importExcelHandler(req, res) {
       }
     }
 
-    logger.info(`ðÅ¸â€�� Mapeamento de colunas:`)
-    logger.info(`   SÃ©rie: ${columnMap.serie}, RG: ${columnMap.rg}, RGD: ${columnMap.rgd}`)
+    logger.info(`🔍 Mapeamento de colunas:`)
+    logger.info(`   Série: ${columnMap.serie}, RG: ${columnMap.rg}, RGD: ${columnMap.rgd}`)
     logger.info(`   Data: ${columnMap.data}, Touro: ${columnMap.touro}`)
-    logger.info(`   ViÃ¡veis: ${columnMap.viaveis}, Cultivados: ${columnMap.cultivados}, EmbriÃµes: ${columnMap.embriao}, %Emb: ${columnMap.pctemb}, TE: ${columnMap.te}`)
+    logger.info(`   Viáveis: ${columnMap.viaveis}, Cultivados: ${columnMap.cultivados}, Embriões: ${columnMap.embriao}, %Emb: ${columnMap.pctemb}, TE: ${columnMap.te}`)
     
     // Verificar se a coluna TE foi encontrada
     if (columnMap.te === -1) {
-      logger.warn(`âÅ¡ ï¸� Coluna TE nÃ£o encontrada nos cabeÃ§alhos. CabeÃ§alhos disponÃ­veis: ${headers.filter(h => h).join(', ')}`)
+      logger.warn(`⚠️ Coluna TE não encontrada nos cabeçalhos. Cabeçalhos disponíveis: ${headers.filter(h => h).join(', ')}`)
     } else {
-      logger.info(`âÅ“â€¦ Coluna TE encontrada no Ã­ndice ${columnMap.te} (cabeÃ§alho: "${headers[columnMap.te]}")`)
+      logger.info(`✅ Coluna TE encontrada no índice ${columnMap.te} (cabeçalho: "${headers[columnMap.te]}")`)
     }
     
     // Validar: precisa ter pelo menos RG, RGD ou Rqd, e Data
     const temRg = columnMap.rg !== -1 || columnMap.rgd !== -1
     if (!temRg || columnMap.data === -1) {
       const cabecalhosStr = headers.filter(h => h).join(', ')
-      logger.error(`â�Å’ Colunas obrigatÃ³rias nÃ£o encontradas. RG/RGD/Rqd: ${temRg}, Data: ${columnMap.data}. CabeÃ§alhos: ${cabecalhosStr}`)
+      logger.error(`❌ Colunas obrigatórias não encontradas. RG/RGD/Rqd: ${temRg}, Data: ${columnMap.data}. Cabeçalhos: ${cabecalhosStr}`)
       return sendValidationError(res, 
-        `Colunas obrigatÃ³rias nÃ£o encontradas. A planilha precisa ter: (1) Rqd, RG, RGD ou Registro da doadora; (2) Data da FIV. CabeÃ§alhos encontrados: ${cabecalhosStr || 'nenhum'}`)
+        `Colunas obrigatórias não encontradas. A planilha precisa ter: (1) Rqd, RG, RGD ou Registro da doadora; (2) Data da FIV. Cabeçalhos encontrados: ${cabecalhosStr || 'nenhum'}`)
     }
 
     // Processar linhas de dados
     const rows = data.slice(headerRowIndex + 1)
-    logger.info(`ðÅ¸â€œ� Processando ${rows.length} linhas de dados...`)
+    logger.info(`📝 Processando ${rows.length} linhas de dados...`)
     const processedData = []
     const errors = []
     const warnings = []
@@ -199,7 +199,7 @@ export default async function importExcelHandler(req, res) {
         rgd = String(row[columnMap.rgd]).trim()
       }
       
-      // Se tem sÃ©rie e RG, combinar: "SÃâ€°RIE RG"
+      // Se tem série e RG, combinar: "SÉRIE RG"
       if (serie && rgd) {
         rgd = `${serie} ${rgd}`.trim()
       } else if (serie && !rgd) {
@@ -213,18 +213,18 @@ export default async function importExcelHandler(req, res) {
         continue
       }
 
-      // Converter data (aceitar vÃ¡rios formatos)
+      // Converter data (aceitar vários formatos)
       let dataFiv = null
       try {
         let dateObj = null
         
-        // Caso 1: JÃ¡ Ã© um objeto Date (quando cellDates: true)
+        // Caso 1: Já é um objeto Date (quando cellDates: true)
         if (dataVal instanceof Date) {
           dateObj = dataVal
           // Adicionar 12 horas para evitar problemas de timezone
           dateObj.setHours(12, 0, 0, 0)
         }
-        // Caso 2: Ãâ€° um nÃºmero (Excel serial date)
+        // Caso 2: É um número (Excel serial date)
         else if (typeof dataVal === 'number') {
           // Excel serial date: Excel usa 1900-01-01 = 1 como base
           // Mas JavaScript Date usa 1970-01-01 como base
@@ -237,9 +237,9 @@ export default async function importExcelHandler(req, res) {
           dateObj.setHours(12, 0, 0, 0)
           
           // Log para debug
-          logger.debug(`ðÅ¸â€œâ€¦ Data numÃ©rica Excel linha ${rowNum}: ${dataVal} ââ€ â€™ ${dateObj.toISOString().split('T')[0]}`)
+          logger.debug(`📅 Data numérica Excel linha ${rowNum}: ${dataVal} → ${dateObj.toISOString().split('T')[0]}`)
         }
-        // Caso 3: Ãâ€° uma string
+        // Caso 3: É uma string
         else {
           const dataStr = String(dataVal).trim()
           
@@ -251,7 +251,7 @@ export default async function importExcelHandler(req, res) {
               const month = parseInt(parts[1]) - 1
               let year = parseInt(parts[2])
               
-              // Se o ano tem 2 dÃ­gitos, assumir 20XX
+              // Se o ano tem 2 dígitos, assumir 20XX
               if (year < 100) {
                 year += 2000
               }
@@ -263,7 +263,7 @@ export default async function importExcelHandler(req, res) {
           else if (dataStr.match(/^\d{4}-\d{2}-\d{2}/)) {
             dateObj = new Date(dataStr + 'T12:00:00')
           }
-          // Tentar parsear como Date padrÃ£o
+          // Tentar parsear como Date padrão
           else {
             dateObj = new Date(dataStr)
             if (!isNaN(dateObj.getTime())) {
@@ -273,61 +273,61 @@ export default async function importExcelHandler(req, res) {
         }
 
         if (!dateObj || isNaN(dateObj.getTime())) {
-          throw new Error(`Data invÃ¡lida: ${dataVal}`)
+          throw new Error(`Data inválida: ${dataVal}`)
         }
 
-        // Verificar se o ano estÃ¡ razoÃ¡vel (entre 2000 e 2100)
+        // Verificar se o ano está razoável (entre 2000 e 2100)
         const year = dateObj.getFullYear()
         if (year < 2000 || year > 2100) {
-          logger.warn(`âÅ¡ ï¸� Ano suspeito na linha ${rowNum}: ${year}. Valor original: ${dataVal}`)
-          // Se o ano estÃ¡ entre 1900-1999, adicionar 100 anos
+          logger.warn(`⚠️ Ano suspeito na linha ${rowNum}: ${year}. Valor original: ${dataVal}`)
+          // Se o ano está entre 1900-1999, adicionar 100 anos
           if (year >= 1900 && year < 2000) {
             dateObj.setFullYear(year + 100)
-            logger.info(`âÅ“â€¦ Ano corrigido de ${year} para ${dateObj.getFullYear()}`)
+            logger.info(`✅ Ano corrigido de ${year} para ${dateObj.getFullYear()}`)
           }
-          // Se o ano estÃ¡ entre 2027-2030, pode ser um erro de interpretaÃ§Ã£o (deveria ser 2025-2026)
-          // Mas nÃ£o vamos corrigir automaticamente, apenas avisar
+          // Se o ano está entre 2027-2030, pode ser um erro de interpretação (deveria ser 2025-2026)
+          // Mas não vamos corrigir automaticamente, apenas avisar
           if (year >= 2027 && year <= 2030) {
-            logger.warn(`âÅ¡ ï¸� Data futura suspeita na linha ${rowNum}: ${year}. Verifique se estÃ¡ correto.`)
+            logger.warn(`⚠️ Data futura suspeita na linha ${rowNum}: ${year}. Verifique se está correto.`)
           }
         }
 
         // Formatar como YYYY-MM-DD
         dataFiv = dateObj.toISOString().split('T')[0]
-        logger.debug(`ðÅ¸â€œâ€¦ Data processada linha ${rowNum}: ${dataVal} ââ€ â€™ ${dataFiv}`)
+        logger.debug(`📅 Data processada linha ${rowNum}: ${dataVal} → ${dataFiv}`)
       } catch (error) {
-        logger.error(`â�Å’ Erro ao processar data linha ${rowNum}:`, error)
-        errors.push(`Linha ${rowNum}: Data invÃ¡lida "${dataVal}" - ${error.message}`)
+        logger.error(`❌ Erro ao processar data linha ${rowNum}:`, error)
+        errors.push(`Linha ${rowNum}: Data inválida "${dataVal}" - ${error.message}`)
         continue
       }
 
-      // Buscar animal pelo RG (usando SÃâ€°RIE + RG se disponÃ­vel)
+      // Buscar animal pelo RG (usando SÉRIE + RG se disponível)
       let animal = null
       let doadoraId = null
       let doadoraNome = rgd
 
       try {
-        // Normalizar busca: remover espaÃ§os extras e converter para maiÃºsculas
+        // Normalizar busca: remover espaços extras e converter para maiúsculas
         const rgNormalizado = rgd.replace(/\s+/g, ' ').trim().toUpperCase()
         
-        // Separar sÃ©rie e RG se possÃ­vel (formato "SÃâ€°RIE RG")
+        // Separar série e RG se possível (formato "SÉRIE RG")
         const partes = rgNormalizado.split(/\s+/)
         let serieBusca = null
         let rgBusca = null
         
         if (partes.length >= 2) {
-          // Assumir que a primeira parte Ã© a sÃ©rie e o resto Ã© o RG
+          // Assumir que a primeira parte é a série e o resto é o RG
           serieBusca = partes[0]
           rgBusca = partes.slice(1).join(' ')
         } else if (partes.length === 1) {
-          // Apenas uma parte, pode ser sÃ³ RG ou sÃ³ sÃ©rie
+          // Apenas uma parte, pode ser só RG ou só série
           rgBusca = partes[0]
         }
         
         // Tentar diferentes formatos de busca
         let animalResult
         if (serieBusca && rgBusca) {
-          // Buscar com sÃ©rie e RG
+          // Buscar com série e RG
           animalResult = await query(
             `SELECT id, nome, rg, serie 
              FROM animais 
@@ -362,11 +362,11 @@ export default async function importExcelHandler(req, res) {
           animal = animalResult.rows[0]
           doadoraId = animal.id
           doadoraNome = animal.nome || `${animal.serie || ''} ${animal.rg || ''}`.trim() || rgd
-          logger.debug(`âÅ“â€¦ Animal encontrado: ${doadoraNome} (ID: ${doadoraId})`)
+          logger.debug(`✅ Animal encontrado: ${doadoraNome} (ID: ${doadoraId})`)
         } else {
-          // Se nÃ£o encontrou, usar o Rgd como nome
+          // Se não encontrou, usar o Rgd como nome
           doadoraNome = rgd
-          logger.debug(`âÅ¡ ï¸� Animal nÃ£o encontrado para ${rgd}, usando como nome`)
+          logger.debug(`⚠️ Animal não encontrado para ${rgd}, usando como nome`)
         }
       } catch (error) {
         logger.warn(`Erro ao buscar animal com RG ${rgd}:`, error)
@@ -379,7 +379,7 @@ export default async function importExcelHandler(req, res) {
         ? String(row[columnMap.touro]).trim() 
         : null
 
-      // Usar "Viaveis" como quantidade de oÃ³citos; fallback para "Cultivados" (ZebuEmbryo)
+      // Usar "Viaveis" como quantidade de oócitos; fallback para "Cultivados" (ZebuEmbryo)
       let quantidadeOocitos = 0
       if (columnMap.viaveis !== -1 && row[columnMap.viaveis]) {
         quantidadeOocitos = parseInt(row[columnMap.viaveis]) || 0
@@ -387,10 +387,10 @@ export default async function importExcelHandler(req, res) {
         quantidadeOocitos = parseInt(row[columnMap.cultivados]) || 0
       }
 
-      // Montar observaÃ§Ãµes apenas com os dados do cabeÃ§alho especificado
+      // Montar observações apenas com os dados do cabeçalho especificado
       const observacoesParts = []
       if (columnMap.embriao !== -1 && row[columnMap.embriao]) {
-        observacoesParts.push(`EmbriÃµes: ${row[columnMap.embriao]}`)
+        observacoesParts.push(`Embriões: ${row[columnMap.embriao]}`)
       }
       if (columnMap.pctemb !== -1 && row[columnMap.pctemb]) {
         observacoesParts.push(`%Emb: ${row[columnMap.pctemb]}`)
@@ -400,7 +400,7 @@ export default async function importExcelHandler(req, res) {
         ? observacoesParts.join(' | ') 
         : null
 
-      // Extrair quantidade de TE / Transferidos (embriÃµes transferidos)
+      // Extrair quantidade de TE / Transferidos (embriões transferidos)
       let quantidadeTE = 0
       const teIdx = columnMap.te !== -1 ? columnMap.te : columnMap.transferidos
       if (teIdx !== -1 && teIdx !== undefined) {
@@ -411,13 +411,13 @@ export default async function importExcelHandler(req, res) {
         }
       }
 
-      // Extrair embriÃµes produzidos
+      // Extrair embriões produzidos
       let embrioesProduzidos = 0
       if (columnMap.embriao !== -1 && row[columnMap.embriao]) {
         embrioesProduzidos = parseInt(row[columnMap.embriao]) || 0
       }
 
-      // Identificador normalizado (SÃâ€°RIE_RG) para busca quando doadora nÃ£o cadastrada
+      // Identificador normalizado (SÉRIE_RG) para busca quando doadora não cadastrada
       const doadoraIdentificador = rgd ? rgd.replace(/\s+/g, ' ').trim().toUpperCase() : null
 
       // Extrair receptora se houver
@@ -465,25 +465,25 @@ export default async function importExcelHandler(req, res) {
       })
     }
 
-    logger.info(`âÅ“â€¦ ${processedData.length} registros processados com sucesso`)
+    logger.info(`✅ ${processedData.length} registros processados com sucesso`)
     if (warnings.length > 0) {
-      logger.warn(`âÅ¡ ï¸� ${warnings.length} avisos encontrados`)
+      logger.warn(`⚠️ ${warnings.length} avisos encontrados`)
     }
     if (errors.length > 0) {
-      logger.error(`â�Å’ ${errors.length} erros encontrados`)
+      logger.error(`❌ ${errors.length} erros encontrados`)
     }
 
     if (processedData.length === 0) {
-      logger.error('â�Å’ Nenhum dado vÃ¡lido encontrado na planilha')
-      return sendValidationError(res, 'Nenhum dado vÃ¡lido encontrado na planilha')
+      logger.error('❌ Nenhum dado válido encontrado na planilha')
+      return sendValidationError(res, 'Nenhum dado válido encontrado na planilha')
     }
 
     // Inserir dados no banco em lote
-    logger.info('ðÅ¸â€™¾ Iniciando inserÃ§Ã£o no banco de dados...')
+    logger.info('💾 Iniciando inserção no banco de dados...')
     const client = await pool.connect()
     try {
       await client.query('BEGIN')
-      logger.info('âÅ“â€¦ TransaÃ§Ã£o iniciada')
+      logger.info('✅ Transação iniciada')
       
       const createdItems = []
       const createdTEs = []
@@ -492,13 +492,13 @@ export default async function importExcelHandler(req, res) {
       for (let idx = 0; idx < processedData.length; idx++) {
         const item = processedData[idx]
         if (idx % 10 === 0) {
-          logger.info(`ðÅ¸â€œÅ  Processando item ${idx + 1}/${processedData.length}...`)
+          logger.info(`📊 Processando item ${idx + 1}/${processedData.length}...`)
         }
         const savepointName = `sp_${idx}`
         try {
           await client.query(`SAVEPOINT ${savepointName}`)
 
-          // Calcular data de transferÃªncia (FIV + 7 dias)
+          // Calcular data de transferência (FIV + 7 dias)
           const fivDate = new Date(item.data_fiv)
           const transferDate = new Date(fivDate)
           transferDate.setDate(transferDate.getDate() + 7)
@@ -506,7 +506,7 @@ export default async function importExcelHandler(req, res) {
 
           // Inserir coleta FIV (usa apenas colunas do schema base para compatibilidade)
           const obsParts = [item.observacoes]
-          if (item.embrioes_produzidos != null) obsParts.push(`EmbriÃµes: ${item.embrioes_produzidos}`)
+          if (item.embrioes_produzidos != null) obsParts.push(`Embriões: ${item.embrioes_produzidos}`)
           if (item.embrioes_transferidos != null) obsParts.push(`TE: ${item.embrioes_transferidos}`)
           const observacoesFinal = obsParts.filter(Boolean).join(' | ') || null
 
@@ -530,9 +530,9 @@ export default async function importExcelHandler(req, res) {
           const coletaFIV = rows[0]
           createdItems.push(coletaFIV)
 
-          // Se houver TE (TransferÃªncias de EmbriÃµes), criar registros
+          // Se houver TE (Transferências de Embriões), criar registros
           if (item.quantidade_te > 0) {
-            logger.info(`ðÅ¸â€œâ€¹ Criando ${item.quantidade_te} TransferÃªncia(s) de EmbriÃ£o para ${item.doadora_nome} (Data FIV: ${item.data_fiv})`)
+            logger.info(`📋 Criando ${item.quantidade_te} Transferência(s) de Embrião para ${item.doadora_nome} (Data FIV: ${item.data_fiv})`)
             
             // Buscar touro_id se touro foi informado
             let touroId = null
@@ -552,10 +552,10 @@ export default async function importExcelHandler(req, res) {
               }
             }
 
-            // Criar uma TE para cada embriÃ£o transferido
+            // Criar uma TE para cada embrião transferido
             for (let teNum = 1; teNum <= item.quantidade_te; teNum++) {
               try {
-                // Gerar nÃºmero TE Ãºnico: TE-YYYYMMDD-IDX-TENUM-TIMESTAMP (evita duplicatas em lote)
+                // Gerar número TE único: TE-YYYYMMDD-IDX-TENUM-TIMESTAMP (evita duplicatas em lote)
                 const teDateStr = data_transferencia.replace(/-/g, '')
                 const uniquePart = `${idx}-${teNum}-${Date.now()}`
                 const numeroTE = `TE-${teDateStr}-${uniquePart}`
@@ -580,7 +580,7 @@ export default async function importExcelHandler(req, res) {
                   ]
                 )
                 createdTEs.push(teResult.rows[0])
-                logger.debug(`âÅ“â€¦ TE criada: ${numeroTE} para ${item.doadora_nome}`)
+                logger.debug(`✅ TE criada: ${numeroTE} para ${item.doadora_nome}`)
               } catch (error) {
                 logger.error(`Erro ao criar TE ${teNum} para ${item.doadora_nome}:`, error)
                 insertErrors.push(`Erro ao criar TE ${teNum} para ${item.doadora_nome}: ${error.message}`)
@@ -597,9 +597,9 @@ export default async function importExcelHandler(req, res) {
       
       await client.query('COMMIT')
       
-      logger.info(`ImportaÃ§Ã£o Excel: ${createdItems.length} coletas FIV criadas com sucesso`)
+      logger.info(`Importação Excel: ${createdItems.length} coletas FIV criadas com sucesso`)
       if (createdTEs.length > 0) {
-        logger.info(`ImportaÃ§Ã£o Excel: ${createdTEs.length} TransferÃªncias de EmbriÃµes criadas com sucesso`)
+        logger.info(`Importação Excel: ${createdTEs.length} Transferências de Embriões criadas com sucesso`)
       }
       
       return sendSuccess(res, {
@@ -610,7 +610,7 @@ export default async function importExcelHandler(req, res) {
         warnings: warnings.length > 0 ? warnings : undefined,
         items: createdItems,
         tes: createdTEs
-      }, `ImportaÃ§Ã£o concluÃ­da: ${createdItems.length} coletas FIV e ${createdTEs.length} TransferÃªncias de EmbriÃµes importadas com sucesso`, 201)
+      }, `Importação concluída: ${createdItems.length} coletas FIV e ${createdTEs.length} Transferências de Embriões importadas com sucesso`, 201)
       
     } catch (error) {
       await client.query('ROLLBACK')

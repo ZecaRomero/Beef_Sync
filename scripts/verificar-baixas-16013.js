@@ -14,10 +14,10 @@ async function verificar() {
   const client = await pool.connect()
   
   try {
-    console.log('ðÅ¸â€�� Verificando baixas relacionadas Ã  CJCJ 16013...\n')
+    console.log('🔍 Verificando baixas relacionadas à CJCJ 16013...\n')
     
-    // 1. Baixas onde serie=CJCJ e rg=16013 (baixa prÃ³pria)
-    console.log('1ï¸�âÆ’£ Baixas prÃ³prias da CJCJ 16013:')
+    // 1. Baixas onde serie=CJCJ e rg=16013 (baixa própria)
+    console.log('1️⃣ Baixas próprias da CJCJ 16013:')
     const baixasProprias = await client.query(`
       SELECT id, tipo, serie, rg, valor, comprador, numero_nf, data_baixa, animal_id
       FROM baixas
@@ -27,18 +27,18 @@ async function verificar() {
     
     if (baixasProprias.rows.length > 0) {
       baixasProprias.rows.forEach(b => {
-        console.log(`  ââ‚¬¢ ID: ${b.id} | ${b.tipo} | ${b.serie} ${b.rg}`)
+        console.log(`  • ID: ${b.id} | ${b.tipo} | ${b.serie} ${b.rg}`)
         console.log(`    Valor: R$ ${b.valor} | NF: ${b.numero_nf}`)
         console.log(`    Comprador: ${b.comprador}`)
         console.log(`    Animal ID: ${b.animal_id}`)
         console.log(`    Data: ${b.data_baixa}`)
       })
     } else {
-      console.log('  âÅ“â€¦ Nenhuma baixa prÃ³pria encontrada')
+      console.log('  ✅ Nenhuma baixa própria encontrada')
     }
 
     // 2. Baixas onde serie_mae=CJCJ e rg_mae=16013 (filhos vendidos)
-    console.log('\n2ï¸�âÆ’£ Baixas de filhos da CJCJ 16013 (serie_mae/rg_mae):')
+    console.log('\n2️⃣ Baixas de filhos da CJCJ 16013 (serie_mae/rg_mae):')
     const baixasFilhos = await client.query(`
       SELECT b.id, b.tipo, b.serie, b.rg, b.serie_mae, b.rg_mae, b.valor, b.comprador, b.numero_nf, b.data_baixa, b.animal_id,
              a.nome as animal_nome
@@ -50,18 +50,18 @@ async function verificar() {
     
     if (baixasFilhos.rows.length > 0) {
       baixasFilhos.rows.forEach(b => {
-        console.log(`  ââ‚¬¢ ID: ${b.id} | ${b.tipo} | ${b.serie} ${b.rg} (${b.animal_nome || 'sem nome'})`)
-        console.log(`    MÃ£e: ${b.serie_mae} ${b.rg_mae}`)
+        console.log(`  • ID: ${b.id} | ${b.tipo} | ${b.serie} ${b.rg} (${b.animal_nome || 'sem nome'})`)
+        console.log(`    Mãe: ${b.serie_mae} ${b.rg_mae}`)
         console.log(`    Valor: R$ ${b.valor} | NF: ${b.numero_nf}`)
         console.log(`    Comprador: ${b.comprador}`)
         console.log(`    Animal ID: ${b.animal_id}`)
       })
     } else {
-      console.log('  âÅ¡ ï¸�  Nenhuma baixa de filhos encontrada')
+      console.log('  ⚠️  Nenhuma baixa de filhos encontrada')
     }
 
     // 3. Verificar filhos cadastrados da CJCJ 16013
-    console.log('\n3ï¸�âÆ’£ Filhos cadastrados da CJCJ 16013 (serie_mae/rg_mae):')
+    console.log('\n3️⃣ Filhos cadastrados da CJCJ 16013 (serie_mae/rg_mae):')
     const filhos = await client.query(`
       SELECT id, serie, rg, nome, sexo, situacao, valor_venda, data_nascimento
       FROM animais
@@ -70,17 +70,17 @@ async function verificar() {
     `)
     
     if (filhos.rows.length > 0) {
-      console.log(`  ðÅ¸â€œâ€¹ ${filhos.rows.length} filho(s) encontrado(s):`)
+      console.log(`  📋 ${filhos.rows.length} filho(s) encontrado(s):`)
       filhos.rows.forEach(f => {
-        console.log(`  ââ‚¬¢ ${f.serie} ${f.rg} | ${f.nome || 'sem nome'} | ${f.sexo} | ${f.situacao}`)
+        console.log(`  • ${f.serie} ${f.rg} | ${f.nome || 'sem nome'} | ${f.sexo} | ${f.situacao}`)
         if (f.valor_venda) console.log(`    Valor venda: R$ ${f.valor_venda}`)
       })
     } else {
-      console.log('  âÅ¡ ï¸�  Nenhum filho cadastrado')
+      console.log('  ⚠️  Nenhum filho cadastrado')
     }
 
     // 4. Verificar se CJCJ 16013 existe
-    console.log('\n4ï¸�âÆ’£ Dados da CJCJ 16013:')
+    console.log('\n4️⃣ Dados da CJCJ 16013:')
     const mae = await client.query(`
       SELECT id, serie, rg, nome, sexo, situacao, valor_venda
       FROM animais
@@ -89,17 +89,17 @@ async function verificar() {
     
     if (mae.rows.length > 0) {
       const m = mae.rows[0]
-      console.log(`  ââ‚¬¢ ID: ${m.id}`)
-      console.log(`  ââ‚¬¢ Nome: ${m.nome}`)
-      console.log(`  ââ‚¬¢ Sexo: ${m.sexo}`)
-      console.log(`  ââ‚¬¢ SituaÃ§Ã£o: ${m.situacao}`)
-      if (m.valor_venda) console.log(`  ââ‚¬¢ Valor venda: R$ ${m.valor_venda}`)
+      console.log(`  • ID: ${m.id}`)
+      console.log(`  • Nome: ${m.nome}`)
+      console.log(`  • Sexo: ${m.sexo}`)
+      console.log(`  • Situação: ${m.situacao}`)
+      if (m.valor_venda) console.log(`  • Valor venda: R$ ${m.valor_venda}`)
     } else {
-      console.log('  â�Å’ CJCJ 16013 nÃ£o encontrada')
+      console.log('  ❌ CJCJ 16013 não encontrada')
     }
     
   } catch (error) {
-    console.error('â�Å’ Erro:', error)
+    console.error('❌ Erro:', error)
   } finally {
     client.release()
     await pool.end()

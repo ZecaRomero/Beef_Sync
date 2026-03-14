@@ -17,9 +17,9 @@ export function useAnimalDetails(id) {
   const [maeLink, setMaeLink] = useState(null)
   const [maeColetas, setMaeColetas] = useState(null)
   const [baixasResumo, setBaixasResumo] = useState(null) // { baixaPropria, resumoMae }
-  const [baixasMae, setBaixasMae] = useState(null) // resumo de baixas da mÃ£e (exibido na ficha do filho)
+  const [baixasMae, setBaixasMae] = useState(null) // resumo de baixas da mãe (exibido na ficha do filho)
 
-  // Ref para controlar se componente ainda estÃ¡ montado (evitar setState apÃ³s unmount)
+  // Ref para controlar se componente ainda está montado (evitar setState após unmount)
   const mountedRef = useRef(true)
 
   // Rankings (iABCZg, DECA, IQG, Pt IQG, MGTe)
@@ -64,17 +64,17 @@ export function useAnimalDetails(id) {
     cacheTTL: 0
   })
 
-  // Atualizar animal e disparar buscas secundÃ¡rias
+  // Atualizar animal e disparar buscas secundárias
   useEffect(() => {
     if (animalData) {
       const a = animalData.data || animalData.animal || animalData
       if (a && (a.id || a.serie)) {
         setAnimal(a)
         
-        // Buscas paralelas secundÃ¡rias
+        // Buscas paralelas secundárias
         const fetchPromises = []
         
-        // Exames AndrolÃ³gicos (apenas machos)
+        // Exames Andrológicos (apenas machos)
         const isMacho = a.sexo && (String(a.sexo).toLowerCase().includes('macho') || a.sexo === 'M')
         if (isMacho && a.rg) {
           fetchPromises.push(
@@ -85,7 +85,7 @@ export function useAnimalDetails(id) {
           )
         }
 
-        // OcorrÃªncias
+        // Ocorrências
         if (a.id) {
           fetchPromises.push(
             fetch(`/api/animals/ocorrencias?animalId=${a.id}&limit=20`)
@@ -94,7 +94,7 @@ export function useAnimalDetails(id) {
               .catch(() => {})
           )
           
-          // TransferÃªncias (receptoras)
+          // Transferências (receptoras)
           fetchPromises.push(
             fetch(`/api/transferencias-embrioes?receptora_id=${a.id}`)
               .then(r => r.json())
@@ -102,8 +102,8 @@ export function useAnimalDetails(id) {
               .catch(() => {})
           )
 
-          // InseminaÃ§Ãµes (fÃªmeas)
-          const isFemea = !isMacho // SimplificaÃ§Ã£o, verificar string se necessÃ¡rio
+          // Inseminações (fêmeas)
+          const isFemea = !isMacho // Simplificação, verificar string se necessário
           if (isFemea) {
              fetchPromises.push(
               fetch(`/api/inseminacoes?animal_id=${a.id}&_t=${Date.now()}`)
@@ -113,7 +113,7 @@ export function useAnimalDetails(id) {
             )
           }
 
-          // Custos: buscar sempre (fallback se API principal nÃ£o retornou ou retornou vazio)
+          // Custos: buscar sempre (fallback se API principal não retornou ou retornou vazio)
           fetchPromises.push(
             fetch(`/api/animals/${a.id}/custos?_t=${Date.now()}`)
               .then(r => r.ok ? r.json() : { data: [] })
@@ -128,24 +128,24 @@ export function useAnimalDetails(id) {
         Promise.all(fetchPromises).finally(() => setLoading(false))
 
       } else {
-        setError('Animal nÃ£o encontrado')
+        setError('Animal não encontrado')
         setLoading(false)
       }
     } else if (animalError) {
       const msg = animalError?.message || ''
       const is404 = msg.includes('404')
       if (is404 && retryCount < 2) {
-        // Retry atÃ© 2x (3 tentativas total) - evita 404 intermitente (replicaÃ§Ã£o/timing)
+        // Retry até 2x (3 tentativas total) - evita 404 intermitente (replicação/timing)
         const delay = retryCount === 0 ? 800 : 1500
         const t = setTimeout(() => setRetryCount(c => c + 1), delay)
         return () => clearTimeout(t)
       }
-      setError(is404 ? 'Animal nÃ£o encontrado' : 'Erro ao carregar dados')
+      setError(is404 ? 'Animal não encontrado' : 'Erro ao carregar dados')
       setLoading(false)
     }
   }, [animalData, animalError, retryCount])
 
-  // Buscar Rankings (separado para nÃ£o bloquear render inicial)
+  // Buscar Rankings (separado para não bloquear render inicial)
   useEffect(() => {
     if (!animal?.id) return
 
@@ -186,7 +186,7 @@ export function useAnimalDetails(id) {
         if (resIQG.success && resIQG.data?.length) processarRanking(resIQG.data, 'posicaoIQG', 'filhoTopIQG', { iqg: resIQG.data[0]?.iqg })
         if (resPtIQG.success && resPtIQG.data?.length) processarRanking(resPtIQG.data, 'posicaoPtIQG', 'filhoTopPtIQG', { pt_iqg: resPtIQG.data[0]?.pt_iqg })
 
-        // MGTe: API especÃ­fica retorna posiÃ§Ã£o (nÃ£o estÃ¡ no ranking limit 50)
+        // MGTe: API específica retorna posição (não está no ranking limit 50)
         if (animal.serie && animal.rg) {
           try {
             const resMgte = await fetch(`/api/animals/ranking-mgte-posicao?serie=${encodeURIComponent(animal.serie)}&rg=${encodeURIComponent(animal.rg)}`).then(r => r.json())
@@ -205,7 +205,7 @@ export function useAnimalDetails(id) {
     fetchRankings()
   }, [animal?.id])
 
-  // FunÃ§Ã£o de refresh dos dados secundÃ¡rios (inseminaÃ§Ãµes, ocorrÃªncias, TEs)
+  // Função de refresh dos dados secundários (inseminações, ocorrências, TEs)
   const refreshSecondary = useCallback((a) => {
     if (!a?.id) return
     const isMacho = a.sexo && (String(a.sexo).toLowerCase().includes('macho') || a.sexo === 'M')
@@ -238,15 +238,15 @@ export function useAnimalDetails(id) {
     return Promise.all(promises)
   }, [])
 
-  // OpÃ§Ã£o 1: Polling automÃ¡tico a cada 30s (fallback quando SSE nÃ£o estiver disponÃ­vel)
+  // Opção 1: Polling automático a cada 30s (fallback quando SSE não estiver disponível)
   useEffect(() => {
     if (!id || !animal?.id) return
 
     const poll = () => {
-      if (document.hidden) return // NÃ£o pollar com aba em background
+      if (document.hidden) return // Não pollar com aba em background
       invalidateCache(`/api/animals/${id}`)
-      // O refetch Ã© disparado automaticamente pelo useOptimizedFetch ao invalidar o cache
-      // Para os dados secundÃ¡rios, atualizamos diretamente
+      // O refetch é disparado automaticamente pelo useOptimizedFetch ao invalidar o cache
+      // Para os dados secundários, atualizamos diretamente
       refreshSecondary(animal)
     }
 
@@ -260,7 +260,7 @@ export function useAnimalDetails(id) {
     return () => { mountedRef.current = false }
   }, [])
 
-  // OpÃ§Ã£o 3: SSE ââ‚¬â€� recebe eventos push do servidor e atualiza imediatamente
+  // Opção 3: SSE — recebe eventos push do servidor e atualiza imediatamente
   useServerEvents((event) => {
     if (!id || !animal) return
 
@@ -273,7 +273,7 @@ export function useAnimalDetails(id) {
     }
 
     if (event.type === 'animal.created') {
-      // Novo animal criado ââ‚¬â€� nÃ£o afeta a ficha atual, mas pode ser relevante para rankings
+      // Novo animal criado — não afeta a ficha atual, mas pode ser relevante para rankings
       invalidateCache('/api/animals/ranking')
     }
 
@@ -290,12 +290,12 @@ export function useAnimalDetails(id) {
       (event.type === 'pesagem.created') &&
       isThisAnimal
     ) {
-      // Pesagem nova ââ‚¬â€� invalida para forÃ§ar re-fetch do animal com pesagens
+      // Pesagem nova — invalida para forçar re-fetch do animal com pesagens
       invalidateCache(`/api/animals/${id}`)
     }
   })
 
-  // Buscar MÃ£e Link e coletas FIV da mÃ£e (quando nÃ£o cadastrada)
+  // Buscar Mãe Link e coletas FIV da mãe (quando não cadastrada)
   useEffect(() => {
     // Permitir buscar quando tem serie_mae+rg_mae mesmo sem mae (ex: CJCJ 16013)
     const temSerieRgMae = animal?.serie_mae && animal?.rg_mae
@@ -307,34 +307,34 @@ export function useAnimalDetails(id) {
 
     const { serie, rg } = animal?.mae ? extrairSerieRG(animal.mae, animal.serie) : { serie: '', rg: '' }
     
-    // Se tem serie_mae e rg_mae, usar isso (mais confiÃ¡vel)
+    // Se tem serie_mae e rg_mae, usar isso (mais confiável)
     const serieMae = animal.serie_mae || serie
     const rgMae = animal.rg_mae || rg
     
     if (serieMae && rgMae) {
       setMaeLink({ serie: serieMae, rg: rgMae })
       
-      // SEMPRE buscar coletas FIV, mesmo que a mÃ£e tenha link
+      // SEMPRE buscar coletas FIV, mesmo que a mãe tenha link
       const params = new URLSearchParams()
       params.set('serie', serieMae)
       params.set('rg', rgMae)
       
-      console.log('ðÅ¸â€�� Buscando coletas FIV da mÃ£e:', `${serieMae} ${rgMae}`)
+      console.log('🔍 Buscando coletas FIV da mãe:', `${serieMae} ${rgMae}`)
       
       fetch(`/api/animals/doadora-coletas?${params}`)
         .then(r2 => r2.json())
         .then(d2 => {
-          console.log('ðÅ¸â€œÅ  Resultado coletas mÃ£e:', d2)
+          console.log('📊 Resultado coletas mãe:', d2)
           if (d2.success && d2.data?.resumo) {
             setMaeColetas(d2.data)
-            console.log('âÅ“â€¦ Coletas da mÃ£e encontradas:', d2.data.resumo.totalColetas)
+            console.log('✅ Coletas da mãe encontradas:', d2.data.resumo.totalColetas)
           } else {
             setMaeColetas(null)
-            console.log('ââ€ž¹ï¸� Nenhuma coleta encontrada para a mÃ£e')
+            console.log('ℹ️ Nenhuma coleta encontrada para a mãe')
           }
         })
         .catch((err) => {
-          console.error('â�Å’ Erro ao buscar coletas da mÃ£e:', err)
+          console.error('❌ Erro ao buscar coletas da mãe:', err)
           setMaeColetas(null)
         })
     } else {
@@ -348,7 +348,7 @@ export function useAnimalDetails(id) {
           if (d.success) {
             setMaeLink({ serie: d.serie, rg: d.rg })
             
-            // Buscar coletas mesmo que encontrou a mÃ£e
+            // Buscar coletas mesmo que encontrou a mãe
             const params = new URLSearchParams()
             params.set('serie', d.serie)
             params.set('rg', d.rg)
@@ -362,7 +362,7 @@ export function useAnimalDetails(id) {
               .catch(() => setMaeColetas(null))
           } else {
             setMaeLink(null)
-            // MÃ£e nÃ£o cadastrada: buscar histÃ³rico de coletas FIV por nome
+            // Mãe não cadastrada: buscar histórico de coletas FIV por nome
             const params = new URLSearchParams({ identificador: animal.mae.trim() })
             fetch(`/api/animals/doadora-coletas?${params}`)
               .then(r2 => r2.json())
@@ -387,7 +387,7 @@ export function useAnimalDetails(id) {
     }
   }, [animal?.mae, animal?.serie_mae, animal?.rg_mae])
 
-  // Buscar resumo de baixas (venda prÃ³pria, resumo filhos vendidos)
+  // Buscar resumo de baixas (venda própria, resumo filhos vendidos)
   useEffect(() => {
     if (!animal?.serie || !animal?.rg) {
       setBaixasResumo(null)
@@ -403,7 +403,7 @@ export function useAnimalDetails(id) {
       .catch(() => { if (mountedRef.current) setBaixasResumo(null) })
   }, [animal?.serie, animal?.rg])
 
-  // Buscar resumo de baixas da MÃÆ’E (para exibir na ficha do filho: NF, valor, comprador da mÃ£e)
+  // Buscar resumo de baixas da MÃE (para exibir na ficha do filho: NF, valor, comprador da mãe)
   useEffect(() => {
     if (!maeLink?.serie || !maeLink?.rg) {
       setBaixasMae(null)
@@ -419,25 +419,25 @@ export function useAnimalDetails(id) {
       .catch(() => { if (mountedRef.current) setBaixasMae(null) })
   }, [maeLink?.serie, maeLink?.rg])
 
-  // CÃ�LCULOS E MÃâ€°TRICAS (Refatorado do [id].jsx)
+  // CÁLCULOS E MÉTRICAS (Refatorado do [id].jsx)
   const metrics = useMemo(() => {
     if (!animal) return {}
 
-    // 1. IdentificaÃ§Ã£o e Idade
+    // 1. Identificação e Idade
     const dataNasc = animal.data_nascimento ? new Date(animal.data_nascimento) : null
     const hoje = new Date()
     const mesesIdade = dataNasc ? Math.floor((hoje - dataNasc) / (1000 * 60 * 60 * 24 * 30.44)) : null
     const anosIdade = mesesIdade != null ? (mesesIdade / 12).toFixed(1) : null
     const idadeDias = dataNasc ? Math.floor((hoje - dataNasc) / (1000 * 60 * 60 * 24)) : null
     
-    // Dias adicionais (alÃ©m dos meses)
+    // Dias adicionais (além dos meses)
     let diasAdicionais = null
     if (dataNasc && mesesIdade != null) {
       const diasEmMeses = Math.floor(mesesIdade * 30.44)
       diasAdicionais = idadeDias - diasEmMeses
     }
 
-    // 2. LocalizaÃ§Ã£o e Tempo
+    // 2. Localização e Tempo
     const dataChegada = animal.data_chegada || animal.dataChegada
     const diasNaFazenda = dataChegada ? Math.floor((hoje - new Date(dataChegada)) / (1000 * 60 * 60 * 24)) : null
     
@@ -449,42 +449,42 @@ export function useAnimalDetails(id) {
     const custosArray = Array.isArray(animal.custos) ? animal.custos : []
     const custoTotal = custosArray.reduce((s, c) => s + parseFloat(c.valor || 0), 0)
 
-    // 5. Planejamento SanitÃ¡rio (Brucelose)
-    // Brucelose Ã© obrigatÃ³ria apenas para fÃªmeas de 3-8 meses (90-240 dias)
+    // 5. Planejamento Sanitário (Brucelose)
+    // Brucelose é obrigatória apenas para fêmeas de 3-8 meses (90-240 dias)
     const temBrucelose = custosArray.some(c => {
       const t = String(c.tipo || '').toLowerCase()
       const s = String(c.subtipo || '').toLowerCase()
       const o = String(c.observacoes || '').toLowerCase()
-      return (t.includes('vacina') || t.includes('vacinaÃ§Ã£o')) && (s.includes('brucelose') || o.includes('brucelose'))
+      return (t.includes('vacina') || t.includes('vacinação')) && (s.includes('brucelose') || o.includes('brucelose'))
     })
-    // ElegÃ­vel = estÃ¡ na janela agora (90-240 dias)
+    // Elegível = está na janela agora (90-240 dias)
     const elegivelBrucelose = isFemea && idadeDias != null && idadeDias >= 90 && idadeDias <= 240 && !temBrucelose
     // precisaBrucelose = ainda pode precisar (inclui <90 dias E passou da janela mas ainda relevante mostrar)
-    // Paramos de mostrar quando >640 dias (animais muito velhos, informaÃ§Ã£o irrelevante)
+    // Paramos de mostrar quando >640 dias (animais muito velhos, informação irrelevante)
     const precisaBrucelose = isFemea && idadeDias != null && idadeDias <= 640 && !temBrucelose
     const janelaEncerrada = isFemea && idadeDias != null && idadeDias > 240 && !temBrucelose
-    // DGT (AvaliaÃ§Ã£o AndrolÃ³gica/Reprodutiva): janela 330-640 dias (~11-21 meses)
-    // Considera DGT realizado se: machos com exame androlÃ³gico OU custo AndrolÃ³gico registrado
+    // DGT (Avaliação Andrológica/Reprodutiva): janela 330-640 dias (~11-21 meses)
+    // Considera DGT realizado se: machos com exame andrológico OU custo Andrológico registrado
     const temDGT = (
       (isMacho && examesAndrologicos.length > 0) ||
       custosArray.some(c => {
         const s = String(c.subtipo || '').toLowerCase()
         const o = String(c.observacoes || '').toLowerCase()
         const t = String(c.tipo || '').toLowerCase()
-        return s.includes('androlÃ³gico') || s.includes('andrologico') || s.includes('dgt') ||
-               o.includes('androlÃ³gico') || o.includes('andrologico') || o.includes('dgt') ||
-               t.includes('androlÃ³gico') || t.includes('andrologico')
+        return s.includes('andrológico') || s.includes('andrologico') || s.includes('dgt') ||
+               o.includes('andrológico') || o.includes('andrologico') || o.includes('dgt') ||
+               t.includes('andrológico') || t.includes('andrologico')
       })
     )
-    // ElegÃ­vel = estÃ¡ na janela agora (330-640 dias) e ainda nÃ£o fez
+    // Elegível = está na janela agora (330-640 dias) e ainda não fez
     const elegivelDGT = idadeDias != null && idadeDias >= 330 && idadeDias <= 640 && !temDGT
-    // Janela encerrada = passou dos 640 dias sem ter feito (mÃ¡x atÃ© ~900 dias para ainda mostrar)
+    // Janela encerrada = passou dos 640 dias sem ter feito (máx até ~900 dias para ainda mostrar)
     const janelaEncerradaDGT = idadeDias != null && idadeDias > 640 && idadeDias <= 900 && !temDGT
     // precisaDGT = relevante mostrar no card (na janela, acabou de entrar ou passou recentemente)
     const precisaDGT = idadeDias != null && idadeDias >= 330 && idadeDias <= 900
 
-    // 6. ReproduÃ§Ã£o (FÃªmeas)
-    // Ordenar inseminaÃ§Ãµes
+    // 6. Reprodução (Fêmeas)
+    // Ordenar inseminações
     const insOrdenadas = [...inseminacoes].sort((a, b) => new Date(b.data_ia || b.data || 0) - new Date(a.data_ia || a.data || 0))
     const ehVazia = (ia) => {
       const r = String(ia.resultado_dg || ia.status_gestacao || '').toLowerCase()
@@ -506,14 +506,14 @@ export function useAnimalDetails(id) {
     const iaPrenha = insOrdenadas.find(ehPrenha)
     const ultimaIA = iaPrenha || insOrdenadas.find(ia => !ehVazia(ia)) || insOrdenadas[0]
     
-    // PrevisÃ£o de parto via IA
+    // Previsão de parto via IA
     let previsaoPartoIA = null
     if ((iaPrenha || (insOrdenadas[0] && !ehVazia(insOrdenadas[0]))) && ultimaIA) {
       const d = new Date(ultimaIA.data_ia || ultimaIA.data_inseminacao || ultimaIA.data)
       if (!isNaN(d.getTime())) previsaoPartoIA = new Date(d.getTime() + 285 * 24 * 60 * 60 * 1000)
     }
 
-    // Status GestaÃ§Ã£o Global
+    // Status Gestação Global
     const resultadoAnimal = String(animal.resultado_dg || animal.resultadoDG || '').toLowerCase()
     const estaVaziaAnimal = resultadoAnimal.includes('vazia') || resultadoAnimal.includes('vazio') || resultadoAnimal.includes('negativo')
     const isPrenha = !!iaPrenha || (!estaVaziaAnimal && (resultadoAnimal.includes('prenha') || resultadoAnimal.includes('pren') || resultadoAnimal.includes('positivo') || resultadoAnimal.trim() === 'p'))
@@ -543,10 +543,10 @@ export function useAnimalDetails(id) {
       ? (parseFloat(ultimaPesagem.peso) - parseFloat(primeiraPesagem.peso)).toFixed(1)
       : null
 
-    // CE (CircunferÃªncia Escrotal)
+    // CE (Circunferência Escrotal)
     let ultimoCE = null
     if (isMacho) {
-      // Prioridade: Pesagens > OcorrÃªncias > Exames
+      // Prioridade: Pesagens > Ocorrências > Exames
       const pCE = pesagens.find(p => p.ce && parseFloat(p.ce) > 0)
       if (pCE) ultimoCE = pCE.ce
       else {
@@ -559,7 +559,7 @@ export function useAnimalDetails(id) {
       }
     }
 
-    // AndrolÃ³gico
+    // Andrológico
     const ultExame = examesAndrologicos[0]
     const diasDesdeExame = ultExame?.data_exame ? Math.floor((hoje - new Date(ultExame.data_exame)) / (1000 * 60 * 60 * 24)) : null
     const isInapto = ultExame && String(ultExame.resultado || '').toUpperCase().includes('INAPTO')
@@ -599,7 +599,7 @@ export function useAnimalDetails(id) {
     baixasResumo,
     baixasMae,
     rankings,
-    // MÃ©tricas calculadas
+    // Métricas calculadas
     metrics
   }
 }

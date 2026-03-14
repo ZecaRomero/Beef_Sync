@@ -12,7 +12,7 @@ const pool = new Pool({
 
 async function verificarStatusCompleto() {
   try {
-    console.log('�Ÿ”� Verificando status completo da receptora 8251...\n');
+    console.log('🔍 Verificando status completo da receptora 8251...\n');
     
     const result = await pool.query(`
       SELECT 
@@ -24,14 +24,14 @@ async function verificarStatusCompleto() {
     `);
     
     if (result.rows.length === 0) {
-      console.log('�Œ Animal não encontrado');
+      console.log('❌ Animal não encontrado');
       return;
     }
     
     const animal = result.rows[0];
     
-    console.log('�Ÿ“Š DADOS COMPLETOS DO ANIMAL:');
-    console.log('�•�'.repeat(60));
+    console.log('📊 DADOS COMPLETOS DO ANIMAL:');
+    console.log('═'.repeat(60));
     console.log(`ID: ${animal.id}`);
     console.log(`RG: ${animal.rg}`);
     console.log(`Série: ${animal.serie}`);
@@ -39,22 +39,22 @@ async function verificarStatusCompleto() {
     console.log(`Sexo: ${animal.sexo}`);
     console.log(`Situação: ${animal.situacao}`);
     console.log('');
-    console.log('�Ÿ“… DATAS:');
+    console.log('📅 DATAS:');
     console.log(`Data Chegada: ${animal.data_chegada ? new Date(animal.data_chegada).toLocaleDateString('pt-BR') : 'Não registrada'}`);
     console.log('');
-    console.log('�Ÿ�� DADOS DO DG:');
-    console.log(`Data DG: ${animal.data_dg ? new Date(animal.data_dg).toLocaleDateString('pt-BR') : '�Œ N�ƒO REGISTRADO'}`);
-    console.log(`Veterinário: ${animal.veterinario_dg || '�Œ N�ƒO REGISTRADO'}`);
-    console.log(`Resultado: ${animal.resultado_dg || '�Œ N�ƒO REGISTRADO'}`);
+    console.log('🤰 DADOS DO DG:');
+    console.log(`Data DG: ${animal.data_dg ? new Date(animal.data_dg).toLocaleDateString('pt-BR') : '❌ NÃO REGISTRADO'}`);
+    console.log(`Veterinário: ${animal.veterinario_dg || '❌ NÃO REGISTRADO'}`);
+    console.log(`Resultado: ${animal.resultado_dg || '❌ NÃO REGISTRADO'}`);
     console.log(`Observações: ${animal.observacoes_dg || 'Nenhuma'}`);
     console.log('');
     
     // Calcular situação reprodutiva
-    console.log('�Ÿ”� SITUA�‡�ƒO REPRODUTIVA CALCULADA:');
-    console.log('�•�'.repeat(60));
+    console.log('🔍 SITUAÇÃO REPRODUTIVA CALCULADA:');
+    console.log('═'.repeat(60));
     
     if (animal.resultado_dg && animal.resultado_dg.toLowerCase().includes('pren')) {
-      console.log('�œ… Status: PRENHA');
+      console.log('✅ Status: PRENHA');
       
       if (animal.data_chegada) {
         const dataChegada = new Date(animal.data_chegada);
@@ -64,23 +64,23 @@ async function verificarStatusCompleto() {
         const hoje = new Date();
         const diasRestantes = Math.max(0, Math.floor((previsaoParto - hoje) / (1000 * 60 * 60 * 24)));
         
-        console.log(`�Ÿ“… Data Chegada: ${dataChegada.toLocaleDateString('pt-BR')}`);
-        console.log(`�Ÿ“… Parto Previsto (estimado): ${previsaoParto.toLocaleDateString('pt-BR')}`);
+        console.log(`📅 Data Chegada: ${dataChegada.toLocaleDateString('pt-BR')}`);
+        console.log(`📅 Parto Previsto (estimado): ${previsaoParto.toLocaleDateString('pt-BR')}`);
         console.log(`⏰ Dias Restantes: ${diasRestantes} dias`);
       } else {
-        console.log('�š�️ Sem data de referência para calcular parto previsto');
+        console.log('⚠️ Sem data de referência para calcular parto previsto');
       }
     } else if (animal.resultado_dg && (animal.resultado_dg.toLowerCase().includes('vaz') || animal.resultado_dg.toLowerCase().includes('negat'))) {
-      console.log('�Œ Status: VAZIA');
+      console.log('❌ Status: VAZIA');
     } else if (animal.data_dg) {
-      console.log('�š�️ Status: DG realizado mas resultado não reconhecido');
+      console.log('⚠️ Status: DG realizado mas resultado não reconhecido');
       console.log(`   Resultado registrado: "${animal.resultado_dg}"`);
     } else {
       console.log('⏳ Status: AGUARDANDO DG');
     }
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
   } finally {
     await pool.end();
   }

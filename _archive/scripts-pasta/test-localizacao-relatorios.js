@@ -5,11 +5,11 @@ const { query } = require('../lib/database');
  */
 
 async function verificarDados() {
-  console.log('≈∏‚Äùç Verificando dados para teste de localiza√ß√£o...\n');
+  console.log('üîç Verificando dados para teste de localiza√ß√£o...\n');
 
   try {
     // 1. Verificar animais cadastrados
-    console.log('1Ô∏è‚∆í£ Verificando animais cadastrados...');
+    console.log('1Ô∏è‚É£ Verificando animais cadastrados...');
     const animais = await query(`
       SELECT id, serie, rg, raca, situacao 
       FROM animais 
@@ -18,19 +18,19 @@ async function verificarDados() {
     `);
     
     if (animais.rows.length === 0) {
-      console.log('‚ù≈í Nenhum animal cadastrado no sistema');
+      console.log('‚ùå Nenhum animal cadastrado no sistema');
       console.log('   Cadastre alguns animais primeiro!\n');
       return;
     }
     
-    console.log(`‚≈ì‚Ä¶ ${animais.rows.length} animais encontrados (mostrando √∫ltimos 5):`);
+    console.log(`‚úÖ ${animais.rows.length} animais encontrados (mostrando √∫ltimos 5):`);
     animais.rows.forEach(a => {
       console.log(`   - ${a.serie}-${a.rg} | ${a.raca} | ${a.situacao}`);
     });
     console.log('');
 
     // 2. Verificar localiza√ß√µes existentes
-    console.log('2Ô∏è‚∆í£ Verificando localiza√ß√µes cadastradas...');
+    console.log('2Ô∏è‚É£ Verificando localiza√ß√µes cadastradas...');
     const localizacoes = await query(`
       SELECT 
         l.*,
@@ -44,22 +44,22 @@ async function verificarDados() {
     `);
     
     if (localizacoes.rows.length === 0) {
-      console.log('‚≈°†Ô∏è Nenhuma localiza√ß√£o cadastrada');
+      console.log('‚ö†Ô∏è Nenhuma localiza√ß√£o cadastrada');
       console.log('   Vou criar algumas localiza√ß√µes de teste...\n');
       
       // Criar localiza√ß√µes de teste
       await criarLocalizacoesTest(animais.rows);
     } else {
-      console.log(`‚≈ì‚Ä¶ ${localizacoes.rows.length} localiza√ß√µes encontradas:`);
+      console.log(`‚úÖ ${localizacoes.rows.length} localiza√ß√µes encontradas:`);
       localizacoes.rows.forEach(l => {
-        const atual = l.data_saida ? '‚ù≈í' : '‚≈ì‚Ä¶';
+        const atual = l.data_saida ? '‚ùå' : '‚úÖ';
         console.log(`   ${atual} ${l.serie}-${l.rg} | ${l.piquete} | Entrada: ${formatarData(l.data_entrada)}`);
       });
       console.log('');
     }
 
     // 3. Verificar lotes no sistema
-    console.log('3Ô∏è‚∆í£ Verificando lotes com animais...');
+    console.log('3Ô∏è‚É£ Verificando lotes com animais...');
     const lotes = await query(`
       SELECT 
         numero_lote,
@@ -74,10 +74,10 @@ async function verificarDados() {
     `);
     
     if (lotes.rows.length === 0) {
-      console.log('‚≈°†Ô∏è Nenhum lote de animais encontrado');
+      console.log('‚ö†Ô∏è Nenhum lote de animais encontrado');
       console.log('   Os lotes s√£o criados automaticamente ao cadastrar/editar animais\n');
     } else {
-      console.log(`‚≈ì‚Ä¶ ${lotes.rows.length} lotes de animais encontrados:`);
+      console.log(`‚úÖ ${lotes.rows.length} lotes de animais encontrados:`);
       lotes.rows.forEach(l => {
         console.log(`   - ${l.numero_lote} | ${l.tipo_operacao} | ${formatarData(l.data_criacao)}`);
       });
@@ -85,25 +85,25 @@ async function verificarDados() {
     }
 
     // 4. Instru√ß√µes finais
-    console.log('‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ');
-    console.log('≈∏‚Äú‚Äπ COMO TESTAR NO APP:');
-    console.log('‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ‚‚ÄùÅ');
+    console.log('‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ');
+    console.log('üìã COMO TESTAR NO APP:');
+    console.log('‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ');
     console.log('');
     console.log('1. Acesse: http://localhost:3000/relatorios-lotes');
     console.log('2. Procure por lotes do m√≥dulo "ANIMAIS"');
-    console.log('3. Clique na seta (‚‚Äìº) para expandir os detalhes');
-    console.log('4. Voc√™ ver√° a se√ß√£o "≈∏‚Äúç Localiza√ß√£o Atual"');
+    console.log('3. Clique na seta (‚ñº) para expandir os detalhes');
+    console.log('4. Voc√™ ver√° a se√ß√£o "üìç Localiza√ß√£o Atual"');
     console.log('');
-    console.log('≈∏‚Äô° Dica: Use o filtro "M√≥dulo" e selecione "ANIMAIS"');
+    console.log('üí° Dica: Use o filtro "M√≥dulo" e selecione "ANIMAIS"');
     console.log('');
 
   } catch (error) {
-    console.error('‚ù≈í Erro ao verificar dados:', error.message);
+    console.error('‚ùå Erro ao verificar dados:', error.message);
   }
 }
 
 async function criarLocalizacoesTest(animais) {
-  console.log('≈∏‚Äúç Criando localiza√ß√µes de teste...\n');
+  console.log('üìç Criando localiza√ß√µes de teste...\n');
 
   const piquetes = ['Piquete 1', 'Piquete 2', 'Piquete 3', 'Piquete Central', 'Piquete Norte'];
   const motivos = [
@@ -160,13 +160,13 @@ async function criarLocalizacoesTest(animais) {
         `Animal ${animal.serie}-${animal.rg} em boas condi√ß√µes`
       ]);
 
-      console.log(`‚≈ì‚Ä¶ Localiza√ß√£o criada: ${animal.serie}-${animal.rg} ‚‚Ä†‚Äô ${piquete}`);
+      console.log(`‚úÖ Localiza√ß√£o criada: ${animal.serie}-${animal.rg} ‚Üí ${piquete}`);
     }
 
-    console.log('\n‚≈ì‚Ä¶ Localiza√ß√µes de teste criadas com sucesso!\n');
+    console.log('\n‚úÖ Localiza√ß√µes de teste criadas com sucesso!\n');
 
   } catch (error) {
-    console.error('‚ù≈í Erro ao criar localiza√ß√µes:', error.message);
+    console.error('‚ùå Erro ao criar localiza√ß√µes:', error.message);
   }
 }
 
@@ -178,11 +178,11 @@ function formatarData(data) {
 // Executar verifica√ß√£o
 verificarDados()
   .then(() => {
-    console.log('‚≈ì‚Ä¶ Verifica√ß√£o conclu√≠da!');
+    console.log('‚úÖ Verifica√ß√£o conclu√≠da!');
     process.exit(0);
   })
   .catch(error => {
-    console.error('‚ù≈í Erro:', error);
+    console.error('‚ùå Erro:', error);
     process.exit(1);
   });
 

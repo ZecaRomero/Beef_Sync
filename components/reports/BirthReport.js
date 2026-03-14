@@ -25,7 +25,7 @@ export default function BirthReport() {
   }
 
   const calculateStats = (birthData) => {
-    // Filtrar por perÃ­odo se necessÃ¡rio
+    // Filtrar por período se necessário
     let filteredData = birthData
     if (selectedPeriod !== 'all') {
       const now = new Date()
@@ -47,7 +47,7 @@ export default function BirthReport() {
     const gestantes = filteredData.filter(b => b.status === 'gestante').length
     const atrasadas = filteredData.filter(b => b.status === 'gestante_atrasada').length
 
-    // EstatÃ­sticas por touro
+    // Estatísticas por touro
     const statsByTouro = filteredData.reduce((acc, birth) => {
       if (!acc[birth.touro]) {
         acc[birth.touro] = { total: 0, nascidos: 0, machos: 0, femeas: 0, mortos: 0, abortos: 0 }
@@ -63,7 +63,7 @@ export default function BirthReport() {
       return acc
     }, {})
 
-    // Nascimentos por mÃªs
+    // Nascimentos por mês
     const nascimentosPorMes = filteredData
       .filter(b => b.data)
       .reduce((acc, birth) => {
@@ -94,7 +94,7 @@ export default function BirthReport() {
     }
   }, [selectedPeriod, births])
 
-  // Dados para grÃ¡fico de barras (nascimentos por touro)
+  // Dados para gráfico de barras (nascimentos por touro)
   const barChartData = {
     labels: Object.keys(stats.statsByTouro || {}).map(touro => 
       touro.length > 20 ? touro.substring(0, 20) + '...' : touro
@@ -117,9 +117,9 @@ export default function BirthReport() {
     ]
   }
 
-  // Dados para grÃ¡fico de pizza (distribuiÃ§Ã£o por sexo)
+  // Dados para gráfico de pizza (distribuição por sexo)
   const pieChartData = {
-    labels: ['Machos', 'FÃªmeas'],
+    labels: ['Machos', 'Fêmeas'],
     datasets: [
       {
         data: [stats.machos || 0, stats.femeas || 0],
@@ -165,7 +165,7 @@ export default function BirthReport() {
       },
       title: {
         display: true,
-        text: 'DistribuiÃ§Ã£o por Sexo'
+        text: 'Distribuição por Sexo'
       }
     }
   }
@@ -174,25 +174,25 @@ export default function BirthReport() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          ðÅ¸â€œÅ  RelatÃ³rio de Nascimentos
+          📊 Relatório de Nascimentos
         </h2>
         <select
           value={selectedPeriod}
           onChange={(e) => setSelectedPeriod(e.target.value)}
           className="input-field w-auto"
         >
-          <option value="all">Todos os perÃ­odos</option>
-          <option value="1m">ÃÅ¡ltimo mÃªs</option>
-          <option value="3m">ÃÅ¡ltimos 3 meses</option>
-          <option value="6m">ÃÅ¡ltimos 6 meses</option>
+          <option value="all">Todos os períodos</option>
+          <option value="1m">Último mês</option>
+          <option value="3m">Últimos 3 meses</option>
+          <option value="6m">Últimos 6 meses</option>
         </select>
       </div>
 
       {births.length === 0 ? (
         <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-          <div className="text-4xl mb-4">ðÅ¸�â€ž</div>
+          <div className="text-4xl mb-4">🐄</div>
           <h3 className="text-lg font-medium mb-2">Nenhum nascimento registrado</h3>
-          <p className="text-sm">Comece registrando nascimentos para ver relatÃ³rios detalhados</p>
+          <p className="text-sm">Comece registrando nascimentos para ver relatórios detalhados</p>
         </div>
       ) : (
         <>
@@ -220,7 +220,7 @@ export default function BirthReport() {
               <div className="text-2xl font-bold text-pink-600 dark:text-pink-400">
                 {stats.femeas || 0}
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">FÃªmeas</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Fêmeas</div>
             </div>
             <div className="card p-4 text-center">
               <div className="text-2xl font-bold text-red-600 dark:text-red-400">
@@ -248,7 +248,7 @@ export default function BirthReport() {
             </div>
           </div>
 
-          {/* GrÃ¡ficos */}
+          {/* Gráficos */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="card p-6">
               <Bar data={barChartData} options={chartOptions} />
@@ -282,7 +282,7 @@ export default function BirthReport() {
                       Machos
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      FÃªmeas
+                      Fêmeas
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Mortos
@@ -336,19 +336,19 @@ export default function BirthReport() {
             </div>
           </div>
 
-          {/* Insights e RecomendaÃ§Ãµes */}
+          {/* Insights e Recomendações */}
           <div className="card p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              ðÅ¸â€™¡ Insights e RecomendaÃ§Ãµes
+              💡 Insights e Recomendações
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {stats.taxaSucesso >= 80 && (
                 <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
                   <div className="text-green-800 dark:text-green-200 font-semibold mb-2">
-                    ðÅ¸Å½â€° Excelente Performance
+                    🎉 Excelente Performance
                   </div>
                   <div className="text-green-700 dark:text-green-300 text-sm">
-                    Taxa de sucesso de {stats.taxaSucesso.toFixed(1)}% estÃ¡ acima da mÃ©dia. Continue com a estratÃ©gia atual.
+                    Taxa de sucesso de {stats.taxaSucesso.toFixed(1)}% está acima da média. Continue com a estratégia atual.
                   </div>
                 </div>
               )}
@@ -356,10 +356,10 @@ export default function BirthReport() {
               {stats.taxaMortalidade > 20 && (
                 <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
                   <div className="text-red-800 dark:text-red-200 font-semibold mb-2">
-                    âÅ¡ ï¸� Alta Mortalidade
+                    ⚠️ Alta Mortalidade
                   </div>
                   <div className="text-red-700 dark:text-red-300 text-sm">
-                    Taxa de mortalidade de {stats.taxaMortalidade.toFixed(1)}% requer atenÃ§Ã£o. Revisar protocolos veterinÃ¡rios.
+                    Taxa de mortalidade de {stats.taxaMortalidade.toFixed(1)}% requer atenção. Revisar protocolos veterinários.
                   </div>
                 </div>
               )}
@@ -367,7 +367,7 @@ export default function BirthReport() {
               {stats.atrasadas > 0 && (
                 <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800">
                   <div className="text-yellow-800 dark:text-yellow-200 font-semibold mb-2">
-                    â�° Partos Atrasados
+                    ⏰ Partos Atrasados
                   </div>
                   <div className="text-yellow-700 dark:text-yellow-300 text-sm">
                     {stats.atrasadas} receptoras com parto atrasado. Verificar e acompanhar de perto.
@@ -378,7 +378,7 @@ export default function BirthReport() {
               {Object.keys(stats.statsByTouro || {}).length > 0 && (
                 <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
                   <div className="text-blue-800 dark:text-blue-200 font-semibold mb-2">
-                    ðÅ¸â€œÅ  AnÃ¡lise de Touros
+                    📊 Análise de Touros
                   </div>
                   <div className="text-blue-700 dark:text-blue-300 text-sm">
                     {Object.keys(stats.statsByTouro).length} touros em uso. Considere focar nos de melhor performance.

@@ -1,18 +1,18 @@
 /**
- * API para corrigir mapeamento de dados genÃ©ticos
+ * API para corrigir mapeamento de dados genéticos
  * Corrige animais onde os valores foram importados nas colunas erradas
  */
 import { query } from '../../../lib/database'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, message: 'MÃ©todo nÃ£o permitido' })
+    return res.status(405).json({ success: false, message: 'Método não permitido' })
   }
 
   try {
-    console.log('ðÅ¸â€�§ Iniciando correÃ§Ã£o de dados genÃ©ticos...')
+    console.log('🔧 Iniciando correção de dados genéticos...')
     
-    // Buscar animais com situacao_abcz numÃ©rico (indica importaÃ§Ã£o errada)
+    // Buscar animais com situacao_abcz numérico (indica importação errada)
     const result = await query(`
       SELECT id, serie, rg, nome, abczg, deca, iqg, pt_iqg, situacao_abcz, genetica_2, decile_2
       FROM animais 
@@ -29,12 +29,12 @@ export default async function handler(req, res) {
       })
     }
     
-    console.log(`ðÅ¸â€œâ€¹ Encontrados ${result.rows.length} animais com dados incorretos`)
+    console.log(`📋 Encontrados ${result.rows.length} animais com dados incorretos`)
     
     const animaisCorrigidos = []
     
     for (const animal of result.rows) {
-      console.log(`\nðÅ¸â€�� Corrigindo: ${animal.serie} ${animal.rg}`)
+      console.log(`\n🔍 Corrigindo: ${animal.serie} ${animal.rg}`)
       
       const antes = {
         abczg: animal.abczg,
@@ -45,7 +45,7 @@ export default async function handler(req, res) {
       }
       
       // Corrigir mapeamento:
-      // situacao_abcz (que tem nÃºmero) -> iqg
+      // situacao_abcz (que tem número) -> iqg
       // iqg (que tem Pt IQG) -> pt_iqg
       // situacao_abcz -> NULL (limpar)
       
@@ -79,10 +79,10 @@ export default async function handler(req, res) {
         depois
       })
       
-      console.log(`   âÅ“â€¦ Corrigido: IQG ${antes.iqg} ââ€ â€™ ${novoIqg}, Pt IQG ${antes.pt_iqg} ââ€ â€™ ${novoPtIqg}`)
+      console.log(`   ✅ Corrigido: IQG ${antes.iqg} → ${novoIqg}, Pt IQG ${antes.pt_iqg} → ${novoPtIqg}`)
     }
     
-    console.log(`\nâÅ“â€¦ CorreÃ§Ã£o concluÃ­da! ${animaisCorrigidos.length} animais corrigidos.`)
+    console.log(`\n✅ Correção concluída! ${animaisCorrigidos.length} animais corrigidos.`)
     
     return res.status(200).json({
       success: true,
@@ -92,10 +92,10 @@ export default async function handler(req, res) {
     })
     
   } catch (error) {
-    console.error('â�Å’ Erro ao corrigir dados genÃ©ticos:', error)
+    console.error('❌ Erro ao corrigir dados genéticos:', error)
     return res.status(500).json({
       success: false,
-      message: 'Erro ao corrigir dados genÃ©ticos',
+      message: 'Erro ao corrigir dados genéticos',
       error: error.message
     })
   }

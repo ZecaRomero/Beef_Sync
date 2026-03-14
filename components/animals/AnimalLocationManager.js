@@ -14,7 +14,7 @@ const AnimalLocationManager = ({ animalId, animalInfo }) => {
   const [editingLocation, setEditingLocation] = useState(null)
   const [toast, setToast] = useState(null)
 
-  // FormulÃ¡rio para nova localizaÃ§Ã£o
+  // Formulário para nova localização
   const [formData, setFormData] = useState({
     piquete: '',
     data_entrada: new Date().toISOString().split('T')[0],
@@ -23,24 +23,24 @@ const AnimalLocationManager = ({ animalId, animalInfo }) => {
     usuario_responsavel: ''
   })
 
-  // Lista de piquetes disponÃ­veis
+  // Lista de piquetes disponíveis
   const piquetesDisponiveis = [
     'Piquete 01', 'Piquete 02', 'Piquete 03', 'Piquete 04', 'Piquete 05',
     'Piquete 06', 'Piquete 07', 'Piquete 08', 'Piquete 09', 'Piquete 10',
-    'Curral', 'ApartaÃ§Ã£o', 'Enfermaria', 'Quarentena'
+    'Curral', 'Apartação', 'Enfermaria', 'Quarentena'
   ]
 
-  // Motivos de movimentaÃ§Ã£o
+  // Motivos de movimentação
   const motivosMovimentacao = [
-    'InseminaÃ§Ã£o Artificial',
-    'TransferÃªncia de EmbriÃ£o',
-    'DiagnÃ³stico de GestaÃ§Ã£o',
-    'VacinaÃ§Ã£o',
-    'Tratamento VeterinÃ¡rio',
-    'ApartaÃ§Ã£o',
+    'Inseminação Artificial',
+    'Transferência de Embrião',
+    'Diagnóstico de Gestação',
+    'Vacinação',
+    'Tratamento Veterinário',
+    'Apartação',
     'Desmame',
     'Manejo Reprodutivo',
-    'RotaÃ§Ã£o de Pastagem',
+    'Rotação de Pastagem',
     'Outros'
   ]
 
@@ -60,11 +60,11 @@ const AnimalLocationManager = ({ animalId, animalInfo }) => {
         setLocalizacoes(data.historico)
         setLocalizacaoAtual(data.localizacao_atual)
       } else {
-        showToast('Erro ao carregar localizaÃ§Ãµes', 'error')
+        showToast('Erro ao carregar localizações', 'error')
       }
     } catch (error) {
-      console.error('Erro ao carregar localizaÃ§Ãµes:', error)
-      showToast('Erro ao carregar localizaÃ§Ãµes', 'error')
+      console.error('Erro ao carregar localizações:', error)
+      showToast('Erro ao carregar localizações', 'error')
     } finally {
       setLoading(false)
     }
@@ -93,18 +93,18 @@ const AnimalLocationManager = ({ animalId, animalInfo }) => {
 
       if (data.success) {
         showToast(
-          editingLocation ? 'LocalizaÃ§Ã£o atualizada!' : 'Nova localizaÃ§Ã£o registrada!',
+          editingLocation ? 'Localização atualizada!' : 'Nova localização registrada!',
           'success'
         )
         setShowModal(false)
         resetForm()
         carregarLocalizacoes()
       } else {
-        showToast(data.error || 'Erro ao salvar localizaÃ§Ã£o', 'error')
+        showToast(data.error || 'Erro ao salvar localização', 'error')
       }
     } catch (error) {
-      console.error('Erro ao salvar localizaÃ§Ã£o:', error)
-      showToast('Erro ao salvar localizaÃ§Ã£o', 'error')
+      console.error('Erro ao salvar localização:', error)
+      showToast('Erro ao salvar localização', 'error')
     } finally {
       setLoading(false)
     }
@@ -124,7 +124,7 @@ const AnimalLocationManager = ({ animalId, animalInfo }) => {
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('Tem certeza que deseja remover esta localizaÃ§Ã£o?')) return
+    if (!confirm('Tem certeza que deseja remover esta localização?')) return
 
     setLoading(true)
     try {
@@ -135,14 +135,14 @@ const AnimalLocationManager = ({ animalId, animalInfo }) => {
       const data = await response.json()
 
       if (data.success) {
-        showToast('LocalizaÃ§Ã£o removida!', 'success')
+        showToast('Localização removida!', 'success')
         carregarLocalizacoes()
       } else {
-        showToast(data.error || 'Erro ao remover localizaÃ§Ã£o', 'error')
+        showToast(data.error || 'Erro ao remover localização', 'error')
       }
     } catch (error) {
-      console.error('Erro ao remover localizaÃ§Ã£o:', error)
-      showToast('Erro ao remover localizaÃ§Ã£o', 'error')
+      console.error('Erro ao remover localização:', error)
+      showToast('Erro ao remover localização', 'error')
     } finally {
       setLoading(false)
     }
@@ -171,18 +171,18 @@ const AnimalLocationManager = ({ animalId, animalInfo }) => {
 
   return (
     <div className="space-y-6">
-      {/* LocalizaÃ§Ã£o Atual */}
+      {/* Localização Atual */}
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              ðÅ¸â€œ� LocalizaÃ§Ã£o Atual
+              📍 Localização Atual
             </h3>
             <Button
               onClick={() => setShowModal(true)}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              + Nova LocalizaÃ§Ã£o
+              + Nova Localização
             </Button>
           </div>
         </CardHeader>
@@ -205,30 +205,30 @@ const AnimalLocationManager = ({ animalId, animalInfo }) => {
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Motivo</p>
                   <p className="font-semibold">
-                    {localizacaoAtual.motivo_movimentacao || 'NÃ£o informado'}
+                    {localizacaoAtual.motivo_movimentacao || 'Não informado'}
                   </p>
                 </div>
               </div>
               {localizacaoAtual.observacoes && (
                 <div className="mt-3">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">ObservaÃ§Ãµes</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Observações</p>
                   <p className="text-sm">{localizacaoAtual.observacoes}</p>
                 </div>
               )}
             </div>
           ) : (
             <div className="text-center py-8 text-gray-500">
-              <p>Nenhuma localizaÃ§Ã£o atual registrada</p>
+              <p>Nenhuma localização atual registrada</p>
             </div>
           )}
         </CardBody>
       </Card>
 
-      {/* HistÃ³rico de LocalizaÃ§Ãµes */}
+      {/* Histórico de Localizações */}
       <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            ðÅ¸â€œâ€¹ HistÃ³rico de LocalizaÃ§Ãµes
+            📋 Histórico de Localizações
           </h3>
         </CardHeader>
         <CardBody>
@@ -254,7 +254,7 @@ const AnimalLocationManager = ({ animalId, animalInfo }) => {
                         <p className="font-semibold">{formatDate(loc.data_entrada)}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">SaÃ­da</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Saída</p>
                         <p className="font-semibold">{formatDate(loc.data_saida)}</p>
                       </div>
                       <div>
@@ -264,7 +264,7 @@ const AnimalLocationManager = ({ animalId, animalInfo }) => {
                             ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                             : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
                         }`}>
-                          {loc.data_saida ? 'HistÃ³rico' : 'Atual'}
+                          {loc.data_saida ? 'Histórico' : 'Atual'}
                         </span>
                       </div>
                     </div>
@@ -298,20 +298,20 @@ const AnimalLocationManager = ({ animalId, animalInfo }) => {
             </div>
           ) : (
             <div className="text-center py-8 text-gray-500">
-              <p>Nenhuma localizaÃ§Ã£o registrada</p>
+              <p>Nenhuma localização registrada</p>
             </div>
           )}
         </CardBody>
       </Card>
 
-      {/* Modal para Nova/Editar LocalizaÃ§Ã£o */}
+      {/* Modal para Nova/Editar Localização */}
       <Modal
         isOpen={showModal}
         onClose={() => {
           setShowModal(false)
           resetForm()
         }}
-        title={editingLocation ? 'Editar LocalizaÃ§Ã£o' : 'Nova LocalizaÃ§Ã£o'}
+        title={editingLocation ? 'Editar Localização' : 'Nova Localização'}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -348,7 +348,7 @@ const AnimalLocationManager = ({ animalId, animalInfo }) => {
             {editingLocation && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Data de SaÃ­da
+                  Data de Saída
                 </label>
                 <Input
                   type="date"
@@ -361,7 +361,7 @@ const AnimalLocationManager = ({ animalId, animalInfo }) => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Motivo da MovimentaÃ§Ã£o
+              Motivo da Movimentação
             </label>
             <Select
               value={formData.motivo_movimentacao}
@@ -378,26 +378,26 @@ const AnimalLocationManager = ({ animalId, animalInfo }) => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              UsuÃ¡rio ResponsÃ¡vel
+              Usuário Responsável
             </label>
             <Input
               type="text"
               value={formData.usuario_responsavel}
               onChange={(e) => setFormData({ ...formData, usuario_responsavel: e.target.value })}
-              placeholder="Nome do responsÃ¡vel"
+              placeholder="Nome do responsável"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              ObservaÃ§Ãµes
+              Observações
             </label>
             <textarea
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
               rows="3"
               value={formData.observacoes}
               onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
-              placeholder="ObservaÃ§Ãµes adicionais..."
+              placeholder="Observações adicionais..."
             />
           </div>
 

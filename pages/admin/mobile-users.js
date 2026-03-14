@@ -1,5 +1,5 @@
 /**
- * PÃ¡gina de administraÃ§Ã£o - UsuÃ¡rios Mobile
+ * Página de administração - Usuários Mobile
  * Lista todos os dispositivos que acessaram o sistema mobile
  */
 import { useState, useEffect } from 'react'
@@ -38,7 +38,7 @@ export default function MobileUsers() {
         setUsers(data.data || [])
       }
     } catch (error) {
-      console.error('Erro ao buscar usuÃ¡rios:', error)
+      console.error('Erro ao buscar usuários:', error)
     } finally {
       setLoading(false)
     }
@@ -93,11 +93,11 @@ export default function MobileUsers() {
   return (
     <>
       <Head>
-        <title>UsuÃ¡rios Mobile | Beef-Sync</title>
+        <title>Usuários Mobile | Beef-Sync</title>
       </Head>
 
       <div className="min-h-screen bg-gray-50">
-        {/* Header com navegaÃ§Ã£o */}
+        {/* Header com navegação */}
         <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
@@ -112,7 +112,7 @@ export default function MobileUsers() {
                 <div className="h-6 w-px bg-gray-300" />
                 <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                   <DevicePhoneMobileIcon className="h-6 w-6 text-amber-600" />
-                  UsuÃ¡rios Mobile
+                  Usuários Mobile
                 </h1>
               </div>
               <Link
@@ -133,7 +133,7 @@ export default function MobileUsers() {
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
                     <DevicePhoneMobileIcon className="h-8 w-8 text-amber-600" />
-                    UsuÃ¡rios Mobile
+                    Usuários Mobile
                   </h1>
                   <p className="text-gray-600 mt-1">
                     Dispositivos que acessaram o sistema mobile
@@ -179,7 +179,7 @@ export default function MobileUsers() {
               <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">Total de UsuÃ¡rios</p>
+                    <p className="text-sm text-gray-600 mb-1">Total de Usuários</p>
                     <p className="text-3xl font-bold text-gray-900">{users.length}</p>
                   </div>
                   <UserIcon className="h-12 w-12 text-blue-500" />
@@ -189,7 +189,7 @@ export default function MobileUsers() {
               <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">UsuÃ¡rios Ativos</p>
+                    <p className="text-sm text-gray-600 mb-1">Usuários Ativos</p>
                     <p className="text-3xl font-bold text-green-600">
                       {users.filter(u => u.ativo).length}
                     </p>
@@ -216,12 +216,12 @@ export default function MobileUsers() {
               {loading ? (
                 <div className="p-12 text-center">
                   <ArrowPathIcon className="h-12 w-12 text-gray-400 animate-spin mx-auto mb-4" />
-                  <p className="text-gray-600">Carregando usuÃ¡rios...</p>
+                  <p className="text-gray-600">Carregando usuários...</p>
                 </div>
               ) : filteredUsers.length === 0 ? (
                 <div className="p-12 text-center">
                   <DevicePhoneMobileIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-600">Nenhum usuÃ¡rio encontrado</p>
+                  <p className="text-gray-600">Nenhum usuário encontrado</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -229,7 +229,7 @@ export default function MobileUsers() {
                     <thead className="bg-gray-50 border-b border-gray-200">
                       <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          UsuÃ¡rio
+                          Usuário
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Telefone
@@ -238,7 +238,7 @@ export default function MobileUsers() {
                           Primeiro Acesso
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          ÃÅ¡ltimo Acesso
+                          Último Acesso
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Acessos
@@ -247,7 +247,7 @@ export default function MobileUsers() {
                           Status
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          AÃ§Ãµes
+                          Ações
                         </th>
                       </tr>
                     </thead>

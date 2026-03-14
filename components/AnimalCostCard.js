@@ -32,7 +32,7 @@ export default function AnimalCostCard({ animal, onUpdateCosts }) {
       setCustos(arr)
       setCustoTotal(total)
       
-      const temProtocolo = arr.some(c => c.tipo === 'Protocolo SanitÃ¡rio')
+      const temProtocolo = arr.some(c => c.tipo === 'Protocolo Sanitário')
       const temDNA = arr.some(c => c.tipo === 'DNA')
       
       setProtocoloStatus(temProtocolo ? 'completo' : 'pendente')
@@ -52,17 +52,17 @@ export default function AnimalCostCard({ animal, onUpdateCosts }) {
     try {
       const { default: costManager } = await import('../services/costManager')
       
-      const resultado = await costManager.aplicarProtocolo(animal.id, animal, 'AplicaÃ§Ã£o automÃ¡tica via card')
+      const resultado = await costManager.aplicarProtocolo(animal.id, animal, 'Aplicação automática via card')
       
       if (resultado) {
         loadCustos()
-        alert(`âÅ“â€¦ Protocolo aplicado!\n\nðÅ¸â€œâ€¹ ${resultado.protocolo}\nðÅ¸â€™° Custo: R$ ${resultado.total.toFixed(2)}`)
+        alert(`✅ Protocolo aplicado!\n\n📋 ${resultado.protocolo}\n💰 Custo: R$ ${resultado.total.toFixed(2)}`)
       } else {
-        alert('ââ€ž¹ï¸� Nenhum protocolo aplicÃ¡vel para este animal')
+        alert('ℹ️ Nenhum protocolo aplicável para este animal')
       }
     } catch (error) {
       console.error('Erro ao aplicar protocolo:', error)
-      alert('â�Å’ Erro ao aplicar protocolo')
+      alert('❌ Erro ao aplicar protocolo')
     }
   }
 
@@ -78,13 +78,13 @@ export default function AnimalCostCard({ animal, onUpdateCosts }) {
         loadCustos()
         const total = custosDNA.reduce((sum, c) => sum + c.valor, 0)
         const tipos = custosDNA.map(c => c.subtipo).join(', ')
-        alert(`âÅ“â€¦ DNA aplicado!\n\nðÅ¸§¬ ${tipos}\nðÅ¸â€™° Custo: R$ ${total.toFixed(2)}`)
+        alert(`✅ DNA aplicado!\n\n🧬 ${tipos}\n💰 Custo: R$ ${total.toFixed(2)}`)
       } else {
-        alert('ââ€ž¹ï¸� Nenhum DNA aplicÃ¡vel para este animal')
+        alert('ℹ️ Nenhum DNA aplicável para este animal')
       }
     } catch (error) {
       console.error('Erro ao aplicar DNA:', error)
-      alert('â�Å’ Erro ao aplicar DNA')
+      alert('❌ Erro ao aplicar DNA')
     }
   }
 
@@ -130,7 +130,7 @@ export default function AnimalCostCard({ animal, onUpdateCosts }) {
           <div className="flex items-center space-x-2">
             {getStatusIcon(protocoloStatus)}
             <span className="text-sm text-gray-700 dark:text-gray-300">
-              Protocolo SanitÃ¡rio
+              Protocolo Sanitário
             </span>
           </div>
           <div className={`text-sm font-medium ${getStatusColor(protocoloStatus)}`}>
@@ -151,25 +151,25 @@ export default function AnimalCostCard({ animal, onUpdateCosts }) {
         </div>
       </div>
 
-      {/* InformaÃ§Ãµes do Animal */}
+      {/* Informações do Animal */}
       <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 mb-4">
         <div className="grid grid-cols-2 gap-2 text-xs">
           <div>
             <span className="font-medium">Era:</span> {animal.meses} meses
           </div>
           <div>
-            <span className="font-medium">Sexo:</span> {animal.sexo === 'M' ? 'Macho' : 'FÃªmea'}
+            <span className="font-medium">Sexo:</span> {animal.sexo === 'M' ? 'Macho' : 'Fêmea'}
           </div>
           <div>
-            <span className="font-medium">FIV:</span> {animal.isFiv ? 'Sim' : 'NÃ£o'}
+            <span className="font-medium">FIV:</span> {animal.isFiv ? 'Sim' : 'Não'}
           </div>
           <div>
-            <span className="font-medium">SituaÃ§Ã£o:</span> {animal.situacao}
+            <span className="font-medium">Situação:</span> {animal.situacao}
           </div>
         </div>
       </div>
 
-      {/* AÃ§Ãµes RÃ¡pidas */}
+      {/* Ações Rápidas */}
       <div className="flex space-x-2">
         {protocoloStatus === 'pendente' && (
           <button
@@ -191,22 +191,22 @@ export default function AnimalCostCard({ animal, onUpdateCosts }) {
 
         {protocoloStatus === 'completo' && dnaStatus === 'completo' && (
           <div className="flex-1 text-center text-xs text-green-600 dark:text-green-400 py-2">
-            âÅ“â€¦ Protocolos Completos
+            ✅ Protocolos Completos
           </div>
         )}
       </div>
 
-      {/* ÃÅ¡ltimos Custos */}
+      {/* Últimos Custos */}
       {custos.length > 0 && (
         <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-600">
           <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-            ÃÅ¡ltimos Custos:
+            Últimos Custos:
           </h4>
           <div className="space-y-1">
             {custos.slice(-3).map(custo => (
               <div key={custo.id} className="flex justify-between items-center text-xs">
                 <span className="text-gray-600 dark:text-gray-400 truncate">
-                  {custo.tipo} {custo.subtipo && `ââ‚¬¢ ${custo.subtipo}`}
+                  {custo.tipo} {custo.subtipo && `• ${custo.subtipo}`}
                 </span>
                 <span className="font-medium text-green-600 dark:text-green-400 ml-2">
                   R$ {custo.valor.toFixed(2)}

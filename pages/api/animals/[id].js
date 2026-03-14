@@ -3,9 +3,9 @@ import logger from '../../../utils/logger'
 import { asyncHandler } from '../../../utils/apiResponse'
 import { broadcast } from '../../../lib/sseClients'
 
-// FunÃ§Ã£o auxiliar de log
+// Função auxiliar de log
 function debugLog(msg) {
-  // Em produÃ§Ã£o, remover ou usar logger.debug
+  // Em produção, remover ou usar logger.debug
   console.log(`[DEBUG-ANIMAL-API] ${msg}`);
 }
 
@@ -20,7 +20,7 @@ import {
 import { canDelete } from '../../../utils/permissions'
 import { RACAS_POR_SERIE as racasPorSerie } from '../../../utils/constants'
 
-// FunÃ§Ã£o para criar nota fiscal de saÃ­da automaticamente
+// Função para criar nota fiscal de saída automaticamente
 async function criarNotaFiscalSaidaAutomatica(animal) {
   try {
     const nfData = {
@@ -57,20 +57,20 @@ async function criarNotaFiscalSaidaAutomatica(animal) {
 
     return await response.json()
   } catch (error) {
-    logger.error('Erro ao criar NF de saÃ­da automÃ¡tica:', error)
+    logger.error('Erro ao criar NF de saída automática:', error)
     throw error
   }
 }
 
-// FunÃ§Ã£o para calcular era baseada na idade em meses e sexo
+// Função para calcular era baseada na idade em meses e sexo
 function calcularEra(meses, sexo) {
-  if (!meses || meses <= 0) return 'NÃ£o informado'
+  if (!meses || meses <= 0) return 'Não informado'
   
-  const isFemea = sexo && (sexo.toLowerCase().includes('fÃªmea') || sexo.toLowerCase().includes('femea') || sexo === 'F')
+  const isFemea = sexo && (sexo.toLowerCase().includes('fêmea') || sexo.toLowerCase().includes('femea') || sexo === 'F')
   const isMacho = sexo && (sexo.toLowerCase().includes('macho') || sexo === 'M')
   
   if (isFemea) {
-    // FÃÅ MEA: 0-7 / 7-12 / 12-18 / 18-24 / 24+
+    // FÊMEA: 0-7 / 7-12 / 12-18 / 18-24 / 24+
     if (meses <= 7) return '0/7'
     if (meses <= 12) return '7/12'
     if (meses <= 18) return '12/18'
@@ -85,7 +85,7 @@ function calcularEra(meses, sexo) {
     return '22+'
   }
   
-  // Se nÃ£o tem sexo definido, usar padrÃ£o antigo para compatibilidade
+  // Se não tem sexo definido, usar padrão antigo para compatibilidade
   if (meses <= 7) return '0/7'
   if (meses <= 12) return '7/12'
   if (meses <= 18) return '12/18'
@@ -98,7 +98,7 @@ export default asyncHandler(async function handler(req, res) {
   const { id } = req.query
 
   if (!id) {
-    return sendValidationError(res, 'ID do animal Ã© obrigatÃ³rio')
+    return sendValidationError(res, 'ID do animal é obrigatório')
   }
 
   const { method } = req
@@ -126,7 +126,7 @@ async function handleGet(req, res, id) {
   let animal = null
   const animalId = parseInt(id, 10)
 
-  // 0. Se id tem formato SÃâ€°RIE-RG (ex: CJCJ-16974) ou SÃâ€°RIE RG (ex: CJCJ 17037), tentar PRIMEIRO - evita 404 recorrente
+  // 0. Se id tem formato SÉRIE-RG (ex: CJCJ-16974) ou SÉRIE RG (ex: CJCJ 17037), tentar PRIMEIRO - evita 404 recorrente
   const idStr = id && typeof id === 'string' ? String(id).trim() : ''
   const isSerieRgFormat = idStr && isNaN(animalId) && (idStr.includes('-') || /^[A-Za-z]+\s+\d+$/.test(idStr))
   if (isSerieRgFormat) {
@@ -151,9 +151,9 @@ async function handleGet(req, res, id) {
       const rgNum = /^\d+$/.test(rgBusca) ? parseInt(rgBusca, 10) : null
 
       if (serieBusca && (rgBusca || rgNum !== null)) {
-        debugLog(`Tentando buscar animal por SÃâ€°RIE-RG: ${serieBusca}-${rgBusca} (bruto: ${rgBruto})`)
+        debugLog(`Tentando buscar animal por SÉRIE-RG: ${serieBusca}-${rgBusca} (bruto: ${rgBruto})`)
 
-        // Tentativa 1: match exato normalizado (rg sem zeros Ã  esquerda)
+        // Tentativa 1: match exato normalizado (rg sem zeros à esquerda)
         let result = await query(
           `SELECT id, serie, rg FROM animais 
            WHERE UPPER(TRIM(COALESCE(serie, ''))) = UPPER(TRIM($1)) 
@@ -186,11 +186,11 @@ async function handleGet(req, res, id) {
               [serieBusca, String(rgNum), rgNum]
             )
             if (r3.rows.length > 0) result = r3
-            debugLog(`Tentativa 3 (numÃ©rico): ${result.rows.length} encontrados`)
-          } catch (_) { /* ignora se rg nÃ£o for numÃ©rico */ }
+            debugLog(`Tentativa 3 (numérico): ${result.rows.length} encontrados`)
+          } catch (_) { /* ignora se rg não for numérico */ }
         }
 
-        // Tentativa 4: busca mais flexÃ­vel (rg contÃ©m ou termina com)
+        // Tentativa 4: busca mais flexível (rg contém ou termina com)
         if (result.rows.length === 0 && rgBruto) {
           result = await query(
             `SELECT id, serie, rg FROM animais 
@@ -199,10 +199,10 @@ async function handleGet(req, res, id) {
              LIMIT 1`,
             [serieBusca, rgBruto]
           )
-          debugLog(`Tentativa 4 (flexÃ­vel): ${result.rows.length} encontrados`)
+          debugLog(`Tentativa 4 (flexível): ${result.rows.length} encontrados`)
         }
 
-        // Tentativa 5: usar buscarAnimais (mesma lÃ³gica da API principal - mais robusta)
+        // Tentativa 5: usar buscarAnimais (mesma lógica da API principal - mais robusta)
         if (result.rows.length === 0) {
           try {
             debugLog(`Tentativa 5 (buscarAnimais service)...`)
@@ -232,7 +232,7 @@ async function handleGet(req, res, id) {
           } catch (_) {}
         }
 
-        // Tentativa 7: serie com espaÃ§os (ex: "CJ CJ" = "CJCJ")
+        // Tentativa 7: serie com espaços (ex: "CJ CJ" = "CJCJ")
         if (result.rows.length === 0 && serieBusca && rgBruto) {
           try {
             const serieSemEspacos = String(serieBusca).replace(/\s/g, '')
@@ -243,11 +243,11 @@ async function handleGet(req, res, id) {
                LIMIT 1`,
               [serieSemEspacos, rgBruto]
             )
-            debugLog(`Tentativa 7 (serie sem espaÃ§os): ${result.rows.length} encontrados`)
+            debugLog(`Tentativa 7 (serie sem espaços): ${result.rows.length} encontrados`)
           } catch (_) {}
         }
 
-        // Tentativa 8: RG com zeros Ã  esquerda (ex: 013604 quando busca 13604) - tenta variantes
+        // Tentativa 8: RG com zeros à esquerda (ex: 013604 quando busca 13604) - tenta variantes
         if (result.rows.length === 0 && serieBusca && rgBruto && /^\d+$/.test(rgBruto)) {
           try {
             const variantesRg = [rgBruto]
@@ -270,28 +270,28 @@ async function handleGet(req, res, id) {
 
         if (result.rows.length > 0) {
           const row = result.rows[0]
-          debugLog(`âÅ“â€¦ Animal encontrado por SÃâ€°RIE-RG ${id} ââ€ â€™ ID ${row.id}`)
+          debugLog(`✅ Animal encontrado por SÉRIE-RG ${id} → ID ${row.id}`)
           try {
             if (history === 'true') {
-              debugLog(`Buscando histÃ³rico completo para ID ${row.id}...`)
+              debugLog(`Buscando histórico completo para ID ${row.id}...`)
               animal = await databaseService.buscarHistoricoAnimal(row.id)
             } else {
-              debugLog(`Buscando dados bÃ¡sicos para ID ${row.id}...`)
+              debugLog(`Buscando dados básicos para ID ${row.id}...`)
               animal = await databaseService.buscarAnimalPorId(row.id)
             }
             if (!animal) {
-                debugLog(`â�Å’ buscarHistoricoAnimal/buscarAnimalPorId retornou null para ID ${row.id}`)
+                debugLog(`❌ buscarHistoricoAnimal/buscarAnimalPorId retornou null para ID ${row.id}`)
             } else {
-                debugLog(`âÅ“â€¦ Dados carregados com sucesso para ID ${row.id}`)
+                debugLog(`✅ Dados carregados com sucesso para ID ${row.id}`)
             }
           } catch (e) {
-            debugLog(`ERRO CRÃ�TICO ao buscar animal/histÃ³rico ID ${row.id}: ${e.message}`)
-            logger.warn('buscarHistoricoAnimal falhou apÃ³s match serie-rg:', e?.message)
+            debugLog(`ERRO CRÍTICO ao buscar animal/histórico ID ${row.id}: ${e.message}`)
+            logger.warn('buscarHistoricoAnimal falhou após match serie-rg:', e?.message)
             try {
-              debugLog(`Tentando fallback bÃ¡sico (buscarAnimalPorId) para ID ${row.id}...`)
+              debugLog(`Tentando fallback básico (buscarAnimalPorId) para ID ${row.id}...`)
               animal = await databaseService.buscarAnimalPorId(row.id)
             } catch (_) {
-              debugLog(`Fallback bÃ¡sico falhou. Tentando query direta manual...`)
+              debugLog(`Fallback básico falhou. Tentando query direta manual...`)
               const { query: q2 } = require('../../../lib/database')
               const full = await q2('SELECT * FROM animais WHERE id = $1', [row.id])
               if (full.rows[0]) {
@@ -310,21 +310,21 @@ async function handleGet(req, res, id) {
                   } catch (__) {}
                 }
                 animal = { ...r, pesagens: [], inseminacoes: [], custos: [], gestacoes: [], filhos, protocolos: [], localizacoes: [], fivs: [] }
-                console.log(`âÅ¡ ï¸� Retornando animal ${r.serie}-${r.rg} (fallback bÃ¡sico com ${filhos.length} filhos)`)
+                console.log(`⚠️ Retornando animal ${r.serie}-${r.rg} (fallback básico com ${filhos.length} filhos)`)
               }
             }
           }
         }
       }
     } catch (e) {
-      debugLog(`â�Å’ Busca SÃâ€°RIE-RG falhou: ${e?.message || e}`)
-      logger.warn('Busca SÃâ€°RIE-RG falhou:', e?.message)
+      debugLog(`❌ Busca SÉRIE-RG falhou: ${e?.message || e}`)
+      logger.warn('Busca SÉRIE-RG falhou:', e?.message)
     }
   }
 
-  // 1. Tentar buscar por ID numÃ©rico (se ainda nÃ£o encontrou)
+  // 1. Tentar buscar por ID numérico (se ainda não encontrou)
   if (!animal && !isNaN(animalId)) {
-    console.log(`ðÅ¸â€œâ€¹ Tentando buscar por ID numÃ©rico: ${animalId}`)
+    console.log(`📋 Tentando buscar por ID numérico: ${animalId}`)
     
     try {
       if (history === 'true') {
@@ -336,7 +336,7 @@ async function handleGet(req, res, id) {
       logger.warn('Erro na busca principal por ID:', err?.message)
     }
     
-    // Fallback 1: query direta (evita inconsistÃªncias - mesma lÃ³gica do /verificar)
+    // Fallback 1: query direta (evita inconsistências - mesma lógica do /verificar)
     if (!animal) {
       try {
         const { query } = require('../../../lib/database')
@@ -346,7 +346,7 @@ async function handleGet(req, res, id) {
         )
         if (direct.rows.length > 0) {
           const foundId = direct.rows[0].id
-          console.log(`ðÅ¸â€œâ€¹ Fallback: encontrado por query direta (id=${foundId}), buscando completo...`)
+          console.log(`📋 Fallback: encontrado por query direta (id=${foundId}), buscando completo...`)
           try {
             if (history === 'true') {
               animal = await databaseService.buscarHistoricoAnimal(foundId)
@@ -372,7 +372,7 @@ async function handleGet(req, res, id) {
         )
         if (bySerieRg.rows.length > 0) {
           const foundId = bySerieRg.rows[0].id
-          console.log(`ðÅ¸â€œâ€¹ Fallback serie+rg: encontrado ${serie}-${rg} (id=${foundId})`)
+          console.log(`📋 Fallback serie+rg: encontrado ${serie}-${rg} (id=${foundId})`)
           try {
             if (history === 'true') {
               animal = await databaseService.buscarHistoricoAnimal(foundId)
@@ -388,7 +388,7 @@ async function handleGet(req, res, id) {
       }
     }
     
-    // Fallback 3: verificaÃ§Ã£o crua - animal existe mas buscarHistoricoAnimal falhou?
+    // Fallback 3: verificação crua - animal existe mas buscarHistoricoAnimal falhou?
     if (!animal && history === 'true') {
       try {
         const { query } = require('../../../lib/database')
@@ -398,7 +398,7 @@ async function handleGet(req, res, id) {
         )
         if (raw.rows.length > 0) {
           const row = raw.rows[0]
-          console.log(`ðÅ¸â€œâ€¹ Fallback cru: animal existe (${row.serie}-${row.rg}), buscarHistoricoAnimal falhou - tentando buscarAnimalPorId`)
+          console.log(`📋 Fallback cru: animal existe (${row.serie}-${row.rg}), buscarHistoricoAnimal falhou - tentando buscarAnimalPorId`)
           try {
             animal = await databaseService.buscarHistoricoAnimal(animalId)
           } catch (_) {
@@ -409,7 +409,7 @@ async function handleGet(req, res, id) {
               }
             } catch (_) {
               animal = { ...row, pesagens: [], inseminacoes: [], custos: [], gestacoes: [], filhos: [], protocolos: [], localizacoes: [], fivs: [] }
-              console.log(`âÅ¡ ï¸� Retornando dados bÃ¡sicos do animal ${row.serie}-${row.rg} (histÃ³rico incompleto)`)
+              console.log(`⚠️ Retornando dados básicos do animal ${row.serie}-${row.rg} (histórico incompleto)`)
             }
           }
         }
@@ -419,15 +419,15 @@ async function handleGet(req, res, id) {
     }
     
     if (animal) {
-      console.log(`âÅ“â€¦ Animal encontrado por ID: ${animalId}`)
+      console.log(`✅ Animal encontrado por ID: ${animalId}`)
     } else {
-      console.log(`âÅ¡ ï¸� Animal nÃ£o encontrado por ID: ${animalId}`)
+      console.log(`⚠️ Animal não encontrado por ID: ${animalId}`)
     }
   }
   
-  // 2. Se nÃ£o encontrou por ID, tentar buscar por RG
+  // 2. Se não encontrou por ID, tentar buscar por RG
   if (!animal) {
-    console.log(`ðÅ¸â€œâ€¹ Tentando buscar por RG: ${id}`)
+    console.log(`📋 Tentando buscar por RG: ${id}`)
     try {
       const { query } = require('../../../lib/database')
       
@@ -439,7 +439,7 @@ async function handleGet(req, res, id) {
       
       if (resultRG.rows.length > 0) {
         const animalRG = resultRG.rows[0]
-        console.log(`âÅ“â€¦ Animal encontrado por RG ${id}: ID ${animalRG.id} (${animalRG.serie}-${animalRG.rg})`)
+        console.log(`✅ Animal encontrado por RG ${id}: ID ${animalRG.id} (${animalRG.serie}-${animalRG.rg})`)
         
         // Buscar animal completo usando o ID encontrado
         if (history === 'true') {
@@ -448,14 +448,14 @@ async function handleGet(req, res, id) {
           animal = await databaseService.buscarAnimalPorId(animalRG.id)
         }
       } else {
-        // Tentar buscar por sÃ©rie-RG combinado (ex: "CJCJ-17836" ou "CJCJ-16013")
+        // Tentar buscar por série-RG combinado (ex: "CJCJ-17836" ou "CJCJ-16013")
         if (id.includes('-')) {
           const parts = id.split('-')
           const serie = parts[0].trim()
-          const rg = parts.slice(1).join('-').trim() // RG pode ter hÃ­fen (ex: 16013)
-          console.log(`ðÅ¸â€œâ€¹ Tentando buscar por sÃ©rie-RG: ${serie}-${rg}`)
+          const rg = parts.slice(1).join('-').trim() // RG pode ter hífen (ex: 16013)
+          console.log(`📋 Tentando buscar por série-RG: ${serie}-${rg}`)
           
-          // Busca flexÃ­vel: rg como texto e como nÃºmero (PostgreSQL aceita ambos)
+          // Busca flexível: rg como texto e como número (PostgreSQL aceita ambos)
           let resultSerieRG = await query(
             `SELECT * FROM animais 
              WHERE UPPER(TRIM(serie)) = UPPER(TRIM($1)) 
@@ -473,7 +473,7 @@ async function handleGet(req, res, id) {
               if (alt.rows.length > 0) resultSerieRG = alt
             } catch (e) { /* ignora */ }
           }
-          // Fallback 2: typo comum Iââ€ â€�J (ex: CJCI vs CJCJ)
+          // Fallback 2: typo comum I↔J (ex: CJCI vs CJCJ)
           if (resultSerieRG.rows.length === 0 && serie.length >= 2) {
             const serieAlt = serie.includes('I') ? serie.replace(/I/g, 'J') : serie.replace(/J/g, 'I')
             if (serieAlt !== serie) {
@@ -489,7 +489,7 @@ async function handleGet(req, res, id) {
           
           if (resultSerieRG.rows.length > 0) {
             const animalSerieRG = resultSerieRG.rows[0]
-            console.log(`âÅ“â€¦ Animal encontrado por sÃ©rie-RG ${id}: ID ${animalSerieRG.id}`)
+            console.log(`✅ Animal encontrado por série-RG ${id}: ID ${animalSerieRG.id}`)
             
             // Buscar animal completo usando o ID encontrado
             if (history === 'true') {
@@ -505,9 +505,9 @@ async function handleGet(req, res, id) {
     }
   }
   
-  // 3. Se ainda nÃ£o encontrou, tentar buscar animais prÃ³ximos (apenas para IDs numÃ©ricos)
+  // 3. Se ainda não encontrou, tentar buscar animais próximos (apenas para IDs numéricos)
   if (!animal && !isNaN(animalId)) {
-    console.log(`âÅ¡ ï¸� Animal ${id} nÃ£o encontrado, buscando animais prÃ³ximos...`)
+    console.log(`⚠️ Animal ${id} não encontrado, buscando animais próximos...`)
     try {
       const { query } = require('../../../lib/database')
       const animaisProximos = await query(
@@ -519,14 +519,14 @@ async function handleGet(req, res, id) {
       )
       
       if (animaisProximos.rows.length > 0) {
-        console.log(`ðÅ¸â€™¡ Animais prÃ³ximos encontrados:`, animaisProximos.rows.map(a => `${a.id} (${a.serie}-${a.rg})`))
+        console.log(`💡 Animais próximos encontrados:`, animaisProximos.rows.map(a => `${a.id} (${a.serie}-${a.rg})`))
       }
     } catch (error) {
-      console.error('Erro ao buscar animais prÃ³ximos:', error)
+      console.error('Erro ao buscar animais próximos:', error)
     }
   }
   
-  // Fallback: se nÃ£o encontrou em animais, buscar coletas FIV por doadora_nome (doadora inativa/nÃ£o cadastrada)
+  // Fallback: se não encontrou em animais, buscar coletas FIV por doadora_nome (doadora inativa/não cadastrada)
   if (!animal && id.includes('-')) {
     try {
       const { query: dbQuery } = require('../../../lib/database')
@@ -550,7 +550,7 @@ async function handleGet(req, res, id) {
           rg,
           nome: `${serie} ${rg}`,
           situacao: 'Inativo (apenas coletas FIV)',
-          sexo: 'FÃªmea',
+          sexo: 'Fêmea',
           fivs,
           is_doadora: true,
           _apenas_coletas: true
@@ -563,15 +563,15 @@ async function handleGet(req, res, id) {
           precoVenda: null,
           status: skeletonAnimal.situacao
         }
-        console.log(`âÅ“â€¦ Doadora ${id} nÃ£o cadastrada - retornando ficha com ${fivs.length} coletas FIV`)
+        console.log(`✅ Doadora ${id} não cadastrada - retornando ficha com ${fivs.length} coletas FIV`)
         return sendSuccess(res, animalComIdentificacao)
       }
     } catch (e) {
-      console.warn('Erro ao buscar coletas FIV para doadora nÃ£o cadastrada:', e.message)
+      console.warn('Erro ao buscar coletas FIV para doadora não cadastrada:', e.message)
     }
   }
 
-  // Fallback final: ID numÃ©rico falhou - se animal existe, retornar dados bÃ¡sicos (buscarHistoricoAnimal pode falhar)
+  // Fallback final: ID numérico falhou - se animal existe, retornar dados básicos (buscarHistoricoAnimal pode falhar)
   if (!animal && !isNaN(animalId)) {
     try {
       const { query: dbQuery } = require('../../../lib/database')
@@ -581,7 +581,7 @@ async function handleGet(req, res, id) {
       )
       if (lookup.rows.length > 0) {
         const row = lookup.rows[0]
-        console.log(`ðÅ¸â€œâ€¹ Fallback final: animal ${animalId} existe (${row.serie}-${row.rg}), retornando dados bÃ¡sicos`)
+        console.log(`📋 Fallback final: animal ${animalId} existe (${row.serie}-${row.rg}), retornando dados básicos`)
         try {
           animal = history === 'true'
             ? await databaseService.buscarHistoricoAnimal(row.id)
@@ -624,7 +624,7 @@ async function handleGet(req, res, id) {
             _apenas_baixas: true,
             baixas
           }
-          debugLog(`âÅ“â€¦ Animal ${id} nÃ£o cadastrado - retornando ficha com ${baixas.length} baixa(s) (histÃ³rico)`)
+          debugLog(`✅ Animal ${id} não cadastrado - retornando ficha com ${baixas.length} baixa(s) (histórico)`)
           return sendSuccess(res, skeletonAnimal)
         }
       }
@@ -633,17 +633,17 @@ async function handleGet(req, res, id) {
     }
   }
 
-  // Se nÃ£o encontrou no PostgreSQL, retornar erro (fallback desativado)
+  // Se não encontrou no PostgreSQL, retornar erro (fallback desativado)
   if (!animal) {
-    return sendNotFound(res, 'Animal nÃ£o encontrado')
+    return sendNotFound(res, 'Animal não encontrado')
   }
   
-  // Corrigir raÃ§a baseada na sÃ©rie
+  // Corrigir raça baseada na série
   if (animal.serie && racasPorSerie[animal.serie] && animal.raca !== racasPorSerie[animal.serie]) {
     animal.raca = racasPorSerie[animal.serie]
   }
 
-  // Enriquecer com sÃ©rie e RG da mÃ£e quando nÃ£o estiverem preenchidos
+  // Enriquecer com série e RG da mãe quando não estiverem preenchidos
   if (animal.mae && !(animal.serie_mae || animal.rg_mae)) {
     try {
       const { query: dbQuery } = require('../../../lib/database')
@@ -663,7 +663,7 @@ async function handleGet(req, res, id) {
           [`%${maeNome}%`]
         )
       }
-      // 2. Se nÃ£o achou em animais, buscar em gestaÃ§Ãµes (receptora_nome = mÃ£e)
+      // 2. Se não achou em animais, buscar em gestações (receptora_nome = mãe)
       if (maeResult.rows.length === 0) {
         let gestMae = await dbQuery(
           `SELECT receptora_serie as serie, receptora_rg as rg 
@@ -688,7 +688,7 @@ async function handleGet(req, res, id) {
           animal.rg_mae = gestMae.rows[0].rg
         }
       }
-      // 2b. GestaÃ§Ãµes mae_serie/mae_rg (doadora biolÃ³gica) - mÃ£e pode estar inativa
+      // 2b. Gestações mae_serie/mae_rg (doadora biológica) - mãe pode estar inativa
       if (!animal.serie_mae && !animal.rg_mae) {
         const gestMaeBio = await dbQuery(
           `SELECT g.mae_serie as serie, g.mae_rg as rg 
@@ -706,7 +706,7 @@ async function handleGet(req, res, id) {
           animal.rg_mae = gestMaeBio.rows[0].rg
         }
       }
-      // 2c. Coleta FIV (doadora) - mÃ£e pode ter coletas mesmo inativa
+      // 2c. Coleta FIV (doadora) - mãe pode ter coletas mesmo inativa
       if (!animal.serie_mae && !animal.rg_mae) {
         const cfMae = await dbQuery(
           `SELECT a.serie, a.rg FROM coleta_fiv cf
@@ -723,7 +723,7 @@ async function handleGet(req, res, id) {
           animal.rg_mae = cfMae.rows[0].rg
         }
       }
-      // 3. Se ainda nÃ£o achou, buscar via nascimentos: gestaÃ§Ã£o onde este animal nasceu
+      // 3. Se ainda não achou, buscar via nascimentos: gestação onde este animal nasceu
       if (!animal.serie_mae && !animal.rg_mae && animal.serie && animal.rg) {
         const nascMae = await dbQuery(
           `SELECT g.receptora_serie as serie, g.receptora_rg as rg 
@@ -745,11 +745,11 @@ async function handleGet(req, res, id) {
         animal.rg_mae = mae.rg
       }
     } catch (e) {
-      console.warn('Erro ao buscar sÃ©rie/RG da mÃ£e:', e)
+      console.warn('Erro ao buscar série/RG da mãe:', e)
     }
   }
 
-  // Garantir localizacoes (piquete) para exibiÃ§Ã£o na consulta - buscar se nÃ£o vier do banco
+  // Garantir localizacoes (piquete) para exibição na consulta - buscar se não vier do banco
   let localizacoes = animal.localizacoes
   if (!localizacoes || !Array.isArray(localizacoes) || localizacoes.length === 0) {
     try {
@@ -764,7 +764,7 @@ async function handleGet(req, res, id) {
     }
   }
 
-  // Corrigir nome quando cadastro estÃ¡ errado - buscar em coleta_fiv (doadora) e gestacoes (receptora)
+  // Corrigir nome quando cadastro está errado - buscar em coleta_fiv (doadora) e gestacoes (receptora)
   let nomeExibir = animal.nome
   const nomeAtual = (animal.nome || '').trim()
   const nomePareceErrado = !nomeAtual || /^[A-Z]\d{4}\s+[A-Z0-9\.]*\s*\d*$/i.test(nomeAtual) // ex: A7389 MAT. ou A7389 MAT. 17037
@@ -784,7 +784,7 @@ async function handleGet(req, res, id) {
           }
         }
       }
-      // 2. Receptora em gestaÃ§Ãµes (ex: JATAUBA SANT ANNA vs A7389 MAT. para CJCJ 17037)
+      // 2. Receptora em gestações (ex: JATAUBA SANT ANNA vs A7389 MAT. para CJCJ 17037)
       if ((!nomeExibir || nomeExibir === animal.nome) && nomePareceErrado && animal.serie && animal.rg) {
         const gestNome = await dbQuery(
           'SELECT receptora_nome FROM gestacoes WHERE receptora_serie = $1 AND receptora_rg::text = $2 AND receptora_nome IS NOT NULL AND TRIM(receptora_nome) != \'\' ORDER BY created_at DESC LIMIT 1',
@@ -792,10 +792,10 @@ async function handleGet(req, res, id) {
         )
         if (gestNome.rows.length > 0) {
           const rn = String(gestNome.rows[0].receptora_nome || '').trim()
-          if (rn && /[a-zÃ¡Ã Ã¢Ã£Ã©ÃªÃ­Ã³Ã´ÃµÃºÃ§]/i.test(rn)) nomeExibir = rn
+          if (rn && /[a-záàâãéêíóôõúç]/i.test(rn)) nomeExibir = rn
         }
       }
-      // 3. Receptora em transferÃªncias de embriÃµes
+      // 3. Receptora em transferências de embriões
       if ((!nomeExibir || nomeExibir === animal.nome) && nomePareceErrado && animal.id) {
         const teNome = await dbQuery(
           'SELECT receptora_nome FROM transferencias_embrioes WHERE receptora_id = $1 AND receptora_nome IS NOT NULL AND TRIM(receptora_nome) != \'\' ORDER BY data_te DESC LIMIT 1',
@@ -803,7 +803,7 @@ async function handleGet(req, res, id) {
         )
         if (teNome.rows.length > 0) {
           const tn = String(teNome.rows[0].receptora_nome || '').trim()
-          if (tn && /[a-zÃ¡Ã Ã¢Ã£Ã©ÃªÃ­Ã³Ã´ÃµÃºÃ§]/i.test(tn)) nomeExibir = tn
+          if (tn && /[a-záàâãéêíóôõúç]/i.test(tn)) nomeExibir = tn
         }
       }
     } catch (e) {
@@ -827,7 +827,7 @@ async function handleGet(req, res, id) {
     situacaoAbcz: animal.situacao_abcz || animal.situacaoAbcz || null
   }
   
-  console.log(`âÅ“â€¦ GET Animal ${animal.serie}-${animal.rg} (ID: ${animal.id})`)
+  console.log(`✅ GET Animal ${animal.serie}-${animal.rg} (ID: ${animal.id})`)
   
   return sendSuccess(res, animalComIdentificacao)
 }
@@ -835,28 +835,28 @@ async function handleGet(req, res, id) {
 async function handlePut(req, res, id) {
   const dataNasc = req.body.dataNascimento ?? req.body.data_nascimento
   const pasto = req.body.pastoAtual ?? req.body.pasto_atual
-  console.log(`ðÅ¸â€œ� PUT animal ${id} | data_nascimento:`, dataNasc, '| pasto_atual:', pasto)
+  console.log(`📝 PUT animal ${id} | data_nascimento:`, dataNasc, '| pasto_atual:', pasto)
   
   const animal = await databaseService.atualizarAnimal(id, req.body)
   
   if (!animal) {
-    return sendNotFound(res, 'Animal nÃ£o encontrado para atualizaÃ§Ã£o')
+    return sendNotFound(res, 'Animal não encontrado para atualização')
   }
-  console.log(`âÅ“â€¦ Animal ${id} atualizado | data_nascimento:`, animal.data_nascimento, '| pasto_atual:', animal.pasto_atual)
+  console.log(`✅ Animal ${id} atualizado | data_nascimento:`, animal.data_nascimento, '| pasto_atual:', animal.pasto_atual)
   
-  // DESABILITADO: NÃ£o criar nota fiscal de saÃ­da automaticamente
-  // A NF deve ser criada manualmente atravÃ©s do mÃ³dulo de Notas Fiscais
+  // DESABILITADO: Não criar nota fiscal de saída automaticamente
+  // A NF deve ser criada manualmente através do módulo de Notas Fiscais
   // if (req.body.situacao === 'Vendido' && req.body.valor_venda) {
   //   try {
   //     await criarNotaFiscalSaidaAutomatica(animal)
-  //     logger.info(`NF de saÃ­da criada automaticamente para: ${animal.serie}${animal.rg}`)
+  //     logger.info(`NF de saída criada automaticamente para: ${animal.serie}${animal.rg}`)
   //   } catch (nfError) {
-  //     logger.error(`Erro ao criar NF de saÃ­da automÃ¡tica: ${nfError.message}`)
-  //     // NÃ£o falhar a atualizaÃ§Ã£o do animal se a NF falhar
+  //     logger.error(`Erro ao criar NF de saída automática: ${nfError.message}`)
+  //     // Não falhar a atualização do animal se a NF falhar
   //   }
   // }
   
-  // Corrigir raÃ§a baseada na sÃ©rie
+  // Corrigir raça baseada na série
   if (animal.serie && racasPorSerie[animal.serie] && animal.raca !== racasPorSerie[animal.serie]) {
     animal.raca = racasPorSerie[animal.serie]
   }
@@ -880,9 +880,9 @@ async function handlePut(req, res, id) {
 }
 
 async function handleDelete(req, res, id) {
-  // Verificar permissÃ£o de exclusÃ£o
+  // Verificar permissão de exclusão
   if (!canDelete(req)) {
-    return sendForbidden(res, 'Acesso negado. Esta aÃ§Ã£o Ã© permitida apenas para o desenvolvedor (acesso local).')
+    return sendForbidden(res, 'Acesso negado. Esta ação é permitida apenas para o desenvolvedor (acesso local).')
   }
 
   const animal = await databaseService.deletarAnimal(id)

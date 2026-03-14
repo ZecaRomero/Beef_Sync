@@ -1,6 +1,6 @@
 /**
- * IdentificaÃ§Ã£o para monitoramento de acessos
- * UsuÃ¡rio informa nome para aparecer no painel de acessos (sem telefone)
+ * Identificação para monitoramento de acessos
+ * Usuário informa nome para aparecer no painel de acessos (sem telefone)
  */
 import React, { useState, useEffect } from 'react'
 import Head from 'next/head'
@@ -46,7 +46,7 @@ export default function Identificar() {
             ipAddress: typeof window !== 'undefined' ? window.location.hostname : 'N/A',
             hostname: typeof window !== 'undefined' ? window.location.hostname : '',
             userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
-            action: 'IdentificaÃ§Ã£o registrada'
+            action: 'Identificação registrada'
           })
         })
       } catch (_) {}
@@ -82,7 +82,7 @@ export default function Identificar() {
               <div>
                 <h1 className="text-xl font-bold text-gray-900 dark:text-white">Identificar-se</h1>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  ApareÃ§a no monitor de acessos com seu nome
+                  Apareça no monitor de acessos com seu nome
                 </p>
               </div>
             </div>
@@ -90,9 +90,9 @@ export default function Identificar() {
             {salvo ? (
               <div className="text-center py-8">
                 <CheckCircleIcon className="h-16 w-16 text-emerald-500 mx-auto mb-4" />
-                <p className="text-lg font-semibold text-gray-900 dark:text-white">IdentificaÃ§Ã£o salva!</p>
+                <p className="text-lg font-semibold text-gray-900 dark:text-white">Identificação salva!</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  Seus prÃ³ximos acessos aparecerÃ£o com seu nome no painel.
+                  Seus próximos acessos aparecerão com seu nome no painel.
                 </p>
               </div>
             ) : (
@@ -121,7 +121,7 @@ export default function Identificar() {
                     onClick={handleLimpar}
                     className="w-full py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                   >
-                    Limpar identificaÃ§Ã£o
+                    Limpar identificação
                   </button>
                 )}
               </form>
@@ -129,14 +129,14 @@ export default function Identificar() {
           </div>
 
           <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-4">
-            Seus dados sÃ£o usados apenas para exibir no painel de acessos do administrador.
+            Seus dados são usados apenas para exibir no painel de acessos do administrador.
           </p>
 
           <Link
             href="/a"
             className="block text-center mt-6 text-amber-600 dark:text-amber-400 font-medium hover:underline"
           >
-            ââ€ � Voltar para consulta
+            ← Voltar para consulta
           </Link>
         </div>
       </div>

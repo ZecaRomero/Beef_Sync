@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import useContabilidade from '../../hooks/useContabilidade'
 import useRecipients from '../../hooks/useRecipients'
 
-// UtilitÃ¡rios
+// Utilitários
 import {
   downloadBoletimGado,
   enviarPorEmail,
@@ -34,7 +34,7 @@ import ModernCard, { ModernCardHeader, ModernCardBody } from '../../components/u
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
 import Toast from '../../components/ui/SimpleToast'
 
-// Componentes especÃ­ficos da contabilidade
+// Componentes específicos da contabilidade
 import ReportCard from '../../components/contabilidade/ReportCard'
 import RecipientsList from '../../components/contabilidade/RecipientsList'
 import ResumoBoletim from '../../components/contabilidade/ResumoBoletim'
@@ -42,7 +42,7 @@ import ResumoBoletim from '../../components/contabilidade/ResumoBoletim'
 export default function Contabilidade() {
   const router = useRouter()
   
-  // Estados bÃ¡sicos
+  // Estados básicos
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   
@@ -68,12 +68,12 @@ export default function Contabilidade() {
   const [showGraficos, setShowGraficos] = useState(false)
   const [graficosData, setGraficosData] = useState(null)
   
-  // Estados de formulÃ¡rios
+  // Estados de formulários
   const [period, setPeriod] = useState(() => {
     const now = new Date()
-    // Usar primeiro dia do ano atÃ© o Ãºltimo dia do mÃªs atual para incluir todas as NFs do ano
-    const firstDay = new Date(now.getFullYear(), 0, 1) // 1Âº de janeiro
-    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0) // ÃÅ¡ltimo dia do mÃªs atual
+    // Usar primeiro dia do ano até o último dia do mês atual para incluir todas as NFs do ano
+    const firstDay = new Date(now.getFullYear(), 0, 1) // 1º de janeiro
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0) // Último dia do mês atual
     
     return {
       startDate: firstDay.toISOString().split('T')[0],
@@ -83,7 +83,7 @@ export default function Contabilidade() {
   
   const [recipients, setRecipients] = useState([])
   const [selectedRecipients, setSelectedRecipients] = useState([])
-  const [selectedReports, setSelectedReports] = useState(['boletim', 'notasFiscais', 'movimentacoes']) // PadrÃ£o: principais relatÃ³rios
+  const [selectedReports, setSelectedReports] = useState(['boletim', 'notasFiscais', 'movimentacoes']) // Padrão: principais relatórios
   const [newRecipient, setNewRecipient] = useState({
     name: '',
     email: '',
@@ -91,16 +91,16 @@ export default function Contabilidade() {
     role: 'Contador'
   })
   
-  // RelatÃ³rios disponÃ­veis
+  // Relatórios disponíveis
   const availableReports = [
-    { id: 'boletim', name: 'Boletim de Gado', description: 'RelatÃ³rio detalhado do rebanho' },
-    { id: 'notasFiscais', name: 'Notas Fiscais', description: 'Entradas e saÃ­das do perÃ­odo' },
-    { id: 'movimentacoes', name: 'MovimentaÃ§Ãµes', description: 'MovimentaÃ§Ãµes do mÃªs' },
-    { id: 'nascimentos', name: 'Nascimentos', description: 'Registro de nascimentos do perÃ­odo' },
-    { id: 'mortes', name: 'Mortes', description: 'Registro de mortes do perÃ­odo' }
+    { id: 'boletim', name: 'Boletim de Gado', description: 'Relatório detalhado do rebanho' },
+    { id: 'notasFiscais', name: 'Notas Fiscais', description: 'Entradas e saídas do período' },
+    { id: 'movimentacoes', name: 'Movimentações', description: 'Movimentações do mês' },
+    { id: 'nascimentos', name: 'Nascimentos', description: 'Registro de nascimentos do período' },
+    { id: 'mortes', name: 'Mortes', description: 'Registro de mortes do período' }
   ]
 
-  // Carregar dados na inicializaÃ§Ã£o
+  // Carregar dados na inicialização
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -116,7 +116,7 @@ export default function Contabilidade() {
     loadData()
   }, [])
 
-  // Carregar resumos quando o perÃ­odo mudar
+  // Carregar resumos quando o período mudar
   useEffect(() => {
     if (period?.startDate && period?.endDate) {
       loadResumosBoletins()
@@ -124,7 +124,7 @@ export default function Contabilidade() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period?.startDate, period?.endDate])
 
-  // FunÃ§Ã£o auxiliar para fazer requisiÃ§Ãµes com timeout e retry
+  // Função auxiliar para fazer requisições com timeout e retry
   const fetchWithTimeout = async (url, options = {}, timeout = 10000, retries = 2) => {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort('Timeout'), timeout)
@@ -147,7 +147,7 @@ export default function Contabilidade() {
     }
   }
 
-  // Carregar estatÃ­sticas
+  // Carregar estatísticas
   const loadStats = async () => {
     try {
       setLoading(true)
@@ -170,7 +170,7 @@ export default function Contabilidade() {
         }
       } catch (animalError) {
         console.error('Erro ao carregar animais:', animalError)
-        // NÃ£o falhar completamente, apenas logar o erro
+        // Não falhar completamente, apenas logar o erro
       }
       
       // Carregar notas fiscais com timeout e retry
@@ -195,12 +195,12 @@ export default function Contabilidade() {
         }
       } catch (nfError) {
         console.error('Erro ao carregar notas fiscais:', nfError)
-        // NÃ£o falhar completamente, apenas logar o erro
+        // Não falhar completamente, apenas logar o erro
       }
       
     } catch (error) {
       console.error('Erro geral ao carregar dados:', error)
-      setError('Erro ao carregar dados do sistema. Tente recarregar a pÃ¡gina.')
+      setError('Erro ao carregar dados do sistema. Tente recarregar a página.')
     } finally {
       setLoading(false)
     }
@@ -214,26 +214,26 @@ export default function Contabilidade() {
       
       if (response.ok) {
         const data = await response.json()
-        console.log('ðÅ¸â€œÅ  Resumos recebidos da API:', {
+        console.log('📊 Resumos recebidos da API:', {
           santAnna: data.santAnna,
           pardinho: data.pardinho
         })
         
         // Log detalhado do resumo Pardinho
         if (data.pardinho) {
-          console.log('ðÅ¸Å½¯ Resumo Pardinho detalhado:', {
+          console.log('🎯 Resumo Pardinho detalhado:', {
             total: data.pardinho.total,
             porSexo: data.pardinho.porSexo,
             porEra: data.pardinho.porEra,
             porRaca: data.pardinho.porRaca
           })
           
-          // Verificar se hÃ¡ dados mas total Ã© 0
+          // Verificar se há dados mas total é 0
           const temFemeas = data.pardinho.porSexo?.femeas > 0
           const temMachos = data.pardinho.porSexo?.machos > 0
           const temEras = data.pardinho.porEra && Object.values(data.pardinho.porEra).some(v => v > 0)
           
-          console.log('ðÅ¸â€�� ValidaÃ§Ã£o Pardinho:', {
+          console.log('🔍 Validação Pardinho:', {
             total: data.pardinho.total,
             temFemeas,
             temMachos,
@@ -243,15 +243,15 @@ export default function Contabilidade() {
           })
           
           if ((temFemeas || temMachos || temEras) && data.pardinho.total === 0) {
-            console.warn('âÅ¡ ï¸� PROBLEMA DETECTADO: HÃ¡ animais mas total Ã© 0! Corrigindo...')
-            // Corrigir o total se necessÃ¡rio
+            console.warn('⚠️ PROBLEMA DETECTADO: Há animais mas total é 0! Corrigindo...')
+            // Corrigir o total se necessário
             if (!data.pardinho.total && (temFemeas || temMachos)) {
               data.pardinho.total = (data.pardinho.porSexo?.femeas || 0) + (data.pardinho.porSexo?.machos || 0)
-              console.log('âÅ“â€¦ Total corrigido para:', data.pardinho.total)
+              console.log('✅ Total corrigido para:', data.pardinho.total)
             }
           }
         } else {
-          console.error('â�Å’ Resumo Pardinho estÃ¡ null ou undefined!')
+          console.error('❌ Resumo Pardinho está null ou undefined!')
         }
         
         setResumosBoletins({
@@ -259,18 +259,18 @@ export default function Contabilidade() {
           pardinho: data.pardinho || null
         })
       } else {
-        console.error('â�Å’ Erro na resposta da API:', response.status, response.statusText)
+        console.error('❌ Erro na resposta da API:', response.status, response.statusText)
         const errorText = await response.text()
-        console.error('â�Å’ Detalhes do erro:', errorText)
+        console.error('❌ Detalhes do erro:', errorText)
         setError(`Erro ao carregar resumos: ${response.status}`)
       }
     } catch (error) {
-      console.error('â�Å’ Erro ao carregar resumos dos boletins:', error)
+      console.error('❌ Erro ao carregar resumos dos boletins:', error)
       setError('Erro ao carregar resumos dos boletins. Tente novamente.')
     }
   }
 
-  // Gerenciar destinatÃ¡rios
+  // Gerenciar destinatários
   const loadRecipients = () => {
     const saved = localStorage.getItem('contabilidadeRecipients')
     if (saved) {
@@ -285,7 +285,7 @@ export default function Contabilidade() {
 
   const addRecipient = () => {
     if (!newRecipient.name || (!newRecipient.email && !newRecipient.whatsapp)) {
-      alert('âÅ¡ ï¸� Nome e Email ou WhatsApp sÃ£o obrigatÃ³rios')
+      alert('⚠️ Nome e Email ou WhatsApp são obrigatórios')
       return
     }
 
@@ -298,14 +298,14 @@ export default function Contabilidade() {
     saveRecipients(updatedRecipients)
     setNewRecipient({ name: '', email: '', whatsapp: '', role: 'Contador' })
     setShowAddRecipient(false)
-    alert('âÅ“â€¦ DestinatÃ¡rio adicionado com sucesso!')
+    alert('✅ Destinatário adicionado com sucesso!')
   }
 
   const removeRecipient = (recipientId) => {
     const updatedRecipients = recipients.filter(r => r.id !== recipientId)
     saveRecipients(updatedRecipients)
     setSelectedRecipients(prev => prev.filter(id => id !== recipientId))
-    alert('âÅ“â€¦ DestinatÃ¡rio removido com sucesso!')
+    alert('✅ Destinatário removido com sucesso!')
   }
 
   const handleRecipientToggle = (recipientId) => {
@@ -324,7 +324,7 @@ export default function Contabilidade() {
     )
   }
 
-  // FunÃ§Ã£o auxiliar compartilhada para garantir dados primitivos limpos
+  // Função auxiliar compartilhada para garantir dados primitivos limpos
   const cleanPeriodData = () => {
     const cleanData = (data) => {
       if (data === null || data === undefined) return null
@@ -346,7 +346,7 @@ export default function Contabilidade() {
     }
   }
 
-  // Handlers para relatÃ³rios
+  // Handlers para relatórios
   const handleDownloadBoletim = (sendToAccounting = false) => {
     downloadBoletimGado(period, animaisData, sendToAccounting, setLoading)
   }
@@ -355,7 +355,7 @@ export default function Contabilidade() {
     try {
       setLoading(true)
       
-      // Criar objeto limpo apenas com os dados necessÃ¡rios (garantir que sÃ£o strings primitivas)
+      // Criar objeto limpo apenas com os dados necessários (garantir que são strings primitivas)
       const periodData = cleanPeriodData()
       
       // Garantir que sendToAccounting seja um booleano primitivo
@@ -363,7 +363,7 @@ export default function Contabilidade() {
       
       // Validar dados antes de enviar
       if (!periodData.startDate || !periodData.endDate) {
-        throw new Error('PerÃ­odo invÃ¡lido. Por favor, selecione as datas corretamente.')
+        throw new Error('Período inválido. Por favor, selecione as datas corretamente.')
       }
       
       const requestBody = { 
@@ -391,7 +391,7 @@ export default function Contabilidade() {
           const errorData = await response.json()
           errorMessage = errorData.message || errorData.error || errorMessage
         } catch (e) {
-          // Se nÃ£o conseguir parsear o JSON, usar o status
+          // Se não conseguir parsear o JSON, usar o status
           errorMessage = `Erro ${response.status}: ${response.statusText}`
         }
         throw new Error(errorMessage)
@@ -408,13 +408,13 @@ export default function Contabilidade() {
       document.body.removeChild(a)
       
       if (sendToAccounting) {
-        Toast.success('âÅ“â€¦ Boletim da AGROPECUÃ�RIA PARDINHO enviado para contabilidade!')
+        Toast.success('✅ Boletim da AGROPECUÁRIA PARDINHO enviado para contabilidade!')
       } else {
-        Toast.success('âÅ“â€¦ Boletim da AGROPECUÃ�RIA PARDINHO gerado com sucesso!')
+        Toast.success('✅ Boletim da AGROPECUÁRIA PARDINHO gerado com sucesso!')
       }
     } catch (error) {
       console.error('Erro:', error)
-      Toast.error(`â�Å’ Erro: ${error.message || 'NÃ£o foi possÃ­vel gerar o boletim'}`)
+      Toast.error(`❌ Erro: ${error.message || 'Não foi possível gerar o boletim'}`)
     } finally {
       setLoading(false)
     }
@@ -424,12 +424,12 @@ export default function Contabilidade() {
     try {
       setLoading(true)
       
-      // Criar objeto limpo apenas com os dados necessÃ¡rios (garantir que sÃ£o strings primitivas)
+      // Criar objeto limpo apenas com os dados necessários (garantir que são strings primitivas)
       const periodData = cleanPeriodData()
       
       // Validar dados antes de enviar
       if (!periodData.startDate || !periodData.endDate) {
-        throw new Error('PerÃ­odo invÃ¡lido. Por favor, selecione as datas corretamente.')
+        throw new Error('Período inválido. Por favor, selecione as datas corretamente.')
       }
       
       // Buscar resumo do boletim Pardinho
@@ -443,10 +443,10 @@ export default function Contabilidade() {
         
         if (pardinho.total > 0) {
           resumoText = `
-ðÅ¸â€œÅ  RESUMO:
-ââ‚¬¢ Total: ${pardinho.total} animais
-ââ‚¬¢ FÃªmeas: ${pardinho.porSexo?.femeas || 0}
-ââ‚¬¢ Machos: ${pardinho.porSexo?.machos || 0}
+📊 RESUMO:
+• Total: ${pardinho.total} animais
+• Fêmeas: ${pardinho.porSexo?.femeas || 0}
+• Machos: ${pardinho.porSexo?.machos || 0}
 
 `
           
@@ -454,11 +454,11 @@ export default function Contabilidade() {
           const porEra = pardinho.porEra || {}
           const detalhesIdade = []
           
-          if (porEra['femea_0-7'] > 0) detalhesIdade.push(`FÃªmeas 0-7m: ${porEra['femea_0-7']}`)
-          if (porEra['femea_7-12'] > 0) detalhesIdade.push(`FÃªmeas 7-12m: ${porEra['femea_7-12']}`)
-          if (porEra['femea_12-18'] > 0) detalhesIdade.push(`FÃªmeas 12-18m: ${porEra['femea_12-18']}`)
-          if (porEra['femea_18-24'] > 0) detalhesIdade.push(`FÃªmeas 18-24m: ${porEra['femea_18-24']}`)
-          if (porEra['femea_24+'] > 0) detalhesIdade.push(`FÃªmeas 24+m: ${porEra['femea_24+']}`)
+          if (porEra['femea_0-7'] > 0) detalhesIdade.push(`Fêmeas 0-7m: ${porEra['femea_0-7']}`)
+          if (porEra['femea_7-12'] > 0) detalhesIdade.push(`Fêmeas 7-12m: ${porEra['femea_7-12']}`)
+          if (porEra['femea_12-18'] > 0) detalhesIdade.push(`Fêmeas 12-18m: ${porEra['femea_12-18']}`)
+          if (porEra['femea_18-24'] > 0) detalhesIdade.push(`Fêmeas 18-24m: ${porEra['femea_18-24']}`)
+          if (porEra['femea_24+'] > 0) detalhesIdade.push(`Fêmeas 24+m: ${porEra['femea_24+']}`)
           
           if (porEra['macho_0-7'] > 0) detalhesIdade.push(`Machos 0-7m: ${porEra['macho_0-7']}`)
           if (porEra['macho_7-15'] > 0) detalhesIdade.push(`Machos 7-15m: ${porEra['macho_7-15']}`)
@@ -467,27 +467,27 @@ export default function Contabilidade() {
           if (porEra['macho_36+'] > 0) detalhesIdade.push(`Machos 36+m: ${porEra['macho_36+']}`)
           
           if (detalhesIdade.length > 0) {
-            resumoText += `ðÅ¸â€œâ€¹ Por Idade:
-${detalhesIdade.map(d => `ââ‚¬¢ ${d}`).join('\n')}
+            resumoText += `📋 Por Idade:
+${detalhesIdade.map(d => `• ${d}`).join('\n')}
 
 `
           }
         } else {
           resumoText = `
-âÅ¡ ï¸� Nenhum animal encontrado para este perÃ­odo.
+⚠️ Nenhum animal encontrado para este período.
 
 `
         }
       }
       
       // Criar link de email usando dados limpos
-      const assunto = encodeURIComponent(`Boletim AGROPECUÃ�RIA PARDINHO - ${periodData.startDate} atÃ© ${periodData.endDate}`)
-      const corpo = encodeURIComponent(`ðÅ¸�â€ž BOLETIM AGROPECUÃ�RIA PARDINHO - BEEF SYNC
+      const assunto = encodeURIComponent(`Boletim AGROPECUÁRIA PARDINHO - ${periodData.startDate} até ${periodData.endDate}`)
+      const corpo = encodeURIComponent(`🐄 BOLETIM AGROPECUÁRIA PARDINHO - BEEF SYNC
 
-ðÅ¸â€œâ€¦ PerÃ­odo: ${periodData.startDate} atÃ© ${periodData.endDate}
-ðÅ¸â€œÅ  Localidade: AGROPECUÃ�RIA PARDINHO LTDA
+📅 Período: ${periodData.startDate} até ${periodData.endDate}
+📊 Localidade: AGROPECUÁRIA PARDINHO LTDA
 
-${resumoText}ðÅ¸â€œÅ½ Acesse o sistema para visualizar o relatÃ³rio completo em Excel.
+${resumoText}📎 Acesse o sistema para visualizar o relatório completo em Excel.
 
 Gerado em: ${new Date().toLocaleString('pt-BR')}
 
@@ -496,10 +496,10 @@ Sistema Beef-Sync`)
       // Abrir cliente de email
       window.location.href = `mailto:?subject=${assunto}&body=${corpo}`
       
-      Toast.success('âÅ“â€¦ Email preparado! Preencha o destinatÃ¡rio e envie.')
+      Toast.success('✅ Email preparado! Preencha o destinatário e envie.')
     } catch (error) {
       console.error('Erro ao enviar por email:', error)
-      Toast.error('â�Å’ Erro ao preparar email')
+      Toast.error('❌ Erro ao preparar email')
     } finally {
       setLoading(false)
     }
@@ -509,12 +509,12 @@ Sistema Beef-Sync`)
     try {
       setLoading(true)
       
-      // Criar objeto limpo apenas com os dados necessÃ¡rios (garantir que sÃ£o strings primitivas)
+      // Criar objeto limpo apenas com os dados necessários (garantir que são strings primitivas)
       const periodData = cleanPeriodData()
       
       // Validar dados antes de enviar
       if (!periodData.startDate || !periodData.endDate) {
-        throw new Error('PerÃ­odo invÃ¡lido. Por favor, selecione as datas corretamente.')
+        throw new Error('Período inválido. Por favor, selecione as datas corretamente.')
       }
       
       // Buscar resumo do boletim Pardinho
@@ -527,10 +527,10 @@ Sistema Beef-Sync`)
         const pardinho = resumos.pardinho || {}
         
         if (pardinho.total > 0) {
-          resumoText = `ðÅ¸â€œÅ  *Resumo:*
-ââ‚¬¢ Total: ${pardinho.total} animais
-ââ‚¬¢ FÃªmeas: ${pardinho.porSexo?.femeas || 0}
-ââ‚¬¢ Machos: ${pardinho.porSexo?.machos || 0}
+          resumoText = `📊 *Resumo:*
+• Total: ${pardinho.total} animais
+• Fêmeas: ${pardinho.porSexo?.femeas || 0}
+• Machos: ${pardinho.porSexo?.machos || 0}
 
 `
           
@@ -538,11 +538,11 @@ Sistema Beef-Sync`)
           const porEra = pardinho.porEra || {}
           const detalhesIdade = []
           
-          if (porEra['femea_0-7'] > 0) detalhesIdade.push(`FÃªmeas 0-7m: ${porEra['femea_0-7']}`)
-          if (porEra['femea_7-12'] > 0) detalhesIdade.push(`FÃªmeas 7-12m: ${porEra['femea_7-12']}`)
-          if (porEra['femea_12-18'] > 0) detalhesIdade.push(`FÃªmeas 12-18m: ${porEra['femea_12-18']}`)
-          if (porEra['femea_18-24'] > 0) detalhesIdade.push(`FÃªmeas 18-24m: ${porEra['femea_18-24']}`)
-          if (porEra['femea_24+'] > 0) detalhesIdade.push(`FÃªmeas 24+m: ${porEra['femea_24+']}`)
+          if (porEra['femea_0-7'] > 0) detalhesIdade.push(`Fêmeas 0-7m: ${porEra['femea_0-7']}`)
+          if (porEra['femea_7-12'] > 0) detalhesIdade.push(`Fêmeas 7-12m: ${porEra['femea_7-12']}`)
+          if (porEra['femea_12-18'] > 0) detalhesIdade.push(`Fêmeas 12-18m: ${porEra['femea_12-18']}`)
+          if (porEra['femea_18-24'] > 0) detalhesIdade.push(`Fêmeas 18-24m: ${porEra['femea_18-24']}`)
+          if (porEra['femea_24+'] > 0) detalhesIdade.push(`Fêmeas 24+m: ${porEra['femea_24+']}`)
           
           if (porEra['macho_0-7'] > 0) detalhesIdade.push(`Machos 0-7m: ${porEra['macho_0-7']}`)
           if (porEra['macho_7-15'] > 0) detalhesIdade.push(`Machos 7-15m: ${porEra['macho_7-15']}`)
@@ -551,25 +551,25 @@ Sistema Beef-Sync`)
           if (porEra['macho_36+'] > 0) detalhesIdade.push(`Machos 36+m: ${porEra['macho_36+']}`)
           
           if (detalhesIdade.length > 0) {
-            resumoText += `ðÅ¸â€œâ€¹ *Por Idade:*
-${detalhesIdade.map(d => `ââ‚¬¢ ${d}`).join('\n')}
+            resumoText += `📋 *Por Idade:*
+${detalhesIdade.map(d => `• ${d}`).join('\n')}
 
 `
           }
         } else {
-          resumoText = `âÅ¡ ï¸� Nenhum animal encontrado para este perÃ­odo.
+          resumoText = `⚠️ Nenhum animal encontrado para este período.
 
 `
         }
       }
 
       // Criar mensagem para WhatsApp usando dados limpos
-      const mensagem = `ðÅ¸�â€ž *BOLETIM AGROPECUÃ�RIA PARDINHO - BEEF SYNC*
+      const mensagem = `🐄 *BOLETIM AGROPECUÁRIA PARDINHO - BEEF SYNC*
 
-ðÅ¸â€œâ€¦ *PerÃ­odo:* ${periodData.startDate} atÃ© ${periodData.endDate}
-ðÅ¸â€œÅ  *Localidade:* AGROPECUÃ�RIA PARDINHO LTDA
+📅 *Período:* ${periodData.startDate} até ${periodData.endDate}
+📊 *Localidade:* AGROPECUÁRIA PARDINHO LTDA
 
-${resumoText}ðÅ¸â€œÅ½ *Acesse o sistema para visualizar o relatÃ³rio completo em Excel.*
+${resumoText}📎 *Acesse o sistema para visualizar o relatório completo em Excel.*
 
 Gerado em: ${new Date().toLocaleString('pt-BR')}
 
@@ -578,10 +578,10 @@ _Sistema Beef-Sync_`
       const mensagemEncoded = encodeURIComponent(mensagem)
       window.open(`https://wa.me/?text=${mensagemEncoded}`, '_blank')
       
-      Toast.success('âÅ“â€¦ WhatsApp aberto! Envie a mensagem.')
+      Toast.success('✅ WhatsApp aberto! Envie a mensagem.')
     } catch (error) {
       console.error('Erro ao enviar por WhatsApp:', error)
-      Toast.error('â�Å’ Erro ao preparar WhatsApp')
+      Toast.error('❌ Erro ao preparar WhatsApp')
     } finally {
       setLoading(false)
     }
@@ -601,41 +601,41 @@ _Sistema Beef-Sync_`
 
   const handleSendAllReports = () => {
     if (selectedReports.length === 0) {
-      alert('âÅ¡ ï¸� Selecione pelo menos um relatÃ³rio para enviar')
+      alert('⚠️ Selecione pelo menos um relatório para enviar')
       return
     }
     sendAllReports(period, selectedRecipients, recipients, setLoading, selectedReports)
   }
 
-  // Gerar grÃ¡ficos
+  // Gerar gráficos
   const gerarGraficos = async () => {
     try {
       setLoading(true)
       
-      console.log('ðÅ¸â€�� Gerando grÃ¡ficos (API buscarÃ¡ animais do banco)...')
+      console.log('🔍 Gerando gráficos (API buscará animais do banco)...')
       
       const response = await fetchWithTimeout('/api/contabilidade/graficos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           period
-          // NÃ£o enviar animais - API buscarÃ¡ diretamente do banco para evitar limite de 1MB
+          // Não enviar animais - API buscará diretamente do banco para evitar limite de 1MB
         })
-      }, 30000) // Timeout maior para grÃ¡ficos (30 segundos)
+      }, 30000) // Timeout maior para gráficos (30 segundos)
       
       if (response.ok) {
         const data = await response.json()
         setGraficosData(data)
         setShowGraficos(true)
-        console.log('âÅ“â€¦ GrÃ¡ficos gerados com sucesso')
+        console.log('✅ Gráficos gerados com sucesso')
       } else {
         const errorText = await response.text()
-        console.error('â�Å’ Erro na resposta:', response.status, errorText)
-        alert(`â�Å’ Erro ao gerar grÃ¡ficos: ${response.status}`)
+        console.error('❌ Erro na resposta:', response.status, errorText)
+        alert(`❌ Erro ao gerar gráficos: ${response.status}`)
       }
     } catch (error) {
-      console.error('â�Å’ Erro ao gerar grÃ¡ficos:', error)
-      alert(`â�Å’ Erro ao gerar grÃ¡ficos: ${error.message}`)
+      console.error('❌ Erro ao gerar gráficos:', error)
+      alert(`❌ Erro ao gerar gráficos: ${error.message}`)
     } finally {
       setLoading(false)
     }
@@ -645,9 +645,9 @@ _Sistema Beef-Sync_`
   if (loading && !reportStats.totalAnimals) {
     return (
       <ModernLayout
-        title="RelatÃ³rios para Contabilidade"
+        title="Relatórios para Contabilidade"
         subtitle="Carregando dados..."
-        icon="ðÅ¸â€œÅ "
+        icon="📊"
       >
         <div className="flex justify-center items-center min-h-[400px]">
           <LoadingSpinner size="lg" text="Carregando dados da contabilidade..." />
@@ -660,15 +660,15 @@ _Sistema Beef-Sync_`
   if (error) {
     return (
       <ModernLayout
-        title="RelatÃ³rios para Contabilidade"
+        title="Relatórios para Contabilidade"
         subtitle="Erro no sistema"
-        icon="ðÅ¸â€œÅ "
+        icon="📊"
       >
         <ModernCard variant="glass" className="border-red-200 dark:border-red-800 bg-red-50/80 dark:bg-red-900/20">
           <ModernCardBody>
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-red-500 rounded-xl text-white">
-                <span>âÅ¡ ï¸�</span>
+                <span>⚠️</span>
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-red-800 dark:text-red-200">
@@ -684,7 +684,7 @@ _Sistema Beef-Sync_`
                   }}
                   className="mt-3 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 >
-                  Recarregar PÃ¡gina
+                  Recarregar Página
                 </button>
               </div>
             </div>
@@ -696,12 +696,12 @@ _Sistema Beef-Sync_`
 
   return (
     <ModernLayout
-      title="RelatÃ³rios para Contabilidade"
-      subtitle="Gere e envie relatÃ³rios completos para sua equipe contÃ¡bil"
-      icon="ðÅ¸â€œÅ "
+      title="Relatórios para Contabilidade"
+      subtitle="Gere e envie relatórios completos para sua equipe contábil"
+      icon="📊"
     >
       <div className="space-y-8">
-        {/* EstatÃ­sticas RÃ¡pidas */}
+        {/* Estatísticas Rápidas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatsCard
             title="Total de Animais"
@@ -720,27 +720,27 @@ _Sistema Beef-Sync_`
             onClick={() => setShowCardDetails('nfs-entradas')}
           />
           <StatsCard
-            title="NFs SaÃ­da"
+            title="NFs Saída"
             value={reportStats.nfsSaidas}
-            subtitle="Notas fiscais de saÃ­da"
+            subtitle="Notas fiscais de saída"
             icon={<DocumentTextIcon className="h-6 w-6" />}
             color="red"
             onClick={() => setShowCardDetails('nfs-saidas')}
           />
           <StatsCard
-            title="Total MovimentaÃ§Ãµes"
+            title="Total Movimentações"
             value={reportStats.movimentacoes}
-            subtitle="Entradas + SaÃ­das"
+            subtitle="Entradas + Saídas"
             icon={<ChartBarIcon className="h-6 w-6" />}
             color="purple"
             onClick={() => setShowCardDetails('total-movimentacoes')}
           />
         </div>
 
-        {/* SeleÃ§Ã£o de PerÃ­odo */}
+        {/* Seleção de Período */}
         <Card>
           <CardHeader>
-            <h2 className="text-xl font-semibold text-white">ðÅ¸â€œâ€¦ PerÃ­odo dos RelatÃ³rios</h2>
+            <h2 className="text-xl font-semibold text-white">📅 Período dos Relatórios</h2>
           </CardHeader>
           <CardBody>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -759,19 +759,19 @@ _Sistema Beef-Sync_`
             </div>
             <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
               <p className="text-sm text-blue-800 dark:text-blue-200">
-                ðÅ¸â€™¡ <strong>Dica:</strong> Os relatÃ³rios incluirÃ£o todas as movimentaÃ§Ãµes e dados 
-                referentes ao perÃ­odo selecionado.
+                💡 <strong>Dica:</strong> Os relatórios incluirão todas as movimentações e dados 
+                referentes ao período selecionado.
               </p>
             </div>
           </CardBody>
         </Card>
 
-        {/* GrÃ¡ficos Visuais */}
+        {/* Gráficos Visuais */}
         <ModernCard variant="gradient" className="mb-8">
           <ModernCardHeader
             icon={<ChartBarIcon className="h-6 w-6" />}
-            title="GrÃ¡ficos Visuais do Rebanho"
-            subtitle="Visualize dados do rebanho em grÃ¡ficos interativos"
+            title="Gráficos Visuais do Rebanho"
+            subtitle="Visualize dados do rebanho em gráficos interativos"
           />
           <ModernCardBody>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -781,14 +781,14 @@ _Sistema Beef-Sync_`
                 loading={loading}
                 className="w-full"
               >
-                {showGraficos ? 'Atualizar GrÃ¡ficos' : 'Gerar GrÃ¡ficos'}
+                {showGraficos ? 'Atualizar Gráficos' : 'Gerar Gráficos'}
               </Button>
               <Button
                 variant="outline"
                 onClick={() => setShowGraficos(!showGraficos)}
                 className="w-full"
               >
-                {showGraficos ? 'Ocultar GrÃ¡ficos' : 'Visualizar GrÃ¡ficos'}
+                {showGraficos ? 'Ocultar Gráficos' : 'Visualizar Gráficos'}
               </Button>
             </div>
 
@@ -796,12 +796,12 @@ _Sistema Beef-Sync_`
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                   <h4 className="font-semibold text-gray-900 dark:text-white mb-3 text-center">
-                    ðÅ¸�â€ž DistribuiÃ§Ã£o por RaÃ§a
+                    🐄 Distribuição por Raça
                   </h4>
                   <div className="flex justify-center">
                     <img 
                       src={`data:image/png;base64,${graficosData.graficos.porRaca}`} 
-                      alt="GrÃ¡fico por RaÃ§a"
+                      alt="Gráfico por Raça"
                       className="max-w-full h-auto rounded"
                     />
                   </div>
@@ -809,12 +809,12 @@ _Sistema Beef-Sync_`
                 
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                   <h4 className="font-semibold text-gray-900 dark:text-white mb-3 text-center">
-                    ðÅ¸â€˜¥ DistribuiÃ§Ã£o por Sexo
+                    👥 Distribuição por Sexo
                   </h4>
                   <div className="flex justify-center">
                     <img 
                       src={`data:image/png;base64,${graficosData.graficos.porSexo}`} 
-                      alt="GrÃ¡fico por Sexo"
+                      alt="Gráfico por Sexo"
                       className="max-w-full h-auto rounded"
                     />
                   </div>
@@ -822,12 +822,12 @@ _Sistema Beef-Sync_`
                 
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                   <h4 className="font-semibold text-gray-900 dark:text-white mb-3 text-center">
-                    ðÅ¸â€œÅ  DistribuiÃ§Ã£o por ClassificaÃ§Ã£o EtÃ¡ria
+                    📊 Distribuição por Classificação Etária
                   </h4>
                   <div className="flex justify-center">
                     <img 
                       src={`data:image/png;base64,${graficosData.graficos.porIdade}`} 
-                      alt="GrÃ¡fico por Idade"
+                      alt="Gráfico por Idade"
                       className="max-w-full h-auto rounded"
                     />
                   </div>
@@ -835,12 +835,12 @@ _Sistema Beef-Sync_`
                 
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                   <h4 className="font-semibold text-gray-900 dark:text-white mb-3 text-center">
-                    ðÅ¸â€œË† DistribuiÃ§Ã£o por ERA
+                    📈 Distribuição por ERA
                   </h4>
                   <div className="flex justify-center">
                     <img 
                       src={`data:image/png;base64,${graficosData.graficos.porEra}`} 
-                      alt="GrÃ¡fico por ERA"
+                      alt="Gráfico por ERA"
                       className="max-w-full h-auto rounded"
                     />
                   </div>
@@ -848,12 +848,12 @@ _Sistema Beef-Sync_`
                 
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                   <h4 className="font-semibold text-gray-900 dark:text-white mb-3 text-center">
-                    ðÅ¸Å½¯ DistribuiÃ§Ã£o por SituaÃ§Ã£o
+                    🎯 Distribuição por Situação
                   </h4>
                   <div className="flex justify-center">
                     <img 
                       src={`data:image/png;base64,${graficosData.graficos.porSituacao}`} 
-                      alt="GrÃ¡fico por SituaÃ§Ã£o"
+                      alt="Gráfico por Situação"
                       className="max-w-full h-auto rounded"
                     />
                   </div>
@@ -861,12 +861,12 @@ _Sistema Beef-Sync_`
                 
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                   <h4 className="font-semibold text-gray-900 dark:text-white mb-3 text-center">
-                    ðÅ¸â€˜¨ Top 10 - DistribuiÃ§Ã£o por Pai
+                    👨 Top 10 - Distribuição por Pai
                   </h4>
                   <div className="flex justify-center">
                     <img 
                       src={`data:image/png;base64,${graficosData.graficos.porPai}`} 
-                      alt="GrÃ¡fico por Pai"
+                      alt="Gráfico por Pai"
                       className="max-w-full h-auto rounded"
                     />
                   </div>
@@ -874,12 +874,12 @@ _Sistema Beef-Sync_`
                 
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                   <h4 className="font-semibold text-gray-900 dark:text-white mb-3 text-center">
-                    ðÅ¸â€˜© Top 10 - DistribuiÃ§Ã£o por MÃ£e
+                    👩 Top 10 - Distribuição por Mãe
                   </h4>
                   <div className="flex justify-center">
                     <img 
                       src={`data:image/png;base64,${graficosData.graficos.porMae}`} 
-                      alt="GrÃ¡fico por MÃ£e"
+                      alt="Gráfico por Mãe"
                       className="max-w-full h-auto rounded"
                     />
                   </div>
@@ -889,19 +889,19 @@ _Sistema Beef-Sync_`
           </ModernCardBody>
         </ModernCard>
 
-        {/* RelatÃ³rios DisponÃ­veis */}
+        {/* Relatórios Disponíveis */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <ModernCard modern={true} hover={true}>
             <ModernCardHeader
               icon={<DocumentTextIcon className="h-6 w-6" />}
-              title="RelatÃ³rios DisponÃ­veis"
-              subtitle="Gere e compartilhe relatÃ³rios profissionais"
+              title="Relatórios Disponíveis"
+              subtitle="Gere e compartilhe relatórios profissionais"
             />
             <ModernCardBody>
               <div className="space-y-6">
                 <ReportCard
                   title="Boletim SANT ANNA - RANCHARIA"
-                  description="RelatÃ³rio detalhado do rebanho por raÃ§a e faixas de idade"
+                  description="Relatório detalhado do rebanho por raça e faixas de idade"
                   icon={<TableCellsIcon className="h-5 w-5" />}
                   iconColor="from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20"
                   onSendToAccounting={() => handleDownloadBoletim(true)}
@@ -913,8 +913,8 @@ _Sistema Beef-Sync_`
                 </ReportCard>
                 
                 <ReportCard
-                  title="Boletim AGROPECUÃ�RIA PARDINHO"
-                  description="RelatÃ³rio especÃ­fico de entradas da AGROPECUÃ�RIA PARDINHO LTDA"
+                  title="Boletim AGROPECUÁRIA PARDINHO"
+                  description="Relatório específico de entradas da AGROPECUÁRIA PARDINHO LTDA"
                   icon={<TableCellsIcon className="h-5 w-5" />}
                   iconColor="from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20"
                   onSendToAccounting={() => handleDownloadBoletimPardinho(true)}
@@ -927,7 +927,7 @@ _Sistema Beef-Sync_`
                 
                 <ReportCard
                   title="Notas Fiscais"
-                  description="RelatÃ³rio completo de entradas e saÃ­das"
+                  description="Relatório completo de entradas e saídas"
                   icon={<DocumentTextIcon className="h-5 w-5" />}
                   iconColor="from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20"
                   onSendToAccounting={handleDownloadNFs}
@@ -937,7 +937,7 @@ _Sistema Beef-Sync_`
             </ModernCardBody>
           </ModernCard>
 
-          {/* Painel de DestinatÃ¡rios */}
+          {/* Painel de Destinatários */}
           <div className="space-y-6">
             <RecipientsList
               recipients={recipients}
@@ -947,19 +947,19 @@ _Sistema Beef-Sync_`
               onAddRecipient={() => setShowAddRecipient(true)}
             />
 
-            {/* AÃ§Ãµes */}
+            {/* Ações */}
             <ModernCard variant="premium" modern={true} hover={true} glow={true}>
               <ModernCardHeader
                 icon={<PaperAirplaneIcon className="h-6 w-6" />}
-                title="Enviar RelatÃ³rios"
-                subtitle="Selecione os relatÃ³rios e destinatÃ¡rios"
+                title="Enviar Relatórios"
+                subtitle="Selecione os relatórios e destinatários"
               />
               <ModernCardBody>
                 <div className="space-y-4">
-                  {/* SeleÃ§Ã£o de RelatÃ³rios */}
+                  {/* Seleção de Relatórios */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      ðÅ¸â€œÅ  RelatÃ³rios DisponÃ­veis
+                      📊 Relatórios Disponíveis
                     </label>
                     <div className="space-y-2">
                       {availableReports.map((report) => (
@@ -997,28 +997,28 @@ _Sistema Beef-Sync_`
                     modern={true}
                     glow={true}
                   >
-                    Enviar {selectedReports.length} RelatÃ³rio(s)
+                    Enviar {selectedReports.length} Relatório(s)
                   </Button>
                   
                   <div className="space-y-2">
                     {selectedRecipients.length > 0 && (
                       <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
                         <p className="text-sm text-green-800 dark:text-green-200">
-                          âÅ“â€œ {selectedRecipients.length} destinatÃ¡rio(s) selecionado(s)
+                          ✓ {selectedRecipients.length} destinatário(s) selecionado(s)
                         </p>
                       </div>
                     )}
                     {selectedReports.length > 0 && (
                       <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
                         <p className="text-sm text-blue-800 dark:text-blue-200">
-                          âÅ“â€œ {selectedReports.length} relatÃ³rio(s) selecionado(s)
+                          ✓ {selectedReports.length} relatório(s) selecionado(s)
                         </p>
                       </div>
                     )}
                     {(selectedRecipients.length === 0 || selectedReports.length === 0) && (
                       <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg">
                         <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                          âÅ¡ ï¸� Selecione pelo menos um relatÃ³rio e um destinatÃ¡rio
+                          ⚠️ Selecione pelo menos um relatório e um destinatário
                         </p>
                       </div>
                     )}
@@ -1030,27 +1030,27 @@ _Sistema Beef-Sync_`
         </div>
       </div>
 
-      {/* Modal Adicionar DestinatÃ¡rio */}
+      {/* Modal Adicionar Destinatário */}
       <Modal
         isOpen={showAddRecipient}
         onClose={() => {
           setShowAddRecipient(false)
           setNewRecipient({ name: '', email: '', whatsapp: '', role: 'Contador' })
         }}
-        title="Adicionar DestinatÃ¡rio"
+        title="Adicionar Destinatário"
         size="md"
       >
         <div className="space-y-4">
           <Input
-            label="ðÅ¸â€œ� Nome Completo"
+            label="📝 Nome Completo"
             value={newRecipient.name}
             onChange={(e) => setNewRecipient(prev => ({ ...prev, name: e.target.value }))}
-            placeholder="Ex: JoÃ£o Silva"
+            placeholder="Ex: João Silva"
             required
           />
           
           <Input
-            label="ðÅ¸â€œ§ Email"
+            label="📧 Email"
             type="email"
             value={newRecipient.email}
             onChange={(e) => setNewRecipient(prev => ({ ...prev, email: e.target.value }))}
@@ -1058,7 +1058,7 @@ _Sistema Beef-Sync_`
           />
           
           <Input
-            label="ðÅ¸â€œ± WhatsApp"
+            label="📱 WhatsApp"
             value={newRecipient.whatsapp}
             onChange={(e) => setNewRecipient(prev => ({ ...prev, whatsapp: e.target.value }))}
             placeholder="Ex: (11) 99999-9999"
@@ -1070,7 +1070,7 @@ _Sistema Beef-Sync_`
               className="flex-1"
               variant="primary"
             >
-              âÅ“â€¦ Adicionar
+              ✅ Adicionar
             </Button>
             <Button
               onClick={() => setShowAddRecipient(false)}
@@ -1115,13 +1115,13 @@ _Sistema Beef-Sync_`
 function getCardDetailsTitle(cardType) {
   switch (cardType) {
     case 'total-animais':
-      return 'ðÅ¸â€œÅ  Total de Animais - Detalhes'
+      return '📊 Total de Animais - Detalhes'
     case 'nfs-entradas':
-      return 'ðÅ¸â€œ¥ Notas Fiscais de Entrada'
+      return '📥 Notas Fiscais de Entrada'
     case 'nfs-saidas':
-      return 'ðÅ¸â€œ¤ Notas Fiscais de SaÃ­da'
+      return '📤 Notas Fiscais de Saída'
     case 'total-movimentacoes':
-      return 'ðÅ¸â€�â€ž Total de MovimentaÃ§Ãµes'
+      return '🔄 Total de Movimentações'
     default:
       return 'Detalhes'
   }
@@ -1152,7 +1152,7 @@ function getCardDetailsContent(cardType, data = {}) {
                     {animal.nome || animal.serie || 'Sem nome'}
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
-                    {animal.raca} ââ‚¬¢ {animal.sexo}
+                    {animal.raca} • {animal.sexo}
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     Cadastrado em: {formatDate(animal.created_at)}
@@ -1178,7 +1178,7 @@ function getCardDetailsContent(cardType, data = {}) {
         <div className="space-y-4">
           <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
             <p className="text-sm text-green-800 dark:text-green-200">
-              <strong>DefiniÃ§Ã£o:</strong> Notas fiscais de entrada registradas no perÃ­odo selecionado.
+              <strong>Definição:</strong> Notas fiscais de entrada registradas no período selecionado.
             </p>
           </div>
           
@@ -1194,7 +1194,7 @@ function getCardDetailsContent(cardType, data = {}) {
                     NF: {nf.numero_nf || nf.numero || 'N/A'}
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
-                    {nf.data || 'Data nÃ£o informada'} ââ‚¬¢ {nf.fornecedor || 'Fornecedor nÃ£o informado'}
+                    {nf.data || 'Data não informada'} • {nf.fornecedor || 'Fornecedor não informado'}
                   </div>
                 </div>
               ))
@@ -1212,12 +1212,12 @@ function getCardDetailsContent(cardType, data = {}) {
         <div className="space-y-4">
           <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
             <p className="text-sm text-red-800 dark:text-red-200">
-              <strong>DefiniÃ§Ã£o:</strong> Notas fiscais de saÃ­da registradas no perÃ­odo selecionado.
+              <strong>Definição:</strong> Notas fiscais de saída registradas no período selecionado.
             </p>
           </div>
           
           <div className="space-y-3">
-            <h4 className="font-medium text-gray-900 dark:text-white">Notas Fiscais de SaÃ­da:</h4>
+            <h4 className="font-medium text-gray-900 dark:text-white">Notas Fiscais de Saída:</h4>
             {nfsSaidasData.length > 0 ? (
               nfsSaidasData.map((nf, index) => (
                 <div 
@@ -1228,13 +1228,13 @@ function getCardDetailsContent(cardType, data = {}) {
                     NF: {nf.numero_nf || nf.numero || 'N/A'}
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
-                    {nf.data || 'Data nÃ£o informada'} ââ‚¬¢ {nf.destino || nf.cliente || 'Cliente nÃ£o informado'}
+                    {nf.data || 'Data não informada'} • {nf.destino || nf.cliente || 'Cliente não informado'}
                   </div>
                 </div>
               ))
             ) : (
               <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                Nenhuma nota fiscal de saÃ­da registrada
+                Nenhuma nota fiscal de saída registrada
               </div>
             )}
           </div>
@@ -1246,7 +1246,7 @@ function getCardDetailsContent(cardType, data = {}) {
         <div className="space-y-4">
           <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
             <p className="text-sm text-purple-800 dark:text-purple-200">
-              <strong>DefiniÃ§Ã£o:</strong> Total de movimentaÃ§Ãµes (entradas + saÃ­das) registradas no perÃ­odo selecionado.
+              <strong>Definição:</strong> Total de movimentações (entradas + saídas) registradas no período selecionado.
             </p>
           </div>
           
@@ -1264,7 +1264,7 @@ function getCardDetailsContent(cardType, data = {}) {
                 {reportStats.nfsSaidas}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                SaÃ­das
+                Saídas
               </div>
             </div>
           </div>
@@ -1272,6 +1272,6 @@ function getCardDetailsContent(cardType, data = {}) {
       )
 
     default:
-      return <div>Detalhes nÃ£o disponÃ­veis</div>
+      return <div>Detalhes não disponíveis</div>
   }
 }

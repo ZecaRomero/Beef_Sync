@@ -2,7 +2,7 @@ const ExcelJS = require('exceljs');
 const path = require('path');
 
 async function criarExcelExemplo() {
-  console.log('�Ÿ“Š CRIANDO EXCEL DE EXEMPLO\n');
+  console.log('📊 CRIANDO EXCEL DE EXEMPLO\n');
   console.log('='.repeat(80));
   
   const workbook = new ExcelJS.Workbook();
@@ -14,11 +14,11 @@ async function criarExcelExemplo() {
 
   // Configurar largura das colunas
   worksheet.columns = [
-    { width: 12 }, // S�‰RIE
+    { width: 12 }, // SÉRIE
     { width: 12 }, // RG
     { width: 20 }, // LOCAL
     { width: 20 }, // TOURO_1ª I.A
-    { width: 12 }, // S�‰RIE (pai)
+    { width: 12 }, // SÉRIE (pai)
     { width: 12 }, // RG (pai)
     { width: 15 }, // DATA I.A
     { width: 18 }, // DATA DG 1ª I.A
@@ -27,11 +27,11 @@ async function criarExcelExemplo() {
 
   // Cabeçalho
   const headerRow = worksheet.addRow([
-    'S�‰RIE',
+    'SÉRIE',
     'RG',
     'LOCAL',
     'TOURO_1ª I.A',
-    'S�‰RIE (pai)',
+    'SÉRIE (pai)',
     'RG (pai)',
     'DATA I.A',
     'DATA DG 1ª I.A',
@@ -84,15 +84,15 @@ async function criarExcelExemplo() {
 
   await workbook.xlsx.writeFile(filepath);
   
-  console.log(`�œ… Arquivo criado: ${filename}`);
-  console.log(`�Ÿ“� Localização: ${filepath}`);
+  console.log(`✅ Arquivo criado: ${filename}`);
+  console.log(`📁 Localização: ${filepath}`);
   console.log('\n' + '='.repeat(80));
-  console.log('\n�Ÿ’� Como usar:');
+  console.log('\n💡 Como usar:');
   console.log('   1. Abra o arquivo no Excel');
   console.log('   2. Edite os dados conforme necessário');
   console.log('   3. Acesse http://localhost:3000/importar-piquetes');
   console.log('   4. Faça upload do arquivo');
-  console.log('\n�Ÿ“‹ Dados de exemplo incluídos:');
+  console.log('\n📋 Dados de exemplo incluídos:');
   console.log(`   - ${dadosExemplo.length} animais`);
   console.log('   - 4 piquetes (A, B, C, D)');
   console.log('   - Dados de IA e DG');

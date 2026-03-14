@@ -3,7 +3,7 @@ const API_URL = 'http://localhost:3020';
 
 async function registrarPrenhasNascimentos() {
   try {
-    console.log('�Ÿ�� Registrando 46 receptoras prenhas em Nascimentos...\n');
+    console.log('🤰 Registrando 46 receptoras prenhas em Nascimentos...\n');
     
     // 1. Buscar receptoras com DG positivo
     const responseAnimais = await fetch(`${API_URL}/api/animals`);
@@ -15,10 +15,10 @@ async function registrarPrenhasNascimentos() {
       return resultado.includes('pren') || resultado.includes('positiv');
     });
     
-    console.log(`�Ÿ“Š Total de receptoras com DG positivo: ${receptorasPrenhas.length}\n`);
+    console.log(`📊 Total de receptoras com DG positivo: ${receptorasPrenhas.length}\n`);
     
     if (receptorasPrenhas.length === 0) {
-      console.log('�š�️ Nenhuma receptora com DG positivo encontrada!');
+      console.log('⚠️ Nenhuma receptora com DG positivo encontrada!');
       return;
     }
     
@@ -28,14 +28,14 @@ async function registrarPrenhasNascimentos() {
     const nfs = dataNFs.data || dataNFs || [];
     const nfsReceptoras = nfs.filter(nf => nf.eh_receptoras);
     
-    console.log(`�Ÿ“„ Total de NFs de receptoras: ${nfsReceptoras.length}\n`);
+    console.log(`📄 Total de NFs de receptoras: ${nfsReceptoras.length}\n`);
     
     // 3. Buscar transferências de embriões
     const responseTEs = await fetch(`${API_URL}/api/transferencias-embrioes`);
     const dataTEs = await responseTEs.json();
     const tes = dataTEs.data || dataTEs || [];
     
-    console.log(`�Ÿ’‰ Total de TEs registradas: ${tes.length}\n`);
+    console.log(`💉 Total de TEs registradas: ${tes.length}\n`);
     
     // 4. Para cada receptora prenha, registrar em nascimentos
     let sucessos = 0;
@@ -79,11 +79,11 @@ async function registrarPrenhasNascimentos() {
         // Se não tem data_te, usar data_chegada como fallback
         if (!dataTE && receptora.data_chegada) {
           dataTE = receptora.data_chegada;
-          console.log(`�„�️ ${rgCompleto} - Usando data_chegada como fallback`);
+          console.log(`ℹ️ ${rgCompleto} - Usando data_chegada como fallback`);
         }
         
         if (!dataTE) {
-          console.log(`�š�️ ${rgCompleto} - Sem data de TE ou data_chegada, pulando...`);
+          console.log(`⚠️ ${rgCompleto} - Sem data de TE ou data_chegada, pulando...`);
           erros++;
           detalhes.push({ rg: rgCompleto, erro: 'Sem data de TE ou data_chegada' });
           continue;
@@ -120,31 +120,31 @@ async function registrarPrenhasNascimentos() {
         });
         
         if (response.ok) {
-          console.log(`�œ… ${rgCompleto} - Registrada em Nascimentos (Parto previsto: ${prevPartoStr})`);
+          console.log(`✅ ${rgCompleto} - Registrada em Nascimentos (Parto previsto: ${prevPartoStr})`);
           sucessos++;
           detalhes.push({ rg: rgCompleto, sucesso: true, partoPrevisto: prevPartoStr });
         } else {
           const error = await response.text();
-          console.log(`�Œ ${rgCompleto} - Erro ao registrar: ${error}`);
+          console.log(`❌ ${rgCompleto} - Erro ao registrar: ${error}`);
           erros++;
           detalhes.push({ rg: rgCompleto, erro: error });
         }
         
       } catch (error) {
-        console.log(`�Œ ${rgCompleto} - Erro: ${error.message}`);
+        console.log(`❌ ${rgCompleto} - Erro: ${error.message}`);
         erros++;
         detalhes.push({ rg: rgCompleto, erro: error.message });
       }
     }
     
-    console.log(`\n�Ÿ“ˆ Resumo Final:`);
-    console.log(`   �œ… Registradas com sucesso: ${sucessos}`);
-    console.log(`   �Œ Erros: ${erros}`);
-    console.log(`\n�Ÿ’� Agora verifique o menu Reprodução > Nascimentos para ver as 46 receptoras prenhas!`);
+    console.log(`\n📈 Resumo Final:`);
+    console.log(`   ✅ Registradas com sucesso: ${sucessos}`);
+    console.log(`   ❌ Erros: ${erros}`);
+    console.log(`\n💡 Agora verifique o menu Reprodução > Nascimentos para ver as 46 receptoras prenhas!`);
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
-    console.log('\n�Ÿ’� Certifique-se de que o servidor está rodando em http://localhost:3020');
+    console.error('❌ Erro:', error.message);
+    console.log('\n💡 Certifique-se de que o servidor está rodando em http://localhost:3020');
   }
 }
 

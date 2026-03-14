@@ -14,7 +14,7 @@ function limparTemp(filepath) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' })
+    return res.status(405).json({ error: 'Método não permitido' })
   }
 
   const form = formidable({
@@ -53,7 +53,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Planilha vazia ou sem dados' })
     }
 
-    // Identificar linha do cabeÃ§alho
+    // Identificar linha do cabeçalho
     let headerRow = 0
     let dataStartRow = 1
     for (let i = 0; i < Math.min(5, rows.length); i++) {
@@ -67,17 +67,17 @@ export default async function handler(req, res) {
 
     const headers = rows[headerRow].map(h => String(h || '').toUpperCase().trim())
 
-    // Mapear colunas pelos headers ââ‚¬â€� detecÃ§Ã£o precisa para evitar falsos positivos
+    // Mapear colunas pelos headers — detecção precisa para evitar falsos positivos
     let colMap = { rack: 0, touro: 1, raca: 2, botijao: 3, caneca: 4, obs: 5, entradas: 6, saidas: 7, estoque: 8 }
     headers.forEach((h, i) => {
       if (h.includes('RACK') || (h.includes('COD') && i === 0)) colMap.rack = i
       else if (h === 'TOURO') colMap.touro = i
-      else if (h === 'RACA' || h === 'RAÃâ€¡A' || h === 'RAÃâ€¡' || h === 'RA\u00c7A') colMap.raca = i
+      else if (h === 'RACA' || h === 'RAÇA' || h === 'RAÇ' || h === 'RA\u00c7A') colMap.raca = i
       else if (h.includes('BOTIJ')) colMap.botijao = i
       else if (h.includes('CANECA')) colMap.caneca = i
       else if (h.includes('OBS')) colMap.obs = i
       else if (h.includes('ENTRADA')) colMap.entradas = i
-      else if ((h.includes('SAIDA') || h.includes('SAÃ�DA') || h === 'SA\u00cdDAS') && i > 4) colMap.saidas = i
+      else if ((h.includes('SAIDA') || h.includes('SAÍDA') || h === 'SA\u00cdDAS') && i > 4) colMap.saidas = i
       else if (h.includes('ESTOQUE')) colMap.estoque = i
     })
 
@@ -96,7 +96,7 @@ export default async function handler(req, res) {
       const caneca = String(row[colMap.caneca] || '').trim()
       const observacoes = String(row[colMap.obs] || '').trim()
 
-      // Extrair nome e RG do touro ââ‚¬â€� ex: "CAMARGO - BASA 893"
+      // Extrair nome e RG do touro — ex: "CAMARGO - BASA 893"
       let nomeTouro = touroVal
       let rgTouro = ''
       if (touroVal.includes(' - ')) {
@@ -107,7 +107,7 @@ export default async function handler(req, res) {
 
       const status = estoqueVal > 0 ? 'disponivel' : 'esgotado'
 
-      // Detectar embriÃ£o automaticamente pelo nome (ex: "ACASALAMENTO (X x Y)" ou "A X B")
+      // Detectar embrião automaticamente pelo nome (ex: "ACASALAMENTO (X x Y)" ou "A X B")
       const isEmbriao = tipoMaterialBase === 'embriao' ||
         nomeTouro.toUpperCase().includes(' X ') ||
         nomeTouro.toUpperCase().includes('ACASALAMENTO')
@@ -152,7 +152,7 @@ export default async function handler(req, res) {
     })
   } catch (error) {
     limparTemp(filepath)
-    console.error('Erro ao importar Excel de sÃªmen:', error)
+    console.error('Erro ao importar Excel de sêmen:', error)
     return res.status(500).json({ error: 'Erro ao processar arquivo', details: error.message })
   }
 }

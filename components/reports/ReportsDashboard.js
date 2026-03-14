@@ -18,8 +18,8 @@ import CoverageTypeCard from './CoverageTypeCard.js'
 const QUICK_REPORTS = [
   {
     id: 'daily_summary',
-    name: 'Resumo DiÃ¡rio',
-    description: 'Atividades das Ãºltimas 24h',
+    name: 'Resumo Diário',
+    description: 'Atividades das últimas 24h',
     icon: ClockIcon,
     color: 'blue',
     period: 'today'
@@ -27,23 +27,23 @@ const QUICK_REPORTS = [
   {
     id: 'weekly_performance',
     name: 'Performance Semanal',
-    description: 'MÃ©tricas dos Ãºltimos 7 dias',
+    description: 'Métricas dos últimos 7 dias',
     icon: TrendingUpIcon,
     color: 'green',
     period: 'week'
   },
   {
     id: 'monthly_overview',
-    name: 'VisÃ£o Mensal',
-    description: 'Resumo completo do mÃªs',
+    name: 'Visão Mensal',
+    description: 'Resumo completo do mês',
     icon: CalendarIcon,
     color: 'purple',
     period: 'month'
   },
   {
     id: 'alerts_report',
-    name: 'RelatÃ³rio de Alertas',
-    description: 'SituaÃ§Ãµes que requerem atenÃ§Ã£o',
+    name: 'Relatório de Alertas',
+    description: 'Situações que requerem atenção',
     icon: ExclamationTriangleIcon,
     color: 'red',
     period: 'current'
@@ -53,7 +53,7 @@ const QUICK_REPORTS = [
 const RECENT_REPORTS = [
   {
     id: 1,
-    name: 'RelatÃ³rio de LocalizaÃ§Ã£o - Outubro 2025',
+    name: 'Relatório de Localização - Outubro 2025',
     type: 'location_report',
     generatedAt: '2025-10-28T10:30:00Z',
     status: 'completed',
@@ -62,7 +62,7 @@ const RECENT_REPORTS = [
   },
   {
     id: 2,
-    name: 'AnÃ¡lise Financeira - Q3 2025',
+    name: 'Análise Financeira - Q3 2025',
     type: 'financial_analysis',
     generatedAt: '2025-10-27T15:45:00Z',
     status: 'completed',
@@ -95,18 +95,18 @@ export default function ReportsDashboard({ onCreateReport, onViewReport }) {
 
   const loadDashboardStats = async () => {
     try {
-      // Simular carregamento de estatÃ­sticas
+      // Simular carregamento de estatísticas
       setTimeout(() => {
         setStats({
           totalReports: 47,
           reportsThisMonth: 12,
           avgGenerationTime: 3.2,
-          mostUsedType: 'RelatÃ³rio de LocalizaÃ§Ã£o'
+          mostUsedType: 'Relatório de Localização'
         })
         setLoading(false)
       }, 1000)
     } catch (error) {
-      console.error('Erro ao carregar estatÃ­sticas:', error)
+      console.error('Erro ao carregar estatísticas:', error)
       setLoading(false)
     }
   }
@@ -115,7 +115,7 @@ export default function ReportsDashboard({ onCreateReport, onViewReport }) {
     try {
       setLoading(true)
       
-      // Definir perÃ­odo baseado na configuraÃ§Ã£o
+      // Definir período baseado na configuração
       const now = new Date()
       let startDate, endDate
       
@@ -150,7 +150,7 @@ export default function ReportsDashboard({ onCreateReport, onViewReport }) {
         })
       })
 
-      if (!response.ok) throw new Error('Erro ao gerar relatÃ³rio')
+      if (!response.ok) throw new Error('Erro ao gerar relatório')
       
       const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
@@ -162,9 +162,9 @@ export default function ReportsDashboard({ onCreateReport, onViewReport }) {
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
       
-      alert('âÅ“â€¦ RelatÃ³rio gerado com sucesso!')
+      alert('✅ Relatório gerado com sucesso!')
     } catch (error) {
-      alert('â�Å’ Erro ao gerar relatÃ³rio rÃ¡pido')
+      alert('❌ Erro ao gerar relatório rápido')
     } finally {
       setLoading(false)
     }
@@ -183,7 +183,7 @@ export default function ReportsDashboard({ onCreateReport, onViewReport }) {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'completed':
-        return <Badge variant="success" size="sm">ConcluÃ­do</Badge>
+        return <Badge variant="success" size="sm">Concluído</Badge>
       case 'processing':
         return <Badge variant="warning" size="sm">Processando</Badge>
       case 'failed':
@@ -210,10 +210,10 @@ export default function ReportsDashboard({ onCreateReport, onViewReport }) {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            ðÅ¸â€œÅ  Dashboard de RelatÃ³rios
+            📊 Dashboard de Relatórios
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            VisÃ£o geral e acesso rÃ¡pido aos seus relatÃ³rios
+            Visão geral e acesso rápido aos seus relatórios
           </p>
         </div>
         <Button
@@ -221,7 +221,7 @@ export default function ReportsDashboard({ onCreateReport, onViewReport }) {
           onClick={onCreateReport}
           leftIcon={<DocumentTextIcon className="h-4 w-4" />}
         >
-          Criar RelatÃ³rio
+          Criar Relatório
         </Button>
       </div>
 
@@ -235,7 +235,7 @@ export default function ReportsDashboard({ onCreateReport, onViewReport }) {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Total de RelatÃ³rios
+                  Total de Relatórios
                 </p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {stats.totalReports}
@@ -253,7 +253,7 @@ export default function ReportsDashboard({ onCreateReport, onViewReport }) {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Este MÃªs
+                  Este Mês
                 </p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {stats.reportsThisMonth}
@@ -271,7 +271,7 @@ export default function ReportsDashboard({ onCreateReport, onViewReport }) {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Tempo MÃ©dio
+                  Tempo Médio
                 </p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {stats.avgGenerationTime}s
@@ -308,10 +308,10 @@ export default function ReportsDashboard({ onCreateReport, onViewReport }) {
         <Card>
           <CardHeader>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              ðÅ¸Å¡â‚¬ RelatÃ³rios RÃ¡pidos
+              🚀 Relatórios Rápidos
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Gere relatÃ³rios com um clique
+              Gere relatórios com um clique
             </p>
           </CardHeader>
           <CardBody>
@@ -355,10 +355,10 @@ export default function ReportsDashboard({ onCreateReport, onViewReport }) {
         <Card>
           <CardHeader>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              ðÅ¸â€œâ€¹ RelatÃ³rios Recentes
+              📋 Relatórios Recentes
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Seus Ãºltimos relatÃ³rios gerados
+              Seus últimos relatórios gerados
             </p>
           </CardHeader>
           <CardBody>
@@ -406,9 +406,9 @@ export default function ReportsDashboard({ onCreateReport, onViewReport }) {
               <Button
                 variant="secondary"
                 className="w-full"
-                onClick={() => {/* Implementar histÃ³rico completo */}}
+                onClick={() => {/* Implementar histórico completo */}}
               >
-                Ver Todos os RelatÃ³rios
+                Ver Todos os Relatórios
               </Button>
             </div>
           </CardBody>
@@ -419,7 +419,7 @@ export default function ReportsDashboard({ onCreateReport, onViewReport }) {
       <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            ðÅ¸â€œË† Insights de Performance
+            📈 Insights de Performance
           </h3>
         </CardHeader>
         <CardBody>
@@ -429,10 +429,10 @@ export default function ReportsDashboard({ onCreateReport, onViewReport }) {
                 <TrendingUpIcon className="h-8 w-8 text-green-600 dark:text-green-400" />
               </div>
               <h4 className="font-medium text-gray-900 dark:text-white mb-1">
-                EficiÃªncia Melhorada
+                Eficiência Melhorada
               </h4>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Tempo de geraÃ§Ã£o 23% mais rÃ¡pido este mÃªs
+                Tempo de geração 23% mais rápido este mês
               </p>
             </div>
             
@@ -444,7 +444,7 @@ export default function ReportsDashboard({ onCreateReport, onViewReport }) {
                 Alta Confiabilidade
               </h4>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                99.2% de taxa de sucesso na geraÃ§Ã£o
+                99.2% de taxa de sucesso na geração
               </p>
             </div>
             
@@ -456,7 +456,7 @@ export default function ReportsDashboard({ onCreateReport, onViewReport }) {
                 Uso Crescente
               </h4>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                +34% de relatÃ³rios gerados vs. mÃªs anterior
+                +34% de relatórios gerados vs. mês anterior
               </p>
             </div>
           </div>

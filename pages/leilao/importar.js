@@ -24,9 +24,9 @@ export default function LeilaoImportar() {
   const [animais, setAnimais] = useState([])
   const [abaAtiva, setAbaAtiva] = useState('avaliacao') // 'avaliacao' | 'excel' | 'pesagens'
 
-  // AvaliaÃ§Ã£o/ProjeÃ§Ã£o - import
+  // Avaliação/Projeção - import
   const [fileAvaliacao, setFileAvaliacao] = useState(null)
-  const [carimboLeilao, setCarimboLeilao] = useState('10Âº LeilÃ£o Matrizes Sant Anna no dia 15/03')
+  const [carimboLeilao, setCarimboLeilao] = useState('10º Leilão Matrizes Sant Anna no dia 15/03')
   const [loadingAvaliacao, setLoadingAvaliacao] = useState(false)
   const [previewAvaliacao, setPreviewAvaliacao] = useState(null)
   const [erroAvaliacao, setErroAvaliacao] = useState(null)
@@ -90,7 +90,7 @@ export default function LeilaoImportar() {
       try {
         result = await res.json()
       } catch (parseErr) {
-        setErroAvaliacao('Resposta invÃ¡lida do servidor. Verifique se o banco estÃ¡ acessÃ­vel.')
+        setErroAvaliacao('Resposta inválida do servidor. Verifique se o banco está acessível.')
         setLoadingAvaliacao(false)
         return
       }
@@ -98,7 +98,7 @@ export default function LeilaoImportar() {
         const atualizados = result.data?.atualizados ?? 0
         const errosCount = result.data?.erros ?? 0
         if (atualizados > 0) {
-          handleImportSuccess('AvaliaÃ§Ã£o/ProjeÃ§Ã£o', atualizados)
+          handleImportSuccess('Avaliação/Projeção', atualizados)
           setFileAvaliacao(null)
           setPreviewAvaliacao(null)
         } else if (errosCount > 0) {
@@ -106,19 +106,19 @@ export default function LeilaoImportar() {
           const exemplos = detalhes.slice(0, 3).map(d => `${d.serie || '?'}-${d.rg || '?'}: ${d.motivo}`).join('; ')
           setErroAvaliacao(
             `Nenhum animal foi atualizado. ${errosCount} registro(s) com problema. ` +
-            `Os animais precisam existir no banco (SÃ©rie + RG). Exemplos: ${exemplos || 'verifique SÃ©rie e RGN no Excel'}`
+            `Os animais precisam existir no banco (Série + RG). Exemplos: ${exemplos || 'verifique Série e RGN no Excel'}`
           )
         } else {
-          setErroAvaliacao('Nenhum animal foi atualizado. Verifique se as colunas SÃ©rie e RGN existem no Excel e se os animais estÃ£o cadastrados.')
+          setErroAvaliacao('Nenhum animal foi atualizado. Verifique se as colunas Série e RGN existem no Excel e se os animais estão cadastrados.')
         }
       } else {
         const msg = typeof result.message === 'string'
           ? result.message
-          : (result.message?.required ? `Campos obrigatÃ³rios: ${(result.message.required || []).join(', ')}` : 'Erro na importaÃ§Ã£o')
+          : (result.message?.required ? `Campos obrigatórios: ${(result.message.required || []).join(', ')}` : 'Erro na importação')
         setErroAvaliacao(msg)
       }
     } catch (err) {
-      setErroAvaliacao('Erro: ' + (err.message || 'Falha na conexÃ£o. Tente novamente.'))
+      setErroAvaliacao('Erro: ' + (err.message || 'Falha na conexão. Tente novamente.'))
     } finally {
       setLoadingAvaliacao(false)
     }
@@ -131,14 +131,14 @@ export default function LeilaoImportar() {
         <div>
           <Link href="/leilao" className="inline-flex items-center gap-1 text-sm text-amber-600 dark:text-amber-400 hover:underline mb-2">
             <ArrowLeftIcon className="h-4 w-4" />
-            Voltar ao Dashboard LeilÃ£o
+            Voltar ao Dashboard Leilão
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <DocumentArrowDownIcon className="h-8 w-8 text-amber-600" />
-            Importar Dados para LeilÃ£o
+            Importar Dados para Leilão
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Pesagens, InseminaÃ§Ã£o Artificial, PariÃ§Ãµes e mais ââ‚¬â€� prepare seus dados para anÃ¡lise de custo e ROI
+            Pesagens, Inseminação Artificial, Parições e mais — prepare seus dados para análise de custo e ROI
           </p>
         </div>
       </div>
@@ -161,7 +161,7 @@ export default function LeilaoImportar() {
               <HeartIcon className="h-6 w-6 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white">InseminaÃ§Ã£o Artificial</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white">Inseminação Artificial</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">Data IA, Touro, DG, Resultado</p>
             </div>
           </div>
@@ -172,8 +172,8 @@ export default function LeilaoImportar() {
               <UserGroupIcon className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white">PariÃ§Ãµes</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Nascimentos, SÃ©rie, RG, Peso, Pai, MÃ£e</p>
+              <h3 className="font-semibold text-gray-900 dark:text-white">Parições</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Nascimentos, Série, RG, Peso, Pai, Mãe</p>
             </div>
           </div>
         </Card>
@@ -200,7 +200,7 @@ export default function LeilaoImportar() {
               : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
           }`}
         >
-          ðÅ¸�·ï¸� AvaliaÃ§Ã£o + Carimbo LeilÃ£o
+          🏷️ Avaliação + Carimbo Leilão
         </button>
         <button
           onClick={() => setAbaAtiva('excel')}
@@ -210,7 +210,7 @@ export default function LeilaoImportar() {
               : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
           }`}
         >
-          ðÅ¸â€œÅ  Excel (IA, PariÃ§Ãµes, DG)
+          📊 Excel (IA, Parições, DG)
         </button>
         <button
           onClick={() => setAbaAtiva('pesagens')}
@@ -220,11 +220,11 @@ export default function LeilaoImportar() {
               : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
           }`}
         >
-          âÅ¡â€“ï¸� Pesagens (Texto)
+          ⚖️ Pesagens (Texto)
         </button>
       </div>
 
-      {/* ConteÃºdo das abas */}
+      {/* Conteúdo das abas */}
       {abaAtiva === 'avaliacao' && (
         <Card className="p-6 relative">
           {loadingAvaliacao && (
@@ -239,31 +239,31 @@ export default function LeilaoImportar() {
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
               <TagIcon className="h-6 w-6 text-amber-600" />
-              AvaliaÃ§Ã£o - ProjeÃ§Ã£o da Cria
+              Avaliação - Projeção da Cria
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Importe o Excel com SÃ©rie, RGN, LOTE, OBSERVAÃâ€¡ÃÆ’O (PRENHA, PARIDA...), PREV PARTO, genÃ©tica. 
-              Aplique o carimbo de leilÃ£o aos animais importados.
+              Importe o Excel com Série, RGN, LOTE, OBSERVAÇÃO (PRENHA, PARIDA...), PREV PARTO, genética. 
+              Aplique o carimbo de leilão aos animais importados.
             </p>
           </div>
 
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Carimbo do LeilÃ£o (ex: 10Âº LeilÃ£o Matrizes Sant Anna no dia 15/03)
+                Carimbo do Leilão (ex: 10º Leilão Matrizes Sant Anna no dia 15/03)
               </label>
               <input
                 type="text"
                 value={carimboLeilao}
                 onChange={(e) => setCarimboLeilao(e.target.value)}
-                placeholder="10Âº LeilÃ£o Matrizes Sant Anna no dia 15/03"
+                placeholder="10º Leilão Matrizes Sant Anna no dia 15/03"
                 className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Arquivo Excel (AVALIAÃâ€¡ÃÆ’O - PROJEÃâ€¡ÃÆ’O DA CRIA)
+                Arquivo Excel (AVALIAÇÃO - PROJEÇÃO DA CRIA)
               </label>
               <input
                 type="file"
@@ -308,18 +308,18 @@ export default function LeilaoImportar() {
           </div>
 
           <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-            <p className="text-sm font-semibold text-amber-800 dark:text-amber-200 mb-2">âÅ¡ ï¸� Importante:</p>
+            <p className="text-sm font-semibold text-amber-800 dark:text-amber-200 mb-2">⚠️ Importante:</p>
             <p className="text-sm text-amber-700 dark:text-amber-300 mb-3">
-              Os animais precisam jÃ¡ estar cadastrados no sistema (SÃ©rie + RG). Se nÃ£o estiverem, importe primeiro pela Central de ImportaÃ§Ãµes ou Excel Universal.
+              Os animais precisam já estar cadastrados no sistema (Série + RG). Se não estiverem, importe primeiro pela Central de Importações ou Excel Universal.
             </p>
             <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-2">Colunas esperadas:</p>
             <ul className="text-sm text-amber-700 dark:text-amber-300 space-y-1">
-              <li><strong>SÃ©rie:</strong> identificaÃ§Ã£o da sÃ©rie</li>
+              <li><strong>Série:</strong> identificação da série</li>
               <li><strong>RGN:</strong> RG do animal</li>
-              <li><strong>LOTE:</strong> nÃºmero do lote</li>
-              <li><strong>OBSERVAÃâ€¡ÃÆ’O:</strong> prenha, parida, etc (situaÃ§Ã£o reprodutiva)</li>
-              <li><strong>PREV PARTO:</strong> previsÃ£o de parto (ex: JUNHO/2026)</li>
-              <li><strong>iABCZg*, DECA, IQG, PtIQG, MGT, TOP:</strong> genÃ©tica</li>
+              <li><strong>LOTE:</strong> número do lote</li>
+              <li><strong>OBSERVAÇÃO:</strong> prenha, parida, etc (situação reprodutiva)</li>
+              <li><strong>PREV PARTO:</strong> previsão de parto (ex: JUNHO/2026)</li>
+              <li><strong>iABCZg*, DECA, IQG, PtIQG, MGT, TOP:</strong> genética</li>
             </ul>
           </div>
         </Card>
@@ -330,11 +330,11 @@ export default function LeilaoImportar() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                ImportaÃ§Ã£o via Excel
+                Importação via Excel
               </h2>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                O sistema detecta automaticamente: IA, Nascimentos (pariÃ§Ãµes), DiagnÃ³stico de GestaÃ§Ã£o. 
-                Suporta variaÃ§Ãµes de nomes de colunas (ex: Data IA, DataIA, data_ia).
+                O sistema detecta automaticamente: IA, Nascimentos (parições), Diagnóstico de Gestação. 
+                Suporta variações de nomes de colunas (ex: Data IA, DataIA, data_ia).
               </p>
             </div>
             <Button onClick={() => setShowExcelModal(true)} className="flex items-center gap-2">
@@ -345,9 +345,9 @@ export default function LeilaoImportar() {
           <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
             <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Colunas esperadas:</p>
             <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-              <li><strong>IA:</strong> SÃ©rie, RG, Data IA, Touro, Data DG, Resultado</li>
-              <li><strong>PariÃ§Ãµes:</strong> SÃ©rie, RG, Data Nascimento, Peso, Pai, MÃ£e, Receptora</li>
-              <li><strong>DG:</strong> SÃ©rie, RG, Data DG, Resultado (P/N)</li>
+              <li><strong>IA:</strong> Série, RG, Data IA, Touro, Data DG, Resultado</li>
+              <li><strong>Parições:</strong> Série, RG, Data Nascimento, Peso, Pai, Mãe, Receptora</li>
+              <li><strong>DG:</strong> Série, RG, Data DG, Resultado (P/N)</li>
             </ul>
           </div>
         </Card>
@@ -360,7 +360,7 @@ export default function LeilaoImportar() {
               Importar Pesagens por Texto
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Cole o texto com SÃ©rie, RG, Peso, CE (opcional), Data. Formatos: SERIE RG PESO ou SERIE RG DATA PESO CE
+              Cole o texto com Série, RG, Peso, CE (opcional), Data. Formatos: SERIE RG PESO ou SERIE RG DATA PESO CE
             </p>
           </div>
           <ImportarTextoPesagens
@@ -379,7 +379,7 @@ export default function LeilaoImportar() {
               Pesagens em Excel?
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Use a pÃ¡gina de Pesagem para importar Excel com mapeamento de colunas
+              Use a página de Pesagem para importar Excel com mapeamento de colunas
             </p>
           </div>
           <Link href="/manejo/pesagem">

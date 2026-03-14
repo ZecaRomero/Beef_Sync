@@ -11,7 +11,7 @@ const pool = new Pool({
 
 async function reativarPiquete() {
   try {
-    console.log('�Ÿ”„ Reativando PIQUETE 1...\n');
+    console.log('🔄 Reativando PIQUETE 1...\n');
 
     // Reativar o piquete
     const result = await pool.query(`
@@ -22,7 +22,7 @@ async function reativarPiquete() {
     `);
 
     if (result.rows.length > 0) {
-      console.log('�œ… PIQUETE 1 reativado com sucesso!');
+      console.log('✅ PIQUETE 1 reativado com sucesso!');
       console.log('\nDetalhes:');
       console.log(`  ID: ${result.rows[0].id}`);
       console.log(`  Código: ${result.rows[0].codigo}`);
@@ -30,11 +30,11 @@ async function reativarPiquete() {
       console.log(`  Ativo: ${result.rows[0].ativo ? 'Sim' : 'Não'}`);
       console.log(`  Atualizado em: ${result.rows[0].updated_at}`);
     } else {
-      console.log('�Œ PIQUETE 1 não encontrado!');
+      console.log('❌ PIQUETE 1 não encontrado!');
     }
 
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
   } finally {
     await pool.end();
   }

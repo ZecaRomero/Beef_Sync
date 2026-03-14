@@ -1,11 +1,11 @@
 // Script para debugar o modal de observações
 // Execute este script no console do navegador na página do nitrogênio
 
-console.log('�Ÿ”� Iniciando debug do modal de observações...');
+console.log('🔍 Iniciando debug do modal de observações...');
 
 // Função para verificar o estado dos modais
 function debugModalState() {
-  console.log('\n�Ÿ“Š Estado atual dos modais:');
+  console.log('\n📊 Estado atual dos modais:');
   
   // Verificar se os elementos existem
   const modals = document.querySelectorAll('[class*="modal"], [class*="Modal"]');
@@ -38,7 +38,7 @@ function debugModalState() {
 
 // Função para simular clique no badge de observação
 function simulateObservationClick() {
-  console.log('\n�Ÿ–�️ Simulando clique no badge de observação...');
+  console.log('\n🖱️ Simulando clique no badge de observação...');
   
   const badges = document.querySelectorAll('[class*="badge"], [class*="Badge"]');
   console.log(`   Badges encontrados: ${badges.length}`);
@@ -60,13 +60,13 @@ function simulateObservationClick() {
       debugModalState();
     }, 500);
   } else {
-    console.log('   �Œ Nenhum badge de observação encontrado');
+    console.log('   ❌ Nenhum badge de observação encontrado');
   }
 }
 
 // Função para verificar dados de observação
 function checkObservationData() {
-  console.log('\n�Ÿ“� Verificando dados de observação...');
+  console.log('\n📝 Verificando dados de observação...');
   
   // Verificar se há dados no React state (se possível)
   const reactElements = document.querySelectorAll('[data-reactroot], [id="__next"]');
@@ -91,7 +91,7 @@ function checkObservationData() {
 
 // Função para verificar CSS
 function checkCSS() {
-  console.log('\n�ŸŽ� Verificando CSS...');
+  console.log('\n🎨 Verificando CSS...');
   
   // Verificar se Tailwind está carregado
   const testElement = document.createElement('div');
@@ -101,7 +101,7 @@ function checkCSS() {
   const styles = window.getComputedStyle(testElement);
   const hasTailwind = styles.position === 'fixed' && styles.zIndex === '50';
   
-  console.log(`   Tailwind CSS funcionando: ${hasTailwind ? '�œ…' : '�Œ'}`);
+  console.log(`   Tailwind CSS funcionando: ${hasTailwind ? '✅' : '❌'}`);
   
   document.body.removeChild(testElement);
   
@@ -112,10 +112,10 @@ function checkCSS() {
 
 // Função para verificar JavaScript
 function checkJavaScript() {
-  console.log('\n�š™️ Verificando JavaScript...');
+  console.log('\n⚙️ Verificando JavaScript...');
   
   // Verificar se React está carregado
-  console.log(`   React carregado: ${typeof React !== 'undefined' ? '�œ…' : '�Œ'}`);
+  console.log(`   React carregado: ${typeof React !== 'undefined' ? '✅' : '❌'}`);
   
   // Verificar se há erros no console
   const originalError = console.error;
@@ -130,21 +130,21 @@ function checkJavaScript() {
     console.error = originalError;
     console.log(`   Erros JavaScript detectados: ${errors.length}`);
     if (errors.length > 0) {
-      console.log('   �šltimos erros:', errors.slice(-3));
+      console.log('   Últimos erros:', errors.slice(-3));
     }
   }, 1000);
 }
 
 // Função principal de debug
 function runFullDebug() {
-  console.log('�Ÿš€ Executando debug completo...');
+  console.log('🚀 Executando debug completo...');
   
   debugModalState();
   checkObservationData();
   checkCSS();
   checkJavaScript();
   
-  console.log('\n�ŸŽ� Para testar manualmente:');
+  console.log('\n🎯 Para testar manualmente:');
   console.log('   1. Execute: simulateObservationClick()');
   console.log('   2. Execute: debugModalState()');
   console.log('   3. Verifique se o modal apareceu');
@@ -160,7 +160,7 @@ window.debugNitrogenioModal = {
   checkJavaScript
 };
 
-console.log('�œ… Debug carregado! Execute: debugNitrogenioModal.runFullDebug()');
+console.log('✅ Debug carregado! Execute: debugNitrogenioModal.runFullDebug()');
 
 // Executar debug inicial
 runFullDebug();

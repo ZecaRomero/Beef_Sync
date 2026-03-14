@@ -39,19 +39,19 @@ async function corrigirDataTE() {
       `, [dataCorreta, receptora.te_id]);
       
       if (result.rows.length > 0) {
-        console.log(`�œ… M ${receptora.rg} (TE ID: ${receptora.te_id})`);
+        console.log(`✅ M ${receptora.rg} (TE ID: ${receptora.te_id})`);
         console.log(`   Nova data TE: ${new Date(result.rows[0].data_te).toLocaleDateString('pt-BR')}`);
         corrigidas++;
       } else {
-        console.log(`�Œ M ${receptora.rg}: Erro ao atualizar`);
+        console.log(`❌ M ${receptora.rg}: Erro ao atualizar`);
       }
     }
     
-    console.log(`\n�Ÿ“Š RESUMO:`);
-    console.log(`�œ… ${corrigidas} de ${receptoras.length} receptoras corrigidas`);
+    console.log(`\n📊 RESUMO:`);
+    console.log(`✅ ${corrigidas} de ${receptoras.length} receptoras corrigidas`);
     
     // Verificar se as datas foram atualizadas
-    console.log('\n=== VERIFICANDO ATUALIZA�‡�•ES ===\n');
+    console.log('\n=== VERIFICANDO ATUALIZAÇÕES ===\n');
     
     for (const receptora of receptoras) {
       const result = await client.query(`
@@ -60,13 +60,13 @@ async function corrigirDataTE() {
       
       if (result.rows.length > 0) {
         const dataAtual = new Date(result.rows[0].data_te).toLocaleDateString('pt-BR');
-        const status = dataAtual === '27/11/2025' ? '�œ…' : '�Œ';
+        const status = dataAtual === '27/11/2025' ? '✅' : '❌';
         console.log(`${status} M ${receptora.rg}: ${dataAtual}`);
       }
     }
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
     console.error(error.stack);
   } finally {
     client.release();

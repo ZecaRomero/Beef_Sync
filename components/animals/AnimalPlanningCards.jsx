@@ -13,7 +13,7 @@ export default function AnimalPlanningCards({ metrics }) {
     elegivelBrucelose,
     temBrucelose,
     precisaBrucelose,
-    janelaEncerrada,       // fÃªmea >240d sem vacina
+    janelaEncerrada,       // fêmea >240d sem vacina
     // DGT
     elegivelDGT,
     temDGT,
@@ -24,9 +24,9 @@ export default function AnimalPlanningCards({ metrics }) {
     isFemea,
   } = metrics
 
-  // Mostrar Brucelose sÃ³ quando precisar de aÃ§Ã£o ââ‚¬â€� se jÃ¡ vacinada ou janela encerrada, nÃ£o mostrar
+  // Mostrar Brucelose só quando precisar de ação — se já vacinada ou janela encerrada, não mostrar
   const mostrarBrucelose = isFemea && !temBrucelose && elegivelBrucelose
-  // Mostrar DGT apenas se estÃ¡ NA janela (330-640d) ou jÃ¡ fez ââ‚¬â€� nÃ£o mostrar se janela jÃ¡ encerrou
+  // Mostrar DGT apenas se está NA janela (330-640d) ou já fez — não mostrar se janela já encerrou
   const mostrarDGT = elegivelDGT || temDGT
 
   // Nada relevante para mostrar
@@ -36,12 +36,12 @@ export default function AnimalPlanningCards({ metrics }) {
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-5 border border-gray-200 dark:border-gray-700">
       <div className="flex items-center gap-2 mb-3">
         <ShieldCheckIcon className="h-6 w-6 text-amber-500" />
-        <h3 className="font-bold text-gray-900 dark:text-white">Planejamento / ObrigaÃ§Ãµes</h3>
+        <h3 className="font-bold text-gray-900 dark:text-white">Planejamento / Obrigações</h3>
       </div>
 
       <div className="space-y-3 text-sm">
 
-        {/* ââ€�â‚¬ââ€�â‚¬ BRUCELOSE (somente fÃªmeas) ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ */}
+        {/* ── BRUCELOSE (somente fêmeas) ─────────────────────────────── */}
         {mostrarBrucelose && (
           <div className={`p-3 rounded-xl border ${
             temBrucelose
@@ -53,17 +53,17 @@ export default function AnimalPlanningCards({ metrics }) {
               : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-600'
           }`}>
             <p className="font-semibold text-gray-900 dark:text-white">
-              Vacina Brucelose <span className="font-normal text-gray-500">(fÃªmeas 3-8 meses)</span>
+              Vacina Brucelose <span className="font-normal text-gray-500">(fêmeas 3-8 meses)</span>
             </p>
             {temBrucelose ? (
-              <p className="text-green-600 dark:text-green-400 mt-1">âÅ“â€œ JÃ¡ vacinada</p>
+              <p className="text-green-600 dark:text-green-400 mt-1">✓ Já vacinada</p>
             ) : elegivelBrucelose ? (
               <p className="text-amber-600 dark:text-amber-400 mt-1">
-                âÅ¡ ï¸� Na janela agora ({Math.floor(idadeDias / 30)} meses) ââ‚¬â€� agendar vacinaÃ§Ã£o
+                ⚠️ Na janela agora ({Math.floor(idadeDias / 30)} meses) — agendar vacinação
               </p>
             ) : janelaEncerrada ? (
               <p className="text-red-500 dark:text-red-400 mt-1">
-                Janela encerrada ({Math.floor(idadeDias / 30)} meses) ââ‚¬â€� nÃ£o Ã© mais necessÃ¡rio vacinar
+                Janela encerrada ({Math.floor(idadeDias / 30)} meses) — não é mais necessário vacinar
               </p>
             ) : (
               /* idadeDias < 90 */
@@ -74,7 +74,7 @@ export default function AnimalPlanningCards({ metrics }) {
           </div>
         )}
 
-        {/* ââ€�â‚¬ââ€�â‚¬ DGT ââ‚¬â€� AvaliaÃ§Ã£o AndrolÃ³gica/Reprodutiva ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ */}
+        {/* ── DGT — Avaliação Andrológica/Reprodutiva ────────────────── */}
         {mostrarDGT && (
           <div className={`p-3 rounded-xl border ${
             temDGT
@@ -86,20 +86,20 @@ export default function AnimalPlanningCards({ metrics }) {
               : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-600'
           }`}>
             <p className="font-semibold text-gray-900 dark:text-white">
-              AvaliaÃ§Ã£o DGT <span className="font-normal text-gray-500">(330-640 dias)</span>
+              Avaliação DGT <span className="font-normal text-gray-500">(330-640 dias)</span>
             </p>
             {temDGT ? (
-              <p className="text-green-600 dark:text-green-400 mt-1">âÅ“â€œ AvaliaÃ§Ã£o jÃ¡ realizada</p>
+              <p className="text-green-600 dark:text-green-400 mt-1">✓ Avaliação já realizada</p>
             ) : elegivelDGT ? (
               <p className="text-emerald-600 dark:text-emerald-400 mt-1">
-                âÅ¡ ï¸� Na janela agora ({idadeDias} dias) ââ‚¬â€� agendar avaliaÃ§Ã£o
+                ⚠️ Na janela agora ({idadeDias} dias) — agendar avaliação
               </p>
             ) : janelaEncerradaDGT ? (
               <p className="text-red-500 dark:text-red-400 mt-1">
-                Janela encerrada ({Math.floor(idadeDias / 30)} meses) ââ‚¬â€� avaliaÃ§Ã£o nÃ£o realizada na janela
+                Janela encerrada ({Math.floor(idadeDias / 30)} meses) — avaliação não realizada na janela
               </p>
             ) : null
-            /* Nota: nÃ£o mostramos "aguardar" para DGT ââ‚¬â€� o card sÃ³ aparece quando idadeDias >= 330 */
+            /* Nota: não mostramos "aguardar" para DGT — o card só aparece quando idadeDias >= 330 */
             }
           </div>
         )}

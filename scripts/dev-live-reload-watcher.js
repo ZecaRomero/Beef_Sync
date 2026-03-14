@@ -1,6 +1,6 @@
 /**
  * Watcher para Live Reload no desenvolvimento mobile
- * Detecta mudanÃ§as em arquivos e atualiza timestamp para o cliente recarregar
+ * Detecta mudanças em arquivos e atualiza timestamp para o cliente recarregar
  * Rode junto com: npm run dev
  */
 const fs = require('fs')
@@ -21,7 +21,7 @@ function writeTimestamp() {
   ensureNextDir()
   const data = { timestamp: Date.now(), updated: new Date().toISOString() }
   fs.writeFileSync(RELOAD_FILE, JSON.stringify(data))
-  console.log('[dev-live-reload] ðÅ¸â€œ± MudanÃ§a detectada - mobile serÃ¡ notificado para recarregar')
+  console.log('[dev-live-reload] 📱 Mudança detectada - mobile será notificado para recarregar')
 }
 
 function shouldWatch(filePath) {
@@ -44,6 +44,6 @@ function watchDir(dir) {
 
 // Inicial
 writeTimestamp()
-console.log('[dev-live-reload] ðÅ¸â€˜â‚¬ Observando mudanÃ§as para live reload no mobile...')
+console.log('[dev-live-reload] 👀 Observando mudanças para live reload no mobile...')
 
 WATCH_DIRS.forEach(watchDir)

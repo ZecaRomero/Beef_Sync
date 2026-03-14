@@ -1,6 +1,6 @@
 /**
- * ServiÃ§o de AnÃ¡lise de Mercado e RecomendaÃ§Ã£o de Vendas
- * Analisa condiÃ§Ãµes de mercado e determina se animais estÃ£o aptos para venda
+ * Serviço de Análise de Mercado e Recomendação de Vendas
+ * Analisa condições de mercado e determina se animais estão aptos para venda
  */
 
 import logger from '../utils/logger'
@@ -8,7 +8,7 @@ import logger from '../utils/logger'
 class MarketAnalysisService {
   constructor() {
     this.marketPrices = {
-      // PreÃ§os mÃ©dios por categoria (R$/@)
+      // Preços médios por categoria (R$/@)
       novilho_gordo: { min: 280, max: 320, media: 300 },
       boi_gordo: { min: 270, max: 310, media: 290 },
       vaca_gorda: { min: 250, max: 290, media: 270 },
@@ -27,9 +27,9 @@ class MarketAnalysisService {
   }
 
   /**
-   * Analisa se um animal estÃ¡ apto para venda conforme mercado
+   * Analisa se um animal está apto para venda conforme mercado
    * @param {Object} animal - Dados do animal
-   * @returns {Object} AnÃ¡lise de aptidÃ£o para venda
+   * @returns {Object} Análise de aptidão para venda
    */
   async analyzeSaleReadiness(animal) {
     try {
@@ -37,7 +37,7 @@ class MarketAnalysisService {
         animal_id: animal.id,
         identificacao: `${animal.serie || ''}${animal.rg || ''}`,
         apto_venda: false,
-        recomendacao: 'NÃ£o recomendado',
+        recomendacao: 'Não recomendado',
         score: 0,
         fatores: [],
         valor_estimado_mercado: 0,
@@ -46,7 +46,7 @@ class MarketAnalysisService {
         justificativa: []
       }
 
-      // 1. Verificar idade e peso mÃ­nimo
+      // 1. Verificar idade e peso mínimo
       const idadeMeses = this.calculateAgeInMonths(animal.dataNascimento || animal.data_nascimento)
       const peso = parseFloat(animal.peso) || 0
       
@@ -62,37 +62,37 @@ class MarketAnalysisService {
       analysis.valor_estimado_mercado = valorMercado
       
       if (valorMercado > analysis.valor_atual * 1.2) {
-        analysis.fatores.push('Valor de mercado favorÃ¡vel')
+        analysis.fatores.push('Valor de mercado favorável')
         analysis.score += 25
         analysis.roi_estimado = ((valorMercado - analysis.valor_atual) / analysis.valor_atual) * 100
       } else {
         analysis.justificativa.push(`ROI estimado: ${(((valorMercado - analysis.valor_atual) / analysis.valor_atual) * 100).toFixed(1)}% - Abaixo do ideal`)
       }
 
-      // 3. Verificar saÃºde e status
+      // 3. Verificar saúde e status
       if (animal.situacao === 'Ativo' && !animal.doente) {
-        analysis.fatores.push('Animal saudÃ¡vel')
+        analysis.fatores.push('Animal saudável')
         analysis.score += 20
       } else {
-        analysis.justificativa.push('Animal com problemas de saÃºde ou status inadequado')
+        analysis.justificativa.push('Animal com problemas de saúde ou status inadequado')
       }
 
       // 4. Verificar sazonalidade
       const seasonalFactor = this.getSeasonalFactor()
       if (seasonalFactor >= 1.0) {
-        analysis.fatores.push('Ãâ€°poca favorÃ¡vel para venda')
+        analysis.fatores.push('Época favorável para venda')
         analysis.score += 15
       } else {
-        analysis.justificativa.push(`Fator sazonal: ${(seasonalFactor * 100).toFixed(0)}% - NÃ£o Ã© a melhor Ã©poca`)
+        analysis.justificativa.push(`Fator sazonal: ${(seasonalFactor * 100).toFixed(0)}% - Não é a melhor época`)
       }
 
-      // 5. Verificar raÃ§a e genÃ©tica
+      // 5. Verificar raça e genética
       if (animal.raca && ['Nelore', 'Angus', 'Brahman', 'Hereford'].includes(animal.raca)) {
-        analysis.fatores.push('RaÃ§a valorizada no mercado')
+        analysis.fatores.push('Raça valorizada no mercado')
         analysis.score += 10
       }
 
-      // Determinar recomendaÃ§Ã£o final
+      // Determinar recomendação final
       if (analysis.score >= 70) {
         analysis.apto_venda = true
         analysis.recomendacao = 'Altamente Recomendado'
@@ -102,12 +102,12 @@ class MarketAnalysisService {
       } else if (analysis.score >= 30) {
         analysis.recomendacao = 'Avaliar com Cautela'
       } else {
-        analysis.recomendacao = 'NÃ£o Recomendado'
+        analysis.recomendacao = 'Não Recomendado'
       }
 
       return analysis
     } catch (error) {
-      logger.error('Erro ao analisar aptidÃ£o para venda:', error)
+      logger.error('Erro ao analisar aptidão para venda:', error)
       throw error
     }
   }
@@ -137,7 +137,7 @@ class MarketAnalysisService {
     
     let categoria = 'novilho_gordo'
     
-    if (sexo.includes('fÃªmea') || sexo.includes('femea')) {
+    if (sexo.includes('fêmea') || sexo.includes('femea')) {
       if (idadeMeses < 24) {
         categoria = 'novilha_gorda'
       } else {
@@ -157,7 +157,7 @@ class MarketAnalysisService {
     const fatorSazonal = this.getSeasonalFactor()
     const precoAjustado = precoBase.media * fatorSazonal
     
-    // Calcular valor total (preÃ§o por @ * peso em arrobas)
+    // Calcular valor total (preço por @ * peso em arrobas)
     const pesoArrobas = peso / 15 // 1 arroba = 15kg
     const valorTotal = precoAjustado * pesoArrobas
     
@@ -165,7 +165,7 @@ class MarketAnalysisService {
   }
 
   /**
-   * ObtÃ©m fator sazonal do mÃªs atual
+   * Obtém fator sazonal do mês atual
    */
   getSeasonalFactor() {
     const mes = new Date().toLocaleString('pt-BR', { month: 'long' }).toLowerCase()
@@ -173,7 +173,7 @@ class MarketAnalysisService {
   }
 
   /**
-   * Analisa mÃºltiplos animais e retorna os mais aptos para venda
+   * Analisa múltiplos animais e retorna os mais aptos para venda
    */
   async analyzeMultipleAnimals(animais) {
     try {
@@ -191,17 +191,17 @@ class MarketAnalysisService {
         analises: analyses
       }
     } catch (error) {
-      logger.error('Erro ao analisar mÃºltiplos animais:', error)
+      logger.error('Erro ao analisar múltiplos animais:', error)
       throw error
     }
   }
 
   /**
-   * Atualiza preÃ§os de mercado (pode ser chamado periodicamente)
+   * Atualiza preços de mercado (pode ser chamado periodicamente)
    */
   updateMarketPrices(newPrices) {
     this.marketPrices = { ...this.marketPrices, ...newPrices }
-    logger.info('PreÃ§os de mercado atualizados')
+    logger.info('Preços de mercado atualizados')
   }
 }
 

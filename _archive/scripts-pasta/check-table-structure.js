@@ -10,17 +10,17 @@ const pool = new Pool({
 
 async function checkTableStructure() {
   try {
-    console.log('�Ÿ”� Verificando estrutura da tabela animais...');
+    console.log('🔍 Verificando estrutura da tabela animais...');
     
     const result = await pool.query("SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'animais' ORDER BY ordinal_position");
     
-    console.log('\n�Ÿ“Š Colunas da tabela animais:');
+    console.log('\n📊 Colunas da tabela animais:');
     result.rows.forEach(row => {
       console.log('  -', row.column_name, '(' + row.data_type + ')');
     });
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
   } finally {
     await pool.end();
   }

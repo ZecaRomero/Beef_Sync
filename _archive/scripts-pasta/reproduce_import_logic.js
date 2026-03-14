@@ -7,7 +7,7 @@ function processarTexto(texto) {
     
     // Remover cabeçalho se tiver
     const primeiraLinha = linhas[0].toUpperCase();
-    const temCabecalho = primeiraLinha.includes('S�‰RIE') || primeiraLinha.includes('SERIE') || primeiraLinha.includes('LOCAL') || primeiraLinha.includes('ACASALAMENTO') || primeiraLinha.includes('TOURO');
+    const temCabecalho = primeiraLinha.includes('SÉRIE') || primeiraLinha.includes('SERIE') || primeiraLinha.includes('LOCAL') || primeiraLinha.includes('ACASALAMENTO') || primeiraLinha.includes('TOURO');
     
     let mapaColunas = null;
     let dadosLinhas = linhas;
@@ -35,7 +35,7 @@ function processarTexto(texto) {
         cols.forEach((col, idx) => {
           if (!col) return;
           const c = col.toUpperCase();
-          if (c.includes('S�‰RIE') || c.includes('SERIE')) mapaColunas.serie = idx;
+          if (c.includes('SÉRIE') || c.includes('SERIE')) mapaColunas.serie = idx;
           else if (c === 'RG') mapaColunas.rg = idx;
           else if (c.includes('LOCAL') || c.includes('PIQUETE')) mapaColunas.local = idx;
           else if (c.includes('TOURO') || c.includes('ACASALAMENTO') || c.includes('REPRODUTOR')) mapaColunas.touro = idx;
@@ -43,7 +43,7 @@ function processarTexto(texto) {
           else if (c.includes('DATA DG') || c.includes('DIAG') || c.includes('PREVISAO')) mapaColunas.dataDG = idx;
           else if (c.includes('RESULT')) mapaColunas.resultado = idx;
         });
-        console.log('�Ÿ—�️ Mapa de colunas detectado:', mapaColunas);
+        console.log('🗺️ Mapa de colunas detectado:', mapaColunas);
       }
     } else {
        dadosLinhas = linhas;
@@ -65,7 +65,7 @@ function processarTexto(texto) {
         if (colunas.length <= 1) {
           const colsEspacos = linha.split(/\s{2,}/).map(c => c.trim());
           if (colsEspacos.length > colunas.length) {
-            console.log(`  �š�️ Linha ${numeroLinha}: Tabs não encontrados, usando espaços.`);
+            console.log(`  ⚠️ Linha ${numeroLinha}: Tabs não encontrados, usando espaços.`);
             colunas = colsEspacos;
             usouFallbackEspacos = true;
           }
@@ -98,14 +98,14 @@ function processarTexto(texto) {
 
          // Validação extra: Se touroIA parece ser uma data (erro de deslocamento), limpar
          if (touroIA && (touroIA.includes('/') || /^\d{1,2}\/\d{1,2}/.test(touroIA))) {
-             console.log(`  �š�️ Touro inválido detectado (parece data): "${touroIA}". Limpando para reprocessar.`);
+             console.log(`  ⚠️ Touro inválido detectado (parece data): "${touroIA}". Limpando para reprocessar.`);
              touroIA = '';
          }
 
          if (!touroIA && (mapaColunas.separador === 'spaces' || usouFallbackEspacos)) {
             if (local && local.length > 2 && !local.includes('/') && isNaN(local.replace(/\s/g, '')) && /[a-zA-Z]{2,}/.test(local)) {
                if (!/^(PIQUETE|LOCAL|PASTO|RETIRO|MANGUEIRO|CURRAL)/i.test(local)) {
-                   console.log(`  �†’ Touro estava no campo Local (realocando): "${local}"`);
+                   console.log(`  → Touro estava no campo Local (realocando): "${local}"`);
                    touroIA = local;
                    local = ''; 
                }
@@ -115,7 +115,7 @@ function processarTexto(texto) {
               for (const col of colunas) {
                 if (!col || col === serie || col === rg || col === local || col === dataIA || col === dataDG || col === resultado) continue;
                 if (col.length > 2 && !col.includes('/') && isNaN(col.replace(/\s/g, '')) && /[a-zA-Z]{2,}/.test(col)) {
-                  console.log(`  �†’ Touro não encontrado no índice, tentando usar: "${col}"`);
+                  console.log(`  → Touro não encontrado no índice, tentando usar: "${col}"`);
                   touroIA = col;
                   break; 
                 }
@@ -128,7 +128,7 @@ function processarTexto(texto) {
              for (const col of colunas) {
                  if (col && (col.includes('/') || /^\d{1,2}\/\d{1,2}/.test(col))) {
                      if (col !== dataDG) {
-                         console.log(`  �†’ Data IA recuperada de outra coluna: "${col}"`);
+                         console.log(`  → Data IA recuperada de outra coluna: "${col}"`);
                          dataIA = col;
                          break;
                      }
@@ -148,25 +148,25 @@ function processarTexto(texto) {
 
 // Teste 1: Dados com tabs perfeitos
 console.log('\n--- Teste 1: Tabs perfeitos ---');
-const texto1 = `S�‰RIE\tRG\tLOCAL\tACASALAMENTOS\tDATA IA
+const texto1 = `SÉRIE\tRG\tLOCAL\tACASALAMENTOS\tDATA IA
 A\t123\tPIQUETE 1\tIDEAL - A3139\t01/01/2024`;
 processarTexto(texto1);
 
 // Teste 2: Cabeçalho com tabs, dados com espaços (cenário do erro)
 console.log('\n--- Teste 2: Cabeçalho Tabs, Dados Espaços ---');
-const texto2 = `S�‰RIE\tRG\tLOCAL\tACASALAMENTOS\tDATA IA
+const texto2 = `SÉRIE\tRG\tLOCAL\tACASALAMENTOS\tDATA IA
 A    123    PIQUETE 1    IDEAL - A3139    01/01/2024`;
 processarTexto(texto2);
 
 // Teste 3: Cabeçalho com tabs, dados com espaços e colunas vazias
 // Ex: Local vazio
 console.log('\n--- Teste 3: Dados Espaços com coluna vazia ---');
-const texto3 = `S�‰RIE\tRG\tLOCAL\tACASALAMENTOS\tDATA IA
+const texto3 = `SÉRIE\tRG\tLOCAL\tACASALAMENTOS\tDATA IA
 A    123        IDEAL - A3139    01/01/2024`;
 processarTexto(texto3);
 
 // Teste 4: Cabeçalho com espaços
 console.log('\n--- Teste 4: Tudo Espaços ---');
-const texto4 = `S�‰RIE    RG    LOCAL    ACASALAMENTOS    DATA IA
+const texto4 = `SÉRIE    RG    LOCAL    ACASALAMENTOS    DATA IA
 A    123    PIQUETE 1    IDEAL - A3139    01/01/2024`;
 processarTexto(texto4);

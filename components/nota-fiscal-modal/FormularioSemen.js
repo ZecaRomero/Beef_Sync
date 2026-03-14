@@ -12,7 +12,7 @@ export default function FormularioSemen({ novoItem, setNovoItem, adicionarItem }
   return (
     <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
       <h4 className="font-semibold text-purple-900 dark:text-purple-100 mb-3">
-        ðÅ¸§¬ Adicionar SÃªmen
+        🧬 Adicionar Sêmen
       </h4>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
@@ -43,7 +43,7 @@ export default function FormularioSemen({ novoItem, setNovoItem, adicionarItem }
 
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            RaÃ§a
+            Raça
           </label>
           <input
             type="text"
@@ -69,7 +69,7 @@ export default function FormularioSemen({ novoItem, setNovoItem, adicionarItem }
 
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Valor UnitÃ¡rio/Dose * (R$)
+            Valor Unitário/Dose * (R$)
           </label>
           <div className="relative">
             <span className="absolute left-3 top-2.5 text-gray-500 dark:text-gray-400">R$</span>
@@ -110,7 +110,7 @@ export default function FormularioSemen({ novoItem, setNovoItem, adicionarItem }
 
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            BotijÃ£o
+            Botijão
           </label>
           <input
             type="text"
@@ -143,7 +143,7 @@ export default function FormularioSemen({ novoItem, setNovoItem, adicionarItem }
             value={novoItem.certificado}
             onChange={(e) => setNovoItem(prev => ({ ...prev, certificado: e.target.value }))}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
-            placeholder="NÃºmero do certificado"
+            placeholder="Número do certificado"
           />
         </div>
 
@@ -167,7 +167,7 @@ export default function FormularioSemen({ novoItem, setNovoItem, adicionarItem }
           className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
         >
           <PlusIcon className="h-5 w-5" />
-          <span>Adicionar SÃªmen</span>
+          <span>Adicionar Sêmen</span>
         </button>
       </div>
     </div>

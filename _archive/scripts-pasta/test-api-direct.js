@@ -62,15 +62,15 @@ async function testAPI() {
     endDate: '2025-10-31'
   }
   
-  console.log('�Ÿ�� Testando função generateMonthlySummary da API...')
+  console.log('🧪 Testando função generateMonthlySummary da API...')
   console.log(`Período: ${period.startDate} a ${period.endDate}\n`)
   
   const result = await generateMonthlySummary(period)
   
-  console.log('�Ÿ“Š Resultado da função:')
+  console.log('📊 Resultado da função:')
   console.log(JSON.stringify(result, null, 2))
   
-  console.log('\n�Ÿ”� Verificando se o resultado está vazio:')
+  console.log('\n🔍 Verificando se o resultado está vazio:')
   console.log('Object.keys(result).length:', Object.keys(result).length)
   console.log('JSON.stringify(result) === "{}":', JSON.stringify(result) === '{}')
   

@@ -68,7 +68,7 @@ export default function ImportarTextoInseminacoes({ isOpen, onClose, onImportCom
           onImportComplete(data.resultados);
         }
         
-        // Fechar apÃ³s 3 segundos
+        // Fechar após 3 segundos
         setTimeout(() => {
           handleClose();
         }, 3000);
@@ -96,7 +96,7 @@ export default function ImportarTextoInseminacoes({ isOpen, onClose, onImportCom
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
           <h2 className="text-2xl font-bold text-gray-800">
-            ðÅ¸â€œ� Importar InseminaÃ§Ãµes via Texto
+            📝 Importar Inseminações via Texto
           </h2>
           <button
             onClick={handleClose}
@@ -111,7 +111,7 @@ export default function ImportarTextoInseminacoes({ isOpen, onClose, onImportCom
 
         <div className="p-6">
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-            <h3 className="font-semibold text-blue-900 mb-2">ðÅ¸â€œâ€¹ Como usar:</h3>
+            <h3 className="font-semibold text-blue-900 mb-2">📋 Como usar:</h3>
             <ol className="text-sm text-blue-800 list-decimal list-inside space-y-1">
               <li>Copie os dados do Excel (Ctrl+C)</li>
               <li>Cole aqui na caixa de texto (Ctrl+V)</li>
@@ -119,7 +119,7 @@ export default function ImportarTextoInseminacoes({ isOpen, onClose, onImportCom
               <li>Se estiver tudo OK, clique em "Importar"</li>
             </ol>
             <p className="text-xs text-blue-700 mt-2">
-              ðÅ¸â€™¡ Colunas aceitas: SÃâ€°RIE | RG | LOCAL | TOURO ou ACASALAMENTO | DATA IA ou DATA I.A | DATA DG ou PREVISAO DE PARTO | Result (LOCAL e Result sÃ£o opcionais)
+              💡 Colunas aceitas: SÉRIE | RG | LOCAL | TOURO ou ACASALAMENTO | DATA IA ou DATA I.A | DATA DG ou PREVISAO DE PARTO | Result (LOCAL e Result são opcionais)
             </p>
           </div>
 
@@ -150,7 +150,7 @@ export default function ImportarTextoInseminacoes({ isOpen, onClose, onImportCom
                     : 'bg-blue-600 hover:bg-blue-700'
                 }`}
               >
-                {validando ? 'â�³ Validando...' : 'ðÅ¸â€�� Validar Dados'}
+                {validando ? '⏳ Validando...' : '🔍 Validar Dados'}
               </button>
 
               {validacao && validacao.valido && (
@@ -163,7 +163,7 @@ export default function ImportarTextoInseminacoes({ isOpen, onClose, onImportCom
                       : 'bg-green-600 hover:bg-green-700'
                   }`}
                 >
-                  {importando ? 'â�³ Importando...' : 'âÅ“â€¦ Importar Agora'}
+                  {importando ? '⏳ Importando...' : '✅ Importar Agora'}
                 </button>
               )}
             </div>
@@ -171,7 +171,7 @@ export default function ImportarTextoInseminacoes({ isOpen, onClose, onImportCom
 
           {erro && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mt-4">
-              <p className="text-red-800 font-semibold">â�Å’ Erro:</p>
+              <p className="text-red-800 font-semibold">❌ Erro:</p>
               <p className="text-red-700 text-sm">{erro}</p>
             </div>
           )}
@@ -183,7 +183,7 @@ export default function ImportarTextoInseminacoes({ isOpen, onClose, onImportCom
               <h3 className={`font-semibold mb-3 ${
                 validacao.valido ? 'text-green-900' : 'text-yellow-900'
               }`}>
-                {validacao.valido ? 'âÅ“â€¦ ValidaÃ§Ã£o OK!' : 'âÅ¡ ï¸� Erros Encontrados'}
+                {validacao.valido ? '✅ Validação OK!' : '⚠️ Erros Encontrados'}
               </h3>
               
               <div className="grid grid-cols-2 gap-4 mb-4">
@@ -203,7 +203,7 @@ export default function ImportarTextoInseminacoes({ isOpen, onClose, onImportCom
               {validacao.erros.length > 0 && (
                 <div className="mt-4">
                   <p className="text-sm font-semibold text-yellow-800 mb-2">
-                    Erros de validaÃ§Ã£o:
+                    Erros de validação:
                   </p>
                   <div className="max-h-40 overflow-y-auto bg-white rounded border p-2">
                     {validacao.erros.map((erro, index) => (
@@ -219,7 +219,7 @@ export default function ImportarTextoInseminacoes({ isOpen, onClose, onImportCom
 
           {resultado && (
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4">
-              <h3 className="font-semibold text-green-900 mb-3">âÅ“â€¦ ImportaÃ§Ã£o ConcluÃ­da!</h3>
+              <h3 className="font-semibold text-green-900 mb-3">✅ Importação Concluída!</h3>
               
               <div className="grid grid-cols-3 gap-4">
                 <div className="bg-white rounded p-3 border border-green-200">

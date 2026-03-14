@@ -21,10 +21,10 @@ async function diagnosticarECorrigir() {
   const client = await pool.connect()
   
   try {
-    console.log('�Ÿ”� Iniciando diagnóstico e correção...\n')
+    console.log('🔍 Iniciando diagnóstico e correção...\n')
     
     // 1. Verificar tipo da coluna RG
-    console.log('1️�ƒ� Verificando tipo da coluna RG:')
+    console.log('1️⃣ Verificando tipo da coluna RG:')
     const tipoRG = await client.query(`
       SELECT 
         column_name,
@@ -37,7 +37,7 @@ async function diagnosticarECorrigir() {
     `)
     
     if (tipoRG.rows.length === 0) {
-      console.log('   �Œ Coluna RG não encontrada!')
+      console.log('   ❌ Coluna RG não encontrada!')
       return
     }
     
@@ -48,22 +48,22 @@ async function diagnosticarECorrigir() {
     
     // Verificar se o tipo está correto
     if (coluna.data_type !== 'character varying' && coluna.data_type !== 'varchar' && coluna.data_type !== 'text') {
-      console.log(`\n   �š�️ PROBLEMA ENCONTRADO: Coluna RG tem tipo ${coluna.data_type} ao invés de VARCHAR!`)
-      console.log('   �Ÿ”� Tentando corrigir...')
+      console.log(`\n   ⚠️ PROBLEMA ENCONTRADO: Coluna RG tem tipo ${coluna.data_type} ao invés de VARCHAR!`)
+      console.log('   🔧 Tentando corrigir...')
       
       try {
         await client.query('ALTER TABLE animais ALTER COLUMN rg TYPE VARCHAR(20)')
-        console.log('   �œ… Tipo da coluna RG corrigido para VARCHAR(20)')
+        console.log('   ✅ Tipo da coluna RG corrigido para VARCHAR(20)')
       } catch (error) {
-        console.log('   �Œ Erro ao corrigir tipo:', error.message)
-        console.log('   �Ÿ’� Você pode precisar fazer backup e recriar a tabela')
+        console.log('   ❌ Erro ao corrigir tipo:', error.message)
+        console.log('   💡 Você pode precisar fazer backup e recriar a tabela')
       }
     } else {
-      console.log('   �œ… Tipo da coluna RG está correto (VARCHAR)')
+      console.log('   ✅ Tipo da coluna RG está correto (VARCHAR)')
     }
     
     // 2. Verificar RGs problemáticos
-    console.log('\n2️�ƒ� Verificando RGs com caracteres especiais:')
+    console.log('\n2️⃣ Verificando RGs com caracteres especiais:')
     const rgsProblematicos = await client.query(`
       SELECT 
         id,
@@ -82,19 +82,19 @@ async function diagnosticarECorrigir() {
     `)
     
     if (rgsProblematicos.rows.length > 0) {
-      console.log(`   �š�️ Encontrados ${rgsProblematicos.rows.length} RGs com problemas:`)
+      console.log(`   ⚠️ Encontrados ${rgsProblematicos.rows.length} RGs com problemas:`)
       rgsProblematicos.rows.forEach(row => {
         console.log(`   - ID ${row.id}: ${row.serie}-${row.rg} (${row.problema})`)
       })
       
-      console.log('\n   �Ÿ’� Estes RGs são válidos, mas podem causar problemas em algumas queries')
-      console.log('   �Ÿ’� Considere padronizar o formato no Excel antes de importar')
+      console.log('\n   💡 Estes RGs são válidos, mas podem causar problemas em algumas queries')
+      console.log('   💡 Considere padronizar o formato no Excel antes de importar')
     } else {
-      console.log('   �œ… Nenhum RG problemático encontrado')
+      console.log('   ✅ Nenhum RG problemático encontrado')
     }
     
     // 3. Verificar índices
-    console.log('\n3️�ƒ� Verificando índices na coluna RG:')
+    console.log('\n3️⃣ Verificando índices na coluna RG:')
     const indices = await client.query(`
       SELECT 
         indexname,
@@ -112,16 +112,16 @@ async function diagnosticarECorrigir() {
         
         // Verificar se há CAST problemático
         if (idx.indexdef.includes('CAST') && idx.indexdef.includes('integer')) {
-          console.log(`     �š�️ PROBLEMA: Índice faz CAST para INTEGER!`)
-          console.log(`     �Ÿ”� Recomendado remover e recriar: DROP INDEX ${idx.indexname};`)
+          console.log(`     ⚠️ PROBLEMA: Índice faz CAST para INTEGER!`)
+          console.log(`     🔧 Recomendado remover e recriar: DROP INDEX ${idx.indexname};`)
         }
       })
     } else {
-      console.log('   �„�️ Nenhum índice específico para RG encontrado')
+      console.log('   ℹ️ Nenhum índice específico para RG encontrado')
     }
     
     // 4. Verificar triggers
-    console.log('\n4️�ƒ� Verificando triggers:')
+    console.log('\n4️⃣ Verificando triggers:')
     const triggers = await client.query(`
       SELECT 
         trigger_name,
@@ -138,11 +138,11 @@ async function diagnosticarECorrigir() {
         console.log(`   - ${trg.trigger_name} (${trg.event_manipulation})`)
       })
     } else {
-      console.log('   �œ… Nenhum trigger encontrado')
+      console.log('   ✅ Nenhum trigger encontrado')
     }
     
     // 5. Teste de inserção
-    console.log('\n5️�ƒ� Testando inserção de RG com letras:')
+    console.log('\n5️⃣ Testando inserção de RG com letras:')
     try {
       await client.query('BEGIN')
       
@@ -152,33 +152,33 @@ async function diagnosticarECorrigir() {
         RETURNING id, serie, rg
       `)
       
-      console.log('   �œ… Inserção bem-sucedida!')
+      console.log('   ✅ Inserção bem-sucedida!')
       console.log(`   ID: ${testResult.rows[0].id}, RG: ${testResult.rows[0].rg}`)
       
       await client.query('ROLLBACK')
-      console.log('   �Ÿ�� Teste revertido (ROLLBACK)')
+      console.log('   🧹 Teste revertido (ROLLBACK)')
       
     } catch (error) {
       await client.query('ROLLBACK')
-      console.log('   �Œ Erro ao inserir:')
+      console.log('   ❌ Erro ao inserir:')
       console.log(`   Código: ${error.code}`)
       console.log(`   Mensagem: ${error.message}`)
       
       if (error.message.includes('COMLSLSC') || error.message.includes('text') && error.message.includes('numeric')) {
-        console.log('\n   �Ÿ”� CAUSA IDENTIFICADA: Há uma comparação ou conversão de tipo problemática')
-        console.log('   �Ÿ’� Verifique se há constraints, triggers ou índices que fazem CAST para INTEGER')
+        console.log('\n   🔍 CAUSA IDENTIFICADA: Há uma comparação ou conversão de tipo problemática')
+        console.log('   💡 Verifique se há constraints, triggers ou índices que fazem CAST para INTEGER')
       }
     }
     
-    console.log('\n�œ… Diagnóstico concluído!')
-    console.log('\n�Ÿ“‹ Resumo:')
+    console.log('\n✅ Diagnóstico concluído!')
+    console.log('\n📋 Resumo:')
     console.log('   - Tipo da coluna RG:', coluna.data_type)
     console.log('   - RGs problemáticos:', rgsProblematicos.rows.length)
     console.log('   - Índices encontrados:', indices.rows.length)
     console.log('   - Triggers encontrados:', triggers.rows.length)
     
   } catch (error) {
-    console.error('�Œ Erro durante diagnóstico:', error)
+    console.error('❌ Erro durante diagnóstico:', error)
     console.error('Stack:', error.stack)
   } finally {
     client.release()

@@ -22,7 +22,7 @@ export default async function handler(req, res) {
         res.status(405).end(`Method ${method} Not Allowed`)
     }
   } catch (error) {
-    console.error('Erro na API de notificaÃ§Ãµes:', error)
+    console.error('Erro na API de notificações:', error)
     res.status(500).json({ message: 'Erro interno do servidor', error: error.message })
   }
 }
@@ -35,16 +35,16 @@ async function handleGet(req, res) {
       SELECT 
         n.*,
         CASE 
-          WHEN n.tipo = 'nascimento' THEN 'ðÅ¸�â€ž'
-          WHEN n.tipo = 'estoque' THEN 'ðÅ¸â€œ¦'
-          WHEN n.tipo = 'gestacao' THEN 'ðÅ¸�â€ž'
-          WHEN n.tipo = 'saude' THEN 'ðÅ¸�¥'
-          WHEN n.tipo = 'financeiro' THEN 'ðÅ¸â€™°'
-          WHEN n.tipo = 'sistema' THEN 'âÅ¡â„¢ï¸�'
-          WHEN n.tipo = 'nitrogenio' THEN 'â�â€žï¸�'
-          WHEN n.tipo = 'andrologico' THEN 'ðÅ¸â€�¬'
-          WHEN n.tipo = 'reproducao' THEN 'ðÅ¸â€�¬'
-          ELSE 'ðÅ¸â€œ¢'
+          WHEN n.tipo = 'nascimento' THEN '🐄'
+          WHEN n.tipo = 'estoque' THEN '📦'
+          WHEN n.tipo = 'gestacao' THEN '🐄'
+          WHEN n.tipo = 'saude' THEN '🏥'
+          WHEN n.tipo = 'financeiro' THEN '💰'
+          WHEN n.tipo = 'sistema' THEN '⚙️'
+          WHEN n.tipo = 'nitrogenio' THEN '❄️'
+          WHEN n.tipo = 'andrologico' THEN '🔬'
+          WHEN n.tipo = 'reproducao' THEN '🔬'
+          ELSE '📢'
         END as icon,
         CASE 
           WHEN n.prioridade = 'high' THEN 'bg-red-500'
@@ -85,20 +85,20 @@ async function handleGet(req, res) {
       feedbacks = feedbacksResult.rows.map(f => ({
         id: `feedback_${f.id}`,
         tipo: 'feedback',
-        titulo: `ðÅ¸â€™¬ Novo feedback de ${f.nome}`,
-        mensagem: f.sugestao ? f.sugestao.substring(0, 100) + (f.sugestao.length > 100 ? '...' : '') : 'Feedback com Ã¡udio',
+        titulo: `💬 Novo feedback de ${f.nome}`,
+        mensagem: f.sugestao ? f.sugestao.substring(0, 100) + (f.sugestao.length > 100 ? '...' : '') : 'Feedback com áudio',
         prioridade: 'high',
         lida: false,
         created_at: f.created_at,
         dados_extras: { feedback_id: f.id, tem_audio: !!f.audio_path },
-        icon: 'ðÅ¸â€™¬',
+        icon: '💬',
         color_class: 'bg-blue-500'
       }))
     } catch (e) {
-      // Tabela feedbacks nÃ£o existe ainda
+      // Tabela feedbacks não existe ainda
     }
     
-    // Combinar notificaÃ§Ãµes normais com feedbacks
+    // Combinar notificações normais com feedbacks
     const allNotifications = [...feedbacks, ...result.rows]
     
     // Ordenar por prioridade e data
@@ -114,7 +114,7 @@ async function handleGet(req, res) {
     // Limitar total
     const limitedNotifications = allNotifications.slice(0, parseInt(limit))
     
-    // Formatar timestamps para exibiÃ§Ã£o
+    // Formatar timestamps para exibição
     const notifications = limitedNotifications.map(notif => ({
       ...notif,
       tempo_relativo: getRelativeTime(notif.created_at),
@@ -123,8 +123,8 @@ async function handleGet(req, res) {
     
     res.status(200).json(notifications)
   } catch (error) {
-    console.error('Erro ao buscar notificaÃ§Ãµes:', error)
-    res.status(500).json({ message: 'Erro ao buscar notificaÃ§Ãµes', error: error.message })
+    console.error('Erro ao buscar notificações:', error)
+    res.status(500).json({ message: 'Erro ao buscar notificações', error: error.message })
   }
 }
 
@@ -139,19 +139,19 @@ async function handlePost(req, res) {
       animal_id = null
     } = req.body
 
-    // ValidaÃ§Ãµes
+    // Validações
     if (!tipo || !titulo || !mensagem) {
       return res.status(400).json({ 
-        message: 'Tipo, tÃ­tulo e mensagem sÃ£o obrigatÃ³rios',
+        message: 'Tipo, título e mensagem são obrigatórios',
         campos: { tipo, titulo, mensagem }
       })
     }
 
-    // Validar tipo de notificaÃ§Ã£o
+    // Validar tipo de notificação
     const tiposValidos = ['nascimento', 'estoque', 'gestacao', 'saude', 'financeiro', 'sistema', 'andrologico', 'reproducao']
     if (!tiposValidos.includes(tipo)) {
       return res.status(400).json({ 
-        message: `Tipo de notificaÃ§Ã£o invÃ¡lido. Valores aceitos: ${tiposValidos.join(', ')}` 
+        message: `Tipo de notificação inválido. Valores aceitos: ${tiposValidos.join(', ')}` 
       })
     }
 
@@ -159,7 +159,7 @@ async function handlePost(req, res) {
     const prioridadesValidas = ['low', 'medium', 'high']
     if (!prioridadesValidas.includes(prioridade)) {
       return res.status(400).json({ 
-        message: `Prioridade invÃ¡lida. Valores aceitos: ${prioridadesValidas.join(', ')}` 
+        message: `Prioridade inválida. Valores aceitos: ${prioridadesValidas.join(', ')}` 
       })
     }
 
@@ -191,7 +191,7 @@ async function handlePost(req, res) {
 
     res.status(201).json(notificationWithExtras)
   } catch (error) {
-    console.error('Erro ao criar notificaÃ§Ã£o:', error)
+    console.error('Erro ao criar notificação:', error)
     res.status(500).json({ message: 'Erro interno do servidor', error: error.message })
   }
 }
@@ -202,10 +202,10 @@ async function handlePut(req, res) {
     const { lida, dados_extras } = req.body
 
     if (!id) {
-      return res.status(400).json({ message: 'ID da notificaÃ§Ã£o Ã© obrigatÃ³rio' })
+      return res.status(400).json({ message: 'ID da notificação é obrigatório' })
     }
 
-    // NotificaÃ§Ãµes de feedback sÃ£o virtuais (nÃ£o estÃ£o na tabela notificacoes)
+    // Notificações de feedback são virtuais (não estão na tabela notificacoes)
     // Retornar sucesso sem atualizar para evitar erro 500
     if (String(id).startsWith('feedback_')) {
       return res.status(200).json({ id, lida: true, message: 'Feedback marcado como visualizado' })
@@ -231,7 +231,7 @@ async function handlePut(req, res) {
     const result = await query(sql, params)
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ message: 'NotificaÃ§Ã£o nÃ£o encontrada' })
+      return res.status(404).json({ message: 'Notificação não encontrada' })
     }
 
     const notification = result.rows[0]
@@ -247,7 +247,7 @@ async function handlePut(req, res) {
 
     res.status(200).json(notificationWithExtras)
   } catch (error) {
-    console.error('Erro ao atualizar notificaÃ§Ã£o:', error)
+    console.error('Erro ao atualizar notificação:', error)
     res.status(500).json({ message: 'Erro interno do servidor', error: error.message })
   }
 }
@@ -257,10 +257,10 @@ async function handleDelete(req, res) {
     const { id } = req.query
 
     if (!id) {
-      return res.status(400).json({ message: 'ID da notificaÃ§Ã£o Ã© obrigatÃ³rio' })
+      return res.status(400).json({ message: 'ID da notificação é obrigatório' })
     }
 
-    // NotificaÃ§Ãµes de feedback: atualizar status para nÃ£o aparecer mais na lista
+    // Notificações de feedback: atualizar status para não aparecer mais na lista
     if (String(id).startsWith('feedback_')) {
       const feedbackId = id.replace('feedback_', '')
       try {
@@ -269,9 +269,9 @@ async function handleDelete(req, res) {
           [feedbackId]
         )
       } catch (e) {
-        // Tabela pode nÃ£o existir
+        // Tabela pode não existir
       }
-      return res.status(200).json({ message: 'NotificaÃ§Ã£o removida com sucesso' })
+      return res.status(200).json({ message: 'Notificação removida com sucesso' })
     }
 
     const result = await query(
@@ -280,30 +280,30 @@ async function handleDelete(req, res) {
     )
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ message: 'NotificaÃ§Ã£o nÃ£o encontrada' })
+      return res.status(404).json({ message: 'Notificação não encontrada' })
     }
 
-    res.status(200).json({ message: 'NotificaÃ§Ã£o excluÃ­da com sucesso' })
+    res.status(200).json({ message: 'Notificação excluída com sucesso' })
   } catch (error) {
-    console.error('Erro ao excluir notificaÃ§Ã£o:', error)
+    console.error('Erro ao excluir notificação:', error)
     res.status(500).json({ message: 'Erro interno do servidor', error: error.message })
   }
 }
 
-// FunÃ§Ãµes auxiliares
+// Funções auxiliares
 function getIconForType(tipo) {
   const icons = {
-    'nascimento': 'ðÅ¸�â€ž',
-    'estoque': 'ðÅ¸â€œ¦',
-    'gestacao': 'ðÅ¸�â€ž',
-    'saude': 'ðÅ¸�¥',
-    'financeiro': 'ðÅ¸â€™°',
-    'sistema': 'âÅ¡â„¢ï¸�',
-    'nitrogenio': 'â�â€žï¸�',
-    'andrologico': 'ðÅ¸â€�¬',
-    'reproducao': 'ðÅ¸â€�¬'
+    'nascimento': '🐄',
+    'estoque': '📦',
+    'gestacao': '🐄',
+    'saude': '🏥',
+    'financeiro': '💰',
+    'sistema': '⚙️',
+    'nitrogenio': '❄️',
+    'andrologico': '🔬',
+    'reproducao': '🔬'
   }
-  return icons[tipo] || 'ðÅ¸â€œ¢'
+  return icons[tipo] || '📢'
 }
 
 function getColorForPriority(prioridade) {
@@ -324,8 +324,8 @@ function getRelativeTime(dateString) {
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
 
   if (diffMinutes < 1) return 'Agora mesmo'
-  if (diffMinutes < 60) return `HÃ¡ ${diffMinutes} min`
-  if (diffHours < 24) return `HÃ¡ ${diffHours}h`
-  if (diffDays < 7) return `HÃ¡ ${diffDays} dia${diffDays > 1 ? 's' : ''}`
+  if (diffMinutes < 60) return `Há ${diffMinutes} min`
+  if (diffHours < 24) return `Há ${diffHours}h`
+  if (diffDays < 7) return `Há ${diffDays} dia${diffDays > 1 ? 's' : ''}`
   return date.toLocaleDateString('pt-BR')
 }

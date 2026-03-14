@@ -34,7 +34,7 @@ export default function LimparAnimais() {
       return
     }
 
-    if (!window.confirm('�š�️ ATEN�‡�ƒO: Esta operação é IRREVERSÍVEL!\n\nTodos os animais e dados relacionados serão PERMANENTEMENTE excluídos.\n\nDeseja continuar?')) {
+    if (!window.confirm('⚠️ ATENÇÃO: Esta operação é IRREVERSÍVEL!\n\nTodos os animais e dados relacionados serão PERMANENTEMENTE excluídos.\n\nDeseja continuar?')) {
       return
     }
 
@@ -98,14 +98,14 @@ export default function LimparAnimais() {
               <ExclamationTriangleIcon className="h-6 w-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-1" />
               <div>
                 <h3 className="text-lg font-semibold text-red-900 dark:text-red-200 mb-2">
-                  �š�️ OPERA�‡�ƒO IRREVERSÍVEL
+                  ⚠️ OPERAÇÃO IRREVERSÍVEL
                 </h3>
                 <ul className="list-disc list-inside space-y-1 text-red-800 dark:text-red-300 text-sm">
                   <li>Todos os animais serão <strong>permanentemente excluídos</strong></li>
                   <li>Todos os custos relacionados serão excluídos</li>
                   <li>Todas as localizações serão excluídas</li>
                   <li>Todas as mortes registradas serão excluídas</li>
-                  <li>Esta ação <strong>N�ƒO PODE SER DESFEITA</strong></li>
+                  <li>Esta ação <strong>NÃO PODE SER DESFEITA</strong></li>
                 </ul>
               </div>
             </div>
@@ -167,7 +167,7 @@ export default function LimparAnimais() {
           {resultado && (
             <div className="mt-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
               <h3 className="text-lg font-semibold text-green-900 dark:text-green-200 mb-2">
-                �œ… Exclusão Concluída com Sucesso!
+                ✅ Exclusão Concluída com Sucesso!
               </h3>
               <div className="space-y-1 text-sm text-green-800 dark:text-green-300">
                 <p><strong>Animais excluídos:</strong> {resultado.total_excluidos?.toLocaleString('pt-BR') || 0}</p>
@@ -189,7 +189,7 @@ export default function LimparAnimais() {
           {erro && (
             <div className="mt-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
               <h3 className="text-lg font-semibold text-red-900 dark:text-red-200 mb-2">
-                �Œ Erro
+                ❌ Erro
               </h3>
               <p className="text-red-800 dark:text-red-300">{erro}</p>
             </div>

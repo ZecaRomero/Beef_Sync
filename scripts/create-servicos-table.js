@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Script para criar tabela de serviÃ§os/custos cadastrados
+ * Script para criar tabela de serviços/custos cadastrados
  */
 
 require('dotenv').config()
@@ -19,10 +19,10 @@ async function createServicosTable() {
   const pool = new Pool(dbConfig)
   
   try {
-    console.log('ðÅ¸â€�§ Criando tabela de serviÃ§os cadastrados...')
+    console.log('🔧 Criando tabela de serviços cadastrados...')
     
     await pool.query(`
-      -- Tabela de tipos de serviÃ§os/custos cadastrados
+      -- Tabela de tipos de serviços/custos cadastrados
       CREATE TABLE IF NOT EXISTS tipos_servicos (
         id SERIAL PRIMARY KEY,
         nome VARCHAR(200) NOT NULL,
@@ -36,39 +36,39 @@ async function createServicosTable() {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
-      -- Ã�ndices para performance
+      -- Índices para performance
       CREATE INDEX IF NOT EXISTS idx_tipos_servicos_categoria ON tipos_servicos(categoria);
       CREATE INDEX IF NOT EXISTS idx_tipos_servicos_ativo ON tipos_servicos(ativo);
 
-      -- Inserir alguns serviÃ§os padrÃ£o
+      -- Inserir alguns serviços padrão
       INSERT INTO tipos_servicos (nome, categoria, valor_padrao, aplicavel_macho, aplicavel_femea, descricao)
       VALUES 
-        ('Exame AndrolÃ³gico', 'VeterinÃ¡rios', 165.00, true, false, 'Exame reprodutivo para machos'),
-        ('DiagnÃ³stico de Prenhez', 'VeterinÃ¡rios', 80.00, false, true, 'Ultrassom ou palpaÃ§Ã£o para diagnÃ³stico de gestaÃ§Ã£o'),
-        ('InseminaÃ§Ã£o Artificial', 'ReproduÃ§Ã£o', 60.00, false, true, 'Procedimento de IA'),
-        ('TransferÃªncia de EmbriÃ£o', 'ReproduÃ§Ã£o', 250.00, false, true, 'Procedimento de TE'),
-        ('Consulta VeterinÃ¡ria', 'VeterinÃ¡rios', 120.00, true, true, 'Consulta veterinÃ¡ria geral'),
-        ('Vacina ObrigatÃ³ria ABCZ', 'Medicamentos', 36.90, true, true, 'Vacinas obrigatÃ³rias para registro'),
-        ('VermÃ­fugo', 'Medicamentos', 18.00, true, true, 'Tratamento parasitÃ¡rio'),
-        ('CastraÃ§Ã£o', 'Manejo', 45.00, true, false, 'Procedimento de castraÃ§Ã£o'),
+        ('Exame Andrológico', 'Veterinários', 165.00, true, false, 'Exame reprodutivo para machos'),
+        ('Diagnóstico de Prenhez', 'Veterinários', 80.00, false, true, 'Ultrassom ou palpação para diagnóstico de gestação'),
+        ('Inseminação Artificial', 'Reprodução', 60.00, false, true, 'Procedimento de IA'),
+        ('Transferência de Embrião', 'Reprodução', 250.00, false, true, 'Procedimento de TE'),
+        ('Consulta Veterinária', 'Veterinários', 120.00, true, true, 'Consulta veterinária geral'),
+        ('Vacina Obrigatória ABCZ', 'Medicamentos', 36.90, true, true, 'Vacinas obrigatórias para registro'),
+        ('Vermífugo', 'Medicamentos', 18.00, true, true, 'Tratamento parasitário'),
+        ('Castração', 'Manejo', 45.00, true, false, 'Procedimento de castração'),
         ('Descorna', 'Manejo', 30.00, true, true, 'Procedimento de descorna'),
-        ('Casqueamento', 'Manejo', 40.00, true, true, 'Casqueamento para venda ou exposiÃ§Ã£o'),
-        ('AnÃ¡lise DNA Paternidade', 'DNA', 40.00, true, true, 'Teste de paternidade'),
-        ('AnÃ¡lise DNA GenÃ´mica', 'DNA', 80.00, true, true, 'Teste genÃ´mico completo'),
-        ('AntibiÃ³tico Tratamento', 'Medicamentos', 50.00, true, true, 'Tratamento com antibiÃ³ticos'),
-        ('Ultrassonografia', 'VeterinÃ¡rios', 100.00, false, true, 'Exame de ultrassom reprodutivo'),
-        ('Cirurgia Geral', 'VeterinÃ¡rios', 300.00, true, true, 'Procedimento cirÃºrgico geral'),
-        ('Exame Laboratorial', 'VeterinÃ¡rios', 80.00, true, true, 'Exames laboratoriais diversos'),
-        ('Brinco IdentificaÃ§Ã£o', 'Manejo', 15.00, true, true, 'Brinco de identificaÃ§Ã£o eletrÃ´nico')
+        ('Casqueamento', 'Manejo', 40.00, true, true, 'Casqueamento para venda ou exposição'),
+        ('Análise DNA Paternidade', 'DNA', 40.00, true, true, 'Teste de paternidade'),
+        ('Análise DNA Genômica', 'DNA', 80.00, true, true, 'Teste genômico completo'),
+        ('Antibiótico Tratamento', 'Medicamentos', 50.00, true, true, 'Tratamento com antibióticos'),
+        ('Ultrassonografia', 'Veterinários', 100.00, false, true, 'Exame de ultrassom reprodutivo'),
+        ('Cirurgia Geral', 'Veterinários', 300.00, true, true, 'Procedimento cirúrgico geral'),
+        ('Exame Laboratorial', 'Veterinários', 80.00, true, true, 'Exames laboratoriais diversos'),
+        ('Brinco Identificação', 'Manejo', 15.00, true, true, 'Brinco de identificação eletrônico')
       ON CONFLICT DO NOTHING;
     `)
     
-    console.log('âÅ“â€¦ Tabela tipos_servicos criada com sucesso!')
-    console.log('ðÅ¸â€œÅ  20 serviÃ§os padrÃ£o inseridos')
+    console.log('✅ Tabela tipos_servicos criada com sucesso!')
+    console.log('📊 20 serviços padrão inseridos')
     console.log('')
-    console.log('ðÅ¸Å½¯ Categorias disponÃ­veis:')
-    console.log('   - VeterinÃ¡rios')
-    console.log('   - ReproduÃ§Ã£o')
+    console.log('🎯 Categorias disponíveis:')
+    console.log('   - Veterinários')
+    console.log('   - Reprodução')
     console.log('   - Medicamentos')
     console.log('   - Manejo')
     console.log('   - DNA')
@@ -77,7 +77,7 @@ async function createServicosTable() {
     process.exit(0)
     
   } catch (error) {
-    console.error('â�Å’ Erro ao criar tabela:', error.message)
+    console.error('❌ Erro ao criar tabela:', error.message)
     await pool.end()
     process.exit(1)
   }

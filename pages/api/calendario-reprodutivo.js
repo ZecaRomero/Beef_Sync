@@ -33,7 +33,7 @@ async function handleGet(req, res) {
   const { id, data_inicio, data_fim, tipo, animal, limit = 200, offset = 0 } = req.query
 
   try {
-    logger.info(`Buscando eventos do calendÃ¡rio - Tipo: ${tipo || 'todos'}, Data: ${data_inicio || 'todas'}`)
+    logger.info(`Buscando eventos do calendário - Tipo: ${tipo || 'todos'}, Data: ${data_inicio || 'todas'}`)
     
     if (id) {
       const result = await query(
@@ -42,13 +42,13 @@ async function handleGet(req, res) {
       )
 
       if (result.rows.length === 0) {
-        return sendNotFound(res, 'Evento nÃ£o encontrado')
+        return sendNotFound(res, 'Evento não encontrado')
       }
 
       return sendSuccess(res, result.rows[0])
     }
 
-    // Buscar eventos do calendÃ¡rio manual
+    // Buscar eventos do calendário manual
     let sql = `
       SELECT 
         cr.id,
@@ -166,14 +166,14 @@ async function handleGet(req, res) {
       receptorasResult = { rows: [] }
     }
     
-    console.log(`ðÅ¸â€œâ€¹ Receptoras encontradas na query: ${receptorasResult.rows.length}`)
+    console.log(`📋 Receptoras encontradas na query: ${receptorasResult.rows.length}`)
     if (receptorasResult.rows.length > 0) {
-      console.log('ðÅ¸â€œâ€¹ Primeira receptora exemplo:', JSON.stringify(receptorasResult.rows[0], null, 2))
+      console.log('📋 Primeira receptora exemplo:', JSON.stringify(receptorasResult.rows[0], null, 2))
     }
 
-    // Buscar animais que jÃ¡ tÃªm DG (para filtrar eventos DG agendado)
+    // Buscar animais que já têm DG (para filtrar eventos DG agendado)
     const animaisComDG = new Set()
-    const receptoraVaziaKeys = new Set() // Receptoras diagnosticadas como VAZIA - nÃ£o mostrar Parto Previsto
+    const receptoraVaziaKeys = new Set() // Receptoras diagnosticadas como VAZIA - não mostrar Parto Previsto
     try {
       const r = await query(`SELECT serie, rg, tatuagem, resultado_dg FROM animais WHERE data_dg IS NOT NULL`)
       r.rows.forEach(ax => {
@@ -183,7 +183,7 @@ async function handleGet(req, res) {
         const tatuagem = String(ax.tatuagem||'').replace(/\s/g, '').toLowerCase()
         const serieRg = (serie+rg).replace(/\s/g, '').toLowerCase()
         const res = String(ax.resultado_dg || '').toLowerCase()
-        const ehVazia = res.includes('vazia') || res.includes('negativ') || res.includes('nao') || res.includes('nÃ£o')
+        const ehVazia = res.includes('vazia') || res.includes('negativ') || res.includes('nao') || res.includes('não')
         animaisComDG.add(`${serie}_${rg}`)
         animaisComDG.add(`_${rgSemZero}`)
         animaisComDG.add(serieRg)
@@ -233,7 +233,7 @@ async function handleGet(req, res) {
     const eventosReceptoras = []
     const receptorasMap = new Map()
 
-    console.log(`ðÅ¸â€�â€ž Iniciando processamento de ${receptorasResult.rows.length} receptoras...`)
+    console.log(`🔄 Iniciando processamento de ${receptorasResult.rows.length} receptoras...`)
 
     receptorasResult.rows.forEach((row, index) => {
       try {
@@ -241,7 +241,7 @@ async function handleGet(req, res) {
         let letra = row.receptora_letra || ''
         let numero = row.receptora_numero || ''
         
-        // Extrair letra e nÃºmero da tatuagem se disponÃ­vel
+        // Extrair letra e número da tatuagem se disponível
         if (tatuagem) {
           const matchLetra = tatuagem.match(/^([A-Za-z]+)/)
           const matchNumero = tatuagem.match(/(\d+)/)
@@ -249,11 +249,11 @@ async function handleGet(req, res) {
           if (matchNumero) numero = matchNumero[1]
         }
 
-        // Se nÃ£o conseguiu extrair da tatuagem, usar da NF
+        // Se não conseguiu extrair da tatuagem, usar da NF
         if (!numero && row.receptora_numero) numero = String(row.receptora_numero).trim()
         if (!letra && row.receptora_letra) letra = String(row.receptora_letra).toUpperCase().trim()
 
-        // Sempre processar, mesmo sem nÃºmero (usar tatuagem como identificador)
+        // Sempre processar, mesmo sem número (usar tatuagem como identificador)
         const itemId = row.item_id || index
         const chave = `${row.nf_id}_${itemId}`
         
@@ -261,7 +261,7 @@ async function handleGet(req, res) {
           receptorasMap.set(chave, true)
           
           const nomeReceptora = tatuagem || `${letra}${numero}`.trim() || `Receptora ${row.numero_nf}`
-          console.log(`  âÅ“â€¦ Processando: ${nomeReceptora}`)
+          console.log(`  ✅ Processando: ${nomeReceptora}`)
           
           // Evento 1: Chegada da NF
           if (row.data_compra) {
@@ -272,7 +272,7 @@ async function handleGet(req, res) {
               data_evento: row.data_compra,
               tipo_evento: 'Chegada de Receptora',
               descricao: `Receptora ${nomeReceptora} chegou na NF ${row.numero_nf}${row.fornecedor ? ` - ${row.fornecedor}` : ''}${row.data_te ? `. TE: ${new Date(row.data_te).toLocaleDateString('pt-BR')}` : ''}`,
-              status: 'ConcluÃ­do',
+              status: 'Concluído',
               animal_serie: letra,
               animal_rg: numero,
               animal_nome: row.animal_nome || nomeReceptora,
@@ -284,7 +284,7 @@ async function handleGet(req, res) {
             })
           }
 
-          // Evento 2: DG Agendado (20 dias apÃ³s chegada) - SOMENTE se o animal ainda NÃÆ’O passou pelo DG
+          // Evento 2: DG Agendado (20 dias após chegada) - SOMENTE se o animal ainda NÃO passou pelo DG
           const temDG = row.animal_data_dg || jaTemDG(letra, numero, tatuagem)
           if (row.data_prevista_dg && !temDG) {
             eventosReceptoras.push({
@@ -292,8 +292,8 @@ async function handleGet(req, res) {
                 titulo: `DG - Receptora ${nomeReceptora}`,
                 animal_id: row.animal_id,
                 data_evento: row.data_prevista_dg,
-                tipo_evento: 'DiagnÃ³stico de GestaÃ§Ã£o',
-                descricao: `DiagnÃ³stico de GestaÃ§Ã£o agendado para Receptora ${nomeReceptora} (NF ${row.numero_nf})`,
+                tipo_evento: 'Diagnóstico de Gestação',
+                descricao: `Diagnóstico de Gestação agendado para Receptora ${nomeReceptora} (NF ${row.numero_nf})`,
                 status: 'Agendado',
                 animal_serie: letra,
                 animal_rg: numero,
@@ -306,9 +306,9 @@ async function handleGet(req, res) {
             })
           }
 
-          // Evento 3: Parto Previsto (9 meses apÃ³s TE) - SOMENTE se NÃÆ’O foi diagnosticada como VAZIA
+          // Evento 3: Parto Previsto (9 meses após TE) - SOMENTE se NÃO foi diagnosticada como VAZIA
           const resDG = String(row.animal_resultado_dg || '').toLowerCase()
-          const foiVazia = resDG.includes('vazia') || resDG.includes('negativ') || resDG.includes('nao') || resDG.includes('nÃ£o') || ehReceptoraVazia(letra, numero, tatuagem)
+          const foiVazia = resDG.includes('vazia') || resDG.includes('negativ') || resDG.includes('nao') || resDG.includes('não') || ehReceptoraVazia(letra, numero, tatuagem)
           if (row.data_te && !foiVazia) {
             const dataTE = new Date(row.data_te)
             const dataParto = new Date(dataTE)
@@ -339,9 +339,9 @@ async function handleGet(req, res) {
       }
     })
     
-    console.log(`âÅ“â€¦ Eventos de receptoras criados: ${eventosReceptoras.length}`)
+    console.log(`✅ Eventos de receptoras criados: ${eventosReceptoras.length}`)
 
-    // Buscar exames androlÃ³gicos para refazer (Inapto ââ€ â€™ reagendamento em 30 dias)
+    // Buscar exames andrológicos para refazer (Inapto → reagendamento em 30 dias)
     let examesAndrologicosResult = { rows: [] }
     try {
       let sqlAndrologicos = `
@@ -394,7 +394,7 @@ async function handleGet(req, res) {
         return true
       })
     } catch (queryError) {
-      logger.error('Erro ao buscar exames androlÃ³gicos:', queryError)
+      logger.error('Erro ao buscar exames andrológicos:', queryError)
       examesAndrologicosResult = { rows: [] }
     }
 
@@ -403,10 +403,10 @@ async function handleGet(req, res) {
       const nomeTouro = row.touro || `${row.animal_serie || ''}${row.animal_rg || row.rg}`.trim() || `RG ${row.rg}`
       return {
         id: `andrologico_refazer_${row.exame_id}`,
-        titulo: `Refazer Exame AndrolÃ³gico - ${nomeTouro}`,
+        titulo: `Refazer Exame Andrológico - ${nomeTouro}`,
         animal_id: row.animal_id,
         data_evento: dataEvento,
-        tipo_evento: 'Refazer Exame AndrolÃ³gico',
+        tipo_evento: 'Refazer Exame Andrológico',
         descricao: `Touro ${nomeTouro} (RG: ${row.rg}) deu Inapto. Refazer exame em 30 dias.`,
         status: 'Agendado',
         animal_serie: row.animal_serie,
@@ -417,9 +417,9 @@ async function handleGet(req, res) {
       }
     })
 
-    console.log(`âÅ“â€¦ Eventos androlÃ³gicos para refazer: ${eventosAndrologicos.length}`)
+    console.log(`✅ Eventos andrológicos para refazer: ${eventosAndrologicos.length}`)
 
-    // Combinar eventos manuais, de receptoras e androlÃ³gicos
+    // Combinar eventos manuais, de receptoras e andrológicos
     const todosEventos = [
       ...eventosManuais.rows.map(e => ({ ...e, origem: 'manual' })),
       ...eventosReceptoras,
@@ -443,7 +443,7 @@ async function handleGet(req, res) {
       )
     }
     
-    console.log(`ðÅ¸â€œÅ  Total de eventos apÃ³s filtros: ${eventosFiltrados.length} (Manuais: ${eventosManuais.rows.length}, Receptoras: ${eventosReceptoras.length})`)
+    console.log(`📊 Total de eventos após filtros: ${eventosFiltrados.length} (Manuais: ${eventosManuais.rows.length}, Receptoras: ${eventosReceptoras.length})`)
 
     // Ordenar por data
     eventosFiltrados.sort((a, b) => {
@@ -464,7 +464,7 @@ async function handleGet(req, res) {
     // Aplicar limite e offset
     const eventosPaginados = eventosFiltrados.slice(parseInt(offset), parseInt(offset) + parseInt(limit))
 
-    console.log(`ðÅ¸â€œ¤ Retornando ${eventosPaginados.length} eventos`)
+    console.log(`📤 Retornando ${eventosPaginados.length} eventos`)
     if (eventosPaginados.length > 0) {
       console.log('Primeiro evento:', eventosPaginados[0].titulo)
     }
@@ -472,7 +472,7 @@ async function handleGet(req, res) {
     return sendSuccess(res, eventosPaginados)
 
   } catch (error) {
-    logger.error('Erro ao buscar eventos do calendÃ¡rio:', error)
+    logger.error('Erro ao buscar eventos do calendário:', error)
     console.error('Erro completo:', error)
     console.error('Stack:', error.stack)
     return res.status(500).json({ 
@@ -495,7 +495,7 @@ async function handlePost(req, res) {
   } = req.body
 
   if (!titulo || !data_evento) {
-    return sendValidationError(res, 'TÃ­tulo e data do evento sÃ£o obrigatÃ³rios')
+    return sendValidationError(res, 'Título e data do evento são obrigatórios')
   }
 
   try {
@@ -525,7 +525,7 @@ async function handlePut(req, res) {
   const { titulo, animal_id, data_evento, tipo_evento, descricao, status } = req.body
 
   if (!id) {
-    return sendValidationError(res, 'ID do evento Ã© obrigatÃ³rio')
+    return sendValidationError(res, 'ID do evento é obrigatório')
   }
 
   try {
@@ -575,7 +575,7 @@ async function handlePut(req, res) {
     const result = await query(sql, params)
 
     if (result.rows.length === 0) {
-      return sendNotFound(res, 'Evento nÃ£o encontrado')
+      return sendNotFound(res, 'Evento não encontrado')
     }
 
     logger.info(`Evento atualizado: ID ${id}`)
@@ -595,7 +595,7 @@ async function handleDelete(req, res) {
   const { id } = req.query
 
   if (!id) {
-    return sendValidationError(res, 'ID do evento Ã© obrigatÃ³rio')
+    return sendValidationError(res, 'ID do evento é obrigatório')
   }
 
   try {
@@ -605,11 +605,11 @@ async function handleDelete(req, res) {
     )
 
     if (result.rows.length === 0) {
-      return sendNotFound(res, 'Evento nÃ£o encontrado')
+      return sendNotFound(res, 'Evento não encontrado')
     }
 
-    logger.info(`Evento excluÃ­do: ID ${id}`)
-    return sendSuccess(res, result.rows[0], 'Evento excluÃ­do com sucesso')
+    logger.info(`Evento excluído: ID ${id}`)
+    return sendSuccess(res, result.rows[0], 'Evento excluído com sucesso')
 
   } catch (error) {
     logger.error('Erro ao excluir evento:', error)

@@ -10,21 +10,21 @@ async function test() {
         
         const animal = await service.buscarAnimalPorId("16207");
         if (animal) {
-            console.log('�œ… Found animal:', animal.serie, animal.rg, 'ID:', animal.id);
+            console.log('✅ Found animal:', animal.serie, animal.rg, 'ID:', animal.id);
         } else {
-            console.log('�Œ Animal not found with "16207"');
+            console.log('❌ Animal not found with "16207"');
         }
         
         console.log('Testing buscarAnimalPorId with ID 1175...');
         const animalId = await service.buscarAnimalPorId(1175);
         if (animalId) {
-             console.log('�œ… Found animal by ID:', animalId.serie, animalId.rg, 'ID:', animalId.id);
+             console.log('✅ Found animal by ID:', animalId.serie, animalId.rg, 'ID:', animalId.id);
         } else {
-             console.log('�Œ Animal not found by ID 1175');
+             console.log('❌ Animal not found by ID 1175');
         }
 
     } catch (e) {
-        console.error('�Œ Error:', e);
+        console.error('❌ Error:', e);
     }
     process.exit(0);
 }

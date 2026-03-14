@@ -10,7 +10,7 @@ const pool = new Pool({
 
 async function buscarAnimal() {
   try {
-    console.log('�Ÿ”� Buscando animal 15639...\n')
+    console.log('🔍 Buscando animal 15639...\n')
     
     // Buscar animal
     const animal = await pool.query(`
@@ -18,11 +18,11 @@ async function buscarAnimal() {
     `)
     
     if (animal.rows.length === 0) {
-      console.log('�Œ Animal não encontrado')
+      console.log('❌ Animal não encontrado')
       return
     }
     
-    console.log('�Ÿ“‹ Dados do animal:')
+    console.log('📋 Dados do animal:')
     console.log(animal.rows[0])
     
     // Buscar inseminações
@@ -32,7 +32,7 @@ async function buscarAnimal() {
       ORDER BY data_ia DESC
     `)
     
-    console.log('\n�Ÿ’‰ Inseminações:')
+    console.log('\n💉 Inseminações:')
     console.log(inseminacoes.rows)
     
     // Buscar gestações
@@ -42,11 +42,11 @@ async function buscarAnimal() {
       ORDER BY data_inicio DESC
     `)
     
-    console.log('\n�Ÿ�� Gestações:')
+    console.log('\n🤰 Gestações:')
     console.log(gestacoes.rows)
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message)
+    console.error('❌ Erro:', error.message)
   } finally {
     await pool.end()
   }

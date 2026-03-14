@@ -36,7 +36,7 @@ export default function ImportarPiquetes() {
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
-            ðÅ¸â€œ� Importar via Texto (Recomendado)
+            📝 Importar via Texto (Recomendado)
           </button>
           <button
             onClick={() => setModoAtivo('excel')}
@@ -46,7 +46,7 @@ export default function ImportarPiquetes() {
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
-            ðÅ¸â€œÅ  Importar via Excel
+            📊 Importar via Excel
           </button>
         </div>
 
@@ -61,7 +61,7 @@ export default function ImportarPiquetes() {
 
           <div className="space-y-4">
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="font-semibold text-gray-800 mb-3">ââ€ž¹ï¸� InformaÃ§Ãµes</h3>
+              <h3 className="font-semibold text-gray-800 mb-3">ℹ️ Informações</h3>
               <div className="space-y-2 text-sm text-gray-600">
                 {modoAtivo === 'texto' ? (
                   <>
@@ -69,34 +69,34 @@ export default function ImportarPiquetes() {
                       <strong>Modo Texto:</strong> Copie e cole diretamente do Excel
                     </p>
                     <p>
-                      <strong>ValidaÃ§Ã£o:</strong> Verifica os dados antes de importar
+                      <strong>Validação:</strong> Verifica os dados antes de importar
                     </p>
                     <p>
-                      <strong>Formato:</strong> MantÃ©m automaticamente ao copiar do Excel
+                      <strong>Formato:</strong> Mantém automaticamente ao copiar do Excel
                     </p>
                   </>
                 ) : (
                   <>
                     <p>
-                      <strong>Piquetes:</strong> SerÃ£o criados automaticamente se nÃ£o existirem
+                      <strong>Piquetes:</strong> Serão criados automaticamente se não existirem
                     </p>
                     <p>
-                      <strong>Animais:</strong> Novos animais serÃ£o cadastrados, existentes serÃ£o atualizados
+                      <strong>Animais:</strong> Novos animais serão cadastrados, existentes serão atualizados
                     </p>
                     <p>
-                      <strong>InseminaÃ§Ãµes:</strong> Dados de IA e DG serÃ£o registrados automaticamente
+                      <strong>Inseminações:</strong> Dados de IA e DG serão registrados automaticamente
                     </p>
                   </>
                 )}
                 <p className="text-green-600 font-semibold mt-2">
-                  âÅ“â€¦ Todos os animais sÃ£o cadastrados como FÃÅ MEA
+                  ✅ Todos os animais são cadastrados como FÊMEA
                 </p>
               </div>
             </div>
 
             {ultimaImportacao && (
               <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="font-semibold text-gray-800 mb-3">ðÅ¸â€œÅ  ÃÅ¡ltima ImportaÃ§Ã£o</h3>
+                <h3 className="font-semibold text-gray-800 mb-3">📊 Última Importação</h3>
                 <div className="space-y-2 text-sm">
                   <p className="text-gray-600">
                     <strong>Data:</strong> {ultimaImportacao.data}
@@ -120,9 +120,9 @@ export default function ImportarPiquetes() {
             )}
 
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <h3 className="font-semibold text-yellow-900 mb-2">âÅ¡ ï¸� AtenÃ§Ã£o</h3>
+              <h3 className="font-semibold text-yellow-900 mb-2">⚠️ Atenção</h3>
               <p className="text-sm text-yellow-800">
-                Certifique-se de que o arquivo Excel estÃ¡ no formato correto antes de importar.
+                Certifique-se de que o arquivo Excel está no formato correto antes de importar.
                 Dados incorretos podem causar problemas no sistema.
               </p>
             </div>

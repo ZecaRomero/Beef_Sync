@@ -21,7 +21,7 @@ async function verificarAnimaisSemAvo() {
       AND mae != ''
     `)
     
-    console.log(`�Ÿ“Š Animais sem avô materno mas com mãe: ${result.rows[0].total}`)
+    console.log(`📊 Animais sem avô materno mas com mãe: ${result.rows[0].total}`)
     
     // Buscar alguns exemplos
     const exemplos = await client.query(`
@@ -33,7 +33,7 @@ async function verificarAnimaisSemAvo() {
       LIMIT 10
     `)
     
-    console.log('\n�Ÿ“‹ Exemplos de animais sem avô materno:')
+    console.log('\n📋 Exemplos de animais sem avô materno:')
     exemplos.rows.forEach((animal, index) => {
       console.log(`${index + 1}. ${animal.serie}-${animal.rg}: Mãe = "${animal.mae}"`)
     })
@@ -48,10 +48,10 @@ async function verificarAnimaisSemAvo() {
     
     if (animalEspecifico.rows.length > 0) {
       const animal = animalEspecifico.rows[0]
-      console.log(`\n�Ÿ”� Verificando animal específico: ${animal.serie}-${animal.rg}`)
+      console.log(`\n🔍 Verificando animal específico: ${animal.serie}-${animal.rg}`)
       console.log(`   Mãe: ${animal.mae}`)
       
-      // Buscar outros animais com a mesma mãe que T�ŠM avô materno
+      // Buscar outros animais com a mesma mãe que TÊM avô materno
       if (animal.mae) {
         const match = animal.mae.match(/([A-Za-z]+)[\s\/\-]*(\d+)/)
         if (match) {
@@ -67,14 +67,14 @@ async function verificarAnimaisSemAvo() {
           `, [`%${maeSerie}%${maeRg}%`])
           
           if (irmaos.rows.length > 0) {
-            console.log(`\n�œ… Encontrados ${irmaos.rows.length} irmãos com avô materno:`)
+            console.log(`\n✅ Encontrados ${irmaos.rows.length} irmãos com avô materno:`)
             irmaos.rows.forEach((irmao, index) => {
               console.log(`   ${index + 1}. ${irmao.serie}-${irmao.rg}: "${irmao.avo_materno}"`)
             })
             
             // Usar o avô materno do primeiro irmão
             const avoMaterno = irmaos.rows[0].avo_materno
-            console.log(`\n�Ÿ’� Atualizando ${animal.serie}-${animal.rg} com avô materno: "${avoMaterno}"`)
+            console.log(`\n💡 Atualizando ${animal.serie}-${animal.rg} com avô materno: "${avoMaterno}"`)
             
             await client.query(`
               UPDATE animais 
@@ -82,16 +82,16 @@ async function verificarAnimaisSemAvo() {
               WHERE id = $2
             `, [avoMaterno, animal.id])
             
-            console.log('�œ… Animal atualizado!')
+            console.log('✅ Animal atualizado!')
           } else {
-            console.log('\n�š�️ Nenhum irmão com avô materno encontrado')
+            console.log('\n⚠️ Nenhum irmão com avô materno encontrado')
           }
         }
       }
     }
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message)
+    console.error('❌ Erro:', error.message)
     throw error
   } finally {
     client.release()
@@ -101,11 +101,11 @@ async function verificarAnimaisSemAvo() {
 
 verificarAnimaisSemAvo()
   .then(() => {
-    console.log('\n�œ… Script concluído!')
+    console.log('\n✅ Script concluído!')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n�Œ Erro fatal:', error)
+    console.error('\n❌ Erro fatal:', error)
     process.exit(1)
   })
 

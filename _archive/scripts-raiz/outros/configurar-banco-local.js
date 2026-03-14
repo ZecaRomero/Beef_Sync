@@ -2,7 +2,7 @@ require('dotenv').config();
 const { Pool } = require('pg');
 const fs = require('fs');
 
-console.log('�Ÿ”� Configurando banco de dados LOCAL...\n');
+console.log('🔧 Configurando banco de dados LOCAL...\n');
 
 const poolLocal = new Pool({
   host: 'localhost',
@@ -15,10 +15,10 @@ const poolLocal = new Pool({
 
 async function configurarLocal() {
   try {
-    console.log('�Ÿ“� Testando conexão com PostgreSQL local...');
+    console.log('📡 Testando conexão com PostgreSQL local...');
     const client = await poolLocal.connect();
     
-    console.log('�œ… PostgreSQL local conectado!\n');
+    console.log('✅ PostgreSQL local conectado!\n');
     
     // Verificar se o banco existe
     const dbCheck = await client.query(
@@ -26,18 +26,18 @@ async function configurarLocal() {
     );
     
     if (dbCheck.rows.length === 0) {
-      console.log('�Ÿ“� Criando banco de dados beef_sync...');
+      console.log('📦 Criando banco de dados beef_sync...');
       await client.query('CREATE DATABASE beef_sync');
-      console.log('�œ… Banco criado!');
+      console.log('✅ Banco criado!');
     } else {
-      console.log('�œ… Banco beef_sync já existe');
+      console.log('✅ Banco beef_sync já existe');
     }
     
     client.release();
     await poolLocal.end();
     
     // Atualizar .env para usar banco local
-    console.log('\n�Ÿ“� Atualizando arquivo .env...');
+    console.log('\n📝 Atualizando arquivo .env...');
     
     let envContent = fs.readFileSync('.env', 'utf8');
     
@@ -49,25 +49,25 @@ async function configurarLocal() {
     
     fs.writeFileSync('.env', envContent);
     
-    console.log('�œ… Arquivo .env atualizado para usar banco local\n');
-    console.log('�ŸŽ‰ CONFIGURA�‡�ƒO CONCLUÍDA!');
-    console.log('\n�Ÿ“‹ Próximos passos:');
+    console.log('✅ Arquivo .env atualizado para usar banco local\n');
+    console.log('🎉 CONFIGURAÇÃO CONCLUÍDA!');
+    console.log('\n📋 Próximos passos:');
     console.log('1. Execute: node scripts/restore-database.js backup');
     console.log('2. Ou execute: npm run dev');
-    console.log('\n�Ÿ’� O sistema agora usará o PostgreSQL local');
+    console.log('\n💡 O sistema agora usará o PostgreSQL local');
     
     process.exit(0);
     
   } catch (error) {
-    console.error('�Œ ERRO:', error.message);
+    console.error('❌ ERRO:', error.message);
     
     if (error.code === 'ECONNREFUSED') {
-      console.log('\n�š�️  PostgreSQL não está rodando localmente!');
-      console.log('\n�Ÿ”� SOLU�‡�•ES:');
+      console.log('\n⚠️  PostgreSQL não está rodando localmente!');
+      console.log('\n🔧 SOLUÇÕES:');
       console.log('1. Instale o PostgreSQL: https://www.postgresql.org/download/windows/');
       console.log('2. Ou use o Docker: docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=jcromero85 postgres');
       console.log('3. Ou inicie o serviço PostgreSQL no Windows');
-      console.log('\n�Ÿ’� Após instalar, execute este script novamente');
+      console.log('\n💡 Após instalar, execute este script novamente');
     }
     
     await poolLocal.end();

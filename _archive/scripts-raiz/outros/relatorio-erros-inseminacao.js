@@ -2,13 +2,13 @@
 const { query } = require('./lib/database')
 
 async function gerarRelatorioErros() {
-  console.log('�Ÿ“‹ RELAT�“RIO DETALHADO DOS ERROS DE IMPORTA�‡�ƒO - INSEMINA�‡�ƒO ARTIFICIAL')
+  console.log('📋 RELATÓRIO DETALHADO DOS ERROS DE IMPORTAÇÃO - INSEMINAÇÃO ARTIFICIAL')
   console.log('=' .repeat(80))
   console.log('')
 
   try {
     // 1. Analisar os animais específicos mencionados nos erros
-    console.log('�Ÿ”� 1. ANÁLISE DOS ANIMAIS COM ERRO')
+    console.log('🔍 1. ANÁLISE DOS ANIMAIS COM ERRO')
     console.log('-'.repeat(50))
     
     const animaisComErro = [
@@ -49,25 +49,25 @@ async function gerarRelatorioErros() {
 
           // Identificar problemas
           if (animal.sexo === 'Macho' || animal.sexo === 'M') {
-            problema.push('�Œ SEXO: �‰ MACHO (não pode ser inseminado)')
-            solucao.push('�€� Remover da planilha de IA')
-            solucao.push('�€� Ou corrigir sexo se estiver incorreto')
+            problema.push('❌ SEXO: É MACHO (não pode ser inseminado)')
+            solucao.push('• Remover da planilha de IA')
+            solucao.push('• Ou corrigir sexo se estiver incorreto')
           } else if (animal.sexo === 'Fêmea' || animal.sexo === 'F') {
-            problema.push('�œ… SEXO: �‰ F�ŠMEA (pode ser inseminada)')
+            problema.push('✅ SEXO: É FÊMEA (pode ser inseminada)')
           } else {
-            problema.push(`�š�️ SEXO: "${animal.sexo}" (não reconhecido)`)
-            solucao.push('�€� Padronizar sexo para "Macho" ou "Fêmea"')
+            problema.push(`⚠️ SEXO: "${animal.sexo}" (não reconhecido)`)
+            solucao.push('• Padronizar sexo para "Macho" ou "Fêmea"')
           }
 
           if (animal.situacao !== 'Ativo') {
-            problema.push(`�š�️ SITUA�‡�ƒO: ${animal.situacao}`)
-            solucao.push('�€� Verificar se animal deve estar ativo')
+            problema.push(`⚠️ SITUAÇÃO: ${animal.situacao}`)
+            solucao.push('• Verificar se animal deve estar ativo')
           }
 
           const idadeMeses = parseInt(animal.idade_meses) || 0
           if (idadeMeses < 15) {
-            problema.push(`�š�️ IDADE: ${idadeMeses} meses (muito jovem para IA)`)
-            solucao.push('�€� Aguardar até 15-18 meses para primeira IA')
+            problema.push(`⚠️ IDADE: ${idadeMeses} meses (muito jovem para IA)`)
+            solucao.push('• Aguardar até 15-18 meses para primeira IA')
           }
 
           relatorioAnimais.push({
@@ -87,8 +87,8 @@ async function gerarRelatorioErros() {
           relatorioAnimais.push({
             animal: `${serie} ${rg}`,
             id: null,
-            problemas: ['�Œ ANIMAL N�ƒO ENCONTRADO'],
-            solucoes: ['�€� Verificar se série e RG estão corretos', '�€� Cadastrar animal se necessário']
+            problemas: ['❌ ANIMAL NÃO ENCONTRADO'],
+            solucoes: ['• Verificar se série e RG estão corretos', '• Cadastrar animal se necessário']
           })
         }
       } catch (error) {
@@ -104,7 +104,7 @@ async function gerarRelatorioErros() {
         console.log(`   Raça: ${item.raca} | Idade: ${item.idade}`)
         console.log(`   Situação: ${item.situacao} | IAs: ${item.total_ias}`)
         if (item.ultima_ia) {
-          console.log(`   �šltima IA: ${new Date(item.ultima_ia).toLocaleDateString('pt-BR')}`)
+          console.log(`   Última IA: ${new Date(item.ultima_ia).toLocaleDateString('pt-BR')}`)
         }
       }
       
@@ -112,14 +112,14 @@ async function gerarRelatorioErros() {
       item.problemas.forEach(p => console.log(`     ${p}`))
       
       if (item.solucoes && item.solucoes.length > 0) {
-        console.log('   SOLU�‡�•ES:')
+        console.log('   SOLUÇÕES:')
         item.solucoes.forEach(s => console.log(`     ${s}`))
       }
       console.log('')
     })
 
     // 2. Estatísticas gerais
-    console.log('�Ÿ“Š 2. ESTATÍSTICAS GERAIS')
+    console.log('📊 2. ESTATÍSTICAS GERAIS')
     console.log('-'.repeat(50))
     
     const totalAnimais = relatorioAnimais.length
@@ -131,14 +131,14 @@ async function gerarRelatorioErros() {
 
     console.log(`Total de animais analisados: ${totalAnimais}`)
     console.log(`Animais encontrados no sistema: ${animaisEncontrados}`)
-    console.log(`Animais N�ƒO encontrados: ${animaisNaoEncontrados}`)
+    console.log(`Animais NÃO encontrados: ${animaisNaoEncontrados}`)
     console.log(`Machos (não podem ser inseminados): ${machos}`)
     console.log(`Fêmeas (podem ser inseminadas): ${femeas}`)
     console.log(`Sexo indefinido: ${sexoIndefinido}`)
     console.log('')
 
     // 3. Verificar estrutura da tabela inseminacoes
-    console.log('�Ÿ”� 3. VERIFICA�‡�ƒO DA ESTRUTURA DO BANCO')
+    console.log('🔧 3. VERIFICAÇÃO DA ESTRUTURA DO BANCO')
     console.log('-'.repeat(50))
     
     try {
@@ -152,54 +152,54 @@ async function gerarRelatorioErros() {
 
       console.log('Colunas da tabela inseminacoes:')
       colunas.rows.forEach(col => {
-        console.log(`  �œ… ${col.column_name}: ${col.data_type} ${col.is_nullable === 'NO' ? '(obrigatório)' : '(opcional)'}`)
+        console.log(`  ✅ ${col.column_name}: ${col.data_type} ${col.is_nullable === 'NO' ? '(obrigatório)' : '(opcional)'}`)
       })
       
       if (colunas.rows.length < 15) {
-        console.log('�š�️ ATEN�‡�ƒO: Tabela pode estar com colunas faltando')
+        console.log('⚠️ ATENÇÃO: Tabela pode estar com colunas faltando')
         console.log('   Execute: node fix-inseminacao-table.js')
       }
     } catch (error) {
-      console.log('�Œ ERRO: Tabela inseminacoes não existe ou tem problemas')
+      console.log('❌ ERRO: Tabela inseminacoes não existe ou tem problemas')
       console.log('   Execute: node fix-inseminacao-table.js')
     }
 
     console.log('')
 
     // 4. Recomendações específicas
-    console.log('�Ÿ’� 4. RECOMENDA�‡�•ES ESPECÍFICAS')
+    console.log('💡 4. RECOMENDAÇÕES ESPECÍFICAS')
     console.log('-'.repeat(50))
     
-    console.log('PARA CORRIGIR OS ERROS DE IMPORTA�‡�ƒO:')
+    console.log('PARA CORRIGIR OS ERROS DE IMPORTAÇÃO:')
     console.log('')
     
     console.log('A) ANIMAIS MACHOS (remover da planilha):')
     const machosParaRemover = relatorioAnimais.filter(a => a.sexo === 'Macho' || a.sexo === 'M')
     machosParaRemover.forEach(animal => {
-      console.log(`   �Œ ${animal.animal} - REMOVER da planilha Excel`)
+      console.log(`   ❌ ${animal.animal} - REMOVER da planilha Excel`)
     })
     
     console.log('')
-    console.log('B) ANIMAIS N�ƒO ENCONTRADOS (verificar cadastro):')
+    console.log('B) ANIMAIS NÃO ENCONTRADOS (verificar cadastro):')
     const naoEncontrados = relatorioAnimais.filter(a => a.id === null)
     naoEncontrados.forEach(animal => {
-      console.log(`   �“ ${animal.animal} - Verificar se existe no sistema`)
+      console.log(`   ❓ ${animal.animal} - Verificar se existe no sistema`)
     })
     
     console.log('')
-    console.log('C) F�ŠMEAS APTAS PARA IA:')
+    console.log('C) FÊMEAS APTAS PARA IA:')
     const femeasAptas = relatorioAnimais.filter(a => 
       (a.sexo === 'Fêmea' || a.sexo === 'F') && 
       a.id !== null &&
       a.situacao === 'Ativo'
     )
     femeasAptas.forEach(animal => {
-      console.log(`   �œ… ${animal.animal} - Pode ser inseminada`)
+      console.log(`   ✅ ${animal.animal} - Pode ser inseminada`)
     })
 
     // 5. Gerar arquivo CSV com o relatório
     console.log('')
-    console.log('�Ÿ“„ 5. GERANDO ARQUIVO DE RELAT�“RIO')
+    console.log('📄 5. GERANDO ARQUIVO DE RELATÓRIO')
     console.log('-'.repeat(50))
     
     const csvContent = [
@@ -218,11 +218,11 @@ async function gerarRelatorioErros() {
     ].join('\n')
 
     require('fs').writeFileSync('relatorio-erros-inseminacao.csv', csvContent, 'utf8')
-    console.log('�œ… Arquivo criado: relatorio-erros-inseminacao.csv')
+    console.log('✅ Arquivo criado: relatorio-erros-inseminacao.csv')
 
     // 6. Comandos para correção
     console.log('')
-    console.log('�Ÿ›�️ 6. COMANDOS PARA CORRE�‡�ƒO')
+    console.log('🛠️ 6. COMANDOS PARA CORREÇÃO')
     console.log('-'.repeat(50))
     console.log('Execute os seguintes comandos para corrigir os problemas:')
     console.log('')
@@ -236,10 +236,10 @@ async function gerarRelatorioErros() {
     console.log('   node filter-females-for-inseminacao.js')
     console.log('')
 
-    console.log('�œ… RELAT�“RIO CONCLUÍDO!')
+    console.log('✅ RELATÓRIO CONCLUÍDO!')
 
   } catch (error) {
-    console.error('�Œ Erro ao gerar relatório:', error)
+    console.error('❌ Erro ao gerar relatório:', error)
   }
 }
 
@@ -247,13 +247,13 @@ async function gerarRelatorioErros() {
 gerarRelatorioErros()
   .then(() => {
     console.log('')
-    console.log('�ŸŽ� RESUMO EXECUTIVO:')
-    console.log('�€� Relatório detalhado gerado')
-    console.log('�€� Problemas identificados e catalogados')
-    console.log('�€� Soluções específicas fornecidas')
-    console.log('�€� Arquivo CSV criado para análise')
+    console.log('🎯 RESUMO EXECUTIVO:')
+    console.log('• Relatório detalhado gerado')
+    console.log('• Problemas identificados e catalogados')
+    console.log('• Soluções específicas fornecidas')
+    console.log('• Arquivo CSV criado para análise')
     console.log('')
-    console.log('�Ÿ“‹ PR�“XIMOS PASSOS:')
+    console.log('📋 PRÓXIMOS PASSOS:')
     console.log('1. Analise o arquivo relatorio-erros-inseminacao.csv')
     console.log('2. Remova os animais machos da planilha Excel')
     console.log('3. Corrija os dados conforme recomendações')

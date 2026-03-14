@@ -126,11 +126,11 @@ export default function LimparDadosBanco() {
   }
 
   const limparTodosDados = async () => {
-    if (!confirm('�š�️ ATEN�‡�ƒO: Esta ação irá remover dados mock do banco de dados PostgreSQL. Tem certeza?')) {
+    if (!confirm('⚠️ ATENÇÃO: Esta ação irá remover dados mock do banco de dados PostgreSQL. Tem certeza?')) {
       return
     }
 
-    if (!confirm('�Ÿš� CONFIRMA�‡�ƒO FINAL: Os dados serão removidos permanentemente do banco. Continuar?')) {
+    if (!confirm('🚨 CONFIRMAÇÃO FINAL: Os dados serão removidos permanentemente do banco. Continuar?')) {
       return
     }
 
@@ -155,16 +155,16 @@ export default function LimparDadosBanco() {
       if (sucessos > 0) {
         setConcluido(true)
         setTimeout(() => {
-          alert(`�œ… Limpeza concluída! ${sucessos} tipos de dados removidos, ${erros} erros.`)
+          alert(`✅ Limpeza concluída! ${sucessos} tipos de dados removidos, ${erros} erros.`)
           verificarDadosMock() // Recarregar dados
         }, 2000)
       } else {
-        alert('�„�️ Nenhum dado mock foi encontrado para remover.')
+        alert('ℹ️ Nenhum dado mock foi encontrado para remover.')
       }
 
     } catch (error) {
       console.error('Erro durante a limpeza:', error)
-      alert('�Œ Erro durante a limpeza: ' + error.message)
+      alert('❌ Erro durante a limpeza: ' + error.message)
     } finally {
       setLimpando(false)
     }
@@ -266,7 +266,7 @@ export default function LimparDadosBanco() {
                             <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Exemplos encontrados:</p>
                             {info.exemplos.map((exemplo, index) => (
                               <div key={index} className="text-xs text-gray-800 dark:text-gray-200 mb-1">
-                                �€� {exemplo.receptora_nome || exemplo.doadora_nome || exemplo.nome || exemplo.rg || 'Item mock'}
+                                • {exemplo.receptora_nome || exemplo.doadora_nome || exemplo.nome || exemplo.rg || 'Item mock'}
                               </div>
                             ))}
                           </div>
@@ -306,13 +306,13 @@ export default function LimparDadosBanco() {
 
           <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <h3 className="font-medium text-gray-900 dark:text-white mb-2">
-              �Ÿ—„️ Sobre esta Limpeza:
+              🗄️ Sobre esta Limpeza:
             </h3>
             <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-              <li>�€� Remove dados fictícios do banco PostgreSQL</li>
-              <li>�€� Procura por padrões como "Vaca 001", "Vaca 002", etc.</li>
-              <li>�€� Operação irreversível - faça backup se necessário</li>
-              <li>�€� Acesse: <code>localhost:3020/limpar-dados-banco</code></li>
+              <li>• Remove dados fictícios do banco PostgreSQL</li>
+              <li>• Procura por padrões como "Vaca 001", "Vaca 002", etc.</li>
+              <li>• Operação irreversível - faça backup se necessário</li>
+              <li>• Acesse: <code>localhost:3020/limpar-dados-banco</code></li>
             </ul>
           </div>
         </div>

@@ -17,11 +17,11 @@ async function verificar() {
       ORDER BY ordinal_position
     `);
     
-    console.log('\n�Ÿ“‹ COLUNAS DA TABELA inseminacoes:\n');
+    console.log('\n📋 COLUNAS DA TABELA inseminacoes:\n');
     console.table(result.rows);
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
   } finally {
     await pool.end();
   }

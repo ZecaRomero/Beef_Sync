@@ -3,7 +3,7 @@ const fetch = require('node-fetch')
 const BASE_URL = 'http://localhost:3000'
 
 async function testExamesAndrologicos() {
-  console.log('�Ÿ”� Testando Sistema de Exames Andrológicos')
+  console.log('🔬 Testando Sistema de Exames Andrológicos')
   console.log('=' .repeat(50))
 
   try {
@@ -23,9 +23,9 @@ async function testExamesAndrologicos() {
 
     if (exameApto.ok) {
       const resultApto = await exameApto.json()
-      console.log('�œ… Exame "Apto" criado:', resultApto.exame?.id)
+      console.log('✅ Exame "Apto" criado:', resultApto.exame?.id)
     } else {
-      console.log('�Œ Erro ao criar exame "Apto"')
+      console.log('❌ Erro ao criar exame "Apto"')
     }
 
     // 2. Criar um exame com resultado "Inapto" (deve gerar reagendamento)
@@ -44,13 +44,13 @@ async function testExamesAndrologicos() {
 
     if (exameInapto.ok) {
       const resultInapto = await exameInapto.json()
-      console.log('�œ… Exame "Inapto" criado:', resultInapto.exame?.id)
+      console.log('✅ Exame "Inapto" criado:', resultInapto.exame?.id)
       if (resultInapto.reagendamento) {
-        console.log('�Ÿ”„ Reagendamento automático criado para:', resultInapto.reagendamento.data_exame)
-        console.log('�Ÿ“� Mensagem:', resultInapto.message)
+        console.log('🔄 Reagendamento automático criado para:', resultInapto.reagendamento.data_exame)
+        console.log('📝 Mensagem:', resultInapto.message)
       }
     } else {
-      console.log('�Œ Erro ao criar exame "Inapto"')
+      console.log('❌ Erro ao criar exame "Inapto"')
     }
 
     // 3. Listar todos os exames
@@ -59,7 +59,7 @@ async function testExamesAndrologicos() {
     
     if (listarExames.ok) {
       const exames = await listarExames.json()
-      console.log(`�Ÿ“‹ Total de exames: ${exames.length}`)
+      console.log(`📋 Total de exames: ${exames.length}`)
       
       exames.forEach((exame, index) => {
         console.log(`\n   Exame ${index + 1}:`)
@@ -78,7 +78,7 @@ async function testExamesAndrologicos() {
         }
       })
     } else {
-      console.log('�Œ Erro ao listar exames')
+      console.log('❌ Erro ao listar exames')
     }
 
     // 4. Testar atualização de exame de "Pendente" para "Inapto"
@@ -98,7 +98,7 @@ async function testExamesAndrologicos() {
     if (examePendente.ok) {
       const resultPendente = await examePendente.json()
       const exameId = resultPendente.exame.id
-      console.log('�œ… Exame pendente criado:', exameId)
+      console.log('✅ Exame pendente criado:', exameId)
 
       // Atualizar para "Inapto"
       const updateExame = await fetch(`${BASE_URL}/api/reproducao/exames-andrologicos?id=${exameId}`, {
@@ -115,27 +115,27 @@ async function testExamesAndrologicos() {
 
       if (updateExame.ok) {
         const updateResult = await updateExame.json()
-        console.log('�œ… Exame atualizado para "Inapto"')
+        console.log('✅ Exame atualizado para "Inapto"')
         if (updateResult.reagendamento) {
-          console.log('�Ÿ”„ Novo reagendamento criado para:', updateResult.reagendamento.data_exame)
+          console.log('🔄 Novo reagendamento criado para:', updateResult.reagendamento.data_exame)
         }
       }
     }
 
     console.log('\n' + '=' .repeat(50))
-    console.log('�œ… Teste do sistema de exames andrológicos concluído!')
+    console.log('✅ Teste do sistema de exames andrológicos concluído!')
     console.log('\nFuncionalidades testadas:')
-    console.log('- �œ… Criação de exames com resultado "Apto"')
-    console.log('- �œ… Criação de exames com resultado "Inapto" e reagendamento automático')
-    console.log('- �œ… Listagem de exames com informações de reagendamento')
-    console.log('- �œ… Atualização de exames e reagendamento automático')
+    console.log('- ✅ Criação de exames com resultado "Apto"')
+    console.log('- ✅ Criação de exames com resultado "Inapto" e reagendamento automático')
+    console.log('- ✅ Listagem de exames com informações de reagendamento')
+    console.log('- ✅ Atualização de exames e reagendamento automático')
     console.log('\nReagendamento automático:')
-    console.log('- �Ÿ”„ Exames "Inapto" são automaticamente reagendados para 30 dias depois')
-    console.log('- �Ÿ“… Status do exame original é alterado para "Reagendado"')
-    console.log('- �Ÿ”— Novo exame fica vinculado ao exame original')
+    console.log('- 🔄 Exames "Inapto" são automaticamente reagendados para 30 dias depois')
+    console.log('- 📅 Status do exame original é alterado para "Reagendado"')
+    console.log('- 🔗 Novo exame fica vinculado ao exame original')
 
   } catch (error) {
-    console.error('�Œ Erro durante o teste:', error.message)
+    console.error('❌ Erro durante o teste:', error.message)
   }
 }
 

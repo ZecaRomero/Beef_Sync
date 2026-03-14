@@ -9,12 +9,12 @@ const pool = new Pool({
 });
 
 async function verificarTabelaMortes() {
-  console.log('�Ÿ”� VERIFICANDO TABELA DE MORTES\n');
+  console.log('🔍 VERIFICANDO TABELA DE MORTES\n');
   console.log('='.repeat(60));
 
   try {
     // 1. Verificar estrutura da tabela mortes
-    console.log('\n�Ÿ“Š 1. Estrutura da tabela mortes...');
+    console.log('\n📊 1. Estrutura da tabela mortes...');
     const estrutura = await pool.query(`
       SELECT column_name, data_type, is_nullable
       FROM information_schema.columns
@@ -22,19 +22,19 @@ async function verificarTabelaMortes() {
       ORDER BY ordinal_position
     `);
     
-    console.log('�œ… Colunas da tabela:');
+    console.log('✅ Colunas da tabela:');
     estrutura.rows.forEach(col => {
       console.log(`   - ${col.column_name}: ${col.data_type} ${col.is_nullable === 'NO' ? 'NOT NULL' : ''}`);
     });
 
     // 2. Contar registros
-    console.log('\n�Ÿ“Š 2. Total de registros...');
+    console.log('\n📊 2. Total de registros...');
     const count = await pool.query(`SELECT COUNT(*) as total FROM mortes`);
-    console.log(`�œ… Total: ${count.rows[0].total}`);
+    console.log(`✅ Total: ${count.rows[0].total}`);
 
     // 3. Buscar todos os registros
     if (count.rows[0].total > 0) {
-      console.log('\n�Ÿ“Š 3. Registros encontrados:');
+      console.log('\n📊 3. Registros encontrados:');
       const mortes = await pool.query(`
         SELECT * FROM mortes 
         ORDER BY created_at DESC
@@ -51,7 +51,7 @@ async function verificarTabelaMortes() {
       });
 
       // 4. Verificar se os animais dessas mortes têm situação "Morto"
-      console.log('\n�Ÿ“Š 4. Verificando situação dos animais...');
+      console.log('\n📊 4. Verificando situação dos animais...');
       for (const morte of mortes.rows) {
         if (morte.animal_id) {
           const animal = await pool.query(`
@@ -65,22 +65,22 @@ async function verificarTabelaMortes() {
             console.log(`   - Animal ${a.serie}-${a.rg}: situação = "${a.situacao}"`);
             
             if (a.situacao !== 'Morto') {
-              console.log(`     �š�️ ATEN�‡�ƒO: Animal deveria estar como "Morto" mas está como "${a.situacao}"`);
+              console.log(`     ⚠️ ATENÇÃO: Animal deveria estar como "Morto" mas está como "${a.situacao}"`);
             }
           } else {
-            console.log(`   - Animal ID ${morte.animal_id}: N�ƒO ENCONTRADO na tabela animais`);
+            console.log(`   - Animal ID ${morte.animal_id}: NÃO ENCONTRADO na tabela animais`);
           }
         }
       }
     } else {
-      console.log('�š�️ Nenhum registro de morte encontrado na tabela');
+      console.log('⚠️ Nenhum registro de morte encontrado na tabela');
     }
 
     console.log('\n' + '='.repeat(60));
-    console.log('�œ… Verificação concluída!');
+    console.log('✅ Verificação concluída!');
 
   } catch (error) {
-    console.error('\n�Œ Erro durante verificação:', error);
+    console.error('\n❌ Erro durante verificação:', error);
     console.error('Detalhes:', error.message);
   } finally {
     await pool.end();

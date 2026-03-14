@@ -13,10 +13,10 @@ async function fixSemenStructure() {
   const client = await pool.connect();
   
   try {
-    console.log('�Ÿ”� Corrigindo estrutura das tabelas de sêmen...');
+    console.log('🔧 Corrigindo estrutura das tabelas de sêmen...');
     
     // 1. Adicionar colunas faltantes na tabela entradas_semen
-    console.log('�Ÿ“� Adicionando colunas faltantes...');
+    console.log('📝 Adicionando colunas faltantes...');
     
     const addColumns = [
       'ALTER TABLE entradas_semen ADD COLUMN IF NOT EXISTS nome_touro VARCHAR(255)',
@@ -40,13 +40,13 @@ async function fixSemenStructure() {
         await client.query(sql);
       } catch (error) {
         if (error.code !== '42701') { // Ignore "column already exists" errors
-          console.log(`�š�️  ${error.message}`);
+          console.log(`⚠️  ${error.message}`);
         }
       }
     }
     
     // 2. Migrar dados da tabela estoque_semen para as novas tabelas
-    console.log('�Ÿ“� Migrando dados...');
+    console.log('📦 Migrando dados...');
     
     // Limpar tabelas antes da migração
     await client.query('DELETE FROM saidas_semen');
@@ -58,7 +58,7 @@ async function fixSemenStructure() {
       WHERE tipo_operacao = 'entrada' OR tipo_operacao IS NULL
     `);
     
-    console.log(`�Ÿ“� Migrando ${entradas.rows.length} entradas...`);
+    console.log(`📥 Migrando ${entradas.rows.length} entradas...`);
     
     for (const entrada of entradas.rows) {
       await client.query(`
@@ -92,10 +92,10 @@ async function fixSemenStructure() {
       ]);
     }
     
-    console.log('�œ… Estrutura corrigida e dados migrados!');
+    console.log('✅ Estrutura corrigida e dados migrados!');
     
   } catch (error) {
-    console.error('�Œ Erro:', error);
+    console.error('❌ Erro:', error);
   } finally {
     client.release();
     await pool.end();

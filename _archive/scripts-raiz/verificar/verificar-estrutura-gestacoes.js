@@ -10,7 +10,7 @@ const pool = new Pool({
 
 async function verificarEstrutura() {
   try {
-    console.log('�Ÿ”� Verificando estrutura da tabela gestacoes...\n')
+    console.log('🔍 Verificando estrutura da tabela gestacoes...\n')
     
     const colunas = await pool.query(`
       SELECT column_name, data_type
@@ -19,22 +19,22 @@ async function verificarEstrutura() {
       ORDER BY ordinal_position
     `)
     
-    console.log('�Ÿ“‹ Colunas:')
+    console.log('📋 Colunas:')
     colunas.rows.forEach(col => {
       console.log(`  - ${col.column_name} (${col.data_type})`)
     })
     
     // Buscar gestações do animal 232
-    console.log('\n�Ÿ”� Buscando gestações do animal 232...')
+    console.log('\n🔍 Buscando gestações do animal 232...')
     const gestacoes = await pool.query(`
       SELECT * FROM gestacoes LIMIT 5
     `)
     
-    console.log('\n�Ÿ“‹ Primeiras 5 gestações:')
+    console.log('\n📋 Primeiras 5 gestações:')
     console.log(gestacoes.rows)
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message)
+    console.error('❌ Erro:', error.message)
   } finally {
     await pool.end()
   }

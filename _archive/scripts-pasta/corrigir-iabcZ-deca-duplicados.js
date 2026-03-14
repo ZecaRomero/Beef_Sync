@@ -63,7 +63,7 @@ async function corrigir() {
       [ids]
     );
 
-    console.log(`\n�œ… ${updateRes.rows.length} animal(is) corrigido(s). iABCZ e DECA foram limpos.`);
+    console.log(`\n✅ ${updateRes.rows.length} animal(is) corrigido(s). iABCZ e DECA foram limpos.`);
     console.log('   Importe os valores corretos de iABCZ/DECA quando tiver o arquivo.');
   } catch (err) {
     console.error('Erro:', err.message);

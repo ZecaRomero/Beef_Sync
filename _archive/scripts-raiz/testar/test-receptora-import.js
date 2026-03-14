@@ -7,7 +7,7 @@
 const { query } = require('./lib/database')
 
 async function testReceptoraImport() {
-  console.log('�Ÿ�� Testando importação com campo receptora...\n')
+  console.log('🧪 Testando importação com campo receptora...\n')
 
   try {
     // 1. Simular dados como viriam do AnimalImporter
@@ -72,7 +72,7 @@ async function testReceptoraImport() {
 
     if (result.rows.length > 0) {
       const animal = result.rows[0]
-      console.log(`   �œ… Animal inserido com sucesso!`)
+      console.log(`   ✅ Animal inserido com sucesso!`)
       console.log(`   ID: ${animal.id}`)
       console.log(`   Receptora salva: "${animal.receptora || 'VAZIO'}"`)
     }
@@ -89,7 +89,7 @@ async function testReceptoraImport() {
 
     if (searchResult.rows.length > 0) {
       const animal = searchResult.rows[0]
-      console.log(`   �œ… Animal encontrado:`)
+      console.log(`   ✅ Animal encontrado:`)
       console.log(`   ID: ${animal.id}`)
       console.log(`   Receptora: "${animal.receptora || 'VAZIO'}"`)
     }
@@ -106,20 +106,20 @@ async function testReceptoraImport() {
     }
 
     const createdAnimal = await databaseService.criarAnimal(testAnimal2)
-    console.log(`   �œ… Animal criado via databaseService:`)
+    console.log(`   ✅ Animal criado via databaseService:`)
     console.log(`   ID: ${createdAnimal.id}`)
     console.log(`   Receptora: "${createdAnimal.receptora || 'VAZIO'}"`)
 
     // 5. Limpar dados de teste
     console.log('\n5. Limpando dados de teste...')
     await query(`DELETE FROM animais WHERE serie IN ('TEST', 'TEST2')`)
-    console.log(`   �œ… Dados de teste removidos`)
+    console.log(`   ✅ Dados de teste removidos`)
 
-    console.log('\n�œ… Teste concluído com sucesso!')
-    console.log('\n�ŸŽ� RESULTADO: O sistema está funcionando corretamente para salvar receptora')
+    console.log('\n✅ Teste concluído com sucesso!')
+    console.log('\n🎯 RESULTADO: O sistema está funcionando corretamente para salvar receptora')
 
   } catch (error) {
-    console.error('�Œ Erro durante teste:', error)
+    console.error('❌ Erro durante teste:', error)
     
     // Tentar limpar dados mesmo com erro
     try {
@@ -133,7 +133,7 @@ async function testReceptoraImport() {
 // Executar
 testReceptoraImport()
   .then(() => {
-    console.log('\n�Ÿ”� PR�“XIMO PASSO: Verificar os dados originais da importação do CJCC 1')
+    console.log('\n🔍 PRÓXIMO PASSO: Verificar os dados originais da importação do CJCC 1')
     process.exit(0)
   })
   .catch(error => {

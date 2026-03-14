@@ -46,8 +46,8 @@ function LoadingSpinner() {
 
 function MessageBanner({ message }) {
   if (!message) return null
-  const isSuccess = message.includes('âÅ“â€¦')
-  const isError = message.includes('â�Å’')
+  const isSuccess = message.includes('✅')
+  const isError = message.includes('❌')
   const cls = isSuccess
     ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700 text-green-800 dark:text-green-200'
     : isError
@@ -194,7 +194,7 @@ export default function AcessosSistema() {
         if (types.length > 0) setTiposRelatorios(types)
       }
     } catch (e) {
-      console.error('Erro ao buscar tipos de relatÃ³rios:', e)
+      console.error('Erro ao buscar tipos de relatórios:', e)
     }
   }, [])
 
@@ -218,28 +218,28 @@ export default function AcessosSistema() {
       if (d.success && d.data) {
         setSettings(d.data)
         if (key === 'maintenance_message') {
-          showMessage('âÅ“â€¦ Mensagem salva com sucesso! JÃ¡ estÃ¡ visÃ­vel no mobile.')
+          showMessage('✅ Mensagem salva com sucesso! Já está visível no mobile.')
         } else if (key === 'mobile_reports_enabled') {
-          showMessage('âÅ“â€¦ RelatÃ³rios mobile atualizados!')
+          showMessage('✅ Relatórios mobile atualizados!')
         } else if (key === 'maintenance_mode' && value) {
-          showMessage('Modo manutenÃ§Ã£o ativado. UsuÃ¡rios verÃ£o a tela de atualizaÃ§Ã£o.')
+          showMessage('Modo manutenção ativado. Usuários verão a tela de atualização.')
         } else if (key === 'block_access' && value) {
           showMessage('Acesso bloqueado. Apenas localhost pode acessar.')
         } else {
-          showMessage('ConfiguraÃ§Ã£o atualizada.')
+          showMessage('Configuração atualizada.')
         }
       } else {
-        showMessage('â�Å’ Erro ao salvar.', 3000)
+        showMessage('❌ Erro ao salvar.', 3000)
       }
     } catch {
-      showMessage('â�Å’ Erro ao salvar.', 3000)
+      showMessage('❌ Erro ao salvar.', 3000)
     } finally {
       setSaving(false)
     }
   }, [showMessage])
 
   const handleLogoutAll = useCallback(async () => {
-    if (!confirm('âÅ¡ ï¸� Tem certeza? Todos os usuÃ¡rios mobile verÃ£o a tela de manutenÃ§Ã£o imediatamente e precisarÃ£o fazer login novamente.')) return
+    if (!confirm('⚠️ Tem certeza? Todos os usuários mobile verão a tela de manutenção imediatamente e precisarão fazer login novamente.')) return
     setSaving(true)
     try {
       const res = await fetch('/api/system-settings', {
@@ -250,12 +250,12 @@ export default function AcessosSistema() {
       const d = await res.json()
       if (d.success && d.data) {
         setSettings(d.data)
-        showMessage('âÅ“â€¦ Modo manutenÃ§Ã£o ativado! Todos os celulares foram deslogados e precisarÃ£o fazer login novamente.')
+        showMessage('✅ Modo manutenção ativado! Todos os celulares foram deslogados e precisarão fazer login novamente.')
       } else {
-        showMessage('â�Å’ Erro ao ativar modo manutenÃ§Ã£o.', 3000)
+        showMessage('❌ Erro ao ativar modo manutenção.', 3000)
       }
     } catch {
-      showMessage('â�Å’ Erro ao ativar modo manutenÃ§Ã£o.', 3000)
+      showMessage('❌ Erro ao ativar modo manutenção.', 3000)
     } finally {
       setSaving(false)
     }
@@ -305,32 +305,32 @@ export default function AcessosSistema() {
       })
       const d = await res.json()
       if (d.success) {
-        showMessage(`âÅ“â€¦ ${tipo === 'banido' ? 'UsuÃ¡rio banido' : 'Colocado em espera'}.`, 3000)
+        showMessage(`✅ ${tipo === 'banido' ? 'Usuário banido' : 'Colocado em espera'}.`, 3000)
         loadData()
       } else {
-        showMessage(`â�Å’ ${d.message || 'Erro'}`, 3000)
+        showMessage(`❌ ${d.message || 'Erro'}`, 3000)
       }
     } catch (e) {
-      showMessage('â�Å’ Erro ao aplicar restriÃ§Ã£o.', 3000)
+      showMessage('❌ Erro ao aplicar restrição.', 3000)
     } finally {
       setSaving(false)
     }
   }, [showMessage, loadData])
 
   const removerRestricao = useCallback(async (id) => {
-    if (!confirm('Remover esta restriÃ§Ã£o?')) return
+    if (!confirm('Remover esta restrição?')) return
     setSaving(true)
     try {
       const res = await fetch(`/api/usuarios-restricoes?id=${id}`, { method: 'DELETE' })
       const d = await res.json()
       if (d.success) {
-        showMessage('âÅ“â€¦ RestriÃ§Ã£o removida.', 3000)
+        showMessage('✅ Restrição removida.', 3000)
         loadData()
       } else {
-        showMessage(`â�Å’ ${d.message || 'Erro'}`, 3000)
+        showMessage(`❌ ${d.message || 'Erro'}`, 3000)
       }
     } catch (e) {
-      showMessage('â�Å’ Erro ao remover.', 3000)
+      showMessage('❌ Erro ao remover.', 3000)
     } finally {
       setSaving(false)
     }
@@ -345,14 +345,14 @@ export default function AcessosSistema() {
       </Head>
       <div className="space-y-6">
 
-        {/* CabeÃ§alho */}
+        {/* Cabeçalho */}
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <EyeIcon className="h-8 w-8 text-violet-600 dark:text-violet-400" />
             Acessos ao Sistema
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1">
-            Monitoramento de acessos, incluindo celular e desktop. Controle de bloqueio e manutenÃ§Ã£o.
+            Monitoramento de acessos, incluindo celular e desktop. Controle de bloqueio e manutenção.
           </p>
         </div>
 
@@ -366,7 +366,7 @@ export default function AcessosSistema() {
             {[
               { label: 'Hoje', period: stats?.hoje },
               { label: 'Esta semana', period: stats?.semana },
-              { label: 'Este mÃªs', period: stats?.mes },
+              { label: 'Este mês', period: stats?.mes },
             ].map(({ label, period }) => (
               <div key={label}>
                 <p className="text-3xl font-bold">{period?.mobile ?? 0}</p>
@@ -377,11 +377,11 @@ export default function AcessosSistema() {
           </div>
         </div>
 
-        {/* EstatÃ­sticas gerais */}
+        {/* Estatísticas gerais */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <StatCard label="Hoje"       total={stats?.hoje?.total}   mobile={stats?.hoje?.mobile}   desktop={stats?.hoje?.desktop} />
           <StatCard label="Esta semana" total={stats?.semana?.total} mobile={stats?.semana?.mobile} desktop={stats?.semana?.desktop} />
-          <StatCard label="Este mÃªs"   total={stats?.mes?.total}    mobile={stats?.mes?.mobile}    desktop={stats?.mes?.desktop} />
+          <StatCard label="Este mês"   total={stats?.mes?.total}    mobile={stats?.mes?.mobile}    desktop={stats?.mes?.desktop} />
         </div>
 
         {/* Controle de Acesso */}
@@ -398,7 +398,7 @@ export default function AcessosSistema() {
             <div className="mb-4 p-4 rounded-lg border-2 border-red-500 bg-red-50 dark:bg-red-900/20 flex items-start gap-3">
               <NoSymbolIcon className="h-6 w-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold text-red-800 dark:text-red-200">Bloqueio ATIVO ââ‚¬â€� usuarios mobile nao conseguem entrar!</p>
+                <p className="font-semibold text-red-800 dark:text-red-200">Bloqueio ATIVO — usuarios mobile nao conseguem entrar!</p>
                 <p className="text-sm text-red-600 dark:text-red-300 mt-1">
                   O "Bloquear uso do sistema" esta LIGADO. Apenas quem acessa pelo computador local (localhost) consegue entrar.
                   Usuarios de celular veem a tela de "Acesso bloqueado". Desligue abaixo para liberar.
@@ -429,7 +429,7 @@ export default function AcessosSistema() {
               />
             </div>
 
-            {/* Toggle: modo manutenÃ§Ã£o */}
+            {/* Toggle: modo manutenção */}
             <div className={`flex items-center justify-between p-4 rounded-lg border-2 transition-colors ${
               settings?.maintenance_mode
                 ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-300 dark:border-amber-700'
@@ -450,42 +450,42 @@ export default function AcessosSistema() {
               />
             </div>
 
-            {/* Mensagem de manutenÃ§Ã£o */}
+            {/* Mensagem de manutenção */}
             {settings?.maintenance_mode && (
               <div className="mt-4 p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800">
                 <label className="block text-sm font-semibold text-amber-900 dark:text-amber-200 mb-2">
-                  ðÅ¸â€œ± Mensagem exibida no mobile
+                  📱 Mensagem exibida no mobile
                 </label>
                 <textarea
                   value={settings?.maintenance_message || ''}
                   onChange={(e) => setSettings(s => ({ ...s, maintenance_message: e.target.value }))}
-                  placeholder="Sistema em manutenÃ§Ã£o. Volte em breve."
+                  placeholder="Sistema em manutenção. Volte em breve."
                   rows={3}
                   className="w-full px-4 py-3 rounded-lg border-2 border-amber-300 dark:border-amber-700 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 resize-none font-medium"
                 />
                 <div className="flex items-center justify-between mt-3">
                   <p className="text-xs text-amber-700 dark:text-amber-300">
-                    ðÅ¸â€™¡ Esta mensagem serÃ¡ exibida para todos os usuÃ¡rios
+                    💡 Esta mensagem será exibida para todos os usuários
                   </p>
                   <button
                     onClick={() => updateSetting('maintenance_message', settings?.maintenance_message)}
                     disabled={saving}
                     className="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    {saving ? 'Salvando...' : 'ðÅ¸â€™¾ Salvar mensagem'}
+                    {saving ? 'Salvando...' : '💾 Salvar mensagem'}
                   </button>
                 </div>
               </div>
             )}
 
-            {/* RelatÃ³rios visÃ­veis no mobile */}
+            {/* Relatórios visíveis no mobile */}
             <div className="mt-6 p-4 rounded-lg bg-teal-50 dark:bg-teal-900/20 border-2 border-teal-200 dark:border-teal-800">
               <div className="flex items-start gap-3">
                 <ChartBarIcon className="h-6 w-6 text-teal-600 dark:text-teal-400 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  <p className="font-semibold text-teal-900 dark:text-teal-200 mb-1">RelatÃ³rios visÃ­veis no mobile</p>
+                  <p className="font-semibold text-teal-900 dark:text-teal-200 mb-1">Relatórios visíveis no mobile</p>
                   <p className="text-sm text-teal-700 dark:text-teal-300 mb-3">
-                    Marque os relatÃ³rios que usuÃ¡rios mobile podem visualizar em /mobile-relatorios
+                    Marque os relatórios que usuários mobile podem visualizar em /mobile-relatorios
                   </p>
 
                   <div className="flex justify-end mb-2">
@@ -499,7 +499,7 @@ export default function AcessosSistema() {
                   </div>
 
                   {tiposRelatorios.length === 0 && (
-                    <p className="text-sm text-gray-500 italic">Carregando relatÃ³rios disponÃ­veis...</p>
+                    <p className="text-sm text-gray-500 italic">Carregando relatórios disponíveis...</p>
                   )}
 
                   <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
@@ -528,31 +528,31 @@ export default function AcessosSistema() {
                     disabled={saving || mobileReportsDraft === null}
                     className="mt-3 px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {saving ? 'Salvando...' : 'Salvar relatÃ³rios mobile'}
+                    {saving ? 'Salvando...' : 'Salvar relatórios mobile'}
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* ClassificaÃ§Ã£o PMGZ */}
+            {/* Classificação PMGZ */}
             <div className="mt-6 p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800">
               <div className="flex items-start gap-3">
-                <div className="text-2xl flex-shrink-0 mt-0.5">ðÅ¸�â€ </div>
+                <div className="text-2xl flex-shrink-0 mt-0.5">🏆</div>
                 <div className="flex-1">
-                  <p className="font-semibold text-amber-900 dark:text-amber-200 mb-1">ClassificaÃ§Ã£o de Animais no PMGZ</p>
+                  <p className="font-semibold text-amber-900 dark:text-amber-200 mb-1">Classificação de Animais no PMGZ</p>
                   <p className="text-sm text-amber-700 dark:text-amber-300 mb-3">
-                    Exibe rankings de iABCZ, Peso e CE na pÃ¡gina /mobile-animal
+                    Exibe rankings de iABCZ, Peso e CE na página /mobile-animal
                   </p>
                   <div className="bg-white dark:bg-gray-800 rounded-lg p-3 mb-3">
-                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-2"><strong>Rankings disponÃ­veis:</strong></p>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-2"><strong>Rankings disponíveis:</strong></p>
                     <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1 ml-4">
-                      <li>ââ‚¬¢ Top 10 iABCZ (quanto maior, melhor)</li>
-                      <li>ââ‚¬¢ Top 10 Peso (maiores pesos registrados)</li>
-                      <li>ââ‚¬¢ Top 10 CE (maiores circunferÃªncias escrotais - machos)</li>
+                      <li>• Top 10 iABCZ (quanto maior, melhor)</li>
+                      <li>• Top 10 Peso (maiores pesos registrados)</li>
+                      <li>• Top 10 CE (maiores circunferências escrotais - machos)</li>
                     </ul>
                   </div>
                   <p className="text-xs text-amber-600 dark:text-amber-400 italic">
-                    ââ€ž¹ï¸� Esta funcionalidade estÃ¡ sempre ativa no /mobile-animal. Os rankings sÃ£o calculados automaticamente com base nos dados dos animais.
+                    ℹ️ Esta funcionalidade está sempre ativa no /mobile-animal. Os rankings são calculados automaticamente com base nos dados dos animais.
                   </p>
                 </div>
               </div>
@@ -575,9 +575,9 @@ export default function AcessosSistema() {
                         try {
                           const r = await fetch('/api/access-log?tipo=localhost', { method: 'DELETE' })
                           const d = await r.json()
-                          showMessage(`âÅ“â€¦ ${d.data?.deleted || 0} registros de localhost removidos!`, 4000)
+                          showMessage(`✅ ${d.data?.deleted || 0} registros de localhost removidos!`, 4000)
                           loadData()
-                        } catch { showMessage('â�Å’ Erro ao limpar', 3000) }
+                        } catch { showMessage('❌ Erro ao limpar', 3000) }
                         finally { setSaving(false) }
                       }}
                       disabled={saving}
@@ -593,9 +593,9 @@ export default function AcessosSistema() {
                         try {
                           const r = await fetch('/api/access-log', { method: 'DELETE' })
                           const d = await r.json()
-                          showMessage(`âÅ“â€¦ ${d.data?.deleted || 0} registros antigos removidos!`, 4000)
+                          showMessage(`✅ ${d.data?.deleted || 0} registros antigos removidos!`, 4000)
                           loadData()
-                        } catch { showMessage('â�Å’ Erro ao limpar', 3000) }
+                        } catch { showMessage('❌ Erro ao limpar', 3000) }
                         finally { setSaving(false) }
                       }}
                       disabled={saving}
@@ -616,7 +616,7 @@ export default function AcessosSistema() {
                 <div className="flex-1">
                   <p className="font-semibold text-red-900 dark:text-red-200 mb-1">Deslogar todos os celulares</p>
                   <p className="text-sm text-red-700 dark:text-red-300 mb-3">
-                    Ativa o modo manutenÃ§Ã£o e forÃ§a todos os usuÃ¡rios mobile a verem a tela de atualizaÃ§Ã£o. Use quando precisar fazer manutenÃ§Ã£o urgente.
+                    Ativa o modo manutenção e força todos os usuários mobile a verem a tela de atualização. Use quando precisar fazer manutenção urgente.
                   </p>
                   <button
                     onClick={handleLogoutAll}
@@ -624,7 +624,7 @@ export default function AcessosSistema() {
                     className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
                   >
                     <DevicePhoneMobileIcon className="h-5 w-5" />
-                    {settings?.maintenance_mode ? 'âÅ“â€œ Modo manutenÃ§Ã£o ativo' : 'ðÅ¸Å¡¨ Deslogar todos os celulares'}
+                    {settings?.maintenance_mode ? '✓ Modo manutenção ativo' : '🚨 Deslogar todos os celulares'}
                   </button>
                 </div>
               </div>
@@ -632,16 +632,16 @@ export default function AcessosSistema() {
           </div>
         </div>
 
-        {/* RestriÃ§Ãµes ativas (banidos / em espera) */}
+        {/* Restrições ativas (banidos / em espera) */}
         {restricoes.length > 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="p-4 border-b border-gray-200 dark:border-gray-700">
               <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <NoSymbolIcon className="h-5 w-5 text-amber-600" />
-                RestriÃ§Ãµes ativas ({restricoes.length})
+                Restrições ativas ({restricoes.length})
               </h2>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                UsuÃ¡rios banidos ou em espera. Clique em &quot;Liberar&quot; para remover a restriÃ§Ã£o.
+                Usuários banidos ou em espera. Clique em &quot;Liberar&quot; para remover a restrição.
               </p>
             </div>
             <div className="p-4 overflow-x-auto">
@@ -662,16 +662,16 @@ export default function AcessosSistema() {
           </div>
         )}
 
-        {/* UsuÃ¡rios Supabase Auth */}
+        {/* Usuários Supabase Auth */}
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
             <div>
               <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <UserCircleIcon className="h-5 w-5 text-violet-600 dark:text-violet-400" />
-                UsuÃ¡rios Supabase (Auth)
+                Usuários Supabase (Auth)
               </h2>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                UsuÃ¡rios cadastrados no Supabase Authentication (como na dashboard do Supabase)
+                Usuários cadastrados no Supabase Authentication (como na dashboard do Supabase)
               </p>
             </div>
             <button
@@ -688,10 +688,10 @@ export default function AcessosSistema() {
               <div className="p-8 text-center">
                 <UserCircleIcon className="h-16 w-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
                 <p className="text-gray-500 dark:text-gray-400 font-medium mb-2">
-                  Nenhum usuÃ¡rio encontrado ou Supabase nÃ£o configurado.
+                  Nenhum usuário encontrado ou Supabase não configurado.
                 </p>
                 <p className="text-sm text-gray-400 dark:text-gray-500">
-                  Configure SUPABASE_SERVICE_ROLE_KEY no .env para exibir os usuÃ¡rios.
+                  Configure SUPABASE_SERVICE_ROLE_KEY no .env para exibir os usuários.
                 </p>
                 <button
                   onClick={loadData}
@@ -704,7 +704,7 @@ export default function AcessosSistema() {
               <table className="w-full text-sm min-w-[700px]">
                 <thead className="bg-gray-50 dark:bg-gray-700/50 sticky top-0">
                   <tr>
-                    {['UID', 'Nome', 'Email', 'Telefone', 'Provedor', 'Criado em', 'AÃ§Ãµes'].map(col => (
+                    {['UID', 'Nome', 'Email', 'Telefone', 'Provedor', 'Criado em', 'Ações'].map(col => (
                       <th key={col} className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">{col}</th>
                     ))}
                   </tr>
@@ -764,7 +764,7 @@ export default function AcessosSistema() {
                 Quem conectou (acessos recentes)
               </h2>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Celulares e desktop ââ‚¬¢ Quem fizer login durante manutenÃ§Ã£o aparece com nome e telefone ââ‚¬¢ Atualiza a cada 10s
+                Celulares e desktop • Quem fizer login durante manutenção aparece com nome e telefone • Atualiza a cada 10s
               </p>
             </div>
             <button
@@ -782,7 +782,7 @@ export default function AcessosSistema() {
                 <UserCircleIcon className="h-16 w-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
                 <p className="text-gray-500 dark:text-gray-400 font-medium mb-2">Nenhum acesso registrado ainda.</p>
                 <p className="text-sm text-gray-400 dark:text-gray-500">
-                  Quando alguÃ©m acessar (celular ou desktop), aparecerÃ¡ aqui automaticamente.
+                  Quando alguém acessar (celular ou desktop), aparecerá aqui automaticamente.
                 </p>
                 <button
                   onClick={loadData}
@@ -795,7 +795,7 @@ export default function AcessosSistema() {
               <table className="w-full text-sm min-w-[950px]">
                 <thead className="bg-gray-50 dark:bg-gray-700/50 sticky top-0">
                   <tr>
-                    {['UsuÃ¡rio', 'Telefone', 'Tipo', 'IP', 'Browser', 'Sistema', 'Aparelho', 'Data/Hora', 'AÃ§Ãµes'].map(col => (
+                    {['Usuário', 'Telefone', 'Tipo', 'IP', 'Browser', 'Sistema', 'Aparelho', 'Data/Hora', 'Ações'].map(col => (
                       <th key={col} className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">{col}</th>
                     ))}
                   </tr>
@@ -858,7 +858,7 @@ export default function AcessosSistema() {
           </div>
         </div>
 
-        {/* Debug: informaÃ§Ãµes completas (apenas em desenvolvimento) */}
+        {/* Debug: informações completas (apenas em desenvolvimento) */}
         {process.env.NODE_ENV !== 'production' && (
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-amber-200 dark:border-amber-700 overflow-hidden">
             <div className="p-4 border-b border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20">
@@ -867,7 +867,7 @@ export default function AcessosSistema() {
                 Debug: Acessos Mobile Completos
               </h2>
               <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
-                Mostra TODOS os celulares detectados com informaÃ§Ãµes completas do User-Agent
+                Mostra TODOS os celulares detectados com informações completas do User-Agent
               </p>
             </div>
             <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
@@ -880,7 +880,7 @@ export default function AcessosSistema() {
                 <table className="w-full text-sm min-w-[900px]">
                   <thead className="bg-amber-50 dark:bg-amber-900/20 sticky top-0">
                     <tr>
-                      {['UsuÃ¡rio', 'Telefone', 'IP/Host', 'Browser', 'Sistema', 'Aparelho', 'User-Agent', 'Data/Hora'].map(col => (
+                      {['Usuário', 'Telefone', 'IP/Host', 'Browser', 'Sistema', 'Aparelho', 'User-Agent', 'Data/Hora'].map(col => (
                         <th key={col} className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">{col}</th>
                       ))}
                     </tr>

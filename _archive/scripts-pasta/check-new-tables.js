@@ -13,7 +13,7 @@ async function checkTables() {
   const client = await pool.connect();
   
   try {
-    console.log('�Ÿ”� Verificando tabelas criadas...');
+    console.log('🔍 Verificando tabelas criadas...');
     
     // Verificar se as tabelas existem
     const tables = await client.query(`
@@ -23,11 +23,11 @@ async function checkTables() {
       AND table_name IN ('entradas_semen', 'saidas_semen')
     `);
     
-    console.log('�Ÿ“‹ Tabelas encontradas:', tables.rows.map(r => r.table_name));
+    console.log('📋 Tabelas encontradas:', tables.rows.map(r => r.table_name));
     
     // Verificar estrutura das tabelas se existirem
     for (const table of tables.rows) {
-      console.log(`\n�Ÿ“Š Estrutura da tabela ${table.table_name}:`);
+      console.log(`\n📊 Estrutura da tabela ${table.table_name}:`);
       const columns = await client.query(`
         SELECT column_name, data_type, is_nullable
         FROM information_schema.columns 
@@ -41,7 +41,7 @@ async function checkTables() {
     }
     
   } catch (error) {
-    console.error('�Œ Erro:', error.message);
+    console.error('❌ Erro:', error.message);
   } finally {
     client.release();
     await pool.end();

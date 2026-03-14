@@ -3,10 +3,10 @@ const { query, initDatabase } = require('../lib/database')
 
 async function verificarFornecedores() {
   try {
-    console.log('�Ÿ”— Conectando ao banco de dados...')
+    console.log('🔗 Conectando ao banco de dados...')
     initDatabase()
     
-    console.log('\n�Ÿ“Š Fornecedores cadastrados:')
+    console.log('\n📊 Fornecedores cadastrados:')
     const result = await query(`
       SELECT id, nome, cnpj_cpf, tipo, municipio 
       FROM fornecedores_destinatarios 
@@ -15,7 +15,7 @@ async function verificarFornecedores() {
     `)
     
     if (result.rows.length === 0) {
-      console.log('�Œ Nenhum fornecedor encontrado no banco!')
+      console.log('❌ Nenhum fornecedor encontrado no banco!')
     } else {
       result.rows.forEach(f => {
         console.log(`\nID: ${f.id}`)
@@ -31,7 +31,7 @@ async function verificarFornecedores() {
     }
     
     // Buscar especificamente pelo CNPJ mencionado
-    console.log('\n�Ÿ”� Buscando CNPJ específico: 44017440001018')
+    console.log('\n🔍 Buscando CNPJ específico: 44017440001018')
     const busca = await query(`
       SELECT id, nome, cnpj_cpf, tipo 
       FROM fornecedores_destinatarios 
@@ -39,17 +39,17 @@ async function verificarFornecedores() {
     `, ['44017440001018'])
     
     if (busca.rows.length > 0) {
-      console.log('�œ… Encontrado!')
+      console.log('✅ Encontrado!')
       busca.rows.forEach(f => {
         console.log(`  Nome: ${f.nome} | CNPJ: ${f.cnpj_cpf} | Tipo: ${f.tipo}`)
       })
     } else {
-      console.log('�Œ Não encontrado no banco!')
+      console.log('❌ Não encontrado no banco!')
     }
     
     process.exit(0)
   } catch (error) {
-    console.error('�Œ Erro:', error.message)
+    console.error('❌ Erro:', error.message)
     process.exit(1)
   }
 }

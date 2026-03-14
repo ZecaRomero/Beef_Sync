@@ -41,7 +41,7 @@ export default function ProtocolEditor() {
   }, [])
 
   const syncExistingMedicines = async (force = false) => {
-    // Sincronizar medicamentos jÃ¡ cadastrados no histÃ³rico
+    // Sincronizar medicamentos já cadastrados no histórico
     try {
       const customMedicamentos = localStorage.getItem('customMedicamentos')
       if (customMedicamentos) {
@@ -50,7 +50,7 @@ export default function ProtocolEditor() {
         
         if ((!syncStatus || force) && Object.keys(medicamentos).length > 0) {
           setSyncing(true)
-          console.log('ðÅ¸â€�â€ž Sincronizando medicamentos existentes no histÃ³rico...')
+          console.log('🔄 Sincronizando medicamentos existentes no histórico...')
           
           let successCount = 0
           
@@ -79,31 +79,31 @@ export default function ProtocolEditor() {
               })
 
               if (response.ok) {
-                console.log(`âÅ“â€¦ ${key} sincronizado com sucesso`)
+                console.log(`✅ ${key} sincronizado com sucesso`)
                 successCount++
               } else {
-                console.error(`â�Å’ Erro ao sincronizar ${key}:`, await response.text())
+                console.error(`❌ Erro ao sincronizar ${key}:`, await response.text())
               }
             } catch (error) {
-              console.error(`â�Å’ Erro ao sincronizar ${key}:`, error)
+              console.error(`❌ Erro ao sincronizar ${key}:`, error)
             }
           }
           
           localStorage.setItem('medicinesSynced', 'true')
-          console.log('âÅ“â€¦ SincronizaÃ§Ã£o concluÃ­da!')
+          console.log('✅ Sincronização concluída!')
           setSyncing(false)
           
           if (successCount > 0) {
-            alert(`âÅ“â€¦ ${successCount} medicamento(s) foram registrados no histÃ³rico de lanÃ§amentos!`)
+            alert(`✅ ${successCount} medicamento(s) foram registrados no histórico de lançamentos!`)
           } else {
-            alert('âÅ¡ ï¸� Nenhum medicamento foi registrado. Verifique o console para mais detalhes.')
+            alert('⚠️ Nenhum medicamento foi registrado. Verifique o console para mais detalhes.')
           }
         }
       }
     } catch (error) {
       console.error('Erro ao sincronizar medicamentos:', error)
       setSyncing(false)
-      alert('â�Å’ Erro ao sincronizar medicamentos. Verifique o console.')
+      alert('❌ Erro ao sincronizar medicamentos. Verifique o console.')
     }
   }
 
@@ -117,12 +117,12 @@ export default function ProtocolEditor() {
         setProtocolos(JSON.parse(customProtocolos))
         setMedicamentos(JSON.parse(customMedicamentos))
       } else {
-        // Carregar dados padrÃ£o do costManager
+        // Carregar dados padrão do costManager
         const costManagerModule = await import('../services/costManager')
         const costManager = costManagerModule.default || costManagerModule
         setProtocolos(costManager.protocolos)
 
-        // Adicionar campo nome aos medicamentos se nÃ£o existir e filtrar itens indesejados
+        // Adicionar campo nome aos medicamentos se não existir e filtrar itens indesejados
         const medicamentosComNome = {}
         const blacklist = ['SUPLENUT', 'RACAO', 'ALIMENTACAO', 'NUTRICAO']
         
@@ -136,13 +136,13 @@ export default function ProtocolEditor() {
         })
         setMedicamentos(medicamentosComNome)
 
-        // Salvar os dados iniciais com nomes no localStorage para futuras ediÃ§Ãµes
+        // Salvar os dados iniciais com nomes no localStorage para futuras edições
         localStorage.setItem('customMedicamentos', JSON.stringify(medicamentosComNome))
         localStorage.setItem('customProtocolos', JSON.stringify(costManager.protocolos))
       }
     } catch (error) {
       console.error('Erro ao carregar dados:', error)
-      // Fallback com dados bÃ¡sicos
+      // Fallback com dados básicos
       setProtocolos({
         machos: {},
         femeas: {}
@@ -173,14 +173,14 @@ export default function ProtocolEditor() {
 
   const addNewMedicine = async () => {
     if (!newMedicine.nome || !newMedicine.preco) {
-      alert('Nome e preÃ§o sÃ£o obrigatÃ³rios')
+      alert('Nome e preço são obrigatórios')
       return
     }
 
     const medicineKey = newMedicine.nome.toUpperCase().replace(/\s+/g, '_')
     const newMedicamentos = { ...medicamentos }
 
-    // Calcular custo por animal baseado no tipo de aplicaÃ§Ã£o
+    // Calcular custo por animal baseado no tipo de aplicação
     let custoPorAnimal
     if (newMedicine.tipoAplicacao === 'lote') {
       const custoPorLote = parseFloat(newMedicine.custoPorLote) || parseFloat(newMedicine.preco)
@@ -202,7 +202,7 @@ export default function ProtocolEditor() {
     setMedicamentos(newMedicamentos)
     localStorage.setItem('customMedicamentos', JSON.stringify(newMedicamentos))
 
-    // Registrar no histÃ³rico de lotes
+    // Registrar no histórico de lotes
     try {
       const response = await fetch('/api/lotes', {
         method: 'POST',
@@ -227,12 +227,12 @@ export default function ProtocolEditor() {
       })
 
       if (!response.ok) {
-        console.error('Erro ao registrar no histÃ³rico:', await response.text())
+        console.error('Erro ao registrar no histórico:', await response.text())
       } else {
-        console.log('âÅ“â€¦ Medicamento registrado no histÃ³rico com sucesso')
+        console.log('✅ Medicamento registrado no histórico com sucesso')
       }
     } catch (error) {
-      console.error('Erro ao registrar medicamento no histÃ³rico:', error)
+      console.error('Erro ao registrar medicamento no histórico:', error)
     }
 
     setNewMedicine({
@@ -291,13 +291,13 @@ export default function ProtocolEditor() {
         <div className="text-center space-y-6">
           <div className="relative">
             <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl mx-auto flex items-center justify-center animate-pulse">
-              <span className="text-4xl animate-spin">âÅ¡â„¢ï¸�</span>
+              <span className="text-4xl animate-spin">⚙️</span>
             </div>
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-3xl animate-ping"></div>
           </div>
           <div className="space-y-2">
             <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300">Carregando protocolos...</h3>
-            <p className="text-gray-500 dark:text-gray-400">Preparando medicamentos e configuraÃ§Ãµes</p>
+            <p className="text-gray-500 dark:text-gray-400">Preparando medicamentos e configurações</p>
           </div>
           <div className="flex justify-center space-x-1">
             <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
@@ -312,61 +312,61 @@ export default function ProtocolEditor() {
   return (
     <ModernLayout
       title="Editor de Protocolos"
-      subtitle="Edite medicamentos, preÃ§os e protocolos sanitÃ¡rios"
-      icon="âÅ¡â„¢ï¸�"
+      subtitle="Edite medicamentos, preços e protocolos sanitários"
+      icon="⚙️"
       className={`${highContrast ? 'high-contrast' : ''} ${largeText ? 'text-[15px] md:text-base' : ''}`}
     >
       <div className="space-y-8">
 
-        {/* ExplicaÃ§Ã£o dos tipos de medicaÃ§Ã£o */}
+        {/* Explicação dos tipos de medicação */}
         <ModernCard variant="glass" modern={true}>
           <ModernCardHeader
-            icon={<span className="text-2xl">ðÅ¸â€™¡</span>}
-            title="Tipos de MedicaÃ§Ã£o"
-            subtitle="Entenda as diferentes formas de aplicaÃ§Ã£o"
+            icon={<span className="text-2xl">💡</span>}
+            title="Tipos de Medicação"
+            subtitle="Entenda as diferentes formas de aplicação"
           />
           <ModernCardBody>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-6 border border-blue-200 dark:border-blue-800">
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center text-white">
-                    <span className="text-xl">ðÅ¸�â€ž</span>
+                    <span className="text-xl">🐄</span>
                   </div>
                   <strong className="text-blue-800 dark:text-blue-200 text-lg">Individual</strong>
                 </div>
                 <p className="text-blue-700 dark:text-blue-300 leading-relaxed">
-                  Cada animal recebe sua prÃ³pria dose. Ideal para medicamentos aplicados individualmente.
+                  Cada animal recebe sua própria dose. Ideal para medicamentos aplicados individualmente.
                 </p>
               </div>
               <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-6 border border-purple-200 dark:border-purple-800">
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="w-12 h-12 bg-purple-500 rounded-2xl flex items-center justify-center text-white">
-                    <span className="text-xl">ðÅ¸â€œ¦</span>
+                    <span className="text-xl">📦</span>
                   </div>
                   <strong className="text-purple-800 dark:text-purple-200 text-lg">Em Lote</strong>
                 </div>
                 <p className="text-purple-700 dark:text-purple-300 leading-relaxed">
-                  Um produto trata vÃ¡rios animais. Ideal para medicamentos na Ã¡gua ou aplicaÃ§Ã£o coletiva.
+                  Um produto trata vários animais. Ideal para medicamentos na água ou aplicação coletiva.
                 </p>
               </div>
             </div>
           </ModernCardBody>
         </ModernCard>
 
-        {/* SeÃ§Ã£o de Medicamentos Moderna */}
+        {/* Seção de Medicamentos Moderna */}
         <ModernCard variant="gradient" modern={true} hover={true}>
           <ModernCardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl text-white shadow-lg">
-                  <span className="text-2xl">ðÅ¸â€™Å </span>
+                  <span className="text-2xl">💊</span>
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    Medicamentos e PreÃ§os
+                    Medicamentos e Preços
                   </h2>
                   <p className="text-gray-600 dark:text-gray-400 mt-1">
-                    Gerencie medicamentos, custos e aplicaÃ§Ãµes
+                    Gerencie medicamentos, custos e aplicações
                   </p>
                 </div>
               </div>
@@ -383,7 +383,7 @@ export default function ProtocolEditor() {
                 </Button>
                 <Button
                   onClick={async () => {
-                    if (confirm('Sincronizar medicamentos cadastrados no histÃ³rico de lanÃ§amentos?')) {
+                    if (confirm('Sincronizar medicamentos cadastrados no histórico de lançamentos?')) {
                       await syncExistingMedicines(true)
                     }
                   }}
@@ -392,11 +392,11 @@ export default function ProtocolEditor() {
                   size="md"
                   modern={true}
                 >
-                  {syncing ? 'ðÅ¸â€�â€ž Sincronizando...' : 'ðÅ¸â€�â€ž Sincronizar HistÃ³rico'}
+                  {syncing ? '🔄 Sincronizando...' : '🔄 Sincronizar Histórico'}
                 </Button>
                 <Button
                   onClick={() => {
-                    if (confirm('Tem certeza que deseja resetar todos os dados para os valores padrÃ£o?')) {
+                    if (confirm('Tem certeza que deseja resetar todos os dados para os valores padrão?')) {
                       localStorage.removeItem('customMedicamentos')
                       localStorage.removeItem('customProtocolos')
                       window.location.reload()
@@ -451,7 +451,7 @@ export default function ProtocolEditor() {
                 <div className="space-y-3">
                   <div>
                     <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      ðÅ¸â€™Å  Nome do Medicamento
+                      💊 Nome do Medicamento
                     </label>
                     <input
                       type="text"
@@ -467,7 +467,7 @@ export default function ProtocolEditor() {
 
                   <div>
                     <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      ðÅ¸â€™° PreÃ§o Total (R$)
+                      💰 Preço Total (R$)
                     </label>
                     <input
                       type="number"
@@ -478,13 +478,13 @@ export default function ProtocolEditor() {
                         [key]: { ...medicine, preco: parseFloat(e.target.value) }
                       })}
                       className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      placeholder="Ex: 1300.00 (preÃ§o total do produto)"
+                      placeholder="Ex: 1300.00 (preço total do produto)"
                     />
                   </div>
 
                   <div>
                     <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      ðÅ¸â€œ¦ Unidade de Medida
+                      📦 Unidade de Medida
                     </label>
                     <input
                       type="text"
@@ -500,7 +500,7 @@ export default function ProtocolEditor() {
 
                   <div>
                     <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      ðÅ¸Å½¯ Tipo de AplicaÃ§Ã£o
+                      🎯 Tipo de Aplicação
                     </label>
                     <select
                       value={medicine.tipoAplicacao || 'individual'}
@@ -518,8 +518,8 @@ export default function ProtocolEditor() {
                       }}
                       className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     >
-                      <option value="individual">ðÅ¸�â€ž Individual (por animal)</option>
-                      <option value="lote">ðÅ¸â€œ¦ Em Lote (grupo de animais)</option>
+                      <option value="individual">🐄 Individual (por animal)</option>
+                      <option value="lote">📦 Em Lote (grupo de animais)</option>
                     </select>
                   </div>
 
@@ -527,7 +527,7 @@ export default function ProtocolEditor() {
                     <>
                       <div>
                         <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          ðÅ¸â€œÅ  Animais por Lote
+                          📊 Animais por Lote
                         </label>
                         <input
                           type="number"
@@ -551,7 +551,7 @@ export default function ProtocolEditor() {
                       </div>
                       <div>
                         <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          ðÅ¸â€™° Custo por Lote (R$)
+                          💰 Custo por Lote (R$)
                         </label>
                         <input
                           type="number"
@@ -575,14 +575,14 @@ export default function ProtocolEditor() {
                       </div>
                       <div className="bg-blue-50 dark:bg-blue-900/30 p-2 rounded text-xs">
                         <span className="text-blue-800 dark:text-blue-200">
-                          ðÅ¸â€™¡ Custo por animal: R$ {((medicine.custoPorLote || medicine.preco) / (medicine.animaisPorLote || 1)).toFixed(2)}
+                          💡 Custo por animal: R$ {((medicine.custoPorLote || medicine.preco) / (medicine.animaisPorLote || 1)).toFixed(2)}
                         </span>
                       </div>
                     </>
                   ) : (
                     <div>
                       <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        ðÅ¸�â€ž Custo por Animal (R$)
+                        🐄 Custo por Animal (R$)
                       </label>
                       <input
                         type="number"
@@ -635,25 +635,25 @@ export default function ProtocolEditor() {
                   </div>
                   <div className="space-y-1 text-xs text-gray-800 dark:text-gray-200">
                     <div className="flex items-center space-x-2">
-                      <span>ðÅ¸â€™° PreÃ§o: R$ {medicine.preco?.toFixed(2)}</span>
+                      <span>💰 Preço: R$ {medicine.preco?.toFixed(2)}</span>
                       <span className={`px-2 py-0.5 rounded text-xs font-medium ${medicine.tipoAplicacao === 'lote'
                         ? 'bg-purple-100 dark:bg-purple-800 text-purple-800 dark:text-purple-200'
                         : 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200'
                         }`}>
-                        {medicine.tipoAplicacao === 'lote' ? 'ðÅ¸â€œ¦ Lote' : 'ðÅ¸�â€ž Individual'}
+                        {medicine.tipoAplicacao === 'lote' ? '📦 Lote' : '🐄 Individual'}
                       </span>
                     </div>
-                    <div>ðÅ¸â€œ¦ Unidade: {medicine.unidade}</div>
+                    <div>📦 Unidade: {medicine.unidade}</div>
                     {medicine.tipoAplicacao === 'lote' ? (
                       <>
-                        <div>ðÅ¸â€œÅ  Animais/lote: {medicine.animaisPorLote || 1}</div>
-                        <div>ðÅ¸â€™° Custo/lote: R$ {(medicine.custoPorLote || medicine.preco)?.toFixed(2)}</div>
+                        <div>📊 Animais/lote: {medicine.animaisPorLote || 1}</div>
+                        <div>💰 Custo/lote: R$ {(medicine.custoPorLote || medicine.preco)?.toFixed(2)}</div>
                         <div className="font-medium text-blue-600 dark:text-blue-400">
-                          ðÅ¸�â€ž Por animal: R$ {medicine.porAnimal?.toFixed(2)}
+                          🐄 Por animal: R$ {medicine.porAnimal?.toFixed(2)}
                         </div>
                       </>
                     ) : (
-                      <div>ðÅ¸�â€ž Por animal: R$ {medicine.porAnimal?.toFixed(2)}</div>
+                      <div>🐄 Por animal: R$ {medicine.porAnimal?.toFixed(2)}</div>
                     )}
                   </div>
                 </div>
@@ -669,7 +669,7 @@ export default function ProtocolEditor() {
         {/* Protocolos Machos */}
         <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md border border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-bold text-blue-600 dark:text-blue-400 mb-3">
-            ðÅ¸�â€š Protocolos para Machos
+            🐂 Protocolos para Machos
           </h2>
 
           <div className="space-y-2">
@@ -719,7 +719,7 @@ export default function ProtocolEditor() {
                         onClick={() => setEditingProtocol(null)}
                         className="w-full mt-2 text-sm px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors focus:ring-2 focus:ring-green-500"
                       >
-                        Concluir EdiÃ§Ã£o
+                        Concluir Edição
                       </button>
                     </div>
                   )}
@@ -729,10 +729,10 @@ export default function ProtocolEditor() {
           </div>
         </div>
 
-        {/* Protocolos FÃªmeas */}
+        {/* Protocolos Fêmeas */}
         <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md border border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-bold text-pink-600 dark:text-pink-400 mb-3">
-            ðÅ¸�â€ž Protocolos para FÃªmeas
+            🐄 Protocolos para Fêmeas
           </h2>
 
           <div className="space-y-2">
@@ -782,7 +782,7 @@ export default function ProtocolEditor() {
                         onClick={() => setEditingProtocol(null)}
                         className="w-full mt-2 text-sm px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors focus:ring-2 focus:ring-green-500"
                       >
-                        Concluir EdiÃ§Ã£o
+                        Concluir Edição
                       </button>
                     </div>
                   )}
@@ -804,7 +804,7 @@ export default function ProtocolEditor() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  ðÅ¸â€™Å  Nome do Medicamento *
+                  💊 Nome do Medicamento *
                 </label>
                 <input
                   type="text"
@@ -817,7 +817,7 @@ export default function ProtocolEditor() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  ðÅ¸â€™° PreÃ§o Total do Produto *
+                  💰 Preço Total do Produto *
                 </label>
                 <input
                   type="number"
@@ -841,13 +841,13 @@ export default function ProtocolEditor() {
                     setNewMedicine({ ...newMedicine, preco, porAnimal })
                   }}
                   className="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  placeholder="Ex: PreÃ§o do medicamento"
+                  placeholder="Ex: Preço do medicamento"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  ðÅ¸â€œ¦ Unidade de Medida
+                  📦 Unidade de Medida
                 </label>
                 <input
                   type="text"
@@ -860,7 +860,7 @@ export default function ProtocolEditor() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  ðÅ¸â€œÅ  Quantidade Total do Produto ({newMedicine.unidade || 'ML'})
+                  📊 Quantidade Total do Produto ({newMedicine.unidade || 'ML'})
                 </label>
                 <input
                   type="number"
@@ -893,7 +893,7 @@ export default function ProtocolEditor() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  ðÅ¸â€™â€° Quantidade por Animal ({newMedicine.unidade || 'ML'})
+                  💉 Quantidade por Animal ({newMedicine.unidade || 'ML'})
                 </label>
                 <input
                   type="number"
@@ -927,14 +927,14 @@ export default function ProtocolEditor() {
               {newMedicine.quantidadeTotal && newMedicine.quantidadePorAnimal && newMedicine.preco && (
                 <div className="bg-green-50 dark:bg-green-900/30 p-3 rounded border border-green-200 dark:border-green-800">
                   <p className="text-sm text-green-800 dark:text-green-200">
-                    ðÅ¸â€™¡ <strong>Custo Calculado:</strong> R$ {(
+                    💡 <strong>Custo Calculado:</strong> R$ {(
                       (parseFloat(newMedicine.preco) || 0) / 
                       (parseFloat(newMedicine.quantidadeTotal) || 1) * 
                       (parseFloat(newMedicine.quantidadePorAnimal) || 0)
                     ).toFixed(2)} por animal
                   </p>
                   <p className="text-xs text-green-700 dark:text-green-300 mt-1">
-                    CÃ¡lculo: (R$ {parseFloat(newMedicine.preco || 0).toFixed(2)} Ã· {newMedicine.quantidadeTotal} {newMedicine.unidade || 'ML'}) Ãâ€” {newMedicine.quantidadePorAnimal} {newMedicine.unidade || 'ML'} = R$ {(
+                    Cálculo: (R$ {parseFloat(newMedicine.preco || 0).toFixed(2)} ÷ {newMedicine.quantidadeTotal} {newMedicine.unidade || 'ML'}) × {newMedicine.quantidadePorAnimal} {newMedicine.unidade || 'ML'} = R$ {(
                       (parseFloat(newMedicine.preco) || 0) / 
                       (parseFloat(newMedicine.quantidadeTotal) || 1) * 
                       (parseFloat(newMedicine.quantidadePorAnimal) || 0)
@@ -945,15 +945,15 @@ export default function ProtocolEditor() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  ðÅ¸Å½¯ Tipo de AplicaÃ§Ã£o
+                  🎯 Tipo de Aplicação
                 </label>
                 <select
                   value={newMedicine.tipoAplicacao}
                   onChange={(e) => setNewMedicine({ ...newMedicine, tipoAplicacao: e.target.value })}
                   className="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 >
-                  <option value="individual">ðÅ¸�â€ž Individual (por animal)</option>
-                  <option value="lote">ðÅ¸â€œ¦ Em Lote (grupo de animais)</option>
+                  <option value="individual">🐄 Individual (por animal)</option>
+                  <option value="lote">📦 Em Lote (grupo de animais)</option>
                 </select>
               </div>
 
@@ -961,7 +961,7 @@ export default function ProtocolEditor() {
                 <>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      ðÅ¸â€œÅ  Quantos Animais por Lote
+                      📊 Quantos Animais por Lote
                     </label>
                     <input
                       type="number"
@@ -974,7 +974,7 @@ export default function ProtocolEditor() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      ðÅ¸â€™° Custo por Lote (R$)
+                      💰 Custo por Lote (R$)
                     </label>
                     <input
                       type="number"
@@ -985,13 +985,13 @@ export default function ProtocolEditor() {
                       placeholder="Quanto custa tratar um lote completo"
                     />
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Se nÃ£o informar, serÃ¡ usado o preÃ§o total do produto
+                      Se não informar, será usado o preço total do produto
                     </p>
                   </div>
                   {newMedicine.animaisPorLote && (newMedicine.custoPorLote || newMedicine.preco) && (
                     <div className="bg-blue-50 dark:bg-blue-900/30 p-3 rounded">
                       <p className="text-sm text-blue-800 dark:text-blue-200">
-                        ðÅ¸â€™¡ <strong>Custo por animal:</strong> R$ {(
+                        💡 <strong>Custo por animal:</strong> R$ {(
                           (parseFloat(newMedicine.custoPorLote) || parseFloat(newMedicine.preco) || 0) /
                           (parseInt(newMedicine.animaisPorLote) || 1)
                         ).toFixed(2)}
@@ -1002,7 +1002,7 @@ export default function ProtocolEditor() {
               ) : (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    ðÅ¸�â€ž Custo por Animal (R$)
+                    🐄 Custo por Animal (R$)
                   </label>
                   <input
                     type="number"
@@ -1014,8 +1014,8 @@ export default function ProtocolEditor() {
                   />
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {newMedicine.quantidadeTotal && newMedicine.quantidadePorAnimal && newMedicine.preco
-                      ? 'Campo calculado automaticamente. VocÃª pode editar manualmente se necessÃ¡rio.'
-                      : 'Se nÃ£o informar quantidade, serÃ¡ usado o preÃ§o total. Ou informe manualmente o custo por animal.'}
+                      ? 'Campo calculado automaticamente. Você pode editar manualmente se necessário.'
+                      : 'Se não informar quantidade, será usado o preço total. Ou informe manualmente o custo por animal.'}
                   </p>
                 </div>
               )}
