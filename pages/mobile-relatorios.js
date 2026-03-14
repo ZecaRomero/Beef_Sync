@@ -103,6 +103,13 @@ export default function MobileRelatorios() {
   const [currentTab, setCurrentTab] = useState('home')
   const [showMenu, setShowMenu] = useState(false)
   const [isDarkMode, setIsDarkMode] = useState(false)
+
+  const CATS = [
+    { key: 'Piquetes',     emoji: '🌿', test: s => /piquete|^piq\s/i.test(s),  colors: 'from-green-500 to-emerald-600' },
+    { key: 'Cabanha',      emoji: '🏠', test: s => /cabanha/i.test(s),          colors: 'from-violet-500 to-purple-600' },
+    { key: 'Confinamento', emoji: '🏗️', test: s => /confina|^conf\b/i.test(s),  colors: 'from-orange-500 to-amber-600' },
+    { key: 'Projetos',     emoji: '🔬', test: s => /projeto/i.test(s),          colors: 'from-cyan-500 to-teal-600' },
+  ]
   
   const getGreeting = () => {
     const h = new Date().getHours()
@@ -3372,7 +3379,7 @@ export default function MobileRelatorios() {
                     </motion.div>
                   )}
 
-                  {/* ══ Resumo visual aprimorado: Boletim Campo e Rebanho ══ */}
+                  {/* ══ PAINEL DE ANÁLISE COMPLETO: Boletim Campo ══ */}
                   {(ehBoletimCampo || ehBoletimRebanho) && dadosParaExibir.length > 0 && (() => {
                     const qtyKey = ehBoletimCampo ? 'quant' : 'total'
                     const rows = dadosParaExibir.filter(d =>
@@ -3380,154 +3387,166 @@ export default function MobileRelatorios() {
                       d.local_1 !== 'TOTAL GERAL' && d.fazenda !== 'TOTAL GERAL'
                     )
 
-                    // Calcular resumos
-                    const porRaca = {}, porEra = {}, porSexo = {}, porCategoria = {}, porLocal1 = {}
-                    const CATS = [
-                      { key: 'Piquetes',     emoji: '🌿', test: s => /piquete|^piq\s/i.test(s),  colors: 'from-green-500 to-emerald-600' },
-                      { key: 'Cabanha',      emoji: '🏠', test: s => /cabanha/i.test(s),          colors: 'from-violet-500 to-purple-600' },
-                      { key: 'Confinamento', emoji: '🏗️', test: s => /confina|^conf\b/i.test(s),  colors: 'from-orange-500 to-amber-600' },
-                      { key: 'Projetos',     emoji: '🔬', test: s => /projeto/i.test(s),          colors: 'from-cyan-500 to-teal-600' },
+                    // Categorias de área
+                    const AREA_CATS = [
+                      { key: 'Piquetes',     emoji: '🌿', test: s => /piquete|^piq[\s_-]/i.test(s), grad: 'from-green-500 to-emerald-600' },
+                      { key: 'Cabanha',      emoji: '🏠', test: s => /cabanha/i.test(s),              grad: 'from-violet-500 to-purple-600' },
+                      { key: 'Confinamento', emoji: '🏗️',  test: s => /confina|^conf\b/i.test(s),     grad: 'from-orange-500 to-amber-600' },
+                      { key: 'Projetos',     emoji: '🔬', test: s => /projeto/i.test(s),              grad: 'from-cyan-500 to-teal-600' },
                     ]
-                    const ehOutros = s => !CATS.some(c => c.test(s))
+
+                    // Categorias de animal
+                    const CAT_ANIMAL = [
+                      { key: 'Bezerros',   emoji: '🐣', test: s => /bezerr|cria/i.test(s),      color: 'yellow' },
+                      { key: 'Vacas',      emoji: '🐄', test: s => /^vaca|vacas/i.test(s),      color: 'pink' },
+                      { key: 'Novilhas',   emoji: '🌸', test: s => /novilha/i.test(s),           color: 'rose' },
+                      { key: 'Touros',     emoji: '🐂', test: s => /touro/i.test(s),             color: 'blue' },
+                      { key: 'Novilhos',   emoji: '🐃', test: s => /novilho/i.test(s),           color: 'indigo' },
+                      { key: 'Receptoras', emoji: '💉', test: s => /recept/i.test(s),            color: 'purple' },
+                    ]
+                    const corAnimal = {
+                      yellow: { bg:'bg-yellow-50 dark:bg-yellow-900/20', border:'border-yellow-300 dark:border-yellow-700', text:'text-yellow-700 dark:text-yellow-300', badge:'bg-yellow-400', num:'text-yellow-900 dark:text-yellow-100' },
+                      pink:   { bg:'bg-pink-50 dark:bg-pink-900/20',     border:'border-pink-300 dark:border-pink-700',     text:'text-pink-700 dark:text-pink-300',     badge:'bg-pink-400',   num:'text-pink-900 dark:text-pink-100' },
+                      rose:   { bg:'bg-rose-50 dark:bg-rose-900/20',     border:'border-rose-300 dark:border-rose-700',     text:'text-rose-700 dark:text-rose-300',     badge:'bg-rose-500',   num:'text-rose-900 dark:text-rose-100' },
+                      blue:   { bg:'bg-blue-50 dark:bg-blue-900/20',     border:'border-blue-300 dark:border-blue-700',     text:'text-blue-700 dark:text-blue-400',     badge:'bg-blue-500',   num:'text-blue-900 dark:text-blue-100' },
+                      indigo: { bg:'bg-indigo-50 dark:bg-indigo-900/20', border:'border-indigo-300 dark:border-indigo-700', text:'text-indigo-700 dark:text-indigo-300', badge:'bg-indigo-500', num:'text-indigo-900 dark:text-indigo-100' },
+                      purple: { bg:'bg-purple-50 dark:bg-purple-900/20', border:'border-purple-300 dark:border-purple-700', text:'text-purple-700 dark:text-purple-300', badge:'bg-purple-500', num:'text-purple-900 dark:text-purple-100' },
+                    }
+
+                    // Aggregação completa
+                    const porRaca = {}, porEra = {}, porSexo = {}
+                    const porAreaCat = {}, porCatAnimal = {}
+                    const piquetes = {}
 
                     let totalGeral = 0
                     rows.forEach(d => {
-                      const raca = d.raca || 'Não informado'
-                      const era = d.era || '-'
-                      const sexo = (d.sexo || '').toString().trim()
-                      const local = d.local || d.local_1 || ''
-                      const local1 = d.local_1 || d.local || ''
                       const qtd = parseInt(d[qtyKey] ?? d.quant ?? d.total) || 0
+                      if (!qtd) return
                       totalGeral += qtd
+
+                      const raca    = (d.raca || 'Não informado').trim()
+                      const era     = (d.era  || '-').trim()
+                      const sexoRaw = (d.sexo || '').toString().trim()
+                      const cat     = (d.categoria || '').toString().trim()
+                      const local   = (d.local   || d.local_1 || '').trim()
+                      const local1  = (d.local_1 || d.local   || '').trim()
+                      const sub2    = (d.sub_local_2 || '').trim()
+
+                      const sexo = /^f/i.test(sexoRaw) ? 'F' : /^m/i.test(sexoRaw) ? 'M' : sexoRaw || '-'
+
                       porRaca[raca] = (porRaca[raca] || 0) + qtd
-                      porEra[era] = (porEra[era] || 0) + qtd
-                      // Sexo: normalizar F/M
-                      const sexoNorm = /^f/i.test(sexo) ? 'F' : /^m/i.test(sexo) ? 'M' : sexo || '-'
-                      porSexo[sexoNorm] = (porSexo[sexoNorm] || 0) + qtd
-                      // Categoria
-                      let cat = ehOutros(local) ? 'Outros' : CATS.find(c => c.test(local))?.key || 'Outros'
-                      porCategoria[cat] = (porCategoria[cat] || 0) + qtd
-                      // Local1
-                      if (local1 && local1 !== 'TOTAL GERAL') {
-                        porLocal1[local1] = (porLocal1[local1] || 0) + qtd
-                      }
+                      porEra[era]   = (porEra[era]   || 0) + qtd
+                      porSexo[sexo] = (porSexo[sexo] || 0) + qtd
+
+                      const areaCat = AREA_CATS.find(c => c.test(local))?.key || 'Outros'
+                      porAreaCat[areaCat] = (porAreaCat[areaCat] || 0) + qtd
+
+                      const catAnimal = CAT_ANIMAL.find(c => c.test(cat))?.key || (cat || 'Outros')
+                      porCatAnimal[catAnimal] = (porCatAnimal[catAnimal] || 0) + qtd
+
+                      const piqKey = sub2 || local || local1 || 'Sem local'
+                      if (!piquetes[piqKey]) piquetes[piqKey] = { total: 0, f: 0, m: 0, eras: {}, racas: {}, cats: {}, local1 }
+                      piquetes[piqKey].total += qtd
+                      if (sexo === 'F') piquetes[piqKey].f += qtd
+                      if (sexo === 'M') piquetes[piqKey].m += qtd
+                      piquetes[piqKey].eras[era]        = (piquetes[piqKey].eras[era]        || 0) + qtd
+                      piquetes[piqKey].racas[raca]      = (piquetes[piqKey].racas[raca]      || 0) + qtd
+                      piquetes[piqKey].cats[catAnimal]  = (piquetes[piqKey].cats[catAnimal]  || 0) + qtd
                     })
 
-                    const racasTop  = Object.entries(porRaca).sort(([,a],[,b]) => b-a).slice(0,6)
-                    const erasTop   = Object.entries(porEra).sort(([,a],[,b]) => b-a).slice(0,6)
-                    const sexosTop  = Object.entries(porSexo).filter(([,q]) => q > 0)
-                    const local1Top = Object.entries(porLocal1).sort(([,a],[,b]) => b-a).slice(0,6)
+                    const racasTop      = Object.entries(porRaca).sort(([,a],[,b])=>b-a).slice(0,6)
+                    const erasAll       = Object.entries(porEra).sort(([,a],[,b])=>b-a)
+                    const sexosTop      = Object.entries(porSexo).filter(([,q])=>q>0)
+                    const piquetesOrd   = Object.entries(piquetes).sort(([,a],[,b])=>b.total-a.total)
+                    const catsAnimalOrd = Object.entries(porCatAnimal).sort(([,a],[,b])=>b-a)
+
                     const totalF = porSexo['F'] || 0
                     const totalM = porSexo['M'] || 0
-                    const pctF = totalGeral > 0 ? Math.round(totalF / totalGeral * 100) : 0
-                    const pctM = 100 - pctF
+                    const pctF   = totalGeral > 0 ? Math.round(totalF/totalGeral*100) : 0
+                    const pctM   = 100 - pctF
 
-                    // Helper: barra de progresso proporcional
-                    const ProgressBar = ({ value, max, color }) => (
-                      <div className="mt-1.5 h-1.5 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full ${color}`} style={{ width: `${max > 0 ? Math.round(value/max*100) : 0}%` }} />
-                      </div>
-                    )
+                    const top1 = obj => Object.entries(obj).sort(([,a],[,b])=>b-a)[0]?.[0] || '-'
 
                     return (
-                      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 mb-2">
+                      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-5 mb-2">
 
-                        {/* ── Header total com F/M ── */}
-                        <div className="rounded-2xl overflow-hidden shadow-lg">
-                          <div className="bg-gradient-to-r from-slate-800 to-slate-700 p-4">
-                            <div className="flex items-center justify-between mb-3">
+                        {/* 1. HEADER DARK — total + F/M + tiles de área */}
+                        <div className="rounded-2xl overflow-hidden shadow-xl">
+                          <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 p-4 pb-3">
+                            <p className="text-slate-400 text-[10px] uppercase tracking-widest font-bold mb-1">Boletim Campo</p>
+                            <div className="flex items-end justify-between mb-3">
                               <div>
-                                <p className="text-slate-400 text-xs uppercase tracking-wider font-semibold">Total no campo</p>
-                                <p className="text-4xl font-black text-white">{totalGeral.toLocaleString('pt-BR')}</p>
-                                <p className="text-slate-400 text-xs mt-0.5">{rows.length} registros</p>
+                                <p className="text-5xl font-black text-white leading-none">{totalGeral.toLocaleString('pt-BR')}</p>
+                                <p className="text-slate-400 text-xs mt-1">{rows.length} registros · {piquetesOrd.length} locais</p>
                               </div>
-                              <div className="text-right">
-                                <div className="flex gap-3">
-                                  <div className="text-center">
-                                    <p className="text-pink-400 text-xs font-semibold">♀ Fêmeas</p>
-                                    <p className="text-2xl font-bold text-pink-300">{totalF.toLocaleString('pt-BR')}</p>
-                                    <p className="text-pink-500 text-xs">{pctF}%</p>
-                                  </div>
-                                  <div className="text-center">
-                                    <p className="text-blue-400 text-xs font-semibold">♂ Machos</p>
-                                    <p className="text-2xl font-bold text-blue-300">{totalM.toLocaleString('pt-BR')}</p>
-                                    <p className="text-blue-500 text-xs">{pctM}%</p>
-                                  </div>
+                              <div className="flex gap-3">
+                                <div className="text-center bg-pink-500/20 rounded-xl px-3 py-2 border border-pink-500/30">
+                                  <p className="text-pink-300 text-[10px] font-bold tracking-wide">♀ FÊMEAS</p>
+                                  <p className="text-2xl font-black text-pink-200">{totalF.toLocaleString('pt-BR')}</p>
+                                  <p className="text-pink-400 text-xs">{pctF}%</p>
+                                </div>
+                                <div className="text-center bg-blue-500/20 rounded-xl px-3 py-2 border border-blue-500/30">
+                                  <p className="text-blue-300 text-[10px] font-bold tracking-wide">♂ MACHOS</p>
+                                  <p className="text-2xl font-black text-blue-200">{totalM.toLocaleString('pt-BR')}</p>
+                                  <p className="text-blue-400 text-xs">{pctM}%</p>
                                 </div>
                               </div>
                             </div>
-                            {/* Barra F/M */}
-                            <div className="h-2 rounded-full overflow-hidden bg-white/10 flex">
-                              <div className="h-full bg-gradient-to-r from-pink-500 to-rose-500 transition-all" style={{ width: `${pctF}%` }} />
-                              <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all" style={{ width: `${pctM}%` }} />
+                            <div className="h-3 rounded-full overflow-hidden bg-white/10 flex gap-0.5">
+                              <div className="h-full bg-gradient-to-r from-pink-500 to-rose-400" style={{ width:`${pctF}%` }} />
+                              <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-400" style={{ width:`${pctM}%` }} />
+                            </div>
+                            <div className="flex justify-between mt-1 text-[10px] text-slate-500">
+                              <span>♀ {pctF}% fêmeas</span>
+                              <span>♂ {pctM}% machos</span>
                             </div>
                           </div>
-
-                          {/* Categorias coloridas */}
                           {ehBoletimCampo && (
-                            <div className="grid grid-cols-4 divide-x divide-white/20">
-                              {CATS.map(cat => {
-                                const qtd = porCategoria[cat.key] || 0
+                            <div className="grid grid-cols-4 divide-x divide-black/20">
+                              {AREA_CATS.map(cat => {
+                                const qtd = porAreaCat[cat.key] || 0
                                 const pct = totalGeral > 0 ? Math.round(qtd/totalGeral*100) : 0
                                 return (
-                                  <button
-                                    key={cat.key}
-                                    type="button"
-                                    onClick={() => setResumoDetalheModal({ open: true, tipo: 'categoria_local', valor: cat.key, titulo: cat.key, qtd })}
-                                    className={`bg-gradient-to-b ${cat.colors} p-2 text-center active:opacity-80 transition-opacity`}
-                                  >
-                                    <p className="text-white/70 text-[10px] font-medium">{cat.emoji} {cat.key}</p>
-                                    <p className="text-xl font-black text-white">{qtd || '-'}</p>
-                                    {qtd > 0 && <p className="text-white/60 text-[10px]">{pct}%</p>}
-                                  </button>
+                                  <div key={cat.key} className={`bg-gradient-to-b ${cat.grad} p-2 text-center`}>
+                                    <p className="text-white/80 text-sm">{cat.emoji}</p>
+                                    <p className="text-white/70 text-[9px] font-medium">{cat.key}</p>
+                                    <p className="text-xl font-black text-white">{qtd || '–'}</p>
+                                    {qtd > 0 && <p className="text-white/60 text-[9px]">{pct}%</p>}
+                                  </div>
                                 )
                               })}
                             </div>
                           )}
                         </div>
 
-                        {/* ── Por Local (local_1) — só boletim campo ── */}
-                        {ehBoletimCampo && local1Top.length > 0 && (
+                        {/* 2. CATEGORIA DE ANIMAL */}
+                        {ehBoletimCampo && catsAnimalOrd.length > 0 && (
                           <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
                             <div className="flex items-center gap-2 mb-3">
-                              <span className="text-xl">📍</span>
-                              <h4 className="font-bold text-gray-900 dark:text-white">Por Local</h4>
-                              <span className="ml-auto text-xs text-gray-400">toque para filtrar</span>
+                              <span className="text-xl">🏷️</span>
+                              <h4 className="font-bold text-gray-900 dark:text-white">Categoria do Animal</h4>
                             </div>
-                            <div className="space-y-2">
-                              {local1Top.map(([local, qtd], idx) => {
-                                const cat = CATS.find(c => c.test(local))
+                            <div className="grid grid-cols-3 gap-2">
+                              {catsAnimalOrd.map(([cat, qtd], idx) => {
+                                const def = CAT_ANIMAL.find(c => c.key === cat)
+                                const c   = corAnimal[def?.color] || corAnimal.indigo
                                 const pct = totalGeral > 0 ? Math.round(qtd/totalGeral*100) : 0
-                                const colors = [
-                                  { bg: 'bg-violet-50 dark:bg-violet-900/20', border: 'border-violet-200 dark:border-violet-800', text: 'text-violet-700 dark:text-violet-300', bar: 'bg-violet-500' },
-                                  { bg: 'bg-emerald-50 dark:bg-emerald-900/20', border: 'border-emerald-200 dark:border-emerald-800', text: 'text-emerald-700 dark:text-emerald-300', bar: 'bg-emerald-500' },
-                                  { bg: 'bg-orange-50 dark:bg-orange-900/20', border: 'border-orange-200 dark:border-orange-800', text: 'text-orange-700 dark:text-orange-300', bar: 'bg-orange-500' },
-                                  { bg: 'bg-cyan-50 dark:bg-cyan-900/20', border: 'border-cyan-200 dark:border-cyan-800', text: 'text-cyan-700 dark:text-cyan-300', bar: 'bg-cyan-500' },
-                                  { bg: 'bg-rose-50 dark:bg-rose-900/20', border: 'border-rose-200 dark:border-rose-800', text: 'text-rose-700 dark:text-rose-300', bar: 'bg-rose-500' },
-                                  { bg: 'bg-indigo-50 dark:bg-indigo-900/20', border: 'border-indigo-200 dark:border-indigo-800', text: 'text-indigo-700 dark:text-indigo-300', bar: 'bg-indigo-500' },
-                                ][idx % 6]
                                 return (
                                   <motion.button
-                                    key={local}
+                                    key={cat}
                                     type="button"
-                                    onClick={() => setResumoDetalheModal({ open: true, tipo: 'local_1', valor: local, titulo: local, qtd })}
-                                    initial={{ opacity: 0, x: -12 }}
-                                    animate={{ opacity: 1, x: 0 }}
+                                    onClick={() => setResumoDetalheModal({ open: true, tipo: 'categoria', valor: cat, titulo: `${def?.emoji || ''} ${cat}`, qtd })}
+                                    initial={{ opacity: 0, scale: 0.88 }}
+                                    animate={{ opacity: 1, scale: 1 }}
                                     transition={{ delay: idx * 0.04 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    className={`w-full text-left ${colors.bg} border-2 ${colors.border} rounded-xl p-3 active:ring-2`}
+                                    whileTap={{ scale: 0.95 }}
+                                    className={`text-left ${c.bg} border-2 ${c.border} rounded-xl p-2.5`}
                                   >
-                                    <div className="flex items-center justify-between">
-                                      <div className="min-w-0 flex-1">
-                                        <p className={`text-xs font-semibold ${colors.text} truncate`}>{cat?.emoji || '📍'} {local}</p>
-                                        <div className="mt-1 h-1.5 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
-                                          <div className={`h-full rounded-full ${colors.bar} transition-all`} style={{ width: `${pct}%` }} />
-                                        </div>
-                                      </div>
-                                      <div className="text-right ml-3 shrink-0">
-                                        <p className="text-2xl font-black text-gray-900 dark:text-white">{qtd}</p>
-                                        <p className={`text-xs ${colors.text}`}>{pct}%</p>
-                                      </div>
+                                    <p className="text-base mb-0.5">{def?.emoji || '🐄'}</p>
+                                    <p className={`text-[10px] font-semibold ${c.text} leading-tight truncate`}>{cat}</p>
+                                    <p className={`text-xl font-black ${c.num}`}>{qtd}</p>
+                                    <div className="h-1 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden mt-1">
+                                      <div className={`h-full rounded-full ${c.badge}`} style={{ width:`${pct}%` }} />
                                     </div>
                                   </motion.button>
                                 )
@@ -3536,7 +3555,134 @@ export default function MobileRelatorios() {
                           </div>
                         )}
 
-                        {/* ── Por Raça ── */}
+                        {/* 3. PIQUETES / LOCAIS DETALHADOS */}
+                        {ehBoletimCampo && piquetesOrd.length > 0 && (
+                          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                            <div className="flex items-center gap-2 p-4 pb-3 border-b border-gray-100 dark:border-gray-700">
+                              <span className="text-xl">🌿</span>
+                              <h4 className="font-bold text-gray-900 dark:text-white">Piquetes / Locais</h4>
+                              <span className="ml-auto bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-xs font-semibold px-2 py-0.5 rounded-full">{piquetesOrd.length} locais</span>
+                            </div>
+                            <div className="divide-y divide-gray-100 dark:divide-gray-700/60">
+                              {piquetesOrd.map(([piq, data], idx) => {
+                                const pctPiq  = totalGeral > 0 ? Math.round(data.total/totalGeral*100) : 0
+                                const pctFPiq = data.total > 0 ? Math.round(data.f/data.total*100) : 0
+                                const pctMPiq = 100 - pctFPiq
+                                const mainEra  = top1(data.eras)
+                                const mainRaca = top1(data.racas)
+                                const mainCat  = top1(data.cats)
+                                const PALETTE  = [
+                                  'bg-emerald-500','bg-violet-500','bg-orange-500','bg-cyan-500',
+                                  'bg-rose-500','bg-indigo-500','bg-amber-500','bg-teal-500',
+                                  'bg-pink-500','bg-sky-500','bg-lime-500','bg-fuchsia-500',
+                                ]
+                                const barColor = PALETTE[idx % PALETTE.length]
+                                return (
+                                  <motion.button
+                                    key={piq}
+                                    type="button"
+                                    onClick={() => setResumoDetalheModal({ open: true, tipo: 'local', valor: piq, titulo: piq, qtd: data.total })}
+                                    initial={{ opacity: 0, x: -8 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: idx * 0.025 }}
+                                    whileTap={{ scale: 0.99 }}
+                                    className="w-full text-left p-3 hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors"
+                                  >
+                                    <div className="flex items-center gap-2 mb-1.5">
+                                      <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${barColor}`} />
+                                      <p className="text-sm font-semibold text-gray-900 dark:text-white flex-1 truncate">{piq}</p>
+                                      <p className="text-xl font-black text-gray-900 dark:text-white shrink-0">{data.total}</p>
+                                    </div>
+                                    <div className="flex gap-0.5 h-2 rounded-full overflow-hidden mb-1.5 mx-4">
+                                      {data.f > 0 && <div className="h-full bg-pink-400 rounded-l-full" style={{ width:`${pctFPiq}%` }} />}
+                                      {data.m > 0 && <div className="h-full bg-blue-400 rounded-r-full" style={{ width:`${pctMPiq}%` }} />}
+                                    </div>
+                                    <div className="flex flex-wrap gap-1 items-center ml-4">
+                                      {data.f > 0 && <span className="text-[10px] bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 px-1.5 py-0.5 rounded-full font-medium">♀ {data.f}</span>}
+                                      {data.m > 0 && <span className="text-[10px] bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-1.5 py-0.5 rounded-full font-medium">♂ {data.m}</span>}
+                                      {mainEra !== '-'  && <span className="text-[10px] bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 px-1.5 py-0.5 rounded-full">Era: {mainEra}</span>}
+                                      {mainRaca !== '-' && mainRaca !== 'Não informado' && <span className="text-[10px] bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 px-1.5 py-0.5 rounded-full">{mainRaca}</span>}
+                                      {mainCat && mainCat !== 'Outros' && <span className="text-[10px] bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded-full">{mainCat}</span>}
+                                      <span className="ml-auto text-[10px] text-gray-400">{pctPiq}%</span>
+                                    </div>
+                                  </motion.button>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* 4. ERAS com F/M por era */}
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="text-xl">📅</span>
+                            <h4 className="font-bold text-gray-900 dark:text-white">Eras dos Animais</h4>
+                            <span className="ml-auto bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-xs font-semibold px-2 py-0.5 rounded-full">{erasAll.length} eras</span>
+                          </div>
+                          {(() => {
+                            const eraFM = {}
+                            rows.forEach(d => {
+                              const era = (d.era || '-').trim()
+                              const qtd = parseInt(d[qtyKey] ?? d.quant ?? d.total) || 0
+                              const sx  = (d.sexo || '').toString()
+                              if (!eraFM[era]) eraFM[era] = { f:0, m:0, total:0 }
+                              eraFM[era].total += qtd
+                              if (/^f/i.test(sx)) eraFM[era].f += qtd
+                              else if (/^m/i.test(sx)) eraFM[era].m += qtd
+                            })
+                            const ERA_COLORS = [
+                              { grad:'from-amber-400 to-yellow-500',   light:'bg-amber-50 dark:bg-amber-900/20',   border:'border-amber-200 dark:border-amber-800',   text:'text-amber-700 dark:text-amber-300' },
+                              { grad:'from-orange-400 to-amber-500',   light:'bg-orange-50 dark:bg-orange-900/20', border:'border-orange-200 dark:border-orange-800', text:'text-orange-700 dark:text-orange-300' },
+                              { grad:'from-green-400 to-emerald-500',  light:'bg-green-50 dark:bg-green-900/20',   border:'border-green-200 dark:border-green-800',   text:'text-green-700 dark:text-green-300' },
+                              { grad:'from-teal-400 to-cyan-500',      light:'bg-teal-50 dark:bg-teal-900/20',     border:'border-teal-200 dark:border-teal-800',     text:'text-teal-700 dark:text-teal-300' },
+                              { grad:'from-violet-400 to-purple-500',  light:'bg-violet-50 dark:bg-violet-900/20', border:'border-violet-200 dark:border-violet-800', text:'text-violet-700 dark:text-violet-300' },
+                              { grad:'from-rose-400 to-pink-500',      light:'bg-rose-50 dark:bg-rose-900/20',     border:'border-rose-200 dark:border-rose-800',     text:'text-rose-700 dark:text-rose-300' },
+                            ]
+                            return (
+                              <div className="space-y-2">
+                                {erasAll.map(([era, qtd], idx) => {
+                                  const fm   = eraFM[era] || { f:0, m:0, total: qtd }
+                                  const pct  = totalGeral > 0 ? Math.round(qtd/totalGeral*100) : 0
+                                  const pctF2 = fm.total > 0 ? Math.round(fm.f/fm.total*100) : 0
+                                  const ec   = ERA_COLORS[idx % ERA_COLORS.length]
+                                  return (
+                                    <motion.button
+                                      key={era}
+                                      type="button"
+                                      onClick={() => setResumoDetalheModal({ open: true, tipo: 'era', valor: era, titulo: `Era: ${era}`, qtd })}
+                                      initial={{ opacity: 0, x: -8 }}
+                                      animate={{ opacity: 1, x: 0 }}
+                                      transition={{ delay: idx * 0.04 }}
+                                      whileTap={{ scale: 0.98 }}
+                                      className={`w-full text-left flex items-center gap-3 ${ec.light} border ${ec.border} rounded-xl p-3`}
+                                    >
+                                      <div className={`bg-gradient-to-b ${ec.grad} rounded-lg p-2 shrink-0 text-center min-w-[52px]`}>
+                                        <p className="text-[9px] text-white/70 font-bold uppercase">Era</p>
+                                        <p className="text-sm font-black text-white leading-tight">{era}</p>
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between mb-1">
+                                          <div className="flex gap-2 flex-wrap">
+                                            {fm.f > 0 && <span className="text-[10px] text-pink-600 dark:text-pink-400 font-semibold">♀ {fm.f}</span>}
+                                            {fm.m > 0 && <span className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">♂ {fm.m}</span>}
+                                          </div>
+                                          <span className={`text-[10px] ${ec.text}`}>{pct}%</span>
+                                        </div>
+                                        <div className="flex h-1.5 rounded-full overflow-hidden bg-black/10 dark:bg-white/10">
+                                          {fm.f > 0 && <div className="bg-pink-400 h-full" style={{ width:`${pctF2}%` }} />}
+                                          {fm.m > 0 && <div className="bg-blue-400 h-full" style={{ width:`${100-pctF2}%` }} />}
+                                        </div>
+                                      </div>
+                                      <p className="text-2xl font-black text-gray-900 dark:text-white shrink-0">{qtd}</p>
+                                    </motion.button>
+                                  )
+                                })}
+                              </div>
+                            )
+                          })()}
+                        </div>
+
+                        {/* 5. RAÇAS */}
                         <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
                           <div className="flex items-center gap-2 mb-3">
                             <span className="text-xl">🐄</span>
@@ -3550,7 +3696,7 @@ export default function MobileRelatorios() {
                                   key={raca}
                                   type="button"
                                   onClick={() => setResumoDetalheModal({ open: true, tipo: 'raca', valor: raca, titulo: `Raça: ${raca}`, qtd })}
-                                  initial={{ opacity: 0, scale: 0.92 }}
+                                  initial={{ opacity: 0, scale: 0.9 }}
                                   animate={{ opacity: 1, scale: 1 }}
                                   transition={{ delay: idx * 0.05 }}
                                   whileTap={{ scale: 0.96 }}
@@ -3558,7 +3704,9 @@ export default function MobileRelatorios() {
                                 >
                                   <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-0.5 truncate">{raca}</p>
                                   <p className="text-2xl font-black text-blue-900 dark:text-blue-100">{qtd}</p>
-                                  <ProgressBar value={qtd} max={racasTop[0]?.[1] || 1} color="bg-blue-400" />
+                                  <div className="h-1.5 bg-blue-200/60 dark:bg-blue-900/40 rounded-full overflow-hidden mt-1.5">
+                                    <div className="h-full bg-blue-500 rounded-full" style={{ width:`${racasTop[0]?.[1]>0?Math.round(qtd/racasTop[0][1]*100):0}%` }} />
+                                  </div>
                                   <p className="text-[10px] text-blue-500 mt-0.5">{pct}% do total</p>
                                 </motion.button>
                               )
@@ -3566,72 +3714,46 @@ export default function MobileRelatorios() {
                           </div>
                         </div>
 
-                        {/* ── Por Era ── */}
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
-                          <div className="flex items-center gap-2 mb-3">
-                            <span className="text-xl">📅</span>
-                            <h4 className="font-bold text-gray-900 dark:text-white">Por Era</h4>
-                          </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            {erasTop.map(([era, qtd], idx) => {
-                              const pct = totalGeral > 0 ? Math.round(qtd/totalGeral*100) : 0
-                              return (
-                                <motion.button
-                                  key={era}
-                                  type="button"
-                                  onClick={() => setResumoDetalheModal({ open: true, tipo: 'era', valor: era, titulo: `Era: ${era}`, qtd })}
-                                  initial={{ opacity: 0, scale: 0.92 }}
-                                  animate={{ opacity: 1, scale: 1 }}
-                                  transition={{ delay: idx * 0.05 }}
-                                  whileTap={{ scale: 0.96 }}
-                                  className="text-left bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-900/10 border-2 border-amber-200 dark:border-amber-800 rounded-xl p-3"
-                                >
-                                  <p className="text-xs font-semibold text-amber-600 dark:text-amber-400 mb-0.5 truncate">{era}</p>
-                                  <p className="text-2xl font-black text-amber-900 dark:text-amber-100">{qtd}</p>
-                                  <ProgressBar value={qtd} max={erasTop[0]?.[1] || 1} color="bg-amber-400" />
-                                  <p className="text-[10px] text-amber-500 mt-0.5">{pct}% do total</p>
-                                </motion.button>
-                              )
-                            })}
-                          </div>
-                        </div>
-
-                        {/* ── Por Sexo ── */}
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
-                          <div className="flex items-center gap-2 mb-3">
-                            <span className="text-xl">⚥</span>
-                            <h4 className="font-bold text-gray-900 dark:text-white">Por Sexo</h4>
-                          </div>
-                          <div className="grid grid-cols-2 gap-3">
-                            {sexosTop.map(([sexo, qtd], idx) => {
-                              const ehF = /^f/i.test(sexo)
-                              const ehM = /^m/i.test(sexo)
-                              const pct = totalGeral > 0 ? Math.round(qtd/totalGeral*100) : 0
-                              const style = ehF
-                                ? { grad: 'from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/10', border: 'border-pink-200 dark:border-pink-800', label: 'text-pink-600 dark:text-pink-400', value: 'text-pink-900 dark:text-pink-100', bar: 'bg-gradient-to-r from-pink-400 to-rose-500', icon: '♀' }
-                                : ehM
-                                ? { grad: 'from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/10', border: 'border-blue-200 dark:border-blue-800', label: 'text-blue-600 dark:text-blue-400', value: 'text-blue-900 dark:text-blue-100', bar: 'bg-gradient-to-r from-blue-400 to-indigo-500', icon: '♂' }
-                                : { grad: 'from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700', border: 'border-gray-200 dark:border-gray-600', label: 'text-gray-600 dark:text-gray-400', value: 'text-gray-900 dark:text-white', bar: 'bg-gray-400', icon: '—' }
-                              return (
-                                <motion.button
-                                  key={sexo}
-                                  type="button"
-                                  onClick={() => setResumoDetalheModal({ open: true, tipo: 'sexo', valor: sexo, titulo: `Sexo: ${sexo === 'F' ? 'Fêmea' : sexo === 'M' ? 'Macho' : sexo}`, qtd })}
-                                  initial={{ opacity: 0, y: 10 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  transition={{ delay: idx * 0.08 }}
-                                  whileTap={{ scale: 0.97 }}
-                                  className={`text-left bg-gradient-to-br ${style.grad} border-2 ${style.border} rounded-xl p-4`}
-                                >
-                                  <p className={`text-sm font-semibold ${style.label} mb-1`}>{style.icon} {sexo === 'F' ? 'Fêmeas' : sexo === 'M' ? 'Machos' : sexo}</p>
-                                  <p className={`text-3xl font-black ${style.value}`}>{qtd.toLocaleString('pt-BR')}</p>
-                                  <div className="mt-2 h-2 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
-                                    <div className={`h-full rounded-full ${style.bar}`} style={{ width: `${pct}%` }} />
-                                  </div>
-                                  <p className={`text-xs ${style.label} mt-1 font-medium`}>{pct}% do rebanho</p>
-                                </motion.button>
-                              )
-                            })}
+                        {/* 6. SEXO — visual grande */}
+                        <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-200 dark:border-gray-700">
+                          <div className="bg-gray-50 dark:bg-gray-800 p-4 pb-3">
+                            <div className="flex items-center gap-2 mb-3">
+                              <span className="text-xl">⚥</span>
+                              <h4 className="font-bold text-gray-900 dark:text-white">Por Sexo</h4>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                              {sexosTop.map(([sexo, qtd], idx) => {
+                                const ehF = /^f/i.test(sexo)
+                                const ehM = /^m/i.test(sexo)
+                                const pct = totalGeral > 0 ? Math.round(qtd/totalGeral*100) : 0
+                                const s = ehF
+                                  ? { grad:'from-pink-500 to-rose-600', light:'bg-pink-50 dark:bg-pink-900/20', border:'border-pink-300 dark:border-pink-700', label:'text-pink-600 dark:text-pink-400', num:'text-pink-900 dark:text-pink-100', icon:'♀', name:'Fêmeas' }
+                                  : ehM
+                                  ? { grad:'from-blue-500 to-indigo-600', light:'bg-blue-50 dark:bg-blue-900/20', border:'border-blue-300 dark:border-blue-700', label:'text-blue-600 dark:text-blue-400', num:'text-blue-900 dark:text-blue-100', icon:'♂', name:'Machos' }
+                                  : { grad:'from-gray-400 to-gray-500', light:'bg-gray-50 dark:bg-gray-700', border:'border-gray-200 dark:border-gray-600', label:'text-gray-600 dark:text-gray-400', num:'text-gray-900 dark:text-white', icon:'—', name:sexo }
+                                return (
+                                  <motion.div
+                                    key={sexo}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: idx * 0.08 }}
+                                    className={`${s.light} border-2 ${s.border} rounded-xl overflow-hidden`}
+                                  >
+                                    <div className={`bg-gradient-to-r ${s.grad} px-3 py-1.5 flex items-center gap-1`}>
+                                      <span className="text-white/90 text-lg font-black">{s.icon}</span>
+                                      <span className="text-white/80 text-xs font-semibold">{s.name}</span>
+                                    </div>
+                                    <div className="p-3">
+                                      <p className={`text-4xl font-black ${s.num}`}>{qtd.toLocaleString('pt-BR')}</p>
+                                      <div className="mt-2 h-2 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
+                                        <div className={`h-full bg-gradient-to-r ${s.grad}`} style={{ width:`${pct}%` }} />
+                                      </div>
+                                      <p className={`text-xs ${s.label} mt-1 font-medium`}>{pct}% do rebanho</p>
+                                    </div>
+                                  </motion.div>
+                                )
+                              })}
+                            </div>
                           </div>
                         </div>
 
@@ -3646,26 +3768,40 @@ export default function MobileRelatorios() {
                       d.raca !== 'TOTAL GERAL' && d.local !== 'TOTAL GERAL' &&
                       d.local_1 !== 'TOTAL GERAL' && d.fazenda !== 'TOTAL GERAL'
                     )
+                    const CAT_ANIMAL_MODAL = [
+                      { key: 'Bezerros',   test: s => /bezerr|cria/i.test(s) },
+                      { key: 'Vacas',      test: s => /^vaca|vacas/i.test(s) },
+                      { key: 'Novilhas',   test: s => /novilha/i.test(s) },
+                      { key: 'Touros',     test: s => /touro/i.test(s) },
+                      { key: 'Novilhos',   test: s => /novilho/i.test(s) },
+                      { key: 'Receptoras', test: s => /recept/i.test(s) },
+                    ]
                     const filtered = rows.filter(d => {
-                      if (tipo === 'raca') return (d.raca || 'Não informado') === valor
-                      if (tipo === 'era') return (d.era || '-') === valor
-                      if (tipo === 'local_1') return (d.local_1 || d.local || '') === valor
-                      if (tipo === 'categoria_local') {
-                        const cat = CATS.find(c => c.key === valor)
-                        return cat ? cat.test(d.local || d.local_1 || '') : false
+                      if (tipo === 'raca') return (d.raca || 'Não informado').trim() === valor
+                      if (tipo === 'era')  return (d.era || '-').trim() === valor
+                      if (tipo === 'local_1') return (d.local_1 || d.local || '').trim() === valor
+                      if (tipo === 'local') {
+                        const sub2  = (d.sub_local_2 || '').trim()
+                        const loc   = (d.local || d.local_1 || '').trim()
+                        return sub2 === valor || loc === valor
+                      }
+                      if (tipo === 'categoria') {
+                        const cat = (d.categoria || '').toString().trim()
+                        const def = CAT_ANIMAL_MODAL.find(c => c.key === valor)
+                        return def ? def.test(cat) : cat === valor
                       }
                       if (tipo === 'sexo') {
                         const s = (d.sexo || '-').toString()
-                        if (s === valor) return true
                         if (valor === 'F' && /^f/i.test(s)) return true
                         if (valor === 'M' && /^m/i.test(s)) return true
+                        if (s === valor) return true
                         if (valor.toLowerCase().includes('macho') && /^m/i.test(s)) return true
                         if (valor.toLowerCase().includes('fêmea') && /^f/i.test(s)) return true
                         return false
                       }
                       return false
                     })
-                    const cols = filtered[0] ? Object.keys(filtered[0]).filter(c => !['_resumo', 'animal_id'].includes(c) && typeof (filtered[0][c]) !== 'object') : []
+                    const cols = filtered[0] ? Object.keys(filtered[0]).filter(c => !['_resumo', 'animal_id', 'id'].includes(c) && typeof (filtered[0][c]) !== 'object') : []
                     const qtyKey = ehBoletimCampo ? 'quant' : 'total'
                     return (
                       <div

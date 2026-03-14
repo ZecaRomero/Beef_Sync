@@ -121,7 +121,7 @@ export default async function handler(req, res) {
         });
       }
       if (rows.some(r => r.mgte != null || r.top != null)) {
-        try { // (createTablesIfNotExist removido � tabelas criadas automaticamente no primeiro uso); } catch (e) { /* ignora */ }
+        // tabelas criadas automaticamente no primeiro uso
       }
       const resultados = await processarLinhas(rows, criarNaoEncontrados, limparForaDaLista);
       let msg = `Importação concluída: ${resultados.animaisAtualizados} animais atualizados`;
