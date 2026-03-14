@@ -1,4 +1,4 @@
-import { query } from '../../../lib/database';
+﻿import { query } from '../../../lib/database';
 import formidable from 'formidable';
 import ExcelJS from 'exceljs';
 import fs from 'fs';
@@ -10,7 +10,7 @@ export const config = {
 };
 
 /**
- * Extrai valor efetivo de célula Excel (fórmulas retornam .result)
+ * Extrai valor efetivo de cÃ©lula Excel (fÃ³rmulas retornam .result)
  */
 function getCellValue(cell) {
   if (!cell) return null;
@@ -20,8 +20,8 @@ function getCellValue(cell) {
 }
 
 /**
- * Normaliza valor numérico (iABCZ pode vir com vírgula: 47,71).
- * Trata objetos do Excel (fórmulas, richText) e evita "[object Object]".
+ * Normaliza valor numÃ©rico (iABCZ pode vir com vÃ­rgula: 47,71).
+ * Trata objetos do Excel (fÃ³rmulas, richText) e evita "[object Object]".
  */
 function normalizarNumero(val) {
   if (val === null || val === undefined) return null;
@@ -52,7 +52,7 @@ function normalizarNumero(val) {
 }
 
 /**
- * Normaliza texto (Série, RG, Deca). Evita retornar "[object Object]".
+ * Normaliza texto (SÃ©rie, RG, Deca). Evita retornar "[object Object]".
  */
 function normalizarTexto(val) {
   if (val === null || val === undefined) return '';
@@ -77,7 +77,7 @@ function normalizarTexto(val) {
 }
 
 /**
- * Normaliza RG: remove zeros à esquerda quando for numérico (ex: 017328 -> 17328)
+ * Normaliza RG: remove zeros Ã  esquerda quando for numÃ©rico (ex: 017328 -> 17328)
  * para garantir matching com o banco
  */
 function normalizarRG(val) {
@@ -87,13 +87,13 @@ function normalizarRG(val) {
 }
 
 /**
- * Importa Série, RG, iABCZ, Deca de animais.
- * Formato esperado: Série (A) | RG (B) | iABCZ (C) | Deca (D)
+ * Importa SÃ©rie, RG, iABCZ, Deca de animais.
+ * Formato esperado: SÃ©rie (A) | RG (B) | iABCZ (C) | Deca (D)
  * Aceita Excel (.xlsx, .xls) ou JSON no body (para colar texto).
  */
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Método não permitido' });
+    return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' });
   }
 
   try {
@@ -124,7 +124,7 @@ export default async function handler(req, res) {
         // tabelas criadas automaticamente no primeiro uso
       }
       const resultados = await processarLinhas(rows, criarNaoEncontrados, limparForaDaLista);
-      let msg = `Importação concluída: ${resultados.animaisAtualizados} animais atualizados`;
+      let msg = `ImportaÃ§Ã£o concluÃ­da: ${resultados.animaisAtualizados} animais atualizados`;
       if (resultados.animaisLimpos > 0) msg += `, ${resultados.animaisLimpos} limpos (fora da planilha)`;
       return res.status(200).json({
         success: true,
@@ -140,7 +140,7 @@ export default async function handler(req, res) {
     });
 
     if (err) {
-      console.error('Erro ao fazer parse do formulário:', err);
+      console.error('Erro ao fazer parse do formulÃ¡rio:', err);
       return res.status(500).json({ error: 'Erro ao processar arquivo', details: String(err?.message || err) });
     }
 
@@ -151,7 +151,7 @@ export default async function handler(req, res) {
 
     const filepath = file.filepath || file.path;
     if (!filepath) {
-      return res.status(400).json({ error: 'Arquivo inválido' });
+      return res.status(400).json({ error: 'Arquivo invÃ¡lido' });
     }
 
     const workbook = new ExcelJS.Workbook();
@@ -168,11 +168,11 @@ export default async function handler(req, res) {
     const cellA1 = (primeiraLinha.getCell(1).value ?? '').toString().toUpperCase();
     const cellB1 = (primeiraLinha.getCell(2).value ?? '').toString().toUpperCase();
     const cellC1 = (primeiraLinha.getCell(3).value ?? '').toString().toUpperCase();
-    if (cellA1.includes('SÉRIE') || cellA1.includes('SERIE') || cellA1.includes('SERIE') || cellB1.includes('RG') || cellB1.includes('RGN')) {
+    if (cellA1.includes('SÃ‰RIE') || cellA1.includes('SERIE') || cellA1.includes('SERIE') || cellB1.includes('RG') || cellB1.includes('RGN')) {
       startRow = 2;
     }
 
-    // Formato Série|RGN|Status (3 colunas) - ex: SERIE, RGN, Status
+    // Formato SÃ©rie|RGN|Status (3 colunas) - ex: SERIE, RGN, Status
     const formatoStatusAbcz = cellC1.includes('STATUS');
     const cellD1 = (primeiraLinha.getCell(4).value ?? '').toString().toUpperCase();
     const cellE1 = (primeiraLinha.getCell(5).value ?? '').toString().toUpperCase();
@@ -180,19 +180,19 @@ export default async function handler(req, res) {
     const cellG1 = (primeiraLinha.getCell(7).value ?? '').toString().toUpperCase();
     const cellH1 = (primeiraLinha.getCell(8).value ?? '').toString().toUpperCase();
     const cellI1 = (primeiraLinha.getCell(9).value ?? '').toString().toUpperCase();
-    // Formato completo 9 colunas: Série | RG | MGTe | TOP | iABCZ | DECA | IQG | Pt IQG | situações_abcz
+    // Formato completo 9 colunas: SÃ©rie | RG | MGTe | TOP | iABCZ | DECA | IQG | Pt IQG | situaÃ§Ãµes_abcz
     const formatoCompleto9Cols = /MGTE|MGT\b/i.test(String(cellC1 || '').trim()) && /TOP/i.test(String(cellD1 || '').trim()) &&
       (cellE1.includes('IABCZ') || cellE1.includes('ABCZ')) && cellF1.includes('DECA') &&
       (cellG1.includes('IQG') || cellG1.includes('IQGG')) && (cellH1.includes('PT') || cellH1.includes('PL') || cellH1.includes('IQG')) &&
       (cellI1.includes('SITUA') || cellI1.includes('STATUS') || cellI1.includes('RGN') || cellI1.includes('ABCZ'));
-    // Formato Série | RG | MGTe | TOP (4 colunas) - ex: planilha de mérito genético (ANCP, etc)
+    // Formato SÃ©rie | RG | MGTe | TOP (4 colunas) - ex: planilha de mÃ©rito genÃ©tico (ANCP, etc)
     const formatoMGTeTOP = !formatoCompleto9Cols && /MGTE|MGT\b/i.test(String(cellC1 || '').trim()) && /TOP/i.test(String(cellD1 || '').trim());
-    // Formato completo 6 colunas: SÉRIE | RG | iABCZg | DECA | IQG | Pt IQG
+    // Formato completo 6 colunas: SÃ‰RIE | RG | iABCZg | DECA | IQG | Pt IQG
     const formatoCompleto6Cols = cellC1.includes('IABCZ') && cellD1.includes('DECA') &&
       (cellE1.includes('IQG') || cellE1.includes('IQGG')) &&
       (cellF1.includes('PT') || cellF1.includes('PL') || cellF1.includes('IQG'));
-    // Formato 7 colunas: Série | RG | iABCZg | DECA | IQG | Pt IQG | Situação ABCZ
-    const formatoCompleto7Cols = formatoCompleto6Cols && (cellG1.includes('SITUAÇÃO') || cellG1.includes('SITUACAO') || cellG1.includes('STATUS'));
+    // Formato 7 colunas: SÃ©rie | RG | iABCZg | DECA | IQG | Pt IQG | SituaÃ§Ã£o ABCZ
+    const formatoCompleto7Cols = formatoCompleto6Cols && (cellG1.includes('SITUAÃ‡ÃƒO') || cellG1.includes('SITUACAO') || cellG1.includes('STATUS'));
     const row1 = worksheet.getRow(startRow);
     const valC1 = row1.getCell(3).value;
     const valD1 = row1.getCell(4).value;
@@ -203,7 +203,7 @@ export default async function handler(req, res) {
     const col5Num = valE1 != null && !isNaN(parseFloat(String(valE1).replace(',', '.')));
     const col6Num = valF1 != null && !isNaN(parseFloat(String(valF1).replace(',', '.')));
     const formatoCompleto6ColsPelosDados = startRow === 1 && col3Num && col4Num && col5Num && col6Num;
-    // Formato Série|RG|IQG/IQGg|Pt (4 colunas) - col 3 e 4 vão para IQG e Pt IQG (não iABCZ/DECA)
+    // Formato SÃ©rie|RG|IQG/IQGg|Pt (4 colunas) - col 3 e 4 vÃ£o para IQG e Pt IQG (nÃ£o iABCZ/DECA)
     const formatoIQGPeloHeader = (cellC1.includes('IQG') || cellC1.includes('IQGG') || cellD1.includes('PT') || cellD1.includes('PL') || cellD1.includes('IQG')) &&
       !cellC1.includes('IABCZ') && !cellC1.includes('DECA');
     const formatoIQGPelosDados = startRow === 1 && col3Num && col4Num;
@@ -271,10 +271,10 @@ export default async function handler(req, res) {
     const valLimpar = Array.isArray(rawLimpar) ? rawLimpar[0] : rawLimpar;
     const limparForaDaLista = !!(valLimpar === 'true' || valLimpar === true);
     if (rows.some(r => r.mgte != null || r.top != null)) {
-      try { // (createTablesIfNotExist removido � tabelas criadas automaticamente no primeiro uso); } catch (e) { /* ignora */ }
+      // tabelas criadas automaticamente no primeiro uso
     }
     const resultados = await processarLinhas(rows, criarNaoEncontrados, limparForaDaLista);
-    let msg = `Importação concluída: ${resultados.animaisAtualizados} animais atualizados`;
+    let msg = `ImportaÃ§Ã£o concluÃ­da: ${resultados.animaisAtualizados} animais atualizados`;
     if (resultados.animaisLimpos > 0) msg += `, ${resultados.animaisLimpos} limpos (fora da planilha)`;
     return res.status(200).json({
       success: true,
@@ -282,25 +282,25 @@ export default async function handler(req, res) {
       resultados,
     });
   } catch (error) {
-    console.error('❌ Erro ao importar genética:', error);
+    console.error('âŒ Erro ao importar genÃ©tica:', error);
     let details = error?.message || String(error);
     if (error?.name === 'AggregateError' && Array.isArray(error?.errors) && error.errors.length > 0) {
       details = error.errors.map(e => e?.message || String(e)).join('; ') || details;
     }
     return res.status(500).json({
-      error: 'Erro ao processar importação',
+      error: 'Erro ao processar importaÃ§Ã£o',
       details,
     });
   }
 }
 
-/** Tenta INSERT com iqg/pt_iqg; se coluna não existir, usa genetica_2/decile_2 */
+/** Tenta INSERT com iqg/pt_iqg; se coluna nÃ£o existir, usa genetica_2/decile_2 */
 async function insertOuUpdateAnimal(nome, serie, rg, tatuagem, abczg, deca, situacaoAbcz, genetica2, decile2) {
   const params = [nome, serie, rg, tatuagem, abczg, deca, situacaoAbcz, genetica2, decile2];
   try {
     return await query(
       `INSERT INTO animais (nome, serie, rg, tatuagem, sexo, raca, situacao, abczg, deca, situacao_abcz, iqg, pt_iqg)
-       VALUES ($1, $2, $3, $4, 'Não informado', 'Não informada', 'Ativo', $5, $6, $7, NULLIF(TRIM(REPLACE($8::text, ',', '.')), '')::numeric, NULLIF(TRIM(REPLACE($9::text, ',', '.')), '')::numeric)
+       VALUES ($1, $2, $3, $4, 'NÃ£o informado', 'NÃ£o informada', 'Ativo', $5, $6, $7, NULLIF(TRIM(REPLACE($8::text, ',', '.')), '')::numeric, NULLIF(TRIM(REPLACE($9::text, ',', '.')), '')::numeric)
        ON CONFLICT (serie, rg) DO UPDATE SET
          iqg = COALESCE(NULLIF(TRIM(REPLACE(EXCLUDED.iqg::text, ',', '.')), '')::numeric, animais.iqg),
          pt_iqg = COALESCE(NULLIF(TRIM(REPLACE(EXCLUDED.pt_iqg::text, ',', '.')), '')::numeric, animais.pt_iqg),
@@ -315,7 +315,7 @@ async function insertOuUpdateAnimal(nome, serie, rg, tatuagem, abczg, deca, situ
     if (/column.*does not exist/i.test(e?.message || '')) {
       return await query(
         `INSERT INTO animais (nome, serie, rg, tatuagem, sexo, raca, situacao, abczg, deca, situacao_abcz, genetica_2, decile_2)
-         VALUES ($1, $2, $3, $4, 'Não informado', 'Não informada', 'Ativo', $5, $6, $7, NULLIF(TRIM(REPLACE($8::text, ',', '.')), '')::numeric, $9::text)
+         VALUES ($1, $2, $3, $4, 'NÃ£o informado', 'NÃ£o informada', 'Ativo', $5, $6, $7, NULLIF(TRIM(REPLACE($8::text, ',', '.')), '')::numeric, $9::text)
          ON CONFLICT (serie, rg) DO UPDATE SET
            genetica_2 = COALESCE(NULLIF(TRIM(REPLACE(EXCLUDED.genetica_2::text, ',', '.')), '')::numeric, animais.genetica_2),
            decile_2 = COALESCE(EXCLUDED.decile_2::text, animais.decile_2::text),
@@ -341,18 +341,18 @@ async function processarLinhas(rows, criarNaoEncontrados = false, limparForaDaLi
     erros: [],
   };
 
-  // Normalizar e filtrar linhas (RG sem zeros à esquerda para matching)
+  // Normalizar e filtrar linhas (RG sem zeros Ã  esquerda para matching)
   const dados = [];
   for (let i = 0; i < rows.length; i++) {
     const r = rows[i];
-    let serie = (normalizarTexto(r.serie || r.Série || r.SERIE) || '').substring(0, 10).trim();
+    let serie = (normalizarTexto(r.serie || r.SÃ©rie || r.SERIE) || '').substring(0, 10).trim();
     let rg = normalizarRG(r.rg || r.RG || r.RGN);
     
-    // Se RG contém hífen, pode estar no formato "CJCJ-16310" (série-rg junto)
+    // Se RG contÃ©m hÃ­fen, pode estar no formato "CJCJ-16310" (sÃ©rie-rg junto)
     if (rg && rg.includes('-')) {
       const partes = rg.split('-');
       if (partes.length === 2) {
-        // Se série está vazia, usar a primeira parte como série
+        // Se sÃ©rie estÃ¡ vazia, usar a primeira parte como sÃ©rie
         if (!serie) {
           serie = partes[0].trim();
         }
@@ -385,8 +385,8 @@ async function processarLinhas(rows, criarNaoEncontrados = false, limparForaDaLi
       rg,
       abczg: abczgVal,
       deca: apenasMgteTop ? null : (normalizarTexto(r.deca ?? r.Deca ?? r.DECA) || null),
-      situacaoAbcz: apenasMgteTop ? null : (normalizarTexto(r.situacaoAbcz ?? r.situacao_abcz ?? r['Situação ABCZ'] ?? r.Status) || null),
-      genetica2: apenasMgteTop ? null : safeNum(r.iqg ?? r.genetica_2 ?? r.genetica2 ?? r['IQG'] ?? r['Genética 2']),
+      situacaoAbcz: apenasMgteTop ? null : (normalizarTexto(r.situacaoAbcz ?? r.situacao_abcz ?? r['SituaÃ§Ã£o ABCZ'] ?? r.Status) || null),
+      genetica2: apenasMgteTop ? null : safeNum(r.iqg ?? r.genetica_2 ?? r.genetica2 ?? r['IQG'] ?? r['GenÃ©tica 2']),
       decile2: decile2Val,
       mgte: safeNum(r.mgte ?? r.MGTe),
       top: safeNum(r.top ?? r.TOP) ?? (apenasMgteTop ? null : decile2Val),
@@ -396,7 +396,7 @@ async function processarLinhas(rows, criarNaoEncontrados = false, limparForaDaLi
 
   if (dados.length === 0) return resultados;
 
-  // Buscar animais em lotes (evita query muito grande) - RG normalizado no banco (sem zeros à esquerda)
+  // Buscar animais em lotes (evita query muito grande) - RG normalizado no banco (sem zeros Ã  esquerda)
   const mapaAnimais = new Map();
   const BATCH_SELECT = 100;
 
@@ -405,7 +405,7 @@ async function processarLinhas(rows, criarNaoEncontrados = false, limparForaDaLi
     const pares = batch.map(d => [(d.serie || '').trim(), String(d.rg || '').trim()]);
     const flatParams = pares.flat();
 
-    // 1) Busca por serie + rg (RG normalizado: sem zeros à esquerda no banco)
+    // 1) Busca por serie + rg (RG normalizado: sem zeros Ã  esquerda no banco)
     const animaisRes = await query(
       `SELECT id, serie, rg, situacao FROM animais a
        WHERE (UPPER(COALESCE(TRIM(a.serie), '')), COALESCE(NULLIF(REGEXP_REPLACE(TRIM(a.rg::text), '^0+', ''), ''), '0')) IN (
@@ -420,7 +420,7 @@ async function processarLinhas(rows, criarNaoEncontrados = false, limparForaDaLi
       mapaAnimais.set(key, a);
     }
 
-    // 2) Fallback: buscar por tatuagem (serie-rg, serie+rg, serie+espaço+rg) para os que não foram encontrados
+    // 2) Fallback: buscar por tatuagem (serie-rg, serie+rg, serie+espaÃ§o+rg) para os que nÃ£o foram encontrados
     const naoEncontradosNoBatch = batch.filter(d => !mapaAnimais.has(`${(d.serie || '').toUpperCase().trim()}|${d.rg}`));
     const tatuagens = [...new Set(naoEncontradosNoBatch.flatMap(d => {
       const s = (d.serie || '').trim().toUpperCase();
@@ -574,7 +574,7 @@ async function processarLinhas(rows, criarNaoEncontrados = false, limparForaDaLi
         resultados.animaisAtualizados += updatesMgteTop.length;
       } catch (e) {
         if (/column.*mgte|column.*top|does not exist/i.test(e?.message || '')) {
-          console.warn('[excel-genetica] Colunas mgte/top não existem, ignorando import MGTe/TOP');
+          console.warn('[excel-genetica] Colunas mgte/top nÃ£o existem, ignorando import MGTe/TOP');
         } else {
           batchForFullUpdate.push(...updatesMgteTop);
         }
@@ -624,7 +624,7 @@ async function processarLinhas(rows, criarNaoEncontrados = false, limparForaDaLi
         } catch (e) {
           if (withMgteTop && /column.*mgte|column.*top|does not exist/i.test(e?.message || '')) {
             await runBatchUpdate(true, false, false, batchForFullUpdate);
-          } else if (/column.*iqg|column.*genetica|coluna.*não existe/i.test(e?.message || '')) {
+          } else if (/column.*iqg|column.*genetica|coluna.*nÃ£o existe/i.test(e?.message || '')) {
             temColGenetica2 = false;
             await runBatchUpdate(true, true, false, batchForFullUpdate);
           } else throw e;
@@ -645,7 +645,7 @@ async function processarLinhas(rows, criarNaoEncontrados = false, limparForaDaLi
         resultados.animaisAtualizados += batchForFullUpdate.length;
       }
     } catch (colErr) {
-      if (/column.*does not exist|coluna.*não existe/i.test(colErr?.message || '')) {
+      if (/column.*does not exist|coluna.*nÃ£o existe/i.test(colErr?.message || '')) {
         temColGenetica2 = false;
         try {
           await runBatchUpdate(true, true);
@@ -668,7 +668,7 @@ async function processarLinhas(rows, criarNaoEncontrados = false, limparForaDaLi
     }
   }
 
-  // Limpar iABCZ/DECA de animais da mesma série que NÃO estão na planilha
+  // Limpar iABCZ/DECA de animais da mesma sÃ©rie que NÃƒO estÃ£o na planilha
   if (limparForaDaLista && dados.length > 0) {
     try {
       const seriesNaPlanilha = [...new Set(dados.map(d => (d.serie || '').trim().toUpperCase()).filter(Boolean))];
