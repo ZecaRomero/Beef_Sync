@@ -1,10 +1,7 @@
-import { query, createTablesIfNotExist } from '../../../lib/database'
+import { query } from '../../../lib/database'
 
 export default async function handler(req, res) {
   try {
-    // Garantir que as tabelas existam
-    await createTablesIfNotExist()
-    
     const { id } = req.query
     
     if (!id) {

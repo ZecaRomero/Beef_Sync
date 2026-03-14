@@ -16,8 +16,22 @@ export default function LoginPage() {
   const [submitting, setSubmitting] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
 
+  const resolveTargetPath = (currentUser) => {
+    const redirectParam = typeof router.query?.redirect === 'string' ? router.query.redirect : ''
+    if (redirectParam && redirectParam.startsWith('/')) {
+      return redirectParam
+    }
+
+    if (currentUser?.email === 'adelso@fazendasantanna.com.br') {
+      return '/adelso-menu'
+    }
+
+    const role = currentUser?.user_metadata?.role || 'externo'
+    return role === 'desenvolvedor' ? '/dashboard' : '/a'
+  }
+
   useEffect(() => {
-    if (!loading && user) router.replace('/')
+    if (!loading && user) router.replace(resolveTargetPath(user))
   }, [user, loading, router])
 
   const handleSubmit = async (e) => {
@@ -27,8 +41,9 @@ export default function LoginPage() {
     setSubmitting(true)
     try {
       if (mode === 'login') {
-        await signIn(email, password)
-        router.replace('/')
+        const authData = await signIn(email, password)
+        const signedUser = authData?.user || user
+        router.replace(resolveTargetPath(signedUser))
       } else if (mode === 'register') {
         await signUp(email, password, { nome: name })
         setSuccess('Conta criada! Verifique seu e-mail para confirmar.')

@@ -1,4 +1,4 @@
-import { query, createTablesIfNotExist } from '../../../lib/database';
+import { query } from '../../../lib/database';
 import formidable from 'formidable';
 import ExcelJS from 'exceljs';
 import fs from 'fs';
@@ -121,7 +121,7 @@ export default async function handler(req, res) {
         });
       }
       if (rows.some(r => r.mgte != null || r.top != null)) {
-        try { await createTablesIfNotExist(); } catch (e) { /* ignora */ }
+        try { // (createTablesIfNotExist removido � tabelas criadas automaticamente no primeiro uso); } catch (e) { /* ignora */ }
       }
       const resultados = await processarLinhas(rows, criarNaoEncontrados, limparForaDaLista);
       let msg = `Importação concluída: ${resultados.animaisAtualizados} animais atualizados`;
@@ -271,7 +271,7 @@ export default async function handler(req, res) {
     const valLimpar = Array.isArray(rawLimpar) ? rawLimpar[0] : rawLimpar;
     const limparForaDaLista = !!(valLimpar === 'true' || valLimpar === true);
     if (rows.some(r => r.mgte != null || r.top != null)) {
-      try { await createTablesIfNotExist(); } catch (e) { /* ignora */ }
+      try { // (createTablesIfNotExist removido � tabelas criadas automaticamente no primeiro uso); } catch (e) { /* ignora */ }
     }
     const resultados = await processarLinhas(rows, criarNaoEncontrados, limparForaDaLista);
     let msg = `Importação concluída: ${resultados.animaisAtualizados} animais atualizados`;
@@ -695,3 +695,4 @@ async function processarLinhas(rows, criarNaoEncontrados = false, limparForaDaLi
 
   return resultados;
 }
+

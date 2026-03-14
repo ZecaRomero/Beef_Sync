@@ -1,9 +1,33 @@
-import { query, createTablesIfNotExist } from '../../../lib/database'
+import { query } from '../../../lib/database'
+
+// Inicializar tabela uma única vez por processo (não em toda requisição)
+let tableReady = false
+async function ensureBoletimCampoTable() {
+  if (tableReady) return
+  await query(`
+    CREATE TABLE IF NOT EXISTS boletim_campo (
+      id SERIAL PRIMARY KEY,
+      local VARCHAR(200) NOT NULL,
+      local_1 VARCHAR(200),
+      sub_local_2 VARCHAR(200),
+      quant INTEGER DEFAULT 0,
+      sexo CHAR(1),
+      categoria VARCHAR(100),
+      raca VARCHAR(100),
+      era VARCHAR(50),
+      observacao TEXT,
+      usuario VARCHAR(100),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `)
+  tableReady = true
+}
 
 export default async function handler(req, res) {
   if (req.method === 'GET') {
     try {
-      await createTablesIfNotExist()
+      await ensureBoletimCampoTable()
       const result = await query(`
         SELECT id, local, local_1, sub_local_2, quant, sexo, categoria, raca, era, observacao, usuario, created_at, updated_at
         FROM boletim_campo

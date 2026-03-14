@@ -21,53 +21,48 @@ export default function MaintenanceOverlay() {
     }
   }, [])
 
+  const handleSettingsResponse = (d, isLocalhost) => {
+    if (d.success && d.data) {
+      const maintenanceAuth = localStorage.getItem('maintenance_auth')
+      const currentSessionToken = d.data.session_token
+      if (maintenanceAuth) {
+        try {
+          const auth = JSON.parse(maintenanceAuth)
+          if (!auth.session_token ||
+              auth.session_token !== currentSessionToken ||
+              !auth.timestamp ||
+              (Date.now() - auth.timestamp > 24 * 60 * 60 * 1000)) {
+            localStorage.removeItem('maintenance_auth')
+            if (d.data.maintenance_mode && !isLocalhost) {
+              setStatus({ ...d.data, isLocalhost })
+              return
+            }
+          } else {
+            setStatus({ maintenance_mode: false, block_access: false, isLocalhost })
+            return
+          }
+        } catch {
+          localStorage.removeItem('maintenance_auth')
+        }
+      }
+      setStatus({ ...d.data, isLocalhost })
+    }
+  }
+
   useEffect(() => {
     if (!mounted || typeof window === 'undefined') return
     const hostname = window.location.hostname
     const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1'
 
+    // Localhost nunca precisa buscar — sempre liberado
+    if (isLocalhost) {
+      setStatus({ maintenance_mode: false, block_access: false, isLocalhost: true })
+      return
+    }
+
     fetch('/api/system-settings')
       .then(r => r.json())
-      .then(d => {
-        if (d.success && d.data) {
-          // Verificar se o session_token mudou (significa que todos foram deslogados)
-          const maintenanceAuth = localStorage.getItem('maintenance_auth')
-          const currentSessionToken = d.data.session_token
-          
-          if (maintenanceAuth) {
-            try {
-              const auth = JSON.parse(maintenanceAuth)
-              
-              // Se o token mudou, expirou (24h), ou não tem token salvo, invalidar login
-              if (!auth.session_token ||
-                  auth.session_token !== currentSessionToken || 
-                  !auth.timestamp || 
-                  (Date.now() - auth.timestamp > 24 * 60 * 60 * 1000)) {
-                localStorage.removeItem('maintenance_auth')
-                // Forçar mostrar tela de manutenção se o modo estiver ativo
-                if (d.data.maintenance_mode && !isLocalhost) {
-                  setStatus({
-                    ...d.data,
-                    isLocalhost
-                  })
-                  return
-                }
-              } else {
-                // Login ainda válido - permitir acesso
-                setStatus({ maintenance_mode: false, block_access: false, isLocalhost })
-                return
-              }
-            } catch (e) {
-              localStorage.removeItem('maintenance_auth')
-            }
-          }
-
-          setStatus({
-            ...d.data,
-            isLocalhost
-          })
-        }
-      })
+      .then(d => handleSettingsResponse(d, isLocalhost))
       .catch(() => setStatus({ maintenance_mode: false, block_access: false, isLocalhost }))
   }, [mounted])
 

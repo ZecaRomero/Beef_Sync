@@ -785,26 +785,10 @@ class DatabaseService {
   }
 
   // Buscar todos os animais
+  // OTIMIZADO: custos removidos do JOIN para evitar query pesada na listagem.
+  // Custos são carregados sob demanda em buscarAnimalPorId.
   async buscarAnimais(filtros = {}) {
-    let queryText = `
-      SELECT a.*, 
-             COALESCE(
-               json_agg(
-                 json_build_object(
-                   'id', c.id,
-                   'tipo', c.tipo,
-                   'subtipo', c.subtipo,
-                   'valor', c.valor,
-                   'data', c.data,
-                   'observacoes', c.observacoes,
-                   'detalhes', c.detalhes
-                 ) ORDER BY c.data DESC
-               ) FILTER (WHERE c.id IS NOT NULL AND c.tipo NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação')), 
-               '[]'::json
-             ) as custos
-    FROM animais a
-    LEFT JOIN custos c ON a.id = c.animal_id AND c.tipo NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação')
-    `;
+    let queryText = `SELECT a.* FROM animais a`;
     
     const params = [];
     const conditions = [];
@@ -850,10 +834,6 @@ class DatabaseService {
     if (conditions.length > 0) {
       queryText += ` WHERE ${conditions.join(' AND ')}`;
     }
-
-    queryText += `
-      GROUP BY a.id
-    `;
 
     // Ordenação
     if (filtros.orderBy === 'created_at') {

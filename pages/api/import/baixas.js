@@ -126,7 +126,7 @@ export default async function handler(req, res) {
 
     let filepathToClean = filepath
     try {
-      await createTablesIfNotExist()
+      // (createTablesIfNotExist removido — tabelas criadas automaticamente no primeiro uso)
       const workbook = XLSX.readFile(filepath)
       const sheetName = workbook.SheetNames[0]
       const sheet = workbook.Sheets[sheetName]
@@ -319,3 +319,4 @@ export default async function handler(req, res) {
     }
   })
 }
+

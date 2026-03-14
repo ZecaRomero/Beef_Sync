@@ -107,9 +107,6 @@ function calcularEra(meses, sexo) {
 
 // Handler original para cadastro de animais
 async function animaisHandler(req, res) {
-  // Log da requisição
-  console.log(`[API] ${req.method} /api/animals - Iniciando processamento`)
-  
   if (req.method === 'GET') {
     const { situacao, raca, sexo, serie, rg, orderBy, limit } = req.query
     const filtros = {}
@@ -143,8 +140,7 @@ async function animaisHandler(req, res) {
       }
     })
     
-    logger.debug(`[API] GET /api/animals - Enviando resposta com ${animaisComIdentificacao.length} animais`)
-    console.log(`[API] GET /api/animals - Enviando resposta com ${animaisComIdentificacao.length} animais`)
+    logger.debug(`[API] GET /api/animals - ${animaisComIdentificacao.length} animais`)
     return sendSuccess(res, animaisComIdentificacao, 'Animais recuperados com sucesso')
     
   } else if (req.method === 'POST') {
@@ -283,7 +279,7 @@ async function animaisHandler(req, res) {
         status: animal.situacao
       }
       
-      logger.debug(`[API] POST /api/animals - Enviando resposta de sucesso para animal criado`)
+      logger.debug(`[API] POST /api/animals - Animal criado: ${animal.serie}-${animal.rg}`)
       broadcast('animal.created', { animalId: animal.id, serie: animal.serie, rg: animal.rg })
       return sendSuccess(res, animalComIdentificacao, 'Animal criado com sucesso', HTTP_STATUS.CREATED)
       

@@ -7,6 +7,7 @@ import React, { createContext, useCallback, useContext, useEffect, useRef, useSt
 import apiClient from '../utils/apiClient'
 import logger from '../utils/logger'
 import { useServerEvents } from '../hooks/useServerEvents'
+import { useAuth } from './AuthContext'
 
 const AppContext = createContext(null)
 
@@ -26,6 +27,7 @@ export function useApp() {
  * Agora carrega dados do PostgreSQL através das APIs
  */
 export function AppProvider({ children }) {
+  const { user } = useAuth()
   // Estados dos dados (carregados do PostgreSQL)
   const [animals, setAnimals] = useState([])
   const [birthData, setBirthData] = useState([])
@@ -34,7 +36,7 @@ export function AppProvider({ children }) {
   const [notasFiscais, setNotasFiscais] = useState([])
 
   // Estados temporários
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [initialized, setInitialized] = useState(false)
 
@@ -45,55 +47,48 @@ export function AppProvider({ children }) {
    * Carrega todos os dados do PostgreSQL
    * Não bloqueia a UI - carrega em background
    */
-  const loadAllData = useCallback(async () => {
+  const loadAllData = useCallback(async ({ background = false } = {}) => {
+    if (!user) {
+      setLoading(false)
+      return
+    }
+
     try {
       setError(null)
-      setLoading(true)
-
-      // Timeout de 8s por requisição - falha mais rápido para não travar o app
-      const fetchOpts = { timeout: 8000 }
-
-      // Carregar dados em paralelo para melhor performance
-      // Custos removidos do carregamento global para otimizar performance inicial
-      const [animalsRes, birthsRes, semenRes, nfsRes] = await Promise.allSettled([
-        apiClient.get('/api/animals', fetchOpts),
-        apiClient.get('/api/births', fetchOpts),
-        apiClient.get('/api/semen', fetchOpts),
-        apiClient.get('/api/notas-fiscais', fetchOpts),
-      ])
-
-      // Processar resultados
-      if (animalsRes.status === 'fulfilled') {
-        setAnimals(Array.isArray(animalsRes.value.data) ? animalsRes.value.data : [])
-      } else {
-        logger.warn('Erro ao carregar animais:', animalsRes.reason)
+      if (!background) {
+        setLoading(true)
       }
 
-      if (birthsRes.status === 'fulfilled') {
-        setBirthData(Array.isArray(birthsRes.value.data) ? birthsRes.value.data : [])
-      } else {
-        logger.warn('Erro ao carregar nascimentos:', birthsRes.reason)
-      }
+      // Carregar primeiro apenas o que é mais crítico para abrir o app rápido
+      const criticalFetchOpts = { timeout: 8000 }
+      const animalsRes = await apiClient.get('/api/animals', criticalFetchOpts)
+      setAnimals(Array.isArray(animalsRes?.data) ? animalsRes.data : [])
 
-      /* 
-      if (costsRes.status === 'fulfilled') {
-        setCosts(Array.isArray(costsRes.value.data) ? costsRes.value.data : [])
-      } else {
-        logger.warn('Erro ao carregar custos:', costsRes.reason)
-      }
-      */
+      // Carregar dados complementares em background (sem bloquear entrada)
+      const backgroundFetchOpts = { timeout: 5000 }
+      Promise.allSettled([
+        apiClient.get('/api/births', backgroundFetchOpts),
+        apiClient.get('/api/semen', backgroundFetchOpts),
+        apiClient.get('/api/notas-fiscais', backgroundFetchOpts),
+      ]).then(([birthsRes, semenRes, nfsRes]) => {
+        if (birthsRes.status === 'fulfilled') {
+          setBirthData(Array.isArray(birthsRes.value.data) ? birthsRes.value.data : [])
+        } else {
+          logger.warn('Erro ao carregar nascimentos:', birthsRes.reason)
+        }
 
-      if (semenRes.status === 'fulfilled') {
-        setSemenStock(Array.isArray(semenRes.value.data) ? semenRes.value.data : [])
-      } else {
-        logger.warn('Erro ao carregar estoque de sêmen:', semenRes.reason)
-      }
+        if (semenRes.status === 'fulfilled') {
+          setSemenStock(Array.isArray(semenRes.value.data) ? semenRes.value.data : [])
+        } else {
+          logger.warn('Erro ao carregar estoque de semen:', semenRes.reason)
+        }
 
-      if (nfsRes.status === 'fulfilled') {
-        setNotasFiscais(Array.isArray(nfsRes.value.data) ? nfsRes.value.data : [])
-      } else {
-        logger.warn('Erro ao carregar notas fiscais:', nfsRes.reason)
-      }
+        if (nfsRes.status === 'fulfilled') {
+          setNotasFiscais(Array.isArray(nfsRes.value.data) ? nfsRes.value.data : [])
+        } else {
+          logger.warn('Erro ao carregar notas fiscais:', nfsRes.reason)
+        }
+      })
 
       logger.info('Dados do contexto carregados do PostgreSQL')
     } catch (err) {
@@ -101,10 +96,12 @@ export function AppProvider({ children }) {
       setError(errorMessage)
       logger.error('Erro ao carregar dados do contexto:', err)
     } finally {
-      setLoading(false)
+      if (!background) {
+        setLoading(false)
+      }
       setInitialized(true)
     }
-  }, [])
+  }, [user])
 
   /**
    * Recarrega dados específicos
@@ -170,11 +167,20 @@ export function AppProvider({ children }) {
 
   // Carregar dados na inicialização (não bloqueia - UI abre imediatamente)
   useEffect(() => {
+    if (!user) {
+      setLoading(false)
+      if (initialized) {
+        setInitialized(false)
+      }
+      return
+    }
+
     if (!initialized) {
       setInitialized(true)
-      loadAllData()
+      // Evita travar navegação de entrada; carrega em background.
+      loadAllData({ background: true })
     }
-  }, [initialized, loadAllData])
+  }, [user, initialized, loadAllData])
 
   // Ref para throttle do refreshData via SSE (evita múltiplos refreshes simultâneos)
   const refreshTimers = useRef({})

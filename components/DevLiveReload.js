@@ -5,7 +5,7 @@
  */
 import { useEffect, useRef } from 'react'
 
-const POLL_INTERVAL = 3000 // 3 segundos
+const POLL_INTERVAL = 10000 // 10 segundos
 
 export default function DevLiveReload() {
   const lastTimestamp = useRef(null)

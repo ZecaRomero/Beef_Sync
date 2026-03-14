@@ -19,7 +19,7 @@ export default async function handler(req, res) {
       return res.status(405).json({ error: 'Método não permitido' })
     }
 
-    await createTablesIfNotExist()
+    // (createTablesIfNotExist removido � tabelas criadas automaticamente no primeiro uso)
 
     const { pesagens = [], pendentes = [], criarAnimaisAusentes = false } = req.body || {}
     const todasPesagens = [...pesagens]
@@ -204,3 +204,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Erro ao importar: ' + (outerError.message || 'Erro interno do servidor') })
   }
 }
+

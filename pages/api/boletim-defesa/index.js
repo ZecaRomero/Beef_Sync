@@ -1,5 +1,21 @@
 import { query } from '../../../lib/database'
 
+let tableReady = false
+async function ensureBoletimDefesaTable() {
+  if (tableReady) return
+  await query(`
+    CREATE TABLE IF NOT EXISTS boletim_defesa_fazendas (
+      id SERIAL PRIMARY KEY,
+      nome VARCHAR(255) NOT NULL,
+      cnpj VARCHAR(20),
+      quantidades JSONB DEFAULT '{}',
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )
+  `)
+  tableReady = true
+}
+
 const FAIXAS_LABELS = {
   '0a3': '0 a 3 meses',
   '3a8': '3 a 8 meses',
@@ -12,6 +28,8 @@ const FAIXAS_LABELS = {
 export default async function handler(req, res) {
   if (req.method === 'GET') {
     try {
+      await ensureBoletimDefesaTable()
+
       // Garantir que tabela de histórico existe
       await query(`
         CREATE TABLE IF NOT EXISTS boletim_defesa_historico (

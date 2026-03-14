@@ -14,6 +14,8 @@ import {
   ClockIcon
 } from '../components/ui/Icons'
 import { SparklesIcon, LightBulbIcon } from '../components/ui/Icons'
+import SyncSupabaseButton from '../components/SyncSupabaseButton'
+import { useAuth } from '../contexts/AuthContext'
 
 const NotasFiscaisRecentesWidget = () => {
   const router = useRouter()
@@ -346,6 +348,8 @@ const LastAnimalWidget = () => {
 
 export default function Dashboard() {
   const router = useRouter()
+  const { user } = useAuth()
+  const isDev = user?.user_metadata?.role === 'desenvolvedor'
   const [stats, setStats] = useState({
     totalAnimals: 0,
     activeAnimals: 0,
@@ -491,6 +495,20 @@ export default function Dashboard() {
 
   return (
     <div className="container mx-auto p-3 md:p-6 space-y-4 md:space-y-6">
+
+      {/* Painel do Desenvolvedor — visível só para Zeca */}
+      {isDev && (
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-violet-950/60 border border-violet-500/30 text-violet-300 text-sm">
+          <span className="text-base">🛠</span>
+          <span className="font-semibold text-violet-200">Modo Desenvolvedor</span>
+          <span className="text-violet-400/60">·</span>
+          <span className="text-violet-400 text-xs">Banco local ativo</span>
+          <div className="ml-auto">
+            <SyncSupabaseButton />
+          </div>
+        </div>
+      )}
+
       {/* Mostrar erro se houver */}
       {error && (
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">

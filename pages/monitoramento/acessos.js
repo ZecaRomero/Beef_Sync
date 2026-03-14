@@ -393,12 +393,33 @@ export default function AcessosSistema() {
 
           <MessageBanner message={message} />
 
+          {/* Aviso de bloqueio ativo */}
+          {settings?.block_access && (
+            <div className="mb-4 p-4 rounded-lg border-2 border-red-500 bg-red-50 dark:bg-red-900/20 flex items-start gap-3">
+              <NoSymbolIcon className="h-6 w-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-red-800 dark:text-red-200">Bloqueio ATIVO — usuarios mobile nao conseguem entrar!</p>
+                <p className="text-sm text-red-600 dark:text-red-300 mt-1">
+                  O "Bloquear uso do sistema" esta LIGADO. Apenas quem acessa pelo computador local (localhost) consegue entrar.
+                  Usuarios de celular veem a tela de "Acesso bloqueado". Desligue abaixo para liberar.
+                </p>
+              </div>
+            </div>
+          )}
+
           <div className="space-y-4">
             {/* Toggle: bloquear acesso */}
-            <div className="flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+            <div className={`flex items-center justify-between p-4 rounded-lg border-2 transition-colors ${
+              settings?.block_access
+                ? 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700'
+                : 'bg-gray-50 dark:bg-gray-700/50 border-transparent'
+            }`}>
               <div>
-                <p className="font-medium text-gray-900 dark:text-white">Bloquear uso do sistema</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Impede novos acessos (exceto localhost)</p>
+                <p className="font-medium text-gray-900 dark:text-white">
+                  Bloquear uso do sistema
+                  {settings?.block_access && <span className="ml-2 text-xs font-bold text-red-600 dark:text-red-400 uppercase">(ATIVO)</span>}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Impede todos os acessos externos (exceto localhost)</p>
               </div>
               <Toggle
                 checked={!!settings?.block_access}
@@ -409,10 +430,17 @@ export default function AcessosSistema() {
             </div>
 
             {/* Toggle: modo manutenção */}
-            <div className="flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+            <div className={`flex items-center justify-between p-4 rounded-lg border-2 transition-colors ${
+              settings?.maintenance_mode
+                ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-300 dark:border-amber-700'
+                : 'bg-gray-50 dark:bg-gray-700/50 border-transparent'
+            }`}>
               <div>
-                <p className="font-medium text-gray-900 dark:text-white">Modo manutenção / Atualização</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Exibe tela de "Em atualização" para todos os usuários</p>
+                <p className="font-medium text-gray-900 dark:text-white">
+                  Modo manutencao / Atualizacao
+                  {settings?.maintenance_mode && <span className="ml-2 text-xs font-bold text-amber-600 dark:text-amber-400 uppercase">(ATIVO)</span>}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Exibe tela de "Em atualizacao" para todos os usuarios</p>
               </div>
               <Toggle
                 checked={!!settings?.maintenance_mode}

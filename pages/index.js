@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -8,19 +8,20 @@ export default function Home() {
   const router = useRouter()
   const { user, loading } = useAuth()
   const [showFallback, setShowFallback] = useState(false)
-  const [stats, setStats] = useState({ total: 0, ativos: 0 })
+  const hasRedirectedRef = useRef(false)
 
   useEffect(() => {
-    if (loading) return
+    if (loading || hasRedirectedRef.current) return
 
     if (!user) {
+      hasRedirectedRef.current = true
       router.replace('/login')
       return
     }
 
     // Adelso (email fazenda): acesso ao Boletim Campo e Relatórios
     if (user.email === 'adelso@fazendasantanna.com.br') {
-      router.prefetch('/adelso-menu')
+      hasRedirectedRef.current = true
       router.replace('/adelso-menu')
       return
     }
@@ -28,30 +29,16 @@ export default function Home() {
     const role = user.user_metadata?.role || 'externo'
     const target = role === 'desenvolvedor' ? '/dashboard' : '/a'
 
-    // Prefetch da página de destino para carregamento mais rápido
-    router.prefetch(target)
-    router.replace(target)
+    // Evita navegação redundante para a mesma rota
+    if (target !== router.pathname) {
+      hasRedirectedRef.current = true
+      router.replace(target)
+    }
 
     // Fallback: se após 2s ainda estiver aqui, mostrar link manual
     const t = setTimeout(() => setShowFallback(true), 2000)
     return () => clearTimeout(t)
   }, [user, loading, router])
-
-  // Carregar estatísticas rápidas
-  useEffect(() => {
-    if (!user) return
-    fetch('/api/statistics')
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        if (data?.success) {
-          setStats({
-            total: data.data.totalAnimais || data.data.total_animais || 0,
-            ativos: data.data.animaisAtivos || 0
-          })
-        }
-      })
-      .catch(() => {})
-  }, [user])
 
   const role = user?.user_metadata?.role || 'externo'
   const targetPath = user?.email === 'adelso@fazendasantanna.com.br'
@@ -87,28 +74,6 @@ export default function Home() {
               Controle completo do seu rebanho em tempo real
             </p>
           </div>
-
-          {/* Estatísticas Rápidas */}
-          {stats.total > 0 && (
-            <div className="grid grid-cols-2 gap-4 mb-8 animate-slide-up">
-              <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-                <div className="text-3xl font-bold text-amber-600 dark:text-amber-400 mb-1">
-                  {stats.total}
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Total de Animais
-                </div>
-              </div>
-              <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-                <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-1">
-                  {stats.ativos}
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Animais Ativos
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* Loading e Redirecionamento */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl border border-gray-200 dark:border-gray-700 mb-6">

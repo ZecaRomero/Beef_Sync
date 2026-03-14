@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import Head from 'next/head'
-import { DocumentTextIcon, ArrowPathIcon, ShieldCheckIcon, TableCellsIcon, PencilSquareIcon, PaperAirplaneIcon, Cog6ToothIcon, MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { DocumentTextIcon, ArrowPathIcon, ShieldCheckIcon, TableCellsIcon, PencilSquareIcon, PaperAirplaneIcon, Cog6ToothIcon, MagnifyingGlassIcon, XMarkIcon, BeakerIcon, ClockIcon as ClockOutlineIcon, CheckCircleIcon as CheckCircleOutlineIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline'
 import { useAuth } from '../../contexts/AuthContext'
 
 const CATEGORIAS_LOCAL = [
@@ -56,6 +56,13 @@ export default function BoletimDefesaMobile() {
   const [sugerirResumo, setSugerirResumo] = useState(false)
   const [modalResumoAlteracoes, setModalResumoAlteracoes] = useState(false)
   const [modalEscolhaEnvio, setModalEscolhaEnvio] = useState(null) // { downloadUrl, waLink, nomeContato } quando fallback
+
+  // Medicamentos por local
+  const [medicamentos, setMedicamentos] = useState({}) // { boletim_campo_id: [meds ordenados] }
+  const [modalMedicamento, setModalMedicamento] = useState(null) // { registro }
+  const [formMed, setFormMed] = useState({ medicamento: '', dataAplicacao: '', dataProxima: '', observacao: '' })
+  const [salvandoMed, setSalvandoMed] = useState(false)
+  const [excluindoMedId, setExcluindoMedId] = useState(null)
 
   useEffect(() => {
     carregarDados()
@@ -137,7 +144,10 @@ export default function BoletimDefesaMobile() {
   const carregarCampo = async () => {
     setLoadingCampo(true)
     try {
-      const res = await fetch('/api/boletim-campo')
+      const [res] = await Promise.all([
+        fetch('/api/boletim-campo'),
+        carregarMedicamentos()
+      ])
       const json = await res.json()
       if (json.success) {
         const data = (json.data || []).filter(d => d.local !== 'TOTAL GERAL' && d.local_1 !== 'TOTAL GERAL')
@@ -149,6 +159,97 @@ export default function BoletimDefesaMobile() {
       setLoadingCampo(false)
     }
   }
+
+  // ── Medicamentos ──────────────────────────────────────────────────────────
+  const diasDesde = (dateStr) => {
+    if (!dateStr) return null
+    const d = new Date(dateStr)
+    d.setHours(0, 0, 0, 0)
+    const hoje = new Date()
+    hoje.setHours(0, 0, 0, 0)
+    return Math.floor((hoje - d) / (1000 * 60 * 60 * 24))
+  }
+
+  const diasAte = (dateStr) => {
+    if (!dateStr) return null
+    const d = new Date(dateStr)
+    d.setHours(0, 0, 0, 0)
+    const hoje = new Date()
+    hoje.setHours(0, 0, 0, 0)
+    return Math.ceil((d - hoje) / (1000 * 60 * 60 * 24))
+  }
+
+  const medsDoRegistro = (id) => medicamentos[id] || []
+  const ultimoMed = (id) => medsDoRegistro(id)[0] || null
+
+  const carregarMedicamentos = async () => {
+    try {
+      const res = await fetch('/api/boletim-campo/medicamentos')
+      const json = await res.json()
+      if (json.success) {
+        const map = {}
+        ;(json.data || []).forEach(m => {
+          const key = m.boletim_campo_id
+          if (key != null) {
+            if (!map[key]) map[key] = []
+            map[key].push(m)
+          }
+        })
+        setMedicamentos(map)
+      }
+    } catch (_) {}
+  }
+
+  const salvarMedicamento = async () => {
+    if (!formMed.medicamento.trim() || !formMed.dataAplicacao) {
+      alert('Informe o nome do medicamento e a data de aplicação')
+      return
+    }
+    setSalvandoMed(true)
+    try {
+      const registro = modalMedicamento.registro
+      const res = await fetch('/api/boletim-campo/medicamentos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          boletim_campo_id: registro.id,
+          local: registro.local,
+          local_1: registro.local_1,
+          sub_local_2: registro.sub_local_2,
+          medicamento: formMed.medicamento.trim(),
+          data_aplicacao: formMed.dataAplicacao,
+          data_proxima_aplicacao: formMed.dataProxima || null,
+          observacao: formMed.observacao || null,
+          usuario: 'Adelso'
+        })
+      })
+      const json = await res.json()
+      if (json.success) {
+        await carregarMedicamentos()
+        setFormMed({ medicamento: '', dataAplicacao: new Date().toISOString().split('T')[0], dataProxima: '', observacao: '' })
+      } else {
+        alert(json.message || 'Erro ao salvar')
+      }
+    } catch (_) {
+      alert('Erro ao salvar medicamento')
+    } finally {
+      setSalvandoMed(false)
+    }
+  }
+
+  const excluirMedicamento = async (medId) => {
+    if (!confirm('Excluir este registro de medicamento?')) return
+    setExcluindoMedId(medId)
+    try {
+      await fetch(`/api/boletim-campo/medicamentos?id=${medId}`, { method: 'DELETE' })
+      await carregarMedicamentos()
+    } catch (_) {
+      alert('Erro ao excluir')
+    } finally {
+      setExcluindoMedId(null)
+    }
+  }
+  // ─────────────────────────────────────────────────────────────────────────
 
   const confirmarAlteracaoCompleta = async (registro, valorNovo, form) => {
     const valorAntigo = registro.quant || 0
@@ -582,6 +683,45 @@ export default function BoletimDefesaMobile() {
                                     Alterar quantidade
                                   </button>
                                 )}
+
+                                {/* Botão de Medicamentos — visível para todos, edição só para Adelso */}
+                                {!isTotal && row.id && (() => {
+                                  const ult = ultimoMed(row.id)
+                                  const dias = ult ? diasDesde(ult.data_aplicacao) : null
+                                  const proxDias = ult?.data_proxima_aplicacao ? diasAte(ult.data_proxima_aplicacao) : null
+                                  const vencida = proxDias !== null && proxDias < 0
+                                  const proxima = proxDias !== null && proxDias >= 0 && proxDias <= 7
+                                  return (
+                                    <button
+                                      onClick={() => {
+                                        setModalMedicamento({ registro: row })
+                                        setFormMed({ medicamento: '', dataAplicacao: new Date().toISOString().split('T')[0], dataProxima: '', observacao: '' })
+                                      }}
+                                      className={`mt-2 w-full flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-semibold border transition-colors ${
+                                        vencida
+                                          ? 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-300 dark:border-red-700'
+                                          : proxima
+                                          ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-700'
+                                          : ult
+                                          ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-700'
+                                          : 'bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-600'
+                                      }`}
+                                    >
+                                      {vencida ? <ExclamationCircleIcon className="w-4 h-4" /> : proxima ? <ClockOutlineIcon className="w-4 h-4" /> : <BeakerIcon className="w-4 h-4" />}
+                                      {ult
+                                        ? <>
+                                            <span className="truncate max-w-[140px]">{ult.medicamento}</span>
+                                            <span className="shrink-0">·</span>
+                                            <span className="shrink-0">
+                                              {dias === 0 ? 'hoje' : `${dias}d atrás`}
+                                              {vencida ? ' ⚠️ renovar' : proxima ? ` · próx. ${proxDias}d` : ''}
+                                            </span>
+                                          </>
+                                        : 'Registrar medicamento'
+                                      }
+                                    </button>
+                                  )
+                                })()}
                               </div>
                             </div>
                           )
@@ -1169,6 +1309,191 @@ export default function BoletimDefesaMobile() {
             >
               Fechar
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ════════ Modal de Medicamentos ════════ */}
+      {modalMedicamento && (
+        <div className="fixed inset-0 bg-black/60 z-[80] flex items-end justify-center sm:items-center p-0 sm:p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-t-3xl sm:rounded-2xl shadow-2xl w-full max-w-lg max-h-[92vh] flex flex-col">
+
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-purple-600 to-purple-700 rounded-t-3xl sm:rounded-t-2xl shrink-0">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <BeakerIcon className="w-5 h-5 text-purple-100 shrink-0" />
+                  <h3 className="text-white font-bold text-base">Medicamentos</h3>
+                </div>
+                <p className="text-purple-200 text-xs mt-0.5 truncate">
+                  {[modalMedicamento.registro.local, modalMedicamento.registro.local_1, modalMedicamento.registro.sub_local_2].filter(Boolean).join(' / ')}
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setModalMedicamento(null)
+                  setFormMed({ medicamento: '', dataAplicacao: '', dataProxima: '', observacao: '' })
+                }}
+                className="p-1 rounded-full hover:bg-purple-500 transition-colors shrink-0"
+              >
+                <XMarkIcon className="w-6 h-6 text-white" />
+              </button>
+            </div>
+
+            <div className="overflow-y-auto flex-1 p-5 space-y-5">
+
+              {/* Histórico de aplicações */}
+              {medsDoRegistro(modalMedicamento.registro.id).length > 0 && (
+                <div>
+                  <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Histórico de aplicações</h4>
+                  <div className="space-y-2">
+                    {medsDoRegistro(modalMedicamento.registro.id).map((m, idx) => {
+                      const dias = diasDesde(m.data_aplicacao)
+                      const proxDias = m.data_proxima_aplicacao ? diasAte(m.data_proxima_aplicacao) : null
+                      const vencida = proxDias !== null && proxDias < 0
+                      return (
+                        <div
+                          key={m.id}
+                          className={`rounded-xl border-2 p-3 ${
+                            idx === 0
+                              ? 'border-purple-300 dark:border-purple-600 bg-purple-50 dark:bg-purple-900/20'
+                              : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50'
+                          }`}
+                        >
+                          <div className="flex items-start gap-2">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <p className="font-bold text-gray-900 dark:text-white text-sm">{m.medicamento}</p>
+                                {idx === 0 && (
+                                  <span className="text-xs bg-purple-100 dark:bg-purple-800 text-purple-700 dark:text-purple-200 px-2 py-0.5 rounded-full font-medium">último</span>
+                                )}
+                              </div>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                Aplicado em {new Date(m.data_aplicacao + 'T12:00:00').toLocaleDateString('pt-BR')}
+                                {' · '}
+                                <span className={`font-semibold ${idx === 0 ? 'text-purple-600 dark:text-purple-400' : ''}`}>
+                                  {dias === 0 ? 'hoje' : dias === 1 ? '1 dia atrás' : `${dias} dias atrás`}
+                                </span>
+                              </p>
+                              {m.data_proxima_aplicacao && (
+                                <p className="text-xs mt-1 flex items-center gap-1">
+                                  {vencida
+                                    ? <><ExclamationCircleIcon className="w-3.5 h-3.5 text-red-500" /><span className="text-red-600 dark:text-red-400 font-semibold">Próxima vencida há {Math.abs(proxDias)} dias — renovar!</span></>
+                                    : proxDias === 0
+                                    ? <><ClockOutlineIcon className="w-3.5 h-3.5 text-amber-500" /><span className="text-amber-600 font-semibold">Próxima: hoje</span></>
+                                    : <><CheckCircleOutlineIcon className="w-3.5 h-3.5 text-green-500" /><span className="text-green-600 dark:text-green-400">Próxima em {proxDias} dias ({new Date(m.data_proxima_aplicacao + 'T12:00:00').toLocaleDateString('pt-BR')})</span></>
+                                  }
+                                </p>
+                              )}
+                              {m.observacao && (
+                                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 italic">{m.observacao}</p>
+                              )}
+                            </div>
+                            <div className="flex flex-col gap-1 shrink-0">
+                              {/* Botão renovar (pré-preenche o formulário) */}
+                              {isAdelso && idx === 0 && (
+                                <button
+                                  onClick={() => setFormMed(f => ({ ...f, medicamento: m.medicamento, dataAplicacao: new Date().toISOString().split('T')[0] }))}
+                                  className="text-xs bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 px-2 py-1 rounded-lg font-medium"
+                                >
+                                  Renovar
+                                </button>
+                              )}
+                              {isAdelso && (
+                                <button
+                                  onClick={() => excluirMedicamento(m.id)}
+                                  disabled={excluindoMedId === m.id}
+                                  className="text-xs bg-red-50 dark:bg-red-900/20 text-red-500 px-2 py-1 rounded-lg font-medium disabled:opacity-40"
+                                >
+                                  {excluindoMedId === m.id ? '...' : 'Excluir'}
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Formulário nova aplicação */}
+              {isAdelso ? (
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                  <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+                    {medsDoRegistro(modalMedicamento.registro.id).length === 0 ? 'Registrar medicamento' : 'Nova aplicação'}
+                  </h4>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Medicamento <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={formMed.medicamento}
+                        onChange={e => setFormMed(f => ({ ...f, medicamento: e.target.value }))}
+                        placeholder="Ex: Ivermectina, Vacina Raiva, Antibiótico..."
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 text-sm"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Data de aplicação <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="date"
+                          value={formMed.dataAplicacao}
+                          onChange={e => setFormMed(f => ({ ...f, dataAplicacao: e.target.value }))}
+                          className="w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Próxima aplicação
+                        </label>
+                        <input
+                          type="date"
+                          value={formMed.dataProxima}
+                          onChange={e => setFormMed(f => ({ ...f, dataProxima: e.target.value }))}
+                          className="w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Observação <span className="text-gray-400 text-xs">(dose, produto comercial...)</span>
+                      </label>
+                      <textarea
+                        value={formMed.observacao}
+                        onChange={e => setFormMed(f => ({ ...f, observacao: e.target.value }))}
+                        placeholder="Ex: 1ml/10kg, produto: Ivomec Gold..."
+                        rows={2}
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 text-sm resize-none"
+                      />
+                    </div>
+
+                    <button
+                      onClick={salvarMedicamento}
+                      disabled={salvandoMed || !formMed.medicamento.trim() || !formMed.dataAplicacao}
+                      className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold text-sm disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+                    >
+                      <BeakerIcon className="w-4 h-4" />
+                      {salvandoMed ? 'Salvando...' : 'Salvar aplicação'}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                medsDoRegistro(modalMedicamento.registro.id).length === 0 && (
+                  <div className="text-center py-10 text-gray-400">
+                    <BeakerIcon className="w-12 h-12 mx-auto mb-2 opacity-40" />
+                    <p className="text-sm">Nenhum medicamento registrado ainda</p>
+                  </div>
+                )
+              )}
+            </div>
           </div>
         </div>
       )}

@@ -2,7 +2,7 @@
  * API de autenticação do usuário Adelso para Boletim Campo.
  * Senha temporária: 123 (desenvolvedor pode resetar via banco)
  */
-import { query, createTablesIfNotExist } from '../../../lib/database'
+import { query } from '../../../lib/database'
 
 const DEV_MASTER_PASSWORD = 'dev_master_123' // Desenvolvedor usa isso para resetar
 
@@ -12,7 +12,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    await createTablesIfNotExist()
+    // (createTablesIfNotExist removido � tabelas criadas automaticamente no primeiro uso)
     const { nome, senha, novaSenha, acao } = req.body
 
     if (!nome || !senha) {
@@ -84,3 +84,4 @@ export default async function handler(req, res) {
     })
   }
 }
+
