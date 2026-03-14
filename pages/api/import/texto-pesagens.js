@@ -6,20 +6,20 @@ export const config = { maxDuration: 300 }
 const TAMANHO_LOTE = 80
 const DEFAULTS_ANIMAL_IMPORT = {
   sexo: 'Macho',
-  raca: 'Não informado',
+  raca: 'NÃ£o informado',
   boletim: '1',
   pasto_atual: 'A definir',
   situacao: 'Ativo',
-  observacoes: 'Animal criado via importação de pesagens. Complete o cadastro (data de nascimento, sexo, raça, etc.) em Animais.'
+  observacoes: 'Animal criado via importaÃ§Ã£o de pesagens. Complete o cadastro (data de nascimento, sexo, raÃ§a, etc.) em Animais.'
 }
 
 export default async function handler(req, res) {
   try {
     if (req.method !== 'POST') {
-      return res.status(405).json({ error: 'Método não permitido' })
+      return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' })
     }
 
-    // (createTablesIfNotExist removido � tabelas criadas automaticamente no primeiro uso)
+    // (createTablesIfNotExist removido — tabelas criadas automaticamente no primeiro uso)
 
     const { pesagens = [], pendentes = [], criarAnimaisAusentes = false } = req.body || {}
     const todasPesagens = [...pesagens]
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
         let animal = animaisCache[chave]
         if (!animal) {
           try {
-            const sexoDoArquivo = (p.sexo === 'Fêmea' || p.sexo === 'Macho') ? p.sexo : DEFAULTS_ANIMAL_IMPORT.sexo
+            const sexoDoArquivo = (p.sexo === 'FÃªmea' || p.sexo === 'Macho') ? p.sexo : DEFAULTS_ANIMAL_IMPORT.sexo
             const novoAnimal = await databaseService.criarAnimal({
               nome: null,
               serie: (p.serie || '').toString().trim(),
@@ -109,7 +109,7 @@ export default async function handler(req, res) {
       client = await pool.connect()
     } catch (connErr) {
       console.error('Erro ao conectar no banco:', connErr)
-      return res.status(500).json({ error: 'Erro de conexão com o banco de dados' })
+      return res.status(500).json({ error: 'Erro de conexÃ£o com o banco de dados' })
     }
 
     try {
@@ -194,7 +194,7 @@ export default async function handler(req, res) {
     } catch (error) {
       try { await client?.query('ROLLBACK') } catch (_) {}
       try { client?.release() } catch (_) {}
-      console.error('Erro na importação:', error)
+      console.error('Erro na importaÃ§Ã£o:', error)
       return res.status(500).json({ error: 'Erro ao importar pesagens: ' + (error.message || 'Erro interno') })
     } finally {
       try { client?.release() } catch (_) {}

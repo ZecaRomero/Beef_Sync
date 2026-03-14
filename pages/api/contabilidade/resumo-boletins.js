@@ -1,4 +1,4 @@
-﻿import { query } from '../../../lib/database'
+import { query } from '../../../lib/database'
 import { RACAS_POR_SERIE as racasPorSerie } from '../../../utils/constants'
 import databaseService from '../../../services/databaseService'
 

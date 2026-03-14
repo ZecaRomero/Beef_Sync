@@ -1,11 +1,11 @@
-// ServiÃ§o de acesso ao banco de dados PostgreSQL
+// Serviço de acesso ao banco de dados PostgreSQL
 const { query, testConnection, getPoolInfo } = require('../lib/database');
 const loggerModule = require('../utils/logger');
 const logger = loggerModule.default || loggerModule;
 
 class DatabaseService {
   
-  // Testar conexÃ£o
+  // Testar conexão
   async testConnection() {
     return await testConnection()
   }
@@ -15,7 +15,7 @@ class DatabaseService {
     return await query(text, params)
   }
   
-  // Obter informaÃ§Ãµes do pool
+  // Obter informações do pool
   getPoolInfo() {
     return getPoolInfo()
   }
@@ -26,13 +26,13 @@ class DatabaseService {
   async getTableCount(tableName) {
     const safeName = String(tableName || '').trim().toLowerCase();
     if (!DatabaseService.ALLOWED_TABLES.includes(safeName)) {
-      throw new Error(`Tabela invÃ¡lida: ${tableName}`);
+      throw new Error(`Tabela inválida: ${tableName}`);
     }
     const result = await query(`SELECT COUNT(*) as count FROM ${safeName}`);
     return parseInt(result.rows[0].count, 10);
   }
 
-  // Obter estatÃ­sticas do sistema
+  // Obter estatísticas do sistema
   async getSystemStats() {
     try {
       const [totalAnimals, totalBirths, totalCosts, totalSemen] = await Promise.all([
@@ -50,19 +50,19 @@ class DatabaseService {
         lastUpdated: new Date().toISOString()
       };
     } catch (error) {
-      throw new Error(`Erro ao obter estatÃ­sticas: ${error.message}`);
+      throw new Error(`Erro ao obter estatísticas: ${error.message}`);
     }
   }
   
-  // ============ OPERAÃâ€¡Ãâ€¢ES COM ANIMAIS ============
+  // ============ OPERAÇÕES COM ANIMAIS ============
   
-  // MÃ©todo buscarAnimalPorId removido daqui pois estava duplicado
-  // Veja a implementaÃ§Ã£o completa mais abaixo na classe (linha ~750)
+  // Método buscarAnimalPorId removido daqui pois estava duplicado
+  // Veja a implementação completa mais abaixo na classe (linha ~750)
   
-  // Buscar histÃ³rico completo do animal
+  // Buscar histórico completo do animal
   async buscarHistoricoAnimal(id) {
     try {
-      // Buscar dados bÃ¡sicos do animal
+      // Buscar dados básicos do animal
       const animal = await this.buscarAnimalPorId(id);
       if (!animal) return null;
 
@@ -71,7 +71,7 @@ class DatabaseService {
         SELECT * FROM pesagens WHERE animal_id = $1 ORDER BY data DESC
       `, [animal.id]);
 
-      // Buscar inseminaÃ§Ãµes
+      // Buscar inseminações
       const inseminacoes = await query(`
         SELECT * FROM inseminacoes WHERE animal_id = $1 ORDER BY data_ia DESC
       `, [animal.id]);
@@ -80,11 +80,11 @@ class DatabaseService {
       const custos = await query(`
         SELECT * FROM custos 
         WHERE animal_id = $1 
-          AND tipo NOT IN ('AlimentaÃ§Ã£o', 'NutriÃ§Ã£o', 'RaÃ§Ã£o', 'SuplementaÃ§Ã£o')
+          AND tipo NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação')
         ORDER BY data DESC
       `, [animal.id]);
 
-      // Buscar gestaÃ§Ãµes (como mÃ£e ou receptora)
+      // Buscar gestações (como mãe ou receptora)
       const gestacoes = await query(`
         SELECT * FROM gestacoes 
         WHERE (mae_serie = $1 AND mae_rg = $2) 
@@ -92,8 +92,8 @@ class DatabaseService {
         ORDER BY created_at DESC
       `, [animal.serie, animal.rg]);
 
-      // Buscar nascimentos (filhos) - onde este animal Ã© a mÃ£e
-      // Prioridade: serie_mae + rg_mae (identificaÃ§Ã£o exata, evita erros como "JALY SANT ANNA" vs "Mosca, CJCJ 15959")
+      // Buscar nascimentos (filhos) - onde este animal é a mãe
+      // Prioridade: serie_mae + rg_mae (identificação exata, evita erros como "JALY SANT ANNA" vs "Mosca, CJCJ 15959")
       // Fallback: mae (texto) para compatibilidade com dados antigos
       let filhosResult
       try {
@@ -118,12 +118,12 @@ class DatabaseService {
         } else throw colErr
       }
       
-      // Buscar protocolos sanitÃ¡rios
+      // Buscar protocolos sanitários
       const protocolos = await query(`
         SELECT * FROM protocolos_aplicados WHERE animal_id = $1 ORDER BY data_inicio DESC
       `, [animal.id]);
 
-      // Buscar movimentaÃ§Ãµes
+      // Buscar movimentações
       const localizacoes = await query(`
         SELECT * FROM localizacoes_animais WHERE animal_id = $1 ORDER BY data_entrada DESC
       `, [animal.id]);
@@ -145,11 +145,11 @@ class DatabaseService {
         fivs: fivs.rows
       };
     } catch (error) {
-      throw new Error(`Erro ao buscar histÃ³rico do animal: ${error.message}`);
+      throw new Error(`Erro ao buscar histórico do animal: ${error.message}`);
     }
   }
   
-  // Atualizar situaÃ§Ã£o do animal
+  // Atualizar situação do animal
   async atualizarSituacaoAnimal(id, situacao) {
     try {
       const result = await query(`
@@ -161,11 +161,11 @@ class DatabaseService {
       
       return result.rows[0];
     } catch (error) {
-      throw new Error(`Erro ao atualizar situaÃ§Ã£o do animal: ${error.message}`);
+      throw new Error(`Erro ao atualizar situação do animal: ${error.message}`);
     }
   }
   
-  // ============ OPERAÃâ€¡Ãâ€¢ES COM CUSTOS ============
+  // ============ OPERAÇÕES COM CUSTOS ============
   
   // Registrar custo
   async registrarCusto(custoData) {
@@ -199,9 +199,9 @@ class DatabaseService {
     }
   }
 
-  // ============ OPERAÃâ€¡Ãâ€¢ES COM SÃÅ MEN ============
+  // ============ OPERAÇÕES COM SÊMEN ============
   
-  // Criar sÃªmen
+  // Criar sêmen
   async criarSemen(semenData) {
     const {
       nome_touro,
@@ -236,13 +236,13 @@ class DatabaseService {
 
       return result.rows[0];
     } catch (error) {
-      throw new Error(`Erro ao criar sÃªmen: ${error.message}`);
+      throw new Error(`Erro ao criar sêmen: ${error.message}`);
     }
   }
 
-  // ============ OPERAÃâ€¡Ãâ€¢ES COM EMBRIÃâ€¢ES ============
+  // ============ OPERAÇÕES COM EMBRIÕES ============
   
-  // Criar embriÃ£o
+  // Criar embrião
   async criarEmbriao(embriaoData) {
     const {
       doadora,
@@ -274,11 +274,11 @@ class DatabaseService {
 
       return result.rows[0];
     } catch (error) {
-      throw new Error(`Erro ao criar embriÃ£o: ${error.message}`);
+      throw new Error(`Erro ao criar embrião: ${error.message}`);
     }
   }
 
-  // ============ OPERAÃâ€¡Ãâ€¢ES COM MORTES ============
+  // ============ OPERAÇÕES COM MORTES ============
   
   // Registrar morte
   async registrarMorte(morteData) {
@@ -397,7 +397,7 @@ class DatabaseService {
       ]);
 
       if (result.rows.length === 0) {
-        throw new Error('Registro de morte nÃ£o encontrado');
+        throw new Error('Registro de morte não encontrado');
       }
 
       return result.rows[0];
@@ -416,7 +416,7 @@ class DatabaseService {
       `, [id]);
 
       if (result.rows.length === 0) {
-        throw new Error('Registro de morte nÃ£o encontrado');
+        throw new Error('Registro de morte não encontrado');
       }
 
       return result.rows[0];
@@ -425,7 +425,7 @@ class DatabaseService {
     }
   }
 
-  // ============ OPERAÃâ€¡Ãâ€¢ES COM BAIXAS ============
+  // ============ OPERAÇÕES COM BAIXAS ============
 
   async inserirBaixa(baixaData) {
     const { animal_id, serie, rg, tipo, causa, data_baixa, comprador, valor, numero_nf, serie_mae, rg_mae, observacoes } = baixaData;
@@ -497,7 +497,7 @@ class DatabaseService {
     return result.rows;
   }
 
-  /** Buscar venda em movimentacoes_contabeis (NF de saÃ­da) por serie e rg do animal */
+  /** Buscar venda em movimentacoes_contabeis (NF de saída) por serie e rg do animal */
   async buscarVendaPorMovimentacaoContabil(serie, rg) {
     const result = await query(`
       SELECT m.valor, m.data_movimento, m.dados_extras
@@ -511,7 +511,7 @@ class DatabaseService {
     return result.rows[0] || null;
   }
 
-  /** Buscar venda em notas_fiscais de saÃ­da por tatuagem (serie+rg) - para doadoras nÃ£o cadastradas */
+  /** Buscar venda em notas_fiscais de saída por tatuagem (serie+rg) - para doadoras não cadastradas */
   async buscarVendaPorNotaFiscalSaida(serie, rg) {
     const padroes = [`${serie} ${rg}`, `${serie}-${rg}`, `${serie}${rg}`]
     try {
@@ -529,12 +529,12 @@ class DatabaseService {
       `, [padroes[0], padroes[1], padroes[2], `%${serie}%${rg}%`]);
       return result.rows[0] || null;
     } catch (e) {
-      if (e.code === '42P01') return null // tabela nÃ£o existe
+      if (e.code === '42P01') return null // tabela não existe
       throw e
     }
   }
   
-  // ============ OPERAÃâ€¡Ãâ€¢ES COM CAUSAS DE MORTE ============
+  // ============ OPERAÇÕES COM CAUSAS DE MORTE ============
   
   // Buscar causas de morte
   async buscarCausasMorte() {
@@ -575,7 +575,7 @@ class DatabaseService {
       `, [id]);
       
       if (result.rows.length === 0) {
-        throw new Error('Causa de morte nÃ£o encontrada');
+        throw new Error('Causa de morte não encontrada');
       }
       
       return result.rows[0];
@@ -584,9 +584,9 @@ class DatabaseService {
     }
   }
   
-  // ============ OPERAÃâ€¡Ãâ€¢ES COM BOLETIM CONTÃ�BIL ============
+  // ============ OPERAÇÕES COM BOLETIM CONTÁBIL ============
   
-  // Obter ou criar boletim do perÃ­odo
+  // Obter ou criar boletim do período
   async obterBoletimPeriodo(periodo) {
     try {
       let result = await query(`
@@ -615,7 +615,7 @@ class DatabaseService {
     }
   }
   
-  // Registrar movimentaÃ§Ã£o contÃ¡bil
+  // Registrar movimentação contábil
   async registrarMovimentacao(dadosMovimentacao) {
     const {
       periodo,
@@ -631,10 +631,10 @@ class DatabaseService {
     } = dadosMovimentacao;
 
     try {
-      // Obter boletim do perÃ­odo
+      // Obter boletim do período
       const boletim = await this.obterBoletimPeriodo(periodo);
       
-      // Inserir movimentaÃ§Ã£o
+      // Inserir movimentação
       const result = await query(`
         INSERT INTO movimentacoes_contabeis (
           boletim_id, tipo, subtipo, data_movimento, animal_id, 
@@ -652,7 +652,7 @@ class DatabaseService {
       
       return result.rows[0];
     } catch (error) {
-      throw new Error(`Erro ao registrar movimentaÃ§Ã£o: ${error.message}`);
+      throw new Error(`Erro ao registrar movimentação: ${error.message}`);
     }
   }
   
@@ -690,7 +690,7 @@ class DatabaseService {
     }
   }
   
-  // Buscar movimentaÃ§Ãµes do perÃ­odo
+  // Buscar movimentações do período
   async buscarMovimentacoes(periodo, filtros = {}) {
     try {
       let queryText = `
@@ -733,7 +733,7 @@ class DatabaseService {
       const result = await query(queryText, params);
       return result.rows;
     } catch (error) {
-      throw new Error(`Erro ao buscar movimentaÃ§Ãµes: ${error.message}`);
+      throw new Error(`Erro ao buscar movimentações: ${error.message}`);
     }
   }
   
@@ -776,7 +776,7 @@ class DatabaseService {
           return {
             ...existingAnimal[0],
             _duplicate: true,
-            _duplicateMessage: `âÅ¡ ï¸� RG "${rg}" jÃ¡ existe no sistema!`
+            _duplicateMessage: `⚠️ RG "${rg}" já existe no sistema!`
           };
         }
       }
@@ -786,7 +786,7 @@ class DatabaseService {
 
   // Buscar todos os animais
   // OTIMIZADO: custos removidos do JOIN para evitar query pesada na listagem.
-  // Custos sÃ£o carregados sob demanda em buscarAnimalPorId.
+  // Custos são carregados sob demanda em buscarAnimalPorId.
   async buscarAnimais(filtros = {}) {
     let queryText = `SELECT a.* FROM animais a`;
     
@@ -810,22 +810,22 @@ class DatabaseService {
     }
     
     if (filtros.serie) {
-      // Busca case-insensitive e remove espaÃ§os
+      // Busca case-insensitive e remove espaços
       conditions.push(`UPPER(TRIM(a.serie)) = UPPER(TRIM($${params.length + 1}))`);
       params.push(filtros.serie);
     }
     
     if (filtros.rg) {
-      // Busca flexÃ­vel: tenta como texto e como nÃºmero
+      // Busca flexível: tenta como texto e como número
       const rgValue = filtros.rg.toString().trim();
       const rgNum = parseInt(rgValue);
       
       if (!isNaN(rgNum) && rgValue === rgNum.toString()) {
-        // Se Ã© um nÃºmero vÃ¡lido sem zeros Ã  esquerda, tentar ambas comparaÃ§Ãµes
+        // Se é um número válido sem zeros à esquerda, tentar ambas comparações
         conditions.push(`(TRIM(a.rg::text) = $${params.length + 1} OR a.rg = $${params.length + 2})`);
         params.push(rgValue, rgNum);
       } else {
-        // Busca como texto (remove espaÃ§os)
+        // Busca como texto (remove espaços)
         conditions.push(`TRIM(a.rg::text) = $${params.length + 1}`);
         params.push(rgValue);
       }
@@ -835,14 +835,14 @@ class DatabaseService {
       queryText += ` WHERE ${conditions.join(' AND ')}`;
     }
 
-    // OrdenaÃ§Ã£o
+    // Ordenação
     if (filtros.orderBy === 'created_at') {
       queryText += ` ORDER BY a.created_at DESC`;
     } else {
       queryText += ` ORDER BY a.data_nascimento DESC, a.created_at DESC`;
     }
 
-    // Limite (usar parÃ¢metro para evitar SQL injection)
+    // Limite (usar parâmetro para evitar SQL injection)
     if (filtros.limit) {
       const limitVal = Math.min(Math.max(parseInt(filtros.limit, 10) || 0, 1), 10000);
       if (limitVal > 0) {
@@ -861,12 +861,12 @@ class DatabaseService {
   }
 
   /**
-   * Enriquece animal com Ãºltimo DG de historia_ocorrencias quando o animal
-   * nÃ£o tem data_dg em animais (ex: DG lanÃ§ado antes da correÃ§Ã£o).
+   * Enriquece animal com último DG de historia_ocorrencias quando o animal
+   * não tem data_dg em animais (ex: DG lançado antes da correção).
    */
   async enriquecerComDGDeHistoria(animal) {
     if (!animal?.id) return animal
-    if (animal.data_dg || animal.dataDG) return animal // JÃ¡ tem DG no animal
+    if (animal.data_dg || animal.dataDG) return animal // Já tem DG no animal
     try {
       const dgResult = await query(`
         SELECT data, observacoes, descricao FROM historia_ocorrencias
@@ -879,9 +879,9 @@ class DatabaseService {
       let resultadoDG = 'Vazia'
       const texto = (row.observacoes || row.descricao || '').toLowerCase()
       if (texto.includes('prenha') || texto.includes('positivo')) resultadoDG = 'Prenha'
-      else if (texto.includes('negativo') || texto.includes('vazia') || texto.includes('nÃ£o') || texto.includes('nao')) resultadoDG = 'Vazia'
-      else if (texto.includes('diagnÃ³stico')) {
-        const match = (row.observacoes || row.descricao || '').match(/DiagnÃ³stico de GestaÃ§Ã£o:\s*(\w+)/i)
+      else if (texto.includes('negativo') || texto.includes('vazia') || texto.includes('não') || texto.includes('nao')) resultadoDG = 'Vazia'
+      else if (texto.includes('diagnóstico')) {
+        const match = (row.observacoes || row.descricao || '').match(/Diagnóstico de Gestação:\s*(\w+)/i)
         if (match) resultadoDG = match[1].trim()
       }
       return {
@@ -898,14 +898,14 @@ class DatabaseService {
   }
 
   /**
-   * Enriquece dados de receptoras (mestiÃ§as) com data_te da NF de entrada,
-   * data_chegada, data_dg, resultado_dg e previsÃ£o de parto (9 meses apÃ³s TE).
-   * PrevisÃ£o de parto sÃ³ Ã© adicionada quando DG = Prenha (nÃ£o vazia).
+   * Enriquece dados de receptoras (mestiças) com data_te da NF de entrada,
+   * data_chegada, data_dg, resultado_dg e previsão de parto (9 meses após TE).
+   * Previsão de parto só é adicionada quando DG = Prenha (não vazia).
    */
   async enriquecerDadosReceptora(animal) {
     if (!animal) return animal;
     const raca = (animal.raca || '').toLowerCase();
-    const ehReceptora = raca.includes('mestiÃ§a') || raca.includes('mestica') || raca.includes('receptora');
+    const ehReceptora = raca.includes('mestiça') || raca.includes('mestica') || raca.includes('receptora');
     if (!ehReceptora) return animal;
 
     try {
@@ -925,13 +925,13 @@ class DatabaseService {
       `, [animalId]);
       if (teResult.rows.length > 0) {
         dataTE = teResult.rows[0].data_te;
-        // Extrair NF da observaÃ§Ã£o se existir (ex: "NF de Entrada: 2141")
+        // Extrair NF da observação se existir (ex: "NF de Entrada: 2141")
         const obs = teResult.rows[0].observacoes || '';
         const nfMatch = obs.match(/NF[^0-9]*(\d+)/i);
         if (nfMatch && !nfNumero) nfNumero = nfMatch[1];
       }
 
-      // 2. Se nÃ£o tem TE, buscar da NF de entrada (notas_fiscais)
+      // 2. Se não tem TE, buscar da NF de entrada (notas_fiscais)
       if (!dataTE) {
         // 2a. Por numero_nf/origem do animal (se existir)
         if (nfNumero && typeof nfNumero === 'string' && nfNumero.trim()) {
@@ -992,7 +992,7 @@ class DatabaseService {
             nfNumero = nfNumero || nfFallback.rows[0].numero_nf;
           }
         }
-        // 2d. NF 2141: receptoras M1815, M3233... - buscar por numero_nf quando sÃ©rie = M+numero
+        // 2d. NF 2141: receptoras M1815, M3233... - buscar por numero_nf quando série = M+numero
         if (!dataTE && serie && rg && /^M\d+$/i.test(serie)) {
           const nf2141 = await query(`
             SELECT data_te, data_chegada_animais, data_compra, numero_nf
@@ -1013,7 +1013,7 @@ class DatabaseService {
       const ehPrenha = resultadoDG.toLowerCase().includes('pren');
       const ehVazia = resultadoDG.toLowerCase().includes('vazia') || resultadoDG === '';
 
-      // PrevisÃ£o de parto: 9 meses apÃ³s TE - APENAS quando Prenha (nÃ£o vazia no DG)
+      // Previsão de parto: 9 meses após TE - APENAS quando Prenha (não vazia no DG)
       let previsaoParto = null;
       if (dataTE && ehPrenha && !ehVazia) {
         const teDate = new Date(dataTE);
@@ -1077,12 +1077,12 @@ class DatabaseService {
               ) ORDER BY c.data DESC
             )
             FROM custos c
-            WHERE c.animal_id = a.id AND c.tipo NOT IN ('AlimentaÃ§Ã£o', 'NutriÃ§Ã£o', 'RaÃ§Ã£o', 'SuplementaÃ§Ã£o')
+            WHERE c.animal_id = a.id AND c.tipo NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação')
           ),
           '[]'::json
         ) as custos,
         COALESCE(
-          (SELECT SUM(valor) FROM custos c WHERE c.animal_id = a.id AND c.tipo NOT IN ('AlimentaÃ§Ã£o', 'NutriÃ§Ã£o', 'RaÃ§Ã£o', 'SuplementaÃ§Ã£o') AND (c.data IS NULL OR c.data <= CURRENT_DATE)),
+          (SELECT SUM(valor) FROM custos c WHERE c.animal_id = a.id AND c.tipo NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação') AND (c.data IS NULL OR c.data <= CURRENT_DATE)),
           0
         ) as custo_total_calculado
       FROM animais a
@@ -1095,7 +1095,7 @@ class DatabaseService {
         // Calcular custo total a partir dos custos ou usar o calculado (exclui custos com data futura)
         let custoTotal = parseFloat(animal.custo_total_calculado || 0)
         
-        // Se tiver custos no array, tambÃ©m calcular a partir deles para garantir
+        // Se tiver custos no array, também calcular a partir deles para garantir
         if (animal.custos && Array.isArray(animal.custos) && animal.custos.length > 0) {
           const hoje = new Date()
           hoje.setHours(23, 59, 59, 999)
@@ -1104,7 +1104,7 @@ class DatabaseService {
             if (dataCusto && new Date(dataCusto) > hoje) return sum // Excluir custos futuros
             return sum + parseFloat(custo.valor || 0)
           }, 0)
-          // Usar o maior valor entre os dois cÃ¡lculos
+          // Usar o maior valor entre os dois cálculos
           custoTotal = Math.max(custoTotal, somaCustos)
         }
         
@@ -1120,7 +1120,7 @@ class DatabaseService {
             `, [custoTotal, animal.id])
             logger.info(`Custo total atualizado para animal ${animal.id}: R$ ${custoTotal.toFixed(2)}`)
           } catch (updateError) {
-            // Se falhar a atualizaÃ§Ã£o, apenas logar e continuar
+            // Se falhar a atualização, apenas logar e continuar
             logger.warn('Erro ao atualizar custo_total:', updateError.message)
           }
         }
@@ -1138,50 +1138,50 @@ class DatabaseService {
       return null;
     };
 
-    // 1. Tenta buscar por ID (garantir que seja nÃºmero)
+    // 1. Tenta buscar por ID (garantir que seja número)
     try {
       const animalId = parseInt(id, 10)
       if (isNaN(animalId)) {
-        logger.warn(`ID invÃ¡lido fornecido: ${id}`)
+        logger.warn(`ID inválido fornecido: ${id}`)
         return null
       }
       
-      logger.debug(`Buscando animal por ID numÃ©rico: ${animalId}`)
+      logger.debug(`Buscando animal por ID numérico: ${animalId}`)
       const resultId = await query(`${baseQuery} WHERE a.id = $1`, [animalId]);
       
       if (resultId.rows.length === 0) {
-        logger.debug(`Animal com ID ${animalId} nÃ£o encontrado no banco de dados, tentando buscar por RG...`)
-        // ForÃ§ar erro para cair no catch e tentar buscar por RG
-        throw new Error('Animal nÃ£o encontrado por ID')
+        logger.debug(`Animal com ID ${animalId} não encontrado no banco de dados, tentando buscar por RG...`)
+        // Forçar erro para cair no catch e tentar buscar por RG
+        throw new Error('Animal não encontrado por ID')
       }
 
       logger.info(`Animal com ID ${animalId} encontrado. Processando dados...`)
       
       const processedId = await processResult(resultId);
       if (processedId) {
-        // Buscar dados de FIV para determinar se Ã© doadora e listar coletas
+        // Buscar dados de FIV para determinar se é doadora e listar coletas
         // Priorizar busca por doadora_id (mais preciso)
-        // Se nÃ£o houver doadora_id, buscar por correspondÃªncia exata ou especÃ­fica do nome/RG
+        // Se não houver doadora_id, buscar por correspondência exata ou específica do nome/RG
         const nomeAnimal = processedId.nome || ''
         const rgAnimal = processedId.rg || ''
         const serieAnimal = processedId.serie || ''
         
-        // Query: buscar APENAS por doadora_id para garantir precisÃ£o
-        // Se nÃ£o houver doadora_id, buscar por correspondÃªncia exata do nome/RG
+        // Query: buscar APENAS por doadora_id para garantir precisão
+        // Se não houver doadora_id, buscar por correspondência exata do nome/RG
         let fivQuery = 'SELECT * FROM coleta_fiv WHERE doadora_id = $1'
         const fivParams = [processedId.id]
         
-        // Se nÃ£o houver doadora_id nas coletas, buscar por correspondÃªncia exata
-        // Construir possÃ­veis formatos do nome da doadora (apenas correspondÃªncias exatas)
+        // Se não houver doadora_id nas coletas, buscar por correspondência exata
+        // Construir possíveis formatos do nome da doadora (apenas correspondências exatas)
         const possiveisNomes = []
         if (rgAnimal) {
-          // RG Ã© o identificador mais Ãºnico, priorizar busca por RG
+          // RG é o identificador mais único, priorizar busca por RG
           possiveisNomes.push(rgAnimal) // Apenas RG
           if (serieAnimal) {
-            possiveisNomes.push(`${serieAnimal}-${rgAnimal}`) // SÃ©rie-RG
-            possiveisNomes.push(`${serieAnimal} ${rgAnimal}`) // SÃ©rie RG
-            // TambÃ©m tentar sem espaÃ§o
-            possiveisNomes.push(`${serieAnimal}${rgAnimal}`) // SÃ©rieRG
+            possiveisNomes.push(`${serieAnimal}-${rgAnimal}`) // Série-RG
+            possiveisNomes.push(`${serieAnimal} ${rgAnimal}`) // Série RG
+            // Também tentar sem espaço
+            possiveisNomes.push(`${serieAnimal}${rgAnimal}`) // SérieRG
           }
           if (nomeAnimal) {
             possiveisNomes.push(`${nomeAnimal} ${rgAnimal}`) // Nome + RG
@@ -1191,7 +1191,7 @@ class DatabaseService {
           possiveisNomes.push(nomeAnimal)
         }
         
-        // Adicionar busca por nome apenas se doadora_id for NULL (correspondÃªncia exata)
+        // Adicionar busca por nome apenas se doadora_id for NULL (correspondência exata)
         if (possiveisNomes.length > 0) {
           const nomeConditions = possiveisNomes.map((nome) => {
             fivParams.push(nome)
@@ -1204,16 +1204,16 @@ class DatabaseService {
         
         const fivResult = await query(fivQuery, fivParams);
         
-        // Filtrar resultados para garantir que sÃ£o realmente desta doadora
+        // Filtrar resultados para garantir que são realmente desta doadora
         // Verificar se o nome da doadora na coleta corresponde exatamente ao animal
         const coletasFiltradas = fivResult.rows.filter(coleta => {
           // Se tem doadora_id e corresponde, incluir
           if (coleta.doadora_id && coleta.doadora_id === processedId.id) return true
           
-          // Se nÃ£o tem doadora_id, verificar correspondÃªncia exata do nome
+          // Se não tem doadora_id, verificar correspondência exata do nome
           if (!coleta.doadora_id && coleta.doadora_nome) {
             const nomeColeta = coleta.doadora_nome.trim()
-            // Verificar correspondÃªncia exata com os possÃ­veis formatos
+            // Verificar correspondência exata com os possíveis formatos
             return possiveisNomes.some(nome => nome.trim() === nomeColeta)
           }
           
@@ -1225,40 +1225,40 @@ class DatabaseService {
           fivs: coletasFiltradas,
           is_doadora: coletasFiltradas.length > 0
         };
-        // Enriquecer com dados de receptora (data_te da NF, previsÃ£o de parto)
+        // Enriquecer com dados de receptora (data_te da NF, previsão de parto)
         const receptoraEnriquecido = await this.enriquecerDadosReceptora(animalCompleto);
-        // Enriquecer com DG de historia_ocorrencias se animal nÃ£o tiver data_dg
+        // Enriquecer com DG de historia_ocorrencias se animal não tiver data_dg
         return await this.enriquecerComDGDeHistoria(receptoraEnriquecido);
       }
     } catch (e) {
-      if (e.message !== 'Animal nÃ£o encontrado por ID') {
+      if (e.message !== 'Animal não encontrado por ID') {
         logger.error(`Erro inesperado ao buscar animal por ID ${id}: ${e.message}`)
       }
       // Ignorar erro se busca por ID falhar
     }
 
-    // 2. Se nÃ£o encontrou por ID, tenta buscar por RG
+    // 2. Se não encontrou por ID, tenta buscar por RG
     try {
       const resultRg = await query(`${baseQuery} WHERE a.rg = $1`, [id]);
       const processedRg = await processResult(resultRg);
       if (processedRg) {
-        // Buscar dados de FIV para determinar se Ã© doadora e listar coletas
+        // Buscar dados de FIV para determinar se é doadora e listar coletas
         // Priorizar busca por doadora_id (mais preciso)
-        // Se nÃ£o houver doadora_id, buscar por correspondÃªncia exata ou especÃ­fica do nome/RG
+        // Se não houver doadora_id, buscar por correspondência exata ou específica do nome/RG
         const nomeAnimal = processedRg.nome || ''
         const rgAnimal = processedRg.rg || ''
         const serieAnimal = processedRg.serie || ''
         
-        // Construir possÃ­veis formatos do nome da doadora (apenas correspondÃªncias exatas)
+        // Construir possíveis formatos do nome da doadora (apenas correspondências exatas)
         const possiveisNomes = []
         if (rgAnimal) {
-          // RG Ã© o identificador mais Ãºnico, priorizar busca por RG
+          // RG é o identificador mais único, priorizar busca por RG
           possiveisNomes.push(rgAnimal) // Apenas RG
           if (serieAnimal) {
-            possiveisNomes.push(`${serieAnimal}-${rgAnimal}`) // SÃ©rie-RG
-            possiveisNomes.push(`${serieAnimal} ${rgAnimal}`) // SÃ©rie RG
-            // TambÃ©m tentar sem espaÃ§o
-            possiveisNomes.push(`${serieAnimal}${rgAnimal}`) // SÃ©rieRG
+            possiveisNomes.push(`${serieAnimal}-${rgAnimal}`) // Série-RG
+            possiveisNomes.push(`${serieAnimal} ${rgAnimal}`) // Série RG
+            // Também tentar sem espaço
+            possiveisNomes.push(`${serieAnimal}${rgAnimal}`) // SérieRG
           }
           if (nomeAnimal) {
             possiveisNomes.push(`${nomeAnimal} ${rgAnimal}`) // Nome + RG
@@ -1268,12 +1268,12 @@ class DatabaseService {
           possiveisNomes.push(nomeAnimal)
         }
         
-        // Query: buscar por ID primeiro, depois por correspondÃªncia exata do nome
+        // Query: buscar por ID primeiro, depois por correspondência exata do nome
         let fivQuery = 'SELECT * FROM coleta_fiv WHERE doadora_id = $1'
         const fivParams = [processedRg.id]
         
-        // Se houver possÃ­veis nomes, adicionar busca por nome (apenas se doadora_id for NULL)
-        // Usar APENAS correspondÃªncia exata para evitar falsos positivos
+        // Se houver possíveis nomes, adicionar busca por nome (apenas se doadora_id for NULL)
+        // Usar APENAS correspondência exata para evitar falsos positivos
         if (possiveisNomes.length > 0) {
           const nomeConditions = possiveisNomes.map((nome) => {
             fivParams.push(nome)
@@ -1286,15 +1286,15 @@ class DatabaseService {
         
         const fivResult = await query(fivQuery, fivParams);
         
-        // Filtrar resultados para garantir que sÃ£o realmente desta doadora
+        // Filtrar resultados para garantir que são realmente desta doadora
         const coletasFiltradas = fivResult.rows.filter(coleta => {
           // Se tem doadora_id e corresponde, incluir
           if (coleta.doadora_id && coleta.doadora_id === processedRg.id) return true
           
-          // Se nÃ£o tem doadora_id, verificar correspondÃªncia exata do nome
+          // Se não tem doadora_id, verificar correspondência exata do nome
           if (!coleta.doadora_id && coleta.doadora_nome) {
             const nomeColeta = coleta.doadora_nome.trim()
-            // Verificar correspondÃªncia exata com os possÃ­veis formatos
+            // Verificar correspondência exata com os possíveis formatos
             return possiveisNomes.some(nome => nome.trim() === nomeColeta)
           }
           
@@ -1306,9 +1306,9 @@ class DatabaseService {
           fivs: coletasFiltradas,
           is_doadora: coletasFiltradas.length > 0
         };
-        // Enriquecer com dados de receptora (data_te da NF, previsÃ£o de parto)
+        // Enriquecer com dados de receptora (data_te da NF, previsão de parto)
         const receptoraEnriquecido = await this.enriquecerDadosReceptora(animalCompleto);
-        // Enriquecer com DG de historia_ocorrencias se animal nÃ£o tiver data_dg
+        // Enriquecer com DG de historia_ocorrencias se animal não tiver data_dg
         return await this.enriquecerComDGDeHistoria(receptoraEnriquecido);
       }
     } catch (e) {
@@ -1328,10 +1328,10 @@ class DatabaseService {
         targetId = check.rows[0].id
       }
     } catch (e) {
-      // Ignorar erro na verificaÃ§Ã£o; continuar com ID original
+      // Ignorar erro na verificação; continuar com ID original
     }
 
-    // Garantir que colunas existam (migraÃ§Ã£o automÃ¡tica)
+    // Garantir que colunas existam (migração automática)
     try {
       await query(`ALTER TABLE animais ADD COLUMN IF NOT EXISTS pasto_atual VARCHAR(100)`)
       await query(`ALTER TABLE animais ADD COLUMN IF NOT EXISTS piquete_atual VARCHAR(200)`)
@@ -1343,10 +1343,10 @@ class DatabaseService {
       await query(`ALTER TABLE animais ADD COLUMN IF NOT EXISTS mgte VARCHAR(50)`)
       await query(`ALTER TABLE animais ADD COLUMN IF NOT EXISTS top VARCHAR(50)`)
     } catch (e) {
-      if (!e.message?.includes('already exists')) logger?.warn?.('MigraÃ§Ã£o colunas:', e.message)
+      if (!e.message?.includes('already exists')) logger?.warn?.('Migração colunas:', e.message)
     }
 
-    // Buscar colunas vÃ¡lidas da tabela para filtrar o payload
+    // Buscar colunas válidas da tabela para filtrar o payload
     const colsRes = await query(`
       SELECT column_name 
       FROM information_schema.columns 
@@ -1385,7 +1385,7 @@ class DatabaseService {
         continue
       }
       const coluna = aliasMap[campoOriginal] || campoOriginal
-      // NÃ£o permitir sobrescrever chaves internas
+      // Não permitir sobrescrever chaves internas
       if (coluna === 'created_at' || coluna === 'updated_at') continue
       if (colSet.has(coluna)) {
         campos.push(`${coluna} = $${++paramCount}`)
@@ -1393,7 +1393,7 @@ class DatabaseService {
       }
     }
 
-    // Se nÃ£o hÃ¡ campos vÃ¡lidos, retornar registro atual sem atualizar
+    // Se não há campos válidos, retornar registro atual sem atualizar
     if (campos.length === 0) {
       const current = await query('SELECT * FROM animais WHERE id = $1 LIMIT 1', [targetId])
       return current.rows[0] || null
@@ -1421,14 +1421,14 @@ class DatabaseService {
         targetId = check.rows[0].id;
       }
     } catch (e) {
-      // Ignorar erro na verificaÃ§Ã£o
+      // Ignorar erro na verificação
     }
 
     const result = await query('DELETE FROM animais WHERE id = $1 RETURNING *', [targetId]);
     return result.rows[0];
   }
 
-  // ============ OPERAÃâ€¡Ãâ€¢ES COM CUSTOS ============
+  // ============ OPERAÇÕES COM CUSTOS ============
   
   // Adicionar custo a um animal
   async adicionarCusto(animalId, custoData) {
@@ -1452,7 +1452,7 @@ class DatabaseService {
       SELECT c.*, c.detalhes::json as detalhes_json
       FROM custos c
       WHERE c.animal_id = $1
-        AND c.tipo NOT IN ('AlimentaÃ§Ã£o', 'NutriÃ§Ã£o', 'RaÃ§Ã£o', 'SuplementaÃ§Ã£o')
+        AND c.tipo NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação')
       ORDER BY c.data DESC
     `, [animalId]);
 
@@ -1464,7 +1464,7 @@ class DatabaseService {
     const result = await query(`
       SELECT c.*, c.detalhes::json as detalhes_json
       FROM custos c
-      WHERE c.tipo NOT IN ('AlimentaÃ§Ã£o', 'NutriÃ§Ã£o', 'RaÃ§Ã£o', 'SuplementaÃ§Ã£o')
+      WHERE c.tipo NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação')
       ORDER BY c.data_registro DESC
       LIMIT $1
     `, [limit]);
@@ -1537,7 +1537,7 @@ class DatabaseService {
     return { atualizados: result.rows.length, animais: animalIds.length }
   }
 
-  // Atualizar custo total do animal (exclui custos com data futura - exames agendados nÃ£o contam ainda)
+  // Atualizar custo total do animal (exclui custos com data futura - exames agendados não contam ainda)
   async atualizarCustoTotalAnimal(animalId) {
     const result = await query(`
       UPDATE animais 
@@ -1555,7 +1555,7 @@ class DatabaseService {
     return result.rows[0]?.custo_total || 0;
   }
 
-  // Calcular custo de medicamento baseado na quantidade aplicada e preÃ§o
+  // Calcular custo de medicamento baseado na quantidade aplicada e preço
   calcularCustoMedicamento(medicamento, quantidadeAplicada, quantidadeFrasco) {
     if (!medicamento || !medicamento.preco) {
       return 0
@@ -1567,16 +1567,16 @@ class DatabaseService {
 
     // Se tiver quantidade aplicada e quantidade do frasco, calcular proporcionalmente
     if (qtdAplicada > 0 && qtdFrasco > 0 && precoFrasco > 0) {
-      // FÃ³rmula: (preÃ§o do frasco / quantidade total do frasco) * quantidade aplicada por animal
+      // Fórmula: (preço do frasco / quantidade total do frasco) * quantidade aplicada por animal
       return (precoFrasco / qtdFrasco) * qtdAplicada
     }
 
-    // Se nÃ£o tiver quantidade do frasco, usar preÃ§o fixo por animal se disponÃ­vel
+    // Se não tiver quantidade do frasco, usar preço fixo por animal se disponível
     if (medicamento.porAnimal) {
       return parseFloat(medicamento.porAnimal) * (qtdAplicada || 1)
     }
 
-    // Fallback: usar preÃ§o do medicamento
+    // Fallback: usar preço do medicamento
     return precoFrasco
   }
 
@@ -1605,9 +1605,9 @@ class DatabaseService {
     return parseFloat(result.rows[0]?.total || 0);
   }
 
-  // ============ OPERAÃâ€¡Ãâ€¢ES COM GESTAÃâ€¡Ãâ€¢ES ============
+  // ============ OPERAÇÕES COM GESTAÇÕES ============
   
-  // Criar gestaÃ§Ã£o
+  // Criar gestação
   async criarGestacao(gestacaoData) {
     const {
       pai_serie, pai_rg, mae_serie, mae_rg, receptora_nome,
@@ -1631,7 +1631,7 @@ class DatabaseService {
     return result.rows[0];
   }
 
-  // Buscar gestaÃ§Ãµes
+  // Buscar gestações
   async buscarGestacoes(filtros = {}) {
     let queryText = 'SELECT * FROM gestacoes';
     const params = [];
@@ -1700,22 +1700,22 @@ class DatabaseService {
     );
 
     if (parseInt(nascimentosVinculados.rows[0].count) > 0) {
-      // Se houver nascimentos, apenas desvincula (SET NULL jÃ¡ estÃ¡ configurado no ON DELETE)
-      logger.info(`GestaÃ§Ã£o ${id} tem nascimentos vinculados. Desvinculando...`);
+      // Se houver nascimentos, apenas desvincula (SET NULL já está configurado no ON DELETE)
+      logger.info(`Gestação ${id} tem nascimentos vinculados. Desvinculando...`);
     }
 
-    // Excluir a gestaÃ§Ã£o
+    // Excluir a gestação
     const result = await query('DELETE FROM gestacoes WHERE id = $1 RETURNING *', [id]);
 
     if (result.rows.length === 0) {
-      throw new Error('GestaÃ§Ã£o nÃ£o encontrada');
+      throw new Error('Gestação não encontrada');
     }
 
     return result.rows[0];
   }
 
 
-  // ============ OPERAÃâ€¡Ãâ€¢ES COM NASCIMENTOS ============
+  // ============ OPERAÇÕES COM NASCIMENTOS ============
   
   // Registrar nascimento
   async registrarNascimento(nascimentoData) {
@@ -1788,11 +1788,11 @@ class DatabaseService {
     return result.rows;
   }
 
-  // ============ ESTATÃ�STICAS ============
+  // ============ ESTATÍSTICAS ============
   
-  // Obter estatÃ­sticas gerais (otimizado: menos round-trips ao banco)
+  // Obter estatísticas gerais (otimizado: menos round-trips ao banco)
   async obterEstatisticas() {
-    // Query Ãºnica para contagens de animais e valores (evita 7 round-trips)
+    // Query única para contagens de animais e valores (evita 7 round-trips)
     const [mainResult, racasResult, sexosResult, semenResult] = await Promise.all([
       query(`
         SELECT
@@ -1836,9 +1836,9 @@ class DatabaseService {
     };
   }
 
-  // ============ OPERAÃâ€¡Ãâ€¢ES COM ESTOQUE DE SÃÅ MEN ============
+  // ============ OPERAÇÕES COM ESTOQUE DE SÊMEN ============
   
-  // Buscar todo o estoque de sÃªmen
+  // Buscar todo o estoque de sêmen
   async buscarEstoqueSemen(filtros = {}) {
     try {
       // Tentar com a estrutura nova
@@ -1910,7 +1910,7 @@ class DatabaseService {
     }
   }
 
-  // Buscar entradas disponÃ­veis para saÃ­da
+  // Buscar entradas disponíveis para saída
   async buscarEntradasDisponiveis() {
     try {
       // Tentar com a estrutura nova
@@ -1929,7 +1929,7 @@ class DatabaseService {
       // Se falhar, tentar com a estrutura antiga
       if (error.code === '42703') {
         const logger = require('../utils/logger.cjs');
-        logger.debug('Usando estrutura antiga para buscar entradas disponÃ­veis');
+        logger.debug('Usando estrutura antiga para buscar entradas disponíveis');
         
         const result = await query(`
           SELECT id, serie as nome_touro, rg as rg_touro, raca, 
@@ -1946,13 +1946,13 @@ class DatabaseService {
     }
   }
 
-  // Buscar sÃªmen por ID
+  // Buscar sêmen por ID
   async buscarSemenPorId(id) {
     const result = await query('SELECT * FROM estoque_semen WHERE id = $1', [id]);
     return result.rows[0] || null;
   }
 
-  // Adicionar sÃªmen ao estoque
+  // Adicionar sêmen ao estoque
   async adicionarSemen(semenData) {
     const {
       nomeTouro, rgTouro, raca, localizacao, rackTouro, botijao, caneca,
@@ -1961,7 +1961,7 @@ class DatabaseService {
       linhagem, observacoes, entradaId, dataOperacao
     } = semenData;
 
-    // FunÃ§Ã£o para tratar valores de data
+    // Função para tratar valores de data
     const treatDateValue = (value) => {
       if (!value || value === '' || value.trim() === '') {
         return null;
@@ -1969,10 +1969,10 @@ class DatabaseService {
       return value;
     };
 
-    // Se for operaÃ§Ã£o de saÃ­da, validar e atualizar entrada
+    // Se for operação de saída, validar e atualizar entrada
     if (tipoOperacao === 'saida') {
       if (!entradaId) {
-        throw new Error('ID da entrada Ã© obrigatÃ³rio para operaÃ§Ãµes de saÃ­da');
+        throw new Error('ID da entrada é obrigatório para operações de saída');
       }
 
       const quantidadeSaida = parseInt(quantidadeDoses) || 0;
@@ -1980,10 +1980,10 @@ class DatabaseService {
         throw new Error('Quantidade de doses deve ser maior que zero');
       }
 
-      // Buscar entrada para validaÃ§Ã£o com log detalhado
+      // Buscar entrada para validação com log detalhado
       const entradaResult = await query('SELECT * FROM estoque_semen WHERE id = $1', [entradaId]);
       if (entradaResult.rows.length === 0) {
-        throw new Error('Entrada nÃ£o encontrada');
+        throw new Error('Entrada não encontrada');
       }
 
       const entrada = entradaResult.rows[0];
@@ -1991,7 +1991,7 @@ class DatabaseService {
 
       // Log detalhado para debug
       const logger = require('../utils/logger.cjs');
-      logger.debug('ValidaÃ§Ã£o de saÃ­da de sÃªmen:', {
+      logger.debug('Validação de saída de sêmen:', {
         entradaId,
         quantidadeSaida,
         dosesDisponiveis,
@@ -2006,10 +2006,10 @@ class DatabaseService {
       });
 
       if (quantidadeSaida > dosesDisponiveis) {
-        throw new Error(`Quantidade solicitada (${quantidadeSaida}) excede doses disponÃ­veis (${dosesDisponiveis}). Entrada ID: ${entradaId}, Touro: ${entrada.nome_touro}`);
+        throw new Error(`Quantidade solicitada (${quantidadeSaida}) excede doses disponíveis (${dosesDisponiveis}). Entrada ID: ${entradaId}, Touro: ${entrada.nome_touro}`);
       }
 
-      // Atualizar doses disponÃ­veis na entrada
+      // Atualizar doses disponíveis na entrada
       const novasDosesDisponiveis = dosesDisponiveis - quantidadeSaida;
       const novoStatus = novasDosesDisponiveis === 0 ? 'esgotado' : 'disponivel';
 
@@ -2022,7 +2022,7 @@ class DatabaseService {
         WHERE id = $4
       `, [novasDosesDisponiveis, quantidadeSaida, novoStatus, entradaId]);
 
-      // Registrar saÃ­da com dados da entrada
+      // Registrar saída com dados da entrada
       const result = await query(`
         INSERT INTO estoque_semen (
           nome_touro, rg_touro, raca, localizacao, rack_touro, botijao, caneca,
@@ -2060,7 +2060,7 @@ class DatabaseService {
       return result.rows[0];
     }
 
-    // OperaÃ§Ã£o de entrada (cÃ³digo original)
+    // Operação de entrada (código original)
     try {
       // Tentar inserir com a estrutura nova
       const result = await query(`
@@ -2076,7 +2076,7 @@ class DatabaseService {
         nomeTouro || 'Sem nome',
         rgTouro || null,
         raca || null,
-        localizacao || 'Sem localizaÃ§Ã£o',
+        localizacao || 'Sem localização',
         rackTouro || null,
         botijao || null,
         caneca || null,
@@ -2099,7 +2099,7 @@ class DatabaseService {
       return result.rows[0];
     } catch (error) {
       // Se falhar, tentar com a estrutura antiga
-      if (error.code === '42703') { // Coluna nÃ£o existe
+      if (error.code === '42703') { // Coluna não existe
         const logger = require('../utils/logger.cjs');
         logger.debug('Usando estrutura antiga da tabela');
         
@@ -2129,7 +2129,7 @@ class DatabaseService {
     }
   }
 
-  // Atualizar sÃªmen
+  // Atualizar sêmen
   async atualizarSemen(id, dadosAtualizados) {
     try {
       const campos = [];
@@ -2193,13 +2193,13 @@ class DatabaseService {
       `, valores);
 
       if (result.rows.length === 0) {
-        throw new Error('SÃªmen nÃ£o encontrado para atualizaÃ§Ã£o');
+        throw new Error('Sêmen não encontrado para atualização');
       }
 
       return result.rows[0];
     } catch (error) {
       const logger = require('../utils/logger');
-      logger.error('Erro detalhado ao atualizar sÃªmen:', error);
+      logger.error('Erro detalhado ao atualizar sêmen:', error);
       
       // Se falhar com estrutura nova, tentar com estrutura antiga
       if (error.code === '42703') {
@@ -2236,7 +2236,7 @@ class DatabaseService {
         }
 
         if (campos.length === 0) {
-          throw new Error('Nenhum campo compatÃ­vel para atualizar na estrutura antiga');
+          throw new Error('Nenhum campo compatível para atualizar na estrutura antiga');
         }
 
         valores.push(id);
@@ -2249,7 +2249,7 @@ class DatabaseService {
         `, valores);
 
         if (result.rows.length === 0) {
-          throw new Error('SÃªmen nÃ£o encontrado para atualizaÃ§Ã£o');
+          throw new Error('Sêmen não encontrado para atualização');
         }
 
         return result.rows[0];
@@ -2259,9 +2259,9 @@ class DatabaseService {
     }
   }
 
-  // Deletar sÃªmen
+  // Deletar sêmen
   async deletarSemen(id) {
-    // Primeiro, obter os dados do sÃªmen antes de excluir
+    // Primeiro, obter os dados do sêmen antes de excluir
     const semenResult = await query('SELECT * FROM estoque_semen WHERE id = $1', [id]);
     
     if (semenResult.rows.length === 0) {
@@ -2270,7 +2270,7 @@ class DatabaseService {
     
     const semen = semenResult.rows[0];
     
-    // Criar tabela de exclusÃµes se nÃ£o existir
+    // Criar tabela de exclusões se não existir
     await query(`
       CREATE TABLE IF NOT EXISTS semen_exclusoes (
         id SERIAL PRIMARY KEY,
@@ -2282,7 +2282,7 @@ class DatabaseService {
       )
     `);
     
-    // Marcar como excluÃ­do na tabela de exclusÃµes
+    // Marcar como excluído na tabela de exclusões
     try {
       await query(`
         INSERT INTO semen_exclusoes (nome_touro, raca, fornecedor)
@@ -2291,7 +2291,7 @@ class DatabaseService {
       `, [semen.nome_touro || semen.serie, semen.raca, semen.fornecedor]);
     } catch (error) {
       const logger = require('../utils/logger');
-      logger.debug('Registro jÃ¡ marcado como excluÃ­do ou erro ao marcar exclusÃ£o:', error.message);
+      logger.debug('Registro já marcado como excluído ou erro ao marcar exclusão:', error.message);
     }
     
     // Agora excluir da tabela principal
@@ -2299,7 +2299,7 @@ class DatabaseService {
     return result.rows[0];
   }
 
-  // Usar dose de sÃªmen
+  // Usar dose de sêmen
   async usarDoseSemen(id, quantidadeUsada = 1) {
     const result = await query(`
       UPDATE estoque_semen 
@@ -2318,9 +2318,9 @@ class DatabaseService {
     return result.rows[0];
   }
 
-  // ============ RELATÃâ€œRIOS ============
+  // ============ RELATÓRIOS ============
   
-  // RelatÃ³rio de custos por animal
+  // Relatório de custos por animal
   async relatorioCustosAnimal(animalId) {
     const custos = await this.buscarCustosAnimal(animalId);
     const total = custos.reduce((sum, custo) => sum + parseFloat(custo.valor), 0);
@@ -2343,7 +2343,7 @@ class DatabaseService {
     };
   }
 
-  // RelatÃ³rio geral de custos
+  // Relatório geral de custos
   async relatorioGeral() {
     const result = await query(`
       SELECT 
@@ -2355,7 +2355,7 @@ class DatabaseService {
           ELSE 0 
         END as media_por_animal
       FROM custos c
-      WHERE c.tipo NOT IN ('AlimentaÃ§Ã£o', 'NutriÃ§Ã£o', 'RaÃ§Ã£o', 'SuplementaÃ§Ã£o')
+      WHERE c.tipo NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação')
     `);
 
     const animaisComCustos = await query(`
@@ -2366,7 +2366,7 @@ class DatabaseService {
         a.custo_total,
         COUNT(c.id) as qtd_custos
       FROM animais a
-      LEFT JOIN custos c ON a.id = c.animal_id AND c.tipo NOT IN ('AlimentaÃ§Ã£o', 'NutriÃ§Ã£o', 'RaÃ§Ã£o', 'SuplementaÃ§Ã£o')
+      LEFT JOIN custos c ON a.id = c.animal_id AND c.tipo NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação')
       GROUP BY a.id, a.serie, a.rg, a.custo_total
       ORDER BY a.custo_total DESC
     `);
@@ -2380,7 +2380,7 @@ class DatabaseService {
   }
 }
 
-// InstÃ¢ncia singleton
+// Instância singleton
 const databaseService = new DatabaseService();
 
 module.exports = databaseService;

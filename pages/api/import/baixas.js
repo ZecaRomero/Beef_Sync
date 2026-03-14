@@ -1,7 +1,7 @@
 /**
- * API de importação de Baixas (MORTE/BAIXA e VENDA)
- * Aceita Excel com colunas: SÉRIE, RG/RF/RC, OCORRENCIA, Causa, Data, COMPRADOR, VALOR, NOTA FISCAL, SÉRIE MA, RG
- * Formato VENDAS-only: SÉRIE RG, DATA, COMPRADOR, VALOR, NOTA FISCAL, SÉRIE MAE RG (sem OCORRENCIA)
+ * API de importaÃ§Ã£o de Baixas (MORTE/BAIXA e VENDA)
+ * Aceita Excel com colunas: SÃ‰RIE, RG/RF/RC, OCORRENCIA, Causa, Data, COMPRADOR, VALOR, NOTA FISCAL, SÃ‰RIE MA, RG
+ * Formato VENDAS-only: SÃ‰RIE RG, DATA, COMPRADOR, VALOR, NOTA FISCAL, SÃ‰RIE MAE RG (sem OCORRENCIA)
  */
 import formidable from 'formidable'
 import fs from 'fs'
@@ -44,28 +44,28 @@ function parseValor(val) {
   if (val == null || val === '') return null
   if (typeof val === 'number') return val
   
-  // Converter string para número, lidando com formato brasileiro (R$ 3.640,00)
+  // Converter string para nÃºmero, lidando com formato brasileiro (R$ 3.640,00)
   let str = String(val).trim()
-  // Remover símbolo de moeda e espaços
+  // Remover sÃ­mbolo de moeda e espaÃ§os
   str = str.replace(/[R$\s]/g, '')
   
-  // Se tem ponto e vírgula, assumir formato brasileiro (3.640,00)
+  // Se tem ponto e vÃ­rgula, assumir formato brasileiro (3.640,00)
   if (str.includes('.') && str.includes(',')) {
     str = str.replace(/\./g, '').replace(',', '.')
   }
-  // Se tem apenas vírgula, assumir formato brasileiro (3640,00)
+  // Se tem apenas vÃ­rgula, assumir formato brasileiro (3640,00)
   else if (str.includes(',')) {
     str = str.replace(',', '.')
   }
   // Se tem apenas ponto, pode ser formato americano (3640.00) ou separador de milhar brasileiro (3.640)
-  // Verificar se há mais de um ponto ou se o ponto está a mais de 3 dígitos do final
+  // Verificar se hÃ¡ mais de um ponto ou se o ponto estÃ¡ a mais de 3 dÃ­gitos do final
   else if (str.includes('.')) {
     const parts = str.split('.')
     if (parts.length > 2 || (parts.length === 2 && parts[1].length > 2)) {
       // Formato brasileiro com separador de milhar (3.640)
       str = str.replace(/\./g, '')
     }
-    // Caso contrário, manter como está (formato americano 3640.00)
+    // Caso contrÃ¡rio, manter como estÃ¡ (formato americano 3640.00)
   }
   
   const n = parseFloat(str)
@@ -103,7 +103,7 @@ function parseSerieMaeRg(val) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Método não permitido' })
+    return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' })
   }
 
   const form = formidable({ multiples: false, maxFileSize: 100 * 1024 * 1024 })
@@ -121,12 +121,12 @@ export default async function handler(req, res) {
 
     const filepath = file.filepath || file.path
     if (!filepath) {
-      return res.status(500).json({ error: 'Arquivo não recebido corretamente. Tente um arquivo menor ou divida em partes.' })
+      return res.status(500).json({ error: 'Arquivo nÃ£o recebido corretamente. Tente um arquivo menor ou divida em partes.' })
     }
 
     let filepathToClean = filepath
     try {
-      // (createTablesIfNotExist removido � tabelas criadas automaticamente no primeiro uso)
+      // (createTablesIfNotExist removido — tabelas criadas automaticamente no primeiro uso)
       const workbook = XLSX.readFile(filepath)
       const sheetName = workbook.SheetNames[0]
       const sheet = workbook.Sheets[sheetName]
@@ -139,7 +139,7 @@ export default async function handler(req, res) {
       const headerRow = aoa[0].map(h => String(h || '').trim())
       const dataRows = aoa.slice(1)
 
-      // Mapear índices por nome (formato BAIXAS: SÉRIE, RG, OCORRENCIA, Causa, Data, SÉRIE MAE, RG)
+      // Mapear Ã­ndices por nome (formato BAIXAS: SÃ‰RIE, RG, OCORRENCIA, Causa, Data, SÃ‰RIE MAE, RG)
       const findIdx = (names) => {
         for (const n of names) {
           const idx = headerRow.findIndex(h => normalizeKey(h).includes(normalizeKey(n)))
@@ -147,27 +147,27 @@ export default async function handler(req, res) {
         }
         return -1
       }
-      // SÉR/SÉRIE do animal (não confundir com SÉRIE MAE - que é da mãe)
+      // SÃ‰R/SÃ‰RIE do animal (nÃ£o confundir com SÃ‰RIE MAE - que Ã© da mÃ£e)
       const serieIdx = (() => {
         for (let i = 0; i < headerRow.length; i++) {
           const n = normalizeKey(headerRow[i])
           if (n.includes('mae')) continue
-          if (n === 'ser' || n === 'sér' || n.includes('serie')) return i
+          if (n === 'ser' || n === 'sÃ©r' || n.includes('serie')) return i
         }
-        return findIdx(['série', 'serie'])
+        return findIdx(['sÃ©rie', 'serie'])
       })()
       const rgIdx = findIdx(['rg', 'rf', 'rc'])
       const ocorrenciaIdx = findIdx(['ocorrencia', 'ocorrenc'])
       const causaIdx = findIdx(['causa'])
       const dataIdx = findIdx(['data', 'dt'])
       const compradorIdx = findIdx(['comprador', 'cliente', 'destinatario'])
-      const valorIdx = findIdx(['valor', 'preco', 'preço', 'vlr'])
-      const nfIdx = findIdx(['nota fiscal', 'nota_fiscal', 'nf', 'numero nf', 'nº nf'])
-      const serieMaeIdx = findIdx(['serie mae', 'série mae', 'serie_mae', 'serie ma', 'série ma'])
-      const serieRgCombinedIdx = findIdx(['serie rg', 'série rg', 'serie_rg', 'sér rg', 'ser rg', 'identificacao', 'identificação'])
-      const serieMaeRgCombinedIdx = findIdx(['serie mae rg', 'série mae rg', 'serie_mae_rg'])
+      const valorIdx = findIdx(['valor', 'preco', 'preÃ§o', 'vlr'])
+      const nfIdx = findIdx(['nota fiscal', 'nota_fiscal', 'nf', 'numero nf', 'nÂº nf'])
+      const serieMaeIdx = findIdx(['serie mae', 'sÃ©rie mae', 'serie_mae', 'serie ma', 'sÃ©rie ma'])
+      const serieRgCombinedIdx = findIdx(['serie rg', 'sÃ©rie rg', 'serie_rg', 'sÃ©r rg', 'ser rg', 'identificacao', 'identificaÃ§Ã£o'])
+      const serieMaeRgCombinedIdx = findIdx(['serie mae rg', 'sÃ©rie mae rg', 'serie_mae_rg'])
 
-      // RG da mãe: segunda coluna "RG" (após SÉRIE MAE)
+      // RG da mÃ£e: segunda coluna "RG" (apÃ³s SÃ‰RIE MAE)
       let rgMaeIdx = -1
       if (serieMaeIdx >= 0 && serieMaeIdx + 1 < headerRow.length) {
         const nextHeader = normalizeKey(headerRow[serieMaeIdx + 1] || '')
@@ -224,7 +224,7 @@ export default async function handler(req, res) {
         const dataStr = v(dataIdx)
         const dataBaixa = converterData(dataStr)
         if (!dataBaixa) {
-          resultados.erros.push({ linha: i + 2, animal: `${serie} ${rg}`, msg: 'Data inválida' })
+          resultados.erros.push({ linha: i + 2, animal: `${serie} ${rg}`, msg: 'Data invÃ¡lida' })
           continue
         }
 
@@ -277,12 +277,12 @@ export default async function handler(req, res) {
               await databaseService.registrarMorte({
                 animal_id: animalId,
                 data_morte: dataBaixa,
-                causa_morte: causa || 'Não informado',
+                causa_morte: causa || 'NÃ£o informado',
                 observacoes: null,
                 valor_perda: animal?.custo_total || 0,
               })
             } catch (e) {
-              // ignora se já existir morte
+              // ignora se jÃ¡ existir morte
             }
           }
 
@@ -296,10 +296,10 @@ export default async function handler(req, res) {
         await pool.query(
           `INSERT INTO importacoes_historico (tipo, descricao, registros, usuario, status)
            VALUES ($1, $2, $3, $4, $5)`,
-          ['Baixas', `Importação baixas: ${resultados.importados} importados`, resultados.importados, 'Sistema', 'sucesso']
+          ['Baixas', `ImportaÃ§Ã£o baixas: ${resultados.importados} importados`, resultados.importados, 'Sistema', 'sucesso']
         )
       } catch (e) {
-        // ignora se tabela não existir
+        // ignora se tabela nÃ£o existir
       }
 
       return res.status(200).json({

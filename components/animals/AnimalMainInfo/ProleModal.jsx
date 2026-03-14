@@ -13,7 +13,7 @@ function SexoBadge({ sexo }) {
         ? 'bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-300'
         : 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
     }`}>
-      {ehF ? 'ââ„¢â‚¬' : 'ââ„¢â€š'} {ehF ? 'FÃªmea' : 'Macho'}
+      {ehF ? '♀' : '♂'} {ehF ? 'Fêmea' : 'Macho'}
     </span>
   )
 }
@@ -22,7 +22,7 @@ function EraBadge({ era }) {
   if (!era) return null
   return (
     <span className="inline-flex items-center text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
-      ðÅ¸â€œâ€¦ Era {era}
+      📅 Era {era}
     </span>
   )
 }
@@ -39,7 +39,7 @@ export default function ProleModal({ proleDetalhesData, onClose }) {
         {/* Header */}
         <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-600 flex justify-between items-center bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20">
           <div>
-            <h3 className="font-bold text-amber-800 dark:text-amber-200">ðÅ¸â€œÅ  Prole ââ‚¬â€� detalhes importados</h3>
+            <h3 className="font-bold text-amber-800 dark:text-amber-200">📊 Prole — detalhes importados</h3>
             <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">{proleDetalhesData.length} filho(s) registrado(s)</p>
           </div>
           <button type="button" onClick={onClose} className="p-2 rounded-lg hover:bg-amber-100 dark:hover:bg-gray-700 transition-colors">

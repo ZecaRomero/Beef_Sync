@@ -1,4 +1,4 @@
-﻿import { Chart, registerables } from 'chart.js'
+import { Chart, registerables } from 'chart.js'
 import { ChartJSNodeCanvas } from 'chartjs-node-canvas'
 import databaseService from '../../../services/databaseService'
 import { RACAS_POR_SERIE as racasPorSerie } from '../../../utils/constants'

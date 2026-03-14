@@ -1,7 +1,7 @@
 /**
  * Ficha do Animal - Modo Consulta (somente leitura)
- * Usado quando o usuÃ¡rio acessa via /a - sem ediÃ§Ã£o, sem sidebar
- * Inclui: machos = exames androlÃ³gicos | fÃªmeas = FIV, inseminaÃ§Ãµes, gestaÃ§Ãµes
+ * Usado quando o usuário acessa via /a - sem edição, sem sidebar
+ * Inclui: machos = exames andrológicos | fêmeas = FIV, inseminações, gestações
  */
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react'
 import Head from 'next/head'
@@ -71,7 +71,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
       const ativos = animal?.filhos || []
       const baixados = baixasResumo?.resumoMae?.proleDetalhes || []
     
-    // Combinar e remover duplicatas por ID (se houver) ou RG/SÃ©rie
+    // Combinar e remover duplicatas por ID (se houver) ou RG/Série
     const map = new Map()
     
     ativos.forEach(f => {
@@ -86,10 +86,10 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
     
     baixados.forEach((f, idx) => {
       const key = `${f.serie}-${f.rg}`
-      // Usar id do animal se disponÃ­vel, senÃ£o gerar id de baixa
+      // Usar id do animal se disponível, senão gerar id de baixa
       const animalId = f.id || null
       const fComId = { ...f, id: animalId || `baixa-${f.serie}-${f.rg}-${idx}`, status: f.tipo }
-      // Encontrar a chave do mapa onde esse filho jÃ¡ existe (evita duplicatas e chaves React duplicadas)
+      // Encontrar a chave do mapa onde esse filho já existe (evita duplicatas e chaves React duplicadas)
       let mapKeyToUpdate = null
       for (const [k, v] of map) {
         if (v.serie === f.serie && v.rg === f.rg) {
@@ -122,7 +122,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
 
   const [, setShowIABCZInfo] = useState(false)
   const [isEditGeneticaModalOpen, setIsEditGeneticaModalOpen] = useState(false)
-  const sectionRefs = useRef({ custos: null, genÃ©tica: null, pai: null, filhos: null, peso: null, fiv: null, localizacao: null })
+  const sectionRefs = useRef({ custos: null, genética: null, pai: null, filhos: null, peso: null, fiv: null, localizacao: null })
 
   const handleSaveGenetica = useCallback((updatedAnimal) => {
     setAnimal(prev => ({ ...prev, ...updatedAnimal }))
@@ -155,27 +155,27 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
     const locAtiva = animal.localizacoes?.find(l => !l.data_saida)
     const locMaisRecente = animal.localizacoes?.[0]
     const locBruto = locAtiva?.piquete || locMaisRecente?.piquete || animal.piquete_atual || animal.piqueteAtual || animal.localizacao_atual
-    const locFiltrada = localizacaoValidaParaExibir(locBruto) || (locBruto ? 'NÃ£o informado' : null)
+    const locFiltrada = localizacaoValidaParaExibir(locBruto) || (locBruto ? 'Não informado' : null)
     const texto = [
       `Animal: ${animal.nome || `${animal.serie || ''} ${animal.rg || ''}`.trim() || '-'}`,
-      `IdentificaÃ§Ã£o: ${animal.serie || '-'} ${animal.rg || '-'}`,
+      `Identificação: ${animal.serie || '-'} ${animal.rg || '-'}`,
       animal.sexo ? `Sexo: ${animal.sexo}` : null,
-      animal.raca ? `RaÃ§a: ${animal.raca}` : null,
+      animal.raca ? `Raça: ${animal.raca}` : null,
       animal.pai ? `Pai: ${animal.pai}` : null,
-      animal.mae ? `MÃ£e: ${animal.mae}` : null,
-      (animal.avo_materno || animal.avoMaterno) ? `AvÃ´ materno: ${animal.avo_materno || animal.avoMaterno}` : null,
+      animal.mae ? `Mãe: ${animal.mae}` : null,
+      (animal.avo_materno || animal.avoMaterno) ? `Avô materno: ${animal.avo_materno || animal.avoMaterno}` : null,
       metrics.mesesIdade ? `Idade: ${metrics.mesesIdade} meses` : null,
       animal.peso ? `Peso: ${animal.peso} kg` : null,
-      (animal.abczg || animal.abczg === 0) ? `iABCZ: ${animal.abczg}${filhoTopRanking ? ' ââ‚¬¢ MÃ£e do 1Âº do ranking' : rankingPosicao ? ` ââ‚¬¢ ${rankingPosicao}Âº no ranking` : ''}` : null,
-      ((animal.iqg ?? animal.genetica_2) || (animal.iqg ?? animal.genetica_2) === 0) ? `IQG: ${(animal.iqg ?? animal.genetica_2)}${rankingPosicaoGenetica2 ? ` ââ‚¬¢ ${rankingPosicaoGenetica2}Âº no ranking` : ''}` : null,
+      (animal.abczg || animal.abczg === 0) ? `iABCZ: ${animal.abczg}${filhoTopRanking ? ' • Mãe do 1º do ranking' : rankingPosicao ? ` • ${rankingPosicao}º no ranking` : ''}` : null,
+      ((animal.iqg ?? animal.genetica_2) || (animal.iqg ?? animal.genetica_2) === 0) ? `IQG: ${(animal.iqg ?? animal.genetica_2)}${rankingPosicaoGenetica2 ? ` • ${rankingPosicaoGenetica2}º no ranking` : ''}` : null,
       ((animal.pt_iqg ?? animal.decile_2) || (animal.pt_iqg ?? animal.decile_2) === 0) ? `Pt IQG: ${(animal.pt_iqg ?? animal.decile_2)}` : null,
-      locFiltrada ? `LocalizaÃ§Ã£o: ${locFiltrada}` : null
+      locFiltrada ? `Localização: ${locFiltrada}` : null
     ].filter(Boolean).join('\n')
     const url = `https://wa.me/?text=${encodeURIComponent(texto)}`
     window.open(url, '_blank')
   }, [animal, metrics, rankingPosicao, rankingPosicaoGenetica2, filhoTopRanking])
 
-  // LocalizaÃ§Ã£o atual para exibiÃ§Ã£o
+  // Localização atual para exibição
   const locAtual = useMemo(() => {
     if (!animal) return null
     const locAtiva = animal.localizacoes?.find(l => !l.data_saida)
@@ -188,7 +188,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
       || animal.pastoAtual
       || (typeof animal.localizacao_atual === 'object' ? animal.localizacao_atual?.piquete : null)
       || animal.localizacao_atual
-    return localizacaoValidaParaExibir(locBruto) || (locBruto ? 'NÃ£o informado' : null)
+    return localizacaoValidaParaExibir(locBruto) || (locBruto ? 'Não informado' : null)
   }, [animal])
 
   const resumoChips = useMemo(() => {
@@ -200,8 +200,8 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
         animal.raca,
         animal.pelagem,
         animal.categoria,
-        locAtual ? `ðÅ¸â€œ� ${locAtual}` : null,
-        animal.brinco ? `ðÅ¸�·ï¸� ${animal.brinco}` : null
+        locAtual ? `📍 ${locAtual}` : null,
+        animal.brinco ? `🏷️ ${animal.brinco}` : null
       ].filter(Boolean)
     } catch (error) {
       console.error('Erro ao gerar resumoChips:', error)
@@ -279,9 +279,9 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
           <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
         </Head>
         <div className="min-h-screen flex flex-col items-center justify-center px-4 py-6 bg-gray-50 dark:bg-gray-900">
-          <p className="text-red-600 dark:text-red-400 text-center mb-2">{error || 'Animal nÃ£o encontrado'}</p>
+          <p className="text-red-600 dark:text-red-400 text-center mb-2">{error || 'Animal não encontrado'}</p>
           <p className="text-gray-500 dark:text-gray-400 text-sm text-center mb-6 max-w-sm">
-            Se o animal existe no banco, tente por identificaÃ§Ã£o: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">/consulta-animal/SERIE-RG</code>
+            Se o animal existe no banco, tente por identificação: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">/consulta-animal/SERIE-RG</code>
           </p>
           <Link
             href="/a?buscar=1"
@@ -302,7 +302,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover" />
       </Head>
       <div className={`min-h-screen ${getPageBgClasses(sexTheme)} pb-[calc(6.5rem+env(safe-area-inset-bottom))] scroll-pt-4`}>
-        <ErrorBoundary fallbackMessage="Erro ao carregar a ficha do animal. Tente recarregar a pÃ¡gina.">
+        <ErrorBoundary fallbackMessage="Erro ao carregar a ficha do animal. Tente recarregar a página.">
         <AnimalHeader
           darkMode={darkMode}
           toggleDarkMode={toggleDarkMode}
@@ -376,7 +376,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
 
           <div ref={r => sectionRefs.current.custos = r} className="scroll-mb-28"><AnimalCosts animal={animal} onCustosUpdated={refreshCustos} /></div>
 
-          <div ref={r => sectionRefs.current.genÃ©tica = r} className="scroll-mb-28"><AnimalGenetics animal={animal} /></div>
+          <div ref={r => sectionRefs.current.genética = r} className="scroll-mb-28"><AnimalGenetics animal={animal} /></div>
 
           <AnimalNotes animal={animal} />
 

@@ -3,7 +3,7 @@ import { query } from '../../../lib/database'
 export default async function handler(req, res) {
   try {
     // Garantir que as tabelas existam
-    // (createTablesIfNotExist removido � tabelas criadas automaticamente no primeiro uso)
+    // (createTablesIfNotExist removido — tabelas criadas automaticamente no primeiro uso)
     
     if (req.method === 'GET') {
       const { busca, tipo } = req.query
@@ -22,7 +22,7 @@ export default async function handler(req, res) {
       }
       
       if (busca) {
-        // Normalizar busca removendo formatação para comparação de CNPJ
+        // Normalizar busca removendo formataÃ§Ã£o para comparaÃ§Ã£o de CNPJ
         const buscaLimpa = busca.replace(/[.\-\/\s]/g, '').trim()
         sqlQuery += ` AND (
           nome ILIKE $${paramCount} OR 
@@ -62,11 +62,11 @@ export default async function handler(req, res) {
       if (!nome || !tipo) {
         return res.status(400).json({
           success: false,
-          message: 'Nome e tipo são obrigatórios'
+          message: 'Nome e tipo sÃ£o obrigatÃ³rios'
         })
       }
       
-      // Verificar se já existe (verificar por nome+tipo ou por CNPJ se fornecido)
+      // Verificar se jÃ¡ existe (verificar por nome+tipo ou por CNPJ se fornecido)
       let existing = null
       if (cnpj_cpf) {
         existing = await query(`
@@ -84,11 +84,11 @@ export default async function handler(req, res) {
         return res.status(200).json({
           success: true,
           data: existing.rows[0],
-          message: 'Fornecedor/Destinatário já existe'
+          message: 'Fornecedor/DestinatÃ¡rio jÃ¡ existe'
         })
       }
       
-      // Criar novo fornecedor/destinatário
+      // Criar novo fornecedor/destinatÃ¡rio
       const result = await query(`
         INSERT INTO fornecedores_destinatarios (
           nome, tipo, endereco, municipio, estado, cnpj_cpf, telefone, email, observacoes
@@ -109,13 +109,13 @@ export default async function handler(req, res) {
       return res.status(201).json({
         success: true,
         data: result.rows[0],
-        message: 'Fornecedor/Destinatário criado com sucesso'
+        message: 'Fornecedor/DestinatÃ¡rio criado com sucesso'
       })
     }
     
     return res.status(405).json({
       success: false,
-      message: 'Método não permitido'
+      message: 'MÃ©todo nÃ£o permitido'
     })
   } catch (error) {
     console.error('Erro na API de fornecedores:', error)

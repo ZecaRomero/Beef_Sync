@@ -1,4 +1,4 @@
-﻿import ExcelJS from 'exceljs'
+import ExcelJS from 'exceljs'
 import databaseService from '../../../services/databaseService'
 import { RACAS_POR_SERIE as racasPorSerie } from '../../../utils/constants'
 

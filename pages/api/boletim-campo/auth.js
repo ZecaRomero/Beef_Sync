@@ -1,6 +1,6 @@
 /**
- * API de autenticação do usuário Adelso para Boletim Campo.
- * Senha temporária: 123 (desenvolvedor pode resetar via banco)
+ * API de autenticaÃ§Ã£o do usuÃ¡rio Adelso para Boletim Campo.
+ * Senha temporÃ¡ria: 123 (desenvolvedor pode resetar via banco)
  */
 import { query } from '../../../lib/database'
 
@@ -8,17 +8,17 @@ const DEV_MASTER_PASSWORD = 'dev_master_123' // Desenvolvedor usa isso para rese
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Método não permitido' })
+    return res.status(405).json({ message: 'MÃ©todo nÃ£o permitido' })
   }
 
   try {
-    // (createTablesIfNotExist removido � tabelas criadas automaticamente no primeiro uso)
+    // (createTablesIfNotExist removido — tabelas criadas automaticamente no primeiro uso)
     const { nome, senha, novaSenha, acao } = req.body
 
     if (!nome || !senha) {
       return res.status(400).json({
         success: false,
-        message: 'Nome e senha são obrigatórios'
+        message: 'Nome e senha sÃ£o obrigatÃ³rios'
       })
     }
 
@@ -26,7 +26,7 @@ export default async function handler(req, res) {
     if (nomeNorm.toLowerCase() !== 'adelso') {
       return res.status(401).json({
         success: false,
-        message: 'Usuário não encontrado'
+        message: 'UsuÃ¡rio nÃ£o encontrado'
       })
     }
 
@@ -38,7 +38,7 @@ export default async function handler(req, res) {
     if (userResult.rows.length === 0) {
       return res.status(401).json({
         success: false,
-        message: 'Usuário não encontrado'
+        message: 'UsuÃ¡rio nÃ£o encontrado'
       })
     }
 

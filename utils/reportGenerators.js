@@ -1,4 +1,4 @@
-﻿// Funções auxiliares para gerar relatórios diretamente (sem HTTP)
+// Funções auxiliares para gerar relatórios diretamente (sem HTTP)
 // Estas funções podem ser chamadas diretamente de outras APIs
 
 import ExcelJS from 'exceljs'
