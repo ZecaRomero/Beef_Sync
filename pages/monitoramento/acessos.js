@@ -9,7 +9,9 @@ import {
   ArrowPathIcon,
   ExclamationTriangleIcon,
   ChartBarIcon,
-  UserCircleIcon
+  UserCircleIcon,
+  ClockIcon,
+  CheckCircleIcon
 } from '@heroicons/react/24/outline'
 
 // --- Helpers ---
@@ -111,6 +113,7 @@ export default function AcessosSistema() {
   const [logs, setLogs] = useState([])
   const [settings, setSettings] = useState(null)
   const [supabaseUsers, setSupabaseUsers] = useState([])
+  const [restricoes, setRestricoes] = useState([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -141,11 +144,12 @@ export default function AcessosSistema() {
   const loadData = useCallback(async () => {
     setRefreshing(true)
     try {
-      const [statsRes, logsRes, settingsRes, usersRes] = await Promise.all([
+      const [statsRes, logsRes, settingsRes, usersRes, restricoesRes] = await Promise.all([
         fetchWithTimeout('/api/access-log?stats=true'),
-        fetchWithTimeout('/api/access-log?limit=30'),
+        fetchWithTimeout('/api/access-log?limit=50'),
         fetchWithTimeout('/api/system-settings'),
         fetchWithTimeout('/api/supabase-users'),
+        fetchWithTimeout('/api/usuarios-restricoes'),
       ])
       if (statsRes.ok) {
         const d = await statsRes.json()
@@ -164,6 +168,12 @@ export default function AcessosSistema() {
         if (d.success && Array.isArray(d.data)) setSupabaseUsers(d.data)
       } else {
         setSupabaseUsers([])
+      }
+      if (restricoesRes?.ok) {
+        const d = await restricoesRes.json()
+        if (d.success && Array.isArray(d.data)) setRestricoes(d.data)
+      } else {
+        setRestricoes([])
       }
     } catch (e) {
       if (e.name !== 'AbortError' && e !== 'Timeout') {
@@ -276,6 +286,55 @@ export default function AcessosSistema() {
     updateSetting('mobile_reports_enabled', next)
     setMobileReportsDraft(null)
   }, [mobileReportsDraft, settings?.mobile_reports_enabled, updateSetting])
+
+  const isRestrito = useCallback((identificador, valor) => {
+    if (!valor) return null
+    const v = identificador === 'phone' ? String(valor).replace(/\D/g, '') : String(valor).trim().toLowerCase()
+    return restricoes.find(r => r.identificador === identificador && r.valor === v)
+  }, [restricoes])
+
+  const aplicarRestricao = useCallback(async (tipo, identificador, valor, label) => {
+    if (!confirm(`Confirma ${tipo === 'banido' ? 'BANIR' : 'colocar em espera'} ${label || valor}?`)) return
+    setSaving(true)
+    try {
+      const body = { tipo, identificador, valor: identificador === 'phone' ? String(valor).replace(/\D/g, '') : String(valor).trim().toLowerCase() }
+      const res = await fetch('/api/usuarios-restricoes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+      const d = await res.json()
+      if (d.success) {
+        showMessage(`✅ ${tipo === 'banido' ? 'Usuário banido' : 'Colocado em espera'}.`, 3000)
+        loadData()
+      } else {
+        showMessage(`❌ ${d.message || 'Erro'}`, 3000)
+      }
+    } catch (e) {
+      showMessage('❌ Erro ao aplicar restrição.', 3000)
+    } finally {
+      setSaving(false)
+    }
+  }, [showMessage, loadData])
+
+  const removerRestricao = useCallback(async (id) => {
+    if (!confirm('Remover esta restrição?')) return
+    setSaving(true)
+    try {
+      const res = await fetch(`/api/usuarios-restricoes?id=${id}`, { method: 'DELETE' })
+      const d = await res.json()
+      if (d.success) {
+        showMessage('✅ Restrição removida.', 3000)
+        loadData()
+      } else {
+        showMessage(`❌ ${d.message || 'Erro'}`, 3000)
+      }
+    } catch (e) {
+      showMessage('❌ Erro ao remover.', 3000)
+    } finally {
+      setSaving(false)
+    }
+  }, [showMessage, loadData])
 
   if (loading) return <LoadingSpinner />
 
@@ -494,6 +553,36 @@ export default function AcessosSistema() {
           </div>
         </div>
 
+        {/* Restrições ativas (banidos / em espera) */}
+        {restricoes.length > 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <NoSymbolIcon className="h-5 w-5 text-amber-600" />
+                Restrições ativas ({restricoes.length})
+              </h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                Usuários banidos ou em espera. Clique em &quot;Liberar&quot; para remover a restrição.
+              </p>
+            </div>
+            <div className="p-4 overflow-x-auto">
+              <div className="flex flex-wrap gap-2">
+                {restricoes.map(r => (
+                  <div key={r.id} className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700">
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${r.tipo === 'banido' ? 'bg-red-200 text-red-800 dark:bg-red-900/50 dark:text-red-300' : 'bg-amber-200 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300'}`}>
+                      {r.tipo === 'banido' ? 'Banido' : 'Em espera'}
+                    </span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">{r.identificador}: {r.valor}</span>
+                    <button onClick={() => removerRestricao(r.id)} disabled={saving} className="px-2 py-1 rounded bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-xs font-medium">
+                      <CheckCircleIcon className="h-4 w-4 inline mr-0.5" /> Liberar
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Usuários Supabase Auth */}
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
@@ -533,43 +622,70 @@ export default function AcessosSistema() {
                 </button>
               </div>
             ) : (
-              <table className="w-full text-sm min-w-[600px]">
+              <table className="w-full text-sm min-w-[700px]">
                 <thead className="bg-gray-50 dark:bg-gray-700/50 sticky top-0">
                   <tr>
-                    {['UID', 'Nome', 'Email', 'Telefone', 'Provedor', 'Criado em'].map(col => (
+                    {['UID', 'Nome', 'Email', 'Telefone', 'Provedor', 'Criado em', 'Ações'].map(col => (
                       <th key={col} className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">{col}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {supabaseUsers.map((u) => (
-                    <tr key={u.id} className="border-t border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/30">
-                      <td className="px-4 py-2 text-gray-500 dark:text-gray-400 font-mono text-xs truncate max-w-[180px]" title={u.id}>{u.id}</td>
-                      <td className="px-4 py-2 text-gray-900 dark:text-white">{u.display_name || '-'}</td>
-                      <td className="px-4 py-2 font-medium text-gray-900 dark:text-white">{u.email || '-'}</td>
-                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{u.phone || '-'}</td>
-                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400 capitalize">{Array.isArray(u.providers) ? u.providers.join(', ') : 'email'}</td>
-                      <td className="px-4 py-2 text-gray-500 dark:text-gray-500 whitespace-nowrap">
-                        {u.created_at ? new Date(u.created_at).toLocaleString('pt-BR') : '-'}
-                      </td>
-                    </tr>
-                  ))}
+                  {supabaseUsers.map((u) => {
+                    const rEmail = isRestrito('email', u.email)
+                    const rPhone = isRestrito('phone', u.phone)
+                    const rUid = isRestrito('uid', u.id)
+                    const rest = rEmail || rPhone || rUid
+                    return (
+                      <tr key={u.id} className="border-t border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/30">
+                        <td className="px-4 py-2 text-gray-500 dark:text-gray-400 font-mono text-xs truncate max-w-[180px]" title={u.id}>{u.id}</td>
+                        <td className="px-4 py-2 text-gray-900 dark:text-white">
+                          {rest && (
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${rest.tipo === 'banido' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' : 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300'}`}>
+                              {rest.tipo === 'banido' ? <NoSymbolIcon className="h-3.5 w-3.5" /> : <ClockIcon className="h-3.5 w-3.5" />}
+                              {rest.tipo === 'banido' ? 'Banido' : 'Em espera'}
+                            </span>
+                          )}
+                          {u.display_name || '-'}
+                        </td>
+                        <td className="px-4 py-2 font-medium text-gray-900 dark:text-white">{u.email || '-'}</td>
+                        <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{u.phone || '-'}</td>
+                        <td className="px-4 py-2 text-gray-600 dark:text-gray-400 capitalize">{Array.isArray(u.providers) ? u.providers.join(', ') : 'email'}</td>
+                        <td className="px-4 py-2 text-gray-500 dark:text-gray-500 whitespace-nowrap">
+                          {u.created_at ? new Date(u.created_at).toLocaleString('pt-BR') : '-'}
+                        </td>
+                        <td className="px-4 py-2">
+                          <div className="flex items-center gap-1 flex-wrap">
+                            {!rEmail && u.email && (
+                              <button onClick={() => aplicarRestricao('banido', 'email', u.email, u.email)} disabled={saving} className="px-2 py-1 rounded bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-700 dark:text-red-300 text-xs font-medium" title="Banir por email">Banir</button>
+                            )}
+                            {!rUid && u.id && (
+                              <button onClick={() => aplicarRestricao('banido', 'uid', u.id, u.email)} disabled={saving} className="px-2 py-1 rounded bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-700 dark:text-red-300 text-xs font-medium" title="Banir por ID">Banir</button>
+                            )}
+                            {!rest && (u.email || u.phone) && (
+                              <button onClick={() => aplicarRestricao('em_espera', u.email ? 'email' : 'phone', u.email || u.phone, u.email || u.phone)} disabled={saving} className="px-2 py-1 rounded bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/30 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-300 text-xs font-medium" title="Colocar em espera">Em espera</button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             )}
           </div>
         </div>
 
-        {/* Log de acessos mobile recentes */}
+        {/* Quem conectou (acessos recentes - mobile e desktop) */}
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
             <div>
               <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                <DevicePhoneMobileIcon className="h-5 w-5 text-emerald-600" />
-                Acessos mobile recentes
+                <UserCircleIcon className="h-5 w-5 text-emerald-600" />
+                Quem conectou (acessos recentes)
               </h2>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Apenas celulares • Quem fizer login durante manutenção aparece com nome e telefone • Atualiza a cada 10s
+                Celulares e desktop • Quem fizer login durante manutenção aparece com nome e telefone • Atualiza a cada 10s
               </p>
             </div>
             <button
@@ -582,12 +698,12 @@ export default function AcessosSistema() {
             </button>
           </div>
           <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
-            {mobileLogs.length === 0 ? (
+            {logs.length === 0 ? (
               <div className="p-8 text-center">
-                <DevicePhoneMobileIcon className="h-16 w-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-                <p className="text-gray-500 dark:text-gray-400 font-medium mb-2">Nenhum acesso mobile registrado ainda.</p>
+                <UserCircleIcon className="h-16 w-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
+                <p className="text-gray-500 dark:text-gray-400 font-medium mb-2">Nenhum acesso registrado ainda.</p>
                 <p className="text-sm text-gray-400 dark:text-gray-500">
-                  Quando alguém acessar pelo celular, aparecerá aqui automaticamente.
+                  Quando alguém acessar (celular ou desktop), aparecerá aqui automaticamente.
                 </p>
                 <button
                   onClick={loadData}
@@ -597,33 +713,66 @@ export default function AcessosSistema() {
                 </button>
               </div>
             ) : (
-              <table className="w-full text-sm min-w-[900px]">
+              <table className="w-full text-sm min-w-[950px]">
                 <thead className="bg-gray-50 dark:bg-gray-700/50 sticky top-0">
                   <tr>
-                    {['Usuário', 'Telefone', 'Dispositivo', 'IP', 'Browser', 'Sistema', 'Aparelho', 'Data/Hora'].map(col => (
+                    {['Usuário', 'Telefone', 'Tipo', 'IP', 'Browser', 'Sistema', 'Aparelho', 'Data/Hora', 'Ações'].map(col => (
                       <th key={col} className="text-left px-4 py-2 text-gray-600 dark:text-gray-400">{col}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {mobileLogs.map((log) => (
-                    <tr key={log.id} className="border-t border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/30">
-                      <td className="px-4 py-2 font-medium text-gray-900 dark:text-white">{log.user_name}</td>
-                      <td className="px-4 py-2"><TelefoneCell telefone={log.telefone} /></td>
-                      <td className="px-4 py-2">
-                        <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
-                          <DevicePhoneMobileIcon className="h-4 w-4" /> Celular
-                        </span>
-                      </td>
-                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400 font-mono text-xs">{log.ip_address || log.hostname || '-'}</td>
-                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{log.browser || '-'}</td>
-                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{log.os || '-'}</td>
-                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400" title={log.user_agent}>{log.device || '-'}</td>
-                      <td className="px-4 py-2 text-gray-500 dark:text-gray-500 whitespace-nowrap">
-                        {log.access_time ? new Date(log.access_time).toLocaleString('pt-BR') : '-'}
-                      </td>
-                    </tr>
-                  ))}
+                  {logs.map((log) => {
+                    const rPhone = isRestrito('phone', log.telefone)
+                    const rIp = isRestrito('ip', log.ip_address || log.hostname)
+                    const rest = rPhone || rIp
+                    const label = log.user_name || log.telefone || log.ip_address || '-'
+                    return (
+                      <tr key={log.id} className="border-t border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/30">
+                        <td className="px-4 py-2 font-medium text-gray-900 dark:text-white">
+                          {rest && (
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium mr-1 ${rest.tipo === 'banido' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' : 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300'}`}>
+                              {rest.tipo === 'banido' ? <NoSymbolIcon className="h-3.5 w-3.5" /> : <ClockIcon className="h-3.5 w-3.5" />}
+                              {rest.tipo === 'banido' ? 'Banido' : 'Em espera'}
+                            </span>
+                          )}
+                          {log.user_name}
+                        </td>
+                        <td className="px-4 py-2"><TelefoneCell telefone={log.telefone} /></td>
+                        <td className="px-4 py-2">
+                          {log.is_mobile ? (
+                            <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                              <DevicePhoneMobileIcon className="h-4 w-4" /> Celular
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                              <ComputerDesktopIcon className="h-4 w-4" /> Desktop
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-2 text-gray-600 dark:text-gray-400 font-mono text-xs">{log.ip_address || log.hostname || '-'}</td>
+                        <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{log.browser || '-'}</td>
+                        <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{log.os || '-'}</td>
+                        <td className="px-4 py-2 text-gray-600 dark:text-gray-400" title={log.user_agent}>{log.device || '-'}</td>
+                        <td className="px-4 py-2 text-gray-500 dark:text-gray-500 whitespace-nowrap">
+                          {log.access_time ? new Date(log.access_time).toLocaleString('pt-BR') : '-'}
+                        </td>
+                        <td className="px-4 py-2">
+                          <div className="flex items-center gap-1 flex-wrap">
+                            {!rPhone && log.telefone && (
+                              <button onClick={() => aplicarRestricao('banido', 'phone', log.telefone, label)} disabled={saving} className="px-2 py-1 rounded bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-700 dark:text-red-300 text-xs font-medium" title="Banir por telefone">Banir</button>
+                            )}
+                            {!rIp && (log.ip_address || log.hostname) && (
+                              <button onClick={() => aplicarRestricao('banido', 'ip', log.ip_address || log.hostname, label)} disabled={saving} className="px-2 py-1 rounded bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-700 dark:text-red-300 text-xs font-medium" title="Banir por IP">Banir</button>
+                            )}
+                            {!rest && (log.telefone || log.ip_address || log.hostname) && (
+                              <button onClick={() => aplicarRestricao('em_espera', log.telefone ? 'phone' : 'ip', log.telefone || log.ip_address || log.hostname, label)} disabled={saving} className="px-2 py-1 rounded bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/30 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-300 text-xs font-medium" title="Colocar em espera">Em espera</button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             )}

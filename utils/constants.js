@@ -80,7 +80,6 @@ export const TIPOS_PROTOCOLO = ['IATF', 'IA Convencional', 'Monta Natural', 'TE'
 export const TIPOS_CUSTO = [
   'Aquisição',
   'Nascimento',
-  'Alimentação',
   'DNA',
   'Medicamentos',
   'Veterinário',
@@ -92,7 +91,6 @@ export const TIPOS_CUSTO = [
 ]
 
 export const SUBTIPOS_CUSTO = {
-  Alimentação:    ['Ração', 'Sal Mineral', 'Silagem', 'Feno', 'Suplemento', 'Pasto'],
   DNA:            ['Teste de Paternidade', 'Perfil Genético', 'Genealogia'],
   Medicamentos:   ['Vacina', 'Antiparasitário', 'Antibiótico', 'Vitamina', 'Hormônio', 'Outros'],
   Veterinário:    ['Consulta', 'Cirurgia', 'Exame', 'Procedimento'],

@@ -26,26 +26,24 @@ export default function CostReport() {
       setError(null)
 
       // Buscar dados de custos e animais
-      const [costsRes, animalsRes, medicamentosRes, racaoRes] = await Promise.all([
+      const [costsRes, animalsRes, medicamentosRes] = await Promise.all([
         fetch('/api/custos'),
         fetch('/api/animals'),
-        fetch('/api/medicamentos'),
-        fetch('/api/racao')
+        fetch('/api/medicamentos')
       ])
 
       if (!costsRes.ok || !animalsRes.ok) {
         throw new Error('Erro ao carregar dados de custos')
       }
 
-      const [costs, animals, medicamentos, racao] = await Promise.all([
+      const [costs, animals, medicamentos] = await Promise.all([
         costsRes.json(),
         animalsRes.json(),
-        medicamentosRes.ok ? medicamentosRes.json() : [],
-        racaoRes.ok ? racaoRes.json() : []
+        medicamentosRes.ok ? medicamentosRes.json() : []
       ])
 
       // Processar dados de custos
-      const costAnalysis = analyzeCosts(costs, animals, medicamentos, racao, period, costType)
+      const costAnalysis = analyzeCosts(costs, animals, medicamentos, period, costType)
       setData(costAnalysis)
 
     } catch (err) {
@@ -57,7 +55,7 @@ export default function CostReport() {
   }
 
   // Analisar custos
-  const analyzeCosts = (costs, animals, medicamentos, racao, periodDays, filterType) => {
+  const analyzeCosts = (costs, animals, medicamentos, periodDays, filterType) => {
     const now = new Date()
     const periodStart = new Date(now.getTime() - (periodDays * 24 * 60 * 60 * 1000))
 
@@ -91,7 +89,7 @@ export default function CostReport() {
       .slice(0, 10)
 
     // Análise de eficiência
-    const efficiency = analyzeCostEfficiency(filteredCosts, animals, medicamentos, racao)
+    const efficiency = analyzeCostEfficiency(filteredCosts, animals, medicamentos)
 
     return {
       period: periodDays,
@@ -253,30 +251,20 @@ export default function CostReport() {
   }
 
   // Analisar eficiência de custos
-  const analyzeCostEfficiency = (costs, animals, medicamentos, racao) => {
+  const analyzeCostEfficiency = (costs, animals, medicamentos) => {
     const medicamentoCosts = costs.filter(c => 
       c.categoria?.toLowerCase().includes('medicamento') ||
       c.tipo?.toLowerCase().includes('medicamento')
     )
     
-    const racaoCosts = costs.filter(c => 
-      c.categoria?.toLowerCase().includes('ração') ||
-      c.categoria?.toLowerCase().includes('racao') ||
-      c.tipo?.toLowerCase().includes('ração')
-    )
-
     const totalMedicamento = medicamentoCosts.reduce((sum, c) => sum + (c.valor || 0), 0)
-    const totalRacao = racaoCosts.reduce((sum, c) => sum + (c.valor || 0), 0)
 
     return {
       medicamentoCostPerAnimal: animals.length > 0 ? totalMedicamento / animals.length : 0,
-      racaoCostPerAnimal: animals.length > 0 ? totalRacao / animals.length : 0,
       medicamentoEfficiency: medicamentos.length > 0 ? totalMedicamento / medicamentos.length : 0,
-      racaoEfficiency: racao.length > 0 ? totalRacao / racao.length : 0,
       costDistribution: {
         medicamento: totalMedicamento,
-        racao: totalRacao,
-        outros: costs.reduce((sum, c) => sum + (c.valor || 0), 0) - totalMedicamento - totalRacao
+        outros: costs.reduce((sum, c) => sum + (c.valor || 0), 0) - totalMedicamento
       }
     }
   }
@@ -411,7 +399,6 @@ export default function CostReport() {
           >
             <option value="all">Todos os custos</option>
             <option value="medicamento">Medicamentos</option>
-            <option value="ração">Ração</option>
             <option value="veterinario">Veterinário</option>
             <option value="manutenção">Manutenção</option>
           </select>
@@ -614,21 +601,9 @@ export default function CostReport() {
               </p>
             </div>
             <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <p className="text-sm text-gray-600 dark:text-gray-400">Ração/Animal</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">
-                R$ {data.efficiency.racaoCostPerAnimal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-              </p>
-            </div>
-            <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
               <p className="text-sm text-gray-600 dark:text-gray-400">Total Medicamentos</p>
               <p className="text-xl font-bold text-gray-900 dark:text-white">
                 R$ {data.efficiency.costDistribution.medicamento.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-              </p>
-            </div>
-            <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Ração</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">
-                R$ {data.efficiency.costDistribution.racao.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </p>
             </div>
           </div>

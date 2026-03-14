@@ -5,28 +5,37 @@ import { useApp } from '../contexts/AppContext'
 import AdvancedReports from '../components/reports/AdvancedReports'
 
 export default function Reports() {
-  const { animals, costs } = useApp()
+  const { animals } = useApp()
+  const [costs, setCosts] = useState([])
   const [sales, setSales] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Carregar dados de vendas da API
-    const loadSales = async () => {
+    // Carregar dados de vendas e custos da API
+    const loadData = async () => {
       try {
-        const response = await fetch('/api/sales')
-        if (response.ok) {
-          const data = await response.json()
-          setSales(data)
+        const [salesRes, costsRes] = await Promise.all([
+          fetch('/api/sales'),
+          fetch('/api/custos')
+        ])
+
+        if (salesRes.ok) {
+          const salesData = await salesRes.json()
+          setSales(salesData)
+        }
+
+        if (costsRes.ok) {
+          const costsData = await costsRes.json()
+          setCosts(costsData)
         }
       } catch (error) {
-        console.error('Erro ao carregar vendas:', error)
-        setSales([])
+        console.error('Erro ao carregar dados:', error)
       } finally {
         setLoading(false)
       }
     }
 
-    loadSales()
+    loadData()
   }, [])
 
   if (loading) {

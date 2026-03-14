@@ -212,13 +212,13 @@ export default function InteractiveDashboard() {
     const categoryColors = {
       'Nascimento': { bg: 'from-green-400 to-green-600', icon: '🐄', border: 'border-green-200 dark:border-green-800' },
       'DNA': { bg: 'from-purple-400 to-purple-600', icon: '🧬', border: 'border-purple-200 dark:border-purple-800' },
-      'Alimentação': { bg: 'from-orange-400 to-orange-600', icon: '🌾', border: 'border-orange-200 dark:border-orange-800' },
+      'Sanidade': { bg: 'from-blue-400 to-blue-600', icon: '💉', border: 'border-blue-200 dark:border-blue-800' },
       'Medicamentos': { bg: 'from-red-400 to-red-600', icon: '💊', border: 'border-red-200 dark:border-red-800' },
       'Veterinários': { bg: 'from-blue-400 to-blue-600', icon: '🩺', border: 'border-blue-200 dark:border-blue-800' },
       'Aquisição': { bg: 'from-indigo-400 to-indigo-600', icon: '💰', border: 'border-indigo-200 dark:border-indigo-800' },
       'Mão de Obra Proporcional': { bg: 'from-yellow-400 to-yellow-600', icon: '👷', border: 'border-yellow-200 dark:border-yellow-800' },
       'Frete / Transporte': { bg: 'from-teal-400 to-teal-600', icon: '🚛', border: 'border-teal-200 dark:border-teal-800' },
-      'Manejo': { bg: 'from-pink-400 to-pink-600', icon: '🔧', border: 'border-pink-200 dark:border-pink-800' },
+      'Manejo': { bg: 'from-green-400 to-green-600', icon: '🤠', border: 'border-green-200 dark:border-green-800' },
       'Infraestrutura': { bg: 'from-gray-400 to-gray-600', icon: '🏗️', border: 'border-gray-200 dark:border-gray-800' },
       'Reprodução': { bg: 'from-rose-400 to-rose-600', icon: '💕', border: 'border-rose-200 dark:border-rose-800' },
       'Outros': { bg: 'from-slate-400 to-slate-600', icon: '📦', border: 'border-slate-200 dark:border-slate-800' }

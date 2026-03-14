@@ -295,7 +295,6 @@ Sistema Beef Sync`
 
   const getCategoriaFiscal = (tipoCusto) => {
     const categorias = {
-      'Alimentação': 'Custo de Produção',
       'Medicamentos': 'Custo de Produção',
       'Veterinários': 'Serviços Terceirizados',
       'DNA': 'Serviços Terceirizados',

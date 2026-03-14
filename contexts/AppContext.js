@@ -29,7 +29,7 @@ export function AppProvider({ children }) {
   // Estados dos dados (carregados do PostgreSQL)
   const [animals, setAnimals] = useState([])
   const [birthData, setBirthData] = useState([])
-  const [costs, setCosts] = useState([])
+  // const [costs, setCosts] = useState([]) // Removido para otimização - carregado sob demanda
   const [semenStock, setSemenStock] = useState([])
   const [notasFiscais, setNotasFiscais] = useState([])
 
@@ -54,10 +54,10 @@ export function AppProvider({ children }) {
       const fetchOpts = { timeout: 8000 }
 
       // Carregar dados em paralelo para melhor performance
-      const [animalsRes, birthsRes, costsRes, semenRes, nfsRes] = await Promise.allSettled([
+      // Custos removidos do carregamento global para otimizar performance inicial
+      const [animalsRes, birthsRes, semenRes, nfsRes] = await Promise.allSettled([
         apiClient.get('/api/animals', fetchOpts),
         apiClient.get('/api/births', fetchOpts),
-        apiClient.get('/api/custos', fetchOpts),
         apiClient.get('/api/semen', fetchOpts),
         apiClient.get('/api/notas-fiscais', fetchOpts),
       ])
@@ -75,11 +75,13 @@ export function AppProvider({ children }) {
         logger.warn('Erro ao carregar nascimentos:', birthsRes.reason)
       }
 
+      /* 
       if (costsRes.status === 'fulfilled') {
         setCosts(Array.isArray(costsRes.value.data) ? costsRes.value.data : [])
       } else {
         logger.warn('Erro ao carregar custos:', costsRes.reason)
       }
+      */
 
       if (semenRes.status === 'fulfilled') {
         setSemenStock(Array.isArray(semenRes.value.data) ? semenRes.value.data : [])
@@ -121,10 +123,12 @@ export function AppProvider({ children }) {
           endpoint = '/api/births'
           setter = setBirthData
           break
+        /*
         case 'costs':
           endpoint = '/api/custos'
           setter = setCosts
           break
+        */
         case 'semen':
           endpoint = '/api/semen'
           setter = setSemenStock
@@ -157,7 +161,7 @@ export function AppProvider({ children }) {
     if (confirmed) {
       setAnimals([])
       setBirthData([])
-      setCosts([])
+      // setCosts([])
       setSemenStock([])
       setNotasFiscais([])
       logger.info('Dados do contexto resetados')
@@ -222,7 +226,7 @@ export function AppProvider({ children }) {
     totalAnimals: Array.isArray(animals) ? animals.length : 0,
     activeAnimals: Array.isArray(animals) ? animals.filter(a => a?.situacao === 'Ativo').length : 0,
     totalBirths: Array.isArray(birthData) ? birthData.length : 0,
-    totalCosts: Array.isArray(costs) ? costs.reduce((sum, c) => sum + (parseFloat(c?.valor) || 0), 0) : 0,
+    // totalCosts: Array.isArray(costs) ? costs.reduce((sum, c) => sum + (parseFloat(c?.valor) || 0), 0) : 0, // Removido
     totalSemen: Array.isArray(semenStock) ? semenStock.reduce((sum, s) => sum + (parseInt(s?.quantidade_doses || s?.quantidade || 0)), 0) : 0,
   }
 
@@ -232,8 +236,8 @@ export function AppProvider({ children }) {
     setAnimals,
     birthData,
     setBirthData,
-    costs,
-    setCosts,
+    // costs, // Removido
+    // setCosts, // Removido
     semenStock,
     setSemenStock,
     notasFiscais,

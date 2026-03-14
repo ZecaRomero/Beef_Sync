@@ -86,18 +86,12 @@ const AdvancedReports = ({ animals, costs, sales = [] }) => {
         : 0
 
       const weightGainData = activeAnimals.map(animal => {
-        const animalCosts = filteredCosts.filter(c => c.animalId === animal.id)
-        const feedCosts = animalCosts.filter(c => c.tipo === 'Alimentação')
-        const totalFeedCost = feedCosts.reduce((sum, c) => sum + (parseFloat(c.valor) || 0), 0)
-        
         return {
           id: animal.id,
           nome: animal.nome || animal.numero,
-          peso: animal.peso || 0,
-          feedCost: totalFeedCost,
-          efficiency: totalFeedCost > 0 ? (animal.peso || 0) / totalFeedCost : 0
+          peso: animal.peso || 0
         }
-      }).sort((a, b) => b.efficiency - a.efficiency)
+      }).sort((a, b) => (b.peso || 0) - (a.peso || 0))
 
       return {
         type: 'productivity',

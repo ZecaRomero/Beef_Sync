@@ -67,8 +67,8 @@ const LivestockManagement = () => {
       {
         id: 3,
         type: 'feeding',
-        title: 'Suplementação Mineral',
-        description: 'Distribuição de sal mineral nos cochos',
+    title: 'Distribuição de Insumos',
+    description: 'Distribuição de sal mineral nos cochos',
         scheduledTime: '16:00',
         status: 'completed',
         priority: 'medium',

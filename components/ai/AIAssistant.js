@@ -55,7 +55,7 @@ export default function AIAssistant() {
         response = `Atualmente temos **${data.totalAnimals || 0} animais** cadastrados, sendo **${data.activeAnimals || 0} ativos**. O rebanho está distribuído em várias localizações.`
       } 
       else if (lowerQuery.includes('financeiro') || lowerQuery.includes('custo') || lowerQuery.includes('dinheiro')) {
-        response = "Análise Financeira Rápida:\n\n• **Custo Médio:** R$ 1.250,00/cabeça\n• **Projeção de Venda:** Alta para o próximo trimestre.\n• **Dica:** Revise os custos de nutrição do Lote 04."
+        response = "Análise Financeira Rápida:\n\n• **Custo Médio:** R$ 1.250,00/cabeça\n• **Projeção de Venda:** Alta para o próximo trimestre.\n• **Dica:** Mantenha o foco na eficiência operacional."
       }
       else if (lowerQuery.includes('nascimento') || lowerQuery.includes('parto')) {
         response = "Temos **3 partos previstos** para esta semana. Recomendo verificar a maternidade e os kits de primeiros socorros."

@@ -7,7 +7,6 @@
  * - Receptoras sem DNA Genômica → R$ 80,00
  * - Todos os animais → Brinco Amarelo R$ 2,70
  * - Todos os animais → Botton Eletrônico R$ 6,00
- * - Todos os animais → Ração/suplementação (média pasto+silagem) R$ 120/mês
  * - Machos 15-32 meses → Exame Andrológico + Exames R$ 165,00
  */
 const { query } = require('../../../lib/database')
@@ -21,7 +20,6 @@ const CUSTOS = {
   DNA_GENOMICA_RECEPTORA: { tipo: 'DNA', subtipo: 'DNA Genômica Receptora', valor: 80.00, desc: 'DNA Genômica (receptoras sem genômica)' },
   BRINCO_AMARELO: { tipo: 'Manejo', subtipo: 'Brinco Amarelo', valor: 2.70, desc: 'Brinco amarelo de identificação' },
   BOTTON: { tipo: 'Manejo', subtipo: 'Botton Eletrônico', valor: 6.00, desc: 'Botton eletrônico' },
-  RACAO: { tipo: 'Alimentação', subtipo: 'Ração/suplementação', valor: 120.00, desc: 'Média mensal pasto+silagem+suplemento (estimativa)' },
   ANDROLOGICO: { tipo: 'Exame', subtipo: 'Andrológico + Exames', valor: 165.00, desc: 'Exame andrológico e exames complementares (machos 15-32 meses)' }
 }
 
@@ -33,15 +31,6 @@ async function animalJaTemCusto(animalId, tipo, subtipo) {
   const r = await query(
     `SELECT 1 FROM custos WHERE animal_id = $1 AND tipo = $2 AND subtipo = $3 LIMIT 1`,
     [animalId, tipo, subtipo]
-  )
-  return r.rows.length > 0
-}
-
-async function animalJaTemRacaoEsteMes(animalId) {
-  const r = await query(
-    `SELECT 1 FROM custos WHERE animal_id = $1 AND tipo = 'Alimentação' AND subtipo = 'Ração/suplementação'
-     AND DATE_TRUNC('month', data) = DATE_TRUNC('month', CURRENT_DATE) LIMIT 1`,
-    [animalId]
   )
   return r.rows.length > 0
 }
@@ -70,7 +59,6 @@ export default async function handler(req, res) {
       dnaGenomicaReceptora: { aplicados: 0, pulados: 0 },
       brincoAmarelo: { aplicados: 0, pulados: 0 },
       botton: { aplicados: 0, pulados: 0 },
-      racao: { aplicados: 0, pulados: 0 },
       andrologico: { aplicados: 0, pulados: 0 },
       erros: []
     }
@@ -254,25 +242,6 @@ export default async function handler(req, res) {
       resultados.botton.aplicados++
     }
 
-    // 8. Todos os animais → Ração/suplementação R$ 120/mês (média pasto+silagem)
-    for (const a of todosAnimais.rows) {
-      const jaTem = await animalJaTemRacaoEsteMes(a.id)
-      if (jaTem) {
-        resultados.racao.pulados++
-        continue
-      }
-      if (!dryRun) {
-        await databaseService.adicionarCusto(a.id, {
-          tipo: CUSTOS.RACAO.tipo,
-          subtipo: CUSTOS.RACAO.subtipo,
-          valor: CUSTOS.RACAO.valor,
-          data: hoje(),
-          observacoes: CUSTOS.RACAO.desc
-        })
-      }
-      resultados.racao.aplicados++
-    }
-
     // 9. Machos 15-32 meses → Exame Andrológico + Exames R$ 165,00
     const machos1532 = await query(`
       SELECT id, serie, rg, sexo, meses, data_nascimento
@@ -309,7 +278,7 @@ export default async function handler(req, res) {
       resultados.brucelose.aplicados + resultados.dnaVrgen.aplicados +
       resultados.dnaGenomicaReceptora.aplicados +
       resultados.brincoAmarelo.aplicados + resultados.botton.aplicados +
-      resultados.racao.aplicados + resultados.andrologico.aplicados
+      resultados.andrologico.aplicados
 
     return res.status(200).json({
       success: true,

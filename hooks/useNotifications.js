@@ -140,58 +140,42 @@ export default function useNotifications() {
     }
   }
 
-  // Carregar notificações na inicialização
+  // Carregar notificações na inicialização (sem bloquear o carregamento)
   useEffect(() => {
-    const initNotifications = async () => {
-      await loadNotifications()
-      
-      // Gerar notificações de exames andrológicos automaticamente na inicialização
-      try {
-        const response = await fetch('/api/generate-notifications', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tipo: 'andrologico' })
+    // 1. Carregar notificações existentes primeiro (leve)
+    loadNotifications()
+    
+    // 2. Adiar generate-notifications para não competir com outras APIs no carregamento inicial
+    const generateTimeout = setTimeout(() => {
+      fetch('/api/generate-notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tipo: 'andrologico' })
+      })
+        .then(r => r.ok && loadNotifications())
+        .catch(err => {
+          if (err?.name !== 'TypeError' || !err?.message?.includes('Failed to fetch')) {
+            console.error('Erro ao gerar notificações andrológicas:', err)
+          }
         })
-        if (response.ok) {
-          await loadNotifications() // Recarregar após gerar
-        }
-      } catch (err) {
-        // Silenciar erros de rede (servidor não disponível)
-        if (err.name === 'TypeError' && err.message.includes('Failed to fetch')) {
-          return
-        }
-        console.error('Erro ao gerar notificações de exames andrológicos:', err)
-      }
-    }
+    }, 5000) // 5s após carregar a página
     
-    initNotifications()
+    // 3. Atualizar notificações a cada 30 segundos
+    const interval = setInterval(() => loadNotifications(), 30000)
     
-    // Atualizar notificações a cada 30 segundos
-    const interval = setInterval(async () => {
-      await loadNotifications()
-    }, 30000)
-    
-    // Gerar notificações de exames andrológicos a cada 5 minutos
-    const generateInterval = setInterval(async () => {
-      try {
-        const response = await fetch('/api/generate-notifications', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tipo: 'andrologico' })
-        })
-        if (response.ok) {
-          await loadNotifications() // Recarregar após gerar
-        }
-      } catch (err) {
-        // Silenciar erros de rede (servidor não disponível)
-        if (err.name === 'TypeError' && err.message.includes('Failed to fetch')) {
-          return
-        }
-        console.error('Erro ao gerar notificações de exames andrológicos:', err)
-      }
-    }, 300000) // 5 minutos
+    // 4. Gerar notificações andrológicas a cada 5 minutos
+    const generateInterval = setInterval(() => {
+      fetch('/api/generate-notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tipo: 'andrologico' })
+      })
+        .then(r => r.ok && loadNotifications())
+        .catch(() => {})
+    }, 300000)
     
     return () => {
+      clearTimeout(generateTimeout)
       clearInterval(interval)
       clearInterval(generateInterval)
     }

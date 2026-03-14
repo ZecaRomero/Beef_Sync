@@ -1096,7 +1096,7 @@ export default function Pesagem() {
               
               <p className="mt-4 text-sm opacity-90">
                 {analiseTendencias.tendencia === 'crescente' && '📈 Tendência positiva! O rebanho está ganhando peso ao longo do tempo.'}
-                {analiseTendencias.tendencia === 'decrescente' && '📉 Atenção: O rebanho está perdendo peso. Verifique nutrição e saúde.'}
+                {analiseTendencias.tendencia === 'decrescente' && '📉 Atenção: O rebanho está perdendo peso. Verifique manejo e saúde.'}
                 {analiseTendencias.tendencia === 'estável' && '➡️ Peso estável ao longo do período analisado.'}
               </p>
             </div>

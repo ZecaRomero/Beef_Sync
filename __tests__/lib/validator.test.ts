@@ -106,7 +106,7 @@ describe('Validadores Específicos', () => {
     it('deve validar custo válido', () => {
       const custo: Partial<Custo> = {
         animal_id: 1,
-        tipo: 'Alimentação',
+        tipo: 'Medicamentos',
         valor: 100,
         data: new Date(),
       };

@@ -1,4 +1,4 @@
-import NFService from '../../../services/NFService'
+const NFService = require('../../../services/NFService')
 import { sendSuccess, sendValidationError, sendMethodNotAllowed, asyncHandler } from '../../../utils/apiResponse'
 
 /**

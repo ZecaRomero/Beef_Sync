@@ -1,6 +1,7 @@
-﻿
+
 import React, { useState } from 'react'
 
+const mockAnimals = []
 
 export default function AdvancedCharts({ timeRange }) {
   const [selectedChart, setSelectedChart] = useState('costs')
@@ -52,7 +53,6 @@ export default function AdvancedCharts({ timeRange }) {
     const categoryColors = {
       'Nascimento': 'from-green-400 to-green-600',
       'DNA': 'from-purple-400 to-purple-600',
-      'Alimentação': 'from-orange-400 to-orange-600',
       'Medicamentos': 'from-red-400 to-red-600',
       'Veterinários': 'from-blue-400 to-blue-600',
       'Aquisição': 'from-indigo-400 to-indigo-600',
@@ -270,8 +270,8 @@ export default function AdvancedCharts({ timeRange }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
           {selectedChart === 'costs' && (
             <>
-              <div>📈 Alimentação representa o maior custo operacional</div>
-              <div>🎯 Foque na otimização dos 3 maiores custos</div>
+              <div>📈 Custos operacionais sob controle</div>
+              <div>🎯 Mantenha o foco na eficiência</div>
             </>
           )}
           {selectedChart === 'breeds' && (

@@ -23,7 +23,6 @@ import {
   ShieldCheckIcon,
   CalendarDaysIcon,
   TruckIcon,
-  ScaleIcon,
   EyeIcon,
   ArrowPathIcon,
   ArrowUpTrayIcon,
@@ -170,18 +169,6 @@ const navigation: NavigationItem[] = [
     children: [
       { name: 'Gerenciar NFs', href: '/notas-fiscais', description: 'Entradas e Saídas (Vendas)' },
       { name: 'Relatório Fiscal', href: '/notas-fiscais/relatorio', description: 'Relatórios fiscais' }
-    ]
-  },
-  {
-    name: 'Nutrição',
-    icon: ScaleIcon,
-    color: 'text-lime-600 dark:text-lime-400',
-    children: [
-      { name: 'Dietas', href: '/nutricao/dietas', description: 'Planos nutricionais' },
-      { name: 'Suplementação', href: '/nutricao/suplementacao', description: 'Controle de suplementos' },
-      { name: 'Consumo de Ração', href: '/nutricao/consumo-racao', description: 'Monitorar consumo' },
-      { name: 'Análise Nutricional', href: '/nutricao/analise', description: 'Análise de alimentos' },
-      { name: 'Custos Nutricionais', href: '/nutricao/custos', description: 'Custos com alimentação' }
     ]
   },
   {

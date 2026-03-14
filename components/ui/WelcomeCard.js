@@ -50,7 +50,7 @@ const WelcomeCard = memo(function WelcomeCard({ onStart }) {
                 2. Controlar Custos
               </h4>
               <p className="text-xs text-blue-700 dark:text-blue-300">
-                Registre alimentação, medicamentos, etc.
+                Registre manejos, medicamentos, etc.
               </p>
             </div>
             

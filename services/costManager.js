@@ -50,7 +50,6 @@ class CostManager {
           medicamentos: [
             { nome: 'PANACOXX', quantidade: 7, unidade: 'ML' },
             { nome: 'BOVILIS', quantidade: 5, unidade: 'ML' },
-            { nome: 'SUPLENUT', quantidade: 1, unidade: 'ML' },
             { nome: 'IODO 10%', quantidade: 10, unidade: 'ML' },
             { nome: 'DNA VIRGEM', condicional: 'FIV_OU_RECEPTORA' },
             { nome: 'DNA GENOMICA', condicional: 'TODOS_0_7' }
@@ -82,21 +81,15 @@ class CostManager {
         },
         '22_acima': {
           nome: '22 ACIMA - MACHOS',
-          medicamentos: [
-            { nome: 'RACAO', quantidade: 1, unidade: 'KG_DIA' }
-          ]
+          medicamentos: []
         },
         '25/36': {
           nome: 'ERA 25/36 - MACHOS',
-          medicamentos: [
-            { nome: 'RACAO', quantidade: 1, unidade: 'KG_DIA' }
-          ]
+          medicamentos: []
         },
         'acima_36': {
           nome: 'ERA ACIMA 36 - MACHOS',
-          medicamentos: [
-            { nome: 'RACAO', quantidade: 1, unidade: 'KG_DIA' }
-          ]
+          medicamentos: []
         }
       },
       femeas: {
@@ -105,7 +98,6 @@ class CostManager {
           medicamentos: [
             { nome: 'PANACOXX', quantidade: 7, unidade: 'ML' },
             { nome: 'BOVILIS', quantidade: 5, unidade: 'ML' },
-            { nome: 'SUPLENUT', quantidade: 1, unidade: 'ML' },
             { nome: 'IODO 10%', quantidade: 10, unidade: 'ML' },
             { nome: 'VACINA BRUCELOSE', quantidade: 1, unidade: 'DOSE' },
             { nome: 'DNA VIRGEM', condicional: 'FIV_OU_RECEPTORA' },
@@ -140,21 +132,15 @@ class CostManager {
         },
         '24_acima': {
           nome: '24 ACIMA - FÊMEAS',
-          medicamentos: [
-            { nome: 'RACAO', quantidade: 1, unidade: 'KG_DIA' }
-          ]
+          medicamentos: []
         },
         '25/36': {
           nome: 'ERA 25/36 - FÊMEAS',
-          medicamentos: [
-            { nome: 'RACAO', quantidade: 1, unidade: 'KG_DIA' }
-          ]
+          medicamentos: []
         },
         'acima_36': {
           nome: 'ERA ACIMA 36 - FÊMEAS',
-          medicamentos: [
-            { nome: 'RACAO', quantidade: 1, unidade: 'KG_DIA' }
-          ]
+          medicamentos: []
         }
       }
     }
@@ -166,7 +152,6 @@ class CostManager {
       'TREO ACE': { preco: 470.00, unidade: 'FRASCO_500ML', porAnimal: 5.64 },
       'PANACOXX': { preco: 1300.00, unidade: 'FRASCO', porAnimal: 9.10 },
       'VACINA BOVILIS': { preco: 99.30, unidade: '50_DOSES', porAnimal: 0.61 },
-      'SUPLENUT': { preco: 305.00, unidade: 'FRASCO', porAnimal: 1.67 },
       'TINTURA IODO': { preco: 166.94, unidade: 'LITRO', porAnimal: 2.39 },
       'IVOMEC GOLD': { preco: 597.00, unidade: 'LITRO', porAnimal: 0.96 },
       'VACINA RAIVACEL': { preco: 12.00, unidade: '50ML_250_DOSES', porAnimal: 2.70 },
@@ -183,7 +168,6 @@ class CostManager {
       'MLTREO': { preco: 166.94, unidade: 'LITRO', porAnimal: 0.83 },
       'CASQUEAR': { preco: 10.00, unidade: 'PROCEDIMENTO', porAnimal: 10.00 },
       'INSEMINACAO': { preco: 50.00, unidade: 'PROCEDIMENTO', porAnimal: 50.00 },
-      'RACAO': { preco: 2.50, unidade: 'KG', porAnimal: 2.50 },
       'VACINA BRUCELOSE': { preco: 5.00, unidade: 'DOSE', porAnimal: 5.00 }
     }
   }

@@ -903,7 +903,6 @@ export default function ReportGenerator() {
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
                       >
                         <option value="">Todas as categorias</option>
-                        <option value="alimentacao">Alimentação</option>
                         <option value="medicamentos">Medicamentos</option>
                         <option value="veterinario">Veterinário</option>
                         <option value="manutencao">Manutenção</option>

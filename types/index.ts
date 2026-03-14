@@ -14,7 +14,7 @@ export type TipoProduto = 'bovino' | 'semen' | 'embriao';
 export type StatusProtocolo = 'em_andamento' | 'concluido' | 'cancelado';
 export type TipoNotificacao = 'nascimento' | 'estoque' | 'gestacao' | 'saude' | 'financeiro' | 'sistema';
 export type PrioridadeNotificacao = 'low' | 'medium' | 'high';
-export type TipoServico = 'Vacinação' | 'Nutrição' | 'Reprodução' | 'Tratamento' | 'Manutenção' | 'Outro';
+export type TipoServico = 'Vacinação' | 'Reprodução' | 'Tratamento' | 'Manutenção' | 'Outro';
 export type StatusServico = 'Ativo' | 'Concluído' | 'Pendente' | 'Cancelado';
 
 // ============ INTERFACES DE ENTIDADES ============
@@ -299,8 +299,9 @@ export interface AppContextType {
   setAnimals: (animals: Animal[]) => void;
   birthData: Nascimento[];
   setBirthData: (births: Nascimento[]) => void;
-  costs: Custo[];
-  setCosts: (costs: Custo[]) => void;
+  /** @deprecated Custos removidos do contexto - carregar sob demanda via API */
+  costs?: Custo[];
+  setCosts?: (costs: Custo[]) => void;
   semenStock: EstoqueSemen[];
   setSemenStock: (stock: EstoqueSemen[]) => void;
   notasFiscais: NotaFiscal[];

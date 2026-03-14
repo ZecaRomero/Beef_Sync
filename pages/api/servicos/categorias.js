@@ -8,6 +8,7 @@ export default async function handler(req, res) {
         SELECT DISTINCT categoria 
         FROM tipos_servicos 
         WHERE ativo = true 
+          AND categoria NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação')
         ORDER BY categoria
       `)
 

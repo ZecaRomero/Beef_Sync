@@ -4,7 +4,7 @@ import { CurrencyDollarIcon, ChevronDownIcon, ChevronUpIcon, PencilIcon, TrashIc
 import { formatDate, formatCurrency } from '../../utils/formatters'
 
 const TIPOS_CUSTO = [
-  'Protocolo Sanitário', 'DNA', 'Medicamento', 'Vacina', 'Alimentação',
+  'Protocolo Sanitário', 'DNA', 'Medicamento', 'Vacina',
   'Veterinário', 'Manejo', 'Pesagens', 'Transporte', 'ABCZ', 'Exame', 'Outros'
 ]
 

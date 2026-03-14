@@ -94,7 +94,7 @@ async function analyzeWeightData(data) {
       icon: '⚠️',
       title: 'Atenção Necessária',
       description: `${piorPiquete.Piquete || piorPiquete.piquete} está ${((1 - minPeso/mediaPeso) * 100).toFixed(0)}% abaixo da média`,
-      detail: 'Recomenda-se avaliar nutrição e sanidade deste lote'
+      detail: 'Recomenda-se avaliar o manejo sanitário deste lote'
     })
   }
 
@@ -154,7 +154,7 @@ async function analyzeWeightTrends(data, period) {
       icon: gmd > 0.8 ? '📈' : '📊',
       title: 'Ganho Médio Diário',
       description: `GMD estimado: ${gmd.toFixed(3)} kg/dia`,
-      detail: gmd > 1.0 ? 'Excelente desempenho!' : gmd > 0.8 ? 'Bom desempenho' : 'Considere revisar estratégia nutricional'
+      detail: gmd > 1.0 ? 'Excelente desempenho!' : gmd > 0.8 ? 'Bom desempenho' : 'Considere revisar estratégia de manejo'
     })
   }
 

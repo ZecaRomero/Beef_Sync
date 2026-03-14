@@ -72,7 +72,7 @@ export default function FutureProjections() {
               strategies.push({
                   title: `Cenário de Alta: +${percentChange}%`,
                   description: `Se a arroba atingir R$ ${boi.toFixed(2)}, sua margem líquida expande significativamente.`,
-                  action: 'Estratégia: Segurar animais próximos do acabamento para aproveitar a alta, mas travar custos de nutrição agora.',
+                  action: 'Estratégia: Segurar animais próximos do acabamento para aproveitar a alta, mas travar custos operacionais agora.',
                   icon: 'trending_up',
                   color: 'green'
               })
@@ -93,17 +93,17 @@ export default function FutureProjections() {
         sentiment = 'positive'
         strategies.push({
           title: 'Oportunidade de Confinamento',
-          description: `A relação de troca está favorável (${relacaoTroca.toFixed(2)} sacas/@). O custo da alimentação está baixo em relação ao preço de venda.`,
-          action: 'Recomendamos intensificar o trato no cocho para acelerar o acabamento.',
+          description: `A relação de troca está favorável (${relacaoTroca.toFixed(2)} sacas/@). O custo de produção está baixo em relação ao preço de venda.`,
+          action: 'Recomendamos intensificar o manejo para acelerar o acabamento.',
           icon: 'trending_up',
           color: 'green'
         })
       } else if (relacaoTroca < 3.5) {
         sentiment = 'negative'
         strategies.push({
-          title: 'Custo de Nutrição Elevado',
-          description: `O milho está caro em relação à arroba (${relacaoTroca.toFixed(2)} sacas/@). Margens de confinamento apertadas.`,
-          action: 'Foque em pastagem e suplementação estratégica de baixo custo. Evite retenção longa no cocho.',
+    title: 'Custo Operacional Elevado',
+    description: `Insumos e manutenção estão impactando a margem. Margens operacionais apertadas.`,
+    action: 'Foque em eficiência de pastejo e otimização de recursos. Evite gastos desnecessários.',
           icon: 'trending_down',
           color: 'red'
         })
@@ -111,7 +111,7 @@ export default function FutureProjections() {
         strategies.push({
           title: 'Margens Estáveis',
           description: 'Relação de troca dentro da média histórica.',
-          action: 'Mantenha o planejamento nutricional padrão e monitore oportunidades de compra de insumos.',
+          action: 'Mantenha o planejamento operacional padrão e monitore oportunidades de compra de insumos.',
           icon: 'minus',
           color: 'blue'
         })

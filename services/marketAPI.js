@@ -232,7 +232,7 @@ export class MarketAPI {
       },
       {
         id: 3,
-        title: 'Custo da ração sobe 8% no último mês',
+        title: 'Custo de insumos sobe 8% no último mês',
         summary: 'Alta do milho e soja impacta custos de produção pecuária',
         source: 'Globo Rural',
         publishedAt: new Date(Date.now() - 8 * 60 * 60 * 1000), // 8 horas atrás
@@ -283,7 +283,7 @@ export class MarketAPI {
           'Redução do rebanho'
         ],
         negative: [
-          'Custo de ração elevado',
+          'Custo de produção elevado',
           'Pressão inflacionária',
           'Questões climáticas',
           'Regulamentações ambientais'

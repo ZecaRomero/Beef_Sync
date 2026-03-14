@@ -17,7 +17,7 @@ export default async function handler(req, res) {
       query('SELECT COUNT(*) as total, COUNT(*) FILTER (WHERE situacao = $1) as ativos FROM animais', ['Ativo']),
       query('SELECT COUNT(*) as total FROM nascimentos'),
       query('SELECT COUNT(*) as total, SUM(doses_disponiveis) as doses_disponiveis FROM estoque_semen'),
-      query('SELECT COUNT(*) as total, SUM(valor) as total_valor FROM custos')
+      query("SELECT COUNT(*) as total, SUM(valor) as total_valor FROM custos WHERE tipo NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação')")
     ])
 
     // Extrair dados dos resultados

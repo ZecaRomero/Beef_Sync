@@ -56,9 +56,6 @@ async function createServicosTable() {
         ('Análise DNA Paternidade', 'DNA', 40.00, true, true, 'Teste de paternidade'),
         ('Análise DNA Genômica', 'DNA', 80.00, true, true, 'Teste genômico completo'),
         ('Antibiótico Tratamento', 'Medicamentos', 50.00, true, true, 'Tratamento com antibióticos'),
-        ('Suplemento Vitamínico', 'Alimentação', 25.00, true, true, 'Suplementação vitamínica'),
-        ('Ração Concentrada (kg)', 'Alimentação', 1.20, true, true, 'Ração concentrada por kg'),
-        ('Sal Mineral (kg)', 'Alimentação', 3.50, true, true, 'Sal mineral por kg'),
         ('Ultrassonografia', 'Veterinários', 100.00, false, true, 'Exame de ultrassom reprodutivo'),
         ('Cirurgia Geral', 'Veterinários', 300.00, true, true, 'Procedimento cirúrgico geral'),
         ('Exame Laboratorial', 'Veterinários', 80.00, true, true, 'Exames laboratoriais diversos'),
@@ -75,7 +72,6 @@ async function createServicosTable() {
     console.log('   - Medicamentos')
     console.log('   - Manejo')
     console.log('   - DNA')
-    console.log('   - Alimentação')
     
     await pool.end()
     process.exit(0)

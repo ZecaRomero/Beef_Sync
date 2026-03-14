@@ -86,6 +86,22 @@ export default function MaintenanceOverlay() {
 
     setLoggingIn(true)
     try {
+      // Verificar se usuário está banido ou em espera
+      const phoneNorm = loginData.telefone.replace(/\D/g, '')
+      const checkRes = await fetch(`/api/usuarios-restricoes?check=1&phone=${encodeURIComponent(phoneNorm)}`)
+      const checkData = await checkRes.json()
+      if (checkData.success && checkData.data) {
+        if (checkData.data.banned) {
+          setLoginError('Seu acesso foi bloqueado. Entre em contato com o administrador.')
+          setLoggingIn(false)
+          return
+        }
+        if (checkData.data.em_espera) {
+          setLoginError('Seu acesso está pendente de aprovação. Aguarde a liberação do administrador.')
+          setLoggingIn(false)
+          return
+        }
+      }
       // Salvar dados se usuário marcou "lembrar"
       if (loginData.lembrar) {
         localStorage.setItem('maintenance_saved_data', JSON.stringify({

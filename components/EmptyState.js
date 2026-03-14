@@ -28,7 +28,7 @@ export default function EmptyState({
         {
             step: 3,
             title: "Adicione custos",
-            description: "Registre os custos de nascimento, alimentação e cuidados",
+            description: "Registre os custos de nascimento, manejos e cuidados",
             icon: "💰"
         },
         {

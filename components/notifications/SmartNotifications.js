@@ -68,7 +68,7 @@ const SmartNotifications = ({ animals, costs }) => {
           message: `${animal.nome || animal.numero} está com ${animal.peso}kg (esperado: ${expectedWeight}kg)`,
           animal: animal.nome || animal.numero,
           animalId: animal.id,
-          action: 'Revisar alimentação',
+          action: 'Revisar manejo',
           icon: '⚖️',
           color: 'yellow',
           createdAt: now.toISOString()

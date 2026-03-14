@@ -82,7 +82,7 @@ export default function TrendAnalysis() {
           unit: 'R$',
           trend: custoTotal > 0 ? 'neutral' : 'up',
           percentage: 0, // Seria necessário dados históricos para calcular
-          description: 'Custos nutricionais registrados'
+          description: 'Custos operacionais registrados'
         }
       ]
 
@@ -211,7 +211,7 @@ export default function TrendAnalysis() {
                 <p className="text-sm text-orange-800 dark:text-orange-200">
                   {trends.find(t => t.id === 'custos')?.current > 0
                     ? `Custos registrados: R$ ${trends.find(t => t.id === 'custos')?.current.toLocaleString('pt-BR')}. Continue registrando para análise de tendências.`
-                    : 'Registre custos nutricionais para acompanhar os gastos operacionais.'
+                    : 'Registre custos operacionais para acompanhar os gastos.'
                   }
                 </p>
               </div>

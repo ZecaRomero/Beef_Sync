@@ -78,7 +78,10 @@ class DatabaseService {
 
       // Buscar custos
       const custos = await query(`
-        SELECT * FROM custos WHERE animal_id = $1 ORDER BY data DESC
+        SELECT * FROM custos 
+        WHERE animal_id = $1 
+          AND tipo NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação')
+        ORDER BY data DESC
       `, [animal.id]);
 
       // Buscar gestações (como mãe ou receptora)
@@ -796,11 +799,11 @@ class DatabaseService {
                    'observacoes', c.observacoes,
                    'detalhes', c.detalhes
                  ) ORDER BY c.data DESC
-               ) FILTER (WHERE c.id IS NOT NULL), 
+               ) FILTER (WHERE c.id IS NOT NULL AND c.tipo NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação')), 
                '[]'::json
              ) as custos
-      FROM animais a
-      LEFT JOIN custos c ON a.id = c.animal_id
+    FROM animais a
+    LEFT JOIN custos c ON a.id = c.animal_id AND c.tipo NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação')
     `;
     
     const params = [];
@@ -1094,12 +1097,12 @@ class DatabaseService {
               ) ORDER BY c.data DESC
             )
             FROM custos c
-            WHERE c.animal_id = a.id
+            WHERE c.animal_id = a.id AND c.tipo NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação')
           ),
           '[]'::json
         ) as custos,
         COALESCE(
-          (SELECT SUM(valor) FROM custos WHERE animal_id = a.id AND (data IS NULL OR data <= CURRENT_DATE)),
+          (SELECT SUM(valor) FROM custos c WHERE c.animal_id = a.id AND c.tipo NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação') AND (c.data IS NULL OR c.data <= CURRENT_DATE)),
           0
         ) as custo_total_calculado
       FROM animais a
@@ -1469,6 +1472,7 @@ class DatabaseService {
       SELECT c.*, c.detalhes::json as detalhes_json
       FROM custos c
       WHERE c.animal_id = $1
+        AND c.tipo NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação')
       ORDER BY c.data DESC
     `, [animalId]);
 
@@ -1480,6 +1484,7 @@ class DatabaseService {
     const result = await query(`
       SELECT c.*, c.detalhes::json as detalhes_json
       FROM custos c
+      WHERE c.tipo NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação')
       ORDER BY c.data_registro DESC
       LIMIT $1
     `, [limit]);
@@ -1805,67 +1810,46 @@ class DatabaseService {
 
   // ============ ESTATÍSTICAS ============
   
-  // Obter estatísticas gerais
+  // Obter estatísticas gerais (otimizado: menos round-trips ao banco)
   async obterEstatisticas() {
-    const results = await Promise.all([
-      query('SELECT COUNT(*) as total FROM animais'),
-      query("SELECT COUNT(*) as ativos FROM animais WHERE situacao = 'Ativo'"),
-      query("SELECT COUNT(*) as vendidos FROM animais WHERE situacao = 'Vendido'"),
-      query("SELECT COUNT(*) as mortos FROM animais WHERE situacao = 'Morto'"),
-      query(`SELECT COUNT(*) as nascimentos FROM nascimentos WHERE created_at >= CURRENT_DATE - INTERVAL '12 months'`),
-      query('SELECT COALESCE(SUM(custo_total), 0) as total_investido FROM animais'),
-      query('SELECT COALESCE(SUM(valor_venda), 0) as total_recibido FROM animais WHERE valor_venda IS NOT NULL')
+    // Query única para contagens de animais e valores (evita 7 round-trips)
+    const [mainResult, racasResult, sexosResult, semenResult] = await Promise.all([
+      query(`
+        SELECT
+          (SELECT COUNT(*) FROM animais) as total,
+          (SELECT COUNT(*) FROM animais WHERE situacao = 'Ativo') as ativos,
+          (SELECT COUNT(*) FROM animais WHERE situacao = 'Vendido') as vendidos,
+          (SELECT COUNT(*) FROM animais WHERE situacao = 'Morto') as mortos,
+          (SELECT COUNT(*) FROM nascimentos WHERE created_at >= CURRENT_DATE - INTERVAL '12 months') as nascimentos,
+          (SELECT COALESCE(SUM(custo_total), 0) FROM animais) as total_investido,
+          (SELECT COALESCE(SUM(valor_venda), 0) FROM animais WHERE valor_venda IS NOT NULL) as total_recibido
+      `),
+      query(`SELECT raca, COUNT(*) as quantidade FROM animais GROUP BY raca ORDER BY quantidade DESC`),
+      query(`SELECT sexo, COUNT(*) as quantidade FROM animais GROUP BY sexo`),
+      query(`SELECT COUNT(*) as total_touros, COALESCE(SUM(doses_disponiveis), 0) as total_doses FROM estoque_semen WHERE status = 'disponivel'`)
     ]);
 
-    const [
-      totalAnimais, animaisAtivos, animaisVendidos, animaisMortos,
-      nascimentos, totalInvestido, totalRecibido
-    ] = results.map(r => r.rows[0]);
-
-    // Estatísticas por raça
-    const racasResult = await query(`
-      SELECT raca, COUNT(*) as quantidade
-      FROM animais
-      GROUP BY raca
-      ORDER BY quantidade DESC
-    `);
-
-    // Estatísticas por sexo
-    const sexosResult = await query(`
-      SELECT sexo, COUNT(*) as quantidade
-      FROM animais
-      GROUP BY sexo
-    `);
-
-    // Estatísticas de estoque de sêmen
-    const semenResult = await query(`
-      SELECT 
-        COUNT(*) as total_touros,
-        COALESCE(SUM(doses_disponiveis), 0) as total_doses
-      FROM estoque_semen
-      WHERE status = 'disponivel'
-    `);
-
+    const r = mainResult.rows[0];
     const semenStats = semenResult.rows[0] || { total_touros: 0, total_doses: 0 };
 
     return {
-      total_animais: parseInt(totalAnimais.total),
-      totalAnimais: parseInt(totalAnimais.total),
-      animaisAtivos: parseInt(animaisAtivos.ativos),
-      animaisVendidos: parseInt(animaisVendidos.vendidos),
-      animaisMortos: parseInt(animaisMortos.mortos),
-      total_nascimentos: parseInt(nascimentos.nascimentos),
-      nascimentos: parseInt(nascimentos.nascimentos),
-      totalInvestido: parseFloat(totalInvestido.total_investido),
-      totalRecibido: parseFloat(totalRecibido.total_recibido),
-      total_receita: parseFloat(totalRecibido.total_recibido),
+      total_animais: parseInt(r.total),
+      totalAnimais: parseInt(r.total),
+      animaisAtivos: parseInt(r.ativos),
+      animaisVendidos: parseInt(r.vendidos),
+      animaisMortos: parseInt(r.mortos),
+      total_nascimentos: parseInt(r.nascimentos),
+      nascimentos: parseInt(r.nascimentos),
+      totalInvestido: parseFloat(r.total_investido),
+      totalRecibido: parseFloat(r.total_recibido),
+      total_receita: parseFloat(r.total_recibido),
       total_semen: parseInt(semenStats.total_touros),
       total_doses: parseInt(semenStats.total_doses),
-      animaisPorRaca: racasResult.rows.reduce((acc, row) => {
+      animaisPorRaca: (racasResult.rows || []).reduce((acc, row) => {
         acc[row.raca] = parseInt(row.quantidade);
         return acc;
       }, {}),
-      animaisPorSexo: sexosResult.rows.reduce((acc, row) => {
+      animaisPorSexo: (sexosResult.rows || []).reduce((acc, row) => {
         acc[row.sexo] = parseInt(row.quantidade);
         return acc;
       }, {})
@@ -2391,6 +2375,7 @@ class DatabaseService {
           ELSE 0 
         END as media_por_animal
       FROM custos c
+      WHERE c.tipo NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação')
     `);
 
     const animaisComCustos = await query(`
@@ -2401,7 +2386,7 @@ class DatabaseService {
         a.custo_total,
         COUNT(c.id) as qtd_custos
       FROM animais a
-      LEFT JOIN custos c ON a.id = c.animal_id
+      LEFT JOIN custos c ON a.id = c.animal_id AND c.tipo NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação')
       GROUP BY a.id, a.serie, a.rg, a.custo_total
       ORDER BY a.custo_total DESC
     `);

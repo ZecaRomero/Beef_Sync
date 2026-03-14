@@ -38,33 +38,26 @@ export const custosPorERA = {
       { tipo: 'Nascimento', subtipo: '', valor: 150, obrigatorio: true, descricao: 'Custo do parto e primeiros cuidados' },
       { tipo: 'Medicamentos', subtipo: 'Brincos e Identificação', valor: 15, obrigatorio: true, descricao: 'Identificação do animal' },
       { tipo: 'DNA', subtipo: 'Paternidade', valor: 40, obrigatorio: false, descricao: 'Confirmação de paternidade (FIV)' },
-      { tipo: 'Medicamentos', subtipo: 'Vitaminas e Minerais', valor: 25, obrigatorio: false, descricao: 'Suplementação inicial' }
+      { tipo: 'Medicamentos', subtipo: 'Vitaminas e Minerais', valor: 25, obrigatorio: false, descricao: 'Aporte vitamínico inicial' }
     ],
     'ERA 4/8': [
       { tipo: 'Medicamentos', subtipo: 'Vacinas Obrigatórias', valor: 36.90, obrigatorio: true, descricao: 'Controle ABCZ RGD' },
-      { tipo: 'Alimentação', subtipo: 'Ração Creep Feeding', valor: 1.50, obrigatorio: false, descricao: 'Ração especial para bezerros (por dia)' },
-      { tipo: 'Alimentação', subtipo: 'Ração Concentrada', valor: null, obrigatorio: false, descricao: 'Calcular por peso (300g/dia)' },
       { tipo: 'Medicamentos', subtipo: 'Vermífugos', valor: 18, obrigatorio: true, descricao: 'Controle parasitário' }
     ],
     'ERA 9/12': [
       { tipo: 'Medicamentos', subtipo: 'Vacinas Obrigatórias', valor: 36.90, obrigatorio: true, descricao: 'Controle ABCZ RGD' },
-      { tipo: 'Alimentação', subtipo: 'Ração Creep Feeding', valor: 1.50, obrigatorio: false, descricao: 'Ração especial (por dia)' },
-      { tipo: 'Alimentação', subtipo: 'Ração Concentrada', valor: null, obrigatorio: false, descricao: 'Calcular por peso' },
       { tipo: 'Manejo', subtipo: 'Castração', valor: 45, obrigatorio: false, descricao: 'Castração se necessário' }
     ],
     'ERA 10/24': [
       { tipo: 'Medicamentos', subtipo: 'Vacinas Obrigatórias', valor: 89.10, obrigatorio: true, descricao: 'Controle ABCZ RGD' },
-      { tipo: 'Alimentação', subtipo: 'Ração Concentrada', valor: null, obrigatorio: false, descricao: 'Calcular por peso' },
       { tipo: 'Veterinários', subtipo: 'Andrológico', valor: 120, obrigatorio: false, descricao: 'Exame reprodutivo' }
     ],
     'ERA 25/36': [
       { tipo: 'Manejo', subtipo: 'Casquear somente animais para venda', valor: null, obrigatorio: false, descricao: 'Casqueamento se for para venda' },
-      { tipo: 'Alimentação', subtipo: 'Ração Concentrada', valor: null, obrigatorio: false, descricao: 'Calcular por peso' },
       { tipo: 'Veterinários', subtipo: 'Andrológico', valor: 120, obrigatorio: false, descricao: 'Exame reprodutivo anual' }
     ],
     'ERA ACIMA 36': [
       { tipo: 'Manejo', subtipo: 'Casquear somente animais para venda', valor: null, obrigatorio: false, descricao: 'Casqueamento se for para venda' },
-      { tipo: 'Alimentação', subtipo: 'Ração Concentrada', valor: null, obrigatorio: false, descricao: 'Calcular por peso' },
       { tipo: 'Veterinários', subtipo: 'Andrológico', valor: 120, obrigatorio: false, descricao: 'Exame reprodutivo anual' }
     ]
   },
@@ -73,33 +66,27 @@ export const custosPorERA = {
       { tipo: 'Nascimento', subtipo: '', valor: 150, obrigatorio: true, descricao: 'Custo do parto e primeiros cuidados' },
       { tipo: 'Medicamentos', subtipo: 'Brincos e Identificação', valor: 15, obrigatorio: true, descricao: 'Identificação do animal' },
       { tipo: 'DNA', subtipo: 'Paternidade', valor: 40, obrigatorio: false, descricao: 'Confirmação de paternidade (FIV)' },
-      { tipo: 'Medicamentos', subtipo: 'Vitaminas e Minerais', valor: 25, obrigatorio: false, descricao: 'Suplementação inicial' }
+      { tipo: 'Medicamentos', subtipo: 'Vitaminas e Minerais', valor: 25, obrigatorio: false, descricao: 'Aporte vitamínico inicial' }
     ],
     'ERA 4/8': [
       { tipo: 'Medicamentos', subtipo: 'Vacinas Obrigatórias', valor: 36.90, obrigatorio: true, descricao: 'Controle ABCZ RGD' },
-      { tipo: 'Alimentação', subtipo: 'Ração Creep Feeding', valor: 1.50, obrigatorio: false, descricao: 'Ração especial para bezerros (por dia)' },
-      { tipo: 'Alimentação', subtipo: 'Ração Concentrada', valor: null, obrigatorio: false, descricao: 'Calcular por peso' },
       { tipo: 'Medicamentos', subtipo: 'Vermífugos', valor: 18, obrigatorio: true, descricao: 'Controle parasitário' },
       { tipo: 'Medicamentos', subtipo: 'Vacinas Opcionais', valor: null, obrigatorio: false, descricao: 'Vacina B3 se necessário' }
     ],
     'ERA 9/12': [
       { tipo: 'Medicamentos', subtipo: 'Vacinas Obrigatórias', valor: 36.90, obrigatorio: true, descricao: 'Controle ABCZ RGD' },
-      { tipo: 'Alimentação', subtipo: 'Ração Concentrada', valor: null, obrigatorio: false, descricao: 'Calcular por peso' },
       { tipo: 'Medicamentos', subtipo: 'Vermífugos', valor: 18, obrigatorio: true, descricao: 'Controle parasitário' }
     ],
     'ERA 10/24': [
       { tipo: 'Medicamentos', subtipo: 'Vacinas Obrigatórias', valor: 89.10, obrigatorio: true, descricao: 'Controle ABCZ RGD' },
-      { tipo: 'Alimentação', subtipo: 'Ração Concentrada', valor: null, obrigatorio: false, descricao: 'Calcular por peso' },
       { tipo: 'Reprodução', subtipo: 'Inseminação', valor: null, obrigatorio: false, descricao: 'Inseminação artificial' }
     ],
     'ERA 25/36': [
       { tipo: 'Manejo', subtipo: 'Casquear somente animais para venda', valor: null, obrigatorio: false, descricao: 'Casqueamento se for para venda' },
-      { tipo: 'Alimentação', subtipo: 'Ração Concentrada', valor: null, obrigatorio: false, descricao: 'Calcular por peso' },
       { tipo: 'Veterinários', subtipo: 'Diagnóstico de Prenhez', valor: 80, obrigatorio: false, descricao: 'Diagnóstico de gestação' }
     ],
     'ERA ACIMA 36': [
       { tipo: 'Manejo', subtipo: 'Casquear somente animais para venda', valor: null, obrigatorio: false, descricao: 'Casqueamento se for para venda' },
-      { tipo: 'Alimentação', subtipo: 'Ração Concentrada', valor: null, obrigatorio: false, descricao: 'Calcular por peso' },
       { tipo: 'Veterinários', subtipo: 'Diagnóstico de Prenhez', valor: 80, obrigatorio: false, descricao: 'Diagnóstico de gestação' }
     ]
   }
@@ -107,11 +94,6 @@ export const custosPorERA = {
 
 // Preços de referência para cálculos automáticos
 export const precosReferencia = {
-  racaoKg: 1.20,
-  salMineralKg: 3.50,
-  salProteinadoKg: 4.20,
-  consumoDiarioRacao: 0.025, // 2.5% do peso corporal
-  consumoDiarioSalMineral: 0.08, // 80g por dia
   pesoMedioMachosPorIdade: {
     3: 120, 6: 180, 9: 240, 12: 300, 18: 420, 24: 520, 36: 650
   },
@@ -122,14 +104,6 @@ export const precosReferencia = {
 
 // Sugestões de preços de mercado (valores podem ser atualizados)
 export const sugestoesPrecosReferencia = {
-  'Alimentação': {
-    'Ração Concentrada': { min: 1.00, max: 1.50, medio: 1.20, unidade: 'kg' },
-    'Ração Creep Feeding': { min: 1.80, max: 2.20, medio: 2.00, unidade: 'kg' },
-    'Sal Mineral': { min: 3.00, max: 4.00, medio: 3.50, unidade: 'kg' },
-    'Sal Proteinado': { min: 3.80, max: 4.60, medio: 4.20, unidade: 'kg' },
-    'Silagem': { min: 0.15, max: 0.25, medio: 0.20, unidade: 'kg' },
-    'Feno': { min: 0.40, max: 0.60, medio: 0.50, unidade: 'kg' }
-  },
   'Medicamentos': {
     'Vacinas Obrigatórias': { min: 30.00, max: 45.00, medio: 36.90, unidade: 'dose' },
     'Vacinas Opcionais': { min: 15.00, max: 30.00, medio: 22.50, unidade: 'dose' },
@@ -171,19 +145,17 @@ export const alertasInteligentes = {
   },
   'ERA 4/8': {
     obrigatorios: ['Vacinas Obrigatórias', 'Vermífugos'],
-    recomendados: ['Ração Creep Feeding', 'Controle parasitário'],
+    recomendados: ['Controle parasitário'],
     alertas: [
       'Período crítico para vacinação',
-      'Iniciar suplementação alimentar',
       'Monitorar ganho de peso'
     ]
   },
   'ERA 9/12': {
     obrigatorios: ['Vacinas Obrigatórias'],
-    recomendados: ['Ração Concentrada', 'Castração (se necessário)'],
+    recomendados: ['Castração (se necessário)'],
     alertas: [
       'Avaliar necessidade de castração',
-      'Intensificar alimentação',
       'Preparar para desmama'
     ]
   },
@@ -218,17 +190,6 @@ export const alertasInteligentes = {
 
 // Calculadoras auxiliares
 export const calculadoras = {
-  // Calcular consumo de ração baseado no peso
-  consumoRacao: (peso, percentual = 2.5) => {
-    return (peso * percentual / 100).toFixed(2)
-  },
-  
-  // Calcular custo mensal de alimentação
-  custoMensalAlimentacao: (peso, precoKg = 1.20, percentual = 2.5) => {
-    const consumoDiario = peso * percentual / 100
-    return (consumoDiario * precoKg * 30).toFixed(2)
-  },
-  
   // Calcular ROI (Retorno sobre Investimento)
   calcularROI: (valorVenda, custoTotal) => {
     if (!valorVenda || custoTotal === 0) return 0

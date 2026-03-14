@@ -122,12 +122,16 @@ export default function ProtocolEditor() {
         const costManager = costManagerModule.default || costManagerModule
         setProtocolos(costManager.protocolos)
 
-        // Adicionar campo nome aos medicamentos se não existir
+        // Adicionar campo nome aos medicamentos se não existir e filtrar itens indesejados
         const medicamentosComNome = {}
+        const blacklist = ['SUPLENUT', 'RACAO', 'ALIMENTACAO', 'NUTRICAO']
+        
         Object.entries(costManager.medicamentos).forEach(([key, medicine]) => {
-          medicamentosComNome[key] = {
-            ...medicine,
-            nome: medicine.nome || key.replace(/_/g, ' ')
+          if (!blacklist.some(term => key.toUpperCase().includes(term))) {
+            medicamentosComNome[key] = {
+              ...medicine,
+              nome: medicine.nome || key.replace(/_/g, ' ')
+            }
           }
         })
         setMedicamentos(medicamentosComNome)
@@ -342,7 +346,7 @@ export default function ProtocolEditor() {
                   <strong className="text-purple-800 dark:text-purple-200 text-lg">Em Lote</strong>
                 </div>
                 <p className="text-purple-700 dark:text-purple-300 leading-relaxed">
-                  Um produto trata vários animais. Ideal para medicamentos na água, ração ou aplicação coletiva.
+                  Um produto trata vários animais. Ideal para medicamentos na água ou aplicação coletiva.
                 </p>
               </div>
             </div>

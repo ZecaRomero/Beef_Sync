@@ -388,7 +388,6 @@ export default function ServicosManager() {
                     <option value="Medicamentos">Medicamentos</option>
                     <option value="Manejo">Manejo</option>
                     <option value="DNA">DNA</option>
-                    <option value="Alimentação">Alimentação</option>
                     <option value="Outros">Outros</option>
                   </select>
                 </div>

@@ -229,11 +229,12 @@ export default async function handler(req, res) {
           `)
 
           // 5. Financeiro (Custos e Vendas no período)
-          // Custos
+          // Custos (Excluindo Nutrição/Alimentação conforme solicitado)
           const qCustos = await query(`
             SELECT SUM(valor) as total
             FROM custos
             WHERE data >= $1 AND data <= $2
+              AND tipo NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação')
           `, [start, end])
           
           // Vendas (Animais vendidos ou notas de saída)

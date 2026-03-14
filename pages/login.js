@@ -17,9 +17,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
 
   useEffect(() => {
-    if (!loading && user) {
-      router.replace('/')
-    }
+    if (!loading && user) router.replace('/')
   }, [user, loading, router])
 
   const handleSubmit = async (e) => {
@@ -27,7 +25,6 @@ export default function LoginPage() {
     setError('')
     setSuccess('')
     setSubmitting(true)
-
     try {
       if (mode === 'login') {
         await signIn(email, password)
@@ -56,8 +53,11 @@ export default function LoginPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900">
-        <div className="animate-spin w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full" />
+      <div className="min-h-screen flex items-center justify-center bg-[#0a1628]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="animate-spin w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full" />
+          <span className="text-blue-300/60 text-sm">Carregando...</span>
+        </div>
       </div>
     )
   }
@@ -70,72 +70,100 @@ export default function LoginPage() {
         <title>Login | Beef Sync</title>
       </Head>
 
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 px-4">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-8">
-              <div className="bg-white p-6 rounded-3xl shadow-2xl shadow-black/30 transform hover:scale-105 transition-transform duration-300">
-                <img 
-                  src="/logo-santanna.png.jpg" 
-                  alt="Sant Anna" 
-                  className="h-32 object-contain"
+      <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden bg-[#0a1628]">
+        {/* Background decorativo */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl" />
+          <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-800/10 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-900/5 rounded-full blur-3xl" />
+          {/* Grid sutil */}
+          <div
+            className="absolute inset-0 opacity-[0.03]"
+            style={{
+              backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
+              backgroundSize: '40px 40px',
+            }}
+          />
+        </div>
+
+        <div className="w-full max-w-sm relative z-10">
+          {/* Logo */}
+          <div className="flex flex-col items-center mb-8">
+            <div className="relative mb-5">
+              <div className="absolute inset-0 bg-blue-500/20 rounded-2xl blur-xl scale-110" />
+              <div className="relative bg-white rounded-2xl p-4 shadow-2xl shadow-black/40">
+                <img
+                  src="/logo-santanna.png.jpg"
+                  alt="Fazendas Sant'Anna"
+                  className="h-20 w-auto object-contain"
                 />
               </div>
             </div>
-            <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">Beef Sync</h1>
-            <p className="text-blue-200/80 font-medium">Sistema de Gestão Pecuária</p>
+            <h1 className="text-3xl font-bold text-white tracking-tight">Beef Sync</h1>
+            <p className="text-blue-300/60 text-sm mt-1 font-medium tracking-wide uppercase">
+              Sistema de Gestão Pecuária
+            </p>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
-            <h2 className="text-xl font-semibold text-white mb-6">
-              {mode === 'login' && 'Entrar'}
-              {mode === 'register' && 'Criar conta'}
+          {/* Card */}
+          <div className="bg-white/[0.06] backdrop-blur-2xl border border-white/10 rounded-2xl p-7 shadow-2xl shadow-black/40">
+            <h2 className="text-lg font-semibold text-white mb-5">
+              {mode === 'login' && 'Entrar na sua conta'}
+              {mode === 'register' && 'Criar nova conta'}
               {mode === 'reset' && 'Recuperar senha'}
             </h2>
 
             {error && (
-              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-300 text-sm">
-                {error}
+              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-300 text-sm flex items-start gap-2">
+                <span className="mt-0.5">⚠</span>
+                <span>{error}</span>
               </div>
             )}
 
             {success && (
-              <div className="mb-4 p-3 bg-green-500/10 border border-green-500/20 rounded-lg text-green-300 text-sm">
-                {success}
+              <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-300 text-sm flex items-start gap-2">
+                <span className="mt-0.5">✓</span>
+                <span>{success}</span>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {mode === 'register' && (
                 <div>
-                  <label className="block text-sm font-medium text-blue-200/70 mb-1">Nome</label>
+                  <label className="block text-xs font-semibold text-blue-200/50 mb-1.5 uppercase tracking-wider">
+                    Nome
+                  </label>
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                    placeholder="Seu nome"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500/40 transition-all text-sm"
+                    placeholder="Seu nome completo"
                   />
                 </div>
               )}
 
               <div>
-                <label className="block text-sm font-medium text-blue-200/70 mb-1">E-mail</label>
+                <label className="block text-xs font-semibold text-blue-200/50 mb-1.5 uppercase tracking-wider">
+                  E-mail
+                </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   autoComplete="email"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500/40 transition-all text-sm"
                   placeholder="seu@email.com"
                 />
               </div>
 
               {mode !== 'reset' && (
                 <div>
-                  <label className="block text-sm font-medium text-blue-200/70 mb-1">Senha</label>
+                  <label className="block text-xs font-semibold text-blue-200/50 mb-1.5 uppercase tracking-wider">
+                    Senha
+                  </label>
                   <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
@@ -143,21 +171,17 @@ export default function LoginPage() {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                      className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                      className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500/40 transition-all text-sm"
                       placeholder="••••••••"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-white/50 hover:text-white/80 transition"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg text-blue-400 hover:text-white hover:bg-white/10 transition-colors"
                       tabIndex={-1}
                       aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
                     >
-                      {showPassword ? (
-                        <EyeSlashIcon className="w-5 h-5" />
-                      ) : (
-                        <EyeIcon className="w-5 h-5" />
-                      )}
+                      {showPassword ? <EyeSlashIcon className="w-5 h-5" strokeWidth={2} /> : <EyeIcon className="w-5 h-5" strokeWidth={2} />}
                     </button>
                   </div>
                 </div>
@@ -166,7 +190,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-3 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-600/50 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-blue-600/20 hover:shadow-blue-500/30 disabled:cursor-not-allowed"
+                className="w-full py-3 mt-1 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-blue-600/25 hover:shadow-blue-500/35 text-sm"
               >
                 {submitting ? (
                   <span className="flex items-center justify-center gap-2">
@@ -183,29 +207,38 @@ export default function LoginPage() {
               </button>
             </form>
 
-            <div className="mt-6 space-y-2 text-center text-sm">
+            <div className="mt-5 space-y-2 text-center text-sm">
               {mode === 'login' && (
                 <>
-                  <button onClick={() => { setMode('reset'); setError(''); setSuccess('') }} className="text-blue-400 hover:text-blue-300 transition">
+                  <button
+                    onClick={() => { setMode('reset'); setError(''); setSuccess('') }}
+                    className="block w-full text-blue-400/80 hover:text-blue-300 transition-colors text-xs"
+                  >
                     Esqueceu a senha?
                   </button>
-                  <div className="text-white/30">
+                  <p className="text-white/20 text-xs pt-1">
                     Não tem conta?{' '}
-                    <button onClick={() => { setMode('register'); setError(''); setSuccess('') }} className="text-blue-400 hover:text-blue-300 transition">
+                    <button
+                      onClick={() => { setMode('register'); setError(''); setSuccess('') }}
+                      className="text-blue-400/80 hover:text-blue-300 transition-colors font-medium"
+                    >
                       Criar conta
                     </button>
-                  </div>
+                  </p>
                 </>
               )}
               {(mode === 'register' || mode === 'reset') && (
-                <button onClick={() => { setMode('login'); setError(''); setSuccess('') }} className="text-blue-400 hover:text-blue-300 transition">
-                  Voltar para login
+                <button
+                  onClick={() => { setMode('login'); setError(''); setSuccess('') }}
+                  className="text-blue-400/80 hover:text-blue-300 transition-colors text-xs"
+                >
+                  ← Voltar para login
                 </button>
               )}
             </div>
           </div>
 
-          <p className="text-center text-white/20 text-xs mt-6">
+          <p className="text-center text-white/15 text-xs mt-5">
             Beef Sync v3.0 &middot; Gestão Pecuária
           </p>
         </div>

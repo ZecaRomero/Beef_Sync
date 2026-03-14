@@ -3,7 +3,7 @@
  * Compatível com o cliente API centralizado
  */
 import { useState, useCallback, useEffect } from 'react'
-import { apiRequest } from '../lib/apiClient'
+import { apiRequest, apiAll } from '../lib/apiClient'
 import logger from '../utils/logger'
 
 /**
@@ -80,7 +80,6 @@ export function useFetchAll(requests, deps = []) {
     setError(null)
 
     try {
-      const { apiAll } = await import('../lib/apiClient')
       const result = await apiAll(requests)
 
       if (result.success) {

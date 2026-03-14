@@ -22,7 +22,7 @@ export default async function handler(req, res) {
     if (req.method === 'GET') {
       // 1. Buscar custos existentes
       const resultCustos = await query(`
-        SELECT * FROM custos WHERE animal_id = $1 ORDER BY data DESC, created_at DESC
+        SELECT * FROM custos WHERE animal_id = $1 AND tipo NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação') ORDER BY data DESC, created_at DESC
       `, [id]);
       let custos = resultCustos.rows;
 
@@ -76,21 +76,7 @@ export default async function handler(req, res) {
           }
         }
 
-        // C. Ração / Nutrição (Custo mensal estimado)
-        const temAlimentacao = custos.some(c => c.tipo === 'Alimentação');
-        if (!temAlimentacao && idadeMeses > 0) {
-          const custoMensal = 80.00;
-          const totalEstimado = custoMensal * idadeMeses;
-          
-          novosCustos.push({
-            animal_id: id,
-            tipo: 'Alimentação',
-            subtipo: 'Custo Nutricional Estimado (Vida)',
-            valor: totalEstimado,
-            data: new Date().toISOString().split('T')[0],
-            observacoes: `Custo estimado: R$ ${custoMensal}/mês x ${idadeMeses} meses`
-          });
-        }
+        // C. Ração / Nutrição REMOVIDO conforme solicitação do usuário
 
         // Persistir novos custos
         if (novosCustos.length > 0) {

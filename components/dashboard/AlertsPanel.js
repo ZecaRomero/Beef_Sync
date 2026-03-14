@@ -48,7 +48,7 @@ const AlertsPanel = ({ animals, costs }) => {
           title: 'Peso Abaixo do Esperado',
           message: `${animal.nome} está com peso baixo para a idade`,
           animal: animal.nome,
-          action: 'Revisar alimentação',
+          action: 'Revisar manejo',
           icon: '⚖️',
           color: 'yellow'
         })

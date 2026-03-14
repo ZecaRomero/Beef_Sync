@@ -105,11 +105,11 @@ class AIIntelligenceService {
       if (percentual < 85) {
         return {
           recommendation: {
-            type: 'nutrition',
+            type: 'health',
             priority: 'high',
             title: 'Peso abaixo do esperado',
             description: `Animal com ${percentual.toFixed(1)}% do peso esperado para a idade`,
-            action: 'Revisar dieta e suplementação nutricional'
+            action: 'Verificar saúde e condições gerais'
           }
         }
       } else if (percentual > 115) {
@@ -119,7 +119,7 @@ class AIIntelligenceService {
             priority: 'medium',
             title: 'Peso acima do esperado',
             description: `Animal com ${percentual.toFixed(1)}% do peso esperado`,
-            action: 'Monitorar saúde e ajustar alimentação se necessário'
+            action: 'Monitorar saúde'
           }
         }
       }
