@@ -2335,11 +2335,12 @@ export default async function handler(req, res) {
       case 'boletim_campo': {
         try {
           const r = await query(`
-            SELECT local, local_1, sub_local_2, quant, sexo, categoria, raca, era, observacao
+            SELECT id, local, local_1, sub_local_2, quant, sexo, categoria, raca, era, observacao
             FROM boletim_campo
             ORDER BY local, local_1, sub_local_2
           `)
           data = (r.rows || []).map(row => ({
+            id: row.id,
             local: row.local,
             local_1: row.local_1 || '-',
             sub_local_2: row.sub_local_2 || '-',

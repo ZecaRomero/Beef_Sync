@@ -3372,151 +3372,269 @@ export default function MobileRelatorios() {
                     </motion.div>
                   )}
 
-                  {/* Resumo visual: quantidade por raça, era, sexo (Boletim Campo e Boletim Rebanho) */}
+                  {/* ══ Resumo visual aprimorado: Boletim Campo e Rebanho ══ */}
                   {(ehBoletimCampo || ehBoletimRebanho) && dadosParaExibir.length > 0 && (() => {
                     const qtyKey = ehBoletimCampo ? 'quant' : 'total'
-                    const rows = dadosParaExibir.filter(d => 
-                      d.raca !== 'TOTAL GERAL' && 
-                      d.local !== 'TOTAL GERAL' && 
-                      d.local_1 !== 'TOTAL GERAL' && 
-                      d.fazenda !== 'TOTAL GERAL'
+                    const rows = dadosParaExibir.filter(d =>
+                      d.raca !== 'TOTAL GERAL' && d.local !== 'TOTAL GERAL' &&
+                      d.local_1 !== 'TOTAL GERAL' && d.fazenda !== 'TOTAL GERAL'
                     )
-                    // Calcular resumos por raça, era e sexo
-                    const porRaca = {}
-                    const porEra = {}
-                    const porSexo = {}
-                    
+
+                    // Calcular resumos
+                    const porRaca = {}, porEra = {}, porSexo = {}, porCategoria = {}, porLocal1 = {}
+                    const CATS = [
+                      { key: 'Piquetes',     emoji: '🌿', test: s => /piquete|^piq\s/i.test(s),  colors: 'from-green-500 to-emerald-600' },
+                      { key: 'Cabanha',      emoji: '🏠', test: s => /cabanha/i.test(s),          colors: 'from-violet-500 to-purple-600' },
+                      { key: 'Confinamento', emoji: '🏗️', test: s => /confina|^conf\b/i.test(s),  colors: 'from-orange-500 to-amber-600' },
+                      { key: 'Projetos',     emoji: '🔬', test: s => /projeto/i.test(s),          colors: 'from-cyan-500 to-teal-600' },
+                    ]
+                    const ehOutros = s => !CATS.some(c => c.test(s))
+
+                    let totalGeral = 0
                     rows.forEach(d => {
                       const raca = d.raca || 'Não informado'
                       const era = d.era || '-'
-                      const sexo = d.sexo || '-'
-                      const total = parseInt(d[qtyKey] ?? d.total ?? d.quant) || 0
-                      
-                      porRaca[raca] = (porRaca[raca] || 0) + total
-                      porEra[era] = (porEra[era] || 0) + total
-                      porSexo[sexo] = (porSexo[sexo] || 0) + total
+                      const sexo = (d.sexo || '').toString().trim()
+                      const local = d.local || d.local_1 || ''
+                      const local1 = d.local_1 || d.local || ''
+                      const qtd = parseInt(d[qtyKey] ?? d.quant ?? d.total) || 0
+                      totalGeral += qtd
+                      porRaca[raca] = (porRaca[raca] || 0) + qtd
+                      porEra[era] = (porEra[era] || 0) + qtd
+                      // Sexo: normalizar F/M
+                      const sexoNorm = /^f/i.test(sexo) ? 'F' : /^m/i.test(sexo) ? 'M' : sexo || '-'
+                      porSexo[sexoNorm] = (porSexo[sexoNorm] || 0) + qtd
+                      // Categoria
+                      let cat = ehOutros(local) ? 'Outros' : CATS.find(c => c.test(local))?.key || 'Outros'
+                      porCategoria[cat] = (porCategoria[cat] || 0) + qtd
+                      // Local1
+                      if (local1 && local1 !== 'TOTAL GERAL') {
+                        porLocal1[local1] = (porLocal1[local1] || 0) + qtd
+                      }
                     })
-                    
-                    const racasTop = Object.entries(porRaca).sort(([,a], [,b]) => b - a).slice(0, 5)
-                    const erasTop = Object.entries(porEra).sort(([,a], [,b]) => b - a).slice(0, 5)
-                    const sexosTop = Object.entries(porSexo).filter(([, qtd]) => qtd > 0).sort(([,a], [,b]) => b - a)
-                    
+
+                    const racasTop  = Object.entries(porRaca).sort(([,a],[,b]) => b-a).slice(0,6)
+                    const erasTop   = Object.entries(porEra).sort(([,a],[,b]) => b-a).slice(0,6)
+                    const sexosTop  = Object.entries(porSexo).filter(([,q]) => q > 0)
+                    const local1Top = Object.entries(porLocal1).sort(([,a],[,b]) => b-a).slice(0,6)
+                    const totalF = porSexo['F'] || 0
+                    const totalM = porSexo['M'] || 0
+                    const pctF = totalGeral > 0 ? Math.round(totalF / totalGeral * 100) : 0
+                    const pctM = 100 - pctF
+
+                    // Helper: barra de progresso proporcional
+                    const ProgressBar = ({ value, max, color }) => (
+                      <div className="mt-1.5 h-1.5 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
+                        <div className={`h-full rounded-full ${color}`} style={{ width: `${max > 0 ? Math.round(value/max*100) : 0}%` }} />
+                      </div>
+                    )
+
                     return (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="space-y-4 mb-6"
-                      >
-                        {/* Título */}
-                        <div className="flex items-center gap-2 px-1">
-                          <ChartBarIcon className="h-5 w-5 text-amber-500" />
-                          <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                            {ehBoletimCampo ? 'Resumo por Raça, Era e Sexo' : 'Resumo do Rebanho'}
-                          </h3>
+                      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 mb-2">
+
+                        {/* ── Header total com F/M ── */}
+                        <div className="rounded-2xl overflow-hidden shadow-lg">
+                          <div className="bg-gradient-to-r from-slate-800 to-slate-700 p-4">
+                            <div className="flex items-center justify-between mb-3">
+                              <div>
+                                <p className="text-slate-400 text-xs uppercase tracking-wider font-semibold">Total no campo</p>
+                                <p className="text-4xl font-black text-white">{totalGeral.toLocaleString('pt-BR')}</p>
+                                <p className="text-slate-400 text-xs mt-0.5">{rows.length} registros</p>
+                              </div>
+                              <div className="text-right">
+                                <div className="flex gap-3">
+                                  <div className="text-center">
+                                    <p className="text-pink-400 text-xs font-semibold">♀ Fêmeas</p>
+                                    <p className="text-2xl font-bold text-pink-300">{totalF.toLocaleString('pt-BR')}</p>
+                                    <p className="text-pink-500 text-xs">{pctF}%</p>
+                                  </div>
+                                  <div className="text-center">
+                                    <p className="text-blue-400 text-xs font-semibold">♂ Machos</p>
+                                    <p className="text-2xl font-bold text-blue-300">{totalM.toLocaleString('pt-BR')}</p>
+                                    <p className="text-blue-500 text-xs">{pctM}%</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            {/* Barra F/M */}
+                            <div className="h-2 rounded-full overflow-hidden bg-white/10 flex">
+                              <div className="h-full bg-gradient-to-r from-pink-500 to-rose-500 transition-all" style={{ width: `${pctF}%` }} />
+                              <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all" style={{ width: `${pctM}%` }} />
+                            </div>
+                          </div>
+
+                          {/* Categorias coloridas */}
+                          {ehBoletimCampo && (
+                            <div className="grid grid-cols-4 divide-x divide-white/20">
+                              {CATS.map(cat => {
+                                const qtd = porCategoria[cat.key] || 0
+                                const pct = totalGeral > 0 ? Math.round(qtd/totalGeral*100) : 0
+                                return (
+                                  <button
+                                    key={cat.key}
+                                    type="button"
+                                    onClick={() => setResumoDetalheModal({ open: true, tipo: 'categoria_local', valor: cat.key, titulo: cat.key, qtd })}
+                                    className={`bg-gradient-to-b ${cat.colors} p-2 text-center active:opacity-80 transition-opacity`}
+                                  >
+                                    <p className="text-white/70 text-[10px] font-medium">{cat.emoji} {cat.key}</p>
+                                    <p className="text-xl font-black text-white">{qtd || '-'}</p>
+                                    {qtd > 0 && <p className="text-white/60 text-[10px]">{pct}%</p>}
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          )}
                         </div>
-                        
-                        {/* Por Raça */}
+
+                        {/* ── Por Local (local_1) — só boletim campo ── */}
+                        {ehBoletimCampo && local1Top.length > 0 && (
+                          <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center gap-2 mb-3">
+                              <span className="text-xl">📍</span>
+                              <h4 className="font-bold text-gray-900 dark:text-white">Por Local</h4>
+                              <span className="ml-auto text-xs text-gray-400">toque para filtrar</span>
+                            </div>
+                            <div className="space-y-2">
+                              {local1Top.map(([local, qtd], idx) => {
+                                const cat = CATS.find(c => c.test(local))
+                                const pct = totalGeral > 0 ? Math.round(qtd/totalGeral*100) : 0
+                                const colors = [
+                                  { bg: 'bg-violet-50 dark:bg-violet-900/20', border: 'border-violet-200 dark:border-violet-800', text: 'text-violet-700 dark:text-violet-300', bar: 'bg-violet-500' },
+                                  { bg: 'bg-emerald-50 dark:bg-emerald-900/20', border: 'border-emerald-200 dark:border-emerald-800', text: 'text-emerald-700 dark:text-emerald-300', bar: 'bg-emerald-500' },
+                                  { bg: 'bg-orange-50 dark:bg-orange-900/20', border: 'border-orange-200 dark:border-orange-800', text: 'text-orange-700 dark:text-orange-300', bar: 'bg-orange-500' },
+                                  { bg: 'bg-cyan-50 dark:bg-cyan-900/20', border: 'border-cyan-200 dark:border-cyan-800', text: 'text-cyan-700 dark:text-cyan-300', bar: 'bg-cyan-500' },
+                                  { bg: 'bg-rose-50 dark:bg-rose-900/20', border: 'border-rose-200 dark:border-rose-800', text: 'text-rose-700 dark:text-rose-300', bar: 'bg-rose-500' },
+                                  { bg: 'bg-indigo-50 dark:bg-indigo-900/20', border: 'border-indigo-200 dark:border-indigo-800', text: 'text-indigo-700 dark:text-indigo-300', bar: 'bg-indigo-500' },
+                                ][idx % 6]
+                                return (
+                                  <motion.button
+                                    key={local}
+                                    type="button"
+                                    onClick={() => setResumoDetalheModal({ open: true, tipo: 'local_1', valor: local, titulo: local, qtd })}
+                                    initial={{ opacity: 0, x: -12 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: idx * 0.04 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    className={`w-full text-left ${colors.bg} border-2 ${colors.border} rounded-xl p-3 active:ring-2`}
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <div className="min-w-0 flex-1">
+                                        <p className={`text-xs font-semibold ${colors.text} truncate`}>{cat?.emoji || '📍'} {local}</p>
+                                        <div className="mt-1 h-1.5 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
+                                          <div className={`h-full rounded-full ${colors.bar} transition-all`} style={{ width: `${pct}%` }} />
+                                        </div>
+                                      </div>
+                                      <div className="text-right ml-3 shrink-0">
+                                        <p className="text-2xl font-black text-gray-900 dark:text-white">{qtd}</p>
+                                        <p className={`text-xs ${colors.text}`}>{pct}%</p>
+                                      </div>
+                                    </div>
+                                  </motion.button>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* ── Por Raça ── */}
                         <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
                           <div className="flex items-center gap-2 mb-3">
-                            <span className="text-2xl">🐄</span>
+                            <span className="text-xl">🐄</span>
                             <h4 className="font-bold text-gray-900 dark:text-white">Por Raça</h4>
                           </div>
                           <div className="grid grid-cols-2 gap-2">
-                            {racasTop.map(([raca, qtd], idx) => (
-                              <motion.button
-                                key={raca}
-                                type="button"
-                                onClick={() => setResumoDetalheModal({ open: true, tipo: 'raca', valor: raca, titulo: `Raça: ${raca}`, qtd })}
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: idx * 0.05 }}
-                                whileTap={{ scale: 0.97 }}
-                                className="text-left bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/10 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-3 cursor-pointer active:ring-2 active:ring-blue-400"
-                              >
-                                <p className="text-xs font-medium text-blue-600 dark:text-blue-400 mb-1 truncate">
-                                  {raca}
-                                </p>
-                                <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-                                  {qtd}
-                                </p>
-                              </motion.button>
-                            ))}
-                          </div>
-                        </div>
-                        
-                        {/* Por Era */}
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
-                          <div className="flex items-center gap-2 mb-3">
-                            <span className="text-2xl">📅</span>
-                            <h4 className="font-bold text-gray-900 dark:text-white">Por Era</h4>
-                          </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            {erasTop.map(([era, qtd], idx) => (
-                              <motion.button
-                                key={era}
-                                type="button"
-                                onClick={() => setResumoDetalheModal({ open: true, tipo: 'era', valor: era, titulo: `Era: ${era}`, qtd })}
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: idx * 0.05 }}
-                                whileTap={{ scale: 0.97 }}
-                                className="text-left bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-900/10 border-2 border-amber-200 dark:border-amber-800 rounded-xl p-3 cursor-pointer active:ring-2 active:ring-amber-400"
-                              >
-                                <p className="text-xs font-medium text-amber-600 dark:text-amber-400 mb-1 truncate">
-                                  {era}
-                                </p>
-                                <p className="text-2xl font-bold text-amber-900 dark:text-amber-100">
-                                  {qtd}
-                                </p>
-                              </motion.button>
-                            ))}
-                          </div>
-                        </div>
-                        
-                        {/* Por Sexo */}
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
-                          <div className="flex items-center gap-2 mb-3">
-                            <span className="text-2xl">⚥</span>
-                            <h4 className="font-bold text-gray-900 dark:text-white">Por Sexo</h4>
-                          </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            {sexosTop.map(([sexo, qtd], idx) => {
-                              const ehMacho = sexo.toLowerCase().includes('macho')
-                              const gradient = ehMacho 
-                                ? 'from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/10'
-                                : 'from-pink-50 to-pink-100/50 dark:from-pink-900/20 dark:to-pink-900/10'
-                              const border = ehMacho
-                                ? 'border-blue-200 dark:border-blue-800'
-                                : 'border-pink-200 dark:border-pink-800'
-                              const textColor = ehMacho
-                                ? 'text-blue-600 dark:text-blue-400'
-                                : 'text-pink-600 dark:text-pink-400'
-                              const valueColor = ehMacho
-                                ? 'text-blue-900 dark:text-blue-100'
-                                : 'text-pink-900 dark:text-pink-100'
-                              
+                            {racasTop.map(([raca, qtd], idx) => {
+                              const pct = totalGeral > 0 ? Math.round(qtd/totalGeral*100) : 0
                               return (
                                 <motion.button
-                                  key={sexo}
+                                  key={raca}
                                   type="button"
-                                  onClick={() => setResumoDetalheModal({ open: true, tipo: 'sexo', valor: sexo, titulo: `Sexo: ${sexo}`, qtd })}
-                                  initial={{ opacity: 0, scale: 0.9 }}
+                                  onClick={() => setResumoDetalheModal({ open: true, tipo: 'raca', valor: raca, titulo: `Raça: ${raca}`, qtd })}
+                                  initial={{ opacity: 0, scale: 0.92 }}
                                   animate={{ opacity: 1, scale: 1 }}
                                   transition={{ delay: idx * 0.05 }}
-                                  whileTap={{ scale: 0.97 }}
-                                  className={`text-left bg-gradient-to-br ${gradient} border-2 ${border} rounded-xl p-3 cursor-pointer active:ring-2 active:ring-amber-400`}
+                                  whileTap={{ scale: 0.96 }}
+                                  className="text-left bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/10 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-3"
                                 >
-                                  <p className={`text-xs font-medium ${textColor} mb-1`}>
-                                    {sexo}
-                                  </p>
-                                  <p className={`text-2xl font-bold ${valueColor}`}>
-                                    {qtd}
-                                  </p>
+                                  <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-0.5 truncate">{raca}</p>
+                                  <p className="text-2xl font-black text-blue-900 dark:text-blue-100">{qtd}</p>
+                                  <ProgressBar value={qtd} max={racasTop[0]?.[1] || 1} color="bg-blue-400" />
+                                  <p className="text-[10px] text-blue-500 mt-0.5">{pct}% do total</p>
                                 </motion.button>
                               )
                             })}
                           </div>
                         </div>
+
+                        {/* ── Por Era ── */}
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="text-xl">📅</span>
+                            <h4 className="font-bold text-gray-900 dark:text-white">Por Era</h4>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            {erasTop.map(([era, qtd], idx) => {
+                              const pct = totalGeral > 0 ? Math.round(qtd/totalGeral*100) : 0
+                              return (
+                                <motion.button
+                                  key={era}
+                                  type="button"
+                                  onClick={() => setResumoDetalheModal({ open: true, tipo: 'era', valor: era, titulo: `Era: ${era}`, qtd })}
+                                  initial={{ opacity: 0, scale: 0.92 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  transition={{ delay: idx * 0.05 }}
+                                  whileTap={{ scale: 0.96 }}
+                                  className="text-left bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-900/10 border-2 border-amber-200 dark:border-amber-800 rounded-xl p-3"
+                                >
+                                  <p className="text-xs font-semibold text-amber-600 dark:text-amber-400 mb-0.5 truncate">{era}</p>
+                                  <p className="text-2xl font-black text-amber-900 dark:text-amber-100">{qtd}</p>
+                                  <ProgressBar value={qtd} max={erasTop[0]?.[1] || 1} color="bg-amber-400" />
+                                  <p className="text-[10px] text-amber-500 mt-0.5">{pct}% do total</p>
+                                </motion.button>
+                              )
+                            })}
+                          </div>
+                        </div>
+
+                        {/* ── Por Sexo ── */}
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="text-xl">⚥</span>
+                            <h4 className="font-bold text-gray-900 dark:text-white">Por Sexo</h4>
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            {sexosTop.map(([sexo, qtd], idx) => {
+                              const ehF = /^f/i.test(sexo)
+                              const ehM = /^m/i.test(sexo)
+                              const pct = totalGeral > 0 ? Math.round(qtd/totalGeral*100) : 0
+                              const style = ehF
+                                ? { grad: 'from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/10', border: 'border-pink-200 dark:border-pink-800', label: 'text-pink-600 dark:text-pink-400', value: 'text-pink-900 dark:text-pink-100', bar: 'bg-gradient-to-r from-pink-400 to-rose-500', icon: '♀' }
+                                : ehM
+                                ? { grad: 'from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/10', border: 'border-blue-200 dark:border-blue-800', label: 'text-blue-600 dark:text-blue-400', value: 'text-blue-900 dark:text-blue-100', bar: 'bg-gradient-to-r from-blue-400 to-indigo-500', icon: '♂' }
+                                : { grad: 'from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700', border: 'border-gray-200 dark:border-gray-600', label: 'text-gray-600 dark:text-gray-400', value: 'text-gray-900 dark:text-white', bar: 'bg-gray-400', icon: '—' }
+                              return (
+                                <motion.button
+                                  key={sexo}
+                                  type="button"
+                                  onClick={() => setResumoDetalheModal({ open: true, tipo: 'sexo', valor: sexo, titulo: `Sexo: ${sexo === 'F' ? 'Fêmea' : sexo === 'M' ? 'Macho' : sexo}`, qtd })}
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: idx * 0.08 }}
+                                  whileTap={{ scale: 0.97 }}
+                                  className={`text-left bg-gradient-to-br ${style.grad} border-2 ${style.border} rounded-xl p-4`}
+                                >
+                                  <p className={`text-sm font-semibold ${style.label} mb-1`}>{style.icon} {sexo === 'F' ? 'Fêmeas' : sexo === 'M' ? 'Machos' : sexo}</p>
+                                  <p className={`text-3xl font-black ${style.value}`}>{qtd.toLocaleString('pt-BR')}</p>
+                                  <div className="mt-2 h-2 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
+                                    <div className={`h-full rounded-full ${style.bar}`} style={{ width: `${pct}%` }} />
+                                  </div>
+                                  <p className={`text-xs ${style.label} mt-1 font-medium`}>{pct}% do rebanho</p>
+                                </motion.button>
+                              )
+                            })}
+                          </div>
+                        </div>
+
                       </motion.div>
                     )
                   })()}
@@ -3531,9 +3649,16 @@ export default function MobileRelatorios() {
                     const filtered = rows.filter(d => {
                       if (tipo === 'raca') return (d.raca || 'Não informado') === valor
                       if (tipo === 'era') return (d.era || '-') === valor
+                      if (tipo === 'local_1') return (d.local_1 || d.local || '') === valor
+                      if (tipo === 'categoria_local') {
+                        const cat = CATS.find(c => c.key === valor)
+                        return cat ? cat.test(d.local || d.local_1 || '') : false
+                      }
                       if (tipo === 'sexo') {
                         const s = (d.sexo || '-').toString()
                         if (s === valor) return true
+                        if (valor === 'F' && /^f/i.test(s)) return true
+                        if (valor === 'M' && /^m/i.test(s)) return true
                         if (valor.toLowerCase().includes('macho') && /^m/i.test(s)) return true
                         if (valor.toLowerCase().includes('fêmea') && /^f/i.test(s)) return true
                         return false
@@ -4488,7 +4613,7 @@ export default function MobileRelatorios() {
                         {dadosParaExibir.length > 0 ? (() => {
                           const firstRow = reportData.data?.find(d => !d._resumo)
                           const columns = firstRow ? Object.keys(firstRow).filter(c => {
-                            if (c === '_resumo' || c === 'animal_id') return false
+                            if (c === '_resumo' || c === 'animal_id' || c === 'id') return false
                             const val = firstRow[c]
                             // Ocultar colunas com objetos/arrays (como a lista de animais)
                             if (typeof val === 'object' && val !== null) return false
