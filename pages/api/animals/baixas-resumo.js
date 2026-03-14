@@ -103,6 +103,7 @@ export default async function handler(req, res) {
       }
       const proleDetalhes = await databaseService.buscarBaixasFilhosMae(serieNorm, rgNorm)
       resumoMae.proleDetalhes = (proleDetalhes || []).map(b => ({
+        id: b.animal_id || null,
         serie: b.serie || b.animal_serie,
         rg: b.rg || b.animal_rg,
         tipo: b.tipo,
@@ -112,6 +113,7 @@ export default async function handler(req, res) {
         valor: b.valor != null ? parseFloat(b.valor) : null,
         numero_nf: b.numero_nf,
         sexo: b.sexo,
+        era: b.era,
         pai: b.pai,
         mae: b.mae,
         avo_materno: b.avo_materno,

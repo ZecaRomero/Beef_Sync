@@ -1,4 +1,4 @@
-﻿﻿ï»¿import { query } from '../../../lib/database';
+import { query } from '../../../lib/database';
 import formidable from 'formidable';
 import ExcelJS from 'exceljs';
 import fs from 'fs';

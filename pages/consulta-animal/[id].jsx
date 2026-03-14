@@ -76,12 +76,19 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
     
     ativos.forEach(f => {
       const key = f.id ? `id-${f.id}` : `${f.serie}-${f.rg}`
-      map.set(key, { ...f, status: 'ATIVO' })
+      // Usar situacao do animal para determinar status real
+      const situacao = (f.situacao || '').trim()
+      const statusReal = /morto|morte/i.test(situacao) ? 'MORTE/BAIXA'
+        : /vendido|venda/i.test(situacao) ? 'VENDA'
+        : 'ATIVO'
+      map.set(key, { ...f, status: statusReal })
     })
     
     baixados.forEach((f, idx) => {
       const key = `${f.serie}-${f.rg}`
-      const fComId = { ...f, id: f.id || `baixa-${f.serie}-${f.rg}-${idx}`, status: f.tipo }
+      // Usar id do animal se disponível, senão gerar id de baixa
+      const animalId = f.id || null
+      const fComId = { ...f, id: animalId || `baixa-${f.serie}-${f.rg}-${idx}`, status: f.tipo }
       // Encontrar a chave do mapa onde esse filho já existe (evita duplicatas e chaves React duplicadas)
       let mapKeyToUpdate = null
       for (const [k, v] of map) {
@@ -340,7 +347,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
           <div className="animate-fade-in-stagger-4">
           <AnimalGestations gestacoes={animal.gestacoes || []} />
           
-          <AnimalInseminations inseminacoes={inseminacoes} dataNascimento={animal?.data_nascimento} />
+          <AnimalInseminations inseminacoes={inseminacoes} dataNascimento={animal?.data_nascimento} animalId={animal?.id} />
           </div>
 
           <div className="animate-fade-in-stagger-5">
