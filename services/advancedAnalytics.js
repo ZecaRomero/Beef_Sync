@@ -1,4 +1,4 @@
-// Sistema de análise avançada para Beef Sync
+// Sistema de anÃ¡lise avanÃ§ada para Beef Sync
 import { query } from '../lib/database'
 
 class AdvancedAnalytics {
@@ -7,10 +7,10 @@ class AdvancedAnalytics {
     this.cacheTTL = 10 * 60 * 1000 // 10 minutos
   }
 
-  // Análise de performance do rebanho
+  // AnÃ¡lise de performance do rebanho
   async analyzeHerdPerformance() {
     try {
-      console.log('📊 Analisando performance do rebanho...')
+      console.log('ðÅ¸â€œÅ  Analisando performance do rebanho...')
 
       const analysis = {
         timestamp: new Date(),
@@ -19,7 +19,7 @@ class AdvancedAnalytics {
         recommendations: []
       }
 
-      // Dados básicos do rebanho
+      // Dados bÃ¡sicos do rebanho
       const herdData = await query(`
         SELECT 
           COUNT(*) as total_animais,
@@ -28,13 +28,13 @@ class AdvancedAnalytics {
           COUNT(CASE WHEN situacao = 'Morto' THEN 1 END) as animais_mortos,
           AVG(meses) as idade_media,
           COUNT(CASE WHEN sexo = 'Macho' THEN 1 END) as machos,
-          COUNT(CASE WHEN sexo = 'Fêmea' THEN 1 END) as femeas
+          COUNT(CASE WHEN sexo = 'FÃªmea' THEN 1 END) as femeas
         FROM animais
       `)
 
       analysis.overview = herdData.rows[0]
 
-      // Análise de custos
+      // AnÃ¡lise de custos
       const costAnalysis = await query(`
         SELECT 
           AVG(c.total_custo) as custo_medio,
@@ -53,7 +53,7 @@ class AdvancedAnalytics {
       analysis.overview.custo_minimo = costAnalysis.rows[0]?.custo_minimo || 0
       analysis.overview.animais_custo_alto = costAnalysis.rows[0]?.animais_custo_alto || 0
 
-      // Tendências de nascimentos
+      // TendÃªncias de nascimentos
       const birthTrends = await query(`
         SELECT 
           DATE_TRUNC('month', data_nascimento) as mes,
@@ -66,7 +66,7 @@ class AdvancedAnalytics {
 
       analysis.trends.nascimentos = birthTrends.rows
 
-      // Tendências de vendas
+      // TendÃªncias de vendas
       const salesTrends = await query(`
         SELECT 
           DATE_TRUNC('month', updated_at) as mes,
@@ -80,13 +80,13 @@ class AdvancedAnalytics {
 
       analysis.trends.vendas = salesTrends.rows
 
-      // Gerar recomendações
+      // Gerar recomendaÃ§Ãµes
       if (analysis.overview.animais_custo_alto > analysis.overview.total_animais * 0.2) {
         analysis.recommendations.push({
           type: 'cost',
           priority: 'high',
           message: `${analysis.overview.animais_custo_alto} animais com custo alto (>R$ 8.000)`,
-          action: 'Revisar estratégia de custos para animais de alto valor'
+          action: 'Revisar estratÃ©gia de custos para animais de alto valor'
         })
       }
 
@@ -94,23 +94,23 @@ class AdvancedAnalytics {
         analysis.recommendations.push({
           type: 'age',
           priority: 'medium',
-          message: `Idade média do rebanho: ${analysis.overview.idade_media.toFixed(1)} meses`,
-          action: 'Considerar renovação do rebanho'
+          message: `Idade mÃ©dia do rebanho: ${analysis.overview.idade_media.toFixed(1)} meses`,
+          action: 'Considerar renovaÃ§Ã£o do rebanho'
         })
       }
 
       return analysis
 
     } catch (error) {
-      console.error('❌ Erro na análise de performance do rebanho:', error)
+      console.error('â�Å’ Erro na anÃ¡lise de performance do rebanho:', error)
       throw error
     }
   }
 
-  // Análise de rentabilidade
+  // AnÃ¡lise de rentabilidade
   async analyzeProfitability() {
     try {
-      console.log('💰 Analisando rentabilidade...')
+      console.log('ðÅ¸â€™° Analisando rentabilidade...')
 
       const analysis = {
         timestamp: new Date(),
@@ -119,7 +119,7 @@ class AdvancedAnalytics {
         recommendations: []
       }
 
-      // Métricas de rentabilidade
+      // MÃ©tricas de rentabilidade
       const profitabilityMetrics = await query(`
         SELECT 
           a.id,
@@ -168,7 +168,7 @@ class AdvancedAnalytics {
         margem_bruta: totalReceita > 0 ? (totalLucro / totalReceita) * 100 : 0
       }
 
-      // Análise por faixa etária
+      // AnÃ¡lise por faixa etÃ¡ria
       const ageAnalysis = await query(`
         SELECT 
           CASE 
@@ -216,13 +216,13 @@ class AdvancedAnalytics {
 
       analysis.trends.por_faixa_etaria = ageAnalysis.rows
 
-      // Gerar recomendações
+      // Gerar recomendaÃ§Ãµes
       if (analysis.metrics.roi_medio < 15) {
         analysis.recommendations.push({
           type: 'profitability',
           priority: 'high',
-          message: `ROI médio baixo: ${analysis.metrics.roi_medio.toFixed(1)}%`,
-          action: 'Otimizar custos ou melhorar preços de venda'
+          message: `ROI mÃ©dio baixo: ${analysis.metrics.roi_medio.toFixed(1)}%`,
+          action: 'Otimizar custos ou melhorar preÃ§os de venda'
         })
       }
 
@@ -231,22 +231,22 @@ class AdvancedAnalytics {
           type: 'margin',
           priority: 'medium',
           message: `Margem bruta baixa: ${analysis.metrics.margem_bruta.toFixed(1)}%`,
-          action: 'Revisar estratégia de precificação'
+          action: 'Revisar estratÃ©gia de precificaÃ§Ã£o'
         })
       }
 
       return analysis
 
     } catch (error) {
-      console.error('❌ Erro na análise de rentabilidade:', error)
+      console.error('â�Å’ Erro na anÃ¡lise de rentabilidade:', error)
       throw error
     }
   }
 
-  // Análise de reprodução
+  // AnÃ¡lise de reproduÃ§Ã£o
   async analyzeReproduction() {
     try {
-      console.log('🐄 Analisando performance reprodutiva...')
+      console.log('ðÅ¸�â€ž Analisando performance reprodutiva...')
 
       const analysis = {
         timestamp: new Date(),
@@ -255,7 +255,7 @@ class AdvancedAnalytics {
         recommendations: []
       }
 
-      // Métricas de reprodução
+      // MÃ©tricas de reproduÃ§Ã£o
       const reproductionMetrics = await query(`
         SELECT 
           COUNT(DISTINCT g.animal_id) as femeas_gestantes,
@@ -276,7 +276,7 @@ class AdvancedAnalytics {
 
       analysis.metrics.taxa_sucesso = successRate
 
-      // Análise por mês
+      // AnÃ¡lise por mÃªs
       const monthlyAnalysis = await query(`
         SELECT 
           DATE_TRUNC('month', g.data_gestacao) as mes,
@@ -295,7 +295,7 @@ class AdvancedAnalytics {
 
       analysis.trends.mensal = monthlyAnalysis.rows
 
-      // Análise por idade da fêmea
+      // AnÃ¡lise por idade da fÃªmea
       const ageAnalysis = await query(`
         SELECT 
           CASE 
@@ -320,7 +320,7 @@ class AdvancedAnalytics {
 
       analysis.trends.por_idade = ageAnalysis.rows
 
-      // Gerar recomendações
+      // Gerar recomendaÃ§Ãµes
       if (successRate < 70) {
         analysis.recommendations.push({
           type: 'reproduction',
@@ -334,23 +334,23 @@ class AdvancedAnalytics {
         analysis.recommendations.push({
           type: 'gestation',
           priority: 'medium',
-          message: `Gestação média longa: ${analysis.metrics.gestacao_media_dias.toFixed(0)} dias`,
-          action: 'Verificar precisão dos dados de gestação'
+          message: `GestaÃ§Ã£o mÃ©dia longa: ${analysis.metrics.gestacao_media_dias.toFixed(0)} dias`,
+          action: 'Verificar precisÃ£o dos dados de gestaÃ§Ã£o'
         })
       }
 
       return analysis
 
     } catch (error) {
-      console.error('❌ Erro na análise de reprodução:', error)
+      console.error('â�Å’ Erro na anÃ¡lise de reproduÃ§Ã£o:', error)
       throw error
     }
   }
 
-  // Análise de custos
+  // AnÃ¡lise de custos
   async analyzeCosts() {
     try {
-      console.log('💸 Analisando custos...')
+      console.log('ðÅ¸â€™¸ Analisando custos...')
 
       const analysis = {
         timestamp: new Date(),
@@ -359,7 +359,7 @@ class AdvancedAnalytics {
         recommendations: []
       }
 
-      // Métricas de custos
+      // MÃ©tricas de custos
       const costMetrics = await query(`
         SELECT 
           COUNT(*) as total_custos,
@@ -374,7 +374,7 @@ class AdvancedAnalytics {
 
       analysis.metrics = costMetrics.rows[0] || {}
 
-      // Análise por tipo de custo
+      // AnÃ¡lise por tipo de custo
       const costByType = await query(`
         SELECT 
           tipo,
@@ -390,7 +390,7 @@ class AdvancedAnalytics {
 
       analysis.trends.por_tipo = costByType.rows
 
-      // Análise mensal
+      // AnÃ¡lise mensal
       const monthlyCosts = await query(`
         SELECT 
           DATE_TRUNC('month', data) as mes,
@@ -405,7 +405,7 @@ class AdvancedAnalytics {
 
       analysis.trends.mensal = monthlyCosts.rows
 
-      // Análise por animal
+      // AnÃ¡lise por animal
       const costByAnimal = await query(`
         SELECT 
           a.serie,
@@ -425,13 +425,13 @@ class AdvancedAnalytics {
 
       analysis.trends.por_animal = costByAnimal.rows
 
-      // Gerar recomendações
+      // Gerar recomendaÃ§Ãµes
       if (analysis.metrics.valor_medio > 500) {
         analysis.recommendations.push({
           type: 'cost',
           priority: 'medium',
-          message: `Custo médio alto: R$ ${analysis.metrics.valor_medio.toFixed(2)}`,
-          action: 'Revisar estratégia de custos'
+          message: `Custo mÃ©dio alto: R$ ${analysis.metrics.valor_medio.toFixed(2)}`,
+          action: 'Revisar estratÃ©gia de custos'
         })
       }
 
@@ -441,22 +441,22 @@ class AdvancedAnalytics {
           type: 'protocol',
           priority: 'low',
           message: `Protocolos representam ${protocolosPercentual.toFixed(1)}% dos custos`,
-          action: 'Otimizar protocolos sanitários'
+          action: 'Otimizar protocolos sanitÃ¡rios'
         })
       }
 
       return analysis
 
     } catch (error) {
-      console.error('❌ Erro na análise de custos:', error)
+      console.error('â�Å’ Erro na anÃ¡lise de custos:', error)
       throw error
     }
   }
 
-  // Análise completa do sistema
+  // AnÃ¡lise completa do sistema
   async generateCompleteAnalysis() {
     try {
-      console.log('🔍 Gerando análise completa do sistema...')
+      console.log('ðÅ¸â€�� Gerando anÃ¡lise completa do sistema...')
 
       const [herdAnalysis, profitabilityAnalysis, reproductionAnalysis, costAnalysis] = await Promise.all([
         this.analyzeHerdPerformance(),
@@ -502,19 +502,19 @@ class AdvancedAnalytics {
       return completeAnalysis
 
     } catch (error) {
-      console.error('❌ Erro na análise completa:', error)
+      console.error('â�Å’ Erro na anÃ¡lise completa:', error)
       throw error
     }
   }
 
-  // Obter análise com cache
+  // Obter anÃ¡lise com cache
   async getCachedAnalysis(type, forceRefresh = false) {
     const cacheKey = `analysis:${type}`
     
     if (!forceRefresh && this.cache.has(cacheKey)) {
       const cached = this.cache.get(cacheKey)
       if (Date.now() - cached.timestamp < this.cacheTTL) {
-        console.log(`📦 Análise ${type} carregada do cache`)
+        console.log(`ðÅ¸â€œ¦ AnÃ¡lise ${type} carregada do cache`)
         return cached.data
       }
     }
@@ -537,7 +537,7 @@ class AdvancedAnalytics {
         analysis = await this.generateCompleteAnalysis()
         break
       default:
-        throw new Error(`Tipo de análise não suportado: ${type}`)
+        throw new Error(`Tipo de anÃ¡lise nÃ£o suportado: ${type}`)
     }
 
     this.cache.set(cacheKey, {
@@ -551,11 +551,11 @@ class AdvancedAnalytics {
   // Limpar cache
   clearCache() {
     this.cache.clear()
-    console.log('🗑️ Cache de análises limpo')
+    console.log('ðÅ¸â€”â€˜ï¸� Cache de anÃ¡lises limpo')
   }
 }
 
-// Instância singleton
+// InstÃ¢ncia singleton
 const advancedAnalytics = new AdvancedAnalytics()
 
 export default advancedAnalytics

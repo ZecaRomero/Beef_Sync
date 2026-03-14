@@ -52,16 +52,16 @@ export default function CalendarioReprodutivo() {
         }
         
         const url = `/api/calendario-reprodutivo${params.toString() ? '?' + params.toString() : ''}`
-        console.log(`📡 Buscando eventos: ${url}`)
+        console.log(`ðÅ¸â€œ¡ Buscando eventos: ${url}`)
         
         const response = await fetch(url)
         if (response.ok) {
           const responseData = await response.json()
           const data = responseData.data || responseData
           const eventosArray = Array.isArray(data) ? data : []
-          console.log(`📋 Eventos carregados da API: ${eventosArray.length}`)
+          console.log(`ðÅ¸â€œâ€¹ Eventos carregados da API: ${eventosArray.length}`)
           if (eventosArray.length > 0) {
-            console.log('📋 Primeiro evento:', eventosArray[0])
+            console.log('ðÅ¸â€œâ€¹ Primeiro evento:', eventosArray[0])
           }
           setEventos(eventosArray)
           return
@@ -71,7 +71,7 @@ export default function CalendarioReprodutivo() {
         }
       } catch (apiError) {
         console.error('Erro ao buscar eventos da API:', apiError)
-        console.log('API não disponível, usando localStorage')
+        console.log('API nÃ£o disponÃ­vel, usando localStorage')
       }
 
       // Fallback para localStorage
@@ -95,7 +95,7 @@ export default function CalendarioReprodutivo() {
     e.preventDefault()
     
     if (!formData.titulo.trim() || !formData.animal.trim()) {
-      alert('Preencha todos os campos obrigatórios')
+      alert('Preencha todos os campos obrigatÃ³rios')
       return
     }
 
@@ -112,7 +112,7 @@ export default function CalendarioReprodutivo() {
             data_evento: formData.data,
             tipo_evento: formData.tipo,
             descricao: formData.descricao,
-            // Nota: animal_id seria necessário se tivéssemos integração com animais
+            // Nota: animal_id seria necessÃ¡rio se tivÃ©ssemos integraÃ§Ã£o com animais
             animal_nome: formData.animal
           })
         })
@@ -131,7 +131,7 @@ export default function CalendarioReprodutivo() {
           return
         }
       } catch (apiError) {
-        console.log('API não disponível, salvando no localStorage')
+        console.log('API nÃ£o disponÃ­vel, salvando no localStorage')
       }
 
       // Fallback para localStorage
@@ -169,10 +169,10 @@ export default function CalendarioReprodutivo() {
   }
 
   const handleDelete = async (id) => {
-    // Não permitir excluir eventos de receptoras (são gerados automaticamente)
+    // NÃ£o permitir excluir eventos de receptoras (sÃ£o gerados automaticamente)
     const evento = eventos.find(e => e.id === id)
     if (evento && evento.origem === 'receptora') {
-      alert('Este evento é gerado automaticamente e não pode ser excluído.')
+      alert('Este evento Ã© gerado automaticamente e nÃ£o pode ser excluÃ­do.')
       return
     }
 
@@ -185,12 +185,12 @@ export default function CalendarioReprodutivo() {
           })
 
           if (response.ok) {
-            alert('Evento excluído com sucesso!')
+            alert('Evento excluÃ­do com sucesso!')
             loadEventos()
             return
           }
         } catch (apiError) {
-          console.log('API não disponível, removendo do localStorage')
+          console.log('API nÃ£o disponÃ­vel, removendo do localStorage')
         }
 
         // Fallback para localStorage
@@ -201,7 +201,7 @@ export default function CalendarioReprodutivo() {
           localStorage.setItem('calendarioReprodutivo', JSON.stringify(updatedData))
         }
         
-        alert('Evento excluído com sucesso!')
+        alert('Evento excluÃ­do com sucesso!')
       } catch (error) {
         console.error('Erro ao excluir evento:', error)
         alert('Erro ao excluir evento')
@@ -217,27 +217,27 @@ export default function CalendarioReprodutivo() {
       const ExcelJS = (await import('exceljs')).default
       
       const workbook = new ExcelJS.Workbook()
-      const worksheet = workbook.addWorksheet('Calendário Reprodutivo')
+      const worksheet = workbook.addWorksheet('CalendÃ¡rio Reprodutivo')
       
-      // Título principal
+      // TÃ­tulo principal
       worksheet.mergeCells('A1:J1')
       const titleCell = worksheet.getCell('A1')
-      titleCell.value = 'CALENDÁRIO REPRODUTIVO'
+      titleCell.value = 'CALENDÃ�RIO REPRODUTIVO'
       titleCell.font = { size: 16, bold: true }
       titleCell.alignment = { horizontal: 'center', vertical: 'middle' }
       
-      // Informações gerais
+      // InformaÃ§Ãµes gerais
       worksheet.mergeCells('A2:J2')
       const infoCell = worksheet.getCell('A2')
       infoCell.value = `Gerado em: ${new Date().toLocaleDateString('pt-BR')} - Total de eventos: ${eventos.length}`
       infoCell.font = { size: 10, italic: true }
       infoCell.alignment = { horizontal: 'center' }
       
-      // Cabeçalhos
-      const headers = ['Data', 'Tipo de Evento', 'Título', 'Animal', 'Tatuagem', 'Status', 'Descrição', 'NF', 'Fornecedor', 'Data TE']
+      // CabeÃ§alhos
+      const headers = ['Data', 'Tipo de Evento', 'TÃ­tulo', 'Animal', 'Tatuagem', 'Status', 'DescriÃ§Ã£o', 'NF', 'Fornecedor', 'Data TE']
       worksheet.addRow(headers)
       
-      // Estilizar cabeçalhos
+      // Estilizar cabeÃ§alhos
       const headerRow = worksheet.getRow(3)
       headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } }
       headerRow.fill = {
@@ -279,11 +279,11 @@ export default function CalendarioReprodutivo() {
       worksheet.columns.forEach((column, index) => {
         if (index === 0) column.width = 12 // Data
         else if (index === 1) column.width = 25 // Tipo
-        else if (index === 2) column.width = 30 // Título
+        else if (index === 2) column.width = 30 // TÃ­tulo
         else if (index === 3) column.width = 20 // Animal
         else if (index === 4) column.width = 15 // Tatuagem
         else if (index === 5) column.width = 15 // Status
-        else if (index === 6) column.width = 40 // Descrição
+        else if (index === 6) column.width = 40 // DescriÃ§Ã£o
         else if (index === 7) column.width = 12 // NF
         else if (index === 8) column.width = 20 // Fornecedor
         else column.width = 12 // Data TE
@@ -291,10 +291,10 @@ export default function CalendarioReprodutivo() {
       
       // Aplicar cores condicionais no status
       eventos.forEach((evento, index) => {
-        const row = worksheet.getRow(index + 4) // +4 porque temos título, info, header e começa em 1
-        const statusCell = row.getCell(6) // Coluna F (Status) - 6ª coluna
+        const row = worksheet.getRow(index + 4) // +4 porque temos tÃ­tulo, info, header e comeÃ§a em 1
+        const statusCell = row.getCell(6) // Coluna F (Status) - 6Âª coluna
         
-        if (statusCell.value === 'Concluído' || statusCell.value === 'Prenha') {
+        if (statusCell.value === 'ConcluÃ­do' || statusCell.value === 'Prenha') {
           statusCell.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -331,18 +331,18 @@ export default function CalendarioReprodutivo() {
       window.URL.revokeObjectURL(url)
       
       setExportando(false)
-      alert('Calendário exportado com sucesso!')
+      alert('CalendÃ¡rio exportado com sucesso!')
     } catch (error) {
       console.error('Erro ao exportar:', error)
       setExportando(false)
-      alert('Erro ao exportar calendário')
+      alert('Erro ao exportar calendÃ¡rio')
     }
   }
 
   const handleStatusChange = async (id, novoStatus) => {
     const evento = eventos.find(e => e.id === id)
     if (evento && evento.origem === 'receptora') {
-      alert('Eventos gerados automaticamente não podem ter o status alterado.')
+      alert('Eventos gerados automaticamente nÃ£o podem ter o status alterado.')
       return
     }
     try {
@@ -415,7 +415,7 @@ export default function CalendarioReprodutivo() {
       const tipo = evento.tipo_evento || evento.tipo || 'sem-tipo'
       const nf = evento.numero_nf || 'sem-nf'
       
-      // Chave única para o grupo: Data + Tipo + NF
+      // Chave Ãºnica para o grupo: Data + Tipo + NF
       const key = `${dataFormatada}|${tipo}|${nf}`
       
       if (!groups[key]) {
@@ -432,7 +432,7 @@ export default function CalendarioReprodutivo() {
       groups[key].events.push(evento)
     })
     
-    // Converter para array e manter a ordem original (ordenado por data se possível)
+    // Converter para array e manter a ordem original (ordenado por data se possÃ­vel)
     return Object.values(groups).sort((a, b) => {
         // Tentar ordenar por data decrescente
         if (a.data && b.data) {
@@ -453,7 +453,7 @@ export default function CalendarioReprodutivo() {
     
     // Cor do badge de status
     let statusColor = 'bg-gray-500'
-    if (status === 'Concluído' || status === 'Prenha') statusColor = 'bg-green-500'
+    if (status === 'ConcluÃ­do' || status === 'Prenha') statusColor = 'bg-green-500'
     else if (status === 'Vazia') statusColor = 'bg-red-500'
     else if (status === 'Agendado') statusColor = 'bg-orange-500'
     
@@ -464,7 +464,7 @@ export default function CalendarioReprodutivo() {
     // Cor da borda baseada no tipo de evento
     let borderColor = 'border-pink-500'
     if (tipoEvento === 'Chegada de Receptora') borderColor = 'border-blue-500'
-    else if (tipoEvento === 'Diagnóstico de Gestação') borderColor = 'border-yellow-500'
+    else if (tipoEvento === 'DiagnÃ³stico de GestaÃ§Ã£o') borderColor = 'border-yellow-500'
     else if (tipoEvento === 'Parto Previsto') borderColor = 'border-green-500'
     else if (origem === 'receptora') borderColor = 'border-purple-500'
     
@@ -556,7 +556,7 @@ export default function CalendarioReprodutivo() {
                   Agendar
                 </button>
                 <button
-                  onClick={() => handleStatusChange(item.id, 'Concluído')}
+                  onClick={() => handleStatusChange(item.id, 'ConcluÃ­do')}
                   className="px-2 py-1 text-xs rounded bg-green-600 text-white hover:bg-green-700"
                 >
                   Concluir
@@ -642,7 +642,7 @@ export default function CalendarioReprodutivo() {
           </button>
         </div>
         <div className="grid grid-cols-7 gap-2">
-          {['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d => (
+          {['Dom','Seg','Ter','Qua','Qui','Sex','SÃ¡b'].map(d => (
             <div key={d} className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
               {d}
             </div>
@@ -678,7 +678,7 @@ export default function CalendarioReprodutivo() {
                     const tipo = ev.tipo_evento || ev.tipo || ''
                     const status = ev.status || 'Agendado'
                     const color =
-                      status === 'Concluído' || status === 'Prenha' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
+                      status === 'ConcluÃ­do' || status === 'Prenha' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
                       status === 'Vazia' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' :
                       'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300'
                     return (
@@ -748,7 +748,7 @@ export default function CalendarioReprodutivo() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <CalendarIcon className="w-8 h-8 text-pink-600" />
-            Calendário Reprodutivo
+            CalendÃ¡rio Reprodutivo
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-2">
             Agenda reprodutiva - {eventosFiltrados.length} evento(s) encontrado(s)
@@ -766,7 +766,7 @@ export default function CalendarioReprodutivo() {
               onClick={() => setViewMode('month')}
               className={`px-3 py-2 text-sm ${viewMode === 'month' ? 'bg-pink-600 text-white' : 'text-gray-700 dark:text-gray-300'}`}
             >
-              Calendário
+              CalendÃ¡rio
             </button>
           </div>
           <button
@@ -809,7 +809,7 @@ export default function CalendarioReprodutivo() {
         <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800">
           <div className="text-sm text-yellow-600 dark:text-yellow-400">DG Agendados</div>
           <div className="text-2xl font-bold text-yellow-900 dark:text-yellow-100">
-            {eventos.filter(e => e.tipo_evento === 'Diagnóstico de Gestação').length}
+            {eventos.filter(e => e.tipo_evento === 'DiagnÃ³stico de GestaÃ§Ã£o').length}
           </div>
         </div>
         <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
@@ -819,9 +819,9 @@ export default function CalendarioReprodutivo() {
           </div>
         </div>
         <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg border border-orange-200 dark:border-orange-800">
-          <div className="text-sm text-orange-600 dark:text-orange-400">Refazer Andrológico</div>
+          <div className="text-sm text-orange-600 dark:text-orange-400">Refazer AndrolÃ³gico</div>
           <div className="text-2xl font-bold text-orange-900 dark:text-orange-100">
-            {eventos.filter(e => e.tipo_evento === 'Refazer Exame Andrológico').length}
+            {eventos.filter(e => e.tipo_evento === 'Refazer Exame AndrolÃ³gico').length}
           </div>
         </div>
         <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
@@ -846,13 +846,13 @@ export default function CalendarioReprodutivo() {
             >
               <option value="">Todos os tipos</option>
               <option value="Chegada de Receptora">Chegada de Receptora</option>
-              <option value="Diagnóstico de Gestação">Diagnóstico de Gestação</option>
-              <option value="Inseminação">Inseminação Artificial</option>
-              <option value="Transferência">Transferência de Embriões</option>
+              <option value="DiagnÃ³stico de GestaÃ§Ã£o">DiagnÃ³stico de GestaÃ§Ã£o</option>
+              <option value="InseminaÃ§Ã£o">InseminaÃ§Ã£o Artificial</option>
+              <option value="TransferÃªncia">TransferÃªncia de EmbriÃµes</option>
               <option value="Parto">Parto Previsto</option>
               <option value="Exame">Exame Reprodutivo</option>
-              <option value="Refazer Exame Andrológico">Refazer Exame Andrológico</option>
-              <option value="Vacinação">Vacinação</option>
+              <option value="Refazer Exame AndrolÃ³gico">Refazer Exame AndrolÃ³gico</option>
+              <option value="VacinaÃ§Ã£o">VacinaÃ§Ã£o</option>
               <option value="Outro">Outro</option>
             </select>
           </div>
@@ -878,7 +878,7 @@ export default function CalendarioReprodutivo() {
             >
               <option value="">Todos</option>
               <option value="Agendado">Agendado</option>
-              <option value="Concluído">Concluído</option>
+              <option value="ConcluÃ­do">ConcluÃ­do</option>
               <option value="Vazia">Vazia</option>
               <option value="Prenha">Prenha</option>
             </select>
@@ -906,7 +906,7 @@ export default function CalendarioReprodutivo() {
                 <input
                   value={filtroBusca}
                   onChange={(e) => setFiltroBusca(e.target.value)}
-                  placeholder="Procurar por título, animal, tatuagem, NF, fornecedor..."
+                  placeholder="Procurar por tÃ­tulo, animal, tatuagem, NF, fornecedor..."
                   className="w-full bg-transparent outline-none text-gray-900 dark:text-white"
                 />
               </div>
@@ -915,7 +915,7 @@ export default function CalendarioReprodutivo() {
         </div>
       </div>
 
-      {/* Formulário de Novo Evento */}
+      {/* FormulÃ¡rio de Novo Evento */}
       {showForm && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
           <div className="flex justify-between items-center mb-6">
@@ -934,13 +934,13 @@ export default function CalendarioReprodutivo() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Título do Evento *
+                  TÃ­tulo do Evento *
                 </label>
                 <input
                   type="text"
                   value={formData.titulo}
                   onChange={(e) => setFormData({...formData, titulo: e.target.value})}
-                  placeholder="Ex: Inseminação, Parto, Exame..."
+                  placeholder="Ex: InseminaÃ§Ã£o, Parto, Exame..."
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:text-white"
                   required
                 />
@@ -954,7 +954,7 @@ export default function CalendarioReprodutivo() {
                   type="text"
                   value={formData.animal}
                   onChange={(e) => setFormData({...formData, animal: e.target.value})}
-                  placeholder="Identificação do animal"
+                  placeholder="IdentificaÃ§Ã£o do animal"
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:text-white"
                   required
                 />
@@ -983,19 +983,19 @@ export default function CalendarioReprodutivo() {
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:text-white"
                 >
                   <option value="">Selecione o tipo</option>
-                  <option value="Inseminação">Inseminação Artificial</option>
-                  <option value="Transferência">Transferência de Embriões</option>
+                  <option value="InseminaÃ§Ã£o">InseminaÃ§Ã£o Artificial</option>
+                  <option value="TransferÃªncia">TransferÃªncia de EmbriÃµes</option>
                   <option value="Parto">Parto Previsto</option>
                   <option value="Exame">Exame Reprodutivo</option>
-                  <option value="Refazer Exame Andrológico">Refazer Exame Andrológico</option>
-                  <option value="Vacinação">Vacinação</option>
+                  <option value="Refazer Exame AndrolÃ³gico">Refazer Exame AndrolÃ³gico</option>
+                  <option value="VacinaÃ§Ã£o">VacinaÃ§Ã£o</option>
                   <option value="Outro">Outro</option>
                 </select>
               </div>
 
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Descrição
+                  DescriÃ§Ã£o
                 </label>
                 <textarea
                   value={formData.descricao}
@@ -1039,7 +1039,7 @@ export default function CalendarioReprodutivo() {
             Nenhum evento agendado
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            Comece adicionando eventos ao calendário reprodutivo
+            Comece adicionando eventos ao calendÃ¡rio reprodutivo
           </p>
           <button
             onClick={() => setShowForm(true)}
@@ -1065,7 +1065,7 @@ export default function CalendarioReprodutivo() {
             const origem = group.events[0].origem
             let borderColor = 'border-pink-500'
             if (tipoEvento === 'Chegada de Receptora') borderColor = 'border-blue-500'
-            else if (tipoEvento === 'Diagnóstico de Gestação') borderColor = 'border-yellow-500'
+            else if (tipoEvento === 'DiagnÃ³stico de GestaÃ§Ã£o') borderColor = 'border-yellow-500'
             else if (tipoEvento === 'Parto Previsto') borderColor = 'border-green-500'
             else if (origem === 'receptora') borderColor = 'border-purple-500'
 
@@ -1091,7 +1091,7 @@ export default function CalendarioReprodutivo() {
                             )}
                         </div>
                         <div className="text-sm text-gray-600 dark:text-gray-400">
-                            {group.data ? new Date(group.data).toLocaleDateString('pt-BR') : 'Data N/A'} • {group.fornecedor || 'Fornecedor N/A'}
+                            {group.data ? new Date(group.data).toLocaleDateString('pt-BR') : 'Data N/A'} ââ‚¬¢ {group.fornecedor || 'Fornecedor N/A'}
                         </div>
                     </div>
                     <div>

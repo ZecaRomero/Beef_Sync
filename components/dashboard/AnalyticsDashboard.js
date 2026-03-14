@@ -12,7 +12,7 @@ import {
   ClockIcon
 } from '../ui/Icons'
 
-// Ícones adicionais que não estão no arquivo Icons.js
+// Ã�cones adicionais que nÃ£o estÃ£o no arquivo Icons.js
 const ArrowUpIcon = ({ className = "h-6 w-6" }) => (
   <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
@@ -51,29 +51,29 @@ export default function AnalyticsDashboard() {
       const semen = JSON.parse(localStorage.getItem('estoqueSemen') || '[]')
       const notasFiscais = JSON.parse(localStorage.getItem('notasFiscais') || '[]')
 
-      // Calcular métricas de animais
+      // Calcular mÃ©tricas de animais
       const totalAnimais = (animais || []).length
       const animaisAtivos = (animais || []).filter(a => a.situacao === 'Ativo').length
       const animaisVendidos = (animais || []).filter(a => a.situacao === 'Vendido').length
       const animaisMortos = (animais || []).filter(a => a.situacao === 'Morto').length
 
-      // Calcular métricas financeiras
+      // Calcular mÃ©tricas financeiras
       const receitaTotal = (animais || []).reduce((sum, animal) => sum + (parseFloat(animal.valorVenda) || 0), 0)
       const custosTotal = (custos || []).reduce((sum, custo) => sum + (parseFloat(custo.valor) || 0), 0)
       const lucro = receitaTotal - custosTotal
       const roi = custosTotal > 0 ? ((lucro / custosTotal) * 100) : 0
 
-      // Calcular métricas reprodutivas
+      // Calcular mÃ©tricas reprodutivas
       const gestacoesAtivas = (nascimentos || []).filter(n => n.status === 'gestacao').length
       const nascimentosConfirmados = (nascimentos || []).filter(n => n.status === 'nascido').length
       const taxaConcepcao = gestacoesAtivas > 0 ? (nascimentosConfirmados / gestacoesAtivas) * 100 : 0
 
-      // Calcular métricas de estoque
+      // Calcular mÃ©tricas de estoque
       const semenTotal = (semen || []).reduce((sum, s) => sum + (parseInt(s.quantidadeDoses) || 0), 0)
       const semenUsado = (semen || []).reduce((sum, s) => sum + (parseInt(s.dosesUsadas) || 0), 0)
       const semenDisponivel = semenTotal - semenUsado
 
-      // Calcular tendências
+      // Calcular tendÃªncias
       const crescimentoRebanho = calcularCrescimentoRebanho(animais, timeRange)
       const eficienciaReprodutiva = calcularEficienciaReprodutiva(nascimentos, timeRange)
 
@@ -93,7 +93,7 @@ export default function AnalyticsDashboard() {
   }
 
   const calcularCrescimentoRebanho = (animais, periodo) => {
-    // Calcular crescimento baseado em nascimentos vs vendas no período
+    // Calcular crescimento baseado em nascimentos vs vendas no perÃ­odo
     const agora = new Date()
     const inicioPeriodo = new Date()
     
@@ -170,10 +170,10 @@ export default function AnalyticsDashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            📊 Analytics Avançados
+            ðÅ¸â€œÅ  Analytics AvanÃ§ados
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Análise detalhada baseada nos seus dados reais
+            AnÃ¡lise detalhada baseada nos seus dados reais
           </p>
         </div>
         
@@ -183,15 +183,15 @@ export default function AnalyticsDashboard() {
             onChange={(e) => setTimeRange(e.target.value)}
             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
           >
-            <option value="7dias">Últimos 7 dias</option>
-            <option value="30dias">Últimos 30 dias</option>
-            <option value="90dias">Últimos 90 dias</option>
-            <option value="ano">Último ano</option>
+            <option value="7dias">ÃÅ¡ltimos 7 dias</option>
+            <option value="30dias">ÃÅ¡ltimos 30 dias</option>
+            <option value="90dias">ÃÅ¡ltimos 90 dias</option>
+            <option value="ano">ÃÅ¡ltimo ano</option>
           </select>
         </div>
       </div>
 
-      {/* Cards de Métricas Principais */}
+      {/* Cards de MÃ©tricas Principais */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total de Animais */}
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white">
@@ -225,7 +225,7 @@ export default function AnalyticsDashboard() {
         <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-purple-100 text-sm">Lucro Líquido</p>
+              <p className="text-purple-100 text-sm">Lucro LÃ­quido</p>
               <p className="text-2xl font-bold">{formatCurrency(analytics.financeiro.lucro)}</p>
               <p className="text-purple-100 text-xs mt-1">
                 Custos: {formatCurrency(analytics.financeiro.custos)}
@@ -235,11 +235,11 @@ export default function AnalyticsDashboard() {
           </div>
         </div>
 
-        {/* Taxa de Concepção */}
+        {/* Taxa de ConcepÃ§Ã£o */}
         <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-orange-100 text-sm">Taxa de Concepção</p>
+              <p className="text-orange-100 text-sm">Taxa de ConcepÃ§Ã£o</p>
               <p className="text-3xl font-bold">{formatPercentage(analytics.reprodutivo.taxa_concepcao)}</p>
               <p className="text-orange-100 text-xs mt-1">
                 {analytics.reprodutivo.nascimentos} nascimentos
@@ -250,12 +250,12 @@ export default function AnalyticsDashboard() {
         </div>
       </div>
 
-      {/* Métricas Detalhadas */}
+      {/* MÃ©tricas Detalhadas */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Status dos Animais */}
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            📊 Status do Rebanho
+            ðÅ¸â€œÅ  Status do Rebanho
           </h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -305,10 +305,10 @@ export default function AnalyticsDashboard() {
           </div>
         </div>
 
-        {/* Estoque de Sêmen */}
+        {/* Estoque de SÃªmen */}
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            🧬 Estoque de Sêmen
+            ðÅ¸§¬ Estoque de SÃªmen
           </h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -319,7 +319,7 @@ export default function AnalyticsDashboard() {
             </div>
             
             <div className="flex items-center justify-between">
-              <span className="text-gray-600 dark:text-gray-400">Disponíveis</span>
+              <span className="text-gray-600 dark:text-gray-400">DisponÃ­veis</span>
               <span className="text-lg font-semibold text-green-600 dark:text-green-400">
                 {analytics.estoque.semen_disponivel}
               </span>
@@ -343,7 +343,7 @@ export default function AnalyticsDashboard() {
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">
                 {analytics.estoque.semen_total > 0 ? 
-                  `${((analytics.estoque.semen_disponivel / analytics.estoque.semen_total) * 100).toFixed(1)}% disponível` : 
+                  `${((analytics.estoque.semen_disponivel / analytics.estoque.semen_total) * 100).toFixed(1)}% disponÃ­vel` : 
                   'Nenhum estoque cadastrado'
                 }
               </p>
@@ -352,10 +352,10 @@ export default function AnalyticsDashboard() {
         </div>
       </div>
 
-      {/* Tendências */}
+      {/* TendÃªncias */}
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          📈 Tendências do Período
+          ðÅ¸â€œË† TendÃªncias do PerÃ­odo
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex items-center space-x-4">
@@ -368,7 +368,7 @@ export default function AnalyticsDashboard() {
                 +{analytics.tendencias.crescimento_rebanho}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Novos animais no período
+                Novos animais no perÃ­odo
               </p>
             </div>
           </div>
@@ -378,7 +378,7 @@ export default function AnalyticsDashboard() {
               <ChartBarIcon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Eficiência Reprodutiva</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">EficiÃªncia Reprodutiva</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
                 {analytics.tendencias.eficiencia_reprodutiva}
               </p>

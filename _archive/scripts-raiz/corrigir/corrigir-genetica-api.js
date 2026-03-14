@@ -7,7 +7,7 @@ const http = require('http')
 
 async function corrigirGenetica() {
   try {
-    console.log('\n🔧 Iniciando correção de dados genéticos via API...\n')
+    console.log('\n�Ÿ”� Iniciando correção de dados genéticos via API...\n')
     
     const options = {
       hostname: 'localhost',
@@ -37,14 +37,14 @@ async function corrigirGenetica() {
     })
     
     if (!response.success) {
-      console.log('❌ Erro:', response.message)
+      console.log('�Œ Erro:', response.message)
       return
     }
     
-    console.log(`✅ ${response.message}\n`)
+    console.log(`�œ… ${response.message}\n`)
     
     if (response.animais && response.animais.length > 0) {
-      console.log('📋 Animais corrigidos:\n')
+      console.log('�Ÿ“‹ Animais corrigidos:\n')
       
       response.animais.forEach((animal, index) => {
         console.log(`${index + 1}. ${animal.serie} ${animal.rg} (${animal.nome || 'Sem nome'})`)
@@ -60,11 +60,11 @@ async function corrigirGenetica() {
       })
     }
     
-    console.log('✅ Correção concluída!\n')
+    console.log('�œ… Correção concluída!\n')
     
   } catch (error) {
-    console.error('❌ Erro:', error.message)
-    console.error('\n💡 Certifique-se de que o servidor está rodando em http://localhost:3020')
+    console.error('�Œ Erro:', error.message)
+    console.error('\n�Ÿ’� Certifique-se de que o servidor está rodando em http://localhost:3020')
   }
 }
 

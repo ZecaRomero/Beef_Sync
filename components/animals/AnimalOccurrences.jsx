@@ -17,12 +17,12 @@ export default function AnimalOccurrences({ ocorrencias }) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ExclamationTriangleIcon className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-            <h2 className="font-semibold text-gray-900 dark:text-white">Ocorrências</h2>
+            <h2 className="font-semibold text-gray-900 dark:text-white">OcorrÃªncias</h2>
           </div>
           {isExpanded ? <ChevronUpIcon className="h-5 w-5" /> : <ChevronDownIcon className="h-5 w-5" />}
         </div>
         <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
-          {ocorrencias.length} registro(s) • Vacinas, tratamentos, serviços
+          {ocorrencias.length} registro(s) ââ‚¬¢ Vacinas, tratamentos, serviÃ§os
         </p>
       </button>
       <div className={`overflow-hidden transition-all ${isExpanded ? 'max-h-[999px]' : 'max-h-0'}`}>
@@ -43,7 +43,7 @@ export default function AnimalOccurrences({ ocorrencias }) {
               {(o.peso || o.ce) && (
                 <p className="text-xs text-gray-500 dark:text-gray-500 mt-0.5">
                   {o.peso && `Peso: ${o.peso} kg`}
-                  {o.peso && o.ce && ' • '}
+                  {o.peso && o.ce && ' ââ‚¬¢ '}
                   {o.ce && `CE: ${o.ce} cm`}
                 </p>
               )}

@@ -1,6 +1,6 @@
 /**
  * Hook para detectar media queries de forma reativa
- * Útil para responsividade e adaptação de UI
+ * ÃÅ¡til para responsividade e adaptaÃ§Ã£o de UI
  */
 import { useEffect, useState } from 'react'
 
@@ -10,7 +10,7 @@ export function useMediaQuery(query: string): boolean {
   const [matches, setMatches] = useState(false);
 
   useEffect(() => {
-    // Verificação SSR
+    // VerificaÃ§Ã£o SSR
     if (typeof window === 'undefined') {
       return;
     }
@@ -20,12 +20,12 @@ export function useMediaQuery(query: string): boolean {
     // Definir estado inicial
     setMatches(media.matches);
 
-    // Listener para mudanças
+    // Listener para mudanÃ§as
     const listener = (e: MediaQueryListEvent) => {
       setMatches(e.matches);
     };
 
-    // Adicionar listener (compatível com browsers antigos)
+    // Adicionar listener (compatÃ­vel com browsers antigos)
     if (media.addEventListener) {
       media.addEventListener('change', listener);
     } else {
@@ -47,7 +47,7 @@ export function useMediaQuery(query: string): boolean {
 }
 
 /**
- * Hooks pré-configurados para breakpoints comuns
+ * Hooks prÃ©-configurados para breakpoints comuns
  */
 export function useIsMobile(): boolean {
   return useMediaQuery('(max-width: 768px)');

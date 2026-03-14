@@ -59,7 +59,7 @@ export default function CostReport() {
     const now = new Date()
     const periodStart = new Date(now.getTime() - (periodDays * 24 * 60 * 60 * 1000))
 
-    // Filtrar custos por período
+    // Filtrar custos por perÃ­odo
     let filteredCosts = costs.filter(cost => 
       new Date(cost.data) >= periodStart
     )
@@ -88,7 +88,7 @@ export default function CostReport() {
       .sort((a, b) => (b.valor || 0) - (a.valor || 0))
       .slice(0, 10)
 
-    // Análise de eficiência
+    // AnÃ¡lise de eficiÃªncia
     const efficiency = analyzeCostEfficiency(filteredCosts, animals, medicamentos)
 
     return {
@@ -168,7 +168,7 @@ export default function CostReport() {
       .slice(0, 20) // Top 20 animais com maior custo
   }
 
-  // Analisar custos por mês
+  // Analisar custos por mÃªs
   const analyzeCostsByMonth = (costs, periodDays) => {
     const months = {}
     
@@ -188,7 +188,7 @@ export default function CostReport() {
       months[monthKey].count += 1
     })
 
-    // Calcular média por dia para cada mês
+    // Calcular mÃ©dia por dia para cada mÃªs
     Object.values(months).forEach(month => {
       const daysInMonth = new Date(
         parseInt(month.month.split('-')[0]),
@@ -201,9 +201,9 @@ export default function CostReport() {
     return Object.values(months).sort((a, b) => a.month.localeCompare(b.month))
   }
 
-  // Analisar tendências de custos
+  // Analisar tendÃªncias de custos
   const analyzeCostTrends = (allCosts, periodDays) => {
-    const intervals = Math.min(periodDays / 7, 12) // Máximo 12 intervalos
+    const intervals = Math.min(periodDays / 7, 12) // MÃ¡ximo 12 intervalos
     const intervalDays = periodDays / intervals
     const now = new Date()
 
@@ -250,7 +250,7 @@ export default function CostReport() {
     return ((currentPeriodCosts - previousPeriodCosts) / previousPeriodCosts) * 100
   }
 
-  // Analisar eficiência de custos
+  // Analisar eficiÃªncia de custos
   const analyzeCostEfficiency = (costs, animals, medicamentos) => {
     const medicamentoCosts = costs.filter(c => 
       c.categoria?.toLowerCase().includes('medicamento') ||
@@ -280,7 +280,7 @@ export default function CostReport() {
       alerts.push({
         type: 'warning',
         title: 'Custos Elevados Detectados',
-        message: `${highCostAnimals.length} transações com custos acima da média (R$ ${highCostThreshold.toFixed(2)})`
+        message: `${highCostAnimals.length} transaÃ§Ãµes com custos acima da mÃ©dia (R$ ${highCostThreshold.toFixed(2)})`
       })
     }
 
@@ -291,8 +291,8 @@ export default function CostReport() {
       if (avgMonthly > 1000) {
         alerts.push({
           type: 'info',
-          title: 'Análise de Custos',
-          message: `Custo médio mensal de R$ ${avgMonthly.toFixed(2)} por transação`
+          title: 'AnÃ¡lise de Custos',
+          message: `Custo mÃ©dio mensal de R$ ${avgMonthly.toFixed(2)} por transaÃ§Ã£o`
         })
       }
     }
@@ -300,12 +300,12 @@ export default function CostReport() {
     return alerts
   }
 
-  // Exportar relatório
+  // Exportar relatÃ³rio
   const exportReport = () => {
     if (!data) return
 
     const reportData = {
-      titulo: 'Relatório de Custos',
+      titulo: 'RelatÃ³rio de Custos',
       periodo: `${data.period} dias`,
       filtro: data.filterType,
       gerado_em: new Date().toLocaleString(),
@@ -327,7 +327,7 @@ export default function CostReport() {
     URL.revokeObjectURL(url)
   }
 
-  // Imprimir relatório
+  // Imprimir relatÃ³rio
   const printReport = () => {
     window.print()
   }
@@ -348,7 +348,7 @@ export default function CostReport() {
     return (
       <EmptyState
         icon={CurrencyDollarIcon}
-        title="Erro ao carregar relatório"
+        title="Erro ao carregar relatÃ³rio"
         description={error}
         action={
           <Button onClick={loadCostData}>
@@ -364,21 +364,21 @@ export default function CostReport() {
       <EmptyState
         icon={CurrencyDollarIcon}
         title="Nenhum dado encontrado"
-        description="Não há dados de custos para o período selecionado"
+        description="NÃ£o hÃ¡ dados de custos para o perÃ­odo selecionado"
       />
     )
   }
 
   return (
     <div className="space-y-6">
-      {/* Cabeçalho */}
+      {/* CabeÃ§alho */}
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Relatório de Custos
+            RelatÃ³rio de Custos
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
-            Análise detalhada dos custos operacionais
+            AnÃ¡lise detalhada dos custos operacionais
           </p>
         </div>
         <div className="flex gap-2">
@@ -387,10 +387,10 @@ export default function CostReport() {
             onChange={(e) => setPeriod(e.target.value)}
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           >
-            <option value="7">Últimos 7 dias</option>
-            <option value="30">Últimos 30 dias</option>
-            <option value="90">Últimos 90 dias</option>
-            <option value="365">Último ano</option>
+            <option value="7">ÃÅ¡ltimos 7 dias</option>
+            <option value="30">ÃÅ¡ltimos 30 dias</option>
+            <option value="90">ÃÅ¡ltimos 90 dias</option>
+            <option value="365">ÃÅ¡ltimo ano</option>
           </select>
           <select
             value={costType}
@@ -399,8 +399,8 @@ export default function CostReport() {
           >
             <option value="all">Todos os custos</option>
             <option value="medicamento">Medicamentos</option>
-            <option value="veterinario">Veterinário</option>
-            <option value="manutenção">Manutenção</option>
+            <option value="veterinario">VeterinÃ¡rio</option>
+            <option value="manutenÃ§Ã£o">ManutenÃ§Ã£o</option>
           </select>
           <Button variant="outline" onClick={exportReport}>
             <DocumentArrowDownIcon className="h-4 w-4 mr-2" />
@@ -443,7 +443,7 @@ export default function CostReport() {
                   R$ {data.summary.totalCosts.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {data.summary.totalTransactions} transações
+                  {data.summary.totalTransactions} transaÃ§Ãµes
                 </p>
               </div>
               <CurrencyDollarIcon className="h-8 w-8 text-red-500" />
@@ -460,7 +460,7 @@ export default function CostReport() {
                   R$ {data.summary.avgCostPerDay.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
                 <p className="text-xs text-gray-500">
-                  Média diária
+                  MÃ©dia diÃ¡ria
                 </p>
               </div>
               <CalendarDaysIcon className="h-8 w-8 text-blue-500" />
@@ -477,7 +477,7 @@ export default function CostReport() {
                   R$ {data.summary.avgCostPerAnimal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
                 <p className="text-xs text-gray-500">
-                  Média por cabeça
+                  MÃ©dia por cabeÃ§a
                 </p>
               </div>
               <ChartPieIcon className="h-8 w-8 text-purple-500" />
@@ -494,7 +494,7 @@ export default function CostReport() {
                   {data.summary.costGrowth > 0 ? '+' : ''}{data.summary.costGrowth.toFixed(1)}%
                 </p>
                 <p className="text-xs text-gray-500">
-                  vs período anterior
+                  vs perÃ­odo anterior
                 </p>
               </div>
               {data.summary.costGrowth > 0 ? (
@@ -528,8 +528,8 @@ export default function CostReport() {
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-                    <span>{category.count} transações ({category.percentage.toFixed(1)}%)</span>
-                    <span>Média: R$ {category.avgCost.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    <span>{category.count} transaÃ§Ãµes ({category.percentage.toFixed(1)}%)</span>
+                    <span>MÃ©dia: R$ {category.avgCost.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                   </div>
                   <div className="mt-2 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                     <div
@@ -557,7 +557,7 @@ export default function CostReport() {
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-700">
                   <th className="text-left py-2">Data</th>
-                  <th className="text-left py-2">Descrição</th>
+                  <th className="text-left py-2">DescriÃ§Ã£o</th>
                   <th className="text-left py-2">Categoria</th>
                   <th className="text-right py-2">Valor</th>
                 </tr>
@@ -585,11 +585,11 @@ export default function CostReport() {
         </CardBody>
       </Card>
 
-      {/* Análise de Eficiência */}
+      {/* AnÃ¡lise de EficiÃªncia */}
       <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Análise de Eficiência
+            AnÃ¡lise de EficiÃªncia
           </h3>
         </CardHeader>
         <CardBody>

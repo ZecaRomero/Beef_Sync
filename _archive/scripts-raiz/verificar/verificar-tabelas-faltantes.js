@@ -9,7 +9,7 @@ const pool = new Pool({
 });
 
 async function verificarTabelas() {
-  console.log('🔍 Verificando tabelas no banco de dados...\n');
+  console.log('�Ÿ”� Verificando tabelas no banco de dados...\n');
 
   try {
     // Listar todas as tabelas
@@ -20,7 +20,7 @@ async function verificarTabelas() {
       ORDER BY table_name
     `);
 
-    console.log(`📊 Total de tabelas encontradas: ${result.rows.length}\n`);
+    console.log(`�Ÿ“Š Total de tabelas encontradas: ${result.rows.length}\n`);
     
     const tabelas = result.rows.map(r => r.table_name);
     
@@ -33,22 +33,22 @@ async function verificarTabelas() {
       'lotes'
     ];
 
-    console.log('🔍 Verificando tabelas importantes:\n');
+    console.log('�Ÿ”� Verificando tabelas importantes:\n');
     for (const tabela of tabelasImportantes) {
       if (tabelas.includes(tabela)) {
         // Contar registros
         const count = await pool.query(`SELECT COUNT(*) FROM ${tabela}`);
-        console.log(`  ✅ ${tabela}: ${count.rows[0].count} registros`);
+        console.log(`  �œ… ${tabela}: ${count.rows[0].count} registros`);
       } else {
-        console.log(`  ❌ ${tabela}: NÃO EXISTE`);
+        console.log(`  �Œ ${tabela}: N�ƒO EXISTE`);
       }
     }
 
-    console.log('\n📋 Todas as tabelas no banco:');
+    console.log('\n�Ÿ“‹ Todas as tabelas no banco:');
     tabelas.forEach(t => console.log(`  - ${t}`));
 
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
   } finally {
     await pool.end();
   }

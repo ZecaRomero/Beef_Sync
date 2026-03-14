@@ -39,13 +39,13 @@ export default function SystemCheck() {
         const results = await response.json()
         setCheckResults(results)
         setLastCheck(new Date().toISOString())
-        Toast.success('Verificação do sistema concluída!')
+        Toast.success('VerificaÃ§Ã£o do sistema concluÃ­da!')
       } else {
         Toast.error('Erro ao verificar sistema')
       }
     } catch (error) {
-      console.error('Erro na verificação:', error)
-      Toast.error('Erro na verificação do sistema')
+      console.error('Erro na verificaÃ§Ã£o:', error)
+      Toast.error('Erro na verificaÃ§Ã£o do sistema')
     } finally {
       setLoading(false)
     }
@@ -92,7 +92,7 @@ export default function SystemCheck() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Verificação do Sistema
+            VerificaÃ§Ã£o do Sistema
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
             Verifique o status de todas as APIs e componentes do sistema
@@ -119,7 +119,7 @@ export default function SystemCheck() {
           <div className="text-center">
             <ServerIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500 dark:text-gray-400">
-              Clique em "Verificar Sistema" para iniciar a verificação
+              Clique em "Verificar Sistema" para iniciar a verificaÃ§Ã£o
             </p>
           </div>
         </div>
@@ -186,11 +186,11 @@ export default function SystemCheck() {
                   <span className="text-green-600 dark:text-green-400 font-medium">Conectado</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Versão:</span>
+                  <span className="text-gray-600 dark:text-gray-400">VersÃ£o:</span>
                   <span className="text-gray-900 dark:text-white">{checkResults.database.version}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Última Verificação:</span>
+                  <span className="text-gray-600 dark:text-gray-400">ÃÅ¡ltima VerificaÃ§Ã£o:</span>
                   <span className="text-gray-900 dark:text-white">{formatDate(checkResults.database.timestamp)}</span>
                 </div>
               </div>
@@ -274,7 +274,7 @@ export default function SystemCheck() {
                     {apiInfo.endpoint}
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400">
-                    Métodos: {apiInfo.methods.join(', ')}
+                    MÃ©todos: {apiInfo.methods.join(', ')}
                   </div>
                 </div>
               ))}
@@ -293,13 +293,13 @@ export default function SystemCheck() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Animais Órfãos:</span>
+                  <span className="text-gray-600 dark:text-gray-400">Animais Ãâ€œrfÃ£os:</span>
                   <span className={checkResults.data.orphanedAnimals > 0 ? 'text-yellow-600 dark:text-yellow-400' : 'text-green-600 dark:text-green-400'}>
                     {checkResults.data.orphanedAnimals}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">TEs Órfãs:</span>
+                  <span className="text-gray-600 dark:text-gray-400">TEs Ãâ€œrfÃ£s:</span>
                   <span className={checkResults.data.orphanedTEs > 0 ? 'text-yellow-600 dark:text-yellow-400' : 'text-green-600 dark:text-green-400'}>
                     {checkResults.data.orphanedTEs}
                   </span>
@@ -313,7 +313,7 @@ export default function SystemCheck() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Datas Inválidas:</span>
+                  <span className="text-gray-600 dark:text-gray-400">Datas InvÃ¡lidas:</span>
                   <span className={checkResults.data.invalidDates > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}>
                     {checkResults.data.invalidDates}
                   </span>
@@ -349,11 +349,11 @@ export default function SystemCheck() {
             </div>
           </div>
 
-          {/* Informações da Verificação */}
+          {/* InformaÃ§Ãµes da VerificaÃ§Ã£o */}
           <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
             <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
               <ClockIcon className="h-4 w-4" />
-              <span>Última verificação: {lastCheck ? formatDate(lastCheck) : 'Nunca'}</span>
+              <span>ÃÅ¡ltima verificaÃ§Ã£o: {lastCheck ? formatDate(lastCheck) : 'Nunca'}</span>
             </div>
           </div>
         </div>

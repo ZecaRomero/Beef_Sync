@@ -30,20 +30,20 @@ const NFManager = ({ animals, costs, sales }) => {
         // Processar dados reais do PostgreSQL
         const nfsReais = data.data || []
 
-        // Separar por tipo (entrada/saída)
+        // Separar por tipo (entrada/saÃ­da)
         const entradas = nfsReais.filter(nf => nf.tipo === 'entrada').map(nf => ({
           id: nf.id,
           numero: nf.numero_nf,
           serie: '1',
           tipo: nf.tipo,
-          fornecedor: nf.fornecedor || 'Fornecedor não informado',
-          cnpj: nf.cnpj || 'CNPJ não informado',
+          fornecedor: nf.fornecedor || 'Fornecedor nÃ£o informado',
+          cnpj: nf.cnpj || 'CNPJ nÃ£o informado',
           valor: parseFloat(nf.valor_total) || 0,
           data_emissao: nf.data,
           data_entrada: nf.data,
-          descricao: nf.natureza_operacao || 'Operação não especificada',
-          categoria_fiscal: nf.tipo_produto === 'bovino' ? 'Aquisição de Estoque' :
-            nf.tipo_produto === 'semen' ? 'Aquisição de Sêmen' : 'Outros',
+          descricao: nf.natureza_operacao || 'OperaÃ§Ã£o nÃ£o especificada',
+          categoria_fiscal: nf.tipo_produto === 'bovino' ? 'AquisiÃ§Ã£o de Estoque' :
+            nf.tipo_produto === 'semen' ? 'AquisiÃ§Ã£o de SÃªmen' : 'Outros',
           ncm: nf.tipo_produto === 'bovino' ? '0102.90.00' :
             nf.tipo_produto === 'semen' ? '0511.10.00' : '9999.99.99',
           cfop: '1102',
@@ -58,11 +58,11 @@ const NFManager = ({ animals, costs, sales }) => {
           numero: nf.numero_nf,
           serie: '1',
           tipo: nf.tipo,
-          cliente: nf.destino || 'Cliente não informado',
-          cnpj: nf.cnpj || 'CNPJ não informado',
+          cliente: nf.destino || 'Cliente nÃ£o informado',
+          cnpj: nf.cnpj || 'CNPJ nÃ£o informado',
           valor: parseFloat(nf.valor_total) || 0,
           data_emissao: nf.data,
-          descricao: nf.natureza_operacao || 'Operação não especificada',
+          descricao: nf.natureza_operacao || 'OperaÃ§Ã£o nÃ£o especificada',
           categoria_fiscal: nf.tipo_produto === 'bovino' ? 'Venda de Estoque' : 'Outros',
           ncm: nf.tipo_produto === 'bovino' ? '0102.90.00' : '9999.99.99',
           cfop: '5102',
@@ -88,7 +88,7 @@ const NFManager = ({ animals, costs, sales }) => {
 
     } catch (error) {
       console.error('Erro ao carregar NFs:', error)
-      toast.error('Erro de conexão ao carregar notas fiscais')
+      toast.error('Erro de conexÃ£o ao carregar notas fiscais')
       setNfEntradas([])
       setNfSaidas([])
     } finally {
@@ -101,10 +101,10 @@ const NFManager = ({ animals, costs, sales }) => {
     const totalSaidas = nfSaidas.reduce((sum, nf) => sum + (nf.valor || 0), 0)
     const saldoFiscal = totalSaidas - totalEntradas // Receitas - Despesas
 
-    // Explicação do saldo negativo
+    // ExplicaÃ§Ã£o do saldo negativo
     const explicacaoSaldo = saldoFiscal < 0
-      ? 'Saldo negativo indica que você teve mais despesas (entradas) que receitas (saídas) no período. Isso é normal quando você está investindo na compra de animais.'
-      : 'Saldo positivo indica que você teve mais receitas (vendas) que despesas no período.'
+      ? 'Saldo negativo indica que vocÃª teve mais despesas (entradas) que receitas (saÃ­das) no perÃ­odo. Isso Ã© normal quando vocÃª estÃ¡ investindo na compra de animais.'
+      : 'Saldo positivo indica que vocÃª teve mais receitas (vendas) que despesas no perÃ­odo.'
 
     return {
       totalEntradas,
@@ -147,7 +147,7 @@ const NFManager = ({ animals, costs, sales }) => {
           animals.find(a => a.id === nf.animal_relacionado) : null
       })),
 
-      // Detalhamento das NFs de saída
+      // Detalhamento das NFs de saÃ­da
       nf_saidas: nfSaidas.map(nf => ({
         numero: nf.numero,
         serie: nf.serie,
@@ -162,25 +162,25 @@ const NFManager = ({ animals, costs, sales }) => {
         icms: nf.icms
       })),
 
-      // Análise por categoria
+      // AnÃ¡lise por categoria
       analise_categorias: {
         aquisicao_animais: nfEntradas
-          .filter(nf => nf.categoria_fiscal === 'Aquisição de Estoque')
+          .filter(nf => nf.categoria_fiscal === 'AquisiÃ§Ã£o de Estoque')
           .reduce((sum, nf) => sum + nf.valor, 0),
         venda_animais: nfSaidas
           .filter(nf => nf.categoria_fiscal === 'Venda de Estoque')
           .reduce((sum, nf) => sum + nf.valor, 0),
         servicos_veterinarios: nfEntradas
-          .filter(nf => nf.categoria_fiscal === 'Serviços Veterinários')
+          .filter(nf => nf.categoria_fiscal === 'ServiÃ§os VeterinÃ¡rios')
           .reduce((sum, nf) => sum + nf.valor, 0)
       },
 
-      // Observações importantes
+      // ObservaÃ§Ãµes importantes
       observacoes: [
         resumoFiscal.explicacaoSaldo,
         'Todas as NFs foram processadas e categorizadas fiscalmente',
-        'Valores de ICMS calculados conforme legislação vigente',
-        'Animais relacionados às NFs estão identificados no sistema'
+        'Valores de ICMS calculados conforme legislaÃ§Ã£o vigente',
+        'Animais relacionados Ã s NFs estÃ£o identificados no sistema'
       ]
     }
 
@@ -189,7 +189,7 @@ const NFManager = ({ animals, costs, sales }) => {
 
   const enviarBoletimContador = async () => {
     try {
-      toast.info('Gerando boletim contábil...')
+      toast.info('Gerando boletim contÃ¡bil...')
 
       // Chamar API para gerar boletim
       const response = await fetch('/api/boletim-contabil', {
@@ -232,7 +232,7 @@ const NFManager = ({ animals, costs, sales }) => {
 
     } catch (error) {
       console.error('Erro ao enviar boletim:', error)
-      toast.error('Erro ao gerar boletim contábil')
+      toast.error('Erro ao gerar boletim contÃ¡bil')
     }
   }
 
@@ -246,14 +246,14 @@ const NFManager = ({ animals, costs, sales }) => {
   }
 
   const handleUpdateAnimal = (updatedAnimal) => {
-    // Em produção, isso atualizaria o animal no banco de dados
+    // Em produÃ§Ã£o, isso atualizaria o animal no banco de dados
     console.log('Animal atualizado com NF:', updatedAnimal)
     toast.success('Animal atualizado com dados da NF!')
   }
 
   return (
     <div className="space-y-6">
-      {/* Tabs de Navegação */}
+      {/* Tabs de NavegaÃ§Ã£o */}
       <div className="border-b border-gray-200 dark:border-gray-700">
         <nav className="-mb-px flex space-x-8">
           <button
@@ -263,7 +263,7 @@ const NFManager = ({ animals, costs, sales }) => {
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
               }`}
           >
-            📊 Resumo Fiscal
+            ðÅ¸â€œÅ  Resumo Fiscal
           </button>
           <button
             onClick={() => setActiveTab('gerar')}
@@ -272,7 +272,7 @@ const NFManager = ({ animals, costs, sales }) => {
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
               }`}
           >
-            📄 Gerar NF
+            ðÅ¸â€œâ€ž Gerar NF
           </button>
         </nav>
       </div>
@@ -289,7 +289,7 @@ const NFManager = ({ animals, costs, sales }) => {
                   <p className="text-sm font-medium text-green-600 dark:text-green-400">NFs Entrada</p>
                   <p className="text-2xl font-bold text-green-900 dark:text-green-100">{resumoFiscal.qtdEntradas}</p>
                 </div>
-                <div className="text-green-600 dark:text-green-400 text-2xl">📥</div>
+                <div className="text-green-600 dark:text-green-400 text-2xl">ðÅ¸â€œ¥</div>
               </div>
               <p className="text-sm text-green-700 dark:text-green-300 mt-2">
                 {formatCurrency(resumoFiscal.totalEntradas)}
@@ -299,10 +299,10 @@ const NFManager = ({ animals, costs, sales }) => {
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-blue-600 dark:text-blue-400">NFs Saída</p>
+                  <p className="text-sm font-medium text-blue-600 dark:text-blue-400">NFs SaÃ­da</p>
                   <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{resumoFiscal.qtdSaidas}</p>
                 </div>
-                <div className="text-blue-600 dark:text-blue-400 text-2xl">📤</div>
+                <div className="text-blue-600 dark:text-blue-400 text-2xl">ðÅ¸â€œ¤</div>
               </div>
               <p className="text-sm text-blue-700 dark:text-blue-300 mt-2">
                 {formatCurrency(resumoFiscal.totalSaidas)}
@@ -332,7 +332,7 @@ const NFManager = ({ animals, costs, sales }) => {
                   ? 'text-purple-600 dark:text-purple-400'
                   : 'text-orange-600 dark:text-orange-400'
                   }`}>
-                  {resumoFiscal.saldoFiscal >= 0 ? '📈' : '📉'}
+                  {resumoFiscal.saldoFiscal >= 0 ? 'ðÅ¸â€œË†' : 'ðÅ¸â€œâ€°'}
                 </div>
               </div>
               <p className={`text-sm mt-2 ${resumoFiscal.saldoFiscal >= 0
@@ -349,7 +349,7 @@ const NFManager = ({ animals, costs, sales }) => {
                   onClick={enviarBoletimContador}
                   className="flex flex-col items-center justify-center text-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors rounded p-3"
                 >
-                  <div className="text-2xl mb-1">📧</div>
+                  <div className="text-2xl mb-1">ðÅ¸â€œ§</div>
                   <div className="font-semibold text-gray-900 dark:text-white text-sm">Enviar Boletim</div>
                   <div className="text-xs text-gray-600 dark:text-gray-400">p/ Contador</div>
                 </button>
@@ -359,7 +359,7 @@ const NFManager = ({ animals, costs, sales }) => {
                   disabled={loading}
                   className="flex flex-col items-center justify-center text-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors rounded p-3 disabled:opacity-50"
                 >
-                  <div className="text-2xl mb-1">🔄</div>
+                  <div className="text-2xl mb-1">ðÅ¸â€�â€ž</div>
                   <div className="font-semibold text-gray-900 dark:text-white text-sm">
                     {loading ? 'Carregando...' : 'Atualizar NFs'}
                   </div>
@@ -368,22 +368,22 @@ const NFManager = ({ animals, costs, sales }) => {
 
                 <button
                   onClick={() => {
-                    toast.success('✅ Teste de notificação funcionando!');
-                    setTimeout(() => toast.info('📋 Notificação de informação'), 1000);
-                    setTimeout(() => toast.warning('⚠️ Notificação de aviso'), 2000);
-                    setTimeout(() => toast.error('❌ Notificação de erro'), 3000);
+                    toast.success('âÅ“â€¦ Teste de notificaÃ§Ã£o funcionando!');
+                    setTimeout(() => toast.info('ðÅ¸â€œâ€¹ NotificaÃ§Ã£o de informaÃ§Ã£o'), 1000);
+                    setTimeout(() => toast.warning('âÅ¡ ï¸� NotificaÃ§Ã£o de aviso'), 2000);
+                    setTimeout(() => toast.error('â�Å’ NotificaÃ§Ã£o de erro'), 3000);
                   }}
                   className="flex flex-col items-center justify-center text-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors rounded p-3"
                 >
-                  <div className="text-2xl mb-1">🧪</div>
+                  <div className="text-2xl mb-1">ðÅ¸§ª</div>
                   <div className="font-semibold text-gray-900 dark:text-white text-sm">Testar</div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400">Notificações</div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">NotificaÃ§Ãµes</div>
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Explicação do Saldo */}
+          {/* ExplicaÃ§Ã£o do Saldo */}
           <div className={`rounded-lg p-4 border ${resumoFiscal.saldoFiscal >= 0
             ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
             : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
@@ -391,14 +391,14 @@ const NFManager = ({ animals, costs, sales }) => {
             <div className="flex items-start space-x-3">
               <span className={`text-lg ${resumoFiscal.saldoFiscal >= 0 ? 'text-green-600' : 'text-yellow-600'
                 }`}>
-                {resumoFiscal.saldoFiscal >= 0 ? '✅' : '💡'}
+                {resumoFiscal.saldoFiscal >= 0 ? 'âÅ“â€¦' : 'ðÅ¸â€™¡'}
               </span>
               <div>
                 <h4 className={`font-medium ${resumoFiscal.saldoFiscal >= 0
                   ? 'text-green-900 dark:text-green-100'
                   : 'text-yellow-900 dark:text-yellow-100'
                   }`}>
-                  Explicação do Saldo {resumoFiscal.saldoFiscal >= 0 ? 'Positivo' : 'Negativo'}
+                  ExplicaÃ§Ã£o do Saldo {resumoFiscal.saldoFiscal >= 0 ? 'Positivo' : 'Negativo'}
                 </h4>
                 <p className={`text-sm ${resumoFiscal.saldoFiscal >= 0
                   ? 'text-green-800 dark:text-green-200'
@@ -407,8 +407,8 @@ const NFManager = ({ animals, costs, sales }) => {
                   {resumoFiscal.explicacaoSaldo}
                 </p>
                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
-                  📊 Dados carregados diretamente do PostgreSQL •
-                  🔄 Clique em "Atualizar NFs" para recarregar
+                  ðÅ¸â€œÅ  Dados carregados diretamente do PostgreSQL ââ‚¬¢
+                  ðÅ¸â€�â€ž Clique em "Atualizar NFs" para recarregar
                 </p>
               </div>
             </div>
@@ -417,12 +417,12 @@ const NFManager = ({ animals, costs, sales }) => {
           {/* Lista de NFs de Entrada */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
             <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-4">
-              📥 Notas Fiscais de Entrada
+              ðÅ¸â€œ¥ Notas Fiscais de Entrada
             </h4>
 
             {nfEntradas.length === 0 ? (
               <div className="text-center py-8">
-                <div className="text-gray-400 dark:text-gray-500 text-4xl mb-2">📄</div>
+                <div className="text-gray-400 dark:text-gray-500 text-4xl mb-2">ðÅ¸â€œâ€ž</div>
                 <p className="text-gray-500 dark:text-gray-400">Nenhuma NF de entrada encontrada</p>
               </div>
             ) : (
@@ -435,7 +435,7 @@ const NFManager = ({ animals, costs, sales }) => {
                           NF {nf.numero}/{nf.serie} - {nf.fornecedor}
                         </h5>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          CNPJ: {nf.cnpj} • Data: {formatDate(nf.data_emissao)}
+                          CNPJ: {nf.cnpj} ââ‚¬¢ Data: {formatDate(nf.data_emissao)}
                         </p>
                       </div>
                       <div className="text-right">
@@ -450,7 +450,7 @@ const NFManager = ({ animals, costs, sales }) => {
 
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
                       <div>
-                        <span className="font-medium text-gray-700 dark:text-gray-300">Descrição:</span>
+                        <span className="font-medium text-gray-700 dark:text-gray-300">DescriÃ§Ã£o:</span>
                         <p className="text-gray-600 dark:text-gray-400">{nf.descricao}</p>
                       </div>
                       <div>
@@ -470,11 +470,11 @@ const NFManager = ({ animals, costs, sales }) => {
                     {nf.animal_relacionado && (
                       <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                         <div className="flex items-center space-x-2">
-                          <span className="text-blue-600 dark:text-blue-400">🐄</span>
+                          <span className="text-blue-600 dark:text-blue-400">ðÅ¸�â€ž</span>
                           <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
                             Animal Relacionado: {animals.find(a => a.id === nf.animal_relacionado)?.nome ||
                               animals.find(a => a.id === nf.animal_relacionado)?.numero ||
-                              'Animal não encontrado'}
+                              'Animal nÃ£o encontrado'}
                           </span>
                         </div>
                       </div>
@@ -482,7 +482,7 @@ const NFManager = ({ animals, costs, sales }) => {
 
                     {nf.observacoes && (
                       <div className="mt-3 text-sm text-gray-600 dark:text-gray-400">
-                        <span className="font-medium">Observações:</span> {nf.observacoes}
+                        <span className="font-medium">ObservaÃ§Ãµes:</span> {nf.observacoes}
                       </div>
                     )}
                   </div>
@@ -491,20 +491,20 @@ const NFManager = ({ animals, costs, sales }) => {
             )}
           </div>
 
-          {/* Lista de NFs de Saída */}
+          {/* Lista de NFs de SaÃ­da */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
             <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-4">
-              📤 Notas Fiscais de Saída
+              ðÅ¸â€œ¤ Notas Fiscais de SaÃ­da
             </h4>
 
             {nfSaidas.length === 0 ? (
               <div className="text-center py-8">
-                <div className="text-gray-400 dark:text-gray-500 text-4xl mb-2">📄</div>
-                <p className="text-gray-500 dark:text-gray-400">Nenhuma NF de saída encontrada</p>
+                <div className="text-gray-400 dark:text-gray-500 text-4xl mb-2">ðÅ¸â€œâ€ž</div>
+                <p className="text-gray-500 dark:text-gray-400">Nenhuma NF de saÃ­da encontrada</p>
               </div>
             ) : (
               <div className="space-y-3">
-                {/* Aqui seriam listadas as NFs de saída quando houver */}
+                {/* Aqui seriam listadas as NFs de saÃ­da quando houver */}
               </div>
             )}
           </div>

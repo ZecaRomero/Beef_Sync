@@ -14,7 +14,7 @@ async function ver() {
   const client = await pool.connect()
   
   try {
-    console.log('🔍 Estrutura da tabela animais:\n')
+    console.log('ðÅ¸â€�� Estrutura da tabela animais:\n')
     
     const result = await client.query(`
       SELECT column_name, data_type 
@@ -24,11 +24,11 @@ async function ver() {
     `)
 
     result.rows.forEach(col => {
-      console.log(`  • ${col.column_name}: ${col.data_type}`)
+      console.log(`  ââ‚¬¢ ${col.column_name}: ${col.data_type}`)
     })
 
     // Buscar CJCJ 17037 com todas as colunas
-    console.log('\n🔍 Dados da CJCJ 17037:\n')
+    console.log('\nðÅ¸â€�� Dados da CJCJ 17037:\n')
     const animal = await client.query(`
       SELECT * FROM animais
       WHERE serie ILIKE '%CJCJ%' AND rg::text LIKE '%17037%'
@@ -40,7 +40,7 @@ async function ver() {
     }
     
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('â�Å’ Erro:', error)
   } finally {
     client.release()
     await pool.end()

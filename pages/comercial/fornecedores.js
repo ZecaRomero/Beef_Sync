@@ -47,7 +47,7 @@ export default function Suppliers() {
       const response = await fetch('/api/notas-fiscais')
       if (response.ok) {
         const data = await response.json()
-        // Filtrar notas de entrada do fornecedor específico
+        // Filtrar notas de entrada do fornecedor especÃ­fico
         const notasFiltradas = (data.data || []).filter(nota => 
           nota.tipo === 'entrada' && 
           nota.fornecedor && 
@@ -96,10 +96,10 @@ export default function Suppliers() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <CubeIcon className="h-8 w-8 text-blue-600" />
-            Gestão de Fornecedores
+            GestÃ£o de Fornecedores
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-2">
-            Fornecedores extraídos das notas fiscais de entrada
+            Fornecedores extraÃ­dos das notas fiscais de entrada
           </p>
         </div>
         <Button onClick={() => setShowNewSupplier(true)} className="flex items-center gap-2">
@@ -159,7 +159,7 @@ export default function Suppliers() {
           type="text"
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
-          placeholder="Buscar fornecedor por nome, CNPJ ou município..."
+          placeholder="Buscar fornecedor por nome, CNPJ ou municÃ­pio..."
           className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
         />
       </Card>
@@ -193,7 +193,7 @@ export default function Suppliers() {
                     CNPJ/CPF
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Município
+                    MunicÃ­pio
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Total de Notas
@@ -202,10 +202,10 @@ export default function Suppliers() {
                     Valor Total
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Última Compra
+                    ÃÅ¡ltima Compra
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Ações
+                    AÃ§Ãµes
                   </th>
                 </tr>
               </thead>
@@ -281,7 +281,7 @@ export default function Suppliers() {
                 </div>
 
                 <div className="space-y-6">
-                  {/* Informações Gerais */}
+                  {/* InformaÃ§Ãµes Gerais */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
@@ -302,7 +302,7 @@ export default function Suppliers() {
                     {fornecedorSelecionado.endereco && (
                       <div className="col-span-2">
                         <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                          Endereço
+                          EndereÃ§o
                         </label>
                         <p className="text-base text-gray-900 dark:text-white">
                           {fornecedorSelecionado.endereco}
@@ -312,7 +312,7 @@ export default function Suppliers() {
                     {fornecedorSelecionado.municipio && (
                       <div>
                         <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                          Município/Estado
+                          MunicÃ­pio/Estado
                         </label>
                         <p className="text-base text-gray-900 dark:text-white">
                           {fornecedorSelecionado.municipio} {fornecedorSelecionado.estado ? `- ${fornecedorSelecionado.estado}` : ''}
@@ -341,10 +341,10 @@ export default function Suppliers() {
                     )}
                   </div>
 
-                  {/* Estatísticas */}
+                  {/* EstatÃ­sticas */}
                   <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                     <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-                      Estatísticas
+                      EstatÃ­sticas
                     </h4>
                     <div className="grid grid-cols-3 gap-4">
                       <div>
@@ -384,7 +384,7 @@ export default function Suppliers() {
                       {fornecedorSelecionado.ultima_compra && (
                         <div>
                           <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                            Última Compra
+                            ÃÅ¡ltima Compra
                           </label>
                           <p className="text-base text-gray-900 dark:text-white">
                             {new Date(fornecedorSelecionado.ultima_compra).toLocaleDateString('pt-BR')}
@@ -394,10 +394,10 @@ export default function Suppliers() {
                     </div>
                   </div>
 
-                  {/* Histórico de Notas Fiscais */}
+                  {/* HistÃ³rico de Notas Fiscais */}
                   <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                     <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-                      Histórico de Notas Fiscais ({notasFornecedor.length})
+                      HistÃ³rico de Notas Fiscais ({notasFornecedor.length})
                     </h4>
                     {loadingNotas ? (
                       <div className="text-center py-4">
@@ -463,7 +463,7 @@ export default function Suppliers() {
         </div>
       )}
 
-      {/* Modal Novo Fornecedor - manter funcionalidade existente se necessário */}
+      {/* Modal Novo Fornecedor - manter funcionalidade existente se necessÃ¡rio */}
     </div>
   )
 }

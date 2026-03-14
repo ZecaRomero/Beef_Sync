@@ -136,7 +136,7 @@ export default function Medicamentos() {
     e.preventDefault()
 
     if (!formData.nome || !formData.categoria) {
-      alert('Por favor, preencha os campos obrigatórios (Nome e Categoria)')
+      alert('Por favor, preencha os campos obrigatÃ³rios (Nome e Categoria)')
       return
     }
 
@@ -231,17 +231,17 @@ export default function Medicamentos() {
 
   const getCategoriaColor = (categoria) => {
     switch (categoria) {
-      case 'Antibiótico':
+      case 'AntibiÃ³tico':
         return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-      case 'Anti-inflamatório':
+      case 'Anti-inflamatÃ³rio':
         return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'
       case 'Vacina':
         return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-      case 'Vermífugo':
+      case 'VermÃ­fugo':
         return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
       case 'Vitamina':
         return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-      case 'Hormônio':
+      case 'HormÃ´nio':
         return 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200'
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
@@ -268,7 +268,7 @@ export default function Medicamentos() {
               <BeakerIcon className="w-8 h-8 text-emerald-600" />
               Estoque de Medicamentos
             </h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-2">Controle completo do estoque farmacêutico veterinário</p>
+            <p className="text-gray-500 dark:text-gray-400 mt-2">Controle completo do estoque farmacÃªutico veterinÃ¡rio</p>
           </div>
           <div className="flex gap-2">
             <button
@@ -349,7 +349,7 @@ export default function Medicamentos() {
                 <BeakerIcon className="w-6 h-6 text-blue-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Prescrição</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">PrescriÃ§Ã£o</p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {medicamentosData.filter(item => item.prescricaoVeterinaria).length}
                 </p>
@@ -390,9 +390,9 @@ export default function Medicamentos() {
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Categoria</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Estoque</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Vencimento</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Carência</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Prescrição</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Ações</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">CarÃªncia</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">PrescriÃ§Ã£o</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">AÃ§Ãµes</th>
                 </tr>
               </thead>
               <tbody>
@@ -423,7 +423,7 @@ export default function Medicamentos() {
                           </div>
                           {item.quantidadeMinima > 0 && (
                             <div className="text-xs text-gray-500">
-                              Mín: {item.quantidadeMinima} {item.unidade}
+                              MÃ­n: {item.quantidadeMinima} {item.unidade}
                             </div>
                           )}
                         </div>
@@ -441,10 +441,10 @@ export default function Medicamentos() {
                       <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">
                         <div className="text-xs">
                           {item.carenciaLeite && (
-                            <div>🥛 {item.carenciaLeite}d</div>
+                            <div>ðÅ¸¥â€º {item.carenciaLeite}d</div>
                           )}
                           {item.carenciaCarne && (
-                            <div>🥩 {item.carenciaCarne}d</div>
+                            <div>ðÅ¸¥© {item.carenciaCarne}d</div>
                           )}
                           {!item.carenciaLeite && !item.carenciaCarne && '-'}
                         </div>
@@ -456,7 +456,7 @@ export default function Medicamentos() {
                           </span>
                         ) : (
                           <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                            Não
+                            NÃ£o
                           </span>
                         )}
                       </td>
@@ -484,7 +484,7 @@ export default function Medicamentos() {
           </div>
         )}
 
-        {/* Modal do Formulário */}
+        {/* Modal do FormulÃ¡rio */}
         {showForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
@@ -518,7 +518,7 @@ export default function Medicamentos() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Princípio Ativo
+                      PrincÃ­pio Ativo
                     </label>
                     <input
                       type="text"
@@ -542,14 +542,14 @@ export default function Medicamentos() {
                       required
                     >
                       <option value="">Selecione a categoria...</option>
-                      <option value="Antibiótico">Antibiótico</option>
-                      <option value="Anti-inflamatório">Anti-inflamatório</option>
+                      <option value="AntibiÃ³tico">AntibiÃ³tico</option>
+                      <option value="Anti-inflamatÃ³rio">Anti-inflamatÃ³rio</option>
                       <option value="Vacina">Vacina</option>
-                      <option value="Vermífugo">Vermífugo</option>
+                      <option value="VermÃ­fugo">VermÃ­fugo</option>
                       <option value="Vitamina">Vitamina</option>
-                      <option value="Hormônio">Hormônio</option>
-                      <option value="Anestésico">Anestésico</option>
-                      <option value="Antisséptico">Antisséptico</option>
+                      <option value="HormÃ´nio">HormÃ´nio</option>
+                      <option value="AnestÃ©sico">AnestÃ©sico</option>
+                      <option value="AntissÃ©ptico">AntissÃ©ptico</option>
                       <option value="Outros">Outros</option>
                     </select>
                   </div>
@@ -596,7 +596,7 @@ export default function Medicamentos() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Valor Unitário (R$)
+                      Valor UnitÃ¡rio (R$)
                     </label>
                     <input
                       type="number"
@@ -626,7 +626,7 @@ export default function Medicamentos() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Quantidade Mínima
+                      Quantidade MÃ­nima
                     </label>
                     <input
                       type="number"
@@ -664,7 +664,7 @@ export default function Medicamentos() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Carência Leite (dias)
+                      CarÃªncia Leite (dias)
                     </label>
                     <input
                       type="number"
@@ -677,7 +677,7 @@ export default function Medicamentos() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Carência Carne (dias)
+                      CarÃªncia Carne (dias)
                     </label>
                     <input
                       type="number"
@@ -692,7 +692,7 @@ export default function Medicamentos() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Via de Aplicação
+                      Via de AplicaÃ§Ã£o
                     </label>
                     <select
                       value={formData.viaAplicacao}
@@ -701,11 +701,11 @@ export default function Medicamentos() {
                     >
                       <option value="">Selecione...</option>
                       <option value="Intramuscular">Intramuscular</option>
-                      <option value="Subcutânea">Subcutânea</option>
+                      <option value="SubcutÃ¢nea">SubcutÃ¢nea</option>
                       <option value="Intravenosa">Intravenosa</option>
                       <option value="Oral">Oral</option>
-                      <option value="Tópica">Tópica</option>
-                      <option value="Intramamária">Intramamária</option>
+                      <option value="TÃ³pica">TÃ³pica</option>
+                      <option value="IntramamÃ¡ria">IntramamÃ¡ria</option>
                       <option value="Outras">Outras</option>
                     </select>
                   </div>
@@ -719,21 +719,21 @@ export default function Medicamentos() {
                       className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
                     />
                     <label htmlFor="prescricaoVeterinaria" className="ml-2 block text-sm text-gray-900 dark:text-white">
-                      Requer prescrição veterinária
+                      Requer prescriÃ§Ã£o veterinÃ¡ria
                     </label>
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Indicações
+                    IndicaÃ§Ãµes
                   </label>
                   <textarea
                     value={formData.indicacoes}
                     onChange={(e) => setFormData({ ...formData, indicacoes: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:text-white"
                     rows="2"
-                    placeholder="Para que é indicado o medicamento..."
+                    placeholder="Para que Ã© indicado o medicamento..."
                   />
                 </div>
 
@@ -752,27 +752,27 @@ export default function Medicamentos() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Observações
+                    ObservaÃ§Ãµes
                   </label>
                   <textarea
                     value={formData.observacoes}
                     onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:text-white"
                     rows="3"
-                    placeholder="Observações sobre armazenamento, efeitos colaterais, etc..."
+                    placeholder="ObservaÃ§Ãµes sobre armazenamento, efeitos colaterais, etc..."
                   />
                 </div>
 
                 <div className="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-lg">
                   <h3 className="font-medium text-emerald-900 dark:text-emerald-200 mb-2">
-                    💊 Importante - Medicamentos Veterinários
+                    ðÅ¸â€™Å  Importante - Medicamentos VeterinÃ¡rios
                   </h3>
                   <ul className="text-sm text-emerald-800 dark:text-emerald-300 space-y-1">
-                    <li>• Respeite sempre os períodos de carência</li>
-                    <li>• Mantenha registros de aplicação</li>
-                    <li>• Armazene conforme instruções do fabricante</li>
-                    <li>• Verifique datas de vencimento regularmente</li>
-                    <li>• Medicamentos com prescrição só devem ser usados com orientação veterinária</li>
+                    <li>ââ‚¬¢ Respeite sempre os perÃ­odos de carÃªncia</li>
+                    <li>ââ‚¬¢ Mantenha registros de aplicaÃ§Ã£o</li>
+                    <li>ââ‚¬¢ Armazene conforme instruÃ§Ãµes do fabricante</li>
+                    <li>ââ‚¬¢ Verifique datas de vencimento regularmente</li>
+                    <li>ââ‚¬¢ Medicamentos com prescriÃ§Ã£o sÃ³ devem ser usados com orientaÃ§Ã£o veterinÃ¡ria</li>
                   </ul>
                 </div>
 

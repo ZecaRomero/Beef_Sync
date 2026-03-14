@@ -40,7 +40,7 @@ export default function NotasFiscais() {
   const [nfResumo, setNfResumo] = useState(null)
   const [showDetailModal, setShowDetailModal] = useState(false)
   const [detailNF, setDetailNF] = useState(null)
-  // Estados para seleção múltipla
+  // Estados para seleÃ§Ã£o mÃºltipla
   const [selectedNFs, setSelectedNFs] = useState([])
   const [selectAll, setSelectAll] = useState(false)
   // const [showIntegrationPanel, setShowIntegrationPanel] = useState(false)
@@ -54,7 +54,7 @@ export default function NotasFiscais() {
   const [paginaAtual, setPaginaAtual] = useState(1)
   const itensPorPagina = 10
 
-  // Importação Excel/CSV para Notas Fiscais
+  // ImportaÃ§Ã£o Excel/CSV para Notas Fiscais
   const [showImportNF, setShowImportNF] = useState(false)
   const [importMethodNF, setImportMethodNF] = useState('excel')
   const [importDataNF, setImportDataNF] = useState('')
@@ -107,8 +107,8 @@ export default function NotasFiscais() {
   }
 
   useEffect(() => {
-    // FORÇAR LIMPEZA COMPLETA DO ESTADO
-    console.log('🧹 Limpando estado React completamente...')
+    // FORÃâ€¡AR LIMPEZA COMPLETA DO ESTADO
+    console.log('ðÅ¸§¹ Limpando estado React completamente...')
     setNfs([])
     setSelectedNFs([])
     setSelectAll(false)
@@ -121,24 +121,24 @@ export default function NotasFiscais() {
     loadNFs()
     loadAnimals()
 
-    // Verificar se há uma NF para edição vinda da página de contabilidade
+    // Verificar se hÃ¡ uma NF para ediÃ§Ã£o vinda da pÃ¡gina de contabilidade
     const nfParaEdicao = localStorage.getItem('nfParaEdicao')
     if (nfParaEdicao) {
       try {
         const nf = JSON.parse(nfParaEdicao)
-        console.log('🔍 NF para edição encontrada:', nf)
+        console.log('ðÅ¸â€�� NF para ediÃ§Ã£o encontrada:', nf)
         setNfEditando(nf)
         setShowModal(true)
-        // Limpar o localStorage após usar
+        // Limpar o localStorage apÃ³s usar
         localStorage.removeItem('nfParaEdicao')
       } catch (error) {
-        console.error('Erro ao processar NF para edição:', error)
+        console.error('Erro ao processar NF para ediÃ§Ã£o:', error)
         localStorage.removeItem('nfParaEdicao')
       }
     }
   }, [])
 
-  // Detectar cabeçalhos ou número de colunas para importação
+  // Detectar cabeÃ§alhos ou nÃºmero de colunas para importaÃ§Ã£o
   useEffect(() => {
     const lines = importDataNF.trim().split('\n').filter((l) => l.trim())
     if (lines.length) {
@@ -146,7 +146,7 @@ export default function NotasFiscais() {
       const cells = splitCellsNF(first)
       setColumnCountNF(cells.length || 10)
       const lower = cells.map((c) => c.toLowerCase())
-      const maybeHeader = lower.some((s) => ['tipo','número','numero','data','fornecedor','destino','produto','valor'].some((h) => s.includes(h)))
+      const maybeHeader = lower.some((s) => ['tipo','nÃºmero','numero','data','fornecedor','destino','produto','valor'].some((h) => s.includes(h)))
       setHeadersDetectedNF(maybeHeader ? cells : [])
     } else {
       setColumnCountNF(10)
@@ -168,7 +168,7 @@ export default function NotasFiscais() {
     localStorage.setItem('nfImportMapping', JSON.stringify({ mappingModeNF, fieldMappingNF, extraFieldsNF }))
   }, [mappingModeNF, fieldMappingNF, extraFieldsNF])
 
-  // Novo useEffect para capturar parâmetros da URL
+  // Novo useEffect para capturar parÃ¢metros da URL
   useEffect(() => {
     if (router.isReady) {
       const { tipo, busca } = router.query
@@ -180,8 +180,8 @@ export default function NotasFiscais() {
         }))
 
         // Mostrar toast informativo
-        const tipoTexto = tipo === 'entrada' ? 'Entradas' : tipo === 'saida' ? 'Saídas' : 'Todas as movimentações'
-        Toast.success(`📋 Filtro aplicado: ${tipoTexto}`)
+        const tipoTexto = tipo === 'entrada' ? 'Entradas' : tipo === 'saida' ? 'SaÃ­das' : 'Todas as movimentaÃ§Ãµes'
+        Toast.success(`ðÅ¸â€œâ€¹ Filtro aplicado: ${tipoTexto}`)
       }
       if (busca && typeof busca === 'string') {
         setSearchTerm(busca.trim())
@@ -203,7 +203,7 @@ export default function NotasFiscais() {
         // A API pode retornar { success: true, data: [...] } ou apenas o array
         const animalsList = Array.isArray(result) ? result : (result.data || result.success ? result.data : [])
         
-        // Garantir que todos os animais tenham série e RG como string
+        // Garantir que todos os animais tenham sÃ©rie e RG como string
         const animalsNormalizados = animalsList.map(animal => ({
           ...animal,
           serie: String(animal.serie || '').trim(),
@@ -212,7 +212,7 @@ export default function NotasFiscais() {
         
         setAnimals(animalsNormalizados)
         localStorage.setItem('animals', JSON.stringify(animalsNormalizados))
-        console.log(`✅ ${animalsNormalizados.length} animais carregados para notas fiscais`)
+        console.log(`âÅ“â€¦ ${animalsNormalizados.length} animais carregados para notas fiscais`)
       } else {
         console.error('Erro ao carregar animais:', response.status)
         // Fallback para localStorage
@@ -228,17 +228,17 @@ export default function NotasFiscais() {
   }
 
   const loadNFs = async () => {
-    // Proteção contra múltiplas chamadas simultâneas
+    // ProteÃ§Ã£o contra mÃºltiplas chamadas simultÃ¢neas
     if (loading) {
-      console.log('⏸️ loadNFs já está em execução, ignorando chamada duplicada')
+      console.log('â�¸ï¸� loadNFs jÃ¡ estÃ¡ em execuÃ§Ã£o, ignorando chamada duplicada')
       return
     }
     
     try {
       setLoading(true)
-      console.log('📥 Carregando notas fiscais (uma única requisição)...')
+      console.log('ðÅ¸â€œ¥ Carregando notas fiscais (uma Ãºnica requisiÃ§Ã£o)...')
 
-      // Fazer apenas UMA requisição simples - SEM cache-busting desnecessário
+      // Fazer apenas UMA requisiÃ§Ã£o simples - SEM cache-busting desnecessÃ¡rio
       const response = await fetch('/api/notas-fiscais', {
         method: 'GET',
         headers: {
@@ -251,17 +251,17 @@ export default function NotasFiscais() {
 
         // Garantir que seja um array
         const nfsData = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : [])
-        console.log(`📥 ${nfsData.length} notas fiscais carregadas`)
+        console.log(`ðÅ¸â€œ¥ ${nfsData.length} notas fiscais carregadas`)
 
         // SIMPLIFICADO: Normalizar campos diretamente sem processamento em lotes
-        // Não fazer nenhuma requisição adicional - usar apenas os dados que já vieram da API
+        // NÃ£o fazer nenhuma requisiÃ§Ã£o adicional - usar apenas os dados que jÃ¡ vieram da API
         const nfsNormalizadas = nfsData.map((nf) => {
           return {
             ...nf,
-            tipo: (nf.tipo || '').toLowerCase(), // Garantir minúsculo
+            tipo: (nf.tipo || '').toLowerCase(), // Garantir minÃºsculo
             numeroNF: nf.numero_nf || nf.numeroNF || '',
             tipoProduto: nf.tipo_produto || nf.tipoProduto || 'bovino',
-            // Usar valor_total_calculado se disponível, senão usar valor_total
+            // Usar valor_total_calculado se disponÃ­vel, senÃ£o usar valor_total
             valorTotal: nf.valor_total_calculado || nf.valor_total || nf.valorTotal || 0,
             data: nf.data || nf.data_compra || '',
             fornecedor: nf.fornecedor || '',
@@ -271,28 +271,28 @@ export default function NotasFiscais() {
             cnpjOrigemDestino: nf.cnpj_origem_destino || nf.cnpjOrigemDestino || '',
             naturezaOperacao: nf.natureza_operacao || nf.naturezaOperacao || '',
             observacoes: nf.observacoes || '',
-            incricao: nf.incricao || nf.incrição || '',
-            itens: [], // Itens só serão carregados quando necessário (editar/ver detalhes)
+            incricao: nf.incricao || nf.incriÃ§Ã£o || '',
+            itens: [], // Itens sÃ³ serÃ£o carregados quando necessÃ¡rio (editar/ver detalhes)
             quantidadeAnimais: nf.total_itens || 0 // Usar total_itens diretamente do banco
           }
         })
 
         setNfs(nfsNormalizadas)
 
-        // Limpar localStorage quando API funcionar para evitar inconsistências
+        // Limpar localStorage quando API funcionar para evitar inconsistÃªncias
         localStorage.removeItem('notasFiscais')
         localStorage.removeItem('nfParaEdicao')
 
-        console.log('✅ Dados carregados da API e localStorage limpo')
+        console.log('âÅ“â€¦ Dados carregados da API e localStorage limpo')
       } else {
-        console.error('❌ API não disponível')
+        console.error('â�Å’ API nÃ£o disponÃ­vel')
         setNfs([])
-        Toast.error('❌ Erro ao conectar com o servidor. Recarregue a página.')
+        Toast.error('â�Å’ Erro ao conectar com o servidor. Recarregue a pÃ¡gina.')
       }
     } catch (error) {
       console.error('Erro ao carregar NFs:', error)
       setNfs([])
-      Toast.error('❌ Erro de conexão. Recarregue a página.')
+      Toast.error('â�Å’ Erro de conexÃ£o. Recarregue a pÃ¡gina.')
     } finally {
       setLoading(false)
     }
@@ -312,7 +312,7 @@ export default function NotasFiscais() {
       } else {
         const errData = await response.json().catch(() => ({}))
         const msg = errData?.message || errData?.error || `Erro ${response.status}`
-        console.error('❌ Erro ao salvar NF:', msg)
+        console.error('â�Å’ Erro ao salvar NF:', msg)
         Toast.error(`Erro ao salvar: ${msg}`)
         return
       }
@@ -342,7 +342,7 @@ export default function NotasFiscais() {
         mensagemAnimais = resultAnimais.message
       }
 
-      // Segundo: Sincronizar todas as notas fiscais com o boletim contábil
+      // Segundo: Sincronizar todas as notas fiscais com o boletim contÃ¡bil
       const responseNFs = await fetch('/api/boletim-contabil/sync-notas-fiscais', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
@@ -356,18 +356,18 @@ export default function NotasFiscais() {
 
       // Exibir resultado combinado
       const mensagemCompleta = [
-        mensagemAnimais && `📋 Animais: ${mensagemAnimais}`,
-        mensagemNFs && `📄 NFs: ${mensagemNFs}`
+        mensagemAnimais && `ðÅ¸â€œâ€¹ Animais: ${mensagemAnimais}`,
+        mensagemNFs && `ðÅ¸â€œâ€ž NFs: ${mensagemNFs}`
       ].filter(Boolean).join('\n')
 
-      Toast.success(`✅ Sincronização concluída!\n${mensagemCompleta}`)
+      Toast.success(`âÅ“â€¦ SincronizaÃ§Ã£o concluÃ­da!\n${mensagemCompleta}`)
 
       // Recarregar dados
       await loadNFs()
 
     } catch (error) {
-      console.error('Erro na sincronização:', error)
-      Toast.error('❌ Erro ao conectar com o servidor')
+      console.error('Erro na sincronizaÃ§Ã£o:', error)
+      Toast.error('â�Å’ Erro ao conectar com o servidor')
     } finally {
       setSyncing(false)
     }
@@ -378,23 +378,23 @@ export default function NotasFiscais() {
       if (nf.tipo === 'entrada') {
         const result = await integrarNFEntrada(nf)
         if (result.success) {
-          Toast.success(`✅ ${result.message}`)
+          Toast.success(`âÅ“â€¦ ${result.message}`)
         } else {
-          Toast.error(`❌ ${result.message}`)
+          Toast.error(`â�Å’ ${result.message}`)
         }
       } else if (nf.tipo === 'saida') {
         const result = await integrarNFSaida(nf)
         if (result.success) {
-          Toast.success(`✅ ${result.message}`)
+          Toast.success(`âÅ“â€¦ ${result.message}`)
         } else {
-          Toast.error(`❌ ${result.message}`)
+          Toast.error(`â�Å’ ${result.message}`)
         }
       }
 
-      // Atualizar estatísticas
+      // Atualizar estatÃ­sticas
       // loadEstatisticasIntegracao()
     } catch (error) {
-      console.error('Erro na integração:', error)
+      console.error('Erro na integraÃ§Ã£o:', error)
       Toast.error('Erro ao integrar NF com boletim de animais')
     }
   }
@@ -408,12 +408,12 @@ export default function NotasFiscais() {
       })
 
       if (response.ok) {
-        Toast.success('Nota fiscal excluída com sucesso!')
+        Toast.success('Nota fiscal excluÃ­da com sucesso!')
         loadNFs()
       } else {
-        // SEM FALLBACK - Forçar erro se API não funcionar
-        console.error('❌ Erro ao excluir NF - API não disponível')
-        Toast.error('❌ Erro ao excluir nota fiscal. Recarregue a página.')
+        // SEM FALLBACK - ForÃ§ar erro se API nÃ£o funcionar
+        console.error('â�Å’ Erro ao excluir NF - API nÃ£o disponÃ­vel')
+        Toast.error('â�Å’ Erro ao excluir nota fiscal. Recarregue a pÃ¡gina.')
         return
       }
     } catch (error) {
@@ -422,10 +422,10 @@ export default function NotasFiscais() {
     }
   }
 
-  // Funções para seleção múltipla
+  // FunÃ§Ãµes para seleÃ§Ã£o mÃºltipla
   const handleSelectNF = (nfId) => {
     if (!nfId) {
-      Toast.warning('Esta nota fiscal não pode ser selecionada (sem ID)')
+      Toast.warning('Esta nota fiscal nÃ£o pode ser selecionada (sem ID)')
       return
     }
     setSelectedNFs(prev => {
@@ -442,7 +442,7 @@ export default function NotasFiscais() {
       setSelectedNFs([])
       setSelectAll(false)
     } else {
-      // Filtrar apenas NFs com ID válido
+      // Filtrar apenas NFs com ID vÃ¡lido
       const idsValidos = nfsFiltradas.filter(nf => nf.id).map(nf => nf.id)
       setSelectedNFs(idsValidos)
       setSelectAll(true)
@@ -455,7 +455,7 @@ export default function NotasFiscais() {
       return
     }
 
-    const confirmMessage = `Tem certeza que deseja excluir ${selectedNFs.length} nota${selectedNFs.length > 1 ? 's' : ''} fiscal${selectedNFs.length > 1 ? 'is' : ''}?\n\nEsta ação não pode ser desfeita!`
+    const confirmMessage = `Tem certeza que deseja excluir ${selectedNFs.length} nota${selectedNFs.length > 1 ? 's' : ''} fiscal${selectedNFs.length > 1 ? 'is' : ''}?\n\nEsta aÃ§Ã£o nÃ£o pode ser desfeita!`
     if (!confirm(confirmMessage)) return
 
     try {
@@ -464,7 +464,7 @@ export default function NotasFiscais() {
       let errorCount = 0
       const errors = []
 
-      // Processar exclusões em lotes para evitar sobrecarga
+      // Processar exclusÃµes em lotes para evitar sobrecarga
       const processarEmLotes = async (ids, tamanhoLote) => {
         for (let i = 0; i < ids.length; i += tamanhoLote) {
           const lote = ids.slice(i, i + tamanhoLote)
@@ -486,7 +486,7 @@ export default function NotasFiscais() {
             } catch (error) {
               console.error(`Erro ao excluir NF ${nfId}:`, error)
               errorCount++
-              errors.push({ id: nfId, error: error.message || 'Erro de conexão' })
+              errors.push({ id: nfId, error: error.message || 'Erro de conexÃ£o' })
             }
           }))
           // Pequeno delay entre lotes
@@ -500,20 +500,20 @@ export default function NotasFiscais() {
 
       // Mostrar resultados
       if (successCount > 0) {
-        Toast.success(`✅ ${successCount} nota${successCount > 1 ? 's' : ''} fiscal${successCount > 1 ? 'is' : ''} excluída${successCount > 1 ? 's' : ''} com sucesso!`)
+        Toast.success(`âÅ“â€¦ ${successCount} nota${successCount > 1 ? 's' : ''} fiscal${successCount > 1 ? 'is' : ''} excluÃ­da${successCount > 1 ? 's' : ''} com sucesso!`)
       }
 
       if (errorCount > 0) {
-        Toast.error(`❌ ${errorCount} nota${errorCount > 1 ? 's' : ''} fiscal${errorCount > 1 ? 'is' : ''} não puderam ser excluída${errorCount > 1 ? 's' : ''}`)
-        console.error('Erros na exclusão:', errors)
+        Toast.error(`â�Å’ ${errorCount} nota${errorCount > 1 ? 's' : ''} fiscal${errorCount > 1 ? 'is' : ''} nÃ£o puderam ser excluÃ­da${errorCount > 1 ? 's' : ''}`)
+        console.error('Erros na exclusÃ£o:', errors)
       }
 
-      // Limpar seleção e recarregar dados
+      // Limpar seleÃ§Ã£o e recarregar dados
       setSelectedNFs([])
       setSelectAll(false)
       await loadNFs()
     } catch (error) {
-      console.error('Erro na exclusão múltipla:', error)
+      console.error('Erro na exclusÃ£o mÃºltipla:', error)
       Toast.error('Erro ao excluir notas fiscais. Tente novamente.')
     } finally {
       setLoading(false)
@@ -537,7 +537,7 @@ export default function NotasFiscais() {
       }
     }
 
-    // Filtro de tipo (entrada/saída)
+    // Filtro de tipo (entrada/saÃ­da)
     if (filtros.tipo !== 'todas' && nf.tipo !== filtros.tipo) {
       return false
     }
@@ -547,7 +547,7 @@ export default function NotasFiscais() {
       return false
     }
 
-    // Filtro de período (para saída usar data_saida se existir)
+    // Filtro de perÃ­odo (para saÃ­da usar data_saida se existir)
     if (filtros.periodo !== 'todos') {
       const hoje = new Date()
       const dataNF = new Date(nf.tipo === 'saida' && nf.data_saida ? nf.data_saida : nf.data)
@@ -576,20 +576,20 @@ export default function NotasFiscais() {
         return (parseFloat(b.valor_total) || parseFloat(b.valorTotal) || 0) - (parseFloat(a.valor_total) || parseFloat(a.valorTotal) || 0)
       case 'recentes':
       default:
-        // Se tiver created_at usa, senão usa data
+        // Se tiver created_at usa, senÃ£o usa data
         const dateA = a.created_at ? new Date(a.created_at) : new Date(a.data)
         const dateB = b.created_at ? new Date(b.created_at) : new Date(b.data)
         return dateB - dateA
     }
   })
 
-  // Paginação
+  // PaginaÃ§Ã£o
   const totalPaginas = Math.ceil(nfsFiltradas.length / itensPorPagina)
   const indiceInicial = (paginaAtual - 1) * itensPorPagina
   const indiceFinal = indiceInicial + itensPorPagina
   const nfsPaginadas = nfsFiltradas.slice(indiceInicial, indiceFinal)
 
-  // Resetar página quando filtros mudarem
+  // Resetar pÃ¡gina quando filtros mudarem
   useEffect(() => {
     setPaginaAtual(1)
   }, [filtros, searchTerm])
@@ -614,7 +614,7 @@ export default function NotasFiscais() {
   }
 
   const abrirDetalhes = async (nf) => {
-    // Não ativar loading global para não remontar a lista inteira, apenas mostrar feedback visual se possível
+    // NÃ£o ativar loading global para nÃ£o remontar a lista inteira, apenas mostrar feedback visual se possÃ­vel
     // Mas como o loading atual bloqueia a tela, vamos usar ele mesmo por enquanto
     setLoading(true)
     try {
@@ -625,7 +625,7 @@ export default function NotasFiscais() {
         setDetailNF(nfCompleta)
         setShowDetailModal(true)
       } else {
-        // Se não conseguir buscar completa, usar a básica
+        // Se nÃ£o conseguir buscar completa, usar a bÃ¡sica
         setDetailNF(nf)
         setShowDetailModal(true)
       }
@@ -649,13 +649,13 @@ export default function NotasFiscais() {
         setNfEditando(nfCompleta)
         setShowModal(true)
       } else {
-        // Se não conseguir buscar completa, usar a básica
+        // Se nÃ£o conseguir buscar completa, usar a bÃ¡sica
         setNfEditando(nf)
         setShowModal(true)
       }
     } catch (error) {
-      console.error('Erro ao carregar NF para edição:', error)
-      // Em caso de erro, usar a NF básica mesmo assim
+      console.error('Erro ao carregar NF para ediÃ§Ã£o:', error)
+      // Em caso de erro, usar a NF bÃ¡sica mesmo assim
       setNfEditando(nf)
       setShowModal(true)
     } finally {
@@ -663,7 +663,7 @@ export default function NotasFiscais() {
     }
   }
 
-  // Estatísticas
+  // EstatÃ­sticas
   const nfsArray = Array.isArray(nfs) ? nfs : []
   const stats = {
     totalEntradas: nfsArray.filter(n => n.tipo === 'entrada').length,
@@ -682,22 +682,22 @@ export default function NotasFiscais() {
     }).format(value || 0)
   }
 
-  // Função para calcular quantidade total de animais de uma NF
+  // FunÃ§Ã£o para calcular quantidade total de animais de uma NF
   const calcularQuantidadeAnimais = async (nf) => {
     try {
-      // Se já tiver itens carregados, usar diretamente
+      // Se jÃ¡ tiver itens carregados, usar diretamente
       if (nf.itens && Array.isArray(nf.itens) && nf.itens.length > 0) {
         return nf.itens.reduce((total, item) => {
           // Se for modo categoria, usar o campo quantidade
           if (item.modoCadastro === 'categoria' && item.quantidade) {
             return total + (parseInt(item.quantidade) || 0)
           }
-          // Se não for modo categoria, contar como 1 animal por item
+          // Se nÃ£o for modo categoria, contar como 1 animal por item
           return total + 1
         }, 0)
       }
       
-      // Se não tiver itens carregados, buscar da API
+      // Se nÃ£o tiver itens carregados, buscar da API
       if (nf.id) {
         const response = await fetch(`/api/notas-fiscais/${nf.id}`)
         if (response.ok) {
@@ -726,25 +726,25 @@ export default function NotasFiscais() {
 
   const getIconeTipo = (tipo) => {
     switch (tipo) {
-      case 'bovino': return '🐄'
-      case 'semen': return '🧬'
-      case 'embriao': return '🧫'
-      default: return '📦'
+      case 'bovino': return 'ðÅ¸�â€ž'
+      case 'semen': return 'ðÅ¸§¬'
+      case 'embriao': return 'ðÅ¸§«'
+      default: return 'ðÅ¸â€œ¦'
     }
   }
 
-  // Helpers para importação NF
+  // Helpers para importaÃ§Ã£o NF
   const normalizeTipoNF = (v) => {
     if (!v) return 'entrada'
     const s = String(v).toLowerCase()
-    if (s.includes('saida') || s.includes('saída')) return 'saida'
+    if (s.includes('saida') || s.includes('saÃ­da')) return 'saida'
     return 'entrada'
   }
 
   const normalizeProduto = (v) => {
     const s = String(v || '').toLowerCase()
     if (s.includes('bov')) return 'bovino'
-    if (s.includes('sem') || s.includes('sêmen')) return 'semen'
+    if (s.includes('sem') || s.includes('sÃªmen')) return 'semen'
     if (s.includes('emb')) return 'embriao'
     return 'outros'
   }
@@ -775,7 +775,7 @@ export default function NotasFiscais() {
         try {
           const campos = splitCellsNF(linha)
 
-          // Construção via mapeamento manual
+          // ConstruÃ§Ã£o via mapeamento manual
           let dados = {}
           let extrasLocal = null
           if (mappingModeNF === 'manual') {
@@ -798,7 +798,7 @@ export default function NotasFiscais() {
               if (f.enabled) extrasLocal[f.name] = getBySourceNF(campos, f.source)
             })
           } else {
-            // Automático básico: assume ordem padrão
+            // AutomÃ¡tico bÃ¡sico: assume ordem padrÃ£o
             dados = {
               tipo: campos[0],
               numeroNF: campos[1],
@@ -810,7 +810,7 @@ export default function NotasFiscais() {
             }
           }
 
-          // Normalizações / validações
+          // NormalizaÃ§Ãµes / validaÃ§Ãµes
           const tipo = normalizeTipoNF(dados.tipo)
           const numeroNF = String(dados.numeroNF || '').trim()
           const dataISO = convertDateExcelToISO(dados.data)
@@ -818,7 +818,7 @@ export default function NotasFiscais() {
           const valorTotal = parseFloat(String(dados.valorTotal).replace(',', '.')) || 0
 
           if (!numeroNF || !dataISO || !tipo) {
-            throw new Error('Campos obrigatórios: Tipo, Número NF e Data')
+            throw new Error('Campos obrigatÃ³rios: Tipo, NÃºmero NF e Data')
           }
 
           const nfObj = {
@@ -866,14 +866,14 @@ export default function NotasFiscais() {
         })
         if (resp.ok) ok++
       }
-      Toast.success(`Importação concluída: ${ok} NFs salvas`) 
+      Toast.success(`ImportaÃ§Ã£o concluÃ­da: ${ok} NFs salvas`) 
       setShowImportNF(false)
       setImportDataNF('')
       setValidationNF(null)
       await loadNFs()
     } catch (err) {
-      console.error('Erro na importação NF:', err)
-      Toast.error('Erro na importação de notas fiscais')
+      console.error('Erro na importaÃ§Ã£o NF:', err)
+      Toast.error('Erro na importaÃ§Ã£o de notas fiscais')
     } finally {
       setImportandoNF(false)
       setImportProgressNF({ atual: 0, total: 0, etapa: '' })
@@ -887,17 +887,17 @@ export default function NotasFiscais() {
       // Importar biblioteca xlsx
       const XLSX = await import('xlsx')
       
-      // Preparar dados para exportação
+      // Preparar dados para exportaÃ§Ã£o
       const dadosExportacao = nfsFiltradas.map(nf => {
         const dataExibir = (nf.tipo === 'saida' && nf.data_saida) ? nf.data_saida : nf.data
         return {
-        'Tipo': nf.tipo === 'entrada' ? 'Entrada' : 'Saída',
-        'Número NF': nf.numero_nf || nf.numeroNF || '',
+        'Tipo': nf.tipo === 'entrada' ? 'Entrada' : 'SaÃ­da',
+        'NÃºmero NF': nf.numero_nf || nf.numeroNF || '',
         'Data': dataExibir ? new Date(dataExibir).toLocaleDateString('pt-BR') : '',
         'Fornecedor/Destino': nf.fornecedor || nf.destino || '',
         'Natureza': nf.natureza_operacao || nf.naturezaOperacao || '',
         'Valor Total': nf.valor_total || nf.valorTotal || 0,
-        'Observações': nf.observacoes || ''
+        'ObservaÃ§Ãµes': nf.observacoes || ''
       }})
       
       // Criar workbook e worksheet
@@ -912,7 +912,7 @@ export default function NotasFiscais() {
       // Download
       XLSX.writeFile(wb, nomeArquivo)
       
-      Toast.success(`✅ Arquivo exportado: ${nomeArquivo}`)
+      Toast.success(`âÅ“â€¦ Arquivo exportado: ${nomeArquivo}`)
     } catch (error) {
       console.error('Erro ao exportar:', error)
       Toast.error('Erro ao exportar para Excel')
@@ -939,7 +939,7 @@ export default function NotasFiscais() {
                       Notas Fiscais
                     </h1>
                     <p className="text-blue-100 text-lg font-medium">
-                      Gerenciamento completo de entradas e saídas
+                      Gerenciamento completo de entradas e saÃ­das
                     </p>
                   </div>
                 </div>
@@ -973,7 +973,7 @@ export default function NotasFiscais() {
                 >
                   <div className="flex items-center space-x-2">
                     <DocumentArrowUpIcon className="h-5 w-5 group-hover:animate-bounce" />
-                    <span className="font-medium">Nova Saída</span>
+                    <span className="font-medium">Nova SaÃ­da</span>
                   </div>
                 </button>
 
@@ -1002,7 +1002,7 @@ export default function NotasFiscais() {
         </div>
       </div>
 
-      {/* Cards de Estatísticas Modernos */}
+      {/* Cards de EstatÃ­sticas Modernos */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <button
           onClick={() => setFiltros(prev => ({ ...prev, tipo: 'entrada' }))}
@@ -1022,7 +1022,7 @@ export default function NotasFiscais() {
             <div className="space-y-2">
               <div className="text-lg font-semibold">{formatCurrency(stats.valorTotalEntradas)}</div>
               <div className="text-xs text-emerald-100 opacity-90 bg-white/10 rounded-full px-3 py-1 text-center">
-                👆 Clique para filtrar entradas
+                ðÅ¸â€˜â€  Clique para filtrar entradas
               </div>
             </div>
           </div>
@@ -1040,13 +1040,13 @@ export default function NotasFiscais() {
               </div>
               <div className="text-right">
                 <div className="text-3xl font-bold tracking-tight">{stats.totalSaidas}</div>
-                <div className="text-blue-100 text-sm font-medium">Saídas</div>
+                <div className="text-blue-100 text-sm font-medium">SaÃ­das</div>
               </div>
             </div>
             <div className="space-y-2">
               <div className="text-lg font-semibold">{formatCurrency(stats.valorTotalSaidas)}</div>
               <div className="text-xs text-blue-100 opacity-90 bg-white/10 rounded-full px-3 py-1 text-center">
-                👆 Clique para filtrar saídas
+                ðÅ¸â€˜â€  Clique para filtrar saÃ­das
               </div>
             </div>
           </div>
@@ -1069,20 +1069,20 @@ export default function NotasFiscais() {
             <div className="space-y-3">
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div className="bg-white/10 rounded-xl p-2">
-                  <div className="text-xl">🐄</div>
+                  <div className="text-xl">ðÅ¸�â€ž</div>
                   <div className="text-sm font-bold">{stats.bovinos}</div>
                 </div>
                 <div className="bg-white/10 rounded-xl p-2">
-                  <div className="text-xl">🧬</div>
+                  <div className="text-xl">ðÅ¸§¬</div>
                   <div className="text-sm font-bold">{stats.semen}</div>
                 </div>
                 <div className="bg-white/10 rounded-xl p-2">
-                  <div className="text-xl">🧫</div>
+                  <div className="text-xl">ðÅ¸§«</div>
                   <div className="text-sm font-bold">{stats.embrioes}</div>
                 </div>
               </div>
               <div className="text-xs text-purple-100 opacity-90 bg-white/10 rounded-full px-3 py-1 text-center">
-                👆 Ver todos os tipos
+                ðÅ¸â€˜â€  Ver todos os tipos
               </div>
             </div>
           </div>
@@ -1108,30 +1108,30 @@ export default function NotasFiscais() {
                 <CurrencyDollarIcon className="h-8 w-8 text-white" />
               </div>
               <div className="text-right">
-                <div className="text-sm font-medium text-orange-100">Saldo Líquido</div>
+                <div className="text-sm font-medium text-orange-100">Saldo LÃ­quido</div>
               </div>
             </div>
             <div className="space-y-2">
               <div className="text-2xl font-bold tracking-tight">
                 {formatCurrency(stats.valorTotalSaidas - stats.valorTotalEntradas)}
               </div>
-              <div className="text-sm text-orange-100 opacity-90">Saídas - Entradas</div>
+              <div className="text-sm text-orange-100 opacity-90">SaÃ­das - Entradas</div>
               <div className="text-xs text-orange-100 opacity-90 bg-white/10 rounded-full px-3 py-1 text-center">
-                👆 Ver detalhes do saldo
+                ðÅ¸â€˜â€  Ver detalhes do saldo
               </div>
             </div>
           </div>
         </button>
       </div>
 
-      {/* Painel de Sincronização */}
+      {/* Painel de SincronizaÃ§Ã£o */}
       {/* {showSyncPanel && (
         <div className="mb-6">
           <NotasFiscaisSyncPanel />
         </div>
       )} */}
 
-      {/* Painel de Integração */}
+      {/* Painel de IntegraÃ§Ã£o */}
       {/* {showIntegrationPanel && (
         <div className="mb-6">
           <PainelIntegracaoBoletim
@@ -1154,7 +1154,7 @@ export default function NotasFiscais() {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Buscar por número, fornecedor, destino ou natureza..."
+                placeholder="Buscar por nÃºmero, fornecedor, destino ou natureza..."
                 className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-gray-700/50 border-0 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-gray-700 transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 shadow-inner"
               />
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -1169,9 +1169,9 @@ export default function NotasFiscais() {
                 onChange={(e) => setFiltros(prev => ({ ...prev, tipo: e.target.value }))}
                 className="appearance-none bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-600 border-0 rounded-2xl px-4 py-3 pr-10 focus:ring-2 focus:ring-blue-500 transition-all duration-300 text-gray-900 dark:text-white font-medium shadow-sm hover:shadow-md cursor-pointer"
               >
-                <option value="todas" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">📋 Todas</option>
-                <option value="entrada" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">📥 Entradas</option>
-                <option value="saida" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">📤 Saídas</option>
+                <option value="todas" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">ðÅ¸â€œâ€¹ Todas</option>
+                <option value="entrada" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">ðÅ¸â€œ¥ Entradas</option>
+                <option value="saida" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">ðÅ¸â€œ¤ SaÃ­das</option>
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                 <FunnelIcon className="h-4 w-4 text-gray-400" />
@@ -1184,10 +1184,10 @@ export default function NotasFiscais() {
                 onChange={(e) => setFiltros(prev => ({ ...prev, tipoProduto: e.target.value }))}
                 className="appearance-none bg-gradient-to-r from-purple-50 to-pink-50 dark:from-gray-700 dark:to-gray-600 border-0 rounded-2xl px-4 py-3 pr-10 focus:ring-2 focus:ring-purple-500 transition-all duration-300 text-gray-900 dark:text-white font-medium shadow-sm hover:shadow-md cursor-pointer"
               >
-                <option value="todos" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">🏷️ Todos Tipos</option>
-                <option value="bovino" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">🐄 Bovino</option>
-                <option value="semen" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">🧬 Sêmen</option>
-                <option value="embriao" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">🧫 Embrião</option>
+                <option value="todos" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">ðÅ¸�·ï¸� Todos Tipos</option>
+                <option value="bovino" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">ðÅ¸�â€ž Bovino</option>
+                <option value="semen" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">ðÅ¸§¬ SÃªmen</option>
+                <option value="embriao" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">ðÅ¸§« EmbriÃ£o</option>
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                 <FunnelIcon className="h-4 w-4 text-gray-400" />
@@ -1200,11 +1200,11 @@ export default function NotasFiscais() {
                 onChange={(e) => setFiltros(prev => ({ ...prev, periodo: e.target.value }))}
                 className="appearance-none bg-gradient-to-r from-green-50 to-emerald-50 dark:from-gray-700 dark:to-gray-600 border-0 rounded-2xl px-4 py-3 pr-10 focus:ring-2 focus:ring-green-500 transition-all duration-300 text-gray-900 dark:text-white font-medium shadow-sm hover:shadow-md cursor-pointer"
               >
-                <option value="7dias" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">📅 Últimos 7 dias</option>
-                <option value="30dias" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">📅 Últimos 30 dias</option>
-                <option value="90dias" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">📅 Últimos 90 dias</option>
-                <option value="ano" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">📅 Último ano</option>
-                <option value="todos" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">📅 Todos</option>
+                <option value="7dias" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">ðÅ¸â€œâ€¦ ÃÅ¡ltimos 7 dias</option>
+                <option value="30dias" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">ðÅ¸â€œâ€¦ ÃÅ¡ltimos 30 dias</option>
+                <option value="90dias" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">ðÅ¸â€œâ€¦ ÃÅ¡ltimos 90 dias</option>
+                <option value="ano" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">ðÅ¸â€œâ€¦ ÃÅ¡ltimo ano</option>
+                <option value="todos" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">ðÅ¸â€œâ€¦ Todos</option>
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                 <FunnelIcon className="h-4 w-4 text-gray-400" />
@@ -1217,12 +1217,12 @@ export default function NotasFiscais() {
                 onChange={(e) => setOrdenacao(e.target.value)}
                 className="appearance-none bg-gradient-to-r from-orange-50 to-amber-50 dark:from-gray-700 dark:to-gray-600 border-0 rounded-2xl px-4 py-3 pr-10 focus:ring-2 focus:ring-orange-500 transition-all duration-300 text-gray-900 dark:text-white font-medium shadow-sm hover:shadow-md cursor-pointer"
               >
-                <option value="dataDesc" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">📅 Mais recentes</option>
-                <option value="dataAsc" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">📅 Mais antigas</option>
-                <option value="numeroDesc" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">🔢 Maior Número</option>
-                <option value="numeroAsc" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">🔢 Menor Número</option>
-                <option value="valorDesc" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">💰 Maior Valor</option>
-                <option value="valorAsc" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">💰 Menor Valor</option>
+                <option value="dataDesc" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">ðÅ¸â€œâ€¦ Mais recentes</option>
+                <option value="dataAsc" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">ðÅ¸â€œâ€¦ Mais antigas</option>
+                <option value="numeroDesc" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">ðÅ¸â€�¢ Maior NÃºmero</option>
+                <option value="numeroAsc" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">ðÅ¸â€�¢ Menor NÃºmero</option>
+                <option value="valorDesc" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">ðÅ¸â€™° Maior Valor</option>
+                <option value="valorAsc" className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">ðÅ¸â€™° Menor Valor</option>
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                 <FunnelIcon className="h-4 w-4 text-gray-400" />
@@ -1239,7 +1239,7 @@ export default function NotasFiscais() {
               {nfsFiltradas.length} {nfsFiltradas.length === 1 ? 'nota fiscal encontrada' : 'notas fiscais encontradas'}
               {nfsFiltradas.length > itensPorPagina && (
                 <span className="ml-2 text-gray-500 dark:text-gray-400">
-                  (Página {paginaAtual} de {totalPaginas})
+                  (PÃ¡gina {paginaAtual} de {totalPaginas})
                 </span>
               )}
             </span>
@@ -1249,13 +1249,13 @@ export default function NotasFiscais() {
               onClick={() => setSearchTerm('')}
               className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full transition-colors duration-200"
             >
-              Limpar busca ✕
+              Limpar busca âÅ“â€¢
             </button>
           )}
         </div>
       </div>
 
-      {/* Barra de Ações para Seleção Múltipla Moderna */}
+      {/* Barra de AÃ§Ãµes para SeleÃ§Ã£o MÃºltipla Moderna */}
       {selectedNFs.length > 0 && (
         <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-900/20 dark:via-indigo-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 rounded-3xl p-6 shadow-lg backdrop-blur-sm">
           <div className="flex items-center justify-between">
@@ -1268,7 +1268,7 @@ export default function NotasFiscais() {
                   {selectedNFs.length} nota{selectedNFs.length > 1 ? 's' : ''} fiscal{selectedNFs.length > 1 ? 'is' : ''} selecionada{selectedNFs.length > 1 ? 's' : ''}
                 </div>
                 <div className="text-xs text-blue-700 dark:text-blue-300">
-                  Ações em lote disponíveis
+                  AÃ§Ãµes em lote disponÃ­veis
                 </div>
               </div>
             </div>
@@ -1280,7 +1280,7 @@ export default function NotasFiscais() {
                 }}
                 className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 bg-white/50 dark:bg-gray-700/50 rounded-xl transition-all duration-200 hover:bg-white dark:hover:bg-gray-700"
               >
-                Cancelar seleção
+                Cancelar seleÃ§Ã£o
               </button>
               <button
                 onClick={handleDeleteMultiple}
@@ -1314,7 +1314,7 @@ export default function NotasFiscais() {
                 <DocumentTextIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
               </div>
               <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
-                <span className="text-sm">🔍</span>
+                <span className="text-sm">ðÅ¸â€��</span>
               </div>
             </div>
             <div className="space-y-3">
@@ -1328,13 +1328,13 @@ export default function NotasFiscais() {
                     onClick={abrirModalEntrada}
                     className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl font-medium hover:from-green-600 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105"
                   >
-                    📥 Nova Entrada
+                    ðÅ¸â€œ¥ Nova Entrada
                   </button>
                   <button
                     onClick={abrirModalSaida}
                     className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl font-medium hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105"
                   >
-                    📤 Nova Saída
+                    ðÅ¸â€œ¤ Nova SaÃ­da
                   </button>
                 </div>
               )}
@@ -1363,7 +1363,7 @@ export default function NotasFiscais() {
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                     <div className="flex items-center space-x-1">
-                      <span>Número NF</span>
+                      <span>NÃºmero NF</span>
                       <div className="w-1 h-1 bg-green-500 rounded-full"></div>
                     </div>
                   </th>
@@ -1417,7 +1417,7 @@ export default function NotasFiscais() {
                   </th>
                   <th className="px-6 py-4 text-right text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                     <div className="flex items-center justify-end space-x-1">
-                      <span>Ações</span>
+                      <span>AÃ§Ãµes</span>
                       <div className="w-1 h-1 bg-red-500 rounded-full"></div>
                     </div>
                   </th>
@@ -1453,7 +1453,7 @@ export default function NotasFiscais() {
                       ) : (
                         <span className="inline-flex items-center px-3 py-1.5 rounded-2xl text-xs font-semibold bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 dark:from-blue-900/30 dark:to-indigo-900/30 dark:text-blue-300 shadow-sm">
                           <DocumentArrowUpIcon className="h-3 w-3 mr-1.5" />
-                          Saída
+                          SaÃ­da
                         </span>
                       )}
                     </td>
@@ -1475,7 +1475,7 @@ export default function NotasFiscais() {
                       </div>
                     </td>
                     <td className="px-6 py-5">
-                      {/* Para saída: mostrar destino/comprador */}
+                      {/* Para saÃ­da: mostrar destino/comprador */}
                       {/* Para entrada: mostrar fornecedor (origem) */}
                       {nf.tipo === 'saida' ? (
                         (nf.destino || nf.destinatario) ? (
@@ -1483,15 +1483,15 @@ export default function NotasFiscais() {
                             {nf.destino || nf.destinatario}
                           </div>
                         ) : (
-                          <div className="text-sm text-gray-400 dark:text-gray-500 font-medium max-w-xs truncate px-2 py-1 rounded-lg bg-yellow-50 dark:bg-yellow-900/20" title="Destino não informado">
-                            ⚠️ Não informado
+                          <div className="text-sm text-gray-400 dark:text-gray-500 font-medium max-w-xs truncate px-2 py-1 rounded-lg bg-yellow-50 dark:bg-yellow-900/20" title="Destino nÃ£o informado">
+                            âÅ¡ ï¸� NÃ£o informado
                           </div>
                         )
                       ) : (
                         // Para entrada: mostrar fornecedor na coluna destino (origem)
                         nf.fornecedor ? (
                           <div className="text-sm font-medium max-w-xs truncate px-2 py-1 rounded-lg text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50" title={`Fornecedor: ${nf.fornecedor}`}>
-                            📥 {nf.fornecedor}
+                            ðÅ¸â€œ¥ {nf.fornecedor}
                           </div>
                         ) : (
                           <div className="text-sm text-gray-400 dark:text-gray-500 font-medium max-w-xs truncate" title="-">
@@ -1545,19 +1545,19 @@ export default function NotasFiscais() {
                                   const data = await response.json()
                                   
                                   if (data.success) {
-                                    alert(`✅ ${data.message}\n\n${data.registradas} movimentação(ões) registrada(s) no boletim contábil.\nLocalidade: ${data.localidade}`)
+                                    alert(`âÅ“â€¦ ${data.message}\n\n${data.registradas} movimentaÃ§Ã£o(Ãµes) registrada(s) no boletim contÃ¡bil.\nLocalidade: ${data.localidade}`)
                                     // Recarregar NFs para atualizar dados
                                     loadNFs()
                                   } else {
-                                    alert(`❌ Erro: ${data.message}`)
+                                    alert(`â�Å’ Erro: ${data.message}`)
                                   }
                                 } catch (error) {
                                   console.error('Erro ao sincronizar NF:', error)
-                                  alert(`❌ Erro ao sincronizar NF: ${error.message}`)
+                                  alert(`â�Å’ Erro ao sincronizar NF: ${error.message}`)
                                 }
                               }}
                               className="group/btn p-2 text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/20 dark:hover:bg-purple-900/40 rounded-xl transition-all duration-200 hover:scale-110"
-                              title="Sincronizar com Boletim Contábil"
+                              title="Sincronizar com Boletim ContÃ¡bil"
                             >
                               <ArrowPathIcon className="h-4 w-4 group-hover/btn:animate-spin" />
                             </button>
@@ -1603,7 +1603,7 @@ export default function NotasFiscais() {
           </div>
         )}
 
-        {/* Paginação */}
+        {/* PaginaÃ§Ã£o */}
         {nfsFiltradas.length > itensPorPagina && (
           <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-t border-gray-200 dark:border-gray-700 px-6 py-4">
             <div className="flex items-center justify-between">
@@ -1622,7 +1622,7 @@ export default function NotasFiscais() {
                 </button>
                 <div className="flex items-center space-x-1">
                   {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((pagina) => {
-                    // Mostrar apenas algumas páginas ao redor da atual
+                    // Mostrar apenas algumas pÃ¡ginas ao redor da atual
                     if (
                       pagina === 1 ||
                       pagina === totalPaginas ||
@@ -1659,7 +1659,7 @@ export default function NotasFiscais() {
                   disabled={paginaAtual === totalPaginas}
                   className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                 >
-                  Próxima
+                  PrÃ³xima
                 </button>
               </div>
             </div>
@@ -1686,7 +1686,7 @@ export default function NotasFiscais() {
       {showResumo && nfResumo && (
         <ResumoAnimaisNF
           numeroNF={nfResumo}
-          localidade="AGROPECUÁRIA PARDINHO LTDA"
+          localidade="AGROPECUÃ�RIA PARDINHO LTDA"
           onClose={() => {
             setShowResumo(false)
             setNfResumo(null)
@@ -1716,17 +1716,17 @@ export default function NotasFiscais() {
                   <p className="text-gray-600 dark:text-gray-400">Cole dados do Excel/CSV e mapeie os campos</p>
                 </div>
               </div>
-              <button onClick={() => setShowImportNF(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl font-bold">×</button>
+              <button onClick={() => setShowImportNF(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl font-bold">Ãâ€”</button>
             </div>
 
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
-              {/* Método */}
+              {/* MÃ©todo */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Escolha o Método</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Escolha o MÃ©todo</h3>
                 <div className="flex space-x-4">
                   <label className="flex items-center">
                     <input type="radio" value="excel" checked={importMethodNF === 'excel'} onChange={(e) => setImportMethodNF(e.target.value)} className="mr-2" />
-                    <span className="text-gray-700 dark:text-gray-300">📊 Excel/Planilha</span>
+                    <span className="text-gray-700 dark:text-gray-300">ðÅ¸â€œÅ  Excel/Planilha</span>
                   </label>
                   <label className="flex items-center">
                     <input type="radio" value="csv" checked={importMethodNF === 'csv'} onChange={(e) => setImportMethodNF(e.target.value)} className="mr-2" />
@@ -1735,13 +1735,13 @@ export default function NotasFiscais() {
                 </div>
               </div>
 
-              {/* Instruções */}
+              {/* InstruÃ§Ãµes */}
               <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
-                <h4 className="font-semibold text-amber-900 dark:text-amber-200 mb-2">📋 Instruções</h4>
+                <h4 className="font-semibold text-amber-900 dark:text-amber-200 mb-2">ðÅ¸â€œâ€¹ InstruÃ§Ãµes</h4>
                 <div className="space-y-1 text-sm text-amber-800 dark:text-amber-300">
-                  <p><strong>Colunas sugeridas:</strong> Tipo, Número NF, Data, Fornecedor, Destino, Produto, Valor Total</p>
+                  <p><strong>Colunas sugeridas:</strong> Tipo, NÃºmero NF, Data, Fornecedor, Destino, Produto, Valor Total</p>
                   <p><strong>Exemplo:</strong> Entrada\t12345\t09/08/23\tFornecedor X\tDestino Y\tBovino\t1234,56</p>
-                  <p><strong>Dica:</strong> Cole direto do Excel com TABs ou vírgulas</p>
+                  <p><strong>Dica:</strong> Cole direto do Excel com TABs ou vÃ­rgulas</p>
                 </div>
               </div>
 
@@ -1753,23 +1753,23 @@ export default function NotasFiscais() {
                   onChange={(e) => setImportDataNF(e.target.value)}
                   rows={8}
                   className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono text-sm"
-                  placeholder={'Entrada\t12345\t09/08/23\tFornecedor X\tDestino Y\tBovino\t1234,56\nSaída\t67890\t10/08/23\tFornecedor Z\tDestino W\tSêmen\t500,00'}
+                  placeholder={'Entrada\t12345\t09/08/23\tFornecedor X\tDestino Y\tBovino\t1234,56\nSaÃ­da\t67890\t10/08/23\tFornecedor Z\tDestino W\tSÃªmen\t500,00'}
                 />
               </div>
 
-              {/* Configuração de Campos */}
+              {/* ConfiguraÃ§Ã£o de Campos */}
               <div className="mb-6">
-                <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Configuração dos Campos</h4>
+                <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">ConfiguraÃ§Ã£o dos Campos</h4>
                 <div className="flex items-center space-x-4 mb-3">
                   <label className="flex items-center">
                     <input type="radio" value="auto" checked={mappingModeNF === 'auto'} onChange={(e) => setMappingModeNF(e.target.value)} className="mr-2" />
-                    Automático
+                    AutomÃ¡tico
                   </label>
                   <label className="flex items-center">
                     <input type="radio" value="manual" checked={mappingModeNF === 'manual'} onChange={(e) => setMappingModeNF(e.target.value)} className="mr-2" />
                     Manual (mapear colunas)
                   </label>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">{headersDetectedNF.length ? 'Cabeçalhos detectados' : `${columnCountNF} colunas detectadas`}</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{headersDetectedNF.length ? 'CabeÃ§alhos detectados' : `${columnCountNF} colunas detectadas`}</span>
                 </div>
 
                 {mappingModeNF === 'manual' && (
@@ -1844,7 +1844,7 @@ export default function NotasFiscais() {
                   <div className="grid grid-cols-3 gap-4">
                     <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
                       <div className="text-2xl font-bold text-green-600 dark:text-green-400">{validationNF.sucesso.length}</div>
-                      <div className="text-sm text-green-600 dark:text-green-400">Válidos</div>
+                      <div className="text-sm text-green-600 dark:text-green-400">VÃ¡lidos</div>
                     </div>
                     <div className="text-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
                       <div className="text-2xl font-bold text-red-600 dark:text-red-400">{validationNF.erros.length}</div>
@@ -1872,7 +1872,7 @@ export default function NotasFiscais() {
 
                   {validationNF.sucesso.length > 0 && (
                     <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                      <h4 className="font-semibold text-green-900 dark:text-green-200 mb-2">Notas Prontas para Importação ({validationNF.sucesso.length})</h4>
+                      <h4 className="font-semibold text-green-900 dark:text-green-200 mb-2">Notas Prontas para ImportaÃ§Ã£o ({validationNF.sucesso.length})</h4>
                       <div className="space-y-2 max-h-40 overflow-y-auto">
                         {validationNF.sucesso.slice(0,5).map((nf,i) => (
                           <div key={i} className="text-sm text-green-800 dark:text-green-300 flex justify-between">
@@ -1896,7 +1896,7 @@ export default function NotasFiscais() {
         </div>
       )}
 
-      {/* Painel de Integração */}
+      {/* Painel de IntegraÃ§Ã£o */}
       {/* {showIntegrationPanel && (
         <PainelIntegracaoBoletim
           estatisticas={estatisticasIntegracao}

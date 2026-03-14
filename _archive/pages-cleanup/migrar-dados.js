@@ -89,7 +89,7 @@ export default function MigrarDados() {
 
   const limparLocalStorage = () => {
     if (window.confirm(
-      '⚠️ ATENÇÃO!\n\n' +
+      '�š�️ ATEN�‡�ƒO!\n\n' +
       'Isso vai APAGAR todos os dados do localStorage.\n' +
       'Certifique-se de que a migração foi concluída com sucesso!\n\n' +
       'Deseja continuar?'
@@ -98,7 +98,7 @@ export default function MigrarDados() {
       localStorage.removeItem('naturezasOperacao');
       localStorage.removeItem('origensReceptoras');
       
-      alert('✅ LocalStorage limpo com sucesso!');
+      alert('�œ… LocalStorage limpo com sucesso!');
       verificarDadosLocalStorage();
       setResultado(null);
     }
@@ -111,7 +111,7 @@ export default function MigrarDados() {
     setTimeout(() => {
       if (resultado?.sucesso) {
         if (window.confirm(
-          '✅ Migração concluída com sucesso!\n\n' +
+          '�œ… Migração concluída com sucesso!\n\n' +
           'Deseja limpar os dados do localStorage agora?'
         )) {
           limparLocalStorage();
@@ -138,7 +138,7 @@ export default function MigrarDados() {
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 text-white mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold">🔄 Migração de Dados</h1>
+              <h1 className="text-3xl font-bold">�Ÿ”„ Migração de Dados</h1>
               <p className="text-blue-100 mt-2">
                 Migre seus dados do localStorage para o PostgreSQL
               </p>
@@ -150,14 +150,14 @@ export default function MigrarDados() {
         {/* Status dos Dados */}
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-            📊 Dados Encontrados no LocalStorage
+            �Ÿ“Š Dados Encontrados no LocalStorage
           </h2>
 
           {!dadosLocalStorage.temDados ? (
             <div className="text-center py-8">
               <CheckCircleIcon className="h-16 w-16 text-green-600 mx-auto mb-4" />
               <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                ✅ Nenhum dado encontrado no localStorage!
+                �œ… Nenhum dado encontrado no localStorage!
               </p>
               <p className="text-gray-600 dark:text-gray-400 mt-2">
                 Você já está usando apenas o banco de dados PostgreSQL.
@@ -216,7 +216,7 @@ export default function MigrarDados() {
         {dadosLocalStorage.temDados && (
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-              ⚡ Ações Disponíveis
+              �š� Ações Disponíveis
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -304,30 +304,30 @@ export default function MigrarDados() {
                     ? 'text-green-900 dark:text-green-200' 
                     : 'text-red-900 dark:text-red-200'
                 }`}>
-                  {resultado.sucesso ? '✅ Migração Concluída com Sucesso!' : '❌ Erro na Migração'}
+                  {resultado.sucesso ? '�œ… Migração Concluída com Sucesso!' : '�Œ Erro na Migração'}
                 </h3>
                 
                 {resultado.sucesso ? (
                   <div className="mt-3 space-y-2">
                     <p className="text-green-800 dark:text-green-300">
-                      📋 Notas Fiscais migradas: <strong>{resultado.nfsMigradas}</strong>
+                      �Ÿ“‹ Notas Fiscais migradas: <strong>{resultado.nfsMigradas}</strong>
                     </p>
                     <p className="text-green-800 dark:text-green-300">
-                      🏷️ Naturezas de Operação migradas: <strong>{resultado.naturezasMigradas}</strong>
+                      �Ÿ��️ Naturezas de Operação migradas: <strong>{resultado.naturezasMigradas}</strong>
                     </p>
                     <p className="text-green-800 dark:text-green-300">
-                      📍 Origens de Receptoras migradas: <strong>{resultado.origensMigradas}</strong>
+                      �Ÿ“� Origens de Receptoras migradas: <strong>{resultado.origensMigradas}</strong>
                     </p>
                     
                     {resultado.erros && resultado.erros.length > 0 && (
                       <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded">
                         <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-200">
-                          ⚠️ {resultado.erros.length} item(ns) com erro:
+                          �š�️ {resultado.erros.length} item(ns) com erro:
                         </p>
                         <ul className="mt-2 text-sm text-yellow-800 dark:text-yellow-300 space-y-1">
                           {resultado.erros.map((erro, index) => (
                             <li key={index}>
-                              • {erro.tipo}: {erro.nome || erro.nf} - {erro.erro}
+                              �€� {erro.tipo}: {erro.nome || erro.nf} - {erro.erro}
                             </li>
                           ))}
                         </ul>
@@ -347,13 +347,13 @@ export default function MigrarDados() {
         {/* Info */}
         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
           <h3 className="font-semibold text-blue-900 dark:text-blue-200 mb-2">
-            ℹ️ Informações Importantes
+            �„�️ Informações Importantes
           </h3>
           <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-2">
-            <li>• <strong>Migrar Dados</strong>: Copia os dados do localStorage para o PostgreSQL</li>
-            <li>• <strong>Migrar e Limpar</strong>: Migra os dados e remove do localStorage automaticamente</li>
-            <li>• <strong>Apenas Limpar</strong>: Remove dados do localStorage (use após confirmar migração)</li>
-            <li>• <strong>Recomendação</strong>: Use "Migrar e Limpar" para processo completo</li>
+            <li>�€� <strong>Migrar Dados</strong>: Copia os dados do localStorage para o PostgreSQL</li>
+            <li>�€� <strong>Migrar e Limpar</strong>: Migra os dados e remove do localStorage automaticamente</li>
+            <li>�€� <strong>Apenas Limpar</strong>: Remove dados do localStorage (use após confirmar migração)</li>
+            <li>�€� <strong>Recomendação</strong>: Use "Migrar e Limpar" para processo completo</li>
           </ul>
         </div>
       </div>

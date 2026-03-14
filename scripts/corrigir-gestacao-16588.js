@@ -3,9 +3,9 @@ require('dotenv').config();
 
 async function corrigirGestacao16588() {
   try {
-    console.log('🔍 Verificando gestações do animal 16588 (MARCOLINA SANT ANNA)...\n');
+    console.log('ðÅ¸â€�� Verificando gestaÃ§Ãµes do animal 16588 (MARCOLINA SANT ANNA)...\n');
     
-    // Buscar todas as gestações relacionadas ao animal 16588
+    // Buscar todas as gestaÃ§Ãµes relacionadas ao animal 16588
     const gestacoes = await query(`
       SELECT 
         g.*,
@@ -22,53 +22,53 @@ async function corrigirGestacao16588() {
       ORDER BY g.data_cobertura DESC
     `);
     
-    console.log(`📊 Total de gestações encontradas: ${gestacoes.rows.length}\n`);
+    console.log(`ðÅ¸â€œÅ  Total de gestaÃ§Ãµes encontradas: ${gestacoes.rows.length}\n`);
     
     if (gestacoes.rows.length === 0) {
-      console.log('✅ Nenhuma gestação encontrada para o animal 16588');
+      console.log('âÅ“â€¦ Nenhuma gestaÃ§Ã£o encontrada para o animal 16588');
       return;
     }
     
-    // Mostrar detalhes de cada gestação
+    // Mostrar detalhes de cada gestaÃ§Ã£o
     for (const gestacao of gestacoes.rows) {
-      console.log(`\n📋 Gestação ID: ${gestacao.id}`);
+      console.log(`\nðÅ¸â€œâ€¹ GestaÃ§Ã£o ID: ${gestacao.id}`);
       console.log(`   Data Cobertura: ${gestacao.data_cobertura}`);
-      console.log(`   Situação: ${gestacao.situacao}`);
+      console.log(`   SituaÃ§Ã£o: ${gestacao.situacao}`);
       console.log(`   Receptora: ${gestacao.receptora_serie} ${gestacao.receptora_rg} - ${gestacao.receptora_nome}`);
-      console.log(`   Mãe: ${gestacao.mae_serie} ${gestacao.mae_rg}`);
+      console.log(`   MÃ£e: ${gestacao.mae_serie} ${gestacao.mae_rg}`);
       console.log(`   Pai: ${gestacao.pai_serie} ${gestacao.pai_rg}`);
       console.log(`   Status: ${gestacao.status_nascimento}`);
-      console.log(`   Observações: ${gestacao.observacoes || 'N/A'}`);
+      console.log(`   ObservaÃ§Ãµes: ${gestacao.observacoes || 'N/A'}`);
     }
     
-    // Perguntar se deseja excluir gestações sem nascimento
-    console.log('\n\n⚠️  ATENÇÃO: Deseja excluir as gestações SEM nascimento vinculado?');
-    console.log('   (Gestações COM nascimento serão mantidas)\n');
+    // Perguntar se deseja excluir gestaÃ§Ãµes sem nascimento
+    console.log('\n\nâÅ¡ ï¸�  ATENÃâ€¡ÃÆ’O: Deseja excluir as gestaÃ§Ãµes SEM nascimento vinculado?');
+    console.log('   (GestaÃ§Ãµes COM nascimento serÃ£o mantidas)\n');
     
     const gestacoesParaExcluir = gestacoes.rows.filter(g => g.status_nascimento === 'Sem Nascimento');
     
     if (gestacoesParaExcluir.length === 0) {
-      console.log('✅ Todas as gestações têm nascimentos vinculados. Nada a excluir.');
+      console.log('âÅ“â€¦ Todas as gestaÃ§Ãµes tÃªm nascimentos vinculados. Nada a excluir.');
       return;
     }
     
-    console.log(`📝 Gestações que serão excluídas: ${gestacoesParaExcluir.length}`);
+    console.log(`ðÅ¸â€œ� GestaÃ§Ãµes que serÃ£o excluÃ­das: ${gestacoesParaExcluir.length}`);
     gestacoesParaExcluir.forEach(g => {
       console.log(`   - ID ${g.id}: ${g.data_cobertura} (${g.situacao})`);
     });
     
-    // Executar exclusão
-    console.log('\n🗑️  Excluindo gestações...');
+    // Executar exclusÃ£o
+    console.log('\nðÅ¸â€”â€˜ï¸�  Excluindo gestaÃ§Ãµes...');
     
     for (const gestacao of gestacoesParaExcluir) {
       await query('DELETE FROM gestacoes WHERE id = $1', [gestacao.id]);
-      console.log(`   ✓ Gestação ${gestacao.id} excluída`);
+      console.log(`   âÅ“â€œ GestaÃ§Ã£o ${gestacao.id} excluÃ­da`);
     }
     
-    console.log('\n✅ Correção concluída com sucesso!');
-    console.log(`   Total excluído: ${gestacoesParaExcluir.length} gestação(ões)`);
+    console.log('\nâÅ“â€¦ CorreÃ§Ã£o concluÃ­da com sucesso!');
+    console.log(`   Total excluÃ­do: ${gestacoesParaExcluir.length} gestaÃ§Ã£o(Ãµes)`);
     
-    // Verificar se ainda há gestações
+    // Verificar se ainda hÃ¡ gestaÃ§Ãµes
     const verificacao = await query(`
       SELECT COUNT(*) as total
       FROM gestacoes
@@ -78,10 +78,10 @@ async function corrigirGestacao16588() {
         OR pai_rg = '16588'
     `);
     
-    console.log(`\n📊 Gestações restantes para o animal 16588: ${verificacao.rows[0].total}`);
+    console.log(`\nðÅ¸â€œÅ  GestaÃ§Ãµes restantes para o animal 16588: ${verificacao.rows[0].total}`);
     
   } catch (error) {
-    console.error('❌ Erro ao corrigir gestações:', error);
+    console.error('â�Å’ Erro ao corrigir gestaÃ§Ãµes:', error);
     throw error;
   }
 }
@@ -89,10 +89,10 @@ async function corrigirGestacao16588() {
 // Executar
 corrigirGestacao16588()
   .then(() => {
-    console.log('\n✅ Script finalizado');
+    console.log('\nâÅ“â€¦ Script finalizado');
     process.exit(0);
   })
   .catch(error => {
-    console.error('\n❌ Erro fatal:', error);
+    console.error('\nâ�Å’ Erro fatal:', error);
     process.exit(1);
   });

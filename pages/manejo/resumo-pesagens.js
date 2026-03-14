@@ -41,7 +41,7 @@ export default function ResumoPesagens() {
     load()
   }, [mounted])
 
-  // Enriquecer pesagens sem animal_sexo (igual à página de pesagem)
+  // Enriquecer pesagens sem animal_sexo (igual Ã  pÃ¡gina de pesagem)
   useEffect(() => {
     if (!mounted || pesagens.length === 0 || animais.length === 0) return
     const semSexo = pesagens.filter(p => !p.animal_sexo && (p.animal_id || p.animal))
@@ -63,15 +63,15 @@ export default function ResumoPesagens() {
   }, [mounted, pesagens, animais])
 
   const extrairLocal = (obs) => {
-    if (!obs || typeof obs !== 'string') return 'Não informado'
+    if (!obs || typeof obs !== 'string') return 'NÃ£o informado'
     const s = obs.trim()
-    if (!s) return 'Não informado'
-    const sNorm = s.replace(/CONFINAÇÃO/gi, 'CONFINA').replace(/CONFINACAO/gi, 'CONFINA')
+    if (!s) return 'NÃ£o informado'
+    const sNorm = s.replace(/CONFINAÃâ€¡ÃÆ’O/gi, 'CONFINA').replace(/CONFINACAO/gi, 'CONFINA')
     const m = sNorm.match(/(PIQUETE\s*\d+|PROJETO\s*[\dA-Za-z\-]+|LOTE\s*\d+|CONFINA\w*|GUARITA|CABANHA|PISTA\s*\d*)/i)
     if (m) {
       let loc = m[1].trim().toUpperCase().replace(/\s+/g, ' ')
       if (/^CONFINA/.test(loc)) loc = 'CONFINA'
-      // PIQUETE X e PROJETO X → PROJETO X (agrupar mesmo local)
+      // PIQUETE X e PROJETO X ââ€ â€™ PROJETO X (agrupar mesmo local)
       if (/^PIQUETE\s+\d+$/.test(loc)) loc = loc.replace(/^PIQUETE\s+/i, 'PROJETO ')
       return loc
     }
@@ -79,13 +79,13 @@ export default function ResumoPesagens() {
   }
 
   const machos = pesagens.filter(p => p.animal_sexo === 'Macho')
-  const femeas = pesagens.filter(p => p.animal_sexo === 'Fêmea')
+  const femeas = pesagens.filter(p => p.animal_sexo === 'FÃªmea')
   const pesos = pesagens.map(p => parseFloat(p.peso)).filter(n => !isNaN(n))
   const ces = pesagens.map(p => parseFloat(p.ce)).filter(n => !isNaN(n))
 
   const resumoPorSexo = [
-    { label: '♂️ Machos', dados: machos },
-    { label: '♀️ Fêmeas', dados: femeas }
+    { label: 'ââ„¢â€šï¸� Machos', dados: machos },
+    { label: 'ââ„¢â‚¬ï¸� FÃªmeas', dados: femeas }
   ].map(({ label, dados }) => {
     const p = dados.map(x => parseFloat(x.peso)).filter(n => !isNaN(n))
     const c = dados.map(x => parseFloat(x.ce)).filter(n => !isNaN(n))
@@ -99,7 +99,7 @@ export default function ResumoPesagens() {
     }
   })
 
-  // Local atual = da última pesagem de cada animal (como no relatório "Contagem de RGN")
+  // Local atual = da Ãºltima pesagem de cada animal (como no relatÃ³rio "Contagem de RGN")
   const porAnimalUltima = {}
   pesagens.forEach(p => {
     const aid = p.animal_id ?? p.animal ?? `f${(p.peso || 0)}-${p.data || ''}`
@@ -118,7 +118,7 @@ export default function ResumoPesagens() {
   const resumoPorLocal = Object.entries(porLocal).map(([local, dados]) => {
     const animaisUnicos = new Set(dados.map(p => p.animal_id || p.animal || `${p.peso}-${p.data}`))
     const qtde = animaisUnicos.size
-    const femeasLocal = dados.filter(p => p.animal_sexo === 'Fêmea')
+    const femeasLocal = dados.filter(p => p.animal_sexo === 'FÃªmea')
     const machosLocal = dados.filter(p => p.animal_sexo === 'Macho')
     const animaisFemeas = new Set(femeasLocal.map(p => p.animal_id || p.animal))
     const animaisMachos = new Set(machosLocal.map(p => p.animal_id || p.animal))
@@ -159,7 +159,7 @@ export default function ResumoPesagens() {
           <div className="text-center py-16 text-gray-500">Carregando...</div>
         ) : pesagens.length === 0 ? (
           <div className="bg-white dark:bg-gray-800 rounded-lg p-12 text-center text-gray-500">
-            Nenhuma pesagem encontrada. Importe pesagens em Manejo → Pesagem.
+            Nenhuma pesagem encontrada. Importe pesagens em Manejo ââ€ â€™ Pesagem.
           </div>
         ) : (
           <div className="space-y-6">
@@ -174,23 +174,23 @@ export default function ResumoPesagens() {
                   <div className="text-2xl font-bold">{pesagens.length}</div>
                 </div>
                 <div>
-                  <div className="text-xs opacity-80">Peso Médio</div>
+                  <div className="text-xs opacity-80">Peso MÃ©dio</div>
                   <div className="text-2xl font-bold">{pesos.length ? (pesos.reduce((a, b) => a + b, 0) / pesos.length).toFixed(1) : '-'} kg</div>
                 </div>
                 <div>
-                  <div className="text-xs opacity-80">Peso Mín</div>
+                  <div className="text-xs opacity-80">Peso MÃ­n</div>
                   <div className="text-2xl font-bold">{pesos.length ? Math.min(...pesos).toFixed(1) : '-'} kg</div>
                 </div>
                 <div>
-                  <div className="text-xs opacity-80">Peso Máx</div>
+                  <div className="text-xs opacity-80">Peso MÃ¡x</div>
                   <div className="text-2xl font-bold">{pesos.length ? Math.max(...pesos).toFixed(1) : '-'} kg</div>
                 </div>
                 <div>
-                  <div className="text-xs opacity-80">CE Médio</div>
+                  <div className="text-xs opacity-80">CE MÃ©dio</div>
                   <div className="text-2xl font-bold">{ces.length ? (ces.reduce((a, b) => a + b, 0) / ces.length).toFixed(1) : '-'} cm</div>
                 </div>
                 <div>
-                  <div className="text-xs opacity-80">Animais Únicos</div>
+                  <div className="text-xs opacity-80">Animais ÃÅ¡nicos</div>
                   <div className="text-2xl font-bold">{new Set(pesagens.map(p => p.animal_id || p.animal)).size}</div>
                 </div>
               </div>
@@ -203,10 +203,10 @@ export default function ResumoPesagens() {
                   <tr className="border-b border-white/20">
                     <th className="text-left py-2">Sexo</th>
                     <th className="text-right py-2">Qtde</th>
-                    <th className="text-right py-2">Média Peso</th>
-                    <th className="text-right py-2">Peso Mín</th>
-                    <th className="text-right py-2">Peso Máx</th>
-                    <th className="text-right py-2">Média CE</th>
+                    <th className="text-right py-2">MÃ©dia Peso</th>
+                    <th className="text-right py-2">Peso MÃ­n</th>
+                    <th className="text-right py-2">Peso MÃ¡x</th>
+                    <th className="text-right py-2">MÃ©dia CE</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -231,13 +231,13 @@ export default function ResumoPesagens() {
                   <thead>
                     <tr className="border-b border-white/20">
                       <th className="text-left py-2 sticky top-0 bg-slate-800">Local</th>
-                      <th className="text-right py-2 sticky top-0 bg-slate-800">Fêmea</th>
+                      <th className="text-right py-2 sticky top-0 bg-slate-800">FÃªmea</th>
                       <th className="text-right py-2 sticky top-0 bg-slate-800">Macho</th>
                       <th className="text-right py-2 sticky top-0 bg-slate-800">Total</th>
-                      <th className="text-right py-2 sticky top-0 bg-slate-800">Média Peso</th>
-                      <th className="text-right py-2 sticky top-0 bg-slate-800">Peso Mín</th>
-                      <th className="text-right py-2 sticky top-0 bg-slate-800">Peso Máx</th>
-                      <th className="text-right py-2 sticky top-0 bg-slate-800">Média CE</th>
+                      <th className="text-right py-2 sticky top-0 bg-slate-800">MÃ©dia Peso</th>
+                      <th className="text-right py-2 sticky top-0 bg-slate-800">Peso MÃ­n</th>
+                      <th className="text-right py-2 sticky top-0 bg-slate-800">Peso MÃ¡x</th>
+                      <th className="text-right py-2 sticky top-0 bg-slate-800">MÃ©dia CE</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -292,7 +292,7 @@ export default function ResumoPesagens() {
               </button>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-              {selectedLocalDados.dados.length} animal(is) com última pesagem neste local
+              {selectedLocalDados.dados.length} animal(is) com Ãºltima pesagem neste local
             </p>
             <div className="overflow-y-auto flex-1 border border-gray-200 dark:border-gray-600 rounded-lg">
               <table className="w-full text-sm">

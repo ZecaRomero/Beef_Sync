@@ -4,7 +4,7 @@ const { exec } = require('child_process');
 const { promisify } = require('util');
 const execAsync = promisify(exec);
 
-console.log('🚀 MIGRAÇÃO: PostgreSQL Local → Supabase\n');
+console.log('�Ÿš€ MIGRA�‡�ƒO: PostgreSQL Local �†’ Supabase\n');
 console.log('='.repeat(60));
 
 // Pool local
@@ -25,29 +25,29 @@ const poolSupabase = new Pool({
 });
 
 async function testarConexoes() {
-  console.log('🔍 Testando conexões...\n');
+  console.log('�Ÿ”� Testando conexões...\n');
   
   try {
-    console.log('📡 Testando PostgreSQL local...');
+    console.log('�Ÿ“� Testando PostgreSQL local...');
     const clientLocal = await poolLocal.connect();
     const resultLocal = await clientLocal.query('SELECT COUNT(*) as total FROM animais');
-    console.log(`✅ Local conectado - ${resultLocal.rows[0].total} animais`);
+    console.log(`�œ… Local conectado - ${resultLocal.rows[0].total} animais`);
     clientLocal.release();
   } catch (error) {
-    console.error('❌ Erro no banco local:', error.message);
+    console.error('�Œ Erro no banco local:', error.message);
     return false;
   }
   
   try {
-    console.log('📡 Testando Supabase...');
+    console.log('�Ÿ“� Testando Supabase...');
     const clientSupabase = await poolSupabase.connect();
     await clientSupabase.query('SELECT NOW()');
-    console.log('✅ Supabase conectado');
+    console.log('�œ… Supabase conectado');
     clientSupabase.release();
   } catch (error) {
-    console.error('❌ Erro no Supabase:', error.message);
-    console.log('\n⚠️  SUPABASE NÃO ACESSÍVEL!');
-    console.log('💡 Certifique-se de:');
+    console.error('�Œ Erro no Supabase:', error.message);
+    console.log('\n�š�️  SUPABASE N�ƒO ACESSÍVEL!');
+    console.log('�Ÿ’� Certifique-se de:');
     console.log('   1. VPN está ativa');
     console.log('   2. Ou está usando hotspot do celular');
     console.log('   3. Projeto Supabase está ativo\n');
@@ -58,7 +58,7 @@ async function testarConexoes() {
 }
 
 async function exportarDados() {
-  console.log('\n📦 Exportando dados do banco local...\n');
+  console.log('\n�Ÿ“� Exportando dados do banco local...\n');
   
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
   const backupFile = `backup-para-supabase-${timestamp}.sql`;
@@ -68,17 +68,17 @@ async function exportarDados() {
   try {
     console.log('⏳ Criando backup SQL...');
     await execAsync(pgDumpCmd, { env: { ...process.env, PGPASSWORD: 'jcromero85' } });
-    console.log(`✅ Backup criado: ${backupFile}`);
+    console.log(`�œ… Backup criado: ${backupFile}`);
     return backupFile;
   } catch (error) {
-    console.error('❌ Erro ao criar backup:', error.message);
-    console.log('\n💡 Tentando método alternativo (pg_dump pode não estar no PATH)...');
+    console.error('�Œ Erro ao criar backup:', error.message);
+    console.log('\n�Ÿ’� Tentando método alternativo (pg_dump pode não estar no PATH)...');
     return null;
   }
 }
 
 async function migrarDadosDireto() {
-  console.log('\n🔄 Migrando dados diretamente...\n');
+  console.log('\n�Ÿ”„ Migrando dados diretamente...\n');
   
   const tabelas = [
     'animais',
@@ -114,7 +114,7 @@ async function migrarDadosDireto() {
   
   for (const tabela of tabelas) {
     try {
-      console.log(`📋 Migrando tabela: ${tabela}...`);
+      console.log(`�Ÿ“‹ Migrando tabela: ${tabela}...`);
       
       // Buscar dados do local
       const clientLocal = await poolLocal.connect();
@@ -126,7 +126,7 @@ async function migrarDadosDireto() {
         continue;
       }
       
-      console.log(`   📊 ${result.rows.length} registros encontrados`);
+      console.log(`   �Ÿ“Š ${result.rows.length} registros encontrados`);
       
       // Inserir no Supabase
       const clientSupabase = await poolSupabase.connect();
@@ -159,10 +159,10 @@ async function migrarDadosDireto() {
       clientSupabase.release();
       
       totalRegistros += result.rows.length;
-      console.log(`   ✅ ${result.rows.length} registros migrados\n`);
+      console.log(`   �œ… ${result.rows.length} registros migrados\n`);
       
     } catch (error) {
-      console.error(`   ❌ Erro na tabela ${tabela}:`, error.message);
+      console.error(`   �Œ Erro na tabela ${tabela}:`, error.message);
       // Continua com próxima tabela
     }
   }
@@ -171,16 +171,16 @@ async function migrarDadosDireto() {
 }
 
 async function verificarMigracao() {
-  console.log('\n🔍 Verificando migração...\n');
+  console.log('\n�Ÿ”� Verificando migração...\n');
   
   try {
     const clientSupabase = await poolSupabase.connect();
     const result = await clientSupabase.query('SELECT COUNT(*) as total FROM animais');
-    console.log(`✅ Animais no Supabase: ${result.rows[0].total}`);
+    console.log(`�œ… Animais no Supabase: ${result.rows[0].total}`);
     clientSupabase.release();
     return true;
   } catch (error) {
-    console.error('❌ Erro ao verificar:', error.message);
+    console.error('�Œ Erro ao verificar:', error.message);
     return false;
   }
 }
@@ -193,7 +193,7 @@ async function migrar() {
       process.exit(1);
     }
     
-    console.log('\n⚠️  ATENÇÃO: Esta operação irá:');
+    console.log('\n�š�️  ATEN�‡�ƒO: Esta operação irá:');
     console.log('   1. Limpar dados existentes no Supabase');
     console.log('   2. Copiar todos os dados do banco local');
     console.log('   3. Pode levar alguns minutos\n');
@@ -209,23 +209,23 @@ async function migrar() {
     await verificarMigracao();
     
     console.log('\n' + '='.repeat(60));
-    console.log('✅ MIGRAÇÃO CONCLUÍDA COM SUCESSO!');
+    console.log('�œ… MIGRA�‡�ƒO CONCLUÍDA COM SUCESSO!');
     console.log('='.repeat(60));
-    console.log(`\n📊 Total de registros migrados: ${total}`);
-    console.log('\n📋 PRÓXIMOS PASSOS:\n');
+    console.log(`\n�Ÿ“Š Total de registros migrados: ${total}`);
+    console.log('\n�Ÿ“‹ PR�“XIMOS PASSOS:\n');
     console.log('1. Execute: node trocar-banco.js');
     console.log('2. Escolha opção 2 (Supabase)');
     console.log('3. Configure app mobile com:');
     console.log('   URL: https://bpsltnglmbwdpvumjeaf.supabase.co');
     console.log('   Database: Supabase (nuvem)\n');
-    console.log('🎉 Agora o app funciona sem o PC ligado!\n');
+    console.log('�ŸŽ‰ Agora o app funciona sem o PC ligado!\n');
     
     await poolLocal.end();
     await poolSupabase.end();
     process.exit(0);
     
   } catch (error) {
-    console.error('\n❌ ERRO NA MIGRAÇÃO:', error.message);
+    console.error('\n�Œ ERRO NA MIGRA�‡�ƒO:', error.message);
     await poolLocal.end();
     await poolSupabase.end();
     process.exit(1);

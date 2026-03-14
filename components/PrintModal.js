@@ -17,7 +17,7 @@ export default function PrintModal({ isOpen, onClose, animals, selectedAnimal = 
     {
       id: 'lista-simples',
       nome: 'Lista Simples',
-      descricao: 'Lista básica com informações principais',
+      descricao: 'Lista bÃ¡sica com informaÃ§Ãµes principais',
       icon: DocumentTextIcon,
     },
     {
@@ -35,7 +35,7 @@ export default function PrintModal({ isOpen, onClose, animals, selectedAnimal = 
     {
       id: 'etiquetas',
       nome: 'Etiquetas',
-      descricao: 'Etiquetas para identificação (10 por página)',
+      descricao: 'Etiquetas para identificaÃ§Ã£o (10 por pÃ¡gina)',
       icon: TagIcon,
     },
   ];
@@ -43,7 +43,7 @@ export default function PrintModal({ isOpen, onClose, animals, selectedAnimal = 
   const handlePrint = () => {
     const animaisParaImprimir = selectedAnimal ? [selectedAnimal] : animals;
     
-    // Criar conteúdo HTML baseado no formato selecionado
+    // Criar conteÃºdo HTML baseado no formato selecionado
     let conteudoHTML = '';
     
     switch (selectedFormat) {
@@ -63,7 +63,7 @@ export default function PrintModal({ isOpen, onClose, animals, selectedAnimal = 
         conteudoHTML = gerarListaSimples(animaisParaImprimir);
     }
 
-    // Abrir janela de impressão
+    // Abrir janela de impressÃ£o
     const janelaImpressao = window.open('', '_blank');
     janelaImpressao.document.write(conteudoHTML);
     janelaImpressao.document.close();
@@ -82,7 +82,7 @@ export default function PrintModal({ isOpen, onClose, animals, selectedAnimal = 
       <tr>
         <td style="padding: 8px; border: 1px solid #ddd;">${animal.serie || ''} ${animal.rg || ''}</td>
         <td style="padding: 8px; border: 1px solid #ddd;">${animal.raca || 'N/A'}</td>
-        <td style="padding: 8px; border: 1px solid #ddd;">${animal.sexo === 'M' ? 'Macho' : animal.sexo === 'F' ? 'Fêmea' : animal.sexo}</td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${animal.sexo === 'M' ? 'Macho' : animal.sexo === 'F' ? 'FÃªmea' : animal.sexo}</td>
         <td style="padding: 8px; border: 1px solid #ddd;">${animal.meses || 0} meses</td>
         <td style="padding: 8px; border: 1px solid #ddd;">${animal.situacao || 'Ativo'}</td>
         ${printOptions.incluirCustos ? `<td style="padding: 8px; border: 1px solid #ddd;">R$ ${(animal.custoTotal || 0).toFixed(2)}</td>` : ''}
@@ -132,18 +132,18 @@ export default function PrintModal({ isOpen, onClose, animals, selectedAnimal = 
           </style>
         </head>
         <body>
-          <h1>🐄 BeefSync - Lista de Animais</h1>
-          <p><strong>Data:</strong> ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
+          <h1>ðÅ¸�â€ž BeefSync - Lista de Animais</h1>
+          <p><strong>Data:</strong> ${new Date().toLocaleDateString('pt-BR')} Ã s ${new Date().toLocaleTimeString('pt-BR')}</p>
           <p><strong>Total de animais:</strong> ${animais.length}</p>
           
           <table>
             <thead>
               <tr>
-                <th>Identificação</th>
-                <th>Raça</th>
+                <th>IdentificaÃ§Ã£o</th>
+                <th>RaÃ§a</th>
                 <th>Sexo</th>
                 <th>Idade</th>
-                <th>Situação</th>
+                <th>SituaÃ§Ã£o</th>
                 ${printOptions.incluirCustos ? '<th>Custo Total</th>' : ''}
               </tr>
             </thead>
@@ -153,7 +153,7 @@ export default function PrintModal({ isOpen, onClose, animals, selectedAnimal = 
           </table>
           
           <div class="footer">
-            <p>BeefSync - Sistema de Gestão Pecuária</p>
+            <p>BeefSync - Sistema de GestÃ£o PecuÃ¡ria</p>
             <p>Impresso em ${new Date().toLocaleString('pt-BR')}</p>
           </div>
         </body>
@@ -166,7 +166,7 @@ export default function PrintModal({ isOpen, onClose, animals, selectedAnimal = 
       <tr>
         <td style="padding: 8px; border: 1px solid #ddd;">${animal.serie || ''} ${animal.rg || ''}</td>
         <td style="padding: 8px; border: 1px solid #ddd;">${animal.raca || 'N/A'}</td>
-        <td style="padding: 8px; border: 1px solid #ddd;">${animal.sexo === 'M' ? '♂ Macho' : animal.sexo === 'F' ? '♀ Fêmea' : animal.sexo}</td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${animal.sexo === 'M' ? 'ââ„¢â€š Macho' : animal.sexo === 'F' ? 'ââ„¢â‚¬ FÃªmea' : animal.sexo}</td>
         <td style="padding: 8px; border: 1px solid #ddd;">${animal.data_nascimento ? new Date(animal.data_nascimento).toLocaleDateString('pt-BR') : 'N/A'}</td>
         <td style="padding: 8px; border: 1px solid #ddd;">${animal.meses || 0} meses</td>
         <td style="padding: 8px; border: 1px solid #ddd;">${animal.peso || 0} kg</td>
@@ -222,22 +222,22 @@ export default function PrintModal({ isOpen, onClose, animals, selectedAnimal = 
           </style>
         </head>
         <body>
-          <h1>🐄 BeefSync - Lista Detalhada de Animais</h1>
-          <p><strong>Data:</strong> ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
+          <h1>ðÅ¸�â€ž BeefSync - Lista Detalhada de Animais</h1>
+          <p><strong>Data:</strong> ${new Date().toLocaleDateString('pt-BR')} Ã s ${new Date().toLocaleTimeString('pt-BR')}</p>
           <p><strong>Total de animais:</strong> ${animais.length}</p>
           
           <table>
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Raça</th>
+                <th>RaÃ§a</th>
                 <th>Sexo</th>
                 <th>Nascimento</th>
                 <th>Idade</th>
                 <th>Peso</th>
-                <th>Situação</th>
+                <th>SituaÃ§Ã£o</th>
                 <th>Custo</th>
-                ${printOptions.incluirObservacoes ? '<th>Observações</th>' : ''}
+                ${printOptions.incluirObservacoes ? '<th>ObservaÃ§Ãµes</th>' : ''}
               </tr>
             </thead>
             <tbody>
@@ -246,7 +246,7 @@ export default function PrintModal({ isOpen, onClose, animals, selectedAnimal = 
           </table>
           
           <div class="footer">
-            <p>BeefSync - Sistema de Gestão Pecuária</p>
+            <p>BeefSync - Sistema de GestÃ£o PecuÃ¡ria</p>
             <p>Impresso em ${new Date().toLocaleString('pt-BR')}</p>
           </div>
         </body>
@@ -258,13 +258,13 @@ export default function PrintModal({ isOpen, onClose, animals, selectedAnimal = 
     const fichas = animais.map(animal => `
       <div class="ficha" style="page-break-after: always; padding: 40px; border: 2px solid #2563eb; margin-bottom: 20px;">
         <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="color: #2563eb; margin: 0;">🐄 BeefSync</h1>
+          <h1 style="color: #2563eb; margin: 0;">ðÅ¸�â€ž BeefSync</h1>
           <h2 style="color: #333; margin: 10px 0;">Ficha Individual do Animal</h2>
         </div>
         
         <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-          <h3 style="color: #2563eb; margin-top: 0;">Identificação</h3>
-          <p><strong>Série/RG:</strong> ${animal.serie || ''} ${animal.rg || ''}</p>
+          <h3 style="color: #2563eb; margin-top: 0;">IdentificaÃ§Ã£o</h3>
+          <p><strong>SÃ©rie/RG:</strong> ${animal.serie || ''} ${animal.rg || ''}</p>
           <p><strong>Brinco:</strong> ${animal.brinco || 'N/A'}</p>
           <p><strong>Nome:</strong> ${animal.nome || 'N/A'}</p>
         </div>
@@ -272,16 +272,16 @@ export default function PrintModal({ isOpen, onClose, animals, selectedAnimal = 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
           <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px;">
             <h4 style="color: #2563eb; margin-top: 0;">Dados Gerais</h4>
-            <p><strong>Raça:</strong> ${animal.raca || 'N/A'}</p>
-            <p><strong>Sexo:</strong> ${animal.sexo === 'M' ? '♂ Macho' : animal.sexo === 'F' ? '♀ Fêmea' : animal.sexo}</p>
+            <p><strong>RaÃ§a:</strong> ${animal.raca || 'N/A'}</p>
+            <p><strong>Sexo:</strong> ${animal.sexo === 'M' ? 'ââ„¢â€š Macho' : animal.sexo === 'F' ? 'ââ„¢â‚¬ FÃªmea' : animal.sexo}</p>
             <p><strong>Data Nascimento:</strong> ${animal.data_nascimento ? new Date(animal.data_nascimento).toLocaleDateString('pt-BR') : 'N/A'}</p>
             <p><strong>Idade:</strong> ${animal.meses || 0} meses</p>
             <p><strong>Peso:</strong> ${animal.peso || 0} kg</p>
           </div>
 
           <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px;">
-            <h4 style="color: #2563eb; margin-top: 0;">Situação e Custos</h4>
-            <p><strong>Situação:</strong> ${animal.situacao || 'Ativo'}</p>
+            <h4 style="color: #2563eb; margin-top: 0;">SituaÃ§Ã£o e Custos</h4>
+            <p><strong>SituaÃ§Ã£o:</strong> ${animal.situacao || 'Ativo'}</p>
             <p><strong>Custo Total:</strong> R$ ${(animal.custoTotal || 0).toFixed(2)}</p>
             <p><strong>Valor Resultado:</strong> R$ ${(animal.valorResultado || 0).toFixed(2)}</p>
           </div>
@@ -291,13 +291,13 @@ export default function PrintModal({ isOpen, onClose, animals, selectedAnimal = 
         <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
           <h4 style="color: #2563eb; margin-top: 0;">Genealogia</h4>
           <p><strong>Pai:</strong> ${animal.pai || 'N/A'}</p>
-          <p><strong>Mãe:</strong> ${animal.mae || 'N/A'}</p>
+          <p><strong>MÃ£e:</strong> ${animal.mae || 'N/A'}</p>
         </div>
         ` : ''}
 
         ${animal.observacoes ? `
         <div style="background-color: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b;">
-          <h4 style="color: #f59e0b; margin-top: 0;">📝 Observações</h4>
+          <h4 style="color: #f59e0b; margin-top: 0;">ðÅ¸â€œ� ObservaÃ§Ãµes</h4>
           <p style="margin: 0;">${animal.observacoes}</p>
         </div>
         ` : ''}
@@ -346,7 +346,7 @@ export default function PrintModal({ isOpen, onClose, animals, selectedAnimal = 
           ${animal.serie || ''} ${animal.rg || ''}
         </div>
         <div style="font-size: 14px; color: #666;">
-          ${animal.raca || 'N/A'} • ${animal.sexo === 'M' ? '♂' : animal.sexo === 'F' ? '♀' : animal.sexo}
+          ${animal.raca || 'N/A'} ââ‚¬¢ ${animal.sexo === 'M' ? 'ââ„¢â€š' : animal.sexo === 'F' ? 'ââ„¢â‚¬' : animal.sexo}
         </div>
         <div style="font-size: 12px; color: #999; margin-top: 5px;">
           ${animal.meses || 0} meses
@@ -413,8 +413,8 @@ export default function PrintModal({ isOpen, onClose, animals, selectedAnimal = 
                   {selectedAnimal 
                     ? `1 animal selecionado: ${selectedAnimal.serie} ${selectedAnimal.rg}`
                     : animals.length > 0
-                    ? `${animals.length} animais serão impressos`
-                    : 'Nenhum animal selecionado para impressão'
+                    ? `${animals.length} animais serÃ£o impressos`
+                    : 'Nenhum animal selecionado para impressÃ£o'
                   }
                 </p>
               </div>
@@ -430,7 +430,7 @@ export default function PrintModal({ isOpen, onClose, animals, selectedAnimal = 
 
         {/* Body */}
         <div className="p-6 space-y-6">
-          {/* Formatos de Impressão */}
+          {/* Formatos de ImpressÃ£o */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Escolha o Formato
@@ -467,10 +467,10 @@ export default function PrintModal({ isOpen, onClose, animals, selectedAnimal = 
             </div>
           </div>
 
-          {/* Opções de Impressão */}
+          {/* OpÃ§Ãµes de ImpressÃ£o */}
           <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Opções de Impressão
+              OpÃ§Ãµes de ImpressÃ£o
             </h3>
             <div className="space-y-3">
               {selectedFormat !== 'etiquetas' && (
@@ -483,7 +483,7 @@ export default function PrintModal({ isOpen, onClose, animals, selectedAnimal = 
                       className="w-5 h-5 text-blue-600 rounded"
                     />
                     <span className="text-sm text-gray-700 dark:text-gray-300">
-                      Incluir informações de custos
+                      Incluir informaÃ§Ãµes de custos
                     </span>
                   </label>
 
@@ -495,7 +495,7 @@ export default function PrintModal({ isOpen, onClose, animals, selectedAnimal = 
                       className="w-5 h-5 text-blue-600 rounded"
                     />
                     <span className="text-sm text-gray-700 dark:text-gray-300">
-                      Incluir observações
+                      Incluir observaÃ§Ãµes
                     </span>
                   </label>
                 </>

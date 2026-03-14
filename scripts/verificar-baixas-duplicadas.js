@@ -14,7 +14,7 @@ async function verificar() {
   const client = await pool.connect()
   
   try {
-    console.log('🔍 Buscando baixas duplicadas...\n')
+    console.log('ðÅ¸â€�� Buscando baixas duplicadas...\n')
     
     // Buscar baixas que aparecem mais de uma vez (mesmo serie, rg, tipo)
     const duplicadas = await client.query(`
@@ -28,16 +28,16 @@ async function verificar() {
     `)
     
     if (duplicadas.rows.length === 0) {
-      console.log('✅ Nenhuma baixa duplicada encontrada')
+      console.log('âÅ“â€¦ Nenhuma baixa duplicada encontrada')
       return
     }
     
-    console.log(`⚠️  Encontradas ${duplicadas.rows.length} baixas duplicadas:\n`)
+    console.log(`âÅ¡ ï¸�  Encontradas ${duplicadas.rows.length} baixas duplicadas:\n`)
     
     for (const dup of duplicadas.rows) {
-      console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
-      console.log(`📋 ${dup.serie} ${dup.rg} - ${dup.tipo} (${dup.total}x duplicado)`)
-      console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
+      console.log(`\nââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��`)
+      console.log(`ðÅ¸â€œâ€¹ ${dup.serie} ${dup.rg} - ${dup.tipo} (${dup.total}x duplicado)`)
+      console.log(`ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��`)
       
       // Buscar detalhes de cada duplicata
       const detalhes = await client.query(`
@@ -54,17 +54,17 @@ async function verificar() {
         console.log(`   NF: ${b.numero_nf || 'N/A'}`)
         console.log(`   Data: ${b.data_baixa ? new Date(b.data_baixa).toLocaleDateString('pt-BR') : 'N/A'}`)
         console.log(`   Comprador: ${b.comprador || 'N/A'}`)
-        console.log(`   Mãe: ${b.serie_mae || ''} ${b.rg_mae || ''}`)
+        console.log(`   MÃ£e: ${b.serie_mae || ''} ${b.rg_mae || ''}`)
         console.log(`   Animal ID: ${b.animal_id || 'NULL'}`)
         if (b.causa) console.log(`   Causa: ${b.causa}`)
       })
     }
     
-    console.log('\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.log('💡 RECOMENDAÇÃO: Limpar duplicatas mantendo apenas 1 registro por animal')
+    console.log('\n\nââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��')
+    console.log('ðÅ¸â€™¡ RECOMENDAÃâ€¡ÃÆ’O: Limpar duplicatas mantendo apenas 1 registro por animal')
     
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('â�Å’ Erro:', error)
   } finally {
     client.release()
     await pool.end()

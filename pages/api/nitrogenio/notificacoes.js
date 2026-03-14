@@ -14,7 +14,7 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: `Method ${method} not allowed` })
     }
   } catch (error) {
-    console.error('Erro na API de notificações de nitrogênio:', error)
+    console.error('Erro na API de notificaÃ§Ãµes de nitrogÃªnio:', error)
     return res.status(500).json({ 
       error: 'Erro interno do servidor',
       details: error.message 
@@ -24,7 +24,7 @@ export default async function handler(req, res) {
 
 async function handleGet(req, res) {
   try {
-    // Buscar abastecimentos que precisam de notificação (5 dias antes de 1 mês)
+    // Buscar abastecimentos que precisam de notificaÃ§Ã£o (5 dias antes de 1 mÃªs)
     const result = await query(`
       SELECT 
         id,
@@ -46,9 +46,9 @@ async function handleGet(req, res) {
       total: result.rows.length
     })
   } catch (error) {
-    console.error('Erro ao buscar abastecimentos para notificação:', error)
+    console.error('Erro ao buscar abastecimentos para notificaÃ§Ã£o:', error)
     return res.status(500).json({ 
-      error: 'Erro ao buscar abastecimentos para notificação',
+      error: 'Erro ao buscar abastecimentos para notificaÃ§Ã£o',
       details: error.message 
     })
   }
@@ -56,7 +56,7 @@ async function handleGet(req, res) {
 
 async function handlePost(req, res) {
   try {
-    // Buscar abastecimentos que precisam de notificação
+    // Buscar abastecimentos que precisam de notificaÃ§Ã£o
     const abastecimentosResult = await query(`
       SELECT 
         id,
@@ -79,7 +79,7 @@ async function handlePost(req, res) {
         (new Date(abastecimento.proximo_abastecimento) - new Date()) / (1000 * 60 * 60 * 24)
       )
 
-      // Criar notificação no sistema
+      // Criar notificaÃ§Ã£o no sistema
       const notificacaoResult = await query(`
         INSERT INTO notificacoes 
         (tipo, titulo, mensagem, prioridade, dados_extras)
@@ -87,8 +87,8 @@ async function handlePost(req, res) {
         RETURNING *
       `, [
         'nitrogenio',
-        'Lembrete de Abastecimento de Nitrogênio',
-        `É hora de abastecer o nitrogênio! Último abastecimento foi em ${new Date(abastecimento.data_abastecimento).toLocaleDateString('pt-BR')} com ${abastecimento.quantidade_litros}L pelo motorista ${abastecimento.motorista}. ${diasRestantes <= 0 ? 'Prazo vencido!' : `Restam ${diasRestantes} dias.`}`,
+        'Lembrete de Abastecimento de NitrogÃªnio',
+        `Ãâ€° hora de abastecer o nitrogÃªnio! ÃÅ¡ltimo abastecimento foi em ${new Date(abastecimento.data_abastecimento).toLocaleDateString('pt-BR')} com ${abastecimento.quantidade_litros}L pelo motorista ${abastecimento.motorista}. ${diasRestantes <= 0 ? 'Prazo vencido!' : `Restam ${diasRestantes} dias.`}`,
         diasRestantes <= 0 ? 'high' : 'medium',
         JSON.stringify({
           abastecimento_id: abastecimento.id,
@@ -100,7 +100,7 @@ async function handlePost(req, res) {
         })
       ])
 
-      // Marcar como notificação enviada
+      // Marcar como notificaÃ§Ã£o enviada
       await query(`
         UPDATE abastecimento_nitrogenio 
         SET notificacao_enviada = true, updated_at = CURRENT_TIMESTAMP
@@ -115,14 +115,14 @@ async function handlePost(req, res) {
     }
 
     return res.status(200).json({
-      message: `${notificacoesCriadas.length} notificações de nitrogênio criadas com sucesso`,
+      message: `${notificacoesCriadas.length} notificaÃ§Ãµes de nitrogÃªnio criadas com sucesso`,
       notificacoes: notificacoesCriadas,
       total: notificacoesCriadas.length
     })
   } catch (error) {
-    console.error('Erro ao gerar notificações de nitrogênio:', error)
+    console.error('Erro ao gerar notificaÃ§Ãµes de nitrogÃªnio:', error)
     return res.status(500).json({ 
-      error: 'Erro ao gerar notificações de nitrogênio',
+      error: 'Erro ao gerar notificaÃ§Ãµes de nitrogÃªnio',
       details: error.message 
     })
   }

@@ -13,7 +13,7 @@ async function testarNotificacoes() {
   const pool = new Pool(dbConfig)
   
   try {
-    console.log('🔍 Verificando dados para teste...\n')
+    console.log('�Ÿ”� Verificando dados para teste...\n')
     
     // Verificar abastecimentos
     const abastecimentos = await pool.query(`
@@ -29,15 +29,15 @@ async function testarNotificacoes() {
       LIMIT 5
     `)
     
-    console.log('📊 Abastecimentos encontrados:')
+    console.log('�Ÿ“Š Abastecimentos encontrados:')
     if (abastecimentos.rows.length === 0) {
-      console.log('  ⚠️ Nenhum abastecimento com próximo abastecimento definido')
+      console.log('  �š�️ Nenhum abastecimento com próximo abastecimento definido')
     } else {
       abastecimentos.rows.forEach(a => {
         console.log(`  - ID: ${a.id}`)
         console.log(`    Próximo abastecimento: ${a.proximo_abastecimento}`)
         console.log(`    Dias restantes: ${a.dias_restantes}`)
-        console.log(`    Notificação enviada (2 dias): ${a.notificacao_enviada_2dias ? '✅ Sim' : '❌ Não'}`)
+        console.log(`    Notificação enviada (2 dias): ${a.notificacao_enviada_2dias ? '�œ… Sim' : '�Œ Não'}`)
         console.log('')
       })
     }
@@ -49,16 +49,16 @@ async function testarNotificacoes() {
       WHERE ativo = true
     `)
     
-    console.log(`📱 Contatos WhatsApp cadastrados: ${contatos.rows.length}`)
+    console.log(`�Ÿ“� Contatos WhatsApp cadastrados: ${contatos.rows.length}`)
     if (contatos.rows.length === 0) {
-      console.log('  ⚠️ Nenhum contato cadastrado!')
+      console.log('  �š�️ Nenhum contato cadastrado!')
     } else {
       contatos.rows.forEach(c => {
         console.log(`  - ${c.nome}: ${c.whatsapp}`)
       })
     }
     
-    console.log('\n🚀 Testando envio de notificações...\n')
+    console.log('\n�Ÿš€ Testando envio de notificações...\n')
     
     // Buscar abastecimentos que precisam de notificação (2 dias antes)
     const abastecimentosParaNotificar = await pool.query(`
@@ -78,18 +78,18 @@ async function testarNotificacoes() {
     `)
     
     if (abastecimentosParaNotificar.rows.length === 0) {
-      console.log('ℹ️ Nenhum abastecimento precisa de notificação no momento (faltam exatamente 2 dias)')
+      console.log('�„�️ Nenhum abastecimento precisa de notificação no momento (faltam exatamente 2 dias)')
       console.log('   Para testar, você pode:')
       console.log('   1. Criar um abastecimento com próximo abastecimento em 2 dias')
       console.log('   2. Ou modificar um existente para ter próximo abastecimento em 2 dias')
     } else {
-      console.log(`✅ Encontrados ${abastecimentosParaNotificar.rows.length} abastecimento(s) para notificar`)
+      console.log(`�œ… Encontrados ${abastecimentosParaNotificar.rows.length} abastecimento(s) para notificar`)
       
       if (contatos.rows.length === 0) {
-        console.log('⚠️ Mas não há contatos cadastrados para receber as notificações!')
+        console.log('�š�️ Mas não há contatos cadastrados para receber as notificações!')
       } else {
-        console.log(`📤 Serão enviadas notificações para ${contatos.rows.length} contato(s)`)
-        console.log('\n💬 Chamando API de envio...\n')
+        console.log(`�Ÿ“� Serão enviadas notificações para ${contatos.rows.length} contato(s)`)
+        console.log('\n�Ÿ’� Chamando API de envio...\n')
         
         // Chamar a API
         const fetch = require('node-fetch')
@@ -106,33 +106,33 @@ async function testarNotificacoes() {
           const result = await response.json()
           
           if (result.success) {
-            console.log('✅ SUCESSO!')
+            console.log('�œ… SUCESSO!')
             console.log(`   ${result.message}`)
             if (result.data) {
-              console.log(`   • Abastecimentos processados: ${result.data.abastecimentos_processados}`)
-              console.log(`   • Contatos notificados: ${result.data.contatos_notificados}`)
-              console.log(`   • Total de mensagens enviadas: ${result.data.resultados.total_enviados}`)
+              console.log(`   �€� Abastecimentos processados: ${result.data.abastecimentos_processados}`)
+              console.log(`   �€� Contatos notificados: ${result.data.contatos_notificados}`)
+              console.log(`   �€� Total de mensagens enviadas: ${result.data.resultados.total_enviados}`)
               
               if (result.data.resultados.erros.length > 0) {
-                console.log(`\n   ⚠️ Erros encontrados: ${result.data.resultados.erros.length}`)
+                console.log(`\n   �š�️ Erros encontrados: ${result.data.resultados.erros.length}`)
                 result.data.resultados.erros.forEach(erro => {
                   console.log(`      - ${erro.contato_nome}: ${erro.erro}`)
                 })
               }
             }
           } else {
-            console.log('❌ Erro:', result.message)
+            console.log('�Œ Erro:', result.message)
           }
         } catch (apiError) {
-          console.error('❌ Erro ao chamar API:', apiError.message)
-          console.log('\n💡 Dica: Certifique-se de que o servidor está rodando na porta 3020')
+          console.error('�Œ Erro ao chamar API:', apiError.message)
+          console.log('\n�Ÿ’� Dica: Certifique-se de que o servidor está rodando na porta 3020')
         }
       }
     }
     
     await pool.end()
   } catch (error) {
-    console.error('❌ Erro:', error.message)
+    console.error('�Œ Erro:', error.message)
     await pool.end()
     process.exit(1)
   }

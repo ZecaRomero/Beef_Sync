@@ -2,7 +2,7 @@ import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
 export const generateDNAFormularioVRGEN = async (dados) => {
-  console.log('🎨 Gerando PDF com dados:', dados)
+  console.log('ðÅ¸Å½¨ Gerando PDF com dados:', dados)
   
   const {
     dataEnvio,
@@ -17,12 +17,12 @@ export const generateDNAFormularioVRGEN = async (dados) => {
     observacoes
   } = dados
 
-  console.log('🐄 Animais recebidos no gerador:', animais)
-  console.log('📊 Quantidade de animais:', animais?.length)
+  console.log('ðÅ¸�â€ž Animais recebidos no gerador:', animais)
+  console.log('ðÅ¸â€œÅ  Quantidade de animais:', animais?.length)
 
-  // Validar se há animais
+  // Validar se hÃ¡ animais
   if (!animais || animais.length === 0) {
-    console.error('❌ Nenhum animal fornecido para gerar PDF')
+    console.error('â�Å’ Nenhum animal fornecido para gerar PDF')
     throw new Error('Nenhum animal fornecido para gerar o PDF')
   }
 
@@ -32,9 +32,9 @@ export const generateDNAFormularioVRGEN = async (dados) => {
     format: 'a4'
   })
   
-  // Garantir que autoTable está disponível
+  // Garantir que autoTable estÃ¡ disponÃ­vel
   if (!doc.autoTable && typeof autoTable === 'function') {
-    // Registrar autoTable no doc se necessário
+    // Registrar autoTable no doc se necessÃ¡rio
     doc.autoTable = autoTable
   }
 
@@ -69,10 +69,10 @@ export const generateDNAFormularioVRGEN = async (dados) => {
       }
     }
   } catch (error) {
-    console.warn('⚠️ Erro ao carregar logotipo:', error)
+    console.warn('âÅ¡ ï¸� Erro ao carregar logotipo:', error)
   }
 
-  // Cabeçalho preto
+  // CabeÃ§alho preto
   doc.setFillColor(0, 0, 0)
   doc.rect(0, 0, pageWidth, 15, 'F')
   
@@ -81,7 +81,7 @@ export const generateDNAFormularioVRGEN = async (dados) => {
   doc.setFont('helvetica', 'bold')
   doc.text('ANIMAIS PARA DNA', pageWidth / 2, 10, { align: 'center' })
 
-  // Adicionar logotipo se disponível
+  // Adicionar logotipo se disponÃ­vel
   if (logoBase64) {
     try {
       doc.addImage(logoBase64, 'PNG', pageWidth - 50, 2, 45, 12)
@@ -90,13 +90,13 @@ export const generateDNAFormularioVRGEN = async (dados) => {
       doc.setFont('helvetica', 'normal')
       doc.text('FAZENDAS SANT\'ANNA', pageWidth - 25, 16, { align: 'center' })
       doc.setFontSize(7)
-      doc.text('A GENÉTICA DA CARNE', pageWidth - 25, 19, { align: 'center' })
+      doc.text('A GENÃâ€°TICA DA CARNE', pageWidth - 25, 19, { align: 'center' })
     } catch (e) {
       console.warn('Erro ao adicionar logo:', e)
     }
   }
 
-  // Informações do cabeçalho
+  // InformaÃ§Ãµes do cabeÃ§alho
   doc.setTextColor(0, 0, 0)
   doc.setFontSize(10)
   doc.setFont('helvetica', 'normal')
@@ -116,22 +116,22 @@ export const generateDNAFormularioVRGEN = async (dados) => {
 
   yPos += 7
 
-  // Linha 2: Proprietário e Responsável
+  // Linha 2: ProprietÃ¡rio e ResponsÃ¡vel
   doc.setFont('helvetica', 'bold')
-  doc.text('PROPRIETÁRIO:', 15, yPos)
+  doc.text('PROPRIETÃ�RIO:', 15, yPos)
   doc.setFont('helvetica', 'normal')
   doc.text(proprietario || '', 45, yPos)
 
   doc.setFont('helvetica', 'bold')
-  doc.text('RESPONSÁVEL:', 150, yPos)
+  doc.text('RESPONSÃ�VEL:', 150, yPos)
   doc.setFont('helvetica', 'normal')
   doc.text(responsavel || '', 190, yPos)
 
   yPos += 7
 
-  // Linha 3: Raça
+  // Linha 3: RaÃ§a
   doc.setFont('helvetica', 'bold')
-  doc.text('RAÇA:', 15, yPos)
+  doc.text('RAÃâ€¡A:', 15, yPos)
   doc.setFont('helvetica', 'normal')
   doc.text(raca || 'NELORE', 45, yPos)
 
@@ -140,7 +140,7 @@ export const generateDNAFormularioVRGEN = async (dados) => {
   // Linha 4: E-mails
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(9)
-  const emailText = `E-mail para envio a Associação ABCZ (LAUDOS): ${emailAssociacao || ''}`
+  const emailText = `E-mail para envio a AssociaÃ§Ã£o ABCZ (LAUDOS): ${emailAssociacao || ''}`
   doc.text(emailText, 15, yPos)
 
   yPos += 5
@@ -151,26 +151,26 @@ export const generateDNAFormularioVRGEN = async (dados) => {
 
   // Tabela de animais - estrutura conforme a planilha
   const tableHeaders = [
-    'Para uso Laboratório',
-    'Sér',
+    'Para uso LaboratÃ³rio',
+    'SÃ©r',
     'RG',
-    'raça',
+    'raÃ§a',
     'Tipo Exame',
-    '', // Coluna sem cabeçalho (sexo)
+    '', // Coluna sem cabeÃ§alho (sexo)
     'Nascimento',
     'Mes',
-    'Série Pa',
+    'SÃ©rie Pa',
     'Rg Pa',
     'Nome do Pai',
-    'Série Mã',
-    'Rg Mã',
-    'Nome da Mãe',
+    'SÃ©rie MÃ£',
+    'Rg MÃ£',
+    'Nome da MÃ£e',
     'OBS'
   ]
 
   // Preparar dados da tabela
   const tableData = animais.map((animal, index) => {
-    // Calcular meses se não fornecido
+    // Calcular meses se nÃ£o fornecido
     let meses = animal.meses || ''
     if (!meses && animal.data_nascimento) {
       try {
@@ -201,25 +201,25 @@ export const generateDNAFormularioVRGEN = async (dados) => {
     }
 
     return [
-      (index + 1).toString(), // Para uso Laboratório
-      String(animal.serie || ''), // Sér
+      (index + 1).toString(), // Para uso LaboratÃ³rio
+      String(animal.serie || ''), // SÃ©r
       String(animal.rg || ''), // RG
-      String(animal.raca || raca || 'NELORE'), // raça
+      String(animal.raca || raca || 'NELORE'), // raÃ§a
       String(animal.tipoExame || animal.tipo_exame || tipoExame || ''), // Tipo Exame
-      String(animal.sexo || ''), // Sexo (sem cabeçalho)
+      String(animal.sexo || ''), // Sexo (sem cabeÃ§alho)
       dataNascimento, // Nascimento
       String(meses), // Mes
-      String(animal.serie_pai || ''), // Série Pa
+      String(animal.serie_pai || ''), // SÃ©rie Pa
       String(animal.rg_pai || ''), // Rg Pa
       String(animal.nome_pai || ''), // Nome do Pai
-      String(animal.serie_mae || ''), // Série Mã
-      String(animal.rg_mae || ''), // Rg Mã
-      String(animal.nome_mae || ''), // Nome da Mãe
+      String(animal.serie_mae || ''), // SÃ©rie MÃ£
+      String(animal.rg_mae || ''), // Rg MÃ£
+      String(animal.nome_mae || ''), // Nome da MÃ£e
       String(animal.observacoes || '') // OBS
     ]
   })
 
-  console.log('📋 Dados da tabela preparados:', tableData.length, 'linhas')
+  console.log('ðÅ¸â€œâ€¹ Dados da tabela preparados:', tableData.length, 'linhas')
 
   // Gerar tabela
   try {
@@ -228,12 +228,12 @@ export const generateDNAFormularioVRGEN = async (dados) => {
       throw new Error('Nenhum dado de animal para gerar tabela')
     }
 
-    console.log('📊 Gerando tabela com', tableData.length, 'linhas e', tableHeaders.length, 'colunas')
-    console.log('📋 Primeira linha de dados:', tableData[0])
-    console.log('📋 Headers:', tableHeaders)
+    console.log('ðÅ¸â€œÅ  Gerando tabela com', tableData.length, 'linhas e', tableHeaders.length, 'colunas')
+    console.log('ðÅ¸â€œâ€¹ Primeira linha de dados:', tableData[0])
+    console.log('ðÅ¸â€œâ€¹ Headers:', tableHeaders)
 
     // Executar autoTable de forma robusta (mesma abordagem do exportUtils.js)
-    // Tentar doc.autoTable primeiro, depois a função importada
+    // Tentar doc.autoTable primeiro, depois a funÃ§Ã£o importada
     let runAutoTable = doc.autoTable
     
     if (typeof runAutoTable !== 'function') {
@@ -241,15 +241,15 @@ export const generateDNAFormularioVRGEN = async (dados) => {
     }
     
     if (typeof runAutoTable !== 'function') {
-      console.error('❌ autoTable não é uma função. Tipo:', typeof autoTable)
-      console.error('❌ autoTable:', autoTable)
-      console.error('❌ doc.autoTable:', doc.autoTable)
+      console.error('â�Å’ autoTable nÃ£o Ã© uma funÃ§Ã£o. Tipo:', typeof autoTable)
+      console.error('â�Å’ autoTable:', autoTable)
+      console.error('â�Å’ doc.autoTable:', doc.autoTable)
       throw new Error('Falha ao carregar plugin de tabela PDF')
     }
     
-    console.log('✅ autoTable carregado corretamente, tipo:', typeof runAutoTable)
+    console.log('âÅ“â€¦ autoTable carregado corretamente, tipo:', typeof runAutoTable)
 
-    // Calcular largura total disponível (página landscape A4 = 297mm, menos margens)
+    // Calcular largura total disponÃ­vel (pÃ¡gina landscape A4 = 297mm, menos margens)
     const availableWidth = pageWidth - 20 // 10mm de margem de cada lado
     
     const tableConfig = {
@@ -280,30 +280,30 @@ export const generateDNAFormularioVRGEN = async (dados) => {
         fontSize: 6
       },
       columnStyles: {
-        0: { cellWidth: 12, halign: 'center' }, // Para uso Laboratório
-        1: { cellWidth: 12, halign: 'center' }, // Sér
+        0: { cellWidth: 12, halign: 'center' }, // Para uso LaboratÃ³rio
+        1: { cellWidth: 12, halign: 'center' }, // SÃ©r
         2: { cellWidth: 12, halign: 'center' }, // RG
-        3: { cellWidth: 14, halign: 'center' }, // raça
+        3: { cellWidth: 14, halign: 'center' }, // raÃ§a
         4: { cellWidth: 18, halign: 'center' }, // Tipo Exame
         5: { cellWidth: 10, halign: 'center' },  // Sexo (aumentado de 6 para 10)
         6: { cellWidth: 18, halign: 'center' }, // Nascimento
         7: { cellWidth: 8, halign: 'center' }, // Mes
-        8: { cellWidth: 12, halign: 'center' }, // Série Pa
+        8: { cellWidth: 12, halign: 'center' }, // SÃ©rie Pa
         9: { cellWidth: 12, halign: 'center' }, // Rg Pa
         10: { cellWidth: 30, halign: 'left' },  // Nome do Pai (aumentado de 20 para 30)
-        11: { cellWidth: 12, halign: 'center' }, // Série Mã
-        12: { cellWidth: 12, halign: 'center' }, // Rg Mã
-        13: { cellWidth: 30, halign: 'left' },   // Nome da Mãe (aumentado de 20 para 30)
+        11: { cellWidth: 12, halign: 'center' }, // SÃ©rie MÃ£
+        12: { cellWidth: 12, halign: 'center' }, // Rg MÃ£
+        13: { cellWidth: 30, halign: 'left' },   // Nome da MÃ£e (aumentado de 20 para 30)
         14: { cellWidth: 20, halign: 'left' }    // OBS (aumentado de 12 para 20)
       },
       margin: { left: 10, right: 10 },
       didDrawPage: function (data) {
-        // Garantir que o conteúdo seja desenhado
-        console.log('📄 Página desenhada:', data.pageNumber)
+        // Garantir que o conteÃºdo seja desenhado
+        console.log('ðÅ¸â€œâ€ž PÃ¡gina desenhada:', data.pageNumber)
       }
     }
     
-    console.log('🔧 Chamando autoTable com configuração:', {
+    console.log('ðÅ¸â€�§ Chamando autoTable com configuraÃ§Ã£o:', {
       startY: tableConfig.startY,
       headRows: tableConfig.head.length,
       bodyRows: tableConfig.body.length
@@ -313,21 +313,21 @@ export const generateDNAFormularioVRGEN = async (dados) => {
     
     // Verificar se a tabela foi gerada
     if (doc.lastAutoTable && doc.lastAutoTable.finalY) {
-      console.log('✅ Tabela gerada com sucesso. Final Y:', doc.lastAutoTable.finalY)
+      console.log('âÅ“â€¦ Tabela gerada com sucesso. Final Y:', doc.lastAutoTable.finalY)
     } else {
-      console.warn('⚠️ Tabela pode não ter sido gerada. doc.lastAutoTable:', doc.lastAutoTable)
+      console.warn('âÅ¡ ï¸� Tabela pode nÃ£o ter sido gerada. doc.lastAutoTable:', doc.lastAutoTable)
     }
   } catch (error) {
-    console.error('❌ Erro ao gerar tabela:', error)
+    console.error('â�Å’ Erro ao gerar tabela:', error)
     console.error('Stack:', error.stack)
     console.error('Tipo de autoTable:', typeof autoTable)
     console.error('autoTable:', autoTable)
     
-    // Gerar tabela manualmente como último recurso
+    // Gerar tabela manualmente como Ãºltimo recurso
     try {
       doc.setFontSize(8)
       doc.setTextColor(0, 0, 0)
-      doc.text('Erro ao gerar tabela automática. Dados dos animais:', 15, yPos)
+      doc.text('Erro ao gerar tabela automÃ¡tica. Dados dos animais:', 15, yPos)
       yPos += 7
       
       animais.forEach((animal, index) => {
@@ -339,14 +339,14 @@ export const generateDNAFormularioVRGEN = async (dados) => {
         doc.text(linha, 15, yPos)
         yPos += 5
       })
-      console.log('⚠️ Tabela gerada manualmente como fallback')
+      console.log('âÅ¡ ï¸� Tabela gerada manualmente como fallback')
     } catch (manualError) {
-      console.error('❌ Erro ao gerar tabela manual:', manualError)
+      console.error('â�Å’ Erro ao gerar tabela manual:', manualError)
       throw error
     }
   }
 
-  // Observações em vermelho
+  // ObservaÃ§Ãµes em vermelho
   let finalY = yPos + 10
   if (doc.lastAutoTable && doc.lastAutoTable.finalY) {
     finalY = doc.lastAutoTable.finalY + 10
@@ -355,10 +355,10 @@ export const generateDNAFormularioVRGEN = async (dados) => {
   doc.setTextColor(255, 0, 0)
   doc.setFontSize(12)
   doc.setFont('helvetica', 'bold')
-  const obsText = observacoes || 'ANIMAIS VÃO SER CONTROLADOS NO COMEÇO DE FEVEREIRO'
+  const obsText = observacoes || 'ANIMAIS VÃÆ’O SER CONTROLADOS NO COMEÃâ€¡O DE FEVEREIRO'
   doc.text(`OBS: ${obsText}`, pageWidth / 2, finalY, { align: 'center' })
 
-  console.log('✅ PDF gerado com sucesso')
+  console.log('âÅ“â€¦ PDF gerado com sucesso')
   return doc
 }
 
@@ -368,7 +368,7 @@ export const downloadDNAFormularioVRGEN = async (dados) => {
     const fileName = `DNA_VRGEN_${dados.dataEnvio?.replace(/\//g, '-')}_${Date.now()}.pdf`
     doc.save(fileName)
   } catch (error) {
-    console.error('❌ Erro ao gerar PDF:', error)
+    console.error('â�Å’ Erro ao gerar PDF:', error)
     throw error
   }
 }
@@ -380,7 +380,7 @@ export const previewDNAFormularioVRGEN = async (dados) => {
     const pdfUrl = URL.createObjectURL(pdfBlob)
     window.open(pdfUrl, '_blank')
   } catch (error) {
-    console.error('❌ Erro ao gerar preview do PDF:', error)
+    console.error('â�Å’ Erro ao gerar preview do PDF:', error)
     throw error
   }
 }

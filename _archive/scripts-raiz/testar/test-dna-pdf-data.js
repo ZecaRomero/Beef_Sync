@@ -3,7 +3,7 @@ const { query } = require('./lib/database')
 
 async function testarDadosPDF() {
   try {
-    console.log('🔍 Testando busca de dados para PDF...\n')
+    console.log('�Ÿ”� Testando busca de dados para PDF...\n')
     
     // 1. Buscar um envio de DNA
     const enviosResult = await query(
@@ -11,12 +11,12 @@ async function testarDadosPDF() {
     )
     
     if (enviosResult.rows.length === 0) {
-      console.log('❌ Nenhum envio de DNA encontrado')
+      console.log('�Œ Nenhum envio de DNA encontrado')
       return
     }
     
     const envio = enviosResult.rows[0]
-    console.log('📦 Envio encontrado:', {
+    console.log('�Ÿ“� Envio encontrado:', {
       id: envio.id,
       data_envio: envio.data_envio,
       laboratorio: envio.laboratorio,
@@ -29,7 +29,7 @@ async function testarDadosPDF() {
       [envio.id]
     )
     
-    console.log(`\n🐄 ${animaisResult.rows.length} animal(is) vinculado(s) ao envio\n`)
+    console.log(`\n�Ÿ�„ ${animaisResult.rows.length} animal(is) vinculado(s) ao envio\n`)
     
     // 3. Buscar dados completos de cada animal
     for (const row of animaisResult.rows.slice(0, 3)) { // Apenas 3 primeiros para teste
@@ -45,12 +45,12 @@ async function testarDadosPDF() {
       )
       
       if (animalResult.rows.length === 0) {
-        console.log(`❌ Animal ${animalId} não encontrado`)
+        console.log(`�Œ Animal ${animalId} não encontrado`)
         continue
       }
       
       const animal = animalResult.rows[0]
-      console.log(`\n📋 Animal ${animal.serie}-${animal.rg}:`)
+      console.log(`\n�Ÿ“‹ Animal ${animal.serie}-${animal.rg}:`)
       console.log('  - Sexo:', animal.sexo)
       console.log('  - Raça:', animal.raca)
       console.log('  - Data Nascimento:', animal.data_nascimento)
@@ -66,9 +66,9 @@ async function testarDadosPDF() {
         
         if (paiResult.rows.length > 0) {
           const pai = paiResult.rows[0]
-          console.log(`  ✅ Pai encontrado: ${pai.serie}-${pai.rg} (${pai.nome || 'Sem nome'})`)
+          console.log(`  �œ… Pai encontrado: ${pai.serie}-${pai.rg} (${pai.nome || 'Sem nome'})`)
         } else {
-          console.log(`  ⚠️ Pai ID ${animal.pai_id} não encontrado no banco`)
+          console.log(`  �š�️ Pai ID ${animal.pai_id} não encontrado no banco`)
         }
       }
       
@@ -81,17 +81,17 @@ async function testarDadosPDF() {
         
         if (maeResult.rows.length > 0) {
           const mae = maeResult.rows[0]
-          console.log(`  ✅ Mãe encontrada: ${mae.serie}-${mae.rg} (${mae.nome || 'Sem nome'})`)
+          console.log(`  �œ… Mãe encontrada: ${mae.serie}-${mae.rg} (${mae.nome || 'Sem nome'})`)
         } else {
-          console.log(`  ⚠️ Mãe ID ${animal.mae_id} não encontrada no banco`)
+          console.log(`  �š�️ Mãe ID ${animal.mae_id} não encontrada no banco`)
         }
       }
     }
     
-    console.log('\n✅ Teste concluído!')
+    console.log('\n�œ… Teste concluído!')
     
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('�Œ Erro:', error)
   } finally {
     process.exit(0)
   }

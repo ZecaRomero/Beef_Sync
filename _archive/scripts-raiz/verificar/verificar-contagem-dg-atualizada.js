@@ -3,7 +3,7 @@ const API_URL = 'http://localhost:3020';
 
 async function verificarContagemAtualizada() {
   try {
-    console.log('📊 Verificando contagem atualizada de receptoras...\n');
+    console.log('�Ÿ“Š Verificando contagem atualizada de receptoras...\n');
     
     // 1. Buscar todas as receptoras
     const responseAnimais = await fetch(`${API_URL}/api/animals`);
@@ -16,7 +16,7 @@ async function verificarContagemAtualizada() {
       (a.serie || '').toUpperCase() === 'G'
     );
     
-    console.log(`📋 Total de receptoras: ${receptoras.length}\n`);
+    console.log(`�Ÿ“‹ Total de receptoras: ${receptoras.length}\n`);
     
     // 2. Contar por status de DG
     const comDG = receptoras.filter(r => r.data_dg).length;
@@ -30,10 +30,10 @@ async function verificarContagemAtualizada() {
     }).length;
     const semDG = receptoras.filter(r => !r.data_dg).length;
     
-    console.log('📈 Status de DG:\n');
-    console.log(`   ✅ Com DG realizado: ${comDG}`);
-    console.log(`      🤰 DG Positivo (Prenhas): ${comDGPositivo}`);
-    console.log(`      ❌ DG Negativo (Vazias): ${comDGNegativo}`);
+    console.log('�Ÿ“ˆ Status de DG:\n');
+    console.log(`   �œ… Com DG realizado: ${comDG}`);
+    console.log(`      �Ÿ�� DG Positivo (Prenhas): ${comDGPositivo}`);
+    console.log(`      �Œ DG Negativo (Vazias): ${comDGNegativo}`);
     console.log(`   ⏳ Aguardando DG: ${semDG}\n`);
     
     // 3. Buscar nascimentos (gestantes registradas)
@@ -44,34 +44,34 @@ async function verificarContagemAtualizada() {
     // Filtrar apenas receptoras série G
     const gestantesRegistradas = nascimentos.filter(n => n.serie === 'G').length;
     
-    console.log('🤰 Gestantes Registradas em Nascimentos:\n');
+    console.log('�Ÿ�� Gestantes Registradas em Nascimentos:\n');
     console.log(`   Total: ${gestantesRegistradas} receptoras\n`);
     
     // 4. Verificação de consistência
-    console.log('🔍 Verificação de Consistência:\n');
+    console.log('�Ÿ”� Verificação de Consistência:\n');
     
     if (comDGPositivo === gestantesRegistradas) {
-      console.log(`   ✅ CORRETO: ${comDGPositivo} prenhas = ${gestantesRegistradas} gestantes registradas`);
+      console.log(`   �œ… CORRETO: ${comDGPositivo} prenhas = ${gestantesRegistradas} gestantes registradas`);
     } else {
-      console.log(`   ⚠️ ATENÇÃO: ${comDGPositivo} prenhas ≠ ${gestantesRegistradas} gestantes registradas`);
+      console.log(`   �š�️ ATEN�‡�ƒO: ${comDGPositivo} prenhas �‰� ${gestantesRegistradas} gestantes registradas`);
       console.log(`   Diferença: ${Math.abs(comDGPositivo - gestantesRegistradas)}`);
     }
     
-    console.log('\n📊 Resumo Final:\n');
+    console.log('\n�Ÿ“Š Resumo Final:\n');
     console.log(`   Total de receptoras: ${receptoras.length}`);
     console.log(`   Com DG positivo (prenhas): ${comDGPositivo}`);
     console.log(`   Aguardando DG: ${semDG}`);
     console.log(`   Gestantes em Nascimentos: ${gestantesRegistradas}`);
     
     if (semDG === 151) {
-      console.log('\n✅ CONTAGEM CORRETA: 151 receptoras aguardando DG (197 - 46 = 151)');
+      console.log('\n�œ… CONTAGEM CORRETA: 151 receptoras aguardando DG (197 - 46 = 151)');
     } else {
-      console.log(`\n⚠️ Contagem esperada: 151, encontrada: ${semDG}`);
+      console.log(`\n�š�️ Contagem esperada: 151, encontrada: ${semDG}`);
     }
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
-    console.log('\n💡 Certifique-se de que o servidor está rodando em http://localhost:3020');
+    console.error('�Œ Erro:', error.message);
+    console.log('\n�Ÿ’� Certifique-se de que o servidor está rodando em http://localhost:3020');
   }
 }
 

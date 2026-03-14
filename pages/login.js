@@ -50,14 +50,14 @@ export default function LoginPage() {
         setMode('login')
       } else if (mode === 'reset') {
         await resetPassword(email)
-        setSuccess('E-mail de recuperação enviado. Verifique sua caixa de entrada.')
+        setSuccess('E-mail de recuperaÃ§Ã£o enviado. Verifique sua caixa de entrada.')
         setMode('login')
       }
     } catch (err) {
       const messages = {
         'Invalid login credentials': 'E-mail ou senha incorretos',
-        'Email not confirmed': 'E-mail ainda não confirmado. Verifique sua caixa de entrada.',
-        'User already registered': 'Este e-mail já está cadastrado',
+        'Email not confirmed': 'E-mail ainda nÃ£o confirmado. Verifique sua caixa de entrada.',
+        'User already registered': 'Este e-mail jÃ¡ estÃ¡ cadastrado',
         'Password should be at least 6 characters': 'A senha deve ter pelo menos 6 caracteres',
       }
       setError(messages[err.message] || err.message)
@@ -116,7 +116,7 @@ export default function LoginPage() {
             </div>
             <h1 className="text-3xl font-bold text-white tracking-tight">Beef Sync</h1>
             <p className="text-blue-300/60 text-sm mt-1 font-medium tracking-wide uppercase">
-              Sistema de Gestão Pecuária
+              Sistema de GestÃ£o PecuÃ¡ria
             </p>
           </div>
 
@@ -130,14 +130,14 @@ export default function LoginPage() {
 
             {error && (
               <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-300 text-sm flex items-start gap-2">
-                <span className="mt-0.5">⚠</span>
+                <span className="mt-0.5">âÅ¡ </span>
                 <span>{error}</span>
               </div>
             )}
 
             {success && (
               <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-300 text-sm flex items-start gap-2">
-                <span className="mt-0.5">✓</span>
+                <span className="mt-0.5">âÅ“â€œ</span>
                 <span>{success}</span>
               </div>
             )}
@@ -187,7 +187,7 @@ export default function LoginPage() {
                       required
                       autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                       className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500/40 transition-all text-sm"
-                      placeholder="••••••••"
+                      placeholder="ââ‚¬¢ââ‚¬¢ââ‚¬¢ââ‚¬¢ââ‚¬¢ââ‚¬¢ââ‚¬¢ââ‚¬¢"
                     />
                     <button
                       type="button"
@@ -216,7 +216,7 @@ export default function LoginPage() {
                   <>
                     {mode === 'login' && 'Entrar'}
                     {mode === 'register' && 'Criar conta'}
-                    {mode === 'reset' && 'Enviar e-mail de recuperação'}
+                    {mode === 'reset' && 'Enviar e-mail de recuperaÃ§Ã£o'}
                   </>
                 )}
               </button>
@@ -232,7 +232,7 @@ export default function LoginPage() {
                     Esqueceu a senha?
                   </button>
                   <p className="text-white/20 text-xs pt-1">
-                    Não tem conta?{' '}
+                    NÃ£o tem conta?{' '}
                     <button
                       onClick={() => { setMode('register'); setError(''); setSuccess('') }}
                       className="text-blue-400/80 hover:text-blue-300 transition-colors font-medium"
@@ -247,14 +247,14 @@ export default function LoginPage() {
                   onClick={() => { setMode('login'); setError(''); setSuccess('') }}
                   className="text-blue-400/80 hover:text-blue-300 transition-colors text-xs"
                 >
-                  ← Voltar para login
+                  ââ€ � Voltar para login
                 </button>
               )}
             </div>
           </div>
 
           <p className="text-center text-white/15 text-xs mt-5">
-            Beef Sync v3.0 &middot; Gestão Pecuária
+            Beef Sync v3.0 &middot; GestÃ£o PecuÃ¡ria
           </p>
         </div>
       </div>

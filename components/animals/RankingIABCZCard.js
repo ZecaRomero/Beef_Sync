@@ -53,7 +53,7 @@ export default function RankingIABCZCard({ onSelectAnimal }) {
           Ranking iABCZ (Top 10)
         </h3>
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          Nenhum animal com iABCZ cadastrado. Use a Central de Importações (sidebar) para importar Série, RG, iABCZ e Deca do Excel.
+          Nenhum animal com iABCZ cadastrado. Use a Central de ImportaÃ§Ãµes (sidebar) para importar SÃ©rie, RG, iABCZ e Deca do Excel.
         </p>
       </div>
     )
@@ -87,16 +87,16 @@ export default function RankingIABCZCard({ onSelectAnimal }) {
               <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                 r.posicao === 1 ? 'bg-amber-500 text-white' : r.posicao === 2 ? 'bg-gray-400 text-white' : 'bg-amber-700 text-white'
               }`}>
-                {r.posicao === 1 ? '🥇' : r.posicao === 2 ? '🥈' : '🥉'}
+                {r.posicao === 1 ? 'ðÅ¸¥â€¡' : r.posicao === 2 ? 'ðÅ¸¥Ë†' : 'ðÅ¸¥â€°'}
               </span>
               <span className="font-medium text-gray-900 dark:text-white truncate">{r.identificacao}</span>
             </div>
             <div className="text-right">
               <div className="font-bold text-blue-600 dark:text-blue-400">iABCZ {r.abczg}</div>
               <div className="text-[11px] text-gray-600 dark:text-gray-300">
-                {r.sexo || '-'} • {idadeTexto(r.data_nascimento) || '-'} • {r.local || '-'}
-                {r.ultimo_peso != null && ` • ${r.ultimo_peso} kg`}
-                {(r.sexo && String(r.sexo).toUpperCase().startsWith('M')) && r.ultimo_ce != null && ` • CE: ${r.ultimo_ce} cm`}
+                {r.sexo || '-'} ââ‚¬¢ {idadeTexto(r.data_nascimento) || '-'} ââ‚¬¢ {r.local || '-'}
+                {r.ultimo_peso != null && ` ââ‚¬¢ ${r.ultimo_peso} kg`}
+                {(r.sexo && String(r.sexo).toUpperCase().startsWith('M')) && r.ultimo_ce != null && ` ââ‚¬¢ CE: ${r.ultimo_ce} cm`}
               </div>
             </div>
           </div>
@@ -119,9 +119,9 @@ export default function RankingIABCZCard({ onSelectAnimal }) {
               <div className="text-right">
                 <div className="font-bold text-blue-600 dark:text-blue-400">iABCZ {r.abczg}</div>
                 <div className="text-[11px] text-gray-600 dark:text-gray-300">
-                  {r.sexo || '-'} • {idadeTexto(r.data_nascimento) || '-'} • {r.local || '-'}
-                  {r.ultimo_peso != null && ` • ${r.ultimo_peso} kg`}
-                  {(r.sexo && String(r.sexo).toUpperCase().startsWith('M')) && r.ultimo_ce != null && ` • CE: ${r.ultimo_ce} cm`}
+                  {r.sexo || '-'} ââ‚¬¢ {idadeTexto(r.data_nascimento) || '-'} ââ‚¬¢ {r.local || '-'}
+                  {r.ultimo_peso != null && ` ââ‚¬¢ ${r.ultimo_peso} kg`}
+                  {(r.sexo && String(r.sexo).toUpperCase().startsWith('M')) && r.ultimo_ce != null && ` ââ‚¬¢ CE: ${r.ultimo_ce} cm`}
                 </div>
               </div>
             </div>

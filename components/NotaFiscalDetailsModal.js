@@ -64,7 +64,7 @@ export default function NotaFiscalDetailsModal({ isOpen, onClose, nf, onEdit }) 
     }).length;
     const femeas = bovinos.filter(b => {
       const s = String((b.dados_item || b).sexo || '').toLowerCase();
-      return s.includes('femea') || s.includes('fêmea') || s === 'f';
+      return s.includes('femea') || s.includes('fÃªmea') || s === 'f';
     }).length;
     const porEra = {};
     bovinos.forEach(b => {
@@ -140,9 +140,9 @@ export default function NotaFiscalDetailsModal({ isOpen, onClose, nf, onEdit }) 
           <div class="header-info">
             <div>
               <div class="info-group">
-                <span class="label">TIPO DE OPERAÇÃO</span>
+                <span class="label">TIPO DE OPERAÃâ€¡ÃÆ’O</span>
                 <span class="value status-badge ${nf.tipo === 'entrada' ? 'status-entrada' : 'status-saida'}">
-                  ${nf.tipo === 'entrada' ? 'ENTRADA' : 'SAÍDA'}
+                  ${nf.tipo === 'entrada' ? 'ENTRADA' : 'SAÃ�DA'}
                 </span>
               </div>
               <div class="info-group">
@@ -150,13 +150,13 @@ export default function NotaFiscalDetailsModal({ isOpen, onClose, nf, onEdit }) 
                 <span class="value">${formatDate(nf.data || nf.data_compra)}</span>
               </div>
               <div class="info-group">
-                <span class="label">NATUREZA DA OPERAÇÃO</span>
+                <span class="label">NATUREZA DA OPERAÃâ€¡ÃÆ’O</span>
                 <span class="value">${nf.naturezaOperacao || nf.natureza_operacao || '-'}</span>
               </div>
             </div>
             <div>
               <div class="info-group">
-                <span class="label">${nf.tipo === 'entrada' ? 'FORNECEDOR' : 'DESTINATÁRIO'}</span>
+                <span class="label">${nf.tipo === 'entrada' ? 'FORNECEDOR' : 'DESTINATÃ�RIO'}</span>
                 <span class="value">${nf.fornecedor || nf.destino || nf.destinatario || '-'}</span>
               </div>
               <div class="info-group">
@@ -174,7 +174,7 @@ export default function NotaFiscalDetailsModal({ isOpen, onClose, nf, onEdit }) 
           <table>
             <thead>
               <tr>
-                <th>Item / Descrição</th>
+                <th>Item / DescriÃ§Ã£o</th>
                 <th>Quantidade</th>
                 <th>Valor Unit.</th>
                 <th>Valor Total</th>
@@ -186,13 +186,13 @@ export default function NotaFiscalDetailsModal({ isOpen, onClose, nf, onEdit }) 
                 return `
                 <tr>
                   <td>
-                    ${tipoProduto === 'bovino' ? '🐄 Bovino' : 
-                      tipoProduto === 'semen' ? '🧬 Sêmen' : 
-                      tipoProduto === 'embriao' ? '🧫 Embrião' : 
+                    ${tipoProduto === 'bovino' ? 'ðÅ¸�â€ž Bovino' : 
+                      tipoProduto === 'semen' ? 'ðÅ¸§¬ SÃªmen' : 
+                      tipoProduto === 'embriao' ? 'ðÅ¸§« EmbriÃ£o' : 
                       tipoProduto || 'Item'}
                     ${brinco ? ` - Ident: ${brinco}` : ''}
                     ${nomeTouro ? ` - Touro: ${nomeTouro}` : ''}
-                    ${raca ? ` - Raça: ${raca}` : ''}
+                    ${raca ? ` - RaÃ§a: ${raca}` : ''}
                     ${local ? ` - Local: ${local}` : ''}
                     ${descricao ? ` - ${descricao}` : ''}
                   </td>
@@ -245,7 +245,7 @@ export default function NotaFiscalDetailsModal({ isOpen, onClose, nf, onEdit }) 
                   Nota Fiscal #{nf.numeroNF || nf.numero_nf || 'N/A'}
                 </h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {nf.tipo === 'entrada' ? 'Entrada de Mercadoria' : 'Saída de Mercadoria'}
+                  {nf.tipo === 'entrada' ? 'Entrada de Mercadoria' : 'SaÃ­da de Mercadoria'}
                 </p>
               </div>
             </div>
@@ -262,7 +262,7 @@ export default function NotaFiscalDetailsModal({ isOpen, onClose, nf, onEdit }) 
             {/* Info Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
-                <span className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Data de Emissão</span>
+                <span className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Data de EmissÃ£o</span>
                 <span className="text-lg font-medium text-gray-900 dark:text-white">{formatDate(nf.data || nf.data_compra)}</span>
               </div>
               <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
@@ -271,7 +271,7 @@ export default function NotaFiscalDetailsModal({ isOpen, onClose, nf, onEdit }) 
               </div>
               <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700 md:col-span-2">
                 <span className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
-                  {nf.tipo === 'entrada' ? 'Fornecedor' : 'Destinatário'}
+                  {nf.tipo === 'entrada' ? 'Fornecedor' : 'DestinatÃ¡rio'}
                 </span>
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-medium text-gray-900 dark:text-white truncate pr-2">
@@ -290,12 +290,12 @@ export default function NotaFiscalDetailsModal({ isOpen, onClose, nf, onEdit }) 
             <div className="mb-8 bg-blue-50 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100 dark:border-blue-800/30">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <span className="block text-xs font-semibold text-blue-800 dark:text-blue-300 mb-1">Natureza da Operação</span>
+                  <span className="block text-xs font-semibold text-blue-800 dark:text-blue-300 mb-1">Natureza da OperaÃ§Ã£o</span>
                   <span className="text-sm text-gray-800 dark:text-gray-200">{nf.naturezaOperacao || nf.natureza_operacao || '-'}</span>
                 </div>
                 {nf.observacoes && (
                   <div className="md:col-span-2">
-                    <span className="block text-xs font-semibold text-blue-800 dark:text-blue-300 mb-1">Observações</span>
+                    <span className="block text-xs font-semibold text-blue-800 dark:text-blue-300 mb-1">ObservaÃ§Ãµes</span>
                     <span className="text-sm text-gray-800 dark:text-gray-200">{nf.observacoes}</span>
                   </div>
                 )}
@@ -306,8 +306,8 @@ export default function NotaFiscalDetailsModal({ isOpen, onClose, nf, onEdit }) 
             {receptoras.length > 0 && (
               <div className="mb-8 bg-pink-50 dark:bg-pink-900/20 p-4 rounded-xl border-2 border-pink-200 dark:border-pink-800/40">
                 <h4 className="text-sm font-bold text-pink-800 dark:text-pink-300 mb-3 flex items-center">
-                  <span className="mr-2">🤰</span>
-                  Receptoras desta NF ({receptoras.length}) — Clique para ver detalhes
+                  <span className="mr-2">ðÅ¸¤°</span>
+                  Receptoras desta NF ({receptoras.length}) ââ‚¬â€� Clique para ver detalhes
                 </h4>
                 {loadingReceptoras ? (
                   <div className="flex items-center gap-2 text-pink-600 dark:text-pink-400">
@@ -323,11 +323,11 @@ export default function NotaFiscalDetailsModal({ isOpen, onClose, nf, onEdit }) 
                           onClick={() => { router.push(r.link); onClose?.(); }}
                           className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-pink-300 dark:border-pink-700 rounded-lg text-sm font-medium text-pink-800 dark:text-pink-200 hover:bg-pink-100 dark:hover:bg-pink-900/40 hover:border-pink-500 transition-all"
                         >
-                          {r.serie} →
+                          {r.serie} ââ€ â€™
                         </button>
                       ) : (
-                        <span key={i} className="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg text-sm text-gray-500" title="Animal não cadastrado">
-                          {r.tatuagem} ⚠️
+                        <span key={i} className="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg text-sm text-gray-500" title="Animal nÃ£o cadastrado">
+                          {r.tatuagem} âÅ¡ ï¸�
                         </span>
                       )
                     ))}
@@ -340,7 +340,7 @@ export default function NotaFiscalDetailsModal({ isOpen, onClose, nf, onEdit }) 
             {resumoAnimais && (
               <div className="mb-8 bg-green-50 dark:bg-green-900/20 p-4 rounded-xl border border-green-200 dark:border-green-800/40">
                 <h4 className="text-sm font-bold text-green-800 dark:text-green-300 mb-3 flex items-center">
-                  <span className="mr-2">🐄</span> Resumo dos Animais
+                  <span className="mr-2">ðÅ¸�â€ž</span> Resumo dos Animais
                 </h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div>
@@ -352,7 +352,7 @@ export default function NotaFiscalDetailsModal({ isOpen, onClose, nf, onEdit }) 
                     <span className="text-xl font-bold text-blue-700 dark:text-blue-300">{resumoAnimais.machos}</span>
                   </div>
                   <div>
-                    <span className="block text-xs text-green-700 dark:text-green-400">Fêmeas</span>
+                    <span className="block text-xs text-green-700 dark:text-green-400">FÃªmeas</span>
                     <span className="text-xl font-bold text-pink-700 dark:text-pink-300">{resumoAnimais.femeas}</span>
                   </div>
                   <div className="col-span-2 md:col-span-1">
@@ -384,7 +384,7 @@ export default function NotaFiscalDetailsModal({ isOpen, onClose, nf, onEdit }) 
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                   <thead className="bg-gray-50 dark:bg-gray-800">
                     <tr>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Item / Descrição</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Item / DescriÃ§Ã£o</th>
                       <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Qtd</th>
                       <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Valor Unit.</th>
                       <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total</th>
@@ -399,16 +399,16 @@ export default function NotaFiscalDetailsModal({ isOpen, onClose, nf, onEdit }) 
                         <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                           <td className="px-6 py-4">
                             <div className="text-sm font-medium text-gray-900 dark:text-white">
-                              {tipoProduto === 'bovino' ? '🐄 Bovino' : tipoProduto === 'semen' ? '🧬 Sêmen' : tipoProduto === 'embriao' ? '🧫 Embrião' : tipoProduto || 'Item'}
+                              {tipoProduto === 'bovino' ? 'ðÅ¸�â€ž Bovino' : tipoProduto === 'semen' ? 'ðÅ¸§¬ SÃªmen' : tipoProduto === 'embriao' ? 'ðÅ¸§« EmbriÃ£o' : tipoProduto || 'Item'}
                             </div>
                             <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                               {[
                                 brinco && `Ident: ${brinco}`,
                                 nomeTouro && `Touro: ${nomeTouro}`,
-                                raca && `Raça: ${raca}`,
+                                raca && `RaÃ§a: ${raca}`,
                                 local && `Local: ${local}`,
                                 descricao
-                              ].filter(Boolean).join(' • ')}
+                              ].filter(Boolean).join(' ââ‚¬¢ ')}
                             </div>
                           </td>
                           <td className="px-6 py-4 text-right text-sm text-gray-500 dark:text-gray-400">

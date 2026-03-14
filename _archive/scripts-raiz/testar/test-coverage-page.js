@@ -2,13 +2,13 @@
 const { query } = require('./lib/database')
 
 async function testCoveragePage() {
-  console.log('🧪 TESTANDO PÁGINA DE COBERTURAS')
+  console.log('�Ÿ�� TESTANDO PÁGINA DE COBERTURAS')
   console.log('=' .repeat(50))
   console.log('')
 
   try {
     // 1. Verificar se a API está funcionando
-    console.log('1️⃣ TESTANDO API:')
+    console.log('1️�ƒ� TESTANDO API:')
     console.log('-'.repeat(30))
     
     // Simular chamada da API
@@ -27,7 +27,7 @@ async function testCoveragePage() {
     `
     
     const totalsResult = await query(totalsQuery)
-    console.log('✅ API de totais funcionando')
+    console.log('�œ… API de totais funcionando')
     
     // Dados mensais
     const monthlyQuery = `
@@ -44,7 +44,7 @@ async function testCoveragePage() {
     `
     
     const monthlyResult = await query(monthlyQuery)
-    console.log('✅ API de dados mensais funcionando')
+    console.log('�œ… API de dados mensais funcionando')
     
     // Coberturas recentes
     const recentQuery = `
@@ -62,11 +62,11 @@ async function testCoveragePage() {
     `
     
     const recentResult = await query(recentQuery)
-    console.log('✅ API de coberturas recentes funcionando')
+    console.log('�œ… API de coberturas recentes funcionando')
     
     // 2. Verificar estrutura dos dados
     console.log('')
-    console.log('2️⃣ ESTRUTURA DOS DADOS:')
+    console.log('2️�ƒ� ESTRUTURA DOS DADOS:')
     console.log('-'.repeat(30))
     
     let totalIA = 0
@@ -87,7 +87,7 @@ async function testCoveragePage() {
     
     // 3. Simular resposta da API
     console.log('')
-    console.log('3️⃣ SIMULANDO RESPOSTA DA API:')
+    console.log('3️�ƒ� SIMULANDO RESPOSTA DA API:')
     console.log('-'.repeat(30))
     
     const monthlyMap = {}
@@ -138,7 +138,7 @@ async function testCoveragePage() {
     
     // 4. Testar cálculos do card
     console.log('')
-    console.log('4️⃣ TESTANDO CÁLCULOS DO CARD:')
+    console.log('4️�ƒ� TESTANDO CÁLCULOS DO CARD:')
     console.log('-'.repeat(30))
     
     const totalCoverages = apiResponse.totalIA + apiResponse.totalFIV
@@ -151,7 +151,7 @@ async function testCoveragePage() {
     
     // 5. Testar dados para gráfico
     console.log('')
-    console.log('5️⃣ DADOS PARA GRÁFICO:')
+    console.log('5️�ƒ� DADOS PARA GRÁFICO:')
     console.log('-'.repeat(30))
     
     console.log('Evolução mensal:')
@@ -165,7 +165,7 @@ async function testCoveragePage() {
     
     // 6. Verificar componentes necessários
     console.log('')
-    console.log('6️⃣ VERIFICANDO COMPONENTES:')
+    console.log('6️�ƒ� VERIFICANDO COMPONENTES:')
     console.log('-'.repeat(30))
     
     const fs = require('fs')
@@ -179,17 +179,17 @@ async function testCoveragePage() {
     
     componentsToCheck.forEach(component => {
       if (fs.existsSync(path.join(__dirname, component))) {
-        console.log(`✅ ${component} existe`)
+        console.log(`�œ… ${component} existe`)
       } else {
-        console.log(`❌ ${component} não encontrado`)
+        console.log(`�Œ ${component} não encontrado`)
       }
     })
     
     console.log('')
-    console.log('✅ TESTE CONCLUÍDO!')
+    console.log('�œ… TESTE CONCLUÍDO!')
     
   } catch (error) {
-    console.error('❌ Erro no teste:', error)
+    console.error('�Œ Erro no teste:', error)
   }
 }
 
@@ -197,17 +197,17 @@ async function testCoveragePage() {
 testCoveragePage()
   .then(() => {
     console.log('')
-    console.log('🎯 RESULTADO FINAL:')
-    console.log('• ✅ Card de coberturas implementado')
-    console.log('• ✅ API funcionando corretamente')
-    console.log('• ✅ Página de demonstração criada')
-    console.log('• ✅ Integração com dashboard completa')
-    console.log('• ✅ Dados de IA e FIV diferenciados')
-    console.log('• ✅ Filtros por período e tipo')
-    console.log('• ✅ Gráfico de evolução temporal')
-    console.log('• ✅ Lista de coberturas recentes')
+    console.log('�ŸŽ� RESULTADO FINAL:')
+    console.log('�€� �œ… Card de coberturas implementado')
+    console.log('�€� �œ… API funcionando corretamente')
+    console.log('�€� �œ… Página de demonstração criada')
+    console.log('�€� �œ… Integração com dashboard completa')
+    console.log('�€� �œ… Dados de IA e FIV diferenciados')
+    console.log('�€� �œ… Filtros por período e tipo')
+    console.log('�€� �œ… Gráfico de evolução temporal')
+    console.log('�€� �œ… Lista de coberturas recentes')
     console.log('')
-    console.log('🚀 PRONTO PARA USO!')
+    console.log('�Ÿš€ PRONTO PARA USO!')
     process.exit(0)
   })
   .catch(error => {

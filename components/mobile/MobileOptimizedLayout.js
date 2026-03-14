@@ -82,14 +82,14 @@ export default function MobileOptimizedLayout({ children, title = "Beef-Sync" })
 
             {/* Navigation */}
             <nav className="flex-1 px-4 py-4 space-y-2">
-              <MobileNavItem href="/dashboard" icon="📊" label="Dashboard" />
-              <MobileNavItem href="/animals" icon="🐄" label="Animais" />
-              <MobileNavItem href="/births" icon="👶" label="Nascimentos" />
-              <MobileNavItem href="/semen" icon="🧬" label="Estoque Sêmen" />
-              <MobileNavItem href="/costs" icon="💰" label="Custos" />
-              <MobileNavItem href="/notas-fiscais" icon="📄" label="Notas Fiscais" />
-              <MobileNavItem href="/reports" icon="📈" label="Relatórios" />
-              <MobileNavItem href="/settings" icon="⚙️" label="Configurações" />
+              <MobileNavItem href="/dashboard" icon="ðÅ¸â€œÅ " label="Dashboard" />
+              <MobileNavItem href="/animals" icon="ðÅ¸�â€ž" label="Animais" />
+              <MobileNavItem href="/births" icon="ðÅ¸â€˜¶" label="Nascimentos" />
+              <MobileNavItem href="/semen" icon="ðÅ¸§¬" label="Estoque SÃªmen" />
+              <MobileNavItem href="/costs" icon="ðÅ¸â€™°" label="Custos" />
+              <MobileNavItem href="/notas-fiscais" icon="ðÅ¸â€œâ€ž" label="Notas Fiscais" />
+              <MobileNavItem href="/reports" icon="ðÅ¸â€œË†" label="RelatÃ³rios" />
+              <MobileNavItem href="/settings" icon="âÅ¡â„¢ï¸�" label="ConfiguraÃ§Ãµes" />
             </nav>
 
             {/* User Info */}
@@ -100,7 +100,7 @@ export default function MobileOptimizedLayout({ children, title = "Beef-Sync" })
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    Usuário
+                    UsuÃ¡rio
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     Fazenda Local
@@ -146,11 +146,11 @@ export default function MobileOptimizedLayout({ children, title = "Beef-Sync" })
       {/* Mobile Bottom Navigation */}
       <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-30">
         <div className="grid grid-cols-5 h-16">
-          <MobileBottomNavItem href="/dashboard" icon="📊" label="Home" />
-          <MobileBottomNavItem href="/animals" icon="🐄" label="Animais" />
-          <MobileBottomNavItem href="/births" icon="👶" label="Nascimentos" />
-          <MobileBottomNavItem href="/costs" icon="💰" label="Custos" />
-          <MobileBottomNavItem href="/reports" icon="📈" label="Relatórios" />
+          <MobileBottomNavItem href="/dashboard" icon="ðÅ¸â€œÅ " label="Home" />
+          <MobileBottomNavItem href="/animals" icon="ðÅ¸�â€ž" label="Animais" />
+          <MobileBottomNavItem href="/births" icon="ðÅ¸â€˜¶" label="Nascimentos" />
+          <MobileBottomNavItem href="/costs" icon="ðÅ¸â€™°" label="Custos" />
+          <MobileBottomNavItem href="/reports" icon="ðÅ¸â€œË†" label="RelatÃ³rios" />
         </div>
       </div>
     </div>

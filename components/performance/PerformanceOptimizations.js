@@ -38,7 +38,7 @@ export default function PerformanceOptimizations() {
     try {
       setLoading(true)
       
-      // Simular coleta de métricas de performance
+      // Simular coleta de mÃ©tricas de performance
       const metrics = {
         loadTime: Math.random() * 2000 + 500, // 500-2500ms
         renderTime: Math.random() * 100 + 50, // 50-150ms
@@ -49,7 +49,7 @@ export default function PerformanceOptimizations() {
       
       setPerformanceMetrics(metrics)
     } catch (error) {
-      console.error('Erro ao carregar métricas:', error)
+      console.error('Erro ao carregar mÃ©tricas:', error)
     } finally {
       setLoading(false)
     }
@@ -60,7 +60,7 @@ export default function PerformanceOptimizations() {
       const saved = JSON.parse(localStorage.getItem('beefsync_performance') || '{}')
       setOptimizations({ ...optimizations, ...saved })
     } catch (error) {
-      console.error('Erro ao carregar configurações:', error)
+      console.error('Erro ao carregar configuraÃ§Ãµes:', error)
     }
   }
 
@@ -69,7 +69,7 @@ export default function PerformanceOptimizations() {
       localStorage.setItem('beefsync_performance', JSON.stringify(newSettings))
       setOptimizations(newSettings)
     } catch (error) {
-      console.error('Erro ao salvar configurações:', error)
+      console.error('Erro ao salvar configuraÃ§Ãµes:', error)
     }
   }
 
@@ -81,11 +81,11 @@ export default function PerformanceOptimizations() {
   const getPerformanceScore = useMemo(() => {
     const { loadTime, renderTime, memoryUsage, cacheHitRate, apiResponseTime } = performanceMetrics
     
-    // Calcular score baseado nas métricas (0-100)
+    // Calcular score baseado nas mÃ©tricas (0-100)
     const loadScore = Math.max(0, 100 - (loadTime / 25)) // Penaliza tempos > 2.5s
     const renderScore = Math.max(0, 100 - (renderTime / 1.5)) // Penaliza tempos > 150ms
     const memoryScore = Math.max(0, 100 - (memoryUsage / 0.6)) // Penaliza uso > 60MB
-    const cacheScore = cacheHitRate // Cache hit rate já é uma porcentagem
+    const cacheScore = cacheHitRate // Cache hit rate jÃ¡ Ã© uma porcentagem
     const apiScore = Math.max(0, 100 - (apiResponseTime / 6)) // Penaliza tempos > 600ms
     
     const averageScore = (loadScore + renderScore + memoryScore + cacheScore + apiScore) / 5
@@ -170,7 +170,7 @@ export default function PerformanceOptimizations() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            ⚡ Otimizações de Performance
+            âÅ¡¡ OtimizaÃ§Ãµes de Performance
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
             Monitore e otimize a performance do sistema
@@ -188,10 +188,10 @@ export default function PerformanceOptimizations() {
         </div>
       </div>
 
-      {/* Métricas de Performance */}
+      {/* MÃ©tricas de Performance */}
       <div>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Métricas Atuais
+          MÃ©tricas Atuais
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <PerformanceCard
@@ -199,28 +199,28 @@ export default function PerformanceOptimizations() {
             value={performanceMetrics.loadTime}
             type="time"
             icon={ClockIcon}
-            description="Tempo para carregar a página"
+            description="Tempo para carregar a pÃ¡gina"
           />
           <PerformanceCard
-            title="Tempo de Renderização"
+            title="Tempo de RenderizaÃ§Ã£o"
             value={performanceMetrics.renderTime}
             type="time"
             icon={ChartBarIcon}
             description="Tempo para renderizar componentes"
           />
           <PerformanceCard
-            title="Uso de Memória"
+            title="Uso de MemÃ³ria"
             value={performanceMetrics.memoryUsage}
             type="memory"
             icon={CpuChipIcon}
-            description="Memória utilizada pelo sistema"
+            description="MemÃ³ria utilizada pelo sistema"
           />
           <PerformanceCard
             title="Taxa de Cache"
             value={performanceMetrics.cacheHitRate}
             type="percentage"
             icon={BoltIcon}
-            description="Eficiência do cache"
+            description="EficiÃªncia do cache"
           />
           <PerformanceCard
             title="Tempo de API"
@@ -232,43 +232,43 @@ export default function PerformanceOptimizations() {
         </div>
       </div>
 
-      {/* Otimizações */}
+      {/* OtimizaÃ§Ãµes */}
       <div>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Configurações de Otimização
+          ConfiguraÃ§Ãµes de OtimizaÃ§Ã£o
         </h3>
         <div className="space-y-3">
           <OptimizationToggle
             key="lazyLoading"
-            title="Carregamento Preguiçoso"
-            description="Carrega componentes apenas quando necessário"
+            title="Carregamento PreguiÃ§oso"
+            description="Carrega componentes apenas quando necessÃ¡rio"
             enabled={optimizations.lazyLoading}
             onChange={handleOptimizationChange}
           />
           <OptimizationToggle
             key="imageOptimization"
-            title="Otimização de Imagens"
+            title="OtimizaÃ§Ã£o de Imagens"
             description="Comprime e otimiza imagens automaticamente"
             enabled={optimizations.imageOptimization}
             onChange={handleOptimizationChange}
           />
           <OptimizationToggle
             key="codeSplitting"
-            title="Divisão de Código"
-            description="Divide o código em chunks menores"
+            title="DivisÃ£o de CÃ³digo"
+            description="Divide o cÃ³digo em chunks menores"
             enabled={optimizations.codeSplitting}
             onChange={handleOptimizationChange}
           />
           <OptimizationToggle
             key="caching"
             title="Sistema de Cache"
-            description="Armazena dados em cache para acesso rápido"
+            description="Armazena dados em cache para acesso rÃ¡pido"
             enabled={optimizations.caching}
             onChange={handleOptimizationChange}
           />
           <OptimizationToggle
             key="compression"
-            title="Compressão"
+            title="CompressÃ£o"
             description="Comprime dados para reduzir tamanho"
             enabled={optimizations.compression}
             onChange={handleOptimizationChange}
@@ -276,31 +276,31 @@ export default function PerformanceOptimizations() {
           <OptimizationToggle
             key="virtualScrolling"
             title="Scroll Virtual"
-            description="Renderiza apenas itens visíveis em listas grandes"
+            description="Renderiza apenas itens visÃ­veis em listas grandes"
             enabled={optimizations.virtualScrolling}
             onChange={handleOptimizationChange}
           />
           <OptimizationToggle
             key="memoization"
-            title="Memoização"
-            description="Cache de resultados de funções computacionalmente caras"
+            title="MemoizaÃ§Ã£o"
+            description="Cache de resultados de funÃ§Ãµes computacionalmente caras"
             enabled={optimizations.memoization}
             onChange={handleOptimizationChange}
           />
         </div>
       </div>
 
-      {/* Recomendações */}
+      {/* RecomendaÃ§Ãµes */}
       <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          💡 Recomendações de Performance
+          ðÅ¸â€™¡ RecomendaÃ§Ãµes de Performance
         </h3>
         <div className="space-y-3">
           {getPerformanceScore < 60 && (
             <div className="flex items-start space-x-2">
               <ExclamationTriangleIcon className="h-5 w-5 text-yellow-500 mt-0.5" />
               <p className="text-sm text-gray-700 dark:text-gray-300">
-                Performance baixa detectada. Considere habilitar mais otimizações.
+                Performance baixa detectada. Considere habilitar mais otimizaÃ§Ãµes.
               </p>
             </div>
           )}
@@ -308,7 +308,7 @@ export default function PerformanceOptimizations() {
             <div className="flex items-start space-x-2">
               <ExclamationTriangleIcon className="h-5 w-5 text-orange-500 mt-0.5" />
               <p className="text-sm text-gray-700 dark:text-gray-300">
-                Tempo de carregamento alto. Ative compressão e cache.
+                Tempo de carregamento alto. Ative compressÃ£o e cache.
               </p>
             </div>
           )}
@@ -316,7 +316,7 @@ export default function PerformanceOptimizations() {
             <div className="flex items-start space-x-2">
               <ExclamationTriangleIcon className="h-5 w-5 text-red-500 mt-0.5" />
               <p className="text-sm text-gray-700 dark:text-gray-300">
-                Alto uso de memória. Considere scroll virtual para listas grandes.
+                Alto uso de memÃ³ria. Considere scroll virtual para listas grandes.
               </p>
             </div>
           )}
@@ -324,23 +324,23 @@ export default function PerformanceOptimizations() {
             <div className="flex items-start space-x-2">
               <CheckCircleIcon className="h-5 w-5 text-green-500 mt-0.5" />
               <p className="text-sm text-gray-700 dark:text-gray-300">
-                Excelente performance! O sistema está otimizado.
+                Excelente performance! O sistema estÃ¡ otimizado.
               </p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Botões de Ação */}
+      {/* BotÃµes de AÃ§Ã£o */}
       <div className="flex justify-between items-center">
         <button
           onClick={loadPerformanceMetrics}
           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
         >
-          Atualizar Métricas
+          Atualizar MÃ©tricas
         </button>
         <div className="text-sm text-gray-500 dark:text-gray-400">
-          Última atualização: {new Date().toLocaleTimeString()}
+          ÃÅ¡ltima atualizaÃ§Ã£o: {new Date().toLocaleTimeString()}
         </div>
       </div>
     </div>

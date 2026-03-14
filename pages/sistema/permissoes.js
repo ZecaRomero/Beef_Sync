@@ -25,7 +25,7 @@ export default function SistemaPermissoes() {
         setSystemInfo(data)
       }
     } catch (error) {
-      console.error('Erro ao carregar informações do sistema:', error)
+      console.error('Erro ao carregar informaÃ§Ãµes do sistema:', error)
     }
   }
 
@@ -45,42 +45,42 @@ export default function SistemaPermissoes() {
       name: 'Visualizar',
       key: 'canView',
       description: 'Visualizar dados do sistema',
-      icon: '👁️',
+      icon: 'ðÅ¸â€˜�ï¸�',
       level: 'basic'
     },
     {
       name: 'Editar',
       key: 'canEdit',
       description: 'Editar registros existentes',
-      icon: '✏️',
+      icon: 'âÅ“�ï¸�',
       level: 'intermediate'
     },
     {
       name: 'Excluir',
       key: 'canDelete',
       description: 'Excluir registros do sistema',
-      icon: '🗑️',
+      icon: 'ðÅ¸â€”â€˜ï¸�',
       level: 'advanced'
     },
     {
       name: 'Backup',
       key: 'canBackup',
       description: 'Criar backups do sistema',
-      icon: '💾',
+      icon: 'ðÅ¸â€™¾',
       level: 'admin'
     },
     {
       name: 'Restaurar',
       key: 'canRestore',
       description: 'Restaurar backups do sistema',
-      icon: '🔄',
+      icon: 'ðÅ¸â€�â€ž',
       level: 'admin'
     },
     {
       name: 'Importar',
       key: 'canImport',
       description: 'Importar dados externos',
-      icon: '📥',
+      icon: 'ðÅ¸â€œ¥',
       level: 'admin'
     }
   ]
@@ -103,11 +103,11 @@ export default function SistemaPermissoes() {
   const getLevelName = (level) => {
     switch (level) {
       case 'basic':
-        return 'Básico'
+        return 'BÃ¡sico'
       case 'intermediate':
-        return 'Intermediário'
+        return 'IntermediÃ¡rio'
       case 'advanced':
-        return 'Avançado'
+        return 'AvanÃ§ado'
       case 'admin':
         return 'Administrador'
       default:
@@ -122,10 +122,10 @@ export default function SistemaPermissoes() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
-              <div className="text-2xl mr-3">🛡️</div>
+              <div className="text-2xl mr-3">ðÅ¸â€º¡ï¸�</div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Sistema de Permissões</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Controle de acesso e segurança</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Sistema de PermissÃµes</h1>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Controle de acesso e seguranÃ§a</p>
               </div>
             </div>
           </div>
@@ -133,11 +133,11 @@ export default function SistemaPermissoes() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Status do Usuário Atual */}
+        {/* Status do UsuÃ¡rio Atual */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
           <div className="flex items-center mb-4">
             <UserGroupIcon className="h-6 w-6 text-blue-600 mr-2" />
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Status do Usuário Atual</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Status do UsuÃ¡rio Atual</h2>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -150,7 +150,7 @@ export default function SistemaPermissoes() {
                   'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
                 }`}>
                   {permissions?.isDeveloper ? 'Desenvolvedor' :
-                   permissions?.isNetworkUser ? 'Usuário de Rede' : 'Usuário Local'}
+                   permissions?.isNetworkUser ? 'UsuÃ¡rio de Rede' : 'UsuÃ¡rio Local'}
                 </span>
               </div>
             </div>
@@ -166,27 +166,27 @@ export default function SistemaPermissoes() {
 
             <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Nível de Segurança</span>
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-300">NÃ­vel de SeguranÃ§a</span>
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                   permissions?.isDeveloper ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
                   'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
                 }`}>
-                  {permissions?.isDeveloper ? 'Alto' : 'Padrão'}
+                  {permissions?.isDeveloper ? 'Alto' : 'PadrÃ£o'}
                 </span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Lista de Permissões */}
+        {/* Lista de PermissÃµes */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center">
-              <div className="text-xl mr-2">🔑</div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Permissões do Sistema</h2>
+              <div className="text-xl mr-2">ðÅ¸â€�â€˜</div>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">PermissÃµes do Sistema</h2>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              Suas permissões atuais no sistema
+              Suas permissÃµes atuais no sistema
             </p>
           </div>
 
@@ -234,33 +234,33 @@ export default function SistemaPermissoes() {
           </div>
         </div>
 
-        {/* Informações de Segurança */}
+        {/* InformaÃ§Ãµes de SeguranÃ§a */}
         <div className="mt-8 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
           <div className="flex items-start">
             <ExclamationTriangleIcon className="h-6 w-6 text-yellow-600 dark:text-yellow-400 mr-3 mt-0.5" />
             <div>
               <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200 mb-2">
-                Informações de Segurança
+                InformaÃ§Ãµes de SeguranÃ§a
               </h3>
               <div className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1">
-                <p>• As permissões são baseadas no tipo de acesso (local vs. rede)</p>
-                <p>• Desenvolvedores têm acesso completo quando conectados localmente</p>
-                <p>• Usuários de rede têm permissões limitadas por segurança</p>
-                <p>• Algumas operações críticas requerem acesso local</p>
+                <p>ââ‚¬¢ As permissÃµes sÃ£o baseadas no tipo de acesso (local vs. rede)</p>
+                <p>ââ‚¬¢ Desenvolvedores tÃªm acesso completo quando conectados localmente</p>
+                <p>ââ‚¬¢ UsuÃ¡rios de rede tÃªm permissÃµes limitadas por seguranÃ§a</p>
+                <p>ââ‚¬¢ Algumas operaÃ§Ãµes crÃ­ticas requerem acesso local</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Informações do Sistema */}
+        {/* InformaÃ§Ãµes do Sistema */}
         {systemInfo && (
           <div className="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Informações do Sistema
+              InformaÃ§Ãµes do Sistema
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="font-medium text-gray-600 dark:text-gray-300">Versão do Sistema:</span>
+                <span className="font-medium text-gray-600 dark:text-gray-300">VersÃ£o do Sistema:</span>
                 <span className="ml-2 text-gray-900 dark:text-white">Beef-Sync v1.0</span>
               </div>
               <div>
@@ -270,7 +270,7 @@ export default function SistemaPermissoes() {
                 </span>
               </div>
               <div>
-                <span className="font-medium text-gray-600 dark:text-gray-300">Última Verificação:</span>
+                <span className="font-medium text-gray-600 dark:text-gray-300">ÃÅ¡ltima VerificaÃ§Ã£o:</span>
                 <span className="ml-2 text-gray-900 dark:text-white">
                   {new Date().toLocaleString('pt-BR')}
                 </span>

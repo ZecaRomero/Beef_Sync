@@ -1,17 +1,17 @@
 /**
- * Script para corrigir o estoque de embriões
+ * Script para corrigir o estoque de embriÃµes
  * 
- * Problema: Embriões transferidos ainda aparecem no relatório porque
- * o campo doses_disponiveis não está sendo atualizado corretamente.
+ * Problema: EmbriÃµes transferidos ainda aparecem no relatÃ³rio porque
+ * o campo doses_disponiveis nÃ£o estÃ¡ sendo atualizado corretamente.
  * 
- * Solução: Recalcular doses_disponiveis = quantidade_doses - doses_usadas
+ * SoluÃ§Ã£o: Recalcular doses_disponiveis = quantidade_doses - doses_usadas
  */
 
 const { Pool } = require('pg')
 require('dotenv').config()
 
 async function corrigirEstoqueEmbrioes() {
-  // Criar pool de conexão
+  // Criar pool de conexÃ£o
   const pool = new Pool({
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT) || 5432,
@@ -21,12 +21,12 @@ async function corrigirEstoqueEmbrioes() {
   })
 
   try {
-    console.log('🔌 Conectando ao banco de dados...')
+    console.log('ðÅ¸â€�Å’ Conectando ao banco de dados...')
     await pool.query('SELECT 1')
-    console.log('✅ Conectado ao banco de dados')
+    console.log('âÅ“â€¦ Conectado ao banco de dados')
 
-    // 1. Verificar estado ANTES da correção
-    console.log('\n📊 ANTES DA CORREÇÃO:')
+    // 1. Verificar estado ANTES da correÃ§Ã£o
+    console.log('\nðÅ¸â€œÅ  ANTES DA CORREÃâ€¡ÃÆ’O:')
     const antes = await pool.query(`
       SELECT 
         id,
@@ -42,25 +42,25 @@ async function corrigirEstoqueEmbrioes() {
       ORDER BY nome_touro
     `)
 
-    console.log(`📦 Total de registros de embriões: ${antes.rows.length}`)
+    console.log(`ðÅ¸â€œ¦ Total de registros de embriÃµes: ${antes.rows.length}`)
     
     const comDosesDisponiveis = antes.rows.filter(r => r.doses_disponiveis > 0)
-    console.log(`✅ Embriões com doses disponíveis: ${comDosesDisponiveis.length}`)
+    console.log(`âÅ“â€¦ EmbriÃµes com doses disponÃ­veis: ${comDosesDisponiveis.length}`)
     
     if (comDosesDisponiveis.length > 0) {
-      console.log('\n📋 Detalhes dos embriões com doses disponíveis:')
+      console.log('\nðÅ¸â€œâ€¹ Detalhes dos embriÃµes com doses disponÃ­veis:')
       comDosesDisponiveis.forEach(e => {
         const deveriaTer = e.quantidade_doses - e.doses_usadas
         const diferenca = e.doses_disponiveis - deveriaTer
         console.log(`  - ${e.acasalamento}:`)
-        console.log(`    • Disponíveis: ${e.doses_disponiveis}`)
-        console.log(`    • Total: ${e.quantidade_doses}, Usadas: ${e.doses_usadas}`)
-        console.log(`    • Deveria ter: ${deveriaTer} ${diferenca !== 0 ? '⚠️ INCONSISTENTE' : '✓'}`)
+        console.log(`    ââ‚¬¢ DisponÃ­veis: ${e.doses_disponiveis}`)
+        console.log(`    ââ‚¬¢ Total: ${e.quantidade_doses}, Usadas: ${e.doses_usadas}`)
+        console.log(`    ââ‚¬¢ Deveria ter: ${deveriaTer} ${diferenca !== 0 ? 'âÅ¡ ï¸� INCONSISTENTE' : 'âÅ“â€œ'}`)
       })
     }
 
-    // 2. APLICAR CORREÇÃO
-    console.log('\n\n🔧 APLICANDO CORREÇÃO...')
+    // 2. APLICAR CORREÃâ€¡ÃÆ’O
+    console.log('\n\nðÅ¸â€�§ APLICANDO CORREÃâ€¡ÃÆ’O...')
     console.log('Recalculando: doses_disponiveis = quantidade_doses - doses_usadas')
     
     const resultado = await pool.query(`
@@ -74,10 +74,10 @@ async function corrigirEstoqueEmbrioes() {
       RETURNING id, nome_touro, quantidade_doses, doses_disponiveis, COALESCE(doses_usadas, 0) as doses_usadas
     `)
 
-    console.log(`✅ ${resultado.rows.length} registros atualizados`)
+    console.log(`âÅ“â€¦ ${resultado.rows.length} registros atualizados`)
 
-    // 3. Verificar estado DEPOIS da correção
-    console.log('\n📊 DEPOIS DA CORREÇÃO:')
+    // 3. Verificar estado DEPOIS da correÃ§Ã£o
+    console.log('\nðÅ¸â€œÅ  DEPOIS DA CORREÃâ€¡ÃÆ’O:')
     const depois = await pool.query(`
       SELECT 
         COUNT(*) as total,
@@ -91,11 +91,11 @@ async function corrigirEstoqueEmbrioes() {
     `)
 
     const stats = depois.rows[0]
-    console.log(`📦 Total de registros: ${stats.total}`)
-    console.log(`✅ Com doses disponíveis: ${stats.com_doses}`)
-    console.log(`🧬 Total de doses disponíveis: ${stats.total_doses_disponiveis}`)
+    console.log(`ðÅ¸â€œ¦ Total de registros: ${stats.total}`)
+    console.log(`âÅ“â€¦ Com doses disponÃ­veis: ${stats.com_doses}`)
+    console.log(`ðÅ¸§¬ Total de doses disponÃ­veis: ${stats.total_doses_disponiveis}`)
 
-    // 4. Mostrar registros que ainda têm doses
+    // 4. Mostrar registros que ainda tÃªm doses
     const aindaComDoses = await pool.query(`
       SELECT 
         nome_touro as acasalamento,
@@ -112,34 +112,34 @@ async function corrigirEstoqueEmbrioes() {
     `)
 
     if (aindaComDoses.rows.length > 0) {
-      console.log('\n📋 Embriões que ainda têm doses disponíveis:')
+      console.log('\nðÅ¸â€œâ€¹ EmbriÃµes que ainda tÃªm doses disponÃ­veis:')
       aindaComDoses.rows.forEach(e => {
         console.log(`  - ${e.acasalamento}: ${e.doses_disponiveis} doses (total: ${e.quantidade_doses}, usadas: ${e.doses_usadas})`)
       })
     } else {
-      console.log('\n✅ Nenhum embrião com doses disponíveis (todos foram transferidos)')
+      console.log('\nâÅ“â€¦ Nenhum embriÃ£o com doses disponÃ­veis (todos foram transferidos)')
     }
 
-    console.log('\n\n✅ CORREÇÃO CONCLUÍDA COM SUCESSO!')
-    console.log('📱 Agora o relatório mobile deve mostrar apenas embriões realmente disponíveis')
+    console.log('\n\nâÅ“â€¦ CORREÃâ€¡ÃÆ’O CONCLUÃ�DA COM SUCESSO!')
+    console.log('ðÅ¸â€œ± Agora o relatÃ³rio mobile deve mostrar apenas embriÃµes realmente disponÃ­veis')
 
   } catch (error) {
-    console.error('\n❌ Erro:', error.message)
+    console.error('\nâ�Å’ Erro:', error.message)
     console.error('Stack:', error.stack)
     throw error
   } finally {
     await pool.end()
-    console.log('\n🔌 Conexão encerrada')
+    console.log('\nðÅ¸â€�Å’ ConexÃ£o encerrada')
   }
 }
 
 // Executar
 corrigirEstoqueEmbrioes()
   .then(() => {
-    console.log('\n✅ Script finalizado')
+    console.log('\nâÅ“â€¦ Script finalizado')
     process.exit(0)
   })
   .catch(error => {
-    console.error('\n❌ Erro ao executar script:', error.message)
+    console.error('\nâ�Å’ Erro ao executar script:', error.message)
     process.exit(1)
   })

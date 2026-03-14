@@ -4,9 +4,9 @@ import { ArrowDownTrayIcon, CheckIcon, XMarkIcon } from '../../components/ui/Ico
 import { formatDateBR, formatDateForFilename } from '../../utils/dateFormatter'
 
 const COLUNAS_EXPORTAR = [
-  { id: 'lote', label: 'Nº Lote' },
+  { id: 'lote', label: 'NÂº Lote' },
   { id: 'letra', label: 'Letra' },
-  { id: 'numero', label: 'Número' },
+  { id: 'numero', label: 'NÃºmero' },
   { id: 'tatuagem', label: 'BRINCO' },
   { id: 'fornecedor', label: 'Fornecedor' },
   { id: 'dataChegada', label: 'Data Chegada' },
@@ -14,9 +14,9 @@ const COLUNAS_EXPORTAR = [
   { id: 'diasPrenhas', label: 'Dias Prenhas' },
   { id: 'origem', label: 'Origem (NF)' },
   { id: 'dataDG', label: 'Data do DG' },
-  { id: 'veterinario', label: 'Veterinário' },
+  { id: 'veterinario', label: 'VeterinÃ¡rio' },
   { id: 'resultado', label: 'Resultado' },
-  { id: 'observacoes', label: 'Observações' }
+  { id: 'observacoes', label: 'ObservaÃ§Ãµes' }
 ]
 
 export default function ReceptorasDG() {
@@ -26,47 +26,47 @@ export default function ReceptorasDG() {
   const [exporting, setExporting] = useState(false)
   const [saving, setSaving] = useState(false)
   
-  // Dados do lançamento em lote
+  // Dados do lanÃ§amento em lote
   const [dataDG, setDataDG] = useState('')
   const [veterinario, setVeterinario] = useState('')
   const [lotesSelecionadosParaDG, setLotesSelecionadosParaDG] = useState([]) // Lotes selecionados (1-9)
-  const [lotesAplicados, setLotesAplicados] = useState(false) // Se já aplicou o filtro de lotes
+  const [lotesAplicados, setLotesAplicados] = useState(false) // Se jÃ¡ aplicou o filtro de lotes
   
-  // Seleção e resultados individuais
+  // SeleÃ§Ã£o e resultados individuais
   const [selectedReceptoras, setSelectedReceptoras] = useState({})
   const [resultados, setResultados] = useState({})
   const [observacoes, setObservacoes] = useState({})
   const [datasIndividuais, setDatasIndividuais] = useState({}) // Novo: data individual por receptora
-  const [veterinariosIndividuais, setVeterinariosIndividuais] = useState({}) // Novo: veterinário individual por receptora
+  const [veterinariosIndividuais, setVeterinariosIndividuais] = useState({}) // Novo: veterinÃ¡rio individual por receptora
   const [showImportModal, setShowImportModal] = useState(false)
   const [importText, setImportText] = useState('')
   const [importPreview, setImportPreview] = useState(null)
   const [importApplying, setImportApplying] = useState(false)
 
-  // Modo de visualização: 'lotes' | 'lista'
+  // Modo de visualizaÃ§Ã£o: 'lotes' | 'lista'
   const [modoVisualizacao, setModoVisualizacao] = useState('lotes')
-  const [loteFiltro, setLoteFiltro] = useState(null) // legado: um único lote para filtro
-  // Seleção múltipla de lotes (cards) - usuário escolhe quais para DG
+  const [loteFiltro, setLoteFiltro] = useState(null) // legado: um Ãºnico lote para filtro
+  // SeleÃ§Ã£o mÃºltipla de lotes (cards) - usuÃ¡rio escolhe quais para DG
   const [lotesSelecionados, setLotesSelecionados] = useState(new Set())
-  // Número do lote que o usuário define para cada card
+  // NÃºmero do lote que o usuÃ¡rio define para cada card
   const [numerosLote, setNumerosLote] = useState({})
 
-  // Paginação
+  // PaginaÃ§Ã£o
   const [paginaAtual, setPaginaAtual] = useState(1)
   const [itensPorPagina] = useState(10)
 
   // Busca
   const [termoBusca, setTermoBusca] = useState('')
 
-  // Filtros rápidos
+  // Filtros rÃ¡pidos
   const [filtroStatus, setFiltroStatus] = useState('todos') // todos, pendentes, comDG
   const [fornecedorFiltro, setFornecedorFiltro] = useState(null) // Novo: filtro por fornecedor
   const [compactMode, setCompactMode] = useState(false)
 
-  // Ações em massa
+  // AÃ§Ãµes em massa
   const [showAcoesMassa, setShowAcoesMassa] = useState(false)
 
-  // Modal de detalhes de erros do lançamento em lote
+  // Modal de detalhes de erros do lanÃ§amento em lote
   const [errosDetalhes, setErrosDetalhes] = useState(null)
 
   // Export: modal com escolha de colunas
@@ -82,7 +82,7 @@ export default function ReceptorasDG() {
   
   const exportReceptorasCSV = (lista) => {
     try {
-      const header = ['RG','Série','Letra','Número','Fornecedor','Data Chegada','Data TE','Data DG','Resultado','Veterinário','Dias','Origem/NF']
+      const header = ['RG','SÃ©rie','Letra','NÃºmero','Fornecedor','Data Chegada','Data TE','Data DG','Resultado','VeterinÃ¡rio','Dias','Origem/NF']
       const lines = [header.join(';'), ...lista.map(r => {
         const dias = (r.dataTE || r.dataChegada) ? Math.floor((new Date() - new Date(r.dataTE || r.dataChegada)) / (24*60*60*1000)) : ''
         const resultado = r.resultadoDG || ''
@@ -209,7 +209,7 @@ export default function ReceptorasDG() {
     return lotesTodos.filter(lote => lote.receptoras.some(r => !r.dataDG))
   }, [lotesTodos])
 
-  // Inicializar números de lote sequenciais quando lotes mudam
+  // Inicializar nÃºmeros de lote sequenciais quando lotes mudam
   useEffect(() => {
     if (lotes.length > 0) {
       setNumerosLote(prev => {
@@ -233,11 +233,11 @@ export default function ReceptorasDG() {
   // Aplicar filtro de lotes e selecionar automaticamente as receptoras pendentes
   const aplicarFiltroLotes = () => {
     if (lotesSelecionadosParaDG.length === 0) {
-      alert('⚠️ Selecione pelo menos um lote')
+      alert('âÅ¡ ï¸� Selecione pelo menos um lote')
       return
     }
     setLotesAplicados(true)
-    // Calcular receptoras que estarão no filtro (pendentes de DG)
+    // Calcular receptoras que estarÃ£o no filtro (pendentes de DG)
     const lotesParaFiltrar = lotes.filter((_, idx) => lotesSelecionadosParaDG.includes(idx + 1))
     const chavesLotes = new Set(lotesParaFiltrar.map(l => l.chave))
     const receptorasNoFiltro = receptoras.filter(r => chavesLotes.has(getChaveLote(r)))
@@ -284,7 +284,7 @@ export default function ReceptorasDG() {
     setLotesSelecionadosParaDG([])
   }
 
-  // Toggle seleção de lote
+  // Toggle seleÃ§Ã£o de lote
   const toggleLoteSelecionado = (numeroLote) => {
     setLotesSelecionadosParaDG(prev => {
       if (prev.includes(numeroLote)) {
@@ -296,7 +296,7 @@ export default function ReceptorasDG() {
   }
 
   // Receptoras filtradas (por lotes selecionados ou todas)
-  // IMPORTANTE: Em modo "lotes", por padrão considera apenas os 6 primeiros lotes (disponíveis para DG)
+  // IMPORTANTE: Em modo "lotes", por padrÃ£o considera apenas os 6 primeiros lotes (disponÃ­veis para DG)
   const receptorasExibidas = useMemo(() => {
     let lista = receptoras
     
@@ -310,15 +310,15 @@ export default function ReceptorasDG() {
       lista = receptoras.filter(r => chavesLotes.has(getChaveLote(r)))
     }
     
-    // Filtro por lotes selecionados (seleção múltipla de cards)
+    // Filtro por lotes selecionados (seleÃ§Ã£o mÃºltipla de cards)
     else if (modoVisualizacao === 'lotes' && lotesSelecionados.size > 0) {
       lista = receptoras.filter(r => lotesSelecionados.has(getChaveLote(r)))
     } else if (modoVisualizacao === 'lotes' && loteFiltro) {
-      // Fallback: filtro por um único lote (legado)
+      // Fallback: filtro por um Ãºnico lote (legado)
       const lote = lotes.find(l => l.chave === loteFiltro)
       lista = lote ? lote.receptoras : receptoras
     }
-    // Em modo lotes SEM filtro: mostrar todos (API já retorna só pendentes)
+    // Em modo lotes SEM filtro: mostrar todos (API jÃ¡ retorna sÃ³ pendentes)
     else if (modoVisualizacao === 'lotes' && lotes.length > 0) {
       lista = receptoras
     }
@@ -364,7 +364,7 @@ export default function ReceptorasDG() {
     })
   }, [receptorasExibidas, termoBusca])
 
-  // Paginação
+  // PaginaÃ§Ã£o
   const totalPaginas = Math.ceil(receptorasFiltradas.length / itensPorPagina)
   const indiceInicio = (paginaAtual - 1) * itensPorPagina
   const indiceFim = indiceInicio + itensPorPagina
@@ -385,7 +385,7 @@ export default function ReceptorasDG() {
     return { comDG, prenhas, vazias, pendentes, taxa }
   }, [receptorasExibidas])
 
-  // Reset página ao mudar filtros
+  // Reset pÃ¡gina ao mudar filtros
   useEffect(() => {
     setPaginaAtual(1)
   }, [termoBusca, loteFiltro, modoVisualizacao, filtroStatus, lotesSelecionados])
@@ -405,7 +405,7 @@ export default function ReceptorasDG() {
         e.preventDefault()
         document.getElementById('busca-receptoras')?.focus()
       }
-      // Ctrl/Cmd + A para selecionar todas da página (exceto as que já têm DG)
+      // Ctrl/Cmd + A para selecionar todas da pÃ¡gina (exceto as que jÃ¡ tÃªm DG)
       if ((e.ctrlKey || e.metaKey) && e.key === 'a' && e.target.tagName !== 'INPUT') {
         e.preventDefault()
         const indiceInicio = (paginaAtual - 1) * itensPorPagina
@@ -413,7 +413,7 @@ export default function ReceptorasDG() {
         const paginadas = receptorasFiltradas.slice(indiceInicio, indiceFim)
         const novo = { ...selectedReceptoras }
         paginadas.forEach(r => {
-          if (r.dataDG) return // Não seleciona receptoras que já têm DG
+          if (r.dataDG) return // NÃ£o seleciona receptoras que jÃ¡ tÃªm DG
           const id = r.animalId || `${r.letra}_${r.numero}`
           novo[id] = true
         })
@@ -425,7 +425,7 @@ export default function ReceptorasDG() {
     return () => window.removeEventListener('keydown', handleKeyPress)
   }, [dataDG, veterinario, selectedReceptoras, paginaAtual, itensPorPagina, receptorasFiltradas])
 
-  // Ações em massa
+  // AÃ§Ãµes em massa
   const marcarTodasComoPrenha = () => {
     const novo = { ...resultados }
     Object.keys(selectedReceptoras).forEach(id => {
@@ -453,7 +453,7 @@ export default function ReceptorasDG() {
     setShowAcoesMassa(false)
   }
 
-  // Estatísticas avançadas
+  // EstatÃ­sticas avanÃ§adas
   const estatisticasAvancadas = useMemo(() => {
     const prenhas = receptoras.filter(r => {
       const res = r.resultadoDG
@@ -468,7 +468,7 @@ export default function ReceptorasDG() {
     const comDG = receptoras.filter(r => r.dataDG).length
     const taxaPrenhez = comDG > 0 ? ((prenhas / comDG) * 100).toFixed(1) : 0
     
-    // Dias médios até DG
+    // Dias mÃ©dios atÃ© DG
     const receptorasComTE = receptoras.filter(r => r.dataTE && r.dataDG)
     const mediaDias = receptorasComTE.length > 0
       ? Math.round(receptorasComTE.reduce((acc, r) => {
@@ -477,7 +477,7 @@ export default function ReceptorasDG() {
         }, 0) / receptorasComTE.length)
       : 0
     
-    // Estatísticas por lote selecionado
+    // EstatÃ­sticas por lote selecionado
     const receptorasSelecionadasLote = lotesSelecionados.size > 0
       ? receptoras.filter(r => lotesSelecionados.has(getChaveLote(r)))
       : []
@@ -514,13 +514,13 @@ export default function ReceptorasDG() {
         const data = result.data || []
         setReceptoras(data)
         
-        // Inicializar seleção e resultados
+        // Inicializar seleÃ§Ã£o e resultados
         const initialSelected = {}
         const initialResultados = {}
         const initialObservacoes = {}
         data.forEach(r => {
           initialSelected[r.animalId || `${r.letra}_${r.numero}`] = false
-          // Todas começam como Prenha por padrão
+          // Todas comeÃ§am como Prenha por padrÃ£o
           initialResultados[r.animalId || `${r.letra}_${r.numero}`] = r.resultadoDG || 'Prenha'
           initialObservacoes[r.animalId || `${r.letra}_${r.numero}`] = r.observacoes || ''
         })
@@ -589,37 +589,37 @@ export default function ReceptorasDG() {
     const veterinarioIndividual = veterinariosIndividuais[id]
 
     if (!dataIndividual) {
-      alert('⚠️ Por favor, informe a data do DG para esta receptora')
+      alert('âÅ¡ ï¸� Por favor, informe a data do DG para esta receptora')
       return
     }
 
     if (!veterinarioIndividual) {
-      alert('⚠️ Por favor, informe o veterinário para esta receptora')
+      alert('âÅ¡ ï¸� Por favor, informe o veterinÃ¡rio para esta receptora')
       return
     }
 
-    // Verificar se já tem DG
+    // Verificar se jÃ¡ tem DG
     if (receptora.dataDG) {
-      alert(`⚠️ Esta receptora já possui DG lançado em ${formatDateBR(receptora.dataDG)}`)
+      alert(`âÅ¡ ï¸� Esta receptora jÃ¡ possui DG lanÃ§ado em ${formatDateBR(receptora.dataDG)}`)
       return
     }
 
     const resultado = resultados[id]
 
     if (!resultado) {
-      alert('⚠️ Por favor, selecione o resultado (Prenha ou Vazia)')
+      alert('âÅ¡ ï¸� Por favor, selecione o resultado (Prenha ou Vazia)')
       return
     }
 
     const identificador = receptora.rg || receptora.numero || receptora.letra
-    if (!confirm(`Confirma o lançamento do DG para a receptora ${identificador}?\n\nData: ${formatDateBR(dataIndividual)}\nVeterinário: ${veterinarioIndividual}\nResultado: ${resultado}`)) {
+    if (!confirm(`Confirma o lanÃ§amento do DG para a receptora ${identificador}?\n\nData: ${formatDateBR(dataIndividual)}\nVeterinÃ¡rio: ${veterinarioIndividual}\nResultado: ${resultado}`)) {
       return
     }
 
     try {
       setSaving(true)
 
-      // Encontrar o índice do lote desta receptora
+      // Encontrar o Ã­ndice do lote desta receptora
       const chaveLote = getChaveLote(receptora)
       const indiceLote = lotes.findIndex(l => l.chave === chaveLote)
       const numeroLote = indiceLote >= 0 ? indiceLote + 1 : 1
@@ -634,7 +634,7 @@ export default function ReceptorasDG() {
         numeroNF: receptora.nf_numero || receptora.numeroNF || receptora.origem
       }]
 
-      console.log('📤 Salvamento individual:', { dataDG: dataIndividual, veterinario: veterinarioIndividual, receptora: payload[0] })
+      console.log('ðÅ¸â€œ¤ Salvamento individual:', { dataDG: dataIndividual, veterinario: veterinarioIndividual, receptora: payload[0] })
 
       const response = await fetch('/api/receptoras/lancar-dg-batch', {
         method: 'POST',
@@ -651,13 +651,13 @@ export default function ReceptorasDG() {
 
       if (response.ok && result.sucessos > 0) {
         const isPrenha = resultado.toLowerCase().includes('pren') || resultado.toLowerCase().includes('positivo')
-        let mensagem = `✅ DG da receptora ${identificador} salvo com sucesso!`
+        let mensagem = `âÅ“â€¦ DG da receptora ${identificador} salvo com sucesso!`
         if (isPrenha) {
-          mensagem += `\n\n🤰 Receptora prenha registrada no menu de Nascimentos com parto previsto para 9 meses após a TE.`
+          mensagem += `\n\nðÅ¸¤° Receptora prenha registrada no menu de Nascimentos com parto previsto para 9 meses apÃ³s a TE.`
         }
         alert(mensagem)
         
-        // Atualização otimista do card/resumo: refletir DG imediatamente no estado local
+        // AtualizaÃ§Ã£o otimista do card/resumo: refletir DG imediatamente no estado local
         setReceptoras(prev => prev.map(r => {
           const matchPorId = r.animalId && receptora.animalId && r.animalId === receptora.animalId
           const matchPorSerieRg = (r.letra === receptora.letra) && (String(r.numero) === String(receptora.numero))
@@ -697,11 +697,11 @@ export default function ReceptorasDG() {
         
       } else {
         const msg = result?.message || result?.error || `Erro ${response.status}`
-        alert(`❌ Erro ao salvar DG: ${msg}`)
+        alert(`â�Å’ Erro ao salvar DG: ${msg}`)
       }
     } catch (error) {
       console.error('Erro ao salvar individual:', error)
-      alert('❌ Erro ao salvar dados no PostgreSQL')
+      alert('â�Å’ Erro ao salvar dados no PostgreSQL')
     } finally {
       setSaving(false)
     }
@@ -709,12 +709,12 @@ export default function ReceptorasDG() {
 
   const salvarLote = async () => {
     if (!dataDG) {
-      alert('⚠️ Por favor, informe a data do DG')
+      alert('âÅ¡ ï¸� Por favor, informe a data do DG')
       return
     }
 
     if (!veterinario) {
-      alert('⚠️ Por favor, informe o veterinário')
+      alert('âÅ¡ ï¸� Por favor, informe o veterinÃ¡rio')
       return
     }
 
@@ -723,35 +723,35 @@ export default function ReceptorasDG() {
       return selectedReceptoras[id]
     })
 
-    // Excluir receptoras que já possuem DG (ex: 8251) - não devem entrar no lançamento
+    // Excluir receptoras que jÃ¡ possuem DG (ex: 8251) - nÃ£o devem entrar no lanÃ§amento
     const comDG = selecionadas.filter(r => r.dataDG)
     selecionadas = selecionadas.filter(r => !r.dataDG)
 
     if (selecionadas.length === 0) {
       if (comDG.length > 0) {
         const exemplos = comDG.slice(0, 3).map(r => r.rg || r.numero).join(', ')
-        alert(`⚠️ Todas as receptoras selecionadas já possuem DG (ex: ${exemplos}). Nenhuma pendente para lançar.`)
+        alert(`âÅ¡ ï¸� Todas as receptoras selecionadas jÃ¡ possuem DG (ex: ${exemplos}). Nenhuma pendente para lanÃ§ar.`)
       } else {
-        alert('⚠️ Selecione pelo menos uma receptora')
+        alert('âÅ¡ ï¸� Selecione pelo menos uma receptora')
       }
       return
     }
 
-    // Verificar se todas as selecionadas têm resultado
+    // Verificar se todas as selecionadas tÃªm resultado
     const semResultado = selecionadas.filter(r => {
       const id = r.animalId || `${r.letra}_${r.numero}`
       return !resultados[id]
     })
 
     if (semResultado.length > 0) {
-      alert(`⚠️ ${semResultado.length} receptora(s) sem resultado definido`)
+      alert(`âÅ¡ ï¸� ${semResultado.length} receptora(s) sem resultado definido`)
       return
     }
 
-    let msgConfirm = `Confirma o lançamento do DG para ${selecionadas.length} receptora(s)?`
+    let msgConfirm = `Confirma o lanÃ§amento do DG para ${selecionadas.length} receptora(s)?`
     if (comDG.length > 0) {
       const exemplos = comDG.slice(0, 3).map(r => r.rg || r.numero).join(', ')
-      msgConfirm = `${comDG.length} receptora(s) já possuem DG (ex: ${exemplos}) e serão ignoradas.\n\n` + msgConfirm
+      msgConfirm = `${comDG.length} receptora(s) jÃ¡ possuem DG (ex: ${exemplos}) e serÃ£o ignoradas.\n\n` + msgConfirm
     }
     if (!confirm(msgConfirm)) {
       return
@@ -762,7 +762,7 @@ export default function ReceptorasDG() {
 
       const payload = selecionadas.map(r => {
         const id = r.animalId || `${r.letra}_${r.numero}`
-        // Encontrar o índice do lote desta receptora
+        // Encontrar o Ã­ndice do lote desta receptora
         const chaveLote = getChaveLote(r)
         const indiceLote = lotes.findIndex(l => l.chave === chaveLote)
         const numeroLote = indiceLote >= 0 ? indiceLote + 1 : 1
@@ -777,12 +777,12 @@ export default function ReceptorasDG() {
           numeroNF: r.nf_numero || r.numeroNF || r.origem
         }
         
-        console.log('📤 Payload da receptora:', receptoraPayload);
+        console.log('ðÅ¸â€œ¤ Payload da receptora:', receptoraPayload);
         
         return receptoraPayload;
       })
       
-      console.log('📤 Payload completo:', { dataDG, veterinario, lotes: lotesSelecionadosParaDG, receptoras: payload });
+      console.log('ðÅ¸â€œ¤ Payload completo:', { dataDG, veterinario, lotes: lotesSelecionadosParaDG, receptoras: payload });
 
       const response = await fetch('/api/receptoras/lancar-dg-batch', {
         method: 'POST',
@@ -807,18 +807,18 @@ export default function ReceptorasDG() {
           return res && (res.toLowerCase().includes('pren') || res.toLowerCase().includes('positivo'))
         }).length
 
-        let mensagem = `✅ ${sucessos} receptora(s) atualizada(s) com sucesso no PostgreSQL!`
+        let mensagem = `âÅ“â€¦ ${sucessos} receptora(s) atualizada(s) com sucesso no PostgreSQL!`
         if (prenhas > 0) {
-          mensagem += `\n\n🤰 ${prenhas} receptora(s) prenha(s) registrada(s) no menu de Nascimentos com parto previsto para 9 meses após a TE.`
+          mensagem += `\n\nðÅ¸¤° ${prenhas} receptora(s) prenha(s) registrada(s) no menu de Nascimentos com parto previsto para 9 meses apÃ³s a TE.`
         }
         if (erros > 0) {
-          mensagem += `\n\n⚠️ ${erros} erro(s) encontrado(s). Clique em OK para ver os detalhes.`
+          mensagem += `\n\nâÅ¡ ï¸� ${erros} erro(s) encontrado(s). Clique em OK para ver os detalhes.`
           const errosLista = detalhes.filter(d => d.erro).map(d => ({ receptora: d.identificador, erro: d.erro }))
           setErrosDetalhes({ total: erros, lista: errosLista })
         }
         
         alert(mensagem)
-        // Atualização otimista: marcar as selecionadas como com DG no estado local,
+        // AtualizaÃ§Ã£o otimista: marcar as selecionadas como com DG no estado local,
         // para refletir imediatamente nos cards por fornecedor
         setReceptoras(prev => prev.map(r => {
           const idR = r.animalId || `${r.letra}_${r.numero}`
@@ -839,24 +839,24 @@ export default function ReceptorasDG() {
         setVeterinario('')
         setLotesSelecionadosParaDG([]) // Resetar lotes selecionados
         setLotesAplicados(false) // Resetar filtro aplicado
-        setSelectedReceptoras({}) // Limpar seleção
+        setSelectedReceptoras({}) // Limpar seleÃ§Ã£o
         setResultados({}) // Limpar resultados
-        setObservacoes({}) // Limpar observações
-        // Redirecionar apenas quando não houver erros (para o usuário poder ver o modal de detalhes)
+        setObservacoes({}) // Limpar observaÃ§Ãµes
+        // Redirecionar apenas quando nÃ£o houver erros (para o usuÃ¡rio poder ver o modal de detalhes)
         if (erros === 0) {
           router.push('/nascimentos')
         }
       } else if (response.ok && sucessos === 0 && erros > 0) {
         const errosLista = detalhes.filter(d => d.erro).map(d => ({ receptora: d.identificador, erro: d.erro }))
         setErrosDetalhes({ total: erros, lista: errosLista })
-        alert(`❌ Erro ao atualizar receptoras no PostgreSQL. ${erros} falha(s). Clique em OK para ver os detalhes.`)
+        alert(`â�Å’ Erro ao atualizar receptoras no PostgreSQL. ${erros} falha(s). Clique em OK para ver os detalhes.`)
       } else {
         const msg = result?.message || result?.error || `Erro ${response.status}`
-        alert(`❌ Erro ao atualizar receptoras no PostgreSQL: ${msg}`)
+        alert(`â�Å’ Erro ao atualizar receptoras no PostgreSQL: ${msg}`)
       }
     } catch (error) {
       console.error('Erro ao salvar lote:', error)
-      alert('❌ Erro ao salvar dados no PostgreSQL')
+      alert('â�Å’ Erro ao salvar dados no PostgreSQL')
     } finally {
       setSaving(false)
     }
@@ -885,7 +885,7 @@ export default function ReceptorasDG() {
       const mergeCols = cols.length
       worksheet.mergeCells(1, 1, 1, mergeCols)
       const titleRow = worksheet.getRow(1)
-      titleRow.getCell(1).value = 'LISTA DE RECEPTORAS PARA DIAGNÓSTICO DE GESTAÇÃO (DG)-Criado por Beef-Sync '
+      titleRow.getCell(1).value = 'LISTA DE RECEPTORAS PARA DIAGNÃâ€œSTICO DE GESTAÃâ€¡ÃÆ’O (DG)-Criado por Beef-Sync '
       titleRow.font = { size: 16, bold: true, color: { argb: 'FFFFFFFF' } }
       titleRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE91E63' } }
       titleRow.alignment = { vertical: 'middle', horizontal: 'center' }
@@ -953,10 +953,10 @@ export default function ReceptorasDG() {
       a.click()
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
-      alert('✅ Relatório exportado com sucesso!')
+      alert('âÅ“â€¦ RelatÃ³rio exportado com sucesso!')
     } catch (error) {
       console.error('Erro ao exportar:', error)
-      alert('❌ Erro ao exportar relatório')
+      alert('â�Å’ Erro ao exportar relatÃ³rio')
     } finally {
       setExporting(false)
     }
@@ -985,10 +985,10 @@ export default function ReceptorasDG() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 className="text-3xl font-bold text-white flex items-center gap-3">
-              🤰 Diagnóstico de Gestação
+              ðÅ¸¤° DiagnÃ³stico de GestaÃ§Ã£o
             </h2>
             <p className="text-white/90 mt-2 text-lg">
-              Lançamento em lote de DG para receptoras
+              LanÃ§amento em lote de DG para receptoras
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -1005,13 +1005,13 @@ export default function ReceptorasDG() {
                 onClick={() => { setModoVisualizacao('lotes'); setLoteFiltro(null) }}
                 className={`px-4 py-2.5 text-sm font-semibold transition-all ${modoVisualizacao === 'lotes' ? 'bg-white text-purple-600 shadow-md' : 'text-white hover:bg-white/10'}`}
               >
-                📦 Por Lote
+                ðÅ¸â€œ¦ Por Lote
               </button>
               <button
                 onClick={() => { setModoVisualizacao('lista'); setLoteFiltro(null) }}
                 className={`px-4 py-2.5 text-sm font-semibold transition-all ${modoVisualizacao === 'lista' ? 'bg-white text-purple-600 shadow-md' : 'text-white hover:bg-white/10'}`}
               >
-                📋 Lista Completa
+                ðÅ¸â€œâ€¹ Lista Completa
               </button>
             </div>
           </div>
@@ -1030,7 +1030,7 @@ export default function ReceptorasDG() {
             </span>
             <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-lg">
               <kbd className="bg-white/20 px-2 py-0.5 rounded font-mono">Ctrl+A</kbd>
-              <span>Selecionar página</span>
+              <span>Selecionar pÃ¡gina</span>
             </span>
           </div>
         </div>
@@ -1042,25 +1042,25 @@ export default function ReceptorasDG() {
           {lotes.length === 0 ? (
             <div className="p-8 rounded-2xl bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 text-center">
               <p className="text-lg font-semibold text-green-800 dark:text-green-200">
-                ✅ Todos os lotes já foram diagnosticados
+                âÅ“â€¦ Todos os lotes jÃ¡ foram diagnosticados
               </p>
               <p className="text-sm text-green-700 dark:text-green-300 mt-2">
-                Não há lotes pendentes de DG. Somente novos lotes que chegarem aparecerão aqui.
+                NÃ£o hÃ¡ lotes pendentes de DG. Somente novos lotes que chegarem aparecerÃ£o aqui.
               </p>
             </div>
           ) : (
             <>
               <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                📦 Lotes pendentes de DG
+                ðÅ¸â€œ¦ Lotes pendentes de DG
                 <span className="text-sm font-normal text-gray-500">({lotes.length} lote{lotes.length !== 1 ? 's' : ''})</span>
                 {lotesSelecionados.size > 0 && (
                   <span className="text-sm font-semibold text-purple-600 dark:text-purple-400 ml-2">
-                    • {lotesSelecionados.size} selecionado{lotesSelecionados.size !== 1 ? 's' : ''} para DG
+                    ââ‚¬¢ {lotesSelecionados.size} selecionado{lotesSelecionados.size !== 1 ? 's' : ''} para DG
                   </span>
                 )}
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Clique nos cards para selecionar os lotes. Somente lotes com receptoras pendentes de DG são exibidos.
+                Clique nos cards para selecionar os lotes. Somente lotes com receptoras pendentes de DG sÃ£o exibidos.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {lotes.map(lote => {
@@ -1083,11 +1083,11 @@ export default function ReceptorasDG() {
                       return next
                     })
                     
-                    // Selecionar/desmarcar todas as receptoras deste lote (exceto as que já têm DG)
+                    // Selecionar/desmarcar todas as receptoras deste lote (exceto as que jÃ¡ tÃªm DG)
                     setSelectedReceptoras(prev => {
                       const next = { ...prev }
                       lote.receptoras.forEach(r => {
-                        if (r.dataDG) return // Pula receptoras que já têm DG
+                        if (r.dataDG) return // Pula receptoras que jÃ¡ tÃªm DG
                         const id = r.animalId || `${r.letra}_${r.numero}`
                         next[id] = !estaSelec
                       })
@@ -1129,8 +1129,8 @@ export default function ReceptorasDG() {
                         }}
                         onClick={e => e.stopPropagation()}
                         className="w-14 sm:w-16 bg-transparent border-b-2 border-transparent hover:border-current focus:border-current focus:outline-none font-black text-3xl sm:text-4xl [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        placeholder="Nº"
-                        title="Número do lote (edite aqui)"
+                        placeholder="NÂº"
+                        title="NÃºmero do lote (edite aqui)"
                       />
                     </div>
                     <div className="flex-1">
@@ -1146,17 +1146,17 @@ export default function ReceptorasDG() {
                         {qtd}
                       </span>
                       <span className="text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase">
-                        Cabeças
+                        CabeÃ§as
                       </span>
                     </div>
                   </div>
                   <div className="space-y-1 text-xs text-gray-600 dark:text-gray-400">
                     <div className="flex items-center gap-1.5">
-                      <span className="font-semibold">📄 NF:</span>
+                      <span className="font-semibold">ðÅ¸â€œâ€ž NF:</span>
                       <span>{lote.nf_numero || '-'}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <span className="font-semibold">📅 Entrada:</span>
+                      <span className="font-semibold">ðÅ¸â€œâ€¦ Entrada:</span>
                       <span>{dataStr}</span>
                     </div>
                   </div>
@@ -1168,8 +1168,8 @@ export default function ReceptorasDG() {
                     onClick={() => { setLotesSelecionados(new Set()); setLoteFiltro(null) }}
                     className="p-5 rounded-2xl border-3 border-dashed border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-purple-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 text-sm font-semibold transition-all flex flex-col items-center justify-center gap-2"
                   >
-                    <span className="text-2xl">🔄</span>
-                    Limpar seleção
+                    <span className="text-2xl">ðÅ¸â€�â€ž</span>
+                    Limpar seleÃ§Ã£o
                   </button>
                 )}
               </div>
@@ -1178,7 +1178,7 @@ export default function ReceptorasDG() {
         </div>
       )}
 
-      {/* Formulário de Lançamento em Lote - Melhorado */}
+      {/* FormulÃ¡rio de LanÃ§amento em Lote - Melhorado */}
       <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-900/30 dark:via-indigo-900/30 dark:to-purple-900/30 p-6 rounded-2xl border-2 border-blue-300 dark:border-blue-700 shadow-lg">
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
@@ -1187,7 +1187,7 @@ export default function ReceptorasDG() {
             </div>
             <div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                Lançamento em Lote
+                LanÃ§amento em Lote
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Preencha os dados e selecione as receptoras
@@ -1205,15 +1205,15 @@ export default function ReceptorasDG() {
         </div>
         
         <div className="grid grid-cols-1 gap-5 mb-5">
-          {/* Seleção de Lotes */}
+          {/* SeleÃ§Ã£o de Lotes */}
           <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl p-4 border border-blue-200 dark:border-blue-800">
             <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-              🔢 Selecione os Lotes para DG <span className="text-red-500">*</span>
+              ðÅ¸â€�¢ Selecione os Lotes para DG <span className="text-red-500">*</span>
               <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">(Apenas lotes sem DG)</span>
             </label>
             {lotes.length === 0 ? (
               <p className="text-sm text-green-600 dark:text-green-400 font-medium py-3">
-                ✅ Não há lotes pendentes de DG. Somente novos lotes que chegarem aparecerão aqui.
+                âÅ“â€¦ NÃ£o hÃ¡ lotes pendentes de DG. Somente novos lotes que chegarem aparecerÃ£o aqui.
               </p>
             ) : (
               <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mb-3">
@@ -1240,12 +1240,12 @@ export default function ReceptorasDG() {
             )}
             {lotesSelecionadosParaDG.length > 0 && (
               <div className="text-sm text-blue-600 dark:text-blue-400 font-medium">
-                ✓ {lotesSelecionadosParaDG.length} lote(s) selecionado(s): {lotesSelecionadosParaDG.join(', ')}
+                âÅ“â€œ {lotesSelecionadosParaDG.length} lote(s) selecionado(s): {lotesSelecionadosParaDG.join(', ')}
               </div>
             )}
           </div>
 
-          {/* Botão Aplicar ou Dados do DG */}
+          {/* BotÃ£o Aplicar ou Dados do DG */}
           {!lotesAplicados ? (
             <div className="flex gap-3">
               <button
@@ -1253,7 +1253,7 @@ export default function ReceptorasDG() {
                 disabled={lotesSelecionadosParaDG.length === 0}
                 className="flex-1 px-6 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2"
               >
-                ✓ Aplicar Filtro de Lotes
+                âÅ“â€œ Aplicar Filtro de Lotes
               </button>
             </div>
           ) : (
@@ -1263,14 +1263,14 @@ export default function ReceptorasDG() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-bold text-green-700 dark:text-green-300">
-                      ✓ Filtro Aplicado
+                      âÅ“â€œ Filtro Aplicado
                     </p>
                     <p className="text-xs text-green-600 dark:text-green-400 mt-1">
                       Mostrando {receptorasExibidas.length} receptora(s) dos lotes: {lotesSelecionadosParaDG.join(', ')}
                     </p>
                     {receptorasExibidas.filter(r => r.dataDG).length > 0 && (
                       <p className="text-xs text-amber-700 dark:text-amber-400 mt-1 font-medium">
-                        ⚠️ {receptorasExibidas.filter(r => r.dataDG).length} já possuem DG e serão ignoradas no lançamento (ex: {receptorasExibidas.filter(r => r.dataDG).slice(0, 3).map(r => r.rg || r.numero).join(', ')})
+                        âÅ¡ ï¸� {receptorasExibidas.filter(r => r.dataDG).length} jÃ¡ possuem DG e serÃ£o ignoradas no lanÃ§amento (ex: {receptorasExibidas.filter(r => r.dataDG).slice(0, 3).map(r => r.rg || r.numero).join(', ')})
                       </p>
                     )}
                   </div>
@@ -1289,13 +1289,13 @@ export default function ReceptorasDG() {
                       }}
                       className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all font-bold text-sm"
                     >
-                      ✓ Selecionar pendentes ({receptorasExibidas.filter(r => !r.dataDG).length})
+                      âÅ“â€œ Selecionar pendentes ({receptorasExibidas.filter(r => !r.dataDG).length})
                     </button>
                     <button
                       onClick={limparFiltroLotes}
                       className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-all font-bold text-sm"
                     >
-                      ↺ Alterar Lotes
+                      ââ€ º Alterar Lotes
                     </button>
                   </div>
                 </div>
@@ -1305,7 +1305,7 @@ export default function ReceptorasDG() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                    📅 Data do DG <span className="text-red-500">*</span>
+                    ðÅ¸â€œâ€¦ Data do DG <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="date"
@@ -1317,13 +1317,13 @@ export default function ReceptorasDG() {
                 
                 <div>
                   <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                    👨‍⚕️ Veterinário <span className="text-red-500">*</span>
+                    ðÅ¸â€˜¨ââ‚¬�âÅ¡â€¢ï¸� VeterinÃ¡rio <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={veterinario}
                     onChange={(e) => setVeterinario(e.target.value)}
-                    placeholder="Nome do veterinário"
+                    placeholder="Nome do veterinÃ¡rio"
                     className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-gray-400"
                   />
                 </div>
@@ -1342,7 +1342,7 @@ export default function ReceptorasDG() {
                     className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2"
                     title={
                       !dataDG ? 'Preencha a data do DG' :
-                      !veterinario ? 'Preencha o veterinário' :
+                      !veterinario ? 'Preencha o veterinÃ¡rio' :
                       selecionadasCount === 0 ? 'Selecione pelo menos uma receptora' :
                       'Salvar DG das receptoras selecionadas'
                     }
@@ -1354,7 +1354,7 @@ export default function ReceptorasDG() {
                       </>
                     ) : (
                       <>
-                        💾 Salvar Lote {selecionadasCount > 0 && `(${selecionadasCount})`}
+                        ðÅ¸â€™¾ Salvar Lote {selecionadasCount > 0 && `(${selecionadasCount})`}
                       </>
                     )}
                   </button>
@@ -1367,13 +1367,13 @@ export default function ReceptorasDG() {
 
         <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl p-4 border border-blue-200 dark:border-blue-800">
           <p className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-            💡 Como usar:
+            ðÅ¸â€™¡ Como usar:
           </p>
           <ol className="list-decimal list-inside space-y-1.5 text-sm text-gray-600 dark:text-gray-400">
-            <li>Preencha a <strong>data do DG</strong> e o <strong>veterinário</strong></li>
-            <li>Marque as receptoras que deseja lançar na tabela abaixo</li>
-            <li>Todas começam como <strong className="text-green-600">Prenha</strong> por padrão</li>
-            <li>Se alguma estiver vazia, altere o resultado e adicione observação</li>
+            <li>Preencha a <strong>data do DG</strong> e o <strong>veterinÃ¡rio</strong></li>
+            <li>Marque as receptoras que deseja lanÃ§ar na tabela abaixo</li>
+            <li>Todas comeÃ§am como <strong className="text-green-600">Prenha</strong> por padrÃ£o</li>
+            <li>Se alguma estiver vazia, altere o resultado e adicione observaÃ§Ã£o</li>
             <li>Clique em <strong>"Salvar Lote"</strong> para aplicar a todas selecionadas</li>
           </ol>
           <div className="mt-3 pt-3 border-t border-blue-200 dark:border-blue-700 space-y-2">
@@ -1381,11 +1381,11 @@ export default function ReceptorasDG() {
               <svg className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
-              <span><strong>Dados salvos automaticamente no PostgreSQL.</strong> Receptoras prenhas são registradas no menu de Nascimentos com parto previsto para 9 meses após a TE.</span>
+              <span><strong>Dados salvos automaticamente no PostgreSQL.</strong> Receptoras prenhas sÃ£o registradas no menu de Nascimentos com parto previsto para 9 meses apÃ³s a TE.</span>
             </p>
             <p className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-2">
-              <span>⚠️</span>
-              <span><strong>Receptoras que já possuem DG</strong> (ex: 8251) são identificadas e <strong>automaticamente excluídas</strong> do lançamento em lote.</span>
+              <span>âÅ¡ ï¸�</span>
+              <span><strong>Receptoras que jÃ¡ possuem DG</strong> (ex: 8251) sÃ£o identificadas e <strong>automaticamente excluÃ­das</strong> do lanÃ§amento em lote.</span>
             </p>
           </div>
         </div>
@@ -1403,7 +1403,7 @@ export default function ReceptorasDG() {
                 value={importText}
                 onChange={(e) => setImportText(e.target.value)}
                 rows={8}
-                placeholder="Exemplos:&#10;8251; 2026-02-18; Prenha; Dr. João&#10;8249, 18/02/2026, Vazia, Maria&#10;RG 8230 Prenha 2026-02-19 Vet Carlos"
+                placeholder="Exemplos:&#10;8251; 2026-02-18; Prenha; Dr. JoÃ£o&#10;8249, 18/02/2026, Vazia, Maria&#10;RG 8230 Prenha 2026-02-19 Vet Carlos"
                 className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
               <div className="flex items-center gap-2">
@@ -1440,12 +1440,12 @@ export default function ReceptorasDG() {
         </div>
       )}
 
-      {/* Estatísticas - Melhoradas */}
+      {/* EstatÃ­sticas - Melhoradas */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105 cursor-pointer">
           <div className="flex items-center justify-between mb-2">
             <span className="text-blue-100 text-sm font-semibold uppercase tracking-wide">Total</span>
-            <span className="text-3xl">📊</span>
+            <span className="text-3xl">ðÅ¸â€œÅ </span>
           </div>
           <div className="text-4xl font-black text-white">{receptorasExibidas.length}</div>
           <div className="text-blue-100 text-xs mt-1">receptoras</div>
@@ -1454,12 +1454,12 @@ export default function ReceptorasDG() {
         <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105 cursor-pointer">
           <div className="flex items-center justify-between mb-2">
             <span className="text-purple-100 text-sm font-semibold uppercase tracking-wide">Selecionadas</span>
-            <span className="text-3xl">✅</span>
+            <span className="text-3xl">âÅ“â€¦</span>
           </div>
           <div className="text-4xl font-black text-white">
             {selecionadasCount}
           </div>
-          <div className="text-purple-100 text-xs mt-1">para lançar</div>
+          <div className="text-purple-100 text-xs mt-1">para lanÃ§ar</div>
         </div>
         
         <div 
@@ -1468,13 +1468,13 @@ export default function ReceptorasDG() {
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-green-100 text-sm font-semibold uppercase tracking-wide">Com DG</span>
-            <span className="text-3xl">🤰</span>
+            <span className="text-3xl">ðÅ¸¤°</span>
           </div>
           <div className="text-4xl font-black text-white">
             {receptorasExibidas.filter(r => r.dataDG).length}
           </div>
           <div className="text-green-100 text-xs mt-1">
-            {filtroStatus === 'comDG' ? '🔍 Filtrando' : 'já diagnosticadas'}
+            {filtroStatus === 'comDG' ? 'ðÅ¸â€�� Filtrando' : 'jÃ¡ diagnosticadas'}
           </div>
         </div>
         
@@ -1484,18 +1484,18 @@ export default function ReceptorasDG() {
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-yellow-100 text-sm font-semibold uppercase tracking-wide">Pendentes</span>
-            <span className="text-3xl">⏳</span>
+            <span className="text-3xl">â�³</span>
           </div>
           <div className="text-4xl font-black text-white">
             {receptorasExibidas.filter(r => !r.dataDG).length}
           </div>
           <div className="text-yellow-100 text-xs mt-1">
-            {filtroStatus === 'pendentes' ? '🔍 Filtrando' : 'aguardando DG'}
+            {filtroStatus === 'pendentes' ? 'ðÅ¸â€�� Filtrando' : 'aguardando DG'}
           </div>
         </div>
       </div>
 
-      {/* Dashboard de Análise Avançada */}
+      {/* Dashboard de AnÃ¡lise AvanÃ§ada */}
       {estatisticasAvancadas.comDG > 0 && (
         <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-900/20 dark:via-purple-900/20 dark:to-pink-900/20 rounded-2xl p-6 border-2 border-indigo-200 dark:border-indigo-700 shadow-lg">
           <div className="flex items-center gap-3 mb-5">
@@ -1506,10 +1506,10 @@ export default function ReceptorasDG() {
             </div>
             <div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                📈 Análise de Performance
+                ðÅ¸â€œË† AnÃ¡lise de Performance
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Estatísticas e indicadores de sucesso
+                EstatÃ­sticas e indicadores de sucesso
               </p>
             </div>
           </div>
@@ -1519,7 +1519,7 @@ export default function ReceptorasDG() {
             <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border-2 border-green-200 dark:border-green-700 shadow-sm">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase">Taxa de Prenhez</span>
-                <span className="text-2xl">🎯</span>
+                <span className="text-2xl">ðÅ¸Å½¯</span>
               </div>
               <div className="flex items-end gap-2">
                 <span className="text-4xl font-black text-green-600 dark:text-green-400">
@@ -1537,45 +1537,45 @@ export default function ReceptorasDG() {
               </div>
               <div className="mt-2 flex items-center justify-between text-xs">
                 <span className="text-green-600 dark:text-green-400 font-semibold">
-                  ✓ {estatisticasAvancadas.prenhas} Prenhas
+                  âÅ“â€œ {estatisticasAvancadas.prenhas} Prenhas
                 </span>
                 <span className="text-red-600 dark:text-red-400 font-semibold">
-                  ✗ {estatisticasAvancadas.vazias} Vazias
+                  âÅ“â€” {estatisticasAvancadas.vazias} Vazias
                 </span>
               </div>
             </div>
 
-            {/* Média de Dias até DG */}
+            {/* MÃ©dia de Dias atÃ© DG */}
             <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border-2 border-blue-200 dark:border-blue-700 shadow-sm">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase">Média de Dias</span>
-                <span className="text-2xl">📅</span>
+                <span className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase">MÃ©dia de Dias</span>
+                <span className="text-2xl">ðÅ¸â€œâ€¦</span>
               </div>
               <div className="flex items-end gap-2">
                 <span className="text-4xl font-black text-blue-600 dark:text-blue-400">
                   {estatisticasAvancadas.mediaDias}
                 </span>
                 <span className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                  dias até DG
+                  dias atÃ© DG
                 </span>
               </div>
               <div className="mt-3 flex items-center gap-2 text-xs">
                 {estatisticasAvancadas.mediaDias < 30 ? (
                   <span className="px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 rounded-full font-semibold">
-                    ⚠️ DG Precoce
+                    âÅ¡ ï¸� DG Precoce
                   </span>
                 ) : estatisticasAvancadas.mediaDias > 45 ? (
                   <span className="px-2 py-1 bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400 rounded-full font-semibold">
-                    ⚠️ DG Tardio
+                    âÅ¡ ï¸� DG Tardio
                   </span>
                 ) : (
                   <span className="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 rounded-full font-semibold">
-                    ✓ Período Ideal
+                    âÅ“â€œ PerÃ­odo Ideal
                   </span>
                 )}
               </div>
               <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                Ideal: 30-45 dias após TE
+                Ideal: 30-45 dias apÃ³s TE
               </p>
             </div>
 
@@ -1584,7 +1584,7 @@ export default function ReceptorasDG() {
               <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border-2 border-purple-200 dark:border-purple-700 shadow-sm">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase">Lote Selecionado</span>
-                  <span className="text-2xl">📦</span>
+                  <span className="text-2xl">ðÅ¸â€œ¦</span>
                 </div>
                 <div className="flex items-end gap-2">
                   <span className="text-4xl font-black text-purple-600 dark:text-purple-400">
@@ -1606,55 +1606,55 @@ export default function ReceptorasDG() {
               </div>
             )}
 
-            {/* Placeholder quando não há lote selecionado */}
+            {/* Placeholder quando nÃ£o hÃ¡ lote selecionado */}
             {(lotesSelecionados.size === 0 || estatisticasAvancadas.receptorasSelecionadasLote === 0) && (
               <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border-2 border-gray-200 dark:border-gray-700 shadow-sm flex flex-col items-center justify-center text-center">
-                <span className="text-4xl mb-2">📦</span>
+                <span className="text-4xl mb-2">ðÅ¸â€œ¦</span>
                 <span className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">
                   Selecione um Lote
                 </span>
                 <span className="text-xs text-gray-500 dark:text-gray-400">
-                  Para ver estatísticas específicas
+                  Para ver estatÃ­sticas especÃ­ficas
                 </span>
               </div>
             )}
           </div>
 
-          {/* Dicas e Recomendações */}
+          {/* Dicas e RecomendaÃ§Ãµes */}
           <div className="mt-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl p-4 border border-indigo-200 dark:border-indigo-700">
             <div className="flex items-start gap-3">
-              <span className="text-2xl">💡</span>
+              <span className="text-2xl">ðÅ¸â€™¡</span>
               <div className="flex-1">
-                <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-2">Recomendações:</h4>
+                <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-2">RecomendaÃ§Ãµes:</h4>
                 <ul className="space-y-1 text-xs text-gray-600 dark:text-gray-400">
                   {estatisticasAvancadas.taxaPrenhez < 50 && (
                     <li className="flex items-center gap-2">
-                      <span className="text-yellow-500">⚠️</span>
+                      <span className="text-yellow-500">âÅ¡ ï¸�</span>
                       <span>Taxa de prenhez abaixo de 50%. Considere revisar protocolo de TE.</span>
                     </li>
                   )}
                   {estatisticasAvancadas.taxaPrenhez >= 70 && (
                     <li className="flex items-center gap-2">
-                      <span className="text-green-500">✓</span>
+                      <span className="text-green-500">âÅ“â€œ</span>
                       <span>Excelente taxa de prenhez! Continue com o protocolo atual.</span>
                     </li>
                   )}
                   {estatisticasAvancadas.mediaDias < 30 && (
                     <li className="flex items-center gap-2">
-                      <span className="text-orange-500">⚠️</span>
+                      <span className="text-orange-500">âÅ¡ ï¸�</span>
                       <span>DG muito precoce pode gerar falsos negativos. Ideal: 30-35 dias.</span>
                     </li>
                   )}
                   {estatisticasAvancadas.mediaDias > 45 && (
                     <li className="flex items-center gap-2">
-                      <span className="text-orange-500">⚠️</span>
-                      <span>DG tardio aumenta risco de perda. Recomendado: até 40 dias.</span>
+                      <span className="text-orange-500">âÅ¡ ï¸�</span>
+                      <span>DG tardio aumenta risco de perda. Recomendado: atÃ© 40 dias.</span>
                     </li>
                   )}
                   {receptoras.filter(r => !r.dataDG).length > 10 && (
                     <li className="flex items-center gap-2">
-                      <span className="text-blue-500">ℹ️</span>
-                      <span>{receptoras.filter(r => !r.dataDG).length} receptoras aguardando DG. Agende visita do veterinário.</span>
+                      <span className="text-blue-500">ââ€ž¹ï¸�</span>
+                      <span>{receptoras.filter(r => !r.dataDG).length} receptoras aguardando DG. Agende visita do veterinÃ¡rio.</span>
                     </li>
                   )}
                 </ul>
@@ -1676,7 +1676,7 @@ export default function ReceptorasDG() {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                  🏢 Resumo por Fornecedor
+                  ðÅ¸�¢ Resumo por Fornecedor
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   {fornecedorFiltro ? `Filtrando: ${fornecedorFiltro}` : 'Clique em um fornecedor para filtrar'}
@@ -1755,7 +1755,7 @@ export default function ReceptorasDG() {
                       </div>
                       <div className={`bg-gradient-to-br ${cor} text-white rounded-lg px-3 py-2 text-center min-w-[60px] shadow-lg transform transition-transform ${isFiltered ? 'scale-110' : ''}`}>
                         <div className="text-2xl font-black">{dados.total}</div>
-                        <div className="text-[10px] font-semibold uppercase">cabeças</div>
+                        <div className="text-[10px] font-semibold uppercase">cabeÃ§as</div>
                       </div>
                     </div>
                     <div className="space-y-2">
@@ -1788,18 +1788,18 @@ export default function ReceptorasDG() {
                             <span className="text-gray-600 dark:text-gray-400 font-semibold">Taxa de Prenhez:</span>
                             <div className="flex items-center gap-2">
                               <span className={`font-bold text-lg ${parseFloat(taxaPrenhez) >= 70 ? 'text-green-600 dark:text-green-400' : parseFloat(taxaPrenhez) >= 50 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`}>{taxaPrenhez}%</span>
-                              {parseFloat(taxaPrenhez) >= 70 ? '🏆' : parseFloat(taxaPrenhez) >= 50 ? '👍' : '⚠️'}
+                              {parseFloat(taxaPrenhez) >= 70 ? 'ðÅ¸�â€ ' : parseFloat(taxaPrenhez) >= 50 ? 'ðÅ¸â€˜�' : 'âÅ¡ ï¸�'}
                             </div>
                           </div>
                         </div>
                       )}
                     </div>
-                    {/* Botões de Ação Rápida */}
+                    {/* BotÃµes de AÃ§Ã£o RÃ¡pida */}
                     <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 flex gap-2">
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
-                          // Selecionar receptoras deste fornecedor (exceto as que já têm DG)
+                          // Selecionar receptoras deste fornecedor (exceto as que jÃ¡ tÃªm DG)
                           const receptorasFornecedor = receptoras.filter(r => (r.fornecedor || 'Sem Fornecedor') === fornecedor)
                           setSelectedReceptoras(prev => {
                             const next = { ...prev }
@@ -1846,7 +1846,7 @@ export default function ReceptorasDG() {
           <div className="mt-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl p-4 border border-cyan-200 dark:border-cyan-700">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-3">
-                <span className="text-2xl">📊</span>
+                <span className="text-2xl">ðÅ¸â€œÅ </span>
                 <div>
                   <h4 className="text-sm font-bold text-gray-900 dark:text-white">Resumo Geral</h4>
                   <p className="text-xs text-gray-600 dark:text-gray-400">{Object.keys(receptoras.reduce((acc, r) => ({ ...acc, [r.fornecedor || 'Sem Fornecedor']: true }), {})).length} fornecedores diferentes</p>
@@ -1872,7 +1872,7 @@ export default function ReceptorasDG() {
                 <div className="text-sm text-gray-500 dark:text-gray-400">Fornecedor</div>
                 <div className="text-lg font-bold text-gray-900 dark:text-white truncate">{fornecedorLista.fornecedor}</div>
                 <div className="text-xs text-gray-500 dark:text-gray-400">
-                  {fornecedorLista.status === 'prenhas' ? 'Prenhas' : fornecedorLista.status === 'vazias' ? 'Vazias' : 'Pendentes'} • {fornecedorLista.itens.length}
+                  {fornecedorLista.status === 'prenhas' ? 'Prenhas' : fornecedorLista.status === 'vazias' ? 'Vazias' : 'Pendentes'} ââ‚¬¢ {fornecedorLista.itens.length}
                 </div>
               </div>
               <button 
@@ -1892,12 +1892,12 @@ export default function ReceptorasDG() {
                   <thead className={`bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white ${compactMode ? 'text-xs' : 'text-sm'}`}>
                     <tr>
                       <th className="px-3 py-2 text-left text-gray-900 dark:text-white">Letra</th>
-                      <th className="px-3 py-2 text-left text-gray-900 dark:text-white">Número</th>
+                      <th className="px-3 py-2 text-left text-gray-900 dark:text-white">NÃºmero</th>
                       <th className="px-3 py-2 text-left text-gray-900 dark:text-white">Brinco</th>
                       <th className="px-3 py-2 text-left text-gray-900 dark:text-white">NF</th>
                       <th className="px-3 py-2 text-left text-gray-900 dark:text-white">Data DG</th>
                       <th className="px-3 py-2 text-left text-gray-900 dark:text-white">Resultado</th>
-                      <th className="px-3 py-2 text-left text-gray-900 dark:text-white">Veterinário</th>
+                      <th className="px-3 py-2 text-left text-gray-900 dark:text-white">VeterinÃ¡rio</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -1923,7 +1923,7 @@ export default function ReceptorasDG() {
       {(loteFiltro || lotesSelecionados.size > 0 || fornecedorFiltro) && (
         <div className="bg-purple-50 dark:bg-purple-900/20 border-l-4 border-purple-500 p-4 rounded-lg">
           <p className="text-sm text-gray-700 dark:text-gray-300 flex items-center gap-2 flex-wrap">
-            <span className="text-lg">🔍</span>
+            <span className="text-lg">ðÅ¸â€��</span>
             Mostrando <strong className="text-purple-600 dark:text-purple-400">{receptorasFiltradas.length} receptoras</strong>
             {lotesSelecionados.size > 0 && ` de ${lotesSelecionados.size} lote(s) selecionado(s)`}
             {fornecedorFiltro && ` do fornecedor "${fornecedorFiltro}"`}
@@ -1945,7 +1945,7 @@ export default function ReceptorasDG() {
         </div>
       )}
 
-      {/* Barra de Busca e Ações em Massa */}
+      {/* Barra de Busca e AÃ§Ãµes em Massa */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 border border-gray-200 dark:border-gray-700">
         <div className="flex flex-col sm:flex-row gap-4 items-center">
           <div className="flex-1 w-full">
@@ -1955,7 +1955,7 @@ export default function ReceptorasDG() {
                 type="text"
                 value={termoBusca}
                 onChange={(e) => setTermoBusca(e.target.value)}
-                placeholder="🔍 Buscar por RG, série, nome, letra, número, fornecedor ou NF..."
+                placeholder="ðÅ¸â€�� Buscar por RG, sÃ©rie, nome, letra, nÃºmero, fornecedor ou NF..."
                 className="w-full px-4 py-3 pl-10 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all placeholder:text-gray-400"
               />
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1999,7 +1999,7 @@ export default function ReceptorasDG() {
                   onClick={() => setShowAcoesMassa(!showAcoesMassa)}
                   className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-all shadow-lg font-semibold"
                 >
-                  <span>⚡ Ações ({selecionadasCount})</span>
+                  <span>âÅ¡¡ AÃ§Ãµes ({selecionadasCount})</span>
                   <svg className={`h-4 w-4 transition-transform ${showAcoesMassa ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
@@ -2011,7 +2011,7 @@ export default function ReceptorasDG() {
                       onClick={marcarTodasComoPrenha}
                       className="w-full px-4 py-3 text-left hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors flex items-center gap-3 border-b border-gray-200 dark:border-gray-700"
                     >
-                      <span className="text-2xl">🤰</span>
+                      <span className="text-2xl">ðÅ¸¤°</span>
                       <div>
                         <div className="font-semibold text-gray-900 dark:text-white">Marcar como Prenha</div>
                         <div className="text-xs text-gray-500">Todas selecionadas</div>
@@ -2021,7 +2021,7 @@ export default function ReceptorasDG() {
                       onClick={marcarTodasComoVazia}
                       className="w-full px-4 py-3 text-left hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center gap-3 border-b border-gray-200 dark:border-gray-700"
                     >
-                      <span className="text-2xl">❌</span>
+                      <span className="text-2xl">â�Å’</span>
                       <div>
                         <div className="font-semibold text-gray-900 dark:text-white">Marcar como Vazia</div>
                         <div className="text-xs text-gray-500">Todas selecionadas</div>
@@ -2031,10 +2031,10 @@ export default function ReceptorasDG() {
                       onClick={desmarcarTodas}
                       className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-3"
                     >
-                      <span className="text-2xl">🔄</span>
+                      <span className="text-2xl">ðÅ¸â€�â€ž</span>
                       <div>
                         <div className="font-semibold text-gray-900 dark:text-white">Desmarcar Todas</div>
-                        <div className="text-xs text-gray-500">Limpar seleção</div>
+                        <div className="text-xs text-gray-500">Limpar seleÃ§Ã£o</div>
                       </div>
                     </button>
                   </div>
@@ -2097,7 +2097,7 @@ export default function ReceptorasDG() {
                   
                 </th>
                 <th className="px-2 py-2 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase w-12">
-                  Nº
+                  NÂº
                 </th>
                 <th className="px-2 py-2 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase w-12">
                   <div className="flex items-center gap-1">
@@ -2120,7 +2120,7 @@ export default function ReceptorasDG() {
                   Data DG
                 </th>
                 <th className="px-2 py-2 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase w-24">
-                  Veterinário
+                  VeterinÃ¡rio
                 </th>
                 <th className="px-2 py-2 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase w-12">
                   Dias
@@ -2132,13 +2132,13 @@ export default function ReceptorasDG() {
                   Resultado
                 </th>
                 <th className="px-2 py-2 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase w-32">
-                  Observações
+                  ObservaÃ§Ãµes
                 </th>
                 <th className="px-2 py-2 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase w-20">
                   Status
                 </th>
                 <th className="px-2 py-2 text-center text-xs font-bold text-gray-700 dark:text-gray-300 uppercase w-24">
-                  Ações
+                  AÃ§Ãµes
                 </th>
               </tr>
             </thead>
@@ -2147,7 +2147,7 @@ export default function ReceptorasDG() {
                 <tr>
                   <td colSpan="16" className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center gap-3">
-                      <span className="text-6xl">🔍</span>
+                      <span className="text-6xl">ðÅ¸â€��</span>
                       <p className="text-gray-500 dark:text-gray-400 text-lg font-medium">
                         {termoBusca ? `Nenhuma receptora encontrada para "${termoBusca}"` : 
                          receptoras.length === 0 ? 'Nenhuma receptora encontrada' : 'Nenhuma receptora neste lote'}
@@ -2191,8 +2191,8 @@ export default function ReceptorasDG() {
                     >
                       <td className="px-3 py-2">
                         {receptora.dataDG ? (
-                          <span className="text-xs font-semibold text-amber-600 dark:text-amber-400" title="Já possui DG - será ignorada no lançamento">
-                            ✓ DG
+                          <span className="text-xs font-semibold text-amber-600 dark:text-amber-400" title="JÃ¡ possui DG - serÃ¡ ignorada no lanÃ§amento">
+                            âÅ“â€œ DG
                           </span>
                         ) : (
                           <input
@@ -2209,7 +2209,7 @@ export default function ReceptorasDG() {
                           if (receptora.animalId) {
                             router.push(`/animals/${receptora.animalId}`)
                           } else {
-                            alert('⚠️ Animal não encontrado no cadastro')
+                            alert('âÅ¡ ï¸� Animal nÃ£o encontrado no cadastro')
                           }
                         }}
                         title="Clique para ver a ficha do animal"
@@ -2222,7 +2222,7 @@ export default function ReceptorasDG() {
                           if (receptora.animalId) {
                             router.push(`/animals/${receptora.animalId}`)
                           } else {
-                            alert('⚠️ Animal não encontrado no cadastro')
+                            alert('âÅ¡ ï¸� Animal nÃ£o encontrado no cadastro')
                           }
                         }}
                         title="Clique para ver a ficha do animal"
@@ -2235,7 +2235,7 @@ export default function ReceptorasDG() {
                           if (receptora.animalId) {
                             router.push(`/animals/${receptora.animalId}`)
                           } else {
-                            alert('⚠️ Animal não encontrado no cadastro')
+                            alert('âÅ¡ ï¸� Animal nÃ£o encontrado no cadastro')
                           }
                         }}
                         title="Clique para ver a ficha do animal"
@@ -2243,7 +2243,7 @@ export default function ReceptorasDG() {
                         <div className="flex items-center gap-1">
                           <span>{receptora.rg || '-'}</span>
                           {receptora.animalId && (
-                            <span className="opacity-0 group-hover:opacity-100 transition-opacity">👁️</span>
+                            <span className="opacity-0 group-hover:opacity-100 transition-opacity">ðÅ¸â€˜�ï¸�</span>
                           )}
                         </div>
                       </td>
@@ -2253,7 +2253,7 @@ export default function ReceptorasDG() {
                           if (receptora.animalId) {
                             router.push(`/animals/${receptora.animalId}`)
                           } else {
-                            alert('⚠️ Animal não encontrado no cadastro')
+                            alert('âÅ¡ ï¸� Animal nÃ£o encontrado no cadastro')
                           }
                         }}
                         title="Clique para ver a ficha do animal"
@@ -2294,9 +2294,9 @@ export default function ReceptorasDG() {
                             type="text"
                             value={veterinariosIndividuais[id] || ''}
                             onChange={(e) => setVeterinarioIndividual(id, e.target.value)}
-                            placeholder="Veterinário..."
+                            placeholder="VeterinÃ¡rio..."
                             className="w-full px-2 py-1 border-2 border-purple-300 rounded-lg text-xs bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:border-purple-500 focus:ring-2 focus:ring-purple-500"
-                            title="Veterinário responsável pelo DG"
+                            title="VeterinÃ¡rio responsÃ¡vel pelo DG"
                           />
                         ) : (
                           <span className="text-xs text-gray-600 dark:text-gray-400">
@@ -2327,8 +2327,8 @@ export default function ReceptorasDG() {
                               : 'border-gray-200 bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
                           }`}
                         >
-                          <option value="Prenha">🤰 Prenha</option>
-                          <option value="Vazia">❌ Vazia</option>
+                          <option value="Prenha">ðÅ¸¤° Prenha</option>
+                          <option value="Vazia">â�Å’ Vazia</option>
                         </select>
                       </td>
                       <td className="px-2 py-2">
@@ -2337,7 +2337,7 @@ export default function ReceptorasDG() {
                           value={observacao}
                           onChange={(e) => setObservacao(id, e.target.value)}
                           disabled={!isSelected}
-                          placeholder={isSelected ? "Observações..." : ""}
+                          placeholder={isSelected ? "ObservaÃ§Ãµes..." : ""}
                           className={`w-full px-2 py-1 border-2 rounded-lg text-xs transition-all ${
                             isSelected 
                               ? 'border-purple-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:border-purple-500 focus:ring-2 focus:ring-purple-500' 
@@ -2352,7 +2352,7 @@ export default function ReceptorasDG() {
                         {receptora.dataDG && (
                           <div className="mt-1 flex flex-col gap-0.5">
                             <span className="text-xs font-bold text-amber-600 dark:text-amber-400">
-                              ✓ Já com DG
+                              âÅ“â€œ JÃ¡ com DG
                             </span>
                             <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                               {new Date(receptora.dataDG).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
@@ -2372,18 +2372,18 @@ export default function ReceptorasDG() {
                             }`}
                             title={
                               !datasIndividuais[id] ? 'Preencha a data do DG' :
-                              !veterinariosIndividuais[id] ? 'Preencha o veterinário' :
+                              !veterinariosIndividuais[id] ? 'Preencha o veterinÃ¡rio' :
                               !resultados[id] ? 'Selecione o resultado (Prenha/Vazia)' :
                               saving ? 'Salvando...' :
                               'Salvar DG desta receptora'
                             }
                           >
-                            💾 Salvar
+                            ðÅ¸â€™¾ Salvar
                           </button>
                         )}
                         {receptora.dataDG && (
                           <span className="text-xs text-green-600 dark:text-green-400 font-bold">
-                            ✓ Salvo
+                            âÅ“â€œ Salvo
                           </span>
                         )}
                       </td>
@@ -2395,7 +2395,7 @@ export default function ReceptorasDG() {
           </table>
         </div>
 
-        {/* Paginação */}
+        {/* PaginaÃ§Ã£o */}
         {totalPaginas > 1 && (
           <div className="bg-gray-50 dark:bg-gray-700/50 px-6 py-4 border-t border-gray-200 dark:border-gray-600">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -2410,30 +2410,30 @@ export default function ReceptorasDG() {
                   onClick={() => setPaginaAtual(1)}
                   disabled={paginaAtual === 1}
                   className="px-3 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                  title="Primeira página"
+                  title="Primeira pÃ¡gina"
                 >
-                  «
+                  Â«
                 </button>
                 
                 <button
                   onClick={() => setPaginaAtual(prev => Math.max(1, prev - 1))}
                   disabled={paginaAtual === 1}
                   className="px-3 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                  title="Página anterior"
+                  title="PÃ¡gina anterior"
                 >
-                  ‹
+                  ââ‚¬¹
                 </button>
 
                 <div className="flex items-center gap-1">
                   {Array.from({ length: totalPaginas }, (_, i) => i + 1)
                     .filter(num => {
-                      // Mostrar primeira, última, atual e adjacentes
+                      // Mostrar primeira, Ãºltima, atual e adjacentes
                       return num === 1 || 
                              num === totalPaginas || 
                              (num >= paginaAtual - 1 && num <= paginaAtual + 1)
                     })
                     .map((num, idx, arr) => {
-                      // Adicionar "..." entre números não consecutivos
+                      // Adicionar "..." entre nÃºmeros nÃ£o consecutivos
                       const showEllipsis = idx > 0 && num - arr[idx - 1] > 1
                       return (
                         <div key={num} className="flex items-center gap-1">
@@ -2459,18 +2459,18 @@ export default function ReceptorasDG() {
                   onClick={() => setPaginaAtual(prev => Math.min(totalPaginas, prev + 1))}
                   disabled={paginaAtual === totalPaginas}
                   className="px-3 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                  title="Próxima página"
+                  title="PrÃ³xima pÃ¡gina"
                 >
-                  ›
+                  ââ‚¬º
                 </button>
                 
                 <button
                   onClick={() => setPaginaAtual(totalPaginas)}
                   disabled={paginaAtual === totalPaginas}
                   className="px-3 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                  title="Última página"
+                  title="ÃÅ¡ltima pÃ¡gina"
                 >
-                  »
+                  Â»
                 </button>
               </div>
             </div>
@@ -2479,17 +2479,17 @@ export default function ReceptorasDG() {
       </div>
       )}
 
-      {/* Modal Detalhes dos Erros do Lançamento */}
+      {/* Modal Detalhes dos Erros do LanÃ§amento */}
       {errosDetalhes && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] flex flex-col border-2 border-red-200 dark:border-red-800">
             <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-3">
                 <div className="bg-red-100 dark:bg-red-900/30 p-2 rounded-xl">
-                  <span className="text-2xl">⚠️</span>
+                  <span className="text-2xl">âÅ¡ ï¸�</span>
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                  Erros do Lançamento ({errosDetalhes.total})
+                  Erros do LanÃ§amento ({errosDetalhes.total})
                 </h3>
               </div>
               <button 
@@ -2501,7 +2501,7 @@ export default function ReceptorasDG() {
             </div>
             <div className="p-4 overflow-y-auto flex-1">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                Receptoras que não puderam ser atualizadas e o motivo:
+                Receptoras que nÃ£o puderam ser atualizadas e o motivo:
               </p>
               <div className="space-y-2">
                 {errosDetalhes.lista.map((item, idx) => (
@@ -2547,7 +2547,7 @@ export default function ReceptorasDG() {
             </div>
             
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
-              📋 Selecione as colunas que deseja incluir no relatório:
+              ðÅ¸â€œâ€¹ Selecione as colunas que deseja incluir no relatÃ³rio:
             </p>
             
             <div className="space-y-2 max-h-72 overflow-y-auto pr-2 custom-scrollbar">
@@ -2572,13 +2572,13 @@ export default function ReceptorasDG() {
                 onClick={() => selecionarTodasColunas(true)} 
                 className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-semibold hover:underline"
               >
-                ✅ Todas
+                âÅ“â€¦ Todas
               </button>
               <button 
                 onClick={() => selecionarTodasColunas(false)} 
                 className="text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-semibold hover:underline"
               >
-                ❌ Nenhuma
+                â�Å’ Nenhuma
               </button>
             </div>
             
@@ -2594,7 +2594,7 @@ export default function ReceptorasDG() {
                 disabled={!Object.values(colunasSelecionadas).some(v => v)} 
                 className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
               >
-                📥 Exportar
+                ðÅ¸â€œ¥ Exportar
               </button>
             </div>
           </div>

@@ -3,7 +3,7 @@ import { query } from '../../../lib/database';
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     try {
-      console.log('🔄 Iniciando sincronização das tabelas de sêmen...');
+      console.log('ðÅ¸â€�â€ž Iniciando sincronizaÃ§Ã£o das tabelas de sÃªmen...');
       
       // Buscar todos os dados da tabela entradas_semen
       const entradasResult = await query('SELECT * FROM entradas_semen ORDER BY id');
@@ -12,8 +12,8 @@ export default async function handler(req, res) {
       let skipped = 0;
       let deleted = 0;
       
-      // Primeiro, vamos marcar registros que foram excluídos pelo usuário
-      // Criar uma tabela temporária para rastrear exclusões se não existir
+      // Primeiro, vamos marcar registros que foram excluÃ­dos pelo usuÃ¡rio
+      // Criar uma tabela temporÃ¡ria para rastrear exclusÃµes se nÃ£o existir
       await query(`
         CREATE TABLE IF NOT EXISTS semen_exclusoes (
           id SERIAL PRIMARY KEY,
@@ -25,8 +25,8 @@ export default async function handler(req, res) {
         )
       `);
       
-      // Verificar quais registros da entradas_semen não existem mais no estoque_semen
-      // mas não estão marcados como excluídos
+      // Verificar quais registros da entradas_semen nÃ£o existem mais no estoque_semen
+      // mas nÃ£o estÃ£o marcados como excluÃ­dos
       for (const entrada of entradasResult.rows) {
         const existsResult = await query(`
           SELECT id FROM estoque_semen 
@@ -38,7 +38,7 @@ export default async function handler(req, res) {
           continue;
         }
         
-        // Verificar se foi excluído pelo usuário
+        // Verificar se foi excluÃ­do pelo usuÃ¡rio
         const deletedResult = await query(`
           SELECT id FROM semen_exclusoes 
           WHERE nome_touro = $1 AND raca = $2 AND fornecedor = $3
@@ -83,7 +83,7 @@ export default async function handler(req, res) {
       
       res.status(200).json({
         success: true,
-        message: 'Sincronização concluída com sucesso',
+        message: 'SincronizaÃ§Ã£o concluÃ­da com sucesso',
         migrated,
         skipped,
         deleted,
@@ -91,10 +91,10 @@ export default async function handler(req, res) {
       });
       
     } catch (error) {
-      console.error('Erro na sincronização:', error);
+      console.error('Erro na sincronizaÃ§Ã£o:', error);
       res.status(500).json({ 
         success: false,
-        message: 'Erro ao sincronizar tabelas de sêmen', 
+        message: 'Erro ao sincronizar tabelas de sÃªmen', 
         error: error.message 
       });
     }

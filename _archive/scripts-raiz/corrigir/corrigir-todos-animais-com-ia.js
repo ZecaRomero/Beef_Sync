@@ -16,10 +16,10 @@ async function corrigir() {
   try {
     await client.query('BEGIN')
     
-    console.log('🔧 Corrigindo TODOS os animais com inseminações...\n')
+    console.log('�Ÿ”� Corrigindo TODOS os animais com inseminações...\n')
     
     // 1. Buscar todos os animais que têm inseminações mas não têm resultado_dg
-    console.log('📋 1. Buscando animais com inseminações sem resultado_dg...')
+    console.log('�Ÿ“‹ 1. Buscando animais com inseminações sem resultado_dg...')
     const animaisSemDG = await client.query(`
       SELECT DISTINCT a.id, a.serie, a.rg, a.nome, a.resultado_dg, a.data_te
       FROM animais a
@@ -28,16 +28,16 @@ async function corrigir() {
       ORDER BY a.serie, a.rg
     `)
     
-    console.log(`   📊 Encontrados ${animaisSemDG.rows.length} animais`)
+    console.log(`   �Ÿ“Š Encontrados ${animaisSemDG.rows.length} animais`)
     
     if (animaisSemDG.rows.length === 0) {
-      console.log('\n✅ Todos os animais com IA já têm resultado_dg!')
+      console.log('\n�œ… Todos os animais com IA já têm resultado_dg!')
       await client.query('COMMIT')
       return
     }
     
     // 2. Para cada animal, buscar a IA mais recente e atualizar
-    console.log('\n📅 2. Atualizando resultado_dg e data_te...')
+    console.log('\n�Ÿ“… 2. Atualizando resultado_dg e data_te...')
     let atualizados = 0
     let prenhas = 0
     let vazias = 0
@@ -71,10 +71,10 @@ async function corrigir() {
         
         if (status === 'Prenha') {
           prenhas++
-          console.log(`   ✅ ${animal.serie}-${animal.rg}: Prenha (${new Date(dataIA).toLocaleDateString('pt-BR')})`)
+          console.log(`   �œ… ${animal.serie}-${animal.rg}: Prenha (${new Date(dataIA).toLocaleDateString('pt-BR')})`)
         } else if (status === 'Vazia') {
           vazias++
-          console.log(`   ⚪ ${animal.serie}-${animal.rg}: Vazia (${new Date(dataIA).toLocaleDateString('pt-BR')})`)
+          console.log(`   �š� ${animal.serie}-${animal.rg}: Vazia (${new Date(dataIA).toLocaleDateString('pt-BR')})`)
         } else {
           pendentes++
           console.log(`   ⏳ ${animal.serie}-${animal.rg}: Pendente (${new Date(dataIA).toLocaleDateString('pt-BR')})`)
@@ -82,14 +82,14 @@ async function corrigir() {
       }
     }
     
-    console.log(`\n📊 RESUMO:`)
+    console.log(`\n�Ÿ“Š RESUMO:`)
     console.log(`   Total atualizado: ${atualizados} animais`)
     console.log(`   Prenhas: ${prenhas}`)
     console.log(`   Vazias: ${vazias}`)
     console.log(`   Pendentes: ${pendentes}`)
     
     // 3. Verificar resultado final
-    console.log('\n📊 3. Verificando resultado final...')
+    console.log('\n�Ÿ“Š 3. Verificando resultado final...')
     const verificacao = await client.query(`
       SELECT 
         COUNT(*) as total_animais_com_ia,
@@ -105,12 +105,12 @@ async function corrigir() {
     console.log(`   Com data_te: ${v.com_data_te}`)
     
     await client.query('COMMIT')
-    console.log('\n✅ Correção concluída com sucesso!')
-    console.log('\n💡 Agora TODAS as fichas de animais com IA devem exibir as informações de reprodução!')
+    console.log('\n�œ… Correção concluída com sucesso!')
+    console.log('\n�Ÿ’� Agora TODAS as fichas de animais com IA devem exibir as informações de reprodução!')
     
   } catch (error) {
     await client.query('ROLLBACK')
-    console.error('\n❌ Erro:', error.message)
+    console.error('\n�Œ Erro:', error.message)
     throw error
   } finally {
     client.release()

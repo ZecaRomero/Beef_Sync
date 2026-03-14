@@ -9,7 +9,7 @@ import {
 import { criarLoteManual } from '../../../utils/loteMiddleware'
 
 export default asyncHandler(async function handler(req, res) {
-  // Aumentar timeout da conexão se possível
+  // Aumentar timeout da conexÃ£o se possÃ­vel
   req.setTimeout && req.setTimeout(300000); // 5 minutos
 
   if (req.method !== 'POST') {
@@ -18,96 +18,96 @@ export default asyncHandler(async function handler(req, res) {
 
   const { animais, usuario = 'sistema' } = req.body
 
-  console.log(`📥 Recebido pedido de atualização em lote para ${animais?.length} animais`)
+  console.log(`ðÅ¸â€œ¥ Recebido pedido de atualizaÃ§Ã£o em lote para ${animais?.length} animais`)
 
   if (!animais || !Array.isArray(animais) || animais.length === 0) {
-    return sendValidationError(res, 'Lista de animais é obrigatória e deve conter pelo menos um animal')
+    return sendValidationError(res, 'Lista de animais Ã© obrigatÃ³ria e deve conter pelo menos um animal')
   }
 
-  // Função auxiliar para sanitizar RG
+  // FunÃ§Ã£o auxiliar para sanitizar RG
   const sanitizarRG = (rg) => {
     if (!rg) return null
     
-    // Converter para string e remover espaços extras
+    // Converter para string e remover espaÃ§os extras
     let rgLimpo = String(rg).trim()
     
-    // Remover espaços múltiplos (manter apenas espaços simples)
+    // Remover espaÃ§os mÃºltiplos (manter apenas espaÃ§os simples)
     rgLimpo = rgLimpo.replace(/\s+/g, ' ')
     
-    // Limitar tamanho máximo a 20 caracteres
+    // Limitar tamanho mÃ¡ximo a 20 caracteres
     if (rgLimpo.length > 20) {
-      console.warn(`⚠️ RG muito longo (${rgLimpo.length} caracteres), truncando para 20: ${rgLimpo}`)
+      console.warn(`âÅ¡ ï¸� RG muito longo (${rgLimpo.length} caracteres), truncando para 20: ${rgLimpo}`)
       rgLimpo = rgLimpo.substring(0, 20)
     }
     
     return rgLimpo
   }
 
-  // Função auxiliar para sanitizar Série
+  // FunÃ§Ã£o auxiliar para sanitizar SÃ©rie
   const sanitizarSerie = (serie) => {
     if (!serie) return null
     
-    // Converter para string e remover espaços extras
+    // Converter para string e remover espaÃ§os extras
     let serieLimpa = String(serie).trim()
     
-    // Remover espaços múltiplos
+    // Remover espaÃ§os mÃºltiplos
     serieLimpa = serieLimpa.replace(/\s+/g, ' ')
     
-    // Limitar tamanho máximo a 10 caracteres
+    // Limitar tamanho mÃ¡ximo a 10 caracteres
     if (serieLimpa.length > 10) {
-      console.warn(`⚠️ Série muito longa (${serieLimpa.length} caracteres), truncando para 10: ${serieLimpa}`)
+      console.warn(`âÅ¡ ï¸� SÃ©rie muito longa (${serieLimpa.length} caracteres), truncando para 10: ${serieLimpa}`)
       serieLimpa = serieLimpa.substring(0, 10)
     }
     
     return serieLimpa
   }
 
-  // Função auxiliar para sanitizar Nome (preserva o valor do Excel para busca no mobile)
+  // FunÃ§Ã£o auxiliar para sanitizar Nome (preserva o valor do Excel para busca no mobile)
   const sanitizarNome = (nome) => {
     if (nome === undefined || nome === null) return null
     const s = String(nome).trim()
     if (!s) return null
     // Limitar a 100 caracteres (VARCHAR na tabela animais)
     if (s.length > 100) {
-      console.warn(`⚠️ Nome muito longo (${s.length} caracteres), truncando: ${s.substring(0, 30)}...`)
+      console.warn(`âÅ¡ ï¸� Nome muito longo (${s.length} caracteres), truncando: ${s.substring(0, 30)}...`)
       return s.substring(0, 100)
     }
     return s
   }
 
-  // Validar e sanitizar cada animal - Série e RG são sempre obrigatórios
-  // Sexo e raça são obrigatórios apenas para animais novos (não para atualizações parciais)
+  // Validar e sanitizar cada animal - SÃ©rie e RG sÃ£o sempre obrigatÃ³rios
+  // Sexo e raÃ§a sÃ£o obrigatÃ³rios apenas para animais novos (nÃ£o para atualizaÃ§Ãµes parciais)
   for (let i = 0; i < animais.length; i++) {
     const animal = animais[i]
     
-    // Sanitizar série, RG e nome
+    // Sanitizar sÃ©rie, RG e nome
     animal.serie = sanitizarSerie(animal.serie)
     animal.rg = sanitizarRG(animal.rg)
     if (animal.nome !== undefined && animal.nome !== null) {
       animal.nome = sanitizarNome(animal.nome)
     }
     
-    // Validar que série e RG existem e não são vazios
+    // Validar que sÃ©rie e RG existem e nÃ£o sÃ£o vazios
     if (!animal.serie || !animal.rg) {
-      console.error(`❌ Animal ${i + 1} inválido:`, animal)
-      return sendValidationError(res, `Animal ${i + 1}: Série e RG são obrigatórios`, {
+      console.error(`â�Å’ Animal ${i + 1} invÃ¡lido:`, animal)
+      return sendValidationError(res, `Animal ${i + 1}: SÃ©rie e RG sÃ£o obrigatÃ³rios`, {
         required: ['serie', 'rg'],
         animal_index: i + 1,
         animal_recebido: animal
       })
     }
     
-    // Validar que série e RG não contêm apenas espaços
+    // Validar que sÃ©rie e RG nÃ£o contÃªm apenas espaÃ§os
     if (animal.serie.trim() === '' || animal.rg.trim() === '') {
-      console.error(`❌ Animal ${i + 1} com série ou RG vazio:`, animal)
-      return sendValidationError(res, `Animal ${i + 1}: Série e RG não podem ser vazios`, {
+      console.error(`â�Å’ Animal ${i + 1} com sÃ©rie ou RG vazio:`, animal)
+      return sendValidationError(res, `Animal ${i + 1}: SÃ©rie e RG nÃ£o podem ser vazios`, {
         required: ['serie', 'rg'],
         animal_index: i + 1
       })
     }
     
     // Log do animal sanitizado
-    console.log(`✅ Animal ${i + 1} validado: ${animal.serie}-${animal.rg}`)
+    console.log(`âÅ“â€¦ Animal ${i + 1} validado: ${animal.serie}-${animal.rg}`)
   }
 
   let lote = null
@@ -122,11 +122,11 @@ export default asyncHandler(async function handler(req, res) {
   const client = await pool.connect()
 
   try {
-    // NÃO usar transação para permitir que cada animal seja salvo individualmente
-    // Se um animal falhar, os outros ainda serão salvos
-    console.log('🚀 Iniciando processamento sem transação (commits individuais)')
+    // NÃÆ’O usar transaÃ§Ã£o para permitir que cada animal seja salvo individualmente
+    // Se um animal falhar, os outros ainda serÃ£o salvos
+    console.log('ðÅ¸Å¡â‚¬ Iniciando processamento sem transaÃ§Ã£o (commits individuais)')
 
-    // Criar lote ANTES de processar os animais (fora da transação)
+    // Criar lote ANTES de processar os animais (fora da transaÃ§Ã£o)
     try {
       lote = await criarLoteManual({
         tipo_operacao: 'CADASTRO_ANIMAIS',
@@ -142,19 +142,19 @@ export default asyncHandler(async function handler(req, res) {
         modulo: 'ANIMAIS',
         req
       })
-      console.log(`🚀 Iniciando processamento do lote ${lote.numero_lote} com ${animais.length} animais`)
+      console.log(`ðÅ¸Å¡â‚¬ Iniciando processamento do lote ${lote.numero_lote} com ${animais.length} animais`)
     } catch (loteError) {
-      console.error('❌ Erro ao criar lote:', loteError)
-      console.error('📋 Stack do erro de lote:', loteError.stack)
-      // Fallback para lote fictício se falhar - não bloquear o processamento
+      console.error('â�Å’ Erro ao criar lote:', loteError)
+      console.error('ðÅ¸â€œâ€¹ Stack do erro de lote:', loteError.stack)
+      // Fallback para lote fictÃ­cio se falhar - nÃ£o bloquear o processamento
       lote = { numero_lote: 'LOTE-MANUAL-' + Date.now() }
-      console.log(`⚠️ Usando lote temporário: ${lote.numero_lote}`)
+      console.log(`âÅ¡ ï¸� Usando lote temporÃ¡rio: ${lote.numero_lote}`)
     }
 
     // Contar total de animais ANTES de processar qualquer um
     const totalAntes = await client.query('SELECT COUNT(*) as total FROM animais')
     const totalAntesNum = parseInt(totalAntes.rows[0].total, 10)
-    console.log(`📊 Total de animais ANTES da importação: ${totalAntesNum}`)
+    console.log(`ðÅ¸â€œÅ  Total de animais ANTES da importaÃ§Ã£o: ${totalAntesNum}`)
 
     // Processar cada animal
     for (let i = 0; i < animais.length; i++) {
@@ -166,37 +166,37 @@ export default asyncHandler(async function handler(req, res) {
         let sexoNormalizado = animalData.sexo
         if (sexoNormalizado) {
           sexoNormalizado = sexoNormalizado.toString().trim()
-          // Converter diferentes formatos para o padrão do banco
+          // Converter diferentes formatos para o padrÃ£o do banco
           if (sexoNormalizado === 'M' || sexoNormalizado.toUpperCase() === 'MACHO') {
             sexoNormalizado = 'Macho'
-          } else if (sexoNormalizado === 'F' || sexoNormalizado.toUpperCase() === 'FEMEA' || sexoNormalizado.toUpperCase() === 'FÊMEA') {
-            sexoNormalizado = 'Fêmea'
+          } else if (sexoNormalizado === 'F' || sexoNormalizado.toUpperCase() === 'FEMEA' || sexoNormalizado.toUpperCase() === 'FÃÅ MEA') {
+            sexoNormalizado = 'FÃªmea'
           }
         }
 
-        // Verificar se animal já existe (serie + rg único)
+        // Verificar se animal jÃ¡ existe (serie + rg Ãºnico)
         const checkExisting = await client.query(
           'SELECT id FROM animais WHERE serie = $1 AND rg = $2',
           [animalData.serie, animalData.rg]
         )
 
         if (checkExisting.rows.length > 0) {
-          // Animal já existe - atualizar ao invés de inserir
+          // Animal jÃ¡ existe - atualizar ao invÃ©s de inserir
           const existingId = checkExisting.rows[0].id
-          console.log(`⚠️ Animal ${animalData.serie}-${animalData.rg} já existe (ID: ${existingId}), atualizando...`)
+          console.log(`âÅ¡ ï¸� Animal ${animalData.serie}-${animalData.rg} jÃ¡ existe (ID: ${existingId}), atualizando...`)
           
-          // Buscar dados existentes do animal para preservar campos não fornecidos
+          // Buscar dados existentes do animal para preservar campos nÃ£o fornecidos
           const existingAnimal = await client.query(
             'SELECT * FROM animais WHERE id = $1',
             [existingId]
           )
           
           if (!existingAnimal.rows || existingAnimal.rows.length === 0) {
-            console.error(`❌ Animal existente não encontrado no banco (ID: ${existingId}). Pulando atualização.`)
+            console.error(`â�Å’ Animal existente nÃ£o encontrado no banco (ID: ${existingId}). Pulando atualizaÃ§Ã£o.`)
             resultados.erros.push({
               index: i + 1,
               brinco: `${animalData.serie}-${animalData.rg}`,
-              erro: `Animal já existe mas não foi possível buscar dados existentes (ID: ${existingId})`,
+              erro: `Animal jÃ¡ existe mas nÃ£o foi possÃ­vel buscar dados existentes (ID: ${existingId})`,
               codigo_erro: 'FETCH_ERROR',
               animal_id: existingId
             })
@@ -206,17 +206,17 @@ export default asyncHandler(async function handler(req, res) {
           
           const animalExistente = existingAnimal.rows[0]
           
-          // Não contar como sucesso de importação se já existia
-          // O objetivo da importação é ADICIONAR novos animais, não atualizar existentes
+          // NÃ£o contar como sucesso de importaÃ§Ã£o se jÃ¡ existia
+          // O objetivo da importaÃ§Ã£o Ã© ADICIONAR novos animais, nÃ£o atualizar existentes
           
-          // Validar e sanitizar campo meses para UPDATE também
+          // Validar e sanitizar campo meses para UPDATE tambÃ©m
           let mesesSanitizado = null
           if (animalData.meses !== null && animalData.meses !== undefined) {
             const mesesValue = parseInt(animalData.meses, 10)
             if (!isNaN(mesesValue) && mesesValue >= 0 && mesesValue <= 9999) {
               mesesSanitizado = mesesValue
             } else {
-              console.warn(`⚠️ Valor inválido para meses: ${animalData.meses}. Animal ${animalData.serie}-${animalData.rg}`)
+              console.warn(`âÅ¡ ï¸� Valor invÃ¡lido para meses: ${animalData.meses}. Animal ${animalData.serie}-${animalData.rg}`)
               mesesSanitizado = null
             }
           }
@@ -239,21 +239,21 @@ export default asyncHandler(async function handler(req, res) {
             }
           }
 
-          // Função auxiliar para verificar se um valor foi fornecido (não é undefined, null ou string vazia)
+          // FunÃ§Ã£o auxiliar para verificar se um valor foi fornecido (nÃ£o Ã© undefined, null ou string vazia)
           const foiFornecido = (valor) => {
             return valor !== undefined && valor !== null && valor !== ''
           }
 
-          // Função auxiliar para verificar se campo está vazio no banco
+          // FunÃ§Ã£o auxiliar para verificar se campo estÃ¡ vazio no banco
           const estaVazio = (valor) => {
             return valor === null || valor === undefined || valor === '' || (typeof valor === 'string' && valor.trim() === '')
           }
 
-          // Atualização inteligente: só preencher campos vazios se a flag estiver ativa
+          // AtualizaÃ§Ã£o inteligente: sÃ³ preencher campos vazios se a flag estiver ativa
           const atualizarApenasVazios = animalData.atualizarApenasVazios === true
 
           // Log para debug - campos de genealogia recebidos
-          console.log(`🔍 Animal ${animalData.serie}-${animalData.rg} - Campos recebidos:`, {
+          console.log(`ðÅ¸â€�� Animal ${animalData.serie}-${animalData.rg} - Campos recebidos:`, {
             pai: animalData.pai,
             mae: animalData.mae,
             receptora: animalData.receptora,
@@ -266,7 +266,7 @@ export default asyncHandler(async function handler(req, res) {
           })
 
           // Usar COALESCE para preservar valores existentes quando o novo valor for null/undefined/vazio
-          // Se atualizarApenasVazios estiver ativo, só atualizar campos que estão vazios no banco
+          // Se atualizarApenasVazios estiver ativo, sÃ³ atualizar campos que estÃ£o vazios no banco
           const dadosAnimal = {
             nome: atualizarApenasVazios 
               ? (foiFornecido(animalData.nome) && estaVazio(animalExistente.nome) ? animalData.nome : animalExistente.nome)
@@ -323,7 +323,7 @@ export default asyncHandler(async function handler(req, res) {
               ? (foiFornecido(animalData.situacao) && estaVazio(animalExistente.situacao) ? animalData.situacao : animalExistente.situacao)
               : (animalData.situacao || animalExistente.situacao || 'Ativo'),
             // Campos de genealogia: SEMPRE atualizar se fornecidos, mesmo em modo atualizarApenasVazios
-            // Estes campos são críticos e devem ser atualizados quando fornecidos
+            // Estes campos sÃ£o crÃ­ticos e devem ser atualizados quando fornecidos
             pai: foiFornecido(animalData.pai) ? animalData.pai : animalExistente.pai,
             mae: foiFornecido(animalData.mae) ? animalData.mae : animalExistente.mae,
             avo_materno: foiFornecido(animalData.avoMaterno || animalData.avo_materno)
@@ -368,7 +368,7 @@ export default asyncHandler(async function handler(req, res) {
           ]
 
           // Log antes de atualizar
-          console.log(`💾 Atualizando animal ${animalData.serie}-${animalData.rg} com dados:`, {
+          console.log(`ðÅ¸â€™¾ Atualizando animal ${animalData.serie}-${animalData.rg} com dados:`, {
             pai: dadosAnimal.pai,
             mae: dadosAnimal.mae,
             receptora: dadosAnimal.receptora
@@ -377,25 +377,25 @@ export default asyncHandler(async function handler(req, res) {
           const updateResult = await client.query(updateQuery, updateValues)
           const animal = updateResult.rows[0]
           
-          // Log após atualizar
-          console.log(`✅ Animal ${animalData.serie}-${animalData.rg} atualizado. Valores salvos:`, {
+          // Log apÃ³s atualizar
+          console.log(`âÅ“â€¦ Animal ${animalData.serie}-${animalData.rg} atualizado. Valores salvos:`, {
             pai: animal.pai,
             mae: animal.mae,
             receptora: animal.receptora
           })
           
-          // Contar atualizações bem-sucedidas como sucessos (não erros)
-          // Importação parcial (atualização de campos específicos) também é um sucesso
+          // Contar atualizaÃ§Ãµes bem-sucedidas como sucessos (nÃ£o erros)
+          // ImportaÃ§Ã£o parcial (atualizaÃ§Ã£o de campos especÃ­ficos) tambÃ©m Ã© um sucesso
           resultados.sucessos.push({
             index: i + 1,
             brinco: `${animalData.serie}-${animalData.rg}`,
             animal_id: existingId,
-            tipo: 'atualizado', // Indica que foi atualização, não inserção
+            tipo: 'atualizado', // Indica que foi atualizaÃ§Ã£o, nÃ£o inserÃ§Ã£o
             mensagem: `Animal atualizado com sucesso (ID: ${existingId})`
           })
           resultados.total_sucessos++
 
-          console.log(`✅ Animal ${i + 1}/${animais.length} atualizado com sucesso: ${animal.serie}-${animal.rg} (ID: ${existingId})`)
+          console.log(`âÅ“â€¦ Animal ${i + 1}/${animais.length} atualizado com sucesso: ${animal.serie}-${animal.rg} (ID: ${existingId})`)
           continue
         }
 
@@ -406,7 +406,7 @@ export default asyncHandler(async function handler(req, res) {
           if (!isNaN(mesesValue) && mesesValue >= 0 && mesesValue <= 9999) {
             mesesSanitizado = mesesValue
           } else {
-            console.warn(`⚠️ Valor inválido para meses: ${animalData.meses}. Animal ${animalData.serie}-${animalData.rg}`)
+            console.warn(`âÅ¡ ï¸� Valor invÃ¡lido para meses: ${animalData.meses}. Animal ${animalData.serie}-${animalData.rg}`)
             mesesSanitizado = null
           }
         }
@@ -429,15 +429,15 @@ export default asyncHandler(async function handler(req, res) {
           }
         }
 
-        // Mapear dados do formulário para o formato do banco
-        // Usar valores padrão se não fornecidos para animais novos
+        // Mapear dados do formulÃ¡rio para o formato do banco
+        // Usar valores padrÃ£o se nÃ£o fornecidos para animais novos
         const dadosAnimal = {
           nome: animalData.nome || null,
           serie: animalData.serie,
           rg: animalData.rg,
           tatuagem: animalData.tatuagem || null,
-          sexo: sexoNormalizado || 'Macho', // Padrão se não fornecido
-          raca: animalData.raca || 'Nelore', // Padrão se não fornecido
+          sexo: sexoNormalizado || 'Macho', // PadrÃ£o se nÃ£o fornecido
+          raca: animalData.raca || 'Nelore', // PadrÃ£o se nÃ£o fornecido
           data_nascimento: animalData.dataNascimento || animalData.data_nascimento || null,
           hora_nascimento: animalData.horaNascimento || animalData.hora_nascimento || null,
           peso: pesoSanitizado,
@@ -502,8 +502,8 @@ export default asyncHandler(async function handler(req, res) {
           dadosAnimal.observacoes
         ]
 
-        console.log(`🔄 Tentando inserir animal ${i + 1}/${animais.length}: ${animalData.serie}-${animalData.rg}`)
-        console.log(`📋 Dados preparados:`, JSON.stringify({
+        console.log(`ðÅ¸â€�â€ž Tentando inserir animal ${i + 1}/${animais.length}: ${animalData.serie}-${animalData.rg}`)
+        console.log(`ðÅ¸â€œâ€¹ Dados preparados:`, JSON.stringify({
           serie: dadosAnimal.serie,
           rg: dadosAnimal.rg,
           sexo: dadosAnimal.sexo,
@@ -513,25 +513,25 @@ export default asyncHandler(async function handler(req, res) {
         }))
         
         // Log da query e valores para debug
-        console.log(`📝 Query INSERT com ${values.length} valores`)
-        console.log(`🔍 Valores: [${values.slice(0, 5).map(v => JSON.stringify(v)).join(', ')}...]`)
+        console.log(`ðÅ¸â€œ� Query INSERT com ${values.length} valores`)
+        console.log(`ðÅ¸â€�� Valores: [${values.slice(0, 5).map(v => JSON.stringify(v)).join(', ')}...]`)
         
         // Executar INSERT
-        console.log(`📝 Executando INSERT para ${animalData.serie}-${animalData.rg}...`)
+        console.log(`ðÅ¸â€œ� Executando INSERT para ${animalData.serie}-${animalData.rg}...`)
         const result = await client.query(query, values)
         
         if (!result || !result.rows || result.rows.length === 0) {
-          throw new Error('INSERT não retornou dados. Animal não foi criado.')
+          throw new Error('INSERT nÃ£o retornou dados. Animal nÃ£o foi criado.')
         }
         
         const animal = result.rows[0]
         
         if (!animal || !animal.id) {
-          throw new Error('INSERT retornou dados inválidos. Animal não tem ID.')
+          throw new Error('INSERT retornou dados invÃ¡lidos. Animal nÃ£o tem ID.')
         }
         
-        console.log(`✅ INSERT executado! Animal criado com ID: ${animal.id}`)
-        console.log(`📊 Animal retornado pelo banco:`, JSON.stringify({
+        console.log(`âÅ“â€¦ INSERT executado! Animal criado com ID: ${animal.id}`)
+        console.log(`ðÅ¸â€œÅ  Animal retornado pelo banco:`, JSON.stringify({
           id: animal.id,
           serie: animal.serie,
           rg: animal.rg,
@@ -546,11 +546,11 @@ export default asyncHandler(async function handler(req, res) {
         )
         
         if (verificarAposInsert.rows.length === 0) {
-          console.error(`❌ ERRO CRÍTICO: Animal ${animal.id} não encontrado imediatamente após INSERT!`)
-          throw new Error(`Animal inserido mas não encontrado no banco (ID: ${animal.id})`)
+          console.error(`â�Å’ ERRO CRÃ�TICO: Animal ${animal.id} nÃ£o encontrado imediatamente apÃ³s INSERT!`)
+          throw new Error(`Animal inserido mas nÃ£o encontrado no banco (ID: ${animal.id})`)
         } else {
           const encontrado = verificarAposInsert.rows[0]
-          console.log(`✅ Confirmado: Animal ${encontrado.id} (${encontrado.serie}-${encontrado.rg}) encontrado no banco`)
+          console.log(`âÅ“â€¦ Confirmado: Animal ${encontrado.id} (${encontrado.serie}-${encontrado.rg}) encontrado no banco`)
         }
         
         resultados.sucessos.push({
@@ -562,7 +562,7 @@ export default asyncHandler(async function handler(req, res) {
         })
         resultados.total_sucessos++
 
-        console.log(`✅ Animal ${i + 1}/${animais.length} CRIADO COM SUCESSO: ${animal.serie}-${animal.rg} (ID: ${animal.id})`)
+        console.log(`âÅ“â€¦ Animal ${i + 1}/${animais.length} CRIADO COM SUCESSO: ${animal.serie}-${animal.rg} (ID: ${animal.id})`)
 
       } catch (error) {
         resultados.erros.push({
@@ -579,10 +579,10 @@ export default asyncHandler(async function handler(req, res) {
         })
         resultados.total_erros++
 
-        console.error(`❌ Erro no animal ${i + 1}/${animais.length} (${animalData.serie}-${animalData.rg}):`)
+        console.error(`â�Å’ Erro no animal ${i + 1}/${animais.length} (${animalData.serie}-${animalData.rg}):`)
         console.error(`   Mensagem: ${error.message}`)
-        console.error(`   Código: ${error.code}`)
-        console.error(`   Posição: ${error.position}`)
+        console.error(`   CÃ³digo: ${error.code}`)
+        console.error(`   PosiÃ§Ã£o: ${error.position}`)
         console.error(`   Detalhe: ${error.detail}`)
         console.error(`   Dica: ${error.hint}`)
         console.error(`   Stack: ${error.stack}`)
@@ -596,16 +596,16 @@ export default asyncHandler(async function handler(req, res) {
       console.error(`Erro ao atualizar lote: ${updateError.message}`)
     }
 
-    // Cada INSERT já foi commitado automaticamente (sem transação)
+    // Cada INSERT jÃ¡ foi commitado automaticamente (sem transaÃ§Ã£o)
     // Aguardar um pouco para garantir que todos os commits foram finalizados
     await new Promise(resolve => setTimeout(resolve, 100))
     
-    // Contar total de animais DEPOIS da importação
+    // Contar total de animais DEPOIS da importaÃ§Ã£o
     const totalDepois = await client.query('SELECT COUNT(*) as total FROM animais')
     const totalDepoisNum = parseInt(totalDepois.rows[0].total, 10)
     const diferenca = totalDepoisNum - totalAntesNum
     
-    // Verificar quantos animais realmente foram salvos verificando os RGs específicos
+    // Verificar quantos animais realmente foram salvos verificando os RGs especÃ­ficos
     const rgsParaVerificar = animais.map(a => a.rg.toString())
     const seriesParaVerificar = [...new Set(animais.map(a => a.serie))]
     
@@ -620,22 +620,22 @@ export default asyncHandler(async function handler(req, res) {
       )
       totalNoBanco += parseInt(verificarCount.rows[0].total, 10)
     }
-    console.log(`✅ Processamento concluído!`)
-    console.log(`📊 Animais processados com sucesso: ${resultados.total_sucessos}`)
-    console.log(`📊 Total de erros: ${resultados.total_erros}`)
-    console.log(`📊 Animais esperados: ${animais.length}`)
+    console.log(`âÅ“â€¦ Processamento concluÃ­do!`)
+    console.log(`ðÅ¸â€œÅ  Animais processados com sucesso: ${resultados.total_sucessos}`)
+    console.log(`ðÅ¸â€œÅ  Total de erros: ${resultados.total_erros}`)
+    console.log(`ðÅ¸â€œÅ  Animais esperados: ${animais.length}`)
 
-    // VALIDAÇÃO CRÍTICA: Se nenhum animal foi salvo, retornar erro
+    // VALIDAÃâ€¡ÃÆ’O CRÃ�TICA: Se nenhum animal foi salvo, retornar erro
     if (resultados.total_sucessos === 0 && resultados.total_erros === 0) {
-      console.error('❌ ERRO CRÍTICO: Nenhum animal foi processado!')
+      console.error('â�Å’ ERRO CRÃ�TICO: Nenhum animal foi processado!')
       throw new Error('Nenhum animal foi processado. Verifique os dados enviados.')
     }
 
-    // Não lançar erro se todos falharam - retornar resposta com os erros detalhados
-    // O frontend pode decidir como tratar baseado nos erros específicos
+    // NÃ£o lanÃ§ar erro se todos falharam - retornar resposta com os erros detalhados
+    // O frontend pode decidir como tratar baseado nos erros especÃ­ficos
     if (resultados.total_sucessos === 0 && resultados.total_erros > 0) {
-      console.warn('⚠️ ATENÇÃO: Todos os animais falharam na importação, mas retornando resposta detalhada ao invés de erro fatal')
-      // Retornar resposta 200 com os erros detalhados ao invés de lançar erro
+      console.warn('âÅ¡ ï¸� ATENÃâ€¡ÃÆ’O: Todos os animais falharam na importaÃ§Ã£o, mas retornando resposta detalhada ao invÃ©s de erro fatal')
+      // Retornar resposta 200 com os erros detalhados ao invÃ©s de lanÃ§ar erro
       return sendSuccess(res, {
         lote: lote?.numero_lote || null,
         resultados,
@@ -649,31 +649,31 @@ export default asyncHandler(async function handler(req, res) {
           taxa_sucesso: '0%',
           aviso: 'Todos os animais falharam. Verifique os erros detalhados abaixo.'
         }
-      }, `Processamento concluído com ${resultados.total_erros} erros`, HTTP_STATUS.OK)
+      }, `Processamento concluÃ­do com ${resultados.total_erros} erros`, HTTP_STATUS.OK)
     }
 
-    // Usar os valores já calculados acima (linhas 394-396)
-    console.log(`📊 Total de animais DEPOIS da importação: ${totalDepoisNum}`)
-    console.log(`📊 Diferença (animais adicionados): ${diferenca}`)
+    // Usar os valores jÃ¡ calculados acima (linhas 394-396)
+    console.log(`ðÅ¸â€œÅ  Total de animais DEPOIS da importaÃ§Ã£o: ${totalDepoisNum}`)
+    console.log(`ðÅ¸â€œÅ  DiferenÃ§a (animais adicionados): ${diferenca}`)
 
-    // Contar quantos foram inserções novas vs atualizações (atualizações não aumentam o total)
+    // Contar quantos foram inserÃ§Ãµes novas vs atualizaÃ§Ãµes (atualizaÃ§Ãµes nÃ£o aumentam o total)
     const totalCriados = resultados.sucessos.filter(s => s.acao === 'criado').length
     const totalAtualizados = resultados.sucessos.filter(s => s.tipo === 'atualizado').length
-    console.log(`📊 Novos criados: ${totalCriados}, Atualizados: ${totalAtualizados}`)
+    console.log(`ðÅ¸â€œÅ  Novos criados: ${totalCriados}, Atualizados: ${totalAtualizados}`)
 
-    // Só validar aumento quando houve inserções novas; atualizações não alteram o total
+    // SÃ³ validar aumento quando houve inserÃ§Ãµes novas; atualizaÃ§Ãµes nÃ£o alteram o total
     if (totalCriados > 0 && diferenca < totalCriados) {
-      console.error(`❌ ERRO CRÍTICO: ${totalCriados} animais novos foram processados mas apenas ${diferenca} foram adicionados ao banco!`)
-      console.error(`📋 Total antes: ${totalAntesNum}, Total depois: ${totalDepoisNum}`)
-      throw new Error(`Animais processados mas não foram salvos no banco. Total não aumentou de ${totalAntesNum} para ${totalDepoisNum + totalCriados}`)
+      console.error(`â�Å’ ERRO CRÃ�TICO: ${totalCriados} animais novos foram processados mas apenas ${diferenca} foram adicionados ao banco!`)
+      console.error(`ðÅ¸â€œâ€¹ Total antes: ${totalAntesNum}, Total depois: ${totalDepoisNum}`)
+      throw new Error(`Animais processados mas nÃ£o foram salvos no banco. Total nÃ£o aumentou de ${totalAntesNum} para ${totalDepoisNum + totalCriados}`)
     }
     
-    console.log(`✅ Confirmação: ${diferenca} novos animais foram adicionados ao banco de dados`)
+    console.log(`âÅ“â€¦ ConfirmaÃ§Ã£o: ${diferenca} novos animais foram adicionados ao banco de dados`)
 
-    const mensagem = `Processamento do lote ${lote.numero_lote} concluído: ${resultados.total_sucessos} sucessos, ${resultados.total_erros} erros`
+    const mensagem = `Processamento do lote ${lote.numero_lote} concluÃ­do: ${resultados.total_sucessos} sucessos, ${resultados.total_erros} erros`
     
-    console.log(`🎉 ${mensagem}`)
-    console.log(`📊 Confirmado: ${totalNoBanco} animais encontrados no banco de dados`)
+    console.log(`ðÅ¸Å½â€° ${mensagem}`)
+    console.log(`ðÅ¸â€œÅ  Confirmado: ${totalNoBanco} animais encontrados no banco de dados`)
 
     return sendSuccess(res, {
       lote: lote.numero_lote,
@@ -691,15 +691,15 @@ export default asyncHandler(async function handler(req, res) {
     }, mensagem, HTTP_STATUS.CREATED)
 
   } catch (error) {
-    console.error('❌ Erro geral no processamento:', error)
-    console.error('📋 Stack trace:', error.stack)
-    console.error('📋 Mensagem de erro:', error.message)
-    console.error('📋 Código de erro:', error.code)
+    console.error('â�Å’ Erro geral no processamento:', error)
+    console.error('ðÅ¸â€œâ€¹ Stack trace:', error.stack)
+    console.error('ðÅ¸â€œâ€¹ Mensagem de erro:', error.message)
+    console.error('ðÅ¸â€œâ€¹ CÃ³digo de erro:', error.code)
 
     // Se houve erro geral, atualizar o lote como erro
     if (lote && lote.numero_lote) {
       try {
-        // Tentar fazer update sem transação se possível
+        // Tentar fazer update sem transaÃ§Ã£o se possÃ­vel
         const tempClient = await pool.connect()
         try {
           await atualizarLoteComErro(lote.numero_lote, error.message, tempClient)
@@ -713,22 +713,22 @@ export default asyncHandler(async function handler(req, res) {
       }
     }
 
-    // Não lançar o erro novamente - o asyncHandler vai capturar
+    // NÃ£o lanÃ§ar o erro novamente - o asyncHandler vai capturar
     // Mas garantir que a resposta seja enviada corretamente
     throw error
   } finally {
     if (client) {
       client.release()
-      console.log('🔌 Conexão liberada')
+      console.log('ðÅ¸â€�Å’ ConexÃ£o liberada')
     }
   }
 })
 
-// Função auxiliar para atualizar o lote com os resultados
+// FunÃ§Ã£o auxiliar para atualizar o lote com os resultados
 async function atualizarLoteComResultados(numeroLote, resultados, client) {
-  // Verificar se o lote existe (não é um lote temporário)
+  // Verificar se o lote existe (nÃ£o Ã© um lote temporÃ¡rio)
   if (!numeroLote || numeroLote.startsWith('LOTE-MANUAL-')) {
-    console.log(`⚠️ Pulando atualização de lote temporário: ${numeroLote}`)
+    console.log(`âÅ¡ ï¸� Pulando atualizaÃ§Ã£o de lote temporÃ¡rio: ${numeroLote}`)
     return
   }
 
@@ -761,15 +761,15 @@ async function atualizarLoteComResultados(numeroLote, resultados, client) {
     ])
   } catch (error) {
     console.error(`Erro ao atualizar lote ${numeroLote}:`, error.message)
-    // Não lançar erro - apenas logar
+    // NÃ£o lanÃ§ar erro - apenas logar
   }
 }
 
-// Função auxiliar para marcar lote como erro
+// FunÃ§Ã£o auxiliar para marcar lote como erro
 async function atualizarLoteComErro(numeroLote, mensagemErro, client) {
-  // Verificar se o lote existe (não é um lote temporário)
+  // Verificar se o lote existe (nÃ£o Ã© um lote temporÃ¡rio)
   if (!numeroLote || numeroLote.startsWith('LOTE-MANUAL-')) {
-    console.log(`⚠️ Pulando atualização de lote temporário com erro: ${numeroLote}`)
+    console.log(`âÅ¡ ï¸� Pulando atualizaÃ§Ã£o de lote temporÃ¡rio com erro: ${numeroLote}`)
     return
   }
 
@@ -791,6 +791,6 @@ async function atualizarLoteComErro(numeroLote, mensagemErro, client) {
     ])
   } catch (error) {
     console.error(`Erro ao atualizar lote ${numeroLote} com erro:`, error.message)
-    // Não lançar erro - apenas logar
+    // NÃ£o lanÃ§ar erro - apenas logar
   }
 }

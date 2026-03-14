@@ -13,7 +13,7 @@ const DATA_REAGENDAMENTO = '2026-03-18' // 30 dias depois
 const RGS_INAPTOS = ['16337', '16338', '16193']
 
 async function main() {
-  console.log('\n=== INSERINDO EXAMES ANDROLÓGICOS INAPTOS (16/02) E REAGENDAMENTOS (18/03) ===\n')
+  console.log('\n=== INSERINDO EXAMES ANDROL�“GICOS INAPTOS (16/02) E REAGENDAMENTOS (18/03) ===\n')
   console.log(`RGs dos machos: ${RGS_INAPTOS.join(', ')}`)
   console.log(`Data exame Inapto: ${DATA_EXAME_INAPTO}`)
   console.log(`Data refazer (30 dias): ${DATA_REAGENDAMENTO}\n`)
@@ -31,13 +31,13 @@ async function main() {
     const rgsFaltando = RGS_INAPTOS.filter(rg => !animaisMap.has(rg))
 
     if (animaisRes.rows.length > 0) {
-      console.log(`✅ ${animaisRes.rows.length} animal(is) encontrado(s) no cadastro:`)
+      console.log(`�œ… ${animaisRes.rows.length} animal(is) encontrado(s) no cadastro:`)
       animaisRes.rows.forEach(a => {
         console.log(`   - RG ${a.rg}: ${a.serie || ''}-${a.rg} (${a.nome || 'sem nome'})`)
       })
     }
     if (rgsFaltando.length > 0) {
-      console.log(`⚠️ RGs sem animal cadastrado (será inserido exame mesmo assim): ${rgsFaltando.join(', ')}`)
+      console.log(`�š�️ RGs sem animal cadastrado (será inserido exame mesmo assim): ${rgsFaltando.join(', ')}`)
     }
     console.log('')
 
@@ -70,7 +70,7 @@ async function main() {
       )
 
       const exameInapto = insertRes.rows[0]
-      console.log(`✅ Exame Inapto inserido: ${touro} (ID: ${exameInapto.id})`)
+      console.log(`�œ… Exame Inapto inserido: ${touro} (ID: ${exameInapto.id})`)
 
       // Criar reagendamento (exame Pendente para 18/03)
       const reagendamentoRes = await client.query(
@@ -91,7 +91,7 @@ async function main() {
       )
 
       const reagendamento = reagendamentoRes.rows[0]
-      console.log(`   → Reagendamento criado para ${DATA_REAGENDAMENTO} (ID: ${reagendamento.id})`)
+      console.log(`   �†’ Reagendamento criado para ${DATA_REAGENDAMENTO} (ID: ${reagendamento.id})`)
 
       // Atualizar exame original com status Reagendado e data_reagendamento
       await client.query(
@@ -101,12 +101,12 @@ async function main() {
         [DATA_REAGENDAMENTO, exameInapto.id]
       )
 
-      console.log(`   → Exame original atualizado (status: Reagendado)\n`)
+      console.log(`   �†’ Exame original atualizado (status: Reagendado)\n`)
     }
 
-    console.log('✅ Concluído! Os eventos aparecerão na agenda (Calendário Reprodutivo).')
+    console.log('�œ… Concluído! Os eventos aparecerão na agenda (Calendário Reprodutivo).')
   } catch (err) {
-    console.error('❌ Erro:', err.message)
+    console.error('�Œ Erro:', err.message)
     throw err
   } finally {
     client.release()

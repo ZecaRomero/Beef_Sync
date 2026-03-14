@@ -14,7 +14,7 @@ const endpoints = [
 
 async function testEndpoint(endpoint) {
   try {
-    console.log(`🧪 Testando ${endpoint.name} (${endpoint.method} ${endpoint.url})...`);
+    console.log(`�Ÿ�� Testando ${endpoint.name} (${endpoint.method} ${endpoint.url})...`);
     
     const options = {
       method: endpoint.method,
@@ -32,22 +32,22 @@ async function testEndpoint(endpoint) {
     
     if (response.ok) {
       const data = await response.json();
-      console.log(`✅ ${endpoint.name}: OK (${response.status})`);
+      console.log(`�œ… ${endpoint.name}: OK (${response.status})`);
       return { success: true, status: response.status, endpoint: endpoint.name };
     } else {
       const errorText = await response.text();
-      console.log(`❌ ${endpoint.name}: ERRO ${response.status}`);
+      console.log(`�Œ ${endpoint.name}: ERRO ${response.status}`);
       console.log(`   Detalhes: ${errorText.substring(0, 200)}...`);
       return { success: false, status: response.status, endpoint: endpoint.name, error: errorText };
     }
   } catch (error) {
-    console.log(`💥 ${endpoint.name}: EXCEÇÃO - ${error.message}`);
+    console.log(`�Ÿ’� ${endpoint.name}: EXCE�‡�ƒO - ${error.message}`);
     return { success: false, status: 'EXCEPTION', endpoint: endpoint.name, error: error.message };
   }
 }
 
 async function testAllEndpoints() {
-  console.log('🚀 Iniciando teste de todos os endpoints da página de contabilidade...\n');
+  console.log('�Ÿš€ Iniciando teste de todos os endpoints da página de contabilidade...\n');
   
   const results = [];
   
@@ -60,23 +60,23 @@ async function testAllEndpoints() {
     await new Promise(resolve => setTimeout(resolve, 500));
   }
   
-  console.log('\n📊 RESUMO DOS TESTES:');
+  console.log('\n�Ÿ“Š RESUMO DOS TESTES:');
   console.log('='.repeat(50));
   
   const successful = results.filter(r => r.success);
   const failed = results.filter(r => !r.success);
   
-  console.log(`✅ Sucessos: ${successful.length}/${results.length}`);
-  console.log(`❌ Falhas: ${failed.length}/${results.length}`);
+  console.log(`�œ… Sucessos: ${successful.length}/${results.length}`);
+  console.log(`�Œ Falhas: ${failed.length}/${results.length}`);
   
   if (failed.length > 0) {
-    console.log('\n❌ ENDPOINTS COM FALHA:');
+    console.log('\n�Œ ENDPOINTS COM FALHA:');
     failed.forEach(f => {
       console.log(`   - ${f.endpoint}: ${f.status} - ${f.error?.substring(0, 100) || 'Sem detalhes'}`);
     });
   }
   
-  console.log('\n🔄 Testando requisições simultâneas (como o browser faz)...');
+  console.log('\n�Ÿ”„ Testando requisições simultâneas (como o browser faz)...');
   
   // Testar todas as requisições simultaneamente
   const simultaneousPromises = endpoints.map(endpoint => testEndpoint(endpoint));
@@ -85,11 +85,11 @@ async function testAllEndpoints() {
   const simultaneousSuccessful = simultaneousResults.filter(r => r.status === 'fulfilled' && r.value.success);
   const simultaneousFailed = simultaneousResults.filter(r => r.status === 'rejected' || (r.status === 'fulfilled' && !r.value.success));
   
-  console.log(`✅ Sucessos simultâneos: ${simultaneousSuccessful.length}/${simultaneousResults.length}`);
-  console.log(`❌ Falhas simultâneas: ${simultaneousFailed.length}/${simultaneousResults.length}`);
+  console.log(`�œ… Sucessos simultâneos: ${simultaneousSuccessful.length}/${simultaneousResults.length}`);
+  console.log(`�Œ Falhas simultâneas: ${simultaneousFailed.length}/${simultaneousResults.length}`);
   
   if (simultaneousFailed.length > 0) {
-    console.log('\n❌ FALHAS EM REQUISIÇÕES SIMULTÂNEAS:');
+    console.log('\n�Œ FALHAS EM REQUISI�‡�•ES SIMULT�‚NEAS:');
     simultaneousFailed.forEach((f, index) => {
       if (f.status === 'rejected') {
         console.log(`   - ${endpoints[index].name}: REJECTED - ${f.reason?.message || 'Erro desconhecido'}`);

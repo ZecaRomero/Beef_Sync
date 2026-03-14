@@ -7,52 +7,52 @@ const AnimalFilters = ({ filters, onFilterChange, animals, onClearFilters }) => 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-        🔍 Filtros
+        ðÅ¸â€�� Filtros
       </h3>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Busca por nome/número */}
+        {/* Busca por nome/nÃºmero */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Buscar
           </label>
           <input
             type="text"
-            placeholder="Nome ou número..."
+            placeholder="Nome ou nÃºmero..."
             value={filters.search || ''}
             onChange={(e) => onFilterChange({ ...filters, search: e.target.value })}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
         </div>
 
-        {/* Filtro por raça */}
+        {/* Filtro por raÃ§a */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Raça
+            RaÃ§a
           </label>
           <select
             value={filters.raca || ''}
             onChange={(e) => onFilterChange({ ...filters, raca: e.target.value })}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           >
-            <option value="">Todas as raças</option>
+            <option value="">Todas as raÃ§as</option>
             {racas.map(raca => (
               <option key={`raca-${raca}`} value={raca}>{raca}</option>
             ))}
           </select>
         </div>
 
-        {/* Filtro por situação */}
+        {/* Filtro por situaÃ§Ã£o */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Situação
+            SituaÃ§Ã£o
           </label>
           <select
             value={filters.situacao || ''}
             onChange={(e) => onFilterChange({ ...filters, situacao: e.target.value })}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           >
-            <option value="">Todas as situações</option>
+            <option value="">Todas as situaÃ§Ãµes</option>
             {situacoes.map(situacao => (
               <option key={`situacao-${situacao}`} value={situacao}>{situacao}</option>
             ))}
@@ -77,7 +77,7 @@ const AnimalFilters = ({ filters, onFilterChange, animals, onClearFilters }) => 
         </div>
       </div>
 
-      {/* Filtros avançados */}
+      {/* Filtros avanÃ§ados */}
       <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Filtro por sexo */}
@@ -92,14 +92,14 @@ const AnimalFilters = ({ filters, onFilterChange, animals, onClearFilters }) => 
             >
               <option value="">Todos</option>
               <option value="Macho">Machos</option>
-              <option value="Fêmea">Fêmeas</option>
+              <option value="FÃªmea">FÃªmeas</option>
             </select>
           </div>
 
-          {/* Filtro por peso mínimo */}
+          {/* Filtro por peso mÃ­nimo */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Peso Mínimo (kg)
+              Peso MÃ­nimo (kg)
             </label>
             <input
               type="number"
@@ -110,10 +110,10 @@ const AnimalFilters = ({ filters, onFilterChange, animals, onClearFilters }) => 
             />
           </div>
 
-          {/* Filtro por peso máximo */}
+          {/* Filtro por peso mÃ¡ximo */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Peso Máximo (kg)
+              Peso MÃ¡ximo (kg)
             </label>
             <input
               type="number"
@@ -126,7 +126,7 @@ const AnimalFilters = ({ filters, onFilterChange, animals, onClearFilters }) => 
         </div>
       </div>
 
-      {/* Botão para limpar filtros */}
+      {/* BotÃ£o para limpar filtros */}
       <div className="mt-4 flex justify-end">
         <button
           onClick={() => {

@@ -10,12 +10,12 @@ const pool = new Pool({
 
 async function checkNeloreirAnimals() {
   try {
-    console.log('🔍 Verificando animais NELOREGIR nas notas fiscais...');
+    console.log('�Ÿ”� Verificando animais NELOREGIR nas notas fiscais...');
     
     // Buscar todas as NFs que contêm animais com raça NELOREGIR
     const nfResult = await pool.query('SELECT id, numero_nf, fornecedor, data_compra, itens FROM notas_fiscais WHERE itens IS NOT NULL');
     
-    console.log('\n📄 NFs com animais NELOREGIR:');
+    console.log('\n�Ÿ“„ NFs com animais NELOREGIR:');
     const neloreirAnimals = [];
     
     nfResult.rows.forEach(row => {
@@ -35,7 +35,7 @@ async function checkNeloreirAnimals() {
     });
     
     // Verificar se esses animais existem na tabela animais
-    console.log('\n🔍 Verificando se existem na tabela animais...');
+    console.log('\n�Ÿ”� Verificando se existem na tabela animais...');
     for (const animal of neloreirAnimals) {
       const animalCheck = await pool.query(
         'SELECT id, serie, rg, raca FROM animais WHERE CONCAT(serie, \'-\', rg) = $1', 
@@ -43,21 +43,21 @@ async function checkNeloreirAnimals() {
       );
       
       if (animalCheck.rows.length === 0) {
-        console.log(`  ❌ Animal ${animal.tatuagem} (NELOREGIR) NÃO existe na tabela animais`);
+        console.log(`  �Œ Animal ${animal.tatuagem} (NELOREGIR) N�ƒO existe na tabela animais`);
       } else {
-        console.log(`  ✅ Animal ${animal.tatuagem} existe como: ${animalCheck.rows[0].raca}`);
+        console.log(`  �œ… Animal ${animal.tatuagem} existe como: ${animalCheck.rows[0].raca}`);
       }
     }
     
     // Verificar quantos animais NELOREGIR existem nas NFs vs tabela animais
-    console.log('\n📊 Resumo:');
+    console.log('\n�Ÿ“Š Resumo:');
     console.log(`  Animais NELOREGIR nas NFs: ${neloreirAnimals.length}`);
     
     const neloreAnimalsInDB = await pool.query('SELECT COUNT(*) as count FROM animais WHERE raca ILIKE \'%nelore%\'');
     console.log(`  Animais Nelore na tabela animais: ${neloreAnimalsInDB.rows[0].count}`);
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
   } finally {
     await pool.end();
   }

@@ -3,18 +3,18 @@
 class AnimalDataManager {
   constructor() {
     this.listeners = []
-    this.useLocalStorage = false // Será definida após teste de conexão
+    this.useLocalStorage = false // SerÃ¡ definida apÃ³s teste de conexÃ£o
     
-    // Verificar conexão com banco na inicialização
+    // Verificar conexÃ£o com banco na inicializaÃ§Ã£o
     this.checkDatabaseConnection()
   }
 
-  // Verificar conexão com banco de dados
+  // Verificar conexÃ£o com banco de dados
   async checkDatabaseConnection() {
     try {
       // Verificar se estamos no lado do cliente (browser)
       if (typeof window === 'undefined') {
-        // No servidor, desativamos localStorage e esperamos conexão do banco
+        // No servidor, desativamos localStorage e esperamos conexÃ£o do banco
         this.useLocalStorage = false
         return
       }
@@ -23,20 +23,20 @@ class AnimalDataManager {
       const result = await response.json()
       
       if (result.connected) {
-        console.log('✅ AnimalDataManager: Conexão com PostgreSQL OK')
+        console.log('âÅ“â€¦ AnimalDataManager: ConexÃ£o com PostgreSQL OK')
         this.useLocalStorage = false
       } else {
         throw new Error('Database not connected')
       }
     } catch (error) {
-      console.error('❌ AnimalDataManager: Erro na conexão PostgreSQL:', error)
+      console.error('â�Å’ AnimalDataManager: Erro na conexÃ£o PostgreSQL:', error)
       // Fallback desativado para garantir que tudo seja salvo no banco
       this.useLocalStorage = false
-      console.error('⚠️ Sistema operando sem fallback para localStorage para garantir integridade no PostgreSQL')
+      console.error('âÅ¡ ï¸� Sistema operando sem fallback para localStorage para garantir integridade no PostgreSQL')
     }
   }
 
-  // Adicionar listener para mudanças nos dados
+  // Adicionar listener para mudanÃ§as nos dados
   addListener(callback) {
     this.listeners.push(callback)
   }
@@ -46,7 +46,7 @@ class AnimalDataManager {
     this.listeners = this.listeners.filter(l => l !== callback)
   }
 
-  // Notificar todos os listeners sobre mudanças
+  // Notificar todos os listeners sobre mudanÃ§as
   notifyListeners() {
     // Para PostgreSQL, vamos buscar os dados atualizados antes de notificar
     if (!this.useLocalStorage) {
@@ -59,7 +59,7 @@ class AnimalDataManager {
     }
   }
 
-  // Função auxiliar para mapear campos do frontend para o banco
+  // FunÃ§Ã£o auxiliar para mapear campos do frontend para o banco
   mapearCampoFrontendParaBanco(campoFrontend) {
     const mapeamentos = {
       'dataNascimento': 'data_nascimento',
@@ -78,7 +78,7 @@ class AnimalDataManager {
     return mapeamentos[campoFrontend] || campoFrontend
   }
 
-  // Função auxiliar para mapear campos do banco para o frontend
+  // FunÃ§Ã£o auxiliar para mapear campos do banco para o frontend
   mapearCampoBancoParaFrontend(campoBanco) {
     const mapeamentos = {
       'data_nascimento': 'dataNascimento',
@@ -160,11 +160,11 @@ class AnimalDataManager {
         return animalSalvo
       }
       
-      // Fallback DESATIVADO - Forçar erro se banco não disponível
-      throw new Error('Banco de dados PostgreSQL não disponível para salvar novo animal.')
+      // Fallback DESATIVADO - ForÃ§ar erro se banco nÃ£o disponÃ­vel
+      throw new Error('Banco de dados PostgreSQL nÃ£o disponÃ­vel para salvar novo animal.')
     
     } catch (error) {
-      console.error('❌ Erro ao adicionar animal:', error)
+      console.error('â�Å’ Erro ao adicionar animal:', error)
       throw error
     }
   }
@@ -175,7 +175,7 @@ class AnimalDataManager {
       if (!this.useLocalStorage) {
         const dadosParaAtualizar = {}
         
-        // Lista de colunas válidas no banco de dados
+        // Lista de colunas vÃ¡lidas no banco de dados
         const validColumns = [
           'nome', 'serie', 'rg', 'tatuagem', 'sexo', 'raca', 
           'data_nascimento', 'hora_nascimento', 'peso', 'cor', 
@@ -189,7 +189,7 @@ class AnimalDataManager {
         // Mapear campos do frontend para o banco
         Object.keys(dadosAtualizados).forEach(key => {
           const campoBanco = this.mapearCampoFrontendParaBanco(key)
-          // Apenas incluir se for uma coluna válida
+          // Apenas incluir se for uma coluna vÃ¡lida
           if (campoBanco && validColumns.includes(campoBanco)) {
             let valor = dadosAtualizados[key]
             // Normalizar data vazia para null (evita erro no PostgreSQL DATE)
@@ -204,7 +204,7 @@ class AnimalDataManager {
           dadosParaAtualizar.piquete_atual = dadosParaAtualizar.pasto_atual
         }
 
-        // Garantir envio explícito de campos que costumam falhar ao salvar
+        // Garantir envio explÃ­cito de campos que costumam falhar ao salvar
         const dataNasc = dadosAtualizados.dataNascimento ?? dadosAtualizados.data_nascimento
         const pasto = dadosAtualizados.pastoAtual ?? dadosAtualizados.pasto_atual
         const situacaoAbcz = dadosAtualizados.situacaoAbcz ?? dadosAtualizados.situacao_abcz
@@ -240,10 +240,10 @@ class AnimalDataManager {
       }
       
       // Fallback DESATIVADO
-      throw new Error('Banco de dados PostgreSQL não disponível para atualizar animal.')
+      throw new Error('Banco de dados PostgreSQL nÃ£o disponÃ­vel para atualizar animal.')
       
     } catch (error) {
-      console.error('❌ Erro ao atualizar animal:', error)
+      console.error('â�Å’ Erro ao atualizar animal:', error)
       throw error
     }
   }
@@ -267,11 +267,11 @@ class AnimalDataManager {
         return Array.isArray(result.data) ? result.data : []
       }
       
-      // Fallback para localStorage (Apenas leitura como última opção se configurado, mas preferencialmente falhar)
-      console.warn('⚠️ AnimalDataManager: PostgreSQL indisponível, tentando ler do localStorage (obsoleto)')
+      // Fallback para localStorage (Apenas leitura como Ãºltima opÃ§Ã£o se configurado, mas preferencialmente falhar)
+      console.warn('âÅ¡ ï¸� AnimalDataManager: PostgreSQL indisponÃ­vel, tentando ler do localStorage (obsoleto)')
       const salvos = JSON.parse(localStorage.getItem('animalData') || '[]')
       
-      // Aplicar filtros básicos
+      // Aplicar filtros bÃ¡sicos
       return salvos.filter(animal => {
         if (filtros.situacao && animal.situacao !== filtros.situacao) return false
         if (filtros.raca && animal.raca !== filtros.raca) return false
@@ -280,7 +280,7 @@ class AnimalDataManager {
       })
       
     } catch (error) {
-      console.error('❌ Erro ao buscar animais:', error)
+      console.error('â�Å’ Erro ao buscar animais:', error)
       return []
     }
   }
@@ -314,19 +314,19 @@ class AnimalDataManager {
       return salvos.find(a => a.id === id) || null
       
     } catch (error) {
-      console.error('❌ Erro ao buscar animal:', error)
+      console.error('â�Å’ Erro ao buscar animal:', error)
       return null
     }
   }
 
-  // Obter estatísticas atualizadas
+  // Obter estatÃ­sticas atualizadas
   async getStatistics() {
     try {
       if (!this.useLocalStorage) {
         const response = await fetch('/api/statistics')
         
         if (!response.ok) {
-          throw new Error('Erro ao buscar estatísticas')
+          throw new Error('Erro ao buscar estatÃ­sticas')
         }
         
         const result = await response.json()
@@ -350,13 +350,13 @@ class AnimalDataManager {
       .filter(a => a.valorReal !== null)
       .reduce((acc, a) => acc + a.valorReal, 0)
 
-    // Estatísticas por raça
+    // EstatÃ­sticas por raÃ§a
       const animaisPorRaca = salvos.reduce((acc, animal) => {
       acc[animal.raca] = (acc[animal.raca] || 0) + 1
       return acc
     }, {})
 
-    // Estatísticas por sexo
+    // EstatÃ­sticas por sexo
       const animaisPorSexo = salvos.reduce((acc, animal) => {
       acc[animal.sexo] = (acc[animal.sexo] || 0) + 1
       return acc
@@ -366,7 +366,7 @@ class AnimalDataManager {
       const animaisFIV = salvos.filter(a => a.isFiv).length
       const animaisNaturais = salvos.filter(a => !a.isFiv).length
 
-    // Nascimentos por mês (últimos 12 meses)
+    // Nascimentos por mÃªs (Ãºltimos 12 meses)
       const nascimentosPorMes = salvos
       .filter(a => a.dataNascimento)
       .reduce((acc, animal) => {
@@ -392,7 +392,7 @@ class AnimalDataManager {
       }
       
     } catch (error) {
-      console.error('❌ Erro ao obter estatísticas:', error)
+      console.error('â�Å’ Erro ao obter estatÃ­sticas:', error)
       return {
         totalAnimais: 0,
         animaisAtivos: 0,
@@ -411,7 +411,7 @@ class AnimalDataManager {
     }
   }
 
-  // Obter raça pela série
+  // Obter raÃ§a pela sÃ©rie
   getRacaBySerie(serie) {
     const racasPorSerie = {
       'CJCJ': 'Nelore',
@@ -433,7 +433,7 @@ class AnimalDataManager {
     const diffTime = hoje - nascimento
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
     
-    return Math.floor(diffDays / 30) // Aproximação de meses
+    return Math.floor(diffDays / 30) // AproximaÃ§Ã£o de meses
   }
 
   // Adicionar custo a um animal
@@ -482,7 +482,7 @@ class AnimalDataManager {
     })
       
     } catch (error) {
-      console.error('❌ Erro ao adicionar custo:', error)
+      console.error('â�Å’ Erro ao adicionar custo:', error)
       throw error
     }
   }
@@ -511,7 +511,7 @@ class AnimalDataManager {
       mae: `${dadosGestacao.maeSerie} ${dadosGestacao.maeRg}`,
       receptora: dadosGestacao.receptoraNome,
       isFiv: true,
-      custoTotal: 0, // Será calculado pelo costManager
+      custoTotal: 0, // SerÃ¡ calculado pelo costManager
       valorVenda: null,
       valorReal: null,
       veterinario: dadosNascimento.veterinario
@@ -538,14 +538,14 @@ class AnimalDataManager {
           observacoes: `Rateio 30% da receptora ${dadosGestacao.receptoraNome} (R$ ${dadosGestacao.custoAcumulado.toFixed(2)})`
         })
 
-        // Aplicar DNA automático
+        // Aplicar DNA automÃ¡tico
         costManager.adicionarCustoDNA(animalCriado.id, animalCriado)
 
-        // Aplicar protocolo inicial se aplicável
-        costManager.aplicarProtocolo(animalCriado.id, animalCriado, 'Protocolo inicial automático')
+        // Aplicar protocolo inicial se aplicÃ¡vel
+        costManager.aplicarProtocolo(animalCriado.id, animalCriado, 'Protocolo inicial automÃ¡tico')
       })
 
-      // Integrar com o Boletim Contábil
+      // Integrar com o Boletim ContÃ¡bil
       import('./boletimContabilService').then(({ default: boletimContabilService }) => {
         boletimContabilService.registrarNascimento({
           dataNascimento: dadosNascimento.dataNascimento,
@@ -563,12 +563,12 @@ class AnimalDataManager {
     return animalCriado
       
     } catch (error) {
-      console.error('❌ Erro ao registrar nascimento:', error)
+      console.error('â�Å’ Erro ao registrar nascimento:', error)
       throw error
     }
   }
 
-  // Exportar dados para relatórios
+  // Exportar dados para relatÃ³rios
   async exportarDados() {
     try {
       const animals = await this.getAllAnimals()
@@ -580,7 +580,7 @@ class AnimalDataManager {
       exportDate: new Date().toISOString()
       }
     } catch (error) {
-      console.error('❌ Erro ao exportar dados:', error)
+      console.error('â�Å’ Erro ao exportar dados:', error)
       throw error
     }
   }
@@ -608,7 +608,7 @@ class AnimalDataManager {
       const animaisAtualizados = salvos.filter(a => a.id !== id)
       localStorage.setItem('animalData', JSON.stringify(animaisAtualizados))
       
-      // Integrar com o Boletim Contábil para registrar baixa
+      // Integrar com o Boletim ContÃ¡bil para registrar baixa
       if (animalRemovido && typeof window !== 'undefined') {
         import('./boletimContabilService').then(({ default: boletimContabilService }) => {
           boletimContabilService.registrarMorte({
@@ -618,7 +618,7 @@ class AnimalDataManager {
             sexo: animalRemovido.sexo,
             raca: animalRemovido.raca,
             peso: animalRemovido.peso,
-            causa: 'Exclusão do sistema',
+            causa: 'ExclusÃ£o do sistema',
             observacoes: `Animal removido do sistema - ${animalRemovido.serie} ${animalRemovido.rg}`,
             valorPerda: animalRemovido.custoTotal || 0
           })
@@ -629,13 +629,13 @@ class AnimalDataManager {
       return true
       
     } catch (error) {
-      console.error('❌ Erro ao deletar animal:', error)
+      console.error('â�Å’ Erro ao deletar animal:', error)
       throw error
     }
   }
 }
 
-// Instância singleton
+// InstÃ¢ncia singleton
 const animalDataManager = new AnimalDataManager()
 
 export default animalDataManager

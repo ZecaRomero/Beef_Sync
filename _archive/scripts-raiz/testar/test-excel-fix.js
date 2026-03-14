@@ -2,7 +2,7 @@ import { generateExcelReport } from './utils/reportGenerator.js'
 import fs from 'fs'
 
 async function testExcelGeneration() {
-  console.log('🧪 Testando geração de Excel corrigida...')
+  console.log('�Ÿ�� Testando geração de Excel corrigida...')
   
   try {
     // Dados de teste
@@ -100,19 +100,19 @@ async function testExcelGeneration() {
       endDate: '2024-01-31'
     }
 
-    console.log('📊 Gerando relatório Excel...')
+    console.log('�Ÿ“Š Gerando relatório Excel...')
     const buffer = await generateExcelReport(reportData, period)
     
-    console.log(`✅ Excel gerado com sucesso! Tamanho: ${buffer.length} bytes`)
+    console.log(`�œ… Excel gerado com sucesso! Tamanho: ${buffer.length} bytes`)
     
     // Salvar arquivo para teste
     fs.writeFileSync('teste-excel-corrigido.xlsx', buffer)
-    console.log('💾 Arquivo salvo como: teste-excel-corrigido.xlsx')
+    console.log('�Ÿ’� Arquivo salvo como: teste-excel-corrigido.xlsx')
     
     return true
     
   } catch (error) {
-    console.error('❌ Erro ao gerar Excel:', error.message)
+    console.error('�Œ Erro ao gerar Excel:', error.message)
     console.error('Stack:', error.stack)
     return false
   }
@@ -121,9 +121,9 @@ async function testExcelGeneration() {
 // Executar teste
 testExcelGeneration().then(success => {
   if (success) {
-    console.log('\n🎉 Teste concluído com sucesso!')
+    console.log('\n�ŸŽ‰ Teste concluído com sucesso!')
   } else {
-    console.log('\n💥 Teste falhou!')
+    console.log('\n�Ÿ’� Teste falhou!')
   }
   process.exit(success ? 0 : 1)
 })

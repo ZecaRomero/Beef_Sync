@@ -10,29 +10,29 @@ const pool = new Pool({
 
 async function checkBulletinData() {
   try {
-    console.log('🔍 Verificando dados do boletim...');
+    console.log('�Ÿ”� Verificando dados do boletim...');
     
     // Verificar animais por raça
     const result = await pool.query('SELECT raca, COUNT(*) as count FROM animais GROUP BY raca ORDER BY raca');
     
-    console.log('\n📊 Animais por raça:');
+    console.log('\n�Ÿ“Š Animais por raça:');
     result.rows.forEach(row => {
       console.log('  -', row.raca + ':', row.count, 'animais');
     });
     
     // Verificar se há animais Nelore
     const neloreResult = await pool.query("SELECT COUNT(*) as count FROM animais WHERE raca = 'Nelore'");
-    console.log('\n🔍 Total de animais Nelore:', neloreResult.rows[0].count);
+    console.log('\n�Ÿ”� Total de animais Nelore:', neloreResult.rows[0].count);
     
     // Verificar detalhes dos animais Nelore
     const neloreDetails = await pool.query("SELECT serie, rg, peso, meses, situacao FROM animais WHERE raca = 'Nelore' ORDER BY serie, rg");
-    console.log('\n📋 Detalhes dos animais Nelore:');
+    console.log('\n�Ÿ“‹ Detalhes dos animais Nelore:');
     neloreDetails.rows.forEach(row => {
       console.log(`  - ${row.serie} ${row.rg}: ${row.peso}kg, ${row.meses} meses, ${row.situacao}`);
     });
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
   } finally {
     await pool.end();
   }

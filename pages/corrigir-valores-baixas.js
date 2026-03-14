@@ -8,7 +8,7 @@ export default function CorrigirValoresBaixas() {
   const [erro, setErro] = useState(null)
 
   const executarCorrecao = async () => {
-    if (!confirm('Tem certeza que deseja corrigir os valores? Esta ação multiplicará por 1000 todos os valores de venda menores que R$ 100,00.')) {
+    if (!confirm('Tem certeza que deseja corrigir os valores? Esta aÃ§Ã£o multiplicarÃ¡ por 1000 todos os valores de venda menores que R$ 100,00.')) {
       return
     }
 
@@ -26,10 +26,10 @@ export default function CorrigirValoresBaixas() {
       if (data.success) {
         setResultado(data)
       } else {
-        setErro(data.error || 'Erro ao executar correção')
+        setErro(data.error || 'Erro ao executar correÃ§Ã£o')
       }
     } catch (err) {
-      setErro(err.message || 'Erro ao executar correção')
+      setErro(err.message || 'Erro ao executar correÃ§Ã£o')
     } finally {
       setLoading(false)
     }
@@ -48,14 +48,14 @@ export default function CorrigirValoresBaixas() {
 
         <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-6">
           <h2 className="font-semibold text-amber-900 dark:text-amber-200 mb-2">
-            ⚠️ Atenção
+            âÅ¡ ï¸� AtenÃ§Ã£o
           </h2>
           <p className="text-sm text-amber-800 dark:text-amber-300">
             Esta ferramenta corrige valores de vendas que foram importados incorretamente.
-            Valores menores que R$ 100,00 serão multiplicados por 1000.
+            Valores menores que R$ 100,00 serÃ£o multiplicados por 1000.
           </p>
           <p className="text-sm text-amber-800 dark:text-amber-300 mt-2">
-            Exemplo: R$ 3,64 será corrigido para R$ 3.640,00
+            Exemplo: R$ 3,64 serÃ¡ corrigido para R$ 3.640,00
           </p>
         </div>
 
@@ -64,7 +64,7 @@ export default function CorrigirValoresBaixas() {
           disabled={loading}
           className="px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? 'Executando correção...' : 'Executar Correção'}
+          {loading ? 'Executando correÃ§Ã£o...' : 'Executar CorreÃ§Ã£o'}
         </button>
 
         {erro && (
@@ -78,7 +78,7 @@ export default function CorrigirValoresBaixas() {
           <div className="mt-6 space-y-4">
             <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
               <p className="text-green-800 dark:text-green-300 font-semibold">
-                ✅ {resultado.message}
+                âÅ“â€¦ {resultado.message}
               </p>
               <p className="text-green-700 dark:text-green-400 text-sm mt-1">
                 Registros corrigidos: {resultado.corrigidos}

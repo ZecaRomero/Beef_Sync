@@ -12,7 +12,7 @@ async function verificarItensNFMarcelo() {
   const client = await pool.connect();
   
   try {
-    console.log('🔍 VERIFICANDO ITENS DAS NFs DO MARCELO\n');
+    console.log('�Ÿ”� VERIFICANDO ITENS DAS NFs DO MARCELO\n');
     console.log('='.repeat(80));
     
     // 1. Buscar as NFs do Marcelo
@@ -23,15 +23,15 @@ async function verificarItensNFMarcelo() {
       ORDER BY numero_nf
     `);
     
-    console.log(`📋 NFs do Marcelo: ${nfsResult.rows.length}\n`);
+    console.log(`�Ÿ“‹ NFs do Marcelo: ${nfsResult.rows.length}\n`);
     
     let totalItens = 0;
     
     for (const nf of nfsResult.rows) {
-      console.log(`\n📦 NF ${nf.numero_nf} (ID: ${nf.id}):`);
+      console.log(`\n�Ÿ“� NF ${nf.numero_nf} (ID: ${nf.id}):`);
       console.log(`   Fornecedor: ${nf.fornecedor}`);
       console.log(`   Data: ${nf.data_compra}`);
-      console.log(`   É Receptoras: ${nf.eh_receptoras ? 'SIM' : 'NÃO'}`);
+      console.log(`   �‰ Receptoras: ${nf.eh_receptoras ? 'SIM' : 'N�ƒO'}`);
       
       // Buscar itens da NF
       const itensResult = await client.query(`
@@ -69,23 +69,23 @@ async function verificarItensNFMarcelo() {
               if (dados.raca) console.log(`         Raça: ${dados.raca}`);
               if (dados.peso) console.log(`         Peso: ${dados.peso}`);
             } catch (e) {
-              console.log(`      ⚠️ Erro ao parsear dados_item: ${e.message}`);
+              console.log(`      �š�️ Erro ao parsear dados_item: ${e.message}`);
             }
           }
         });
       } else {
-        console.log(`   ❌ Nenhum item cadastrado nesta NF`);
+        console.log(`   �Œ Nenhum item cadastrado nesta NF`);
       }
     }
     
     console.log('\n' + '='.repeat(80));
-    console.log(`\n📊 RESUMO:`);
+    console.log(`\n�Ÿ“Š RESUMO:`);
     console.log(`   Total de NFs: ${nfsResult.rows.length}`);
     console.log(`   Total de Itens: ${totalItens}`);
     console.log(`   Média de itens por NF: ${nfsResult.rows.length > 0 ? (totalItens / nfsResult.rows.length).toFixed(1) : 0}`);
     
     // Verificar se há tabela notas_fiscais_itens
-    console.log('\n\n🔍 VERIFICANDO ESTRUTURA DA TABELA notas_fiscais_itens:');
+    console.log('\n\n�Ÿ”� VERIFICANDO ESTRUTURA DA TABELA notas_fiscais_itens:');
     const estruturaResult = await client.query(`
       SELECT column_name, data_type
       FROM information_schema.columns
@@ -94,19 +94,19 @@ async function verificarItensNFMarcelo() {
     `);
     
     if (estruturaResult.rows.length > 0) {
-      console.log('\n✅ Tabela existe com as seguintes colunas:');
+      console.log('\n�œ… Tabela existe com as seguintes colunas:');
       estruturaResult.rows.forEach(col => {
         console.log(`   - ${col.column_name} (${col.data_type})`);
       });
     } else {
-      console.log('\n❌ Tabela notas_fiscais_itens NÃO existe!');
+      console.log('\n�Œ Tabela notas_fiscais_itens N�ƒO existe!');
     }
     
     console.log('\n' + '='.repeat(80));
-    console.log('\n✅ Verificação concluída!');
+    console.log('\n�œ… Verificação concluída!');
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
     console.error(error);
   } finally {
     client.release();

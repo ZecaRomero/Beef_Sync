@@ -1,9 +1,9 @@
 /**
- * Funções de formatação centralizadas
+ * FunÃ§Ãµes de formataÃ§Ã£o centralizadas
  */
 
 /**
- * Formata valor monetário em BRL
+ * Formata valor monetÃ¡rio em BRL
  */
 export function formatCurrency(value) {
   if (value === null || value === undefined || isNaN(value)) {
@@ -17,7 +17,7 @@ export function formatCurrency(value) {
 }
 
 /**
- * Formata número com separadores
+ * Formata nÃºmero com separadores
  */
 export function formatNumber(value, decimals = 0) {
   if (value === null || value === undefined || isNaN(value)) {
@@ -67,7 +67,7 @@ export function formatDateTime(date) {
 }
 
 /**
- * Normaliza identificação de doadora (ex: "CJCJ-13604 13604" -> "CJCJ 13604")
+ * Normaliza identificaÃ§Ã£o de doadora (ex: "CJCJ-13604 13604" -> "CJCJ 13604")
  */
 export function formatDoadoraIdentificacao(str) {
   if (!str || typeof str !== 'string') return str
@@ -127,7 +127,7 @@ export function calcularMesesIdade(dataNascimento, mesesCampo) {
 }
 
 /**
- * Calcula idade em meses em uma data de referência (ex: data da venda)
+ * Calcula idade em meses em uma data de referÃªncia (ex: data da venda)
  */
 export function calcularMesesIdadeNaData(dataNascimento, dataRef, mesesCampo) {
   if (mesesCampo != null && !isNaN(parseInt(mesesCampo)) && !dataRef) return parseInt(mesesCampo)
@@ -139,12 +139,12 @@ export function calcularMesesIdadeNaData(dataNascimento, dataRef, mesesCampo) {
 }
 
 /**
- * Calcula era (faixa etária) baseada em meses e sexo
+ * Calcula era (faixa etÃ¡ria) baseada em meses e sexo
  */
 export function calcularEra(meses, sexo) {
   if (!meses || meses <= 0) return null
   const m = parseInt(meses)
-  const isFemea = sexo && (String(sexo).toLowerCase().includes('fêmea') || String(sexo).toLowerCase().includes('femea') || sexo === 'F')
+  const isFemea = sexo && (String(sexo).toLowerCase().includes('fÃªmea') || String(sexo).toLowerCase().includes('femea') || sexo === 'F')
   const isMacho = sexo && (String(sexo).toLowerCase().includes('macho') || sexo === 'M')
   if (isFemea) {
     if (m <= 7) return '0/7'
@@ -168,19 +168,19 @@ export function calcularEra(meses, sexo) {
 }
 
 /**
- * Filtra nomes de touros que aparecem como localização
+ * Filtra nomes de touros que aparecem como localizaÃ§Ã£o
  */
 export function localizacaoValidaParaExibir(loc) {
   if (!loc || typeof loc !== 'string') return null
   const n = loc.trim()
-  if (!n || /^(VAZIO|NÃO INFORMADO|NAO INFORMADO|-)$/i.test(n)) return null
+  if (!n || /^(VAZIO|NÃÆ’O INFORMADO|NAO INFORMADO|-)$/i.test(n)) return null
   if (/^PIQUETE\s+(\d+|CABANHA|CONF|GUARITA|PISTA)$/i.test(n)) return loc
   if (/^PROJETO\s+[\dA-Za-z\-/]+$/i.test(n)) return loc
   if (/^CONFINA$/i.test(n)) return loc
   if (/^PIQ\s+\d+$/i.test(n)) return loc.replace(/^PIQ\s+/i, 'PIQUETE ')
-  // Abreviações comuns de importação: CABANHA, GUARITA, PISTA, CONF
+  // AbreviaÃ§Ãµes comuns de importaÃ§Ã£o: CABANHA, GUARITA, PISTA, CONF
   if (/^(CABANHA|GUARITA|PISTA|CONF)$/i.test(n)) return loc
-  return null // Nome de touro ou inválido
+  return null // Nome de touro ou invÃ¡lido
 }
 
 /**
@@ -195,7 +195,7 @@ export function formatPercentage(value, decimals = 1) {
 }
 
 /**
- * Formata bytes em formato legível
+ * Formata bytes em formato legÃ­vel
  */
 export function formatBytes(bytes, decimals = 2) {
   if (bytes === 0) return '0 Bytes';
@@ -210,7 +210,7 @@ export function formatBytes(bytes, decimals = 2) {
 }
 
 /**
- * Trunca texto com reticências
+ * Trunca texto com reticÃªncias
  */
 export function truncateText(text, maxLength) {
   if (!text) return '';
@@ -227,7 +227,7 @@ export function capitalize(text) {
 }
 
 /**
- * Formata nome próprio (primeira letra de cada palavra maiúscula)
+ * Formata nome prÃ³prio (primeira letra de cada palavra maiÃºscula)
  */
 export function formatProperName(name) {
   if (!name) return '';

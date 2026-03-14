@@ -5,7 +5,7 @@ const { query } = require('../lib/database')
 
 async function debugNF4346() {
   try {
-    console.log('🔍 Buscando NF 4346...')
+    console.log('�Ÿ”� Buscando NF 4346...')
     
     // Buscar a NF
     const nfResult = await query(`
@@ -16,12 +16,12 @@ async function debugNF4346() {
     `)
     
     if (nfResult.rows.length === 0) {
-      console.log('❌ NF 4346 não encontrada!')
+      console.log('�Œ NF 4346 não encontrada!')
       return
     }
     
     const nf = nfResult.rows[0]
-    console.log('✅ NF 4346 encontrada:', {
+    console.log('�œ… NF 4346 encontrada:', {
       id: nf.id,
       numero_nf: nf.numero_nf,
       tipo: nf.tipo,
@@ -37,7 +37,7 @@ async function debugNF4346() {
       ORDER BY id
     `, [nf.id])
     
-    console.log(`\n📦 Total de itens encontrados: ${itensResult.rows.length}`)
+    console.log(`\n�Ÿ“� Total de itens encontrados: ${itensResult.rows.length}`)
     
     itensResult.rows.forEach((row, index) => {
       console.log(`\n--- Item ${index + 1} ---`)
@@ -86,7 +86,7 @@ async function debugNF4346() {
       }
     }, 0)
     
-    console.log(`\n📊 Total de animais calculado: ${totalAnimais}`)
+    console.log(`\n�Ÿ“Š Total de animais calculado: ${totalAnimais}`)
     
     // Contar por sexo
     const porSexo = { femeas: 0, machos: 0 }
@@ -111,12 +111,12 @@ async function debugNF4346() {
       }
     })
     
-    console.log(`\n👥 Por Sexo:`)
+    console.log(`\n�Ÿ‘� Por Sexo:`)
     console.log(`   Fêmeas: ${porSexo.femeas}`)
     console.log(`   Machos: ${porSexo.machos}`)
     
   } catch (error) {
-    console.error('❌ Erro ao debugar NF 4346:', error)
+    console.error('�Œ Erro ao debugar NF 4346:', error)
   } finally {
     process.exit(0)
   }

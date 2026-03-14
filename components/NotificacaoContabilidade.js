@@ -78,7 +78,7 @@ export default function NotificacaoContabilidade({ lembrete, onFechar, onAcao })
                 ? 'text-red-800 dark:text-red-300'
                 : 'text-yellow-800 dark:text-yellow-300'
             }`}>
-              {isVencido ? '🚨 PRAZO VENCIDO!' : '⏰ Lembrete Contabilidade'}
+              {isVencido ? 'ðÅ¸Å¡¨ PRAZO VENCIDO!' : 'â�° Lembrete Contabilidade'}
             </h3>
           </div>
           <button
@@ -89,7 +89,7 @@ export default function NotificacaoContabilidade({ lembrete, onFechar, onAcao })
           </button>
         </div>
 
-        {/* Conteúdo */}
+        {/* ConteÃºdo */}
         <div className="mb-4">
           <p className={`text-sm font-medium mb-2 ${
             isVencido 
@@ -132,7 +132,7 @@ export default function NotificacaoContabilidade({ lembrete, onFechar, onAcao })
                   ? 'text-red-600 dark:text-red-400'
                   : 'text-yellow-600 dark:text-yellow-400'
               }`}>
-                <span className="mr-2">•</span>
+                <span className="mr-2">ââ‚¬¢</span>
                 {item}
               </li>
             ))}
@@ -148,7 +148,7 @@ export default function NotificacaoContabilidade({ lembrete, onFechar, onAcao })
           </ul>
         </div>
 
-        {/* Ações */}
+        {/* AÃ§Ãµes */}
         <div className="flex space-x-2">
           <button
             onClick={() => onAcao && onAcao('gerar_relatorio')}
@@ -159,7 +159,7 @@ export default function NotificacaoContabilidade({ lembrete, onFechar, onAcao })
             }`}
           >
             <DocumentTextIcon className="h-4 w-4 inline mr-1" />
-            Gerar Relatório
+            Gerar RelatÃ³rio
           </button>
           <button
             onClick={() => onAcao && onAcao('marcar_concluido')}
@@ -169,11 +169,11 @@ export default function NotificacaoContabilidade({ lembrete, onFechar, onAcao })
                 : 'bg-green-600 hover:bg-green-700 text-white'
             }`}
           >
-            ✅ Concluído
+            âÅ“â€¦ ConcluÃ­do
           </button>
         </div>
 
-        {/* Botão para abrir modal completo */}
+        {/* BotÃ£o para abrir modal completo */}
         <button
           onClick={() => onAcao && onAcao('abrir_modal')}
           className={`w-full mt-2 px-3 py-2 text-xs font-medium rounded-lg border-2 border-dashed transition-colors ${

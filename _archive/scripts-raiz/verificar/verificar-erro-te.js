@@ -10,7 +10,7 @@ const pool = new Pool({
 
 async function verificarErroTE() {
   try {
-    console.log('🔍 Verificando estrutura da tabela transferencias_embriao...\n')
+    console.log('�Ÿ”� Verificando estrutura da tabela transferencias_embriao...\n')
 
     // Ver estrutura da tabela
     const estrutura = await pool.query(`
@@ -24,7 +24,7 @@ async function verificarErroTE() {
       ORDER BY ordinal_position
     `)
 
-    console.log('📋 Colunas da tabela transferencias_embriao:')
+    console.log('�Ÿ“‹ Colunas da tabela transferencias_embriao:')
     estrutura.rows.forEach(col => {
       const nullable = col.is_nullable === 'YES' ? '(opcional)' : '(obrigatório)'
       const defaultVal = col.column_default ? ` [default: ${col.column_default}]` : ''
@@ -32,7 +32,7 @@ async function verificarErroTE() {
     })
 
     // Verificar constraints
-    console.log('\n📋 Constraints da tabela:')
+    console.log('\n�Ÿ“‹ Constraints da tabela:')
     const constraints = await pool.query(`
       SELECT
         tc.constraint_name,
@@ -50,7 +50,7 @@ async function verificarErroTE() {
     })
 
     // Testar inserção
-    console.log('\n🧪 Testando inserção de TE...')
+    console.log('\n�Ÿ�� Testando inserção de TE...')
     try {
       const teste = await pool.query(`
         INSERT INTO transferencias_embriao 
@@ -60,20 +60,20 @@ async function verificarErroTE() {
       `)
       
       if (teste.rows.length > 0) {
-        console.log(`✅ Inserção bem-sucedida! ID: ${teste.rows[0].id}`)
+        console.log(`�œ… Inserção bem-sucedida! ID: ${teste.rows[0].id}`)
         
         // Deletar o teste
         await pool.query(`DELETE FROM transferencias_embriao WHERE id = $1`, [teste.rows[0].id])
-        console.log('✅ Registro de teste deletado.')
+        console.log('�œ… Registro de teste deletado.')
       }
     } catch (error) {
-      console.log('❌ Erro ao inserir:', error.message)
+      console.log('�Œ Erro ao inserir:', error.message)
       console.log('\nDetalhes do erro:')
       console.log(error)
     }
 
   } catch (error) {
-    console.error('❌ Erro:', error.message)
+    console.error('�Œ Erro:', error.message)
   } finally {
     await pool.end()
   }

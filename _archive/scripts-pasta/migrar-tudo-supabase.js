@@ -25,7 +25,7 @@ function ask(question) {
 }
 
 function run(cmd, opts = {}) {
-  console.log(`\nâ–¶ ${cmd}\n`)
+  console.log(`\nââ€“¶ ${cmd}\n`)
   try {
     execSync(cmd, { stdio: 'inherit', ...opts })
     return true
@@ -38,12 +38,12 @@ async function main() {
   let projectRef = process.argv[2]
   
   if (!projectRef) {
-    console.log('\nğŸ“‹ Reference ID do Supabase (Settings â†’ General):')
+    console.log('\nğÅ¸â€œâ€¹ Reference ID do Supabase (Settings ââ€ â€™ General):')
     projectRef = await ask('> ')
   }
 
   if (!projectRef) {
-    console.error('âŒ Reference ID obrigatÃ³rio.')
+    console.error('âÅ’ Reference ID obrigatÃ³rio.')
     process.exit(1)
   }
 
@@ -54,14 +54,14 @@ async function main() {
   const envPath = path.join(process.cwd(), '.env')
   let envContent = fs.existsSync(envPath) ? fs.readFileSync(envPath, 'utf8') : ''
 
-  console.log('\nâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•')
-  console.log('  MigraÃ§Ã£o Beef-Sync â†’ Supabase')
-  console.log('â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•')
+  console.log('\nââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢')
+  console.log('  MigraÃ§Ã£o Beef-Sync ââ€ â€™ Supabase')
+  console.log('ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢')
 
   // 1. Backup do banco local (--local forÃ§a PostgreSQL local mesmo com DATABASE_URL)
-  console.log('\nğŸ“¦ Passo 1: Backup do banco local...')
+  console.log('\nğÅ¸â€œ¦ Passo 1: Backup do banco local...')
   if (!run('node scripts/backup-database.js completo json --local')) {
-    console.error('\nâŒ Backup falhou. Verifique se o PostgreSQL local estÃ¡ rodando.')
+    console.error('\nâÅ’ Backup falhou. Verifique se o PostgreSQL local estÃ¡ rodando.')
     process.exit(1)
   }
 
@@ -77,40 +77,40 @@ async function main() {
   }
 
   // 2. Configurar .env para Supabase (porta 5432 para migraÃ§Ã£o - mais estÃ¡vel)
-  console.log('\nâš™ï¸  Passo 2: Configurando .env...')
+  console.log('\nâÅ¡â„¢ï¸  Passo 2: Configurando .env...')
   envContent = envContent.replace(/^DATABASE_URL=.*$/m, '')
   envContent = envContent.replace(/^# DATABASE_URL=.*$/m, '')
   envContent = `DATABASE_URL=${databaseUrlSession}\n` + envContent.trim() + '\n'
   fs.writeFileSync(envPath, envContent)
 
   // 3. Inicializar schema no Supabase
-  console.log('\nğŸ“‹ Passo 3: Criando tabelas no Supabase...')
+  console.log('\nğÅ¸â€œâ€¹ Passo 3: Criando tabelas no Supabase...')
   if (!run('npm run db:init')) {
-    console.log('\nâš ï¸  db:init falhou - o schema pode jÃ¡ existir. Continuando...')
+    console.log('\nâÅ¡ ï¸  db:init falhou - o schema pode jÃ¡ existir. Continuando...')
   }
 
   // 4. Restaurar backup (usa porta 5432 - conexÃ£o mais estÃ¡vel para bulk)
   if (backupFile) {
     const backupPath = path.join(backupsDir, backupFile)
-    console.log(`\nğŸ“¥ Passo 4: Restaurando ${backupFile}...`)
+    console.log(`\nğÅ¸â€œ¥ Passo 4: Restaurando ${backupFile}...`)
     if (!run(`node scripts/restore-database.js "${backupPath}" --force`)) {
-      console.error('\nâŒ RestauraÃ§Ã£o falhou.')
+      console.error('\nâÅ’ RestauraÃ§Ã£o falhou.')
       process.exit(1)
     }
   } else {
-    console.log('\nâš ï¸  Nenhum backup encontrado. Restaure manualmente:')
+    console.log('\nâÅ¡ ï¸  Nenhum backup encontrado. Restaure manualmente:')
     console.log('   node scripts/restore-database.js backups/backup_completo_XXXX.json --force')
   }
 
   // 5. Trocar para porta 6543 (modo transaÃ§Ã£o) para o app em produÃ§Ã£o
-  console.log('\nâš™ï¸  Passo 5: Configurando .env para produÃ§Ã£o (porta 6543)...')
+  console.log('\nâÅ¡â„¢ï¸  Passo 5: Configurando .env para produÃ§Ã£o (porta 6543)...')
   envContent = fs.readFileSync(envPath, 'utf8')
   envContent = envContent.replace(/^DATABASE_URL=.*$/m, `DATABASE_URL=${databaseUrlTransaction}`)
   fs.writeFileSync(envPath, envContent)
 
-  console.log('\nâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•')
-  console.log('  âœ… MigraÃ§Ã£o concluÃ­da!')
-  console.log('â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•')
+  console.log('\nââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢')
+  console.log('  âÅ“â€¦ MigraÃ§Ã£o concluÃ­da!')
+  console.log('ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢ââ€¢')
   console.log('\n   Reinicie o app: npm run dev')
   console.log('   Para acesso 24/7: faÃ§a deploy na Vercel\n')
 }

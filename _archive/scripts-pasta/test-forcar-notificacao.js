@@ -14,7 +14,7 @@ async function testarForcado() {
   const pool = new Pool(dbConfig)
   
   try {
-    console.log('🧪 TESTE FORÇADO DE NOTIFICAÇÃO\n')
+    console.log('�Ÿ�� TESTE FOR�‡ADO DE NOTIFICA�‡�ƒO\n')
     
     // Buscar o último abastecimento
     const abastecimento = await pool.query(`
@@ -25,13 +25,13 @@ async function testarForcado() {
     `)
     
     if (abastecimento.rows.length === 0) {
-      console.log('❌ Nenhum abastecimento encontrado!')
+      console.log('�Œ Nenhum abastecimento encontrado!')
       await pool.end()
       return
     }
     
     const abast = abastecimento.rows[0]
-    console.log(`📊 Abastecimento encontrado:`)
+    console.log(`�Ÿ“Š Abastecimento encontrado:`)
     console.log(`   ID: ${abast.id}`)
     console.log(`   Data: ${abast.data_abastecimento}`)
     console.log(`   Próximo abastecimento atual: ${abast.proximo_abastecimento}`)
@@ -42,7 +42,7 @@ async function testarForcado() {
     doisDias.setDate(doisDias.getDate() + 2)
     const proximoAbastecimentoTeste = doisDias.toISOString().split('T')[0]
     
-    console.log(`\n🔧 Modificando próximo abastecimento para: ${proximoAbastecimentoTeste} (2 dias a partir de hoje)`)
+    console.log(`\n�Ÿ”� Modificando próximo abastecimento para: ${proximoAbastecimentoTeste} (2 dias a partir de hoje)`)
     
     // Atualizar o abastecimento para ter próximo abastecimento em 2 dias e resetar notificação
     await pool.query(`
@@ -52,7 +52,7 @@ async function testarForcado() {
       WHERE id = $2
     `, [proximoAbastecimentoTeste, abast.id])
     
-    console.log('✅ Abastecimento atualizado!')
+    console.log('�œ… Abastecimento atualizado!')
     
     // Verificar contatos
     const contatos = await pool.query(`
@@ -61,18 +61,18 @@ async function testarForcado() {
       WHERE ativo = true
     `)
     
-    console.log(`\n📱 Contatos que receberão notificação: ${contatos.rows.length}`)
+    console.log(`\n�Ÿ“� Contatos que receberão notificação: ${contatos.rows.length}`)
     contatos.rows.forEach(c => {
       console.log(`   - ${c.nome}: ${c.whatsapp}`)
     })
     
     if (contatos.rows.length === 0) {
-      console.log('\n⚠️ Nenhum contato cadastrado! Não será possível enviar.')
+      console.log('\n�š�️ Nenhum contato cadastrado! Não será possível enviar.')
       await pool.end()
       return
     }
     
-    console.log('\n🚀 Enviando notificações...\n')
+    console.log('\n�Ÿš€ Enviando notificações...\n')
     
     // Chamar a API
     const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3020'
@@ -87,46 +87,46 @@ async function testarForcado() {
       
       const result = await response.json()
       
-      console.log('📨 RESULTADO DO ENVIO:\n')
+      console.log('�Ÿ“� RESULTADO DO ENVIO:\n')
       
       if (result.success) {
-        console.log('✅ SUCESSO!')
+        console.log('�œ… SUCESSO!')
         console.log(`   ${result.message}`)
         if (result.data) {
-          console.log(`\n   📊 Detalhes:`)
-          console.log(`   • Abastecimentos processados: ${result.data.abastecimentos_processados}`)
-          console.log(`   • Contatos notificados: ${result.data.contatos_notificados}`)
-          console.log(`   • Total de mensagens enviadas: ${result.data.resultados.total_enviados}`)
+          console.log(`\n   �Ÿ“Š Detalhes:`)
+          console.log(`   �€� Abastecimentos processados: ${result.data.abastecimentos_processados}`)
+          console.log(`   �€� Contatos notificados: ${result.data.contatos_notificados}`)
+          console.log(`   �€� Total de mensagens enviadas: ${result.data.resultados.total_enviados}`)
           
           if (result.data.resultados.sucessos.length > 0) {
-            console.log(`\n   ✅ Mensagens enviadas com sucesso:`)
+            console.log(`\n   �œ… Mensagens enviadas com sucesso:`)
             result.data.resultados.sucessos.forEach(s => {
               console.log(`      - ${s.contato_nome} (${s.contato_whatsapp})`)
             })
           }
           
           if (result.data.resultados.erros.length > 0) {
-            console.log(`\n   ⚠️ Erros encontrados: ${result.data.resultados.erros.length}`)
+            console.log(`\n   �š�️ Erros encontrados: ${result.data.resultados.erros.length}`)
             result.data.resultados.erros.forEach(erro => {
               console.log(`      - ${erro.contato_nome}: ${erro.erro}`)
             })
           }
         }
       } else {
-        console.log('❌ Erro:', result.message || result.error)
+        console.log('�Œ Erro:', result.message || result.error)
       }
     } catch (apiError) {
-      console.error('❌ Erro ao chamar API:', apiError.message)
+      console.error('�Œ Erro ao chamar API:', apiError.message)
       if (apiError.code === 'ECONNREFUSED') {
-        console.log('\n💡 O servidor não está rodando!')
+        console.log('\n�Ÿ’� O servidor não está rodando!')
         console.log('   Inicie o servidor com: npm run dev')
       }
     }
     
     await pool.end()
-    console.log('\n✅ Teste concluído!')
+    console.log('\n�œ… Teste concluído!')
   } catch (error) {
-    console.error('❌ Erro:', error.message)
+    console.error('�Œ Erro:', error.message)
     console.error(error.stack)
     await pool.end()
     process.exit(1)

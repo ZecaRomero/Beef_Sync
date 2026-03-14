@@ -19,7 +19,7 @@ async function verificarRemTouros() {
       LIMIT 50
     `)
 
-    console.log(`\n📊 Total de transferências com "REM" no touro: ${result.rows.length}\n`)
+    console.log(`\n�Ÿ“Š Total de transferências com "REM" no touro: ${result.rows.length}\n`)
 
     if (result.rows.length > 0) {
       result.rows.forEach((r, idx) => {
@@ -44,12 +44,12 @@ async function verificarRemTouros() {
         agrupado[touro].push(r)
       })
 
-      console.log('\n📊 Agrupado por valor do touro:\n')
+      console.log('\n�Ÿ“Š Agrupado por valor do touro:\n')
       Object.keys(agrupado).sort().forEach(touro => {
         console.log(`   "${touro}": ${agrupado[touro].length} transferência(s)`)
       })
     } else {
-      console.log('✅ Nenhuma transferência encontrada com "REM" no touro')
+      console.log('�œ… Nenhuma transferência encontrada com "REM" no touro')
     }
 
     // Verificar também touros vazios ou nulos
@@ -59,10 +59,10 @@ async function verificarRemTouros() {
       WHERE touro IS NULL OR touro = ''
     `)
 
-    console.log(`\n📊 Transferências com touro vazio ou NULL: ${vazios.rows[0].total}`)
+    console.log(`\n�Ÿ“Š Transferências com touro vazio ou NULL: ${vazios.rows[0].total}`)
 
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('�Œ Erro:', error)
     throw error
   }
 }
@@ -71,7 +71,7 @@ if (require.main === module) {
   verificarRemTouros()
     .then(() => process.exit(0))
     .catch((error) => {
-      console.error('❌ Erro:', error)
+      console.error('�Œ Erro:', error)
       process.exit(1)
     })
 }

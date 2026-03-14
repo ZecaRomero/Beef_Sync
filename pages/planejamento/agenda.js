@@ -149,33 +149,33 @@ export default function ActivityAgenda() {
     try {
       const dados = tipo === 'brucelose' ? bruceloseFiltrado : dgtFiltrado
       const titulo = tipo === 'brucelose' 
-        ? 'Vacina Brucelose - Fêmeas 3 a 8 meses' 
-        : 'Avaliação DGT - Animais 330 a 640 dias'
+        ? 'Vacina Brucelose - FÃªmeas 3 a 8 meses' 
+        : 'AvaliaÃ§Ã£o DGT - Animais 330 a 640 dias'
       
-      // Preparar dados para exportação
+      // Preparar dados para exportaÃ§Ã£o
       const dadosExcel = dados.map(animal => ({
-        'Série': animal.serie || '',
+        'SÃ©rie': animal.serie || '',
         'RG': animal.rg || '',
         'Sexo': animal.sexo || '',
-        'Raça': animal.raca || '',
+        'RaÃ§a': animal.raca || '',
         'Data Nascimento': formatDate(animal.data_nascimento),
         'Idade (dias)': animal.idade_dias || 0,
         'Idade (meses)': Math.floor((animal.idade_dias || 0) / 30.44),
         'Peso (kg)': animal.peso || '-',
-        'Piquete': animal.piquete || 'Não informado',
-        'Evento': tipo === 'brucelose' ? 'Vacina Brucelose' : 'Avaliação DGT'
+        'Piquete': animal.piquete || 'NÃ£o informado',
+        'Evento': tipo === 'brucelose' ? 'Vacina Brucelose' : 'AvaliaÃ§Ã£o DGT'
       }))
 
       // Criar workbook
       const wb = XLSX.utils.book_new()
       const ws = XLSX.utils.json_to_sheet(dadosExcel)
 
-      // Estilizar cabeçalho (largura das colunas)
+      // Estilizar cabeÃ§alho (largura das colunas)
       const colWidths = [
-        { wch: 10 }, // Série
+        { wch: 10 }, // SÃ©rie
         { wch: 10 }, // RG
         { wch: 8 },  // Sexo
-        { wch: 15 }, // Raça
+        { wch: 15 }, // RaÃ§a
         { wch: 15 }, // Data Nascimento
         { wch: 12 }, // Idade (dias)
         { wch: 12 }, // Idade (meses)
@@ -192,10 +192,10 @@ export default function ActivityAgenda() {
       const nomeArquivo = `${titulo.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`
       XLSX.writeFile(wb, nomeArquivo)
 
-      alert(`✅ Arquivo exportado com sucesso: ${nomeArquivo}`)
+      alert(`âÅ“â€¦ Arquivo exportado com sucesso: ${nomeArquivo}`)
     } catch (error) {
       console.error('Erro ao exportar:', error)
-      alert('❌ Erro ao exportar arquivo. Tente novamente.')
+      alert('â�Å’ Erro ao exportar arquivo. Tente novamente.')
     } finally {
       setExportando(false)
     }
@@ -203,7 +203,7 @@ export default function ActivityAgenda() {
 
   const enviarPorEmail = async (tipo) => {
     if (!emailDestinatario.trim()) {
-      alert('Por favor, informe um e-mail válido.')
+      alert('Por favor, informe um e-mail vÃ¡lido.')
       return
     }
 
@@ -211,8 +211,8 @@ export default function ActivityAgenda() {
     try {
       const dados = tipo === 'brucelose' ? bruceloseFiltrado : dgtFiltrado
       const titulo = tipo === 'brucelose' 
-        ? 'Vacina Brucelose - Fêmeas 3 a 8 meses' 
-        : 'Avaliação DGT - Animais 330 a 640 dias'
+        ? 'Vacina Brucelose - FÃªmeas 3 a 8 meses' 
+        : 'AvaliaÃ§Ã£o DGT - Animais 330 a 640 dias'
 
       const response = await fetch('/api/relatorios-envio/enviar', {
         method: 'POST',
@@ -238,15 +238,15 @@ export default function ActivityAgenda() {
       const result = await response.json()
       
       if (result.success) {
-        alert(`✅ Relatório enviado com sucesso para ${emailDestinatario}`)
+        alert(`âÅ“â€¦ RelatÃ³rio enviado com sucesso para ${emailDestinatario}`)
         setShowEmailModal(null)
         setEmailDestinatario('')
       } else {
-        alert(`❌ Erro ao enviar e-mail: ${result.message || 'Erro desconhecido'}`)
+        alert(`â�Å’ Erro ao enviar e-mail: ${result.message || 'Erro desconhecido'}`)
       }
     } catch (error) {
       console.error('Erro ao enviar e-mail:', error)
-      alert('❌ Erro ao enviar e-mail. Verifique sua conexão e tente novamente.')
+      alert('â�Å’ Erro ao enviar e-mail. Verifique sua conexÃ£o e tente novamente.')
     } finally {
       setEnviandoEmail(false)
     }
@@ -286,7 +286,7 @@ export default function ActivityAgenda() {
             Agenda de Atividades
           </h1>
           <p className="text-gray-600 dark:text-gray-300 mt-2">
-            Cronograma unificado: atividades, vacina Brucelose (fêmeas 3-8 meses) e avaliação DGT (330-640 dias)
+            Cronograma unificado: atividades, vacina Brucelose (fÃªmeas 3-8 meses) e avaliaÃ§Ã£o DGT (330-640 dias)
           </p>
         </div>
         <div className="flex gap-2">
@@ -296,7 +296,7 @@ export default function ActivityAgenda() {
               className="flex items-center gap-2"
             >
               <DevicePhoneMobileIcon className="h-5 w-5" />
-              Versão Mobile
+              VersÃ£o Mobile
             </Button>
           </Link>
           <Button
@@ -305,7 +305,7 @@ export default function ActivityAgenda() {
             className="flex items-center gap-2"
           >
             <LinkIcon className="h-5 w-5" />
-            Calendários Externos
+            CalendÃ¡rios Externos
           </Button>
           <Button onClick={() => setShowNewActivity(true)} className="flex items-center gap-2">
             <PlusIcon className="h-5 w-5" />
@@ -314,12 +314,12 @@ export default function ActivityAgenda() {
         </div>
       </div>
 
-      {/* Links para calendários externos */}
+      {/* Links para calendÃ¡rios externos */}
       {calendarLinks.length > 0 && (
         <Card className="p-4">
           <h3 className="font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
             <LinkIcon className="h-5 w-5" />
-            Calendários vinculados
+            CalendÃ¡rios vinculados
           </h3>
           <div className="flex flex-wrap gap-2">
             {calendarLinks.map(link => (
@@ -331,14 +331,14 @@ export default function ActivityAgenda() {
                 className="inline-flex items-center gap-2 px-3 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors text-sm"
               >
                 {link.nome}
-                <span className="text-xs">↗</span>
+                <span className="text-xs">ââ€ â€”</span>
               </a>
             ))}
           </div>
         </Card>
       )}
 
-      {/* Abas e Calendário */}
+      {/* Abas e CalendÃ¡rio */}
       <div className="flex gap-2 flex-wrap">
         {['todos', 'atividades', 'brucelose', 'dgt'].map(aba => (
           <button
@@ -359,7 +359,7 @@ export default function ActivityAgenda() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Calendário */}
+        {/* CalendÃ¡rio */}
         <Card className="p-4 lg:col-span-1">
           <div className="flex items-center justify-between mb-4">
             <button
@@ -430,7 +430,7 @@ export default function ActivityAgenda() {
               <div className="flex justify-between items-center">
                 <h4 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                   <ShieldCheckIcon className="h-5 w-5 text-amber-500" />
-                  Vacina Brucelose – Fêmeas 3 a 8 meses (obrigatório)
+                  Vacina Brucelose ââ‚¬â€œ FÃªmeas 3 a 8 meses (obrigatÃ³rio)
                 </h4>
                 {bruceloseFiltrado.length > 0 && (
                   <div className="flex gap-2">
@@ -462,7 +462,7 @@ export default function ActivityAgenda() {
                 <Card className="p-4">
                   <CheckCircleIcon className="h-10 w-10 text-green-600 mx-auto mb-2" />
                   <p className="text-gray-600 dark:text-gray-400 text-center text-sm">
-                    Nenhuma fêmea elegível para Brucelose neste mês (3-8 meses, sem vacina prévia)
+                    Nenhuma fÃªmea elegÃ­vel para Brucelose neste mÃªs (3-8 meses, sem vacina prÃ©via)
                   </p>
                 </Card>
               ) : (
@@ -479,9 +479,9 @@ export default function ActivityAgenda() {
                           <span className="text-gray-600 dark:text-gray-400 ml-2">({animal.raca})</span>
                           <p className="text-sm text-gray-500 mt-1">
                             <MapPinIcon className="h-4 w-4 inline mr-1" />
-                            {animal.piquete || 'Piquete não informado'}
+                            {animal.piquete || 'Piquete nÃ£o informado'}
                           </p>
-                          <p className="text-xs text-gray-500 mt-1">{Math.floor((animal.idade_dias || 0) / 30.44)} meses • {formatDate(animal.data_nascimento)}</p>
+                          <p className="text-xs text-gray-500 mt-1">{Math.floor((animal.idade_dias || 0) / 30.44)} meses ââ‚¬¢ {formatDate(animal.data_nascimento)}</p>
                         </div>
                         <Link
                           href={`/consulta-animal/${animal.id}`}
@@ -505,7 +505,7 @@ export default function ActivityAgenda() {
               <div className="flex justify-between items-center">
                 <h4 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                   <ChartBarIcon className="h-5 w-5 text-emerald-500" />
-                  Avaliação DGT – Animais 330 a 640 dias
+                  AvaliaÃ§Ã£o DGT ââ‚¬â€œ Animais 330 a 640 dias
                 </h4>
                 {dgtFiltrado.length > 0 && (
                   <div className="flex gap-2">
@@ -537,7 +537,7 @@ export default function ActivityAgenda() {
                 <Card className="p-4">
                   <CheckCircleIcon className="h-10 w-10 text-green-600 mx-auto mb-2" />
                   <p className="text-gray-600 dark:text-gray-400 text-center text-sm">
-                    Nenhum animal elegível para avaliação DGT neste mês (330-640 dias)
+                    Nenhum animal elegÃ­vel para avaliaÃ§Ã£o DGT neste mÃªs (330-640 dias)
                   </p>
                 </Card>
               ) : (
@@ -551,12 +551,12 @@ export default function ActivityAgenda() {
                       <div className="flex justify-between items-start">
                         <div>
                           <span className="font-semibold text-gray-900 dark:text-white">{animal.serie}-{animal.rg}</span>
-                          <span className="text-gray-600 dark:text-gray-400 ml-2">({animal.sexo} • {animal.raca})</span>
+                          <span className="text-gray-600 dark:text-gray-400 ml-2">({animal.sexo} ââ‚¬¢ {animal.raca})</span>
                           <p className="text-sm text-gray-500 mt-1">
                             <MapPinIcon className="h-4 w-4 inline mr-1" />
-                            {animal.piquete || 'Piquete não informado'}
+                            {animal.piquete || 'Piquete nÃ£o informado'}
                           </p>
-                          <p className="text-xs text-gray-500 mt-1">{animal.idade_dias} dias ({Math.floor((animal.idade_dias || 0) / 30.44)} meses) • {formatDate(animal.data_nascimento)}</p>
+                          <p className="text-xs text-gray-500 mt-1">{animal.idade_dias} dias ({Math.floor((animal.idade_dias || 0) / 30.44)} meses) ââ‚¬¢ {formatDate(animal.data_nascimento)}</p>
                         </div>
                         <Link
                           href={`/consulta-animal/${animal.id}`}
@@ -583,7 +583,7 @@ export default function ActivityAgenda() {
               <Card className="p-8 text-center">
                 <CheckCircleIcon className="h-12 w-12 text-green-600 mx-auto mb-4" />
                 <p className="text-gray-600 dark:text-gray-400">
-                  Nenhum evento para o mês selecionado. Adicione atividades ou verifique os animais elegíveis.
+                  Nenhum evento para o mÃªs selecionado. Adicione atividades ou verifique os animais elegÃ­veis.
                 </p>
               </Card>
             )}
@@ -597,17 +597,17 @@ export default function ActivityAgenda() {
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Nova Atividade</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Título *</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">TÃ­tulo *</label>
                 <input
                   type="text"
                   value={newActivity.title}
                   onChange={(e) => setNewActivity({ ...newActivity, title: e.target.value })}
-                  placeholder="Ex: Vacinação do rebanho"
+                  placeholder="Ex: VacinaÃ§Ã£o do rebanho"
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descrição</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">DescriÃ§Ã£o</label>
                 <textarea
                   value={newActivity.description}
                   onChange={(e) => setNewActivity({ ...newActivity, description: e.target.value })}
@@ -644,7 +644,7 @@ export default function ActivityAgenda() {
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="low">Baixa</option>
-                  <option value="medium">Média</option>
+                  <option value="medium">MÃ©dia</option>
                   <option value="high">Alta</option>
                 </select>
               </div>
@@ -657,18 +657,18 @@ export default function ActivityAgenda() {
         </div>
       )}
 
-      {/* Modal Calendários Externos */}
+      {/* Modal CalendÃ¡rios Externos */}
       {showCalendarLinks && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <Card className="p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Vincular Calendários</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Vincular CalendÃ¡rios</h2>
               <button onClick={() => setShowCalendarLinks(false)} className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded">
                 <XMarkIcon className="h-6 w-6" />
               </button>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              Adicione links para Google Calendar, Outlook ou outros calendários de compromissos.
+              Adicione links para Google Calendar, Outlook ou outros calendÃ¡rios de compromissos.
             </p>
             <div className="space-y-4 mb-4">
               <input
@@ -680,7 +680,7 @@ export default function ActivityAgenda() {
               />
               <input
                 type="url"
-                placeholder="URL do calendário"
+                placeholder="URL do calendÃ¡rio"
                 value={newCalendarLink.url}
                 onChange={(e) => setNewCalendarLink({ ...newCalendarLink, url: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -720,13 +720,13 @@ export default function ActivityAgenda() {
             </div>
             <div className="space-y-3 text-sm">
               <div className="grid grid-cols-2 gap-2">
-                <span className="text-gray-500">Série:</span>
+                <span className="text-gray-500">SÃ©rie:</span>
                 <span className="font-medium">{animalSelecionado.serie}</span>
                 <span className="text-gray-500">RG:</span>
                 <span className="font-medium">{animalSelecionado.rg}</span>
                 <span className="text-gray-500">Sexo:</span>
                 <span className="font-medium">{animalSelecionado.sexo}</span>
-                <span className="text-gray-500">Raça:</span>
+                <span className="text-gray-500">RaÃ§a:</span>
                 <span className="font-medium">{animalSelecionado.raca}</span>
                 <span className="text-gray-500">Data nascimento:</span>
                 <span className="font-medium">{formatDate(animalSelecionado.data_nascimento)}</span>
@@ -739,10 +739,10 @@ export default function ActivityAgenda() {
                 <span className="text-gray-500">Peso:</span>
                 <span className="font-medium">{animalSelecionado.peso ? `${animalSelecionado.peso} kg` : '-'}</span>
                 <span className="text-gray-500">Piquete:</span>
-                <span className="font-medium">{animalSelecionado.piquete || 'Não informado'}</span>
+                <span className="font-medium">{animalSelecionado.piquete || 'NÃ£o informado'}</span>
                 <span className="text-gray-500">Evento:</span>
                 <span className="font-medium">
-                  {animalSelecionado.tipo === 'brucelose' ? 'Vacina Brucelose (3-8 meses)' : 'Avaliação DGT (330-640 dias)'}
+                  {animalSelecionado.tipo === 'brucelose' ? 'Vacina Brucelose (3-8 meses)' : 'AvaliaÃ§Ã£o DGT (330-640 dias)'}
                 </span>
               </div>
               <div className="pt-4 border-t border-gray-200 dark:border-gray-600">
@@ -773,12 +773,12 @@ export default function ActivityAgenda() {
               </button>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              Enviar relatório de {showEmailModal === 'brucelose' ? 'Vacina Brucelose' : 'Avaliação DGT'} com {showEmailModal === 'brucelose' ? bruceloseFiltrado.length : dgtFiltrado.length} animal(is).
+              Enviar relatÃ³rio de {showEmailModal === 'brucelose' ? 'Vacina Brucelose' : 'AvaliaÃ§Ã£o DGT'} com {showEmailModal === 'brucelose' ? bruceloseFiltrado.length : dgtFiltrado.length} animal(is).
             </p>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  E-mail do destinatário *
+                  E-mail do destinatÃ¡rio *
                 </label>
                 <input
                   type="email"

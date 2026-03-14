@@ -1,18 +1,18 @@
-// Serviço de envio de WhatsApp
-// Suporta múltiplas APIs: Twilio, Evolution API, ou WhatsApp Web API
+// ServiÃ§o de envio de WhatsApp
+// Suporta mÃºltiplas APIs: Twilio, Evolution API, ou WhatsApp Web API
 
-// Normaliza número para formato internacional (55 + DDD + número)
-// Evita duplicar código do país quando usuário já informou 55
+// Normaliza nÃºmero para formato internacional (55 + DDD + nÃºmero)
+// Evita duplicar cÃ³digo do paÃ­s quando usuÃ¡rio jÃ¡ informou 55
 function normalizeWhatsAppNumber(whatsapp) {
   if (!whatsapp) return ''
   const digits = String(whatsapp).replace(/\D/g, '')
   if (digits.startsWith('55') && digits.length >= 12) {
-    return digits // Já tem código do país
+    return digits // JÃ¡ tem cÃ³digo do paÃ­s
   }
   return `55${digits}`
 }
 
-// Helper para verificar se Twilio está disponível (twilio em optionalDependencies)
+// Helper para verificar se Twilio estÃ¡ disponÃ­vel (twilio em optionalDependencies)
 const isTwilioAvailable = () => {
   try {
     if (typeof require === 'undefined') return false
@@ -25,18 +25,18 @@ const isTwilioAvailable = () => {
 
 // Helper para importar Twilio dinamicamente (opcional)
 const importTwilio = async () => {
-  // Verificar se está disponível antes de tentar importar
+  // Verificar se estÃ¡ disponÃ­vel antes de tentar importar
   if (!isTwilioAvailable()) {
     return null
   }
   
   try {
-    // Usar Function para evitar análise estática do webpack
+    // Usar Function para evitar anÃ¡lise estÃ¡tica do webpack
     const dynamicImport = new Function('moduleName', 'return import(moduleName)')
     const twilioModule = await dynamicImport('twilio')
     return twilioModule.default || twilioModule
   } catch (error) {
-    // Se o módulo não estiver instalado, retornar null
+    // Se o mÃ³dulo nÃ£o estiver instalado, retornar null
     if (error.code === 'MODULE_NOT_FOUND' || 
         error.message.includes('Cannot find module') ||
         error.message.includes("Cannot resolve module")) {
@@ -49,13 +49,13 @@ const importTwilio = async () => {
 // Enviar via Twilio WhatsApp Business API
 export const sendViaTwilio = async (recipient, message, mediaUrl = null) => {
   if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) {
-    throw new Error('Twilio não configurado. Configure TWILIO_ACCOUNT_SID e TWILIO_AUTH_TOKEN no .env')
+    throw new Error('Twilio nÃ£o configurado. Configure TWILIO_ACCOUNT_SID e TWILIO_AUTH_TOKEN no .env')
   }
 
-  // Import dinâmico do Twilio
+  // Import dinÃ¢mico do Twilio
   const twilio = await importTwilio()
   if (!twilio) {
-    throw new Error('Módulo Twilio não instalado. Execute: npm install twilio ou configure Evolution API')
+    throw new Error('MÃ³dulo Twilio nÃ£o instalado. Execute: npm install twilio ou configure Evolution API')
   }
 
   const client = twilio(
@@ -72,17 +72,17 @@ export const sendViaTwilio = async (recipient, message, mediaUrl = null) => {
     body: message
   }
 
-  // Se houver mídia (arquivo), adicionar
+  // Se houver mÃ­dia (arquivo), adicionar
   if (mediaUrl) {
     messageOptions.mediaUrl = [mediaUrl]
   }
 
   try {
     const result = await client.messages.create(messageOptions)
-    console.log(`✅ WhatsApp enviado via Twilio para ${recipient.whatsapp}:`, result.sid)
+    console.log(`âÅ“â€¦ WhatsApp enviado via Twilio para ${recipient.whatsapp}:`, result.sid)
     return { success: true, messageId: result.sid }
   } catch (error) {
-    console.error(`❌ Erro ao enviar WhatsApp via Twilio:`, error)
+    console.error(`â�Å’ Erro ao enviar WhatsApp via Twilio:`, error)
     throw error
   }
 }
@@ -90,7 +90,7 @@ export const sendViaTwilio = async (recipient, message, mediaUrl = null) => {
 // Enviar via Evolution API (API local de WhatsApp)
 export const sendViaEvolutionAPI = async (recipient, message) => {
   if (!process.env.EVOLUTION_API_URL || !process.env.EVOLUTION_API_KEY) {
-    throw new Error('Evolution API não configurada. Configure EVOLUTION_API_URL e EVOLUTION_API_KEY no .env')
+    throw new Error('Evolution API nÃ£o configurada. Configure EVOLUTION_API_URL e EVOLUTION_API_KEY no .env')
   }
 
   const whatsappNumber = normalizeWhatsAppNumber(recipient.whatsapp)
@@ -104,7 +104,7 @@ export const sendViaEvolutionAPI = async (recipient, message) => {
   }
 
   try {
-    console.log(`📤 Evolution API: enviando para ${whatsappNumber} (${recipient.whatsapp})`)
+    console.log(`ðÅ¸â€œ¤ Evolution API: enviando para ${whatsappNumber} (${recipient.whatsapp})`)
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -116,7 +116,7 @@ export const sendViaEvolutionAPI = async (recipient, message) => {
 
     const responseText = await response.text()
     if (!response.ok) {
-      console.error(`❌ Evolution API error ${response.status}:`, responseText)
+      console.error(`â�Å’ Evolution API error ${response.status}:`, responseText)
       throw new Error(`Evolution API error: ${response.status} - ${responseText}`)
     }
 
@@ -126,20 +126,20 @@ export const sendViaEvolutionAPI = async (recipient, message) => {
     } catch {
       result = {}
     }
-    console.log(`✅ WhatsApp enviado via Evolution API para ${recipient.whatsapp}`)
+    console.log(`âÅ“â€¦ WhatsApp enviado via Evolution API para ${recipient.whatsapp}`)
 
     return { success: true, messageId: result.key?.id }
   } catch (error) {
     if (error.message?.includes('fetch') || error.code === 'ECONNREFUSED') {
-      console.error(`❌ Evolution API inacessível. Verifique se está rodando em ${process.env.EVOLUTION_API_URL}`)
-      throw new Error('Evolution API inacessível. Inicie o Evolution API (ex: docker run -p 8080:8080 atendai/evolution-api) e verifique EVOLUTION_API_URL no .env')
+      console.error(`â�Å’ Evolution API inacessÃ­vel. Verifique se estÃ¡ rodando em ${process.env.EVOLUTION_API_URL}`)
+      throw new Error('Evolution API inacessÃ­vel. Inicie o Evolution API (ex: docker run -p 8080:8080 atendai/evolution-api) e verifique EVOLUTION_API_URL no .env')
     }
-    console.error(`❌ Erro ao enviar WhatsApp via Evolution API:`, error)
+    console.error(`â�Å’ Erro ao enviar WhatsApp via Evolution API:`, error)
     throw error
   }
 }
 
-// Enviar mídia via Evolution API
+// Enviar mÃ­dia via Evolution API
 const sendMediaViaEvolutionAPI = async (recipient, mediaBuffer, filename, caption) => {
   const whatsappNumber = normalizeWhatsAppNumber(recipient.whatsapp)
   const instanceName = process.env.EVOLUTION_INSTANCE_NAME || 'default'
@@ -147,7 +147,7 @@ const sendMediaViaEvolutionAPI = async (recipient, mediaBuffer, filename, captio
   // Converter buffer para base64
   const base64Media = mediaBuffer.toString('base64')
   
-  // Determinar mimeType baseado na extensão do arquivo
+  // Determinar mimeType baseado na extensÃ£o do arquivo
   let mimeType = 'application/octet-stream'
   let mediatype = 'document'
   
@@ -176,7 +176,7 @@ const sendMediaViaEvolutionAPI = async (recipient, mediaBuffer, filename, captio
   }
 
   try {
-    console.log(`📤 Evolution API (mídia): enviando para ${whatsappNumber} (${recipient.whatsapp})`)
+    console.log(`ðÅ¸â€œ¤ Evolution API (mÃ­dia): enviando para ${whatsappNumber} (${recipient.whatsapp})`)
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -188,7 +188,7 @@ const sendMediaViaEvolutionAPI = async (recipient, mediaBuffer, filename, captio
 
     const responseText = await response.text()
     if (!response.ok) {
-      console.error(`❌ Evolution API media error ${response.status}:`, responseText.substring(0, 200))
+      console.error(`â�Å’ Evolution API media error ${response.status}:`, responseText.substring(0, 200))
       throw new Error(`Evolution API media error: ${response.status} - ${responseText}`)
     }
 
@@ -199,8 +199,8 @@ const sendMediaViaEvolutionAPI = async (recipient, mediaBuffer, filename, captio
     }
   } catch (error) {
     if (error.message?.includes('fetch') || error.code === 'ECONNREFUSED') {
-      console.error(`❌ Evolution API inacessível em ${process.env.EVOLUTION_API_URL}`)
-      throw new Error('Evolution API inacessível. Verifique se está rodando e se EVOLUTION_API_URL está correto no .env')
+      console.error(`â�Å’ Evolution API inacessÃ­vel em ${process.env.EVOLUTION_API_URL}`)
+      throw new Error('Evolution API inacessÃ­vel. Verifique se estÃ¡ rodando e se EVOLUTION_API_URL estÃ¡ correto no .env')
     }
     throw error
   }
@@ -214,36 +214,36 @@ async function sendViaWhatsAppWeb(recipient, message) {
     try {
       whatsappWeb = require('./whatsappWebService.cjs')
     } catch {
-      // Se não funcionar, tentar ES module
+      // Se nÃ£o funcionar, tentar ES module
       const module = await import('./whatsappWebService.js')
       whatsappWeb = module.default || module
     }
     
     const ready = await whatsappWeb.isWhatsAppReady()
     if (!ready) {
-      throw new Error('WhatsApp Web não está pronto. Escaneie o QR Code primeiro. Execute o servidor (npm run dev) e escaneie o QR Code que aparecer no terminal.')
+      throw new Error('WhatsApp Web nÃ£o estÃ¡ pronto. Escaneie o QR Code primeiro. Execute o servidor (npm run dev) e escaneie o QR Code que aparecer no terminal.')
     }
     
     return await whatsappWeb.sendWhatsAppWeb(recipient, message)
   } catch (error) {
-    if (error.code === 'MODULE_NOT_FOUND' || error.message.includes('não instalado') || error.message.includes('Cannot find module')) {
-      throw new Error('whatsapp-web.js não instalado. Execute: npm install whatsapp-web.js qrcode-terminal')
+    if (error.code === 'MODULE_NOT_FOUND' || error.message.includes('nÃ£o instalado') || error.message.includes('Cannot find module')) {
+      throw new Error('whatsapp-web.js nÃ£o instalado. Execute: npm install whatsapp-web.js qrcode-terminal')
     }
     throw error
   }
 }
 
-// Função principal de envio de mensagem de texto
+// FunÃ§Ã£o principal de envio de mensagem de texto
 export const sendWhatsApp = async (recipient, message) => {
-  // Verificar qual serviço está configurado (ordem de prioridade)
+  // Verificar qual serviÃ§o estÃ¡ configurado (ordem de prioridade)
   
   // 1. Tentar Twilio primeiro
   if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
     try {
       return await sendViaTwilio(recipient, message)
     } catch (error) {
-      console.warn('⚠️ Erro ao enviar via Twilio, tentando alternativas...', error.message)
-      // Continuar para tentar outras opções
+      console.warn('âÅ¡ ï¸� Erro ao enviar via Twilio, tentando alternativas...', error.message)
+      // Continuar para tentar outras opÃ§Ãµes
     }
   }
   
@@ -252,31 +252,31 @@ export const sendWhatsApp = async (recipient, message) => {
     try {
       return await sendViaEvolutionAPI(recipient, message)
     } catch (error) {
-      console.warn('⚠️ Erro ao enviar via Evolution API, tentando WhatsApp Web...', error.message)
+      console.warn('âÅ¡ ï¸� Erro ao enviar via Evolution API, tentando WhatsApp Web...', error.message)
       // Continuar para tentar WhatsApp Web
     }
   }
   
-  // 3. Tentar WhatsApp Web como última opção
+  // 3. Tentar WhatsApp Web como Ãºltima opÃ§Ã£o
   try {
     return await sendViaWhatsAppWeb(recipient, message)
   } catch (error) {
     // Se nenhum funcionar, mostrar erro claro
     throw new Error(
-      'Nenhum serviço de WhatsApp disponível. ' +
+      'Nenhum serviÃ§o de WhatsApp disponÃ­vel. ' +
       'Configure Twilio, Evolution API ou instale whatsapp-web.js. ' +
       'Veja: docs/CONFIGURAR_WHATSAPP.md'
     )
   }
 }
 
-// Função para enviar arquivo via WhatsApp
+// FunÃ§Ã£o para enviar arquivo via WhatsApp
 export const sendWhatsAppMedia = async (recipient, mediaBuffer, filename, caption = '') => {
   if (process.env.EVOLUTION_API_URL && process.env.EVOLUTION_API_KEY) {
     return await sendMediaViaEvolutionAPI(recipient, mediaBuffer, filename, caption)
   } else if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
-    console.warn('⚠️ Twilio requer URL pública para mídia. Arquivo não enviado.')
-    throw new Error('Twilio requer URL pública para envio de arquivos. Configure Evolution API ou faça upload do arquivo primeiro.')
+    console.warn('âÅ¡ ï¸� Twilio requer URL pÃºblica para mÃ­dia. Arquivo nÃ£o enviado.')
+    throw new Error('Twilio requer URL pÃºblica para envio de arquivos. Configure Evolution API ou faÃ§a upload do arquivo primeiro.')
   } else {
     try {
       let whatsappWeb
@@ -288,7 +288,7 @@ export const sendWhatsAppMedia = async (recipient, mediaBuffer, filename, captio
       }
       return await whatsappWeb.sendWhatsAppWebMedia(recipient, mediaBuffer, filename, caption)
     } catch (error) {
-      throw new Error('Nenhum serviço de WhatsApp configurado para envio de mídia. Instale whatsapp-web.js ou configure Evolution API.')
+      throw new Error('Nenhum serviÃ§o de WhatsApp configurado para envio de mÃ­dia. Instale whatsapp-web.js ou configure Evolution API.')
     }
   }
 }
@@ -296,23 +296,23 @@ export const sendWhatsAppMedia = async (recipient, mediaBuffer, filename, captio
 // Gerar mensagem formatada para WhatsApp
 export const generateWhatsAppMessage = (recipient, period, reports) => {
   const reportNames = {
-    boletim: '📊 Boletim de Gado',
-    notasFiscais: '📋 Notas Fiscais (Entradas e Saídas)',
-    movimentacoes: '📈 Movimentações do Mês'
+    boletim: 'ðÅ¸â€œÅ  Boletim de Gado',
+    notasFiscais: 'ðÅ¸â€œâ€¹ Notas Fiscais (Entradas e SaÃ­das)',
+    movimentacoes: 'ðÅ¸â€œË† MovimentaÃ§Ãµes do MÃªs'
   }
 
-  const reportsList = reports.map(r => `• ${reportNames[r] || r}`).join('\n')
+  const reportsList = reports.map(r => `ââ‚¬¢ ${reportNames[r] || r}`).join('\n')
 
-  return `🐄 *BEEF-SYNC - RELATÓRIOS CONTÁBEIS*
+  return `ðÅ¸�â€ž *BEEF-SYNC - RELATÃâ€œRIOS CONTÃ�BEIS*
 
-Olá ${recipient.name}!
+OlÃ¡ ${recipient.name}!
 
-📅 *Período:* ${period.startDate} até ${period.endDate}
+ðÅ¸â€œâ€¦ *PerÃ­odo:* ${period.startDate} atÃ© ${period.endDate}
 
-📊 *Relatórios incluídos:*
+ðÅ¸â€œÅ  *RelatÃ³rios incluÃ­dos:*
 ${reportsList}
 
-Os arquivos estão sendo enviados em anexo.
+Os arquivos estÃ£o sendo enviados em anexo.
 
 Gerado em: ${new Date().toLocaleString('pt-BR')}
 

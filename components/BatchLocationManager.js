@@ -23,13 +23,13 @@ export default function BatchLocationManager({ animals, onBatchMove, onClose }) 
   const [filterSex, setFilterSex] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
 
-  // Lista de piquetes disponíveis (você pode expandir isso)
+  // Lista de piquetes disponÃ­veis (vocÃª pode expandir isso)
   const availableLocations = [
     'Piquete A', 'Piquete B', 'Piquete C', 'Piquete D', 'Piquete E',
     'Piquete F', 'Piquete G', 'Piquete H', 'Piquete I', 'Piquete J',
     'Campo 1', 'Campo 2', 'Campo 3', 'Campo 4', 'Campo 5',
     'Pastagem Norte', 'Pastagem Sul', 'Pastagem Leste', 'Pastagem Oeste',
-    'Curral Principal', 'Curral Secundário', 'Quarentena', 'Reprodução'
+    'Curral Principal', 'Curral SecundÃ¡rio', 'Quarentena', 'ReproduÃ§Ã£o'
   ]
 
   // Filtrar animais
@@ -65,7 +65,7 @@ export default function BatchLocationManager({ animals, onBatchMove, onClose }) 
     setSelectedAnimals([])
   }
 
-  // Processar movimentação em lote
+  // Processar movimentaÃ§Ã£o em lote
   const handleBatchMove = async () => {
     if (selectedAnimals.length === 0) {
       alert('Selecione pelo menos um animal para movimentar')
@@ -73,7 +73,7 @@ export default function BatchLocationManager({ animals, onBatchMove, onClose }) 
     }
 
     if (!targetLocation) {
-      alert('Selecione uma localização de destino')
+      alert('Selecione uma localizaÃ§Ã£o de destino')
       return
     }
 
@@ -93,15 +93,15 @@ export default function BatchLocationManager({ animals, onBatchMove, onClose }) 
 
       await onBatchMove(moveData)
       
-      // Limpar seleção após sucesso
+      // Limpar seleÃ§Ã£o apÃ³s sucesso
       setSelectedAnimals([])
       setTargetLocation('')
       setNotes('')
       
-      alert(`✅ ${selectedAnimals.length} animais movidos para ${targetLocation} com sucesso!`)
+      alert(`âÅ“â€¦ ${selectedAnimals.length} animais movidos para ${targetLocation} com sucesso!`)
     } catch (error) {
-      console.error('Erro na movimentação em lote:', error)
-      alert('❌ Erro ao movimentar animais. Tente novamente.')
+      console.error('Erro na movimentaÃ§Ã£o em lote:', error)
+      alert('â�Å’ Erro ao movimentar animais. Tente novamente.')
     } finally {
       setIsProcessing(false)
     }
@@ -110,14 +110,14 @@ export default function BatchLocationManager({ animals, onBatchMove, onClose }) 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
-        {/* Cabeçalho */}
+        {/* CabeÃ§alho */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <UserGroupIcon className="h-8 w-8" />
               <div>
-                <h2 className="text-2xl font-bold">Movimentação em Lote</h2>
-                <p className="text-blue-100">Mova vários animais para uma localização específica</p>
+                <h2 className="text-2xl font-bold">MovimentaÃ§Ã£o em Lote</h2>
+                <p className="text-blue-100">Mova vÃ¡rios animais para uma localizaÃ§Ã£o especÃ­fica</p>
               </div>
             </div>
             <Button
@@ -133,7 +133,7 @@ export default function BatchLocationManager({ animals, onBatchMove, onClose }) 
 
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Painel de Seleção de Animais */}
+            {/* Painel de SeleÃ§Ã£o de Animais */}
             <div className="space-y-4">
               <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-4 rounded-xl border">
                 <h3 className="text-lg font-bold text-green-800 dark:text-green-200 mb-4 flex items-center space-x-2">
@@ -147,7 +147,7 @@ export default function BatchLocationManager({ animals, onBatchMove, onClose }) 
                     label="Buscar"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Série, RG ou raça..."
+                    placeholder="SÃ©rie, RG ou raÃ§a..."
                   />
                   <Select
                     label="Sexo"
@@ -156,7 +156,7 @@ export default function BatchLocationManager({ animals, onBatchMove, onClose }) 
                   >
                     <option value="">Todos</option>
                     <option value="Macho">Macho</option>
-                    <option value="Fêmea">Fêmea</option>
+                    <option value="FÃªmea">FÃªmea</option>
                   </Select>
                   <Select
                     label="Status"
@@ -170,7 +170,7 @@ export default function BatchLocationManager({ animals, onBatchMove, onClose }) 
                   </Select>
                 </div>
 
-                {/* Controles de seleção */}
+                {/* Controles de seleÃ§Ã£o */}
                 <div className="flex space-x-2 mb-4">
                   <Button
                     variant="outline"
@@ -188,7 +188,7 @@ export default function BatchLocationManager({ animals, onBatchMove, onClose }) 
                     className="flex items-center space-x-1"
                   >
                     <XCircleIcon className="h-4 w-4" />
-                    <span>Limpar Seleção</span>
+                    <span>Limpar SeleÃ§Ã£o</span>
                   </Button>
                 </div>
 
@@ -196,7 +196,7 @@ export default function BatchLocationManager({ animals, onBatchMove, onClose }) 
                 <div className="max-h-96 overflow-y-auto space-y-2">
                   {filteredAnimals.map(animal => {
                     const isSelected = selectedAnimals.some(a => a.id === animal.id)
-                    const sexoIcon = animal.sexo === 'Macho' ? '🐂' : '🐄'
+                    const sexoIcon = animal.sexo === 'Macho' ? 'ðÅ¸�â€š' : 'ðÅ¸�â€ž'
                     
                     return (
                       <div
@@ -216,7 +216,7 @@ export default function BatchLocationManager({ animals, onBatchMove, onClose }) 
                                 {animal.serie} - {animal.rg}
                               </div>
                               <div className="text-sm text-gray-600 dark:text-gray-400">
-                                {animal.raca} • {animal.sexo} • {animal.situacao}
+                                {animal.raca} ââ‚¬¢ {animal.sexo} ââ‚¬¢ {animal.situacao}
                               </div>
                             </div>
                           </div>
@@ -231,29 +231,29 @@ export default function BatchLocationManager({ animals, onBatchMove, onClose }) 
               </div>
             </div>
 
-            {/* Painel de Configuração da Movimentação */}
+            {/* Painel de ConfiguraÃ§Ã£o da MovimentaÃ§Ã£o */}
             <div className="space-y-4">
               <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 p-4 rounded-xl border">
                 <h3 className="text-lg font-bold text-purple-800 dark:text-purple-200 mb-4 flex items-center space-x-2">
                   <MapPinIcon className="h-5 w-5" />
-                  <span>Configurar Movimentação</span>
+                  <span>Configurar MovimentaÃ§Ã£o</span>
                 </h3>
 
                 <div className="space-y-4">
                   <Select
-                    label="Localização de Destino"
+                    label="LocalizaÃ§Ã£o de Destino"
                     value={targetLocation}
                     onChange={(e) => setTargetLocation(e.target.value)}
                     required
                   >
-                    <option value="">Selecione uma localização...</option>
+                    <option value="">Selecione uma localizaÃ§Ã£o...</option>
                     {availableLocations.map(location => (
                       <option key={location} value={location}>{location}</option>
                     ))}
                   </Select>
 
                   <Input
-                    label="Data da Movimentação"
+                    label="Data da MovimentaÃ§Ã£o"
                     type="date"
                     value={moveDate}
                     onChange={(e) => setMoveDate(e.target.value)}
@@ -262,32 +262,32 @@ export default function BatchLocationManager({ animals, onBatchMove, onClose }) 
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Observações (opcional)
+                      ObservaÃ§Ãµes (opcional)
                     </label>
                     <textarea
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
-                      placeholder="Adicione observações sobre a movimentação..."
+                      placeholder="Adicione observaÃ§Ãµes sobre a movimentaÃ§Ã£o..."
                       className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                       rows={3}
                     />
                   </div>
 
-                  {/* Resumo da movimentação */}
+                  {/* Resumo da movimentaÃ§Ã£o */}
                   {selectedAnimals.length > 0 && (
                     <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-700">
                       <h4 className="font-bold text-blue-800 dark:text-blue-200 mb-2">
-                        Resumo da Movimentação
+                        Resumo da MovimentaÃ§Ã£o
                       </h4>
                       <div className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
-                        <div>• {selectedAnimals.length} animais selecionados</div>
-                        <div>• Destino: {targetLocation || 'Não selecionado'}</div>
-                        <div>• Data: {new Date(moveDate).toLocaleDateString('pt-BR')}</div>
+                        <div>ââ‚¬¢ {selectedAnimals.length} animais selecionados</div>
+                        <div>ââ‚¬¢ Destino: {targetLocation || 'NÃ£o selecionado'}</div>
+                        <div>ââ‚¬¢ Data: {new Date(moveDate).toLocaleDateString('pt-BR')}</div>
                       </div>
                     </div>
                   )}
 
-                  {/* Botões de ação */}
+                  {/* BotÃµes de aÃ§Ã£o */}
                   <div className="flex space-x-3 pt-4">
                     <Button
                       onClick={handleBatchMove}

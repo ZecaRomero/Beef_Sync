@@ -9,7 +9,7 @@ const pool = new Pool({
 })
 
 async function migrarItensNF() {
-  console.log('🔄 MIGRANDO ITENS DE NOTAS FISCAIS\n')
+  console.log('�Ÿ”„ MIGRANDO ITENS DE NOTAS FISCAIS\n')
   console.log('=' .repeat(80))
   
   const client = await pool.connect()
@@ -27,7 +27,7 @@ async function migrarItensNF() {
       ORDER BY id
     `)
     
-    console.log(`\n📋 Encontradas ${nfs.rows.length} notas fiscais com campo itens\n`)
+    console.log(`\n�Ÿ“‹ Encontradas ${nfs.rows.length} notas fiscais com campo itens\n`)
     console.log('-'.repeat(80))
     
     let migradas = 0
@@ -47,7 +47,7 @@ async function migrarItensNF() {
         const totalExistentes = parseInt(itensExistentes.rows[0].total)
         
         if (totalExistentes > 0) {
-          console.log(`✓ NF ${nf.numero_nf}: Já tem ${totalExistentes} itens na tabela`)
+          console.log(`�œ“ NF ${nf.numero_nf}: Já tem ${totalExistentes} itens na tabela`)
           jaExistentes++
           continue
         }
@@ -58,13 +58,13 @@ async function migrarItensNF() {
           const itensJSON = typeof nf.itens === 'string' ? JSON.parse(nf.itens) : nf.itens
           itensArray = Array.isArray(itensJSON) ? itensJSON : (itensJSON.itens || [])
         } catch (e) {
-          console.error(`❌ NF ${nf.numero_nf}: Erro ao parsear itens:`, e.message)
+          console.error(`�Œ NF ${nf.numero_nf}: Erro ao parsear itens:`, e.message)
           erros++
           continue
         }
         
         if (itensArray.length === 0) {
-          console.log(`⚠️  NF ${nf.numero_nf}: Campo itens vazio`)
+          console.log(`�š�️  NF ${nf.numero_nf}: Campo itens vazio`)
           semItens++
           continue
         }
@@ -79,33 +79,33 @@ async function migrarItensNF() {
             `, [nf.id, JSON.stringify(item)])
             itensInseridos++
           } catch (e) {
-            console.error(`   ❌ Erro ao inserir item:`, e.message)
+            console.error(`   �Œ Erro ao inserir item:`, e.message)
           }
         }
         
         if (itensInseridos > 0) {
-          console.log(`✅ NF ${nf.numero_nf}: ${itensInseridos} itens migrados`)
+          console.log(`�œ… NF ${nf.numero_nf}: ${itensInseridos} itens migrados`)
           migradas++
         }
         
       } catch (error) {
-        console.error(`❌ NF ${nf.numero_nf}: Erro ao processar:`, error.message)
+        console.error(`�Œ NF ${nf.numero_nf}: Erro ao processar:`, error.message)
         erros++
       }
     }
     
     console.log('\n' + '='.repeat(80))
-    console.log('\n📊 RESUMO DA MIGRAÇÃO:')
-    console.log(`   ✅ NFs migradas: ${migradas}`)
-    console.log(`   ✓  NFs já existentes: ${jaExistentes}`)
-    console.log(`   ⚠️  NFs sem itens: ${semItens}`)
-    console.log(`   ❌ Erros: ${erros}`)
-    console.log(`   📋 Total processadas: ${nfs.rows.length}`)
+    console.log('\n�Ÿ“Š RESUMO DA MIGRA�‡�ƒO:')
+    console.log(`   �œ… NFs migradas: ${migradas}`)
+    console.log(`   �œ“  NFs já existentes: ${jaExistentes}`)
+    console.log(`   �š�️  NFs sem itens: ${semItens}`)
+    console.log(`   �Œ Erros: ${erros}`)
+    console.log(`   �Ÿ“‹ Total processadas: ${nfs.rows.length}`)
     
-    console.log('\n✅ Migração concluída!')
+    console.log('\n�œ… Migração concluída!')
     
   } catch (error) {
-    console.error('\n❌ ERRO:', error.message)
+    console.error('\n�Œ ERRO:', error.message)
     console.error('\nDetalhes:', error)
   } finally {
     client.release()

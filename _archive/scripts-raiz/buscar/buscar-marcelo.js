@@ -12,11 +12,11 @@ async function buscarMarcelo() {
   const client = await pool.connect();
   
   try {
-    console.log('🔍 BUSCANDO MARCELO NO BANCO\n');
+    console.log('�Ÿ”� BUSCANDO MARCELO NO BANCO\n');
     console.log('='.repeat(80));
     
     // 1. Buscar em notas_fiscais
-    console.log('\n📋 1. NOTAS FISCAIS:');
+    console.log('\n�Ÿ“‹ 1. NOTAS FISCAIS:');
     const nfResult = await client.query(`
       SELECT id, numero_nf, origem, fornecedor, destino, tipo, data_compra
       FROM notas_fiscais
@@ -36,7 +36,7 @@ async function buscarMarcelo() {
     });
     
     // 2. Buscar em animais
-    console.log('\n🐮 2. ANIMAIS:');
+    console.log('\n�Ÿ�� 2. ANIMAIS:');
     const animaisResult = await client.query(`
       SELECT id, rg, nome, fornecedor, sexo, situacao, data_chegada
       FROM animais
@@ -49,7 +49,7 @@ async function buscarMarcelo() {
     if (animaisResult.rows.length > 0) {
       // Estatísticas
       
-      console.log(`📊 Resumo:`);
+      console.log(`�Ÿ“Š Resumo:`);
       console.log(`   Total: ${animaisResult.rows.length}`);
       
       // Por sexo
@@ -75,14 +75,14 @@ async function buscarMarcelo() {
       });
       
       // Mostrar alguns exemplos
-      console.log(`\n   📝 Primeiros 10 animais:`);
+      console.log(`\n   �Ÿ“� Primeiros 10 animais:`);
       animaisResult.rows.slice(0, 10).forEach((a, idx) => {
         console.log(`   ${idx + 1}. RG: ${a.rg} | ${a.nome || 'S/N'} | ${a.sexo} | ${a.situacao}`);
       });
     }
     
     // 3. Buscar em contatos
-    console.log('\n\n👤 3. CONTATOS:');
+    console.log('\n\n�Ÿ‘� 3. CONTATOS:');
     const contatosResult = await client.query(`
       SELECT id, nome, documento, tipo, municipio, uf
       FROM contatos
@@ -99,10 +99,10 @@ async function buscarMarcelo() {
     });
     
     console.log('\n' + '='.repeat(80));
-    console.log('\n✅ Busca concluída!');
+    console.log('\n�œ… Busca concluída!');
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
     console.error(error);
   } finally {
     client.release();

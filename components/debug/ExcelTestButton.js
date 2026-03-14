@@ -12,7 +12,7 @@ export default function ExcelTestButton() {
     setLastSuccess(null)
 
     try {
-      console.log('🧪 Iniciando teste de Excel...')
+      console.log('ðÅ¸§ª Iniciando teste de Excel...')
       
       const testData = {
         reports: ['location_report'],
@@ -23,7 +23,7 @@ export default function ExcelTestButton() {
         format: 'xlsx'
       }
 
-      console.log('📋 Dados do teste:', testData)
+      console.log('ðÅ¸â€œâ€¹ Dados do teste:', testData)
 
       const response = await fetch('/api/reports/download', {
         method: 'POST',
@@ -31,7 +31,7 @@ export default function ExcelTestButton() {
         body: JSON.stringify(testData)
       })
 
-      console.log('📡 Resposta:', {
+      console.log('ðÅ¸â€œ¡ Resposta:', {
         status: response.status,
         statusText: response.statusText,
         contentType: response.headers.get('content-type'),
@@ -40,17 +40,17 @@ export default function ExcelTestButton() {
 
       if (!response.ok) {
         const errorText = await response.text()
-        console.error('❌ Erro da API:', errorText)
+        console.error('â�Å’ Erro da API:', errorText)
         throw new Error(`Erro ${response.status}: ${errorText}`)
       }
 
       const blob = await response.blob()
-      console.log('📦 Blob criado:', {
+      console.log('ðÅ¸â€œ¦ Blob criado:', {
         size: blob.size,
         type: blob.type
       })
 
-      // Verificar se o blob é válido
+      // Verificar se o blob Ã© vÃ¡lido
       if (blob.size === 0) {
         throw new Error('Arquivo vazio recebido')
       }
@@ -61,19 +61,19 @@ export default function ExcelTestButton() {
       a.href = url
       a.download = `teste-excel-${Date.now()}.xlsx`
       
-      console.log('💾 Fazendo download:', a.download)
+      console.log('ðÅ¸â€™¾ Fazendo download:', a.download)
       
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
 
-      setLastSuccess(`✅ Sucesso! Arquivo baixado: ${blob.size} bytes`)
-      console.log('✅ Download concluído com sucesso!')
+      setLastSuccess(`âÅ“â€¦ Sucesso! Arquivo baixado: ${blob.size} bytes`)
+      console.log('âÅ“â€¦ Download concluÃ­do com sucesso!')
 
     } catch (error) {
-      console.error('❌ Erro completo:', error)
-      setLastError(`❌ Erro: ${error.message}`)
+      console.error('â�Å’ Erro completo:', error)
+      setLastError(`â�Å’ Erro: ${error.message}`)
     } finally {
       setLoading(false)
     }
@@ -82,7 +82,7 @@ export default function ExcelTestButton() {
   return (
     <div className="p-4 border border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-600">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-        🧪 Teste de Exportação Excel
+        ðÅ¸§ª Teste de ExportaÃ§Ã£o Excel
       </h3>
       
       <button
@@ -115,8 +115,8 @@ export default function ExcelTestButton() {
       <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
         <p><strong>Este teste:</strong></p>
         <ul className="list-disc list-inside mt-1 space-y-1">
-          <li>Faz uma requisição direta para a API</li>
-          <li>Baixa um relatório de localização em Excel</li>
+          <li>Faz uma requisiÃ§Ã£o direta para a API</li>
+          <li>Baixa um relatÃ³rio de localizaÃ§Ã£o em Excel</li>
           <li>Mostra logs detalhados no console</li>
           <li>Exibe o resultado aqui</li>
         </ul>

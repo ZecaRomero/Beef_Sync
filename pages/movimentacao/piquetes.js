@@ -93,7 +93,7 @@ export default function Piquetes() {
           localStorage.setItem('piquetes', JSON.stringify(updatedData))
         }
         
-        alert('✅ Piquete excluído com sucesso!')
+        alert('âÅ“â€¦ Piquete excluÃ­do com sucesso!')
       } else {
         throw new Error('Erro ao excluir piquete na API')
       }
@@ -104,7 +104,7 @@ export default function Piquetes() {
       const updatedData = piquetes.filter(item => item.id !== id)
       savePiquetes(updatedData)
       
-      alert('⚠️ Piquete removido localmente. Verifique a conexão com o servidor para sincronização completa.')
+      alert('âÅ¡ ï¸� Piquete removido localmente. Verifique a conexÃ£o com o servidor para sincronizaÃ§Ã£o completa.')
     }
   }
 
@@ -166,7 +166,7 @@ export default function Piquetes() {
         
         setPiquetes(updatedData)
         
-        // Também salvar no localStorage como fallback
+        // TambÃ©m salvar no localStorage como fallback
         if (typeof window !== 'undefined') {
           localStorage.setItem('piquetes', JSON.stringify(updatedData))
         }
@@ -174,7 +174,7 @@ export default function Piquetes() {
         handleCloseForm()
         
         const action = editingItem ? 'atualizado' : 'adicionado'
-        alert(`✅ Piquete ${action} com sucesso! Agora está disponível para uso na Localização de Animais.`)
+        alert(`âÅ“â€¦ Piquete ${action} com sucesso! Agora estÃ¡ disponÃ­vel para uso na LocalizaÃ§Ã£o de Animais.`)
         
         // Recarregar lista de piquetes
         loadPiquetes()
@@ -209,7 +209,7 @@ export default function Piquetes() {
       handleCloseForm()
       
       const action = editingItem ? 'atualizado' : 'adicionado'
-      alert(`⚠️ Piquete ${action} localmente. Verifique a conexão com o servidor para sincronização completa.`)
+      alert(`âÅ¡ ï¸� Piquete ${action} localmente. Verifique a conexÃ£o com o servidor para sincronizaÃ§Ã£o completa.`)
     }
   }
 
@@ -254,9 +254,9 @@ export default function Piquetes() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <MapPinIcon className="w-8 h-8 text-amber-600" />
-            Gestão de Piquetes
+            GestÃ£o de Piquetes
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">Gerenciar áreas e piquetes</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">Gerenciar Ã¡reas e piquetes</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -321,7 +321,7 @@ export default function Piquetes() {
                 </div>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Área: {item.area || '-'} {item.unidade || 'hectares'}
+                Ã�rea: {item.area || '-'} {item.unidade || 'hectares'}
               </p>
               {item.capacidade && (
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
@@ -333,7 +333,7 @@ export default function Piquetes() {
         </div>
       )}
 
-      {/* Modal do Formulário */}
+      {/* Modal do FormulÃ¡rio */}
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
@@ -367,7 +367,7 @@ export default function Piquetes() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Área (hectares)
+                    Ã�rea (hectares)
                   </label>
                   <input
                     type="number"
@@ -406,8 +406,8 @@ export default function Piquetes() {
                   <option value="Brachiaria">Brachiaria</option>
                   <option value="Panicum">Panicum</option>
                   <option value="Tifton">Tifton</option>
-                  <option value="Mombaça">Mombaça</option>
-                  <option value="Tanzânia">Tanzânia</option>
+                  <option value="MombaÃ§a">MombaÃ§a</option>
+                  <option value="TanzÃ¢nia">TanzÃ¢nia</option>
                   <option value="Nativa">Pastagem Nativa</option>
                   <option value="Outros">Outros</option>
                 </select>
@@ -415,14 +415,14 @@ export default function Piquetes() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Observações
+                  ObservaÃ§Ãµes
                 </label>
                 <textarea
                   value={formData.observacoes}
                   onChange={(e) => setFormData({...formData, observacoes: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 dark:bg-gray-700 dark:text-white"
                   rows="3"
-                  placeholder="Informações adicionais sobre o piquete..."
+                  placeholder="InformaÃ§Ãµes adicionais sobre o piquete..."
                 />
               </div>
 

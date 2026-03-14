@@ -44,20 +44,20 @@ async function verificar() {
       LIMIT 20
     `)
     
-    console.log('📊 Campos com mais de 10 caracteres:\n')
+    console.log('ðÅ¸â€œÅ  Campos com mais de 10 caracteres:\n')
     
     for (const row of result.rows) {
       console.log(`Serie: "${row.serie}" (${row.len_serie} chars)`)
       console.log(`RG: "${row.rg}" (${row.len_rg} chars)`)
-      console.log(`Serie Mãe: "${row.serie_mae}" (${row.len_serie_mae} chars)`)
-      console.log(`RG Mãe: "${row.rg_mae}" (${row.len_rg_mae} chars)`)
+      console.log(`Serie MÃ£e: "${row.serie_mae}" (${row.len_serie_mae} chars)`)
+      console.log(`RG MÃ£e: "${row.rg_mae}" (${row.len_rg_mae} chars)`)
       console.log('---')
     }
     
     console.log(`\nTotal de registros com campos longos: ${result.rows.length}`)
     
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('â�Å’ Erro:', error)
   } finally {
     client.release()
     await pool.end()
@@ -67,6 +67,6 @@ async function verificar() {
 verificar()
   .then(() => process.exit(0))
   .catch(error => {
-    console.error('💥 Erro fatal:', error)
+    console.error('ðÅ¸â€™¥ Erro fatal:', error)
     process.exit(1)
   })

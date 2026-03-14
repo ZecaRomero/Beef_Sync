@@ -80,10 +80,10 @@ export default function ImportarSerieRgMae({ onImportComplete }) {
         </div>
         <div>
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-            Série e RG da Mãe
+            SÃ©rie e RG da MÃ£e
           </h3>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Corrige animais que mostram &quot;Não encontrada no cadastro&quot; — preenche serie_mae e rg_mae
+            Corrige animais que mostram &quot;NÃ£o encontrada no cadastro&quot; ââ‚¬â€� preenche serie_mae e rg_mae
           </p>
         </div>
       </div>
@@ -92,16 +92,16 @@ export default function ImportarSerieRgMae({ onImportComplete }) {
         <div className="bg-emerald-50 dark:bg-emerald-900/20 border-l-4 border-emerald-500 p-4 rounded">
           <h4 className="font-bold text-emerald-900 dark:text-emerald-300 mb-2">Formato do Excel:</h4>
           <p className="text-sm text-emerald-800 dark:text-emerald-200 mb-2">
-            O arquivo deve conter as colunas (com ou sem cabeçalho):
+            O arquivo deve conter as colunas (com ou sem cabeÃ§alho):
           </p>
           <ol className="list-decimal list-inside space-y-1 text-sm text-emerald-800 dark:text-emerald-200">
-            <li><strong>SÉRIE</strong> – série do filho (ex: CJCJ)</li>
-            <li><strong>RG</strong> – RG do filho (ex: 17000)</li>
-            <li><strong>SÉRIE MÃE</strong> – série da mãe (ex: CJCJ)</li>
-            <li><strong>RG MÃE</strong> ou <strong>RGN MÃE</strong> – RG da mãe</li>
+            <li><strong>SÃâ€°RIE</strong> ââ‚¬â€œ sÃ©rie do filho (ex: CJCJ)</li>
+            <li><strong>RG</strong> ââ‚¬â€œ RG do filho (ex: 17000)</li>
+            <li><strong>SÃâ€°RIE MÃÆ’E</strong> ââ‚¬â€œ sÃ©rie da mÃ£e (ex: CJCJ)</li>
+            <li><strong>RG MÃÆ’E</strong> ou <strong>RGN MÃÆ’E</strong> ââ‚¬â€œ RG da mÃ£e</li>
           </ol>
           <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-2">
-            Exemplo: CJCJ | 17000 | CJCJ | 16999 — atualiza o animal CJCJ 17000 com mãe CJCJ 16999
+            Exemplo: CJCJ | 17000 | CJCJ | 16999 ââ‚¬â€� atualiza o animal CJCJ 17000 com mÃ£e CJCJ 16999
           </p>
         </div>
 
@@ -125,7 +125,7 @@ export default function ImportarSerieRgMae({ onImportComplete }) {
           />
           {arquivo && (
             <p className="mt-2 text-sm text-green-600 dark:text-green-400">
-              ✓ Arquivo selecionado: {arquivo.name}
+              âÅ“â€œ Arquivo selecionado: {arquivo.name}
             </p>
           )}
         </div>
@@ -142,7 +142,7 @@ export default function ImportarSerieRgMae({ onImportComplete }) {
                 Importando...
               </>
             ) : (
-              <>📤 Importar Série/RG da Mãe</>
+              <>ðÅ¸â€œ¤ Importar SÃ©rie/RG da MÃ£e</>
             )}
           </button>
           <button
@@ -163,11 +163,11 @@ export default function ImportarSerieRgMae({ onImportComplete }) {
 
         {resultado && (
           <div className="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 p-4 rounded">
-            <h4 className="font-bold text-green-900 dark:text-green-300 mb-2">Importação concluída</h4>
+            <h4 className="font-bold text-green-900 dark:text-green-300 mb-2">ImportaÃ§Ã£o concluÃ­da</h4>
             <div className="space-y-1 text-sm text-green-800 dark:text-green-200">
               <p>Atualizados: <strong>{resultado.atualizados}</strong></p>
               {resultado.naoEncontrados?.length > 0 && (
-                <p>Não encontrados: <strong>{resultado.naoEncontrados.length}</strong></p>
+                <p>NÃ£o encontrados: <strong>{resultado.naoEncontrados.length}</strong></p>
               )}
               {resultado.erros?.length > 0 && (
                 <p>Erros: <strong>{resultado.erros.length}</strong></p>
@@ -176,7 +176,7 @@ export default function ImportarSerieRgMae({ onImportComplete }) {
             {resultado.naoEncontrados?.length > 0 && (
               <details className="mt-3">
                 <summary className="cursor-pointer text-sm font-bold text-amber-800 dark:text-amber-300">
-                  Ver não encontrados ({resultado.naoEncontrados.length})
+                  Ver nÃ£o encontrados ({resultado.naoEncontrados.length})
                 </summary>
                 <div className="mt-2 max-h-40 overflow-y-auto space-y-1">
                   {resultado.naoEncontrados.slice(0, 50).map((d, i) => (
@@ -198,7 +198,7 @@ export default function ImportarSerieRgMae({ onImportComplete }) {
                 <div className="mt-2 max-h-40 overflow-y-auto space-y-1">
                   {resultado.erros.slice(0, 20).map((d, i) => (
                     <div key={i} className="text-xs">
-                      Linha {d.linha}: {d.serie} {d.rg} – {d.erro}
+                      Linha {d.linha}: {d.serie} {d.rg} ââ‚¬â€œ {d.erro}
                     </div>
                   ))}
                   {resultado.erros.length > 20 && (

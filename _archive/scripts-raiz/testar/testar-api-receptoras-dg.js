@@ -12,7 +12,7 @@ async function testarAPIReceptorasDG() {
   const client = await pool.connect();
   
   try {
-    console.log('🔍 TESTANDO API receptoras/lista-dg COMPLETA\n');
+    console.log('�Ÿ”� TESTANDO API receptoras/lista-dg COMPLETA\n');
     console.log('='.repeat(80));
     
     // Executar a query EXATA da API
@@ -50,7 +50,7 @@ async function testarAPIReceptorasDG() {
     
     const result = await client.query(receptorasQuery);
     
-    console.log(`\n📋 Total de receptoras retornadas: ${result.rows.length}\n`);
+    console.log(`\n�Ÿ“‹ Total de receptoras retornadas: ${result.rows.length}\n`);
     
     // Processar como a API faz
     const receptorasProcessadas = [];
@@ -107,14 +107,14 @@ async function testarAPIReceptorasDG() {
             rg: numero
           });
         } else {
-          console.log(`⚠️ Item ${index + 1} sem número:`, { tatuagem, receptora_letra: row.receptora_letra, receptora_numero: row.receptora_numero });
+          console.log(`�š�️ Item ${index + 1} sem número:`, { tatuagem, receptora_letra: row.receptora_letra, receptora_numero: row.receptora_numero });
         }
       } catch (error) {
         console.error(`Erro ao processar item ${index + 1}:`, error);
       }
     });
     
-    console.log(`✅ Receptoras processadas: ${receptorasProcessadas.length}\n`);
+    console.log(`�œ… Receptoras processadas: ${receptorasProcessadas.length}\n`);
     
     // Agrupar por NF
     const porNF = {};
@@ -126,7 +126,7 @@ async function testarAPIReceptorasDG() {
       porNF[nf].push(r);
     });
     
-    console.log('📊 DISTRIBUIÇÃO POR NF:\n');
+    console.log('�Ÿ“Š DISTRIBUI�‡�ƒO POR NF:\n');
     Object.entries(porNF).forEach(([nf, receptoras]) => {
       console.log(`NF ${nf}: ${receptoras.length} receptoras`);
       console.log(`Fornecedor: ${receptoras[0].fornecedor || 'N/A'}`);
@@ -138,20 +138,20 @@ async function testarAPIReceptorasDG() {
     const g3032 = receptorasProcessadas.find(r => r.numero === '3032' && r.letra === 'G');
     
     if (g3032) {
-      console.log('✅ G 3032 ENCONTRADA NA LISTA FINAL!');
+      console.log('�œ… G 3032 ENCONTRADA NA LISTA FINAL!');
       console.log('Dados:', JSON.stringify(g3032, null, 2));
     } else {
-      console.log('❌ G 3032 NÃO ESTÁ NA LISTA FINAL!');
+      console.log('�Œ G 3032 N�ƒO ESTÁ NA LISTA FINAL!');
       console.log('\nReceptoras com número 3032:');
       const com3032 = receptorasProcessadas.filter(r => r.numero === '3032');
       console.log(com3032);
     }
     
     console.log('\n' + '='.repeat(80));
-    console.log('\n✅ Teste concluído!');
+    console.log('\n�œ… Teste concluído!');
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
     console.error(error);
   } finally {
     client.release();

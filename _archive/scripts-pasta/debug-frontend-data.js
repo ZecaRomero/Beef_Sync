@@ -2,12 +2,12 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 
 async function debugFrontendData() {
   try {
-    console.log('🔍 Debug - Verificando dados que chegam no frontend...');
+    console.log('�Ÿ”� Debug - Verificando dados que chegam no frontend...');
     
     const response = await fetch('http://localhost:3020/api/semen');
     const data = await response.json();
     
-    console.log('\n📊 Dados retornados pela API:');
+    console.log('\n�Ÿ“Š Dados retornados pela API:');
     console.log(`Total de registros: ${data.data.length}`);
     
     data.data.forEach((item, index) => {
@@ -23,18 +23,18 @@ async function debugFrontendData() {
     const entradas = data.data.filter(item => item.tipo_operacao === 'entrada');
     const saidas = data.data.filter(item => item.tipo_operacao === 'saida');
     
-    console.log(`\n📥 Entradas encontradas: ${entradas.length}`);
-    console.log(`📤 Saídas encontradas: ${saidas.length}`);
+    console.log(`\n�Ÿ“� Entradas encontradas: ${entradas.length}`);
+    console.log(`�Ÿ“� Saídas encontradas: ${saidas.length}`);
     
     if (saidas.length > 0) {
-      console.log('\n🔍 Detalhes das saídas:');
+      console.log('\n�Ÿ”� Detalhes das saídas:');
       saidas.forEach(saida => {
-        console.log(`   - ID ${saida.id}: ${saida.nome_touro} → ${saida.destino} (${saida.quantidade_doses} doses)`);
+        console.log(`   - ID ${saida.id}: ${saida.nome_touro} �†’ ${saida.destino} (${saida.quantidade_doses} doses)`);
       });
     }
     
   } catch (error) {
-    console.error('💥 Erro:', error);
+    console.error('�Ÿ’� Erro:', error);
   }
 }
 

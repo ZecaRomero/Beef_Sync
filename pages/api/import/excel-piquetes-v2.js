@@ -9,7 +9,7 @@ export const config = {
   },
 };
 
-// Função robusta para converter qualquer formato de data do Excel
+// FunÃ§Ã£o robusta para converter qualquer formato de data do Excel
 function converterDataExcel(data) {
   if (!data) return null;
   
@@ -45,10 +45,10 @@ function converterDataExcel(data) {
     }
   }
   
-  // Se for número (serial date do Excel)
+  // Se for nÃºmero (serial date do Excel)
   if (typeof data === 'number') {
     let dias = data;
-    if (dias > 59) dias -= 1; // Corrigir bug do Excel (1900 não é bissexto)
+    if (dias > 59) dias -= 1; // Corrigir bug do Excel (1900 nÃ£o Ã© bissexto)
     const excelEpoch = new Date(Date.UTC(1899, 11, 31));
     const dataConvertida = new Date(excelEpoch.getTime() + dias * 86400000);
     const ano = dataConvertida.getUTCFullYear();
@@ -57,7 +57,7 @@ function converterDataExcel(data) {
     return `${ano}-${mes}-${dia}`;
   }
   
-  // Último recurso: tentar converter
+  // ÃÅ¡ltimo recurso: tentar converter
   try {
     const tentativa = new Date(data);
     if (!isNaN(tentativa.getTime())) {
@@ -73,14 +73,14 @@ function converterDataExcel(data) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Método não permitido' });
+    return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' });
   }
 
   const form = formidable({ multiples: false });
 
   form.parse(req, async (err, fields, files) => {
     if (err) {
-      console.error('Erro ao fazer parse do formulário:', err);
+      console.error('Erro ao fazer parse do formulÃ¡rio:', err);
       return res.status(500).json({ error: 'Erro ao processar arquivo' });
     }
 
@@ -108,9 +108,9 @@ export default async function handler(req, res) {
         erros: []
       };
 
-      console.log(`\n📊 Processando ${worksheet.rowCount} linhas...\n`);
+      console.log(`\nðÅ¸â€œÅ  Processando ${worksheet.rowCount} linhas...\n`);
 
-      // Processar cada linha (pular cabeçalho)
+      // Processar cada linha (pular cabeÃ§alho)
       for (let i = 2; i <= worksheet.rowCount; i++) {
         const row = worksheet.getRow(i);
         
@@ -144,12 +144,12 @@ export default async function handler(req, res) {
                 [local, local]
               );
               resultados.piquetesCriados++;
-              console.log(`  ✅ Piquete criado: ${local}`);
+              console.log(`  âÅ“â€¦ Piquete criado: ${local}`);
             }
             resultados.piquetesProcessados++;
           }
 
-          // 2. Criar/atualizar animal - SEMPRE FÊMEA
+          // 2. Criar/atualizar animal - SEMPRE FÃÅ MEA
           if (serie && rg) {
             const animalExiste = await query(
               'SELECT id FROM animais WHERE serie = $1 AND rg = $2',
@@ -165,19 +165,19 @@ export default async function handler(req, res) {
                   serie, rg, tatuagem, nome, sexo, situacao, 
                   piquete_atual, data_entrada_piquete, created_at, updated_at
                 ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
-                [serie, rg, tatuagem, tatuagem, 'Fêmea', 'Ativo', local, dataEntradaPiquete]
+                [serie, rg, tatuagem, tatuagem, 'FÃªmea', 'Ativo', local, dataEntradaPiquete]
               );
               resultados.animaisCriados++;
-              console.log(`  ✅ Animal criado: ${tatuagem}`);
+              console.log(`  âÅ“â€¦ Animal criado: ${tatuagem}`);
             } else {
               await query(
                 `UPDATE animais 
                  SET piquete_atual = $1, data_entrada_piquete = $2, sexo = $3, updated_at = CURRENT_TIMESTAMP
                  WHERE serie = $4 AND rg = $5`,
-                [local, dataEntradaPiquete, 'Fêmea', serie, rg]
+                [local, dataEntradaPiquete, 'FÃªmea', serie, rg]
               );
               resultados.animaisAtualizados++;
-              console.log(`  ✅ Animal atualizado: ${tatuagem}`);
+              console.log(`  âÅ“â€¦ Animal atualizado: ${tatuagem}`);
             }
             resultados.animaisProcessados++;
 
@@ -190,8 +190,8 @@ export default async function handler(req, res) {
               const dataIAFormatada = converterDataExcel(dataIA);
               const dataDGFormatada = converterDataExcel(dataDG);
 
-              console.log(`  📅 Data IA: ${dataIA} → ${dataIAFormatada}`);
-              console.log(`  📅 Data DG: ${dataDG} → ${dataDGFormatada}`);
+              console.log(`  ðÅ¸â€œâ€¦ Data IA: ${dataIA} ââ€ â€™ ${dataIAFormatada}`);
+              console.log(`  ðÅ¸â€œâ€¦ Data DG: ${dataDG} ââ€ â€™ ${dataDGFormatada}`);
 
               if (dataIAFormatada) {
                 const iaExiste = await query(
@@ -216,23 +216,23 @@ export default async function handler(req, res) {
                     ]
                   );
                   resultados.iasRegistradas++;
-                  console.log(`  ✅ IA registrada`);
+                  console.log(`  âÅ“â€¦ IA registrada`);
                 } else {
-                  console.log(`  ℹ️ IA já existe`);
+                  console.log(`  ââ€ž¹ï¸� IA jÃ¡ existe`);
                 }
               } else {
-                console.log(`  ⚠️ Data IA inválida: ${dataIA}`);
+                console.log(`  âÅ¡ ï¸� Data IA invÃ¡lida: ${dataIA}`);
                 resultados.erros.push({
                   linha: i,
                   serie,
                   rg,
-                  erro: `Data IA inválida: ${dataIA} (tipo: ${typeof dataIA})`
+                  erro: `Data IA invÃ¡lida: ${dataIA} (tipo: ${typeof dataIA})`
                 });
               }
             }
           }
         } catch (error) {
-          console.error(`❌ Erro na linha ${i}:`, error.message);
+          console.error(`â�Å’ Erro na linha ${i}:`, error.message);
           resultados.erros.push({
             linha: i,
             serie,
@@ -242,10 +242,10 @@ export default async function handler(req, res) {
         }
       }
 
-      // Limpar arquivo temporário
+      // Limpar arquivo temporÃ¡rio
       fs.unlinkSync(file.filepath);
 
-      console.log(`\n✅ Importação concluída!`);
+      console.log(`\nâÅ“â€¦ ImportaÃ§Ã£o concluÃ­da!`);
       console.log(`   Piquetes: ${resultados.piquetesCriados} novos / ${resultados.piquetesProcessados} total`);
       console.log(`   Animais: ${resultados.animaisCriados} novos, ${resultados.animaisAtualizados} atualizados`);
       console.log(`   IAs: ${resultados.iasRegistradas} registradas`);
@@ -253,12 +253,12 @@ export default async function handler(req, res) {
 
       return res.status(200).json({
         success: true,
-        message: 'Importação concluída',
+        message: 'ImportaÃ§Ã£o concluÃ­da',
         resultados
       });
 
     } catch (error) {
-      console.error('❌ Erro ao processar Excel:', error);
+      console.error('â�Å’ Erro ao processar Excel:', error);
       return res.status(500).json({ 
         error: 'Erro ao processar arquivo Excel',
         details: error.message 

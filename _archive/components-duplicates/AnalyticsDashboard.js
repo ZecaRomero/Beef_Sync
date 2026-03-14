@@ -170,7 +170,7 @@ export default function AnalyticsDashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            📊 Analytics Avançados
+            �Ÿ“Š Analytics Avançados
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
             Análise detalhada baseada nos seus dados reais
@@ -183,10 +183,10 @@ export default function AnalyticsDashboard() {
             onChange={(e) => setTimeRange(e.target.value)}
             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
           >
-            <option value="7dias">Últimos 7 dias</option>
-            <option value="30dias">Últimos 30 dias</option>
-            <option value="90dias">Últimos 90 dias</option>
-            <option value="ano">Último ano</option>
+            <option value="7dias">�šltimos 7 dias</option>
+            <option value="30dias">�šltimos 30 dias</option>
+            <option value="90dias">�šltimos 90 dias</option>
+            <option value="ano">�šltimo ano</option>
           </select>
         </div>
       </div>
@@ -255,7 +255,7 @@ export default function AnalyticsDashboard() {
         {/* Status dos Animais */}
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            📊 Status do Rebanho
+            �Ÿ“Š Status do Rebanho
           </h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -308,7 +308,7 @@ export default function AnalyticsDashboard() {
         {/* Estoque de Sêmen */}
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            🧬 Estoque de Sêmen
+            �Ÿ�� Estoque de Sêmen
           </h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -355,7 +355,7 @@ export default function AnalyticsDashboard() {
       {/* Tendências */}
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          📈 Tendências do Período
+          �Ÿ“ˆ Tendências do Período
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex items-center space-x-4">

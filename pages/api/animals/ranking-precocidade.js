@@ -2,20 +2,20 @@ import { query } from '../../../lib/database'
 
 /**
  * GET /api/animals/ranking-precocidade
- * Retorna o ranking das fêmeas mais precoces — aquelas que emprenharam
+ * Retorna o ranking das fÃªmeas mais precoces ââ‚¬â€� aquelas que emprenharam
  * na menor idade (meses de vida na data da IA confirmada como prenha).
- * Parâmetros opcionais:
- *   ?limit=10  — quantas retornar (default 10)
- *   ?animalId  — se informado, inclui a posição deste animal no ranking
+ * ParÃ¢metros opcionais:
+ *   ?limit=10  ââ‚¬â€� quantas retornar (default 10)
+ *   ?animalId  ââ‚¬â€� se informado, inclui a posiÃ§Ã£o deste animal no ranking
  */
 export default async function handler(req, res) {
-  if (req.method !== 'GET') return res.status(405).json({ message: 'Método não permitido' })
+  if (req.method !== 'GET') return res.status(405).json({ message: 'MÃ©todo nÃ£o permitido' })
 
   const limit = Math.min(parseInt(req.query.limit) || 10, 50)
   const animalId = req.query.animalId ? parseInt(req.query.animalId) : null
 
   try {
-    // Primeira IA confirmada como prenha para cada fêmea
+    // Primeira IA confirmada como prenha para cada fÃªmea
     const result = await query(`
       WITH primeira_prenha AS (
         SELECT
@@ -67,7 +67,7 @@ export default async function handler(req, res) {
       superPrecoce:   parseInt(r.meses) < 14,
     }))
 
-    // Posição do animal solicitado (mesmo se não estiver no top limit)
+    // PosiÃ§Ã£o do animal solicitado (mesmo se nÃ£o estiver no top limit)
     let posicaoAnimal = null
     if (animalId) {
       const posResult = await query(`

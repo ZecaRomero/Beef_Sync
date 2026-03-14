@@ -11,13 +11,13 @@ const formatBR = (dateStr) => {
 }
 
 export async function generateWhatsAppSummary(relatorios, period) {
-  let summaryText = `📧 Relatórios completos enviados por email.\n\n`
-  summaryText += `📊 *RESUMO DE RELATÓRIOS BEEF-SYNC*\n`
-  summaryText += `📅 Período: ${formatBR(period.startDate)} a ${formatBR(period.endDate)}\n`
-  summaryText += `━━━━━━━━━━━━━━━━━━━━━━\n\n`
+  let summaryText = `ðÅ¸â€œ§ RelatÃ³rios completos enviados por email.\n\n`
+  summaryText += `ðÅ¸â€œÅ  *RESUMO DE RELATÃâ€œRIOS BEEF-SYNC*\n`
+  summaryText += `ðÅ¸â€œâ€¦ PerÃ­odo: ${formatBR(period.startDate)} a ${formatBR(period.endDate)}\n`
+  summaryText += `ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��\n\n`
   
   try {
-    // NF Entrada e Saída - COM VALORES
+    // NF Entrada e SaÃ­da - COM VALORES
     if (relatorios.includes('nf_entrada_saida')) {
       const res = await fetch(`/api/notas-fiscais?startDate=${period.startDate}&endDate=${period.endDate}`)
       if (res.ok) {
@@ -31,25 +31,25 @@ export async function generateWhatsAppSummary(relatorios, period) {
         const valorSaidas = saidas.reduce((sum, nf) => sum + (parseFloat(nf.valor_total) || 0), 0)
         const saldo = valorEntradas - valorSaidas
         
-        summaryText += `📄 *NOTAS FISCAIS*\n`
+        summaryText += `ðÅ¸â€œâ€ž *NOTAS FISCAIS*\n`
         summaryText += `Total de NFs: ${nfs.length}\n\n`
-        summaryText += `📥 *Entradas:* ${entradas.length} NFs\n`
+        summaryText += `ðÅ¸â€œ¥ *Entradas:* ${entradas.length} NFs\n`
         summaryText += `   Valor: R$ ${valorEntradas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n\n`
-        summaryText += `📤 *Saídas:* ${saidas.length} NFs\n`
+        summaryText += `ðÅ¸â€œ¤ *SaÃ­das:* ${saidas.length} NFs\n`
         summaryText += `   Valor: R$ ${valorSaidas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n\n`
-        summaryText += `💰 *Saldo:* R$ ${saldo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`
+        summaryText += `ðÅ¸â€™° *Saldo:* R$ ${saldo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`
         
-        // Gráfico visual
+        // GrÃ¡fico visual
         const maxBar = 15
         const totalValor = valorEntradas + valorSaidas
         if (totalValor > 0) {
           const percEntradas = (valorEntradas / totalValor) * 100
           const percSaidas = (valorSaidas / totalValor) * 100
-          const entradasBar = '█'.repeat(Math.round((valorEntradas / totalValor) * maxBar)) || '░'
-          const saidasBar = '█'.repeat(Math.round((valorSaidas / totalValor) * maxBar)) || '░'
-          summaryText += `\n📊 Proporção:\n`
+          const entradasBar = 'ââ€“Ë†'.repeat(Math.round((valorEntradas / totalValor) * maxBar)) || 'ââ€“â€˜'
+          const saidasBar = 'ââ€“Ë†'.repeat(Math.round((valorSaidas / totalValor) * maxBar)) || 'ââ€“â€˜'
+          summaryText += `\nðÅ¸â€œÅ  ProporÃ§Ã£o:\n`
           summaryText += `Entrada: ${entradasBar} ${percEntradas.toFixed(1)}%\n`
-          summaryText += `Saída:   ${saidasBar} ${percSaidas.toFixed(1)}%\n`
+          summaryText += `SaÃ­da:   ${saidasBar} ${percSaidas.toFixed(1)}%\n`
         }
         summaryText += `\n`
       }
@@ -67,19 +67,19 @@ export async function generateWhatsAppSummary(relatorios, period) {
         })
         
         const machos = nascimentos.filter(a => a.sexo === 'M' || a.sexo === 'Macho').length
-        const femeas = nascimentos.filter(a => a.sexo === 'F' || a.sexo === 'Fêmea').length
+        const femeas = nascimentos.filter(a => a.sexo === 'F' || a.sexo === 'FÃªmea').length
         
-        summaryText += `👶 *NASCIMENTOS*\n`
+        summaryText += `ðÅ¸â€˜¶ *NASCIMENTOS*\n`
         summaryText += `Total: ${nascimentos.length}\n`
-        summaryText += `♂️ Machos: ${machos} (${nascimentos.length > 0 ? ((machos/nascimentos.length)*100).toFixed(1) : 0}%)\n`
-        summaryText += `♀️ Fêmeas: ${femeas} (${nascimentos.length > 0 ? ((femeas/nascimentos.length)*100).toFixed(1) : 0}%)\n`
+        summaryText += `ââ„¢â€šï¸� Machos: ${machos} (${nascimentos.length > 0 ? ((machos/nascimentos.length)*100).toFixed(1) : 0}%)\n`
+        summaryText += `ââ„¢â‚¬ï¸� FÃªmeas: ${femeas} (${nascimentos.length > 0 ? ((femeas/nascimentos.length)*100).toFixed(1) : 0}%)\n`
         
-        // Gráfico de barras em texto
+        // GrÃ¡fico de barras em texto
         if (nascimentos.length > 0) {
           const maxBar = 15
-          const machosBar = '█'.repeat(Math.round((machos / nascimentos.length) * maxBar)) || '░'
-          const femeasBar = '█'.repeat(Math.round((femeas / nascimentos.length) * maxBar)) || '░'
-          summaryText += `\n📊 Distribuição:\n`
+          const machosBar = 'ââ€“Ë†'.repeat(Math.round((machos / nascimentos.length) * maxBar)) || 'ââ€“â€˜'
+          const femeasBar = 'ââ€“Ë†'.repeat(Math.round((femeas / nascimentos.length) * maxBar)) || 'ââ€“â€˜'
+          summaryText += `\nðÅ¸â€œÅ  DistribuiÃ§Ã£o:\n`
           summaryText += `M: ${machosBar} ${machos}\n`
           summaryText += `F: ${femeasBar} ${femeas}\n`
         }
@@ -101,13 +101,13 @@ export async function generateWhatsAppSummary(relatorios, period) {
         // Agrupar por pai
         const porPai = {}
         nascimentos.forEach(a => {
-          const pai = a.pai || a.touro || 'Não informado'
+          const pai = a.pai || a.touro || 'NÃ£o informado'
           if (!porPai[pai]) {
             porPai[pai] = { total: 0, machos: 0, femeas: 0 }
           }
           porPai[pai].total++
           if (a.sexo === 'M' || a.sexo === 'Macho') porPai[pai].machos++
-          if (a.sexo === 'F' || a.sexo === 'Fêmea') porPai[pai].femeas++
+          if (a.sexo === 'F' || a.sexo === 'FÃªmea') porPai[pai].femeas++
         })
         
         const topPais = Object.entries(porPai)
@@ -115,7 +115,7 @@ export async function generateWhatsAppSummary(relatorios, period) {
           .slice(0, 5)
         
         if (topPais.length > 0) {
-          summaryText += `🐂 *TOP 5 TOUROS*\n`
+          summaryText += `ðÅ¸�â€š *TOP 5 TOUROS*\n`
           topPais.forEach(([pai, stats], idx) => {
             summaryText += `${idx + 1}. ${pai}\n`
             summaryText += `   Total: ${stats.total} | M: ${stats.machos} | F: ${stats.femeas}\n`
@@ -136,14 +136,14 @@ export async function generateWhatsAppSummary(relatorios, period) {
           return dataMorte >= new Date(period.startDate) && dataMorte <= new Date(period.endDate)
         })
         
-        summaryText += `💀 *MORTES*\n`
+        summaryText += `ðÅ¸â€™â‚¬ *MORTES*\n`
         summaryText += `Total: ${mortes.length}\n`
         
         if (mortes.length > 0) {
           // Agrupar por causa
           const porCausa = {}
           mortes.forEach(m => {
-            const causa = m.causa || 'Não informada'
+            const causa = m.causa || 'NÃ£o informada'
             porCausa[causa] = (porCausa[causa] || 0) + 1
           })
           
@@ -152,7 +152,7 @@ export async function generateWhatsAppSummary(relatorios, period) {
             .sort((a, b) => b[1] - a[1])
             .slice(0, 3)
             .forEach(([causa, qtd]) => {
-              summaryText += `• ${causa}: ${qtd}\n`
+              summaryText += `ââ‚¬¢ ${causa}: ${qtd}\n`
             })
         }
         summaryText += `\n`
@@ -174,12 +174,12 @@ export async function generateWhatsAppSummary(relatorios, period) {
         const totalReceptoras = receptoras.reduce((sum, nf) => sum + (parseInt(nf.quantidade_receptoras) || 0), 0)
         const valorTotal = receptoras.reduce((sum, nf) => sum + (parseFloat(nf.valor_total) || 0), 0)
         
-        summaryText += `🐄 *RECEPTORAS QUE CHEGARAM*\n`
+        summaryText += `ðÅ¸�â€ž *RECEPTORAS QUE CHEGARAM*\n`
         summaryText += `Total de NFs: ${receptoras.length}\n`
         summaryText += `Quantidade: ${totalReceptoras} receptoras\n`
         summaryText += `Valor Total: R$ ${valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`
         if (totalReceptoras > 0) {
-          summaryText += `Valor Médio: R$ ${(valorTotal / totalReceptoras).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/receptora\n`
+          summaryText += `Valor MÃ©dio: R$ ${(valorTotal / totalReceptoras).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/receptora\n`
         }
         summaryText += `\n`
       }
@@ -187,29 +187,29 @@ export async function generateWhatsAppSummary(relatorios, period) {
 
     // Receptoras que faltam parir
     if (relatorios.includes('receptoras_faltam_parir')) {
-      summaryText += `⏰ *RECEPTORAS QUE FALTAM PARIR*\n`
-      summaryText += `Consulte o relatório completo no email\n\n`
+      summaryText += `â�° *RECEPTORAS QUE FALTAM PARIR*\n`
+      summaryText += `Consulte o relatÃ³rio completo no email\n\n`
     }
 
-    // Receptoras que faltam diagnóstico
+    // Receptoras que faltam diagnÃ³stico
     if (relatorios.includes('receptoras_faltam_diagnostico')) {
-      summaryText += `🔬 *RECEPTORAS QUE FALTAM DIAGNÓSTICO*\n`
-      summaryText += `Consulte o relatório completo no email\n\n`
+      summaryText += `ðÅ¸â€�¬ *RECEPTORAS QUE FALTAM DIAGNÃâ€œSTICO*\n`
+      summaryText += `Consulte o relatÃ³rio completo no email\n\n`
     }
 
   } catch (error) {
     console.error('Erro ao gerar resumo:', error)
-    summaryText += `\n⚠️ Erro ao buscar alguns dados\n\n`
+    summaryText += `\nâÅ¡ ï¸� Erro ao buscar alguns dados\n\n`
   }
   
-  summaryText += `━━━━━━━━━━━━━━━━━━━━━━\n`
-  summaryText += `🖥️ Sistema: Beef-Sync\n`
-  summaryText += `📅 Gerado em: ${new Date().toLocaleString('pt-BR')}`
+  summaryText += `ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��\n`
+  summaryText += `ðÅ¸â€“¥ï¸� Sistema: Beef-Sync\n`
+  summaryText += `ðÅ¸â€œâ€¦ Gerado em: ${new Date().toLocaleString('pt-BR')}`
   
   return summaryText
 }
 
-// Normaliza número para wa.me (55 + DDD + número)
+// Normaliza nÃºmero para wa.me (55 + DDD + nÃºmero)
 function normalizePhoneForWaMe(whatsapp) {
   if (!whatsapp) return ''
   const digits = String(whatsapp).replace(/\D/g, '')
@@ -218,7 +218,7 @@ function normalizePhoneForWaMe(whatsapp) {
 }
 
 export function showWhatsAppModal(summaryText, chartImage, whatsappEnviado = false, destinatarios = []) {
-  // Destinatários com WhatsApp para abrir no app instalado
+  // DestinatÃ¡rios com WhatsApp para abrir no app instalado
   const destinatariosComWhatsApp = (destinatarios || []).filter(d => d.recebe_whatsapp && d.whatsapp)
   
   // Abrir modal com resumo visual
@@ -230,12 +230,12 @@ export function showWhatsAppModal(summaryText, chartImage, whatsappEnviado = fal
   
   const chartHtml = chartImage 
     ? `<div style="text-align:center;margin-bottom:20px;">
-         <h3 style="color:#333;font-size:18px;margin-bottom:10px;">📊 Gráfico Resumo</h3>
-         <img src="${chartImage}" style="max-width:100%;border-radius:8px;border:2px solid #ddd;box-shadow:0 4px 8px rgba(0,0,0,0.1);" alt="Gráfico Resumo" />
+         <h3 style="color:#333;font-size:18px;margin-bottom:10px;">ðÅ¸â€œÅ  GrÃ¡fico Resumo</h3>
+         <img src="${chartImage}" style="max-width:100%;border-radius:8px;border:2px solid #ddd;box-shadow:0 4px 8px rgba(0,0,0,0.1);" alt="GrÃ¡fico Resumo" />
        </div>`
     : ''
 
-  // Botões para abrir no WhatsApp (app instalado ou Web) - um por destinatário
+  // BotÃµes para abrir no WhatsApp (app instalado ou Web) - um por destinatÃ¡rio
   let whatsappBtnsHtml = ''
   if (!whatsappEnviado) {
     if (destinatariosComWhatsApp.length > 0) {
@@ -243,40 +243,40 @@ export function showWhatsAppModal(summaryText, chartImage, whatsappEnviado = fal
         const phone = normalizePhoneForWaMe(d.whatsapp)
         if (!phone || phone.length < 12) return ''
         return `<button class="wa-dest-btn" data-phone="${phone}" style="padding:12px 24px;background:#25D366;color:white;border:none;border-radius:8px;cursor:pointer;font-size:15px;font-weight:bold;box-shadow:0 3px 10px rgba(37,211,102,0.3);transition:all 0.3s;">
-          📱 Enviar para ${(d.nome || d.name || 'Contato').substring(0, 25)}
+          ðÅ¸â€œ± Enviar para ${(d.nome || d.name || 'Contato').substring(0, 25)}
         </button>`
       }).filter(Boolean).join('')
     }
-    // Fallback: botão genérico (abre WhatsApp Web sem destinatário)
+    // Fallback: botÃ£o genÃ©rico (abre WhatsApp Web sem destinatÃ¡rio)
     if (!whatsappBtnsHtml) {
       whatsappBtnsHtml = `<button id="whatsappBtn" style="padding:14px 30px;background:#25D366;color:white;border:none;border-radius:8px;cursor:pointer;font-size:16px;font-weight:bold;box-shadow:0 3px 10px rgba(37,211,102,0.3);transition:all 0.3s;">
-         💬 Abrir no WhatsApp
+         ðÅ¸â€™¬ Abrir no WhatsApp
        </button>`
     }
   }
 
   const statusHtml = whatsappEnviado
     ? `<div style="background:#d4edda;border:2px solid #c3e6cb;color:#155724;padding:15px;border-radius:8px;margin-bottom:20px;text-align:center;">
-         <strong>✅ WhatsApp enviado automaticamente!</strong><br>
-         <small>O resumo e gráfico foram enviados para seu WhatsApp instalado.</small>
+         <strong>âÅ“â€¦ WhatsApp enviado automaticamente!</strong><br>
+         <small>O resumo e grÃ¡fico foram enviados para seu WhatsApp instalado.</small>
        </div>`
     : ''
 
   content.innerHTML = `
-    <h2 style="text-align:center;margin-bottom:20px;color:#333;font-size:24px;">📊 RESUMO PARA WHATSAPP</h2>
+    <h2 style="text-align:center;margin-bottom:20px;color:#333;font-size:24px;">ðÅ¸â€œÅ  RESUMO PARA WHATSAPP</h2>
     ${statusHtml}
     ${chartHtml}
     <div id="summaryText" style="background:#f5f5f5;padding:20px;border-radius:8px;font-family:monospace;white-space:pre-wrap;font-size:12px;line-height:1.7;border:2px solid #ddd;max-height:400px;overflow-y:auto;">${summaryText}</div>
     <div style="margin-top:25px;text-align:center;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
       ${whatsappBtnsHtml}
       <button id="copyBtn" style="padding:14px 30px;background:#0088cc;color:white;border:none;border-radius:8px;cursor:pointer;font-size:16px;font-weight:bold;box-shadow:0 3px 10px rgba(0,136,204,0.3);transition:all 0.3s;">
-        📋 Copiar Texto
+        ðÅ¸â€œâ€¹ Copiar Texto
       </button>
       <button id="closeBtn" style="padding:14px 30px;background:#666;color:white;border:none;border-radius:8px;cursor:pointer;font-size:16px;box-shadow:0 3px 10px rgba(0,0,0,0.2);transition:all 0.3s;">
-        ✖️ Fechar
+        âÅ“â€“ï¸� Fechar
       </button>
     </div>
-    ${!whatsappEnviado ? `<p style="text-align:center;margin-top:15px;color:#666;font-size:13px;">💡 ${destinatariosComWhatsApp.length > 0 ? 'Clique no botão para abrir o WhatsApp (app instalado) com a mensagem pronta. Basta clicar em Enviar!' : 'Copie o texto ou abra o WhatsApp para enviar manualmente.'}</p>` : ''}
+    ${!whatsappEnviado ? `<p style="text-align:center;margin-top:15px;color:#666;font-size:13px;">ðÅ¸â€™¡ ${destinatariosComWhatsApp.length > 0 ? 'Clique no botÃ£o para abrir o WhatsApp (app instalado) com a mensagem pronta. Basta clicar em Enviar!' : 'Copie o texto ou abra o WhatsApp para enviar manualmente.'}</p>` : ''}
   `
   
   modal.appendChild(content)
@@ -287,7 +287,7 @@ export function showWhatsAppModal(summaryText, chartImage, whatsappEnviado = fal
     btn.onclick = () => {
       const phone = btn.getAttribute('data-phone')
       const encodedText = encodeURIComponent(summaryText)
-      // wa.me abre o WhatsApp Desktop quando instalado, senão abre Web
+      // wa.me abre o WhatsApp Desktop quando instalado, senÃ£o abre Web
       window.open(`https://wa.me/${phone}?text=${encodedText}`, '_blank')
     }
   })
@@ -306,14 +306,14 @@ export function showWhatsAppModal(summaryText, chartImage, whatsappEnviado = fal
     navigator.clipboard.writeText(summaryText).then(() => {
       const btn = content.querySelector('#copyBtn')
       const originalText = btn.innerHTML
-      btn.innerHTML = '✅ Copiado!'
+      btn.innerHTML = 'âÅ“â€¦ Copiado!'
       btn.style.background = '#4CAF50'
       setTimeout(() => {
         btn.innerHTML = originalText
         btn.style.background = '#0088cc'
       }, 2000)
     }).catch(err => {
-      alert('❌ Erro ao copiar. Selecione e copie manualmente.')
+      alert('â�Å’ Erro ao copiar. Selecione e copie manualmente.')
     })
   }
   

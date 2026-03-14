@@ -47,14 +47,14 @@ export default function ROIAnalyzer({ animal, onClose, onRecommendSale }) {
       setLoading(true)
       
       const response = await fetch(`/api/animals/${animal.animalId}/roi-analysis`)
-      if (!response.ok) throw new Error('Erro ao carregar análise')
+      if (!response.ok) throw new Error('Erro ao carregar anÃ¡lise')
       
       const data = await response.json()
       setAnalysis(data)
       setProjectedSalePrice(data.suggestedSalePrice || '')
     } catch (error) {
-      console.error('Erro ao carregar análise ROI:', error)
-      alert('❌ Erro: Não foi possível carregar a análise ROI')
+      console.error('Erro ao carregar anÃ¡lise ROI:', error)
+      alert('â�Å’ Erro: NÃ£o foi possÃ­vel carregar a anÃ¡lise ROI')
     } finally {
       setLoading(false)
     }
@@ -83,7 +83,7 @@ export default function ROIAnalyzer({ animal, onClose, onRecommendSale }) {
     const isBreeder = analysisData.isBreeder
     const marketConditions = analysisData.marketConditions
 
-    // Lógica de recomendação baseada em múltiplos fatores
+    // LÃ³gica de recomendaÃ§Ã£o baseada em mÃºltiplos fatores
     if (roi >= ROI_THRESHOLDS.EXCELLENT && age >= 18) {
       return {
         type: SALE_RECOMMENDATIONS.IMMEDIATE,
@@ -95,7 +95,7 @@ export default function ROIAnalyzer({ animal, onClose, onRecommendSale }) {
     if (roi >= ROI_THRESHOLDS.GOOD && age >= 15) {
       return {
         type: SALE_RECOMMENDATIONS.SOON,
-        reason: 'Bom ROI, considere vender nos próximos meses',
+        reason: 'Bom ROI, considere vender nos prÃ³ximos meses',
         urgency: 'medium'
       }
     }
@@ -103,7 +103,7 @@ export default function ROIAnalyzer({ animal, onClose, onRecommendSale }) {
     if (roi >= ROI_THRESHOLDS.FAIR && age >= 12) {
       return {
         type: SALE_RECOMMENDATIONS.WAIT,
-        reason: 'ROI razoável, aguarde melhor momento',
+        reason: 'ROI razoÃ¡vel, aguarde melhor momento',
         urgency: 'low'
       }
     }
@@ -111,14 +111,14 @@ export default function ROIAnalyzer({ animal, onClose, onRecommendSale }) {
     if (isBreeder && roi < ROI_THRESHOLDS.POOR) {
       return {
         type: SALE_RECOMMENDATIONS.HOLD,
-        reason: 'Animal reprodutor, manter para reprodução',
+        reason: 'Animal reprodutor, manter para reproduÃ§Ã£o',
         urgency: 'none'
       }
     }
 
     return {
       type: SALE_RECOMMENDATIONS.WAIT,
-      reason: 'Aguardar crescimento e melhores condições',
+      reason: 'Aguardar crescimento e melhores condiÃ§Ãµes',
       urgency: 'low'
     }
   }
@@ -149,7 +149,7 @@ export default function ROIAnalyzer({ animal, onClose, onRecommendSale }) {
       roi: saleData.roi,
       recommendation: saleData.recommendation
     })
-    alert('✅ Sucesso! Animal recomendado para venda')
+    alert('âÅ“â€¦ Sucesso! Animal recomendado para venda')
   }
 
   if (loading) {
@@ -166,7 +166,7 @@ export default function ROIAnalyzer({ animal, onClose, onRecommendSale }) {
       <div className="text-center py-8">
         <ExclamationTriangleIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
         <p className="text-gray-600 dark:text-gray-400">
-          Não foi possível carregar a análise ROI
+          NÃ£o foi possÃ­vel carregar a anÃ¡lise ROI
         </p>
       </div>
     )
@@ -180,10 +180,10 @@ export default function ROIAnalyzer({ animal, onClose, onRecommendSale }) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Análise ROI - {animal.animalInfo?.serie || 'N/A'}{animal.animalInfo?.rg || 'N/A'}
+            AnÃ¡lise ROI - {animal.animalInfo?.serie || 'N/A'}{animal.animalInfo?.rg || 'N/A'}
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
-            Análise de retorno sobre investimento e aptidão para venda
+            AnÃ¡lise de retorno sobre investimento e aptidÃ£o para venda
           </p>
         </div>
         <Button variant="secondary" onClick={onClose}>
@@ -226,7 +226,7 @@ export default function ROIAnalyzer({ animal, onClose, onRecommendSale }) {
                     {currentAnalysis.roi.toFixed(1)}%
                   </p>
                   <Badge variant={getROIBadgeVariant(currentAnalysis.roi)}>
-                    {currentAnalysis.roi >= 0 ? 'Lucro' : 'Prejuízo'}
+                    {currentAnalysis.roi >= 0 ? 'Lucro' : 'PrejuÃ­zo'}
                   </Badge>
                 </div>
               </div>
@@ -276,7 +276,7 @@ export default function ROIAnalyzer({ animal, onClose, onRecommendSale }) {
         <CardHeader>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
             <ChartBarIcon className="h-5 w-5 mr-2" />
-            Recomendação de Venda
+            RecomendaÃ§Ã£o de Venda
           </h3>
         </CardHeader>
         <CardBody>
@@ -296,8 +296,8 @@ export default function ROIAnalyzer({ animal, onClose, onRecommendSale }) {
                   {getRecommendationBadge(currentAnalysis.recommendation).text}
                 </Badge>
                 <span className="text-sm text-gray-500">
-                  Urgência: {currentAnalysis.recommendation.urgency === 'high' ? 'Alta' : 
-                           currentAnalysis.recommendation.urgency === 'medium' ? 'Média' : 'Baixa'}
+                  UrgÃªncia: {currentAnalysis.recommendation.urgency === 'high' ? 'Alta' : 
+                           currentAnalysis.recommendation.urgency === 'medium' ? 'MÃ©dia' : 'Baixa'}
                 </span>
               </div>
               <p className="text-gray-700 dark:text-gray-300">
@@ -341,14 +341,14 @@ export default function ROIAnalyzer({ animal, onClose, onRecommendSale }) {
         <Card>
           <CardHeader>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Simulação de Venda
+              SimulaÃ§Ã£o de Venda
             </h3>
           </CardHeader>
           <CardBody>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Preço de Venda Projetado (R$)
+                  PreÃ§o de Venda Projetado (R$)
                 </label>
                 <div className="flex space-x-2">
                   <input
@@ -371,7 +371,7 @@ export default function ROIAnalyzer({ animal, onClose, onRecommendSale }) {
               {customAnalysis && (
                 <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Lucro/Prejuízo:</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Lucro/PrejuÃ­zo:</span>
                     <span className={`font-medium ${
                       customAnalysis.profit >= 0 ? 'text-green-600' : 'text-red-600'
                     }`}>
@@ -405,19 +405,19 @@ export default function ROIAnalyzer({ animal, onClose, onRecommendSale }) {
       <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Análise de Mercado
+            AnÃ¡lise de Mercado
           </h3>
         </CardHeader>
         <CardBody>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-400">Preço Médio de Mercado</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">PreÃ§o MÃ©dio de Mercado</p>
               <p className="text-lg font-bold text-gray-900 dark:text-white">
                 R$ {analysis.marketPrice.toLocaleString('pt-BR')}
               </p>
             </div>
             <div className="text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-400">Tendência</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">TendÃªncia</p>
               <div className="flex items-center justify-center space-x-1">
                 {analysis.marketTrend === 'up' ? (
                   <TrendingUpIcon className="h-5 w-5 text-green-500" />
@@ -436,7 +436,7 @@ export default function ROIAnalyzer({ animal, onClose, onRecommendSale }) {
               <Badge variant={analysis.marketDemand === 'high' ? 'success' : 
                             analysis.marketDemand === 'medium' ? 'warning' : 'danger'}>
                 {analysis.marketDemand === 'high' ? 'Alta' : 
-                 analysis.marketDemand === 'medium' ? 'Média' : 'Baixa'}
+                 analysis.marketDemand === 'medium' ? 'MÃ©dia' : 'Baixa'}
               </Badge>
             </div>
           </div>

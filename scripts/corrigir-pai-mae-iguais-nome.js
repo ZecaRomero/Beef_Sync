@@ -1,9 +1,9 @@
 /**
- * Encontra e corrige animais onde pai ou mae estão preenchidos com o nome do próprio animal.
- * Isso ocorreu por bug no mapeamento de colunas do Excel (coluna "Nome" era usada para Pai/Mãe).
+ * Encontra e corrige animais onde pai ou mae estÃ£o preenchidos com o nome do prÃ³prio animal.
+ * Isso ocorreu por bug no mapeamento de colunas do Excel (coluna "Nome" era usada para Pai/MÃ£e).
  *
  * Uso: node scripts/corrigir-pai-mae-iguais-nome.js [--corrigir]
- *      --corrigir = aplica a correção (zera pai/mae quando iguais ao nome)
+ *      --corrigir = aplica a correÃ§Ã£o (zera pai/mae quando iguais ao nome)
  */
 const { query } = require('../lib/database')
 
@@ -15,7 +15,7 @@ function normalizar(s) {
 async function main() {
   const corrigir = process.argv.includes('--corrigir')
 
-  console.log('🔍 Buscando animais com pai ou mae = nome do próprio animal...\n')
+  console.log('ðÅ¸â€�� Buscando animais com pai ou mae = nome do prÃ³prio animal...\n')
 
   const r = await query(`
     SELECT id, serie, rg, nome, pai, mae, serie_pai, rg_pai, serie_mae, rg_mae
@@ -43,10 +43,10 @@ async function main() {
     }
   }
 
-  console.log(`📊 Encontrados: ${afetados.length} animal(is) com pai/mae incorretos\n`)
+  console.log(`ðÅ¸â€œÅ  Encontrados: ${afetados.length} animal(is) com pai/mae incorretos\n`)
 
   if (afetados.length === 0) {
-    console.log('✅ Nenhum animal com esse problema.')
+    console.log('âÅ“â€¦ Nenhum animal com esse problema.')
     return
   }
 
@@ -54,14 +54,14 @@ async function main() {
   afetados.slice(0, 30).forEach((a, i) => {
     console.log(`  ${i + 1}. ${a.serie} ${a.rg} | ${a.nome}`)
     if (a.paiErrado) console.log(`     Pai (errado): "${a.pai}"`)
-    if (a.maeErrada) console.log(`     Mãe (errada): "${a.mae}"`)
+    if (a.maeErrada) console.log(`     MÃ£e (errada): "${a.mae}"`)
   })
   if (afetados.length > 30) {
     console.log(`  ... e mais ${afetados.length - 30} animais`)
   }
 
   if (corrigir) {
-    console.log('\n🔧 Aplicando correção (zerando pai/mae incorretos)...')
+    console.log('\nðÅ¸â€�§ Aplicando correÃ§Ã£o (zerando pai/mae incorretos)...')
     let corrigidos = 0
     for (const a of afetados) {
       const updates = []
@@ -84,9 +84,9 @@ async function main() {
         corrigidos++
       }
     }
-    console.log(`✅ ${corrigidos} animal(is) corrigido(s)`)
+    console.log(`âÅ“â€¦ ${corrigidos} animal(is) corrigido(s)`)
   } else {
-    console.log('\n💡 Para aplicar a correção, execute: node scripts/corrigir-pai-mae-iguais-nome.js --corrigir')
+    console.log('\nðÅ¸â€™¡ Para aplicar a correÃ§Ã£o, execute: node scripts/corrigir-pai-mae-iguais-nome.js --corrigir')
   }
 }
 

@@ -7,7 +7,7 @@ export default function AnimalWeights({ pesagens }) {
 
   if (!pesagens || pesagens.length === 0) return null
 
-  // Ordenar por data decrescente para exibição
+  // Ordenar por data decrescente para exibiÃ§Ã£o
   const pesagensOrdenadas = [...pesagens].sort((a, b) => new Date(b.data_pesagem) - new Date(a.data_pesagem))
 
   return (
@@ -20,7 +20,7 @@ export default function AnimalWeights({ pesagens }) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ScaleIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            <h2 className="font-semibold text-gray-900 dark:text-white">Histórico de Pesagens</h2>
+            <h2 className="font-semibold text-gray-900 dark:text-white">HistÃ³rico de Pesagens</h2>
           </div>
           {isExpanded ? <ChevronUpIcon className="h-5 w-5" /> : <ChevronDownIcon className="h-5 w-5" />}
         </div>
@@ -31,7 +31,7 @@ export default function AnimalWeights({ pesagens }) {
       <div className={`overflow-hidden transition-all ${isExpanded ? 'max-h-[999px]' : 'max-h-0'}`}>
         <div className="divide-y divide-gray-100 dark:divide-gray-700">
           {pesagensOrdenadas.map((p, i) => {
-            // Calcular GMD em relação ao peso anterior (que é o próximo na lista ordenada desc)
+            // Calcular GMD em relaÃ§Ã£o ao peso anterior (que Ã© o prÃ³ximo na lista ordenada desc)
             const pesoAnterior = pesagensOrdenadas[i + 1]
             let gmd = null
             let dias = 0
@@ -62,7 +62,7 @@ export default function AnimalWeights({ pesagens }) {
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                     {formatDate(p.data_pesagem)}
-                    {p.tipo_pesagem && ` • ${p.tipo_pesagem}`}
+                    {p.tipo_pesagem && ` ââ‚¬¢ ${p.tipo_pesagem}`}
                   </p>
                 </div>
                 {p.ce && (

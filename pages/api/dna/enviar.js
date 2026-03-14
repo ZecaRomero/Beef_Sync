@@ -9,40 +9,40 @@ export default async function handler(req, res) {
   try {
     const { animais_ids, laboratorio, data_envio, custo_por_animal, custo_total, observacoes, tipo_exame } = req.body
 
-    console.log('📋 Dados recebidos:', { 
+    console.log('ðÅ¸â€œâ€¹ Dados recebidos:', { 
       animais_ids, 
       laboratorio, 
       data_envio, 
       custo_por_animal, 
       custo_total,
       tipo_exame,
-      tipo_animais_ids: Array.isArray(animais_ids) ? animais_ids.map(id => typeof id) : 'não é array'
+      tipo_animais_ids: Array.isArray(animais_ids) ? animais_ids.map(id => typeof id) : 'nÃ£o Ã© array'
     })
 
     if (!animais_ids || !Array.isArray(animais_ids) || animais_ids.length === 0) {
-      return res.status(400).json({ message: 'Lista de animais é obrigatória' })
+      return res.status(400).json({ message: 'Lista de animais Ã© obrigatÃ³ria' })
     }
 
     if (!laboratorio || !['VRGEN', 'NEOGEN'].includes(laboratorio)) {
-      return res.status(400).json({ message: 'Laboratório deve ser VRGEN ou NEOGEN' })
+      return res.status(400).json({ message: 'LaboratÃ³rio deve ser VRGEN ou NEOGEN' })
     }
 
     if (!data_envio) {
-      return res.status(400).json({ message: 'Data de envio é obrigatória' })
+      return res.status(400).json({ message: 'Data de envio Ã© obrigatÃ³ria' })
     }
 
-    // Garantir que os IDs sejam números
+    // Garantir que os IDs sejam nÃºmeros
     const animaisIdsNumericos = animais_ids.map(id => parseInt(id, 10)).filter(id => !isNaN(id))
     
     if (animaisIdsNumericos.length === 0) {
-      return res.status(400).json({ message: 'Nenhum ID de animal válido encontrado' })
+      return res.status(400).json({ message: 'Nenhum ID de animal vÃ¡lido encontrado' })
     }
 
-    // Verificar se as tabelas existem, se não, criar (antes de iniciar transação)
+    // Verificar se as tabelas existem, se nÃ£o, criar (antes de iniciar transaÃ§Ã£o)
     try {
       await query('SELECT 1 FROM dna_envios LIMIT 1')
     } catch (error) {
-      // Tabelas não existem, criar
+      // Tabelas nÃ£o existem, criar
       const { createDNATables } = require('../../../scripts/create-dna-tables')
       await createDNATables()
     }
@@ -50,12 +50,12 @@ export default async function handler(req, res) {
     const client = await pool.connect()
     
     try {
-      // PRIMEIRO: Verificar quais animais existem ANTES de iniciar a transação
+      // PRIMEIRO: Verificar quais animais existem ANTES de iniciar a transaÃ§Ã£o
       const animaisExistentes = []
       const animaisNaoEncontrados = []
       const animaisInfo = []
       
-      console.log(`🔍 Verificando existência de ${animaisIdsNumericos.length} animais antes de processar...`)
+      console.log(`ðÅ¸â€�� Verificando existÃªncia de ${animaisIdsNumericos.length} animais antes de processar...`)
       
       for (const animalId of animaisIdsNumericos) {
         const animalCheck = await client.query(
@@ -64,10 +64,10 @@ export default async function handler(req, res) {
         )
         
         if (animalCheck.rows.length === 0) {
-          console.warn(`❌ Animal ${animalId} não encontrado no banco de dados`)
+          console.warn(`â�Å’ Animal ${animalId} nÃ£o encontrado no banco de dados`)
           animaisNaoEncontrados.push(animalId)
           
-          // Tentar buscar por série/RG caso o ID não seja encontrado
+          // Tentar buscar por sÃ©rie/RG caso o ID nÃ£o seja encontrado
           const buscaAlternativa = await client.query(
             `SELECT id, serie, rg, nome FROM animais 
              WHERE CAST(id AS TEXT) LIKE $1 
@@ -78,7 +78,7 @@ export default async function handler(req, res) {
           )
           
           if (buscaAlternativa.rows.length > 0) {
-            console.log(`💡 Sugestões para ID ${animalId}:`, buscaAlternativa.rows.map(a => `${a.id} (${a.serie}-${a.rg})`))
+            console.log(`ðÅ¸â€™¡ SugestÃµes para ID ${animalId}:`, buscaAlternativa.rows.map(a => `${a.id} (${a.serie}-${a.rg})`))
           }
         } else {
           const animal = animalCheck.rows[0]
@@ -90,11 +90,11 @@ export default async function handler(req, res) {
             nome: animal.nome,
             situacao: animal.situacao
           })
-          console.log(`✅ Animal ${animalId} encontrado: ${animal.serie}-${animal.rg} (${animal.nome || 'sem nome'})`)
+          console.log(`âÅ“â€¦ Animal ${animalId} encontrado: ${animal.serie}-${animal.rg} (${animal.nome || 'sem nome'})`)
         }
       }
       
-      // Se nenhum animal foi encontrado, retornar erro antes de iniciar transação
+      // Se nenhum animal foi encontrado, retornar erro antes de iniciar transaÃ§Ã£o
       if (animaisExistentes.length === 0) {
         return res.status(404).json({
           success: false,
@@ -104,10 +104,10 @@ export default async function handler(req, res) {
         })
       }
       
-      // Se alguns animais não foram encontrados, avisar mas continuar com os que existem
+      // Se alguns animais nÃ£o foram encontrados, avisar mas continuar com os que existem
       if (animaisNaoEncontrados.length > 0) {
-        console.warn(`⚠️ ${animaisNaoEncontrados.length} animal(is) não encontrado(s): ${animaisNaoEncontrados.join(', ')}`)
-        console.log(`✅ Processando ${animaisExistentes.length} animal(is) válido(s)`)
+        console.warn(`âÅ¡ ï¸� ${animaisNaoEncontrados.length} animal(is) nÃ£o encontrado(s): ${animaisNaoEncontrados.join(', ')}`)
+        console.log(`âÅ“â€¦ Processando ${animaisExistentes.length} animal(is) vÃ¡lido(s)`)
       }
 
       await client.query('BEGIN')
@@ -131,7 +131,7 @@ export default async function handler(req, res) {
 
       const envioId = envioResult.rows[0].id
 
-      // Atualizar cada animal com informações de DNA (apenas os que existem)
+      // Atualizar cada animal com informaÃ§Ãµes de DNA (apenas os que existem)
       const animaisAtualizados = []
       
       for (const animalId of animaisExistentes) {
@@ -146,7 +146,7 @@ export default async function handler(req, res) {
         const custoAtual = parseFloat(custoAtualResult.rows[0]?.custo_dna || 0)
         const novoCusto = custoAtual + custo_por_animal
 
-        // Buscar laboratórios já registrados
+        // Buscar laboratÃ³rios jÃ¡ registrados
         const labAtualResult = await client.query(
           'SELECT laboratorio_dna FROM animais WHERE id = $1',
           [animalId]
@@ -156,7 +156,7 @@ export default async function handler(req, res) {
           ? `${labAtual}, ${laboratorio}` 
           : laboratorio
 
-        // Atualizar animal com informações de DNA (acumulando custos e laboratórios)
+        // Atualizar animal com informaÃ§Ãµes de DNA (acumulando custos e laboratÃ³rios)
         await client.query(
           `UPDATE animais 
            SET laboratorio_dna = $1, 
@@ -187,10 +187,10 @@ export default async function handler(req, res) {
           [
             animalId,
             'DNA',
-            'Análise Genética',
+            'AnÃ¡lise GenÃ©tica',
             custo_por_animal,
             data_envio,
-            `Análise de DNA - ${laboratorio}`
+            `AnÃ¡lise de DNA - ${laboratorio}`
           ]
         )
       }
@@ -200,11 +200,11 @@ export default async function handler(req, res) {
       logger.info(`Envio de DNA criado: ${animaisAtualizados.length} animais para ${laboratorio}`)
       
       if (animaisNaoEncontrados.length > 0) {
-        logger.warn(`${animaisNaoEncontrados.length} animal(is) não encontrado(s): ${animaisNaoEncontrados.join(', ')}`)
+        logger.warn(`${animaisNaoEncontrados.length} animal(is) nÃ£o encontrado(s): ${animaisNaoEncontrados.join(', ')}`)
       }
 
       const responseMessage = animaisNaoEncontrados.length > 0
-        ? `${animaisAtualizados.length} animal(is) enviado(s) para ${laboratorio}. ${animaisNaoEncontrados.length} animal(is) não encontrado(s) e foram ignorados: ${animaisNaoEncontrados.join(', ')}`
+        ? `${animaisAtualizados.length} animal(is) enviado(s) para ${laboratorio}. ${animaisNaoEncontrados.length} animal(is) nÃ£o encontrado(s) e foram ignorados: ${animaisNaoEncontrados.join(', ')}`
         : `${animaisAtualizados.length} animal(is) enviado(s) para ${laboratorio}`
 
       res.status(200).json({
@@ -233,10 +233,10 @@ export default async function handler(req, res) {
       }
     }
   } catch (error) {
-    console.error('Erro ao enviar para laboratório:', error)
-    logger.error('Erro ao enviar DNA para laboratório', error)
+    console.error('Erro ao enviar para laboratÃ³rio:', error)
+    logger.error('Erro ao enviar DNA para laboratÃ³rio', error)
     res.status(500).json({ 
-      message: 'Erro ao enviar para laboratório', 
+      message: 'Erro ao enviar para laboratÃ³rio', 
       error: error.message 
     })
   }

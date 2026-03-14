@@ -1,11 +1,11 @@
 import { query } from '../../lib/database'
 
 /**
- * API de Insights com IA para análise de dados do rebanho
+ * API de Insights com IA para anÃ¡lise de dados do rebanho
  */
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Método não permitido' })
+    return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' })
   }
 
   try {
@@ -51,14 +51,14 @@ export default async function handler(req, res) {
   }
 }
 
-// Análise de dados de pesagem
+// AnÃ¡lise de dados de pesagem
 async function analyzeWeightData(data) {
   const insights = []
   
   if (!data || data.length === 0) return insights
 
-  // Calcular médias e variações
-  const pesos = data.map(d => parseFloat(d['Média Peso (kg)'] || d.mediaPeso || 0)).filter(p => p > 0)
+  // Calcular mÃ©dias e variaÃ§Ãµes
+  const pesos = data.map(d => parseFloat(d['MÃ©dia Peso (kg)'] || d.mediaPeso || 0)).filter(p => p > 0)
   if (pesos.length === 0) return insights
 
   const mediaPeso = pesos.reduce((a, b) => a + b, 0) / pesos.length
@@ -68,52 +68,52 @@ async function analyzeWeightData(data) {
 
   insights.push({
     type: 'info',
-    icon: '📊',
-    title: 'Análise de Peso Médio',
-    description: `Peso médio do rebanho: ${mediaPeso.toFixed(1)} kg`,
-    detail: `Variação entre piquetes: ${variacao}%`
+    icon: 'ðÅ¸â€œÅ ',
+    title: 'AnÃ¡lise de Peso MÃ©dio',
+    description: `Peso mÃ©dio do rebanho: ${mediaPeso.toFixed(1)} kg`,
+    detail: `VariaÃ§Ã£o entre piquetes: ${variacao}%`
   })
 
   // Identificar piquetes com desempenho excepcional
-  const melhorPiquete = data.find(d => parseFloat(d['Média Peso (kg)'] || d.mediaPeso) === maxPeso)
+  const melhorPiquete = data.find(d => parseFloat(d['MÃ©dia Peso (kg)'] || d.mediaPeso) === maxPeso)
   if (melhorPiquete && maxPeso > mediaPeso * 1.1) {
     insights.push({
       type: 'success',
-      icon: '🏆',
+      icon: 'ðÅ¸�â€ ',
       title: 'Destaque Positivo',
-      description: `${melhorPiquete.Piquete || melhorPiquete.piquete} apresenta peso ${((maxPeso/mediaPeso - 1) * 100).toFixed(0)}% acima da média`,
-      detail: 'Considere replicar as práticas de manejo deste piquete'
+      description: `${melhorPiquete.Piquete || melhorPiquete.piquete} apresenta peso ${((maxPeso/mediaPeso - 1) * 100).toFixed(0)}% acima da mÃ©dia`,
+      detail: 'Considere replicar as prÃ¡ticas de manejo deste piquete'
     })
   }
 
-  // Identificar piquetes que precisam atenção
-  const piorPiquete = data.find(d => parseFloat(d['Média Peso (kg)'] || d.mediaPeso) === minPeso)
+  // Identificar piquetes que precisam atenÃ§Ã£o
+  const piorPiquete = data.find(d => parseFloat(d['MÃ©dia Peso (kg)'] || d.mediaPeso) === minPeso)
   if (piorPiquete && minPeso < mediaPeso * 0.85) {
     insights.push({
       type: 'warning',
-      icon: '⚠️',
-      title: 'Atenção Necessária',
-      description: `${piorPiquete.Piquete || piorPiquete.piquete} está ${((1 - minPeso/mediaPeso) * 100).toFixed(0)}% abaixo da média`,
-      detail: 'Recomenda-se avaliar o manejo sanitário deste lote'
+      icon: 'âÅ¡ ï¸�',
+      title: 'AtenÃ§Ã£o NecessÃ¡ria',
+      description: `${piorPiquete.Piquete || piorPiquete.piquete} estÃ¡ ${((1 - minPeso/mediaPeso) * 100).toFixed(0)}% abaixo da mÃ©dia`,
+      detail: 'Recomenda-se avaliar o manejo sanitÃ¡rio deste lote'
     })
   }
 
-  // Análise de distribuição por sexo
+  // AnÃ¡lise de distribuiÃ§Ã£o por sexo
   const totalAnimais = data.reduce((sum, d) => sum + (parseInt(d.Animais || d.animais) || 0), 0)
   if (totalAnimais > 0) {
     insights.push({
       type: 'info',
-      icon: '🐄',
-      title: 'Distribuição do Rebanho',
+      icon: 'ðÅ¸�â€ž',
+      title: 'DistribuiÃ§Ã£o do Rebanho',
       description: `Total de ${totalAnimais} animais pesados`,
-      detail: `Distribuídos em ${data.length} piquetes`
+      detail: `DistribuÃ­dos em ${data.length} piquetes`
     })
   }
 
   return insights
 }
 
-// Análise de tendências de pesagem ao longo do tempo
+// AnÃ¡lise de tendÃªncias de pesagem ao longo do tempo
 async function analyzeWeightTrends(data, period) {
   const insights = []
   
@@ -132,7 +132,7 @@ async function analyzeWeightTrends(data, period) {
   const datas = Object.keys(porData).sort()
   if (datas.length < 2) return insights
 
-  // Calcular ganho médio diário
+  // Calcular ganho mÃ©dio diÃ¡rio
   const pesosMedias = datas.map(d => {
     const pesos = porData[d]
     return pesos.reduce((a, b) => a + b, 0) / pesos.length
@@ -151,37 +151,37 @@ async function analyzeWeightTrends(data, period) {
   if (gmd > 0) {
     insights.push({
       type: gmd > 0.8 ? 'success' : 'info',
-      icon: gmd > 0.8 ? '📈' : '📊',
-      title: 'Ganho Médio Diário',
+      icon: gmd > 0.8 ? 'ðÅ¸â€œË†' : 'ðÅ¸â€œÅ ',
+      title: 'Ganho MÃ©dio DiÃ¡rio',
       description: `GMD estimado: ${gmd.toFixed(3)} kg/dia`,
-      detail: gmd > 1.0 ? 'Excelente desempenho!' : gmd > 0.8 ? 'Bom desempenho' : 'Considere revisar estratégia de manejo'
+      detail: gmd > 1.0 ? 'Excelente desempenho!' : gmd > 0.8 ? 'Bom desempenho' : 'Considere revisar estratÃ©gia de manejo'
     })
   }
 
-  // Tendência
+  // TendÃªncia
   if (ganhoTotal > 0) {
     insights.push({
       type: 'success',
-      icon: '✅',
-      title: 'Tendência Positiva',
-      description: `Ganho de ${ganhoTotal.toFixed(1)} kg no período`,
-      detail: 'Rebanho apresenta evolução consistente'
+      icon: 'âÅ“â€¦',
+      title: 'TendÃªncia Positiva',
+      description: `Ganho de ${ganhoTotal.toFixed(1)} kg no perÃ­odo`,
+      detail: 'Rebanho apresenta evoluÃ§Ã£o consistente'
     })
   }
 
   return insights
 }
 
-// Análise de dados de inseminação
+// AnÃ¡lise de dados de inseminaÃ§Ã£o
 async function analyzeInseminationData(data) {
   const insights = []
   
   if (!data || data.length === 0) return insights
 
-  // Análise por touro
+  // AnÃ¡lise por touro
   const porTouro = {}
   data.forEach(r => {
-    const touro = r.touro || 'Não informado'
+    const touro = r.touro || 'NÃ£o informado'
     porTouro[touro] = (porTouro[touro] || 0) + 1
   })
 
@@ -190,9 +190,9 @@ async function analyzeInseminationData(data) {
 
   insights.push({
     type: 'info',
-    icon: '💉',
-    title: 'Resumo de Inseminações',
-    description: `${totalIA} inseminações realizadas`,
+    icon: 'ðÅ¸â€™â€°',
+    title: 'Resumo de InseminaÃ§Ãµes',
+    description: `${totalIA} inseminaÃ§Ãµes realizadas`,
     detail: `Utilizando ${touros.length} touros diferentes`
   })
 
@@ -203,31 +203,31 @@ async function analyzeInseminationData(data) {
     
     insights.push({
       type: 'info',
-      icon: '🏆',
+      icon: 'ðÅ¸�â€ ',
       title: 'Touro Mais Utilizado',
       description: `${touroTop}: ${qtd} IAs (${percentual}%)`,
-      detail: percentual > 50 ? 'Considere diversificar genética' : 'Boa diversificação genética'
+      detail: percentual > 50 ? 'Considere diversificar genÃ©tica' : 'Boa diversificaÃ§Ã£o genÃ©tica'
     })
   }
 
-  // Concentração genética
+  // ConcentraÃ§Ã£o genÃ©tica
   const top3 = touros.slice(0, 3).reduce((sum, [, qtd]) => sum + qtd, 0)
   const concentracao = ((top3 / totalIA) * 100).toFixed(0)
   
   if (concentracao > 70) {
     insights.push({
       type: 'warning',
-      icon: '⚠️',
-      title: 'Concentração Genética',
+      icon: 'âÅ¡ ï¸�',
+      title: 'ConcentraÃ§Ã£o GenÃ©tica',
       description: `${concentracao}% das IAs concentradas em 3 touros`,
-      detail: 'Recomenda-se maior diversificação para reduzir consanguinidade'
+      detail: 'Recomenda-se maior diversificaÃ§Ã£o para reduzir consanguinidade'
     })
   }
 
   return insights
 }
 
-// Análise de taxa de prenhez
+// AnÃ¡lise de taxa de prenhez
 async function analyzePregnancyRate(data) {
   const insights = []
   
@@ -242,30 +242,30 @@ async function analyzePregnancyRate(data) {
   
   insights.push({
     type: taxa >= 50 ? 'success' : taxa >= 40 ? 'info' : 'warning',
-    icon: taxa >= 50 ? '🎯' : taxa >= 40 ? '📊' : '⚠️',
+    icon: taxa >= 50 ? 'ðÅ¸Å½¯' : taxa >= 40 ? 'ðÅ¸â€œÅ ' : 'âÅ¡ ï¸�',
     title: 'Taxa de Prenhez',
     description: `${taxa}% de prenhez (${prenhas}/${total})`,
     detail: taxa >= 50 ? 'Excelente resultado!' : 
-            taxa >= 40 ? 'Resultado dentro da média' : 
+            taxa >= 40 ? 'Resultado dentro da mÃ©dia' : 
             'Abaixo do esperado - revisar protocolo'
   })
 
-  // Análise de não prenhas
+  // AnÃ¡lise de nÃ£o prenhas
   const naoPrenhas = total - prenhas
   if (naoPrenhas > 0) {
     insights.push({
       type: 'info',
-      icon: '🔄',
-      title: 'Oportunidade de Ressincronização',
-      description: `${naoPrenhas} fêmeas disponíveis para novo protocolo`,
-      detail: 'Planeje próximo lote de IA'
+      icon: 'ðÅ¸â€�â€ž',
+      title: 'Oportunidade de RessincronizaÃ§Ã£o',
+      description: `${naoPrenhas} fÃªmeas disponÃ­veis para novo protocolo`,
+      detail: 'Planeje prÃ³ximo lote de IA'
     })
   }
 
   return insights
 }
 
-// Análise de nascimentos
+// AnÃ¡lise de nascimentos
 async function analyzeBirthData(data) {
   const insights = []
   
@@ -281,24 +281,24 @@ async function analyzeBirthData(data) {
   
   insights.push({
     type: 'info',
-    icon: '🐮',
+    icon: 'ðÅ¸�®',
     title: 'Nascimentos Registrados',
-    description: `${total} nascimentos no período`,
-    detail: `${machos} machos (${proporcaoMachos}%) e ${femeas} fêmeas`
+    description: `${total} nascimentos no perÃ­odo`,
+    detail: `${machos} machos (${proporcaoMachos}%) e ${femeas} fÃªmeas`
   })
 
-  // Análise de proporção sexual
+  // AnÃ¡lise de proporÃ§Ã£o sexual
   if (Math.abs(machos - femeas) / total > 0.3) {
     insights.push({
       type: 'info',
-      icon: '⚖️',
-      title: 'Proporção Sexual',
-      description: `Predominância de ${machos > femeas ? 'machos' : 'fêmeas'}`,
-      detail: 'Variação natural esperada em lotes pequenos'
+      icon: 'âÅ¡â€“ï¸�',
+      title: 'ProporÃ§Ã£o Sexual',
+      description: `PredominÃ¢ncia de ${machos > femeas ? 'machos' : 'fÃªmeas'}`,
+      detail: 'VariaÃ§Ã£o natural esperada em lotes pequenos'
     })
   }
 
-  // Análise temporal
+  // AnÃ¡lise temporal
   const porMes = {}
   data.forEach(r => {
     if (r.data) {
@@ -312,17 +312,17 @@ async function analyzeBirthData(data) {
     const [mesTop, qtd] = meses[0]
     insights.push({
       type: 'info',
-      icon: '📅',
+      icon: 'ðÅ¸â€œâ€¦',
       title: 'Pico de Nascimentos',
       description: `${mesTop}: ${qtd} nascimentos`,
-      detail: 'Concentração de partos indica boa sincronização'
+      detail: 'ConcentraÃ§Ã£o de partos indica boa sincronizaÃ§Ã£o'
     })
   }
 
   return insights
 }
 
-// Análise de estoque de sêmen
+// AnÃ¡lise de estoque de sÃªmen
 async function analyzeSemenStock(data) {
   const insights = []
   
@@ -333,9 +333,9 @@ async function analyzeSemenStock(data) {
 
   insights.push({
     type: 'info',
-    icon: '🧪',
-    title: 'Estoque de Sêmen',
-    description: `${totalDoses} doses disponíveis`,
+    icon: 'ðÅ¸§ª',
+    title: 'Estoque de SÃªmen',
+    description: `${totalDoses} doses disponÃ­veis`,
     detail: `${touros} touros em estoque`
   })
 
@@ -344,10 +344,10 @@ async function analyzeSemenStock(data) {
   if (estoqueBaixo.length > 0) {
     insights.push({
       type: 'warning',
-      icon: '⚠️',
+      icon: 'âÅ¡ ï¸�',
       title: 'Estoque Baixo',
       description: `${estoqueBaixo.length} touro(s) com menos de 10 doses`,
-      detail: 'Considere reposição de estoque'
+      detail: 'Considere reposiÃ§Ã£o de estoque'
     })
   }
 
@@ -356,7 +356,7 @@ async function analyzeSemenStock(data) {
   if (maisEstoque) {
     insights.push({
       type: 'info',
-      icon: '📦',
+      icon: 'ðÅ¸â€œ¦',
       title: 'Maior Estoque',
       description: `${maisEstoque.touro}: ${maisEstoque.quantidade} doses`,
       detail: 'Touro com maior disponibilidade'
@@ -366,7 +366,7 @@ async function analyzeSemenStock(data) {
   return insights
 }
 
-// Análise genérica de dados
+// AnÃ¡lise genÃ©rica de dados
 async function analyzeGenericData(data) {
   const insights = []
   const dataArray = Array.isArray(data) ? data : (data?.data || [])
@@ -375,20 +375,20 @@ async function analyzeGenericData(data) {
   if (!dataArray.length) {
     insights.push({
       type: 'info',
-      icon: 'ℹ️',
+      icon: 'ââ€ž¹ï¸�',
       title: 'Sem Dados',
-      description: 'Nenhum registro encontrado no período selecionado',
-      detail: 'Ajuste o período ou verifique os filtros'
+      description: 'Nenhum registro encontrado no perÃ­odo selecionado',
+      detail: 'Ajuste o perÃ­odo ou verifique os filtros'
     })
     return insights
   }
 
   insights.push({
     type: 'info',
-    icon: '📊',
-    title: 'Dados Disponíveis',
+    icon: 'ðÅ¸â€œÅ ',
+    title: 'Dados DisponÃ­veis',
     description: `${total} registros encontrados`,
-    detail: 'Utilize os filtros para análise detalhada'
+    detail: 'Utilize os filtros para anÃ¡lise detalhada'
   })
 
   return insights

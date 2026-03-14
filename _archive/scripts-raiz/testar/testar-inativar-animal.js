@@ -18,7 +18,7 @@ const options = {
   }
 };
 
-console.log(`\n=== TESTANDO INATIVAÇÃO DO ANIMAL ${animalId} ===\n`);
+console.log(`\n=== TESTANDO INATIVA�‡�ƒO DO ANIMAL ${animalId} ===\n`);
 console.log('Dados enviados:', JSON.stringify(dadosAtualizacao, null, 2));
 
 const req = http.request(options, (res) => {
@@ -38,21 +38,21 @@ const req = http.request(options, (res) => {
       console.log(JSON.stringify(response, null, 2));
       
       if (res.statusCode === 200) {
-        console.log('\n✅ Animal inativado com sucesso!');
+        console.log('\n�œ… Animal inativado com sucesso!');
         console.log(`Situação atual: ${response.data?.situacao || response.situacao}`);
       } else {
-        console.log('\n❌ Erro ao inativar animal');
+        console.log('\n�Œ Erro ao inativar animal');
       }
     } catch (error) {
-      console.error('\n❌ Erro ao parsear resposta:', error.message);
+      console.error('\n�Œ Erro ao parsear resposta:', error.message);
       console.log('Resposta bruta:', data);
     }
   });
 });
 
 req.on('error', (error) => {
-  console.error('\n❌ Erro na requisição:', error.message);
-  console.log('\n⚠️  O servidor está rodando na porta 3020?');
+  console.error('\n�Œ Erro na requisição:', error.message);
+  console.log('\n�š�️  O servidor está rodando na porta 3020?');
 });
 
 req.write(JSON.stringify(dadosAtualizacao));

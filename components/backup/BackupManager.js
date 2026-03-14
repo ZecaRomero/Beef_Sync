@@ -31,7 +31,7 @@ export default function BackupManager() {
         try {
             setLoading(true)
             // Simular carregamento de backups
-            // Em produção, isso viria de uma API
+            // Em produÃ§Ã£o, isso viria de uma API
             const mockBackups = [
                 {
                     id: 1,
@@ -77,7 +77,7 @@ export default function BackupManager() {
         try {
             setCreating(true)
 
-            // Simular criação de backup
+            // Simular criaÃ§Ã£o de backup
             const response = await fetch('/api/backup', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -85,13 +85,13 @@ export default function BackupManager() {
             })
 
             if (response.ok) {
-                alert('✅ Backup criado com sucesso!')
+                alert('âÅ“â€¦ Backup criado com sucesso!')
                 loadBackups()
             } else {
                 throw new Error('Erro ao criar backup')
             }
         } catch (error) {
-            alert('❌ Erro ao criar backup: ' + error.message)
+            alert('â�Å’ Erro ao criar backup: ' + error.message)
         } finally {
             setCreating(false)
         }
@@ -107,9 +107,9 @@ export default function BackupManager() {
             link.click()
             document.body.removeChild(link)
 
-            alert('✅ Download iniciado!')
+            alert('âÅ“â€¦ Download iniciado!')
         } catch (error) {
-            alert('❌ Erro ao baixar backup: ' + error.message)
+            alert('â�Å’ Erro ao baixar backup: ' + error.message)
         }
     }
 
@@ -124,18 +124,18 @@ export default function BackupManager() {
             })
 
             if (response.ok) {
-                alert('✅ Backup excluído com sucesso!')
+                alert('âÅ“â€¦ Backup excluÃ­do com sucesso!')
                 loadBackups()
             } else {
                 throw new Error('Erro ao excluir backup')
             }
         } catch (error) {
-            alert('❌ Erro ao excluir backup: ' + error.message)
+            alert('â�Å’ Erro ao excluir backup: ' + error.message)
         }
     }
 
     const restoreBackup = async (backup) => {
-        if (!confirm(`Tem certeza que deseja restaurar o backup "${backup.nome}"?\n\nEsta ação irá substituir os dados atuais!`)) {
+        if (!confirm(`Tem certeza que deseja restaurar o backup "${backup.nome}"?\n\nEsta aÃ§Ã£o irÃ¡ substituir os dados atuais!`)) {
             return
         }
 
@@ -149,12 +149,12 @@ export default function BackupManager() {
             })
 
             if (response.ok) {
-                alert('✅ Backup restaurado com sucesso!')
+                alert('âÅ“â€¦ Backup restaurado com sucesso!')
             } else {
                 throw new Error('Erro ao restaurar backup')
             }
         } catch (error) {
-            alert('❌ Erro ao restaurar backup: ' + error.message)
+            alert('â�Å’ Erro ao restaurar backup: ' + error.message)
         } finally {
             setRestoring(false)
             setShowRestoreModal(false)
@@ -216,7 +216,7 @@ export default function BackupManager() {
             <Card>
                 <CardHeader>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                        🔄 Criar Novo Backup
+                        ðÅ¸â€�â€ž Criar Novo Backup
                     </h3>
                 </CardHeader>
                 <CardBody>
@@ -254,7 +254,7 @@ export default function BackupManager() {
             <Card>
                 <CardHeader>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                        📋 Backups Disponíveis
+                        ðÅ¸â€œâ€¹ Backups DisponÃ­veis
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                         {backups.length} backup(s) encontrado(s)
@@ -302,13 +302,13 @@ export default function BackupManager() {
                                                 {formatDate(backup.dataCriacao)}
                                             </div>
                                             <div>
-                                                📊 {backup.totalRegistros} registros
+                                                ðÅ¸â€œÅ  {backup.totalRegistros} registros
                                             </div>
                                             <div>
-                                                💾 {backup.tamanho}
+                                                ðÅ¸â€™¾ {backup.tamanho}
                                             </div>
                                             <div>
-                                                🗂️ {backup.tabelas.length} tabelas
+                                                ðÅ¸â€”â€šï¸� {backup.tabelas.length} tabelas
                                             </div>
                                         </div>
 
@@ -366,7 +366,7 @@ export default function BackupManager() {
                 </CardBody>
             </Card>
 
-            {/* Modal de Restauração */}
+            {/* Modal de RestauraÃ§Ã£o */}
             {showRestoreModal && selectedBackup && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
@@ -378,7 +378,7 @@ export default function BackupManager() {
                                 onClick={() => setShowRestoreModal(false)}
                                 className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                             >
-                                ×
+                                Ãâ€”
                             </button>
                         </div>
 
@@ -387,12 +387,12 @@ export default function BackupManager() {
                                 <div className="flex items-center gap-2 mb-2">
                                     <ExclamationTriangleIcon className="h-5 w-5 text-red-600" />
                                     <h3 className="font-semibold text-red-900 dark:text-red-200">
-                                        Atenção!
+                                        AtenÃ§Ã£o!
                                     </h3>
                                 </div>
                                 <p className="text-sm text-red-800 dark:text-red-300">
-                                    Esta ação irá substituir todos os dados atuais pelos dados do backup.
-                                    Esta operação não pode ser desfeita.
+                                    Esta aÃ§Ã£o irÃ¡ substituir todos os dados atuais pelos dados do backup.
+                                    Esta operaÃ§Ã£o nÃ£o pode ser desfeita.
                                 </p>
                             </div>
 
@@ -412,7 +412,7 @@ export default function BackupManager() {
                                 variant="danger"
                                 className="flex-1"
                             >
-                                {restoring ? 'Restaurando...' : 'Confirmar Restauração'}
+                                {restoring ? 'Restaurando...' : 'Confirmar RestauraÃ§Ã£o'}
                             </Button>
                             <Button
                                 onClick={() => setShowRestoreModal(false)}
@@ -438,7 +438,7 @@ export default function BackupManager() {
                                 onClick={() => setSelectedBackup(null)}
                                 className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                             >
-                                ×
+                                Ãâ€”
                             </button>
                         </div>
 
@@ -462,7 +462,7 @@ export default function BackupManager() {
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Data de Criação
+                                        Data de CriaÃ§Ã£o
                                     </label>
                                     <p className="text-sm text-gray-900 dark:text-white">
                                         {formatDate(selectedBackup.dataCriacao)}
@@ -480,7 +480,7 @@ export default function BackupManager() {
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Tabelas Incluídas ({selectedBackup.tabelas.length})
+                                    Tabelas IncluÃ­das ({selectedBackup.tabelas.length})
                                 </label>
                                 <div className="flex flex-wrap gap-2">
                                     {selectedBackup.tabelas.map((tabela) => (

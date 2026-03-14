@@ -12,7 +12,7 @@ async function verificarContagemNF240() {
   const client = await pool.connect();
   
   try {
-    console.log('🔍 VERIFICANDO CONTAGEM DA NF 240\n');
+    console.log('�Ÿ”� VERIFICANDO CONTAGEM DA NF 240\n');
     console.log('='.repeat(80));
     
     // 1. Contar itens na tabela notas_fiscais_itens
@@ -22,7 +22,7 @@ async function verificarContagemNF240() {
       WHERE nota_fiscal_id = (SELECT id FROM notas_fiscais WHERE numero_nf = '240')
     `);
     
-    console.log(`📦 Itens na tabela notas_fiscais_itens: ${itensResult.rows[0].total}`);
+    console.log(`�Ÿ“� Itens na tabela notas_fiscais_itens: ${itensResult.rows[0].total}`);
     
     // 2. Simular a query da API receptoras/lista-dg
     const apiResult = await client.query(`
@@ -38,7 +38,7 @@ async function verificarContagemNF240() {
       GROUP BY nf.numero_nf
     `);
     
-    console.log(`📋 Itens retornados pela API: ${apiResult.rows[0]?.total_itens || 0}`);
+    console.log(`�Ÿ“‹ Itens retornados pela API: ${apiResult.rows[0]?.total_itens || 0}`);
     
     // 3. Verificar se há itens duplicados
     const duplicadosResult = await client.query(`
@@ -52,12 +52,12 @@ async function verificarContagemNF240() {
     `);
     
     if (duplicadosResult.rows.length > 0) {
-      console.log(`\n⚠️ ITENS DUPLICADOS ENCONTRADOS:`);
+      console.log(`\n�š�️ ITENS DUPLICADOS ENCONTRADOS:`);
       duplicadosResult.rows.forEach(dup => {
         console.log(`   ${dup.tatuagem}: ${dup.quantidade} vezes`);
       });
     } else {
-      console.log(`\n✅ Nenhum item duplicado`);
+      console.log(`\n�œ… Nenhum item duplicado`);
     }
     
     // 4. Listar todas as tatuagens
@@ -70,7 +70,7 @@ async function verificarContagemNF240() {
       ORDER BY id
     `);
     
-    console.log(`\n📝 LISTA DE TATUAGENS (${tatuagensResult.rows.length} itens):\n`);
+    console.log(`\n�Ÿ“� LISTA DE TATUAGENS (${tatuagensResult.rows.length} itens):\n`);
     tatuagensResult.rows.forEach((row, idx) => {
       console.log(`${idx + 1}. ${row.tatuagem} (ID: ${row.id})`);
     });
@@ -87,17 +87,17 @@ async function verificarContagemNF240() {
     `);
     
     if (todosItensResult.rows.length > 0) {
-      console.log(`\n⚠️ ITENS COM TIPO DIFERENTE DE BOVINO:`);
+      console.log(`\n�š�️ ITENS COM TIPO DIFERENTE DE BOVINO:`);
       todosItensResult.rows.forEach(item => {
         console.log(`   ${item.tatuagem}: tipo_produto = ${item.tipo_produto}`);
       });
     }
     
     console.log('\n' + '='.repeat(80));
-    console.log('\n✅ Verificação concluída!');
+    console.log('\n�œ… Verificação concluída!');
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
     console.error(error);
   } finally {
     client.release();

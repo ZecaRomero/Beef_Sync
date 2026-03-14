@@ -49,7 +49,7 @@ export default function SemenCollectionManager() {
     if (isSelected) {
       setSelectedTouros(prev => [...prev, {
         ...touro,
-        dosesToCollect: 5 // Quantidade padrão
+        dosesToCollect: 5 // Quantidade padrÃ£o
       }])
     } else {
       setSelectedTouros(prev => prev.filter(t => t.id !== touro.id))
@@ -77,7 +77,7 @@ export default function SemenCollectionManager() {
 
   const generateReport = () => {
     if (selectedTouros.length === 0) {
-      alert('⚠️ Selecione pelo menos um touro para gerar o relatório')
+      alert('âÅ¡ ï¸� Selecione pelo menos um touro para gerar o relatÃ³rio')
       return
     }
     setShowReport(true)
@@ -90,7 +90,7 @@ export default function SemenCollectionManager() {
   const exportToExcel = async () => {
     try {
       const reportData = {
-        title: 'Relatório de Coleta de Sêmen',
+        title: 'RelatÃ³rio de Coleta de SÃªmen',
         date: new Date().toLocaleDateString('pt-BR'),
         touros: selectedTouros.map(touro => ({
           nome: touro.nome_touro,
@@ -119,11 +119,11 @@ export default function SemenCollectionManager() {
         a.click()
         window.URL.revokeObjectURL(url)
         document.body.removeChild(a)
-        alert('✅ Relatório exportado com sucesso!')
+        alert('âÅ“â€¦ RelatÃ³rio exportado com sucesso!')
       }
     } catch (error) {
       console.error('Erro ao exportar:', error)
-      alert('❌ Erro ao exportar relatório')
+      alert('â�Å’ Erro ao exportar relatÃ³rio')
     }
   }
 
@@ -145,10 +145,10 @@ export default function SemenCollectionManager() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
             <BeakerIcon className="h-8 w-8 mr-3 text-blue-600" />
-            Coleta de Sêmen
+            Coleta de SÃªmen
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Selecione os touros para coleta e gere o relatório de trabalho
+            Selecione os touros para coleta e gere o relatÃ³rio de trabalho
           </p>
         </div>
         <div className="flex space-x-3">
@@ -166,7 +166,7 @@ export default function SemenCollectionManager() {
             leftIcon={<DocumentTextIcon className="h-4 w-4" />}
             disabled={selectedTouros.length === 0}
           >
-            Gerar Relatório
+            Gerar RelatÃ³rio
           </Button>
         </div>
       </div>
@@ -187,7 +187,7 @@ export default function SemenCollectionManager() {
               onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
             />
             <Input
-              label="Localização"
+              label="LocalizaÃ§Ã£o"
               placeholder="Piquete, curral..."
               value={filters.localizacao}
               onChange={(e) => setFilters(prev => ({ ...prev, localizacao: e.target.value }))}
@@ -202,8 +202,8 @@ export default function SemenCollectionManager() {
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
               >
                 <option value="">Todos</option>
-                <option value="Disponivel">Disponível</option>
-                <option value="Indisponivel">Indisponível</option>
+                <option value="Disponivel">DisponÃ­vel</option>
+                <option value="Indisponivel">IndisponÃ­vel</option>
               </select>
             </div>
           </div>
@@ -263,7 +263,7 @@ export default function SemenCollectionManager() {
       <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Touros Disponíveis ({filteredTouros.length})
+            Touros DisponÃ­veis ({filteredTouros.length})
           </h3>
         </CardHeader>
         <CardBody>
@@ -343,7 +343,7 @@ export default function SemenCollectionManager() {
       <Modal
         isOpen={showReport}
         onClose={() => setShowReport(false)}
-        title="Relatório de Coleta de Sêmen"
+        title="RelatÃ³rio de Coleta de SÃªmen"
         size="xl"
       >
         <SemenCollectionReport 
@@ -356,7 +356,7 @@ export default function SemenCollectionManager() {
   )
 }
 
-// Componente do Relatório
+// Componente do RelatÃ³rio
 function SemenCollectionReport({ touros, onPrint, onExport }) {
   const currentDate = new Date().toLocaleDateString('pt-BR')
   const currentTime = new Date().toLocaleTimeString('pt-BR')
@@ -367,7 +367,7 @@ function SemenCollectionReport({ touros, onPrint, onExport }) {
       {/* Report Header */}
       <div className="text-center border-b pb-4 print:border-black semen-report-header">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          RELATÓRIO DE COLETA DE SÊMEN
+          RELATÃâ€œRIO DE COLETA DE SÃÅ MEN
         </h1>
         <p className="text-gray-600 dark:text-gray-400 mt-2">
           Data: {currentDate} | Hora: {currentTime}
@@ -388,7 +388,7 @@ function SemenCollectionReport({ touros, onPrint, onExport }) {
           <p className="text-2xl font-bold text-purple-600">
             {Math.round(totalDoses / touros.length)}
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">Média/Touro</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">MÃ©dia/Touro</p>
         </div>
       </div>
 
@@ -404,10 +404,10 @@ function SemenCollectionReport({ touros, onPrint, onExport }) {
                 RG
               </th>
               <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left">
-                Raça
+                RaÃ§a
               </th>
               <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left">
-                Localização
+                LocalizaÃ§Ã£o
               </th>
               <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left">
                 Rack
@@ -416,7 +416,7 @@ function SemenCollectionReport({ touros, onPrint, onExport }) {
                 Doses a Coletar
               </th>
               <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left">
-                Observações
+                ObservaÃ§Ãµes
               </th>
             </tr>
           </thead>
@@ -442,7 +442,7 @@ function SemenCollectionReport({ touros, onPrint, onExport }) {
                   {touro.dosesToCollect}
                 </td>
                 <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">
-                  {/* Espaço para observações manuais */}
+                  {/* EspaÃ§o para observaÃ§Ãµes manuais */}
                   <div className="h-6 border-b border-dotted border-gray-300 observation-lines"></div>
                 </td>
               </tr>
@@ -465,7 +465,7 @@ function SemenCollectionReport({ touros, onPrint, onExport }) {
       <div className="border-t pt-4 space-y-4 semen-report-signatures print:keep-together">
         <div className="grid grid-cols-2 gap-8">
           <div>
-            <p className="font-medium mb-2">Responsável pela Coleta:</p>
+            <p className="font-medium mb-2">ResponsÃ¡vel pela Coleta:</p>
             <div className="border-b border-dotted border-gray-400 h-8 signature-line"></div>
           </div>
           <div>
@@ -475,7 +475,7 @@ function SemenCollectionReport({ touros, onPrint, onExport }) {
         </div>
         
         <div>
-          <p className="font-medium mb-2">Observações Gerais:</p>
+          <p className="font-medium mb-2">ObservaÃ§Ãµes Gerais:</p>
           <div className="space-y-2">
             <div className="border-b border-dotted border-gray-400 h-6 observation-lines"></div>
             <div className="border-b border-dotted border-gray-400 h-6 observation-lines"></div>
@@ -484,8 +484,8 @@ function SemenCollectionReport({ touros, onPrint, onExport }) {
         </div>
 
         <div className="text-center text-sm text-gray-500 mt-8">
-          <p>Beef-Sync - Sistema de Gestão Pecuária</p>
-          <p>Relatório gerado em {new Date().toLocaleString('pt-BR')}</p>
+          <p>Beef-Sync - Sistema de GestÃ£o PecuÃ¡ria</p>
+          <p>RelatÃ³rio gerado em {new Date().toLocaleString('pt-BR')}</p>
         </div>
       </div>
 

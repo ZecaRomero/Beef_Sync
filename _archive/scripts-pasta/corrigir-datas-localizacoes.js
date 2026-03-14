@@ -14,9 +14,9 @@ require('dotenv').config()
 const { query } = require('../lib/database')
 
 async function corrigirDatasInconsistentes(dryRun = true) {
-  console.log('в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ')
-  console.log('  CORREГ‡ГѓO DE DATAS INCONSISTENTES - localizacoes_animais')
-  console.log('в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ\n')
+  console.log('ввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђ')
+  console.log('  CORREГвЂЎГЖ’O DE DATAS INCONSISTENTES - localizacoes_animais')
+  console.log('ввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђввЂўђ\n')
 
   try {
     // Buscar registros com data_saida < data_entrada
@@ -34,22 +34,22 @@ async function corrigirDatasInconsistentes(dryRun = true) {
     const registros = result.rows
 
     if (registros.length === 0) {
-      console.log('вњ… Nenhum registro com datas inconsistentes encontrado.')
+      console.log('вЕ“вЂ¦ Nenhum registro com datas inconsistentes encontrado.')
       return
     }
 
-    console.log(`рџ“‹ Encontrados ${registros.length} registro(s) com data_saida < data_entrada\n`)
+    console.log(`рЕёвЂњвЂ№ Encontrados ${registros.length} registro(s) com data_saida < data_entrada\n`)
 
     if (dryRun) {
-      console.log('в”Ђв”Ђв”Ђ Registros que seriam corrigidos (amostra dos 20 primeiros) в”Ђв”Ђв”Ђ\n')
+      console.log('ввЂќв‚¬ввЂќв‚¬ввЂќв‚¬ Registros que seriam corrigidos (amostra dos 20 primeiros) ввЂќв‚¬ввЂќв‚¬ввЂќв‚¬\n')
       registros.slice(0, 20).forEach((r, i) => {
         console.log(`   ${i + 1}. ${r.serie}-${r.rg} | ${r.piquete}`)
-        console.log(`      Entrada: ${r.data_entrada} | SaГ­da: ${r.data_saida} в†’ serГЎ NULL`)
+        console.log(`      Entrada: ${r.data_entrada} | SaГ­da: ${r.data_saida} ввЂ вЂ™ serГЎ NULL`)
       })
       if (registros.length > 20) {
         console.log(`   ... e mais ${registros.length - 20} registro(s)`)
       }
-      console.log('\nв„№пёЏ  Modo --dry-run: nenhuma alteraГ§ГЈo foi feita.')
+      console.log('\nввЂћ№пёЏ  Modo --dry-run: nenhuma alteraГ§ГЈo foi feita.')
       console.log('   Execute com --execute para aplicar a correГ§ГЈo.\n')
       return
     }
@@ -62,11 +62,11 @@ async function corrigirDatasInconsistentes(dryRun = true) {
       WHERE id = ANY($1)
     `, [ids])
 
-    console.log(`вњ… ${registros.length} registro(s) corrigido(s) com sucesso!`)
+    console.log(`вЕ“вЂ¦ ${registros.length} registro(s) corrigido(s) com sucesso!`)
     console.log('   data_saida definida como NULL (animal considerado no piquete).\n')
 
   } catch (error) {
-    console.error('вќЊ Erro:', error.message)
+    console.error('вќЕ’ Erro:', error.message)
     process.exit(1)
   }
 }

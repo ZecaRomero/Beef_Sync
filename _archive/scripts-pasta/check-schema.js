@@ -18,16 +18,16 @@ async function checkSchema() {
 
     const pasto = res.rows.find(r => r.column_name === 'pasto_atual');
     if (pasto) {
-      console.log('\n✅ "pasto_atual" column EXISTS.');
+      console.log('\n�œ… "pasto_atual" column EXISTS.');
     } else {
-      console.log('\n❌ "pasto_atual" column DOES NOT EXIST.');
+      console.log('\n�Œ "pasto_atual" column DOES NOT EXIST.');
     }
 
     const nascimento = res.rows.find(r => r.column_name === 'data_nascimento');
     if (nascimento) {
-      console.log('✅ "data_nascimento" column EXISTS.');
+      console.log('�œ… "data_nascimento" column EXISTS.');
     } else {
-      console.log('❌ "data_nascimento" column DOES NOT EXIST.');
+      console.log('�Œ "data_nascimento" column DOES NOT EXIST.');
     }
 
   } catch (err) {

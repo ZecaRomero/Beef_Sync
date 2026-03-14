@@ -32,7 +32,7 @@ export default function ComercialReports() {
     inventory_report: { estoque_semen: true }
   }
 
-  // Gerar chave de cache baseada no período
+  // Gerar chave de cache baseada no perÃ­odo
   const getCacheKey = useCallback(() => {
     return `${period.startDate}_${period.endDate}`
   }, [period])
@@ -40,7 +40,7 @@ export default function ComercialReports() {
   const doPreview = useCallback(async (forceRefresh = false) => {
     const cacheKey = getCacheKey()
     
-    // Verificar cache se não for refresh forçado
+    // Verificar cache se nÃ£o for refresh forÃ§ado
     if (!forceRefresh && previewCache.current.has(cacheKey)) {
       setPreview(previewCache.current.get(cacheKey))
       return
@@ -50,7 +50,7 @@ export default function ComercialReports() {
       setLoading(true)
       setError(null)
       setProgress(0)
-      setStatusMessage('🔄 Preparando dados...')
+      setStatusMessage('ðÅ¸â€�â€ž Preparando dados...')
       
       // Simular progresso
       const progressInterval = setInterval(() => {
@@ -67,7 +67,7 @@ export default function ComercialReports() {
       const timeout = setTimeout(() => controller.abort(), 30000) // 30s timeout
 
       try {
-        setStatusMessage('📊 Buscando dados do banco...')
+        setStatusMessage('ðÅ¸â€œÅ  Buscando dados do banco...')
         const res = await fetch('/api/reports/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -82,26 +82,26 @@ export default function ComercialReports() {
 
         if (!res.ok) {
           const errorData = await res.json().catch(() => ({}))
-          throw new Error(errorData.message || 'Erro ao gerar preview do relatório')
+          throw new Error(errorData.message || 'Erro ao gerar preview do relatÃ³rio')
         }
 
-        setStatusMessage('✅ Processando resultados...')
+        setStatusMessage('âÅ“â€¦ Processando resultados...')
         const data = await res.json()
         
         clearInterval(progressInterval)
         setProgress(100)
         setPreview(data)
         
-        // Salvar no cache (válido por 5 minutos)
+        // Salvar no cache (vÃ¡lido por 5 minutos)
         previewCache.current.set(cacheKey, { ...data, cachedAt: Date.now() })
         
-        // Limpar cache antigo (mantém apenas os últimos 10)
+        // Limpar cache antigo (mantÃ©m apenas os Ãºltimos 10)
         if (previewCache.current.size > 10) {
           const firstKey = previewCache.current.keys().next().value
           previewCache.current.delete(firstKey)
         }
         
-        setStatusMessage('✅ Preview gerado com sucesso!')
+        setStatusMessage('âÅ“â€¦ Preview gerado com sucesso!')
         setTimeout(() => setStatusMessage(''), 2000)
         retryCount.current = 0
       } finally {
@@ -112,15 +112,15 @@ export default function ComercialReports() {
       clearInterval(progressInterval)
       
       if (err.name === 'AbortError') {
-        setError('⏱️ Tempo de espera excedido. Tente novamente.')
+        setError('â�±ï¸� Tempo de espera excedido. Tente novamente.')
       } else {
-        const errorMsg = err.message || 'Erro ao gerar preview do relatório'
+        const errorMsg = err.message || 'Erro ao gerar preview do relatÃ³rio'
         setError(errorMsg)
         
-        // Retry automático
+        // Retry automÃ¡tico
         if (retryCount.current < maxRetries) {
           retryCount.current++
-          setStatusMessage(`🔄 Tentando novamente... (${retryCount.current}/${maxRetries})`)
+          setStatusMessage(`ðÅ¸â€�â€ž Tentando novamente... (${retryCount.current}/${maxRetries})`)
           setTimeout(() => {
             doPreview(true)
           }, 1000 * retryCount.current) // Backoff exponencial
@@ -143,7 +143,7 @@ export default function ComercialReports() {
       setDownloadLoading(prev => ({ ...prev, [format]: true }))
       setError(null)
       setProgress(0)
-      setStatusMessage(`📥 Gerando relatório ${format.toUpperCase()}...`)
+      setStatusMessage(`ðÅ¸â€œ¥ Gerando relatÃ³rio ${format.toUpperCase()}...`)
 
       const controller = new AbortController()
       const timeout = setTimeout(() => controller.abort(), 60000) // 60s timeout para download
@@ -174,10 +174,10 @@ export default function ComercialReports() {
 
         if (!res.ok) {
           const errorData = await res.json().catch(() => ({}))
-          throw new Error(errorData.message || `Erro ao gerar relatório ${format.toUpperCase()}`)
+          throw new Error(errorData.message || `Erro ao gerar relatÃ³rio ${format.toUpperCase()}`)
         }
 
-        setStatusMessage('📦 Preparando download...')
+        setStatusMessage('ðÅ¸â€œ¦ Preparando download...')
         setProgress(90)
 
         const blob = await res.blob()
@@ -199,7 +199,7 @@ export default function ComercialReports() {
           window.URL.revokeObjectURL(url)
         }, 100)
 
-        setStatusMessage(`✅ Download iniciado: ${fileName}`)
+        setStatusMessage(`âÅ“â€¦ Download iniciado: ${fileName}`)
         setTimeout(() => {
           setStatusMessage('')
           setProgress(0)
@@ -210,9 +210,9 @@ export default function ComercialReports() {
       }
     } catch (err) {
       if (err.name === 'AbortError') {
-        setError('⏱️ Tempo de espera excedido. O relatório pode ser muito grande. Tente novamente.')
+        setError('â�±ï¸� Tempo de espera excedido. O relatÃ³rio pode ser muito grande. Tente novamente.')
       } else {
-        setError(err.message || `Erro ao baixar relatório ${format.toUpperCase()}`)
+        setError(err.message || `Erro ao baixar relatÃ³rio ${format.toUpperCase()}`)
       }
       setProgress(0)
       setStatusMessage('')
@@ -225,14 +225,14 @@ export default function ComercialReports() {
     <Layout>
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Relatórios Comerciais</h1>
-          <p className="text-gray-600 dark:text-gray-400">Geração de relatórios PDF/Excel com dados reais.</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">RelatÃ³rios Comerciais</h1>
+          <p className="text-gray-600 dark:text-gray-400">GeraÃ§Ã£o de relatÃ³rios PDF/Excel com dados reais.</p>
         </div>
 
         <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
           <CardHeader className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Período</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">PerÃ­odo</h2>
               <p className="text-sm text-gray-600 dark:text-gray-400">Ajuste e gere o preview antes de baixar.</p>
             </div>
             <div className="flex gap-2">
@@ -251,7 +251,7 @@ export default function ComercialReports() {
                   </>
                 ) : (
                   <>
-                    📄 Baixar PDF
+                    ðÅ¸â€œâ€ž Baixar PDF
                   </>
                 )}
               </button>
@@ -270,7 +270,7 @@ export default function ComercialReports() {
                   </>
                 ) : (
                   <>
-                    📊 Baixar Excel
+                    ðÅ¸â€œÅ  Baixar Excel
                   </>
                 )}
               </button>
@@ -279,7 +279,7 @@ export default function ComercialReports() {
           <CardBody>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <label className="block">
-                <span className="text-sm text-gray-700 dark:text-gray-300">Início</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">InÃ­cio</span>
                 <input type="date" className="mt-1 w-full p-2 rounded-md border dark:bg-gray-900" value={new Date(period.startDate).toISOString().slice(0,10)} onChange={(e) => setPeriod(p => ({ ...p, startDate: new Date(e.target.value).toISOString() }))} />
               </label>
               <label className="block">
@@ -293,7 +293,7 @@ export default function ComercialReports() {
               disabled={loading}
               className="px-4 py-2 bg-gray-800 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700 transition-colors"
             >
-              {loading ? '🔄 Atualizando...' : '🔄 Atualizar Preview'}
+              {loading ? 'ðÅ¸â€�â€ž Atualizando...' : 'ðÅ¸â€�â€ž Atualizar Preview'}
             </button>
 
             {/* Progress Bar */}
@@ -317,7 +317,7 @@ export default function ComercialReports() {
             {error && (
               <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
                 <div className="flex items-start">
-                  <span className="text-red-600 dark:text-red-400 text-xl mr-2">⚠️</span>
+                  <span className="text-red-600 dark:text-red-400 text-xl mr-2">âÅ¡ ï¸�</span>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-red-800 dark:text-red-300">{error}</p>
                     <button

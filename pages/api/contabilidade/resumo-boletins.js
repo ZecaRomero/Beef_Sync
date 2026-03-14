@@ -1,8 +1,8 @@
-﻿import { query } from '../../../lib/database'
+import { query } from '../../../lib/database'
 import { RACAS_POR_SERIE as racasPorSerie } from '../../../utils/constants'
 import databaseService from '../../../services/databaseService'
 
-// Função para corrigir raça baseada na série (igual ao boletim)
+// FunÃ§Ã£o para corrigir raÃ§a baseada na sÃ©rie (igual ao boletim)
 function corrigirRacaPorSerie(animal) {
   if (animal.serie && racasPorSerie[animal.serie]) {
     const racaCorreta = racasPorSerie[animal.serie]
@@ -24,7 +24,7 @@ export default async function handler(req, res) {
     const { period } = req.query
     
     if (!period) {
-      return res.status(400).json({ message: 'Período é obrigatório' })
+      return res.status(400).json({ message: 'PerÃ­odo Ã© obrigatÃ³rio' })
     }
 
     const [startDate, endDate] = period.split(',')
@@ -47,7 +47,7 @@ export default async function handler(req, res) {
     const pgEnd = toPgDate(endDate)
     
     if (!pgStart || !pgEnd) {
-      return res.status(400).json({ message: 'Formato de data inválido' })
+      return res.status(400).json({ message: 'Formato de data invÃ¡lido' })
     }
 
     const [santAnna, pardinho] = await Promise.all([
@@ -60,7 +60,7 @@ export default async function handler(req, res) {
       pardinho
     }
 
-    console.log('📊 Resumos gerados:', {
+    console.log('ðÅ¸â€œÅ  Resumos gerados:', {
       santAnna: { total: santAnna.total, machos: santAnna.porSexo?.machos, femeas: santAnna.porSexo?.femeas },
       pardinho: { total: pardinho.total, machos: pardinho.porSexo?.machos, femeas: pardinho.porSexo?.femeas }
     })
@@ -77,17 +77,17 @@ export default async function handler(req, res) {
 
 async function getResumoSantAnna(pgStart, pgEnd) {
   try {
-    // Buscar TODOS os animais usando o mesmo método do boletim
+    // Buscar TODOS os animais usando o mesmo mÃ©todo do boletim
     // O boletim SANT ANNA usa databaseService.buscarAnimais({})
-    console.log('🔍 Buscando animais para resumo Sant Anna (usando databaseService.buscarAnimais)...')
+    console.log('ðÅ¸â€�� Buscando animais para resumo Sant Anna (usando databaseService.buscarAnimais)...')
     
     let animais = []
     try {
-      // Usar o mesmo método do boletim
+      // Usar o mesmo mÃ©todo do boletim
       animais = await databaseService.buscarAnimais({})
-      console.log(`✅ ${animais.length} animais encontrados via databaseService`)
+      console.log(`âÅ“â€¦ ${animais.length} animais encontrados via databaseService`)
     } catch (dbError) {
-      console.error('❌ Erro ao buscar animais via databaseService:', dbError)
+      console.error('â�Å’ Erro ao buscar animais via databaseService:', dbError)
       // Fallback para query direta
       const animaisResult = await query(`
         SELECT 
@@ -102,7 +102,7 @@ async function getResumoSantAnna(pgStart, pgEnd) {
         ORDER BY a.raca, a.sexo, a.meses
       `)
       animais = animaisResult.rows || []
-      console.log(`⚠️ Usando fallback: ${animais.length} animais encontrados`)
+      console.log(`âÅ¡ ï¸� Usando fallback: ${animais.length} animais encontrados`)
     }
     
     // Converter formato do banco para formato esperado (igual ao boletim)
@@ -112,18 +112,18 @@ async function getResumoSantAnna(pgStart, pgEnd) {
         dataNascimento: animal.data_nascimento || animal.dataNascimento,
         situacao: animal.situacao || 'Ativo'
       }
-      // Corrigir raça baseada na série (igual ao boletim)
+      // Corrigir raÃ§a baseada na sÃ©rie (igual ao boletim)
       return corrigirRacaPorSerie(animalFormatado)
     })
     
     // Filtrar apenas animais ativos (igual ao boletim)
     animais = animais.filter(animal => animal.situacao === 'Ativo')
-    console.log(`📊 Total de animais ativos após filtro: ${animais.length}`)
+    console.log(`ðÅ¸â€œÅ  Total de animais ativos apÃ³s filtro: ${animais.length}`)
     
-    // IMPORTANTE: Buscar também animais das notas fiscais com incricao = 'SANT ANNA'
-    // Isso inclui a NF 243 (15 cabeças) que entrou na SANT ANNA
+    // IMPORTANTE: Buscar tambÃ©m animais das notas fiscais com incricao = 'SANT ANNA'
+    // Isso inclui a NF 243 (15 cabeÃ§as) que entrou na SANT ANNA
     // Buscar a NF 243 explicitamente, independente do campo incricao
-    console.log('🔍 Buscando animais de notas fiscais SANT ANNA...')
+    console.log('ðÅ¸â€�� Buscando animais de notas fiscais SANT ANNA...')
     try {
       const nfsSantAnna = await query(`
         SELECT 
@@ -136,9 +136,9 @@ async function getResumoSantAnna(pgStart, pgEnd) {
         FROM notas_fiscais nf
         WHERE nf.tipo = 'entrada'
           AND (
-            -- NF 243 sempre incluída (entrou na SANT ANNA)
+            -- NF 243 sempre incluÃ­da (entrou na SANT ANNA)
             CAST(nf.numero_nf AS TEXT) = '243'
-            -- OU NFs com incricao = 'SANT ANNA' no período
+            -- OU NFs com incricao = 'SANT ANNA' no perÃ­odo
             OR (
               UPPER(COALESCE(nf.incricao, '')) = 'SANT ANNA'
               AND (
@@ -149,17 +149,17 @@ async function getResumoSantAnna(pgStart, pgEnd) {
           )
       `, [pgStart, pgEnd])
       
-      console.log(`📋 NFs SANT ANNA encontradas: ${nfsSantAnna.rows.length}`)
+      console.log(`ðÅ¸â€œâ€¹ NFs SANT ANNA encontradas: ${nfsSantAnna.rows.length}`)
       if (nfsSantAnna.rows.length > 0) {
-        console.log(`📋 NFs encontradas:`, nfsSantAnna.rows.map(nf => `NF ${nf.numero_nf} (incricao: ${nf.incricao || 'N/A'})`).join(', '))
+        console.log(`ðÅ¸â€œâ€¹ NFs encontradas:`, nfsSantAnna.rows.map(nf => `NF ${nf.numero_nf} (incricao: ${nf.incricao || 'N/A'})`).join(', '))
       }
       
       // Verificar se a NF 243 foi encontrada
       const nf243Encontrada = nfsSantAnna.rows.find(nf => nf.numero_nf === '243' || nf.numero_nf === 243 || String(nf.numero_nf) === '243')
       if (nf243Encontrada) {
-        console.log(`\n🎯 NF 243 ENCONTRADA para SANT ANNA! ID: ${nf243Encontrada.id}, incricao: ${nf243Encontrada.incricao || 'N/A'}`)
+        console.log(`\nðÅ¸Å½¯ NF 243 ENCONTRADA para SANT ANNA! ID: ${nf243Encontrada.id}, incricao: ${nf243Encontrada.incricao || 'N/A'}`)
       } else {
-        console.log(`\n⚠️ NF 243 NÃO ENCONTRADA na busca de NFs SANT ANNA!`)
+        console.log(`\nâÅ¡ ï¸� NF 243 NÃÆ’O ENCONTRADA na busca de NFs SANT ANNA!`)
       }
       
       let totalAnimaisAdicionadosNFs = 0
@@ -167,7 +167,7 @@ async function getResumoSantAnna(pgStart, pgEnd) {
       // Processar itens das NFs SANT ANNA
       for (const nf of nfsSantAnna.rows || []) {
         const isNF243 = nf.numero_nf === '243' || nf.numero_nf === 243 || String(nf.numero_nf) === '243'
-        console.log(`\n🔍 Processando NF ${nf.numero_nf} SANT ANNA${isNF243 ? ' ⭐ NF 243 ⭐' : ''} (incricao: ${nf.incricao || 'N/A'})`)
+        console.log(`\nðÅ¸â€�� Processando NF ${nf.numero_nf} SANT ANNA${isNF243 ? ' â­� NF 243 â­�' : ''} (incricao: ${nf.incricao || 'N/A'})`)
         
         let itens = []
         
@@ -180,11 +180,11 @@ async function getResumoSantAnna(pgStart, pgEnd) {
               itens = nf.itens
             }
           } catch (e) {
-            console.log(`  ⚠️ Erro ao parsear itens do JSONB:`, e.message)
+            console.log(`  âÅ¡ ï¸� Erro ao parsear itens do JSONB:`, e.message)
           }
         }
         
-        // Buscar da tabela separada (mais confiável)
+        // Buscar da tabela separada (mais confiÃ¡vel)
         if (nf.id) {
           try {
             const itensTabela = await query(`
@@ -208,12 +208,12 @@ async function getResumoSantAnna(pgStart, pgEnd) {
               }
             }
           } catch (e) {
-            console.log(`  ❌ Erro ao buscar itens da tabela:`, e.message)
+            console.log(`  â�Å’ Erro ao buscar itens da tabela:`, e.message)
           }
         }
         
         if (!itens || itens.length === 0) {
-          console.log(`  ⚠️ NF ${nf.numero_nf} não tem itens para processar`)
+          console.log(`  âÅ¡ ï¸� NF ${nf.numero_nf} nÃ£o tem itens para processar`)
           continue
         }
         
@@ -223,7 +223,7 @@ async function getResumoSantAnna(pgStart, pgEnd) {
           const sexoItem = item.sexo || item.sexo_animal || item.sexoAnimal || item.Sexo || ''
           
           let sexoNormalizado = String(sexoItem).toLowerCase().trim()
-          if (sexoNormalizado === 'fêmea' || sexoNormalizado === 'femea' || sexoNormalizado === 'f') {
+          if (sexoNormalizado === 'fÃªmea' || sexoNormalizado === 'femea' || sexoNormalizado === 'f') {
             sexoNormalizado = 'femea'
           } else if (sexoNormalizado === 'macho' || sexoNormalizado === 'm') {
             sexoNormalizado = 'macho'
@@ -231,7 +231,7 @@ async function getResumoSantAnna(pgStart, pgEnd) {
           
           const animalBase = {
             sexo: sexoNormalizado || sexoItem,
-            raca: item.raca || item.raca_animal || item.racaAnimal || 'Não informado',
+            raca: item.raca || item.raca_animal || item.racaAnimal || 'NÃ£o informado',
             meses: item.meses || null,
             era: item.era || null,
             data_nascimento: item.data_nascimento || nf.data_compra || nf.data,
@@ -239,10 +239,10 @@ async function getResumoSantAnna(pgStart, pgEnd) {
           }
           
           if (isNF243) {
-            console.log(`  🎯 ITEM NF 243 SANT ANNA: Quantidade=${quantidade}, Sexo="${sexoNormalizado}", Era="${animalBase.era}"`)
+            console.log(`  ðÅ¸Å½¯ ITEM NF 243 SANT ANNA: Quantidade=${quantidade}, Sexo="${sexoNormalizado}", Era="${animalBase.era}"`)
           }
           
-          // Criar múltiplos animais se quantidade > 1
+          // Criar mÃºltiplos animais se quantidade > 1
           for (let i = 0; i < quantidade; i++) {
             animais.push({ ...animalBase })
             totalAnimaisAdicionadosNFs++
@@ -250,24 +250,24 @@ async function getResumoSantAnna(pgStart, pgEnd) {
         }
         
         if (isNF243) {
-          console.log(`  ✅ NF 243: Total de ${totalAnimaisAdicionadosNFs} animais adicionados até agora desta NF`)
+          console.log(`  âÅ“â€¦ NF 243: Total de ${totalAnimaisAdicionadosNFs} animais adicionados atÃ© agora desta NF`)
         }
       }
       
-      console.log(`📊 Total de animais após incluir NFs SANT ANNA: ${animais.length}`)
-      console.log(`📊 Animais adicionados das NFs SANT ANNA: ${totalAnimaisAdicionadosNFs}`)
+      console.log(`ðÅ¸â€œÅ  Total de animais apÃ³s incluir NFs SANT ANNA: ${animais.length}`)
+      console.log(`ðÅ¸â€œÅ  Animais adicionados das NFs SANT ANNA: ${totalAnimaisAdicionadosNFs}`)
     } catch (e) {
-      console.warn('⚠️ Erro ao buscar NFs SANT ANNA:', e.message)
+      console.warn('âÅ¡ ï¸� Erro ao buscar NFs SANT ANNA:', e.message)
     }
     
-    // Estatísticas de debug
+    // EstatÃ­sticas de debug
     let animaisSemIdade = 0
     let animaisComIdade = 0
     let animaisProcessados = 0
     
     // Agrupar por sexo e era
     const resumo = {
-      total: 0, // Será calculado durante o processamento
+      total: 0, // SerÃ¡ calculado durante o processamento
       porSexo: { machos: 0, femeas: 0 },
       porEra: {
         'femea_0-7': 0,
@@ -285,15 +285,15 @@ async function getResumoSantAnna(pgStart, pgEnd) {
     }
 
     animais.forEach((animal, index) => {
-      // Verificar se é animal da NF 243 (animais adicionados das NFs têm quantidade mas não serie/rg)
+      // Verificar se Ã© animal da NF 243 (animais adicionados das NFs tÃªm quantidade mas nÃ£o serie/rg)
       const isNF243 = animal.quantidade !== undefined && !animal.serie && !animal.rg
       
       // Log para debug dos primeiros animais da NF 243
       if (isNF243 && index < 5) {
-        console.log(`🔍 Animal NF 243 detectado: quantidade=${animal.quantidade}, sexo=${animal.sexo}, era=${animal.era}, meses=${animal.meses}`)
+        console.log(`ðÅ¸â€�� Animal NF 243 detectado: quantidade=${animal.quantidade}, sexo=${animal.sexo}, era=${animal.era}, meses=${animal.meses}`)
       }
       
-      // Calcular idade primeiro (mesma lógica do boletim)
+      // Calcular idade primeiro (mesma lÃ³gica do boletim)
       // O boletim usa dataNascimento (camelCase) ou data_nascimento (snake_case)
       const dataNascimento = animal.dataNascimento || animal.data_nascimento
       let idadeMeses = 0
@@ -306,12 +306,12 @@ async function getResumoSantAnna(pgStart, pgEnd) {
         }
       }
       
-      // Se não tem data de nascimento ou é inválida, usar campo meses
+      // Se nÃ£o tem data de nascimento ou Ã© invÃ¡lida, usar campo meses
       if (idadeMeses === 0 && animal.meses) {
         idadeMeses = parseInt(animal.meses) || 0
       }
       
-      // Se não tem idade mas tem era, calcular idade aproximada da era
+      // Se nÃ£o tem idade mas tem era, calcular idade aproximada da era
       if (idadeMeses === 0 && animal.era) {
         const era = String(animal.era).toLowerCase()
         if (era.includes('24/36') || era.includes('24-36')) {
@@ -343,32 +343,32 @@ async function getResumoSantAnna(pgStart, pgEnd) {
         }
       }
       
-      // Se ainda não tem idade válida, pular animal (exceto se for da NF 243)
+      // Se ainda nÃ£o tem idade vÃ¡lida, pular animal (exceto se for da NF 243)
       if (idadeMeses === 0 && !isNF243) {
         animaisSemIdade++
-        // Log apenas os primeiros 5 para não poluir
+        // Log apenas os primeiros 5 para nÃ£o poluir
         if (animaisSemIdade <= 5) {
-          console.log(`⚠️ Animal sem idade válida: ${animal.serie || 'N/A'} ${animal.rg || 'N/A'} | data_nascimento: ${dataNascimento || 'N/A'} | meses: ${animal.meses || 'N/A'} | era: ${animal.era || 'N/A'}`)
+          console.log(`âÅ¡ ï¸� Animal sem idade vÃ¡lida: ${animal.serie || 'N/A'} ${animal.rg || 'N/A'} | data_nascimento: ${dataNascimento || 'N/A'} | meses: ${animal.meses || 'N/A'} | era: ${animal.era || 'N/A'}`)
         }
         return
       }
       
-      // Se for da NF 243 e ainda não tem idade válida, usar idade padrão
+      // Se for da NF 243 e ainda nÃ£o tem idade vÃ¡lida, usar idade padrÃ£o
       if (idadeMeses === 0 && isNF243) {
-        // Se já tentou calcular da era mas ainda é 0, usar 12 meses como padrão
+        // Se jÃ¡ tentou calcular da era mas ainda Ã© 0, usar 12 meses como padrÃ£o
         idadeMeses = 12
-        console.log(`ℹ️ Animal NF 243 sem idade específica, usando idade padrão: ${idadeMeses} meses (era: ${animal.era || 'N/A'})`)
+        console.log(`ââ€ž¹ï¸� Animal NF 243 sem idade especÃ­fica, usando idade padrÃ£o: ${idadeMeses} meses (era: ${animal.era || 'N/A'})`)
       }
       
       animaisComIdade++
       animaisProcessados++
 
-      // Incrementar total apenas para animais com idade válida
+      // Incrementar total apenas para animais com idade vÃ¡lida
       resumo.total++
 
       // Obter sexo do animal
       const sexo = (animal.sexo || '').toLowerCase()
-      const isFemea = sexo.includes('fêmea') || sexo.includes('femea') || sexo === 'f'
+      const isFemea = sexo.includes('fÃªmea') || sexo.includes('femea') || sexo === 'f'
       const isMacho = sexo.includes('macho') || sexo === 'm'
       
       if (isFemea) resumo.porSexo.femeas++
@@ -389,8 +389,8 @@ async function getResumoSantAnna(pgStart, pgEnd) {
         else if (idadeMeses > 22) resumo.porEra['macho_36+']++
       }
 
-      // Por raça
-      const raca = animal.raca || 'Não informado'
+      // Por raÃ§a
+      const raca = animal.raca || 'NÃ£o informado'
       if (!resumo.porRaca[raca]) {
         resumo.porRaca[raca] = { total: 0, machos: 0, femeas: 0 }
       }
@@ -402,21 +402,21 @@ async function getResumoSantAnna(pgStart, pgEnd) {
     // Contar quantos animais da NF 243 foram processados
     const animaisNF243 = animais.filter(a => a.quantidade !== undefined && !a.serie && !a.rg).length
     
-    console.log(`📊 Estatísticas de processamento Sant Anna:`)
+    console.log(`ðÅ¸â€œÅ  EstatÃ­sticas de processamento Sant Anna:`)
     console.log(`   - Total de animais na query: ${animais.length}`)
     console.log(`   - Animais da NF 243 no array: ${animaisNF243}`)
-    console.log(`   - Animais com idade válida: ${animaisComIdade}`)
-    console.log(`   - Animais sem idade válida: ${animaisSemIdade}`)
+    console.log(`   - Animais com idade vÃ¡lida: ${animaisComIdade}`)
+    console.log(`   - Animais sem idade vÃ¡lida: ${animaisSemIdade}`)
     console.log(`   - Total processado: ${resumo.total}`)
-    console.log(`   - Machos: ${resumo.porSexo.machos}, Fêmeas: ${resumo.porSexo.femeas}`)
+    console.log(`   - Machos: ${resumo.porSexo.machos}, FÃªmeas: ${resumo.porSexo.femeas}`)
     
-    // Verificar se os 15 animais da NF 243 foram incluídos
+    // Verificar se os 15 animais da NF 243 foram incluÃ­dos
     if (animaisNF243 < 15) {
-      console.log(`⚠️ ATENÇÃO: Esperados 15 animais da NF 243, mas apenas ${animaisNF243} foram encontrados no array!`)
+      console.log(`âÅ¡ ï¸� ATENÃâ€¡ÃÆ’O: Esperados 15 animais da NF 243, mas apenas ${animaisNF243} foram encontrados no array!`)
     } else if (animaisNF243 > 15) {
-      console.log(`⚠️ ATENÇÃO: Mais de 15 animais da NF 243 encontrados (${animaisNF243})!`)
+      console.log(`âÅ¡ ï¸� ATENÃâ€¡ÃÆ’O: Mais de 15 animais da NF 243 encontrados (${animaisNF243})!`)
     } else {
-      console.log(`✅ Todos os 15 animais da NF 243 foram encontrados no array`)
+      console.log(`âÅ“â€¦ Todos os 15 animais da NF 243 foram encontrados no array`)
     }
 
     return resumo
@@ -428,7 +428,7 @@ async function getResumoSantAnna(pgStart, pgEnd) {
 
 async function getResumoPardinho(pgStart, pgEnd) {
   try {
-    console.log(`\n🚀 Iniciando getResumoPardinho com período: ${pgStart} até ${pgEnd}`)
+    console.log(`\nðÅ¸Å¡â‚¬ Iniciando getResumoPardinho com perÃ­odo: ${pgStart} atÃ© ${pgEnd}`)
     
     const cnpjDestinoPardinho = '18978214000445'
     const cnpjFornecedorPardinho = '44017440001018'
@@ -455,16 +455,16 @@ async function getResumoPardinho(pgStart, pgEnd) {
       `, [pgStart, pgEnd])
       
       animais = movResult.rows || []
-      console.log(`📊 Animais encontrados em movimentacoes_contabeis: ${animais.length}`)
+      console.log(`ðÅ¸â€œÅ  Animais encontrados em movimentacoes_contabeis: ${animais.length}`)
     } catch (e) {
-      console.warn('⚠️ Erro ao buscar movimentacoes:', e.message)
+      console.warn('âÅ¡ ï¸� Erro ao buscar movimentacoes:', e.message)
       console.error('Detalhes do erro:', e)
     }
 
     // Buscar das notas fiscais APENAS da PARDINHO
-    // IMPORTANTE: PARDINHO deve ter apenas a NF 4346 (986 cabeças)
-    // A NF 243 (15 cabeças) entrou na SANT ANNA, não na PARDINHO
-    // AGORA TAMBÉM: NFs com itens que tenham local = 'Pardinho'
+    // IMPORTANTE: PARDINHO deve ter apenas a NF 4346 (986 cabeÃ§as)
+    // A NF 243 (15 cabeÃ§as) entrou na SANT ANNA, nÃ£o na PARDINHO
+    // AGORA TAMBÃâ€°M: NFs com itens que tenham local = 'Pardinho'
     const nfsResult = await query(`
       SELECT DISTINCT
         nf.id,
@@ -478,9 +478,9 @@ async function getResumoPardinho(pgStart, pgEnd) {
       LEFT JOIN notas_fiscais_itens nfi ON nfi.nota_fiscal_id = nf.id
       WHERE nf.tipo = 'entrada'
         AND (
-          -- NF 4346 (sempre incluída - única NF da PARDINHO)
+          -- NF 4346 (sempre incluÃ­da - Ãºnica NF da PARDINHO)
           CAST(nf.numero_nf AS TEXT) = '4346'
-          -- OU NFs com CNPJ da PARDINHO E que não sejam SANT ANNA
+          -- OU NFs com CNPJ da PARDINHO E que nÃ£o sejam SANT ANNA
           OR (
             (nf.data_compra BETWEEN $1 AND $2 OR nf.data BETWEEN $1 AND $2)
             AND (
@@ -502,29 +502,29 @@ async function getResumoPardinho(pgStart, pgEnd) {
     
     const todasNFs = nfsResult.rows || []
     
-    console.log(`📋 Total de NFs encontradas para resumo Pardinho: ${todasNFs.length}`)
-    console.log(`📋 NFs encontradas:`, todasNFs.map(nf => `NF ${nf.numero_nf}`).join(', '))
+    console.log(`ðÅ¸â€œâ€¹ Total de NFs encontradas para resumo Pardinho: ${todasNFs.length}`)
+    console.log(`ðÅ¸â€œâ€¹ NFs encontradas:`, todasNFs.map(nf => `NF ${nf.numero_nf}`).join(', '))
     
-    // Verificar se a NF 4346 está na lista (única NF esperada na PARDINHO)
+    // Verificar se a NF 4346 estÃ¡ na lista (Ãºnica NF esperada na PARDINHO)
     const nf4346 = todasNFs.find(nf => nf.numero_nf === '4346' || nf.numero_nf === 4346 || String(nf.numero_nf) === '4346')
     
     if (nf4346) {
-      console.log(`\n🎯 NF 4346 ENCONTRADA! ID: ${nf4346.id}, numero_nf: ${nf4346.numero_nf}, incricao: ${nf4346.incricao || 'N/A'}`)
+      console.log(`\nðÅ¸Å½¯ NF 4346 ENCONTRADA! ID: ${nf4346.id}, numero_nf: ${nf4346.numero_nf}, incricao: ${nf4346.incricao || 'N/A'}`)
     } else {
-      console.log(`\n⚠️ NF 4346 NÃO ENCONTRADA na lista de NFs!`)
+      console.log(`\nâÅ¡ ï¸� NF 4346 NÃÆ’O ENCONTRADA na lista de NFs!`)
     }
     
-    // Verificar se há NFs que não deveriam estar aqui (ex: NF 243 que é SANT ANNA)
+    // Verificar se hÃ¡ NFs que nÃ£o deveriam estar aqui (ex: NF 243 que Ã© SANT ANNA)
     const nf243 = todasNFs.find(nf => nf.numero_nf === '243' || nf.numero_nf === 243 || String(nf.numero_nf) === '243')
     if (nf243) {
-      console.log(`\n⚠️ ATENÇÃO: NF 243 encontrada na lista PARDINHO, mas ela é SANT ANNA! Incricao: ${nf243.incricao || 'N/A'}`)
+      console.log(`\nâÅ¡ ï¸� ATENÃâ€¡ÃÆ’O: NF 243 encontrada na lista PARDINHO, mas ela Ã© SANT ANNA! Incricao: ${nf243.incricao || 'N/A'}`)
     }
 
     for (const nf of todasNFs) {
       let itens = []
       
       const isNF4346 = nf.numero_nf === '4346' || nf.numero_nf === 4346 || String(nf.numero_nf) === '4346'
-      console.log(`\n🔍 Processando NF ${nf.numero_nf} (ID: ${nf.id})${isNF4346 ? ' ⭐ NF 4346 ⭐' : ''} (Incricao: ${nf.incricao || 'N/A'})`)
+      console.log(`\nðÅ¸â€�� Processando NF ${nf.numero_nf} (ID: ${nf.id})${isNF4346 ? ' â­� NF 4346 â­�' : ''} (Incricao: ${nf.incricao || 'N/A'})`)
       
       // Buscar do campo JSONB
       if (nf.itens) {
@@ -534,13 +534,13 @@ async function getResumoPardinho(pgStart, pgEnd) {
           } else if (Array.isArray(nf.itens)) {
             itens = nf.itens
           }
-          console.log(`  📦 Itens do campo JSONB: ${itens.length}`)
+          console.log(`  ðÅ¸â€œ¦ Itens do campo JSONB: ${itens.length}`)
         } catch (e) {
-          console.log(`  ⚠️ Erro ao parsear itens do JSONB:`, e.message)
+          console.log(`  âÅ¡ ï¸� Erro ao parsear itens do JSONB:`, e.message)
         }
       }
       
-      // Buscar da tabela separada (sempre buscar, pois é a fonte mais confiável)
+      // Buscar da tabela separada (sempre buscar, pois Ã© a fonte mais confiÃ¡vel)
       if (nf.id) {
         try {
           const itensTabela = await query(`
@@ -549,9 +549,9 @@ async function getResumoPardinho(pgStart, pgEnd) {
           `, [nf.id])
           
           if (itensTabela.rows?.length > 0) {
-            console.log(`  📦 Itens encontrados na tabela separada: ${itensTabela.rows.length}`)
-            // Se já tinha itens do JSONB, usar os da tabela (mais confiável)
-            // Se não tinha, usar os da tabela
+            console.log(`  ðÅ¸â€œ¦ Itens encontrados na tabela separada: ${itensTabela.rows.length}`)
+            // Se jÃ¡ tinha itens do JSONB, usar os da tabela (mais confiÃ¡vel)
+            // Se nÃ£o tinha, usar os da tabela
             if (itens.length === 0 || itensTabela.rows.length > itens.length) {
               itens = itensTabela.rows.map((row, idx) => {
               let dadosItem = row.dados_item
@@ -559,38 +559,38 @@ async function getResumoPardinho(pgStart, pgEnd) {
                 try {
                   dadosItem = JSON.parse(dadosItem)
                 } catch (e) {
-                  console.log(`  ⚠️ Erro ao parsear item ${idx + 1}:`, e.message)
+                  console.log(`  âÅ¡ ï¸� Erro ao parsear item ${idx + 1}:`, e.message)
                   dadosItem = {}
                 }
               }
               // Log do primeiro item para debug
               if (idx === 0 || (nf.numero_nf === '4346' || nf.numero_nf === 4346 || String(nf.numero_nf) === '4346')) {
-                console.log(`  📋 Item ${idx + 1} parseado da tabela (NF ${nf.numero_nf}):`, JSON.stringify(dadosItem, null, 2))
+                console.log(`  ðÅ¸â€œâ€¹ Item ${idx + 1} parseado da tabela (NF ${nf.numero_nf}):`, JSON.stringify(dadosItem, null, 2))
               }
               return dadosItem
               })
             } else {
-              console.log(`  ℹ️ Mantendo itens do JSONB (${itens.length}) ao invés da tabela (${itensTabela.rows.length})`)
+              console.log(`  ââ€ž¹ï¸� Mantendo itens do JSONB (${itens.length}) ao invÃ©s da tabela (${itensTabela.rows.length})`)
             }
           } else {
-            console.log(`  ⚠️ Nenhum item encontrado na tabela separada para NF ${nf.numero_nf}`)
+            console.log(`  âÅ¡ ï¸� Nenhum item encontrado na tabela separada para NF ${nf.numero_nf}`)
           }
         } catch (e) {
-          console.log(`  ❌ Erro ao buscar itens da tabela:`, e.message)
+          console.log(`  â�Å’ Erro ao buscar itens da tabela:`, e.message)
         }
       }
       
       if (!itens || itens.length === 0) {
-        console.log(`  ⚠️ NF ${nf.numero_nf} não tem itens para processar`)
+        console.log(`  âÅ¡ ï¸� NF ${nf.numero_nf} nÃ£o tem itens para processar`)
         continue
       }
       
-      console.log(`  ✅ Total de itens a processar: ${itens.length}`)
+      console.log(`  âÅ“â€¦ Total de itens a processar: ${itens.length}`)
       
       // Converter itens em animais (processar quantidade)
       for (const item of itens || []) {
         const quantidade = parseInt(item.quantidade) || 1
-        // Tentar múltiplas formas de obter o sexo
+        // Tentar mÃºltiplas formas de obter o sexo
         const sexoItem = item.sexo || 
                         item.sexo_animal || 
                         item.sexoAnimal || 
@@ -598,17 +598,17 @@ async function getResumoPardinho(pgStart, pgEnd) {
                         (item.dados_item && (item.dados_item.sexo || item.dados_item.sexo_animal || item.dados_item.sexoAnimal)) ||
                         ''
         
-        // Normalizar o sexo para garantir consistência
+        // Normalizar o sexo para garantir consistÃªncia
         let sexoNormalizado = String(sexoItem).toLowerCase().trim()
-        if (sexoNormalizado === 'fêmea' || sexoNormalizado === 'femea' || sexoNormalizado === 'f') {
+        if (sexoNormalizado === 'fÃªmea' || sexoNormalizado === 'femea' || sexoNormalizado === 'f') {
           sexoNormalizado = 'femea'
         } else if (sexoNormalizado === 'macho' || sexoNormalizado === 'm') {
           sexoNormalizado = 'macho'
         }
         
         const animalBase = {
-          sexo: sexoNormalizado || sexoItem, // Usar normalizado se disponível, senão usar original
-          raca: item.raca || item.raca_animal || item.racaAnimal || 'Não informado',
+          sexo: sexoNormalizado || sexoItem, // Usar normalizado se disponÃ­vel, senÃ£o usar original
+          raca: item.raca || item.raca_animal || item.racaAnimal || 'NÃ£o informado',
           meses: item.meses || null,
           era: item.era || null,
           data_nascimento: item.data_nascimento || nf.data_compra || nf.data,
@@ -616,14 +616,14 @@ async function getResumoPardinho(pgStart, pgEnd) {
         }
         
         if (isNF4346) {
-          console.log(`  🎯 ITEM NF 4346: Quantidade=${quantidade}, Sexo Original="${sexoItem}" (tipo: ${typeof sexoItem}), Sexo Normalizado="${sexoNormalizado}", Era="${animalBase.era}", Raça="${animalBase.raca}"`)
+          console.log(`  ðÅ¸Å½¯ ITEM NF 4346: Quantidade=${quantidade}, Sexo Original="${sexoItem}" (tipo: ${typeof sexoItem}), Sexo Normalizado="${sexoNormalizado}", Era="${animalBase.era}", RaÃ§a="${animalBase.raca}"`)
           console.log(`     Item completo:`, JSON.stringify(item, null, 2))
           console.log(`     animalBase criado:`, JSON.stringify(animalBase, null, 2))
         } else {
-          console.log(`  📊 Item NF ${nf.numero_nf}: Quantidade=${quantidade}, Sexo="${sexoItem}" (tipo: ${typeof sexoItem}), Era="${animalBase.era}", Raça="${animalBase.raca}"`)
+          console.log(`  ðÅ¸â€œÅ  Item NF ${nf.numero_nf}: Quantidade=${quantidade}, Sexo="${sexoItem}" (tipo: ${typeof sexoItem}), Era="${animalBase.era}", RaÃ§a="${animalBase.raca}"`)
         }
         
-        // Criar múltiplos animais se quantidade > 1
+        // Criar mÃºltiplos animais se quantidade > 1
         let animaisCriados = 0
         for (let i = 0; i < quantidade; i++) {
           animais.push({ ...animalBase })
@@ -632,16 +632,16 @@ async function getResumoPardinho(pgStart, pgEnd) {
         
         if (quantidade > 1 || isNF4346) {
           if (isNF4346) {
-            console.log(`  🎯 NF 4346: Criados ${animaisCriados} registros de animais para este item (sexo: "${sexoNormalizado}", era: "${animalBase.era}")`)
+            console.log(`  ðÅ¸Å½¯ NF 4346: Criados ${animaisCriados} registros de animais para este item (sexo: "${sexoNormalizado}", era: "${animalBase.era}")`)
             console.log(`     Total de animais no array agora: ${animais.length}`)
           } else {
-            console.log(`  ✅ Criados ${animaisCriados} registros de animais para este item (sexo: "${sexoNormalizado}")`)
+            console.log(`  âÅ“â€¦ Criados ${animaisCriados} registros de animais para este item (sexo: "${sexoNormalizado}")`)
           }
         }
       }
     }
     
-    console.log(`📊 Total de animais processados das notas fiscais para resumo Pardinho: ${animais.length}`)
+    console.log(`ðÅ¸â€œÅ  Total de animais processados das notas fiscais para resumo Pardinho: ${animais.length}`)
 
     let saidasResumo = { total: 0, femeas: 0, machos: 0 }
     try {
@@ -658,7 +658,7 @@ async function getResumoPardinho(pgStart, pgEnd) {
         const d = r.dados_extras || {}
         const q = parseInt(d.quantidade) || 1
         let sexo = String(d.sexo || '').toLowerCase().trim()
-        if (sexo === 'fêmea' || sexo === 'femea' || sexo === 'f') sexo = 'femea'
+        if (sexo === 'fÃªmea' || sexo === 'femea' || sexo === 'f') sexo = 'femea'
         if (sexo === 'macho' || sexo === 'm') sexo = 'macho'
         saidasResumo.total += q
         if (sexo === 'femea') saidasResumo.femeas += q
@@ -666,11 +666,11 @@ async function getResumoPardinho(pgStart, pgEnd) {
       }
     } catch (e) {}
 
-    // Agrupar por sexo e era (mesma lógica do Sant Anna)
-    // IMPORTANTE: O total deve ser calculado durante o processamento, não apenas animais.length
-    // porque alguns animais podem não ter idade válida e serem pulados
+    // Agrupar por sexo e era (mesma lÃ³gica do Sant Anna)
+    // IMPORTANTE: O total deve ser calculado durante o processamento, nÃ£o apenas animais.length
+    // porque alguns animais podem nÃ£o ter idade vÃ¡lida e serem pulados
     const resumo = {
-      total: 0, // Será calculado durante o processamento
+      total: 0, // SerÃ¡ calculado durante o processamento
       porSexo: { machos: 0, femeas: 0 },
       porEra: {
         'femea_0-7': 0,
@@ -687,51 +687,51 @@ async function getResumoPardinho(pgStart, pgEnd) {
       porRaca: {}
     }
     
-    console.log(`📊 Iniciando processamento de ${animais.length} animais para resumo Pardinho`)
+    console.log(`ðÅ¸â€œÅ  Iniciando processamento de ${animais.length} animais para resumo Pardinho`)
 
-    // Estatísticas de debug para sexo
+    // EstatÃ­sticas de debug para sexo
     let animaisSemSexo = 0
     let animaisComSexoFemea = 0
     let animaisComSexoMacho = 0
     
     animais.forEach((animal, index) => {
       const sexoOriginal = animal.sexo
-      // Normalizar o sexo para garantir consistência
+      // Normalizar o sexo para garantir consistÃªncia
       let sexo = String(animal.sexo || '').toLowerCase().trim()
       
-      // Se o sexo já foi normalizado anteriormente, usar diretamente
-      if (sexo === 'femea' || sexo === 'fêmea' || sexo === 'f') {
+      // Se o sexo jÃ¡ foi normalizado anteriormente, usar diretamente
+      if (sexo === 'femea' || sexo === 'fÃªmea' || sexo === 'f') {
         sexo = 'femea'
       } else if (sexo === 'macho' || sexo === 'm') {
         sexo = 'macho'
       }
       
-      // Log detalhado para os primeiros 10 animais e todos os que têm problemas
+      // Log detalhado para os primeiros 10 animais e todos os que tÃªm problemas
       if (index < 10 || !sexo || (sexo !== 'macho' && sexo !== 'femea' && sexo !== 'f' && sexo !== 'm')) {
-        console.log(`  🐄 Animal ${index + 1}: sexoOriginal="${sexoOriginal}", sexoNormalizado="${sexo}", era="${animal.era}", quantidade=${animal.quantidade || 1}`)
+        console.log(`  ðÅ¸�â€ž Animal ${index + 1}: sexoOriginal="${sexoOriginal}", sexoNormalizado="${sexo}", era="${animal.era}", quantidade=${animal.quantidade || 1}`)
       }
       
-      // Verificação mais robusta de fêmea - verificar primeiro valores exatos
-      // IMPORTANTE: Verificar exatamente "femea" primeiro (sem acento, que é o valor normalizado)
+      // VerificaÃ§Ã£o mais robusta de fÃªmea - verificar primeiro valores exatos
+      // IMPORTANTE: Verificar exatamente "femea" primeiro (sem acento, que Ã© o valor normalizado)
       const isFemea = sexo === 'femea' ||  // Valor normalizado (sem acento)
-                      sexo === 'fêmea' ||  // Com acento (caso não tenha sido normalizado)
-                      sexo === 'f' ||      // Abreviação
-                      (sexo.length > 0 && (sexo.includes('femea') || sexo.includes('fêmea')))
+                      sexo === 'fÃªmea' ||  // Com acento (caso nÃ£o tenha sido normalizado)
+                      sexo === 'f' ||      // AbreviaÃ§Ã£o
+                      (sexo.length > 0 && (sexo.includes('femea') || sexo.includes('fÃªmea')))
       
-      // Verificação mais robusta de macho - verificar primeiro valores exatos
+      // VerificaÃ§Ã£o mais robusta de macho - verificar primeiro valores exatos
       const isMacho = sexo === 'macho' || 
                       sexo === 'm' ||
                       (sexo.length > 0 && sexo.includes('macho'))
       
-      // Log de debug para fêmeas (especialmente da NF 4346)
+      // Log de debug para fÃªmeas (especialmente da NF 4346)
       if (isFemea && index < 5) {
-        console.log(`  ✅ Fêmea detectada: sexoOriginal="${sexoOriginal}", sexoNormalizado="${sexo}", isFemea=${isFemea}`)
+        console.log(`  âÅ“â€¦ FÃªmea detectada: sexoOriginal="${sexoOriginal}", sexoNormalizado="${sexo}", isFemea=${isFemea}`)
       }
       
       if (!sexo || (!isFemea && !isMacho)) {
         animaisSemSexo++
         if (animaisSemSexo <= 5) {
-          console.log(`  ⚠️ Animal sem sexo válido: sexo="${sexoOriginal}" (normalizado: "${sexo}")`)
+          console.log(`  âÅ¡ ï¸� Animal sem sexo vÃ¡lido: sexo="${sexoOriginal}" (normalizado: "${sexo}")`)
         }
       }
       
@@ -739,12 +739,12 @@ async function getResumoPardinho(pgStart, pgEnd) {
       if (isFemea) {
         resumo.porSexo.femeas++
         animaisComSexoFemea++
-        resumo.total++ // Incrementar total quando fêmea é identificada
+        resumo.total++ // Incrementar total quando fÃªmea Ã© identificada
       }
       if (isMacho) {
         resumo.porSexo.machos++
         animaisComSexoMacho++
-        resumo.total++ // Incrementar total quando macho é identificado
+        resumo.total++ // Incrementar total quando macho Ã© identificado
       }
 
       let idadeMeses = animal.meses || 0
@@ -757,19 +757,19 @@ async function getResumoPardinho(pgStart, pgEnd) {
       }
       if (!idadeMeses && animal.era) {
         const era = String(animal.era).toLowerCase()
-        // IMPORTANTE: Verificar faixas específicas ANTES de verificar valores isolados
+        // IMPORTANTE: Verificar faixas especÃ­ficas ANTES de verificar valores isolados
         if (era.includes('24/36') || era.includes('24-36')) {
-          idadeMeses = 30 // Idade média da faixa 24/36 meses
+          idadeMeses = 30 // Idade mÃ©dia da faixa 24/36 meses
         } else if (era.includes('12/24') || era.includes('12-24')) {
-          idadeMeses = 18 // Idade média da faixa 12/24 meses
+          idadeMeses = 18 // Idade mÃ©dia da faixa 12/24 meses
         } else if (era.includes('18-22') || era.includes('18/22')) {
-          idadeMeses = 20 // Idade média da faixa
+          idadeMeses = 20 // Idade mÃ©dia da faixa
         } else if (era.includes('7-15') || era.includes('7/15')) {
-          idadeMeses = 11 // Idade média da faixa
+          idadeMeses = 11 // Idade mÃ©dia da faixa
         } else if (era.includes('15-18') || era.includes('15/18')) {
-          idadeMeses = 16.5 // Idade média da faixa
+          idadeMeses = 16.5 // Idade mÃ©dia da faixa
         } else if (era.includes('12-18') || era.includes('12/18')) {
-          idadeMeses = 15 // Idade média da faixa
+          idadeMeses = 15 // Idade mÃ©dia da faixa
         } else if (era.includes('36') || era.includes('+36')) {
           idadeMeses = 36
         } else if (era.includes('24') || era.includes('+24')) {
@@ -801,7 +801,7 @@ async function getResumoPardinho(pgStart, pgEnd) {
         else if (idadeMeses > 22) resumo.porEra['macho_36+']++
       }
 
-      const raca = animal.raca || 'Não informado'
+      const raca = animal.raca || 'NÃ£o informado'
       if (!resumo.porRaca[raca]) {
         resumo.porRaca[raca] = { total: 0, machos: 0, femeas: 0 }
       }
@@ -810,29 +810,29 @@ async function getResumoPardinho(pgStart, pgEnd) {
       if (isFemea) resumo.porRaca[raca].femeas++
     })
 
-    // Contar fêmeas especificamente da NF 4346
+    // Contar fÃªmeas especificamente da NF 4346
     const femeasNF4346 = animais.filter(animal => {
       const sexo = String(animal.sexo || '').toLowerCase().trim()
-      return (sexo === 'femea' || sexo === 'fêmea' || sexo === 'f' || sexo.includes('femea'))
+      return (sexo === 'femea' || sexo === 'fÃªmea' || sexo === 'f' || sexo.includes('femea'))
     }).length
     
-    console.log(`📊 Estatísticas de processamento Pardinho:`)
+    console.log(`ðÅ¸â€œÅ  EstatÃ­sticas de processamento Pardinho:`)
     console.log(`   - Total de animais processados: ${animais.length}`)
-    console.log(`   - Animais com sexo Fêmea: ${animaisComSexoFemea}`)
+    console.log(`   - Animais com sexo FÃªmea: ${animaisComSexoFemea}`)
     console.log(`   - Animais com sexo Macho: ${animaisComSexoMacho}`)
-    console.log(`   - Animais sem sexo válido: ${animaisSemSexo}`)
+    console.log(`   - Animais sem sexo vÃ¡lido: ${animaisSemSexo}`)
     console.log(`   - Total no resumo: ${resumo.total}`)
-    console.log(`   - Fêmeas no resumo: ${resumo.porSexo.femeas}`)
+    console.log(`   - FÃªmeas no resumo: ${resumo.porSexo.femeas}`)
     console.log(`   - Machos no resumo: ${resumo.porSexo.machos}`)
-    console.log(`   🎯 Fêmeas da NF 4346: ${femeasNF4346}`)
-    console.log(`   📋 Resumo por Era - Fêmeas:`, {
+    console.log(`   ðÅ¸Å½¯ FÃªmeas da NF 4346: ${femeasNF4346}`)
+    console.log(`   ðÅ¸â€œâ€¹ Resumo por Era - FÃªmeas:`, {
       '0-7': resumo.porEra['femea_0-7'],
       '7-12': resumo.porEra['femea_7-12'],
       '12-18': resumo.porEra['femea_12-18'],
       '18-24': resumo.porEra['femea_18-24'],
       '24+': resumo.porEra['femea_24+']
     })
-    console.log(`   📋 Resumo por Era - Machos:`, {
+    console.log(`   ðÅ¸â€œâ€¹ Resumo por Era - Machos:`, {
       '0-7': resumo.porEra['macho_0-7'],
       '7-15': resumo.porEra['macho_7-15'],
       '15-18': resumo.porEra['macho_15-18'],
@@ -840,21 +840,21 @@ async function getResumoPardinho(pgStart, pgEnd) {
       '36+': resumo.porEra['macho_36+']
     })
     
-    // Se não há fêmeas mas deveria haver, mostrar detalhes
+    // Se nÃ£o hÃ¡ fÃªmeas mas deveria haver, mostrar detalhes
     if (resumo.porSexo.femeas === 0 && femeasNF4346 > 0) {
-      console.log(`   ⚠️ ATENÇÃO: ${femeasNF4346} fêmeas foram processadas mas não aparecem no resumo!`)
+      console.log(`   âÅ¡ ï¸� ATENÃâ€¡ÃÆ’O: ${femeasNF4346} fÃªmeas foram processadas mas nÃ£o aparecem no resumo!`)
     }
     
     // Garantir que o total seja calculado corretamente
     // Se o total for 0 mas houver animais por sexo, recalcular
     if (resumo.total === 0 && (resumo.porSexo.femeas > 0 || resumo.porSexo.machos > 0)) {
       resumo.total = resumo.porSexo.femeas + resumo.porSexo.machos
-      console.log(`⚠️ Total estava 0 mas há animais! Recalculando para ${resumo.total}`)
+      console.log(`âÅ¡ ï¸� Total estava 0 mas hÃ¡ animais! Recalculando para ${resumo.total}`)
     }
     
-    // Log do resumo completo que será retornado
-    console.log(`\n✅ Resumo Pardinho final que será retornado:`, JSON.stringify(resumo, null, 2))
-    console.log(`📊 Validação final:`, {
+    // Log do resumo completo que serÃ¡ retornado
+    console.log(`\nâÅ“â€¦ Resumo Pardinho final que serÃ¡ retornado:`, JSON.stringify(resumo, null, 2))
+    console.log(`ðÅ¸â€œÅ  ValidaÃ§Ã£o final:`, {
       total: resumo.total,
       femeas: resumo.porSexo.femeas,
       machos: resumo.porSexo.machos,
@@ -867,12 +867,12 @@ async function getResumoPardinho(pgStart, pgEnd) {
     resumo.porSexo.machos = Math.max(0, (resumo.porSexo.machos || 0) - saidasResumo.machos)
     return resumo
   } catch (error) {
-    console.error('❌ ERRO CRÍTICO ao buscar resumo Pardinho:', error)
+    console.error('â�Å’ ERRO CRÃ�TICO ao buscar resumo Pardinho:', error)
     console.error('Stack trace completo:', error.stack)
     console.error('Mensagem do erro:', error.message)
-    console.error('Código do erro:', error.code)
+    console.error('CÃ³digo do erro:', error.code)
     
-    // Retornar objeto vazio mas válido para não quebrar o frontend
+    // Retornar objeto vazio mas vÃ¡lido para nÃ£o quebrar o frontend
     return { 
       total: 0, 
       porSexo: { machos: 0, femeas: 0 }, 

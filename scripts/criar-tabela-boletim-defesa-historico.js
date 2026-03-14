@@ -1,13 +1,13 @@
 /**
- * Script para criar tabela de histórico do Boletim Defesa
- * Registra todas as alterações de quantidades
+ * Script para criar tabela de histÃ³rico do Boletim Defesa
+ * Registra todas as alteraÃ§Ãµes de quantidades
  */
 
 const { query } = require('../lib/database')
 
 async function criarTabelaHistorico() {
   try {
-    console.log('📋 Criando tabela boletim_defesa_historico...\n')
+    console.log('ðÅ¸â€œâ€¹ Criando tabela boletim_defesa_historico...\n')
 
     await query(`
       CREATE TABLE IF NOT EXISTS boletim_defesa_historico (
@@ -35,9 +35,9 @@ async function criarTabelaHistorico() {
       ON boletim_defesa_historico(created_at DESC)
     `)
 
-    console.log('✅ Tabela boletim_defesa_historico criada com sucesso!')
+    console.log('âÅ“â€¦ Tabela boletim_defesa_historico criada com sucesso!')
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('â�Å’ Erro:', error)
     throw error
   }
 }

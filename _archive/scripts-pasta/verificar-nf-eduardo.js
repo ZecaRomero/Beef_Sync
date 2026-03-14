@@ -2,7 +2,7 @@ const pool = require('../lib/database')
 
 async function verificarNFs() {
   try {
-    console.log('🔍 Buscando NFs do Eduardo Muniz de Lima...\n')
+    console.log('�Ÿ”� Buscando NFs do Eduardo Muniz de Lima...\n')
     
     const result = await pool.query(`
       SELECT 
@@ -20,7 +20,7 @@ async function verificarNFs() {
       ORDER BY data_compra DESC
     `)
     
-    console.log(`📋 Total de NFs encontradas: ${result.rows.length}\n`)
+    console.log(`�Ÿ“‹ Total de NFs encontradas: ${result.rows.length}\n`)
     
     result.rows.forEach(nf => {
       console.log(`NF ${nf.numero_nf}:`)
@@ -29,14 +29,14 @@ async function verificarNFs() {
       console.log(`  Data Compra: ${nf.data_compra}`)
       console.log(`  Data TE: ${nf.data_te}`)
       console.log(`  Tipo: ${nf.tipo}`)
-      console.log(`  É Receptoras: ${nf.eh_receptoras}`)
+      console.log(`  �‰ Receptoras: ${nf.eh_receptoras}`)
       console.log(`  Letra: ${nf.receptora_letra}, Número: ${nf.receptora_numero}`)
       console.log('')
     })
     
     // Buscar itens das NFs
     if (result.rows.length > 0) {
-      console.log('\n📦 Verificando itens das NFs...\n')
+      console.log('\n�Ÿ“� Verificando itens das NFs...\n')
       
       for (const nf of result.rows) {
         const itens = await pool.query(`
@@ -63,7 +63,7 @@ async function verificarNFs() {
     
     process.exit(0)
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('�Œ Erro:', error)
     process.exit(1)
   }
 }

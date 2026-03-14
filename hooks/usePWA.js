@@ -12,7 +12,7 @@ export default function usePWA() {
   const [updateAvailable, setUpdateAvailable] = useState(false)
   const [registration, setRegistration] = useState(null)
 
-  // Detectar se é PWA instalado
+  // Detectar se Ã© PWA instalado
   useEffect(() => {
     const checkStandalone = () => {
       const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches ||
@@ -27,7 +27,7 @@ export default function usePWA() {
     return () => window.removeEventListener('resize', checkStandalone)
   }, [])
 
-  // Detectar status de conexão
+  // Detectar status de conexÃ£o
   useEffect(() => {
     const updateOnlineStatus = () => {
       setIsOnline(navigator.onLine)
@@ -48,10 +48,10 @@ export default function usePWA() {
     if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js')
         .then((reg) => {
-          console.log('✅ Service Worker registrado:', reg)
+          console.log('âÅ“â€¦ Service Worker registrado:', reg)
           setRegistration(reg)
           
-          // Verificar atualizações
+          // Verificar atualizaÃ§Ãµes
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing
             if (newWorker) {
@@ -64,17 +64,17 @@ export default function usePWA() {
           })
         })
         .catch((error) => {
-          console.error('❌ Erro ao registrar Service Worker:', error)
+          console.error('â�Å’ Erro ao registrar Service Worker:', error)
         })
     } else if (process.env.NODE_ENV !== 'production' && 'serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations().then((regs) => {
-        if (regs.length) console.log('🔧 Dev: removendo Service Workers para evitar cache em desenvolvimento');
+        if (regs.length) console.log('ðÅ¸â€�§ Dev: removendo Service Workers para evitar cache em desenvolvimento');
         regs.forEach((r) => r.unregister());
       });
     }
   }, [])
 
-  // Detectar evento de instalação
+  // Detectar evento de instalaÃ§Ã£o
   useEffect(() => {
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault()
@@ -89,10 +89,10 @@ export default function usePWA() {
     }
   }, [])
 
-  // Detectar instalação concluída
+  // Detectar instalaÃ§Ã£o concluÃ­da
   useEffect(() => {
     const handleAppInstalled = () => {
-      console.log('✅ PWA instalado com sucesso')
+      console.log('âÅ“â€¦ PWA instalado com sucesso')
       setIsInstalled(true)
       setIsInstallable(false)
       setDeferredPrompt(null)
@@ -108,7 +108,7 @@ export default function usePWA() {
   // Instalar PWA
   const installPWA = useCallback(async () => {
     if (!deferredPrompt) {
-      console.log('❌ Prompt de instalação não disponível')
+      console.log('â�Å’ Prompt de instalaÃ§Ã£o nÃ£o disponÃ­vel')
       return false
     }
 
@@ -117,16 +117,16 @@ export default function usePWA() {
       const { outcome } = await deferredPrompt.userChoice
       
       if (outcome === 'accepted') {
-        console.log('✅ Usuário aceitou a instalação')
+        console.log('âÅ“â€¦ UsuÃ¡rio aceitou a instalaÃ§Ã£o')
         setIsInstallable(false)
         setDeferredPrompt(null)
         return true
       } else {
-        console.log('❌ Usuário rejeitou a instalação')
+        console.log('â�Å’ UsuÃ¡rio rejeitou a instalaÃ§Ã£o')
         return false
       }
     } catch (error) {
-      console.error('❌ Erro ao instalar PWA:', error)
+      console.error('â�Å’ Erro ao instalar PWA:', error)
       return false
     }
   }, [deferredPrompt])
@@ -134,25 +134,25 @@ export default function usePWA() {
   // Atualizar PWA
   const updatePWA = useCallback(async () => {
     if (!registration) {
-      console.log('❌ Service Worker não registrado')
+      console.log('â�Å’ Service Worker nÃ£o registrado')
       return false
     }
 
     try {
       await registration.update()
       setUpdateAvailable(false)
-      console.log('✅ PWA atualizado')
+      console.log('âÅ“â€¦ PWA atualizado')
       return true
     } catch (error) {
-      console.error('❌ Erro ao atualizar PWA:', error)
+      console.error('â�Å’ Erro ao atualizar PWA:', error)
       return false
     }
   }, [registration])
 
-  // Solicitar permissão para notificações
+  // Solicitar permissÃ£o para notificaÃ§Ãµes
   const requestNotificationPermission = useCallback(async () => {
     if (!('Notification' in window)) {
-      console.log('❌ Notificações não suportadas')
+      console.log('â�Å’ NotificaÃ§Ãµes nÃ£o suportadas')
       return false
     }
 
@@ -161,7 +161,7 @@ export default function usePWA() {
     }
 
     if (Notification.permission === 'denied') {
-      console.log('❌ Notificações negadas pelo usuário')
+      console.log('â�Å’ NotificaÃ§Ãµes negadas pelo usuÃ¡rio')
       return false
     }
 
@@ -169,15 +169,15 @@ export default function usePWA() {
       const permission = await Notification.requestPermission()
       return permission === 'granted'
     } catch (error) {
-      console.error('❌ Erro ao solicitar permissão de notificação:', error)
+      console.error('â�Å’ Erro ao solicitar permissÃ£o de notificaÃ§Ã£o:', error)
       return false
     }
   }, [])
 
-  // Enviar notificação
+  // Enviar notificaÃ§Ã£o
   const sendNotification = useCallback(async (title, options = {}) => {
     if (!('Notification' in window) || Notification.permission !== 'granted') {
-      console.log('❌ Notificações não disponíveis')
+      console.log('â�Å’ NotificaÃ§Ãµes nÃ£o disponÃ­veis')
       return false
     }
 
@@ -195,7 +195,7 @@ export default function usePWA() {
 
       return true
     } catch (error) {
-      console.error('❌ Erro ao enviar notificação:', error)
+      console.error('â�Å’ Erro ao enviar notificaÃ§Ã£o:', error)
       return false
     }
   }, [])
@@ -203,21 +203,21 @@ export default function usePWA() {
   // Sincronizar dados offline
   const syncOfflineData = useCallback(async () => {
     if (!registration) {
-      console.log('❌ Service Worker não registrado')
+      console.log('â�Å’ Service Worker nÃ£o registrado')
       return false
     }
 
     try {
       await registration.sync.register('background-sync')
-      console.log('✅ Sincronização offline iniciada')
+      console.log('âÅ“â€¦ SincronizaÃ§Ã£o offline iniciada')
       return true
     } catch (error) {
-      console.error('❌ Erro na sincronização offline:', error)
+      console.error('â�Å’ Erro na sincronizaÃ§Ã£o offline:', error)
       return false
     }
   }, [registration])
 
-  // Obter informações do PWA
+  // Obter informaÃ§Ãµes do PWA
   const getPWAInfo = useCallback(() => {
     return {
       isInstalled,
@@ -267,7 +267,7 @@ export default function usePWA() {
     }
   }, [])
 
-  // Obter estatísticas de uso
+  // Obter estatÃ­sticas de uso
   const getUsageStats = useCallback(() => {
     if (!registration) return null
 
@@ -283,7 +283,7 @@ export default function usePWA() {
   // Limpar cache
   const clearCache = useCallback(async () => {
     if (!registration) {
-      console.log('❌ Service Worker não registrado')
+      console.log('â�Å’ Service Worker nÃ£o registrado')
       return false
     }
 
@@ -292,10 +292,10 @@ export default function usePWA() {
       await Promise.all(
         cacheNames.map(cacheName => caches.delete(cacheName))
       )
-      console.log('✅ Cache limpo')
+      console.log('âÅ“â€¦ Cache limpo')
       return true
     } catch (error) {
-      console.error('❌ Erro ao limpar cache:', error)
+      console.error('â�Å’ Erro ao limpar cache:', error)
       return false
     }
   }, [registration])
@@ -303,7 +303,7 @@ export default function usePWA() {
   // Reiniciar Service Worker
   const restartServiceWorker = useCallback(async () => {
     if (!registration) {
-      console.log('❌ Service Worker não registrado')
+      console.log('â�Å’ Service Worker nÃ£o registrado')
       return false
     }
 
@@ -312,7 +312,7 @@ export default function usePWA() {
       window.location.reload()
       return true
     } catch (error) {
-      console.error('❌ Erro ao reiniciar Service Worker:', error)
+      console.error('â�Å’ Erro ao reiniciar Service Worker:', error)
       return false
     }
   }, [registration])
@@ -326,7 +326,7 @@ export default function usePWA() {
     updateAvailable,
     registration,
 
-    // Ações
+    // AÃ§Ãµes
     installPWA,
     updatePWA,
     requestNotificationPermission,
@@ -335,12 +335,12 @@ export default function usePWA() {
     clearCache,
     restartServiceWorker,
 
-    // Informações
+    // InformaÃ§Ãµes
     getPWAInfo,
     getSupportedFeatures,
     getUsageStats,
 
-    // Utilitários
+    // UtilitÃ¡rios
     deferredPrompt
   }
 }

@@ -50,7 +50,7 @@ export default function HistoricoLancamentos() {
   ];
 
   const statusOptions = [
-    { value: 'concluido', label: 'Concluído', color: 'green' },
+    { value: 'concluido', label: 'ConcluÃ­do', color: 'green' },
     { value: 'pendente', label: 'Pendente', color: 'yellow' },
     { value: 'erro', label: 'Erro', color: 'red' }
   ];
@@ -187,7 +187,7 @@ export default function HistoricoLancamentos() {
         setShowDeleteModal(false);
         
         // Mostrar mensagem de sucesso
-        alert(`${selectedItems.length} lotes excluídos com sucesso!`);
+        alert(`${selectedItems.length} lotes excluÃ­dos com sucesso!`);
       } else {
         throw new Error('Erro ao excluir lotes');
       }
@@ -232,11 +232,11 @@ export default function HistoricoLancamentos() {
 
   return (
     <div className="space-y-6">
-      {/* Header com Estatísticas */}
+      {/* Header com EstatÃ­sticas */}
       <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            Histórico de Lançamentos
+            HistÃ³rico de LanÃ§amentos
           </h2>
           <div className="flex space-x-3">
             <button
@@ -256,7 +256,7 @@ export default function HistoricoLancamentos() {
           </div>
         </div>
 
-        {/* Estatísticas */}
+        {/* EstatÃ­sticas */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
             <div className="flex items-center">
@@ -278,7 +278,7 @@ export default function HistoricoLancamentos() {
                 <CheckCircleIcon className="h-6 w-6 text-green-600 dark:text-green-400" />
               </div>
               <div className="ml-3">
-                <p className="text-sm font-medium text-green-600 dark:text-green-400">Concluídos</p>
+                <p className="text-sm font-medium text-green-600 dark:text-green-400">ConcluÃ­dos</p>
                 <p className="text-2xl font-bold text-green-900 dark:text-green-100">
                   {stats.lotes_concluidos?.toLocaleString('pt-BR') || '0'}
                 </p>
@@ -329,7 +329,7 @@ export default function HistoricoLancamentos() {
                     type="text"
                     value={filtros.search}
                     onChange={(e) => handleFiltroChange('search', e.target.value)}
-                    placeholder="Número do lote ou descrição..."
+                    placeholder="NÃºmero do lote ou descriÃ§Ã£o..."
                     className="pl-10 w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
@@ -337,14 +337,14 @@ export default function HistoricoLancamentos() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Módulo
+                  MÃ³dulo
                 </label>
                 <select
                   value={filtros.modulo}
                   onChange={(e) => handleFiltroChange('modulo', e.target.value)}
                   className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option value="">Todos os módulos</option>
+                  <option value="">Todos os mÃ³dulos</option>
                   {modulos.map(modulo => (
                     <option key={modulo} value={modulo}>{modulo}</option>
                   ))}
@@ -371,7 +371,7 @@ export default function HistoricoLancamentos() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Data Início
+                  Data InÃ­cio
                 </label>
                 <input
                   type="date"
@@ -406,7 +406,7 @@ export default function HistoricoLancamentos() {
         )}
       </div>
 
-      {/* Barra de Ações para Seleção Múltipla */}
+      {/* Barra de AÃ§Ãµes para SeleÃ§Ã£o MÃºltipla */}
       {selectedItems.length > 0 && (
         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
           <div className="flex items-center justify-between">
@@ -423,13 +423,13 @@ export default function HistoricoLancamentos() {
                 }}
                 className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
               >
-                Cancelar seleção
+                Cancelar seleÃ§Ã£o
               </button>
               <button
                 onClick={() => setShowDeleteModal(true)}
                 className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
               >
-                🗑️ Excluir Selecionados
+                ðÅ¸â€”â€˜ï¸� Excluir Selecionados
               </button>
             </div>
           </div>
@@ -457,16 +457,16 @@ export default function HistoricoLancamentos() {
                   Lote
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Módulo
+                  MÃ³dulo
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Operação
+                  OperaÃ§Ã£o
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Descrição
+                  DescriÃ§Ã£o
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Usuário
+                  UsuÃ¡rio
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Data/Hora
@@ -478,7 +478,7 @@ export default function HistoricoLancamentos() {
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Ações
+                  AÃ§Ãµes
                 </th>
               </tr>
             </thead>
@@ -574,7 +574,7 @@ export default function HistoricoLancamentos() {
           </table>
         </div>
 
-        {/* Paginação */}
+        {/* PaginaÃ§Ã£o */}
         {pagination.totalPages > 1 && (
           <div className="bg-white dark:bg-gray-900 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6">
             <div className="flex-1 flex justify-between sm:hidden">
@@ -590,7 +590,7 @@ export default function HistoricoLancamentos() {
                 disabled={pagination.page === pagination.totalPages}
                 className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
               >
-                Próximo
+                PrÃ³ximo
               </button>
             </div>
             <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
@@ -600,7 +600,7 @@ export default function HistoricoLancamentos() {
                   <span className="font-medium">
                     {((pagination.page - 1) * pagination.limit) + 1}
                   </span>{' '}
-                  até{' '}
+                  atÃ©{' '}
                   <span className="font-medium">
                     {Math.min(pagination.page * pagination.limit, pagination.total)}
                   </span>{' '}
@@ -619,7 +619,7 @@ export default function HistoricoLancamentos() {
                     <ChevronLeftIcon className="h-5 w-5" />
                   </button>
                   
-                  {/* Números das páginas */}
+                  {/* NÃºmeros das pÃ¡ginas */}
                   {Array.from({ length: Math.min(10, pagination.totalPages) }, (_, i) => {
                     let pageNum;
                     if (pagination.totalPages <= 10) {
@@ -667,7 +667,7 @@ export default function HistoricoLancamentos() {
         />
       )}
 
-      {/* Modal de Confirmação de Exclusão */}
+      {/* Modal de ConfirmaÃ§Ã£o de ExclusÃ£o */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
           <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4">
@@ -678,7 +678,7 @@ export default function HistoricoLancamentos() {
                 </div>
                 <div className="ml-3">
                   <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                    Confirmar Exclusão
+                    Confirmar ExclusÃ£o
                   </h3>
                 </div>
               </div>
@@ -688,7 +688,7 @@ export default function HistoricoLancamentos() {
                   Tem certeza que deseja excluir <strong>{selectedItems.length}</strong> lote(s) selecionado(s)?
                 </p>
                 <p className="text-sm text-red-600 dark:text-red-400 mt-2">
-                  ⚠️ Esta ação não pode ser desfeita!
+                  âÅ¡ ï¸� Esta aÃ§Ã£o nÃ£o pode ser desfeita!
                 </p>
               </div>
 
@@ -703,7 +703,7 @@ export default function HistoricoLancamentos() {
                   onClick={handleDeleteSelected}
                   className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                 >
-                  🗑️ Excluir
+                  ðÅ¸â€”â€˜ï¸� Excluir
                 </button>
               </div>
             </div>

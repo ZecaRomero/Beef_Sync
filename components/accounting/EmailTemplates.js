@@ -7,70 +7,70 @@ const EmailTemplates = () => {
   const [activeTemplate, setActiveTemplate] = useState('monthly')
   const [templates, setTemplates] = useState({
     monthly: {
-      name: 'Relatório Mensal',
-      subject: 'Relatório Mensal - Gestão Bovina - [MES/ANO]',
+      name: 'RelatÃ³rio Mensal',
+      subject: 'RelatÃ³rio Mensal - GestÃ£o Bovina - [MES/ANO]',
       body: `Prezado(a) Contador(a),
 
-Segue em anexo o relatório mensal da atividade pecuária referente ao período de [PERIODO].
+Segue em anexo o relatÃ³rio mensal da atividade pecuÃ¡ria referente ao perÃ­odo de [PERIODO].
 
-📊 RESUMO EXECUTIVO:
-• Total de animais no rebanho: [TOTAL_ANIMAIS]
-• Receita bruta do período: [RECEITA_BRUTA]
-• Custos operacionais: [CUSTOS_TOTAIS]
-• Resultado líquido: [RESULTADO_LIQUIDO]
-• ROI do período: [ROI]%
+ðÅ¸â€œÅ  RESUMO EXECUTIVO:
+ââ‚¬¢ Total de animais no rebanho: [TOTAL_ANIMAIS]
+ââ‚¬¢ Receita bruta do perÃ­odo: [RECEITA_BRUTA]
+ââ‚¬¢ Custos operacionais: [CUSTOS_TOTAIS]
+ââ‚¬¢ Resultado lÃ­quido: [RESULTADO_LIQUIDO]
+ââ‚¬¢ ROI do perÃ­odo: [ROI]%
 
-📋 DOCUMENTOS EM ANEXO:
-✓ Relatório detalhado de custos por categoria
-✓ Demonstrativo de vendas e receitas
-✓ Controle de estoque de animais (inventário)
-✓ Planilha de nascimentos e mortes
-✓ Dados para emissão de notas fiscais
+ðÅ¸â€œâ€¹ DOCUMENTOS EM ANEXO:
+âÅ“â€œ RelatÃ³rio detalhado de custos por categoria
+âÅ“â€œ Demonstrativo de vendas e receitas
+âÅ“â€œ Controle de estoque de animais (inventÃ¡rio)
+âÅ“â€œ Planilha de nascimentos e mortes
+âÅ“â€œ Dados para emissÃ£o de notas fiscais
 
-🔍 DESTAQUES DO PERÍODO:
-• Nascimentos: [NASCIMENTOS] animais
-• Vendas realizadas: [VENDAS] animais
-• Investimentos em melhorias: [INVESTIMENTOS]
+ðÅ¸â€�� DESTAQUES DO PERÃ�ODO:
+ââ‚¬¢ Nascimentos: [NASCIMENTOS] animais
+ââ‚¬¢ Vendas realizadas: [VENDAS] animais
+ââ‚¬¢ Investimentos em melhorias: [INVESTIMENTOS]
 
-Para dúvidas ou esclarecimentos, estou à disposição.
+Para dÃºvidas ou esclarecimentos, estou Ã  disposiÃ§Ã£o.
 
 Atenciosamente,
 [NOME_RESPONSAVEL]
-Sistema Beef Sync - Gestão Inteligente de Rebanho`,
+Sistema Beef Sync - GestÃ£o Inteligente de Rebanho`,
       variables: ['PERIODO', 'TOTAL_ANIMAIS', 'RECEITA_BRUTA', 'CUSTOS_TOTAIS', 'RESULTADO_LIQUIDO', 'ROI', 'NASCIMENTOS', 'VENDAS', 'INVESTIMENTOS', 'NOME_RESPONSAVEL']
     },
     nf_request: {
-      name: 'Solicitação de Nota Fiscal',
-      subject: 'URGENTE - Emissão de NF - Venda de Gado - [DATA_VENDA]',
+      name: 'SolicitaÃ§Ã£o de Nota Fiscal',
+      subject: 'URGENTE - EmissÃ£o de NF - Venda de Gado - [DATA_VENDA]',
       body: `Prezado(a) Contador(a),
 
-Solicito com URGÊNCIA a emissão de Nota Fiscal referente à venda de gado realizada.
+Solicito com URGÃÅ NCIA a emissÃ£o de Nota Fiscal referente Ã  venda de gado realizada.
 
-🐄 DADOS DA VENDA:
-• Data da venda: [DATA_VENDA]
-• Comprador: [COMPRADOR]
-• Valor total: [VALOR_TOTAL]
-• Quantidade de animais: [QTD_ANIMAIS]
+ðÅ¸�â€ž DADOS DA VENDA:
+ââ‚¬¢ Data da venda: [DATA_VENDA]
+ââ‚¬¢ Comprador: [COMPRADOR]
+ââ‚¬¢ Valor total: [VALOR_TOTAL]
+ââ‚¬¢ Quantidade de animais: [QTD_ANIMAIS]
 
-📋 DESCRIÇÃO DOS ANIMAIS:
+ðÅ¸â€œâ€¹ DESCRIÃâ€¡ÃÆ’O DOS ANIMAIS:
 [DESCRICAO_DETALHADA]
 
-📊 INFORMAÇÕES FISCAIS:
-• NCM: 0102.90.00 (Bovinos vivos)
-• CFOP: [CFOP_SUGERIDO]
-• Alíquota ICMS: [ALIQUOTA_ICMS]
-• Base de cálculo: [BASE_CALCULO]
+ðÅ¸â€œÅ  INFORMAÃâ€¡Ãâ€¢ES FISCAIS:
+ââ‚¬¢ NCM: 0102.90.00 (Bovinos vivos)
+ââ‚¬¢ CFOP: [CFOP_SUGERIDO]
+ââ‚¬¢ AlÃ­quota ICMS: [ALIQUOTA_ICMS]
+ââ‚¬¢ Base de cÃ¡lculo: [BASE_CALCULO]
 
-📞 DADOS DO COMPRADOR:
-• Nome/Razão Social: [COMPRADOR]
-• CNPJ/CPF: [A CONFIRMAR COM COMPRADOR]
-• Endereço: [A CONFIRMAR COM COMPRADOR]
-• Inscrição Estadual: [A CONFIRMAR COM COMPRADOR]
+ðÅ¸â€œÅ¾ DADOS DO COMPRADOR:
+ââ‚¬¢ Nome/RazÃ£o Social: [COMPRADOR]
+ââ‚¬¢ CNPJ/CPF: [A CONFIRMAR COM COMPRADOR]
+ââ‚¬¢ EndereÃ§o: [A CONFIRMAR COM COMPRADOR]
+ââ‚¬¢ InscriÃ§Ã£o Estadual: [A CONFIRMAR COM COMPRADOR]
 
-⚠️ OBSERVAÇÕES IMPORTANTES:
-• Prazo para emissão: [PRAZO_EMISSAO]
-• Forma de pagamento: [FORMA_PAGAMENTO]
-• Transporte: [RESPONSAVEL_TRANSPORTE]
+âÅ¡ ï¸� OBSERVAÃâ€¡Ãâ€¢ES IMPORTANTES:
+ââ‚¬¢ Prazo para emissÃ£o: [PRAZO_EMISSAO]
+ââ‚¬¢ Forma de pagamento: [FORMA_PAGAMENTO]
+ââ‚¬¢ Transporte: [RESPONSAVEL_TRANSPORTE]
 
 Por favor, confirme o recebimento deste email e me informe quando a NF estiver emitida.
 
@@ -80,73 +80,73 @@ Sistema Beef Sync`,
       variables: ['DATA_VENDA', 'COMPRADOR', 'VALOR_TOTAL', 'QTD_ANIMAIS', 'DESCRICAO_DETALHADA', 'CFOP_SUGERIDO', 'ALIQUOTA_ICMS', 'BASE_CALCULO', 'PRAZO_EMISSAO', 'FORMA_PAGAMENTO', 'RESPONSAVEL_TRANSPORTE', 'NOME_RESPONSAVEL']
     },
     quarterly: {
-      name: 'Relatório Trimestral',
-      subject: 'Relatório Trimestral - Análise Completa - [TRIMESTRE/ANO]',
+      name: 'RelatÃ³rio Trimestral',
+      subject: 'RelatÃ³rio Trimestral - AnÃ¡lise Completa - [TRIMESTRE/ANO]',
       body: `Prezado(a) Contador(a),
 
-Apresento o relatório trimestral consolidado da atividade pecuária.
+Apresento o relatÃ³rio trimestral consolidado da atividade pecuÃ¡ria.
 
-📈 ANÁLISE TRIMESTRAL ([TRIMESTRE]):
-• Performance geral: [PERFORMANCE]
-• Crescimento do rebanho: [CRESCIMENTO]%
-• Eficiência operacional: [EFICIENCIA]%
-• Margem de lucro: [MARGEM_LUCRO]%
+ðÅ¸â€œË† ANÃ�LISE TRIMESTRAL ([TRIMESTRE]):
+ââ‚¬¢ Performance geral: [PERFORMANCE]
+ââ‚¬¢ Crescimento do rebanho: [CRESCIMENTO]%
+ââ‚¬¢ EficiÃªncia operacional: [EFICIENCIA]%
+ââ‚¬¢ Margem de lucro: [MARGEM_LUCRO]%
 
-💰 INDICADORES FINANCEIROS:
-• Receita acumulada: [RECEITA_ACUMULADA]
-• Custos acumulados: [CUSTOS_ACUMULADOS]
-• EBITDA: [EBITDA]
-• Fluxo de caixa: [FLUXO_CAIXA]
+ðÅ¸â€™° INDICADORES FINANCEIROS:
+ââ‚¬¢ Receita acumulada: [RECEITA_ACUMULADA]
+ââ‚¬¢ Custos acumulados: [CUSTOS_ACUMULADOS]
+ââ‚¬¢ EBITDA: [EBITDA]
+ââ‚¬¢ Fluxo de caixa: [FLUXO_CAIXA]
 
-🎯 METAS vs REALIZADO:
-• Meta de nascimentos: [META_NASCIMENTOS] | Realizado: [REAL_NASCIMENTOS]
-• Meta de vendas: [META_VENDAS] | Realizado: [REAL_VENDAS]
-• Meta de ROI: [META_ROI]% | Realizado: [REAL_ROI]%
+ðÅ¸Å½¯ METAS vs REALIZADO:
+ââ‚¬¢ Meta de nascimentos: [META_NASCIMENTOS] | Realizado: [REAL_NASCIMENTOS]
+ââ‚¬¢ Meta de vendas: [META_VENDAS] | Realizado: [REAL_VENDAS]
+ââ‚¬¢ Meta de ROI: [META_ROI]% | Realizado: [REAL_ROI]%
 
-📊 ANEXOS INCLUSOS:
-✓ Demonstrativo de resultados trimestral
-✓ Balanço patrimonial (estoque de animais)
-✓ Fluxo de caixa detalhado
-✓ Análise de custos por categoria
-✓ Projeções para próximo trimestre
+ðÅ¸â€œÅ  ANEXOS INCLUSOS:
+âÅ“â€œ Demonstrativo de resultados trimestral
+âÅ“â€œ BalanÃ§o patrimonial (estoque de animais)
+âÅ“â€œ Fluxo de caixa detalhado
+âÅ“â€œ AnÃ¡lise de custos por categoria
+âÅ“â€œ ProjeÃ§Ãµes para prÃ³ximo trimestre
 
-Aguardo retorno para alinhamento das estratégias fiscais.
+Aguardo retorno para alinhamento das estratÃ©gias fiscais.
 
 Atenciosamente,
 [NOME_RESPONSAVEL]`,
       variables: ['TRIMESTRE', 'PERFORMANCE', 'CRESCIMENTO', 'EFICIENCIA', 'MARGEM_LUCRO', 'RECEITA_ACUMULADA', 'CUSTOS_ACUMULADOS', 'EBITDA', 'FLUXO_CAIXA', 'META_NASCIMENTOS', 'REAL_NASCIMENTOS', 'META_VENDAS', 'REAL_VENDAS', 'META_ROI', 'REAL_ROI', 'NOME_RESPONSAVEL']
     },
     tax_planning: {
-      name: 'Planejamento Tributário',
-      subject: 'Planejamento Tributário - Atividade Rural - [ANO]',
+      name: 'Planejamento TributÃ¡rio',
+      subject: 'Planejamento TributÃ¡rio - Atividade Rural - [ANO]',
       body: `Prezado(a) Contador(a),
 
-Solicito análise para planejamento tributário da atividade rural.
+Solicito anÃ¡lise para planejamento tributÃ¡rio da atividade rural.
 
-🏛️ REGIME TRIBUTÁRIO ATUAL:
-• Pessoa Física/Jurídica: [TIPO_PESSOA]
-• Regime: [REGIME_ATUAL]
-• Atividade principal: Criação de bovinos
+ðÅ¸�â€ºï¸� REGIME TRIBUTÃ�RIO ATUAL:
+ââ‚¬¢ Pessoa FÃ­sica/JurÃ­dica: [TIPO_PESSOA]
+ââ‚¬¢ Regime: [REGIME_ATUAL]
+ââ‚¬¢ Atividade principal: CriaÃ§Ã£o de bovinos
 
-💡 OPORTUNIDADES IDENTIFICADAS:
-• Depreciação de animais reprodutores: [VALOR_DEPRECIACAO]
-• Investimentos em melhoramento genético: [INVESTIMENTO_GENETICO]
-• Custos de formação de pastagens: [CUSTO_PASTAGEM]
-• Investimentos em infraestrutura: [INVESTIMENTOS_INFRA]
+ðÅ¸â€™¡ OPORTUNIDADES IDENTIFICADAS:
+ââ‚¬¢ DepreciaÃ§Ã£o de animais reprodutores: [VALOR_DEPRECIACAO]
+ââ‚¬¢ Investimentos em melhoramento genÃ©tico: [INVESTIMENTO_GENETICO]
+ââ‚¬¢ Custos de formaÃ§Ã£o de pastagens: [CUSTO_PASTAGEM]
+ââ‚¬¢ Investimentos em infraestrutura: [INVESTIMENTOS_INFRA]
 
-📊 DADOS PARA ANÁLISE:
-• Receita bruta anual estimada: [RECEITA_ESTIMADA]
-• Custos operacionais: [CUSTOS_OPERACIONAIS]
-• Investimentos planejados: [INVESTIMENTOS_PLANEJADOS]
-• Estoque de animais (valor): [VALOR_ESTOQUE]
+ðÅ¸â€œÅ  DADOS PARA ANÃ�LISE:
+ââ‚¬¢ Receita bruta anual estimada: [RECEITA_ESTIMADA]
+ââ‚¬¢ Custos operacionais: [CUSTOS_OPERACIONAIS]
+ââ‚¬¢ Investimentos planejados: [INVESTIMENTOS_PLANEJADOS]
+ââ‚¬¢ Estoque de animais (valor): [VALOR_ESTOQUE]
 
-🎯 OBJETIVOS:
-• Otimização da carga tributária
-• Aproveitamento de incentivos fiscais rurais
-• Planejamento sucessório (se aplicável)
-• Estruturação para crescimento
+ðÅ¸Å½¯ OBJETIVOS:
+ââ‚¬¢ OtimizaÃ§Ã£o da carga tributÃ¡ria
+ââ‚¬¢ Aproveitamento de incentivos fiscais rurais
+ââ‚¬¢ Planejamento sucessÃ³rio (se aplicÃ¡vel)
+ââ‚¬¢ EstruturaÃ§Ã£o para crescimento
 
-Por favor, agende uma reunião para discussão detalhada.
+Por favor, agende uma reuniÃ£o para discussÃ£o detalhada.
 
 Atenciosamente,
 [NOME_RESPONSAVEL]`,
@@ -162,9 +162,9 @@ Atenciosamente,
   }
 
   const resetTemplate = () => {
-    if (confirm('Tem certeza que deseja restaurar o template padrão?')) {
-      // Aqui você redefiniria para o template padrão
-      toast.info('Template restaurado para o padrão')
+    if (confirm('Tem certeza que deseja restaurar o template padrÃ£o?')) {
+      // Aqui vocÃª redefiniria para o template padrÃ£o
+      toast.info('Template restaurado para o padrÃ£o')
     }
   }
 
@@ -190,7 +190,7 @@ Atenciosamente,
           </div>
           <div class="content">${template.body}</div>
           <div class="variables">
-            <h4>Variáveis disponíveis:</h4>
+            <h4>VariÃ¡veis disponÃ­veis:</h4>
             <p>${template.variables.map(v => `[${v}]`).join(', ')}</p>
           </div>
         </body>
@@ -213,7 +213,7 @@ Atenciosamente,
       {/* Seletor de Template */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          ✉️ Editor de Templates de Email
+          âÅ“â€°ï¸� Editor de Templates de Email
         </h3>
         
         <div className="flex flex-wrap gap-2 mb-6">
@@ -261,7 +261,7 @@ Atenciosamente,
                 [activeTemplate]: { ...prev[activeTemplate], subject: e.target.value }
               }))}
               className="input-field"
-              placeholder="Use [VARIAVEL] para campos dinâmicos"
+              placeholder="Use [VARIAVEL] para campos dinÃ¢micos"
             />
           </div>
 
@@ -277,14 +277,14 @@ Atenciosamente,
               }))}
               rows={15}
               className="input-field font-mono text-sm"
-              placeholder="Digite o conteúdo do email. Use [VARIAVEL] para campos que serão substituídos automaticamente."
+              placeholder="Digite o conteÃºdo do email. Use [VARIAVEL] para campos que serÃ£o substituÃ­dos automaticamente."
             />
           </div>
 
-          {/* Variáveis Disponíveis */}
+          {/* VariÃ¡veis DisponÃ­veis */}
           <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
             <h4 className="font-medium text-blue-900 dark:text-blue-300 mb-2">
-              📝 Variáveis Disponíveis
+              ðÅ¸â€œ� VariÃ¡veis DisponÃ­veis
             </h4>
             <div className="flex flex-wrap gap-2">
               {templates[activeTemplate].variables.map((variable) => (
@@ -293,7 +293,7 @@ Atenciosamente,
                   className="px-2 py-1 bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 text-xs rounded cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-700"
                   onClick={() => {
                     navigator.clipboard.writeText(`[${variable}]`)
-                    toast.success(`Variável [${variable}] copiada!`)
+                    toast.success(`VariÃ¡vel [${variable}] copiada!`)
                   }}
                   title="Clique para copiar"
                 >
@@ -302,23 +302,23 @@ Atenciosamente,
               ))}
             </div>
             <p className="text-xs text-blue-700 dark:text-blue-400 mt-2">
-              💡 Clique em uma variável para copiá-la. Essas variáveis serão substituídas automaticamente pelos dados reais.
+              ðÅ¸â€™¡ Clique em uma variÃ¡vel para copiÃ¡-la. Essas variÃ¡veis serÃ£o substituÃ­das automaticamente pelos dados reais.
             </p>
           </div>
 
-          {/* Ações */}
+          {/* AÃ§Ãµes */}
           <div className="flex flex-wrap gap-3">
             <button onClick={saveTemplate} className="btn-primary">
-              💾 Salvar Template
+              ðÅ¸â€™¾ Salvar Template
             </button>
             <button onClick={previewTemplate} className="btn-secondary">
-              👁️ Visualizar
+              ðÅ¸â€˜�ï¸� Visualizar
             </button>
             <button onClick={testEmail} className="btn-secondary">
-              📧 Testar Email
+              ðÅ¸â€œ§ Testar Email
             </button>
             <button onClick={resetTemplate} className="btn-secondary">
-              🔄 Restaurar Padrão
+              ðÅ¸â€�â€ž Restaurar PadrÃ£o
             </button>
           </div>
         </div>
@@ -327,27 +327,27 @@ Atenciosamente,
       {/* Dicas de Uso */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-4">
-          💡 Dicas de Uso dos Templates
+          ðÅ¸â€™¡ Dicas de Uso dos Templates
         </h4>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-3">
             <div className="flex items-start space-x-3">
-              <span className="text-green-500 text-lg">✅</span>
+              <span className="text-green-500 text-lg">âÅ“â€¦</span>
               <div>
-                <div className="font-medium text-gray-900 dark:text-white">Variáveis Dinâmicas</div>
+                <div className="font-medium text-gray-900 dark:text-white">VariÃ¡veis DinÃ¢micas</div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Use [VARIAVEL] para campos que serão preenchidos automaticamente
+                  Use [VARIAVEL] para campos que serÃ£o preenchidos automaticamente
                 </div>
               </div>
             </div>
             
             <div className="flex items-start space-x-3">
-              <span className="text-blue-500 text-lg">📧</span>
+              <span className="text-blue-500 text-lg">ðÅ¸â€œ§</span>
               <div>
-                <div className="font-medium text-gray-900 dark:text-white">Integração com Outlook</div>
+                <div className="font-medium text-gray-900 dark:text-white">IntegraÃ§Ã£o com Outlook</div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Os emails abrem automaticamente no seu cliente de email padrão
+                  Os emails abrem automaticamente no seu cliente de email padrÃ£o
                 </div>
               </div>
             </div>
@@ -355,21 +355,21 @@ Atenciosamente,
 
           <div className="space-y-3">
             <div className="flex items-start space-x-3">
-              <span className="text-purple-500 text-lg">🎨</span>
+              <span className="text-purple-500 text-lg">ðÅ¸Å½¨</span>
               <div>
-                <div className="font-medium text-gray-900 dark:text-white">Formatação</div>
+                <div className="font-medium text-gray-900 dark:text-white">FormataÃ§Ã£o</div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Use emojis e formatação para emails mais atrativos
+                  Use emojis e formataÃ§Ã£o para emails mais atrativos
                 </div>
               </div>
             </div>
             
             <div className="flex items-start space-x-3">
-              <span className="text-orange-500 text-lg">🔄</span>
+              <span className="text-orange-500 text-lg">ðÅ¸â€�â€ž</span>
               <div>
-                <div className="font-medium text-gray-900 dark:text-white">Backup Automático</div>
+                <div className="font-medium text-gray-900 dark:text-white">Backup AutomÃ¡tico</div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Seus templates são salvos automaticamente no navegador
+                  Seus templates sÃ£o salvos automaticamente no navegador
                 </div>
               </div>
             </div>

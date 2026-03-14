@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     const pesagensData = await pesagensRes.json()
     const todasPesagens = Array.isArray(pesagensData) ? pesagensData : pesagensData.pesagens || pesagensData.data || []
 
-    // Filtrar por período
+    // Filtrar por perÃ­odo
     const pesagens = todasPesagens.filter(p => {
       const dataPesagem = p.data || ''
       return dataPesagem >= startDate && dataPesagem <= endDate
@@ -24,10 +24,10 @@ export default async function handler(req, res) {
     workbook.creator = 'Beef Sync'
     workbook.created = new Date()
 
-    // Função para extrair local
+    // FunÃ§Ã£o para extrair local
     const extrairLocal = (obs) => {
-      if (!obs) return 'Não informado'
-      const sNorm = obs.replace(/CONFINAÇÃO/gi, 'CONFINA').replace(/CONFINACAO/gi, 'CONFINA')
+      if (!obs) return 'NÃ£o informado'
+      const sNorm = obs.replace(/CONFINAÃâ€¡ÃÆ’O/gi, 'CONFINA').replace(/CONFINACAO/gi, 'CONFINA')
       const match = sNorm.match(/(PIQUETE\s*\d+|PROJETO\s*[\dA-Za-z\-]+|CONFINA\w*|GUARITA|CABANHA|PISTA\s*\d*)/i)
       if (match) {
         let loc = match[1].trim().toUpperCase().replace(/\s+/g, ' ')
@@ -38,7 +38,7 @@ export default async function handler(req, res) {
       return obs.length <= 35 ? obs.toUpperCase() : obs.substring(0, 35).toUpperCase()
     }
 
-    // Última pesagem de cada animal (igual ao dashboard)
+    // ÃÅ¡ltima pesagem de cada animal (igual ao dashboard)
     const porAnimalUltima = {}
     pesagens.forEach(p => {
       const aid = p.animal_id ?? p.animal ?? `f${(p.peso || 0)}-${p.data || ''}`
@@ -50,9 +50,9 @@ export default async function handler(req, res) {
     })
     const pesagensUltima = Object.values(porAnimalUltima)
 
-    // Estatísticas gerais
+    // EstatÃ­sticas gerais
     const machos = pesagens.filter(p => p.animal_sexo === 'Macho')
-    const femeas = pesagens.filter(p => p.animal_sexo === 'Fêmea')
+    const femeas = pesagens.filter(p => p.animal_sexo === 'FÃªmea')
     const pesos = pesagens.map(p => parseFloat(p.peso)).filter(n => !isNaN(n))
     const pesoMedio = pesos.length > 0 ? (pesos.reduce((a, b) => a + b, 0) / pesos.length).toFixed(1) : 0
     const pesoMin = pesos.length > 0 ? Math.min(...pesos).toFixed(1) : 0
@@ -60,7 +60,7 @@ export default async function handler(req, res) {
     const ceValores = pesagens.map(p => parseFloat(p.ce)).filter(n => !isNaN(n))
     const ceMedio = ceValores.length > 0 ? (ceValores.reduce((a, b) => a + b, 0) / ceValores.length).toFixed(1) : '-'
 
-    // Agrupar por local (última pesagem por animal + normalizar PIQUETE X → PROJETO X)
+    // Agrupar por local (Ãºltima pesagem por animal + normalizar PIQUETE X ââ€ â€™ PROJETO X)
     const porLocal = {}
     pesagensUltima.forEach(p => {
       const local = extrairLocal(p.observacoes)
@@ -69,32 +69,32 @@ export default async function handler(req, res) {
     })
 
     // ===== ABA 1: DASHBOARD =====
-    const sheetDash = workbook.addWorksheet('📊 Dashboard')
+    const sheetDash = workbook.addWorksheet('ðÅ¸â€œÅ  Dashboard')
 
-    // Título principal
+    // TÃ­tulo principal
     sheetDash.mergeCells('A1:H1')
     const dashTitle = sheetDash.getCell('A1')
-    dashTitle.value = '📊 DASHBOARD DE PESAGENS'
+    dashTitle.value = 'ðÅ¸â€œÅ  DASHBOARD DE PESAGENS'
     dashTitle.font = { name: 'Calibri', size: 24, bold: true, color: { argb: 'FFFFFFFF' } }
     dashTitle.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0891B2' } }
     dashTitle.alignment = { vertical: 'middle', horizontal: 'center' }
     sheetDash.getRow(1).height = 40
 
-    // Período
+    // PerÃ­odo
     sheetDash.mergeCells('A2:H2')
     const dashPeriod = sheetDash.getCell('A2')
-    dashPeriod.value = `📅 Período: ${new Date(startDate).toLocaleDateString('pt-BR')} a ${new Date(endDate).toLocaleDateString('pt-BR')}`
+    dashPeriod.value = `ðÅ¸â€œâ€¦ PerÃ­odo: ${new Date(startDate).toLocaleDateString('pt-BR')} a ${new Date(endDate).toLocaleDateString('pt-BR')}`
     dashPeriod.font = { name: 'Calibri', size: 12, italic: true }
     dashPeriod.alignment = { horizontal: 'center' }
     sheetDash.getRow(2).height = 25
 
-    // Cards de estatísticas
+    // Cards de estatÃ­sticas
     let row = 4
     const cards = [
-      { label: 'TOTAL DE PESAGENS', value: pesagens.length, color: 'FF6366F1', icon: '📊' },
-      { label: 'MACHOS', value: machos.length, color: 'FF3B82F6', icon: '♂️' },
-      { label: 'FÊMEAS', value: femeas.length, color: 'FFEC4899', icon: '♀️' },
-      { label: 'PESO MÉDIO', value: `${pesoMedio} kg`, color: 'FFF59E0B', icon: '⚖️' }
+      { label: 'TOTAL DE PESAGENS', value: pesagens.length, color: 'FF6366F1', icon: 'ðÅ¸â€œÅ ' },
+      { label: 'MACHOS', value: machos.length, color: 'FF3B82F6', icon: 'ââ„¢â€šï¸�' },
+      { label: 'FÃÅ MEAS', value: femeas.length, color: 'FFEC4899', icon: 'ââ„¢â‚¬ï¸�' },
+      { label: 'PESO MÃâ€°DIO', value: `${pesoMedio} kg`, color: 'FFF59E0B', icon: 'âÅ¡â€“ï¸�' }
     ]
 
     cards.forEach((card, idx) => {
@@ -110,19 +110,19 @@ export default async function handler(req, res) {
 
     row += 3
 
-    // Distribuição por sexo
+    // DistribuiÃ§Ã£o por sexo
     sheetDash.mergeCells(`A${row}:D${row}`)
     const sexoTitle = sheetDash.getCell(`A${row}`)
-    sexoTitle.value = '📈 DISTRIBUIÇÃO POR SEXO'
+    sexoTitle.value = 'ðÅ¸â€œË† DISTRIBUIÃâ€¡ÃÆ’O POR SEXO'
     sexoTitle.font = { name: 'Calibri', size: 14, bold: true }
     sexoTitle.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE5E7EB' } }
     sexoTitle.alignment = { horizontal: 'center' }
     row++
 
     const sexoData = [
-      ['Sexo', 'Quantidade', '% do Total', 'Peso Médio'],
-      ['♂️ Machos', machos.length, `${((machos.length / pesagens.length) * 100).toFixed(1)}%`, `${(machos.reduce((s, p) => s + parseFloat(p.peso || 0), 0) / machos.length).toFixed(1)} kg`],
-      ['♀️ Fêmeas', femeas.length, `${((femeas.length / pesagens.length) * 100).toFixed(1)}%`, `${(femeas.reduce((s, p) => s + parseFloat(p.peso || 0), 0) / femeas.length).toFixed(1)} kg`]
+      ['Sexo', 'Quantidade', '% do Total', 'Peso MÃ©dio'],
+      ['ââ„¢â€šï¸� Machos', machos.length, `${((machos.length / pesagens.length) * 100).toFixed(1)}%`, `${(machos.reduce((s, p) => s + parseFloat(p.peso || 0), 0) / machos.length).toFixed(1)} kg`],
+      ['ââ„¢â‚¬ï¸� FÃªmeas', femeas.length, `${((femeas.length / pesagens.length) * 100).toFixed(1)}%`, `${(femeas.reduce((s, p) => s + parseFloat(p.peso || 0), 0) / femeas.length).toFixed(1)} kg`]
     ]
 
     sexoData.forEach((rowData, idx) => {
@@ -151,13 +151,13 @@ export default async function handler(req, res) {
 
     sheetDash.mergeCells(`A${row}:D${row}`)
     const topTitle = sheetDash.getCell(`A${row}`)
-    topTitle.value = '🏆 TOP 5 PIQUETES COM MAIS PESAGENS'
+    topTitle.value = 'ðÅ¸�â€  TOP 5 PIQUETES COM MAIS PESAGENS'
     topTitle.font = { name: 'Calibri', size: 14, bold: true }
     topTitle.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE5E7EB' } }
     topTitle.alignment = { horizontal: 'center' }
     row++
 
-    const topHeaders = ['Posição', 'Piquete', 'Quantidade', 'Peso Médio']
+    const topHeaders = ['PosiÃ§Ã£o', 'Piquete', 'Quantidade', 'Peso MÃ©dio']
     sheetDash.getRow(row).values = ['', ...topHeaders]
     sheetDash.getRow(row).font = { bold: true }
     sheetDash.getRow(row).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD1D5DB' } }
@@ -166,7 +166,7 @@ export default async function handler(req, res) {
 
     top5Locais.forEach((item, idx) => {
       const r = sheetDash.getRow(row + idx)
-      const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}º`
+      const medal = idx === 0 ? 'ðÅ¸¥â€¡' : idx === 1 ? 'ðÅ¸¥Ë†' : idx === 2 ? 'ðÅ¸¥â€°' : `${idx + 1}Âº`
       r.values = ['', medal, item.local, item.qtd, `${item.pesoMedio} kg`]
       r.alignment = { horizontal: 'center' }
       if (idx < 3) {
@@ -185,19 +185,19 @@ export default async function handler(req, res) {
     sheetDash.getColumn(8).width = 15
 
     // ===== ABA 2: RESUMO POR PIQUETE =====
-    const sheetPiquete = workbook.addWorksheet('📍 Resumo por Piquete')
+    const sheetPiquete = workbook.addWorksheet('ðÅ¸â€œ� Resumo por Piquete')
 
-    // Título
+    // TÃ­tulo
     sheetPiquete.mergeCells('A1:H1')
     const piqTitle = sheetPiquete.getCell('A1')
-    piqTitle.value = '📍 RESUMO DE PESAGENS POR PIQUETE'
+    piqTitle.value = 'ðÅ¸â€œ� RESUMO DE PESAGENS POR PIQUETE'
     piqTitle.font = { name: 'Calibri', size: 18, bold: true, color: { argb: 'FFFFFFFF' } }
     piqTitle.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF10B981' } }
     piqTitle.alignment = { vertical: 'middle', horizontal: 'center' }
     sheetPiquete.getRow(1).height = 30
 
-    // Cabeçalhos
-    sheetPiquete.getRow(3).values = ['Piquete', 'Fêmeas', 'Machos', 'Total', 'Média Peso', 'Peso Mín', 'Peso Máx', 'Média CE']
+    // CabeÃ§alhos
+    sheetPiquete.getRow(3).values = ['Piquete', 'FÃªmeas', 'Machos', 'Total', 'MÃ©dia Peso', 'Peso MÃ­n', 'Peso MÃ¡x', 'MÃ©dia CE']
     sheetPiquete.getRow(3).font = { bold: true, color: { argb: 'FFFFFFFF' } }
     sheetPiquete.getRow(3).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1F2937' } }
     sheetPiquete.getRow(3).alignment = { horizontal: 'center' }
@@ -207,7 +207,7 @@ export default async function handler(req, res) {
     const resumoLocais = Object.entries(porLocal)
       .map(([local, dados]) => {
         const machosLocal = dados.filter(p => p.animal_sexo === 'Macho').length
-        const femeasLocal = dados.filter(p => p.animal_sexo === 'Fêmea').length
+        const femeasLocal = dados.filter(p => p.animal_sexo === 'FÃªmea').length
         const pesosLocal = dados.map(p => parseFloat(p.peso)).filter(n => !isNaN(n))
         const cesLocal = dados.map(p => parseFloat(p.ce)).filter(n => !isNaN(n))
         
@@ -245,7 +245,7 @@ export default async function handler(req, res) {
       // Destaque para top 3
       if (idx < 3) {
         r.font = { bold: true }
-        r.getCell(1).value = `${idx === 0 ? '🥇' : idx === 1 ? '🥈' : '🥉'} ${item.local}`
+        r.getCell(1).value = `${idx === 0 ? 'ðÅ¸¥â€¡' : idx === 1 ? 'ðÅ¸¥Ë†' : 'ðÅ¸¥â€°'} ${item.local}`
       }
 
       r.alignment = { horizontal: 'center' }
@@ -297,6 +297,6 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Erro ao gerar Excel de pesagens:', error)
-    res.status(500).json({ error: 'Erro ao gerar relatório', details: error.message })
+    res.status(500).json({ error: 'Erro ao gerar relatÃ³rio', details: error.message })
   }
 }

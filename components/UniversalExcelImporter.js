@@ -91,12 +91,12 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
 
     // Se nome da planilha/arquivo sugere vendas ou baixas, priorizar
     if (sheetLower.includes('venda') || sheetLower.includes('baixa') || fileLower.includes('venda') || fileLower.includes('baixa')) {
-      const temSerieRg = keys.some(k => (k === 'ser' || k === 'sér' || k.includes('serie')) && !k.includes('mae')) && keys.some(k => k === 'rg' || k.includes('rg'))
+      const temSerieRg = keys.some(k => (k === 'ser' || k === 'sÃ©r' || k.includes('serie')) && !k.includes('mae')) && keys.some(k => k === 'rg' || k.includes('rg'))
       const temIdentificacao = keys.some(k => k.includes('identific'))
       if (temSerieRg || temIdentificacao) return 'baixas'
     }
 
-    // Detectar por colunas específicas
+    // Detectar por colunas especÃ­ficas
     if (keys.some(k => k.includes('data_ia') || k.includes('dataia') || k.includes('data ia'))) {
       return 'inseminacao'
     }
@@ -114,7 +114,7 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
     if (keys.some(k => k.includes('numero_nf') || k.includes('numeronf') || k.includes('numero nf') || k.includes('nf'))) {
       return 'notas_fiscais'
     }
-    // Baixas: SÉRIE, RG, OCORRENCIA (MORTE/BAIXA ou VENDA), Causa/COMPRADOR, Data/DATA
+    // Baixas: SÃâ€°RIE, RG, OCORRENCIA (MORTE/BAIXA ou VENDA), Causa/COMPRADOR, Data/DATA
     if (keys.some(k => (k.includes('ocorrencia') || k.includes('ocorrenc')) && keys.some(k => k.includes('serie')) && keys.some(k => k === 'rg' || k.includes('rg')))) {
       const ocorKey = Object.keys(firstRow).find(k => k.toLowerCase().includes('ocorren'))
       const ocorVal = ocorKey ? String(firstRow[ocorKey] || '').toUpperCase() : ''
@@ -122,11 +122,11 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
         return 'baixas'
       }
     }
-    // Formato VENDAS-only: SÉR/SÉRIE, RG, DATA, COMPRADOR/CLIENTE, VALOR, NOTA FISCAL (sem OCORRENCIA)
-    const temSerieRg = keys.some(k => (k === 'ser' || k === 'sér' || k.includes('serie') || k.includes('identific')) && !k.includes('mae')) && (keys.some(k => k === 'rg' || k.includes('rg')) || keys.some(k => k.includes('identific')))
+    // Formato VENDAS-only: SÃâ€°R/SÃâ€°RIE, RG, DATA, COMPRADOR/CLIENTE, VALOR, NOTA FISCAL (sem OCORRENCIA)
+    const temSerieRg = keys.some(k => (k === 'ser' || k === 'sÃ©r' || k.includes('serie') || k.includes('identific')) && !k.includes('mae')) && (keys.some(k => k === 'rg' || k.includes('rg')) || keys.some(k => k.includes('identific')))
     const temData = keys.some(k => k.includes('data') || k === 'dt')
     const temComprador = keys.some(k => k.includes('comprador') || k.includes('cliente') || k.includes('destinat'))
-    const temValor = keys.some(k => k.includes('valor') || k.includes('preco') || k.includes('preço') || k.includes('vlr'))
+    const temValor = keys.some(k => k.includes('valor') || k.includes('preco') || k.includes('preÃ§o') || k.includes('vlr'))
     const temDataCompradorValor = temData && temComprador && temValor
     const temNf = keys.some(k => k.includes('nota') || k.includes('fiscal') || (k.includes('nf') && !k.includes('confer')))
     if (temSerieRg && (temDataCompradorValor || temNf)) {
@@ -135,7 +135,7 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
     if (keys.some(k => k.includes('serie') && k.includes('rg'))) {
       return 'animais'
     }
-    if (sheetLower.includes('ia') || sheetLower.includes('inseminação') || sheetLower.includes('inseminacao')) {
+    if (sheetLower.includes('ia') || sheetLower.includes('inseminaÃ§Ã£o') || sheetLower.includes('inseminacao')) {
       return 'inseminacao'
     }
     if (sheetLower.includes('fiv')) {
@@ -151,7 +151,7 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
       return 'baixas'
     }
 
-    return 'animais' // Padrão
+    return 'animais' // PadrÃ£o
   }
 
   const processDataByType = (data, type) => {
@@ -185,27 +185,27 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
 
       return {
         id: idx + 1,
-        serie: getVal(['Serie', 'Série', 'serie', 'SERIE', 'Serie Animal', 'Série Animal']),
+        serie: getVal(['Serie', 'SÃ©rie', 'serie', 'SERIE', 'Serie Animal', 'SÃ©rie Animal']),
         rg: getVal(['RG', 'rg', 'Rg', 'RG Animal', 'Rg Animal']),
         touro1: getVal(['Touro1', 'Touro 1', 'touro1', 'Touro', 'touro', 'TOURO']),
-        serie_touro1: getVal(['Serie Touro1', 'Série Touro1', 'serie_touro1', 'SerieTouro1']),
+        serie_touro1: getVal(['Serie Touro1', 'SÃ©rie Touro1', 'serie_touro1', 'SerieTouro1']),
         rg_touro1: getVal(['RG Touro1', 'Rg Touro1', 'rg_touro1', 'RGTouro1']),
         data_ia1: getVal(['Data IA1', 'DataIA1', 'data_ia1', 'Data IA', 'data_ia', 'DataIA']),
         data_dg1: getVal(['Data DG1', 'DataDG1', 'data_dg1', 'Data DG', 'data_dg', 'DataDG']),
         resultado1: getVal(['Resultado1', 'Resultado 1', 'resultado1', 'Resultado', 'resultado', 'RESULTADO']),
         touro2: getVal(['Touro2', 'Touro 2', 'touro2']),
-        serie_touro2: getVal(['Serie Touro2', 'Série Touro2', 'serie_touro2']),
+        serie_touro2: getVal(['Serie Touro2', 'SÃ©rie Touro2', 'serie_touro2']),
         rg_touro2: getVal(['RG Touro2', 'Rg Touro2', 'rg_touro2']),
         data_ia2: getVal(['Data IA2', 'DataIA2', 'data_ia2']),
         data_dg2: getVal(['Data DG2', 'DataDG2', 'data_dg2']),
         resultado2: getVal(['Resultado2', 'Resultado 2', 'resultado2']),
         touro3: getVal(['Touro3', 'Touro 3', 'touro3']),
-        serie_touro3: getVal(['Serie Touro3', 'Série Touro3', 'serie_touro3']),
+        serie_touro3: getVal(['Serie Touro3', 'SÃ©rie Touro3', 'serie_touro3']),
         rg_touro3: getVal(['RG Touro3', 'Rg Touro3', 'rg_touro3']),
         data_ia3: getVal(['Data IA3', 'DataIA3', 'data_ia3']),
         data_dg3: getVal(['Data DG3', 'DataDG3', 'data_dg3']),
         resultado3: getVal(['Resultado3', 'Resultado 3', 'resultado3']),
-        observacoes: getVal(['Observações', 'Observacoes', 'observações', 'observacoes', 'Obs', 'obs'])
+        observacoes: getVal(['ObservaÃ§Ãµes', 'Observacoes', 'observaÃ§Ãµes', 'observacoes', 'Obs', 'obs'])
       }
     })
   }
@@ -222,15 +222,15 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
 
       return {
         id: idx + 1,
-        doadora_serie: getVal(['Serie Doadora', 'Série Doadora', 'serie_doadora', 'Serie', 'Série']),
+        doadora_serie: getVal(['Serie Doadora', 'SÃ©rie Doadora', 'serie_doadora', 'Serie', 'SÃ©rie']),
         doadora_rg: getVal(['RG Doadora', 'Rg Doadora', 'rg_doadora', 'RG', 'rg']),
         doadora_nome: getVal(['Nome Doadora', 'nome_doadora', 'Doadora', 'doadora']),
-        laboratorio: getVal(['Laboratório', 'Laboratorio', 'laboratório', 'laboratorio', 'Lab', 'lab']),
-        veterinario: getVal(['Veterinário', 'Veterinario', 'veterinário', 'veterinario', 'Vet', 'vet']),
+        laboratorio: getVal(['LaboratÃ³rio', 'Laboratorio', 'laboratÃ³rio', 'laboratorio', 'Lab', 'lab']),
+        veterinario: getVal(['VeterinÃ¡rio', 'Veterinario', 'veterinÃ¡rio', 'veterinario', 'Vet', 'vet']),
         data_fiv: getVal(['Data FIV', 'DataFIV', 'data_fiv', 'Data', 'data']),
-        quantidade_oocitos: getVal(['Quantidade Oócitos', 'Quantidade Oocitos', 'quantidade_oocitos', 'Oócitos', 'Oocitos']),
+        quantidade_oocitos: getVal(['Quantidade OÃ³citos', 'Quantidade Oocitos', 'quantidade_oocitos', 'OÃ³citos', 'Oocitos']),
         touro: getVal(['Touro', 'touro', 'TOURO']),
-        observacoes: getVal(['Observações', 'Observacoes', 'observações', 'observacoes'])
+        observacoes: getVal(['ObservaÃ§Ãµes', 'Observacoes', 'observaÃ§Ãµes', 'observacoes'])
       }
     })
   }
@@ -247,21 +247,21 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
 
       return {
         id: idx + 1,
-        serie: getVal(['Serie', 'Série', 'serie', 'SERIE']),
+        serie: getVal(['Serie', 'SÃ©rie', 'serie', 'SERIE']),
         rg: getVal(['RG', 'rg', 'Rg', 'RG']),
         nome: getVal(['Nome', 'nome', 'NOME']),
         sexo: getVal(['Sexo', 'sexo', 'SEXO']),
-        raca: getVal(['Raça', 'Raca', 'raca', 'Raça', 'RACA']),
+        raca: getVal(['RaÃ§a', 'Raca', 'raca', 'RaÃ§a', 'RACA']),
         data_nascimento: getVal(['Data Nascimento', 'DataNascimento', 'data_nascimento', 'Data', 'data']),
         hora_nascimento: getVal(['Hora Nascimento', 'HoraNascimento', 'hora_nascimento', 'Hora', 'hora']),
         peso: getVal(['Peso', 'peso', 'PESO']),
         tipo_nascimento: getVal(['Tipo Nascimento', 'TipoNascimento', 'tipo_nascimento', 'Tipo', 'tipo']),
         pai: getVal(['Pai', 'pai', 'PAI']),
-        mae: getVal(['Mãe', 'Mae', 'mae', 'MAE']),
+        mae: getVal(['MÃ£e', 'Mae', 'mae', 'MAE']),
         receptora: getVal(['Receptora', 'receptora', 'RECEPTORA']),
-        avo_materno: getVal(['Avô Materno', 'Avo Materno', 'avo_materno', 'Avô', 'Avo']),
+        avo_materno: getVal(['AvÃ´ Materno', 'Avo Materno', 'avo_materno', 'AvÃ´', 'Avo']),
         is_fiv: getVal(['FIV', 'fiv', 'Is FIV', 'is_fiv']),
-        observacoes: getVal(['Observações', 'Observacoes', 'observações', 'observacoes'])
+        observacoes: getVal(['ObservaÃ§Ãµes', 'Observacoes', 'observaÃ§Ãµes', 'observacoes'])
       }
     })
   }
@@ -278,11 +278,11 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
 
       return {
         id: idx + 1,
-        serie: getVal(['Serie', 'Série', 'serie']),
+        serie: getVal(['Serie', 'SÃ©rie', 'serie']),
         rg: getVal(['RG', 'rg', 'Rg']),
         data_dg: getVal(['Data DG', 'DataDG', 'data_dg', 'Data', 'data']),
         resultado: getVal(['Resultado', 'resultado', 'RESULTADO', 'Status', 'status']),
-        observacoes: getVal(['Observações', 'Observacoes', 'observações'])
+        observacoes: getVal(['ObservaÃ§Ãµes', 'Observacoes', 'observaÃ§Ãµes'])
       }
     })
   }
@@ -299,7 +299,7 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
 
       return {
         id: idx + 1,
-        numero_nf: getVal(['Número NF', 'Numero NF', 'numero_nf', 'NF', 'nf']),
+        numero_nf: getVal(['NÃºmero NF', 'Numero NF', 'numero_nf', 'NF', 'nf']),
         tipo: getVal(['Tipo', 'tipo', 'TIPO']),
         data: getVal(['Data', 'data', 'DATA']),
         origem: getVal(['Origem', 'origem', 'ORIGEM']),
@@ -319,21 +319,21 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
       setLoading(true)
       setError(null)
 
-      // Processar dados colados como CSV (separado por tab ou vírgula)
+      // Processar dados colados como CSV (separado por tab ou vÃ­rgula)
       const lines = text.split(/\r?\n/).filter(line => line.trim())
       if (lines.length < 2) {
-        setError('Dados devem ter pelo menos 2 linhas (cabeçalho + dados)')
+        setError('Dados devem ter pelo menos 2 linhas (cabeÃ§alho + dados)')
         setLoading(false)
         return
       }
 
-      // Detectar separador: tab (quando copiado do Excel) ou vírgula
+      // Detectar separador: tab (quando copiado do Excel) ou vÃ­rgula
       const firstLine = lines[0]
       const hasTab = firstLine.includes('\t')
       const separator = hasTab ? '\t' : ','
 
       const headers = firstLine.split(separator).map(h => String(h || '').trim())
-      console.log('📋 Cabeçalhos encontrados (colado):', headers)
+      console.log('ðÅ¸â€œâ€¹ CabeÃ§alhos encontrados (colado):', headers)
 
       // Converter para formato de objeto (como se fosse JSON do Excel)
       const jsonData = []
@@ -346,8 +346,8 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
         jsonData.push(row)
       }
 
-      console.log('📊 Total de linhas processadas:', jsonData.length)
-      console.log('🔍 Primeira linha:', jsonData[0])
+      console.log('ðÅ¸â€œÅ  Total de linhas processadas:', jsonData.length)
+      console.log('ðÅ¸â€�� Primeira linha:', jsonData[0])
 
       // Detectar tipo de dados
       const type = detectDataType(jsonData[0] || {}, '')
@@ -373,11 +373,11 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
   const processAnimaisData = (data) => {
     if (!data || data.length === 0) return []
     
-    // Obter todas as chaves disponíveis no primeiro registro para debug
+    // Obter todas as chaves disponÃ­veis no primeiro registro para debug
     const availableKeys = Object.keys(data[0] || {})
-    console.log('📋 Colunas encontradas no Excel:', availableKeys)
-    console.log('📊 Total de registros:', data.length)
-    console.log('🔍 Primeiro registro completo:', data[0])
+    console.log('ðÅ¸â€œâ€¹ Colunas encontradas no Excel:', availableKeys)
+    console.log('ðÅ¸â€œÅ  Total de registros:', data.length)
+    console.log('ðÅ¸â€�� Primeiro registro completo:', data[0])
     
     return data.map((row, idx) => {
       const getVal = (keys, colMustContain = null) => {
@@ -409,28 +409,28 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
 
       const processed = {
         id: idx + 1,
-        serie: getVal(['Serie', 'Série', 'serie', 'SERIE', 'Serie Animal', 'Série Animal', 'SERIE_ANIMAL']),
+        serie: getVal(['Serie', 'SÃ©rie', 'serie', 'SERIE', 'Serie Animal', 'SÃ©rie Animal', 'SERIE_ANIMAL']),
         rg: getVal(['RG', 'rg', 'Rg', 'R.G.', 'RG_ANIMAL', 'RGN', 'rgn']),
         nome: getVal(['Nome', 'nome', 'NOME', 'Nome Animal', 'NOME_ANIMAL', 'Nome do Animal']),
         sexo: getVal(['Sexo', 'sexo', 'SEXO', 'Sexo Animal', 'SEXO_ANIMAL', 'Sx', 'sx', 'SX']),
-        raca: getVal(['Raça', 'Raca', 'raca', 'RACA', 'Raça Animal', 'RACA_ANIMAL']),
+        raca: getVal(['RaÃ§a', 'Raca', 'raca', 'RACA', 'RaÃ§a Animal', 'RACA_ANIMAL']),
         data_nascimento: getVal(['Data Nascimento', 'DataNascimento', 'data_nascimento', 'DATA_NASCIMENTO', 'Data de Nascimento', 'Nascimento', 'nascimento']),
         meses: getVal(['Meses', 'meses', 'MESES']),
         peso: getVal(['Peso', 'peso', 'PESO', 'Peso Animal', 'PESO_ANIMAL']),
         pai: getVal(['Pai', 'pai', 'PAI', 'Pai Animal', 'PAI_ANIMAL', 'Nome do Pai', 'NomePai'], 'pai'),
-        serie_pai: getVal(['SériePai', 'SeriePai', 'serie_pai', 'SERIE_PAI', 'Série Pai']),
+        serie_pai: getVal(['SÃ©riePai', 'SeriePai', 'serie_pai', 'SERIE_PAI', 'SÃ©rie Pai']),
         rg_pai: getVal(['RgnPai', 'Rgn Pai', 'rg_pai', 'RG_PAI', 'RGN Pai']),
-        mae: getVal(['Mãe', 'Mae', 'mae', 'MAE', 'Mãe Animal', 'MAE_ANIMAL', 'Nome da Mãe', 'NomeMãe', 'NomeMae'], ['mae', 'mãe']),
-        serie_mae: getVal(['SérieMãe', 'SerieMãe', 'SerieMae', 'serie_mae', 'SERIE_MAE', 'Série Mãe', 'Série da Mãe', 'Serie da Mae', 'SERIE DA MAE', 'Serie Mae']),
-        rg_mae: getVal(['RgnMãe', 'RgnMae', 'Rgn Mãe', 'rg_mae', 'RG_MAE', 'RGN Mãe', 'RG da Mãe', 'Rg da Mae', 'RG DA MAE', 'RG Mae']),
+        mae: getVal(['MÃ£e', 'Mae', 'mae', 'MAE', 'MÃ£e Animal', 'MAE_ANIMAL', 'Nome da MÃ£e', 'NomeMÃ£e', 'NomeMae'], ['mae', 'mÃ£e']),
+        serie_mae: getVal(['SÃ©rieMÃ£e', 'SerieMÃ£e', 'SerieMae', 'serie_mae', 'SERIE_MAE', 'SÃ©rie MÃ£e', 'SÃ©rie da MÃ£e', 'Serie da Mae', 'SERIE DA MAE', 'Serie Mae']),
+        rg_mae: getVal(['RgnMÃ£e', 'RgnMae', 'Rgn MÃ£e', 'rg_mae', 'RG_MAE', 'RGN MÃ£e', 'RG da MÃ£e', 'Rg da Mae', 'RG DA MAE', 'RG Mae']),
         receptora: getVal(['Receptora', 'receptora', 'RECEPTORA']),
-        avo_materno: getVal(['Avô Materno', 'Avo Materno', 'avo_materno', 'AVO_MATERNO', 'AvôMaterno', 'AvoMaterno']),
+        avo_materno: getVal(['AvÃ´ Materno', 'Avo Materno', 'avo_materno', 'AVO_MATERNO', 'AvÃ´Materno', 'AvoMaterno']),
         iabcz: getVal(['iABCZ', 'IABCZ', 'iabcz', 'iABZ', 'IABZ']),
         deca: getVal(['DECA', 'deca', 'Deca'])
       }
 
-      // Coluna combinada "Série e RG da Mãe" (ex: "CJCJ 16982")
-      const serieRgMaeCombined = getVal(['Série e RG da Mãe', 'Serie e RG da Mae', 'SERIE E RG DA MAE', 'Serie RG Mae', 'Série RG Mãe', 'Identificação Mãe', 'Identificacao Mae'])
+      // Coluna combinada "SÃ©rie e RG da MÃ£e" (ex: "CJCJ 16982")
+      const serieRgMaeCombined = getVal(['SÃ©rie e RG da MÃ£e', 'Serie e RG da Mae', 'SERIE E RG DA MAE', 'Serie RG Mae', 'SÃ©rie RG MÃ£e', 'IdentificaÃ§Ã£o MÃ£e', 'Identificacao Mae'])
       if (serieRgMaeCombined && (!processed.serie_mae || !processed.rg_mae)) {
         const { serie: s, rg: r } = extrairSerieRG(serieRgMaeCombined, processed.serie)
         if (s || r) {
@@ -441,8 +441,8 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
       
       // Log do primeiro registro para debug
       if (idx === 0) {
-        console.log('🔍 Primeiro registro processado:', processed)
-        console.log('📊 Valores originais:', row)
+        console.log('ðÅ¸â€�� Primeiro registro processado:', processed)
+        console.log('ðÅ¸â€œÅ  Valores originais:', row)
       }
       
       return processed
@@ -464,10 +464,10 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
       const usaBatch = tipoParaUsar === 'animais' || tipoParaUsar === 'nascimentos'
       const usarChunks = usaBatch && preview.all.length > CHUNK_SIZE
 
-      console.log('🚀 Iniciando importação...')
-      console.log('📊 Tipo:', tipoParaUsar, selectedType ? '(selecionado manualmente)' : '(detectado)')
-      console.log('📦 Total de registros:', preview.all.length)
-      if (usarChunks) console.log(`📦 Enviando em lotes de ${CHUNK_SIZE} (evita timeout)`)
+      console.log('ðÅ¸Å¡â‚¬ Iniciando importaÃ§Ã£o...')
+      console.log('ðÅ¸â€œÅ  Tipo:', tipoParaUsar, selectedType ? '(selecionado manualmente)' : '(detectado)')
+      console.log('ðÅ¸â€œ¦ Total de registros:', preview.all.length)
+      if (usarChunks) console.log(`ðÅ¸â€œ¦ Enviando em lotes de ${CHUNK_SIZE} (evita timeout)`)
 
       const totalSteps = usarChunks ? Math.ceil(preview.all.length / CHUNK_SIZE) : preview.all.length
       setImportProgress({ atual: 0, total: totalSteps, etapa: usarChunks ? `Importando ${getTypeLabel(tipoParaUsar)}` : `Enviando ${preview.all.length} registros...` })
@@ -558,7 +558,7 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
             break
           case 'baixas':
             if (!file) {
-              setError('Arquivo não disponível. Selecione novamente.')
+              setError('Arquivo nÃ£o disponÃ­vel. Selecione novamente.')
               setLoading(false)
               return
             }
@@ -579,13 +579,13 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
         result = await response.json().catch(() => ({}))
       }
 
-      console.log('📥 Resposta da API:', result)
+      console.log('ðÅ¸â€œ¥ Resposta da API:', result)
 
       const totalImportados = result.data?.resumo?.total_sucessos ?? result.resultados?.importados ?? result.data?.importados ?? preview.total
       if (result.success && (usarChunks || response?.ok)) {
         const msg = tipoParaUsar === 'baixas' && result.resultados
-          ? `✅ ${result.resultados.importados} baixas importadas${result.resultados.erroCount > 0 ? ` (${result.resultados.erroCount} erros)` : ''}${result.resultados.ignorados > 0 ? ` • ${result.resultados.ignorados} ignorados` : ''}`
-          : `✅ ${totalImportados} registros importados com sucesso!`
+          ? `âÅ“â€¦ ${result.resultados.importados} baixas importadas${result.resultados.erroCount > 0 ? ` (${result.resultados.erroCount} erros)` : ''}${result.resultados.ignorados > 0 ? ` ââ‚¬¢ ${result.resultados.ignorados} ignorados` : ''}`
+          : `âÅ“â€¦ ${totalImportados} registros importados com sucesso!`
         setSuccess({
           message: msg,
           details: result.data || result.resultados || {}
@@ -595,7 +595,7 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
           onImportSuccess(tipoParaUsar, tipoParaUsar === 'baixas' ? (result.resultados?.importados ?? 0) : preview.total)
         }
 
-        // Limpar após 3 segundos
+        // Limpar apÃ³s 3 segundos
         setTimeout(() => {
           handleClose()
         }, 3000)
@@ -605,19 +605,19 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
         const errorMessage = typeof rawMessage === 'string'
           ? rawMessage
           : (rawMessage?.required
-            ? `Animal ${rawMessage.animal_index || '?'}: campos obrigatórios ausentes (${(rawMessage.required || []).join(', ')})`
+            ? `Animal ${rawMessage.animal_index || '?'}: campos obrigatÃ³rios ausentes (${(rawMessage.required || []).join(', ')})`
             : JSON.stringify(rawMessage))
         const errorDetails = result.data?.resultados?.erros || []
         
-        console.error('❌ Erro na importação:', errorMessage)
-        console.error('📋 Detalhes dos erros:', errorDetails)
+        console.error('â�Å’ Erro na importaÃ§Ã£o:', errorMessage)
+        console.error('ðÅ¸â€œâ€¹ Detalhes dos erros:', errorDetails)
         
         // Montar mensagem de erro detalhada (sempre string)
         let fullErrorMessage = String(errorMessage)
         if (errorDetails.length > 0) {
           fullErrorMessage += '\n\nDetalhes:\n'
           errorDetails.slice(0, 5).forEach(err => {
-            fullErrorMessage += `\n• ${err.brinco || err.animal || 'Animal'}: ${err.erro || err.msg || '—'}`
+            fullErrorMessage += `\nââ‚¬¢ ${err.brinco || err.animal || 'Animal'}: ${err.erro || err.msg || 'ââ‚¬â€�'}`
           })
           if (errorDetails.length > 5) {
             fullErrorMessage += `\n\n... e mais ${errorDetails.length - 5} erros`
@@ -627,7 +627,7 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
         setError(fullErrorMessage)
       }
     } catch (err) {
-      console.error('❌ Erro ao importar:', err)
+      console.error('â�Å’ Erro ao importar:', err)
       setError(`Erro ao importar: ${err.message}`)
     } finally {
       setLoading(false)
@@ -647,10 +647,10 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
 
   const getTypeLabel = (type) => {
     const labels = {
-      inseminacao: 'Inseminação Artificial (IA)',
-      fiv: 'Fertilização In Vitro (FIV)',
+      inseminacao: 'InseminaÃ§Ã£o Artificial (IA)',
+      fiv: 'FertilizaÃ§Ã£o In Vitro (FIV)',
       nascimentos: 'Nascimentos',
-      diagnostico_gestacao: 'Diagnóstico de Gestação (DG)',
+      diagnostico_gestacao: 'DiagnÃ³stico de GestaÃ§Ã£o (DG)',
       notas_fiscais: 'Notas Fiscais',
       baixas: 'Baixas (MORTE/BAIXA e VENDA)',
       animais: 'Animais'
@@ -666,9 +666,9 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
         importando={loading}
         progress={importProgress ? { atual: importProgress.atual ?? importProgress.current, total: importProgress.total, etapa: importProgress.etapa || `Lote ${importProgress.current}/${importProgress.total} (${importProgress.processed} registros)...` } : {}}
       />
-      <Modal isOpen={isOpen} onClose={handleClose} title="Importação Universal de Excel" size="xl">
+      <Modal isOpen={isOpen} onClose={handleClose} title="ImportaÃ§Ã£o Universal de Excel" size="xl">
       <div className="space-y-4">
-        {/* Método de Importação */}
+        {/* MÃ©todo de ImportaÃ§Ã£o */}
         <div className="flex gap-4 mb-4">
           <button
             type="button"
@@ -684,7 +684,7 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
                 : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
             }`}
           >
-            📁 Upload de Arquivo
+            ðÅ¸â€œ� Upload de Arquivo
           </button>
           <button
             type="button"
@@ -700,7 +700,7 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
                 : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
             }`}
           >
-            📋 Copiar e Colar
+            ðÅ¸â€œâ€¹ Copiar e Colar
           </button>
         </div>
 
@@ -723,10 +723,10 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
         {importMethod === 'paste' && (
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              📋 Cole os dados do Excel aqui (Ctrl+C → Ctrl+V)
+              ðÅ¸â€œâ€¹ Cole os dados do Excel aqui (Ctrl+C ââ€ â€™ Ctrl+V)
             </label>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-              💡 Dica: Selecione os dados no Excel (incluindo o cabeçalho) e pressione Ctrl+C, depois cole aqui com Ctrl+V
+              ðÅ¸â€™¡ Dica: Selecione os dados no Excel (incluindo o cabeÃ§alho) e pressione Ctrl+C, depois cole aqui com Ctrl+V
             </p>
             <textarea
               value={pastedText}
@@ -740,7 +740,7 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
                   }, 300)
                 }
               }}
-              placeholder="Cole aqui os dados do Excel (incluindo cabeçalho)..."
+              placeholder="Cole aqui os dados do Excel (incluindo cabeÃ§alho)..."
               rows={10}
               className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono text-sm"
             />
@@ -770,7 +770,7 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
             </div>
             {importProgress && (
               <p className="mt-2 text-sm text-blue-600 dark:text-blue-400">
-                Aguarde, não feche a janela. Arquivos grandes são enviados em partes.
+                Aguarde, nÃ£o feche a janela. Arquivos grandes sÃ£o enviados em partes.
               </p>
             )}
           </div>
@@ -797,10 +797,10 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
                 <option value="">Detectado ({getTypeLabel(detectedType)})</option>
                 <option value="baixas">Baixas (MORTE/BAIXA e VENDA)</option>
                 <option value="animais">Animais</option>
-                <option value="inseminacao">Inseminação (IA)</option>
+                <option value="inseminacao">InseminaÃ§Ã£o (IA)</option>
                 <option value="fiv">FIV</option>
                 <option value="nascimentos">Nascimentos</option>
-                <option value="diagnostico_gestacao">Diagnóstico de Gestação</option>
+                <option value="diagnostico_gestacao">DiagnÃ³stico de GestaÃ§Ã£o</option>
                 <option value="notas_fiscais">Notas Fiscais</option>
               </select>
             </div>
@@ -817,7 +817,7 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
               Preview (mostrando 5 primeiros registros)
             </h3>
             
-            {/* Aviso sobre campos vazios (apenas para Animais, não para Baixas) */}
+            {/* Aviso sobre campos vazios (apenas para Animais, nÃ£o para Baixas) */}
             {preview.sample && preview.sample.length > 0 && (selectedType || detectedType) !== 'baixas' && (() => {
               const firstRow = preview.sample[0]
               const camposVazios = []
@@ -826,7 +826,7 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
               
               camposObrigatorios.forEach(campo => {
                 if (!firstRow[campo] || firstRow[campo] === null) {
-                  camposVazios.push({ campo, tipo: 'obrigatório' })
+                  camposVazios.push({ campo, tipo: 'obrigatÃ³rio' })
                 }
               })
               
@@ -837,7 +837,7 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
               })
               
               if (camposVazios.length > 0) {
-                const obrigatorios = camposVazios.filter(c => c.tipo === 'obrigatório')
+                const obrigatorios = camposVazios.filter(c => c.tipo === 'obrigatÃ³rio')
                 const importantes = camposVazios.filter(c => c.tipo === 'importante')
                 
                 return (
@@ -846,24 +846,24 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
                       <ExclamationTriangleIcon className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
                       <div className="text-sm">
                         <p className="font-semibold text-yellow-800 dark:text-yellow-200 mb-1">
-                          ⚠️ Atenção: Campos vazios detectados
+                          âÅ¡ ï¸� AtenÃ§Ã£o: Campos vazios detectados
                         </p>
                         {obrigatorios.length > 0 && (
                           <p className="text-yellow-700 dark:text-yellow-300 mb-1">
-                            <strong>Campos obrigatórios vazios:</strong> {obrigatorios.map(c => c.campo.toUpperCase()).join(', ')}
+                            <strong>Campos obrigatÃ³rios vazios:</strong> {obrigatorios.map(c => c.campo.toUpperCase()).join(', ')}
                             <br />
-                            <span className="text-xs">Estes campos são obrigatórios e a importação pode falhar sem eles.</span>
+                            <span className="text-xs">Estes campos sÃ£o obrigatÃ³rios e a importaÃ§Ã£o pode falhar sem eles.</span>
                           </p>
                         )}
                         {importantes.length > 0 && (
                           <p className="text-yellow-700 dark:text-yellow-300">
                             <strong>Campos importantes vazios:</strong> {importantes.map(c => c.campo.toUpperCase()).join(', ')}
                             <br />
-                            <span className="text-xs">Estes campos serão importados como vazios se não estiverem no Excel.</span>
+                            <span className="text-xs">Estes campos serÃ£o importados como vazios se nÃ£o estiverem no Excel.</span>
                           </p>
                         )}
                         <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-2">
-                          💡 Dica: Verifique se os nomes das colunas no Excel correspondem aos esperados (Serie, RG, Nome, Sexo, Raça, etc.)
+                          ðÅ¸â€™¡ Dica: Verifique se os nomes das colunas no Excel correspondem aos esperados (Serie, RG, Nome, Sexo, RaÃ§a, etc.)
                         </p>
                       </div>
                     </div>
@@ -929,7 +929,7 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
                 <span className="text-green-800 dark:text-green-200">{typeof success.message === 'string' ? success.message : String(success.message || '')}</span>
               </div>
             </div>
-            {/* Exemplos de erros quando há muitos */}
+            {/* Exemplos de erros quando hÃ¡ muitos */}
             {success.details?.erros?.length > 0 && (
               <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 text-sm">
                 <p className="font-semibold text-amber-800 dark:text-amber-200 mb-2">
@@ -937,11 +937,11 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
                 </p>
                 <ul className="list-disc list-inside space-y-1 text-amber-700 dark:text-amber-300">
                   {success.details.erros.slice(0, 5).map((e, i) => (
-                    <li key={i}>Linha {e.linha}: {e.animal || '—'} — {e.msg}</li>
+                    <li key={i}>Linha {e.linha}: {e.animal || 'ââ‚¬â€�'} ââ‚¬â€� {e.msg}</li>
                   ))}
                 </ul>
                 <p className="text-xs text-amber-600 dark:text-amber-400 mt-2">
-                  💡 Verifique se as colunas do Excel estão corretas (SÉR/SÉRIE, RG, DATA, COMPRADOR, VALOR). Data no formato DD/MM/AAAA.
+                  ðÅ¸â€™¡ Verifique se as colunas do Excel estÃ£o corretas (SÃâ€°R/SÃâ€°RIE, RG, DATA, COMPRADOR, VALOR). Data no formato DD/MM/AAAA.
                 </p>
               </div>
             )}

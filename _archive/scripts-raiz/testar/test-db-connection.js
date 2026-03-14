@@ -23,10 +23,10 @@ async function testConnection() {
     })
     
     const client = await pool.connect()
-    console.log('✓ Conexão estabelecida com sucesso!')
+    console.log('�œ“ Conexão estabelecida com sucesso!')
     
     const result = await client.query('SELECT NOW() as timestamp, version(), current_database(), current_user')
-    console.log('✓ Query executada com sucesso!')
+    console.log('�œ“ Query executada com sucesso!')
     console.log('Timestamp:', result.rows[0].timestamp)
     console.log('Versão:', result.rows[0].version)
     console.log('Database:', result.rows[0].current_database)
@@ -35,10 +35,10 @@ async function testConnection() {
     client.release()
     await pool.end()
     
-    console.log('\n✓ Teste concluído com sucesso!')
+    console.log('\n�œ“ Teste concluído com sucesso!')
     process.exit(0)
   } catch (error) {
-    console.error('✗ Erro ao conectar:', error.message)
+    console.error('�œ— Erro ao conectar:', error.message)
     console.error('Código:', error.code)
     console.error('Stack:', error.stack)
     process.exit(1)

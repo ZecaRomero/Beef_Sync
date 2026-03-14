@@ -19,15 +19,15 @@ import Input from '../ui/Input'
 
 const OCCURRENCE_TYPES = {
   Pesagem: { icon: ScaleIcon, color: 'blue', label: 'Pesagem' },
-  Local: { icon: MapPinIcon, color: 'green', label: 'Mudança de Local' },
+  Local: { icon: MapPinIcon, color: 'green', label: 'MudanÃ§a de Local' },
   CE: { icon: UserIcon, color: 'purple', label: 'C.E' },
-  DG: { icon: HeartIcon, color: 'pink', label: 'DG (Diagnóstico de Gestação)' },
-  Vacinação: { icon: ShieldCheckIcon, color: 'emerald', label: 'Vacinação' },
+  DG: { icon: HeartIcon, color: 'pink', label: 'DG (DiagnÃ³stico de GestaÃ§Ã£o)' },
+  VacinaÃ§Ã£o: { icon: ShieldCheckIcon, color: 'emerald', label: 'VacinaÃ§Ã£o' },
   Exame: { icon: BeakerIcon, color: 'indigo', label: 'Exame' },
   Tratamento: { icon: PillsIcon, color: 'orange', label: 'Tratamento' },
   Medicamento: { icon: PillsIcon, color: 'amber', label: 'Medicamento' },
   Cirurgia: { icon: FireIcon, color: 'rose', label: 'Cirurgia' },
-  Observação: { icon: DocumentTextIcon, color: 'gray', label: 'Observação' },
+  ObservaÃ§Ã£o: { icon: DocumentTextIcon, color: 'gray', label: 'ObservaÃ§Ã£o' },
   Morte: { icon: XCircleIcon, color: 'red', label: 'Morte' },
   Venda: { icon: CurrencyDollarIcon, color: 'green', label: 'Venda (NF)' }
 }
@@ -75,11 +75,11 @@ export default function QuickOccurrenceForm({ isOpen, onClose, animal, onSuccess
     if (newTipo === 'Venda') {
       if (onVenda) {
         onVenda()
-        // Não fechamos o modal aqui, deixamos o pai decidir ou o pai abre outro modal por cima
+        // NÃ£o fechamos o modal aqui, deixamos o pai decidir ou o pai abre outro modal por cima
         // Mas como queremos sair deste modal para ir pro NF, vamos fechar este
         onClose()
       } else {
-        alert('Funcionalidade de venda não configurada neste contexto')
+        alert('Funcionalidade de venda nÃ£o configurada neste contexto')
       }
       return
     }
@@ -93,51 +93,51 @@ export default function QuickOccurrenceForm({ isOpen, onClose, animal, onSuccess
     setLoading(true)
 
     try {
-      // Validações específicas por tipo
+      // ValidaÃ§Ãµes especÃ­ficas por tipo
       if (tipo === 'Pesagem' && !peso) {
-        setError('Peso é obrigatório')
+        setError('Peso Ã© obrigatÃ³rio')
         setLoading(false)
         return
       }
 
       if (tipo === 'Local' && !local) {
-        setError('Local é obrigatório')
+        setError('Local Ã© obrigatÃ³rio')
         setLoading(false)
         return
       }
 
       if (tipo === 'CE' && !ce) {
-        setError('Circunferência Escrotal (CE) é obrigatória')
+        setError('CircunferÃªncia Escrotal (CE) Ã© obrigatÃ³ria')
         setLoading(false)
         return
       }
 
       if (tipo === 'CE' && animal?.sexo !== 'Macho') {
-        setError('CE só pode ser registrado para machos')
+        setError('CE sÃ³ pode ser registrado para machos')
         setLoading(false)
         return
       }
 
       if (tipo === 'DG' && !dg) {
-        setError('Diagnóstico de Gestação (DG) é obrigatório')
+        setError('DiagnÃ³stico de GestaÃ§Ã£o (DG) Ã© obrigatÃ³rio')
         setLoading(false)
         return
       }
 
-      if (tipo === 'DG' && animal?.sexo !== 'Fêmea') {
-        setError('DG só pode ser registrado para fêmeas')
+      if (tipo === 'DG' && animal?.sexo !== 'FÃªmea') {
+        setError('DG sÃ³ pode ser registrado para fÃªmeas')
         setLoading(false)
         return
       }
 
       if (tipo === 'Morte' && !causaMorte) {
-        setError('Causa da morte é obrigatória')
+        setError('Causa da morte Ã© obrigatÃ³ria')
         setLoading(false)
         return
       }
 
-      if ((tipo === 'Vacinação' || tipo === 'Tratamento' || tipo === 'Medicamento') && !medicamento) {
-        setError('Medicamento é obrigatório')
+      if ((tipo === 'VacinaÃ§Ã£o' || tipo === 'Tratamento' || tipo === 'Medicamento') && !medicamento) {
+        setError('Medicamento Ã© obrigatÃ³rio')
         setLoading(false)
         return
       }
@@ -157,7 +157,7 @@ export default function QuickOccurrenceForm({ isOpen, onClose, animal, onSuccess
         if (veterinario) payload.veterinario = veterinario
       }
       if (tipo === 'Morte') payload.causaMorte = causaMorte
-      if (tipo === 'Vacinação' || tipo === 'Tratamento' || tipo === 'Medicamento') {
+      if (tipo === 'VacinaÃ§Ã£o' || tipo === 'Tratamento' || tipo === 'Medicamento') {
         payload.medicamento = medicamento
         if (dosagem) payload.dosagem = dosagem
         if (veterinario) payload.veterinario = veterinario
@@ -170,7 +170,7 @@ export default function QuickOccurrenceForm({ isOpen, onClose, animal, onSuccess
       if (tipo === 'Cirurgia') {
         if (veterinario) payload.veterinario = veterinario
       }
-      if (veterinario && (tipo === 'Observação' || tipo === 'Cirurgia')) {
+      if (veterinario && (tipo === 'ObservaÃ§Ã£o' || tipo === 'Cirurgia')) {
         payload.veterinario = veterinario
       }
 
@@ -185,13 +185,13 @@ export default function QuickOccurrenceForm({ isOpen, onClose, animal, onSuccess
       const result = await response.json()
 
       if (result.status === 'success' || response.ok) {
-        alert(`✅ ${tipo} registrada com sucesso!`)
+        alert(`âÅ“â€¦ ${tipo} registrada com sucesso!`)
         if (onSuccess) {
           onSuccess(result.data)
         }
         handleClose()
       } else {
-        setError(result.message || 'Erro ao registrar ocorrência')
+        setError(result.message || 'Erro ao registrar ocorrÃªncia')
       }
     } catch (err) {
       setError(`Erro ao registrar: ${err.message}`)
@@ -250,7 +250,7 @@ export default function QuickOccurrenceForm({ isOpen, onClose, animal, onSuccess
               currentTypeInfo?.color === 'gray' ? 'text-gray-500' :
               'text-red-500'
             }`} />
-            Lançar Ocorrência Rápida
+            LanÃ§ar OcorrÃªncia RÃ¡pida
           </h2>
           <button
             onClick={handleClose}
@@ -269,26 +269,26 @@ export default function QuickOccurrenceForm({ isOpen, onClose, animal, onSuccess
               )}
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Sexo: {animal.sexo} • Raça: {animal.raca}
+              Sexo: {animal.sexo} ââ‚¬¢ RaÃ§a: {animal.raca}
             </p>
           </div>
         )}
 
-        {/* Seleção de Tipo */}
+        {/* SeleÃ§Ã£o de Tipo */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-            Tipo de Ocorrência
+            Tipo de OcorrÃªncia
           </label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
             {Object.entries(OCCURRENCE_TYPES).map(([key, info]) => {
               const TypeIcon = info?.icon || ScaleIcon
               if (!TypeIcon) {
-                console.error(`Ícone não encontrado para tipo: ${key}`)
+                console.error(`Ã�cone nÃ£o encontrado para tipo: ${key}`)
                 return null
               }
               const isDisabled = 
                 (key === 'CE' && animal?.sexo !== 'Macho') ||
-                (key === 'DG' && animal?.sexo !== 'Fêmea')
+                (key === 'DG' && animal?.sexo !== 'FÃªmea')
               
               return (
                 <button
@@ -329,7 +329,7 @@ export default function QuickOccurrenceForm({ isOpen, onClose, animal, onSuccess
                   )}
                   <p className="text-xs font-medium text-gray-700 dark:text-gray-300">{info?.label || key}</p>
                   {isDisabled && (
-                    <p className="text-xs text-gray-400 mt-1">Não disponível</p>
+                    <p className="text-xs text-gray-400 mt-1">NÃ£o disponÃ­vel</p>
                   )}
                 </button>
               )
@@ -347,7 +347,7 @@ export default function QuickOccurrenceForm({ isOpen, onClose, animal, onSuccess
             required
           />
 
-          {/* Campos específicos por tipo */}
+          {/* Campos especÃ­ficos por tipo */}
           {tipo === 'Pesagem' && (
             <Input
               label="Peso (kg)"
@@ -420,7 +420,7 @@ export default function QuickOccurrenceForm({ isOpen, onClose, animal, onSuccess
                         }}
                         className="text-sm text-blue-600 dark:text-blue-400 hover:underline mt-1"
                       >
-                        ← Voltar para seleção
+                        ââ€ � Voltar para seleÃ§Ã£o
                       </button>
                     </>
                   )}
@@ -431,7 +431,7 @@ export default function QuickOccurrenceForm({ isOpen, onClose, animal, onSuccess
 
           {tipo === 'CE' && (
             <Input
-              label="Circunferência Escrotal (cm)"
+              label="CircunferÃªncia Escrotal (cm)"
               type="number"
               step="0.1"
               value={ce}
@@ -445,7 +445,7 @@ export default function QuickOccurrenceForm({ isOpen, onClose, animal, onSuccess
             <>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Diagnóstico de Gestação
+                  DiagnÃ³stico de GestaÃ§Ã£o
                 </label>
                 <select
                   value={dg}
@@ -456,16 +456,16 @@ export default function QuickOccurrenceForm({ isOpen, onClose, animal, onSuccess
                   <option value="">Selecione...</option>
                   <option value="Positivo">Positivo</option>
                   <option value="Negativo">Negativo</option>
-                  <option value="Não Realizado">Não Realizado</option>
+                  <option value="NÃ£o Realizado">NÃ£o Realizado</option>
                   <option value="Inconclusivo">Inconclusivo</option>
                 </select>
               </div>
               <Input
-                label="Veterinário (opcional)"
+                label="VeterinÃ¡rio (opcional)"
                 type="text"
                 value={veterinario}
                 onChange={(e) => setVeterinario(e.target.value)}
-                placeholder="Nome do veterinário responsável"
+                placeholder="Nome do veterinÃ¡rio responsÃ¡vel"
               />
             </>
           )}
@@ -476,12 +476,12 @@ export default function QuickOccurrenceForm({ isOpen, onClose, animal, onSuccess
               type="text"
               value={causaMorte}
               onChange={(e) => setCausaMorte(e.target.value)}
-              placeholder="Ex: Doença, Acidente, etc."
+              placeholder="Ex: DoenÃ§a, Acidente, etc."
               required
             />
           )}
 
-          {(tipo === 'Vacinação' || tipo === 'Tratamento' || tipo === 'Medicamento') && (
+          {(tipo === 'VacinaÃ§Ã£o' || tipo === 'Tratamento' || tipo === 'Medicamento') && (
             <>
               <Input
                 label="Medicamento/Vacina"
@@ -499,15 +499,15 @@ export default function QuickOccurrenceForm({ isOpen, onClose, animal, onSuccess
                 placeholder="Ex: 5ml, 1 dose, etc."
               />
               <Input
-                label="Veterinário"
+                label="VeterinÃ¡rio"
                 type="text"
                 value={veterinario}
                 onChange={(e) => setVeterinario(e.target.value)}
-                placeholder="Nome do veterinário"
+                placeholder="Nome do veterinÃ¡rio"
               />
-              {tipo === 'Vacinação' && (
+              {tipo === 'VacinaÃ§Ã£o' && (
                 <Input
-                  label="Próxima Aplicação"
+                  label="PrÃ³xima AplicaÃ§Ã£o"
                   type="date"
                   value={proximaAplicacao}
                   onChange={(e) => setProximaAplicacao(e.target.value)}
@@ -535,36 +535,36 @@ export default function QuickOccurrenceForm({ isOpen, onClose, animal, onSuccess
                 </select>
               </div>
               <Input
-                label="Veterinário"
+                label="VeterinÃ¡rio"
                 type="text"
                 value={veterinario}
                 onChange={(e) => setVeterinario(e.target.value)}
-                placeholder="Nome do veterinário"
+                placeholder="Nome do veterinÃ¡rio"
               />
             </>
           )}
 
           {tipo === 'Cirurgia' && (
             <Input
-              label="Veterinário"
+              label="VeterinÃ¡rio"
               type="text"
               value={veterinario}
               onChange={(e) => setVeterinario(e.target.value)}
-              placeholder="Nome do veterinário responsável"
+              placeholder="Nome do veterinÃ¡rio responsÃ¡vel"
             />
           )}
 
-          {/* Observações */}
+          {/* ObservaÃ§Ãµes */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Observações (opcional)
+              ObservaÃ§Ãµes (opcional)
             </label>
             <textarea
               value={observacoes}
               onChange={(e) => setObservacoes(e.target.value)}
               rows={3}
               className="input-field w-full"
-              placeholder="Informações adicionais..."
+              placeholder="InformaÃ§Ãµes adicionais..."
             />
           </div>
 

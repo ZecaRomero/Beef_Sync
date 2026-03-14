@@ -35,7 +35,7 @@ export default function BirthDashboard() {
     const totalFinalizados = nascidos + mortos + abortos
     const taxaSucesso = totalFinalizados > 0 ? (nascidos / totalFinalizados * 100) : 0
 
-    // Estatísticas por touro
+    // EstatÃ­sticas por touro
     const statsByTouro = birthData.reduce((acc, birth) => {
       if (!acc[birth.touro]) {
         acc[birth.touro] = { total: 0, nascidos: 0, machos: 0, femeas: 0 }
@@ -49,7 +49,7 @@ export default function BirthDashboard() {
       return acc
     }, {})
 
-    // Nascimentos por mês
+    // Nascimentos por mÃªs
     const nascimentosPorMes = birthData
       .filter(b => b.data)
       .reduce((acc, birth) => {
@@ -81,56 +81,56 @@ export default function BirthDashboard() {
     {
       title: 'Total de Registros',
       value: stats.total || 0,
-      icon: '📊',
+      icon: 'ðÅ¸â€œÅ ',
       color: 'bg-blue-500',
       textColor: 'text-blue-600 dark:text-blue-400'
     },
     {
       title: 'Nascimentos',
       value: stats.nascidos || 0,
-      icon: '🐄',
+      icon: 'ðÅ¸�â€ž',
       color: 'bg-green-500',
       textColor: 'text-green-600 dark:text-green-400'
     },
     {
       title: 'Machos',
       value: stats.machos || 0,
-      icon: '🐂',
+      icon: 'ðÅ¸�â€š',
       color: 'bg-blue-500',
       textColor: 'text-blue-600 dark:text-blue-400'
     },
     {
-      title: 'Fêmeas',
+      title: 'FÃªmeas',
       value: stats.femeas || 0,
-      icon: '🐄',
+      icon: 'ðÅ¸�â€ž',
       color: 'bg-pink-500',
       textColor: 'text-pink-600 dark:text-pink-400'
     },
     {
       title: 'Gestantes',
       value: stats.gestantes || 0,
-      icon: '🤱',
+      icon: 'ðÅ¸¤±',
       color: 'bg-purple-500',
       textColor: 'text-purple-600 dark:text-purple-400'
     },
     {
       title: 'Atrasadas',
       value: stats.atrasadas || 0,
-      icon: '⚠️',
+      icon: 'âÅ¡ ï¸�',
       color: 'bg-yellow-500',
       textColor: 'text-yellow-600 dark:text-yellow-400'
     },
     {
       title: 'Taxa de Sucesso',
       value: `${(stats.taxaSucesso || 0).toFixed(1)}%`,
-      icon: '📈',
+      icon: 'ðÅ¸â€œË†',
       color: 'bg-green-500',
       textColor: 'text-green-600 dark:text-green-400'
     },
     {
       title: 'Mortalidade',
       value: (stats.mortos || 0) + (stats.abortos || 0),
-      icon: '💔',
+      icon: 'ðÅ¸â€™â€�',
       color: 'bg-red-500',
       textColor: 'text-red-600 dark:text-red-400'
     }
@@ -140,30 +140,30 @@ export default function BirthDashboard() {
     <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
-          🐄 Dashboard de Nascimentos
+          ðÅ¸�â€ž Dashboard de Nascimentos
         </h2>
         <button
           onClick={() => router.push('/nascimentos')}
           className="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium"
         >
-          Ver Detalhes →
+          Ver Detalhes ââ€ â€™
         </button>
       </div>
 
       {births.length === 0 ? (
         <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-          <div className="text-4xl mb-2">🐄</div>
+          <div className="text-4xl mb-2">ðÅ¸�â€ž</div>
           <div className="text-sm mb-2">Nenhum nascimento registrado</div>
           <button
             onClick={() => router.push('/nascimentos')}
             className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
           >
-            Começar a registrar nascimentos
+            ComeÃ§ar a registrar nascimentos
           </button>
         </div>
       ) : (
         <>
-          {/* Cards de Estatísticas */}
+          {/* Cards de EstatÃ­sticas */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             {cards.map((card, index) => (
               <div key={index} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
@@ -188,7 +188,7 @@ export default function BirthDashboard() {
           {stats.melhorTouro?.touro && (
             <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-4 rounded-lg mb-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 flex items-center">
-                🏆 Melhor Performance
+                ðÅ¸�â€  Melhor Performance
               </h3>
               <div className="text-sm text-gray-700 dark:text-gray-300">
                 <strong>{stats.melhorTouro.touro}</strong> - {stats.melhorTouro.taxa.toFixed(1)}% de sucesso
@@ -197,11 +197,11 @@ export default function BirthDashboard() {
             </div>
           )}
 
-          {/* Alertas Rápidos */}
+          {/* Alertas RÃ¡pidos */}
           {stats.atrasadas > 0 && (
             <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 p-4 rounded-lg mb-6">
               <div className="flex items-center">
-                <div className="text-yellow-600 dark:text-yellow-400 mr-3">⚠️</div>
+                <div className="text-yellow-600 dark:text-yellow-400 mr-3">âÅ¡ ï¸�</div>
                 <div>
                   <div className="font-semibold text-yellow-800 dark:text-yellow-200">
                     {stats.atrasadas} receptoras com parto atrasado
@@ -218,7 +218,7 @@ export default function BirthDashboard() {
           {Object.keys(stats.statsByTouro || {}).length > 0 && (
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                📊 Top Touros
+                ðÅ¸â€œÅ  Top Touros
               </h3>
               <div className="space-y-3">
                 {Object.entries(stats.statsByTouro)

@@ -6,19 +6,19 @@ const { query } = require('../../../lib/database')
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
-    return res.status(405).json({ success: false, message: 'Método não permitido' })
+    return res.status(405).json({ success: false, message: 'MÃ©todo nÃ£o permitido' })
   }
 
   const { rg } = req.query
 
   if (!rg || typeof rg !== 'string' || !rg.trim()) {
-    return res.status(400).json({ success: false, message: 'RG é obrigatório' })
+    return res.status(400).json({ success: false, message: 'RG Ã© obrigatÃ³rio' })
   }
 
   try {
     const rgTrimmed = String(rg).trim()
     
-    // Query mínima para máxima compatibilidade (rg pode ser VARCHAR ou INTEGER)
+    // Query mÃ­nima para mÃ¡xima compatibilidade (rg pode ser VARCHAR ou INTEGER)
     const result = await query(
       `SELECT id, serie, rg, nome, sexo, raca, data_nascimento, situacao
        FROM animais 
@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     )
     
     if (result.rows.length === 0) {
-      console.log(`❌ Nenhum animal encontrado com RG: "${rgTrimmed}"`)
+      console.log(`â�Å’ Nenhum animal encontrado com RG: "${rgTrimmed}"`)
       return res.status(200).json({
         success: true,
         data: [],
@@ -37,7 +37,7 @@ export default async function handler(req, res) {
       })
     }
 
-    console.log(`✅ ${result.rows.length} animal(is) encontrado(s) com RG: "${rgTrimmed}"`)
+    console.log(`âÅ“â€¦ ${result.rows.length} animal(is) encontrado(s) com RG: "${rgTrimmed}"`)
     
     return res.status(200).json({
       success: true,

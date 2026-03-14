@@ -20,15 +20,15 @@ export default function LimparBancoCompleto() {
 
   const handleLimpezaCompleta = async () => {
     if (confirmacao !== 'LIMPAR TUDO DO ZERO') {
-      alert('⚠️ Digite exatamente: LIMPAR TUDO DO ZERO')
+      alert('�š�️ Digite exatamente: LIMPAR TUDO DO ZERO')
       return
     }
 
-    if (!confirm('🚨 ATENÇÃO: Esta operação é IRREVERSÍVEL!\n\nTODOS os dados serão excluídos:\n- Animais\n- Notas Fiscais\n- Boletim Contábil\n- Inseminações\n- Gestações\n- Nascimentos\n- Sêmen\n- Custos\n- Mortes\n- E TODAS as outras tabelas\n\nDeseja continuar?')) {
+    if (!confirm('�Ÿš� ATEN�‡�ƒO: Esta operação é IRREVERSÍVEL!\n\nTODOS os dados serão excluídos:\n- Animais\n- Notas Fiscais\n- Boletim Contábil\n- Inseminações\n- Gestações\n- Nascimentos\n- Sêmen\n- Custos\n- Mortes\n- E TODAS as outras tabelas\n\nDeseja continuar?')) {
       return
     }
 
-    if (!confirm('⚠️ ÚLTIMA CONFIRMAÇÃO!\n\nVocê tem CERTEZA que deseja excluir TODOS os dados?\n\nEsta ação NÃO pode ser desfeita!')) {
+    if (!confirm('�š�️ �šLTIMA CONFIRMA�‡�ƒO!\n\nVocê tem CERTEZA que deseja excluir TODOS os dados?\n\nEsta ação N�ƒO pode ser desfeita!')) {
       return
     }
 
@@ -51,15 +51,15 @@ export default function LimparBancoCompleto() {
 
       if (response.ok) {
         setResultado(data.data)
-        alert(`✅ Limpeza completa realizada!\n\n${data.data.total_excluido} registros excluídos de ${data.data.tabelas_processadas} tabelas.\n\nO banco está limpo e pronto para começar do zero.`)
+        alert(`�œ… Limpeza completa realizada!\n\n${data.data.total_excluido} registros excluídos de ${data.data.tabelas_processadas} tabelas.\n\nO banco está limpo e pronto para começar do zero.`)
       } else {
         setErro(data.message || 'Erro ao realizar limpeza')
-        alert(`❌ Erro: ${data.message || 'Não foi possível realizar a limpeza'}`)
+        alert(`�Œ Erro: ${data.message || 'Não foi possível realizar a limpeza'}`)
       }
     } catch (error) {
       console.error('Erro:', error)
       setErro(error.message || 'Erro ao conectar com o servidor')
-      alert(`❌ Erro: ${error.message || 'Não foi possível conectar com o servidor'}`)
+      alert(`�Œ Erro: ${error.message || 'Não foi possível conectar com o servidor'}`)
     } finally {
       setLoading(false)
     }
@@ -85,28 +85,28 @@ export default function LimparBancoCompleto() {
             <ExclamationTriangleIcon className="h-8 w-8 text-red-600 flex-shrink-0 mt-1" />
             <div className="flex-1">
               <h2 className="text-xl font-bold text-red-900 dark:text-red-200 mb-2">
-                ⚠️ ATENÇÃO: OPERAÇÃO IRREVERSÍVEL
+                �š�️ ATEN�‡�ƒO: OPERA�‡�ƒO IRREVERSÍVEL
               </h2>
               <p className="text-red-800 dark:text-red-300 mb-4">
                 Esta operação irá excluir <strong>TODOS</strong> os dados do banco de dados, incluindo:
               </p>
               <ul className="list-disc list-inside text-red-800 dark:text-red-300 space-y-1 mb-4">
-                <li>🐄 Todos os animais e dados relacionados</li>
-                <li>🧾 Todas as notas fiscais e itens</li>
-                <li>📊 Boletim contábil e movimentações</li>
-                <li>💉 Todas as inseminações</li>
-                <li>🤰 Todas as gestações e diagnósticos</li>
-                <li>👶 Todos os nascimentos</li>
-                <li>🧪 Todo o estoque de sêmen</li>
-                <li>💰 Todos os custos</li>
-                <li>💀 Todas as mortes</li>
-                <li>📍 Todas as localizações</li>
-                <li>📋 Todos os protocolos e serviços</li>
-                <li>📝 Todas as ocorrências</li>
+                <li>�Ÿ�„ Todos os animais e dados relacionados</li>
+                <li>�Ÿ�� Todas as notas fiscais e itens</li>
+                <li>�Ÿ“Š Boletim contábil e movimentações</li>
+                <li>�Ÿ’‰ Todas as inseminações</li>
+                <li>�Ÿ�� Todas as gestações e diagnósticos</li>
+                <li>�Ÿ‘� Todos os nascimentos</li>
+                <li>�Ÿ�� Todo o estoque de sêmen</li>
+                <li>�Ÿ’� Todos os custos</li>
+                <li>�Ÿ’€ Todas as mortes</li>
+                <li>�Ÿ“� Todas as localizações</li>
+                <li>�Ÿ“‹ Todos os protocolos e serviços</li>
+                <li>�Ÿ“� Todas as ocorrências</li>
                 <li>E todas as outras tabelas do sistema</li>
               </ul>
               <p className="text-red-900 dark:text-red-100 font-bold text-lg">
-                ⚠️ Esta ação NÃO pode ser desfeita! ⚠️
+                �š�️ Esta ação N�ƒO pode ser desfeita! �š�️
               </p>
             </div>
           </div>
@@ -139,7 +139,7 @@ export default function LimparBancoCompleto() {
               loading={loading}
               className="w-full"
             >
-              {loading ? '⏳ Excluindo todos os dados...' : '🗑️ EXCLUIR TUDO E COMEÇAR DO ZERO'}
+              {loading ? '⏳ Excluindo todos os dados...' : '�Ÿ—‘️ EXCLUIR TUDO E COME�‡AR DO ZERO'}
             </ModernButton>
           </div>
         </CardBody>
@@ -181,7 +181,7 @@ export default function LimparBancoCompleto() {
               {resultado.total_restante > 0 && (
                 <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 p-4 rounded-lg">
                   <p className="text-yellow-800 dark:text-yellow-200">
-                    ⚠️ Ainda restam {resultado.total_restante} registros no banco. Verifique os erros abaixo.
+                    �š�️ Ainda restam {resultado.total_restante} registros no banco. Verifique os erros abaixo.
                   </p>
                 </div>
               )}
@@ -227,10 +227,10 @@ export default function LimparBancoCompleto() {
                         </div>
                         <div>
                           {dados.status === 'sucesso' && dados.excluidos > 0 && (
-                            <Badge variant="success">✓</Badge>
+                            <Badge variant="success">�œ“</Badge>
                           )}
                           {dados.status === 'erro' && (
-                            <Badge variant="danger">✗</Badge>
+                            <Badge variant="danger">�œ—</Badge>
                           )}
                           {dados.status === 'tabela_nao_existe' && (
                             <Badge variant="default">-</Badge>
@@ -284,7 +284,7 @@ export default function LimparBancoCompleto() {
           onClick={() => router.push('/animals')}
           variant="secondary"
         >
-          ← Voltar para Animais
+          �†� Voltar para Animais
         </ModernButton>
       </div>
     </div>

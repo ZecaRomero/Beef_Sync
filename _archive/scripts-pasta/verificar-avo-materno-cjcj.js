@@ -20,17 +20,17 @@ async function verificarAvoMaterno() {
     `)
     
     if (animalResult.rows.length === 0) {
-      console.log('❌ Animal CJCJ-16173 não encontrado!')
+      console.log('�Œ Animal CJCJ-16173 não encontrado!')
       return
     }
     
     const animal = animalResult.rows[0]
-    console.log('📋 Animal CJCJ-16173:')
+    console.log('�Ÿ“‹ Animal CJCJ-16173:')
     console.log(JSON.stringify(animal, null, 2))
     
     // Extrair série e RG da mãe
     const maeInfo = animal.mae
-    console.log('\n📋 Informação da mãe no campo mae:', maeInfo)
+    console.log('\n�Ÿ“‹ Informação da mãe no campo mae:', maeInfo)
     
     if (maeInfo) {
       // Tentar extrair série e RG
@@ -38,7 +38,7 @@ async function verificarAvoMaterno() {
       if (match) {
         const maeSerie = match[1]
         const maeRg = match[2]
-        console.log(`\n🔍 Buscando mãe: ${maeSerie}-${maeRg}`)
+        console.log(`\n�Ÿ”� Buscando mãe: ${maeSerie}-${maeRg}`)
         
         // Buscar a mãe
         const maeResult = await client.query(`
@@ -49,48 +49,48 @@ async function verificarAvoMaterno() {
         
         if (maeResult.rows.length > 0) {
           const mae = maeResult.rows[0]
-          console.log('\n📋 Mãe encontrada:')
+          console.log('\n�Ÿ“‹ Mãe encontrada:')
           console.log(JSON.stringify(mae, null, 2))
           
           if (mae.avo_materno) {
-            console.log(`\n✅ A mãe tem avô materno: "${mae.avo_materno}"`)
-            console.log('💡 Esse deveria ser o avô materno do animal CJCJ-16173')
+            console.log(`\n�œ… A mãe tem avô materno: "${mae.avo_materno}"`)
+            console.log('�Ÿ’� Esse deveria ser o avô materno do animal CJCJ-16173')
             
             // Atualizar o animal com o avô materno da mãe
             if (!animal.avo_materno || animal.avo_materno.trim() === '') {
-              console.log('\n💡 Atualizando animal CJCJ-16173 com o avô materno da mãe...')
+              console.log('\n�Ÿ’� Atualizando animal CJCJ-16173 com o avô materno da mãe...')
               await client.query(`
                 UPDATE animais 
                 SET avo_materno = $1, updated_at = CURRENT_TIMESTAMP 
                 WHERE id = $2
               `, [mae.avo_materno, animal.id])
-              console.log('✅ Avô materno atualizado!')
+              console.log('�œ… Avô materno atualizado!')
             }
           } else if (mae.pai) {
-            console.log(`\n✅ A mãe tem pai cadastrado: "${mae.pai}"`)
-            console.log('💡 Esse deveria ser o avô materno do animal CJCJ-16173')
+            console.log(`\n�œ… A mãe tem pai cadastrado: "${mae.pai}"`)
+            console.log('�Ÿ’� Esse deveria ser o avô materno do animal CJCJ-16173')
             
             // Atualizar o animal com o pai da mãe
             if (!animal.avo_materno || animal.avo_materno.trim() === '') {
-              console.log('\n💡 Atualizando animal CJCJ-16173 com o pai da mãe...')
+              console.log('\n�Ÿ’� Atualizando animal CJCJ-16173 com o pai da mãe...')
               await client.query(`
                 UPDATE animais 
                 SET avo_materno = $1, updated_at = CURRENT_TIMESTAMP 
                 WHERE id = $2
               `, [mae.pai, animal.id])
-              console.log('✅ Avô materno atualizado!')
+              console.log('�œ… Avô materno atualizado!')
             }
           } else {
-            console.log('\n⚠️ A mãe não tem avô materno nem pai cadastrado')
+            console.log('\n�š�️ A mãe não tem avô materno nem pai cadastrado')
           }
         } else {
-          console.log(`\n❌ Mãe ${maeSerie}-${maeRg} não encontrada no banco`)
+          console.log(`\n�Œ Mãe ${maeSerie}-${maeRg} não encontrada no banco`)
         }
       }
     }
     
   } catch (error) {
-    console.error('❌ Erro:', error.message)
+    console.error('�Œ Erro:', error.message)
     throw error
   } finally {
     client.release()
@@ -100,11 +100,11 @@ async function verificarAvoMaterno() {
 
 verificarAvoMaterno()
   .then(() => {
-    console.log('\n✅ Script concluído!')
+    console.log('\n�œ… Script concluído!')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n❌ Erro fatal:', error)
+    console.error('\n�Œ Erro fatal:', error)
     process.exit(1)
   })
 

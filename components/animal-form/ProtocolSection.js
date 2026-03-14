@@ -20,10 +20,10 @@ export default function ProtocolSection({ formData, updateField }) {
             />
             <div>
               <span className="font-medium text-gray-900 dark:text-white block">
-                🧪 Aplicar Protocolo Automático
+                ðÅ¸§ª Aplicar Protocolo AutomÃ¡tico
               </span>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                Protocolo sanitário baseado na idade e sexo
+                Protocolo sanitÃ¡rio baseado na idade e sexo
               </p>
             </div>
           </label>
@@ -40,10 +40,10 @@ export default function ProtocolSection({ formData, updateField }) {
             />
             <div>
               <span className="font-medium text-gray-900 dark:text-white block">
-                🧬 Aplicar DNA Automático
+                ðÅ¸§¬ Aplicar DNA AutomÃ¡tico
               </span>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                DNA Virgem (FIV) e Genômica (0-7 meses)
+                DNA Virgem (FIV) e GenÃ´mica (0-7 meses)
               </p>
             </div>
           </label>

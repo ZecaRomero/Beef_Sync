@@ -1,14 +1,14 @@
 const { query } = require('../lib/database')
 
 async function generateMonthlySummary(period, sections) {
-  console.log('🔍 Iniciando generateMonthlySummary...')
+  console.log('�Ÿ”� Iniciando generateMonthlySummary...')
   console.log('Period:', period)
   console.log('Sections:', sections)
   
   const summary = {}
 
   try {
-    console.log('\n📊 Executando consultas...')
+    console.log('\n�Ÿ“Š Executando consultas...')
     
     // Nascimentos
     if (!sections || sections.nascimentos !== false) {
@@ -60,12 +60,12 @@ async function generateMonthlySummary(period, sections) {
       console.log('Resultado vendas:', summary.vendas)
     }
 
-    console.log('\n📋 Summary final antes do return:')
+    console.log('\n�Ÿ“‹ Summary final antes do return:')
     console.log(JSON.stringify(summary, null, 2))
     
     return summary
   } catch (error) {
-    console.error('❌ Erro ao gerar resumo mensal:', error)
+    console.error('�Œ Erro ao gerar resumo mensal:', error)
     return {}
   }
 }
@@ -76,15 +76,15 @@ async function testAPI() {
     endDate: '2025-10-31'
   }
   
-  console.log('🧪 Testando função generateMonthlySummary com logs...')
+  console.log('�Ÿ�� Testando função generateMonthlySummary com logs...')
   
   const result = await generateMonthlySummary(period)
   
-  console.log('\n🎯 Resultado final retornado:')
+  console.log('\n�ŸŽ� Resultado final retornado:')
   console.log(JSON.stringify(result, null, 2))
   
-  console.log('\n🔍 Análise do resultado:')
-  console.log('- É objeto vazio?', JSON.stringify(result) === '{}')
+  console.log('\n�Ÿ”� Análise do resultado:')
+  console.log('- �‰ objeto vazio?', JSON.stringify(result) === '{}')
   console.log('- Número de chaves:', Object.keys(result).length)
   console.log('- Chaves:', Object.keys(result))
   

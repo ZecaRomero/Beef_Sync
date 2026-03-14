@@ -12,7 +12,7 @@ async function checkJoaozinhoAnimals() {
   const client = await pool.connect()
   
   try {
-    console.log('🔍 Verificando animais do fornecedor Joaozinho...')
+    console.log('�Ÿ”� Verificando animais do fornecedor Joaozinho...')
     
     // Buscar NFs do Joaozinho
     const nfsResult = await client.query(`
@@ -22,7 +22,7 @@ async function checkJoaozinhoAnimals() {
       ORDER BY created_at DESC
     `)
     
-    console.log(`📄 Encontradas ${nfsResult.rows.length} notas fiscais`)
+    console.log(`�Ÿ“„ Encontradas ${nfsResult.rows.length} notas fiscais`)
     
     nfsResult.rows.forEach((nf, index) => {
       console.log(`\n${index + 1}. NF: ${nf.numero_nf}`)
@@ -52,18 +52,18 @@ async function checkJoaozinhoAnimals() {
     })
     
     // Verificar se esses animais estão na tabela de animais
-    console.log('\n🔍 Verificando se os animais estão cadastrados na tabela de animais...')
+    console.log('\n�Ÿ”� Verificando se os animais estão cadastrados na tabela de animais...')
     
     const animaisResult = await client.query('SELECT serie, rg, raca, situacao FROM animais ORDER BY created_at DESC')
-    console.log(`🐄 Total de animais cadastrados: ${animaisResult.rows.length}`)
+    console.log(`�Ÿ�„ Total de animais cadastrados: ${animaisResult.rows.length}`)
     
-    console.log('\n📋 Lista de todos os animais:')
+    console.log('\n�Ÿ“‹ Lista de todos os animais:')
     animaisResult.rows.forEach((animal, index) => {
       console.log(`   ${index + 1}. ${animal.serie}${animal.rg} (${animal.raca}) - ${animal.situacao}`)
     })
     
     // Buscar especificamente animais que podem ser do Joaozinho
-    console.log('\n🔍 Procurando animais que podem ser do Joaozinho...')
+    console.log('\n�Ÿ”� Procurando animais que podem ser do Joaozinho...')
     
     const animaisJoaozinho = await client.query(`
       SELECT serie, rg, raca, situacao, observacoes, created_at
@@ -76,18 +76,18 @@ async function checkJoaozinhoAnimals() {
     `)
     
     if (animaisJoaozinho.rows.length > 0) {
-      console.log(`\n🎯 ${animaisJoaozinho.rows.length} animais encontrados que podem ser do Joaozinho:`)
+      console.log(`\n�ŸŽ� ${animaisJoaozinho.rows.length} animais encontrados que podem ser do Joaozinho:`)
       animaisJoaozinho.rows.forEach((animal, index) => {
         console.log(`   ${index + 1}. ${animal.serie}${animal.rg} (${animal.raca}) - ${animal.situacao}`)
         console.log(`      Observações: ${animal.observacoes || 'Nenhuma'}`)
         console.log(`      Criado em: ${animal.created_at}`)
       })
     } else {
-      console.log('\n⚠️ Nenhum animal encontrado com referências ao Joaozinho')
+      console.log('\n�š�️ Nenhum animal encontrado com referências ao Joaozinho')
     }
     
   } catch (error) {
-    console.error('❌ Erro na verificação:', error)
+    console.error('�Œ Erro na verificação:', error)
     throw error
   } finally {
     client.release()
@@ -98,11 +98,11 @@ async function checkJoaozinhoAnimals() {
 if (require.main === module) {
   checkJoaozinhoAnimals()
     .then(() => {
-      console.log('🎉 Verificação concluída!')
+      console.log('�ŸŽ‰ Verificação concluída!')
       process.exit(0)
     })
     .catch((error) => {
-      console.error('💥 Erro na verificação:', error)
+      console.error('�Ÿ’� Erro na verificação:', error)
       process.exit(1)
     })
 }

@@ -21,7 +21,7 @@ async function nitrogenioByIdHandler(req, res) {
   const { id } = req.query
 
   if (!id) {
-    return sendValidationError(res, 'ID do abastecimento é obrigatório')
+    return sendValidationError(res, 'ID do abastecimento Ã© obrigatÃ³rio')
   }
 
   if (req.method === 'GET') {
@@ -43,7 +43,7 @@ async function nitrogenioByIdHandler(req, res) {
       )
 
       if (result.rows.length === 0) {
-        return sendNotFound(res, 'Abastecimento não encontrado')
+        return sendNotFound(res, 'Abastecimento nÃ£o encontrado')
       }
 
       return sendSuccess(res, result.rows[0], 'Abastecimento recuperado com sucesso')
@@ -62,9 +62,9 @@ async function nitrogenioByIdHandler(req, res) {
       proximo_abastecimento
     } = req.body
 
-    // Validar dados obrigatórios
+    // Validar dados obrigatÃ³rios
     if (!data_abastecimento || !quantidade_litros || !motorista) {
-      return sendValidationError(res, 'Dados obrigatórios não fornecidos', {
+      return sendValidationError(res, 'Dados obrigatÃ³rios nÃ£o fornecidos', {
         required: ['data_abastecimento', 'quantidade_litros', 'motorista'],
         provided: { 
           data_abastecimento: !!data_abastecimento, 
@@ -82,7 +82,7 @@ async function nitrogenioByIdHandler(req, res) {
       )
 
       if (checkResult.rows.length === 0) {
-        return sendNotFound(res, 'Abastecimento não encontrado')
+        return sendNotFound(res, 'Abastecimento nÃ£o encontrado')
       }
 
       // Atualizar abastecimento
@@ -111,7 +111,7 @@ async function nitrogenioByIdHandler(req, res) {
 
       const abastecimentoAtualizado = result.rows[0]
 
-      console.log(`✅ Abastecimento de nitrogênio atualizado: ID ${id} - ${quantidade_litros}L`)
+      console.log(`âÅ“â€¦ Abastecimento de nitrogÃªnio atualizado: ID ${id} - ${quantidade_litros}L`)
 
       return sendSuccess(res, abastecimentoAtualizado, 'Abastecimento atualizado com sucesso')
     } catch (error) {
@@ -127,7 +127,7 @@ async function nitrogenioByIdHandler(req, res) {
       )
 
       if (checkResult.rows.length === 0) {
-        return sendNotFound(res, 'Abastecimento não encontrado')
+        return sendNotFound(res, 'Abastecimento nÃ£o encontrado')
       }
 
       const abastecimento = checkResult.rows[0]
@@ -138,9 +138,9 @@ async function nitrogenioByIdHandler(req, res) {
         [id]
       )
 
-      console.log(`✅ Abastecimento de nitrogênio excluído: ID ${id} - ${abastecimento.quantidade_litros}L - Motorista: ${abastecimento.motorista}`)
+      console.log(`âÅ“â€¦ Abastecimento de nitrogÃªnio excluÃ­do: ID ${id} - ${abastecimento.quantidade_litros}L - Motorista: ${abastecimento.motorista}`)
 
-      return sendSuccess(res, { id: result.rows[0].id }, 'Abastecimento excluído com sucesso')
+      return sendSuccess(res, { id: result.rows[0].id }, 'Abastecimento excluÃ­do com sucesso')
     } catch (error) {
       console.error('Erro ao excluir abastecimento:', error)
       throw error

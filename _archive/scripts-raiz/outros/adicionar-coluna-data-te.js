@@ -12,7 +12,7 @@ const pool = new Pool({
 
 async function adicionar() {
   try {
-    console.log('🔄 Adicionando coluna data_te na tabela animais...\n')
+    console.log('�Ÿ”„ Adicionando coluna data_te na tabela animais...\n')
     
     // Verificar se a coluna já existe
     const checkColumn = await pool.query(`
@@ -23,17 +23,17 @@ async function adicionar() {
     `)
     
     if (checkColumn.rows[0].exists) {
-      console.log('✅ Coluna data_te já existe')
+      console.log('�œ… Coluna data_te já existe')
     } else {
       // Adicionar coluna
       await pool.query(`
         ALTER TABLE animais ADD COLUMN data_te DATE
       `)
-      console.log('✅ Coluna data_te adicionada com sucesso')
+      console.log('�œ… Coluna data_te adicionada com sucesso')
     }
     
     // Atualizar data_te para animais prenhas que têm inseminação
-    console.log('\n🔄 Atualizando data_te para animais prenhas...')
+    console.log('\n�Ÿ”„ Atualizando data_te para animais prenhas...')
     const result = await pool.query(`
       UPDATE animais a
       SET data_te = i.data_ia, updated_at = CURRENT_TIMESTAMP
@@ -46,16 +46,16 @@ async function adicionar() {
     `)
     
     if (result.rows.length > 0) {
-      console.log(`✅ ${result.rows.length} animais atualizados:`)
+      console.log(`�œ… ${result.rows.length} animais atualizados:`)
       result.rows.forEach(a => {
         console.log(`   - ${a.serie}-${a.rg} (${a.nome}): data_te = ${a.data_te}`)
       })
     } else {
-      console.log('⚠️ Nenhum animal precisou ser atualizado')
+      console.log('�š�️ Nenhum animal precisou ser atualizado')
     }
     
   } catch (error) {
-    console.error('❌ Erro:', error.message)
+    console.error('�Œ Erro:', error.message)
   } finally {
     await pool.end()
   }

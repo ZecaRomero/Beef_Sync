@@ -8,7 +8,7 @@ export default function ImportarObservacoesAnimais() {
 
   const processarImportacao = async () => {
     if (!textoColado.trim()) {
-      alert('⚠️ Cole os dados do Excel primeiro!')
+      alert('âÅ¡ ï¸� Cole os dados do Excel primeiro!')
       return
     }
 
@@ -26,13 +26,13 @@ export default function ImportarObservacoesAnimais() {
 
       if (response.ok) {
         setResultado(data)
-        alert(`✅ ${data.sucessos} observação(ões) atualizada(s) com sucesso!`)
+        alert(`âÅ“â€¦ ${data.sucessos} observaÃ§Ã£o(Ãµes) atualizada(s) com sucesso!`)
       } else {
-        alert(`❌ Erro: ${data.error || 'Erro ao processar importação'}`)
+        alert(`â�Å’ Erro: ${data.error || 'Erro ao processar importaÃ§Ã£o'}`)
       }
     } catch (error) {
       console.error('Erro:', error)
-      alert('❌ Erro ao processar importação')
+      alert('â�Å’ Erro ao processar importaÃ§Ã£o')
     } finally {
       setProcessando(false)
     }
@@ -47,7 +47,7 @@ export default function ImportarObservacoesAnimais() {
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
       <ImportProgressOverlay
         importando={processando}
-        progress={{ atual: 0, total: 0, etapa: 'Importando observações...' }}
+        progress={{ atual: 0, total: 0, etapa: 'Importando observaÃ§Ãµes...' }}
       />
       <div className="flex items-center gap-3 mb-6">
         <div className="bg-blue-600 p-3 rounded-xl">
@@ -57,23 +57,23 @@ export default function ImportarObservacoesAnimais() {
         </div>
         <div>
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-            📋 Importar Observações do Excel
+            ðÅ¸â€œâ€¹ Importar ObservaÃ§Ãµes do Excel
           </h3>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Cole os dados copiados do Excel (Série, RG, Observação)
+            Cole os dados copiados do Excel (SÃ©rie, RG, ObservaÃ§Ã£o)
           </p>
         </div>
       </div>
 
       <div className="space-y-4">
-        {/* Instruções */}
+        {/* InstruÃ§Ãµes */}
         <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-4 rounded">
-          <h4 className="font-bold text-blue-900 dark:text-blue-300 mb-2">📝 Como usar:</h4>
+          <h4 className="font-bold text-blue-900 dark:text-blue-300 mb-2">ðÅ¸â€œ� Como usar:</h4>
           <ol className="list-decimal list-inside space-y-1 text-sm text-blue-800 dark:text-blue-200">
-            <li>No Excel, selecione as colunas: <strong>Série</strong>, <strong>RG</strong> e <strong>Observação</strong></li>
+            <li>No Excel, selecione as colunas: <strong>SÃ©rie</strong>, <strong>RG</strong> e <strong>ObservaÃ§Ã£o</strong></li>
             <li>Copie os dados (Ctrl+C)</li>
             <li>Cole aqui na caixa abaixo (Ctrl+V)</li>
-            <li>Clique em "Processar Importação"</li>
+            <li>Clique em "Processar ImportaÃ§Ã£o"</li>
           </ol>
         </div>
 
@@ -83,11 +83,11 @@ export default function ImportarObservacoesAnimais() {
           <pre className="text-xs text-gray-600 dark:text-gray-400 font-mono">
 M	1815	Animal com problema no casco{'\n'}
 G	2947	Receptora prenha - parto previsto 07/10/2026{'\n'}
-N	3456	Observação importante sobre este animal
+N	3456	ObservaÃ§Ã£o importante sobre este animal
           </pre>
         </div>
 
-        {/* Área de texto */}
+        {/* Ã�rea de texto */}
         <div>
           <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
             Cole os dados do Excel aqui:
@@ -95,7 +95,7 @@ N	3456	Observação importante sobre este animal
           <textarea
             value={textoColado}
             onChange={(e) => setTextoColado(e.target.value)}
-            placeholder="Cole aqui os dados copiados do Excel (Série, RG, Observação)..."
+            placeholder="Cole aqui os dados copiados do Excel (SÃ©rie, RG, ObservaÃ§Ã£o)..."
             rows={10}
             className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-mono text-sm"
           />
@@ -104,7 +104,7 @@ N	3456	Observação importante sobre este animal
           </p>
         </div>
 
-        {/* Botões */}
+        {/* BotÃµes */}
         <div className="flex gap-3">
           <button
             onClick={processarImportacao}
@@ -118,7 +118,7 @@ N	3456	Observação importante sobre este animal
               </>
             ) : (
               <>
-                ✓ Processar Importação
+                âÅ“â€œ Processar ImportaÃ§Ã£o
               </>
             )}
           </button>
@@ -127,18 +127,18 @@ N	3456	Observação importante sobre este animal
             disabled={processando}
             className="px-6 py-3 bg-gray-500 text-white rounded-xl hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-bold"
           >
-            🔄 Limpar
+            ðÅ¸â€�â€ž Limpar
           </button>
         </div>
 
         {/* Resultado */}
         {resultado && (
           <div className="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 p-4 rounded">
-            <h4 className="font-bold text-green-900 dark:text-green-300 mb-2">✅ Importação Concluída!</h4>
+            <h4 className="font-bold text-green-900 dark:text-green-300 mb-2">âÅ“â€¦ ImportaÃ§Ã£o ConcluÃ­da!</h4>
             <div className="space-y-1 text-sm text-green-800 dark:text-green-200">
-              <p>✅ Sucessos: <strong>{resultado.sucessos}</strong></p>
-              <p>❌ Erros: <strong>{resultado.erros}</strong></p>
-              <p>📊 Total processado: <strong>{resultado.total}</strong></p>
+              <p>âÅ“â€¦ Sucessos: <strong>{resultado.sucessos}</strong></p>
+              <p>â�Å’ Erros: <strong>{resultado.erros}</strong></p>
+              <p>ðÅ¸â€œÅ  Total processado: <strong>{resultado.total}</strong></p>
             </div>
             {resultado.detalhes && resultado.detalhes.length > 0 && (
               <details className="mt-3">
@@ -148,7 +148,7 @@ N	3456	Observação importante sobre este animal
                 <div className="mt-2 max-h-40 overflow-y-auto space-y-1">
                   {resultado.detalhes.map((d, i) => (
                     <div key={i} className="text-xs">
-                      {d.sucesso ? '✅' : '❌'} {d.serie} {d.rg} - {d.mensagem || d.erro}
+                      {d.sucesso ? 'âÅ“â€¦' : 'â�Å’'} {d.serie} {d.rg} - {d.mensagem || d.erro}
                     </div>
                   ))}
                 </div>

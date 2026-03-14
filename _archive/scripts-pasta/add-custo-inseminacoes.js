@@ -28,13 +28,13 @@ async function addCustoColumn() {
         ADD COLUMN custo_dose DECIMAL(12,2) DEFAULT 18.00,
         ADD COLUMN custo_id INTEGER REFERENCES custos(id) ON DELETE SET NULL
       `)
-      console.log('✅ Colunas adicionadas com sucesso!')
+      console.log('�œ… Colunas adicionadas com sucesso!')
     } else {
-      console.log('✅ Coluna custo_dose já existe')
+      console.log('�œ… Coluna custo_dose já existe')
     }
 
   } catch (error) {
-    console.error('❌ Erro:', error.message)
+    console.error('�Œ Erro:', error.message)
   } finally {
     client.release()
     await pool.end()

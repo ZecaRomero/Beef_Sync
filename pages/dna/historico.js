@@ -34,15 +34,15 @@ export default function DNAHistorico() {
         setEnvios(data.data || data || [])
       }
     } catch (error) {
-      console.error('Erro ao carregar histórico:', error)
-      Toast.error('Erro ao carregar histórico')
+      console.error('Erro ao carregar histÃ³rico:', error)
+      Toast.error('Erro ao carregar histÃ³rico')
     } finally {
       setLoading(false)
     }
   }
 
   const handleDelete = async (envioId) => {
-    if (!confirm('Tem certeza que deseja excluir este envio? Esta ação não pode ser desfeita.')) {
+    if (!confirm('Tem certeza que deseja excluir este envio? Esta aÃ§Ã£o nÃ£o pode ser desfeita.')) {
       return
     }
 
@@ -52,7 +52,7 @@ export default function DNAHistorico() {
       })
 
       if (response.ok) {
-        Toast.success('Envio excluído com sucesso')
+        Toast.success('Envio excluÃ­do com sucesso')
         loadEnvios() // Recarrega a lista
       } else {
         const error = await response.json()
@@ -66,7 +66,7 @@ export default function DNAHistorico() {
 
   const handleGerarPDF = async (envio) => {
     if (envio.laboratorio !== 'VRGEN') {
-      Toast.error('Geração de PDF disponível apenas para VRGEN')
+      Toast.error('GeraÃ§Ã£o de PDF disponÃ­vel apenas para VRGEN')
       return
     }
 
@@ -80,7 +80,7 @@ export default function DNAHistorico() {
       const data = await response.json()
       const animaisIds = data.animais || []
 
-      console.log('🐄 Animais encontrados:', animaisIds)
+      console.log('ðÅ¸�â€ž Animais encontrados:', animaisIds)
       Toast.info(`Processando ${animaisIds.length} animal(is)...`)
 
       if (animaisIds.length === 0) {
@@ -93,25 +93,25 @@ export default function DNAHistorico() {
       
       for (const animalId of animaisIds) {
         try {
-          console.log(`🔍 Buscando animal ID: ${animalId}`)
+          console.log(`ðÅ¸â€�� Buscando animal ID: ${animalId}`)
           const animalResponse = await fetch(`/api/animals/${animalId}`)
           
           if (!animalResponse.ok) {
-            console.error(`❌ Erro ao buscar animal ${animalId}: ${animalResponse.status}`)
+            console.error(`â�Å’ Erro ao buscar animal ${animalId}: ${animalResponse.status}`)
             continue
           }
           
           const animalData = await animalResponse.json()
-          console.log(`📦 Dados recebidos do animal ${animalId}:`, animalData)
+          console.log(`ðÅ¸â€œ¦ Dados recebidos do animal ${animalId}:`, animalData)
           
           const animal = animalData.data || animalData.animal || animalData
           
           if (!animal || !animal.serie || !animal.rg) {
-            console.error(`❌ Animal ${animalId} sem dados válidos:`, animal)
+            console.error(`â�Å’ Animal ${animalId} sem dados vÃ¡lidos:`, animal)
             continue
           }
           
-          // Determinar raça
+          // Determinar raÃ§a
           let raca = animal.raca || 'NELORE'
           if (animal.serie) {
             const serie = animal.serie.toUpperCase()
@@ -141,7 +141,7 @@ export default function DNAHistorico() {
           
           if (animal.pai && (!dadosPai.serie || !dadosPai.rg)) {
             try {
-              console.log(`👨 Buscando pai pelo nome: ${animal.pai}`)
+              console.log(`ðÅ¸â€˜¨ Buscando pai pelo nome: ${animal.pai}`)
               const paiResponse = await fetch(`/api/animals/buscar-por-nome?nome=${encodeURIComponent(animal.pai)}`)
               if (paiResponse.ok) {
                 const paiData = await paiResponse.json()
@@ -151,15 +151,15 @@ export default function DNAHistorico() {
                     rg: paiData.data.rg || dadosPai.rg,
                     nome: paiData.data.nome || animal.pai
                   }
-                  console.log(`✅ Pai encontrado:`, dadosPai)
+                  console.log(`âÅ“â€¦ Pai encontrado:`, dadosPai)
                 }
               }
             } catch (e) {
-              console.log(`⚠️ Pai não encontrado para animal ${animalId}:`, e.message)
+              console.log(`âÅ¡ ï¸� Pai nÃ£o encontrado para animal ${animalId}:`, e.message)
             }
           }
           
-          // Buscar dados da mãe (usar campos diretos ou buscar pelo nome)
+          // Buscar dados da mÃ£e (usar campos diretos ou buscar pelo nome)
           let dadosMae = { 
             serie: animal.serie_mae || '', 
             rg: animal.rg_mae || '', 
@@ -168,7 +168,7 @@ export default function DNAHistorico() {
           
           if (animal.mae && (!dadosMae.serie || !dadosMae.rg)) {
             try {
-              console.log(`👩 Buscando mãe pelo nome: ${animal.mae}`)
+              console.log(`ðÅ¸â€˜© Buscando mÃ£e pelo nome: ${animal.mae}`)
               const maeResponse = await fetch(`/api/animals/buscar-por-nome?nome=${encodeURIComponent(animal.mae)}`)
               if (maeResponse.ok) {
                 const maeData = await maeResponse.json()
@@ -178,11 +178,11 @@ export default function DNAHistorico() {
                     rg: maeData.data.rg || dadosMae.rg,
                     nome: maeData.data.nome || animal.mae
                   }
-                  console.log(`✅ Mãe encontrada:`, dadosMae)
+                  console.log(`âÅ“â€¦ MÃ£e encontrada:`, dadosMae)
                 }
               }
             } catch (e) {
-              console.log(`⚠️ Mãe não encontrada para animal ${animalId}:`, e.message)
+              console.log(`âÅ¡ ï¸� MÃ£e nÃ£o encontrada para animal ${animalId}:`, e.message)
             }
           }
           
@@ -203,15 +203,15 @@ export default function DNAHistorico() {
             tipoExame: envio.tipo_exame || ''
           }
           
-          console.log(`✅ Animal ${animal.serie}-${animal.rg} preparado para PDF:`, animalPDF)
+          console.log(`âÅ“â€¦ Animal ${animal.serie}-${animal.rg} preparado para PDF:`, animalPDF)
           animaisCompletos.push(animalPDF)
         } catch (error) {
-          console.error(`❌ Erro ao buscar animal ${animalId}:`, error)
+          console.error(`â�Å’ Erro ao buscar animal ${animalId}:`, error)
         }
       }
 
       if (animaisCompletos.length === 0) {
-        Toast.error('Nenhum animal válido encontrado')
+        Toast.error('Nenhum animal vÃ¡lido encontrado')
         return
       }
 
@@ -267,15 +267,15 @@ export default function DNAHistorico() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <BeakerIcon className="h-8 w-8 text-indigo-600" />
-            Histórico de Envios de DNA
+            HistÃ³rico de Envios de DNA
           </h1>
           <p className="text-gray-600 dark:text-gray-300 mt-1">
-            Visualize todos os envios realizados para análise de DNA
+            Visualize todos os envios realizados para anÃ¡lise de DNA
           </p>
         </div>
       </div>
 
-      {/* Filtros e Estatísticas */}
+      {/* Filtros e EstatÃ­sticas */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="p-4">
           <div className="flex items-center justify-between">
@@ -334,7 +334,7 @@ export default function DNAHistorico() {
               </label>
               <input
                 type="text"
-                placeholder="Buscar por laboratório ou observações..."
+                placeholder="Buscar por laboratÃ³rio ou observaÃ§Ãµes..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -342,7 +342,7 @@ export default function DNAHistorico() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Filtrar por Laboratório
+                Filtrar por LaboratÃ³rio
               </label>
               <select
                 value={filterLaboratorio}
@@ -384,7 +384,7 @@ export default function DNAHistorico() {
                       Data de Envio
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      Laboratório
+                      LaboratÃ³rio
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Quantidade
@@ -393,16 +393,16 @@ export default function DNAHistorico() {
                       Animais
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      Custo Unitário
+                      Custo UnitÃ¡rio
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Custo Total
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      Observações
+                      ObservaÃ§Ãµes
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      Ações
+                      AÃ§Ãµes
                     </th>
                   </tr>
                 </thead>

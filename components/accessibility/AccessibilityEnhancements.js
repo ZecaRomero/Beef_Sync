@@ -18,7 +18,7 @@ export default function AccessibilityEnhancements() {
   const [focusVisible, setFocusVisible] = useState(true)
 
   useEffect(() => {
-    // Carregar preferências salvas
+    // Carregar preferÃªncias salvas
     const savedPrefs = JSON.parse(localStorage.getItem('beefsync_accessibility') || '{}')
     setHighContrast(savedPrefs.highContrast || false)
     setLargeText(savedPrefs.largeText || false)
@@ -26,7 +26,7 @@ export default function AccessibilityEnhancements() {
     setScreenReader(savedPrefs.screenReader || false)
     setFocusVisible(savedPrefs.focusVisible !== false)
 
-    // Aplicar preferências
+    // Aplicar preferÃªncias
     applyAccessibilitySettings(savedPrefs)
   }, [])
 
@@ -51,7 +51,7 @@ export default function AccessibilityEnhancements() {
       root.classList.remove('large-text')
     }
 
-    // Reduzir animações
+    // Reduzir animaÃ§Ãµes
     if (settings.reducedMotion) {
       root.style.setProperty('--animation-duration', '0.01ms')
       root.style.setProperty('--transition-duration', '0.01ms')
@@ -69,7 +69,7 @@ export default function AccessibilityEnhancements() {
       root.classList.remove('screen-reader-mode')
     }
 
-    // Focus visível
+    // Focus visÃ­vel
     if (settings.focusVisible !== false) {
       root.classList.add('focus-visible')
     } else {
@@ -113,7 +113,7 @@ export default function AccessibilityEnhancements() {
       <div className="flex items-center space-x-2 mb-6">
         <AdjustmentsHorizontalIcon className="h-6 w-6 text-gray-600 dark:text-gray-400" />
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-          Configurações de Acessibilidade
+          ConfiguraÃ§Ãµes de Acessibilidade
         </h2>
       </div>
 
@@ -172,18 +172,18 @@ export default function AccessibilityEnhancements() {
           </label>
         </div>
 
-        {/* Reduzir Animações */}
+        {/* Reduzir AnimaÃ§Ãµes */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="p-1 bg-gray-100 dark:bg-gray-700 rounded">
-              <span className="text-xs text-gray-600 dark:text-gray-400">⚡</span>
+              <span className="text-xs text-gray-600 dark:text-gray-400">âÅ¡¡</span>
             </div>
             <div>
               <h3 className="font-medium text-gray-900 dark:text-white">
-                Reduzir Animações
+                Reduzir AnimaÃ§Ãµes
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Remove animações que podem causar desconforto
+                Remove animaÃ§Ãµes que podem causar desconforto
               </p>
             </div>
           </div>
@@ -226,18 +226,18 @@ export default function AccessibilityEnhancements() {
           </label>
         </div>
 
-        {/* Focus Visível */}
+        {/* Focus VisÃ­vel */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="p-1 bg-gray-100 dark:bg-gray-700 rounded">
-              <span className="text-xs text-gray-600 dark:text-gray-400">🎯</span>
+              <span className="text-xs text-gray-600 dark:text-gray-400">ðÅ¸Å½¯</span>
             </div>
             <div>
               <h3 className="font-medium text-gray-900 dark:text-white">
-                Focus Visível
+                Focus VisÃ­vel
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Destaca elementos focados para navegação por teclado
+                Destaca elementos focados para navegaÃ§Ã£o por teclado
               </p>
             </div>
           </div>
@@ -253,7 +253,7 @@ export default function AccessibilityEnhancements() {
         </div>
       </div>
 
-      {/* Informações Adicionais */}
+      {/* InformaÃ§Ãµes Adicionais */}
       <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
         <div className="flex items-start space-x-2">
           <InformationCircleIcon className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
@@ -261,9 +261,9 @@ export default function AccessibilityEnhancements() {
             <p className="font-medium">Dicas de Acessibilidade:</p>
             <ul className="mt-1 list-disc list-inside space-y-1">
               <li>Use Tab para navegar entre elementos</li>
-              <li>Pressione Enter ou Espaço para ativar botões</li>
+              <li>Pressione Enter ou EspaÃ§o para ativar botÃµes</li>
               <li>Use Ctrl + para aumentar o zoom do navegador</li>
-              <li>As configurações são salvas automaticamente</li>
+              <li>As configuraÃ§Ãµes sÃ£o salvas automaticamente</li>
             </ul>
           </div>
         </div>

@@ -12,7 +12,7 @@ const pool = new Pool({
 
 async function verificarTabelas() {
   try {
-    console.log('🔍 Verificando tabelas existentes no banco de dados...\n');
+    console.log('�Ÿ”� Verificando tabelas existentes no banco de dados...\n');
     
     const result = await pool.query(`
       SELECT table_name 
@@ -21,7 +21,7 @@ async function verificarTabelas() {
       ORDER BY table_name
     `);
     
-    console.log(`📊 Total de tabelas: ${result.rows.length}\n`);
+    console.log(`�Ÿ“Š Total de tabelas: ${result.rows.length}\n`);
     console.log('Tabelas encontradas:');
     result.rows.forEach((row, index) => {
       console.log(`${index + 1}. ${row.table_name}`);
@@ -31,13 +31,13 @@ async function verificarTabelas() {
     const checkNitrogenio = result.rows.find(row => row.table_name === 'nitrogenio');
     
     if (checkNitrogenio) {
-      console.log('\n✅ Tabela "nitrogenio" EXISTE');
+      console.log('\n�œ… Tabela "nitrogenio" EXISTE');
     } else {
-      console.log('\n❌ Tabela "nitrogenio" NÃO EXISTE - precisa ser criada!');
+      console.log('\n�Œ Tabela "nitrogenio" N�ƒO EXISTE - precisa ser criada!');
     }
     
   } catch (error) {
-    console.error('❌ Erro ao verificar tabelas:', error.message);
+    console.error('�Œ Erro ao verificar tabelas:', error.message);
   } finally {
     await pool.end();
   }

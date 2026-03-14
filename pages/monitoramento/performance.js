@@ -52,14 +52,14 @@ export default function PerformanceMonitoring() {
         const rebanhoTotal = animals.length
         const animaisAtivos = animals.filter(a => a.situacao === 'Ativo').length
         
-        // Calcular crescimento médio (simulado com variação)
+        // Calcular crescimento mÃ©dio (simulado com variaÃ§Ã£o)
         const crescimentoMedio = rebanhoTotal > 0 ? (animaisAtivos / rebanhoTotal * 100).toFixed(1) : '0.0'
         
         // Taxa de mortalidade (simulada)
         const mortos = animals.filter(a => a.situacao === 'Morto').length
         const taxaMortalidade = rebanhoTotal > 0 ? ((mortos / rebanhoTotal) * 100).toFixed(2) : '0.00'
         
-        // Eficiência de reprodução
+        // EficiÃªncia de reproduÃ§Ã£o
         const nascidos = births.filter(b => b.status === 'nascido').length
         const divisorReproducao = rebanhoTotal * 0.3
         const eficienciaReproducao = divisorReproducao > 0 ? (nascidos / divisorReproducao * 100).toFixed(1) : '0.0'
@@ -114,7 +114,7 @@ export default function PerformanceMonitoring() {
       icon: CheckCircleIcon,
       color: 'bg-green-500',
       trend: 'up',
-      description: 'Animais em situação ativa'
+      description: 'Animais em situaÃ§Ã£o ativa'
     },
     {
       id: 'crescimento',
@@ -138,13 +138,13 @@ export default function PerformanceMonitoring() {
     },
     {
       id: 'reproducao',
-      title: 'Eficiência Reprodutiva',
+      title: 'EficiÃªncia Reprodutiva',
       value: performanceData.eficienciaReproducao,
       unit: '%',
       icon: CheckCircleIcon,
       color: 'bg-pink-500',
       trend: 'up',
-      description: 'Eficiência de nascimentos'
+      description: 'EficiÃªncia de nascimentos'
     },
     {
       id: 'custo',
@@ -154,7 +154,7 @@ export default function PerformanceMonitoring() {
       icon: ChartBarIcon,
       color: 'bg-orange-500',
       trend: 'stable',
-      description: 'Custo médio operacional'
+      description: 'Custo mÃ©dio operacional'
     }
   ]
 
@@ -168,7 +168,7 @@ export default function PerformanceMonitoring() {
             Performance do Rebanho
           </h1>
           <p className="text-gray-600 dark:text-gray-300 mt-2">
-            Indicadores e métricas em tempo real
+            Indicadores e mÃ©tricas em tempo real
           </p>
         </div>
         <Button onClick={loadPerformanceData} disabled={loading}>
@@ -211,17 +211,17 @@ export default function PerformanceMonitoring() {
       {/* Detailed View */}
       <Card className="p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Análise Detalhada
+          AnÃ¡lise Detalhada
         </h2>
         
         <div className="space-y-4">
           <div>
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Saúde do Rebanho
+                SaÃºde do Rebanho
               </span>
               <span className="text-sm text-gray-600 dark:text-gray-400">
-                {100 - performanceData.taxaMortalidade}% saudável
+                {100 - performanceData.taxaMortalidade}% saudÃ¡vel
               </span>
             </div>
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -252,7 +252,7 @@ export default function PerformanceMonitoring() {
           <div>
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Eficiência Reprodutiva
+                EficiÃªncia Reprodutiva
               </span>
               <span className="text-sm text-gray-600 dark:text-gray-400">
                 {performanceData.eficienciaReproducao}%
@@ -278,16 +278,16 @@ export default function PerformanceMonitoring() {
             </h3>
             <ul className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
               {performanceData.taxaMortalidade > 5 && (
-                <li>⚠️ Taxa de mortalidade acima do esperado ({performanceData.taxaMortalidade}%)</li>
+                <li>âÅ¡ ï¸� Taxa de mortalidade acima do esperado ({performanceData.taxaMortalidade}%)</li>
               )}
               {performanceData.eficienciaReproducao < 60 && (
-                <li>⚠️ Eficiência reprodutiva baixa - verificar protocolos</li>
+                <li>âÅ¡ ï¸� EficiÃªncia reprodutiva baixa - verificar protocolos</li>
               )}
               {performanceData.custoPorAnimal > 100 && (
-                <li>⚠️ Custo por animal elevado - otimizar recursos</li>
+                <li>âÅ¡ ï¸� Custo por animal elevado - otimizar recursos</li>
               )}
               {performanceData.taxaMortalidade <= 5 && performanceData.eficienciaReproducao >= 60 && (
-                <li>✓ Performance dentro dos padrões esperados</li>
+                <li>âÅ“â€œ Performance dentro dos padrÃµes esperados</li>
               )}
             </ul>
           </div>

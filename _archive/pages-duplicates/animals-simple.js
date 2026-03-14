@@ -10,27 +10,27 @@ export default function AnimalsSimple() {
     const loadAnimals = async () => {
       try {
         setLoading(true)
-        console.log('🔄 Carregando animais...')
+        console.log('�Ÿ”„ Carregando animais...')
         
         const response = await fetch('/api/animals')
-        console.log('📡 Response:', response.status, response.ok)
+        console.log('�Ÿ“� Response:', response.status, response.ok)
         
         if (response.ok) {
           const data = await response.json()
-          console.log('📊 Data:', data)
+          console.log('�Ÿ“Š Data:', data)
           
           if (data.success && Array.isArray(data.data)) {
             setAnimals(data.data)
-            console.log('✅ Animais carregados:', data.data.length)
+            console.log('�œ… Animais carregados:', data.data.length)
           } else {
-            console.log('⚠️ Formato inesperado:', data)
+            console.log('�š�️ Formato inesperado:', data)
             setError('Formato de dados inesperado')
           }
         } else {
           throw new Error(`HTTP ${response.status}`)
         }
       } catch (err) {
-        console.error('❌ Erro:', err)
+        console.error('�Œ Erro:', err)
         setError(err.message)
       } finally {
         setLoading(false)
@@ -55,7 +55,7 @@ export default function AnimalsSimple() {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-red-500 text-6xl mb-4">❌</div>
+          <div className="text-red-500 text-6xl mb-4">�Œ</div>
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Erro ao carregar animais</h2>
           <p className="text-gray-600 dark:text-gray-400">{error}</p>
         </div>
@@ -68,7 +68,7 @@ export default function AnimalsSimple() {
       <div className="max-w-6xl mx-auto px-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-            🐄 Lista Simples de Animais
+            �Ÿ�„ Lista Simples de Animais
           </h1>
 
           <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
@@ -79,7 +79,7 @@ export default function AnimalsSimple() {
 
           {animals.length === 0 ? (
             <div className="text-center py-12">
-              <div className="text-gray-400 dark:text-gray-500 text-6xl mb-4">🐄</div>
+              <div className="text-gray-400 dark:text-gray-500 text-6xl mb-4">�Ÿ�„</div>
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                 Nenhum animal encontrado
               </h3>
@@ -127,19 +127,19 @@ export default function AnimalsSimple() {
               href="/animals"
               className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              🐄 Página Completa de Animais
+              �Ÿ�„ Página Completa de Animais
             </Link>
             <Link
               href="/test-api-animals"
               className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              🧪 Teste da API
+              �Ÿ�� Teste da API
             </Link>
             <Link
               href="/dashboard"
               className="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              📊 Dashboard
+              �Ÿ“Š Dashboard
             </Link>
           </div>
         </div>

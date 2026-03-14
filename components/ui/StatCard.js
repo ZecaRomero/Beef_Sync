@@ -81,8 +81,8 @@ export default function StatCard({
               'flex items-center text-sm font-medium',
               trend === 'up' ? 'text-green-600' : trend === 'down' ? 'text-red-600' : 'text-gray-600'
             )}>
-              {trend === 'up' && <span>↑</span>}
-              {trend === 'down' && <span>↓</span>}
+              {trend === 'up' && <span>ââ€ â€˜</span>}
+              {trend === 'down' && <span>ââ€ â€œ</span>}
               {trendValue && <span className="ml-1">{trendValue}</span>}
             </div>
           )}

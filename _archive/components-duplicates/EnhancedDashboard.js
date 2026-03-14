@@ -85,7 +85,7 @@ const EnhancedDashboard = ({ animals, costs, sales = [] }) => {
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
-                <span className="text-blue-600 dark:text-blue-400 text-lg">🐄</span>
+                <span className="text-blue-600 dark:text-blue-400 text-lg">�Ÿ�„</span>
               </div>
             </div>
             <div className="ml-4">
@@ -106,7 +106,7 @@ const EnhancedDashboard = ({ animals, costs, sales = [] }) => {
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center">
-                <span className="text-green-600 dark:text-green-400 text-lg">💰</span>
+                <span className="text-green-600 dark:text-green-400 text-lg">�Ÿ’�</span>
               </div>
             </div>
             <div className="ml-4">
@@ -127,7 +127,7 @@ const EnhancedDashboard = ({ animals, costs, sales = [] }) => {
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center">
-                <span className="text-purple-600 dark:text-purple-400 text-lg">📈</span>
+                <span className="text-purple-600 dark:text-purple-400 text-lg">�Ÿ“ˆ</span>
               </div>
             </div>
             <div className="ml-4">
@@ -148,7 +148,7 @@ const EnhancedDashboard = ({ animals, costs, sales = [] }) => {
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/20 rounded-lg flex items-center justify-center">
-                <span className="text-orange-600 dark:text-orange-400 text-lg">🍼</span>
+                <span className="text-orange-600 dark:text-orange-400 text-lg">�Ÿ��</span>
               </div>
             </div>
             <div className="ml-4">
@@ -160,7 +160,7 @@ const EnhancedDashboard = ({ animals, costs, sales = [] }) => {
           </div>
           <div className="mt-4">
             <span className="text-sm text-gray-600 dark:text-gray-400">
-              Últimos 30 dias
+              �šltimos 30 dias
             </span>
           </div>
         </div>
@@ -171,7 +171,7 @@ const EnhancedDashboard = ({ animals, costs, sales = [] }) => {
         {/* Distribuição por Raça */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            📊 Distribuição por Raça
+            �Ÿ“Š Distribuição por Raça
           </h3>
           {Object.keys(stats.breedDistribution).length === 0 ? (
             <p className="text-gray-500 dark:text-gray-400 text-center py-4">
@@ -204,7 +204,7 @@ const EnhancedDashboard = ({ animals, costs, sales = [] }) => {
         {/* Distribuição por Idade */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            📅 Distribuição por Idade
+            �Ÿ“… Distribuição por Idade
           </h3>
           {Object.keys(stats.ageDistribution).length === 0 ? (
             <p className="text-gray-500 dark:text-gray-400 text-center py-4">

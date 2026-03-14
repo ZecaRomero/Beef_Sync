@@ -12,13 +12,13 @@ async function verificarAnimaisNF() {
   const client = await pool.connect();
   
   try {
-    console.log('🔍 VERIFICANDO ANIMAIS DAS NFs DO MARCELO\n');
+    console.log('�Ÿ”� VERIFICANDO ANIMAIS DAS NFs DO MARCELO\n');
     console.log('='.repeat(80));
     
     const nfs = ['229', '230', '231'];
     
     for (const nf of nfs) {
-      console.log(`\n📋 NF ${nf}:`);
+      console.log(`\n�Ÿ“‹ NF ${nf}:`);
       
       // Verificar se há campo numero_nf ou outro campo de vínculo
       const result = await client.query(`
@@ -38,7 +38,7 @@ async function verificarAnimaisNF() {
     }
     
     // Verificar se há itens_nota_fiscal
-    console.log('\n\n📦 ITENS DAS NOTAS FISCAIS:');
+    console.log('\n\n�Ÿ“� ITENS DAS NOTAS FISCAIS:');
     for (const nf of nfs) {
       const nfResult = await client.query(`
         SELECT id FROM notas_fiscais WHERE numero_nf = $1
@@ -63,7 +63,7 @@ async function verificarAnimaisNF() {
     }
     
     // Buscar todos os animais com data_chegada próxima às datas das NFs
-    console.log('\n\n📅 ANIMAIS POR DATA DE CHEGADA (Jan 2026):');
+    console.log('\n\n�Ÿ“… ANIMAIS POR DATA DE CHEGADA (Jan 2026):');
     const animaisJanResult = await client.query(`
       SELECT id, rg, nome, sexo, fornecedor, data_chegada
       FROM animais
@@ -84,7 +84,7 @@ async function verificarAnimaisNF() {
         porData[data].push(a);
       });
       
-      console.log('📊 Distribuição por data:');
+      console.log('�Ÿ“Š Distribuição por data:');
       Object.entries(porData).forEach(([data, animais]) => {
         console.log(`\n   ${data}: ${animais.length} animais`);
         console.log(`   Fornecedores: ${[...new Set(animais.map(a => a.fornecedor || 'N/A'))].join(', ')}`);
@@ -101,10 +101,10 @@ async function verificarAnimaisNF() {
     }
     
     console.log('\n' + '='.repeat(80));
-    console.log('\n✅ Verificação concluída!');
+    console.log('\n�œ… Verificação concluída!');
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
     console.error(error);
   } finally {
     client.release();

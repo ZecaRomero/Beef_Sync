@@ -13,10 +13,10 @@ async function checkReportData() {
   const client = await pool.connect()
   
   try {
-    console.log('🔍 Verificando dados para relatório mensal (2025-09-01 a 2025-10-31)...\n')
+    console.log('�Ÿ”� Verificando dados para relatório mensal (2025-09-01 a 2025-10-31)...\n')
     
     // 1. Verificar nascimentos
-    console.log('👶 NASCIMENTOS:')
+    console.log('�Ÿ‘� NASCIMENTOS:')
     const nascimentos = await client.query(`
       SELECT * FROM nascimentos 
       WHERE data_nascimento BETWEEN $1 AND $2
@@ -36,7 +36,7 @@ async function checkReportData() {
     }
     
     // 2. Verificar mortes
-    console.log('\n💀 MORTES:')
+    console.log('\n�Ÿ’€ MORTES:')
     const mortes = await client.query(`
       SELECT m.*, a.serie, a.rg, a.sexo 
       FROM mortes m
@@ -58,7 +58,7 @@ async function checkReportData() {
     }
     
     // 3. Verificar animais vendidos
-    console.log('\n💰 VENDAS (animais com situação "Vendido"):')
+    console.log('\n�Ÿ’� VENDAS (animais com situação "Vendido"):')
     const vendas = await client.query(`
       SELECT * FROM animais 
       WHERE situacao = 'Vendido' AND updated_at BETWEEN $1 AND $2
@@ -78,7 +78,7 @@ async function checkReportData() {
     }
     
     // 4. Verificar todos os animais para debug
-    console.log('\n🐄 TODOS OS ANIMAIS (para debug):')
+    console.log('\n�Ÿ�„ TODOS OS ANIMAIS (para debug):')
     const todosAnimais = await client.query(`
       SELECT id, serie, rg, sexo, situacao, data_nascimento, updated_at 
       FROM animais 
@@ -89,7 +89,7 @@ async function checkReportData() {
     console.table(todosAnimais.rows)
     
   } catch (error) {
-    console.error('❌ Erro ao verificar dados:', error.message)
+    console.error('�Œ Erro ao verificar dados:', error.message)
   } finally {
     client.release()
     await pool.end()

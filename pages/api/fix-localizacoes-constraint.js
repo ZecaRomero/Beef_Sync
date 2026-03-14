@@ -6,11 +6,11 @@ const { query } = require('../../lib/database')
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Método não permitido' })
+    return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' })
   }
 
   try {
-    console.log('🔍 Verificando constraints da tabela localizacoes_animais...')
+    console.log('ðÅ¸â€�� Verificando constraints da tabela localizacoes_animais...')
     
     // Verificar constraints existentes
     const constraints = await query(`
@@ -30,7 +30,7 @@ export default async function handler(req, res) {
       definition: row.definition
     }))
     
-    // Verificar se existe a constraint problemática
+    // Verificar se existe a constraint problemÃ¡tica
     const problematicConstraint = constraints.rows.find(
       row => row.constraint_name === 'localizacoes_animais_animal_id_key'
     )
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
     let duplicates = []
     
     if (problematicConstraint) {
-      console.log('❌ Encontrada constraint UNIQUE incorreta em animal_id!')
+      console.log('â�Å’ Encontrada constraint UNIQUE incorreta em animal_id!')
       
       // Remover constraint
       await query(`
@@ -47,7 +47,7 @@ export default async function handler(req, res) {
         DROP CONSTRAINT IF EXISTS localizacoes_animais_animal_id_key
       `)
       removed = true
-      console.log('✅ Constraint removida com sucesso!')
+      console.log('âÅ“â€¦ Constraint removida com sucesso!')
       
       // Verificar registros duplicados
       const duplicatesResult = await query(`
@@ -61,7 +61,7 @@ export default async function handler(req, res) {
       duplicates = duplicatesResult.rows
     }
     
-    // Criar índices úteis
+    // Criar Ã­ndices Ãºteis
     await query(`
       CREATE INDEX IF NOT EXISTS idx_localizacoes_animal_ativo 
       ON localizacoes_animais(animal_id) 
@@ -77,7 +77,7 @@ export default async function handler(req, res) {
       success: true,
       message: removed 
         ? 'Constraint UNIQUE removida com sucesso!' 
-        : 'Nenhuma constraint problemática encontrada',
+        : 'Nenhuma constraint problemÃ¡tica encontrada',
       details: {
         constraintRemoved: removed,
         constraintsFound: constraintsList,
@@ -87,7 +87,7 @@ export default async function handler(req, res) {
     })
     
   } catch (error) {
-    console.error('❌ Erro ao corrigir constraints:', error)
+    console.error('â�Å’ Erro ao corrigir constraints:', error)
     res.status(500).json({
       success: false,
       error: 'Erro ao corrigir constraints',

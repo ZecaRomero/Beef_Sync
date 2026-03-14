@@ -2,7 +2,7 @@
 const { query } = require('./lib/database')
 
 async function corrigirSexoFemeasInseminacao() {
-  console.log('🔄 CORRIGINDO SEXO DOS ANIMAIS NAS INSEMINAÇÕES')
+  console.log('�Ÿ”„ CORRIGINDO SEXO DOS ANIMAIS NAS INSEMINA�‡�•ES')
   console.log('=' .repeat(70))
   console.log('')
 
@@ -87,7 +87,7 @@ async function corrigirSexoFemeasInseminacao() {
       { serie: 'CJCJ', rg: '16201' }
     ]
 
-    console.log(`📊 Total de animais para verificar: ${dadosInseminacao.length}`)
+    console.log(`�Ÿ“Š Total de animais para verificar: ${dadosInseminacao.length}`)
     console.log('')
 
     let encontrados = 0
@@ -97,7 +97,7 @@ async function corrigirSexoFemeasInseminacao() {
     const erros = []
     const correcoes = []
 
-    console.log('🔍 Verificando e corrigindo sexo dos animais...')
+    console.log('�Ÿ”� Verificando e corrigindo sexo dos animais...')
     console.log('')
 
     for (let i = 0; i < dadosInseminacao.length; i++) {
@@ -116,7 +116,7 @@ async function corrigirSexoFemeasInseminacao() {
 
         if (animalResult.rows.length === 0) {
           naoEncontrados++
-          console.log(`   ❌ Animal não encontrado no sistema`)
+          console.log(`   �Œ Animal não encontrado no sistema`)
           erros.push(`${animal.serie} ${animal.rg}: Animal não encontrado`)
           continue
         }
@@ -127,12 +127,12 @@ async function corrigirSexoFemeasInseminacao() {
         // 2. Verificar se já é fêmea
         if (animalData.sexo === 'Fêmea' || animalData.sexo === 'F') {
           jaFemeas++
-          console.log(`   ✅ Já é fêmea (${animalData.sexo})`)
+          console.log(`   �œ… Já é fêmea (${animalData.sexo})`)
           continue
         }
 
         // 3. Corrigir para fêmea
-        console.log(`   🔧 Corrigindo de "${animalData.sexo}" para "Fêmea"`)
+        console.log(`   �Ÿ”� Corrigindo de "${animalData.sexo}" para "Fêmea"`)
         
         await query(`
           UPDATE animais 
@@ -149,38 +149,38 @@ async function corrigirSexoFemeasInseminacao() {
           sexoNovo: 'Fêmea'
         })
         
-        console.log(`   ✅ Corrigido com sucesso`)
+        console.log(`   �œ… Corrigido com sucesso`)
 
       } catch (error) {
         erros.push(`${animal.serie} ${animal.rg}: ${error.message}`)
-        console.log(`   ❌ Erro: ${error.message}`)
+        console.log(`   �Œ Erro: ${error.message}`)
       }
     }
 
     // Relatório final
     console.log('')
-    console.log('📊 RELATÓRIO FINAL')
+    console.log('�Ÿ“Š RELAT�“RIO FINAL')
     console.log('=' .repeat(50))
-    console.log(`🔍 Animais verificados: ${dadosInseminacao.length}`)
-    console.log(`✅ Encontrados no sistema: ${encontrados}`)
-    console.log(`❌ Não encontrados: ${naoEncontrados}`)
-    console.log(`👩 Já eram fêmeas: ${jaFemeas}`)
-    console.log(`🔧 Corrigidos para fêmea: ${corrigidos}`)
-    console.log(`📈 Taxa de sucesso: ${((encontrados / dadosInseminacao.length) * 100).toFixed(1)}%`)
+    console.log(`�Ÿ”� Animais verificados: ${dadosInseminacao.length}`)
+    console.log(`�œ… Encontrados no sistema: ${encontrados}`)
+    console.log(`�Œ Não encontrados: ${naoEncontrados}`)
+    console.log(`�Ÿ‘� Já eram fêmeas: ${jaFemeas}`)
+    console.log(`�Ÿ”� Corrigidos para fêmea: ${corrigidos}`)
+    console.log(`�Ÿ“ˆ Taxa de sucesso: ${((encontrados / dadosInseminacao.length) * 100).toFixed(1)}%`)
 
     if (corrigidos > 0) {
       console.log('')
-      console.log('🔧 ANIMAIS CORRIGIDOS:')
+      console.log('�Ÿ”� ANIMAIS CORRIGIDOS:')
       console.log('-'.repeat(80))
       correcoes.forEach((correcao, index) => {
         console.log(`${index + 1}. ${correcao.serie} ${correcao.rg} - ${correcao.nome || 'Sem nome'}`)
-        console.log(`   Antes: ${correcao.sexoAnterior} → Depois: ${correcao.sexoNovo}`)
+        console.log(`   Antes: ${correcao.sexoAnterior} �†’ Depois: ${correcao.sexoNovo}`)
       })
     }
 
     if (erros.length > 0) {
       console.log('')
-      console.log('❌ ERROS ENCONTRADOS:')
+      console.log('�Œ ERROS ENCONTRADOS:')
       console.log('-'.repeat(50))
       erros.forEach((erro, index) => {
         console.log(`${index + 1}. ${erro}`)
@@ -189,7 +189,7 @@ async function corrigirSexoFemeasInseminacao() {
 
     // Verificação adicional - buscar todos os animais que ainda estão como machos mas têm inseminações
     console.log('')
-    console.log('🔍 VERIFICAÇÃO ADICIONAL: Buscando machos com inseminações...')
+    console.log('�Ÿ”� VERIFICA�‡�ƒO ADICIONAL: Buscando machos com inseminações...')
     
     const machosComIA = await query(`
       SELECT DISTINCT a.id, a.serie, a.rg, a.nome, a.sexo, COUNT(i.id) as total_ias
@@ -201,11 +201,11 @@ async function corrigirSexoFemeasInseminacao() {
     `)
 
     if (machosComIA.rows.length > 0) {
-      console.log(`⚠️ Encontrados ${machosComIA.rows.length} machos com inseminações:`)
+      console.log(`�š�️ Encontrados ${machosComIA.rows.length} machos com inseminações:`)
       console.log('-'.repeat(80))
       
       for (const macho of machosComIA.rows) {
-        console.log(`• ${macho.serie} ${macho.rg} - ${macho.nome || 'Sem nome'} (${macho.total_ias} IAs)`)
+        console.log(`�€� ${macho.serie} ${macho.rg} - ${macho.nome || 'Sem nome'} (${macho.total_ias} IAs)`)
         
         // Corrigir automaticamente
         await query(`
@@ -214,17 +214,17 @@ async function corrigirSexoFemeasInseminacao() {
           WHERE id = $1
         `, [macho.id])
         
-        console.log(`  ✅ Corrigido para Fêmea`)
+        console.log(`  �œ… Corrigido para Fêmea`)
       }
     } else {
-      console.log('✅ Nenhum macho com inseminações encontrado')
+      console.log('�œ… Nenhum macho com inseminações encontrado')
     }
 
     console.log('')
-    console.log('✅ CORREÇÃO CONCLUÍDA!')
+    console.log('�œ… CORRE�‡�ƒO CONCLUÍDA!')
 
   } catch (error) {
-    console.error('❌ Erro geral:', error)
+    console.error('�Œ Erro geral:', error)
   }
 }
 
@@ -232,10 +232,10 @@ async function corrigirSexoFemeasInseminacao() {
 corrigirSexoFemeasInseminacao()
   .then(() => {
     console.log('')
-    console.log('🎯 RESULTADO FINAL:')
-    console.log('• Sexo dos animais corrigido')
-    console.log('• Todos os animais com inseminação agora são fêmeas')
-    console.log('• Sistema consistente para importações futuras')
+    console.log('�ŸŽ� RESULTADO FINAL:')
+    console.log('�€� Sexo dos animais corrigido')
+    console.log('�€� Todos os animais com inseminação agora são fêmeas')
+    console.log('�€� Sistema consistente para importações futuras')
     process.exit(0)
   })
   .catch(error => {

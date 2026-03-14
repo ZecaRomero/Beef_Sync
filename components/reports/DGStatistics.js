@@ -27,7 +27,7 @@ export default function DGStatistics() {
         setStats(result.data)
       }
     } catch (error) {
-      console.error('Erro ao carregar estatísticas de DG:', error)
+      console.error('Erro ao carregar estatÃ­sticas de DG:', error)
     } finally {
       setLoading(false)
     }
@@ -53,7 +53,7 @@ export default function DGStatistics() {
 
   return (
     <div className="space-y-6">
-      {/* Filtro de Período */}
+      {/* Filtro de PerÃ­odo */}
       <div className="flex gap-2">
         {['all', 'month', 'quarter', 'year'].map((p) => (
           <button
@@ -65,7 +65,7 @@ export default function DGStatistics() {
                 : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
             }`}
           >
-            {p === 'all' ? 'Todos' : p === 'month' ? 'Este Mês' : p === 'quarter' ? 'Trimestre' : 'Ano'}
+            {p === 'all' ? 'Todos' : p === 'month' ? 'Este MÃªs' : p === 'quarter' ? 'Trimestre' : 'Ano'}
           </button>
         ))}
       </div>
@@ -127,13 +127,13 @@ export default function DGStatistics() {
         </Card>
       </div>
 
-      {/* Estatísticas Detalhadas */}
+      {/* EstatÃ­sticas Detalhadas */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Tendência Mensal */}
+        {/* TendÃªncia Mensal */}
         <Card className="p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
             <CalendarIcon className="h-5 w-5 text-blue-600" />
-            Tendência Mensal
+            TendÃªncia Mensal
           </h3>
           <div className="space-y-3">
             {stats.tendencia_mensal && stats.tendencia_mensal.length > 0 ? (
@@ -155,25 +155,25 @@ export default function DGStatistics() {
                       ></div>
                     </div>
                     <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      <span className="text-green-600">✓ {mes.positivas || 0}</span>
-                      <span className="text-red-600">✗ {mes.negativas || 0}</span>
+                      <span className="text-green-600">âÅ“â€œ {mes.positivas || 0}</span>
+                      <span className="text-red-600">âÅ“â€” {mes.negativas || 0}</span>
                     </div>
                   </div>
                 </div>
               ))
             ) : (
               <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-                Nenhum dado disponível
+                Nenhum dado disponÃ­vel
               </p>
             )}
           </div>
         </Card>
 
-        {/* Estatísticas por Raça */}
+        {/* EstatÃ­sticas por RaÃ§a */}
         <Card className="p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
             <SparklesIcon className="h-5 w-5 text-yellow-600" />
-            Taxa de Sucesso por Raça
+            Taxa de Sucesso por RaÃ§a
           </h3>
           <div className="space-y-3">
             {stats.por_raca && stats.por_raca.length > 0 ? (
@@ -200,7 +200,7 @@ export default function DGStatistics() {
               ))
             ) : (
               <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-                Nenhum dado disponível
+                Nenhum dado disponÃ­vel
               </p>
             )}
           </div>

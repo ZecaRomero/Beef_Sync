@@ -30,7 +30,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ success: false, message: 'Erro ao criar tabela', error: e.message })
   }
 
-  // GET — busca medicamentos (todos ou filtrado por boletim_campo_id)
+  // GET ââ‚¬â€� busca medicamentos (todos ou filtrado por boletim_campo_id)
   if (req.method === 'GET') {
     try {
       const { id } = req.query
@@ -58,7 +58,7 @@ export default async function handler(req, res) {
     }
   }
 
-  // POST — registrar nova aplicação de medicamento
+  // POST ââ‚¬â€� registrar nova aplicaÃ§Ã£o de medicamento
   if (req.method === 'POST') {
     try {
       const {
@@ -68,7 +68,7 @@ export default async function handler(req, res) {
       } = req.body
 
       if (!medicamento || !data_aplicacao) {
-        return res.status(400).json({ success: false, message: 'Medicamento e data de aplicação são obrigatórios' })
+        return res.status(400).json({ success: false, message: 'Medicamento e data de aplicaÃ§Ã£o sÃ£o obrigatÃ³rios' })
       }
 
       const result = await query(
@@ -95,11 +95,11 @@ export default async function handler(req, res) {
     }
   }
 
-  // DELETE — remover registro de medicamento
+  // DELETE ââ‚¬â€� remover registro de medicamento
   if (req.method === 'DELETE') {
     try {
       const { id } = req.query
-      if (!id) return res.status(400).json({ success: false, message: 'ID obrigatório' })
+      if (!id) return res.status(400).json({ success: false, message: 'ID obrigatÃ³rio' })
       await query('DELETE FROM boletim_campo_medicamentos WHERE id = $1', [id])
       return res.status(200).json({ success: true })
     } catch (error) {
@@ -107,5 +107,5 @@ export default async function handler(req, res) {
     }
   }
 
-  return res.status(405).json({ message: 'Método não permitido' })
+  return res.status(405).json({ message: 'MÃ©todo nÃ£o permitido' })
 }

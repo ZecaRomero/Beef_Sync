@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * Script de Validação do Schema PostgreSQL
+ * Script de ValidaÃ§Ã£o do Schema PostgreSQL
  * 
- * Este script verifica se todas as tabelas necessárias existem e
+ * Este script verifica se todas as tabelas necessÃ¡rias existem e
  * se possuem as colunas corretas com os tipos adequados.
  */
 
@@ -209,7 +209,7 @@ const SCHEMA_ESPERADO = {
 }
 
 /**
- * Busca informações das colunas de uma tabela
+ * Busca informaÃ§Ãµes das colunas de uma tabela
  */
 async function buscarColunasTabela(nomeTabela) {
   const query = `
@@ -232,7 +232,7 @@ async function buscarColunasTabela(nomeTabela) {
 }
 
 /**
- * Busca índices de uma tabela
+ * Busca Ã­ndices de uma tabela
  */
 async function buscarIndicesTabela(nomeTabela) {
   const query = `
@@ -264,7 +264,7 @@ async function tabelaExiste(nomeTabela) {
 }
 
 /**
- * Valida uma tabela específica
+ * Valida uma tabela especÃ­fica
  */
 async function validarTabela(nomeTabela, schemaEsperado) {
   const problemas = []
@@ -272,7 +272,7 @@ async function validarTabela(nomeTabela, schemaEsperado) {
   // Verificar se a tabela existe
   const existe = await tabelaExiste(nomeTabela)
   if (!existe) {
-    problemas.push(`❌ Tabela '${nomeTabela}' não existe`)
+    problemas.push(`â�Å’ Tabela '${nomeTabela}' nÃ£o existe`)
     return { valida: false, problemas }
   }
   
@@ -280,58 +280,58 @@ async function validarTabela(nomeTabela, schemaEsperado) {
   const colunasReais = await buscarColunasTabela(nomeTabela)
   const colunasEsperadas = schemaEsperado.colunas
   
-  // Verificar colunas obrigatórias
+  // Verificar colunas obrigatÃ³rias
   for (const colunaEsperada of colunasEsperadas.filter(c => !c.nullable)) {
     const colunaReal = colunasReais.find(c => c.nome === colunaEsperada.nome)
     
     if (!colunaReal) {
-      problemas.push(`❌ Coluna obrigatória '${colunaEsperada.nome}' não existe`)
+      problemas.push(`â�Å’ Coluna obrigatÃ³ria '${colunaEsperada.nome}' nÃ£o existe`)
     } else if (colunaReal.nullable && !colunaEsperada.nullable) {
-      problemas.push(`⚠️  Coluna '${colunaEsperada.nome}' deveria ser NOT NULL`)
+      problemas.push(`âÅ¡ ï¸�  Coluna '${colunaEsperada.nome}' deveria ser NOT NULL`)
     }
   }
   
-  // Verificar índices (se especificados)
+  // Verificar Ã­ndices (se especificados)
   if (schemaEsperado.indices) {
     const indicesReais = await buscarIndicesTabela(nomeTabela)
     
     for (const indiceEsperado of schemaEsperado.indices) {
       if (!indicesReais.includes(indiceEsperado)) {
-        problemas.push(`⚠️  Índice '${indiceEsperado}' não existe`)
+        problemas.push(`âÅ¡ ï¸�  Ã�ndice '${indiceEsperado}' nÃ£o existe`)
       }
     }
   }
   
   return {
-    valida: problemas.filter(p => p.startsWith('❌')).length === 0,
+    valida: problemas.filter(p => p.startsWith('â�Å’')).length === 0,
     problemas
   }
 }
 
 /**
- * Função principal de validação
+ * FunÃ§Ã£o principal de validaÃ§Ã£o
  */
 async function validarSchema() {
-  console.log('\n🔍 VALIDAÇÃO DO SCHEMA DO BANCO DE DADOS POSTGRESQL\n')
+  console.log('\nðÅ¸â€�� VALIDAÃâ€¡ÃÆ’O DO SCHEMA DO BANCO DE DADOS POSTGRESQL\n')
   console.log('='.repeat(70))
   
   try {
-    // Testar conexão
-    console.log('\n📡 Testando conexão com o banco de dados...')
+    // Testar conexÃ£o
+    console.log('\nðÅ¸â€œ¡ Testando conexÃ£o com o banco de dados...')
     const conexao = await testConnection()
     
     if (!conexao.success) {
-      console.error('❌ Falha na conexão com o banco de dados:', conexao.error)
+      console.error('â�Å’ Falha na conexÃ£o com o banco de dados:', conexao.error)
       process.exit(1)
     }
     
-    console.log('✅ Conexão estabelecida')
+    console.log('âÅ“â€¦ ConexÃ£o estabelecida')
     console.log(`   Banco: ${conexao.database}`)
-    console.log(`   Usuário: ${conexao.user}`)
-    console.log(`   Versão: ${conexao.version}`)
+    console.log(`   UsuÃ¡rio: ${conexao.user}`)
+    console.log(`   VersÃ£o: ${conexao.version}`)
     
     // Validar cada tabela
-    console.log('\n📋 Validando estrutura das tabelas...\n')
+    console.log('\nðÅ¸â€œâ€¹ Validando estrutura das tabelas...\n')
     
     let tabelasValidas = 0
     let tabelasComProblemas = 0
@@ -343,13 +343,13 @@ async function validarSchema() {
       const resultado = await validarTabela(nomeTabela, schemaEsperado)
       
       if (!await tabelaExiste(nomeTabela)) {
-        console.log('❌ NÃO EXISTE')
+        console.log('â�Å’ NÃÆ’O EXISTE')
         tabelasFaltando++
       } else if (resultado.valida) {
-        console.log('✅ OK')
+        console.log('âÅ“â€¦ OK')
         tabelasValidas++
       } else {
-        console.log('⚠️  COM PROBLEMAS')
+        console.log('âÅ¡ ï¸�  COM PROBLEMAS')
         tabelasComProblemas++
       }
       
@@ -363,43 +363,43 @@ async function validarSchema() {
     
     // Resumo
     console.log('\n' + '='.repeat(70))
-    console.log('\n📊 RESUMO DA VALIDAÇÃO:\n')
-    console.log(`   ✅ Tabelas válidas: ${tabelasValidas}`)
-    console.log(`   ⚠️  Tabelas com problemas: ${tabelasComProblemas}`)
-    console.log(`   ❌ Tabelas faltando: ${tabelasFaltando}`)
-    console.log(`   📋 Total de tabelas: ${Object.keys(SCHEMA_ESPERADO).length}`)
+    console.log('\nðÅ¸â€œÅ  RESUMO DA VALIDAÃâ€¡ÃÆ’O:\n')
+    console.log(`   âÅ“â€¦ Tabelas vÃ¡lidas: ${tabelasValidas}`)
+    console.log(`   âÅ¡ ï¸�  Tabelas com problemas: ${tabelasComProblemas}`)
+    console.log(`   â�Å’ Tabelas faltando: ${tabelasFaltando}`)
+    console.log(`   ðÅ¸â€œâ€¹ Total de tabelas: ${Object.keys(SCHEMA_ESPERADO).length}`)
     
-    // Estatísticas do banco
-    console.log('\n📈 ESTATÍSTICAS DO BANCO:\n')
+    // EstatÃ­sticas do banco
+    console.log('\nðÅ¸â€œË† ESTATÃ�STICAS DO BANCO:\n')
     
     const totalAnimais = await pool.query('SELECT COUNT(*) FROM animais')
     const totalGestacoes = await pool.query('SELECT COUNT(*) FROM gestacoes')
     const totalMortes = await pool.query('SELECT COUNT(*) FROM mortes')
     const totalSemen = await pool.query('SELECT COUNT(*) FROM estoque_semen')
     
-    console.log(`   🐄 Animais cadastrados: ${totalAnimais.rows[0].count}`)
-    console.log(`   🤰 Gestações registradas: ${totalGestacoes.rows[0].count}`)
-    console.log(`   💀 Mortes registradas: ${totalMortes.rows[0].count}`)
-    console.log(`   🧬 Estoque de sêmen: ${totalSemen.rows[0].count}`)
+    console.log(`   ðÅ¸�â€ž Animais cadastrados: ${totalAnimais.rows[0].count}`)
+    console.log(`   ðÅ¸¤° GestaÃ§Ãµes registradas: ${totalGestacoes.rows[0].count}`)
+    console.log(`   ðÅ¸â€™â‚¬ Mortes registradas: ${totalMortes.rows[0].count}`)
+    console.log(`   ðÅ¸§¬ Estoque de sÃªmen: ${totalSemen.rows[0].count}`)
     
     // Status final
     console.log('\n' + '='.repeat(70))
     
     if (tabelasFaltando > 0) {
-      console.log('\n❌ VALIDAÇÃO FALHOU: Há tabelas faltando no banco de dados')
-      console.log('   Execute o script de inicialização: npm run db:init\n')
+      console.log('\nâ�Å’ VALIDAÃâ€¡ÃÆ’O FALHOU: HÃ¡ tabelas faltando no banco de dados')
+      console.log('   Execute o script de inicializaÃ§Ã£o: npm run db:init\n')
       process.exit(1)
     } else if (tabelasComProblemas > 0) {
-      console.log('\n⚠️  VALIDAÇÃO PARCIAL: Há problemas não críticos no schema')
-      console.log('   O sistema pode funcionar, mas recomenda-se correções\n')
+      console.log('\nâÅ¡ ï¸�  VALIDAÃâ€¡ÃÆ’O PARCIAL: HÃ¡ problemas nÃ£o crÃ­ticos no schema')
+      console.log('   O sistema pode funcionar, mas recomenda-se correÃ§Ãµes\n')
       process.exit(0)
     } else {
-      console.log('\n✅ VALIDAÇÃO COMPLETA: Schema do banco de dados está correto!\n')
+      console.log('\nâÅ“â€¦ VALIDAÃâ€¡ÃÆ’O COMPLETA: Schema do banco de dados estÃ¡ correto!\n')
       process.exit(0)
     }
     
   } catch (error) {
-    console.error('\n❌ Erro durante a validação:', error.message)
+    console.error('\nâ�Å’ Erro durante a validaÃ§Ã£o:', error.message)
     console.error(error.stack)
     process.exit(1)
   } finally {
@@ -407,7 +407,7 @@ async function validarSchema() {
   }
 }
 
-// Executar validação
+// Executar validaÃ§Ã£o
 if (require.main === module) {
   validarSchema()
 }

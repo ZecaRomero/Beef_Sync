@@ -16,7 +16,7 @@ export default function LimparDados() {
       localStorage.clear();
       sessionStorage.clear();
       
-      alert('✅ DADOS MOCK REMOVIDOS!\n\nAgora recarregue a página para ver o sistema limpo.');
+      alert('�œ… DADOS MOCK REMOVIDOS!\n\nAgora recarregue a página para ver o sistema limpo.');
       
       // Recarregar automaticamente
       window.location.href = '/';
@@ -41,7 +41,7 @@ export default function LimparDados() {
         maxWidth: '400px'
       }}>
         <h1 style={{ marginBottom: '1rem', color: '#ef4444' }}>
-          🧹 LIMPAR DADOS MOCK
+          �Ÿ�� LIMPAR DADOS MOCK
         </h1>
         
         <p style={{ marginBottom: '2rem', color: '#d1d5db' }}>
@@ -61,7 +61,7 @@ export default function LimparDados() {
             fontWeight: 'bold'
           }}
         >
-          🗑️ EXCLUIR DADOS MOCK
+          �Ÿ—‘️ EXCLUIR DADOS MOCK
         </button>
         
         <div style={{
@@ -71,11 +71,11 @@ export default function LimparDados() {
         }}>
           <p>Dados que serão removidos:</p>
           <ul style={{ textAlign: 'left', marginTop: '0.5rem' }}>
-            <li>• 3 animais fictícios</li>
-            <li>• Custos fictícios (R$ 365,00)</li>
-            <li>• Vendas fictícias (R$ 2.800,00)</li>
-            <li>• Nascimentos fictícios</li>
-            <li>• Estoque de sêmen fictício</li>
+            <li>�€� 3 animais fictícios</li>
+            <li>�€� Custos fictícios (R$ 365,00)</li>
+            <li>�€� Vendas fictícias (R$ 2.800,00)</li>
+            <li>�€� Nascimentos fictícios</li>
+            <li>�€� Estoque de sêmen fictício</li>
           </ul>
         </div>
       </div>

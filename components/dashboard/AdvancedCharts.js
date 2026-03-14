@@ -6,7 +6,7 @@ const mockAnimals = []
 export default function AdvancedCharts({ timeRange }) {
   const [selectedChart, setSelectedChart] = useState('costs')
 
-  // Preparar dados para gráficos
+  // Preparar dados para grÃ¡ficos
   const prepareChartData = () => {
     const custosPorTipo = mockAnimals.reduce((acc, animal) => {
       animal.custos?.forEach(custo => {
@@ -40,10 +40,10 @@ export default function AdvancedCharts({ timeRange }) {
   const { custosPorTipo, animaisPorRaca, roiPorMes, custosTemporais } = prepareChartData()
 
   const chartTypes = [
-    { id: 'costs', label: '💰 Custos por Tipo', data: custosPorTipo },
-    { id: 'breeds', label: '🐄 Animais por Raça', data: animaisPorRaca },
-    { id: 'roi', label: '📈 ROI Mensal', data: roiPorMes },
-    { id: 'timeline', label: '📊 Custos Temporais', data: custosTemporais }
+    { id: 'costs', label: 'ðÅ¸â€™° Custos por Tipo', data: custosPorTipo },
+    { id: 'breeds', label: 'ðÅ¸�â€ž Animais por RaÃ§a', data: animaisPorRaca },
+    { id: 'roi', label: 'ðÅ¸â€œË† ROI Mensal', data: roiPorMes },
+    { id: 'timeline', label: 'ðÅ¸â€œÅ  Custos Temporais', data: custosTemporais }
   ]
 
   const renderBarChart = (data, type) => {
@@ -54,8 +54,8 @@ export default function AdvancedCharts({ timeRange }) {
       'Nascimento': 'from-green-400 to-green-600',
       'DNA': 'from-purple-400 to-purple-600',
       'Medicamentos': 'from-red-400 to-red-600',
-      'Veterinários': 'from-blue-400 to-blue-600',
-      'Aquisição': 'from-indigo-400 to-indigo-600',
+      'VeterinÃ¡rios': 'from-blue-400 to-blue-600',
+      'AquisiÃ§Ã£o': 'from-indigo-400 to-indigo-600',
       'Nelore': 'from-blue-400 to-blue-600',
       'Brahman': 'from-red-400 to-red-600',
       'Gir': 'from-green-400 to-green-600',
@@ -77,12 +77,12 @@ export default function AdvancedCharts({ timeRange }) {
           <div className="text-sm text-gray-600 dark:text-gray-400">
             {type === 'costs' && 'Total de Custos'}
             {type === 'breeds' && 'Total de Animais'}
-            {type === 'roi' && 'ROI Médio Anual'}
+            {type === 'roi' && 'ROI MÃ©dio Anual'}
             {type === 'timeline' && 'Custos Acumulados'}
           </div>
         </div>
 
-        {/* Gráfico */}
+        {/* GrÃ¡fico */}
         <div className="space-y-3 max-h-96 overflow-y-auto">
           {sortedData.map(([key, value], index) => {
             const percentage = ((value / maxValue) * 100)
@@ -142,10 +142,10 @@ export default function AdvancedCharts({ timeRange }) {
       <div className="space-y-4">
         <div className="text-center p-4 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-lg">
           <div className="text-2xl font-bold text-gray-900 dark:text-white">
-            {selectedChart === 'roi' ? `${(Object.values(data).reduce((a, b) => a + b, 0) / entries.length).toFixed(1)}%` : 'Tendência'}
+            {selectedChart === 'roi' ? `${(Object.values(data).reduce((a, b) => a + b, 0) / entries.length).toFixed(1)}%` : 'TendÃªncia'}
           </div>
           <div className="text-sm text-gray-600 dark:text-gray-400">
-            {selectedChart === 'roi' ? 'ROI Médio Anual' : 'Evolução Temporal'}
+            {selectedChart === 'roi' ? 'ROI MÃ©dio Anual' : 'EvoluÃ§Ã£o Temporal'}
           </div>
         </div>
 
@@ -228,15 +228,15 @@ export default function AdvancedCharts({ timeRange }) {
     <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
-          <span className="mr-3 text-2xl">📊</span>
-          Análises Avançadas
+          <span className="mr-3 text-2xl">ðÅ¸â€œÅ </span>
+          AnÃ¡lises AvanÃ§adas
         </h2>
         <div className="text-sm text-gray-500 dark:text-gray-400">
-          Período: {timeRange}
+          PerÃ­odo: {timeRange}
         </div>
       </div>
 
-      {/* Seletor de Gráficos */}
+      {/* Seletor de GrÃ¡ficos */}
       <div className="flex flex-wrap gap-2 mb-6">
         {chartTypes.map(chart => (
           <button
@@ -253,7 +253,7 @@ export default function AdvancedCharts({ timeRange }) {
         ))}
       </div>
 
-      {/* Renderizar Gráfico */}
+      {/* Renderizar GrÃ¡fico */}
       <div className="min-h-96">
         {(selectedChart === 'roi' || selectedChart === 'timeline') 
           ? renderLineChart(chartTypes.find(c => c.id === selectedChart)?.data)
@@ -264,32 +264,32 @@ export default function AdvancedCharts({ timeRange }) {
       {/* Insights */}
       <div className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-800 dark:to-blue-900/20 rounded-lg">
         <h4 className="font-semibold text-gray-900 dark:text-white mb-2 flex items-center">
-          <span className="mr-2">💡</span>
+          <span className="mr-2">ðÅ¸â€™¡</span>
           Insights Inteligentes
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
           {selectedChart === 'costs' && (
             <>
-              <div>📈 Custos operacionais sob controle</div>
-              <div>🎯 Mantenha o foco na eficiência</div>
+              <div>ðÅ¸â€œË† Custos operacionais sob controle</div>
+              <div>ðÅ¸Å½¯ Mantenha o foco na eficiÃªncia</div>
             </>
           )}
           {selectedChart === 'breeds' && (
             <>
-              <div>🐄 Nelore é a raça predominante no rebanho</div>
-              <div>📊 Diversificação racial está equilibrada</div>
+              <div>ðÅ¸�â€ž Nelore Ã© a raÃ§a predominante no rebanho</div>
+              <div>ðÅ¸â€œÅ  DiversificaÃ§Ã£o racial estÃ¡ equilibrada</div>
             </>
           )}
           {selectedChart === 'roi' && (
             <>
-              <div>📈 ROI mostra tendência crescente no ano</div>
-              <div>🎯 Meta de 20% de ROI está sendo atingida</div>
+              <div>ðÅ¸â€œË† ROI mostra tendÃªncia crescente no ano</div>
+              <div>ðÅ¸Å½¯ Meta de 20% de ROI estÃ¡ sendo atingida</div>
             </>
           )}
           {selectedChart === 'timeline' && (
             <>
-              <div>📊 Custos crescem consistentemente</div>
-              <div>⚡ Pico de custos no final do ano</div>
+              <div>ðÅ¸â€œÅ  Custos crescem consistentemente</div>
+              <div>âÅ¡¡ Pico de custos no final do ano</div>
             </>
           )}
         </div>

@@ -22,8 +22,8 @@ const pool = new Pool({
 
 async function main() {
   const execute = process.argv.includes('--execute')
-  console.log('🔍 Beef-Sync - Remoção da tabela duplicada transferencias_embriao')
-  console.log(execute ? '   Modo: EXECUÇÃO\n' : '   Modo: DRY-RUN (use --execute para aplicar)\n')
+  console.log('�Ÿ”� Beef-Sync - Remoção da tabela duplicada transferencias_embriao')
+  console.log(execute ? '   Modo: EXECU�‡�ƒO\n' : '   Modo: DRY-RUN (use --execute para aplicar)\n')
 
   const client = await pool.connect()
   try {
@@ -36,7 +36,7 @@ async function main() {
     `)
 
     if (!existe.rows[0].exists) {
-      console.log('✅ A tabela transferencias_embriao não existe. Nada a fazer.')
+      console.log('�œ… A tabela transferencias_embriao não existe. Nada a fazer.')
       await pool.end()
       return
     }
@@ -49,12 +49,12 @@ async function main() {
     const countCorreta = await client.query('SELECT COUNT(*) as total FROM transferencias_embrioes')
     const totalCorreta = parseInt(countCorreta.rows[0].total)
 
-    console.log('📊 Situação atual:')
+    console.log('�Ÿ“Š Situação atual:')
     console.log(`   - transferencias_embrioes (correta): ${totalCorreta} registros`)
     console.log(`   - transferencias_embriao (legada):   ${totalLegada} registros`)
 
     if (totalLegada > 0) {
-      console.log('\n⚠️  A tabela legada tem dados. Verificando se precisam ser migrados...')
+      console.log('\n�š�️  A tabela legada tem dados. Verificando se precisam ser migrados...')
       const dados = await client.query(`
         SELECT te.id, te.animal_id, te.data_te, te.data_dg, te.resultado_dg, te.veterinario, te.observacoes,
                a.nome, a.serie, a.rg
@@ -79,7 +79,7 @@ async function main() {
       `)
       const pendentes = totalLegada - jaMigrados.rows.length
       if (pendentes > 0) {
-        console.log(`\n   ${pendentes} registros NÃO estão na tabela correta. Migrando...`)
+        console.log(`\n   ${pendentes} registros N�ƒO estão na tabela correta. Migrando...`)
         if (execute) {
           const legados = await client.query('SELECT * FROM transferencias_embriao')
           let migrados = 0
@@ -100,7 +100,7 @@ async function main() {
             ])
             migrados++
           }
-          console.log(`   ✅ ${migrados} registros migrados para transferencias_embrioes`)
+          console.log(`   �œ… ${migrados} registros migrados para transferencias_embrioes`)
         }
       } else {
         console.log('\n   Todos os registros já existem na tabela correta.')
@@ -109,12 +109,12 @@ async function main() {
 
     if (execute) {
       await client.query('DROP TABLE IF EXISTS transferencias_embriao CASCADE')
-      console.log('\n✅ Tabela transferencias_embriao removida com sucesso!')
+      console.log('\n�œ… Tabela transferencias_embriao removida com sucesso!')
     } else {
-      console.log('\n📌 Para remover a tabela legada, execute: node scripts/remover-tabela-te-duplicada.js --execute')
+      console.log('\n�Ÿ“Œ Para remover a tabela legada, execute: node scripts/remover-tabela-te-duplicada.js --execute')
     }
   } catch (err) {
-    console.error('❌ Erro:', err.message)
+    console.error('�Œ Erro:', err.message)
     process.exit(1)
   } finally {
     client.release()

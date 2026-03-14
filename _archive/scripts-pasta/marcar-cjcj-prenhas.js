@@ -1,6 +1,6 @@
 /**
  * Marca como Prenha a última IA de cada fêmea CJCJ.
- * Para cada animal CJCJ fêmea com inseminações, a IA mais recente → Prenha, as demais → Vazia.
+ * Para cada animal CJCJ fêmea com inseminações, a IA mais recente �†’ Prenha, as demais �†’ Vazia.
  *
  * Uso: node scripts/marcar-cjcj-prenhas.js
  */
@@ -8,7 +8,7 @@ require('dotenv').config({ path: '.env.local' })
 const { query } = require('../lib/database')
 
 async function executar() {
-  console.log('🔧 Marcando fêmeas CJCJ como prenhas (última IA)\n')
+  console.log('�Ÿ”� Marcando fêmeas CJCJ como prenhas (última IA)\n')
 
   try {
     const cols = await query(`
@@ -37,11 +37,11 @@ async function executar() {
     `)
 
     if (femeas.rows.length === 0) {
-      console.log('   ⚠️ Nenhuma fêmea CJCJ com inseminações encontrada.')
+      console.log('   �š�️ Nenhuma fêmea CJCJ com inseminações encontrada.')
       process.exit(0)
     }
 
-    console.log(`   📋 ${femeas.rows.length} fêmea(s) CJCJ com IA encontrada(s)\n`)
+    console.log(`   �Ÿ“‹ ${femeas.rows.length} fêmea(s) CJCJ com IA encontrada(s)\n`)
 
     let atualizados = 0
     const atualizadas = []
@@ -74,13 +74,13 @@ async function executar() {
       }
     }
 
-    console.log(`\n   ✅ ${atualizadas.length} fêmea(s) marcada(s) como prenha(s):`)
+    console.log(`\n   �œ… ${atualizadas.length} fêmea(s) marcada(s) como prenha(s):`)
     atualizadas.slice(0, 20).forEach(n => console.log(`      - ${n}`))
     if (atualizadas.length > 20) console.log(`      ... e mais ${atualizadas.length - 20}`)
-    console.log(`\n   📋 ${atualizados} registro(s) atualizado(s).`)
-    console.log('\n   💡 Recarregue o mobile para ver todas as fêmeas prenhas.')
+    console.log(`\n   �Ÿ“‹ ${atualizados} registro(s) atualizado(s).`)
+    console.log('\n   �Ÿ’� Recarregue o mobile para ver todas as fêmeas prenhas.')
   } catch (err) {
-    console.error('❌ Erro:', err.message)
+    console.error('�Œ Erro:', err.message)
     process.exit(1)
   }
   process.exit(0)

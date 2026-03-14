@@ -1,28 +1,28 @@
 import { query } from '../../../lib/database'
 
 /**
- * POST: Lançamento em lote de DG.
+ * POST: LanÃ§amento em lote de DG.
  * Aceita receptoras com ou sem animalId.
- * Se não tiver animalId, busca ou cria o animal por serie+rg e depois atualiza o DG.
+ * Se nÃ£o tiver animalId, busca ou cria o animal por serie+rg e depois atualiza o DG.
  */
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Método não permitido' })
+    return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' })
   }
 
   try {
     const { dataDG, veterinario, receptoras } = req.body
     
     // LOG: Dados recebidos
-    console.log('📥 Dados recebidos na API lancar-dg-batch:');
+    console.log('ðÅ¸â€œ¥ Dados recebidos na API lancar-dg-batch:');
     console.log('Data DG:', dataDG);
-    console.log('Veterinário:', veterinario);
+    console.log('VeterinÃ¡rio:', veterinario);
     console.log('Receptoras:', JSON.stringify(receptoras, null, 2));
 
     if (!dataDG || !veterinario) {
       return res.status(400).json({
         success: false,
-        error: 'Data do DG e veterinário são obrigatórios',
+        error: 'Data do DG e veterinÃ¡rio sÃ£o obrigatÃ³rios',
         required: ['dataDG', 'veterinario']
       })
     }
@@ -30,7 +30,7 @@ export default async function handler(req, res) {
     if (!receptoras || !Array.isArray(receptoras) || receptoras.length === 0) {
       return res.status(400).json({
         success: false,
-        error: 'Lista de receptoras é obrigatória'
+        error: 'Lista de receptoras Ã© obrigatÃ³ria'
       })
     }
 
@@ -48,7 +48,7 @@ export default async function handler(req, res) {
       try {
         let idParaUpdate = animalId
         
-        console.log(`\n🔄 Processando receptora ${identificador}:`);
+        console.log(`\nðÅ¸â€�â€ž Processando receptora ${identificador}:`);
         console.log(`  - animalId: ${animalId}`);
         console.log(`  - letra: ${letra}`);
         console.log(`  - numero: ${numero}`);
@@ -73,7 +73,7 @@ export default async function handler(req, res) {
 
             const novoAnimal = await query(`
               INSERT INTO animais (serie, rg, nome, sexo, raca, situacao)
-              VALUES ($1, $2, $3, 'Fêmea', 'Receptora', 'Ativo')
+              VALUES ($1, $2, $3, 'FÃªmea', 'Receptora', 'Ativo')
               RETURNING id
             `, [letra, numero, `${letra} ${numero}`.trim()])
 
@@ -83,7 +83,7 @@ export default async function handler(req, res) {
 
         if (!idParaUpdate) {
           resultados.erros++
-          resultados.detalhes.push({ identificador, erro: 'Não foi possível identificar o animal' })
+          resultados.detalhes.push({ identificador, erro: 'NÃ£o foi possÃ­vel identificar o animal' })
           continue
         }
 
@@ -93,18 +93,18 @@ export default async function handler(req, res) {
           WHERE id = $5
         `, [dataDG, veterinario, resultadoDG, observacoes, idParaUpdate])
         
-        console.log(`  ✅ DG atualizado com sucesso para animal ID ${idParaUpdate}!`);
+        console.log(`  âÅ“â€¦ DG atualizado com sucesso para animal ID ${idParaUpdate}!`);
 
-        // Se DG positivo, registrar gestante no menu de Nascimentos com parto previsto 9 meses após a TE
+        // Se DG positivo, registrar gestante no menu de Nascimentos com parto previsto 9 meses apÃ³s a TE
         const ehPrenha = (resultadoDG || '').toString().toLowerCase().includes('pren')
         if (ehPrenha && letra && numero) {
           try {
-            // Buscar data da TE: 1) pela NF específica (numero_nf), 2) por receptora_letra/numero, 3) por transferencias_embrioes
+            // Buscar data da TE: 1) pela NF especÃ­fica (numero_nf), 2) por receptora_letra/numero, 3) por transferencias_embrioes
             let dataTE = null
             let touro = ''
             let doadora = ''
 
-            // 1. Se temos numeroNF, buscar data_te dessa NF diretamente (mais confiável)
+            // 1. Se temos numeroNF, buscar data_te dessa NF diretamente (mais confiÃ¡vel)
             if (numeroNF) {
               const nfByNumero = await query(`
                 SELECT data_te, fornecedor, numero_nf
@@ -131,7 +131,7 @@ export default async function handler(req, res) {
                 dataTE = nf.rows[0].data_te
               }
             }
-            // 3. Fallback: transferências de embriões
+            // 3. Fallback: transferÃªncias de embriÃµes
             if (!dataTE) {
               const nomeReceptora = `${letra} ${numero}`
               const te = await query(`
@@ -147,7 +147,7 @@ export default async function handler(req, res) {
                 doadora = te.rows[0].doadora_nome || ''
               }
             }
-            // 4. Último fallback: data_chegada da NF (aprox. TE)
+            // 4. ÃÅ¡ltimo fallback: data_chegada da NF (aprox. TE)
             if (!dataTE && numeroNF) {
               const nfChegada = await query(`
                 SELECT data_chegada_animais, data_compra
@@ -177,7 +177,7 @@ export default async function handler(req, res) {
               const nascimentoStr = prevPartoStr
               const rgCompleto = `${letra} ${numero}`
 
-              // Evitar duplicidade: checar se já existe registro para esta receptora
+              // Evitar duplicidade: checar se jÃ¡ existe registro para esta receptora
               const existe = await query(`
                 SELECT id FROM nascimentos
                 WHERE serie = $1 AND rg = $2
@@ -195,14 +195,14 @@ export default async function handler(req, res) {
                 `, [
                   letra, // serie
                   numero, // rg
-                  'Fêmea', // sexo (receptoras são sempre fêmeas)
+                  'FÃªmea', // sexo (receptoras sÃ£o sempre fÃªmeas)
                   partoPrevisto.toISOString().split('T')[0], // data_nascimento (data prevista do parto)
-                  `DG positivo em ${formatBR(new Date(dataDG))}. Parto previsto 9 meses após a TE. Touro: ${touro || 'N/A'}. Doadora: ${doadora || 'N/A'}.` // observacoes
+                  `DG positivo em ${formatBR(new Date(dataDG))}. Parto previsto 9 meses apÃ³s a TE. Touro: ${touro || 'N/A'}. Doadora: ${doadora || 'N/A'}.` // observacoes
                 ])
               }
             }
           } catch (e) {
-            // Não bloquear o fluxo se falhar inserir no menu de nascimentos
+            // NÃ£o bloquear o fluxo se falhar inserir no menu de nascimentos
             resultados.detalhes.push({ identificador, aviso: `Falha ao inserir em nascimentos: ${e.message}` })
           }
         }
@@ -223,7 +223,7 @@ export default async function handler(req, res) {
       detalhes: resultados.detalhes
     })
   } catch (error) {
-    console.error('Erro ao lançar DG em lote:', error)
+    console.error('Erro ao lanÃ§ar DG em lote:', error)
     return res.status(500).json({
       success: false,
       error: 'Erro ao processar lote',

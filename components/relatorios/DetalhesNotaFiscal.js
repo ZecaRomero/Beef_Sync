@@ -9,7 +9,7 @@ export default function DetalhesNotaFiscal({ body }) {
   return (
     <div className="bg-gradient-to-r from-green-900/30 to-green-800/20 p-4 rounded-lg border border-green-500/30">
       <h4 className="font-bold text-green-300 mb-3 flex items-center gap-2">
-        📄 NOTA FISCAL COMPLETA
+        ðÅ¸â€œâ€ž NOTA FISCAL COMPLETA
       </h4>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <SecaoIdentificacaoNF body={body} />
@@ -22,10 +22,10 @@ export default function DetalhesNotaFiscal({ body }) {
 function SecaoIdentificacaoNF({ body }) {
   return (
     <div className="bg-gray-800/50 p-3 rounded">
-      <h5 className="text-green-200 font-semibold mb-2">📋 Identificação</h5>
+      <h5 className="text-green-200 font-semibold mb-2">ðÅ¸â€œâ€¹ IdentificaÃ§Ã£o</h5>
       {(body.numeroNF || body.numero || body.notaFiscal) && (
         <div className="mb-2">
-          <span className="text-gray-400">Número NF:</span>
+          <span className="text-gray-400">NÃºmero NF:</span>
           <span className="text-white font-bold ml-1 text-lg">
             {body.numeroNF || body.numero || body.notaFiscal}
           </span>
@@ -52,7 +52,7 @@ function SecaoIdentificacaoNF({ body }) {
 function SecaoFornecedor({ body }) {
   return (
     <div className="bg-gray-800/50 p-3 rounded">
-      <h5 className="text-green-200 font-semibold mb-2">🏢 Fornecedor</h5>
+      <h5 className="text-green-200 font-semibold mb-2">ðÅ¸�¢ Fornecedor</h5>
       {body.fornecedor && (
         <div className="mb-1">
           <span className="text-gray-400">Nome:</span>{' '}

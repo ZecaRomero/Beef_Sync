@@ -9,7 +9,7 @@ const { query } = require('../lib/database')
 const RGS = ['16234', '16236', '16238', '16239', '16243', '16245']
 
 async function corrigir() {
-  console.log('🔧 Corrigindo Situação ABCZ (POSSUI RGN) para CJCJ...\n')
+  console.log('�Ÿ”� Corrigindo Situação ABCZ (POSSUI RGN) para CJCJ...\n')
 
   try {
     for (const rg of RGS) {
@@ -21,9 +21,9 @@ async function corrigir() {
         [rg]
       )
       if (res.rows.length > 0) {
-        console.log(`   ✅ CJCJ ${rg} (ID ${res.rows[0].id})`)
+        console.log(`   �œ… CJCJ ${rg} (ID ${res.rows[0].id})`)
       } else {
-        console.log(`   ⚠️ CJCJ ${rg} não encontrado`)
+        console.log(`   �š�️ CJCJ ${rg} não encontrado`)
       }
     }
 
@@ -33,10 +33,10 @@ async function corrigir() {
       WHERE UPPER(TRIM(serie)) = 'CJCJ' 
         AND (situacao_abcz IS NULL OR TRIM(situacao_abcz) = '')
     `)
-    console.log(`\n📋 CJCJ ainda sem Situação ABCZ: ${sem.rows[0].c}`)
-    console.log('   💡 Use "Excluir todas e importar novamente" + seu Excel para preencher todos.')
+    console.log(`\n�Ÿ“‹ CJCJ ainda sem Situação ABCZ: ${sem.rows[0].c}`)
+    console.log('   �Ÿ’� Use "Excluir todas e importar novamente" + seu Excel para preencher todos.')
   } catch (err) {
-    console.error('❌ Erro:', err.message)
+    console.error('�Œ Erro:', err.message)
     process.exit(1)
   }
   process.exit(0)

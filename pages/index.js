@@ -19,7 +19,7 @@ export default function Home() {
       return
     }
 
-    // Adelso (email fazenda): acesso ao Boletim Campo e Relatórios
+    // Adelso (email fazenda): acesso ao Boletim Campo e RelatÃ³rios
     if (user.email === 'adelso@fazendasantanna.com.br') {
       hasRedirectedRef.current = true
       router.replace('/adelso-menu')
@@ -29,13 +29,13 @@ export default function Home() {
     const role = user.user_metadata?.role || 'externo'
     const target = role === 'desenvolvedor' ? '/dashboard' : '/a'
 
-    // Evita navegação redundante para a mesma rota
+    // Evita navegaÃ§Ã£o redundante para a mesma rota
     if (target !== router.pathname) {
       hasRedirectedRef.current = true
       router.replace(target)
     }
 
-    // Fallback: se após 2s ainda estiver aqui, mostrar link manual
+    // Fallback: se apÃ³s 2s ainda estiver aqui, mostrar link manual
     const t = setTimeout(() => setShowFallback(true), 2000)
     return () => clearTimeout(t)
   }, [user, loading, router])
@@ -68,7 +68,7 @@ export default function Home() {
               Beef-Sync
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300 mb-2">
-              Sistema de Gestão Pecuária Inteligente
+              Sistema de GestÃ£o PecuÃ¡ria Inteligente
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Controle completo do seu rebanho em tempo real
@@ -82,20 +82,20 @@ export default function Home() {
               Carregando seu painel...
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Aguarde enquanto preparamos tudo para você
+              Aguarde enquanto preparamos tudo para vocÃª
             </p>
             
             {showFallback && (
               <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                  Está demorando mais que o esperado?
+                  EstÃ¡ demorando mais que o esperado?
                 </p>
                 <Link 
                   href={targetPath} 
                   className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-700 hover:to-orange-600 text-white rounded-xl font-semibold shadow-lg shadow-amber-500/30 transition-all transform hover:scale-105"
                 >
                   <span>Acessar Manualmente</span>
-                  <span>→</span>
+                  <span>ââ€ â€™</span>
                 </Link>
               </div>
             )}
@@ -104,30 +104,30 @@ export default function Home() {
           {/* Features */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
             <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-              <div className="text-2xl mb-2">📊</div>
+              <div className="text-2xl mb-2">ðÅ¸â€œÅ </div>
               <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Dashboard Completo</h3>
               <p className="text-xs text-gray-600 dark:text-gray-400">
-                Visualize métricas e indicadores em tempo real
+                Visualize mÃ©tricas e indicadores em tempo real
               </p>
             </div>
             <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-              <div className="text-2xl mb-2">🐂</div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Gestão de Rebanho</h3>
+              <div className="text-2xl mb-2">ðÅ¸�â€š</div>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-1">GestÃ£o de Rebanho</h3>
               <p className="text-xs text-gray-600 dark:text-gray-400">
                 Controle completo de animais e genealogia
               </p>
             </div>
             <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-              <div className="text-2xl mb-2">📱</div>
+              <div className="text-2xl mb-2">ðÅ¸â€œ±</div>
               <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Acesso Mobile</h3>
               <p className="text-xs text-gray-600 dark:text-gray-400">
-                Consulte informações de qualquer lugar
+                Consulte informaÃ§Ãµes de qualquer lugar
               </p>
             </div>
           </div>
 
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-8">
-            © {new Date().getFullYear()} Beef-Sync. Todos os direitos reservados.
+            Â© {new Date().getFullYear()} Beef-Sync. Todos os direitos reservados.
           </p>
         </div>
       </div>

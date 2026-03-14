@@ -3,7 +3,7 @@ const { query } = require('./lib/database')
 
 async function corrigirIncricoes() {
   try {
-    console.log('🔧 Corrigindo incrições das Notas Fiscais...\n')
+    console.log('�Ÿ”� Corrigindo incrições das Notas Fiscais...\n')
     
     // Buscar todas as NFs sem incrição ou com incrição inválida
     const result = await query(`
@@ -21,10 +21,10 @@ async function corrigirIncricoes() {
          OR (UPPER(incricao) != 'SANT ANNA' AND UPPER(incricao) != 'PARDINHO')
     `)
     
-    console.log(`📋 Total de NFs para corrigir: ${result.rows.length}\n`)
+    console.log(`�Ÿ“‹ Total de NFs para corrigir: ${result.rows.length}\n`)
     
     if (result.rows.length === 0) {
-      console.log('✅ Todas as NFs já possuem incrição válida!')
+      console.log('�œ… Todas as NFs já possuem incrição válida!')
       return
     }
     
@@ -60,26 +60,26 @@ async function corrigirIncricoes() {
           [novaIncricao, nf.id]
         )
         
-        console.log(`✅ NF ${nf.numero_nf} (${nf.tipo}) → Incrição: ${novaIncricao}`)
+        console.log(`�œ… NF ${nf.numero_nf} (${nf.tipo}) �†’ Incrição: ${novaIncricao}`)
         corrigidas++
         
       } catch (error) {
-        console.error(`❌ Erro ao corrigir NF ${nf.numero_nf}:`, error.message)
+        console.error(`�Œ Erro ao corrigir NF ${nf.numero_nf}:`, error.message)
         erros++
       }
     }
     
-    console.log(`\n📊 Resumo:`)
-    console.log(`  ✅ NFs corrigidas: ${corrigidas}`)
+    console.log(`\n�Ÿ“Š Resumo:`)
+    console.log(`  �œ… NFs corrigidas: ${corrigidas}`)
     if (erros > 0) {
-      console.log(`  ❌ Erros: ${erros}`)
+      console.log(`  �Œ Erros: ${erros}`)
     }
     
-    console.log('\n✅ Correção concluída!')
-    console.log('💡 Agora você pode sincronizar as NFs novamente')
+    console.log('\n�œ… Correção concluída!')
+    console.log('�Ÿ’� Agora você pode sincronizar as NFs novamente')
     
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('�Œ Erro:', error)
   } finally {
     process.exit(0)
   }

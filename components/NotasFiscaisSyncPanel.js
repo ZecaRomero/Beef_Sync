@@ -132,15 +132,15 @@ export default function NotasFiscaisSyncPanel() {
       case 'restored':
         return 'Backup restaurado com sucesso! Recarregando...'
       case 'copied':
-        return 'Dados copiados para a área de transferência!'
+        return 'Dados copiados para a Ã¡rea de transferÃªncia!'
       case 'error':
-        return 'Erro na operação. Verifique os dados e tente novamente.'
+        return 'Erro na operaÃ§Ã£o. Verifique os dados e tente novamente.'
       case 'auto-sync-enabled':
-        return 'Sincronização automática ativada!'
+        return 'SincronizaÃ§Ã£o automÃ¡tica ativada!'
       case 'auto-sync-disabled':
-        return 'Sincronização automática desativada!'
+        return 'SincronizaÃ§Ã£o automÃ¡tica desativada!'
       default:
-        return 'Sistema de sincronização de notas fiscais'
+        return 'Sistema de sincronizaÃ§Ã£o de notas fiscais'
     }
   }
 
@@ -149,7 +149,7 @@ export default function NotasFiscaisSyncPanel() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            🔄 Sincronização de Notas Fiscais
+            ðÅ¸â€�â€ž SincronizaÃ§Ã£o de Notas Fiscais
           </h3>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
             Sincronize dados entre localhost e rede local
@@ -163,11 +163,11 @@ export default function NotasFiscaisSyncPanel() {
         </div>
       </div>
 
-      {/* Informações do Sistema */}
+      {/* InformaÃ§Ãµes do Sistema */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
           <div className="flex items-center space-x-2">
-            <div className="text-2xl">📱</div>
+            <div className="text-2xl">ðÅ¸â€œ±</div>
             <div>
               <p className="text-sm text-blue-600 dark:text-blue-400">Dispositivo</p>
               <p className="text-xs text-blue-500 dark:text-blue-300 font-mono">
@@ -179,7 +179,7 @@ export default function NotasFiscaisSyncPanel() {
 
         <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
           <div className="flex items-center space-x-2">
-            <div className="text-2xl">📋</div>
+            <div className="text-2xl">ðÅ¸â€œâ€¹</div>
             <div>
               <p className="text-sm text-green-600 dark:text-green-400">Notas Fiscais</p>
               <p className="text-lg font-semibold text-green-700 dark:text-green-300">
@@ -191,9 +191,9 @@ export default function NotasFiscaisSyncPanel() {
 
         <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
           <div className="flex items-center space-x-2">
-            <div className="text-2xl">⏰</div>
+            <div className="text-2xl">â�°</div>
             <div>
-              <p className="text-sm text-purple-600 dark:text-purple-400">Última Sincronização</p>
+              <p className="text-sm text-purple-600 dark:text-purple-400">ÃÅ¡ltima SincronizaÃ§Ã£o</p>
               <p className="text-xs text-purple-500 dark:text-purple-300">
                 {lastSync ? new Date(lastSync).toLocaleString('pt-BR') : 'Nunca'}
               </p>
@@ -202,7 +202,7 @@ export default function NotasFiscaisSyncPanel() {
         </div>
       </div>
 
-      {/* Controles de Sincronização */}
+      {/* Controles de SincronizaÃ§Ã£o */}
       <div className="space-y-4">
         {/* Exportar Dados */}
         <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
@@ -246,10 +246,10 @@ export default function NotasFiscaisSyncPanel() {
           </button>
         </div>
 
-        {/* Sincronização Automática */}
+        {/* SincronizaÃ§Ã£o AutomÃ¡tica */}
         <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
           <div>
-            <h4 className="font-medium text-gray-900 dark:text-white">Sincronização Automática</h4>
+            <h4 className="font-medium text-gray-900 dark:text-white">SincronizaÃ§Ã£o AutomÃ¡tica</h4>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Sincronizar automaticamente a cada 5 minutos
             </p>
@@ -272,7 +272,7 @@ export default function NotasFiscaisSyncPanel() {
           <div>
             <h4 className="font-medium text-gray-900 dark:text-white">Restaurar Backup</h4>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Restaurar dados do backup automático
+              Restaurar dados do backup automÃ¡tico
             </p>
           </div>
           <button
@@ -292,13 +292,13 @@ export default function NotasFiscaisSyncPanel() {
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  📋 Dados Exportados
+                  ðÅ¸â€œâ€¹ Dados Exportados
                 </h3>
                 <button
                   onClick={() => setShowExportData(false)}
                   className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl"
                 >
-                  ✕
+                  âÅ“â€¢
                 </button>
               </div>
             </div>

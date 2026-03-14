@@ -1,8 +1,8 @@
 // API de mercado de gado com dados realistas
-// Simulação baseada em dados reais do CEPEA, B3 e mercados regionais
+// SimulaÃ§Ã£o baseada em dados reais do CEPEA, B3 e mercados regionais
 
 export class MarketAPI {
-  // Gerar variações realistas de preços
+  // Gerar variaÃ§Ãµes realistas de preÃ§os
   static generateRealisticVariation(basePrice, volatility = 0.02) {
     const variation = (Math.random() - 0.5) * 2 * basePrice * volatility
     return {
@@ -12,21 +12,21 @@ export class MarketAPI {
     }
   }
 
-  // Simular dados de preços do mercado com valores realistas
+  // Simular dados de preÃ§os do mercado com valores realistas
   static async getCattlePrices() {
     // Simular delay de API
     await new Promise(resolve => setTimeout(resolve, 800))
     
-    // Preços base atualizados (Janeiro 2025)
+    // PreÃ§os base atualizados (Janeiro 2025)
     const boiGordoBase = 276 // R$ por arroba (CEPEA)
     const vacaGordaBase = 248 // R$ por arroba
     const novilhaBase = 265 // R$ por arroba
     const garroteBase = 285 // R$ por arroba
-    const bezerroMachoBase = 1862 // R$ por cabeça
-    const bezerraBase = 1650 // R$ por cabeça
-    const novilhoBase = 2150 // R$ por cabeça
+    const bezerroMachoBase = 1862 // R$ por cabeÃ§a
+    const bezerraBase = 1650 // R$ por cabeÃ§a
+    const novilhoBase = 2150 // R$ por cabeÃ§a
 
-    // Gerar variações realistas
+    // Gerar variaÃ§Ãµes realistas
     const boiGordo = this.generateRealisticVariation(boiGordoBase, 0.025)
     const vacaGorda = this.generateRealisticVariation(vacaGordaBase, 0.02)
     const novilha = this.generateRealisticVariation(novilhaBase, 0.03)
@@ -44,7 +44,7 @@ export class MarketAPI {
           market: 'CEPEA/ESALQ',
           lastUpdate: new Date(),
           trend: boiGordo.change > 0 ? 'up' : boiGordo.change < 0 ? 'down' : 'stable',
-          icon: '🐂',
+          icon: 'ðÅ¸�â€š',
           category: 'Terminados',
           description: 'Bovinos machos adultos para abate'
         },
@@ -54,9 +54,9 @@ export class MarketAPI {
           market: 'CEPEA/ESALQ',
           lastUpdate: new Date(),
           trend: vacaGorda.change > 0 ? 'up' : vacaGorda.change < 0 ? 'down' : 'stable',
-          icon: '🐄',
+          icon: 'ðÅ¸�â€ž',
           category: 'Terminados',
-          description: 'Fêmeas adultas para abate'
+          description: 'FÃªmeas adultas para abate'
         },
         novilha: {
           ...novilha,
@@ -64,9 +64,9 @@ export class MarketAPI {
           market: 'CEPEA/ESALQ',
           lastUpdate: new Date(),
           trend: novilha.change > 0 ? 'up' : novilha.change < 0 ? 'down' : 'stable',
-          icon: '🐮',
-          category: 'Reprodução',
-          description: 'Fêmeas jovens para reprodução'
+          icon: 'ðÅ¸�®',
+          category: 'ReproduÃ§Ã£o',
+          description: 'FÃªmeas jovens para reproduÃ§Ã£o'
         },
         garrote: {
           ...garrote,
@@ -74,48 +74,48 @@ export class MarketAPI {
           market: 'Mercado Regional',
           lastUpdate: new Date(),
           trend: garrote.change > 0 ? 'up' : garrote.change < 0 ? 'down' : 'stable',
-          icon: '🐃',
+          icon: 'ðÅ¸�Æ’',
           category: 'Recria',
           description: 'Machos jovens em crescimento'
         },
         bezerro_macho: {
           ...bezerroMacho,
-          unit: 'R$/cabeça',
+          unit: 'R$/cabeÃ§a',
           market: 'Mercado Regional',
           lastUpdate: new Date(),
           trend: bezerroMacho.change > 0 ? 'up' : bezerroMacho.change < 0 ? 'down' : 'stable',
-          icon: '🐂',
+          icon: 'ðÅ¸�â€š',
           category: 'Cria',
-          description: 'Machos até 12 meses'
+          description: 'Machos atÃ© 12 meses'
         },
         bezerra: {
           ...bezerra,
-          unit: 'R$/cabeça',
+          unit: 'R$/cabeÃ§a',
           market: 'Mercado Regional',
           lastUpdate: new Date(),
           trend: bezerra.change > 0 ? 'up' : bezerra.change < 0 ? 'down' : 'stable',
-          icon: '🐄',
+          icon: 'ðÅ¸�â€ž',
           category: 'Cria',
-          description: 'Fêmeas até 12 meses'
+          description: 'FÃªmeas atÃ© 12 meses'
         },
         novilho: {
           ...novilho,
-          unit: 'R$/cabeça',
+          unit: 'R$/cabeÃ§a',
           market: 'Mercado Regional',
           lastUpdate: new Date(),
           trend: novilho.change > 0 ? 'up' : novilho.change < 0 ? 'down' : 'stable',
-          icon: '🐃',
+          icon: 'ðÅ¸�Æ’',
           category: 'Recria',
           description: 'Machos de 12 a 24 meses'
         }
       },
       indices: {
         dolar: {
-          value: 5.614 + (Math.random() - 0.5) * 0.05, // Dólar atual R$ 5,614
+          value: 5.614 + (Math.random() - 0.5) * 0.05, // DÃ³lar atual R$ 5,614
           change: (Math.random() - 0.5) * 0.03,
           changePercent: (Math.random() - 0.5) * 0.8,
           unit: 'R$/USD',
-          icon: '💵',
+          icon: 'ðÅ¸â€™µ',
           source: 'Banco Central'
         },
         euro: {
@@ -123,7 +123,7 @@ export class MarketAPI {
           change: (Math.random() - 0.5) * 0.04,
           changePercent: (Math.random() - 0.5) * 0.9,
           unit: 'R$/EUR',
-          icon: '💶',
+          icon: 'ðÅ¸â€™¶',
           source: 'Banco Central'
         },
         milho: {
@@ -131,7 +131,7 @@ export class MarketAPI {
           change: (Math.random() - 0.5) * 2,
           changePercent: (Math.random() - 0.5) * 3,
           unit: 'R$/saca',
-          icon: '🌽',
+          icon: 'ðÅ¸Å’½',
           source: 'CEPEA'
         },
         soja: {
@@ -139,7 +139,7 @@ export class MarketAPI {
           change: (Math.random() - 0.5) * 4,
           changePercent: (Math.random() - 0.5) * 2.5,
           unit: 'R$/saca',
-          icon: '🌱',
+          icon: 'ðÅ¸Å’±',
           source: 'CEPEA'
         },
         farelo_soja: {
@@ -147,7 +147,7 @@ export class MarketAPI {
           change: (Math.random() - 0.5) * 30,
           changePercent: (Math.random() - 0.5) * 1.5,
           unit: 'R$/ton',
-          icon: '🥜',
+          icon: 'ðÅ¸¥Å“',
           source: 'CEPEA'
         },
         boi_futuro: {
@@ -155,20 +155,20 @@ export class MarketAPI {
           change: (Math.random() - 0.5) * 3,
           changePercent: (Math.random() - 0.5) * 1,
           unit: 'R$/arroba',
-          icon: '📈',
+          icon: 'ðÅ¸â€œË†',
           source: 'B3'
         }
       },
       marketStatus: {
         session: this.getMarketSession(),
         lastUpdate: new Date(),
-        nextUpdate: new Date(Date.now() + 15 * 60 * 1000), // Próxima atualização em 15min
+        nextUpdate: new Date(Date.now() + 15 * 60 * 1000), // PrÃ³xima atualizaÃ§Ã£o em 15min
         dataQuality: 'real-time'
       }
     }
   }
 
-  // Determinar sessão do mercado
+  // Determinar sessÃ£o do mercado
   static getMarketSession() {
     const now = new Date()
     const hour = now.getHours()
@@ -182,7 +182,7 @@ export class MarketAPI {
     }
   }
 
-  // Dados históricos simulados
+  // Dados histÃ³ricos simulados
   static async getHistoricalPrices(days = 30) {
     await new Promise(resolve => setTimeout(resolve, 500))
     
@@ -205,57 +205,57 @@ export class MarketAPI {
     return data
   }
 
-  // Notícias do mercado simuladas
+  // NotÃ­cias do mercado simuladas
   static async getMarketNews() {
     await new Promise(resolve => setTimeout(resolve, 800))
     
     const news = [
       {
         id: 1,
-        title: 'Preço do boi gordo sobe 2,5% na semana',
-        summary: 'Alta demanda por carne bovina impulsiona preços no mercado interno',
+        title: 'PreÃ§o do boi gordo sobe 2,5% na semana',
+        summary: 'Alta demanda por carne bovina impulsiona preÃ§os no mercado interno',
         source: 'Canal Rural',
-        publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 horas atrás
+        publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 horas atrÃ¡s
         category: 'precos',
         impact: 'positive',
         relevance: 'high'
       },
       {
         id: 2,
-        title: 'Exportações de carne batem recorde em dezembro',
-        summary: 'China mantém-se como principal destino da carne brasileira',
+        title: 'ExportaÃ§Ãµes de carne batem recorde em dezembro',
+        summary: 'China mantÃ©m-se como principal destino da carne brasileira',
         source: 'Beef Point',
-        publishedAt: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 horas atrás
+        publishedAt: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 horas atrÃ¡s
         category: 'exportacao',
         impact: 'positive',
         relevance: 'high'
       },
       {
         id: 3,
-        title: 'Custo de insumos sobe 8% no último mês',
-        summary: 'Alta do milho e soja impacta custos de produção pecuária',
+        title: 'Custo de insumos sobe 8% no Ãºltimo mÃªs',
+        summary: 'Alta do milho e soja impacta custos de produÃ§Ã£o pecuÃ¡ria',
         source: 'Globo Rural',
-        publishedAt: new Date(Date.now() - 8 * 60 * 60 * 1000), // 8 horas atrás
+        publishedAt: new Date(Date.now() - 8 * 60 * 60 * 1000), // 8 horas atrÃ¡s
         category: 'custos',
         impact: 'negative',
         relevance: 'medium'
       },
       {
         id: 4,
-        title: 'Vacinação contra aftosa será obrigatória em 2024',
-        summary: 'Ministério da Agricultura define calendário de vacinação',
-        source: 'Ministério da Agricultura',
-        publishedAt: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 horas atrás
+        title: 'VacinaÃ§Ã£o contra aftosa serÃ¡ obrigatÃ³ria em 2024',
+        summary: 'MinistÃ©rio da Agricultura define calendÃ¡rio de vacinaÃ§Ã£o',
+        source: 'MinistÃ©rio da Agricultura',
+        publishedAt: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 horas atrÃ¡s
         category: 'regulacao',
         impact: 'neutral',
         relevance: 'medium'
       },
       {
         id: 5,
-        title: 'Tecnologia blockchain chega à rastreabilidade bovina',
+        title: 'Tecnologia blockchain chega Ã  rastreabilidade bovina',
         summary: 'Nova plataforma promete revolucionar controle de origem',
         source: 'Agro Tech',
-        publishedAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 dia atrás
+        publishedAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 dia atrÃ¡s
         category: 'tecnologia',
         impact: 'positive',
         relevance: 'low'
@@ -265,7 +265,7 @@ export class MarketAPI {
     return news
   }
 
-  // Análise de mercado
+  // AnÃ¡lise de mercado
   static async getMarketAnalysis() {
     await new Promise(resolve => setTimeout(resolve, 600))
     
@@ -278,34 +278,34 @@ export class MarketAPI {
       factors: {
         positive: [
           'Demanda interna aquecida',
-          'Exportações em alta',
-          'Dólar favorável',
-          'Redução do rebanho'
+          'ExportaÃ§Ãµes em alta',
+          'DÃ³lar favorÃ¡vel',
+          'ReduÃ§Ã£o do rebanho'
         ],
         negative: [
-          'Custo de produção elevado',
-          'Pressão inflacionária',
-          'Questões climáticas',
-          'Regulamentações ambientais'
+          'Custo de produÃ§Ã£o elevado',
+          'PressÃ£o inflacionÃ¡ria',
+          'QuestÃµes climÃ¡ticas',
+          'RegulamentaÃ§Ãµes ambientais'
         ]
       },
       recommendations: [
         {
           type: 'buy',
           category: 'Boi Gordo',
-          reason: 'Preços em tendência de alta',
+          reason: 'PreÃ§os em tendÃªncia de alta',
           confidence: 85
         },
         {
           type: 'hold',
           category: 'Bezerro',
-          reason: 'Mercado estável, aguardar melhor momento',
+          reason: 'Mercado estÃ¡vel, aguardar melhor momento',
           confidence: 70
         },
         {
           type: 'sell',
           category: 'Vaca Gorda',
-          reason: 'Preços próximos ao teto histórico',
+          reason: 'PreÃ§os prÃ³ximos ao teto histÃ³rico',
           confidence: 75
         }
       ],
@@ -317,17 +317,17 @@ export class MarketAPI {
     }
   }
 
-  // Calculadora de preços por região
+  // Calculadora de preÃ§os por regiÃ£o
   static async getRegionalPrices(state = 'SP') {
     await new Promise(resolve => setTimeout(resolve, 400))
     
     const basePrices = {
-      'SP': { multiplier: 1.0, name: 'São Paulo' },
+      'SP': { multiplier: 1.0, name: 'SÃ£o Paulo' },
       'MG': { multiplier: 0.95, name: 'Minas Gerais' },
-      'GO': { multiplier: 0.90, name: 'Goiás' },
+      'GO': { multiplier: 0.90, name: 'GoiÃ¡s' },
       'MT': { multiplier: 0.88, name: 'Mato Grosso' },
       'MS': { multiplier: 0.92, name: 'Mato Grosso do Sul' },
-      'PR': { multiplier: 0.98, name: 'Paraná' },
+      'PR': { multiplier: 0.98, name: 'ParanÃ¡' },
       'RS': { multiplier: 0.96, name: 'Rio Grande do Sul' },
       'BA': { multiplier: 0.85, name: 'Bahia' }
     }
@@ -349,7 +349,7 @@ export class MarketAPI {
     }
   }
 
-  // Previsão de preços usando IA simulada
+  // PrevisÃ£o de preÃ§os usando IA simulada
   static async getPriceForecast(days = 7) {
     await new Promise(resolve => setTimeout(resolve, 1200))
     
@@ -358,7 +358,7 @@ export class MarketAPI {
     
     for (let i = 1; i <= days; i++) {
       const trend = Math.sin(i / 3) * 5 + (Math.random() - 0.5) * 8
-      const confidence = Math.max(60, 95 - (i * 5)) // Confiança diminui com o tempo
+      const confidence = Math.max(60, 95 - (i * 5)) // ConfianÃ§a diminui com o tempo
       
       forecast.push({
         date: new Date(Date.now() + i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -366,10 +366,10 @@ export class MarketAPI {
         confidence: confidence,
         trend: trend > 2 ? 'bullish' : trend < -2 ? 'bearish' : 'neutral',
         factors: [
-          'Análise técnica',
-          'Padrões sazonais',
-          'Indicadores econômicos',
-          'Dados históricos'
+          'AnÃ¡lise tÃ©cnica',
+          'PadrÃµes sazonais',
+          'Indicadores econÃ´micos',
+          'Dados histÃ³ricos'
         ]
       })
     }

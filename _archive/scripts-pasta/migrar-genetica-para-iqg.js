@@ -18,10 +18,10 @@ async function migrate() {
 
     if (hasGenetica2 && !hasIqg) {
       await query('ALTER TABLE animais RENAME COLUMN genetica_2 TO iqg');
-      console.log('  ✓ genetica_2 renomeado para iqg');
+      console.log('  �œ“ genetica_2 renomeado para iqg');
     } else if (!hasIqg) {
       await query('ALTER TABLE animais ADD COLUMN iqg VARCHAR(50)');
-      console.log('  ✓ Coluna iqg adicionada');
+      console.log('  �œ“ Coluna iqg adicionada');
     } else {
       console.log('  - Coluna iqg já existe');
     }
@@ -36,10 +36,10 @@ async function migrate() {
 
     if (hasDecile2 && !hasPtIqg) {
       await query('ALTER TABLE animais RENAME COLUMN decile_2 TO pt_iqg');
-      console.log('  ✓ decile_2 renomeado para pt_iqg');
+      console.log('  �œ“ decile_2 renomeado para pt_iqg');
     } else if (!hasPtIqg) {
       await query('ALTER TABLE animais ADD COLUMN pt_iqg VARCHAR(50)');
-      console.log('  ✓ Coluna pt_iqg adicionada');
+      console.log('  �œ“ Coluna pt_iqg adicionada');
     } else {
       console.log('  - Coluna pt_iqg já existe');
     }

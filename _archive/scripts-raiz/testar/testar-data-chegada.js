@@ -1,11 +1,11 @@
 const { pool } = require('./lib/database')
 
 async function testarDataChegada() {
-  console.log('🧪 Testando funcionalidade de Data de Chegada e Alertas de DG\n')
+  console.log('�Ÿ�� Testando funcionalidade de Data de Chegada e Alertas de DG\n')
 
   try {
     // 1. Verificar se as colunas existem
-    console.log('1️⃣ Verificando estrutura da tabela...')
+    console.log('1️�ƒ� Verificando estrutura da tabela...')
     const estrutura = await pool.query(`
       SELECT column_name, data_type, is_nullable
       FROM information_schema.columns
@@ -16,17 +16,17 @@ async function testarDataChegada() {
     
     console.log('   Colunas encontradas:')
     estrutura.rows.forEach(col => {
-      console.log(`   ✓ ${col.column_name} (${col.data_type}) - Nullable: ${col.is_nullable}`)
+      console.log(`   �œ“ ${col.column_name} (${col.data_type}) - Nullable: ${col.is_nullable}`)
     })
 
     if (estrutura.rows.length < 4) {
-      console.log('\n   ⚠️ ATENÇÃO: Algumas colunas estão faltando!')
+      console.log('\n   �š�️ ATEN�‡�ƒO: Algumas colunas estão faltando!')
       console.log('   Execute o script adicionar-data-chegada.js primeiro')
       return
     }
 
     // 2. Verificar se o trigger existe
-    console.log('\n2️⃣ Verificando trigger automático...')
+    console.log('\n2️�ƒ� Verificando trigger automático...')
     const trigger = await pool.query(`
       SELECT trigger_name, event_manipulation, action_statement
       FROM information_schema.triggers
@@ -34,13 +34,13 @@ async function testarDataChegada() {
     `)
     
     if (trigger.rows.length > 0) {
-      console.log('   ✓ Trigger encontrado: calcular_data_dg_trigger')
+      console.log('   �œ“ Trigger encontrado: calcular_data_dg_trigger')
     } else {
-      console.log('   ⚠️ Trigger não encontrado!')
+      console.log('   �š�️ Trigger não encontrado!')
     }
 
     // 3. Verificar se a tabela de alertas existe
-    console.log('\n3️⃣ Verificando tabela de alertas...')
+    console.log('\n3️�ƒ� Verificando tabela de alertas...')
     const tabelaAlertas = await pool.query(`
       SELECT EXISTS (
         SELECT FROM information_schema.tables 
@@ -49,13 +49,13 @@ async function testarDataChegada() {
     `)
     
     if (tabelaAlertas.rows[0].exists) {
-      console.log('   ✓ Tabela alertas_dg encontrada')
+      console.log('   �œ“ Tabela alertas_dg encontrada')
     } else {
-      console.log('   ⚠️ Tabela alertas_dg não encontrada!')
+      console.log('   �š�️ Tabela alertas_dg não encontrada!')
     }
 
     // 4. Criar um animal de teste com data de chegada
-    console.log('\n4️⃣ Criando animal de teste...')
+    console.log('\n4️�ƒ� Criando animal de teste...')
     const dataChegada = new Date()
     dataChegada.setDate(dataChegada.getDate() - 10) // 10 dias atrás
     
@@ -71,26 +71,26 @@ async function testarDataChegada() {
     `, [dataChegada.toISOString().split('T')[0]])
 
     const animalTeste = resultado.rows[0]
-    console.log('   ✓ Animal criado:')
+    console.log('   �œ“ Animal criado:')
     console.log(`     ID: ${animalTeste.id}`)
     console.log(`     Identificação: ${animalTeste.serie}-${animalTeste.rg}`)
     console.log(`     Data Chegada: ${new Date(animalTeste.data_chegada).toLocaleDateString('pt-BR')}`)
     console.log(`     Data DG Prevista: ${new Date(animalTeste.data_dg_prevista).toLocaleDateString('pt-BR')}`)
 
     // 5. Verificar se o trigger calculou corretamente
-    console.log('\n5️⃣ Verificando cálculo automático...')
+    console.log('\n5️�ƒ� Verificando cálculo automático...')
     const dataChegadaDate = new Date(animalTeste.data_chegada)
     const dataDgPrevistaDate = new Date(animalTeste.data_dg_prevista)
     const diferencaDias = Math.round((dataDgPrevistaDate - dataChegadaDate) / (1000 * 60 * 60 * 24))
     
     if (diferencaDias === 15) {
-      console.log(`   ✓ Cálculo correto! DG previsto para 15 dias após chegada`)
+      console.log(`   �œ“ Cálculo correto! DG previsto para 15 dias após chegada`)
     } else {
-      console.log(`   ⚠️ Cálculo incorreto! Diferença: ${diferencaDias} dias (esperado: 15)`)
+      console.log(`   �š�️ Cálculo incorreto! Diferença: ${diferencaDias} dias (esperado: 15)`)
     }
 
     // 6. Testar API de alertas
-    console.log('\n6️⃣ Testando API de alertas...')
+    console.log('\n6️�ƒ� Testando API de alertas...')
     const alertas = await pool.query(`
       SELECT 
         a.id,
@@ -106,31 +106,31 @@ async function testarDataChegada() {
       ORDER BY a.data_dg_prevista ASC
     `)
 
-    console.log(`   ✓ Encontrados ${alertas.rows.length} alertas`)
+    console.log(`   �œ“ Encontrados ${alertas.rows.length} alertas`)
     alertas.rows.forEach(alerta => {
       const diasRestantes = parseInt(alerta.dias_restantes)
-      const status = diasRestantes < 0 ? '🔴 ATRASADO' : diasRestantes <= 2 ? '🟠 URGENTE' : '🟡 PRÓXIMO'
+      const status = diasRestantes < 0 ? '�Ÿ”� ATRASADO' : diasRestantes <= 2 ? '�ŸŸ� URGENTE' : '�ŸŸ� PR�“XIMO'
       console.log(`     ${status} ${alerta.serie}-${alerta.rg} - DG em ${diasRestantes} dias`)
     })
 
     // 7. Limpar dados de teste
-    console.log('\n7️⃣ Limpando dados de teste...')
+    console.log('\n7️�ƒ� Limpando dados de teste...')
     await pool.query('DELETE FROM animais WHERE rg = $1', ['TEST-DG-001'])
-    console.log('   ✓ Animal de teste removido')
+    console.log('   �œ“ Animal de teste removido')
 
-    console.log('\n✅ TESTE CONCLUÍDO COM SUCESSO!')
-    console.log('\n📋 Resumo:')
-    console.log('   • Estrutura do banco: OK')
-    console.log('   • Trigger automático: OK')
-    console.log('   • Cálculo de DG: OK')
-    console.log('   • API de alertas: OK')
-    console.log('\n🎯 Próximos passos:')
+    console.log('\n�œ… TESTE CONCLUÍDO COM SUCESSO!')
+    console.log('\n�Ÿ“‹ Resumo:')
+    console.log('   �€� Estrutura do banco: OK')
+    console.log('   �€� Trigger automático: OK')
+    console.log('   �€� Cálculo de DG: OK')
+    console.log('   �€� API de alertas: OK')
+    console.log('\n�ŸŽ� Próximos passos:')
     console.log('   1. Abra o dashboard para ver o widget de alertas')
     console.log('   2. Cadastre uma receptora com data de chegada')
     console.log('   3. Verifique se o alerta aparece no dashboard')
 
   } catch (error) {
-    console.error('\n❌ Erro durante o teste:', error.message)
+    console.error('\n�Œ Erro durante o teste:', error.message)
     console.error(error)
   } finally {
     await pool.end()

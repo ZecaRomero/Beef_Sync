@@ -7,7 +7,7 @@
 const { query } = require('./lib/database')
 
 async function debugCJCA6Final() {
-  console.log('🔍 Debug final do CJCA6 - Verificação completa...\n')
+  console.log('�Ÿ”� Debug final do CJCA6 - Verificação completa...\n')
 
   try {
     // 1. Verificar dados do CJCA6
@@ -19,12 +19,12 @@ async function debugCJCA6Final() {
     `)
     
     if (cjca6.rows.length === 0) {
-      console.log('   ❌ CJCA6 não encontrado!')
+      console.log('   �Œ CJCA6 não encontrado!')
       return
     }
 
     const animal = cjca6.rows[0]
-    console.log(`   ✅ Animal: ID ${animal.id}, ${animal.serie} ${animal.rg}, Sexo: ${animal.sexo}`)
+    console.log(`   �œ… Animal: ID ${animal.id}, ${animal.serie} ${animal.rg}, Sexo: ${animal.sexo}`)
 
     // 2. Verificar TODAS as formas que o CJCA6 pode estar vinculado
     console.log('\n2. Verificando TODAS as vinculações do CJCA6:')
@@ -36,7 +36,7 @@ async function debugCJCA6Final() {
       WHERE touro_id = $1
     `, [animal.id])
     
-    console.log(`   📊 Como touro_id: ${comoTouro.rows[0].total}`)
+    console.log(`   �Ÿ“Š Como touro_id: ${comoTouro.rows[0].total}`)
 
     // Como doadora_id
     const comoDoadora = await query(`
@@ -45,7 +45,7 @@ async function debugCJCA6Final() {
       WHERE doadora_id = $1
     `, [animal.id])
     
-    console.log(`   📊 Como doadora_id: ${comoDoadora.rows[0].total}`)
+    console.log(`   �Ÿ“Š Como doadora_id: ${comoDoadora.rows[0].total}`)
 
     // Como receptora_id
     const comoReceptora = await query(`
@@ -54,7 +54,7 @@ async function debugCJCA6Final() {
       WHERE receptora_id = $1
     `, [animal.id])
     
-    console.log(`   📊 Como receptora_id: ${comoReceptora.rows[0].total}`)
+    console.log(`   �Ÿ“Š Como receptora_id: ${comoReceptora.rows[0].total}`)
 
     // 3. Verificar por nome/texto
     console.log('\n3. Verificando por nome/texto:')
@@ -65,7 +65,7 @@ async function debugCJCA6Final() {
       WHERE touro ILIKE '%CJCA%6%' OR touro ILIKE '%853%'
     `)
     
-    console.log(`   📊 Por nome no campo touro: ${porNomeTouro.rows[0].total}`)
+    console.log(`   �Ÿ“Š Por nome no campo touro: ${porNomeTouro.rows[0].total}`)
 
     const porNomeDoadora = await query(`
       SELECT COUNT(*) as total
@@ -73,7 +73,7 @@ async function debugCJCA6Final() {
       WHERE doadora_nome ILIKE '%CJCA%6%' OR doadora_nome ILIKE '%853%'
     `)
     
-    console.log(`   📊 Por nome no campo doadora_nome: ${porNomeDoadora.rows[0].total}`)
+    console.log(`   �Ÿ“Š Por nome no campo doadora_nome: ${porNomeDoadora.rows[0].total}`)
 
     const porNomeReceptora = await query(`
       SELECT COUNT(*) as total
@@ -81,7 +81,7 @@ async function debugCJCA6Final() {
       WHERE receptora_nome ILIKE '%CJCA%6%' OR receptora_nome ILIKE '%853%'
     `)
     
-    console.log(`   📊 Por nome no campo receptora_nome: ${porNomeReceptora.rows[0].total}`)
+    console.log(`   �Ÿ“Š Por nome no campo receptora_nome: ${porNomeReceptora.rows[0].total}`)
 
     // 4. Listar TODAS as transferências que podem estar relacionadas
     console.log('\n4. Listando transferências relacionadas:')
@@ -101,7 +101,7 @@ async function debugCJCA6Final() {
     `, [animal.id])
     
     if (todasRelacionadas.rows.length > 0) {
-      console.log(`   ❌ Encontradas ${todasRelacionadas.rows.length} transferências relacionadas:`)
+      console.log(`   �Œ Encontradas ${todasRelacionadas.rows.length} transferências relacionadas:`)
       todasRelacionadas.rows.forEach((te, index) => {
         console.log(`   ${index + 1}. ID: ${te.id}`)
         console.log(`      Touro: "${te.touro}" (ID: ${te.touro_id})`)
@@ -111,12 +111,12 @@ async function debugCJCA6Final() {
         console.log('')
       })
     } else {
-      console.log(`   ✅ Nenhuma transferência relacionada encontrada`)
+      console.log(`   �œ… Nenhuma transferência relacionada encontrada`)
     }
 
-    // 5. LIMPEZA FORÇADA - Remover TODAS as vinculações
+    // 5. LIMPEZA FOR�‡ADA - Remover TODAS as vinculações
     if (todasRelacionadas.rows.length > 0) {
-      console.log('5. LIMPEZA FORÇADA - Removendo TODAS as vinculações:')
+      console.log('5. LIMPEZA FOR�‡ADA - Removendo TODAS as vinculações:')
       
       // Remover por ID
       await query(`
@@ -137,7 +137,7 @@ async function debugCJCA6Final() {
         WHERE receptora_id = $1
       `, [animal.id])
       
-      console.log(`   ✅ Vinculações por ID removidas`)
+      console.log(`   �œ… Vinculações por ID removidas`)
       
       // Remover por nome (se houver)
       const nomeUpdates = await query(`
@@ -164,7 +164,7 @@ async function debugCJCA6Final() {
         RETURNING id
       `)
       
-      console.log(`   ✅ ${nomeUpdates.rows.length} registros de nome atualizados`)
+      console.log(`   �œ… ${nomeUpdates.rows.length} registros de nome atualizados`)
     }
 
     // 6. Verificação final
@@ -184,14 +184,14 @@ async function debugCJCA6Final() {
          OR receptora_nome ILIKE '%853%'
     `, [animal.id])
     
-    console.log(`   📊 Transferências ainda relacionadas: ${verificacaoFinal.rows[0].total}`)
+    console.log(`   �Ÿ“Š Transferências ainda relacionadas: ${verificacaoFinal.rows[0].total}`)
 
     // 7. Testar a API como o frontend faria
     console.log('\n7. Simulando busca da API:')
     
     // Simular a busca que a API faz
     const searchTerm = animal.rg || animal.nome
-    console.log(`   🔍 Termo de busca: "${searchTerm}"`)
+    console.log(`   �Ÿ”� Termo de busca: "${searchTerm}"`)
     
     const apiSimulation = await query(`
       SELECT * FROM transferencias_embrioes 
@@ -199,35 +199,35 @@ async function debugCJCA6Final() {
       ORDER BY data_te DESC
     `)
     
-    console.log(`   📊 Resultados da simulação API: ${apiSimulation.rows.length}`)
+    console.log(`   �Ÿ“Š Resultados da simulação API: ${apiSimulation.rows.length}`)
     
     if (apiSimulation.rows.length > 0) {
-      console.log(`   ❌ A API ainda encontraria ${apiSimulation.rows.length} transferências!`)
+      console.log(`   �Œ A API ainda encontraria ${apiSimulation.rows.length} transferências!`)
       apiSimulation.rows.forEach((te, index) => {
         console.log(`   ${index + 1}. "${te.touro}" - Status: ${te.status}`)
       })
     } else {
-      console.log(`   ✅ A API não encontraria nenhuma transferência`)
+      console.log(`   �œ… A API não encontraria nenhuma transferência`)
     }
 
     // 8. Verificar cache/sessão
     console.log('\n8. Recomendações para limpeza de cache:')
-    console.log('   🔄 Limpe o cache do navegador (Ctrl+Shift+Del)')
-    console.log('   🔄 Faça um hard refresh (Ctrl+F5)')
-    console.log('   🔄 Abra uma aba anônima/privada')
-    console.log('   🔄 Reinicie o servidor se necessário')
+    console.log('   �Ÿ”„ Limpe o cache do navegador (Ctrl+Shift+Del)')
+    console.log('   �Ÿ”„ Faça um hard refresh (Ctrl+F5)')
+    console.log('   �Ÿ”„ Abra uma aba anônima/privada')
+    console.log('   �Ÿ”„ Reinicie o servidor se necessário')
 
-    console.log('\n✅ Debug concluído!')
+    console.log('\n�œ… Debug concluído!')
 
   } catch (error) {
-    console.error('❌ Erro durante debug:', error)
+    console.error('�Œ Erro durante debug:', error)
   }
 }
 
 // Executar
 debugCJCA6Final()
   .then(() => {
-    console.log('\n🎯 DEBUG FINAL CONCLUÍDO')
+    console.log('\n�ŸŽ� DEBUG FINAL CONCLUÍDO')
     process.exit(0)
   })
   .catch(error => {

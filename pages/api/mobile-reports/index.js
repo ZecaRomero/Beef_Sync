@@ -1,47 +1,47 @@
 /**
- * API para relatórios visíveis no mobile.
+ * API para relatÃ³rios visÃ­veis no mobile.
  * GET sem params: retorna config (enabled + allTypes)
- * GET ?tipo=X&startDate=&endDate=: retorna dados do relatório
+ * GET ?tipo=X&startDate=&endDate=: retorna dados do relatÃ³rio
  */
 import { query } from '../../../lib/database'
 import { sendSuccess, sendError, sendMethodNotAllowed } from '../../../utils/apiResponse'
 
 const TIPOS_RELATORIOS = [
-  { key: 'resumo_geral', label: '📊 Visão Geral', category: 'Gestão' },
-  { key: 'agenda_atividades', label: 'Agenda de Atividades', category: 'Gestão' },
-  { key: 'femeas_brucelose', label: '💉 Fêmeas para Brucelose', category: 'Sanidade' },
-  { key: 'animais_dgt', label: '📋 Animais para DGT', category: 'Sanidade' },
+  { key: 'resumo_geral', label: 'ðÅ¸â€œÅ  VisÃ£o Geral', category: 'GestÃ£o' },
+  { key: 'agenda_atividades', label: 'Agenda de Atividades', category: 'GestÃ£o' },
+  { key: 'femeas_brucelose', label: 'ðÅ¸â€™â€° FÃªmeas para Brucelose', category: 'Sanidade' },
+  { key: 'animais_dgt', label: 'ðÅ¸â€œâ€¹ Animais para DGT', category: 'Sanidade' },
   { key: 'pesagens', label: 'Pesagens', category: 'Manejo' },
   { key: 'resumo_pesagens', label: 'Resumo de Pesagens', category: 'Manejo' },
-  { key: 'inseminacoes', label: 'Inseminações', category: 'Reprodução' },
-  { key: 'resumo_femeas_ia', label: 'Resumo de Fêmeas IA', category: 'Reprodução' },
-  { key: 'gestacoes', label: 'Gestações', category: 'Reprodução' },
-  { key: 'nascimentos', label: 'Nascimentos', category: 'Reprodução' },
-  { key: 'resumo_nascimentos', label: 'Resumo de Nascimentos', category: 'Reprodução' },
-  { key: 'previsoes_parto', label: 'Previsões de Parto', category: 'Reprodução' },
-  { key: 'exames_andrologicos', label: 'Exames Andrológicos', category: 'Reprodução' },
-  { key: 'transferencias_embrioes', label: 'Transferências de Embriões', category: 'Reprodução' },
-  { key: 'coleta_fiv', label: 'Coleta FIV', category: 'Reprodução' },
-  { key: 'receptoras_chegaram', label: 'Receptoras que Chegaram', category: 'Reprodução' },
-  { key: 'receptoras_faltam_parir', label: 'Receptoras que Faltam Parir', category: 'Reprodução' },
-  { key: 'receptoras_faltam_diagnostico', label: 'Receptoras que Faltam Diagnóstico', category: 'Reprodução' },
-  { key: 'calendario_reprodutivo', label: 'Calendário Reprodutivo', category: 'Reprodução' },
+  { key: 'inseminacoes', label: 'InseminaÃ§Ãµes', category: 'ReproduÃ§Ã£o' },
+  { key: 'resumo_femeas_ia', label: 'Resumo de FÃªmeas IA', category: 'ReproduÃ§Ã£o' },
+  { key: 'gestacoes', label: 'GestaÃ§Ãµes', category: 'ReproduÃ§Ã£o' },
+  { key: 'nascimentos', label: 'Nascimentos', category: 'ReproduÃ§Ã£o' },
+  { key: 'resumo_nascimentos', label: 'Resumo de Nascimentos', category: 'ReproduÃ§Ã£o' },
+  { key: 'previsoes_parto', label: 'PrevisÃµes de Parto', category: 'ReproduÃ§Ã£o' },
+  { key: 'exames_andrologicos', label: 'Exames AndrolÃ³gicos', category: 'ReproduÃ§Ã£o' },
+  { key: 'transferencias_embrioes', label: 'TransferÃªncias de EmbriÃµes', category: 'ReproduÃ§Ã£o' },
+  { key: 'coleta_fiv', label: 'Coleta FIV', category: 'ReproduÃ§Ã£o' },
+  { key: 'receptoras_chegaram', label: 'Receptoras que Chegaram', category: 'ReproduÃ§Ã£o' },
+  { key: 'receptoras_faltam_parir', label: 'Receptoras que Faltam Parir', category: 'ReproduÃ§Ã£o' },
+  { key: 'receptoras_faltam_diagnostico', label: 'Receptoras que Faltam DiagnÃ³stico', category: 'ReproduÃ§Ã£o' },
+  { key: 'calendario_reprodutivo', label: 'CalendÃ¡rio Reprodutivo', category: 'ReproduÃ§Ã£o' },
   { key: 'mortes', label: 'Mortes', category: 'Sanidade' },
-  { key: 'vacinacoes', label: 'Vacinações', category: 'Sanidade' },
-  { key: 'ocorrencias', label: 'Ocorrências', category: 'Sanidade' },
-  { key: 'estoque_semen', label: 'Estoque de Sêmen', category: 'Estoque' },
-  { key: 'estoque_embrioes', label: 'Estoque de Embriões', category: 'Estoque' },
-  { key: 'abastecimento_nitrogenio', label: 'Abastecimento de Nitrogênio', category: 'Estoque' },
-  { key: 'animais_piquetes', label: 'Animais por Piquete', category: 'Localização' },
+  { key: 'vacinacoes', label: 'VacinaÃ§Ãµes', category: 'Sanidade' },
+  { key: 'ocorrencias', label: 'OcorrÃªncias', category: 'Sanidade' },
+  { key: 'estoque_semen', label: 'Estoque de SÃªmen', category: 'Estoque' },
+  { key: 'estoque_embrioes', label: 'Estoque de EmbriÃµes', category: 'Estoque' },
+  { key: 'abastecimento_nitrogenio', label: 'Abastecimento de NitrogÃªnio', category: 'Estoque' },
+  { key: 'animais_piquetes', label: 'Animais por Piquete', category: 'LocalizaÃ§Ã£o' },
   { key: 'notas_fiscais', label: 'Notas Fiscais', category: 'Documentos' },
-  { key: 'movimentacoes_financeiras', label: 'Movimentações Financeiras', category: 'Financeiro' },
+  { key: 'movimentacoes_financeiras', label: 'MovimentaÃ§Ãµes Financeiras', category: 'Financeiro' },
   { key: 'custos', label: 'Custos', category: 'Financeiro' },
-  { key: 'ranking_animais_avaliados', label: 'Ranking dos Animais Avaliados', category: 'Gestão' },
-  { key: 'ranking_pmgz', label: '🏆 Ranking de animais', category: 'Gestão' },
-  { key: 'ranking_mgte', label: '🏆 Ranking MGTe', category: 'Gestão' },
-  { key: 'boletim_rebanho', label: 'Boletim do Rebanho', category: 'Gestão' },
-  { key: 'boletim_defesa', label: '📋 Boletim Defesa', category: 'Gestão' },
-  { key: 'boletim_campo', label: '📋 Boletim Campo', category: 'Gestão' }
+  { key: 'ranking_animais_avaliados', label: 'Ranking dos Animais Avaliados', category: 'GestÃ£o' },
+  { key: 'ranking_pmgz', label: 'ðÅ¸�â€  Ranking de animais', category: 'GestÃ£o' },
+  { key: 'ranking_mgte', label: 'ðÅ¸�â€  Ranking MGTe', category: 'GestÃ£o' },
+  { key: 'boletim_rebanho', label: 'Boletim do Rebanho', category: 'GestÃ£o' },
+  { key: 'boletim_defesa', label: 'ðÅ¸â€œâ€¹ Boletim Defesa', category: 'GestÃ£o' },
+  { key: 'boletim_campo', label: 'ðÅ¸â€œâ€¹ Boletim Campo', category: 'GestÃ£o' }
 ]
 
 async function getEnabled() {
@@ -73,11 +73,11 @@ function validarDataRange(str) {
 }
 
 // Filtrar nomes de touros (LANDROVER, MALCOM SANT ANNA, etc.) que foram cadastrados como piquete por engano.
-// Só retorna true para locais reais: PIQUETE 1-99, PROJETO X, CONFINA, etc.
+// SÃ³ retorna true para locais reais: PIQUETE 1-99, PROJETO X, CONFINA, etc.
 function ehPiqueteValido(nome) {
   if (!nome || typeof nome !== 'string') return false
   const n = nome.trim()
-  if (!n || /^(VAZIO|NÃO INFORMADO|NAO INFORMADO|-)$/i.test(n)) return false
+  if (!n || /^(VAZIO|NÃÆ’O INFORMADO|NAO INFORMADO|-)$/i.test(n)) return false
   if (/^PIQUETE\s+(\d+|CABANHA|CONF|GUARITA|PISTA)$/i.test(n)) return true
   if (/^PROJETO\s+[\dA-Za-z\-]+$/i.test(n)) return true
   if (/^CONFINA$/i.test(n)) return true
@@ -87,14 +87,14 @@ function ehPiqueteValido(nome) {
 }
 
 function piqueteOuNaoInformado(val) {
-  return (val && ehPiqueteValido(val)) ? val : 'Não informado'
+  return (val && ehPiqueteValido(val)) ? val : 'NÃ£o informado'
 }
 
 function formatarSexo(sexo) {
   if (!sexo) return '-'
   const s = String(sexo).trim().toUpperCase()
   if (s.startsWith('M') || s === 'M') return 'Macho'
-  if (s.startsWith('F') || s === 'F') return 'Fêmea'
+  if (s.startsWith('F') || s === 'F') return 'FÃªmea'
   return sexo
 }
 
@@ -127,11 +127,11 @@ export default async function handler(req, res) {
       })
     }
 
-    // Verificar se o tipo está habilitado (quando vazio, permite todos)
+    // Verificar se o tipo estÃ¡ habilitado (quando vazio, permite todos)
     const allKeys = TIPOS_RELATORIOS.map(t => t.key)
     const enabledEffective = enabled.length > 0 ? [...new Set([...enabled, 'resumo_geral'])] : allKeys
     if (!enabledEffective.includes(tipo)) {
-      return sendError(res, 'Relatório não disponível para mobile', 403)
+      return sendError(res, 'RelatÃ³rio nÃ£o disponÃ­vel para mobile', 403)
     }
 
     const hoje = new Date()
@@ -169,7 +169,7 @@ export default async function handler(req, res) {
               SELECT 
                 COUNT(*) as total,
                 COUNT(CASE WHEN sexo = 'Macho' THEN 1 END) as machos,
-                COUNT(CASE WHEN sexo = 'Fêmea' THEN 1 END) as femeas,
+                COUNT(CASE WHEN sexo = 'FÃªmea' THEN 1 END) as femeas,
                 COUNT(CASE WHEN data_nascimento > NOW() - INTERVAL '12 months' THEN 1 END) as bezerros,
                 COUNT(CASE WHEN data_nascimento <= NOW() - INTERVAL '12 months' AND data_nascimento > NOW() - INTERVAL '24 months' THEN 1 END) as novilhas,
                 COUNT(CASE WHEN data_nascimento <= NOW() - INTERVAL '24 months' THEN 1 END) as adultos
@@ -179,11 +179,11 @@ export default async function handler(req, res) {
             statsRebanho = qRebanho.rows[0]
           }
 
-          // 2. Reprodução (Gestações Ativas) - gestacoes + inseminacoes prenhas
+          // 2. ReproduÃ§Ã£o (GestaÃ§Ãµes Ativas) - gestacoes + inseminacoes prenhas
           let gestacoesAtivas = 0
           try {
             const qGestacoes = await query(`
-              SELECT COUNT(*) as total FROM gestacoes WHERE situacao IN ('Ativa', 'Em Gestação')
+              SELECT COUNT(*) as total FROM gestacoes WHERE situacao IN ('Ativa', 'Em GestaÃ§Ã£o')
             `)
             gestacoesAtivas = parseInt(qGestacoes.rows[0]?.total || 0, 10)
           } catch (_) {}
@@ -211,15 +211,15 @@ export default async function handler(req, res) {
           } catch (_) {}
           const totalGestacoesAtivas = gestacoesAtivas + prenhasIA
           
-          // 3. Nascimentos (no período)
+          // 3. Nascimentos (no perÃ­odo)
           const qNascimentos = await query(`
             SELECT COUNT(*) as total
             FROM nascimentos
             WHERE data_nascimento >= $1 AND data_nascimento <= $2
           `, [start, end])
 
-          // 4. Peso Médio (Última pesagem de animais ativos)
-          // Aproximação: média das últimas pesagens dos últimos 90 dias
+          // 4. Peso MÃ©dio (ÃÅ¡ltima pesagem de animais ativos)
+          // AproximaÃ§Ã£o: mÃ©dia das Ãºltimas pesagens dos Ãºltimos 90 dias
           const qPeso = await query(`
             SELECT AVG(p.peso) as media
             FROM pesagens p
@@ -228,16 +228,16 @@ export default async function handler(req, res) {
               AND p.data >= NOW() - INTERVAL '90 days'
           `)
 
-          // 5. Financeiro (Custos e Vendas no período)
-          // Custos (Excluindo Nutrição/Alimentação conforme solicitado)
+          // 5. Financeiro (Custos e Vendas no perÃ­odo)
+          // Custos (Excluindo NutriÃ§Ã£o/AlimentaÃ§Ã£o conforme solicitado)
           const qCustos = await query(`
             SELECT SUM(valor) as total
             FROM custos
             WHERE data >= $1 AND data <= $2
-              AND tipo NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação')
+              AND tipo NOT IN ('AlimentaÃ§Ã£o', 'NutriÃ§Ã£o', 'RaÃ§Ã£o', 'SuplementaÃ§Ã£o')
           `, [start, end])
           
-          // Vendas (Animais vendidos ou notas de saída)
+          // Vendas (Animais vendidos ou notas de saÃ­da)
           // Tentando pegar de animais vendidos primeiro
           const qVendasAnimais = await query(`
             SELECT SUM(valor_venda) as total
@@ -245,7 +245,7 @@ export default async function handler(req, res) {
             WHERE situacao = 'Vendido' AND updated_at >= $1 AND updated_at <= $2
           `, [start, end])
 
-          // 6. Sanidade (Vacinas no período)
+          // 6. Sanidade (Vacinas no perÃ­odo)
           let vacinasTotal = 0
           try {
             const qVacinas = await query(`
@@ -254,7 +254,7 @@ export default async function handler(req, res) {
             vacinasTotal = parseInt(qVacinas.rows[0]?.total || 0)
           } catch (e) { console.log('Sem tabela vacinacoes ou erro', e.message) }
 
-          // 7. Mortes (no período)
+          // 7. Mortes (no perÃ­odo)
           let mortesTotal = 0
           try {
              const qMortes = await query(`
@@ -263,7 +263,7 @@ export default async function handler(req, res) {
              mortesTotal = parseInt(qMortes.rows[0]?.total || 0)
           } catch (e) { console.log('Sem tabela mortes ou erro', e.message) }
 
-          // 8. Top Piquetes (Ocupação Atual) - usar localizacoes_animais (igual ao app)
+          // 8. Top Piquetes (OcupaÃ§Ã£o Atual) - usar localizacoes_animais (igual ao app)
           let topPiquetes = []
           try {
             const qPiquetes = await query(`
@@ -284,11 +284,11 @@ export default async function handler(req, res) {
               .map(r => ({ label: r.piquete.trim(), valor: parseInt(r.qtd) }))
           } catch (e) { console.log('Erro top piquetes', e.message) }
 
-          // 9. Previsão de Partos (Próximos 30 dias)
+          // 9. PrevisÃ£o de Partos (PrÃ³ximos 30 dias)
           let partosPrevistos = 0
           try {
-             // Gestação bovina ~290 dias (ou 9 meses e meio). 
-             // Buscamos gestações ativas onde (data_cobertura + 290 dias) está entre hoje e hoje+30
+             // GestaÃ§Ã£o bovina ~290 dias (ou 9 meses e meio). 
+             // Buscamos gestaÃ§Ãµes ativas onde (data_cobertura + 290 dias) estÃ¡ entre hoje e hoje+30
              const qPartos = await query(`
                SELECT COUNT(*) as total 
                FROM gestacoes 
@@ -298,18 +298,18 @@ export default async function handler(req, res) {
              partosPrevistos = parseInt(qPartos.rows[0]?.total || 0)
           } catch (e) { console.log('Erro previsao partos', e.message) }
 
-          // 10. Feed de Últimas Atividades (Recentes)
+          // 10. Feed de ÃÅ¡ltimas Atividades (Recentes)
           let ultimasAtividades = []
           try {
-            // Union de Pesagens, Nascimentos, Vacinações (Serviços se tiver, ou vacinacoes tab)
+            // Union de Pesagens, Nascimentos, VacinaÃ§Ãµes (ServiÃ§os se tiver, ou vacinacoes tab)
             // Assumindo tabelas: pesagens, nascimentos, vacinacoes
             const qFeed = await query(`
               SELECT * FROM (
                 SELECT 'Pesagem' as tipo, 'Animal ID ' || animal_id || ': ' || peso || 'kg' as detalhe, data as data_evento FROM pesagens
                 UNION ALL
-                SELECT 'Nascimento' as tipo, 'Série ' || serie || ' (' || sexo || ')' as detalhe, data_nascimento as data_evento FROM nascimentos
+                SELECT 'Nascimento' as tipo, 'SÃ©rie ' || serie || ' (' || sexo || ')' as detalhe, data_nascimento as data_evento FROM nascimentos
                 UNION ALL
-                SELECT 'Vacinação' as tipo, 'Animal ID ' || animal_id as detalhe, data_vacinacao as data_evento FROM vacinacoes
+                SELECT 'VacinaÃ§Ã£o' as tipo, 'Animal ID ' || animal_id as detalhe, data_vacinacao as data_evento FROM vacinacoes
               ) as combined
               ORDER BY data_evento DESC
               LIMIT 7
@@ -317,7 +317,7 @@ export default async function handler(req, res) {
             ultimasAtividades = qFeed.rows
           } catch (e) { console.log('Erro feed atividades', e.message) }
 
-          // 11. Estoque de Sêmen e Embriões — totais para o resumo
+          // 11. Estoque de SÃªmen e EmbriÃµes ââ‚¬â€� totais para o resumo
           let totalTouros = 0, totalDosesSemen = 0, totalAcasalamentos = 0, totalDosesEmbriao = 0
           try {
             const qSemenResumo = await query(`
@@ -376,23 +376,23 @@ export default async function handler(req, res) {
             }
           }
 
-          // Dados estruturados em Módulos para os Cards do Mobile
+          // Dados estruturados em MÃ³dulos para os Cards do Mobile
           const modules = [
             {
               modulo: 'Rebanho',
               dados: {
                 'Total': statsRebanho.total || 0,
                 'Machos': statsRebanho.machos || 0,
-                'Fêmeas': statsRebanho.femeas || 0,
+                'FÃªmeas': statsRebanho.femeas || 0,
                 'Bezerros': statsRebanho.bezerros || 0,
                 'Novilhas': statsRebanho.novilhas || 0,
                 'Adultos': statsRebanho.adultos || 0
               }
             },
             {
-              modulo: 'Reprodução',
+              modulo: 'ReproduÃ§Ã£o',
               dados: {
-                'Gestações Ativas': totalGestacoesAtivas,
+                'GestaÃ§Ãµes Ativas': totalGestacoesAtivas,
                 'Para Parir (30d)': partosPrevistos,
                 'Nascimentos': parseInt(qNascimentos.rows[0]?.total || 0)
               }
@@ -400,7 +400,7 @@ export default async function handler(req, res) {
             {
               modulo: 'Peso',
               dados: {
-                'Média Recente': (parseFloat(qPeso.rows[0]?.media || 0).toFixed(1)) + ' kg'
+                'MÃ©dia Recente': (parseFloat(qPeso.rows[0]?.media || 0).toFixed(1)) + ' kg'
               }
             },
             {
@@ -416,7 +416,7 @@ export default async function handler(req, res) {
             modules.push({
               modulo: 'Sanidade',
               dados: {
-                'Vacinações': vacinasTotal,
+                'VacinaÃ§Ãµes': vacinasTotal,
                 'Mortes': mortesTotal
               }
             })
@@ -426,48 +426,48 @@ export default async function handler(req, res) {
             modules.push({
               modulo: 'Estoque',
               dados: {
-                'Touros (sêmen)': totalTouros,
-                'Doses Sêmen': totalDosesSemen,
+                'Touros (sÃªmen)': totalTouros,
+                'Doses SÃªmen': totalDosesSemen,
                 'Acasalamentos': totalAcasalamentos,
-                'Embriões Disp.': totalDosesEmbriao
+                'EmbriÃµes Disp.': totalDosesEmbriao
               }
             })
           }
 
-          // Dados para gráficos
+          // Dados para grÃ¡ficos
           const chartData = [
             { label: 'Bezerros (0-12m)', valor: statsRebanho.bezerros, categoria: 'Idade' },
             { label: 'Novilhas/os (12-24m)', valor: statsRebanho.novilhas, categoria: 'Idade' },
             { label: 'Adultos (>24m)', valor: statsRebanho.adultos, categoria: 'Idade' },
             { label: 'Machos', valor: statsRebanho.machos, categoria: 'Sexo' },
-            { label: 'Fêmeas', valor: statsRebanho.femeas, categoria: 'Sexo' }
+            { label: 'FÃªmeas', valor: statsRebanho.femeas, categoria: 'Sexo' }
           ]
           
           // Retornar modules em data (para os cards) e chartData em graficos
           // Hack: Atribuir modules a data para compatibilidade com o frontend atual
           data = modules
-          // Adicionar propriedade extra ao objeto data se fosse array, mas JS arrays são objetos
+          // Adicionar propriedade extra ao objeto data se fosse array, mas JS arrays sÃ£o objetos
           // Melhor retornar um objeto wrapper no json final, mas a estrutura espera { data: ... }
-          // Vou injetar 'graficos' no json final modificando a logica de retorno lá embaixo ou aqui
+          // Vou injetar 'graficos' no json final modificando a logica de retorno lÃ¡ embaixo ou aqui
           
-          // A estrutura de retorno padrão é res.json({ data: data, resumo: resumo })
+          // A estrutura de retorno padrÃ£o Ã© res.json({ data: data, resumo: resumo })
           // Vou retornar data = modules. E vou adicionar graficos no resumo ou em um campo extra se eu puder alterar o handler
           
           // Workaround: Anexar graficos ao primeiro item de data ou usar um campo especial
-          // Mas o ideal é retornar { data: modules, graficos: chartData }
-          // O handler lá embaixo faz: return sendSuccess(res, { data, resumo }) -> que vira { success: true, data: { data, resumo } } ??
-          // Não, sendSuccess(res, payload) -> { success: true, data: payload } se payload for array?
-          // Ver utils/apiResponse.js se possível. Mas geralmente é res.json({ success: true, data: ... })
+          // Mas o ideal Ã© retornar { data: modules, graficos: chartData }
+          // O handler lÃ¡ embaixo faz: return sendSuccess(res, { data, resumo }) -> que vira { success: true, data: { data, resumo } } ??
+          // NÃ£o, sendSuccess(res, payload) -> { success: true, data: payload } se payload for array?
+          // Ver utils/apiResponse.js se possÃ­vel. Mas geralmente Ã© res.json({ success: true, data: ... })
           
           // O handler atual faz:
           // return sendSuccess(res, { data, resumo }) se eu mudar a variavel data para ser os modulos.
           // Vou adicionar a propriedade graficos ao objeto de retorno.
           
-          // Mas 'data' é declarado como let data = [].
-          // Se eu atribuir data = modules, o retorno será { data: modules, resumo: ... }
-          // Eu preciso passar 'graficos' também.
+          // Mas 'data' Ã© declarado como let data = [].
+          // Se eu atribuir data = modules, o retorno serÃ¡ { data: modules, resumo: ... }
+          // Eu preciso passar 'graficos' tambÃ©m.
           
-          // Vou monkey-patch o objeto de resposta dentro deste bloco se possível, mas o return está no fim da função.
+          // Vou monkey-patch o objeto de resposta dentro deste bloco se possÃ­vel, mas o return estÃ¡ no fim da funÃ§Ã£o.
           // Vou adicionar 'graficos' ao objeto 'resumo' por enquanto, ou melhor:
           resumo.graficos = chartData
 
@@ -482,12 +482,12 @@ export default async function handler(req, res) {
 
       case 'agenda_atividades': {
         try {
-          // Buscar eventos de Brucelose e DGT usando a mesma lógica da API agenda-eventos
+          // Buscar eventos de Brucelose e DGT usando a mesma lÃ³gica da API agenda-eventos
           const hoje = new Date()
           const mesAtual = hoje.getMonth() + 1
           const anoAtual = hoje.getFullYear()
           
-          // Brucelose: Fêmeas entre 3 e 8 meses (90-240 dias) sem vacina prévia
+          // Brucelose: FÃªmeas entre 3 e 8 meses (90-240 dias) sem vacina prÃ©via
           const bruceloseQuery = await query(`
             SELECT 
               a.id, a.serie, a.rg, a.sexo, a.raca, a.data_nascimento,
@@ -506,7 +506,7 @@ export default async function handler(req, res) {
               ORDER BY data DESC LIMIT 1
             ) p ON TRUE
             WHERE a.situacao = 'Ativo'
-              AND a.sexo = 'Fêmea'
+              AND a.sexo = 'FÃªmea'
               AND (CURRENT_DATE - a.data_nascimento::date) BETWEEN 90 AND 240
               AND NOT EXISTS (
                 SELECT 1 FROM historia_ocorrencias h
@@ -516,7 +516,7 @@ export default async function handler(req, res) {
             ORDER BY a.data_nascimento DESC
           `)
 
-          // DGT: Animais entre 330 e 640 dias que ainda não fizeram a avaliação
+          // DGT: Animais entre 330 e 640 dias que ainda nÃ£o fizeram a avaliaÃ§Ã£o
           const dgtQuery = await query(`
             SELECT 
               a.id, a.serie, a.rg, a.sexo, a.raca, a.data_nascimento,
@@ -557,7 +557,7 @@ export default async function handler(req, res) {
 
           const dgt = dgtQuery.rows.map(r => ({
             ...r,
-            tipo: 'Avaliação DGT',
+            tipo: 'AvaliaÃ§Ã£o DGT',
             categoria: 'dgt',
             idade_meses: Math.floor((r.idade_dias || 0) / 30.44)
           }))
@@ -582,7 +582,7 @@ export default async function handler(req, res) {
 
       case 'femeas_brucelose': {
         try {
-          // Fêmeas entre 3 e 8 meses (90-240 dias) sem vacina prévia
+          // FÃªmeas entre 3 e 8 meses (90-240 dias) sem vacina prÃ©via
           const bruceloseQuery = await query(`
             SELECT 
               a.id, a.serie, a.rg, a.sexo, a.raca, a.data_nascimento,
@@ -601,7 +601,7 @@ export default async function handler(req, res) {
               ORDER BY data DESC LIMIT 1
             ) p ON TRUE
             WHERE a.situacao = 'Ativo'
-              AND a.sexo = 'Fêmea'
+              AND a.sexo = 'FÃªmea'
               AND (CURRENT_DATE - a.data_nascimento::date) BETWEEN 90 AND 240
               AND NOT EXISTS (
                 SELECT 1 FROM historia_ocorrencias h
@@ -617,19 +617,19 @@ export default async function handler(req, res) {
             raca: r.raca,
             idade_dias: r.idade_dias,
             idade_meses: Math.floor((r.idade_dias || 0) / 30.44),
-            piquete: r.piquete || 'Não informado',
+            piquete: r.piquete || 'NÃ£o informado',
             peso: r.peso ? `${r.peso} kg` : '-',
             data_nascimento: toDateStr(r.data_nascimento)
           }))
 
           resumo = {
-            'Total de fêmeas': data.length,
+            'Total de fÃªmeas': data.length,
             'Idade': '3-8 meses (90-240 dias)',
             'Status': 'Sem vacina de brucelose'
           }
 
         } catch (e) {
-          console.error('Erro ao buscar fêmeas para brucelose:', e)
+          console.error('Erro ao buscar fÃªmeas para brucelose:', e)
           data = []
           resumo = { erro: 'Falha ao carregar dados' }
         }
@@ -638,7 +638,7 @@ export default async function handler(req, res) {
 
       case 'animais_dgt': {
         try {
-          // Animais entre 330 e 640 dias que ainda não fizeram DGT
+          // Animais entre 330 e 640 dias que ainda nÃ£o fizeram DGT
           const dgtQuery = await query(`
             SELECT 
               a.id, a.serie, a.rg, a.sexo, a.raca, a.data_nascimento,
@@ -676,7 +676,7 @@ export default async function handler(req, res) {
             raca: r.raca,
             idade_dias: r.idade_dias,
             idade_meses: Math.floor((r.idade_dias || 0) / 30.44),
-            piquete: r.piquete || 'Não informado',
+            piquete: r.piquete || 'NÃ£o informado',
             peso: r.peso ? `${r.peso} kg` : '-',
             data_nascimento: toDateStr(r.data_nascimento)
           }))
@@ -684,7 +684,7 @@ export default async function handler(req, res) {
           resumo = {
             'Total de animais': data.length,
             'Idade': '11-21 meses (330-640 dias)',
-            'Tipo': 'Elegíveis para avaliação DGT'
+            'Tipo': 'ElegÃ­veis para avaliaÃ§Ã£o DGT'
           }
 
         } catch (e) {
@@ -722,7 +722,7 @@ export default async function handler(req, res) {
       case 'resumo_pesagens': {
         function extrairLocal(obs) {
           if (!obs || typeof obs !== 'string') return null
-          const s = obs.trim().replace(/CONFINAÇÃO/gi, 'CONFINA').replace(/CONFINACAO/gi, 'CONFINA')
+          const s = obs.trim().replace(/CONFINAÃâ€¡ÃÆ’O/gi, 'CONFINA').replace(/CONFINACAO/gi, 'CONFINA')
           const m = s.match(/(PIQUETE\s*\d+|PROJETO\s*[\dA-Za-z\-]+|LOTE\s*\d+|CONFINA\w*|GUARITA|CABANHA|PISTA\s*\d*)/i)
           if (m) {
             let loc = m[1].trim().toUpperCase().replace(/\s+/g, ' ')
@@ -732,7 +732,7 @@ export default async function handler(req, res) {
           return s.length <= 35 ? s.toUpperCase() : s.substring(0, 35).toUpperCase()
         }
         function normalizarPiquete(p) {
-          if (!p || p === 'Não informado') return p || 'Não informado'
+          if (!p || p === 'NÃ£o informado') return p || 'NÃ£o informado'
           const s = String(p).trim().toUpperCase()
           const mPiq = s.match(/^PIQUETE\s*(\d+)$/i)
           const mProj = s.match(/^PROJETO\s*([\dA-Za-z\-]+)$/i)
@@ -780,7 +780,7 @@ export default async function handler(req, res) {
         }
         const rows = r.rows || []
 
-        // Última pesagem por animal (para médias por animal)
+        // ÃÅ¡ltima pesagem por animal (para mÃ©dias por animal)
         const porAnimal = {}
         rows.forEach(x => {
           const aid = x.animal_id
@@ -800,11 +800,11 @@ export default async function handler(req, res) {
         const pesosUltima = ultimasPesagens.map(x => parseFloat(x.peso)).filter(n => !isNaN(n))
         const mediaPorAnimal = pesosUltima.length ? (pesosUltima.reduce((a, b) => a + b, 0) / pesosUltima.length).toFixed(1) : '-'
 
-        // Por piquete (fallback: localizacoes_animais -> piquete_atual/pasto_atual do cadastro -> observações)
-        // Filtrar nomes de touros (ex: LANDROVER, MALCOM SANT ANNA) que não são locais
+        // Por piquete (fallback: localizacoes_animais -> piquete_atual/pasto_atual do cadastro -> observaÃ§Ãµes)
+        // Filtrar nomes de touros (ex: LANDROVER, MALCOM SANT ANNA) que nÃ£o sÃ£o locais
         const porPiquete = {}
         ultimasPesagens.forEach(x => {
-          const pBruto = x.piquete_loc || x.piquete_atual || x.pasto_atual || extrairLocal(x.observacoes) || 'Não informado'
+          const pBruto = x.piquete_loc || x.piquete_atual || x.pasto_atual || extrairLocal(x.observacoes) || 'NÃ£o informado'
           const pValidado = piqueteOuNaoInformado(pBruto)
           const p = normalizarPiquete(pValidado)
           if (!porPiquete[p]) porPiquete[p] = { total: 0, machos: 0, femeas: 0, pesos: [], ces: [], animais: [] }
@@ -827,22 +827,22 @@ export default async function handler(req, res) {
           })
         })
 
-        const piquetesValidos = Object.keys(porPiquete).filter(p => !/^(não informado|nao informado|-|vazio)$/i.test(String(p).trim()))
+        const piquetesValidos = Object.keys(porPiquete).filter(p => !/^(nÃ£o informado|nao informado|-|vazio)$/i.test(String(p).trim()))
         resumo = {
           'Total de pesagens': rows.length,
-          'Animais únicos': ultimasPesagens.length,
+          'Animais Ãºnicos': ultimasPesagens.length,
           'Machos': machos.length,
-          'Fêmeas': femeas.length,
+          'FÃªmeas': femeas.length,
           'Piquetes': piquetesValidos.length,
-          'Peso médio geral (kg)': pesos.length ? (pesos.reduce((a, b) => a + b, 0) / pesos.length).toFixed(1) : '-',
-          'Média por animal (kg)': mediaPorAnimal,
-          'Peso mínimo (kg)': pesos.length ? Math.min(...pesos).toFixed(1) : '-',
-          'Peso máximo (kg)': pesos.length ? Math.max(...pesos).toFixed(1) : '-',
-          'CE média (cm)': ces.length ? (ces.reduce((a, b) => a + b, 0) / ces.length).toFixed(1) : '-'
+          'Peso mÃ©dio geral (kg)': pesos.length ? (pesos.reduce((a, b) => a + b, 0) / pesos.length).toFixed(1) : '-',
+          'MÃ©dia por animal (kg)': mediaPorAnimal,
+          'Peso mÃ­nimo (kg)': pesos.length ? Math.min(...pesos).toFixed(1) : '-',
+          'Peso mÃ¡ximo (kg)': pesos.length ? Math.max(...pesos).toFixed(1) : '-',
+          'CE mÃ©dia (cm)': ces.length ? (ces.reduce((a, b) => a + b, 0) / ces.length).toFixed(1) : '-'
         }
 
         data = Object.keys(porPiquete)
-          .filter(p => !/^(não informado|nao informado|-|vazio)$/i.test(String(p).trim()))
+          .filter(p => !/^(nÃ£o informado|nao informado|-|vazio)$/i.test(String(p).trim()))
           .sort()
           .map(p => {
             const s = porPiquete[p]
@@ -855,11 +855,11 @@ export default async function handler(req, res) {
               piquete: p,
               Animais: s.total,
               Machos: s.machos,
-              Fêmeas: s.femeas,
-              'Média Peso (kg)': mediaPeso,
+              FÃªmeas: s.femeas,
+              'MÃ©dia Peso (kg)': mediaPeso,
               'Peso Min (kg)': pesoMinP,
               'Peso Max (kg)': pesoMaxP,
-              'Média CE (cm)': mediaCE,
+              'MÃ©dia CE (cm)': mediaCE,
               animais: s.animais || []
             }
           })
@@ -913,7 +913,7 @@ export default async function handler(req, res) {
 
         let r
         if (temResultadoDg || temStatusGestacao) {
-          // P, Prenha, Prenhez, Positivo e variações (DG costuma usar P ou Positivo)
+          // P, Prenha, Prenhez, Positivo e variaÃ§Ãµes (DG costuma usar P ou Positivo)
           const prenhaCond = [
             temResultadoDg && "(TRIM(COALESCE(resultado_dg,'')) = 'P' OR LOWER(COALESCE(resultado_dg,'')) LIKE '%pren%' OR LOWER(COALESCE(resultado_dg,'')) LIKE '%positivo%')",
             temStatusGestacao && "(TRIM(COALESCE(status_gestacao,'')) = 'P' OR LOWER(COALESCE(status_gestacao,'')) LIKE '%pren%' OR LOWER(COALESCE(status_gestacao,'')) LIKE '%positivo%')"
@@ -992,7 +992,7 @@ export default async function handler(req, res) {
             animal_id: row.animal_id
           }))
 
-          // Incluir inseminações prenhas (IA) quando tabela gestacoes vazia ou para complementar
+          // Incluir inseminaÃ§Ãµes prenhas (IA) quando tabela gestacoes vazia ou para complementar
           const colIA = await query(`
             SELECT column_name FROM information_schema.columns
             WHERE table_name = 'inseminacoes' AND column_name IN ('data_ia', 'data_inseminacao', 'data', 'resultado_dg', 'status_gestacao')
@@ -1170,7 +1170,7 @@ export default async function handler(req, res) {
             'Total de abastecimentos': rows.length,
             'Total de litros': totalLitros.toFixed(1) + ' L',
             'Valor total': 'R$ ' + totalValor.toFixed(2),
-            'Média valor/litro': 'R$ ' + mediaValorUnitario.toFixed(2)
+            'MÃ©dia valor/litro': 'R$ ' + mediaValorUnitario.toFixed(2)
           }
           
           data = rows.map(row => ({
@@ -1183,7 +1183,7 @@ export default async function handler(req, res) {
             observacoes: row.observacoes
           }))
         } catch (e) {
-          console.error('Erro ao buscar abastecimento de nitrogênio:', e)
+          console.error('Erro ao buscar abastecimento de nitrogÃªnio:', e)
           data = []
         }
         break
@@ -1216,14 +1216,14 @@ export default async function handler(req, res) {
       case 'previsoes_parto': {
         try {
           const todas = []
-          // 1. Gestações ativas - filtrar por previsão no período (parto previsto)
+          // 1. GestaÃ§Ãµes ativas - filtrar por previsÃ£o no perÃ­odo (parto previsto)
           try {
             const rg = await query(`
               SELECT g.id, g.receptora_nome, g.receptora_serie, g.receptora_rg,
                      g.data_cobertura, g.situacao, g.pai_serie, g.pai_rg,
                      (g.data_cobertura::date + INTERVAL '285 days')::date as previsao
               FROM gestacoes g
-              WHERE (g.situacao = 'Em Gestação' OR g.situacao = 'Ativa' OR g.situacao IS NULL)
+              WHERE (g.situacao = 'Em GestaÃ§Ã£o' OR g.situacao = 'Ativa' OR g.situacao IS NULL)
                 AND (g.data_cobertura::date + INTERVAL '285 days')::date >= $1
                 AND (g.data_cobertura::date + INTERVAL '285 days')::date <= $2
               ORDER BY previsao ASC
@@ -1241,7 +1241,7 @@ export default async function handler(req, res) {
             })
           } catch (_) {}
 
-          // 2. Inseminações prenhas (data_ia + 285 dias)
+          // 2. InseminaÃ§Ãµes prenhas (data_ia + 285 dias)
           try {
             const colCheck = await query(`
               SELECT column_name FROM information_schema.columns
@@ -1274,7 +1274,7 @@ export default async function handler(req, res) {
             }
           } catch (_) {}
 
-          // Ordenar por previsão e limitar
+          // Ordenar por previsÃ£o e limitar
           data = todas
             .sort((a, b) => (a.previsao_parto || '').localeCompare(b.previsao_parto || ''))
             .slice(0, 200)
@@ -1282,14 +1282,14 @@ export default async function handler(req, res) {
           // Resumo: total e por touro
           const porTouro = {}
           data.forEach(d => {
-            const t = (d.touro || 'Não informado').trim() || 'Não informado'
+            const t = (d.touro || 'NÃ£o informado').trim() || 'NÃ£o informado'
             porTouro[t] = (porTouro[t] || 0) + 1
           })
           const totaisTouro = Object.entries(porTouro)
             .sort((a, b) => b[1] - a[1])
             .map(([nome, qtd]) => `${nome}: ${qtd}`)
           resumo = {
-            'Total de previsões': data.length,
+            'Total de previsÃµes': data.length,
             'Prenhas por touro': totaisTouro.slice(0, 10).join(' | ') || '-'
           }
         } catch (e) {
@@ -1327,7 +1327,7 @@ export default async function handler(req, res) {
 
       case 'calendario_reprodutivo': {
         try {
-          // Usar a mesma API do desktop (eventos manuais, receptoras, partos previstos, refazer andrológico)
+          // Usar a mesma API do desktop (eventos manuais, receptoras, partos previstos, refazer androlÃ³gico)
           const protocol = req.headers['x-forwarded-proto'] || (req.connection?.encrypted ? 'https' : 'http')
           const host = req.headers.host || 'localhost:3000'
           const baseUrl = `${protocol}://${host}`
@@ -1339,7 +1339,7 @@ export default async function handler(req, res) {
             animal: row.animal_id ? `${row.animal_serie || ''} ${row.animal_rg || ''}`.trim() || row.animal_nome || '-' : (row.titulo || '-'),
             data: toDateStr(row.data_evento),
             tipo: row.tipo_evento || row.tipo || 'Evento',
-            titulo: row.titulo || 'Sem título',
+            titulo: row.titulo || 'Sem tÃ­tulo',
             descricao: row.descricao || '',
             status: row.status || 'pendente',
             origem: row.origem,
@@ -1355,7 +1355,7 @@ export default async function handler(req, res) {
                 COALESCE((SELECT l2.piquete FROM localizacoes_animais l2 WHERE l2.animal_id = a.id AND l2.data_saida IS NULL ORDER BY l2.data_entrada DESC LIMIT 1), a.piquete_atual, a.pasto_atual) as piquete,
                 (CURRENT_DATE - a.data_nascimento::date)::int as idade_dias
               FROM animais a
-              WHERE a.situacao = 'Ativo' AND a.sexo = 'Fêmea' AND a.data_nascimento IS NOT NULL
+              WHERE a.situacao = 'Ativo' AND a.sexo = 'FÃªmea' AND a.data_nascimento IS NOT NULL
                 AND (CURRENT_DATE - a.data_nascimento::date) BETWEEN 90 AND 240
                 AND NOT EXISTS (
                   SELECT 1 FROM custos c WHERE c.animal_id = a.id AND (c.tipo ILIKE '%brucelose%' OR c.subtipo ILIKE '%brucelose%' OR c.observacoes ILIKE '%brucelose%')
@@ -1374,7 +1374,7 @@ export default async function handler(req, res) {
             `)
             const eventosBruceloseDgt = []
             const addEvento = (a, tipo, dataEv, descBase) => {
-              const piquete = a.piquete || 'Não informado'
+              const piquete = a.piquete || 'NÃ£o informado'
               const ident = `${a.serie || ''} ${a.rg || ''}`.trim() || a.nome || '-'
               eventosBruceloseDgt.push({
                 animal_id: a.id,
@@ -1382,7 +1382,7 @@ export default async function handler(req, res) {
                 data: dataEv,
                 tipo,
                 titulo: `${tipo} - ${ident}`,
-                descricao: `${descBase} • Piquete: ${piquete}` + (a.idade_dias ? (tipo === 'Brucelose' ? ` • ${Math.floor(a.idade_dias / 30)} meses` : ` • ${a.idade_dias} dias`) : ''),
+                descricao: `${descBase} ââ‚¬¢ Piquete: ${piquete}` + (a.idade_dias ? (tipo === 'Brucelose' ? ` ââ‚¬¢ ${Math.floor(a.idade_dias / 30)} meses` : ` ââ‚¬¢ ${a.idade_dias} dias`) : ''),
                 status: 'Agendado',
                 origem: 'agenda'
               })
@@ -1398,8 +1398,8 @@ export default async function handler(req, res) {
               const dataFim = df.toISOString().split('T')[0]
               const entraNoPeriodo = dataInicio >= start && dataInicio <= end
               const jaNaJanela = dataInicio < start && dataFim >= start
-              if (entraNoPeriodo) addEvento(a, 'Brucelose', dataInicio, 'Fêmea na janela 3-8 meses')
-              else if (jaNaJanela) addEvento(a, 'Brucelose', start, 'Fêmea na janela 3-8 meses')
+              if (entraNoPeriodo) addEvento(a, 'Brucelose', dataInicio, 'FÃªmea na janela 3-8 meses')
+              else if (jaNaJanela) addEvento(a, 'Brucelose', start, 'FÃªmea na janela 3-8 meses')
             })
             dgtResult.rows.forEach(a => {
               const dataNasc = a.data_nascimento ? new Date(a.data_nascimento) : null
@@ -1417,10 +1417,10 @@ export default async function handler(req, res) {
             })
             data = [...data, ...eventosBruceloseDgt].sort((a, b) => (a.data || '').localeCompare(b.data || ''))
           } catch (eAgenda) {
-            console.error('Erro ao buscar Brucelose/DGT para calendário:', eAgenda)
+            console.error('Erro ao buscar Brucelose/DGT para calendÃ¡rio:', eAgenda)
           }
         } catch (e) {
-          console.error('Erro ao buscar calendário reprodutivo:', e)
+          console.error('Erro ao buscar calendÃ¡rio reprodutivo:', e)
           data = []
         }
         break
@@ -1453,8 +1453,8 @@ export default async function handler(req, res) {
 
       case 'animais_piquetes': {
         try {
-          // Usar APENAS localizacoes_animais (mesma fonte do app Histórico de Movimentações) para manter app e mobile sincronizados
-          // Tenta iqg/pt_iqg; se colunas não existirem, usa genetica_2/decile_2
+          // Usar APENAS localizacoes_animais (mesma fonte do app HistÃ³rico de MovimentaÃ§Ãµes) para manter app e mobile sincronizados
+          // Tenta iqg/pt_iqg; se colunas nÃ£o existirem, usa genetica_2/decile_2
           let r
           try {
             r = await query(`
@@ -1476,7 +1476,7 @@ export default async function handler(req, res) {
               LIMIT 10000
             `)
           } catch (colErr) {
-            if (/column.*does not exist|coluna.*não existe/i.test(colErr?.message || '')) {
+            if (/column.*does not exist|coluna.*nÃ£o existe/i.test(colErr?.message || '')) {
               r = await query(`
                 SELECT
                   l.piquete,
@@ -1498,7 +1498,7 @@ export default async function handler(req, res) {
             } else throw colErr
           }
 
-          // Buscar última pesagem (peso e CE) de cada animal
+          // Buscar Ãºltima pesagem (peso e CE) de cada animal
           const animalIds = r.rows.map(row => row.animal_id).filter(Boolean)
           let pesagensMap = {}
           if (animalIds.length > 0) {
@@ -1520,10 +1520,10 @@ export default async function handler(req, res) {
             }
           }
 
-          // Agrupar por piquete (apenas piquetes válidos - igual ao app)
+          // Agrupar por piquete (apenas piquetes vÃ¡lidos - igual ao app)
           const porPiquete = {}
           r.rows.forEach(row => {
-            if (!ehPiqueteValido(row.piquete)) return // Ignorar piquetes inválidos para manter sync com app
+            if (!ehPiqueteValido(row.piquete)) return // Ignorar piquetes invÃ¡lidos para manter sync com app
             const piq = row.piquete.trim()
             if (!porPiquete[piq]) {
               porPiquete[piq] = {
@@ -1573,9 +1573,9 @@ export default async function handler(req, res) {
             })
           })
 
-          // Calcular médias e montar resultado (excluir "Não informado")
+          // Calcular mÃ©dias e montar resultado (excluir "NÃ£o informado")
           data = Object.keys(porPiquete)
-            .filter(piq => !/^(não informado|nao informado|-|vazio)$/i.test(piq.trim()))
+            .filter(piq => !/^(nÃ£o informado|nao informado|-|vazio)$/i.test(piq.trim()))
             .sort()
             .map(piq => {
               const info = porPiquete[piq]
@@ -1605,9 +1605,9 @@ export default async function handler(req, res) {
           resumo = {
             'Total de animais': totalAnimais,
             'Total de machos': totalMachos,
-            'Total de fêmeas': totalFemeas,
+            'Total de fÃªmeas': totalFemeas,
             'Piquetes ocupados': Object.keys(porPiquete).length,
-            'Média de peso geral': mediaPesoGeral + (mediaPesoGeral !== '-' ? ' kg' : '')
+            'MÃ©dia de peso geral': mediaPesoGeral + (mediaPesoGeral !== '-' ? ' kg' : '')
           }
         } catch (e) {
           console.error('Erro em animais_piquetes:', e)
@@ -1961,7 +1961,7 @@ export default async function handler(req, res) {
               sexo: formatarSexo(row.sexo),
               piquete: piqueteOuNaoInformado(row.piquete) || '-'
             })),
-            { _resumo: true, tipo: 'ce', titulo: 'Top 10 CE', descricao: 'Maiores circunferências escrotais (machos)' },
+            { _resumo: true, tipo: 'ce', titulo: 'Top 10 CE', descricao: 'Maiores circunferÃªncias escrotais (machos)' },
             ...rankingCE.rows.map((row, i) => ({
               ranking: 'CE',
               posicao: i + 1,
@@ -2051,7 +2051,7 @@ export default async function handler(req, res) {
             laboratorio: row.laboratorio
           }))
           const totalOocitos = data.reduce((s, d) => s + (parseInt(d.oocitos) || 0), 0)
-          resumo = { 'Total de coletas': data.length, 'Total de oócitos': totalOocitos }
+          resumo = { 'Total de coletas': data.length, 'Total de oÃ³citos': totalOocitos }
         } catch (e) {
           data = []
         }
@@ -2157,7 +2157,7 @@ export default async function handler(req, res) {
             resumo = { 'Receptoras aguardando DG': data.length }
           } else {
             data = []
-            resumo = { info: 'Colunas data_chegada/data_dg_prevista não encontradas' }
+            resumo = { info: 'Colunas data_chegada/data_dg_prevista nÃ£o encontradas' }
           }
         } catch (e) {
           data = []
@@ -2240,7 +2240,7 @@ export default async function handler(req, res) {
           }))
           const entradas = data.filter(d => d.tipo === 'entrada').length
           const saidas = data.filter(d => d.tipo === 'saida').length
-          resumo = { 'Entradas': entradas, 'Saídas': saidas, 'Total NFs': data.length }
+          resumo = { 'Entradas': entradas, 'SaÃ­das': saidas, 'Total NFs': data.length }
         } catch (e) {
           data = []
         }
@@ -2274,27 +2274,27 @@ export default async function handler(req, res) {
 
       case 'boletim_rebanho': {
         try {
-          // Usa dados do boletim_campo (mesma fonte do Boletim Campo) para consistência
+          // Usa dados do boletim_campo (mesma fonte do Boletim Campo) para consistÃªncia
           const r = await query(`
             SELECT
-              COALESCE(NULLIF(TRIM(raca), ''), 'Não informado') as raca,
+              COALESCE(NULLIF(TRIM(raca), ''), 'NÃ£o informado') as raca,
               sexo,
               COALESCE(NULLIF(TRIM(era), ''), '-') as era,
               SUM(COALESCE(quant::int, 0)) as total
             FROM boletim_campo
-            GROUP BY COALESCE(NULLIF(TRIM(raca), ''), 'Não informado'), sexo, COALESCE(NULLIF(TRIM(era), ''), '-')
+            GROUP BY COALESCE(NULLIF(TRIM(raca), ''), 'NÃ£o informado'), sexo, COALESCE(NULLIF(TRIM(era), ''), '-')
             HAVING SUM(COALESCE(quant::int, 0)) > 0
             ORDER BY raca, sexo, era
           `)
           data = (r.rows || []).map(row => ({
-            raca: row.raca || 'Não informado',
+            raca: row.raca || 'NÃ£o informado',
             sexo: formatarSexo(row.sexo),
             era: row.era || '-',
             total: parseInt(row.total || 0)
           }))
           const totalAnimais = data.reduce((s, d) => s + (d.total || 0), 0)
           const racasUnicas = [...new Set(data.map(d => d.raca))]
-          resumo = { 'Total de animais': totalAnimais, 'Raças': racasUnicas.length }
+          resumo = { 'Total de animais': totalAnimais, 'RaÃ§as': racasUnicas.length }
           data.push({ raca: 'TOTAL GERAL', sexo: '-', era: '-', total: totalAnimais })
         } catch (e) {
           data = []
@@ -2361,7 +2361,7 @@ export default async function handler(req, res) {
       }
 
       default:
-        return sendError(res, 'Tipo de relatório não implementado para mobile', 400)
+        return sendError(res, 'Tipo de relatÃ³rio nÃ£o implementado para mobile', 400)
     }
 
     return sendSuccess(res, {
@@ -2373,6 +2373,6 @@ export default async function handler(req, res) {
     })
   } catch (err) {
     console.error('Erro mobile-reports:', err)
-    return sendError(res, err.message || 'Erro ao buscar relatório', 500)
+    return sendError(res, err.message || 'Erro ao buscar relatÃ³rio', 500)
   }
 }

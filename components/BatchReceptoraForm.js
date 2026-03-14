@@ -3,7 +3,7 @@ import { fetchAvailableLocations } from '../utils/piqueteUtils'
 import { XMarkIcon, PlusIcon, TrashIcon, CheckIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
 
 export default function BatchReceptoraForm({ isOpen, onClose, onSave }) {
-  // Dados fixos que serão aplicados a todas as receptoras
+  // Dados fixos que serÃ£o aplicados a todas as receptoras
   const [dadosFixos, setDadosFixos] = useState({
     fornecedor: "",
     notaFiscal: "",
@@ -22,7 +22,7 @@ export default function BatchReceptoraForm({ isOpen, onClose, onSave }) {
   const [receptoras, setReceptoras] = useState([]);
   const [availableLocations, setAvailableLocations] = useState([]);
 
-  // Fetch locations (usa utilitário que filtra nomes de touros cadastrados por engano como piquete)
+  // Fetch locations (usa utilitÃ¡rio que filtra nomes de touros cadastrados por engano como piquete)
   useEffect(() => {
     fetchAvailableLocations()
       .then(setAvailableLocations)
@@ -57,7 +57,7 @@ export default function BatchReceptoraForm({ isOpen, onClose, onSave }) {
       setRgAtual("");
       setShowResumo(false);
       
-      // Focar no input de RG após um pequeno delay
+      // Focar no input de RG apÃ³s um pequeno delay
       setTimeout(() => {
         if (rgInputRef.current) {
           rgInputRef.current.focus();
@@ -69,15 +69,15 @@ export default function BatchReceptoraForm({ isOpen, onClose, onSave }) {
   // Adicionar receptora
   const adicionarReceptora = () => {
     if (!rgAtual.trim()) {
-      alert("⚠️ Digite o RG da receptora");
+      alert("âÅ¡ ï¸� Digite o RG da receptora");
       return;
     }
 
-    // Parse Série/RG (flexível para suportar CJCJ 1234, etc)
+    // Parse SÃ©rie/RG (flexÃ­vel para suportar CJCJ 1234, etc)
     let serie = "RPT";
     let rg = rgAtual.toUpperCase();
     
-    // Tenta identificar padrão "SERIE RG" ou "SERIE-RG"
+    // Tenta identificar padrÃ£o "SERIE RG" ou "SERIE-RG"
     const match = rgAtual.trim().match(/^([A-Za-z]+)[\s-]+(.+)$/);
     if (match) {
         serie = match[1].toUpperCase();
@@ -87,7 +87,7 @@ export default function BatchReceptoraForm({ isOpen, onClose, onSave }) {
     // Verificar duplicatas
     const rgExists = receptoras.some(r => r.serie === serie && r.rg === rg);
     if (rgExists) {
-      alert(`⚠️ Animal ${serie} ${rg} já foi adicionado!`);
+      alert(`âÅ¡ ï¸� Animal ${serie} ${rg} jÃ¡ foi adicionado!`);
       return;
     }
 
@@ -96,7 +96,7 @@ export default function BatchReceptoraForm({ isOpen, onClose, onSave }) {
       serie: serie,
       rg: rg,
       raca: "Receptora",
-      sexo: "Fêmea",
+      sexo: "FÃªmea",
       meses: parseInt(dadosFixos.idadeCompra) || 30,
       situacao: "Ativo",
       isFiv: false,
@@ -105,7 +105,7 @@ export default function BatchReceptoraForm({ isOpen, onClose, onSave }) {
     };
 
     setReceptoras([...receptoras, novaReceptora]);
-    setRgAtual(""); // Limpar campo para próxima entrada
+    setRgAtual(""); // Limpar campo para prÃ³xima entrada
     
     // Focar novamente no input
     if (rgInputRef.current) {
@@ -129,27 +129,27 @@ export default function BatchReceptoraForm({ isOpen, onClose, onSave }) {
   // Validar antes de salvar
   const validarDados = () => {
     if (receptoras.length === 0) {
-      alert("⚠️ Adicione pelo menos uma receptora!");
+      alert("âÅ¡ ï¸� Adicione pelo menos uma receptora!");
       return false;
     }
 
     if (!dadosFixos.fornecedor.trim()) {
-      alert("⚠️ Fornecedor é obrigatório!");
+      alert("âÅ¡ ï¸� Fornecedor Ã© obrigatÃ³rio!");
       return false;
     }
 
     if (!dadosFixos.boletim) {
-      alert("⚠️ Boletim (Local de Entrada) é obrigatório!");
+      alert("âÅ¡ ï¸� Boletim (Local de Entrada) Ã© obrigatÃ³rio!");
       return false;
     }
 
     if (!dadosFixos.pastoAtual) {
-      alert("⚠️ Localização Atual (Piquete) é obrigatória!");
+      alert("âÅ¡ ï¸� LocalizaÃ§Ã£o Atual (Piquete) Ã© obrigatÃ³ria!");
       return false;
     }
 
     if (!dadosFixos.valorCompra || parseFloat(dadosFixos.valorCompra) <= 0) {
-      alert("⚠️ Valor da Compra é obrigatório e deve ser maior que zero!");
+      alert("âÅ¡ ï¸� Valor da Compra Ã© obrigatÃ³rio e deve ser maior que zero!");
       return false;
     }
 
@@ -186,9 +186,9 @@ export default function BatchReceptoraForm({ isOpen, onClose, onSave }) {
             `Receptora ${err.index + 1} (RG: ${err.rg}): ${err.error}`
           ).join('\n');
           
-          alert(`⚠️ Cadastro parcialmente concluído!\n\n✅ ${result.success} receptoras salvas\n❌ ${result.failed} falharam:\n\n${errorMessages}`);
+          alert(`âÅ¡ ï¸� Cadastro parcialmente concluÃ­do!\n\nâÅ“â€¦ ${result.success} receptoras salvas\nâ�Å’ ${result.failed} falharam:\n\n${errorMessages}`);
         } else {
-          alert(`✅ ${result.success} receptoras cadastradas com sucesso!`);
+          alert(`âÅ“â€¦ ${result.success} receptoras cadastradas com sucesso!`);
         }
         
         await onSave(result.saved || []);
@@ -198,7 +198,7 @@ export default function BatchReceptoraForm({ isOpen, onClose, onSave }) {
       }
     } catch (error) {
       console.error("Erro ao salvar receptoras:", error);
-      alert(`❌ Erro ao salvar receptoras: ${error.message}`);
+      alert(`â�Å’ Erro ao salvar receptoras: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -221,7 +221,7 @@ export default function BatchReceptoraForm({ isOpen, onClose, onSave }) {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                🐄 Cadastro em Lote - Receptoras
+                ðÅ¸�â€ž Cadastro em Lote - Receptoras
               </h2>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                 Configure os dados fixos e adicione as receptoras rapidamente
@@ -238,7 +238,7 @@ export default function BatchReceptoraForm({ isOpen, onClose, onSave }) {
 
         {/* Body */}
         <div className="p-6 space-y-6">
-          {/* Seção: Dados Fixos */}
+          {/* SeÃ§Ã£o: Dados Fixos */}
           <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg border-2 border-blue-200 dark:border-blue-800">
             <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-4 flex items-center gap-2">
               <DocumentTextIcon className="h-5 w-5" />
@@ -286,7 +286,7 @@ export default function BatchReceptoraForm({ isOpen, onClose, onSave }) {
                   value={dadosFixos.notaFiscal}
                   onChange={(e) => setDadosFixos({ ...dadosFixos, notaFiscal: e.target.value })}
                   className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-                  placeholder="Número da NF"
+                  placeholder="NÃºmero da NF"
                 />
               </div>
 
@@ -350,10 +350,10 @@ export default function BatchReceptoraForm({ isOpen, onClose, onSave }) {
                 />
               </div>
 
-              {/* Condição Corporal */}
+              {/* CondiÃ§Ã£o Corporal */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Condição Corporal
+                  CondiÃ§Ã£o Corporal
                 </label>
                 <select
                   value={dadosFixos.condicaoCorporal}
@@ -363,7 +363,7 @@ export default function BatchReceptoraForm({ isOpen, onClose, onSave }) {
                   <option value="">Selecione...</option>
                   <option value="1">1 - Muito Magra</option>
                   <option value="2">2 - Magra</option>
-                  <option value="3">3 - Média</option>
+                  <option value="3">3 - MÃ©dia</option>
                   <option value="4">4 - Boa</option>
                   <option value="5">5 - Excelente</option>
                 </select>
@@ -386,10 +386,10 @@ export default function BatchReceptoraForm({ isOpen, onClose, onSave }) {
                 </select>
               </div>
 
-              {/* Localização Atual (Piquete) */}
+              {/* LocalizaÃ§Ã£o Atual (Piquete) */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Localização Atual (Piquete) <span className="text-red-500">*</span>
+                  LocalizaÃ§Ã£o Atual (Piquete) <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={dadosFixos.pastoAtual}
@@ -413,17 +413,17 @@ export default function BatchReceptoraForm({ isOpen, onClose, onSave }) {
                     className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                   />
                   <span className="text-sm text-gray-700 dark:text-gray-300">
-                    🔬 Aplicar Protocolo Sanitário Automático
+                    ðÅ¸â€�¬ Aplicar Protocolo SanitÃ¡rio AutomÃ¡tico
                   </span>
                 </label>
               </div>
             </div>
           </div>
 
-          {/* Seção: Cadastro Rápido de RG */}
+          {/* SeÃ§Ã£o: Cadastro RÃ¡pido de RG */}
           <div className="bg-green-50 dark:bg-green-900/20 p-6 rounded-lg border-2 border-green-200 dark:border-green-800">
             <h3 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-4">
-              ⚡ Cadastro Rápido
+              âÅ¡¡ Cadastro RÃ¡pido
             </h3>
             
             <div className="flex gap-3">
@@ -455,7 +455,7 @@ export default function BatchReceptoraForm({ isOpen, onClose, onSave }) {
             </div>
 
             <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
-              💡 Dica: Digite o RG e pressione <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs">Enter</kbd> para adicionar rapidamente
+              ðÅ¸â€™¡ Dica: Digite o RG e pressione <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs">Enter</kbd> para adicionar rapidamente
             </p>
           </div>
 
@@ -464,7 +464,7 @@ export default function BatchReceptoraForm({ isOpen, onClose, onSave }) {
             <div className="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  📋 Receptoras Adicionadas ({receptoras.length})
+                  ðÅ¸â€œâ€¹ Receptoras Adicionadas ({receptoras.length})
                 </h3>
                 <div className="text-right">
                   <p className="text-sm text-gray-600 dark:text-gray-400">Custo Total Estimado</p>
@@ -489,7 +489,7 @@ export default function BatchReceptoraForm({ isOpen, onClose, onSave }) {
                           RPT {receptora.rg}
                         </p>
                         <p className="text-xs text-gray-600 dark:text-gray-400">
-                          {dadosFixos.fornecedor} • R$ {dadosFixos.valorCompra}
+                          {dadosFixos.fornecedor} ââ‚¬¢ R$ {dadosFixos.valorCompra}
                         </p>
                       </div>
                     </div>
@@ -512,9 +512,9 @@ export default function BatchReceptoraForm({ isOpen, onClose, onSave }) {
           <div className="flex items-center justify-between gap-4">
             <div className="text-sm text-gray-600 dark:text-gray-400">
               {receptoras.length === 0 ? (
-                <span>👆 Preencha os dados fixos e adicione receptoras</span>
+                <span>ðÅ¸â€˜â€  Preencha os dados fixos e adicione receptoras</span>
               ) : (
-                <span>✅ {receptoras.length} receptora(s) pronta(s) para cadastrar</span>
+                <span>âÅ“â€¦ {receptoras.length} receptora(s) pronta(s) para cadastrar</span>
               )}
             </div>
             <div className="flex gap-3">

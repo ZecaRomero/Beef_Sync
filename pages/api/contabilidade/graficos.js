@@ -1,9 +1,9 @@
-﻿import { Chart, registerables } from 'chart.js'
+import { Chart, registerables } from 'chart.js'
 import { ChartJSNodeCanvas } from 'chartjs-node-canvas'
 import databaseService from '../../../services/databaseService'
 import { RACAS_POR_SERIE as racasPorSerie } from '../../../utils/constants'
 
-// Função para corrigir raça baseada na série
+// FunÃ§Ã£o para corrigir raÃ§a baseada na sÃ©rie
 function corrigirRacaPorSerie(animal) {
   if (animal.serie && racasPorSerie[animal.serie]) {
     const racaCorreta = racasPorSerie[animal.serie]
@@ -19,22 +19,22 @@ Chart.register(...registerables)
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Método não permitido' })
+    return res.status(405).json({ message: 'MÃ©todo nÃ£o permitido' })
   }
 
   try {
     const { period } = req.body
 
-    // Buscar animais diretamente do banco ao invés de receber no body
+    // Buscar animais diretamente do banco ao invÃ©s de receber no body
     // Isso evita problemas com limite de tamanho do body (1MB)
     let animals = []
     
     try {
-      console.log('🔄 Buscando animais diretamente do banco de dados para gráficos...')
+      console.log('ðÅ¸â€�â€ž Buscando animais diretamente do banco de dados para grÃ¡ficos...')
       animals = await databaseService.buscarAnimais({})
-      console.log(`✅ ${animals.length} animais encontrados no banco`)
+      console.log(`âÅ“â€¦ ${animals.length} animais encontrados no banco`)
       
-      // Converter formato do banco para formato esperado pelo código e corrigir raça por série
+      // Converter formato do banco para formato esperado pelo cÃ³digo e corrigir raÃ§a por sÃ©rie
       animals = animals.map(animal => {
         const animalFormatado = {
           ...animal,
@@ -44,11 +44,11 @@ export default async function handler(req, res) {
             Math.floor((new Date() - new Date(animal.data_nascimento)) / (1000 * 60 * 60 * 24 * 30.44)) : 0),
           situacao: animal.situacao || 'Ativo'
         }
-        // Corrigir raça baseada na série
+        // Corrigir raÃ§a baseada na sÃ©rie
         return corrigirRacaPorSerie(animalFormatado)
       })
     } catch (dbError) {
-      console.error('❌ Erro ao buscar animais do banco:', dbError)
+      console.error('â�Å’ Erro ao buscar animais do banco:', dbError)
       return res.status(500).json({ 
         message: 'Erro ao buscar dados dos animais do banco de dados',
         error: dbError.message 
@@ -59,17 +59,17 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: 'Nenhum animal encontrado no banco de dados' })
     }
     
-    console.log(`📊 Processando ${animals.length} animais para os gráficos`)
+    console.log(`ðÅ¸â€œÅ  Processando ${animals.length} animais para os grÃ¡ficos`)
 
     // Configurar Chart.js para Node.js
     const width = 800
     const height = 600
     const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height })
 
-    // Preparar dados para os gráficos
+    // Preparar dados para os grÃ¡ficos
     const dadosGraficos = prepararDadosGraficos(animals)
 
-    // Gerar gráficos
+    // Gerar grÃ¡ficos
     const graficos = await Promise.all([
       gerarGraficoRacas(dadosGraficos.porRaca, chartJSNodeCanvas),
       gerarGraficoIdades(dadosGraficos.porIdade, chartJSNodeCanvas),
@@ -96,19 +96,19 @@ export default async function handler(req, res) {
     })
 
   } catch (error) {
-    console.error('Erro ao gerar gráficos:', error)
+    console.error('Erro ao gerar grÃ¡ficos:', error)
     res.status(500).json({ message: 'Erro interno do servidor' })
   }
 }
 
 function calcularEra(meses, sexo) {
-  if (!meses || meses === 0) return 'Não informado'
+  if (!meses || meses === 0) return 'NÃ£o informado'
   
-  const isFemea = sexo && (sexo.toLowerCase().includes('fêmea') || sexo.toLowerCase().includes('femea') || sexo === 'F')
+  const isFemea = sexo && (sexo.toLowerCase().includes('fÃªmea') || sexo.toLowerCase().includes('femea') || sexo === 'F')
   const isMacho = sexo && (sexo.toLowerCase().includes('macho') || sexo === 'M')
   
   if (isFemea) {
-    // FÊMEA: 0-7 / 7-12 / 12-18 / 18-24 / 24+
+    // FÃÅ MEA: 0-7 / 7-12 / 12-18 / 18-24 / 24+
     if (meses <= 7) return '0/7'
     if (meses <= 12) return '7/12'
     if (meses <= 18) return '12/18'
@@ -123,7 +123,7 @@ function calcularEra(meses, sexo) {
     return '22+'
   }
   
-  // Se não tem sexo definido, usar padrão
+  // Se nÃ£o tem sexo definido, usar padrÃ£o
   if (meses <= 7) return '0/7'
   if (meses <= 12) return '7/12'
   if (meses <= 18) return '12/18'
@@ -141,15 +141,15 @@ function prepararDadosGraficos(animals) {
   const porMae = {}
 
   animals.forEach(animal => {
-    // Por Raça
-    const raca = animal.raca || 'Não informado'
+    // Por RaÃ§a
+    const raca = animal.raca || 'NÃ£o informado'
     porRaca[raca] = (porRaca[raca] || 0) + 1
 
     // Por Sexo
-    const sexo = animal.sexo || 'Não informado'
+    const sexo = animal.sexo || 'NÃ£o informado'
     porSexo[sexo] = (porSexo[sexo] || 0) + 1
 
-    // Por Situação
+    // Por SituaÃ§Ã£o
     const situacao = animal.situacao || 'Ativo'
     porSituacao[situacao] = (porSituacao[situacao] || 0) + 1
 
@@ -161,23 +161,23 @@ function prepararDadosGraficos(animals) {
       const nascimento = new Date(dataNascimento)
       const hoje = new Date()
       if (!isNaN(nascimento.getTime())) {
-        idadeMeses = Math.floor((hoje - nascimento) / (1000 * 60 * 60 * 24 * 30.44)) // Média de dias por mês
+        idadeMeses = Math.floor((hoje - nascimento) / (1000 * 60 * 60 * 24 * 30.44)) // MÃ©dia de dias por mÃªs
       }
     }
     
-    // Se não tem data de nascimento válida, usar campo meses
+    // Se nÃ£o tem data de nascimento vÃ¡lida, usar campo meses
     if (idadeMeses === 0 && animal.meses) {
       idadeMeses = parseInt(animal.meses) || 0
     }
 
-    // Por ERA (faixa etária simplificada)
+    // Por ERA (faixa etÃ¡ria simplificada)
     const era = calcularEra(idadeMeses, animal.sexo)
     porEra[era] = (porEra[era] || 0) + 1
 
-    // Categorizar por faixa etária conforme classificação bovina
-    let faixaEtaria = 'Não informado'
+    // Categorizar por faixa etÃ¡ria conforme classificaÃ§Ã£o bovina
+    let faixaEtaria = 'NÃ£o informado'
     if (idadeMeses > 0) {
-      if (animal.sexo === 'Fêmea') {
+      if (animal.sexo === 'FÃªmea') {
         if (idadeMeses <= 7) faixaEtaria = 'Bezerra (0-7 meses)'
         else if (idadeMeses <= 12) faixaEtaria = 'Bezerra/Novilha (8-12 meses)'
         else if (idadeMeses <= 18) faixaEtaria = 'Novilha (13-18 meses)'
@@ -195,11 +195,11 @@ function prepararDadosGraficos(animals) {
     porIdade[faixaEtaria] = (porIdade[faixaEtaria] || 0) + 1
 
     // Por Pai
-    const pai = animal.pai || animal.nomePai || 'Não informado'
+    const pai = animal.pai || animal.nomePai || 'NÃ£o informado'
     porPai[pai] = (porPai[pai] || 0) + 1
 
-    // Por Mãe
-    const mae = animal.mae || animal.nomeMae || 'Não informado'
+    // Por MÃ£e
+    const mae = animal.mae || animal.nomeMae || 'NÃ£o informado'
     porMae[mae] = (porMae[mae] || 0) + 1
   })
 
@@ -250,7 +250,7 @@ async function gerarGraficoRacas(dados, chartJSNodeCanvas) {
       plugins: {
         title: {
           display: true,
-          text: 'Distribuição por Raça',
+          text: 'DistribuiÃ§Ã£o por RaÃ§a',
           font: { size: 18, weight: 'bold', color: '#333333' },
           padding: 20
         },
@@ -311,7 +311,7 @@ async function gerarGraficoIdades(dados, chartJSNodeCanvas) {
       plugins: {
         title: {
           display: true,
-          text: 'Distribuição por Classificação Etária',
+          text: 'DistribuiÃ§Ã£o por ClassificaÃ§Ã£o EtÃ¡ria',
           font: { size: 18, weight: 'bold', color: '#333333' },
           padding: 20
         },
@@ -383,7 +383,7 @@ async function gerarGraficoSexo(dados, chartJSNodeCanvas) {
       plugins: {
         title: {
           display: true,
-          text: 'Distribuição por Sexo',
+          text: 'DistribuiÃ§Ã£o por Sexo',
           font: { size: 18, weight: 'bold', color: '#333333' },
           padding: 20
         },
@@ -438,7 +438,7 @@ async function gerarGraficoSituacao(dados, chartJSNodeCanvas) {
       plugins: {
         title: {
           display: true,
-          text: 'Distribuição por Situação',
+          text: 'DistribuiÃ§Ã£o por SituaÃ§Ã£o',
           font: { size: 18, weight: 'bold', color: '#333333' },
           padding: 20
         },
@@ -470,7 +470,7 @@ async function gerarGraficoSituacao(dados, chartJSNodeCanvas) {
 
 async function gerarGraficoEra(dados, chartJSNodeCanvas) {
   const labels = Object.keys(dados).sort((a, b) => {
-    const ordem = ['0/7', '7/12', '12/18', '18/24', '24+', '7/15', '15/18', '18/22', '22+', 'Não informado']
+    const ordem = ['0/7', '7/12', '12/18', '18/24', '24+', '7/15', '15/18', '18/22', '22+', 'NÃ£o informado']
     return ordem.indexOf(a) - ordem.indexOf(b)
   })
   const values = labels.map(label => dados[label])
@@ -497,7 +497,7 @@ async function gerarGraficoEra(dados, chartJSNodeCanvas) {
       plugins: {
         title: {
           display: true,
-          text: 'Distribuição por ERA (Faixa Etária)',
+          text: 'DistribuiÃ§Ã£o por ERA (Faixa EtÃ¡ria)',
           font: { size: 18, weight: 'bold', color: '#333333' },
           padding: 20
         },
@@ -537,7 +537,7 @@ async function gerarGraficoPai(dados, chartJSNodeCanvas) {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 10)
   
-  const labels = sorted.map(([pai]) => pai || 'Não informado')
+  const labels = sorted.map(([pai]) => pai || 'NÃ£o informado')
   const values = sorted.map(([, count]) => count)
   
   const colors = [
@@ -566,7 +566,7 @@ async function gerarGraficoPai(dados, chartJSNodeCanvas) {
       plugins: {
         title: {
           display: true,
-          text: 'Top 10 - Distribuição por Pai (Descendentes)',
+          text: 'Top 10 - DistribuiÃ§Ã£o por Pai (Descendentes)',
           font: { size: 18, weight: 'bold', color: '#333333' },
           padding: 20
         },
@@ -606,7 +606,7 @@ async function gerarGraficoMae(dados, chartJSNodeCanvas) {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 10)
   
-  const labels = sorted.map(([mae]) => mae || 'Não informado')
+  const labels = sorted.map(([mae]) => mae || 'NÃ£o informado')
   const values = sorted.map(([, count]) => count)
   
   const colors = [
@@ -635,7 +635,7 @@ async function gerarGraficoMae(dados, chartJSNodeCanvas) {
       plugins: {
         title: {
           display: true,
-          text: 'Top 10 - Distribuição por Mãe (Descendentes)',
+          text: 'Top 10 - DistribuiÃ§Ã£o por MÃ£e (Descendentes)',
           font: { size: 18, weight: 'bold', color: '#333333' },
           padding: 20
         },

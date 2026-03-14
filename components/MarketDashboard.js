@@ -41,9 +41,9 @@ export default function MarketDashboard() {
 
   const getTrendIcon = (trend) => {
     switch (trend) {
-      case 'up': return '📈'
-      case 'down': return '📉'
-      default: return '➡️'
+      case 'up': return 'ðÅ¸â€œË†'
+      case 'down': return 'ðÅ¸â€œâ€°'
+      default: return 'âÅ¾¡ï¸�'
     }
   }
 
@@ -67,13 +67,13 @@ export default function MarketDashboard() {
 
   const renderPricesTab = () => (
     <div className="space-y-6">
-      {/* Preços por Categoria */}
+      {/* PreÃ§os por Categoria */}
       {marketData && (
         <>
           {/* Animais Terminados */}
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-              🥩 Animais Terminados (Para Abate)
+              ðÅ¸¥© Animais Terminados (Para Abate)
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {Object.entries(marketData.prices)
@@ -95,10 +95,10 @@ export default function MarketDashboard() {
                       R$ {data.price.toFixed(0)}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                      {data.unit} • {data.market}
+                      {data.unit} ââ‚¬¢ {data.market}
                     </div>
                     <div className={`text-sm font-medium flex items-center ${getTrendColor(data.change)}`}>
-                      <span className="mr-1">{data.change >= 0 ? '↗️' : '↘️'}</span>
+                      <span className="mr-1">{data.change >= 0 ? 'ââ€ â€”ï¸�' : 'ââ€ Ëœï¸�'}</span>
                       {formatPercent(data.changePercent)} ({data.change >= 0 ? '+' : ''}R$ {data.change.toFixed(2)})
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">
@@ -113,7 +113,7 @@ export default function MarketDashboard() {
           {/* Animais de Recria */}
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-              🌱 Animais de Recria (Crescimento)
+              ðÅ¸Å’± Animais de Recria (Crescimento)
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {Object.entries(marketData.prices)
@@ -139,10 +139,10 @@ export default function MarketDashboard() {
                       }
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                      {data.unit} • {data.market}
+                      {data.unit} ââ‚¬¢ {data.market}
                     </div>
                     <div className={`text-sm font-medium flex items-center ${getTrendColor(data.change)}`}>
-                      <span className="mr-1">{data.change >= 0 ? '↗️' : '↘️'}</span>
+                      <span className="mr-1">{data.change >= 0 ? 'ââ€ â€”ï¸�' : 'ââ€ Ëœï¸�'}</span>
                       {formatPercent(data.changePercent)} ({data.change >= 0 ? '+' : ''}R$ {data.change.toFixed(2)})
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">
@@ -157,7 +157,7 @@ export default function MarketDashboard() {
           {/* Animais de Cria */}
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-              🍼 Animais de Cria (Até 12 meses)
+              ðÅ¸�¼ Animais de Cria (AtÃ© 12 meses)
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {Object.entries(marketData.prices)
@@ -179,10 +179,10 @@ export default function MarketDashboard() {
                       {formatCurrency(data.price)}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                      {data.unit} • {data.market}
+                      {data.unit} ââ‚¬¢ {data.market}
                     </div>
                     <div className={`text-sm font-medium flex items-center ${getTrendColor(data.change)}`}>
-                      <span className="mr-1">{data.change >= 0 ? '↗️' : '↘️'}</span>
+                      <span className="mr-1">{data.change >= 0 ? 'ââ€ â€”ï¸�' : 'ââ€ Ëœï¸�'}</span>
                       {formatPercent(data.changePercent)} ({data.change >= 0 ? '+' : ''}R$ {data.change.toFixed(2)})
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">
@@ -196,10 +196,10 @@ export default function MarketDashboard() {
         </>
       )}
 
-      {/* Índices Econômicos */}
+      {/* Ã�ndices EconÃ´micos */}
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-          📊 Índices Econômicos
+          ðÅ¸â€œÅ  Ã�ndices EconÃ´micos
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
           {marketData && Object.entries(marketData.indices).map(([key, data]) => (
@@ -207,7 +207,7 @@ export default function MarketDashboard() {
               <div className="text-center">
                 <div className="text-3xl mb-2">{data.icon}</div>
                 <div className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                  {key === 'dolar' ? 'Dólar USD' :
+                  {key === 'dolar' ? 'DÃ³lar USD' :
                    key === 'milho' ? 'Milho' :
                    key === 'soja' ? 'Soja' :
                    key === 'farelo_soja' ? 'Farelo Soja' :
@@ -217,10 +217,10 @@ export default function MarketDashboard() {
                   {key === 'dolar' ? `USD ${data.value.toFixed(2)}` : `R$ ${data.value.toFixed(0)}`}
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                  {data.unit} • {data.source}
+                  {data.unit} ââ‚¬¢ {data.source}
                 </div>
                 <div className={`text-sm font-medium flex items-center justify-center ${getTrendColor(data.change)}`}>
-                  <span className="mr-1">{data.change >= 0 ? '↗️' : '↘️'}</span>
+                  <span className="mr-1">{data.change >= 0 ? 'ââ€ â€”ï¸�' : 'ââ€ Ëœï¸�'}</span>
                   {formatPercent(data.changePercent)}
                 </div>
               </div>
@@ -233,7 +233,7 @@ export default function MarketDashboard() {
       {marketData && marketData.marketStatus && (
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-            🕐 Status do Mercado
+            ðÅ¸â€¢� Status do Mercado
           </h3>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -253,10 +253,10 @@ export default function MarketDashboard() {
             </div>
             <div className="text-right">
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                Última atualização: {marketData.marketStatus.lastUpdate.toLocaleTimeString('pt-BR')}
+                ÃÅ¡ltima atualizaÃ§Ã£o: {marketData.marketStatus.lastUpdate.toLocaleTimeString('pt-BR')}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                Próxima: {marketData.marketStatus.nextUpdate.toLocaleTimeString('pt-BR')}
+                PrÃ³xima: {marketData.marketStatus.nextUpdate.toLocaleTimeString('pt-BR')}
               </div>
             </div>
           </div>
@@ -277,16 +277,16 @@ export default function MarketDashboard() {
                   item.impact === 'negative' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
                   'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
                 }`}>
-                  {item.impact === 'positive' ? '📈 Positivo' : 
-                   item.impact === 'negative' ? '📉 Negativo' : '➡️ Neutro'}
+                  {item.impact === 'positive' ? 'ðÅ¸â€œË† Positivo' : 
+                   item.impact === 'negative' ? 'ðÅ¸â€œâ€° Negativo' : 'âÅ¾¡ï¸� Neutro'}
                 </span>
                 <span className={`px-2 py-1 text-xs rounded-full font-medium ${
                   item.relevance === 'high' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' :
                   item.relevance === 'medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
                   'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
                 }`}>
-                  {item.relevance === 'high' ? '🔥 Alta' : 
-                   item.relevance === 'medium' ? '⚡ Média' : '📊 Baixa'}
+                  {item.relevance === 'high' ? 'ðÅ¸â€�¥ Alta' : 
+                   item.relevance === 'medium' ? 'âÅ¡¡ MÃ©dia' : 'ðÅ¸â€œÅ  Baixa'}
                 </span>
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
@@ -313,7 +313,7 @@ export default function MarketDashboard() {
           {/* Sentiment do Mercado */}
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-              🎯 Sentimento do Mercado
+              ðÅ¸Å½¯ Sentimento do Mercado
             </h3>
             <div className="flex items-center space-x-4">
               <div className="flex-1">
@@ -348,12 +348,12 @@ export default function MarketDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-semibold text-green-600 dark:text-green-400 mb-4 flex items-center">
-                ✅ Fatores Positivos
+                âÅ“â€¦ Fatores Positivos
               </h3>
               <ul className="space-y-2">
                 {analysis.factors.positive.map((factor, index) => (
                   <li key={index} className="flex items-center text-gray-700 dark:text-gray-300">
-                    <span className="text-green-500 mr-2">•</span>
+                    <span className="text-green-500 mr-2">ââ‚¬¢</span>
                     {factor}
                   </li>
                 ))}
@@ -362,12 +362,12 @@ export default function MarketDashboard() {
 
             <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-semibold text-red-600 dark:text-red-400 mb-4 flex items-center">
-                ⚠️ Fatores Negativos
+                âÅ¡ ï¸� Fatores Negativos
               </h3>
               <ul className="space-y-2">
                 {analysis.factors.negative.map((factor, index) => (
                   <li key={index} className="flex items-center text-gray-700 dark:text-gray-300">
-                    <span className="text-red-500 mr-2">•</span>
+                    <span className="text-red-500 mr-2">ââ‚¬¢</span>
                     {factor}
                   </li>
                 ))}
@@ -375,10 +375,10 @@ export default function MarketDashboard() {
             </div>
           </div>
 
-          {/* Recomendações */}
+          {/* RecomendaÃ§Ãµes */}
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-              💡 Recomendações de Investimento
+              ðÅ¸â€™¡ RecomendaÃ§Ãµes de Investimento
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {analysis.recommendations.map((rec, index) => (
@@ -393,8 +393,8 @@ export default function MarketDashboard() {
                       rec.type === 'sell' ? 'bg-red-500 text-white' :
                       'bg-yellow-500 text-white'
                     }`}>
-                      {rec.type === 'buy' ? '🟢 COMPRAR' :
-                       rec.type === 'sell' ? '🔴 VENDER' : '🟡 MANTER'}
+                      {rec.type === 'buy' ? 'ðÅ¸Å¸¢ COMPRAR' :
+                       rec.type === 'sell' ? 'ðÅ¸â€�´ VENDER' : 'ðÅ¸Å¸¡ MANTER'}
                     </span>
                     <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
                       {rec.confidence}%
@@ -424,25 +424,25 @@ export default function MarketDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
-                  🤖 {forecast.model}
+                  ðÅ¸¤â€“ {forecast.model}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Precisão: {forecast.accuracy} • Último treino: {new Date(forecast.lastTrained).toLocaleDateString('pt-BR')}
+                  PrecisÃ£o: {forecast.accuracy} ââ‚¬¢ ÃÅ¡ltimo treino: {new Date(forecast.lastTrained).toLocaleDateString('pt-BR')}
                 </p>
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {forecast.accuracy}
                 </div>
-                <div className="text-sm text-gray-500">Precisão</div>
+                <div className="text-sm text-gray-500">PrecisÃ£o</div>
               </div>
             </div>
           </div>
 
-          {/* Previsões */}
+          {/* PrevisÃµes */}
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-              📈 Previsão de Preços - Próximos 7 dias
+              ðÅ¸â€œË† PrevisÃ£o de PreÃ§os - PrÃ³ximos 7 dias
             </h3>
             <div className="space-y-3">
               {forecast.forecast.map((day, index) => (
@@ -460,8 +460,8 @@ export default function MarketDashboard() {
                       day.trend === 'bearish' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
                       'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
                     }`}>
-                      {day.trend === 'bullish' ? '📈 Alta' :
-                       day.trend === 'bearish' ? '📉 Baixa' : '➡️ Estável'}
+                      {day.trend === 'bullish' ? 'ðÅ¸â€œË† Alta' :
+                       day.trend === 'bearish' ? 'ðÅ¸â€œâ€° Baixa' : 'âÅ¾¡ï¸� EstÃ¡vel'}
                     </span>
                   </div>
                   <div className="flex items-center space-x-4">
@@ -470,7 +470,7 @@ export default function MarketDashboard() {
                         {formatCurrency(day.predictedPrice)}
                       </div>
                       <div className="text-xs text-gray-500">
-                        Confiança: {day.confidence.toFixed(0)}%
+                        ConfianÃ§a: {day.confidence.toFixed(0)}%
                       </div>
                     </div>
                     <div className="w-16 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
@@ -490,17 +490,17 @@ export default function MarketDashboard() {
   )
 
   const tabs = [
-    { id: 'prices', label: '💰 Preços', component: renderPricesTab },
-    { id: 'news', label: '📰 Notícias', component: renderNewsTab },
-    { id: 'analysis', label: '📊 Análise', component: renderAnalysisTab },
-    { id: 'forecast', label: '🔮 Previsão IA', component: renderForecastTab }
+    { id: 'prices', label: 'ðÅ¸â€™° PreÃ§os', component: renderPricesTab },
+    { id: 'news', label: 'ðÅ¸â€œ° NotÃ­cias', component: renderNewsTab },
+    { id: 'analysis', label: 'ðÅ¸â€œÅ  AnÃ¡lise', component: renderAnalysisTab },
+    { id: 'forecast', label: 'ðÅ¸â€�® PrevisÃ£o IA', component: renderForecastTab }
   ]
 
   if (loading) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700">
         <div className="text-center">
-          <div className="animate-spin text-4xl mb-4">📊</div>
+          <div className="animate-spin text-4xl mb-4">ðÅ¸â€œÅ </div>
           <div className="text-lg font-semibold text-gray-900 dark:text-white">
             Carregando dados do mercado...
           </div>
@@ -519,20 +519,20 @@ export default function MarketDashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-              📈 Market Intelligence
+              ðÅ¸â€œË† Market Intelligence
               <span className="ml-3 px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-sm font-medium rounded-full">
                 Ao Vivo
               </span>
             </h2>
             <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Dados em tempo real do mercado de gado • Última atualização: {marketData?.timestamp.toLocaleTimeString('pt-BR')}
+              Dados em tempo real do mercado de gado ââ‚¬¢ ÃÅ¡ltima atualizaÃ§Ã£o: {marketData?.timestamp.toLocaleTimeString('pt-BR')}
             </p>
           </div>
           <button
             onClick={loadMarketData}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center space-x-2"
           >
-            <span>🔄</span>
+            <span>ðÅ¸â€�â€ž</span>
             <span>Atualizar</span>
           </button>
         </div>

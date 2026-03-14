@@ -1,7 +1,7 @@
 /**
  * Corrige IAs da CJCJ 15668 (MAESTRA SANT ANNA):
- * - IA com LANDROVES DA XARAES → Prenha (gestação atual)
- * - IA com REM 11627, JAMANTA ou qualquer outro → Vazia
+ * - IA com LANDROVES DA XARAES �†’ Prenha (gestação atual)
+ * - IA com REM 11627, JAMANTA ou qualquer outro �†’ Vazia
  *
  * Uso: node scripts/corrigir-ia-cjcj-15668.js
  */
@@ -12,7 +12,7 @@ const SERIE = 'CJCJ'
 const RG = '15668'
 
 async function corrigir() {
-  console.log('🔧 Corrigindo IAs da CJCJ 15668 (MAESTRA SANT ANNA)\n')
+  console.log('�Ÿ”� Corrigindo IAs da CJCJ 15668 (MAESTRA SANT ANNA)\n')
 
   try {
     const cols = await query(`
@@ -40,7 +40,7 @@ async function corrigir() {
       [SERIE.toUpperCase(), RG]
     )
     if (animal.rows.length === 0) {
-      console.log('❌ Animal CJCJ 15668 não encontrado.')
+      console.log('�Œ Animal CJCJ 15668 não encontrado.')
       process.exit(1)
     }
     const animalId = animal.rows[0].id
@@ -75,7 +75,7 @@ async function corrigir() {
     }
 
     if (ins.rows.length === 0) {
-      console.log('   ⚠️ Nenhuma inseminação encontrada.')
+      console.log('   �š�️ Nenhuma inseminação encontrada.')
       process.exit(0)
     }
 
@@ -101,22 +101,22 @@ async function corrigir() {
           `UPDATE inseminacoes SET ${setPrenha}status_gestacao = 'Prenha', updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
           [row.id]
         )
-        console.log(`   ✅ IA ${row.id} (${touro}) → Prenha`)
+        console.log(`   �œ… IA ${row.id} (${touro}) �†’ Prenha`)
         atualizados++
       } else {
         await query(
           `UPDATE inseminacoes SET ${setResultado}status_gestacao = 'Vazia', updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
           [row.id]
         )
-        console.log(`   ✅ IA ${row.id} (${touro}) → Vazia`)
+        console.log(`   �œ… IA ${row.id} (${touro}) �†’ Vazia`)
         atualizados++
       }
     }
 
-    console.log(`\n   📋 ${atualizados} registro(s) atualizado(s).`)
-    console.log('\n   💡 Acesse /consulta-animal/239 ou busque CJCJ 15668 para ver o touro correto (LANDROVES DA XARAES) e a previsão de parto.')
+    console.log(`\n   �Ÿ“‹ ${atualizados} registro(s) atualizado(s).`)
+    console.log('\n   �Ÿ’� Acesse /consulta-animal/239 ou busque CJCJ 15668 para ver o touro correto (LANDROVES DA XARAES) e a previsão de parto.')
   } catch (err) {
-    console.error('❌ Erro:', err.message)
+    console.error('�Œ Erro:', err.message)
     process.exit(1)
   }
   process.exit(0)

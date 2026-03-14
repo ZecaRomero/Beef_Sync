@@ -88,7 +88,7 @@ export default function RegistrarBaixaPage() {
         </Head>
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center p-6">
           <p className="text-amber-600 dark:text-amber-400 font-semibold text-center mb-4">
-            Registrar baixa não está disponível no celular.
+            Registrar baixa nÃ£o estÃ¡ disponÃ­vel no celular.
           </p>
           <p className="text-gray-500 dark:text-gray-400 text-sm text-center mb-6">
             Use um computador para registrar abate, morte ou venda.
@@ -124,14 +124,14 @@ export default function RegistrarBaixaPage() {
               Registrar baixa
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-              {serie && rg ? `Animal: ${ident}` : 'Preencha a identificação e os dados da baixa.'}
+              {serie && rg ? `Animal: ${ident}` : 'Preencha a identificaÃ§Ã£o e os dados da baixa.'}
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {(!serie || !rg) && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Série</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">SÃ©rie</label>
                     <input
                       type="text"
                       value={form.serie || ''}
@@ -223,7 +223,7 @@ export default function RegistrarBaixaPage() {
               )}
 
               {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
-              {result && <p className="text-sm text-green-600 dark:text-green-400">✅ {result.message}</p>}
+              {result && <p className="text-sm text-green-600 dark:text-green-400">âÅ“â€¦ {result.message}</p>}
 
               <button
                 type="submit"

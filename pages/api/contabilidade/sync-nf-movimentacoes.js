@@ -1,8 +1,8 @@
 import { query } from '../../../lib/database'
 
 // POST /api/contabilidade/sync-nf-movimentacoes
-// Converte NFs de entrada do período em registros na tabela movimentacoes_contabeis
-// para alimentar o boletim da "Agropecuária Pardinho" mesmo sem animal vinculado.
+// Converte NFs de entrada do perÃ­odo em registros na tabela movimentacoes_contabeis
+// para alimentar o boletim da "AgropecuÃ¡ria Pardinho" mesmo sem animal vinculado.
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' })
@@ -11,9 +11,9 @@ export default async function handler(req, res) {
   try {
     const { period, nfNumber } = req.body || {}
     
-    // Se não tem nfNumber nem período, retornar erro
+    // Se nÃ£o tem nfNumber nem perÃ­odo, retornar erro
     if (!nfNumber && (!period || !period.startDate || !period.endDate)) {
-      return res.status(400).json({ message: 'Período é obrigatório (ou informe nfNumber)' })
+      return res.status(400).json({ message: 'PerÃ­odo Ã© obrigatÃ³rio (ou informe nfNumber)' })
     }
 
     const toPgDate = (value) => {
@@ -29,21 +29,21 @@ export default async function handler(req, res) {
       return isNaN(d.getTime()) ? null : d.toISOString().split('T')[0]
     }
 
-    // Se tem nfNumber, não precisa de período
+    // Se tem nfNumber, nÃ£o precisa de perÃ­odo
     let pgStart = null
     let pgEnd = null
     if (period && period.startDate && period.endDate) {
       pgStart = toPgDate(period.startDate)
       pgEnd = toPgDate(period.endDate)
       if (!pgStart || !pgEnd) {
-        return res.status(400).json({ message: 'Formato de data inválido. Use YYYY-MM-DD ou dd/MM/yyyy.' })
+        return res.status(400).json({ message: 'Formato de data invÃ¡lido. Use YYYY-MM-DD ou dd/MM/yyyy.' })
       }
     }
 
-    // Buscar NFs de entrada e saída no período com seus itens
+    // Buscar NFs de entrada e saÃ­da no perÃ­odo com seus itens
     let nfs
     if (nfNumber) {
-      // Buscar NF específica sem filtro de período
+      // Buscar NF especÃ­fica sem filtro de perÃ­odo
       nfs = await query(
         `
           SELECT 
@@ -94,10 +94,10 @@ export default async function handler(req, res) {
     let inseridos = 0
     let atualizados = 0
     for (const nf of nfs.rows) {
-      // Data da operação baseada no schema atual
+      // Data da operaÃ§Ã£o baseada no schema atual
       const dataOperacao = nf.data_compra || nf.data
 
-      // Remover movimentações antigas desta NF antes de recriar
+      // Remover movimentaÃ§Ãµes antigas desta NF antes de recriar
       // Isso garante que itens adicionados/removidos sejam refletidos corretamente
       try {
         await query(
@@ -106,9 +106,9 @@ export default async function handler(req, res) {
            AND tipo = $2`,
           [String(nf.numero_nf), String(nf.tipo)]
         )
-        console.log(`🗑️ Movimentações antigas da NF ${nf.numero_nf} removidas`)
+        console.log(`ðÅ¸â€”â€˜ï¸� MovimentaÃ§Ãµes antigas da NF ${nf.numero_nf} removidas`)
       } catch (e) {
-        console.warn(`⚠️ Erro ao remover movimentações antigas da NF ${nf.numero_nf}:`, e.message)
+        console.warn(`âÅ¡ ï¸� Erro ao remover movimentaÃ§Ãµes antigas da NF ${nf.numero_nf}:`, e.message)
       }
 
       // Itens podem estar como string JSON ou objeto/array
@@ -126,7 +126,7 @@ export default async function handler(req, res) {
         itens = []
       }
 
-      // Se não encontrou itens no campo JSONB, buscar da tabela notas_fiscais_itens
+      // Se nÃ£o encontrou itens no campo JSONB, buscar da tabela notas_fiscais_itens
       if ((!itens || itens.length === 0) && nf.id) {
         try {
           const itensTabela = await query(`
@@ -149,7 +149,7 @@ export default async function handler(req, res) {
             })
           }
         } catch (e) {
-          console.warn(`⚠️ Erro ao buscar itens da tabela para NF ${nf.numero_nf}:`, e.message)
+          console.warn(`âÅ¡ ï¸� Erro ao buscar itens da tabela para NF ${nf.numero_nf}:`, e.message)
         }
       }
 
@@ -161,19 +161,19 @@ export default async function handler(req, res) {
         if (raw == null) return meta
         if (typeof raw === 'string') {
           const s = raw.toLowerCase()
-          // quantidade: primeiro número
-          const qMatch = s.match(/(\d{1,3})\s*(?:cabecas|cabeças|animais|machos|fêmeas|femeas)?/)
+          // quantidade: primeiro nÃºmero
+          const qMatch = s.match(/(\d{1,3})\s*(?:cabecas|cabeÃ§as|animais|machos|fÃªmeas|femeas)?/)
           if (qMatch) {
             const q = parseInt(qMatch[1])
             if (!isNaN(q) && q > 0) meta.quantidade = q
           }
           // sexo
           if (s.includes('macho')) meta.sexo = 'macho'
-          else if (s.includes('fêmea') || s.includes('femea')) meta.sexo = 'fêmea'
+          else if (s.includes('fÃªmea') || s.includes('femea')) meta.sexo = 'fÃªmea'
           // era
           const eraMatch = s.match(/(36\+|24\+|18-22|15-18|7-15|0-7|\d{1,2}\+?\s*meses?)/)
           if (eraMatch) meta.era = eraMatch[1]
-          // raça
+          // raÃ§a
           if (s.includes('nelore')) meta.raca = 'Nelore'
           if (s.includes('angus')) meta.raca = 'Angus'
           return meta
@@ -218,10 +218,10 @@ export default async function handler(req, res) {
       }
 
       const tipoMov = (nf.tipo || 'entrada')
-      const subtipoMov = tipoMov === 'entrada' ? 'NF Entrada' : 'NF Saída'
+      const subtipoMov = tipoMov === 'entrada' ? 'NF Entrada' : 'NF SaÃ­da'
 
       if (itens.length === 0) {
-        // Inserir um movimento genérico quando a NF não tiver itens listados
+        // Inserir um movimento genÃ©rico quando a NF nÃ£o tiver itens listados
         const dadosExtras = {
           nf_id: nf.id,
           numero_nf: nf.numero_nf,
@@ -234,7 +234,7 @@ export default async function handler(req, res) {
                tipo, subtipo, data_movimento, animal_id, valor, descricao, observacoes, localidade, dados_extras
              ) VALUES ($1, $2, $3, NULL, $4, $5, NULL, $6, $7)
              ON CONFLICT DO NOTHING`,
-            [tipoMov, subtipoMov, dataOperacao, nf.valor_total || 0, `NF ${nf.numero_nf} (genérico)`, 'AGROPECUÁRIA PARDINHO LTDA', JSON.stringify(dadosExtras)]
+            [tipoMov, subtipoMov, dataOperacao, nf.valor_total || 0, `NF ${nf.numero_nf} (genÃ©rico)`, 'AGROPECUÃ�RIA PARDINHO LTDA', JSON.stringify(dadosExtras)]
           )
           inseridos++
         }
@@ -244,7 +244,7 @@ export default async function handler(req, res) {
                tipo, subtipo, data_movimento, animal_id, valor, descricao, observacoes, localidade, dados_extras
              ) VALUES ($1, $2, $3, NULL, $4, $5, NULL, $6, $7)
              ON CONFLICT DO NOTHING`,
-            [tipoMov, subtipoMov, dataOperacao, nf.valor_total || 0, `NF ${nf.numero_nf} (genérico)`, 'FAZENDA SANT ANNA', JSON.stringify(dadosExtras)]
+            [tipoMov, subtipoMov, dataOperacao, nf.valor_total || 0, `NF ${nf.numero_nf} (genÃ©rico)`, 'FAZENDA SANT ANNA', JSON.stringify(dadosExtras)]
           )
           inseridos++
         }
@@ -271,14 +271,14 @@ export default async function handler(req, res) {
           quantidade: itens.length === 1 ? quantidadeItem : 1
         }
 
-        // Verificar se é NF da AGROPECUÁRIA PARDINHO
-        // Usar dados já buscados da NF
+        // Verificar se Ã© NF da AGROPECUÃ�RIA PARDINHO
+        // Usar dados jÃ¡ buscados da NF
         if (isPardinho) {
           await query(
             `INSERT INTO movimentacoes_contabeis (
                tipo, subtipo, data_movimento, animal_id, valor, descricao, observacoes, localidade, dados_extras
              ) VALUES ($1, $2, $3, NULL, $4, $5, NULL, $6, $7)`,
-            [tipoMov, subtipoMov, dataOperacao, (meta.valor_unitario || item.valor_unitario || 0), `NF ${nf.numero_nf}`, 'AGROPECUÁRIA PARDINHO LTDA', JSON.stringify(dadosExtras)]
+            [tipoMov, subtipoMov, dataOperacao, (meta.valor_unitario || item.valor_unitario || 0), `NF ${nf.numero_nf}`, 'AGROPECUÃ�RIA PARDINHO LTDA', JSON.stringify(dadosExtras)]
           )
           inseridos++
         }
@@ -295,13 +295,13 @@ export default async function handler(req, res) {
     }
 
     return res.status(200).json({ 
-      message: 'Sincronização concluída', 
+      message: 'SincronizaÃ§Ã£o concluÃ­da', 
       inseridos, 
       atualizados,
       filtro: nfNumber ? { nfNumber: String(nfNumber) } : { periodo: { start: pgStart, end: pgEnd } } 
     })
   } catch (error) {
-    console.error('Erro ao sincronizar NFs para movimentações:', error)
+    console.error('Erro ao sincronizar NFs para movimentaÃ§Ãµes:', error)
     return res.status(500).json({ message: 'Erro ao sincronizar NFs', error: error.message })
   }
 }

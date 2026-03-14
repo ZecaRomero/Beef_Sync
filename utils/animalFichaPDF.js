@@ -1,11 +1,11 @@
 import jsPDF from 'jspdf'
 
 /**
- * Gera PDF da ficha completa de um ou vários animais
+ * Gera PDF da ficha completa de um ou vÃ¡rios animais
  * @param {Array} animals - Array de animais
- * @param {Object} examesAndrologicos - Objeto com exames andrológicos por RG
- * @param {Object} reproducaoStatsMap - Mapa de estatísticas reprodutivas por ID do animal
- * @param {Object} transferenciasEmbrioesMap - Mapa de transferências de embriões por ID do animal (opcional)
+ * @param {Object} examesAndrologicos - Objeto com exames androlÃ³gicos por RG
+ * @param {Object} reproducaoStatsMap - Mapa de estatÃ­sticas reprodutivas por ID do animal
+ * @param {Object} transferenciasEmbrioesMap - Mapa de transferÃªncias de embriÃµes por ID do animal (opcional)
  */
 export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, reproducaoStatsMap = {}, transferenciasEmbrioesMap = {}) {
   const doc = new jsPDF()
@@ -18,7 +18,7 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
   let logoBase64 = null
   try {
     // Tentar carregar da pasta public (arquivo deve estar em public/logo-santanna.jpg)
-    // Se não encontrar, tentar outros caminhos
+    // Se nÃ£o encontrar, tentar outros caminhos
     const logoPaths = [
       '/logo-santanna.png.jpg', // Nome atual do arquivo
       '/logo-santanna.jpg',
@@ -47,12 +47,12 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
     console.warn('Erro ao carregar logotipo:', error)
   }
   
-  // Função para adicionar logotipo
+  // FunÃ§Ã£o para adicionar logotipo
   const addLogo = (doc, x, y) => {
     if (!logoBase64) return 0
     try {
       const imgWidth = 50
-      const imgHeight = 30 // Altura fixa para manter proporção
+      const imgHeight = 30 // Altura fixa para manter proporÃ§Ã£o
       doc.addImage(logoBase64, 'JPEG', x, y, imgWidth, imgHeight)
       return imgHeight + 5
     } catch (error) {
@@ -61,7 +61,7 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
     }
   }
 
-  // Função para adicionar nova página se necessário
+  // FunÃ§Ã£o para adicionar nova pÃ¡gina se necessÃ¡rio
   const checkPageBreak = (requiredSpace = 20) => {
     if (yPosition + requiredSpace > doc.internal.pageSize.getHeight() - 20) {
       doc.addPage()
@@ -71,7 +71,7 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
     return false
   }
 
-  // Função para adicionar texto com quebra de linha
+  // FunÃ§Ã£o para adicionar texto com quebra de linha
   const addText = (text, x, y, options = {}) => {
     const { fontSize = 10, fontStyle = 'normal', color = [0, 0, 0], maxWidth = contentWidth } = options
     doc.setFontSize(fontSize)
@@ -83,15 +83,15 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
     return lines.length * (fontSize * 0.4) + 2
   }
 
-  // Função para formatar data
+  // FunÃ§Ã£o para formatar data
   const formatDate = (dateString) => {
-    if (!dateString) return 'Não informado'
+    if (!dateString) return 'NÃ£o informado'
     return new Date(dateString).toLocaleDateString('pt-BR')
   }
 
-  // Função para formatar moeda
+  // FunÃ§Ã£o para formatar moeda
   const formatCurrency = (value) => {
-    if (!value) return 'Não informado'
+    if (!value) return 'NÃ£o informado'
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
@@ -101,7 +101,7 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
   // Processar cada animal
   for (let index = 0; index < animals.length; index++) {
     const animal = animals[index]
-    // Adicionar cabeçalho para cada animal (exceto o primeiro)
+    // Adicionar cabeÃ§alho para cada animal (exceto o primeiro)
     if (index > 0) {
       checkPageBreak(30)
       yPosition += 10
@@ -110,7 +110,7 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
       yPosition += 15
     }
 
-    // Adicionar logotipo no topo (apenas na primeira página do primeiro animal)
+    // Adicionar logotipo no topo (apenas na primeira pÃ¡gina do primeiro animal)
     if (index === 0 && doc.internal.getCurrentPageInfo().pageNumber === 1) {
       const logoHeight = addLogo(doc, pageWidth - margin - 50, 10)
       if (logoHeight > 0) {
@@ -118,14 +118,14 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
       }
     }
 
-    // Cabeçalho do animal
+    // CabeÃ§alho do animal
     doc.setFontSize(18)
     doc.setTextColor(37, 99, 235)
     doc.setFont('helvetica', 'bold')
     doc.text(' FICHA COMPLETA DO ANIMAL', margin, yPosition)
     yPosition += 10
 
-    // Identificação
+    // IdentificaÃ§Ã£o
     doc.setFontSize(14)
     doc.setTextColor(0, 0, 0)
     doc.setFont('helvetica', 'bold')
@@ -138,31 +138,31 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
     }
     yPosition += 10
 
-    // Informações Básicas
+    // InformaÃ§Ãµes BÃ¡sicas
     checkPageBreak(80)
     doc.setFontSize(12)
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(50, 50, 50)
-    doc.text('INFORMAÇÕES BÁSICAS', margin, yPosition)
+    doc.text('INFORMAÃâ€¡Ãâ€¢ES BÃ�SICAS', margin, yPosition)
     yPosition += 8
 
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(10)
     const basicInfo = []
     
-    // Adicionar apenas campos com informações
+    // Adicionar apenas campos com informaÃ§Ãµes
     if (animal.sexo) basicInfo.push(['Sexo:', animal.sexo])
-    if (animal.raca) basicInfo.push(['Raça:', animal.raca])
+    if (animal.raca) basicInfo.push(['RaÃ§a:', animal.raca])
     if (animal.cor) basicInfo.push(['Cor:', animal.cor])
-    if (animal.situacao) basicInfo.push(['Situação:', animal.situacao])
+    if (animal.situacao) basicInfo.push(['SituaÃ§Ã£o:', animal.situacao])
     if (animal.peso) basicInfo.push(['Peso:', `${animal.peso} kg`])
     
-    // Tatuagem: usar série-RG se não tiver tatuagem específica
+    // Tatuagem: usar sÃ©rie-RG se nÃ£o tiver tatuagem especÃ­fica
     const tatuagem = animal.tatuagem || (animal.serie && animal.rg ? `${animal.serie} ${animal.rg}` : null)
     if (tatuagem) basicInfo.push(['Tatuagem:', tatuagem])
     
-    // É Doadora sempre mostrar
-    basicInfo.push(['É Doadora:', (animal.is_doadora || (animal.fivs && animal.fivs.length > 0)) ? 'Sim' : 'Não'])
+    // Ãâ€° Doadora sempre mostrar
+    basicInfo.push(['Ãâ€° Doadora:', (animal.is_doadora || (animal.fivs && animal.fivs.length > 0)) ? 'Sim' : 'NÃ£o'])
 
     let col1X = margin
     let col2X = margin + 70
@@ -204,7 +204,7 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
     doc.setFontSize(10)
     
     // Data de nascimento com meses de vida - SEMPRE EXIBIR
-    const dataNascimentoTexto = animal.data_nascimento ? formatDate(animal.data_nascimento) : 'Não informado'
+    const dataNascimentoTexto = animal.data_nascimento ? formatDate(animal.data_nascimento) : 'NÃ£o informado'
     const mesesVida = animal.meses ? ` (${animal.meses} meses)` : ''
     yPosition += addText(`Data: ${dataNascimentoTexto}${mesesVida}`, margin, yPosition, { maxWidth: contentWidth / 2 })
     
@@ -213,7 +213,7 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
       yPosition += addText(`Hora: ${animal.hora_nascimento}`, margin + contentWidth / 2, yPosition - 5, { maxWidth: contentWidth / 2 })
     }
     
-    // Peso ao nascer - apenas se tiver informação
+    // Peso ao nascer - apenas se tiver informaÃ§Ã£o
     if (animal.peso_nascimento) {
       yPosition += addText(`Peso ao Nascer: ${animal.peso_nascimento} kg`, margin, yPosition, { maxWidth: contentWidth / 2 })
     }
@@ -230,13 +230,13 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
     
     yPosition += 10
     
-    // Informações Adicionais
+    // InformaÃ§Ãµes Adicionais
     if (animal.veterinario || animal.abczg || animal.deca || animal.iabcz || animal.mgq || animal.top || animal.mgta) {
       checkPageBreak(40)
       doc.setFontSize(12)
       doc.setFont('helvetica', 'bold')
       doc.setTextColor(50, 50, 50)
-      doc.text('INFORMAÇÕES ADICIONAIS', margin, yPosition)
+      doc.text('INFORMAÃâ€¡Ãâ€¢ES ADICIONAIS', margin, yPosition)
       yPosition += 8
 
       doc.setFont('helvetica', 'normal')
@@ -245,7 +245,7 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
       let infoRowY = yPosition
       
       const infoItems = []
-      if (animal.veterinario) infoItems.push(['Veterinário:', animal.veterinario])
+      if (animal.veterinario) infoItems.push(['VeterinÃ¡rio:', animal.veterinario])
       if (animal.abczg) infoItems.push(['ABCZG:', animal.abczg])
       if (animal.deca) infoItems.push(['DECA:', animal.deca])
       if (animal.iabcz) infoItems.push(['IABCZ:', animal.iabcz])
@@ -282,29 +282,29 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
     doc.setFontSize(10)
     
     // Pai - SEMPRE EXIBIR
-    const paiTexto = animal.pai || 'Não informado'
+    const paiTexto = animal.pai || 'NÃ£o informado'
     yPosition += addText(`Pai: ${paiTexto}`, margin, yPosition, { maxWidth: contentWidth / 2 })
     
-    // Mãe - SEMPRE EXIBIR
-    const maeTexto = animal.mae || 'Não informado'
-    yPosition += addText(`Mãe: ${maeTexto}`, margin + contentWidth / 2, yPosition - 5, { maxWidth: contentWidth / 2 })
+    // MÃ£e - SEMPRE EXIBIR
+    const maeTexto = animal.mae || 'NÃ£o informado'
+    yPosition += addText(`MÃ£e: ${maeTexto}`, margin + contentWidth / 2, yPosition - 5, { maxWidth: contentWidth / 2 })
     
-    // Avô Materno
-    const avoTexto = animal.avo_materno || animal.avoMaterno || 'Não informado'
-    yPosition += addText(`Avô Materno: ${avoTexto}`, margin, yPosition, { maxWidth: contentWidth / 2 })
+    // AvÃ´ Materno
+    const avoTexto = animal.avo_materno || animal.avoMaterno || 'NÃ£o informado'
+    yPosition += addText(`AvÃ´ Materno: ${avoTexto}`, margin, yPosition, { maxWidth: contentWidth / 2 })
     
     // Receptora
-    const receptoraTexto = animal.receptora || 'Não informado'
+    const receptoraTexto = animal.receptora || 'NÃ£o informado'
     yPosition += addText(`Receptora: ${receptoraTexto}`, margin + contentWidth / 2, yPosition - 5, { maxWidth: contentWidth / 2 })
     
     yPosition += 10
 
-    // Informações Financeiras
+    // InformaÃ§Ãµes Financeiras
     checkPageBreak(60)
     doc.setFontSize(12)
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(50, 50, 50)
-    doc.text('INFORMAÇÕES FINANCEIRAS', margin, yPosition)
+    doc.text('INFORMAÃâ€¡Ãâ€¢ES FINANCEIRAS', margin, yPosition)
     yPosition += 8
 
     doc.setFont('helvetica', 'normal')
@@ -334,31 +334,31 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
     
     yPosition = financeRowY + (financeCol > 0 ? 6 : 0) + 10
     
-    // Calcular lucro/prejuízo se tiver valor de venda e custo
+    // Calcular lucro/prejuÃ­zo se tiver valor de venda e custo
     if (animal.valor_venda && animal.custo_total) {
       const lucro = parseFloat(animal.valor_venda) - parseFloat(animal.custo_total || 0)
       const corLucro = lucro >= 0 ? [34, 197, 94] : [239, 68, 68]
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(11)
       doc.setTextColor(...corLucro)
-      yPosition += addText(`Lucro/Prejuízo: ${formatCurrency(lucro)}`, margin, yPosition)
+      yPosition += addText(`Lucro/PrejuÃ­zo: ${formatCurrency(lucro)}`, margin, yPosition)
       doc.setTextColor(0, 0, 0)
       yPosition += 8
     }
     
-    // Histórico de Custos Detalhado (se disponível)
+    // HistÃ³rico de Custos Detalhado (se disponÃ­vel)
     if (animal.custos && Array.isArray(animal.custos) && animal.custos.length > 0) {
       checkPageBreak(50)
       doc.setFontSize(12)
       doc.setFont('helvetica', 'bold')
       doc.setTextColor(50, 50, 50)
-      doc.text('HISTÓRICO DE CUSTOS DETALHADO', margin, yPosition)
+      doc.text('HISTÃâ€œRICO DE CUSTOS DETALHADO', margin, yPosition)
       yPosition += 8
       
       doc.setFont('helvetica', 'normal')
       doc.setFontSize(9)
       
-      // Cabeçalho da tabela
+      // CabeÃ§alho da tabela
       doc.setFont('helvetica', 'bold')
       doc.text('Data', margin, yPosition)
       doc.text('Tipo', margin + 40, yPosition)
@@ -373,7 +373,7 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
       doc.setFont('helvetica', 'normal')
       let totalCustos = 0
       
-      animal.custos.slice(0, 10).forEach((custo) => { // Limitar a 10 custos para não sobrecarregar
+      animal.custos.slice(0, 10).forEach((custo) => { // Limitar a 10 custos para nÃ£o sobrecarregar
         checkPageBreak(15)
         
         const custoData = custo.data || custo.data_custo || 'N/A'
@@ -382,8 +382,8 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
         const custoValor = parseFloat(custo.valor || 0)
         totalCustos += custoValor
         
-        // Destacar custos de exames andrológicos
-        const isAndrologico = custoTipo === 'Exame' && custoSubtipo === 'Andrológico'
+        // Destacar custos de exames androlÃ³gicos
+        const isAndrologico = custoTipo === 'Exame' && custoSubtipo === 'AndrolÃ³gico'
         if (isAndrologico) {
           doc.setTextColor(219, 39, 119) // Rosa
         }
@@ -416,7 +416,7 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
       yPosition += 10
     }
 
-    // Exames Andrológicos (apenas para machos)
+    // Exames AndrolÃ³gicos (apenas para machos)
     const animalRG = String(animal.rg || '').trim()
     const examesAnimal = examesAndrologicos[animalRG] || []
     
@@ -425,7 +425,7 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
       doc.setFontSize(12)
       doc.setFont('helvetica', 'bold')
       doc.setTextColor(50, 50, 50)
-      doc.text('EXAMES ANDROLÓGICOS', margin, yPosition)
+      doc.text('EXAMES ANDROLÃâ€œGICOS', margin, yPosition)
       yPosition += 8
 
       doc.setFont('helvetica', 'normal')
@@ -451,7 +451,7 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
         doc.setFont('helvetica', 'bold')
         doc.setFontSize(11)
         doc.setTextColor(...corResultado)
-        doc.text(`Exame Andrológico ${idx + 1}: ${resultado}`, margin, yPosition)
+        doc.text(`Exame AndrolÃ³gico ${idx + 1}: ${resultado}`, margin, yPosition)
         
         doc.setFont('helvetica', 'normal')
         doc.setFontSize(10)
@@ -474,7 +474,7 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
         
         // Reagendamento
         if (exame.reagendado) {
-          const dataReagendamento = exame.data_reagendamento ? formatDate(exame.data_reagendamento) : 'Não definida'
+          const dataReagendamento = exame.data_reagendamento ? formatDate(exame.data_reagendamento) : 'NÃ£o definida'
           doc.setFont('helvetica', 'bold')
           doc.setTextColor(59, 130, 246)
           yPosition += addText(`Reagendado para: ${dataReagendamento}`, margin + contentWidth / 2, yPosition - 5, { fontSize: 9, color: [59, 130, 246] })
@@ -491,12 +491,12 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
           doc.setTextColor(0, 0, 0)
         }
         
-        // Observações do exame
+        // ObservaÃ§Ãµes do exame
         if (exame.observacoes) {
-          yPosition += addText(`Observações: ${exame.observacoes}`, margin, yPosition, { fontSize: 9 })
+          yPosition += addText(`ObservaÃ§Ãµes: ${exame.observacoes}`, margin, yPosition, { fontSize: 9 })
         }
         
-        // ID do exame (se disponível)
+        // ID do exame (se disponÃ­vel)
         if (exame.id) {
           doc.setFont('helvetica', 'italic')
           doc.setFontSize(8)
@@ -527,16 +527,16 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
       }
     }
 
-    // Coletas FIV - Doadora de Oócitos
+    // Coletas FIV - Doadora de OÃ³citos
     if (animal.fivs && Array.isArray(animal.fivs) && animal.fivs.length > 0) {
       checkPageBreak(80)
       doc.setFontSize(12)
       doc.setFont('helvetica', 'bold')
       doc.setTextColor(219, 39, 119) // Rosa/Pink
-      doc.text('DOADORA DE OÓCITOS (FIV)', margin, yPosition)
+      doc.text('DOADORA DE OÃâ€œCITOS (FIV)', margin, yPosition)
       yPosition += 8
 
-      // Calcular estatísticas
+      // Calcular estatÃ­sticas
       const totalColetas = animal.fivs.length
       const totalOocitos = animal.fivs.reduce((sum, fiv) => sum + (parseInt(fiv.quantidade_oocitos) || 0), 0)
       const mediaOocitos = totalColetas > 0 ? (totalOocitos / totalColetas).toFixed(1) : 0
@@ -555,10 +555,10 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
       
       const resumoFIV = [
         ['Total de Coletas:', totalColetas],
-        ['Total de Oócitos:', totalOocitos],
-        ['Média por Coleta:', `${mediaOocitos} oócitos`],
+        ['Total de OÃ³citos:', totalOocitos],
+        ['MÃ©dia por Coleta:', `${mediaOocitos} oÃ³citos`],
         ['Primeira Coleta:', formatDate(primeiraColeta.data_fiv)],
-        ['Última Coleta:', formatDate(ultimaColeta.data_fiv)],
+        ['ÃÅ¡ltima Coleta:', formatDate(ultimaColeta.data_fiv)],
       ]
 
       let colFIV = 0
@@ -579,25 +579,25 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
       })
       yPosition = rowYFIV + (colFIV > 0 ? 6 : 0) + 8
 
-      // Tabela de Histórico de Coletas
+      // Tabela de HistÃ³rico de Coletas
       checkPageBreak(50)
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(11)
       doc.setTextColor(219, 39, 119)
-      doc.text('HISTÓRICO DE COLETAS FIV', margin, yPosition)
+      doc.text('HISTÃâ€œRICO DE COLETAS FIV', margin, yPosition)
       yPosition += 6
 
-      // Cabeçalho da tabela
+      // CabeÃ§alho da tabela
       doc.setFontSize(9)
       doc.setFillColor(250, 200, 220) // Fundo rosa claro
       doc.rect(margin, yPosition - 4, contentWidth, 6, 'F')
       doc.setTextColor(0, 0, 0)
       doc.setFont('helvetica', 'bold')
       doc.text('Data FIV', margin + 2, yPosition)
-      doc.text('Laboratório', margin + 35, yPosition)
-      doc.text('Veterinário', margin + 85, yPosition)
+      doc.text('LaboratÃ³rio', margin + 35, yPosition)
+      doc.text('VeterinÃ¡rio', margin + 85, yPosition)
       doc.text('Touro', margin + 135, yPosition)
-      doc.text('Oócitos', margin + 170, yPosition)
+      doc.text('OÃ³citos', margin + 170, yPosition)
       doc.text('Data Transf.', margin + 195, yPosition)
       yPosition += 6
 
@@ -625,14 +625,14 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
         yPosition += 5
       })
 
-      // Observações gerais das coletas (se houver)
+      // ObservaÃ§Ãµes gerais das coletas (se houver)
       const coletasComObservacoes = animal.fivs.filter(fiv => fiv.observacoes)
       if (coletasComObservacoes.length > 0) {
         checkPageBreak(30)
         yPosition += 5
         doc.setFont('helvetica', 'bold')
         doc.setFontSize(10)
-        doc.text('Observações das Coletas:', margin, yPosition)
+        doc.text('ObservaÃ§Ãµes das Coletas:', margin, yPosition)
         yPosition += 6
         
         doc.setFont('helvetica', 'normal')
@@ -666,7 +666,7 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
         ['Total Produzido:', stats.total],
         ['Nascidos/Paridos:', stats.nascidos],
         ['Machos:', `${stats.machos} (${stats.total > 0 ? ((stats.machos/stats.total)*100).toFixed(0) : 0}%)`],
-        ['Fêmeas:', `${stats.femeas} (${stats.total > 0 ? ((stats.femeas/stats.total)*100).toFixed(0) : 0}%)`],
+        ['FÃªmeas:', `${stats.femeas} (${stats.total > 0 ? ((stats.femeas/stats.total)*100).toFixed(0) : 0}%)`],
       ]
 
       let col = 0
@@ -702,7 +702,7 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
           doc.rect(margin, yPosition - 4, contentWidth, 6, 'F')
           doc.text('Nome', margin + 2, yPosition)
           doc.text('Total', margin + 100, yPosition)
-          doc.text('Fêmeas', margin + 125, yPosition)
+          doc.text('FÃªmeas', margin + 125, yPosition)
           doc.text('Machos', margin + 150, yPosition)
           yPosition += 6
 
@@ -733,7 +733,7 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
           doc.setFillColor(230, 255, 230) // Light green background
           doc.rect(margin, yPosition - 4, contentWidth, 6, 'F')
           doc.text('Data TE', margin + 2, yPosition)
-          doc.text('Previsão Parto', margin + 35, yPosition)
+          doc.text('PrevisÃ£o Parto', margin + 35, yPosition)
           doc.text('Dias Restantes', margin + 70, yPosition)
           doc.text('Acasalamento', margin + 105, yPosition)
           doc.text('Sexo', margin + 160, yPosition)
@@ -748,8 +748,8 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
               const previsaoParto = formatDate(prenhez.previsao_parto)
               const diasRestantes = prenhez.dias_restantes
               const parceiro = animal.sexo && (animal.sexo.toLowerCase().startsWith('m') || animal.sexo === 'M') 
-                  ? (prenhez.doadora_nome || 'Não Inf.') 
-                  : (prenhez.touro || 'Não Inf.')
+                  ? (prenhez.doadora_nome || 'NÃ£o Inf.') 
+                  : (prenhez.touro || 'NÃ£o Inf.')
               const sexoPrevisto = prenhez.sexo_prenhez || '?'
 
               doc.text(dataTE, margin + 2, yPosition)
@@ -781,30 +781,30 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
       yPosition += 5
     }
 
-    // Resumo de Transferências de Embriões (detalhado)
+    // Resumo de TransferÃªncias de EmbriÃµes (detalhado)
     const transferencias = transferenciasEmbrioesMap[animal.id] || []
     if (transferencias.length > 0) {
       checkPageBreak(80)
       doc.setFontSize(12)
       doc.setFont('helvetica', 'bold')
       doc.setTextColor(219, 39, 119) // Rosa/Pink
-      doc.text('TRANSFERÊNCIAS DE EMBRIÕES', margin, yPosition)
+      doc.text('TRANSFERÃÅ NCIAS DE EMBRIÃâ€¢ES', margin, yPosition)
       yPosition += 8
 
       // Separar por tipo (doadora, receptora, touro)
-      // Função auxiliar para verificar se a transferência pertence ao animal
+      // FunÃ§Ã£o auxiliar para verificar se a transferÃªncia pertence ao animal
       const pertenceAoAnimal = (te, tipo) => {
-        // Verificar por ID primeiro (mais confiável)
+        // Verificar por ID primeiro (mais confiÃ¡vel)
         if (tipo === 'doadora' && te.doadora_id === animal.id) return true
         if (tipo === 'receptora' && te.receptora_id === animal.id) return true
         if (tipo === 'touro' && te.touro_id === animal.id) return true
         
-        // Verificar por nome (quando ID não está disponível)
+        // Verificar por nome (quando ID nÃ£o estÃ¡ disponÃ­vel)
         if (tipo === 'doadora' && te.doadora_nome) {
           const nome = te.doadora_nome.toLowerCase()
           const serie = animal.serie ? animal.serie.toLowerCase() : ''
           const rg = animal.rg ? animal.rg.toString() : ''
-          // Verificar se contém série e RG, ou formato "SERIE (RG: RG)"
+          // Verificar se contÃ©m sÃ©rie e RG, ou formato "SERIE (RG: RG)"
           if ((nome.includes(serie) && nome.includes(rg)) || 
               nome.includes(`${serie} (rg: ${rg})`) || 
               nome.includes(`${serie}(rg: ${rg})`)) {
@@ -845,13 +845,13 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
       // Resumo geral
       const resumoTE = []
       if (comoDoadora.length > 0) {
-        resumoTE.push(['Como Doadora:', `${comoDoadora.length} transferência(s)`])
+        resumoTE.push(['Como Doadora:', `${comoDoadora.length} transferÃªncia(s)`])
       }
       if (comoReceptora.length > 0) {
-        resumoTE.push(['Como Receptora:', `${comoReceptora.length} transferência(s)`])
+        resumoTE.push(['Como Receptora:', `${comoReceptora.length} transferÃªncia(s)`])
       }
       if (comoTouro.length > 0) {
-        resumoTE.push(['Como Touro:', `${comoTouro.length} transferência(s)`])
+        resumoTE.push(['Como Touro:', `${comoTouro.length} transferÃªncia(s)`])
       }
 
       if (resumoTE.length > 0) {
@@ -874,16 +874,16 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
         yPosition = rowYTE + (colTE > 0 ? 6 : 0) + 8
       }
 
-      // Tabela de Transferências como Doadora
+      // Tabela de TransferÃªncias como Doadora
       if (comoDoadora.length > 0) {
         checkPageBreak(50)
         doc.setFont('helvetica', 'bold')
         doc.setFontSize(11)
         doc.setTextColor(219, 39, 119)
-        doc.text(`Transferências como Doadora (${comoDoadora.length})`, margin, yPosition)
+        doc.text(`TransferÃªncias como Doadora (${comoDoadora.length})`, margin, yPosition)
         yPosition += 6
 
-        // Cabeçalho da tabela
+        // CabeÃ§alho da tabela
         doc.setFontSize(9)
         doc.setFillColor(250, 200, 220) // Fundo rosa claro
         doc.rect(margin, yPosition - 4, contentWidth, 6, 'F')
@@ -898,7 +898,7 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
 
         // Linhas da tabela
         doc.setFont('helvetica', 'normal')
-        comoDoadora.slice(0, 10).forEach((te) => { // Limitar a 10 para não sobrecarregar
+        comoDoadora.slice(0, 10).forEach((te) => { // Limitar a 10 para nÃ£o sobrecarregar
           checkPageBreak(10)
           
           const dataTE = formatDate(te.data_te)
@@ -912,7 +912,7 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
           doc.text(touro, margin + 100, yPosition)
           
           // Colorir status
-          if (status === 'Nascido' || status === 'Parida' || status === 'Concluída') {
+          if (status === 'Nascido' || status === 'Parida' || status === 'ConcluÃ­da') {
             doc.setTextColor(34, 197, 94) // Verde
           } else if (status === 'Negativo' || status === 'Falha' || status === 'Aborto') {
             doc.setTextColor(239, 68, 68) // Vermelho
@@ -930,23 +930,23 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
         if (comoDoadora.length > 10) {
           doc.setFont('helvetica', 'italic')
           doc.setFontSize(8)
-          doc.text(`... e mais ${comoDoadora.length - 10} transferência(s)`, margin, yPosition)
+          doc.text(`... e mais ${comoDoadora.length - 10} transferÃªncia(s)`, margin, yPosition)
           yPosition += 5
         }
         
         yPosition += 5
       }
 
-      // Tabela de Transferências como Receptora
+      // Tabela de TransferÃªncias como Receptora
       if (comoReceptora.length > 0) {
         checkPageBreak(50)
         doc.setFont('helvetica', 'bold')
         doc.setFontSize(11)
         doc.setTextColor(219, 39, 119)
-        doc.text(`Transferências como Receptora (${comoReceptora.length})`, margin, yPosition)
+        doc.text(`TransferÃªncias como Receptora (${comoReceptora.length})`, margin, yPosition)
         yPosition += 6
 
-        // Cabeçalho da tabela
+        // CabeÃ§alho da tabela
         doc.setFontSize(9)
         doc.setFillColor(250, 200, 220) // Fundo rosa claro
         doc.rect(margin, yPosition - 4, contentWidth, 6, 'F')
@@ -975,7 +975,7 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
           doc.text(touro, margin + 100, yPosition)
           
           // Colorir status
-          if (status === 'Nascido' || status === 'Parida' || status === 'Concluída') {
+          if (status === 'Nascido' || status === 'Parida' || status === 'ConcluÃ­da') {
             doc.setTextColor(34, 197, 94) // Verde
           } else if (status === 'Negativo' || status === 'Falha' || status === 'Aborto') {
             doc.setTextColor(239, 68, 68) // Vermelho
@@ -993,23 +993,23 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
         if (comoReceptora.length > 10) {
           doc.setFont('helvetica', 'italic')
           doc.setFontSize(8)
-          doc.text(`... e mais ${comoReceptora.length - 10} transferência(s)`, margin, yPosition)
+          doc.text(`... e mais ${comoReceptora.length - 10} transferÃªncia(s)`, margin, yPosition)
           yPosition += 5
         }
         
         yPosition += 5
       }
 
-      // Tabela de Transferências como Touro
+      // Tabela de TransferÃªncias como Touro
       if (comoTouro.length > 0) {
         checkPageBreak(50)
         doc.setFont('helvetica', 'bold')
         doc.setFontSize(11)
         doc.setTextColor(219, 39, 119)
-        doc.text(`Transferências como Touro (${comoTouro.length})`, margin, yPosition)
+        doc.text(`TransferÃªncias como Touro (${comoTouro.length})`, margin, yPosition)
         yPosition += 6
 
-        // Cabeçalho da tabela
+        // CabeÃ§alho da tabela
         doc.setFontSize(9)
         doc.setFillColor(250, 200, 220) // Fundo rosa claro
         doc.rect(margin, yPosition - 4, contentWidth, 6, 'F')
@@ -1038,7 +1038,7 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
           doc.text(receptora, margin + 100, yPosition)
           
           // Colorir status
-          if (status === 'Nascido' || status === 'Parida' || status === 'Concluída') {
+          if (status === 'Nascido' || status === 'Parida' || status === 'ConcluÃ­da') {
             doc.setTextColor(34, 197, 94) // Verde
           } else if (status === 'Negativo' || status === 'Falha' || status === 'Aborto') {
             doc.setTextColor(239, 68, 68) // Vermelho
@@ -1056,7 +1056,7 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
         if (comoTouro.length > 10) {
           doc.setFont('helvetica', 'italic')
           doc.setFontSize(8)
-          doc.text(`... e mais ${comoTouro.length - 10} transferência(s)`, margin, yPosition)
+          doc.text(`... e mais ${comoTouro.length - 10} transferÃªncia(s)`, margin, yPosition)
           yPosition += 5
         }
         
@@ -1066,26 +1066,26 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
       yPosition += 5
     }
 
-    // Observações - SEMPRE EXIBIR
+    // ObservaÃ§Ãµes - SEMPRE EXIBIR
     checkPageBreak(40)
     doc.setFontSize(12)
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(50, 50, 50)
-    doc.text('OBSERVAÇÕES', margin, yPosition)
+    doc.text('OBSERVAÃâ€¡Ãâ€¢ES', margin, yPosition)
     yPosition += 8
 
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(10)
-    const observacoesTexto = animal.observacoes || 'Nenhuma observação registrada'
+    const observacoesTexto = animal.observacoes || 'Nenhuma observaÃ§Ã£o registrada'
     yPosition += addText(observacoesTexto, margin, yPosition, { maxWidth: contentWidth })
     yPosition += 10
     
-    // Informações do Sistema
+    // InformaÃ§Ãµes do Sistema
     checkPageBreak(30)
     doc.setFontSize(11)
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(100, 100, 100)
-    doc.text('INFORMAÇÕES DO SISTEMA', margin, yPosition)
+    doc.text('INFORMAÃâ€¡Ãâ€¢ES DO SISTEMA', margin, yPosition)
     yPosition += 8
 
     doc.setFont('helvetica', 'normal')
@@ -1097,7 +1097,7 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
       infoSistema.push(`Cadastrado em: ${formatDate(animal.created_at)}`)
     }
     if (animal.updated_at && animal.updated_at !== animal.created_at) {
-      infoSistema.push(`Última atualização: ${formatDate(animal.updated_at)}`)
+      infoSistema.push(`ÃÅ¡ltima atualizaÃ§Ã£o: ${formatDate(animal.updated_at)}`)
     }
     if (animal.id) {
       infoSistema.push(`ID do Sistema: ${animal.id}`)
@@ -1117,16 +1117,16 @@ export async function generateAnimalFichaPDF(animals, examesAndrologicos = {}, r
     doc.setTextColor(0, 0, 0) // Voltar ao preto
   }
 
-  // Rodapé em todas as páginas
+  // RodapÃ© em todas as pÃ¡ginas
   const pageCount = doc.internal.getNumberOfPages()
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i)
     doc.setFontSize(8)
     doc.setTextColor(128, 128, 128)
     doc.setFont('helvetica', 'normal')
-    doc.text(`Página ${i} de ${pageCount}`, margin, doc.internal.pageSize.getHeight() - 10)
+    doc.text(`PÃ¡gina ${i} de ${pageCount}`, margin, doc.internal.pageSize.getHeight() - 10)
     doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, pageWidth - margin - 60, doc.internal.pageSize.getHeight() - 10)
-    doc.text('© Beef-Sync - Sistema de Gestão Pecuária', pageWidth / 2 - 40, doc.internal.pageSize.getHeight() - 10)
+    doc.text('Â© Beef-Sync - Sistema de GestÃ£o PecuÃ¡ria', pageWidth / 2 - 40, doc.internal.pageSize.getHeight() - 10)
   }
 
   return doc

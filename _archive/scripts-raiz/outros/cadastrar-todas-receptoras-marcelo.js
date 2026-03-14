@@ -30,7 +30,7 @@ const receptorasNF231 = [
 
 async function cadastrarReceptoras(nfNumero, receptoras, client) {
   console.log(`\n${'='.repeat(80)}`);
-  console.log(`📦 PROCESSANDO NF ${nfNumero}`);
+  console.log(`�Ÿ“� PROCESSANDO NF ${nfNumero}`);
   console.log('='.repeat(80));
   
   // 1. Buscar NF
@@ -41,24 +41,24 @@ async function cadastrarReceptoras(nfNumero, receptoras, client) {
   `, [nfNumero]);
   
   if (nfResult.rows.length === 0) {
-    console.log(`❌ NF ${nfNumero} não encontrada!`);
+    console.log(`�Œ NF ${nfNumero} não encontrada!`);
     return { sucesso: 0, erros: 0, jaExistentes: 0 };
   }
   
   const nf = nfResult.rows[0];
-  console.log(`✅ NF ${nfNumero} encontrada (ID: ${nf.id})`);
+  console.log(`�œ… NF ${nfNumero} encontrada (ID: ${nf.id})`);
   console.log(`   Fornecedor: ${nf.fornecedor}`);
-  console.log(`   É Receptoras: ${nf.eh_receptoras ? 'SIM' : 'NÃO'}`);
+  console.log(`   �‰ Receptoras: ${nf.eh_receptoras ? 'SIM' : 'N�ƒO'}`);
   
   // 2. Marcar como receptoras se necessário
   if (!nf.eh_receptoras) {
-    console.log(`\n⚠️ Marcando NF ${nfNumero} como receptoras...`);
+    console.log(`\n�š�️ Marcando NF ${nfNumero} como receptoras...`);
     await client.query(`
       UPDATE notas_fiscais
       SET eh_receptoras = true
       WHERE id = $1
     `, [nf.id]);
-    console.log(`✅ NF ${nfNumero} marcada como receptoras`);
+    console.log(`�œ… NF ${nfNumero} marcada como receptoras`);
   }
   
   // 3. Verificar itens existentes
@@ -82,13 +82,13 @@ async function cadastrarReceptoras(nfNumero, receptoras, client) {
     }
   });
   
-  console.log(`\n📦 Itens já cadastrados: ${tatuagensExistentes.size}`);
+  console.log(`\n�Ÿ“� Itens já cadastrados: ${tatuagensExistentes.size}`);
   if (tatuagensExistentes.size > 0) {
     console.log(`   Tatuagens: ${Array.from(tatuagensExistentes).slice(0, 5).join(', ')}${tatuagensExistentes.size > 5 ? '...' : ''}`);
   }
   
   // 4. Cadastrar receptoras
-  console.log(`\n📝 Cadastrando ${receptoras.length} receptoras...\n`);
+  console.log(`\n�Ÿ“� Cadastrando ${receptoras.length} receptoras...\n`);
   
   let cadastrados = 0;
   let erros = 0;
@@ -129,11 +129,11 @@ async function cadastrarReceptoras(nfNumero, receptoras, client) {
       ]);
       
       cadastrados++;
-      console.log(`✅ ${cadastrados}. ${tatuagem} cadastrada`);
+      console.log(`�œ… ${cadastrados}. ${tatuagem} cadastrada`);
       
     } catch (error) {
       erros++;
-      console.error(`❌ Erro ao cadastrar ${tatuagem}:`, error.message);
+      console.error(`�Œ Erro ao cadastrar ${tatuagem}:`, error.message);
     }
   }
   
@@ -146,7 +146,7 @@ async function cadastrarReceptoras(nfNumero, receptoras, client) {
   
   const totalFinal = parseInt(totalFinalResult.rows[0].total);
   
-  console.log(`\n📊 RESUMO NF ${nfNumero}:`);
+  console.log(`\n�Ÿ“Š RESUMO NF ${nfNumero}:`);
   console.log(`   Receptoras esperadas: ${receptoras.length}`);
   console.log(`   Já existentes: ${jaExistentes}`);
   console.log(`   Cadastradas agora: ${cadastrados}`);
@@ -160,9 +160,9 @@ async function cadastrarTodasReceptorasMarcelo() {
   const client = await pool.connect();
   
   try {
-    console.log('🔍 CADASTRANDO TODAS AS RECEPTORAS DO MARCELO\n');
+    console.log('�Ÿ”� CADASTRANDO TODAS AS RECEPTORAS DO MARCELO\n');
     console.log('='.repeat(80));
-    console.log('📋 RESUMO DAS NFs:');
+    console.log('�Ÿ“‹ RESUMO DAS NFs:');
     console.log(`   NF 229: ${receptorasNF229.length} receptoras`);
     console.log(`   NF 230: ${receptorasNF230.length} receptoras`);
     console.log(`   NF 231: ${receptorasNF231.length} receptoras`);
@@ -184,7 +184,7 @@ async function cadastrarTodasReceptorasMarcelo() {
     
     // Resumo final
     console.log(`\n${'='.repeat(80)}`);
-    console.log('📊 RESUMO GERAL');
+    console.log('�Ÿ“Š RESUMO GERAL');
     console.log('='.repeat(80));
     console.log(`\nNF 229:`);
     console.log(`   Cadastradas: ${resultado229.sucesso}`);
@@ -202,16 +202,16 @@ async function cadastrarTodasReceptorasMarcelo() {
     console.log(`   Total final: ${resultado231.totalFinal}`);
     
     const totalGeral = resultado229.totalFinal + resultado230.totalFinal + resultado231.totalFinal;
-    console.log(`\n✅ TOTAL GERAL: ${totalGeral} receptoras cadastradas`);
+    console.log(`\n�œ… TOTAL GERAL: ${totalGeral} receptoras cadastradas`);
     
     if (totalGeral === 46) {
-      console.log('🎉 PERFEITO! Total de 46 cabeças conforme esperado!');
+      console.log('�ŸŽ‰ PERFEITO! Total de 46 cabeças conforme esperado!');
     } else {
-      console.log(`⚠️ ATENÇÃO: Esperado 46, encontrado ${totalGeral}`);
+      console.log(`�š�️ ATEN�‡�ƒO: Esperado 46, encontrado ${totalGeral}`);
     }
     
     console.log('\n' + '='.repeat(80));
-    console.log('\n💡 PRÓXIMOS PASSOS:');
+    console.log('\n�Ÿ’� PR�“XIMOS PASSOS:');
     console.log('   1. Atualize a página de Receptoras DG (F5)');
     console.log('   2. Verifique se os 3 lotes aparecem com as quantidades corretas');
     console.log('   3. Lote 1 (NF 229): 18 cabeças');
@@ -221,7 +221,7 @@ async function cadastrarTodasReceptorasMarcelo() {
     
   } catch (error) {
     await client.query('ROLLBACK');
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
     console.error(error);
   } finally {
     client.release();

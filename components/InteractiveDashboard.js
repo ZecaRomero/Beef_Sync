@@ -28,20 +28,20 @@ export default function InteractiveDashboard() {
     }
   }, [])
 
-  // Se não há animais, mostrar estado vazio
+  // Se nÃ£o hÃ¡ animais, mostrar estado vazio
   if (!Array.isArray(animals) || animals.length === 0) {
     return (
       <EmptyState
         title="Dashboard Interativo"
-        description="Cadastre animais para ver gráficos interativos, análises de custos e performance detalhada do seu rebanho."
-        icon="📊"
-        actionLabel="Começar Agora"
+        description="Cadastre animais para ver grÃ¡ficos interativos, anÃ¡lises de custos e performance detalhada do seu rebanho."
+        icon="ðÅ¸â€œÅ "
+        actionLabel="ComeÃ§ar Agora"
         onAction={() => router.push('/animals')}
       />
     )
   }
 
-  // Dados para análises - com validação
+  // Dados para anÃ¡lises - com validaÃ§Ã£o
   const custosPorTipo = Array.isArray(animals) ? animals.reduce((acc, animal) => {
     if (animal.custos && Array.isArray(animal.custos)) {
       animal.custos.forEach(custo => {
@@ -60,7 +60,7 @@ export default function InteractiveDashboard() {
     return acc
   }, {}) : {}
 
-  // Métricas principais
+  // MÃ©tricas principais
   const totalInvestido = Array.isArray(animals) ? animals.reduce((acc, a) => acc + (a.custoTotal || 0), 0) : 0
 
   const metrics = [
@@ -70,19 +70,19 @@ export default function InteractiveDashboard() {
       value: `R$ ${totalInvestido.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
       change: '+12.5%',
       trend: 'up',
-      emoji: '💰',
+      emoji: 'ðÅ¸â€™°',
       color: 'text-red-600 dark:text-red-400',
       bgColor: 'bg-red-100 dark:bg-red-900'
     },
   ]
 
-  // Função para abrir modal com detalhes
+  // FunÃ§Ã£o para abrir modal com detalhes
   const openModal = (cardId) => {
     setSelectedCard(cardId)
     setShowModal(true)
   }
 
-  // Função para gerar dados detalhados por card
+  // FunÃ§Ã£o para gerar dados detalhados por card
   const getCardDetails = (cardId) => {
     switch (cardId) {
       case 'investido':
@@ -100,13 +100,13 @@ export default function InteractiveDashboard() {
         }, {})
 
         return {
-          title: '💰 Total Investido - Detalhamento',
+          title: 'ðÅ¸â€™° Total Investido - Detalhamento',
           total: totalInvestido,
           items: animaisComCusto,
           breakdown: custosPorSituacao,
           insights: [
             `Maior investimento: ${animaisComCusto[0]?.nome} - R$ ${animaisComCusto[0]?.custo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-            `Investimento médio por animal: R$ ${(totalInvestido / animals.length).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+            `Investimento mÃ©dio por animal: R$ ${(totalInvestido / animals.length).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
             `Total de animais: ${animals.length}`,
             `Animais ativos: ${animals.filter(a => a.situacao === 'Ativo').length}`
           ]
@@ -128,15 +128,15 @@ export default function InteractiveDashboard() {
         }, {})
 
         return {
-          title: '📈 Total Recebido - Detalhamento',
+          title: 'ðÅ¸â€œË† Total Recebido - Detalhamento',
           total: totalRecebido,
           items: animaisVendidos,
           breakdown: receitaPorRaca,
           insights: [
             `Maior venda: ${animaisVendidos[0]?.nome} - R$ ${animaisVendidos[0]?.receita.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-            `Receita média por venda: R$ ${animaisVendidos.length > 0 ? (totalRecebido / animaisVendidos.length).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'}`,
+            `Receita mÃ©dia por venda: R$ ${animaisVendidos.length > 0 ? (totalRecebido / animaisVendidos.length).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'}`,
             `Animais vendidos: ${animaisVendidos.length}`,
-            `Taxa de conversão: ${((animaisVendidos.length / animals.length) * 100).toFixed(1)}%`
+            `Taxa de conversÃ£o: ${((animaisVendidos.length / animals.length) * 100).toFixed(1)}%`
           ]
         }
 
@@ -156,15 +156,15 @@ export default function InteractiveDashboard() {
         }, {})
 
         return {
-          title: `${lucroTotal >= 0 ? '📈' : '📉'} Lucro Total - Detalhamento`,
+          title: `${lucroTotal >= 0 ? 'ðÅ¸â€œË†' : 'ðÅ¸â€œâ€°'} Lucro Total - Detalhamento`,
           total: lucroTotal,
           items: animaisComLucro,
           breakdown: lucroPorRaca,
           insights: [
-            `${lucroTotal >= 0 ? 'Maior lucro' : 'Menor prejuízo'}: ${animaisComLucro[0]?.nome} - R$ ${animaisComLucro[0]?.lucro.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-            `Lucro médio por venda: R$ ${animaisComLucro.length > 0 ? (lucroTotal / animaisComLucro.length).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'}`,
+            `${lucroTotal >= 0 ? 'Maior lucro' : 'Menor prejuÃ­zo'}: ${animaisComLucro[0]?.nome} - R$ ${animaisComLucro[0]?.lucro.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+            `Lucro mÃ©dio por venda: R$ ${animaisComLucro.length > 0 ? (lucroTotal / animaisComLucro.length).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'}`,
             `Vendas lucrativas: ${animaisComLucro.filter(a => a.lucro > 0).length}`,
-            `Margem de lucro média: ${animaisComLucro.length > 0 ? ((lucroTotal / totalRecebido) * 100).toFixed(1) : 0}%`
+            `Margem de lucro mÃ©dia: ${animaisComLucro.length > 0 ? ((lucroTotal / totalRecebido) * 100).toFixed(1) : 0}%`
           ]
         }
 
@@ -187,13 +187,13 @@ export default function InteractiveDashboard() {
         })
 
         return {
-          title: '📊 ROI Médio - Detalhamento',
+          title: 'ðÅ¸â€œÅ  ROI MÃ©dio - Detalhamento',
           total: roiMedio,
           items: animaisComROI,
           breakdown: roiPorRaca,
           insights: [
             `Melhor ROI: ${animaisComROI[0]?.nome} - ${animaisComROI[0]?.roi.toFixed(1)}%`,
-            `ROI médio: ${roiMedio.toFixed(1)}%`,
+            `ROI mÃ©dio: ${roiMedio.toFixed(1)}%`,
             `Vendas com ROI positivo: ${animaisComROI.filter(a => a.roi > 0).length}`,
             `Meta de ROI (20%): ${animaisComROI.filter(a => a.roi >= 20).length} animais atingiram`
           ]
@@ -208,20 +208,20 @@ export default function InteractiveDashboard() {
     const maxValue = Math.max(...Object.values(data))
     const total = Object.values(data).reduce((acc, val) => acc + val, 0)
     
-    // Cores específicas para cada categoria
+    // Cores especÃ­ficas para cada categoria
     const categoryColors = {
-      'Nascimento': { bg: 'from-green-400 to-green-600', icon: '🐄', border: 'border-green-200 dark:border-green-800' },
-      'DNA': { bg: 'from-purple-400 to-purple-600', icon: '🧬', border: 'border-purple-200 dark:border-purple-800' },
-      'Sanidade': { bg: 'from-blue-400 to-blue-600', icon: '💉', border: 'border-blue-200 dark:border-blue-800' },
-      'Medicamentos': { bg: 'from-red-400 to-red-600', icon: '💊', border: 'border-red-200 dark:border-red-800' },
-      'Veterinários': { bg: 'from-blue-400 to-blue-600', icon: '🩺', border: 'border-blue-200 dark:border-blue-800' },
-      'Aquisição': { bg: 'from-indigo-400 to-indigo-600', icon: '💰', border: 'border-indigo-200 dark:border-indigo-800' },
-      'Mão de Obra Proporcional': { bg: 'from-yellow-400 to-yellow-600', icon: '👷', border: 'border-yellow-200 dark:border-yellow-800' },
-      'Frete / Transporte': { bg: 'from-teal-400 to-teal-600', icon: '🚛', border: 'border-teal-200 dark:border-teal-800' },
-      'Manejo': { bg: 'from-green-400 to-green-600', icon: '🤠', border: 'border-green-200 dark:border-green-800' },
-      'Infraestrutura': { bg: 'from-gray-400 to-gray-600', icon: '🏗️', border: 'border-gray-200 dark:border-gray-800' },
-      'Reprodução': { bg: 'from-rose-400 to-rose-600', icon: '💕', border: 'border-rose-200 dark:border-rose-800' },
-      'Outros': { bg: 'from-slate-400 to-slate-600', icon: '📦', border: 'border-slate-200 dark:border-slate-800' }
+      'Nascimento': { bg: 'from-green-400 to-green-600', icon: 'ðÅ¸�â€ž', border: 'border-green-200 dark:border-green-800' },
+      'DNA': { bg: 'from-purple-400 to-purple-600', icon: 'ðÅ¸§¬', border: 'border-purple-200 dark:border-purple-800' },
+      'Sanidade': { bg: 'from-blue-400 to-blue-600', icon: 'ðÅ¸â€™â€°', border: 'border-blue-200 dark:border-blue-800' },
+      'Medicamentos': { bg: 'from-red-400 to-red-600', icon: 'ðÅ¸â€™Å ', border: 'border-red-200 dark:border-red-800' },
+      'VeterinÃ¡rios': { bg: 'from-blue-400 to-blue-600', icon: 'ðÅ¸©º', border: 'border-blue-200 dark:border-blue-800' },
+      'AquisiÃ§Ã£o': { bg: 'from-indigo-400 to-indigo-600', icon: 'ðÅ¸â€™°', border: 'border-indigo-200 dark:border-indigo-800' },
+      'MÃ£o de Obra Proporcional': { bg: 'from-yellow-400 to-yellow-600', icon: 'ðÅ¸â€˜·', border: 'border-yellow-200 dark:border-yellow-800' },
+      'Frete / Transporte': { bg: 'from-teal-400 to-teal-600', icon: 'ðÅ¸Å¡â€º', border: 'border-teal-200 dark:border-teal-800' },
+      'Manejo': { bg: 'from-green-400 to-green-600', icon: 'ðÅ¸¤ ', border: 'border-green-200 dark:border-green-800' },
+      'Infraestrutura': { bg: 'from-gray-400 to-gray-600', icon: 'ðÅ¸�â€”ï¸�', border: 'border-gray-200 dark:border-gray-800' },
+      'ReproduÃ§Ã£o': { bg: 'from-rose-400 to-rose-600', icon: 'ðÅ¸â€™â€¢', border: 'border-rose-200 dark:border-rose-800' },
+      'Outros': { bg: 'from-slate-400 to-slate-600', icon: 'ðÅ¸â€œ¦', border: 'border-slate-200 dark:border-slate-800' }
     }
 
     // Ordenar por valor (maior para menor)
@@ -239,7 +239,7 @@ export default function InteractiveDashboard() {
           </div>
         </div>
 
-        {/* Gráfico de barras melhorado */}
+        {/* GrÃ¡fico de barras melhorado */}
         <div className="space-y-3">
           {sortedData.map(([key, value], index) => {
             const percentage = ((value / maxValue) * 100)
@@ -292,13 +292,13 @@ export default function InteractiveDashboard() {
                   </div>
                 </div>
 
-                {/* Estatísticas adicionais */}
+                {/* EstatÃ­sticas adicionais */}
                 <div className="mt-3 flex justify-between text-xs text-gray-500 dark:text-gray-400">
-                  <span>Posição: {index + 1}º lugar</span>
+                  <span>PosiÃ§Ã£o: {index + 1}Âº lugar</span>
                   <span>
-                    {percentage >= 50 ? '🔥 Alto impacto' : 
-                     percentage >= 25 ? '⚡ Médio impacto' : 
-                     '📊 Baixo impacto'}
+                    {percentage >= 50 ? 'ðÅ¸â€�¥ Alto impacto' : 
+                     percentage >= 25 ? 'âÅ¡¡ MÃ©dio impacto' : 
+                     'ðÅ¸â€œÅ  Baixo impacto'}
                   </span>
                 </div>
               </div>
@@ -309,7 +309,7 @@ export default function InteractiveDashboard() {
         {/* Footer com insights */}
         <div className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-800 dark:to-blue-900/20 rounded-lg border border-gray-200 dark:border-gray-700">
           <h4 className="font-semibold text-gray-900 dark:text-white mb-2 flex items-center">
-            <span className="mr-2">💡</span>
+            <span className="mr-2">ðÅ¸â€™¡</span>
             Insights dos Custos
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
@@ -326,7 +326,7 @@ export default function InteractiveDashboard() {
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600 dark:text-gray-400">Custo médio:</span>
+              <span className="text-gray-600 dark:text-gray-400">Custo mÃ©dio:</span>
               <span className="font-medium text-gray-900 dark:text-white">
                 R$ {(total / sortedData.length).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </span>
@@ -376,7 +376,7 @@ export default function InteractiveDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Métricas Principais com Animação */}
+      {/* MÃ©tricas Principais com AnimaÃ§Ã£o */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {metrics.map((metric, index) => (
           <div
@@ -394,7 +394,7 @@ export default function InteractiveDashboard() {
                 </p>
                 <div className="flex items-center">
                   <span className="mr-1">
-                    {metric.trend === 'up' ? '📈' : '📉'}
+                    {metric.trend === 'up' ? 'ðÅ¸â€œË†' : 'ðÅ¸â€œâ€°'}
                   </span>
                   <span className={`text-sm font-medium ${
                     metric.trend === 'up' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
@@ -411,12 +411,12 @@ export default function InteractiveDashboard() {
         ))}
       </div>
 
-      {/* Seletor de Métricas */}
+      {/* Seletor de MÃ©tricas */}
       <div className="card p-4">
         <div className="flex flex-wrap gap-2">
           {[
-            { key: 'custos', label: '💰 Custos por Tipo' },
-            { key: 'racas', label: '🐄 Animais por Raça' },
+            { key: 'custos', label: 'ðÅ¸â€™° Custos por Tipo' },
+            { key: 'racas', label: 'ðÅ¸�â€ž Animais por RaÃ§a' },
           ].map(option => (
             <button
               key={option.key}
@@ -433,12 +433,12 @@ export default function InteractiveDashboard() {
         </div>
       </div>
 
-      {/* Gráficos Interativos */}
+      {/* GrÃ¡ficos Interativos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="card p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-            <span className="mr-2 text-orange-500">⚡</span>
-            {selectedMetric === 'custos' ? 'Custos por Categoria' : 'Distribuição por Raça'}
+            <span className="mr-2 text-orange-500">âÅ¡¡</span>
+            {selectedMetric === 'custos' ? 'Custos por Categoria' : 'DistribuiÃ§Ã£o por RaÃ§a'}
           </h3>
           <div className="min-h-80 max-h-[600px] overflow-y-auto">
             {selectedMetric === 'custos' && renderBarChart(custosPorTipo)}
@@ -453,17 +453,17 @@ export default function InteractiveDashboard() {
         {/* Top Performers */}
         <div className="card p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center group relative">
-            <span className="mr-2 text-yellow-500">⭐</span>
+            <span className="mr-2 text-yellow-500">â­�</span>
             Top Performers (ROI)
-            <span className="ml-2 text-gray-400 cursor-help">ℹ️</span>
+            <span className="ml-2 text-gray-400 cursor-help">ââ€ž¹ï¸�</span>
             
             {/* Tooltip */}
             <div className="absolute left-0 top-8 bg-gray-900 text-white text-sm rounded-lg p-3 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-10 w-80">
               <div className="font-semibold mb-2">ROI = Retorno sobre Investimento</div>
               <div className="text-xs leading-relaxed">
-                <strong>Fórmula:</strong> (Receita - Investimento) / Investimento × 100<br/>
+                <strong>FÃ³rmula:</strong> (Receita - Investimento) / Investimento Ãâ€” 100<br/>
                 <strong>Exemplo:</strong> Investiu R$ 3.200, vendeu por R$ 4.500<br/>
-                <strong>ROI:</strong> (4.500 - 3.200) / 3.200 × 100 = <span className="text-green-400">40,6%</span><br/>
+                <strong>ROI:</strong> (4.500 - 3.200) / 3.200 Ãâ€” 100 = <span className="text-green-400">40,6%</span><br/>
                 <strong>Significa:</strong> Para cada R$ 1 investido, ganhou R$ 0,40 de lucro
               </div>
             </div>
@@ -548,11 +548,11 @@ export default function InteractiveDashboard() {
                       onClick={() => setShowModal(false)}
                       className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl font-bold"
                     >
-                      ×
+                      Ãâ€”
                     </button>
                   </div>
 
-                  {/* Conteúdo do Modal */}
+                  {/* ConteÃºdo do Modal */}
                   <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
                     {/* Resumo Principal */}
                     <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg">
@@ -566,8 +566,8 @@ export default function InteractiveDashboard() {
                         <div className="text-gray-600 dark:text-gray-400">
                           {selectedCard === 'investido' && 'Total investido em todos os animais'}
                           {selectedCard === 'recebido' && 'Total recebido com vendas'}
-                          {selectedCard === 'lucro' && 'Lucro líquido das operações'}
-                          {selectedCard === 'roi' && 'Retorno médio sobre investimento'}
+                          {selectedCard === 'lucro' && 'Lucro lÃ­quido das operaÃ§Ãµes'}
+                          {selectedCard === 'roi' && 'Retorno mÃ©dio sobre investimento'}
                         </div>
                       </div>
                     </div>
@@ -575,7 +575,7 @@ export default function InteractiveDashboard() {
                     {/* Insights Principais */}
                     <div className="mb-6">
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
-                        <span className="mr-2">💡</span>
+                        <span className="mr-2">ðÅ¸â€™¡</span>
                         Insights Principais
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -592,11 +592,11 @@ export default function InteractiveDashboard() {
                     {/* Breakdown por Categoria */}
                     <div className="mb-6">
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
-                        <span className="mr-2">📊</span>
-                        {selectedCard === 'investido' && 'Investimento por Situação'}
-                        {selectedCard === 'recebido' && 'Receita por Raça'}
-                        {selectedCard === 'lucro' && 'Lucro por Raça'}
-                        {selectedCard === 'roi' && 'ROI Médio por Raça'}
+                        <span className="mr-2">ðÅ¸â€œÅ </span>
+                        {selectedCard === 'investido' && 'Investimento por SituaÃ§Ã£o'}
+                        {selectedCard === 'recebido' && 'Receita por RaÃ§a'}
+                        {selectedCard === 'lucro' && 'Lucro por RaÃ§a'}
+                        {selectedCard === 'roi' && 'ROI MÃ©dio por RaÃ§a'}
                       </h3>
                       <div className="space-y-3">
                         {Object.entries(details.breakdown).map(([key, value]) => (
@@ -618,7 +618,7 @@ export default function InteractiveDashboard() {
                     {/* Lista Detalhada */}
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
-                        <span className="mr-2">📋</span>
+                        <span className="mr-2">ðÅ¸â€œâ€¹</span>
                         {selectedCard === 'investido' && 'Animais por Investimento'}
                         {selectedCard === 'recebido' && 'Vendas por Receita'}
                         {selectedCard === 'lucro' && 'Animais por Lucro'}
@@ -639,8 +639,8 @@ export default function InteractiveDashboard() {
                                 </div>
                                 <div className="text-sm text-gray-600 dark:text-gray-400">
                                   {item.raca}
-                                  {item.situacao && ` • ${item.situacao}`}
-                                  {item.meses && ` • ${item.meses} meses`}
+                                  {item.situacao && ` ââ‚¬¢ ${item.situacao}`}
+                                  {item.meses && ` ââ‚¬¢ ${item.meses} meses`}
                                 </div>
                               </div>
                             </div>

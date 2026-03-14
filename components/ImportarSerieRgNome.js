@@ -80,7 +80,7 @@ export default function ImportarSerieRgNome({ onImportComplete }) {
         </div>
         <div>
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-            Corrigir Série, RG e Nome
+            Corrigir SÃ©rie, RG e Nome
           </h3>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Importe do Excel para corrigir defeitos nos dados dos animais
@@ -92,15 +92,15 @@ export default function ImportarSerieRgNome({ onImportComplete }) {
         <div className="bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 p-4 rounded">
           <h4 className="font-bold text-amber-900 dark:text-amber-300 mb-2">Formato do Excel:</h4>
           <p className="text-sm text-amber-800 dark:text-amber-200 mb-2">
-            O arquivo deve conter as colunas (com ou sem cabeçalho):
+            O arquivo deve conter as colunas (com ou sem cabeÃ§alho):
           </p>
           <ol className="list-decimal list-inside space-y-1 text-sm text-amber-800 dark:text-amber-200">
-            <li><strong>SÉRIE</strong> – identificador da série (ex: M, G, CJCJ)</li>
-            <li><strong>RG</strong> – número do animal</li>
-            <li><strong>NOME DO ANIMAL</strong> – nome a ser atualizado</li>
+            <li><strong>SÃâ€°RIE</strong> ââ‚¬â€œ identificador da sÃ©rie (ex: M, G, CJCJ)</li>
+            <li><strong>RG</strong> ââ‚¬â€œ nÃºmero do animal</li>
+            <li><strong>NOME DO ANIMAL</strong> ââ‚¬â€œ nome a ser atualizado</li>
           </ol>
           <p className="text-xs text-amber-700 dark:text-amber-300 mt-2">
-            Os animais são identificados por Série + RG. O campo Nome será atualizado.
+            Os animais sÃ£o identificados por SÃ©rie + RG. O campo Nome serÃ¡ atualizado.
           </p>
         </div>
 
@@ -124,7 +124,7 @@ export default function ImportarSerieRgNome({ onImportComplete }) {
           />
           {arquivo && (
             <p className="mt-2 text-sm text-green-600 dark:text-green-400">
-              ✓ Arquivo selecionado: {arquivo.name}
+              âÅ“â€œ Arquivo selecionado: {arquivo.name}
             </p>
           )}
         </div>
@@ -141,7 +141,7 @@ export default function ImportarSerieRgNome({ onImportComplete }) {
                 Importando...
               </>
             ) : (
-              <>📤 Importar e Corrigir</>
+              <>ðÅ¸â€œ¤ Importar e Corrigir</>
             )}
           </button>
           <button
@@ -162,11 +162,11 @@ export default function ImportarSerieRgNome({ onImportComplete }) {
 
         {resultado && (
           <div className="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 p-4 rounded">
-            <h4 className="font-bold text-green-900 dark:text-green-300 mb-2">Importação concluída</h4>
+            <h4 className="font-bold text-green-900 dark:text-green-300 mb-2">ImportaÃ§Ã£o concluÃ­da</h4>
             <div className="space-y-1 text-sm text-green-800 dark:text-green-200">
               <p>Atualizados: <strong>{resultado.atualizados}</strong></p>
               {resultado.naoEncontrados?.length > 0 && (
-                <p>Não encontrados: <strong>{resultado.naoEncontrados.length}</strong></p>
+                <p>NÃ£o encontrados: <strong>{resultado.naoEncontrados.length}</strong></p>
               )}
               {resultado.erros?.length > 0 && (
                 <p>Erros: <strong>{resultado.erros.length}</strong></p>
@@ -175,7 +175,7 @@ export default function ImportarSerieRgNome({ onImportComplete }) {
             {resultado.naoEncontrados?.length > 0 && (
               <details className="mt-3">
                 <summary className="cursor-pointer text-sm font-bold text-amber-800 dark:text-amber-300">
-                  Ver não encontrados ({resultado.naoEncontrados.length})
+                  Ver nÃ£o encontrados ({resultado.naoEncontrados.length})
                 </summary>
                 <div className="mt-2 max-h-40 overflow-y-auto space-y-1">
                   {resultado.naoEncontrados.slice(0, 50).map((d, i) => (
@@ -197,7 +197,7 @@ export default function ImportarSerieRgNome({ onImportComplete }) {
                 <div className="mt-2 max-h-40 overflow-y-auto space-y-1">
                   {resultado.erros.slice(0, 20).map((d, i) => (
                     <div key={i} className="text-xs">
-                      Linha {d.linha}: {d.serie} {d.rg} – {d.erro}
+                      Linha {d.linha}: {d.serie} {d.rg} ââ‚¬â€œ {d.erro}
                     </div>
                   ))}
                   {resultado.erros.length > 20 && (

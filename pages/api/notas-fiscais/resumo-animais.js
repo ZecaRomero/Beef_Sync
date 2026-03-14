@@ -1,14 +1,14 @@
 import { query } from '../../../lib/database'
 
-// Função para calcular era baseada em meses e sexo
+// FunÃ§Ã£o para calcular era baseada em meses e sexo
 function calcularEra(meses, sexo) {
-  if (!meses || meses === 0) return 'Não informado'
+  if (!meses || meses === 0) return 'NÃ£o informado'
   
-  const isFemea = sexo && (sexo.toLowerCase().includes('fêmea') || sexo.toLowerCase().includes('femea') || sexo === 'F')
+  const isFemea = sexo && (sexo.toLowerCase().includes('fÃªmea') || sexo.toLowerCase().includes('femea') || sexo === 'F')
   const isMacho = sexo && (sexo.toLowerCase().includes('macho') || sexo === 'M')
   
   if (isFemea) {
-    // FÊMEA: 0-3 / 3-8 / 8-12 / 12-24 / 25-36 / ACIMA 36
+    // FÃÅ MEA: 0-3 / 3-8 / 8-12 / 12-24 / 25-36 / ACIMA 36
     if (meses <= 3) return '0 A 3'
     if (meses <= 8) return '3 A 8'
     if (meses <= 12) return '8 A 12'
@@ -25,23 +25,23 @@ function calcularEra(meses, sexo) {
     return 'ACIMA 36'
   }
   
-  return 'Não informado'
+  return 'NÃ£o informado'
 }
 
-// Função para calcular meses a partir da era
+// FunÃ§Ã£o para calcular meses a partir da era
 function calcularMesesDaEra(era) {
   if (!era) return null
   
   const eraLower = era.toLowerCase().trim()
   
-  if (eraLower.includes('0') && eraLower.includes('3')) return 1.5 // média
+  if (eraLower.includes('0') && eraLower.includes('3')) return 1.5 // mÃ©dia
   if (eraLower.includes('3') && eraLower.includes('8')) return 5.5
   if (eraLower.includes('8') && eraLower.includes('12')) return 10
   if (eraLower.includes('12') && eraLower.includes('24')) return 18
   if (eraLower.includes('25') && eraLower.includes('36')) return 30.5
   if (eraLower.includes('acima') || eraLower.includes('36')) return 48
   
-  // Tentar extrair número de meses diretamente
+  // Tentar extrair nÃºmero de meses diretamente
   const mesesMatch = era.match(/(\d+)\s*meses?/i)
   if (mesesMatch) {
     return parseInt(mesesMatch[1])
@@ -58,7 +58,7 @@ export default async function handler(req, res) {
       if (!numeroNF) {
         return res.status(400).json({
           success: false,
-          message: 'Número da nota fiscal é obrigatório'
+          message: 'NÃºmero da nota fiscal Ã© obrigatÃ³rio'
         })
       }
 
@@ -107,7 +107,7 @@ export default async function handler(req, res) {
       animais.forEach(animal => {
         let era = animal.era
         
-        // Se não tiver era, calcular a partir dos meses
+        // Se nÃ£o tiver era, calcular a partir dos meses
         if (!era && animal.meses) {
           era = calcularEra(animal.meses, animal.sexo)
         } else if (!era && animal.data_nascimento) {
@@ -135,12 +135,12 @@ export default async function handler(req, res) {
       
       const total = subtotais.M + subtotais.F
 
-      // Informações da NF
+      // InformaÃ§Ãµes da NF
       const nfInfo = animais[0] ? {
         numeroNF: animais[0].numero_nf,
         dataNF: animais[0].data_nf,
         fornecedor: animais[0].fornecedor,
-        localidade: localidade || 'AGROPECUÁRIA PARDINHO LTDA'
+        localidade: localidade || 'AGROPECUÃ�RIA PARDINHO LTDA'
       } : null
 
       return res.status(200).json({
@@ -165,7 +165,7 @@ export default async function handler(req, res) {
 
     return res.status(405).json({ 
       success: false,
-      message: 'Método não permitido' 
+      message: 'MÃ©todo nÃ£o permitido' 
     })
   } catch (error) {
     console.error('Erro na API de resumo de animais:', error)

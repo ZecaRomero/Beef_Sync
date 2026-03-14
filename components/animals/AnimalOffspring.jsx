@@ -31,7 +31,7 @@ export default function AnimalOffspring({ animal, filhos }) {
         <div className="divide-y divide-gray-100 dark:divide-gray-700">
           {listaFilhos.map((f, i) => {
             const reactKey = f.id ?? `filho-${f.serie}-${f.rg}-${i}`
-            // Priorizar Série + RG (identificação oficial); nome só quando for nome real, não concatenação
+            // Priorizar SÃ©rie + RG (identificaÃ§Ã£o oficial); nome sÃ³ quando for nome real, nÃ£o concatenaÃ§Ã£o
             const serieRg = [f.serie, f.rg].filter(Boolean).join(' ').trim()
             const nomeValido = f.nome && f.nome.trim() && !/^[A-Z0-9]+\s+[A-Z0-9\.]*\s*\d+$/i.test(f.nome.trim())
             const identificacao = serieRg || (nomeValido ? f.nome.trim() : null) || f.nome || '-'
@@ -68,12 +68,12 @@ export default function AnimalOffspring({ animal, filhos }) {
                     )}
                     {(f.pai || f.avo_materno || f.avoMaterno) && (
                       <span className="block w-full mt-0.5 text-gray-600 dark:text-gray-400">
-                        {[f.pai && `Pai: ${f.pai}`, (f.avo_materno || f.avoMaterno) && `Avô mat.: ${f.avo_materno || f.avoMaterno}`].filter(Boolean).join(' • ')}
+                        {[f.pai && `Pai: ${f.pai}`, (f.avo_materno || f.avoMaterno) && `AvÃ´ mat.: ${f.avo_materno || f.avoMaterno}`].filter(Boolean).join(' ââ‚¬¢ ')}
                       </span>
                     )}
                     {isBaixa && f.data_baixa && (
                       <span className="font-medium text-gray-600 dark:text-gray-300">
-                        Saída: {formatDate(f.data_baixa)}
+                        SaÃ­da: {formatDate(f.data_baixa)}
                       </span>
                     )}
                     {isBaixa && f.valor && (

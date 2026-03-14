@@ -50,7 +50,7 @@ export default function ExamesAndrologicos() {
     }
   }, [mounted])
 
-  // Resetar página quando exames mudarem (deve estar antes do return)
+  // Resetar pÃ¡gina quando exames mudarem (deve estar antes do return)
   useEffect(() => {
     if (exames.length > 0) {
       const totalPagesCalc = Math.ceil(exames.length / itemsPerPage)
@@ -60,14 +60,14 @@ export default function ExamesAndrologicos() {
     }
   }, [exames.length, itemsPerPage])
 
-  // Função para ordenar touros numericamente (série alfabética, RG numérico)
+  // FunÃ§Ã£o para ordenar touros numericamente (sÃ©rie alfabÃ©tica, RG numÃ©rico)
   const ordenarTouros = (lista) => {
     return [...lista].sort((a, b) => {
-      // Primeiro ordena por série (alfabeticamente)
+      // Primeiro ordena por sÃ©rie (alfabeticamente)
       if (a.serie !== b.serie) {
         return a.serie.localeCompare(b.serie)
       }
-      // Se a série for igual, ordena por RG (numericamente)
+      // Se a sÃ©rie for igual, ordena por RG (numericamente)
       const rgA = parseInt(a.rg) || 0
       const rgB = parseInt(b.rg) || 0
       return rgA - rgB
@@ -103,24 +103,24 @@ export default function ExamesAndrologicos() {
     if (savedContacts) {
       setWhatsappContacts(JSON.parse(savedContacts))
     } else {
-      // Contatos padrão sugeridos
+      // Contatos padrÃ£o sugeridos
       setWhatsappContacts([
-        { id: 1, name: 'Veterinário', number: '' },
+        { id: 1, name: 'VeterinÃ¡rio', number: '' },
         { id: 2, name: 'Gerente', number: '' },
-        { id: 3, name: 'Proprietário', number: '' }
+        { id: 3, name: 'ProprietÃ¡rio', number: '' }
       ])
     }
   }, [])
 
   const handleAddContact = () => {
     if (!newContactName || !newContactNumber) {
-      showMessage('Nome e número são obrigatórios', 'error')
+      showMessage('Nome e nÃºmero sÃ£o obrigatÃ³rios', 'error')
       return
     }
     const newContact = {
       id: Date.now(),
       name: newContactName,
-      number: newContactNumber.replace(/\D/g, '') // Apenas números
+      number: newContactNumber.replace(/\D/g, '') // Apenas nÃºmeros
     }
     const updatedContacts = [...whatsappContacts, newContact]
     setWhatsappContacts(updatedContacts)
@@ -209,7 +209,7 @@ export default function ExamesAndrologicos() {
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('Tem certeza que deseja deletar este exame? Isso também removerá reagendamentos relacionados.')) {
+    if (!confirm('Tem certeza que deseja deletar este exame? Isso tambÃ©m removerÃ¡ reagendamentos relacionados.')) {
       return
     }
 
@@ -267,12 +267,12 @@ export default function ExamesAndrologicos() {
     }
     
     if (!newExame.touro.trim() || !newExame.rg.trim()) {
-      showMessage('Dados do touro são obrigatórios', 'error')
+      showMessage('Dados do touro sÃ£o obrigatÃ³rios', 'error')
       return
     }
 
     if (newExame.resultado === 'Inapto' && !newExame.defeitos.trim()) {
-      showMessage('Defeitos são obrigatórios para exames inaptos', 'error')
+      showMessage('Defeitos sÃ£o obrigatÃ³rios para exames inaptos', 'error')
       return
     }
 
@@ -290,7 +290,7 @@ export default function ExamesAndrologicos() {
       return
     }
 
-    // ADICIONAR À LISTA SEM SALVAR (salvar apenas quando clicar em "Salvar Todos")
+    // ADICIONAR Ãâ‚¬ LISTA SEM SALVAR (salvar apenas quando clicar em "Salvar Todos")
     const novoExame = {
       id: `temp-${Date.now()}`,
       touro: newExame.touro,
@@ -301,13 +301,13 @@ export default function ExamesAndrologicos() {
       ce: newExame.ce || null,
       defeitos: newExame.resultado === 'Inapto' ? (newExame.defeitos || null) : null,
       observacoes: newExame.observacoes || null,
-      salvo: false // NÃO salvo ainda
+      salvo: false // NÃÆ’O salvo ainda
     }
 
     setExamesPendentes([...examesPendentes, novoExame])
-    showMessage(`✅ Exame adicionado à lista! (${examesPendentes.length + 1} na lista)`, 'success')
+    showMessage(`âÅ“â€¦ Exame adicionado Ã  lista! (${examesPendentes.length + 1} na lista)`, 'success')
     
-    // Limpar formulário mas manter a data
+    // Limpar formulÃ¡rio mas manter a data
     setNewExame({
       touro: '',
       rg: '',
@@ -332,9 +332,9 @@ export default function ExamesAndrologicos() {
 
     if (!exame.touro.trim() || !exame.rg.trim()) {
       if (!exameToSave) {
-        showMessage('Dados do touro são obrigatórios', 'error')
+        showMessage('Dados do touro sÃ£o obrigatÃ³rios', 'error')
       }
-      return { success: false, error: 'Dados do touro são obrigatórios' }
+      return { success: false, error: 'Dados do touro sÃ£o obrigatÃ³rios' }
     }
 
     try {
@@ -345,21 +345,21 @@ export default function ExamesAndrologicos() {
       const method = isEditing ? 'PUT' : 'POST'
 
       // Validar e garantir que resultado seja um dos valores permitidos
-      let resultadoValido = 'Apto' // Valor padrão
+      let resultadoValido = 'Apto' // Valor padrÃ£o
       
       if (exame.resultado) {
-        // Remover espaços e converter para string
+        // Remover espaÃ§os e converter para string
         const resultadoLimpo = String(exame.resultado).trim()
         
-        // Verificar se está nos valores permitidos (case-sensitive)
+        // Verificar se estÃ¡ nos valores permitidos (case-sensitive)
         if (resultadoLimpo === 'Apto' || resultadoLimpo === 'Inapto' || resultadoLimpo === 'Pendente') {
           resultadoValido = resultadoLimpo
         } else {
-          console.warn('Resultado inválido recebido:', resultadoLimpo, 'Usando padrão: Apto')
+          console.warn('Resultado invÃ¡lido recebido:', resultadoLimpo, 'Usando padrÃ£o: Apto')
         }
       }
 
-      // Log para debug - mostrar o objeto completo que será enviado
+      // Log para debug - mostrar o objeto completo que serÃ¡ enviado
       const dadosParaEnviar = {
         touro: exame.touro,
         rg: exame.rg,
@@ -388,9 +388,9 @@ export default function ExamesAndrologicos() {
       if (response.ok) {
         const result = await response.json()
         
-        // Se houve reagendamento automático, mostrar mensagem especial
+        // Se houve reagendamento automÃ¡tico, mostrar mensagem especial
         if (result.reagendamento && result.message) {
-          console.log('✅ Reagendamento automático criado:', result.reagendamento)
+          console.log('âÅ“â€¦ Reagendamento automÃ¡tico criado:', result.reagendamento)
         }
         
         return { success: true, result }
@@ -410,16 +410,16 @@ export default function ExamesAndrologicos() {
       return
     }
 
-    // Filtrar exames que ainda não foram salvos
-    // Usar id temporário como critério principal - exames com id "temp-*" nunca foram ao banco
+    // Filtrar exames que ainda nÃ£o foram salvos
+    // Usar id temporÃ¡rio como critÃ©rio principal - exames com id "temp-*" nunca foram ao banco
     const examesNaoSalvos = examesPendentes.filter(e => {
       const idTemporario = typeof e.id === 'string' && e.id.startsWith('temp-')
       return idTemporario || !e.salvo
     })
     
-    // Se todos já foram salvos (sem id temporário e todos marcados salvo), limpar lista
+    // Se todos jÃ¡ foram salvos (sem id temporÃ¡rio e todos marcados salvo), limpar lista
     if (examesNaoSalvos.length === 0) {
-      showMessage('✅ Todos os exames já foram salvos anteriormente!', 'success')
+      showMessage('âÅ“â€¦ Todos os exames jÃ¡ foram salvos anteriormente!', 'success')
       setExamesPendentes([])
       await loadExames()
       
@@ -444,7 +444,7 @@ export default function ExamesAndrologicos() {
           const result = await handleSaveExame(exame)
           if (result && result.success) {
             sucessos++
-            // Verificar se houve reagendamento automático
+            // Verificar se houve reagendamento automÃ¡tico
             if (result.result?.reagendamento) {
               reagendamentos++
             }
@@ -459,12 +459,12 @@ export default function ExamesAndrologicos() {
       }
 
       if (sucessos > 0) {
-        let mensagemFinal = `✅ ${sucessos} exame(s) salvo(s) com sucesso!`
+        let mensagemFinal = `âÅ“â€¦ ${sucessos} exame(s) salvo(s) com sucesso!`
         if (reagendamentos > 0) {
-          mensagemFinal += ` ⚠️ ${reagendamentos} reagendamento(s) automático(s) criado(s) para exames inaptos (30 dias).`
+          mensagemFinal += ` âÅ¡ ï¸� ${reagendamentos} reagendamento(s) automÃ¡tico(s) criado(s) para exames inaptos (30 dias).`
         }
         if (erros > 0) {
-          mensagemFinal += ` ❌ ${erros} erro(s).`
+          mensagemFinal += ` â�Å’ ${erros} erro(s).`
         }
         showMessage(mensagemFinal, reagendamentos > 0 ? 'warning' : 'success')
         setExamesPendentes([])
@@ -492,8 +492,8 @@ export default function ExamesAndrologicos() {
   }
 
   const handleAddExame = async () => {
-    // PRIORIDADE 1: Se há exames pendentes não salvos, salvar todos
-    // Usar id temporário como critério - exames com id "temp-*" nunca foram ao banco
+    // PRIORIDADE 1: Se hÃ¡ exames pendentes nÃ£o salvos, salvar todos
+    // Usar id temporÃ¡rio como critÃ©rio - exames com id "temp-*" nunca foram ao banco
     const examesNaoSalvos = examesPendentes.filter(e => {
       const idTemporario = typeof e.id === 'string' && e.id.startsWith('temp-')
       return idTemporario || !e.salvo
@@ -508,33 +508,33 @@ export default function ExamesAndrologicos() {
     if (editingExame) {
       try {
         await handleSaveExame()
-        showMessage('✅ Exame atualizado e salvo no banco!', 'success')
+        showMessage('âÅ“â€¦ Exame atualizado e salvo no banco!', 'success')
         await loadExames()
         resetForm()
       } catch (error) {
-        showMessage('❌ Erro ao atualizar exame', 'error')
+        showMessage('â�Å’ Erro ao atualizar exame', 'error')
         console.error(error)
       }
       return
     }
 
-    // PRIORIDADE 3: Adicionar novo exame à lista (precisa de touro selecionado)
+    // PRIORIDADE 3: Adicionar novo exame Ã  lista (precisa de touro selecionado)
     if (!selectedTouro) {
-      showMessage('Selecione um touro para adicionar à lista', 'error')
+      showMessage('Selecione um touro para adicionar Ã  lista', 'error')
       return
     }
     
     if (!newExame.touro.trim() || !newExame.rg.trim()) {
-      showMessage('Dados do touro são obrigatórios', 'error')
+      showMessage('Dados do touro sÃ£o obrigatÃ³rios', 'error')
       return
     }
 
     if (newExame.resultado === 'Inapto' && !newExame.defeitos.trim()) {
-      showMessage('Defeitos são obrigatórios para exames inaptos', 'error')
+      showMessage('Defeitos sÃ£o obrigatÃ³rios para exames inaptos', 'error')
       return
     }
 
-    // Adicionar à lista (será salvo quando clicar em "Salvar Todos")
+    // Adicionar Ã  lista (serÃ¡ salvo quando clicar em "Salvar Todos")
     await handleAddToList()
   }
 
@@ -639,13 +639,13 @@ export default function ExamesAndrologicos() {
     return dataExameDate < hoje
   }
 
-  // Verificar se o animal já tem um exame resolvido (Apto/Inapto) posterior ou na mesma data
+  // Verificar se o animal jÃ¡ tem um exame resolvido (Apto/Inapto) posterior ou na mesma data
   const temExameResolvidoPosterior = (examePendente) => {
     return exames.some(e => {
       // Mesmo animal
       if (String(e.rg) !== String(examePendente.rg) && e.touro !== examePendente.touro) return false
       
-      // Exame resolvido (não pendente)
+      // Exame resolvido (nÃ£o pendente)
       if (e.resultado === 'Pendente') return false
       
       // Data posterior ou igual
@@ -684,13 +684,13 @@ export default function ExamesAndrologicos() {
     return exames.filter(e => {
       if (e.resultado !== 'Pendente' || !e.reagendado) return false
       
-      // Se já tem exame resolvido posterior, não mostrar na lista
+      // Se jÃ¡ tem exame resolvido posterior, nÃ£o mostrar na lista
       if (temExameResolvidoPosterior(e)) return false
       
       const dataExame = new Date(e.data_exame)
       dataExame.setHours(0, 0, 0, 0)
       
-      // Exames que estão vencidos ou próximos (próximos 3 dias)
+      // Exames que estÃ£o vencidos ou prÃ³ximos (prÃ³ximos 3 dias)
       const diasRestantes = Math.ceil((dataExame - hoje) / (1000 * 60 * 60 * 24))
       return diasRestantes <= 3
     }).sort((a, b) => {
@@ -704,7 +704,7 @@ export default function ExamesAndrologicos() {
   const getExamesInaptosComReagendamento = () => {
     return exames.filter(e => {
       if (e.resultado !== 'Inapto') return false
-      // Verificar se há um exame reagendado vinculado
+      // Verificar se hÃ¡ um exame reagendado vinculado
       return exames.some(reagendado => 
         reagendado.reagendado && 
         reagendado.exame_origem_id === e.id
@@ -728,15 +728,15 @@ export default function ExamesAndrologicos() {
   const examesParaRefazer = getExamesParaRefazer()
   const examesInaptosComReagendamento = getExamesInaptosComReagendamento()
 
-  // Função para reprocessar custos dos exames já lançados
+  // FunÃ§Ã£o para reprocessar custos dos exames jÃ¡ lanÃ§ados
   const handleReprocessarCustos = async () => {
-    if (!confirm('Deseja reprocessar os custos de todos os exames andrológicos já lançados? Isso criará custos para exames que ainda não têm.')) {
+    if (!confirm('Deseja reprocessar os custos de todos os exames androlÃ³gicos jÃ¡ lanÃ§ados? Isso criarÃ¡ custos para exames que ainda nÃ£o tÃªm.')) {
       return
     }
 
     try {
       setReprocessandoCustos(true)
-      showMessage('⏳ Processando custos dos exames...', 'info')
+      showMessage('â�³ Processando custos dos exames...', 'info')
 
       const response = await fetch('/api/reproducao/reprocessar-custos-andrologicos', {
         method: 'POST',
@@ -748,7 +748,7 @@ export default function ExamesAndrologicos() {
       if (response.ok) {
         const result = await response.json()
         showMessage(
-          `✅ Processamento concluído! ${result.custosCriados} custo(s) criado(s). ${result.erros > 0 ? `${result.erros} erro(s).` : ''}`,
+          `âÅ“â€¦ Processamento concluÃ­do! ${result.custosCriados} custo(s) criado(s). ${result.erros > 0 ? `${result.erros} erro(s).` : ''}`,
           result.custosCriados > 0 ? 'success' : 'warning'
         )
         
@@ -762,48 +762,48 @@ export default function ExamesAndrologicos() {
         }
       } else {
         const error = await response.json()
-        showMessage(`❌ Erro ao reprocessar: ${error.error || 'Erro desconhecido'}`, 'error')
+        showMessage(`â�Å’ Erro ao reprocessar: ${error.error || 'Erro desconhecido'}`, 'error')
       }
     } catch (error) {
       console.error('Erro ao reprocessar custos:', error)
-      showMessage('❌ Erro ao reprocessar custos', 'error')
+      showMessage('â�Å’ Erro ao reprocessar custos', 'error')
     } finally {
       setReprocessandoCustos(false)
     }
   }
 
-  // Função para exportar para Excel
+  // FunÃ§Ã£o para exportar para Excel
   const handleExportToExcel = async () => {
     if (exames.length === 0) {
-      showMessage('Não há exames para exportar', 'warning')
+      showMessage('NÃ£o hÃ¡ exames para exportar', 'warning')
       return
     }
 
     setExporting(true)
     try {
       const workbook = new ExcelJS.Workbook()
-      const worksheet = workbook.addWorksheet('Exames Andrológicos')
+      const worksheet = workbook.addWorksheet('Exames AndrolÃ³gicos')
 
-      // Calcular estatísticas
+      // Calcular estatÃ­sticas
       const totalExames = exames.length
       const aprovados = exames.filter(e => e.resultado === 'Apto').length
       const reprovados = exames.filter(e => e.resultado === 'Inapto').length
       const pendentes = exames.filter(e => e.resultado === 'Pendente').length
       
-      // Calcular período
+      // Calcular perÃ­odo
       const datas = exames.map(e => new Date(e.data_exame || e.data)).filter(d => !isNaN(d))
       const dataInicio = datas.length > 0 ? new Date(Math.min(...datas)) : null
       const dataFim = datas.length > 0 ? new Date(Math.max(...datas)) : null
       const periodo = dataInicio && dataFim ? `${formatDateBR(dataInicio)} a ${formatDateBR(dataFim)}` : 'N/A'
 
-      // Adicionar cabeçalho informativo
+      // Adicionar cabeÃ§alho informativo
       worksheet.mergeCells('A1:L1')
-      worksheet.getCell('A1').value = 'RELATÓRIO DE EXAMES ANDROLÓGICOS'
+      worksheet.getCell('A1').value = 'RELATÃâ€œRIO DE EXAMES ANDROLÃâ€œGICOS'
       worksheet.getCell('A1').font = { bold: true, size: 16, color: { argb: 'FF1F4E79' } }
       worksheet.getCell('A1').alignment = { horizontal: 'center', vertical: 'middle' }
       
       worksheet.mergeCells('A2:L2')
-      worksheet.getCell('A2').value = `Período: ${periodo} | Total: ${totalExames} exames | Aprovados: ${aprovados} | Reprovados: ${reprovados} | Pendentes: ${pendentes}`
+      worksheet.getCell('A2').value = `PerÃ­odo: ${periodo} | Total: ${totalExames} exames | Aprovados: ${aprovados} | Reprovados: ${reprovados} | Pendentes: ${pendentes}`
       worksheet.getCell('A2').font = { size: 11 }
       worksheet.getCell('A2').alignment = { horizontal: 'center', vertical: 'middle' }
       
@@ -815,7 +815,7 @@ export default function ExamesAndrologicos() {
       // Linha em branco
       worksheet.addRow([])
 
-      // Definir larguras das colunas ANTES de adicionar o cabeçalho
+      // Definir larguras das colunas ANTES de adicionar o cabeÃ§alho
       worksheet.columns = [
         { width: 10 },  // ID
         { width: 20 },  // Touro
@@ -825,19 +825,19 @@ export default function ExamesAndrologicos() {
         { width: 15 },  // Resultado
         { width: 40 },  // Defeitos
         { width: 15 },  // Status
-        { width: 40 },  // Observações
+        { width: 40 },  // ObservaÃ§Ãµes
         { width: 15 },  // Data Original
         { width: 12 },  // Reagendado
-        { width: 20 }   // Data Criação
+        { width: 20 }   // Data CriaÃ§Ã£o
       ]
 
-      // Cabeçalhos das colunas (linha 5)
+      // CabeÃ§alhos das colunas (linha 5)
       const headerRow = worksheet.addRow([
         'ID', 'Touro', 'RG', 'Data do Exame', 'CE (cm)', 'Resultado', 
-        'Defeitos', 'Status', 'Observações', 'Data Original', 'Reagendado', 'Data Criação'
+        'Defeitos', 'Status', 'ObservaÃ§Ãµes', 'Data Original', 'Reagendado', 'Data CriaÃ§Ã£o'
       ])
       
-      // Estilizar cabeçalho das colunas
+      // Estilizar cabeÃ§alho das colunas
       headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } }
       headerRow.fill = {
         type: 'pattern',
@@ -859,7 +859,7 @@ export default function ExamesAndrologicos() {
           exame.status || 'Ativo',
           exame.observacoes || '-',
           exame.data_exame_original ? formatDateBR(exame.data_exame_original) : '-',
-          exame.reagendado ? 'Sim' : 'Não',
+          exame.reagendado ? 'Sim' : 'NÃ£o',
           exame.created_at ? formatDateTimeForReport(exame.created_at) : '-'
         ])
 
@@ -916,10 +916,10 @@ export default function ExamesAndrologicos() {
       document.body.removeChild(link)
       window.URL.revokeObjectURL(url)
 
-      showMessage(`✅ Arquivo Excel exportado com ${exames.length} exames!`, 'success')
+      showMessage(`âÅ“â€¦ Arquivo Excel exportado com ${exames.length} exames!`, 'success')
     } catch (error) {
       console.error('Erro ao exportar:', error)
-      showMessage('❌ Erro ao exportar para Excel', 'error')
+      showMessage('â�Å’ Erro ao exportar para Excel', 'error')
     } finally {
       setExporting(false)
     }
@@ -937,7 +937,7 @@ export default function ExamesAndrologicos() {
   const generateWhatsAppMessage = (examesList) => {
     if (!examesList || examesList.length === 0) return ''
 
-    let message = '*LISTA DE ANIMAIS PARA REAGENDAMENTO - EXAME ANDROLÓGICO*\n\n'
+    let message = '*LISTA DE ANIMAIS PARA REAGENDAMENTO - EXAME ANDROLÃâ€œGICO*\n\n'
 
     examesList.forEach((exame, index) => {
       // Tentar encontrar animal no state 'touros'
@@ -951,7 +951,7 @@ export default function ExamesAndrologicos() {
       const serie = animal?.serie || exame.touro || 'N/A'
       const rg = animal?.rg || exame.rg || 'N/A'
       
-      let idadeTexto = 'Idade não inf.'
+      let idadeTexto = 'Idade nÃ£o inf.'
       if (animal?.meses) {
         idadeTexto = `${animal.meses} meses`
       } else if (animal?.data_nascimento) {
@@ -961,10 +961,10 @@ export default function ExamesAndrologicos() {
         idadeTexto = `${diffMeses} meses`
       }
 
-      // Tentar obter local de várias propriedades possíveis
-      const local = animal?.localizacao || animal?.piquete || animal?.local || animal?.pastoAtual || animal?.pasto_atual || 'Local não informado'
+      // Tentar obter local de vÃ¡rias propriedades possÃ­veis
+      const local = animal?.localizacao || animal?.piquete || animal?.local || animal?.pastoAtual || animal?.pasto_atual || 'Local nÃ£o informado'
       
-      // Calcular dias desde o último exame
+      // Calcular dias desde o Ãºltimo exame
       let diasDesdeUltimo = 'N/A'
       let dataUltimo = 'N/A'
       if (exame.data_exame_original) {
@@ -975,18 +975,18 @@ export default function ExamesAndrologicos() {
       }
 
       message += `*${index + 1}. Animal ${serie} / ${rg}*\n`
-      message += `   📅 Idade: ${idadeTexto}\n`
-      message += `   📍 Local: ${local}\n`
-      message += `   ⚠️ Status: ${exame.resultado} (Reagendado)\n`
-      message += `   📅 Último Andrológico: ${dataUltimo}\n`
-      message += `   ⏱️ Dias até hoje: ${diasDesdeUltimo} dias\n`
-      message += `   📅 Data Prevista: ${formatDate(exame.data_exame)}\n`
+      message += `   ðÅ¸â€œâ€¦ Idade: ${idadeTexto}\n`
+      message += `   ðÅ¸â€œ� Local: ${local}\n`
+      message += `   âÅ¡ ï¸� Status: ${exame.resultado} (Reagendado)\n`
+      message += `   ðÅ¸â€œâ€¦ ÃÅ¡ltimo AndrolÃ³gico: ${dataUltimo}\n`
+      message += `   â�±ï¸� Dias atÃ© hoje: ${diasDesdeUltimo} dias\n`
+      message += `   ðÅ¸â€œâ€¦ Data Prevista: ${formatDate(exame.data_exame)}\n`
       
-      // Mostrar motivo do inapto (defeitos originais) se disponível, senão mostrar defeitos atuais ou observações
+      // Mostrar motivo do inapto (defeitos originais) se disponÃ­vel, senÃ£o mostrar defeitos atuais ou observaÃ§Ãµes
       if (exame.defeitos_originais) {
-        message += `   🚫 Motivo Inapto: ${exame.defeitos_originais}\n`
+        message += `   ðÅ¸Å¡« Motivo Inapto: ${exame.defeitos_originais}\n`
       } else if (exame.defeitos) {
-        message += `   📝 Defeitos ant.: ${exame.defeitos}\n`
+        message += `   ðÅ¸â€œ� Defeitos ant.: ${exame.defeitos}\n`
       }
       
       message += '\n'
@@ -1016,7 +1016,7 @@ export default function ExamesAndrologicos() {
   const handleSendWhatsApp = async (number) => {
     if (!whatsappMessage) return
 
-    // Registrar notificação na API
+    // Registrar notificaÃ§Ã£o na API
     try {
       const exameIds = currentExamesList.map(ex => ex.id)
       await fetch('/api/reproducao/exames-andrologicos', {
@@ -1042,11 +1042,11 @@ export default function ExamesAndrologicos() {
       setExames(updatedExames)
       
     } catch (error) {
-      console.error('Erro ao registrar notificação:', error)
+      console.error('Erro ao registrar notificaÃ§Ã£o:', error)
     }
 
     // Abrir WhatsApp
-    // Se número não foi passado, abre sem número (usuário escolhe na lista do próprio whats)
+    // Se nÃºmero nÃ£o foi passado, abre sem nÃºmero (usuÃ¡rio escolhe na lista do prÃ³prio whats)
     const phoneParam = number ? `phone=${number}&` : ''
     const link = `https://api.whatsapp.com/send?${phoneParam}text=${encodeURIComponent(whatsappMessage)}`
     window.open(link, '_blank')
@@ -1061,7 +1061,7 @@ export default function ExamesAndrologicos() {
     return maxSent
   }
 
-  // Lógica de filtragem
+  // LÃ³gica de filtragem
   const getFilteredExames = () => {
     if (activeFilter === 'refazer') return examesParaRefazer
     if (activeFilter === 'pendente') return examesComResultadoPendente
@@ -1071,7 +1071,7 @@ export default function ExamesAndrologicos() {
 
   const filteredExames = getFilteredExames()
 
-  // Paginação
+  // PaginaÃ§Ã£o
   const totalPages = Math.ceil(filteredExames.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
@@ -1103,7 +1103,7 @@ export default function ExamesAndrologicos() {
                 <div className="flex items-center gap-2">
                   <ClockIcon className="w-5 h-5 text-orange-600" />
                   <h3 className="font-semibold text-orange-800 dark:text-orange-200">
-                    ⚠️ Lembretes para Refazer ({examesParaRefazer.length})
+                    âÅ¡ ï¸� Lembretes para Refazer ({examesParaRefazer.length})
                   </h3>
                 </div>
                 <button 
@@ -1136,7 +1136,7 @@ export default function ExamesAndrologicos() {
                       <span>{exame.touro}</span>
                       <span className={diasRestantes < 0 ? 'font-bold text-red-600' : ''}>
                         {diasRestantes < 0 
-                          ? `Vencido há ${Math.abs(diasRestantes)} dias` 
+                          ? `Vencido hÃ¡ ${Math.abs(diasRestantes)} dias` 
                           : diasRestantes === 0 
                           ? 'Hoje!' 
                           : `${diasRestantes} dia(s)`}
@@ -1181,7 +1181,7 @@ export default function ExamesAndrologicos() {
                 </button>
               </div>
               <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                Existem exames reagendados aguardando realização.
+                Existem exames reagendados aguardando realizaÃ§Ã£o.
               </p>
             </div>
           )}
@@ -1214,7 +1214,7 @@ export default function ExamesAndrologicos() {
                 </button>
               </div>
               <p className="text-sm text-red-700 dark:text-red-300">
-                Existem exames reagendados que já passaram da data prevista.
+                Existem exames reagendados que jÃ¡ passaram da data prevista.
               </p>
             </div>
           )}
@@ -1225,10 +1225,10 @@ export default function ExamesAndrologicos() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <BeakerIcon className="w-8 h-8 text-pink-600" />
-            Exames Andrológicos
+            Exames AndrolÃ³gicos
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-2">
-            Controle de exames de touros com reagendamento automático para inaptos
+            Controle de exames de touros com reagendamento automÃ¡tico para inaptos
           </p>
         </div>
         <div className="flex gap-2">
@@ -1269,7 +1269,7 @@ export default function ExamesAndrologicos() {
             onClick={handleReprocessarCustos}
             disabled={reprocessandoCustos}
             className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
-            title="Reprocessar custos dos exames já lançados"
+            title="Reprocessar custos dos exames jÃ¡ lanÃ§ados"
           >
             <svg className={`w-5 h-5 ${reprocessandoCustos ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -1297,11 +1297,11 @@ export default function ExamesAndrologicos() {
             Nenhum exame registrado
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            Comece registrando o primeiro exame andrológico
+            Comece registrando o primeiro exame androlÃ³gico
           </p>
           <div className="text-xs text-gray-500 dark:text-gray-500 mb-4">
             {typeof window !== 'undefined' && (
-              <p>Debug: Verifique o console do navegador para mais informações</p>
+              <p>Debug: Verifique o console do navegador para mais informaÃ§Ãµes</p>
             )}
           </div>
           <button
@@ -1324,13 +1324,13 @@ export default function ExamesAndrologicos() {
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Resultado</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Defeitos</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Status</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Observações</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Ações</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">ObservaÃ§Ãµes</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">AÃ§Ãµes</th>
               </tr>
             </thead>
             <tbody>
               {examesPaginados.map((item) => {
-                // Verificar se é um exame que precisa ser refeito
+                // Verificar se Ã© um exame que precisa ser refeito
                 const dataExame = new Date(item.data_exame || item.data)
                 const hoje = new Date()
                 hoje.setHours(0, 0, 0, 0)
@@ -1355,10 +1355,10 @@ export default function ExamesAndrologicos() {
                       {precisaRefazer && (
                         <span className="px-2 py-0.5 rounded text-xs bg-orange-200 text-orange-800 dark:bg-orange-900 dark:text-orange-200 font-semibold">
                           {diasRestantes < 0 
-                            ? `⚠️ Vencido há ${Math.abs(diasRestantes)}d` 
+                            ? `âÅ¡ ï¸� Vencido hÃ¡ ${Math.abs(diasRestantes)}d` 
                             : diasRestantes === 0 
-                            ? '⚠️ Hoje!' 
-                            : `⏰ Em ${diasRestantes}d`}
+                            ? 'âÅ¡ ï¸� Hoje!' 
+                            : `â�° Em ${diasRestantes}d`}
                         </span>
                       )}
                     </div>
@@ -1369,7 +1369,7 @@ export default function ExamesAndrologicos() {
                     )}
                     {item.reagendado && (
                       <div className="text-xs text-blue-600 dark:text-blue-400 mt-1 font-semibold">
-                        🔄 Reagendado (exame inapto anterior)
+                        ðÅ¸â€�â€ž Reagendado (exame inapto anterior)
                       </div>
                     )}
                   </td>
@@ -1414,7 +1414,7 @@ export default function ExamesAndrologicos() {
             </tbody>
           </table>
           
-          {/* Paginação */}
+          {/* PaginaÃ§Ã£o */}
           {totalPages > 1 && (
             <div className="mt-4 flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-2">
@@ -1429,10 +1429,10 @@ export default function ExamesAndrologicos() {
                   }}
                   className="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
                 >
-                  <option value={10}>10 por página</option>
-                  <option value={25}>25 por página</option>
-                  <option value={50}>50 por página</option>
-                  <option value={100}>100 por página</option>
+                  <option value={10}>10 por pÃ¡gina</option>
+                  <option value={25}>25 por pÃ¡gina</option>
+                  <option value={50}>50 por pÃ¡gina</option>
+                  <option value={100}>100 por pÃ¡gina</option>
                 </select>
               </div>
               <div className="flex items-center gap-2">
@@ -1441,31 +1441,31 @@ export default function ExamesAndrologicos() {
                   disabled={currentPage === 1}
                   className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                 >
-                  ««
+                  Â«Â«
                 </button>
                 <button
                   onClick={() => setCurrentPage(currentPage - 1)}
                   disabled={currentPage === 1}
                   className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                 >
-                  « Anterior
+                  Â« Anterior
                 </button>
                 <span className="text-sm text-gray-600 dark:text-gray-400 px-2">
-                  Página {currentPage} de {totalPages}
+                  PÃ¡gina {currentPage} de {totalPages}
                 </span>
                 <button
                   onClick={() => setCurrentPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
                   className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                 >
-                  Próxima »
+                  PrÃ³xima Â»
                 </button>
                 <button
                   onClick={() => setCurrentPage(totalPages)}
                   disabled={currentPage === totalPages}
                   className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                 >
-                  »»
+                  Â»Â»
                 </button>
               </div>
             </div>
@@ -1478,7 +1478,7 @@ export default function ExamesAndrologicos() {
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                {editingExame ? 'Editar Exame Andrológico' : 'Novo Exame Andrológico'}
+                {editingExame ? 'Editar Exame AndrolÃ³gico' : 'Novo Exame AndrolÃ³gico'}
               </h2>
               {examesPendentes.length > 0 && !editingExame && (
                 <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm font-semibold">
@@ -1514,7 +1514,7 @@ export default function ExamesAndrologicos() {
                           {exame.ce && ` - CE: ${exame.ce}cm`}
                         </span>
                         {exame.salvo && (
-                          <span className="ml-2 text-green-600 dark:text-green-400 text-xs">✅ Salvo</span>
+                          <span className="ml-2 text-green-600 dark:text-green-400 text-xs">âÅ“â€¦ Salvo</span>
                         )}
                       </div>
                       <button
@@ -1551,7 +1551,7 @@ export default function ExamesAndrologicos() {
                         type="text"
                         value={searchTouro}
                         onChange={(e) => setSearchTouro(e.target.value)}
-                        placeholder="Buscar por série, RG, raça ou cor..."
+                        placeholder="Buscar por sÃ©rie, RG, raÃ§a ou cor..."
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                       />
                     </div>
@@ -1592,8 +1592,8 @@ export default function ExamesAndrologicos() {
                 <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
                   <h4 className="font-medium text-blue-900 dark:text-blue-200 mb-2">Touro Selecionado:</h4>
                   <div className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
-                    <p><strong>Identificação:</strong> {selectedTouro.serie}-{selectedTouro.rg}</p>
-                    <p><strong>Raça:</strong> {selectedTouro.raca}</p>
+                    <p><strong>IdentificaÃ§Ã£o:</strong> {selectedTouro.serie}-{selectedTouro.rg}</p>
+                    <p><strong>RaÃ§a:</strong> {selectedTouro.raca}</p>
                     {selectedTouro.cor && <p><strong>Cor:</strong> {selectedTouro.cor}</p>}
                     {selectedTouro.data_nascimento && (
                       <p><strong>Nascimento:</strong> {formatDate(selectedTouro.data_nascimento)}</p>
@@ -1641,7 +1641,7 @@ export default function ExamesAndrologicos() {
                 </select>
                 {newExame.resultado === 'Inapto' && (
                   <p className="text-sm text-yellow-600 dark:text-yellow-400 mt-1">
-                    ⚠️ Um novo exame será automaticamente agendado para 30 dias após esta data.
+                    âÅ¡ ï¸� Um novo exame serÃ¡ automaticamente agendado para 30 dias apÃ³s esta data.
                   </p>
                 )}
               </div>
@@ -1661,12 +1661,12 @@ export default function ExamesAndrologicos() {
               )}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Observações
+                  ObservaÃ§Ãµes
                 </label>
                 <textarea
                   value={newExame.observacoes}
                   onChange={(e) => setNewExame({ ...newExame, observacoes: e.target.value })}
-                  placeholder="Observações sobre o exame..."
+                  placeholder="ObservaÃ§Ãµes sobre o exame..."
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
@@ -1684,7 +1684,7 @@ export default function ExamesAndrologicos() {
                   onClick={handleAddToList}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
-                  Adicionar à Lista
+                  Adicionar Ã  Lista
                 </button>
               )}
               <button
@@ -1717,7 +1717,7 @@ export default function ExamesAndrologicos() {
                 <svg className="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
                 </svg>
-                Enviar Notificação
+                Enviar NotificaÃ§Ã£o
               </h2>
               <button
                 onClick={() => setShowWhatsAppModal(false)}
@@ -1758,7 +1758,7 @@ export default function ExamesAndrologicos() {
                         {contact.number ? (
                           <div className="text-xs text-gray-500">{contact.number}</div>
                         ) : (
-                          <div className="text-xs text-orange-500">Sem número</div>
+                          <div className="text-xs text-orange-500">Sem nÃºmero</div>
                         )}
                       </button>
                       <button
@@ -1784,7 +1784,7 @@ export default function ExamesAndrologicos() {
                     />
                     <input
                       type="text"
-                      placeholder="Número (com DDD)"
+                      placeholder="NÃºmero (com DDD)"
                       value={newContactNumber}
                       onChange={(e) => setNewContactNumber(e.target.value)}
                       className="flex-1 px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -1802,12 +1802,12 @@ export default function ExamesAndrologicos() {
 
               <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                  Ou envie para um número temporário:
+                  Ou envie para um nÃºmero temporÃ¡rio:
                 </p>
                 <div className="flex gap-2">
                   <input
                     type="text"
-                    placeholder="Número (com DDD)"
+                    placeholder="NÃºmero (com DDD)"
                     className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     id="tempNumberInput"
                   />

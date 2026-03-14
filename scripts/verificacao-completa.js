@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Script de verificação completa do sistema Beef Sync
+ * Script de verificaÃ§Ã£o completa do sistema Beef Sync
  * Testa banco de dados, APIs e integridade dos dados
  */
 
@@ -10,7 +10,7 @@ const { testConnection, createTables, query, closePool } = require('../lib/datab
 const databaseService = require('../services/databaseService').default;
 
 async function verificacaoCompleta() {
-  console.log('🔍 VERIFICAÇÃO COMPLETA DO SISTEMA BEEF SYNC');
+  console.log('ðÅ¸â€�� VERIFICAÃâ€¡ÃÆ’O COMPLETA DO SISTEMA BEEF SYNC');
   console.log('=' .repeat(50));
   
   const resultados = {
@@ -22,59 +22,59 @@ async function verificacaoCompleta() {
   };
 
   try {
-    // 1. Testar conexão com banco
-    console.log('\n1️⃣ TESTANDO CONEXÃO COM POSTGRESQL...');
+    // 1. Testar conexÃ£o com banco
+    console.log('\n1ï¸�âÆ’£ TESTANDO CONEXÃÆ’O COM POSTGRESQL...');
     const connectionResult = await testConnection();
     if (connectionResult.success) {
-      console.log('✅ Conexão estabelecida com sucesso');
-      console.log(`   📊 Versão: ${connectionResult.version}`);
-      console.log(`   🗄️  Database: ${connectionResult.database}`);
-      console.log(`   👤 User: ${connectionResult.user}`);
+      console.log('âÅ“â€¦ ConexÃ£o estabelecida com sucesso');
+      console.log(`   ðÅ¸â€œÅ  VersÃ£o: ${connectionResult.version}`);
+      console.log(`   ðÅ¸â€”â€žï¸�  Database: ${connectionResult.database}`);
+      console.log(`   ðÅ¸â€˜¤ User: ${connectionResult.user}`);
       resultados.database = true;
     } else {
-      console.log('❌ Falha na conexão:', connectionResult.error);
+      console.log('â�Å’ Falha na conexÃ£o:', connectionResult.error);
       return resultados;
     }
 
     // 2. Verificar/criar estrutura de tabelas
-    console.log('\n2️⃣ VERIFICANDO ESTRUTURA DO BANCO...');
+    console.log('\n2ï¸�âÆ’£ VERIFICANDO ESTRUTURA DO BANCO...');
     await createTables();
-    console.log('✅ Estrutura do banco verificada/criada');
+    console.log('âÅ“â€¦ Estrutura do banco verificada/criada');
     resultados.tables = true;
 
-    // 3. Testar serviços principais
-    console.log('\n3️⃣ TESTANDO SERVIÇOS PRINCIPAIS...');
+    // 3. Testar serviÃ§os principais
+    console.log('\n3ï¸�âÆ’£ TESTANDO SERVIÃâ€¡OS PRINCIPAIS...');
     
-    // Testar estatísticas
+    // Testar estatÃ­sticas
     try {
       const stats = await databaseService.obterEstatisticas();
-      console.log('✅ Serviço de estatísticas funcionando');
-      console.log(`   📊 Total de animais: ${stats.totalAnimais}`);
-      console.log(`   💰 Total investido: R$ ${stats.totalInvestido.toFixed(2)}`);
+      console.log('âÅ“â€¦ ServiÃ§o de estatÃ­sticas funcionando');
+      console.log(`   ðÅ¸â€œÅ  Total de animais: ${stats.totalAnimais}`);
+      console.log(`   ðÅ¸â€™° Total investido: R$ ${stats.totalInvestido.toFixed(2)}`);
     } catch (error) {
-      console.log('❌ Erro no serviço de estatísticas:', error.message);
+      console.log('â�Å’ Erro no serviÃ§o de estatÃ­sticas:', error.message);
     }
 
     // Testar busca de animais
     try {
       const animais = await databaseService.buscarAnimais({ limit: 5 });
-      console.log(`✅ Serviço de animais funcionando (${animais.length} registros)`);
+      console.log(`âÅ“â€¦ ServiÃ§o de animais funcionando (${animais.length} registros)`);
     } catch (error) {
-      console.log('❌ Erro no serviço de animais:', error.message);
+      console.log('â�Å’ Erro no serviÃ§o de animais:', error.message);
     }
 
-    // Testar estoque de sêmen
+    // Testar estoque de sÃªmen
     try {
       const semen = await databaseService.buscarEstoqueSemen({ limit: 5 });
-      console.log(`✅ Serviço de estoque funcionando (${semen.length} registros)`);
+      console.log(`âÅ“â€¦ ServiÃ§o de estoque funcionando (${semen.length} registros)`);
     } catch (error) {
-      console.log('❌ Erro no serviço de estoque:', error.message);
+      console.log('â�Å’ Erro no serviÃ§o de estoque:', error.message);
     }
 
     resultados.services = true;
 
     // 4. Verificar integridade dos dados
-    console.log('\n4️⃣ VERIFICANDO INTEGRIDADE DOS DADOS...');
+    console.log('\n4ï¸�âÆ’£ VERIFICANDO INTEGRIDADE DOS DADOS...');
     
     try {
       // Verificar dados inconsistentes
@@ -88,9 +88,9 @@ async function verificacaoCompleta() {
       const { custos_negativos, datas_futuras, doses_negativas } = inconsistencias.rows[0];
       
       if (custos_negativos == 0 && datas_futuras == 0 && doses_negativas == 0) {
-        console.log('✅ Integridade dos dados verificada');
+        console.log('âÅ“â€¦ Integridade dos dados verificada');
       } else {
-        console.log('⚠️  Inconsistências encontradas:');
+        console.log('âÅ¡ ï¸�  InconsistÃªncias encontradas:');
         if (custos_negativos > 0) console.log(`   - ${custos_negativos} animais com custos negativos`);
         if (datas_futuras > 0) console.log(`   - ${datas_futuras} animais com datas futuras`);
         if (doses_negativas > 0) console.log(`   - ${doses_negativas} itens com doses negativas`);
@@ -98,11 +98,11 @@ async function verificacaoCompleta() {
       
       resultados.data = true;
     } catch (error) {
-      console.log('❌ Erro na verificação de integridade:', error.message);
+      console.log('â�Å’ Erro na verificaÃ§Ã£o de integridade:', error.message);
     }
 
     // 5. Testar performance
-    console.log('\n5️⃣ TESTANDO PERFORMANCE...');
+    console.log('\n5ï¸�âÆ’£ TESTANDO PERFORMANCE...');
     
     try {
       const startTime = Date.now();
@@ -123,49 +123,49 @@ async function verificacaoCompleta() {
       const duration = Date.now() - startTime;
       
       if (duration < 1000) {
-        console.log(`✅ Performance adequada (${duration}ms)`);
+        console.log(`âÅ“â€¦ Performance adequada (${duration}ms)`);
       } else {
-        console.log(`⚠️  Performance lenta (${duration}ms)`);
+        console.log(`âÅ¡ ï¸�  Performance lenta (${duration}ms)`);
       }
       
       resultados.performance = true;
     } catch (error) {
-      console.log('❌ Erro no teste de performance:', error.message);
+      console.log('â�Å’ Erro no teste de performance:', error.message);
     }
 
     // 6. Resumo final
     console.log('\n' + '='.repeat(50));
-    console.log('📋 RESUMO DA VERIFICAÇÃO');
+    console.log('ðÅ¸â€œâ€¹ RESUMO DA VERIFICAÃâ€¡ÃÆ’O');
     console.log('='.repeat(50));
     
     const totalTestes = Object.keys(resultados).length;
     const testesPassaram = Object.values(resultados).filter(Boolean).length;
     
-    console.log(`✅ Testes aprovados: ${testesPassaram}/${totalTestes}`);
-    console.log(`📊 Taxa de sucesso: ${((testesPassaram/totalTestes) * 100).toFixed(1)}%`);
+    console.log(`âÅ“â€¦ Testes aprovados: ${testesPassaram}/${totalTestes}`);
+    console.log(`ðÅ¸â€œÅ  Taxa de sucesso: ${((testesPassaram/totalTestes) * 100).toFixed(1)}%`);
     
     if (testesPassaram === totalTestes) {
-      console.log('\n🎉 SISTEMA TOTALMENTE FUNCIONAL!');
-      console.log('   Todas as verificações passaram com sucesso.');
-      console.log('   O Beef Sync está pronto para uso.');
+      console.log('\nðÅ¸Å½â€° SISTEMA TOTALMENTE FUNCIONAL!');
+      console.log('   Todas as verificaÃ§Ãµes passaram com sucesso.');
+      console.log('   O Beef Sync estÃ¡ pronto para uso.');
     } else {
-      console.log('\n⚠️  SISTEMA PARCIALMENTE FUNCIONAL');
-      console.log('   Algumas verificações falharam.');
+      console.log('\nâÅ¡ ï¸�  SISTEMA PARCIALMENTE FUNCIONAL');
+      console.log('   Algumas verificaÃ§Ãµes falharam.');
       console.log('   Verifique os logs acima para detalhes.');
     }
 
-    // 7. Informações do sistema
-    console.log('\n📋 INFORMAÇÕES DO SISTEMA:');
-    console.log(`   🏷️  Nome: ${process.env.NEXT_PUBLIC_APP_NAME || 'Beef Sync'}`);
-    console.log(`   📦 Versão: ${process.env.NEXT_PUBLIC_APP_VERSION || '3.0.0'}`);
-    console.log(`   🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`   🗄️  Database: ${process.env.DB_NAME || 'estoque_semen'}`);
-    console.log(`   🖥️  Host: ${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || 5432}`);
+    // 7. InformaÃ§Ãµes do sistema
+    console.log('\nðÅ¸â€œâ€¹ INFORMAÃâ€¡Ãâ€¢ES DO SISTEMA:');
+    console.log(`   ðÅ¸�·ï¸�  Nome: ${process.env.NEXT_PUBLIC_APP_NAME || 'Beef Sync'}`);
+    console.log(`   ðÅ¸â€œ¦ VersÃ£o: ${process.env.NEXT_PUBLIC_APP_VERSION || '3.0.0'}`);
+    console.log(`   ðÅ¸Å’� Ambiente: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`   ðÅ¸â€”â€žï¸�  Database: ${process.env.DB_NAME || 'estoque_semen'}`);
+    console.log(`   ðÅ¸â€“¥ï¸�  Host: ${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || 5432}`);
     
     return resultados;
 
   } catch (error) {
-    console.error('\n💥 ERRO CRÍTICO:', error.message);
+    console.error('\nðÅ¸â€™¥ ERRO CRÃ�TICO:', error.message);
     return resultados;
   } finally {
     await closePool();
@@ -180,7 +180,7 @@ if (require.main === module) {
       process.exit(sucesso ? 0 : 1);
     })
     .catch((error) => {
-      console.error('💥 Erro na verificação:', error.message);
+      console.error('ðÅ¸â€™¥ Erro na verificaÃ§Ã£o:', error.message);
       process.exit(1);
     });
 }

@@ -98,8 +98,8 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
       animal.raca ? \`Raça: \${animal.raca}\` : null,
       metrics.mesesIdade ? \`Idade: \${metrics.mesesIdade} meses\` : null,
       animal.peso ? \`Peso: \${animal.peso} kg\` : null,
-      (animal.abczg || animal.abczg === 0) ? \`iABCZ: \${animal.abczg}\${filhoTopRanking ? ' • Mãe do 1º do ranking' : rankingPosicao ? \` • \${rankingPosicao}º no ranking\` : ''}\` : null,
-      ((animal.iqg ?? animal.genetica_2) || (animal.iqg ?? animal.genetica_2) === 0) ? \`IQG: \${(animal.iqg ?? animal.genetica_2)}\${rankingPosicaoGenetica2 ? \` • \${rankingPosicaoGenetica2}º no ranking\` : ''}\` : null,
+      (animal.abczg || animal.abczg === 0) ? \`iABCZ: \${animal.abczg}\${filhoTopRanking ? ' �€� Mãe do 1º do ranking' : rankingPosicao ? \` �€� \${rankingPosicao}º no ranking\` : ''}\` : null,
+      ((animal.iqg ?? animal.genetica_2) || (animal.iqg ?? animal.genetica_2) === 0) ? \`IQG: \${(animal.iqg ?? animal.genetica_2)}\${rankingPosicaoGenetica2 ? \` �€� \${rankingPosicaoGenetica2}º no ranking\` : ''}\` : null,
       ((animal.pt_iqg ?? animal.decile_2) || (animal.pt_iqg ?? animal.decile_2) === 0) ? \`Pt IQG: \${(animal.pt_iqg ?? animal.decile_2)}\` : null,
       locFiltrada ? \`Localização: \${locFiltrada}\` : null
     ].filter(Boolean).join('\\n')
@@ -131,8 +131,8 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
       animal.raca,
       animal.pelagem,
       animal.categoria,
-      locAtual ? \`📍 \${locAtual}\` : null,
-      animal.brinco ? \`🏷️ \${animal.brinco}\` : null
+      locAtual ? \`�Ÿ“� \${locAtual}\` : null,
+      animal.brinco ? \`�Ÿ��️ \${animal.brinco}\` : null
     ].filter(Boolean)
   }, [animal, locAtual])
 

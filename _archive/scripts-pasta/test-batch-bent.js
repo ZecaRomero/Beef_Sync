@@ -26,18 +26,18 @@ async function run() {
       ]
     }
 
-    console.log('➡️ POST', url)
+    console.log('�ž�️ POST', url)
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     })
 
-    console.log('📥 Status:', res.status)
+    console.log('�Ÿ“� Status:', res.status)
     const data = await res.json()
-    console.log('📊 Resposta:', JSON.stringify(data, null, 2))
+    console.log('�Ÿ“Š Resposta:', JSON.stringify(data, null, 2))
   } catch (err) {
-    console.error('❌ Erro no teste batch:', err)
+    console.error('�Œ Erro no teste batch:', err)
     process.exitCode = 1
   }
 }

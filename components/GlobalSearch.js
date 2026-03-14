@@ -13,39 +13,39 @@ export default function GlobalSearch() {
 
   // Dados para busca
   const searchData = [
-    // Páginas
-    { type: 'page', title: 'Dashboard', description: 'Página inicial', url: '/', icon: '🏠' },
-    { type: 'page', title: 'Animais', description: 'Gerenciar rebanho', url: '/animals', icon: '🐄' },
-    { type: 'page', title: 'Nascimentos', description: 'Controle de nascimentos', url: '/nascimentos', icon: '🐄' },
-    { type: 'page', title: 'Custos Individuais', description: 'Custos por animal', url: '/custos', icon: '💰' },
-    { type: 'page', title: 'Gestações', description: 'Controle reprodutivo', url: '/gestacao', icon: '🤱' },
-    { type: 'page', title: 'Relatórios', description: 'Análises e relatórios', url: '/reports', icon: '📊' },
-    { type: 'page', title: 'Lançamento no APP', description: 'Histórico de operações do sistema', url: '/relatorios-lotes', icon: '📦' },
-    { type: 'page', title: 'Teste de Lotes', description: 'Demonstração do sistema de lotes', url: '/teste-lotes', icon: '🔬' },
-    { type: 'page', title: 'Histórico de Ocorrências', description: 'Registrar eventos dos animais', url: '/historico', icon: '📋' },
-    { type: 'page', title: 'Estoque de Sêmen', description: 'Controle de material genético', url: '/estoque-semen', icon: '🧬' },
-    { type: 'page', title: 'Relatórios de Histórico', description: 'Relatórios específicos por tipo', url: '/relatorios-historico', icon: '📈' },
-    { type: 'page', title: 'Configurações', description: 'Configurações do sistema', url: '/settings', icon: '⚙️' },
-    { type: 'page', title: 'Editor de Protocolos', description: 'Editar medicamentos e protocolos', url: '/protocol-editor', icon: '💊' },
+    // PÃ¡ginas
+    { type: 'page', title: 'Dashboard', description: 'PÃ¡gina inicial', url: '/', icon: 'ðÅ¸� ' },
+    { type: 'page', title: 'Animais', description: 'Gerenciar rebanho', url: '/animals', icon: 'ðÅ¸�â€ž' },
+    { type: 'page', title: 'Nascimentos', description: 'Controle de nascimentos', url: '/nascimentos', icon: 'ðÅ¸�â€ž' },
+    { type: 'page', title: 'Custos Individuais', description: 'Custos por animal', url: '/custos', icon: 'ðÅ¸â€™°' },
+    { type: 'page', title: 'GestaÃ§Ãµes', description: 'Controle reprodutivo', url: '/gestacao', icon: 'ðÅ¸¤±' },
+    { type: 'page', title: 'RelatÃ³rios', description: 'AnÃ¡lises e relatÃ³rios', url: '/reports', icon: 'ðÅ¸â€œÅ ' },
+    { type: 'page', title: 'LanÃ§amento no APP', description: 'HistÃ³rico de operaÃ§Ãµes do sistema', url: '/relatorios-lotes', icon: 'ðÅ¸â€œ¦' },
+    { type: 'page', title: 'Teste de Lotes', description: 'DemonstraÃ§Ã£o do sistema de lotes', url: '/teste-lotes', icon: 'ðÅ¸â€�¬' },
+    { type: 'page', title: 'HistÃ³rico de OcorrÃªncias', description: 'Registrar eventos dos animais', url: '/historico', icon: 'ðÅ¸â€œâ€¹' },
+    { type: 'page', title: 'Estoque de SÃªmen', description: 'Controle de material genÃ©tico', url: '/estoque-semen', icon: 'ðÅ¸§¬' },
+    { type: 'page', title: 'RelatÃ³rios de HistÃ³rico', description: 'RelatÃ³rios especÃ­ficos por tipo', url: '/relatorios-historico', icon: 'ðÅ¸â€œË†' },
+    { type: 'page', title: 'ConfiguraÃ§Ãµes', description: 'ConfiguraÃ§Ãµes do sistema', url: '/settings', icon: 'âÅ¡â„¢ï¸�' },
+    { type: 'page', title: 'Editor de Protocolos', description: 'Editar medicamentos e protocolos', url: '/protocol-editor', icon: 'ðÅ¸â€™Å ' },
     
     // Funcionalidades
-    { type: 'action', title: 'Cadastrar Animal', description: 'Adicionar novo animal', action: () => router.push('/animals'), icon: '➕' },
-    { type: 'action', title: 'Novo Nascimento', description: 'Registrar nascimento', action: () => router.push('/nascimentos'), icon: '🐄' },
-    { type: 'action', title: 'Aplicar Protocolo', description: 'Aplicar protocolo sanitário', action: () => router.push('/custos'), icon: '💉' },
-    { type: 'action', title: 'Preços de Mercado', description: 'Ver cotações atuais', action: () => document.getElementById('precos')?.scrollIntoView({ behavior: 'smooth' }), icon: '📈' },
+    { type: 'action', title: 'Cadastrar Animal', description: 'Adicionar novo animal', action: () => router.push('/animals'), icon: 'âÅ¾â€¢' },
+    { type: 'action', title: 'Novo Nascimento', description: 'Registrar nascimento', action: () => router.push('/nascimentos'), icon: 'ðÅ¸�â€ž' },
+    { type: 'action', title: 'Aplicar Protocolo', description: 'Aplicar protocolo sanitÃ¡rio', action: () => router.push('/custos'), icon: 'ðÅ¸â€™â€°' },
+    { type: 'action', title: 'PreÃ§os de Mercado', description: 'Ver cotaÃ§Ãµes atuais', action: () => document.getElementById('precos')?.scrollIntoView({ behavior: 'smooth' }), icon: 'ðÅ¸â€œË†' },
     
-    // Animais serão carregados dinamicamente dos dados reais
+    // Animais serÃ£o carregados dinamicamente dos dados reais
     
     // Medicamentos
-    { type: 'medicine', title: 'PANACOXX', description: 'Medicamento - R$ 9,10', url: '/protocol-editor', icon: '💊' },
-    { type: 'medicine', title: 'BOVILIS', description: 'Vacina - R$ 0,61', url: '/protocol-editor', icon: '💊' },
-    { type: 'medicine', title: 'DNA VIRGEM', description: 'Exame - R$ 50,00', url: '/protocol-editor', icon: '🧬' },
-    { type: 'medicine', title: 'DNA GENOMICA', description: 'Exame - R$ 80,00', url: '/protocol-editor', icon: '🧬' },
+    { type: 'medicine', title: 'PANACOXX', description: 'Medicamento - R$ 9,10', url: '/protocol-editor', icon: 'ðÅ¸â€™Å ' },
+    { type: 'medicine', title: 'BOVILIS', description: 'Vacina - R$ 0,61', url: '/protocol-editor', icon: 'ðÅ¸â€™Å ' },
+    { type: 'medicine', title: 'DNA VIRGEM', description: 'Exame - R$ 50,00', url: '/protocol-editor', icon: 'ðÅ¸§¬' },
+    { type: 'medicine', title: 'DNA GENOMICA', description: 'Exame - R$ 80,00', url: '/protocol-editor', icon: 'ðÅ¸§¬' },
     
-    // Relatórios
-    { type: 'report', title: 'Custos por Categoria', description: 'Análise de custos', url: '/reports', icon: '📊' },
-    { type: 'report', title: 'ROI por Animal', description: 'Retorno sobre investimento', url: '/reports', icon: '📈' },
-    { type: 'report', title: 'Nascimentos por Touro', description: 'Performance reprodutiva', url: '/reports', icon: '📋' }
+    // RelatÃ³rios
+    { type: 'report', title: 'Custos por Categoria', description: 'AnÃ¡lise de custos', url: '/reports', icon: 'ðÅ¸â€œÅ ' },
+    { type: 'report', title: 'ROI por Animal', description: 'Retorno sobre investimento', url: '/reports', icon: 'ðÅ¸â€œË†' },
+    { type: 'report', title: 'Nascimentos por Touro', description: 'Performance reprodutiva', url: '/reports', icon: 'ðÅ¸â€œâ€¹' }
   ]
 
   useEffect(() => {
@@ -63,7 +63,7 @@ export default function GlobalSearch() {
         setSelectedIndex(0)
       }
       
-      // Navegação com setas
+      // NavegaÃ§Ã£o com setas
       if (isOpen && results.length > 0) {
         if (event.key === 'ArrowDown') {
           event.preventDefault()
@@ -102,7 +102,7 @@ export default function GlobalSearch() {
         title: `${animal.serie} ${animal.rg}`,
         description: `${animal.raca} - ${animal.situacao}`,
         url: '/animals',
-        icon: '🐄'
+        icon: 'ðÅ¸�â€ž'
       }))
       
       // Adicionar nascimentos reais
@@ -111,7 +111,7 @@ export default function GlobalSearch() {
         title: birth.receptora,
         description: `${birth.touro} - ${birth.status}`,
         url: '/nascimentos',
-        icon: '🐄'
+        icon: 'ðÅ¸�â€ž'
       }))
       
       // Combinar todos os dados
@@ -120,7 +120,7 @@ export default function GlobalSearch() {
       const filtered = allSearchData.filter(item =>
         item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.description.toLowerCase().includes(searchTerm.toLowerCase())
-      ).slice(0, 8) // Máximo 8 resultados
+      ).slice(0, 8) // MÃ¡ximo 8 resultados
       
       setResults(filtered)
       setSelectedIndex(0)
@@ -154,11 +154,11 @@ export default function GlobalSearch() {
 
   const getTypeLabel = (type) => {
     switch (type) {
-      case 'page': return 'Página'
-      case 'action': return 'Ação'
+      case 'page': return 'PÃ¡gina'
+      case 'action': return 'AÃ§Ã£o'
       case 'animal': return 'Animal'
       case 'medicine': return 'Medicamento'
-      case 'report': return 'Relatório'
+      case 'report': return 'RelatÃ³rio'
       default: return 'Item'
     }
   }
@@ -169,7 +169,7 @@ export default function GlobalSearch() {
         onClick={() => setIsOpen(true)}
         className="fixed top-4 left-1/2 transform -translate-x-1/2 z-40 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center space-x-2 text-gray-600 dark:text-gray-400"
       >
-        <span>🔍</span>
+        <span>ðÅ¸â€��</span>
         <span className="text-sm">Buscar...</span>
         <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs">
           Ctrl+K
@@ -184,11 +184,11 @@ export default function GlobalSearch() {
         {/* Header de busca */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-3">
-            <span className="text-xl">🔍</span>
+            <span className="text-xl">ðÅ¸â€��</span>
             <input
               ref={inputRef}
               type="text"
-              placeholder="Digite para buscar páginas, animais, medicamentos..."
+              placeholder="Digite para buscar pÃ¡ginas, animais, medicamentos..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="flex-1 bg-transparent text-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 outline-none"
@@ -233,33 +233,33 @@ export default function GlobalSearch() {
                     </p>
                   </div>
                   <div className="text-gray-400 dark:text-gray-500">
-                    →
+                    ââ€ â€™
                   </div>
                 </div>
               ))}
             </div>
           ) : searchTerm.trim() ? (
             <div className="p-8 text-center">
-              <div className="text-4xl mb-4">🔍</div>
+              <div className="text-4xl mb-4">ðÅ¸â€��</div>
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                 Nenhum resultado encontrado
               </h3>
               <p className="text-gray-600 dark:text-gray-400">
-                Tente buscar por "animais", "custos", "nascimentos" ou "relatórios"
+                Tente buscar por "animais", "custos", "nascimentos" ou "relatÃ³rios"
               </p>
             </div>
           ) : (
             <div className="p-8 text-center">
-              <div className="text-4xl mb-4">⚡</div>
+              <div className="text-4xl mb-4">âÅ¡¡</div>
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                Busca Rápida
+                Busca RÃ¡pida
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Digite para encontrar páginas, animais, medicamentos e mais
+                Digite para encontrar pÃ¡ginas, animais, medicamentos e mais
               </p>
               <div className="flex items-center justify-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
                 <div className="flex items-center space-x-1">
-                  <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">↑↓</kbd>
+                  <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">ââ€ â€˜ââ€ â€œ</kbd>
                   <span>Navegar</span>
                 </div>
                 <div className="flex items-center space-x-1">

@@ -1,7 +1,7 @@
 /**
- * Overlay de identificação para TODO acesso mobile (nome + telefone).
- * Exibido antes de qualquer página quando o usuário não está identificado.
- * Não depende de modo manutenção.
+ * Overlay de identificaÃ§Ã£o para TODO acesso mobile (nome + telefone).
+ * Exibido antes de qualquer pÃ¡gina quando o usuÃ¡rio nÃ£o estÃ¡ identificado.
+ * NÃ£o depende de modo manutenÃ§Ã£o.
  */
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
@@ -50,7 +50,7 @@ export default function MobileIdentificationOverlay() {
     const skipPaths = ['/login', '/identificar', '/monitoramento', '/adelso']
     if (skipPaths.includes(router.pathname)) return
 
-    // Mostrar para mobile OU para usuários externos (ngrok, etc) em qualquer dispositivo
+    // Mostrar para mobile OU para usuÃ¡rios externos (ngrok, etc) em qualquer dispositivo
     const isExternal = !hostname.startsWith('192.168.') && !hostname.startsWith('10.') && !hostname.startsWith('172.')
     if (!isMobile() && !isExternal) return
 
@@ -70,7 +70,7 @@ export default function MobileIdentificationOverlay() {
     setError('')
 
     if (!formData.nome.trim()) {
-      setError('Nome é obrigatório')
+      setError('Nome Ã© obrigatÃ³rio')
       return
     }
 
@@ -121,7 +121,7 @@ export default function MobileIdentificationOverlay() {
         <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-amber-500/20 flex items-center justify-center">
           <DevicePhoneMobileIcon className="h-12 w-12 text-amber-400" />
         </div>
-        <h1 className="text-2xl font-bold text-white mb-2">Identificação</h1>
+        <h1 className="text-2xl font-bold text-white mb-2">IdentificaÃ§Ã£o</h1>
         <p className="text-gray-400 mb-6 text-sm">
           Preencha seus dados para acessar o sistema
         </p>
@@ -166,7 +166,7 @@ export default function MobileIdentificationOverlay() {
               disabled={submitting}
             />
             <label htmlFor="lembrar-mobile" className="text-sm text-gray-300 cursor-pointer">
-              Lembrar meus dados para próximos acessos
+              Lembrar meus dados para prÃ³ximos acessos
             </label>
           </div>
           {error && (
@@ -181,7 +181,7 @@ export default function MobileIdentificationOverlay() {
           </button>
         </form>
         <p className="text-sm text-gray-500 mt-6">
-          Beef-Sync • {new Date().toLocaleString('pt-BR')}
+          Beef-Sync ââ‚¬¢ {new Date().toLocaleString('pt-BR')}
         </p>
       </div>
     </div>

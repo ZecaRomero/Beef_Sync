@@ -4,7 +4,7 @@ import { formatCurrency, parseCurrencyValue, formatCurrencyInput } from './utils
 
 export default function ListaItens({ itens, removerItem, valorTotal, editarItem, valorTotalNF }) {
   const [selectedIndices, setSelectedIndices] = useState([]);
-  const [expandedIndex, setExpandedIndex] = useState(null); // índice do bovino em edição
+  const [expandedIndex, setExpandedIndex] = useState(null); // Ã­ndice do bovino em ediÃ§Ã£o
 
   useEffect(() => {
     if (expandedIndex !== null && (expandedIndex >= itens.length || itens[expandedIndex]?.tipoProduto !== 'bovino')) {
@@ -19,18 +19,18 @@ export default function ListaItens({ itens, removerItem, valorTotal, editarItem,
 
   const getIconeTipo = (tipoProduto) => {
     switch (tipoProduto) {
-      case 'bovino': return '🐄'
-      case 'semen': return '🧬'
-      case 'embriao': return '🧫'
-      default: return '🐄'
+      case 'bovino': return 'ðÅ¸�â€ž'
+      case 'semen': return 'ðÅ¸§¬'
+      case 'embriao': return 'ðÅ¸§«'
+      default: return 'ðÅ¸�â€ž'
     }
   }
 
   const getNomeTipo = (tipoProduto) => {
     switch (tipoProduto) {
       case 'bovino': return 'Bovino'
-      case 'semen': return 'Sêmen'
-      case 'embriao': return 'Embrião'
+      case 'semen': return 'SÃªmen'
+      case 'embriao': return 'EmbriÃ£o'
       default: return 'Item'
     }
   }
@@ -72,7 +72,7 @@ export default function ListaItens({ itens, removerItem, valorTotal, editarItem,
     <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
       <div className="flex items-center justify-between mb-4">
         <h4 className="font-semibold text-gray-900 dark:text-white">
-          📋 Itens Adicionados ({itens.length})
+          ðÅ¸â€œâ€¹ Itens Adicionados ({itens.length})
         </h4>
         <div className="text-lg font-bold text-green-600 dark:text-green-400">
           {formatCurrency(valorTotal)}
@@ -88,7 +88,7 @@ export default function ListaItens({ itens, removerItem, valorTotal, editarItem,
         }).length;
         const femeas = bovinos.filter(b => {
           const s = String(b.sexo || '').toLowerCase();
-          return s.includes('femea') || s.includes('fêmea') || s === 'f';
+          return s.includes('femea') || s.includes('fÃªmea') || s === 'f';
         }).length;
         const porEra = {};
         bovinos.forEach(b => {
@@ -98,7 +98,7 @@ export default function ListaItens({ itens, removerItem, valorTotal, editarItem,
         return (
           <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800/40">
             <h5 className="text-sm font-bold text-green-800 dark:text-green-300 mb-2 flex items-center">
-              <span className="mr-2">🐄</span> Resumo dos Bovinos
+              <span className="mr-2">ðÅ¸�â€ž</span> Resumo dos Bovinos
             </h5>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
               <div>
@@ -110,7 +110,7 @@ export default function ListaItens({ itens, removerItem, valorTotal, editarItem,
                 <span className="font-bold text-blue-700 dark:text-blue-300">{machos}</span>
               </div>
               <div>
-                <span className="block text-xs text-green-600 dark:text-green-400">Fêmeas</span>
+                <span className="block text-xs text-green-600 dark:text-green-400">FÃªmeas</span>
                 <span className="font-bold text-pink-700 dark:text-pink-300">{femeas}</span>
               </div>
               <div>
@@ -219,7 +219,7 @@ export default function ListaItens({ itens, removerItem, valorTotal, editarItem,
               {item.tipoProduto === 'bovino' && (
                 <div className="text-sm">
                   {expandedIndex === index ? (
-                    /* Formulário expandido para edição */
+                    /* FormulÃ¡rio expandido para ediÃ§Ã£o */
                     <div className="space-y-3">
                       {item.modoCadastro === 'categoria' ? (
                         <>
@@ -236,7 +236,7 @@ export default function ListaItens({ itens, removerItem, valorTotal, editarItem,
                           <div className="grid grid-cols-2 gap-3">
                             <div><label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Sexo</label>
                               <select value={item.sexo} onChange={(e) => editarItem(index, 'sexo', e.target.value)} className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
-                                <option value="">Selecione...</option><option value="macho">Macho</option><option value="femea">Fêmea</option>
+                                <option value="">Selecione...</option><option value="macho">Macho</option><option value="femea">FÃªmea</option>
                               </select>
                             </div>
                             <div><label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Era</label>
@@ -244,7 +244,7 @@ export default function ListaItens({ itens, removerItem, valorTotal, editarItem,
                             </div>
                           </div>
                           <div className="grid grid-cols-2 gap-3">
-                            <div><label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Raça</label>
+                            <div><label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">RaÃ§a</label>
                               <input type="text" value={item.raca || ''} onChange={(e) => editarItem(index, 'raca', e.target.value)} className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white" placeholder="Ex: NELORE" />
                             </div>
                             <div><label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Local</label>
@@ -253,7 +253,7 @@ export default function ListaItens({ itens, removerItem, valorTotal, editarItem,
                               </select>
                             </div>
                           </div>
-                          <div><label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Valor Unitário</label>
+                          <div><label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Valor UnitÃ¡rio</label>
                             <input type="text" value={item.valorUnitario} onChange={(e) => editarItem(index, 'valorUnitario', e.target.value)} className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white" placeholder="Ex: 5.000,00" />
                           </div>
                           <p className="text-green-600 dark:text-green-400 font-semibold text-xs">
@@ -268,7 +268,7 @@ export default function ListaItens({ itens, removerItem, valorTotal, editarItem,
                             </div>
                             <div><label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Sexo</label>
                               <select value={item.sexo} onChange={(e) => editarItem(index, 'sexo', e.target.value)} className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
-                                <option value="">Selecione...</option><option value="macho">Macho</option><option value="femea">Fêmea</option>
+                                <option value="">Selecione...</option><option value="macho">Macho</option><option value="femea">FÃªmea</option>
                               </select>
                             </div>
                           </div>
@@ -276,7 +276,7 @@ export default function ListaItens({ itens, removerItem, valorTotal, editarItem,
                             <div><label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Era</label>
                               <input type="text" value={item.era} onChange={(e) => editarItem(index, 'era', e.target.value)} className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white" placeholder="Ex: 12/24" />
                             </div>
-                            <div><label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Raça</label>
+                            <div><label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">RaÃ§a</label>
                               <input type="text" value={item.raca || ''} onChange={(e) => editarItem(index, 'raca', e.target.value)} className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white" placeholder="Ex: NELORE" />
                             </div>
                           </div>
@@ -290,16 +290,16 @@ export default function ListaItens({ itens, removerItem, valorTotal, editarItem,
                               <input type="text" value={item.peso ?? ''} onChange={(e) => editarItem(index, 'peso', e.target.value)} className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white" placeholder="Ex: 450" />
                             </div>
                           </div>
-                          <div><label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Valor Unitário</label>
+                          <div><label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Valor UnitÃ¡rio</label>
                             <input type="text" value={item.valorUnitario} onChange={(e) => editarItem(index, 'valorUnitario', e.target.value)} className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white" placeholder="Ex: 5.000,00" />
                           </div>
                           <p className="text-green-600 dark:text-green-400 font-semibold text-xs">{formatCurrency(item.valorUnitario)}</p>
                         </>
                       )}
-                      <button type="button" onClick={() => setExpandedIndex(null)} className="text-xs text-blue-600 dark:text-blue-400 hover:underline">Fechar edição</button>
+                      <button type="button" onClick={() => setExpandedIndex(null)} className="text-xs text-blue-600 dark:text-blue-400 hover:underline">Fechar ediÃ§Ã£o</button>
                     </div>
                   ) : (
-                    /* Linha compacta: número/tatuagem + resumo + ações */
+                    /* Linha compacta: nÃºmero/tatuagem + resumo + aÃ§Ãµes */
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-gray-700 dark:text-gray-300">
                         <span className="font-medium">{item.tatuagem || item.quantidade ? (item.modoCadastro === 'categoria' ? `${item.quantidade} animais` : item.tatuagem) : `#${index + 1}`}</span>
@@ -344,7 +344,7 @@ export default function ListaItens({ itens, removerItem, valorTotal, editarItem,
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Raça</label>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">RaÃ§a</label>
                     <input
                       type="text"
                       value={item.raca || ''}
@@ -374,7 +374,7 @@ export default function ListaItens({ itens, removerItem, valorTotal, editarItem,
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Botijão</label>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">BotijÃ£o</label>
                       <input
                         type="text"
                         value={item.botijao || ''}
@@ -423,7 +423,7 @@ export default function ListaItens({ itens, removerItem, valorTotal, editarItem,
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Raça</label>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">RaÃ§a</label>
                     <input
                       type="text"
                       value={item.raca || ''}
@@ -473,16 +473,16 @@ export default function ListaItens({ itens, removerItem, valorTotal, editarItem,
         ))}
       </div>
 
-      {/* Comparação Valor Total NF vs Soma dos Itens */}
+      {/* ComparaÃ§Ã£o Valor Total NF vs Soma dos Itens */}
       {valorTotalNF && parseCurrencyValue(valorTotalNF) > 0 && (() => {
         const valorNF = parseCurrencyValue(valorTotalNF);
         const somaItens = typeof valorTotal === 'number' ? valorTotal : parseCurrencyValue(valorTotal);
         const diff = Math.abs(valorNF - somaItens);
-        const bate = diff < 0.02; // tolerância de 2 centavos
+        const bate = diff < 0.02; // tolerÃ¢ncia de 2 centavos
         return (
           <div className={`mt-4 p-3 rounded-lg border ${bate ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/40' : 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800/40'}`}>
             <h5 className="text-sm font-bold mb-2 flex items-center">
-              {bate ? '✅' : '⚠️'} Conferência de Valores
+              {bate ? 'âÅ“â€¦' : 'âÅ¡ ï¸�'} ConferÃªncia de Valores
             </h5>
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div>
@@ -496,7 +496,7 @@ export default function ListaItens({ itens, removerItem, valorTotal, editarItem,
             </div>
             {!bate && (
               <p className="mt-2 text-amber-700 dark:text-amber-300 text-sm">
-                Valores divergem em {formatCurrency(diff)}. Verifique os valores unitários dos itens.
+                Valores divergem em {formatCurrency(diff)}. Verifique os valores unitÃ¡rios dos itens.
               </p>
             )}
           </div>

@@ -10,7 +10,7 @@ const pool = new Pool({
 
 async function verificarDuplicatas() {
   try {
-    console.log('🔍 Buscando todas as receptoras 8251...\n')
+    console.log('�Ÿ”� Buscando todas as receptoras 8251...\n')
 
     // Buscar todos os animais com 8251
     const animais = await pool.query(`
@@ -34,7 +34,7 @@ async function verificarDuplicatas() {
       ORDER BY id
     `)
 
-    console.log(`📊 Total de animais encontrados: ${animais.rows.length}\n`)
+    console.log(`�Ÿ“Š Total de animais encontrados: ${animais.rows.length}\n`)
 
     animais.rows.forEach((a, index) => {
       console.log(`${index + 1}. Animal ID ${a.id}`)
@@ -47,11 +47,11 @@ async function verificarDuplicatas() {
       console.log(`   Situação: ${a.situacao}`)
       console.log(`   Fornecedor: ${a.fornecedor || 'Não informado'}`)
       console.log(`   Data TE: ${a.data_te ? new Date(a.data_te).toLocaleDateString('pt-BR') : 'Não informada'}`)
-      console.log(`   Data DG: ${a.data_dg ? new Date(a.data_dg).toLocaleDateString('pt-BR') : 'NÃO TEM ❌'}`)
+      console.log(`   Data DG: ${a.data_dg ? new Date(a.data_dg).toLocaleDateString('pt-BR') : 'N�ƒO TEM �Œ'}`)
       console.log(`   Resultado DG: ${a.resultado_dg || 'Não informado'}`)
       console.log(`   Veterinário: ${a.veterinario_dg || 'Não informado'}`)
       console.log(`   Criado em: ${new Date(a.created_at).toLocaleString('pt-BR')}`)
-      console.log('   ─────────────────────────────────────\n')
+      console.log('   �”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€\n')
     })
 
     // Identificar qual é a receptora correta
@@ -60,20 +60,20 @@ async function verificarDuplicatas() {
       a.fornecedor?.toUpperCase().includes('MINEREMBRYO')
     )
 
-    console.log(`\n📋 Receptoras (raça=Receptora ou fornecedor=MINEREMBRYO): ${receptoras.length}`)
+    console.log(`\n�Ÿ“‹ Receptoras (raça=Receptora ou fornecedor=MINEREMBRYO): ${receptoras.length}`)
     receptoras.forEach(r => {
       console.log(`   - ID ${r.id}: ${r.nome} (${r.serie} ${r.rg})`)
     })
 
     // Verificar qual tem TE
     const comTE = animais.rows.filter(a => a.data_te)
-    console.log(`\n📋 Animais com Data TE: ${comTE.length}`)
+    console.log(`\n�Ÿ“‹ Animais com Data TE: ${comTE.length}`)
     comTE.forEach(r => {
       console.log(`   - ID ${r.id}: ${r.nome} - TE em ${new Date(r.data_te).toLocaleDateString('pt-BR')}`)
     })
 
     // Sugestão de qual manter
-    console.log('\n💡 SUGESTÃO:')
+    console.log('\n�Ÿ’� SUGEST�ƒO:')
     if (receptoras.length > 1) {
       console.log('   Existem múltiplas receptoras 8251!')
       console.log('   Recomendo manter apenas a que tem:')
@@ -86,12 +86,12 @@ async function verificarDuplicatas() {
       )
       
       if (correta) {
-        console.log(`\n   ✅ Receptora correta: ID ${correta.id} (${correta.nome})`)
+        console.log(`\n   �œ… Receptora correta: ID ${correta.id} (${correta.nome})`)
         console.log(`      Criada em: ${new Date(correta.created_at).toLocaleString('pt-BR')}`)
         
         const outras = animais.rows.filter(a => a.id !== correta.id)
         if (outras.length > 0) {
-          console.log(`\n   ⚠️ Outras ${outras.length} devem ser removidas ou ter RG alterado:`)
+          console.log(`\n   �š�️ Outras ${outras.length} devem ser removidas ou ter RG alterado:`)
           outras.forEach(o => {
             console.log(`      - ID ${o.id}: ${o.nome} (${o.raca})`)
           })
@@ -100,7 +100,7 @@ async function verificarDuplicatas() {
     }
 
   } catch (error) {
-    console.error('❌ Erro:', error.message)
+    console.error('�Œ Erro:', error.message)
   } finally {
     await pool.end()
   }

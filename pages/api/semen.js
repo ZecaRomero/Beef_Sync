@@ -7,10 +7,10 @@ const semenHandler = async (req, res) => {
   if (req.method === 'GET') {
     try {
       const semenStock = await databaseService.buscarEstoqueSemen(req.query)
-      return sendSuccess(res, semenStock, 'Estoque de sêmen obtido com sucesso')
+      return sendSuccess(res, semenStock, 'Estoque de sÃªmen obtido com sucesso')
     } catch (error) {
-      console.error('Erro ao buscar estoque de sêmen:', error)
-      return sendError(res, 'Erro ao buscar estoque de sêmen', HTTP_STATUS.INTERNAL_SERVER_ERROR, error.message)
+      console.error('Erro ao buscar estoque de sÃªmen:', error)
+      return sendError(res, 'Erro ao buscar estoque de sÃªmen', HTTP_STATUS.INTERNAL_SERVER_ERROR, error.message)
     }
   } else if (req.method === 'POST') {
     try {
@@ -18,7 +18,7 @@ const semenHandler = async (req, res) => {
       
       let result;
       if (tipoOperacao === 'saida') {
-        // Suporte a saída em lote: se vier um array em req.body.saidas, processar múltiplas
+        // Suporte a saÃ­da em lote: se vier um array em req.body.saidas, processar mÃºltiplas
         if (Array.isArray(req.body.saidas)) {
           result = await semenService.registrarSaidaLote(req.body.saidas)
         } else {
@@ -42,28 +42,28 @@ const semenHandler = async (req, res) => {
         return sendError(res, result.message, HTTP_STATUS.BAD_REQUEST, result.error || result.errors)
       }
     } catch (error) {
-      console.error('Erro ao processar sêmen:', error)
-      return sendError(res, 'Erro ao processar operação de sêmen', HTTP_STATUS.INTERNAL_SERVER_ERROR, error.message)
+      console.error('Erro ao processar sÃªmen:', error)
+      return sendError(res, 'Erro ao processar operaÃ§Ã£o de sÃªmen', HTTP_STATUS.INTERNAL_SERVER_ERROR, error.message)
     }
   } else {
     return sendMethodNotAllowed(res, req.method)
   }
 }
 
-// Determinar configuração de lote baseado no método e tipo de operação
+// Determinar configuraÃ§Ã£o de lote baseado no mÃ©todo e tipo de operaÃ§Ã£o
 function getSemenLoteConfig(req) {
   if (req.method === 'POST') {
     const { tipoOperacao } = req.body || {};
     
-    // Log para depuração de template
-    console.log('🔍 [API Semen] Processando lote:', {
+    // Log para depuraÃ§Ã£o de template
+    console.log('ðÅ¸â€�� [API Semen] Processando lote:', {
       tipoOperacao,
       body: req.body,
       templateEntrada: LOTE_CONFIGS.ENTRADA_SEMEN.descricao_template
     });
 
     if (tipoOperacao === 'saida') {
-      // Se for lote, usar configuração específica com contagem
+      // Se for lote, usar configuraÃ§Ã£o especÃ­fica com contagem
       if (Array.isArray(req.body.saidas)) {
         return LOTE_CONFIGS.SAIDA_SEMEN_LOTE
       }

@@ -43,20 +43,20 @@ export default function CleanupAnimals() {
   }
 
   const clearLocalStorage = () => {
-    if (confirm('⚠️ Tem certeza que deseja limpar TODOS os animais do localStorage?')) {
+    if (confirm('�š�️ Tem certeza que deseja limpar TODOS os animais do localStorage?')) {
       localStorage.removeItem('animals')
       localStorage.removeItem('animalData')
       localStorage.removeItem('animalCosts')
       setLocalStorageAnimals([])
-      addLog('✅ localStorage limpo completamente')
-      alert('🗑️ localStorage limpo com sucesso!')
+      addLog('�œ… localStorage limpo completamente')
+      alert('�Ÿ—‘️ localStorage limpo com sucesso!')
     }
   }
 
   const syncWithAPI = async () => {
     try {
       setLoading(true)
-      addLog('🔄 Iniciando sincronização com API...')
+      addLog('�Ÿ”„ Iniciando sincronização com API...')
       
       // Carregar animais da API
       const response = await fetch('/api/animals')
@@ -67,17 +67,17 @@ export default function CleanupAnimals() {
         localStorage.setItem('animals', JSON.stringify(apiAnimals))
         setLocalStorageAnimals(apiAnimals)
         
-        addLog(`✅ Sincronizado: ${apiAnimals.length} animais da API para localStorage`)
-        alert(`✅ Sincronização concluída! ${apiAnimals.length} animais sincronizados.`)
+        addLog(`�œ… Sincronizado: ${apiAnimals.length} animais da API para localStorage`)
+        alert(`�œ… Sincronização concluída! ${apiAnimals.length} animais sincronizados.`)
       } else {
-        addLog('❌ Erro ao carregar dados da API')
-        alert('❌ Erro ao sincronizar com a API')
+        addLog('�Œ Erro ao carregar dados da API')
+        alert('�Œ Erro ao sincronizar com a API')
       }
       
     } catch (error) {
       console.error('Erro na sincronização:', error)
-      addLog(`❌ Erro na sincronização: ${error.message}`)
-      alert('❌ Erro na sincronização')
+      addLog(`�Œ Erro na sincronização: ${error.message}`)
+      alert('�Œ Erro na sincronização')
     } finally {
       setLoading(false)
     }
@@ -96,16 +96,16 @@ export default function CleanupAnimals() {
       localStorage.setItem('animals', JSON.stringify(filteredAnimals))
       setLocalStorageAnimals(filteredAnimals)
       const removedCount = localStorageAnimals.length - filteredAnimals.length
-      addLog(`✅ Removidos ${removedCount} animais específicos do localStorage`)
-      alert(`✅ ${removedCount} animais específicos removidos do localStorage!`)
+      addLog(`�œ… Removidos ${removedCount} animais específicos do localStorage`)
+      alert(`�œ… ${removedCount} animais específicos removidos do localStorage!`)
     } else {
-      addLog('ℹ️ Nenhum animal específico encontrado para remover')
-      alert('ℹ️ Nenhum animal específico encontrado para remover')
+      addLog('�„�️ Nenhum animal específico encontrado para remover')
+      alert('�„�️ Nenhum animal específico encontrado para remover')
     }
   }
 
   const clearAllData = () => {
-    if (confirm('⚠️ ATENÇÃO: Isso irá limpar TODOS os dados de animais!\n\nTem certeza?')) {
+    if (confirm('�š�️ ATEN�‡�ƒO: Isso irá limpar TODOS os dados de animais!\n\nTem certeza?')) {
       // Limpar localStorage
       localStorage.removeItem('animals')
       localStorage.removeItem('animalData')
@@ -115,8 +115,8 @@ export default function CleanupAnimals() {
       setLocalStorageAnimals([])
       setApiAnimals([])
       
-      addLog('🗑️ TODOS os dados de animais foram limpos')
-      alert('🗑️ Todos os dados de animais foram removidos!')
+      addLog('�Ÿ—‘️ TODOS os dados de animais foram limpos')
+      alert('�Ÿ—‘️ Todos os dados de animais foram removidos!')
     }
   }
 
@@ -136,33 +136,33 @@ export default function CleanupAnimals() {
       <div className="max-w-6xl mx-auto px-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-            🧹 Limpeza de Animais
+            �Ÿ�� Limpeza de Animais
           </h1>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
               <h3 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
-                🗑️ localStorage
+                �Ÿ—‘️ localStorage
               </h3>
               <div className="space-y-2 text-sm">
                 <p><strong>Animais:</strong> {localStorageAnimals.length}</p>
-                <p><strong>Status:</strong> {localStorageAnimals.length > 0 ? '⚠️ Com dados' : '✅ Limpo'}</p>
+                <p><strong>Status:</strong> {localStorageAnimals.length > 0 ? '�š�️ Com dados' : '�œ… Limpo'}</p>
               </div>
             </div>
             
             <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
               <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-200 mb-2">
-                🌐 PostgreSQL
+                �ŸŒ� PostgreSQL
               </h3>
               <div className="space-y-2 text-sm">
                 <p><strong>Animais:</strong> {apiAnimals.length}</p>
-                <p><strong>Status:</strong> {apiAnimals.length > 0 ? '⚠️ Com dados' : '✅ Limpo'}</p>
+                <p><strong>Status:</strong> {apiAnimals.length > 0 ? '�š�️ Com dados' : '�œ… Limpo'}</p>
               </div>
             </div>
             
             <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
               <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
-                ⚠️ Problema
+                �š�️ Problema
               </h3>
               <div className="space-y-2 text-sm">
                 <p><strong>Animais inexistentes:</strong> 3 removidos</p>
@@ -176,42 +176,42 @@ export default function CleanupAnimals() {
               onClick={removeSpecificAnimals}
               className="bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              🎯 Remover Animais Específicos
+              �ŸŽ� Remover Animais Específicos
             </button>
             
             <button
               onClick={clearLocalStorage}
               className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              🗑️ Limpar localStorage
+              �Ÿ—‘️ Limpar localStorage
             </button>
             
             <button
               onClick={syncWithAPI}
               className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              🔄 Sincronizar com API
+              �Ÿ”„ Sincronizar com API
             </button>
             
             <button
               onClick={clearAllData}
               className="bg-red-800 hover:bg-red-900 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              ⚠️ Limpar TUDO
+              �š�️ Limpar TUDO
             </button>
             
             <button
               onClick={loadData}
               className="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              🔄 Recarregar
+              �Ÿ”„ Recarregar
             </button>
             
             <a
               href="/animals"
               className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-center"
             >
-              👀 Ver Animais
+              �Ÿ‘€ Ver Animais
             </a>
           </div>
         </div>
@@ -220,7 +220,7 @@ export default function CleanupAnimals() {
         {actionLog.length > 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              📋 Log de Ações
+              �Ÿ“‹ Log de Ações
             </h2>
             <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg max-h-64 overflow-y-auto">
               {actionLog.map((log, index) => (
@@ -236,7 +236,7 @@ export default function CleanupAnimals() {
         {localStorageAnimals.length > 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              📦 Animais no localStorage ({localStorageAnimals.length})
+              �Ÿ“� Animais no localStorage ({localStorageAnimals.length})
             </h2>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -269,7 +269,7 @@ export default function CleanupAnimals() {
         {apiAnimals.length > 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              🌐 Animais na API ({apiAnimals.length})
+              �ŸŒ� Animais na API ({apiAnimals.length})
             </h2>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -302,7 +302,7 @@ export default function CleanupAnimals() {
         {localStorageAnimals.length === 0 && apiAnimals.length === 0 && (
           <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-6 text-center">
             <h2 className="text-xl font-semibold text-green-800 dark:text-green-200 mb-2">
-              ✅ Limpeza Concluída
+              �œ… Limpeza Concluída
             </h2>
             <p className="text-green-700 dark:text-green-300">
               Todos os animais foram removidos do PostgreSQL e localStorage.

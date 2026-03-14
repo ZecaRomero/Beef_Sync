@@ -75,7 +75,7 @@ export default function AlertasPartosAtrasados() {
                       {alerta.dias_atraso} dia(s) de atraso
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                      TE realizada em {formatDate(alerta.data_te)} • Doadora: {alerta.doadora_nome}
+                      TE realizada em {formatDate(alerta.data_te)} ââ‚¬¢ Doadora: {alerta.doadora_nome}
                     </p>
                   </div>
                 </div>
@@ -90,13 +90,13 @@ export default function AlertasPartosAtrasados() {
         </div>
       )}
 
-      {/* Partos Próximos */}
+      {/* Partos PrÃ³ximos */}
       {proximos.length > 0 && (
         <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-3">
             <ClockIcon className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
             <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-300">
-              Partos Próximos ({proximos.length})
+              Partos PrÃ³ximos ({proximos.length})
             </h3>
           </div>
           <div className="space-y-2">
@@ -108,7 +108,7 @@ export default function AlertasPartosAtrasados() {
                       {proximo.receptora_nome}
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Previsão: <span className="font-semibold">{formatDate(proximo.data_esperada_parto)}</span>
+                      PrevisÃ£o: <span className="font-semibold">{formatDate(proximo.data_esperada_parto)}</span>
                     </p>
                     <p className="text-sm text-yellow-600 dark:text-yellow-400 font-semibold">
                       {proximo.dias_restantes > 0 ? `${proximo.dias_restantes} dia(s) restante(s)` : 'Parto esperado hoje'}

@@ -10,12 +10,12 @@ const pool = new Pool({
 });
 
 async function verificarRGsFaltantes() {
-  console.log('🔍 VERIFICANDO RGs FALTANTES POR SÉRIE\n');
+  console.log('�Ÿ”� VERIFICANDO RGs FALTANTES POR S�‰RIE\n');
   console.log('='.repeat(80));
 
   try {
     // 1. Buscar todas as séries
-    console.log('\n📊 1. Buscando séries cadastradas...');
+    console.log('\n�Ÿ“Š 1. Buscando séries cadastradas...');
     const seriesResult = await pool.query(`
       SELECT DISTINCT serie 
       FROM animais 
@@ -24,7 +24,7 @@ async function verificarRGsFaltantes() {
     `);
     
     const series = seriesResult.rows.map(r => r.serie);
-    console.log(`✅ Encontradas ${series.length} séries: ${series.join(', ')}`);
+    console.log(`�œ… Encontradas ${series.length} séries: ${series.join(', ')}`);
 
     const relatorio = {
       data_analise: new Date().toISOString(),
@@ -35,7 +35,7 @@ async function verificarRGsFaltantes() {
     // 2. Para cada série, verificar RGs faltantes
     for (const serie of series) {
       console.log(`\n${'='.repeat(80)}`);
-      console.log(`📋 Analisando série: ${serie}`);
+      console.log(`�Ÿ“‹ Analisando série: ${serie}`);
       console.log('='.repeat(80));
 
       // Buscar todos os RGs desta série
@@ -47,7 +47,7 @@ async function verificarRGsFaltantes() {
       `, [serie]);
 
       const animais = rgsResult.rows;
-      console.log(`✅ Total de animais: ${animais.length}`);
+      console.log(`�œ… Total de animais: ${animais.length}`);
 
       if (animais.length === 0) continue;
 
@@ -58,16 +58,16 @@ async function verificarRGsFaltantes() {
         .sort((a, b) => a - b);
 
       if (rgsNumericos.length === 0) {
-        console.log('⚠️ Nenhum RG numérico encontrado nesta série');
+        console.log('�š�️ Nenhum RG numérico encontrado nesta série');
         continue;
       }
 
       const menorRG = rgsNumericos[0];
       const maiorRG = rgsNumericos[rgsNumericos.length - 1];
 
-      console.log(`📊 Menor RG: ${menorRG}`);
-      console.log(`📊 Maior RG: ${maiorRG}`);
-      console.log(`📊 Intervalo: ${maiorRG - menorRG + 1} números`);
+      console.log(`�Ÿ“Š Menor RG: ${menorRG}`);
+      console.log(`�Ÿ“Š Maior RG: ${maiorRG}`);
+      console.log(`�Ÿ“Š Intervalo: ${maiorRG - menorRG + 1} números`);
 
       // Verificar RGs faltantes
       const faltantes = [];
@@ -101,12 +101,12 @@ async function verificarRGsFaltantes() {
       relatorio.series_analisadas.push(serieInfo);
 
       if (faltantes.length > 0) {
-        console.log(`\n⚠️ ATENÇÃO: ${faltantes.length} RGs faltantes!`);
-        console.log(`📊 Percentual de completude: ${serieInfo.percentual_completo}%`);
+        console.log(`\n�š�️ ATEN�‡�ƒO: ${faltantes.length} RGs faltantes!`);
+        console.log(`�Ÿ“Š Percentual de completude: ${serieInfo.percentual_completo}%`);
         
         // Mostrar os primeiros 20 faltantes
         const mostrar = faltantes.slice(0, 20);
-        console.log(`\n🔴 RGs faltantes (mostrando ${mostrar.length} de ${faltantes.length}):`);
+        console.log(`\n�Ÿ”� RGs faltantes (mostrando ${mostrar.length} de ${faltantes.length}):`);
         
         // Agrupar em intervalos para melhor visualização
         let inicio = mostrar[0];
@@ -142,32 +142,32 @@ async function verificarRGsFaltantes() {
           console.log(`   ... e mais ${faltantes.length - 20} RGs faltantes`);
         }
       } else {
-        console.log(`\n✅ Sequência completa! Nenhum RG faltante.`);
-        console.log(`📊 Percentual de completude: 100%`);
+        console.log(`\n�œ… Sequência completa! Nenhum RG faltante.`);
+        console.log(`�Ÿ“Š Percentual de completude: 100%`);
       }
 
       // Mostrar primeiro e último animal
-      console.log(`\n📌 Primeiro animal: ${serie}-${animais[0].rg} (${animais[0].nome || 'Sem nome'})`);
-      console.log(`📌 Último animal: ${serie}-${animais[animais.length - 1].rg} (${animais[animais.length - 1].nome || 'Sem nome'})`);
+      console.log(`\n�Ÿ“Œ Primeiro animal: ${serie}-${animais[0].rg} (${animais[0].nome || 'Sem nome'})`);
+      console.log(`�Ÿ“Œ �šltimo animal: ${serie}-${animais[animais.length - 1].rg} (${animais[animais.length - 1].nome || 'Sem nome'})`);
     }
 
     // 3. Salvar relatório em JSON
     const nomeArquivoJson = `relatorio-rgs-faltantes-${new Date().toISOString().slice(0, 10)}.json`;
     fs.writeFileSync(nomeArquivoJson, JSON.stringify(relatorio, null, 2));
     console.log(`\n${'='.repeat(80)}`);
-    console.log(`✅ Relatório JSON salvo: ${nomeArquivoJson}`);
+    console.log(`�œ… Relatório JSON salvo: ${nomeArquivoJson}`);
 
     // 4. Criar relatório Excel
-    console.log('\n📊 Gerando relatório Excel...');
+    console.log('\n�Ÿ“Š Gerando relatório Excel...');
     let XLSX;
     try {
       XLSX = require('xlsx');
     } catch (error) {
-      console.log('⚠️ Módulo xlsx não encontrado. Instalando...');
+      console.log('�š�️ Módulo xlsx não encontrado. Instalando...');
       console.log('   Execute: npm install xlsx');
       console.log('   Ou continue - o relatório JSON foi gerado com sucesso!');
       console.log('\n' + '='.repeat(80));
-      console.log(`✅ Relatório JSON salvo: ${nomeArquivoJson}`);
+      console.log(`�œ… Relatório JSON salvo: ${nomeArquivoJson}`);
       return;
     }
     
@@ -175,7 +175,7 @@ async function verificarRGsFaltantes() {
 
     // Aba 1: Resumo
     const resumoData = [
-      ['RELATÓRIO DE RGs FALTANTES'],
+      ['RELAT�“RIO DE RGs FALTANTES'],
       ['Data da Análise:', new Date().toLocaleString('pt-BR')],
       ['Total de Séries:', relatorio.total_series],
       [],
@@ -216,7 +216,7 @@ async function verificarRGsFaltantes() {
     // Aba 3: Detalhes por Série
     relatorio.series_analisadas.forEach(s => {
       const serieData = [
-        [`SÉRIE: ${s.serie}`],
+        [`S�‰RIE: ${s.serie}`],
         [],
         ['Total de Animais:', s.total_animais],
         ['Menor RG:', s.menor_rg],
@@ -230,7 +230,7 @@ async function verificarRGsFaltantes() {
         ['  Nome:', s.primeiro_animal.nome || 'Sem nome'],
         ['  Data:', new Date(s.primeiro_animal.data).toLocaleString('pt-BR')],
         [],
-        ['Último Animal:'],
+        ['�šltimo Animal:'],
         ['  RG:', s.ultimo_animal.rg],
         ['  Nome:', s.ultimo_animal.nome || 'Sem nome'],
         ['  Data:', new Date(s.ultimo_animal.data).toLocaleString('pt-BR')],
@@ -250,21 +250,21 @@ async function verificarRGsFaltantes() {
 
     const nomeArquivoExcel = `relatorio-rgs-faltantes-${new Date().toISOString().slice(0, 10)}.xlsx`;
     XLSX.writeFile(wb, nomeArquivoExcel);
-    console.log(`✅ Relatório Excel salvo: ${nomeArquivoExcel}`);
+    console.log(`�œ… Relatório Excel salvo: ${nomeArquivoExcel}`);
 
     // Resumo final
     console.log(`\n${'='.repeat(80)}`);
-    console.log('📊 RESUMO GERAL');
+    console.log('�Ÿ“Š RESUMO GERAL');
     console.log('='.repeat(80));
     
     const totalFaltantes = relatorio.series_analisadas.reduce((sum, s) => sum + s.total_faltantes, 0);
     const totalAnimais = relatorio.series_analisadas.reduce((sum, s) => sum + s.total_animais, 0);
     
-    console.log(`\n✅ Total de animais cadastrados: ${totalAnimais}`);
-    console.log(`⚠️ Total de RGs faltantes: ${totalFaltantes}`);
+    console.log(`\n�œ… Total de animais cadastrados: ${totalAnimais}`);
+    console.log(`�š�️ Total de RGs faltantes: ${totalFaltantes}`);
     
     if (totalFaltantes > 0) {
-      console.log(`\n🔴 Séries com RGs faltantes:`);
+      console.log(`\n�Ÿ”� Séries com RGs faltantes:`);
       relatorio.series_analisadas
         .filter(s => s.total_faltantes > 0)
         .forEach(s => {
@@ -272,12 +272,12 @@ async function verificarRGsFaltantes() {
         });
     }
 
-    console.log(`\n📄 Arquivos gerados:`);
+    console.log(`\n�Ÿ“„ Arquivos gerados:`);
     console.log(`   - ${nomeArquivoJson}`);
     console.log(`   - ${nomeArquivoExcel}`);
 
   } catch (error) {
-    console.error('\n❌ Erro durante verificação:', error);
+    console.error('\n�Œ Erro durante verificação:', error);
     console.error('Detalhes:', error.message);
   } finally {
     await pool.end();

@@ -1,7 +1,7 @@
 const { query } = require('./databaseService');
 
 class SemenService {
-  // Adicionar entrada de sêmen
+  // Adicionar entrada de sÃªmen
   async adicionarEntrada(semenData) {
     try {
       const {
@@ -23,7 +23,7 @@ class SemenService {
         nomeTouro || 'Sem nome',
         rgTouro || null,
         raca || null,
-        localizacao || 'Sem localização',
+        localizacao || 'Sem localizaÃ§Ã£o',
         rackTouro || null,
         botijao || null,
         caneca || null,
@@ -43,30 +43,30 @@ class SemenService {
       return {
         success: true,
         data: result.rows[0],
-        message: 'Sêmen adicionado ao estoque com sucesso'
+        message: 'SÃªmen adicionado ao estoque com sucesso'
       };
     } catch (error) {
-      console.error('Erro ao adicionar entrada de sêmen:', error);
+      console.error('Erro ao adicionar entrada de sÃªmen:', error);
       return {
         success: false,
         error: error.message,
-        message: 'Erro ao adicionar sêmen ao estoque'
+        message: 'Erro ao adicionar sÃªmen ao estoque'
       };
     }
   }
 
-  // Registrar saída de sêmen
+  // Registrar saÃ­da de sÃªmen
   async registrarSaida(saidaData) {
     try {
-      console.log('📤 Dados recebidos para saída:', saidaData);
+      console.log('ðÅ¸â€œ¤ Dados recebidos para saÃ­da:', saidaData);
       
       const {
         entradaId, destino, quantidadeDoses, observacoes, dataOperacao, numeroNF
       } = saidaData;
 
-      // Validações básicas
+      // ValidaÃ§Ãµes bÃ¡sicas
       if (!entradaId) {
-        throw new Error('ID da entrada é obrigatório para operações de saída');
+        throw new Error('ID da entrada Ã© obrigatÃ³rio para operaÃ§Ãµes de saÃ­da');
       }
 
       if (!quantidadeDoses || quantidadeDoses <= 0) {
@@ -74,13 +74,13 @@ class SemenService {
       }
 
       if (!destino || destino.trim() === '') {
-        throw new Error('Destino é obrigatório para saídas');
+        throw new Error('Destino Ã© obrigatÃ³rio para saÃ­das');
       }
 
       // Validar entrada
       const entradaResult = await query('SELECT * FROM estoque_semen WHERE id = $1 AND tipo_operacao = $2', [entradaId, 'entrada']);
       if (entradaResult.rows.length === 0) {
-        throw new Error('Entrada não encontrada ou inválida');
+        throw new Error('Entrada nÃ£o encontrada ou invÃ¡lida');
       }
 
       const entrada = entradaResult.rows[0];
@@ -89,14 +89,14 @@ class SemenService {
       const touroNome = entrada.nome_touro || 'N/A';
 
       if (dosesDisponiveis <= 0) {
-        throw new Error(`${touroNome}: Sem doses disponíveis (estoque: ${entrada.doses_disponiveis ?? 0})`);
+        throw new Error(`${touroNome}: Sem doses disponÃ­veis (estoque: ${entrada.doses_disponiveis ?? 0})`);
       }
 
       if (quantidadeSaida > dosesDisponiveis) {
-        throw new Error(`${touroNome}: Quantidade (${quantidadeSaida}) excede disponível (${dosesDisponiveis})`);
+        throw new Error(`${touroNome}: Quantidade (${quantidadeSaida}) excede disponÃ­vel (${dosesDisponiveis})`);
       }
 
-      // Atualizar doses disponíveis na entrada
+      // Atualizar doses disponÃ­veis na entrada
       const novasDosesDisponiveis = dosesDisponiveis - quantidadeSaida;
       const novoStatus = novasDosesDisponiveis === 0 ? 'esgotado' : 'disponivel';
 
@@ -109,7 +109,7 @@ class SemenService {
         WHERE id = $4
       `, [novasDosesDisponiveis, quantidadeSaida, novoStatus, entradaId]);
 
-      // Registrar saída
+      // Registrar saÃ­da
       const saidaResult = await query(`
         INSERT INTO estoque_semen (
           nome_touro, rg_touro, raca, localizacao, rack_touro, botijao, caneca,
@@ -135,25 +135,25 @@ class SemenService {
         numeroNF || null
       ]);
 
-      console.log('✅ Saída registrada com sucesso:', saidaResult.rows[0]);
+      console.log('âÅ“â€¦ SaÃ­da registrada com sucesso:', saidaResult.rows[0]);
 
       return {
         success: true,
         data: saidaResult.rows[0],
-        message: 'Saída de sêmen registrada com sucesso'
+        message: 'SaÃ­da de sÃªmen registrada com sucesso'
       };
     } catch (error) {
-      console.error('❌ Erro ao registrar saída de sêmen:', error);
+      console.error('â�Å’ Erro ao registrar saÃ­da de sÃªmen:', error);
       return {
         success: false,
         error: error.message,
-        message: 'Erro ao registrar saída de sêmen'
+        message: 'Erro ao registrar saÃ­da de sÃªmen'
       };
     }
   }
 
   /**
-   * Registrar saídas em lote
+   * Registrar saÃ­das em lote
    * saidas: Array<{ entradaId, destino, quantidadeDoses, observacoes, dataOperacao }>
    */
   async registrarSaidaLote(saidas = []) {
@@ -175,15 +175,15 @@ class SemenService {
     return {
       success: falhas === 0,
       message: falhas === 0
-        ? `Saídas registradas: ${sucesso}`
-        : `Saídas registradas: ${sucesso}. Falhas: ${falhas}`,
+        ? `SaÃ­das registradas: ${sucesso}`
+        : `SaÃ­das registradas: ${sucesso}. Falhas: ${falhas}`,
       data: resultados,
       count: sucesso,
       errors: falhasDetalhes
     }
   }
 
-  // Buscar estoque disponível
+  // Buscar estoque disponÃ­vel
   // tipo: 'semen' | 'embriao' | null (todos)
   async buscarEstoqueDisponivel(tipo = null) {
     try {
@@ -204,7 +204,7 @@ class SemenService {
         data: result.rows
       };
     } catch (error) {
-      console.error('Erro ao buscar estoque disponível:', error);
+      console.error('Erro ao buscar estoque disponÃ­vel:', error);
       return {
         success: false,
         error: error.message,

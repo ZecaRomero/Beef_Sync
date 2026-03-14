@@ -1,19 +1,19 @@
 import { query } from '../../../lib/database'
 
-// Importar databaseService de forma compatível
+// Importar databaseService de forma compatÃ­vel
 let databaseService
 try {
   const dbServiceModule = require('../../../services/databaseService')
   databaseService = dbServiceModule.default || dbServiceModule
   
-  // Verificar se o método existe
+  // Verificar se o mÃ©todo existe
   if (!databaseService || typeof databaseService.registrarMovimentacao !== 'function') {
-    throw new Error('databaseService.registrarMovimentacao não está disponível')
+    throw new Error('databaseService.registrarMovimentacao nÃ£o estÃ¡ disponÃ­vel')
   }
   
-  console.log('✅ databaseService carregado com sucesso')
+  console.log('âÅ“â€¦ databaseService carregado com sucesso')
 } catch (importError) {
-  console.error('❌ Erro ao carregar databaseService:', importError)
+  console.error('â�Å’ Erro ao carregar databaseService:', importError)
   throw importError
 }
 
@@ -21,24 +21,24 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ 
       success: false,
-      message: 'Método não permitido' 
+      message: 'MÃ©todo nÃ£o permitido' 
     })
   }
 
   try {
-    console.log('📥 Requisição recebida para sincronizar NF:', req.body)
+    console.log('ðÅ¸â€œ¥ RequisiÃ§Ã£o recebida para sincronizar NF:', req.body)
     
     const { numeroNF } = req.body || {}
 
     if (!numeroNF) {
-      console.error('❌ Número da NF não fornecido')
+      console.error('â�Å’ NÃºmero da NF nÃ£o fornecido')
       return res.status(400).json({
         success: false,
-        message: 'Número da NF é obrigatório'
+        message: 'NÃºmero da NF Ã© obrigatÃ³rio'
       })
     }
     
-    console.log(`🔍 Buscando NF ${numeroNF}...`)
+    console.log(`ðÅ¸â€�� Buscando NF ${numeroNF}...`)
 
     // Buscar a NF
     const nfResult = await query(`
@@ -49,21 +49,21 @@ export default async function handler(req, res) {
     if (nfResult.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: `NF ${numeroNF} não encontrada`
+        message: `NF ${numeroNF} nÃ£o encontrada`
       })
     }
 
     const nf = nfResult.rows[0]
-    console.log(`✅ NF ${numeroNF} encontrada (ID: ${nf.id})`)
+    console.log(`âÅ“â€¦ NF ${numeroNF} encontrada (ID: ${nf.id})`)
 
     // Buscar itens da NF
-    console.log(`🔍 Buscando itens da NF ${numeroNF} (ID: ${nf.id})...`)
+    console.log(`ðÅ¸â€�� Buscando itens da NF ${numeroNF} (ID: ${nf.id})...`)
     const itensResult = await query(`
       SELECT dados_item FROM notas_fiscais_itens
       WHERE nota_fiscal_id = $1 AND tipo_produto = 'bovino'
     `, [nf.id])
     
-    console.log(`📋 ${itensResult.rows.length} itens encontrados`)
+    console.log(`ðÅ¸â€œâ€¹ ${itensResult.rows.length} itens encontrados`)
 
     // Parse seguro dos itens
     const itens = itensResult.rows.map(row => {
@@ -73,11 +73,11 @@ export default async function handler(req, res) {
         } else if (typeof row.dados_item === 'object' && row.dados_item !== null) {
           return row.dados_item
         } else {
-          console.warn(`⚠️ Item com formato inválido:`, row.dados_item)
+          console.warn(`âÅ¡ ï¸� Item com formato invÃ¡lido:`, row.dados_item)
           return null
         }
       } catch (parseError) {
-        console.error(`❌ Erro ao parsear item da NF ${numeroNF}:`, parseError)
+        console.error(`â�Å’ Erro ao parsear item da NF ${numeroNF}:`, parseError)
         return null
       }
     }).filter(item => item !== null)
@@ -85,18 +85,18 @@ export default async function handler(req, res) {
     if (itens.length === 0) {
       return res.status(400).json({
         success: false,
-        message: `NF ${numeroNF} não possui itens de bovino válidos`
+        message: `NF ${numeroNF} nÃ£o possui itens de bovino vÃ¡lidos`
       })
     }
     
-    console.log(`✅ NF ${numeroNF}: ${itens.length} itens encontrados`)
+    console.log(`âÅ“â€¦ NF ${numeroNF}: ${itens.length} itens encontrados`)
 
-    // Verificar incrição
+    // Verificar incriÃ§Ã£o
     const incricao = nf.incricao || ''
     const incricaoUpper = incricao.toUpperCase()
     const incricaoValida = incricaoUpper === 'SANT ANNA' || incricaoUpper === 'PARDINHO'
 
-    console.log(`📋 NF ${numeroNF}:`, {
+    console.log(`ðÅ¸â€œâ€¹ NF ${numeroNF}:`, {
       tipo: nf.tipo,
       incricao: incricao,
       incricaoValida: incricaoValida,
@@ -107,7 +107,7 @@ export default async function handler(req, res) {
     if (!incricaoValida && nf.tipo === 'entrada') {
       return res.status(400).json({
         success: false,
-        message: `NF ${numeroNF} não possui incrição válida (SANT ANNA ou PARDINHO). Incrição atual: "${incricao}"`
+        message: `NF ${numeroNF} nÃ£o possui incriÃ§Ã£o vÃ¡lida (SANT ANNA ou PARDINHO). IncriÃ§Ã£o atual: "${incricao}"`
       })
     }
 
@@ -150,11 +150,11 @@ export default async function handler(req, res) {
     if (!deveRegistrarEntrada && !deveRegistrarSaida) {
       return res.status(400).json({
         success: false,
-        message: `NF ${numeroNF} não atende aos critérios para registro no boletim contábil`
+        message: `NF ${numeroNF} nÃ£o atende aos critÃ©rios para registro no boletim contÃ¡bil`
       })
     }
 
-    // Remover movimentações antigas desta NF
+    // Remover movimentaÃ§Ãµes antigas desta NF
     try {
       await query(
         `DELETE FROM movimentacoes_contabeis 
@@ -162,12 +162,12 @@ export default async function handler(req, res) {
          AND tipo = $2`,
         [String(numeroNF), nf.tipo]
       )
-      console.log(`🗑️ Movimentações antigas da NF ${numeroNF} removidas`)
+      console.log(`ðÅ¸â€”â€˜ï¸� MovimentaÃ§Ãµes antigas da NF ${numeroNF} removidas`)
     } catch (deleteError) {
-      console.warn(`⚠️ Erro ao remover movimentações antigas:`, deleteError.message)
+      console.warn(`âÅ¡ ï¸� Erro ao remover movimentaÃ§Ãµes antigas:`, deleteError.message)
     }
 
-    // Função para calcular meses da era
+    // FunÃ§Ã£o para calcular meses da era
     function calcularMesesDaEra(era) {
       if (!era) return null
       const eraLower = era.toLowerCase().trim()
@@ -213,21 +213,21 @@ export default async function handler(req, res) {
     // Validar data antes de processar
     const dataMovimento = nf.data || nf.data_compra
     if (!dataMovimento) {
-      console.error(`❌ NF ${numeroNF} não possui data válida`)
+      console.error(`â�Å’ NF ${numeroNF} nÃ£o possui data vÃ¡lida`)
       return res.status(400).json({
         success: false,
-        message: `NF ${numeroNF} não possui data válida`
+        message: `NF ${numeroNF} nÃ£o possui data vÃ¡lida`
       })
     }
 
-    // Registrar movimentações
+    // Registrar movimentaÃ§Ãµes
     const periodoAtual = new Date(dataMovimento).toISOString().slice(0, 7)
     let registradas = 0
     const erros = []
 
-    console.log(`📋 Processando ${itens.length} itens da NF ${numeroNF} para período ${periodoAtual}`)
-    console.log(`📅 Data de movimento: ${dataMovimento}`)
-    console.log(`🏢 Localidade: ${incricao || (ehPardinho ? 'AGROPECUÁRIA PARDINHO LTDA' : 'SANT ANNA')}`)
+    console.log(`ðÅ¸â€œâ€¹ Processando ${itens.length} itens da NF ${numeroNF} para perÃ­odo ${periodoAtual}`)
+    console.log(`ðÅ¸â€œâ€¦ Data de movimento: ${dataMovimento}`)
+    console.log(`ðÅ¸�¢ Localidade: ${incricao || (ehPardinho ? 'AGROPECUÃ�RIA PARDINHO LTDA' : 'SANT ANNA')}`)
 
     for (let i = 0; i < itens.length; i++) {
       const item = itens[i]
@@ -241,9 +241,9 @@ export default async function handler(req, res) {
             
             // Identificar sexo corretamente
             const sexoRaw = String(item.sexo || '').trim().toLowerCase()
-            const sexoTexto = sexoRaw === 'macho' || sexoRaw === 'm' || sexoRaw.startsWith('macho') ? 'Macho' : 'Fêmea'
+            const sexoTexto = sexoRaw === 'macho' || sexoRaw === 'm' || sexoRaw.startsWith('macho') ? 'Macho' : 'FÃªmea'
             
-            console.log(`📝 Item ${i + 1}: ${quantidade} animais (${sexoTexto}) - R$ ${valorTotal.toFixed(2)}`)
+            console.log(`ðÅ¸â€œ� Item ${i + 1}: ${quantidade} animais (${sexoTexto}) - R$ ${valorTotal.toFixed(2)}`)
             
             const dadosMovimentacao = {
               periodo: periodoAtual,
@@ -253,8 +253,8 @@ export default async function handler(req, res) {
               animalId: null,
               valor: valorTotal,
               descricao: `Compra de ${quantidade} bovino(s) via NF ${numeroNF} - ${item.tipoAnimal === 'registrado' ? 'Registrado' : 'Cria/Recria'} - ${sexoTexto} - ${item.era || 'N/A'}`,
-              observacoes: `Quantidade: ${quantidade} | Tipo: ${item.tipoAnimal === 'registrado' ? 'Registrado' : 'Cria/Recria'} | ${item.raca || 'Não informado'} | Valor unitário: R$ ${valorUnitario.toFixed(2)}`,
-              localidade: incricao || (ehPardinho ? 'AGROPECUÁRIA PARDINHO LTDA' : 'SANT ANNA'),
+              observacoes: `Quantidade: ${quantidade} | Tipo: ${item.tipoAnimal === 'registrado' ? 'Registrado' : 'Cria/Recria'} | ${item.raca || 'NÃ£o informado'} | Valor unitÃ¡rio: R$ ${valorUnitario.toFixed(2)}`,
+              localidade: incricao || (ehPardinho ? 'AGROPECUÃ�RIA PARDINHO LTDA' : 'SANT ANNA'),
               dadosExtras: {
                 numeroNF: numeroNF,
                 numero_nf: numeroNF,
@@ -270,7 +270,7 @@ export default async function handler(req, res) {
               }
             }
             
-            console.log(`💾 Registrando movimentação com dados:`, {
+            console.log(`ðÅ¸â€™¾ Registrando movimentaÃ§Ã£o com dados:`, {
               periodo: dadosMovimentacao.periodo,
               tipo: dadosMovimentacao.tipo,
               subtipo: dadosMovimentacao.subtipo,
@@ -281,13 +281,13 @@ export default async function handler(req, res) {
             
             await databaseService.registrarMovimentacao(dadosMovimentacao)
             registradas++
-            console.log(`✅ Movimentação registrada: ${quantidade} animais (${sexoTexto}) - R$ ${valorTotal.toFixed(2)}`)
+            console.log(`âÅ“â€¦ MovimentaÃ§Ã£o registrada: ${quantidade} animais (${sexoTexto}) - R$ ${valorTotal.toFixed(2)}`)
           } else {
             const animalId = animaisIds[i] || null
             const valorUnitario = parseFloat(String(item.valorUnitario || item.valor_unitario || 0).replace(',', '.')) || 0
             
             const sexoRaw = String(item.sexo || '').trim().toLowerCase()
-            const sexoTexto = sexoRaw === 'macho' || sexoRaw === 'm' || sexoRaw.startsWith('macho') ? 'Macho' : 'Fêmea'
+            const sexoTexto = sexoRaw === 'macho' || sexoRaw === 'm' || sexoRaw.startsWith('macho') ? 'Macho' : 'FÃªmea'
             
             const dadosMovimentacao = {
               periodo: periodoAtual,
@@ -297,8 +297,8 @@ export default async function handler(req, res) {
               animalId: animalId,
               valor: valorUnitario,
               descricao: `Compra de bovino via NF ${numeroNF}`,
-              observacoes: `Animal: ${item.tatuagem || 'N/A'} - ${item.raca || 'Não informado'} - ${sexoTexto}`,
-              localidade: incricao || (ehPardinho ? 'AGROPECUÁRIA PARDINHO LTDA' : 'SANT ANNA'),
+              observacoes: `Animal: ${item.tatuagem || 'N/A'} - ${item.raca || 'NÃ£o informado'} - ${sexoTexto}`,
+              localidade: incricao || (ehPardinho ? 'AGROPECUÃ�RIA PARDINHO LTDA' : 'SANT ANNA'),
               dadosExtras: {
                 numeroNF: numeroNF,
                 numero_nf: numeroNF,
@@ -313,10 +313,10 @@ export default async function handler(req, res) {
             
             await databaseService.registrarMovimentacao(dadosMovimentacao)
             registradas++
-            console.log(`✅ Movimentação registrada: Animal ${item.tatuagem || 'N/A'} - R$ ${valorUnitario.toFixed(2)}`)
+            console.log(`âÅ“â€¦ MovimentaÃ§Ã£o registrada: Animal ${item.tatuagem || 'N/A'} - R$ ${valorUnitario.toFixed(2)}`)
           }
         } else if (nf.tipo === 'saida') {
-          // Lógica para saída se necessário
+          // LÃ³gica para saÃ­da se necessÃ¡rio
           const animalId = animaisIds[i] || null
           const valorUnitario = parseFloat(String(item.valorUnitario || item.valor_unitario || 0).replace(',', '.')) || 0
           
@@ -328,8 +328,8 @@ export default async function handler(req, res) {
             animalId: animalId,
             valor: valorUnitario,
             descricao: `Venda de bovino via NF ${numeroNF}`,
-            observacoes: `Animal: ${item.tatuagem || 'N/A'} - ${item.raca || 'Não informado'}`,
-            localidade: incricao || (ehPardinho ? 'AGROPECUÁRIA PARDINHO LTDA' : 'SANT ANNA'),
+            observacoes: `Animal: ${item.tatuagem || 'N/A'} - ${item.raca || 'NÃ£o informado'}`,
+            localidade: incricao || (ehPardinho ? 'AGROPECUÃ�RIA PARDINHO LTDA' : 'SANT ANNA'),
             dadosExtras: {
               numeroNF: numeroNF,
               numero_nf: numeroNF,
@@ -341,7 +341,7 @@ export default async function handler(req, res) {
           registradas++
         }
       } catch (itemError) {
-        console.error(`❌ Erro ao registrar movimentação para item ${i + 1} da NF ${numeroNF}:`, itemError)
+        console.error(`â�Å’ Erro ao registrar movimentaÃ§Ã£o para item ${i + 1} da NF ${numeroNF}:`, itemError)
         console.error(`   Item:`, JSON.stringify(item, null, 2))
         console.error(`   Stack:`, itemError.stack)
         erros.push(`Item ${i + 1}: ${itemError.message}`)
@@ -349,13 +349,13 @@ export default async function handler(req, res) {
     }
     
     if (erros.length > 0) {
-      console.warn(`⚠️ ${erros.length} erro(s) ao processar itens da NF ${numeroNF}:`, erros)
+      console.warn(`âÅ¡ ï¸� ${erros.length} erro(s) ao processar itens da NF ${numeroNF}:`, erros)
       
       // Se todos os itens falharam, retornar erro
       if (registradas === 0) {
         return res.status(500).json({
           success: false,
-          message: `Erro ao sincronizar NF ${numeroNF}: Nenhuma movimentação foi registrada`,
+          message: `Erro ao sincronizar NF ${numeroNF}: Nenhuma movimentaÃ§Ã£o foi registrada`,
           erros: erros
         })
       }
@@ -363,15 +363,15 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       success: true,
-      message: `${registradas} movimentação(ões) registrada(s) no boletim contábil para NF ${numeroNF}`,
+      message: `${registradas} movimentaÃ§Ã£o(Ãµes) registrada(s) no boletim contÃ¡bil para NF ${numeroNF}`,
       registradas: registradas,
       totalItens: itens.length,
       incricao: incricao,
-      localidade: incricao || (ehPardinho ? 'AGROPECUÁRIA PARDINHO LTDA' : 'SANT ANNA')
+      localidade: incricao || (ehPardinho ? 'AGROPECUÃ�RIA PARDINHO LTDA' : 'SANT ANNA')
     })
 
   } catch (error) {
-    console.error('❌ Erro ao sincronizar NF:', error)
+    console.error('â�Å’ Erro ao sincronizar NF:', error)
     console.error('Stack trace:', error.stack)
     console.error('Request body:', req.body)
     

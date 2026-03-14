@@ -20,7 +20,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
   
-  // Estados para seleção múltipla
+  // Estados para seleÃ§Ã£o mÃºltipla
   const [selectedBirths, setSelectedBirths] = useState([])
   const [selectAll, setSelectAll] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -67,7 +67,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
     setBirths(newBirths)
   }
 
-  // Funções para seleção múltipla
+  // FunÃ§Ãµes para seleÃ§Ã£o mÃºltipla
   const handleSelectBirth = (birthId) => {
     setSelectedBirths(prev => {
       if (prev.includes(birthId)) {
@@ -117,7 +117,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
         }
       }
 
-      // Atualizar a lista removendo os itens excluídos
+      // Atualizar a lista removendo os itens excluÃ­dos
       const updatedBirths = (births || []).filter(birth => !selectedBirths.includes(birth.id))
       saveBirths(updatedBirths)
       setSelectedBirths([])
@@ -125,13 +125,13 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
       setShowDeleteModal(false)
 
       if (errorCount === 0) {
-        alert(`✅ ${successCount} registro(s) excluído(s) com sucesso!`)
+        alert(`âÅ“â€¦ ${successCount} registro(s) excluÃ­do(s) com sucesso!`)
       } else {
-        alert(`⚠️ ${successCount} registro(s) excluído(s), ${errorCount} erro(s) encontrado(s).`)
+        alert(`âÅ¡ ï¸� ${successCount} registro(s) excluÃ­do(s), ${errorCount} erro(s) encontrado(s).`)
       }
     } catch (error) {
-      console.error('Erro na exclusão múltipla:', error)
-      alert('❌ Erro na exclusão múltipla. Tente novamente.')
+      console.error('Erro na exclusÃ£o mÃºltipla:', error)
+      alert('â�Å’ Erro na exclusÃ£o mÃºltipla. Tente novamente.')
     }
   }
 
@@ -146,7 +146,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
           const updatedBirths = (births || []).filter(birth => birth.id !== birthId)
           saveBirths(updatedBirths)
           setSelectedBirths(prev => prev.filter(id => id !== birthId))
-          alert('Registro excluído com sucesso!')
+          alert('Registro excluÃ­do com sucesso!')
         } else {
           const errorData = await response.json()
           alert(`Erro ao excluir: ${errorData.message}`)
@@ -162,7 +162,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
 
   // Filtrar nascimentos
   const filteredBirths = (births || []).filter(birth => {
-    // Verificar se birth existe e tem as propriedades necessárias
+    // Verificar se birth existe e tem as propriedades necessÃ¡rias
     if (!birth || typeof birth !== 'object') return false
     
     const matchesSearch =
@@ -180,18 +180,18 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
     return matchesSearch && matchesFilters
   })
 
-  // Paginação
+  // PaginaÃ§Ã£o
   const totalPages = Math.ceil(filteredBirths.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
   const paginatedBirths = filteredBirths.slice(startIndex, endIndex)
 
-  // Reset página quando filtros mudam
+  // Reset pÃ¡gina quando filtros mudam
   useEffect(() => {
     setCurrentPage(1)
   }, [searchTerm, filters])
 
-  // Atualizar estado do "selecionar todos" baseado na seleção individual
+  // Atualizar estado do "selecionar todos" baseado na seleÃ§Ã£o individual
   useEffect(() => {
     if (paginatedBirths.length > 0) {
       const allSelected = paginatedBirths.every(birth => selectedBirths.includes(birth.id))
@@ -199,7 +199,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
     }
   }, [selectedBirths, paginatedBirths])
 
-  // Estatísticas detalhadas
+  // EstatÃ­sticas detalhadas
   const stats = {
     total: (births || []).length,
     nascidos: (births || []).filter(b => b.status === 'nascido').length,
@@ -218,7 +218,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
     ia: (births || []).filter(b => b.tipoCobertura === 'IA').length
   }
 
-  // Estatísticas por touro
+  // EstatÃ­sticas por touro
   const statsByTouro = (births || []).reduce((acc, birth) => {
     if (!acc[birth.touro]) {
       acc[birth.touro] = { total: 0, machos: 0, femeas: 0, nascidos: 0 }
@@ -257,7 +257,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
     }
   }
 
-  // Função para exportar para Excel com formatação profissional
+  // FunÃ§Ã£o para exportar para Excel com formataÃ§Ã£o profissional
   const exportToExcel = () => {
     try {
       // Preparar dados principais
@@ -271,28 +271,28 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
         birth.cc,
         birth.ps1,
         birth.ps2,
-        birth.sexo === 'M' ? 'Macho' : birth.sexo === 'F' ? 'Fêmea' : '',
+        birth.sexo === 'M' ? 'Macho' : birth.sexo === 'F' ? 'FÃªmea' : '',
         getStatusLabel(birth.status),
         birth.touro,
         birth.data,
         birth.observacao,
         birth.tipoCobertura,
         birth.custoDNA ? `R$ ${parseFloat(birth.custoDNA).toFixed(2)}` : '',
-        birth.descarte ? 'SIM' : 'NÃO',
+        birth.descarte ? 'SIM' : 'NÃÆ’O',
         birth.morte
       ])
 
-      // Cabeçalhos da planilha principal
+      // CabeÃ§alhos da planilha principal
       const headers = [
         'Receptora', 'Doador', 'RG', 'Prev Parto', 'Nascimento', 'Tatuagem',
         'CC', 'PS1', 'PS2', 'Sexo', 'Status', 'Touro', 'Data Real',
-        'Observações', 'Tipo Cobertura', 'Custo DNA', 'Descarte', 'Morte'
+        'ObservaÃ§Ãµes', 'Tipo Cobertura', 'Custo DNA', 'Descarte', 'Morte'
       ]
 
       // Criar workbook
       const wb = XLSX.utils.book_new()
 
-      // Planilha principal com formatação
+      // Planilha principal com formataÃ§Ã£o
       const wsData = [headers, ...dataToExport]
       const ws = XLSX.utils.aoa_to_sheet(wsData)
 
@@ -305,7 +305,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
       ]
       ws['!cols'] = colWidths
 
-      // Aplicar formatação ao cabeçalho
+      // Aplicar formataÃ§Ã£o ao cabeÃ§alho
       const headerRange = XLSX.utils.decode_range(ws['!ref'])
       for (let col = headerRange.s.c; col <= headerRange.e.c; col++) {
         const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col })
@@ -324,7 +324,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
         }
       }
 
-      // Aplicar formatação às células de dados
+      // Aplicar formataÃ§Ã£o Ã s cÃ©lulas de dados
       for (let row = 1; row <= headerRange.e.r; row++) {
         for (let col = headerRange.s.c; col <= headerRange.e.c; col++) {
           const cellAddress = XLSX.utils.encode_cell({ r: row, c: col })
@@ -346,12 +346,12 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
       XLSX.utils.book_append_sheet(wb, ws, 'Nascimentos')
 
       // Planilha de Resumo formatada
-      const resumoHeaders = ['Métrica', 'Valor']
+      const resumoHeaders = ['MÃ©trica', 'Valor']
       const resumoData = [
         ['Total de Registros', stats.total],
         ['Nascimentos', stats.nascidos],
         ['Machos', stats.machos],
-        ['Fêmeas', stats.femeas],
+        ['FÃªmeas', stats.femeas],
         ['Perdas Totais', stats.totalPerdas],
         ['Mortos', stats.mortos],
         ['Abortos', stats.abortos],
@@ -366,10 +366,10 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
       const wsResumoData = [resumoHeaders, ...resumoData]
       const wsResumo = XLSX.utils.aoa_to_sheet(wsResumoData)
 
-      // Formatação da planilha de resumo
+      // FormataÃ§Ã£o da planilha de resumo
       wsResumo['!cols'] = [{ wch: 20 }, { wch: 15 }]
 
-      // Cabeçalho do resumo
+      // CabeÃ§alho do resumo
       wsResumo['A1'].s = {
         fill: { fgColor: { rgb: "1F4E79" } },
         font: { color: { rgb: "FFFFFF" }, bold: true, sz: 12 },
@@ -409,7 +409,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
       XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo')
 
       // Planilha de Touros formatada
-      const tourosHeaders = ['Touro', 'Total', 'Nascidos', 'Machos', 'Fêmeas', 'Taxa Sucesso']
+      const tourosHeaders = ['Touro', 'Total', 'Nascidos', 'Machos', 'FÃªmeas', 'Taxa Sucesso']
       const tourosDataArray = Object.entries(statsByTouro).map(([touro, tourosStats]) => [
         touro,
         tourosStats.total,
@@ -422,12 +422,12 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
       const wsTourosData = [tourosHeaders, ...tourosDataArray]
       const wsTouros = XLSX.utils.aoa_to_sheet(wsTourosData)
 
-      // Formatação da planilha de touros
+      // FormataÃ§Ã£o da planilha de touros
       wsTouros['!cols'] = [
         { wch: 30 }, { wch: 8 }, { wch: 10 }, { wch: 8 }, { wch: 8 }, { wch: 12 }
       ]
 
-      // Cabeçalho dos touros
+      // CabeÃ§alho dos touros
       const tourosHeaderRange = XLSX.utils.decode_range(wsTouros['!ref'])
       for (let col = 0; col < tourosHeaders.length; col++) {
         const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col })
@@ -472,25 +472,25 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
         cellStyles: true
       })
 
-      alert('✅ Planilha exportada com sucesso!\n\n📋 3 planilhas criadas:\n• Nascimentos (dados completos)\n• Resumo (estatísticas)\n• Por Touro (performance)\n\n💡 Para aplicar bordas e formatação:\n1. Selecione todos os dados (Ctrl+A)\n2. Vá em "Página Inicial" > "Formatar como Tabela"\n3. Escolha um estilo com bordas\n4. Confirme que a primeira linha contém cabeçalhos')
+      alert('âÅ“â€¦ Planilha exportada com sucesso!\n\nðÅ¸â€œâ€¹ 3 planilhas criadas:\nââ‚¬¢ Nascimentos (dados completos)\nââ‚¬¢ Resumo (estatÃ­sticas)\nââ‚¬¢ Por Touro (performance)\n\nðÅ¸â€™¡ Para aplicar bordas e formataÃ§Ã£o:\n1. Selecione todos os dados (Ctrl+A)\n2. VÃ¡ em "PÃ¡gina Inicial" > "Formatar como Tabela"\n3. Escolha um estilo com bordas\n4. Confirme que a primeira linha contÃ©m cabeÃ§alhos')
     } catch (error) {
       console.error('Erro ao exportar:', error)
-      alert('❌ Erro ao exportar planilha. Verifique se a biblioteca XLSX está disponível.')
+      alert('â�Å’ Erro ao exportar planilha. Verifique se a biblioteca XLSX estÃ¡ disponÃ­vel.')
     }
   }
 
   return (
     <div className="space-y-6">
-      {/* Estatísticas de Nascimentos */}
+      {/* EstatÃ­sticas de Nascimentos */}
       <NascimentosStatistics />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-            � Plaanilha de Nascimentos
+            ï¿½ Plaanilha de Nascimentos
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Controle completo de nascimentos, gestações e alertas
+            Controle completo de nascimentos, gestaÃ§Ãµes e alertas
           </p>
         </div>
         <div className="mt-4 sm:mt-0 flex space-x-3">
@@ -498,9 +498,9 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
             onClick={() => {
               const success = exportToExcelWithFormatting(births, stats, statsByTouro)
               if (success) {
-                alert('✅ Planilha FORMATADA exportada com sucesso!\n\n🎨 Formatação aplicada:\n• Cabeçalhos com fundo azul\n• Bordas em todas as células\n• Alinhamento centralizado\n• 3 planilhas organizadas')
+                alert('âÅ“â€¦ Planilha FORMATADA exportada com sucesso!\n\nðÅ¸Å½¨ FormataÃ§Ã£o aplicada:\nââ‚¬¢ CabeÃ§alhos com fundo azul\nââ‚¬¢ Bordas em todas as cÃ©lulas\nââ‚¬¢ Alinhamento centralizado\nââ‚¬¢ 3 planilhas organizadas')
               } else {
-                alert('❌ Erro ao exportar planilha formatada.')
+                alert('â�Å’ Erro ao exportar planilha formatada.')
               }
             }}
             className="btn-primary flex items-center"
@@ -537,23 +537,23 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
         {/* Resumo de Nascimentos */}
         <div className="card p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-            📊 Resumo de Nascimentos
+            ðÅ¸â€œÅ  Resumo de Nascimentos
           </h3>
           <div className="space-y-3">
             <div className="flex justify-between items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-              <span className="text-green-800 dark:text-green-200">🐄 Nascimentos bem-sucedidos:</span>
+              <span className="text-green-800 dark:text-green-200">ðÅ¸�â€ž Nascimentos bem-sucedidos:</span>
               <span className="font-bold text-green-600 dark:text-green-400">{stats.nascidos} animais</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <span className="text-blue-800 dark:text-blue-200">🐂 Machos nascidos:</span>
+              <span className="text-blue-800 dark:text-blue-200">ðÅ¸�â€š Machos nascidos:</span>
               <span className="font-bold text-blue-600 dark:text-blue-400">{stats.machos} animais</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-pink-50 dark:bg-pink-900/20 rounded-lg">
-              <span className="text-pink-800 dark:text-pink-200">🐄 Fêmeas nascidas:</span>
+              <span className="text-pink-800 dark:text-pink-200">ðÅ¸�â€ž FÃªmeas nascidas:</span>
               <span className="font-bold text-pink-600 dark:text-pink-400">{stats.femeas} animais</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-              <span className="text-purple-800 dark:text-purple-200">💰 Custo total DNA:</span>
+              <span className="text-purple-800 dark:text-purple-200">ðÅ¸â€™° Custo total DNA:</span>
               <span className="font-bold text-purple-600 dark:text-purple-400">R$ {(stats.custoTotalDNA || 0).toFixed(2)}</span>
             </div>
           </div>
@@ -562,23 +562,23 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
         {/* Resumo de Perdas */}
         <div className="card p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-            💔 Resumo de Perdas
+            ðÅ¸â€™â€� Resumo de Perdas
           </h3>
           <div className="space-y-3">
             <div className="flex justify-between items-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-              <span className="text-red-800 dark:text-red-200">☠️ Mortos:</span>
+              <span className="text-red-800 dark:text-red-200">âËœ ï¸� Mortos:</span>
               <span className="font-bold text-red-600 dark:text-red-400">{stats.mortos} animais</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-              <span className="text-orange-800 dark:text-orange-200">🚫 Abortos:</span>
+              <span className="text-orange-800 dark:text-orange-200">ðÅ¸Å¡« Abortos:</span>
               <span className="font-bold text-orange-600 dark:text-orange-400">{stats.abortos} animais</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-              <span className="text-yellow-800 dark:text-yellow-200">🔄 Cio (repetiu):</span>
+              <span className="text-yellow-800 dark:text-yellow-200">ðÅ¸â€�â€ž Cio (repetiu):</span>
               <span className="font-bold text-yellow-600 dark:text-yellow-400">{stats.cio} animais</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-              <span className="text-gray-800 dark:text-gray-200">📊 Total de perdas:</span>
+              <span className="text-gray-800 dark:text-gray-200">ðÅ¸â€œÅ  Total de perdas:</span>
               <span className="font-bold text-gray-600 dark:text-gray-400">{stats.totalPerdas} animais</span>
             </div>
           </div>
@@ -592,7 +592,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
             <ExclamationTriangleIcon className="h-6 w-6 text-yellow-600 dark:text-yellow-400 mr-3" />
             <div>
               <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-200">
-                ⚠️ ALERTA: {stats.atrasadas} receptoras NÃO pariram
+                âÅ¡ ï¸� ALERTA: {stats.atrasadas} receptoras NÃÆ’O pariram
               </h3>
               <p className="text-yellow-700 dark:text-yellow-300 text-sm">
                 <strong>Receptoras atrasadas:</strong> {
@@ -613,7 +613,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
             <ExclamationTriangleIcon className="h-6 w-6 text-orange-600 dark:text-orange-400 mr-3" />
             <div>
               <h3 className="text-lg font-semibold text-orange-800 dark:text-orange-200">
-                🚨 ATENÇÃO: {stats.descartes} animal(is) para descarte
+                ðÅ¸Å¡¨ ATENÃâ€¡ÃÆ’O: {stats.descartes} animal(is) para descarte
               </h3>
               <p className="text-orange-700 dark:text-orange-300 text-sm">
                 <strong>Animais com defeitos:</strong> {
@@ -627,7 +627,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
         </div>
       )}
 
-      {/* Estatísticas Cards */}
+      {/* EstatÃ­sticas Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-10 gap-4">
         <div className="card p-4 text-center">
           <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
@@ -657,7 +657,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
           <div className="text-2xl font-bold text-pink-600 dark:text-pink-400">
             {stats.femeas}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">Fêmeas</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">FÃªmeas</div>
         </div>
         <div className="card p-4 text-center">
           <div className="text-2xl font-bold text-red-600 dark:text-red-400">
@@ -697,10 +697,10 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
         </div>
       </div>
 
-      {/* Filtros Avançados */}
+      {/* Filtros AvanÃ§ados */}
       <div className="card p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-          🔍 Filtros de Pesquisa
+          ðÅ¸â€�� Filtros de Pesquisa
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
           <div>
@@ -709,7 +709,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
             </label>
             <input
               type="text"
-              placeholder="Receptora, touro, observação..."
+              placeholder="Receptora, touro, observaÃ§Ã£o..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="input-field"
@@ -717,7 +717,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              📅 Período
+              ðÅ¸â€œâ€¦ PerÃ­odo
             </label>
             <div className="flex space-x-2">
               <select
@@ -725,11 +725,11 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
                 onChange={(e) => setFilters({ ...filters, mes: e.target.value })}
                 className="input-field flex-1"
               >
-                <option value="">Todos os períodos</option>
-                <optgroup label="📅 2024">
+                <option value="">Todos os perÃ­odos</option>
+                <optgroup label="ðÅ¸â€œâ€¦ 2024">
                   <option value="01/24">Janeiro/2024</option>
                   <option value="02/24">Fevereiro/2024</option>
-                  <option value="03/24">Março/2024</option>
+                  <option value="03/24">MarÃ§o/2024</option>
                   <option value="04/24">Abril/2024</option>
                   <option value="05/24">Maio/2024</option>
                   <option value="06/24">Junho/2024</option>
@@ -740,10 +740,10 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
                   <option value="11/24">Novembro/2024</option>
                   <option value="12/24">Dezembro/2024</option>
                 </optgroup>
-                <optgroup label="📅 2025">
+                <optgroup label="ðÅ¸â€œâ€¦ 2025">
                   <option value="01/25">Janeiro/2025</option>
                   <option value="02/25">Fevereiro/2025</option>
-                  <option value="03/25">Março/2025</option>
+                  <option value="03/25">MarÃ§o/2025</option>
                   <option value="04/25">Abril/2025</option>
                   <option value="05/25">Maio/2025</option>
                   <option value="06/25">Junho/2025</option>
@@ -754,10 +754,10 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
                   <option value="11/25">Novembro/2025</option>
                   <option value="12/25">Dezembro/2025</option>
                 </optgroup>
-                <optgroup label="📅 2026">
+                <optgroup label="ðÅ¸â€œâ€¦ 2026">
                   <option value="01/26">Janeiro/2026</option>
                   <option value="02/26">Fevereiro/2026</option>
-                  <option value="03/26">Março/2026</option>
+                  <option value="03/26">MarÃ§o/2026</option>
                   <option value="04/26">Abril/2026</option>
                   <option value="05/26">Maio/2026</option>
                   <option value="06/26">Junho/2026</option>
@@ -773,7 +773,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              📆 Ano
+              ðÅ¸â€œâ€  Ano
             </label>
             <select
               value={filters.ano || ''}
@@ -788,7 +788,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              🐂 Touro
+              ðÅ¸�â€š Touro
             </label>
             <select
               value={filters.touro}
@@ -803,7 +803,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              🐄 Sexo
+              ðÅ¸�â€ž Sexo
             </label>
             <select
               value={filters.sexo}
@@ -811,13 +811,13 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
               className="input-field"
             >
               <option value="">Todos os sexos</option>
-              <option value="M">🐂 Macho</option>
-              <option value="F">🐄 Fêmea</option>
+              <option value="M">ðÅ¸�â€š Macho</option>
+              <option value="F">ðÅ¸�â€ž FÃªmea</option>
             </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              📊 Status
+              ðÅ¸â€œÅ  Status
             </label>
             <select
               value={filters.status}
@@ -825,17 +825,17 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
               className="input-field"
             >
               <option value="">Todos os status</option>
-              <option value="nascido">✅ Nascidos</option>
-              <option value="parto_previsto">📅 Parto previsto</option>
-              <option value="morto">💀 Mortos</option>
-              <option value="aborto">🚫 Abortos</option>
-              <option value="gestante">🐄 Gestantes</option>
-              <option value="gestante_atrasada">⚠️ Atrasadas</option>
+              <option value="nascido">âÅ“â€¦ Nascidos</option>
+              <option value="parto_previsto">ðÅ¸â€œâ€¦ Parto previsto</option>
+              <option value="morto">ðÅ¸â€™â‚¬ Mortos</option>
+              <option value="aborto">ðÅ¸Å¡« Abortos</option>
+              <option value="gestante">ðÅ¸�â€ž Gestantes</option>
+              <option value="gestante_atrasada">âÅ¡ ï¸� Atrasadas</option>
             </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              🔧 Ações
+              ðÅ¸â€�§ AÃ§Ãµes
             </label>
             <button
               onClick={() => {
@@ -844,7 +844,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
               }}
               className="btn-secondary w-full"
             >
-              🗑️ Limpar Filtros
+              ðÅ¸â€”â€˜ï¸� Limpar Filtros
             </button>
           </div>
         </div>
@@ -854,7 +854,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
           <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
             <div className="flex items-center justify-between">
               <span className="text-sm text-blue-800 dark:text-blue-200">
-                🔍 Filtros ativos: {filteredBirths.length} de {births.length} registros
+                ðÅ¸â€�� Filtros ativos: {filteredBirths.length} de {births.length} registros
               </span>
               <div className="flex flex-wrap gap-2">
                 {searchTerm && (
@@ -864,7 +864,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
                 )}
                 {filters.mes && (
                   <span className="px-2 py-1 bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 rounded text-xs">
-                    Período: {filters.mes}
+                    PerÃ­odo: {filters.mes}
                   </span>
                 )}
                 {filters.ano && (
@@ -879,7 +879,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
                 )}
                 {filters.sexo && (
                   <span className="px-2 py-1 bg-pink-100 dark:bg-pink-800 text-pink-800 dark:text-pink-200 rounded text-xs">
-                    Sexo: {filters.sexo === 'M' ? 'Macho' : 'Fêmea'}
+                    Sexo: {filters.sexo === 'M' ? 'Macho' : 'FÃªmea'}
                   </span>
                 )}
                 {filters.status && (
@@ -898,14 +898,14 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
         <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              �  Lista de Nascimentos
+              ï¿½  Lista de Nascimentos
             </h3>
             <div className="text-sm text-gray-500 dark:text-gray-400">
-              {filteredBirths.length} registros encontrados • Página {currentPage} de {totalPages}
+              {filteredBirths.length} registros encontrados ââ‚¬¢ PÃ¡gina {currentPage} de {totalPages}
             </div>
           </div>
           
-          {/* Barra de Ações em Lote */}
+          {/* Barra de AÃ§Ãµes em Lote */}
           {selectedBirths.length > 0 && (
             <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
               <div className="flex items-center justify-between">
@@ -920,7 +920,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
                     }}
                     className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 text-sm"
                   >
-                    Limpar seleção
+                    Limpar seleÃ§Ã£o
                   </button>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -979,7 +979,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
                   Tipo/DNA
                 </th>
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                  Ações
+                  AÃ§Ãµes
                 </th>
               </tr>
             </thead>
@@ -1026,7 +1026,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
                       birth.sexo === 'F' ? 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200' :
                         'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
                       }`}>
-                      {birth.sexo === 'M' ? '🐂 Macho' : birth.sexo === 'F' ? '🐄 Fêmea' : '-'}
+                      {birth.sexo === 'M' ? 'ðÅ¸�â€š Macho' : birth.sexo === 'F' ? 'ðÅ¸�â€ž FÃªmea' : '-'}
                     </span>
                   </td>
                   <td className="px-3 py-4 whitespace-nowrap">
@@ -1079,7 +1079,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
           </table>
         </div>
 
-        {/* Controles de Paginação */}
+        {/* Controles de PaginaÃ§Ã£o */}
         {totalPages > 1 && (
           <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
@@ -1115,7 +1115,7 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
                   disabled={currentPage === totalPages}
                   className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700"
                 >
-                  Próxima
+                  PrÃ³xima
                 </button>
               </div>
             </div>
@@ -1123,10 +1123,10 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
         )}
       </div>
 
-      {/* Estatísticas por Touro */}
+      {/* EstatÃ­sticas por Touro */}
       <div className="card p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          📊 Estatísticas por Touro
+          ðÅ¸â€œÅ  EstatÃ­sticas por Touro
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {Object.entries(statsByTouro).map(([touro, stats]) => (
@@ -1138,14 +1138,14 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
                 <div>Total: <span className="font-semibold">{stats.total}</span></div>
                 <div>Nascidos: <span className="font-semibold text-green-600">{stats.nascidos}</span></div>
                 <div>Machos: <span className="font-semibold text-blue-600">{stats.machos}</span></div>
-                <div>Fêmeas: <span className="font-semibold text-pink-600">{stats.femeas}</span></div>
+                <div>FÃªmeas: <span className="font-semibold text-pink-600">{stats.femeas}</span></div>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Modal de Confirmação para Exclusão em Lote */}
+      {/* Modal de ConfirmaÃ§Ã£o para ExclusÃ£o em Lote */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full">
@@ -1153,27 +1153,27 @@ export default function BirthManager({ onNewBirth, onEditBirth }) {
               <div className="flex items-center mb-4">
                 <ExclamationTriangleIcon className="h-8 w-8 text-red-500 mr-3" />
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Confirmar Exclusão
+                  Confirmar ExclusÃ£o
                 </h3>
               </div>
               
               <p className="text-gray-600 dark:text-gray-400 mb-6">
                 Tem certeza que deseja excluir <strong>{selectedBirths.length}</strong> registro(s) selecionado(s)? 
-                Esta ação não pode ser desfeita.
+                Esta aÃ§Ã£o nÃ£o pode ser desfeita.
               </p>
               
               <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mb-6">
                 <div className="flex items-start">
                   <ExclamationTriangleIcon className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mr-2 mt-0.5" />
                   <div className="text-sm text-yellow-800 dark:text-yellow-200">
-                    <strong>Registros que serão excluídos:</strong>
+                    <strong>Registros que serÃ£o excluÃ­dos:</strong>
                     <ul className="mt-2 space-y-1">
                       {(births || [])
                         .filter(birth => selectedBirths.includes(birth.id))
                         .slice(0, 5)
                         .map(birth => (
                           <li key={birth.id} className="text-xs">
-                            • {birth.receptora} - {birth.touro} ({getStatusLabel(birth.status)})
+                            ââ‚¬¢ {birth.receptora} - {birth.touro} ({getStatusLabel(birth.status)})
                           </li>
                         ))}
                       {selectedBirths.length > 5 && (

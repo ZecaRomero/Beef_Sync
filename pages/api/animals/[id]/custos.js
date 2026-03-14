@@ -14,7 +14,7 @@ export default async function handler(req, res) {
   if (!id) {
     return res.status(400).json({
       status: 'error',
-      message: 'ID do animal é obrigatório'
+      message: 'ID do animal Ã© obrigatÃ³rio'
     });
   }
 
@@ -22,11 +22,11 @@ export default async function handler(req, res) {
     if (req.method === 'GET') {
       // 1. Buscar custos existentes
       const resultCustos = await query(`
-        SELECT * FROM custos WHERE animal_id = $1 AND tipo NOT IN ('Alimentação', 'Nutrição', 'Ração', 'Suplementação') ORDER BY data DESC, created_at DESC
+        SELECT * FROM custos WHERE animal_id = $1 AND tipo NOT IN ('AlimentaÃ§Ã£o', 'NutriÃ§Ã£o', 'RaÃ§Ã£o', 'SuplementaÃ§Ã£o') ORDER BY data DESC, created_at DESC
       `, [id]);
       let custos = resultCustos.rows;
 
-      // 2. Buscar dados do animal para autogeração
+      // 2. Buscar dados do animal para autogeraÃ§Ã£o
       const resultAnimal = await query(`
         SELECT * FROM animais WHERE id = $1
       `, [id]);
@@ -37,24 +37,24 @@ export default async function handler(req, res) {
         const hoje = new Date();
         const nascimento = animal.data_nascimento ? new Date(animal.data_nascimento) : null;
         const idadeMeses = nascimento ? diffMonths(nascimento, hoje) : 0;
-        const isFemea = animal.sexo && (animal.sexo.toLowerCase().includes('fêmea') || animal.sexo === 'F');
+        const isFemea = animal.sexo && (animal.sexo.toLowerCase().includes('fÃªmea') || animal.sexo === 'F');
 
-        // LÓGICA DE CUSTOS ESTIMADOS (AUTO-APLICAÇÃO)
+        // LÃâ€œGICA DE CUSTOS ESTIMADOS (AUTO-APLICAÃâ€¡ÃÆ’O)
         
-        // A. Identificação (Botton/Brinco)
-        const temIdentificacao = custos.some(c => c.tipo === 'Manejo' && (c.subtipo || '').includes('Identificação'));
+        // A. IdentificaÃ§Ã£o (Botton/Brinco)
+        const temIdentificacao = custos.some(c => c.tipo === 'Manejo' && (c.subtipo || '').includes('IdentificaÃ§Ã£o'));
         if (!temIdentificacao) {
           novosCustos.push({
             animal_id: id,
             tipo: 'Manejo',
-            subtipo: 'Identificação (Botton/Brinco)',
+            subtipo: 'IdentificaÃ§Ã£o (Botton/Brinco)',
             valor: 25.00,
             data: animal.data_nascimento || new Date().toISOString().split('T')[0],
-            observacoes: 'Custo estimado automático: Botton + Brinco Amarelo'
+            observacoes: 'Custo estimado automÃ¡tico: Botton + Brinco Amarelo'
           });
         }
 
-        // B. Vacina de Brucelose (Fêmeas > 3 meses)
+        // B. Vacina de Brucelose (FÃªmeas > 3 meses)
         if (isFemea && idadeMeses >= 3) {
           const temBrucelose = custos.some(c => c.tipo === 'Vacina' && (c.subtipo || '').includes('Brucelose'));
           if (!temBrucelose) {
@@ -71,12 +71,12 @@ export default async function handler(req, res) {
               subtipo: 'Brucelose (B19/RB51)',
               valor: 15.00,
               data: dataVacina.toISOString().split('T')[0],
-              observacoes: 'Custo estimado automático (obrigatório fêmeas 3-8 meses)'
+              observacoes: 'Custo estimado automÃ¡tico (obrigatÃ³rio fÃªmeas 3-8 meses)'
             });
           }
         }
 
-        // C. Ração / Nutrição REMOVIDO conforme solicitação do usuário
+        // C. RaÃ§Ã£o / NutriÃ§Ã£o REMOVIDO conforme solicitaÃ§Ã£o do usuÃ¡rio
 
         // Persistir novos custos
         if (novosCustos.length > 0) {
@@ -105,7 +105,7 @@ export default async function handler(req, res) {
       const { tipo, subtipo, valor, data, observacoes, detalhes } = req.body;
       
       if (!tipo || !valor || !data) {
-        return res.status(400).json({ error: 'Campos obrigatórios: tipo, valor, data' });
+        return res.status(400).json({ error: 'Campos obrigatÃ³rios: tipo, valor, data' });
       }
 
       const result = await query(`

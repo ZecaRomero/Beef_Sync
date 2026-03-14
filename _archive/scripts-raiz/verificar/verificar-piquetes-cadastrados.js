@@ -11,7 +11,7 @@ const pool = new Pool({
 
 async function verificarPiquetes() {
   try {
-    console.log('🔍 Verificando piquetes cadastrados...\n');
+    console.log('�Ÿ”� Verificando piquetes cadastrados...\n');
 
     // Buscar todos os piquetes
     const result = await pool.query(`
@@ -20,13 +20,13 @@ async function verificarPiquetes() {
       ORDER BY codigo
     `);
 
-    console.log(`📊 Total de piquetes: ${result.rows.length}\n`);
+    console.log(`�Ÿ“Š Total de piquetes: ${result.rows.length}\n`);
 
     if (result.rows.length === 0) {
-      console.log('❌ Nenhum piquete encontrado no banco de dados!');
+      console.log('�Œ Nenhum piquete encontrado no banco de dados!');
     } else {
       console.log('Piquetes cadastrados:');
-      console.log('─'.repeat(80));
+      console.log('�”€'.repeat(80));
       result.rows.forEach(p => {
         console.log(`ID: ${p.id}`);
         console.log(`Código: ${p.codigo}`);
@@ -37,12 +37,12 @@ async function verificarPiquetes() {
         console.log(`Ativo: ${p.ativo ? 'Sim' : 'Não'}`);
         console.log(`Criado em: ${p.created_at}`);
         console.log(`Observações: ${p.observacoes || '(nenhuma)'}`);
-        console.log('─'.repeat(80));
+        console.log('�”€'.repeat(80));
       });
     }
 
     // Verificar estrutura da tabela
-    console.log('\n📋 Estrutura da tabela piquetes:');
+    console.log('\n�Ÿ“‹ Estrutura da tabela piquetes:');
     const estrutura = await pool.query(`
       SELECT column_name, data_type, is_nullable, column_default
       FROM information_schema.columns
@@ -55,7 +55,7 @@ async function verificarPiquetes() {
     });
 
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
   } finally {
     await pool.end();
   }

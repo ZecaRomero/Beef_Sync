@@ -53,7 +53,7 @@ export default function RelatorioOcorrencias() {
         setOcorrencias(dados)
       }
     } catch (error) {
-      console.error('Erro ao carregar ocorrências:', error)
+      console.error('Erro ao carregar ocorrÃªncias:', error)
     } finally {
       setLoading(false)
     }
@@ -79,7 +79,7 @@ export default function RelatorioOcorrencias() {
   }
 
   const exportarCSV = () => {
-    const headers = ['Data', 'Animal', 'Série', 'RG', 'Tipo', 'Descrição', 'Peso', 'Local', 'Veterinário', 'Observações']
+    const headers = ['Data', 'Animal', 'SÃ©rie', 'RG', 'Tipo', 'DescriÃ§Ã£o', 'Peso', 'Local', 'VeterinÃ¡rio', 'ObservaÃ§Ãµes']
     const rows = ocorrencias.map(o => [
       o.data ? new Date(o.data).toLocaleDateString('pt-BR') : '',
       o.animal || '',
@@ -141,10 +141,10 @@ export default function RelatorioOcorrencias() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                📊 Relatório de Ocorrências
+                ðÅ¸â€œÅ  RelatÃ³rio de OcorrÃªncias
               </h1>
               <p className="text-gray-600 dark:text-gray-400 mt-1">
-                Visualize e exporte todas as ocorrências registradas
+                Visualize e exporte todas as ocorrÃªncias registradas
               </p>
             </div>
             <div className="flex gap-2">
@@ -179,7 +179,7 @@ export default function RelatorioOcorrencias() {
           <CardBody>
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
               <Input
-                label="Data Início"
+                label="Data InÃ­cio"
                 type="date"
                 value={filtros.dataInicio}
                 onChange={(e) => handleFiltroChange('dataInicio', e.target.value)}
@@ -204,17 +204,17 @@ export default function RelatorioOcorrencias() {
                   <option value="Local">Local</option>
                   <option value="CE">CE</option>
                   <option value="DG">DG</option>
-                  <option value="Vacinação">Vacinação</option>
+                  <option value="VacinaÃ§Ã£o">VacinaÃ§Ã£o</option>
                   <option value="Exame">Exame</option>
                   <option value="Tratamento">Tratamento</option>
                   <option value="Medicamento">Medicamento</option>
                   <option value="Cirurgia">Cirurgia</option>
-                  <option value="Observação">Observação</option>
+                  <option value="ObservaÃ§Ã£o">ObservaÃ§Ã£o</option>
                   <option value="Morte">Morte</option>
                 </select>
               </div>
               <Input
-                label="Série do Animal"
+                label="SÃ©rie do Animal"
                 type="text"
                 value={filtros.animalSerie}
                 onChange={(e) => handleFiltroChange('animalSerie', e.target.value)}
@@ -239,11 +239,11 @@ export default function RelatorioOcorrencias() {
           </CardBody>
         </Card>
 
-        {/* Lista de Ocorrências */}
+        {/* Lista de OcorrÃªncias */}
         <Card>
           <CardHeader>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Ocorrências ({ocorrencias.length})
+              OcorrÃªncias ({ocorrencias.length})
             </h2>
           </CardHeader>
           <CardBody>
@@ -252,7 +252,7 @@ export default function RelatorioOcorrencias() {
             ) : ocorrencias.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-gray-500 dark:text-gray-400">
-                  Nenhuma ocorrência encontrada com os filtros aplicados.
+                  Nenhuma ocorrÃªncia encontrada com os filtros aplicados.
                 </p>
               </div>
             ) : (
@@ -270,7 +270,7 @@ export default function RelatorioOcorrencias() {
                         Tipo
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Descrição
+                        DescriÃ§Ã£o
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Peso
@@ -279,7 +279,7 @@ export default function RelatorioOcorrencias() {
                         Local
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Veterinário
+                        VeterinÃ¡rio
                       </th>
                     </tr>
                   </thead>
@@ -298,8 +298,8 @@ export default function RelatorioOcorrencias() {
                           </span>
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                          <div className="max-w-xs truncate" title={ocorrencia.procedimento || ocorrencia.descricao || 'Sem descrição'}>
-                            {ocorrencia.procedimento || ocorrencia.descricao || 'Sem descrição'}
+                          <div className="max-w-xs truncate" title={ocorrencia.procedimento || ocorrencia.descricao || 'Sem descriÃ§Ã£o'}>
+                            {ocorrencia.procedimento || ocorrencia.descricao || 'Sem descriÃ§Ã£o'}
                           </div>
                           {ocorrencia.observacoes && (
                             <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate max-w-xs" title={ocorrencia.observacoes}>

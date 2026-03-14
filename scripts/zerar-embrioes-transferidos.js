@@ -1,10 +1,10 @@
 /**
- * Script para zerar doses de embriões que já foram transferidos
+ * Script para zerar doses de embriÃµes que jÃ¡ foram transferidos
  * 
  * Baseado na imagem fornecida, os seguintes acasalamentos foram transferidos:
- * - CJ SANT ANNA 14785 (B2887 X JATOBÁ) - 171 doses
+ * - CJ SANT ANNA 14785 (B2887 X JATOBÃ�) - 171 doses
  * - CJ SANT ANNA 15407 (HERMOSO X GENERAL) - 66 doses  
- * - CJCJ 15559 (MALÃO X REM ARMADOR) - 30 doses
+ * - CJCJ 15559 (MALÃÆ’O X REM ARMADOR) - 30 doses
  * - CJ SANT ANNA 15168 (URI X GENERAL) - 15 doses
  */
 
@@ -21,9 +21,9 @@ async function zerarEmbrioesTransferidos() {
   })
 
   try {
-    console.log('🔌 Conectando ao banco de dados...')
+    console.log('ðÅ¸â€�Å’ Conectando ao banco de dados...')
     await pool.query('SELECT 1')
-    console.log('✅ Conectado ao banco de dados\n')
+    console.log('âÅ“â€¦ Conectado ao banco de dados\n')
 
     // Lista de acasalamentos que foram transferidos (baseado na imagem)
     const acasalamentosTransferidos = [
@@ -33,7 +33,7 @@ async function zerarEmbrioesTransferidos() {
       'CJ SANT ANNA 15168'
     ]
 
-    console.log('📋 Acasalamentos a serem zerados:')
+    console.log('ðÅ¸â€œâ€¹ Acasalamentos a serem zerados:')
     acasalamentosTransferidos.forEach(a => console.log(`  - ${a}`))
     console.log('')
 
@@ -41,7 +41,7 @@ async function zerarEmbrioesTransferidos() {
     let totalZerados = 0
     
     for (const acasalamento of acasalamentosTransferidos) {
-      console.log(`\n🔍 Processando: ${acasalamento}`)
+      console.log(`\nðÅ¸â€�� Processando: ${acasalamento}`)
       
       // Buscar registros deste acasalamento
       const registros = await pool.query(`
@@ -60,18 +60,18 @@ async function zerarEmbrioesTransferidos() {
       `, [`%${acasalamento}%`])
 
       if (registros.rows.length === 0) {
-        console.log(`  ⚠️  Nenhum registro encontrado`)
+        console.log(`  âÅ¡ ï¸�  Nenhum registro encontrado`)
         continue
       }
 
-      console.log(`  📦 Encontrados ${registros.rows.length} registro(s)`)
+      console.log(`  ðÅ¸â€œ¦ Encontrados ${registros.rows.length} registro(s)`)
       
       for (const reg of registros.rows) {
         console.log(`\n  Registro ID ${reg.id}:`)
         console.log(`    Nome: ${reg.nome_touro}`)
-        console.log(`    Antes: ${reg.doses_disponiveis} disponíveis (total: ${reg.quantidade_doses}, usadas: ${reg.doses_usadas})`)
+        console.log(`    Antes: ${reg.doses_disponiveis} disponÃ­veis (total: ${reg.quantidade_doses}, usadas: ${reg.doses_usadas})`)
         
-        // Zerar doses disponíveis e marcar todas como usadas
+        // Zerar doses disponÃ­veis e marcar todas como usadas
         const resultado = await pool.query(`
           UPDATE estoque_semen
           SET doses_disponiveis = 0,
@@ -82,14 +82,14 @@ async function zerarEmbrioesTransferidos() {
         `, [reg.id])
 
         const atualizado = resultado.rows[0]
-        console.log(`    Depois: ${atualizado.doses_disponiveis} disponíveis (usadas: ${atualizado.doses_usadas})`)
-        console.log(`    ✅ Zerado com sucesso!`)
+        console.log(`    Depois: ${atualizado.doses_disponiveis} disponÃ­veis (usadas: ${atualizado.doses_usadas})`)
+        console.log(`    âÅ“â€¦ Zerado com sucesso!`)
         totalZerados++
       }
     }
 
-    console.log(`\n\n✅ CORREÇÃO CONCLUÍDA!`)
-    console.log(`📊 Total de registros zerados: ${totalZerados}`)
+    console.log(`\n\nâÅ“â€¦ CORREÃâ€¡ÃÆ’O CONCLUÃ�DA!`)
+    console.log(`ðÅ¸â€œÅ  Total de registros zerados: ${totalZerados}`)
     
     // Verificar resultado final
     const verificacao = await pool.query(`
@@ -105,30 +105,30 @@ async function zerarEmbrioesTransferidos() {
     `)
 
     const stats = verificacao.rows[0]
-    console.log(`\n📊 ESTOQUE ATUAL:`)
-    console.log(`  Total de registros de embriões: ${stats.total}`)
-    console.log(`  Com doses disponíveis: ${stats.com_doses}`)
-    console.log(`  Total de doses disponíveis: ${stats.total_doses_disponiveis}`)
+    console.log(`\nðÅ¸â€œÅ  ESTOQUE ATUAL:`)
+    console.log(`  Total de registros de embriÃµes: ${stats.total}`)
+    console.log(`  Com doses disponÃ­veis: ${stats.com_doses}`)
+    console.log(`  Total de doses disponÃ­veis: ${stats.total_doses_disponiveis}`)
 
-    console.log('\n📱 Agora o relatório mobile deve mostrar apenas os embriões realmente disponíveis!')
+    console.log('\nðÅ¸â€œ± Agora o relatÃ³rio mobile deve mostrar apenas os embriÃµes realmente disponÃ­veis!')
 
   } catch (error) {
-    console.error('\n❌ Erro:', error.message)
+    console.error('\nâ�Å’ Erro:', error.message)
     console.error('Stack:', error.stack)
     throw error
   } finally {
     await pool.end()
-    console.log('\n🔌 Conexão encerrada')
+    console.log('\nðÅ¸â€�Å’ ConexÃ£o encerrada')
   }
 }
 
 // Executar
 zerarEmbrioesTransferidos()
   .then(() => {
-    console.log('\n✅ Script finalizado')
+    console.log('\nâÅ“â€¦ Script finalizado')
     process.exit(0)
   })
   .catch(error => {
-    console.error('\n❌ Erro ao executar script:', error.message)
+    console.error('\nâ�Å’ Erro ao executar script:', error.message)
     process.exit(1)
   })

@@ -12,8 +12,8 @@ import {
 const SUGGESTIONS = [
   "Quantos animais ativos?",
   "Resumo financeiro",
-  "Previsão de nascimentos",
-  "Estoque de sêmen"
+  "PrevisÃ£o de nascimentos",
+  "Estoque de sÃªmen"
 ]
 
 export default function AIAssistant() {
@@ -22,7 +22,7 @@ export default function AIAssistant() {
     { 
       id: 1, 
       type: 'assistant', 
-      text: 'Olá! Sou a IA do Beef Sync. Como posso ajudar você hoje com a gestão do seu rebanho?',
+      text: 'OlÃ¡! Sou a IA do Beef Sync. Como posso ajudar vocÃª hoje com a gestÃ£o do seu rebanho?',
       timestamp: new Date()
     }
   ])
@@ -40,11 +40,11 @@ export default function AIAssistant() {
 
   const processQuery = async (query) => {
     const lowerQuery = query.toLowerCase()
-    let response = "Desculpe, não entendi. Tente perguntar sobre 'animais', 'financeiro' ou 'estoque'."
+    let response = "Desculpe, nÃ£o entendi. Tente perguntar sobre 'animais', 'financeiro' ou 'estoque'."
     
     setIsTyping(true)
 
-    // Simulação de processamento de IA e chamadas de API
+    // SimulaÃ§Ã£o de processamento de IA e chamadas de API
     try {
       await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000)) // Fake delay
 
@@ -52,19 +52,19 @@ export default function AIAssistant() {
         // Fetch real stats if possible, or mock for now based on what we know
         const res = await fetch('/api/statistics')
         const data = await res.json()
-        response = `Atualmente temos **${data.totalAnimals || 0} animais** cadastrados, sendo **${data.activeAnimals || 0} ativos**. O rebanho está distribuído em várias localizações.`
+        response = `Atualmente temos **${data.totalAnimals || 0} animais** cadastrados, sendo **${data.activeAnimals || 0} ativos**. O rebanho estÃ¡ distribuÃ­do em vÃ¡rias localizaÃ§Ãµes.`
       } 
       else if (lowerQuery.includes('financeiro') || lowerQuery.includes('custo') || lowerQuery.includes('dinheiro')) {
-        response = "Análise Financeira Rápida:\n\n• **Custo Médio:** R$ 1.250,00/cabeça\n• **Projeção de Venda:** Alta para o próximo trimestre.\n• **Dica:** Mantenha o foco na eficiência operacional."
+        response = "AnÃ¡lise Financeira RÃ¡pida:\n\nââ‚¬¢ **Custo MÃ©dio:** R$ 1.250,00/cabeÃ§a\nââ‚¬¢ **ProjeÃ§Ã£o de Venda:** Alta para o prÃ³ximo trimestre.\nââ‚¬¢ **Dica:** Mantenha o foco na eficiÃªncia operacional."
       }
       else if (lowerQuery.includes('nascimento') || lowerQuery.includes('parto')) {
         response = "Temos **3 partos previstos** para esta semana. Recomendo verificar a maternidade e os kits de primeiros socorros."
       }
-      else if (lowerQuery.includes('semen') || lowerQuery.includes('sêmen') || lowerQuery.includes('estoque')) {
-        response = "O estoque de sêmen está estável. O botijão 2 precisa de reposição de nitrogênio em 5 dias."
+      else if (lowerQuery.includes('semen') || lowerQuery.includes('sÃªmen') || lowerQuery.includes('estoque')) {
+        response = "O estoque de sÃªmen estÃ¡ estÃ¡vel. O botijÃ£o 2 precisa de reposiÃ§Ã£o de nitrogÃªnio em 5 dias."
       }
-      else if (lowerQuery.includes('olá') || lowerQuery.includes('oi')) {
-        response = "Olá! Em que posso ajudar na gestão da fazenda hoje?"
+      else if (lowerQuery.includes('olÃ¡') || lowerQuery.includes('oi')) {
+        response = "OlÃ¡! Em que posso ajudar na gestÃ£o da fazenda hoje?"
       }
     } catch (error) {
       console.error(error)
@@ -144,7 +144,7 @@ export default function AIAssistant() {
                   <h3 className="font-bold text-white text-lg">Beef IA</h3>
                   <p className="text-blue-100 text-xs flex items-center">
                     <span className="w-2 h-2 bg-green-400 rounded-full mr-1 animate-pulse"></span>
-                    Online • Assistente Inteligente
+                    Online ââ‚¬¢ Assistente Inteligente
                   </p>
                 </div>
               </div>

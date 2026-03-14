@@ -37,26 +37,26 @@ export default function RelatoriosPersonalizados() {
   })
 
   const tiposRelatorio = [
-    { value: 'animais', label: 'Animais', icon: '🐄' },
-    { value: 'reprodutivo', label: 'Reprodutivo', icon: '🐄' },
-    { value: 'financeiro', label: 'Financeiro', icon: '💰' },
-    { value: 'estoque', label: 'Estoque', icon: '📦' },
-    { value: 'customizado', label: 'Customizado', icon: '⚙️' }
+    { value: 'animais', label: 'Animais', icon: 'ðÅ¸�â€ž' },
+    { value: 'reprodutivo', label: 'Reprodutivo', icon: 'ðÅ¸�â€ž' },
+    { value: 'financeiro', label: 'Financeiro', icon: 'ðÅ¸â€™°' },
+    { value: 'estoque', label: 'Estoque', icon: 'ðÅ¸â€œ¦' },
+    { value: 'customizado', label: 'Customizado', icon: 'âÅ¡â„¢ï¸�' }
   ]
 
   const camposDisponiveis = {
     animais: [
-      { campo: 'serie', label: 'Série', tipo: 'texto' },
+      { campo: 'serie', label: 'SÃ©rie', tipo: 'texto' },
       { campo: 'rg', label: 'RG', tipo: 'texto' },
-      { campo: 'raca', label: 'Raça', tipo: 'texto' },
+      { campo: 'raca', label: 'RaÃ§a', tipo: 'texto' },
       { campo: 'data_nascimento', label: 'Data de Nascimento', tipo: 'data' },
-      { campo: 'situacao', label: 'Situação', tipo: 'texto' },
-      { campo: 'custo_aquisicao', label: 'Custo de Aquisição', tipo: 'numero' },
+      { campo: 'situacao', label: 'SituaÃ§Ã£o', tipo: 'texto' },
+      { campo: 'custo_aquisicao', label: 'Custo de AquisiÃ§Ã£o', tipo: 'numero' },
       { campo: 'custo_total', label: 'Custo Total', tipo: 'numero' },
       { campo: 'valor_venda', label: 'Valor de Venda', tipo: 'numero' }
     ],
     reprodutivo: [
-      { campo: 'numero_te', label: 'Número TE', tipo: 'texto' },
+      { campo: 'numero_te', label: 'NÃºmero TE', tipo: 'texto' },
       { campo: 'data_te', label: 'Data TE', tipo: 'data' },
       { campo: 'receptora', label: 'Receptora', tipo: 'texto' },
       { campo: 'doadora', label: 'Doadora', tipo: 'texto' },
@@ -66,7 +66,7 @@ export default function RelatoriosPersonalizados() {
     ],
     financeiro: [
       { campo: 'animal', label: 'Animal', tipo: 'texto' },
-      { campo: 'custo_aquisicao', label: 'Custo Aquisição', tipo: 'numero' },
+      { campo: 'custo_aquisicao', label: 'Custo AquisiÃ§Ã£o', tipo: 'numero' },
       { campo: 'custo_total', label: 'Custo Total', tipo: 'numero' },
       { campo: 'valor_venda', label: 'Valor Venda', tipo: 'numero' },
       { campo: 'lucro', label: 'Lucro', tipo: 'numero' },
@@ -74,9 +74,9 @@ export default function RelatoriosPersonalizados() {
     ],
     estoque: [
       { campo: 'touro', label: 'Touro', tipo: 'texto' },
-      { campo: 'raca', label: 'Raça', tipo: 'texto' },
+      { campo: 'raca', label: 'RaÃ§a', tipo: 'texto' },
       { campo: 'quantidade', label: 'Quantidade', tipo: 'numero' },
-      { campo: 'preco_unitario', label: 'Preço Unitário', tipo: 'numero' },
+      { campo: 'preco_unitario', label: 'PreÃ§o UnitÃ¡rio', tipo: 'numero' },
       { campo: 'valor_total', label: 'Valor Total', tipo: 'numero' }
     ]
   }
@@ -94,8 +94,8 @@ export default function RelatoriosPersonalizados() {
         setRelatorios(data)
       }
     } catch (error) {
-      console.error('Erro ao carregar relatórios:', error)
-      Toast.error('Erro ao carregar relatórios')
+      console.error('Erro ao carregar relatÃ³rios:', error)
+      Toast.error('Erro ao carregar relatÃ³rios')
     } finally {
       setLoading(false)
     }
@@ -119,25 +119,25 @@ export default function RelatoriosPersonalizados() {
       })
 
       if (response.ok) {
-        Toast.success(editingRelatorio ? 'Relatório atualizado!' : 'Relatório criado!')
+        Toast.success(editingRelatorio ? 'RelatÃ³rio atualizado!' : 'RelatÃ³rio criado!')
         setShowModal(false)
         setEditingRelatorio(null)
         resetForm()
         loadRelatorios()
       } else {
         const error = await response.json()
-        Toast.error(error.message || 'Erro ao salvar relatório')
+        Toast.error(error.message || 'Erro ao salvar relatÃ³rio')
       }
     } catch (error) {
-      console.error('Erro ao salvar relatório:', error)
-      Toast.error('Erro ao salvar relatório')
+      console.error('Erro ao salvar relatÃ³rio:', error)
+      Toast.error('Erro ao salvar relatÃ³rio')
     } finally {
       setLoading(false)
     }
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('Tem certeza que deseja excluir este relatório?')) return
+    if (!confirm('Tem certeza que deseja excluir este relatÃ³rio?')) return
 
     try {
       const response = await fetch(`/api/relatorios-personalizados?id=${id}`, {
@@ -145,14 +145,14 @@ export default function RelatoriosPersonalizados() {
       })
 
       if (response.ok) {
-        Toast.success('Relatório excluído!')
+        Toast.success('RelatÃ³rio excluÃ­do!')
         loadRelatorios()
       } else {
-        Toast.error('Erro ao excluir relatório')
+        Toast.error('Erro ao excluir relatÃ³rio')
       }
     } catch (error) {
-      console.error('Erro ao excluir relatório:', error)
-      Toast.error('Erro ao excluir relatório')
+      console.error('Erro ao excluir relatÃ³rio:', error)
+      Toast.error('Erro ao excluir relatÃ³rio')
     }
   }
 
@@ -189,7 +189,7 @@ export default function RelatoriosPersonalizados() {
     try {
       setLoading(true)
       
-      // Gerar relatório em formato JSON (visualização)
+      // Gerar relatÃ³rio em formato JSON (visualizaÃ§Ã£o)
       const response = await fetch('/api/relatorios-personalizados/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -201,18 +201,18 @@ export default function RelatoriosPersonalizados() {
 
       if (!response.ok) {
         const error = await response.json()
-        throw new Error(error.message || 'Erro ao gerar relatório')
+        throw new Error(error.message || 'Erro ao gerar relatÃ³rio')
       }
 
       const data = await response.json()
       
-      // Abrir modal ou mostrar dados do relatório
-      console.log('Relatório gerado:', data)
-      Toast.success(`Relatório "${relatorio.nome}" gerado com sucesso! Total: ${data.total} registros`)
+      // Abrir modal ou mostrar dados do relatÃ³rio
+      console.log('RelatÃ³rio gerado:', data)
+      Toast.success(`RelatÃ³rio "${relatorio.nome}" gerado com sucesso! Total: ${data.total} registros`)
       
     } catch (error) {
-      console.error('Erro ao gerar relatório:', error)
-      Toast.error(error.message || 'Erro ao gerar relatório')
+      console.error('Erro ao gerar relatÃ³rio:', error)
+      Toast.error(error.message || 'Erro ao gerar relatÃ³rio')
     } finally {
       setLoading(false)
     }
@@ -222,7 +222,7 @@ export default function RelatoriosPersonalizados() {
     try {
       setLoading(true)
       
-      // Exportar relatório em formato Excel
+      // Exportar relatÃ³rio em formato Excel
       const response = await fetch('/api/relatorios-personalizados/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -233,19 +233,19 @@ export default function RelatoriosPersonalizados() {
       })
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ message: 'Erro ao exportar relatório' }))
-        throw new Error(error.message || 'Erro ao exportar relatório')
+        const error = await response.json().catch(() => ({ message: 'Erro ao exportar relatÃ³rio' }))
+        throw new Error(error.message || 'Erro ao exportar relatÃ³rio')
       }
 
       // Obter o blob do arquivo Excel
       const blob = await response.blob()
       
-      // Criar URL temporária e fazer download
+      // Criar URL temporÃ¡ria e fazer download
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
       
-      // Obter nome do arquivo do header Content-Disposition ou usar nome padrão
+      // Obter nome do arquivo do header Content-Disposition ou usar nome padrÃ£o
       const contentDisposition = response.headers.get('Content-Disposition')
       let filename = `relatorio-${relatorio.nome}-${new Date().toISOString().split('T')[0]}.xlsx`
       
@@ -266,11 +266,11 @@ export default function RelatoriosPersonalizados() {
         window.URL.revokeObjectURL(url)
       }, 100)
       
-      Toast.success(`Relatório "${relatorio.nome}" exportado com sucesso!`)
+      Toast.success(`RelatÃ³rio "${relatorio.nome}" exportado com sucesso!`)
       
     } catch (error) {
-      console.error('Erro ao exportar relatório:', error)
-      Toast.error(error.message || 'Erro ao exportar relatório')
+      console.error('Erro ao exportar relatÃ³rio:', error)
+      Toast.error(error.message || 'Erro ao exportar relatÃ³rio')
     } finally {
       setLoading(false)
     }
@@ -282,10 +282,10 @@ export default function RelatoriosPersonalizados() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Relatórios Personalizados
+            RelatÃ³rios Personalizados
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Crie e gerencie relatórios personalizados do sistema
+            Crie e gerencie relatÃ³rios personalizados do sistema
           </p>
         </div>
         <Button
@@ -293,11 +293,11 @@ export default function RelatoriosPersonalizados() {
           className="flex items-center space-x-2"
         >
           <PlusIcon className="h-5 w-5" />
-          <span>Novo Relatório</span>
+          <span>Novo RelatÃ³rio</span>
         </Button>
       </div>
 
-      {/* Grid de Relatórios */}
+      {/* Grid de RelatÃ³rios */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {loading ? (
           <div className="col-span-full flex justify-center items-center h-64">
@@ -408,14 +408,14 @@ export default function RelatoriosPersonalizados() {
         )}
       </div>
 
-      {/* Modal de Criação/Edição */}
+      {/* Modal de CriaÃ§Ã£o/EdiÃ§Ã£o */}
       {showModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-10 mx-auto p-5 border w-11/12 md:w-4/5 lg:w-3/4 shadow-lg rounded-md bg-white dark:bg-gray-800">
             <div className="mt-3">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                  {editingRelatorio ? 'Editar Relatório' : 'Novo Relatório Personalizado'}
+                  {editingRelatorio ? 'Editar RelatÃ³rio' : 'Novo RelatÃ³rio Personalizado'}
                 </h3>
                 <button
                   onClick={() => {
@@ -433,16 +433,16 @@ export default function RelatoriosPersonalizados() {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Informações Básicas */}
+                {/* InformaÃ§Ãµes BÃ¡sicas */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Nome do Relatório *
+                      Nome do RelatÃ³rio *
                     </label>
                     <Input
                       value={formData.nome}
                       onChange={(e) => setFormData(prev => ({ ...prev, nome: e.target.value }))}
-                      placeholder="Ex: Relatório de Animais por Raça"
+                      placeholder="Ex: RelatÃ³rio de Animais por RaÃ§a"
                       required
                     />
                   </div>
@@ -467,21 +467,21 @@ export default function RelatoriosPersonalizados() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Descrição
+                    DescriÃ§Ã£o
                   </label>
                   <textarea
                     value={formData.descricao}
                     onChange={(e) => setFormData(prev => ({ ...prev, descricao: e.target.value }))}
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    placeholder="Descreva o propósito deste relatório..."
+                    placeholder="Descreva o propÃ³sito deste relatÃ³rio..."
                   />
                 </div>
 
-                {/* Campos de Exibição */}
+                {/* Campos de ExibiÃ§Ã£o */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Campos de Exibição
+                    Campos de ExibiÃ§Ã£o
                   </label>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
                     {camposDisponiveis[formData.tipo]?.map((campo) => (

@@ -1,12 +1,12 @@
 /**
- * API de debug para verificar variáveis de ambiente
- * ATENÇÃO: Remover após debug!
+ * API de debug para verificar variÃ¡veis de ambiente
+ * ATENÃâ€¡ÃÆ’O: Remover apÃ³s debug!
  */
 export default function handler(req, res) {
   const hasDbUrl = !!process.env.DATABASE_URL
   const dbUrlStart = process.env.DATABASE_URL?.substring(0, 30) || 'NOT_DEFINED'
   
-  // Verificar todas as variáveis DB_*
+  // Verificar todas as variÃ¡veis DB_*
   const dbVars = {}
   Object.keys(process.env).forEach(key => {
     if (key.startsWith('DB_') || key === 'DATABASE_URL') {

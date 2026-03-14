@@ -3,7 +3,7 @@ require('dotenv').config()
 
 async function testarResumoJaneiro2026() {
   try {
-    console.log('🔍 Testando resumo Pardinho para janeiro de 2026...\n')
+    console.log('�Ÿ”� Testando resumo Pardinho para janeiro de 2026...\n')
     
     const pgStart = '2026-01-01'
     const pgEnd = '2026-01-31'
@@ -44,7 +44,7 @@ async function testarResumoJaneiro2026() {
         )
     `, [pgStart, pgEnd, cnpjDestinoPardinho, cnpjFornecedorPardinho])
     
-    console.log(`📊 NFs encontradas para janeiro/2026: ${nfsResult.rows.length}`)
+    console.log(`�Ÿ“Š NFs encontradas para janeiro/2026: ${nfsResult.rows.length}`)
     nfsResult.rows.forEach(nf => {
       console.log(`  - NF ${nf.numero_nf} (Data: ${nf.data_compra || nf.data})`)
     })
@@ -89,21 +89,21 @@ async function testarResumoJaneiro2026() {
       }
     }
     
-    console.log(`\n📈 Total de animais: ${totalAnimais}`)
-    console.log(`👩 Fêmeas +36 meses: ${totalFemeas36Mais}`)
+    console.log(`\n�Ÿ“ˆ Total de animais: ${totalAnimais}`)
+    console.log(`�Ÿ‘� Fêmeas +36 meses: ${totalFemeas36Mais}`)
     
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('�Œ Erro:', error)
     throw error
   }
 }
 
 testarResumoJaneiro2026()
   .then(() => {
-    console.log('\n✅ Teste concluído')
+    console.log('\n�œ… Teste concluído')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n❌ Erro fatal:', error)
+    console.error('\n�Œ Erro fatal:', error)
     process.exit(1)
   })

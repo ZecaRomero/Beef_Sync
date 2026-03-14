@@ -12,7 +12,7 @@ async function criarTabela() {
   const client = await pool.connect();
   
   try {
-    console.log('🔧 CRIANDO TABELA DE INSEMINAÇÕES\n');
+    console.log('�Ÿ”� CRIANDO TABELA DE INSEMINA�‡�•ES\n');
     console.log('='.repeat(80));
     
     await client.query(`
@@ -34,7 +34,7 @@ async function criarTabela() {
       )
     `);
     
-    console.log('✅ Tabela inseminacoes criada');
+    console.log('�œ… Tabela inseminacoes criada');
     
     // Criar índices
     await client.query(`
@@ -44,13 +44,13 @@ async function criarTabela() {
       CREATE INDEX IF NOT EXISTS idx_inseminacoes_status ON inseminacoes(status_gestacao);
     `);
     
-    console.log('✅ Índices criados');
+    console.log('�œ… Índices criados');
     
     console.log('\n' + '='.repeat(80));
-    console.log('\n✅ Tabela de inseminações criada com sucesso!');
+    console.log('\n�œ… Tabela de inseminações criada com sucesso!');
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
     console.error(error);
   } finally {
     client.release();

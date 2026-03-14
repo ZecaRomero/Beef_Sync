@@ -9,7 +9,7 @@ async function verificar() {
     ORDER BY serie, rg
   `)
   
-  console.log(`📊 Animais no PIQUETE 1: ${result.rows.length}`)
+  console.log(`�Ÿ“Š Animais no PIQUETE 1: ${result.rows.length}`)
   console.log('\nSituação dos animais:')
   
   const porSituacao = {}
@@ -42,7 +42,7 @@ async function verificar() {
       AND TRIM(COALESCE(l.piquete, a.piquete_atual, a.pasto_atual)) != ''
   `)
   
-  console.log(`\n🔍 Total que a API retornaria (situacao = 'Ativo'): ${apiResult.rows[0].total}`)
+  console.log(`\n�Ÿ”� Total que a API retornaria (situacao = 'Ativo'): ${apiResult.rows[0].total}`)
   
   process.exit(0)
 }

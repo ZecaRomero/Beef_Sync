@@ -45,7 +45,7 @@ async function verificarColunas() {
     }
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
   } finally {
     client.release();
     await pool.end();

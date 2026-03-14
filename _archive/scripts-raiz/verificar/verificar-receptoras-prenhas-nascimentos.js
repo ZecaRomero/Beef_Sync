@@ -3,7 +3,7 @@ const API_URL = 'http://localhost:3020';
 
 async function verificarReceptorasPrenhasNascimentos() {
   try {
-    console.log('🔍 Verificando receptoras prenhas em Nascimentos...\n');
+    console.log('�Ÿ”� Verificando receptoras prenhas em Nascimentos...\n');
     
     // 1. Buscar receptoras com DG positivo
     const responseAnimais = await fetch(`${API_URL}/api/animals`);
@@ -15,10 +15,10 @@ async function verificarReceptorasPrenhasNascimentos() {
       return resultado.includes('pren') || resultado.includes('positiv');
     });
     
-    console.log(`📊 Total de receptoras com DG positivo: ${receptorasPrenhas.length}\n`);
+    console.log(`�Ÿ“Š Total de receptoras com DG positivo: ${receptorasPrenhas.length}\n`);
     
     if (receptorasPrenhas.length === 0) {
-      console.log('⚠️ Nenhuma receptora com DG positivo encontrada!');
+      console.log('�š�️ Nenhuma receptora com DG positivo encontrada!');
       return;
     }
     
@@ -27,7 +27,7 @@ async function verificarReceptorasPrenhasNascimentos() {
     const dataNascimentos = await responseNascimentos.json();
     const nascimentos = dataNascimentos.data || dataNascimentos || [];
     
-    console.log(`📊 Total de registros em Nascimentos: ${nascimentos.length}\n`);
+    console.log(`�Ÿ“Š Total de registros em Nascimentos: ${nascimentos.length}\n`);
     
     // 3. Verificar quais receptoras prenhas estão em Nascimentos
     let encontradas = 0;
@@ -43,7 +43,7 @@ async function verificarReceptorasPrenhasNascimentos() {
       
       if (encontrado) {
         encontradas++;
-        console.log(`✅ ${letra} ${numero} - Encontrada em Nascimentos (Data prevista: ${new Date(encontrado.data_nascimento).toLocaleDateString('pt-BR')})`);
+        console.log(`�œ… ${letra} ${numero} - Encontrada em Nascimentos (Data prevista: ${new Date(encontrado.data_nascimento).toLocaleDateString('pt-BR')})`);
       } else {
         naoEncontradas++;
         faltando.push({
@@ -55,12 +55,12 @@ async function verificarReceptorasPrenhasNascimentos() {
       }
     });
     
-    console.log(`\n📈 Resumo:`);
-    console.log(`   ✅ Encontradas em Nascimentos: ${encontradas}`);
-    console.log(`   ❌ NÃO encontradas em Nascimentos: ${naoEncontradas}`);
+    console.log(`\n�Ÿ“ˆ Resumo:`);
+    console.log(`   �œ… Encontradas em Nascimentos: ${encontradas}`);
+    console.log(`   �Œ N�ƒO encontradas em Nascimentos: ${naoEncontradas}`);
     
     if (faltando.length > 0) {
-      console.log(`\n⚠️ Receptoras prenhas que FALTAM em Nascimentos:\n`);
+      console.log(`\n�š�️ Receptoras prenhas que FALTAM em Nascimentos:\n`);
       faltando.forEach(r => {
         console.log(`   - ${r.rg}`);
         console.log(`     Data DG: ${r.dataDG || 'N/A'}`);
@@ -69,15 +69,15 @@ async function verificarReceptorasPrenhasNascimentos() {
         console.log('');
       });
       
-      console.log('\n💡 Solução:');
+      console.log('\n�Ÿ’� Solução:');
       console.log('   1. Verifique se o DG foi lançado corretamente');
       console.log('   2. Verifique se a data de TE está cadastrada');
       console.log('   3. Execute novamente o lançamento de DG para essas receptoras');
     }
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
-    console.log('\n💡 Certifique-se de que o servidor está rodando em http://localhost:3020');
+    console.error('�Œ Erro:', error.message);
+    console.log('\n�Ÿ’� Certifique-se de que o servidor está rodando em http://localhost:3020');
   }
 }
 

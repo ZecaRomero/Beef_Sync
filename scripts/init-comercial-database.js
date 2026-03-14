@@ -4,9 +4,9 @@ const path = require('path');
 
 async function initComercialDatabase() {
   try {
-    console.log('🚀 Iniciando criação de tabelas comerciais...\n');
+    console.log('ðÅ¸Å¡â‚¬ Iniciando criaÃ§Ã£o de tabelas comerciais...\n');
 
-    // Primeiro criar as tabelas básicas
+    // Primeiro criar as tabelas bÃ¡sicas
     await createTables();
 
     // Ler e executar o script SQL de tabelas comerciais
@@ -22,29 +22,29 @@ async function initComercialDatabase() {
     for (const command of commands) {
       try {
         await query(command);
-        console.log(`✅ Comando executado com sucesso`);
+        console.log(`âÅ“â€¦ Comando executado com sucesso`);
       } catch (error) {
         if (error.code === '23505') {
-          // Ignorar erros de duplicação (constraint já existe)
-          console.log(`⚠️ Item já existe, continuando...`);
+          // Ignorar erros de duplicaÃ§Ã£o (constraint jÃ¡ existe)
+          console.log(`âÅ¡ ï¸� Item jÃ¡ existe, continuando...`);
         } else {
           throw error;
         }
       }
     }
 
-    console.log('\n✅ Todas as tabelas comerciais foram criadas com sucesso!');
-    console.log('\n📋 Tabelas criadas:');
+    console.log('\nâÅ“â€¦ Todas as tabelas comerciais foram criadas com sucesso!');
+    console.log('\nðÅ¸â€œâ€¹ Tabelas criadas:');
     console.log('   - notas_fiscais');
     console.log('   - servicos');
     console.log('   - naturezas_operacao');
     console.log('   - origens_receptoras');
     
-    console.log('\n🎯 Banco de dados pronto para uso!');
+    console.log('\nðÅ¸Å½¯ Banco de dados pronto para uso!');
 
     process.exit(0);
   } catch (error) {
-    console.error('\n❌ Erro ao criar tabelas comerciais:', error);
+    console.error('\nâ�Å’ Erro ao criar tabelas comerciais:', error);
     console.error('Detalhes:', error.message);
     process.exit(1);
   }

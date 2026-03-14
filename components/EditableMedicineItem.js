@@ -24,7 +24,7 @@ export default function EditableMedicineItem({
 
   const handleSave = () => {
     if (!editData.nome.trim()) {
-      alert('Nome do medicamento é obrigatório')
+      alert('Nome do medicamento Ã© obrigatÃ³rio')
       return
     }
 
@@ -185,7 +185,7 @@ export default function EditableMedicineItem({
                 </span>
                 {formattedMedicineInfo.tipoAplicacao === 'lote' && (
                   <span className="text-xs bg-blue-200 dark:bg-blue-700 text-blue-900 dark:text-blue-100 px-1 py-0 rounded">
-                    📦 {formattedMedicineInfo.displayText}
+                    ðÅ¸â€œ¦ {formattedMedicineInfo.displayText}
                   </span>
                 )}
               </div>

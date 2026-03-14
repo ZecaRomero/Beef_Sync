@@ -10,12 +10,12 @@ const pool = new Pool({
 
 async function checkExistingAnimal() {
   try {
-    console.log('🔍 Verificando se TOURO 001 já existe...');
+    console.log('�Ÿ”� Verificando se TOURO 001 já existe...');
     
     const result = await pool.query("SELECT * FROM animais WHERE serie = 'TOURO' AND rg = '001'");
     
     if (result.rows.length > 0) {
-      console.log('\n📊 Animal encontrado:');
+      console.log('\n�Ÿ“Š Animal encontrado:');
       const animal = result.rows[0];
       console.log('  - ID:', animal.id);
       console.log('  - Série:', animal.serie);
@@ -25,11 +25,11 @@ async function checkExistingAnimal() {
       console.log('  - Peso:', animal.peso);
       console.log('  - Situação:', animal.situacao);
     } else {
-      console.log('\n❌ Animal não encontrado');
+      console.log('\n�Œ Animal não encontrado');
     }
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
   } finally {
     await pool.end();
   }

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * Script de validação completa do sistema Beef Sync
- * Verifica integridade, performance, segurança e funcionalidades
+ * Script de validaÃ§Ã£o completa do sistema Beef Sync
+ * Verifica integridade, performance, seguranÃ§a e funcionalidades
  */
 
 const fs = require('fs');
@@ -26,10 +26,10 @@ function log(message, color = 'reset') {
 }
 
 function checkFileIntegrity() {
-  log('\n1. 📁 INTEGRIDADE DE ARQUIVOS', 'bold');
+  log('\n1. ðÅ¸â€œ� INTEGRIDADE DE ARQUIVOS', 'bold');
   
   const criticalFiles = {
-    'Configuração': [
+    'ConfiguraÃ§Ã£o': [
       '.env',
       'package.json',
       'next.config.js',
@@ -71,23 +71,23 @@ function checkFileIntegrity() {
       if (fs.existsSync(file)) {
         const stats = fs.statSync(file);
         const size = (stats.size / 1024).toFixed(1);
-        log(`   ✅ ${file} (${size} KB)`, 'green');
+        log(`   âÅ“â€¦ ${file} (${size} KB)`, 'green');
         existingFiles++;
       } else {
-        log(`   ❌ ${file} - Não encontrado`, 'red');
+        log(`   â�Å’ ${file} - NÃ£o encontrado`, 'red');
       }
     }
   }
 
   const integrity = (existingFiles / totalFiles * 100).toFixed(1);
-  log(`\n   📊 Integridade: ${existingFiles}/${totalFiles} (${integrity}%)`, 
+  log(`\n   ðÅ¸â€œÅ  Integridade: ${existingFiles}/${totalFiles} (${integrity}%)`, 
       integrity === '100.0' ? 'green' : 'yellow');
   
   return integrity === '100.0';
 }
 
 function checkEnvironmentVariables() {
-  log('\n2. 🔧 VARIÁVEIS DE AMBIENTE', 'bold');
+  log('\n2. ðÅ¸â€�§ VARIÃ�VEIS DE AMBIENTE', 'bold');
   
   const requiredVars = {
     'Database': ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASSWORD'],
@@ -105,9 +105,9 @@ function checkEnvironmentVariables() {
         const value = category === 'Database' && envVar === 'DB_PASSWORD' 
           ? '***' 
           : process.env[envVar];
-        log(`   ✅ ${envVar}: ${value}`, 'green');
+        log(`   âÅ“â€¦ ${envVar}: ${value}`, 'green');
       } else {
-        log(`   ${category === 'Optional' ? '⚠️' : '❌'} ${envVar}: Não configurado`, 
+        log(`   ${category === 'Optional' ? 'âÅ¡ ï¸�' : 'â�Å’'} ${envVar}: NÃ£o configurado`, 
             category === 'Optional' ? 'yellow' : 'red');
         if (category !== 'Optional') allRequired = false;
       }
@@ -118,7 +118,7 @@ function checkEnvironmentVariables() {
 }
 
 function checkPackageDependencies() {
-  log('\n3. 📦 DEPENDÊNCIAS', 'bold');
+  log('\n3. ðÅ¸â€œ¦ DEPENDÃÅ NCIAS', 'bold');
   
   try {
     const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
@@ -141,26 +141,26 @@ function checkPackageDependencies() {
       for (const dep of deps) {
         const version = dependencies[dep] || devDependencies[dep];
         if (version) {
-          log(`   ✅ ${dep}: ${version}`, 'green');
+          log(`   âÅ“â€¦ ${dep}: ${version}`, 'green');
         } else {
-          log(`   ❌ ${dep}: Não instalado`, 'red');
+          log(`   â�Å’ ${dep}: NÃ£o instalado`, 'red');
           allCriticalPresent = false;
         }
       }
     }
 
     const totalDeps = Object.keys(dependencies).length + Object.keys(devDependencies).length;
-    log(`\n   📊 Total de dependências: ${totalDeps}`, 'blue');
+    log(`\n   ðÅ¸â€œÅ  Total de dependÃªncias: ${totalDeps}`, 'blue');
     
     return allCriticalPresent;
   } catch (error) {
-    log(`   ❌ Erro ao ler package.json: ${error.message}`, 'red');
+    log(`   â�Å’ Erro ao ler package.json: ${error.message}`, 'red');
     return false;
   }
 }
 
 function checkCodeQuality() {
-  log('\n4. 🎯 QUALIDADE DO CÓDIGO', 'bold');
+  log('\n4. ðÅ¸Å½¯ QUALIDADE DO CÃâ€œDIGO', 'bold');
   
   const checks = [
     {
@@ -171,10 +171,10 @@ function checkCodeQuality() {
     {
       name: 'Componentes UI completos',
       files: ['components/ui/Icons.js'],
-      minSize: 20000 // 20KB mínimo para Icons.js
+      minSize: 20000 // 20KB mÃ­nimo para Icons.js
     },
     {
-      name: 'Scripts de automação',
+      name: 'Scripts de automaÃ§Ã£o',
       files: ['scripts/health-check.js', 'scripts/optimize-production.js'],
       shouldExist: true
     }
@@ -186,17 +186,17 @@ function checkCodeQuality() {
     if (check.shouldNotExist) {
       const exists = check.files.some(file => fs.existsSync(file));
       if (!exists) {
-        log(`   ✅ ${check.name}`, 'green');
+        log(`   âÅ“â€¦ ${check.name}`, 'green');
       } else {
-        log(`   ❌ ${check.name} - Arquivos duplicados encontrados`, 'red');
+        log(`   â�Å’ ${check.name} - Arquivos duplicados encontrados`, 'red');
         allChecksPass = false;
       }
     } else if (check.shouldExist) {
       const allExist = check.files.every(file => fs.existsSync(file));
       if (allExist) {
-        log(`   ✅ ${check.name}`, 'green');
+        log(`   âÅ“â€¦ ${check.name}`, 'green');
       } else {
-        log(`   ❌ ${check.name} - Arquivos faltando`, 'red');
+        log(`   â�Å’ ${check.name} - Arquivos faltando`, 'red');
         allChecksPass = false;
       }
     } else if (check.minSize) {
@@ -204,12 +204,12 @@ function checkCodeQuality() {
       if (fs.existsSync(file)) {
         const stats = fs.statSync(file);
         if (stats.size >= check.minSize) {
-          log(`   ✅ ${check.name} (${(stats.size / 1024).toFixed(1)} KB)`, 'green');
+          log(`   âÅ“â€¦ ${check.name} (${(stats.size / 1024).toFixed(1)} KB)`, 'green');
         } else {
-          log(`   ⚠️  ${check.name} - Arquivo muito pequeno`, 'yellow');
+          log(`   âÅ¡ ï¸�  ${check.name} - Arquivo muito pequeno`, 'yellow');
         }
       } else {
-        log(`   ❌ ${check.name} - Arquivo não encontrado`, 'red');
+        log(`   â�Å’ ${check.name} - Arquivo nÃ£o encontrado`, 'red');
         allChecksPass = false;
       }
     }
@@ -219,13 +219,13 @@ function checkCodeQuality() {
 }
 
 function checkSecurity() {
-  log('\n5. 🔒 SEGURANÇA', 'bold');
+  log('\n5. ðÅ¸â€�â€™ SEGURANÃâ€¡A', 'bold');
   
   const securityChecks = [
     {
-      name: 'Arquivo .env não commitado',
+      name: 'Arquivo .env nÃ£o commitado',
       check: () => {
-        // Verificar se .env está no .gitignore
+        // Verificar se .env estÃ¡ no .gitignore
         if (fs.existsSync('.gitignore')) {
           const gitignore = fs.readFileSync('.gitignore', 'utf8');
           return gitignore.includes('.env');
@@ -234,9 +234,9 @@ function checkSecurity() {
       }
     },
     {
-      name: 'Senhas não expostas no código',
+      name: 'Senhas nÃ£o expostas no cÃ³digo',
       check: () => {
-        // Verificar se não há senhas hardcoded
+        // Verificar se nÃ£o hÃ¡ senhas hardcoded
         const sensitiveFiles = ['lib/database.js', 'utils/apiResponse.js'];
         for (const file of sensitiveFiles) {
           if (fs.existsSync(file)) {
@@ -250,9 +250,9 @@ function checkSecurity() {
       }
     },
     {
-      name: 'Validação de entrada nas APIs',
+      name: 'ValidaÃ§Ã£o de entrada nas APIs',
       check: () => {
-        // Verificar se utils/apiResponse.js existe (indica validação)
+        // Verificar se utils/apiResponse.js existe (indica validaÃ§Ã£o)
         return fs.existsSync('utils/apiResponse.js');
       }
     }
@@ -263,12 +263,12 @@ function checkSecurity() {
   for (const check of securityChecks) {
     try {
       if (check.check()) {
-        log(`   ✅ ${check.name}`, 'green');
+        log(`   âÅ“â€¦ ${check.name}`, 'green');
       } else {
-        log(`   ⚠️  ${check.name}`, 'yellow');
+        log(`   âÅ¡ ï¸�  ${check.name}`, 'yellow');
       }
     } catch (error) {
-      log(`   ❌ ${check.name} - Erro na verificação`, 'red');
+      log(`   â�Å’ ${check.name} - Erro na verificaÃ§Ã£o`, 'red');
       allSecure = false;
     }
   }
@@ -278,48 +278,48 @@ function checkSecurity() {
 
 function generateReport(results) {
   log('\n' + '='.repeat(60), 'blue');
-  log('📊 RELATÓRIO FINAL DE VALIDAÇÃO', 'bold');
+  log('ðÅ¸â€œÅ  RELATÃâ€œRIO FINAL DE VALIDAÃâ€¡ÃÆ’O', 'bold');
   log('='.repeat(60), 'blue');
 
   const categories = [
     { name: 'Integridade de Arquivos', result: results.integrity },
-    { name: 'Variáveis de Ambiente', result: results.environment },
-    { name: 'Dependências', result: results.dependencies },
-    { name: 'Qualidade do Código', result: results.codeQuality },
-    { name: 'Segurança', result: results.security }
+    { name: 'VariÃ¡veis de Ambiente', result: results.environment },
+    { name: 'DependÃªncias', result: results.dependencies },
+    { name: 'Qualidade do CÃ³digo', result: results.codeQuality },
+    { name: 'SeguranÃ§a', result: results.security }
   ];
 
   let passedChecks = 0;
   const totalChecks = categories.length;
 
   for (const category of categories) {
-    const status = category.result ? '✅ PASSOU' : '❌ FALHOU';
+    const status = category.result ? 'âÅ“â€¦ PASSOU' : 'â�Å’ FALHOU';
     const color = category.result ? 'green' : 'red';
     log(`${category.name}: ${status}`, color);
     if (category.result) passedChecks++;
   }
 
   const score = (passedChecks / totalChecks * 100).toFixed(1);
-  log(`\n📈 PONTUAÇÃO GERAL: ${passedChecks}/${totalChecks} (${score}%)`, 
+  log(`\nðÅ¸â€œË† PONTUAÃâ€¡ÃÆ’O GERAL: ${passedChecks}/${totalChecks} (${score}%)`, 
       score === '100.0' ? 'green' : score >= '80.0' ? 'yellow' : 'red');
 
   if (score === '100.0') {
-    log('\n🎉 SISTEMA TOTALMENTE VALIDADO!', 'green');
-    log('✨ Todas as verificações passaram com sucesso', 'green');
+    log('\nðÅ¸Å½â€° SISTEMA TOTALMENTE VALIDADO!', 'green');
+    log('âÅ“¨ Todas as verificaÃ§Ãµes passaram com sucesso', 'green');
   } else if (score >= '80.0') {
-    log('\n⚠️  SISTEMA FUNCIONAL COM PEQUENOS PROBLEMAS', 'yellow');
-    log('💡 Corrija os itens marcados para melhor qualidade', 'yellow');
+    log('\nâÅ¡ ï¸�  SISTEMA FUNCIONAL COM PEQUENOS PROBLEMAS', 'yellow');
+    log('ðÅ¸â€™¡ Corrija os itens marcados para melhor qualidade', 'yellow');
   } else {
-    log('\n🚨 SISTEMA COM PROBLEMAS CRÍTICOS', 'red');
-    log('🔧 Corrija os problemas antes de usar em produção', 'red');
+    log('\nðÅ¸Å¡¨ SISTEMA COM PROBLEMAS CRÃ�TICOS', 'red');
+    log('ðÅ¸â€�§ Corrija os problemas antes de usar em produÃ§Ã£o', 'red');
   }
 
   return score >= 80.0;
 }
 
 async function main() {
-  log('🔍 VALIDAÇÃO COMPLETA DO SISTEMA BEEF SYNC', 'bold');
-  log('Verificando integridade, qualidade e segurança...', 'blue');
+  log('ðÅ¸â€�� VALIDAÃâ€¡ÃÆ’O COMPLETA DO SISTEMA BEEF SYNC', 'bold');
+  log('Verificando integridade, qualidade e seguranÃ§a...', 'blue');
 
   const results = {
     integrity: checkFileIntegrity(),
@@ -331,16 +331,16 @@ async function main() {
 
   const systemValid = generateReport(results);
 
-  log('\n💡 PRÓXIMOS PASSOS RECOMENDADOS:', 'bold');
+  log('\nðÅ¸â€™¡ PRÃâ€œXIMOS PASSOS RECOMENDADOS:', 'bold');
   
   if (systemValid) {
-    log('• Execute npm run health:check para verificar APIs', 'blue');
-    log('• Execute npm run build para testar build de produção', 'blue');
-    log('• Configure backup automático com npm run backup', 'blue');
+    log('ââ‚¬¢ Execute npm run health:check para verificar APIs', 'blue');
+    log('ââ‚¬¢ Execute npm run build para testar build de produÃ§Ã£o', 'blue');
+    log('ââ‚¬¢ Configure backup automÃ¡tico com npm run backup', 'blue');
   } else {
-    log('• Corrija os problemas identificados acima', 'yellow');
-    log('• Execute novamente este script após correções', 'yellow');
-    log('• Consulte a documentação para ajuda', 'yellow');
+    log('ââ‚¬¢ Corrija os problemas identificados acima', 'yellow');
+    log('ââ‚¬¢ Execute novamente este script apÃ³s correÃ§Ãµes', 'yellow');
+    log('ââ‚¬¢ Consulte a documentaÃ§Ã£o para ajuda', 'yellow');
   }
 
   process.exit(systemValid ? 0 : 1);
@@ -348,7 +348,7 @@ async function main() {
 
 if (require.main === module) {
   main().catch(error => {
-    log(`❌ Erro crítico na validação: ${error.message}`, 'red');
+    log(`â�Å’ Erro crÃ­tico na validaÃ§Ã£o: ${error.message}`, 'red');
     process.exit(1);
   });
 }

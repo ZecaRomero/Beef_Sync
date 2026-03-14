@@ -12,11 +12,11 @@ async function buscarG3032() {
   const client = await pool.connect();
   
   try {
-    console.log('🔍 BUSCANDO G 3032\n');
+    console.log('�Ÿ”� BUSCANDO G 3032\n');
     console.log('='.repeat(80));
     
     // 1. Buscar na NF 230
-    console.log('\n📋 1. VERIFICANDO NF 230:');
+    console.log('\n�Ÿ“‹ 1. VERIFICANDO NF 230:');
     const nfResult = await client.query(`
       SELECT id, numero_nf, fornecedor
       FROM notas_fiscais
@@ -24,16 +24,16 @@ async function buscarG3032() {
     `);
     
     if (nfResult.rows.length === 0) {
-      console.log('❌ NF 230 não encontrada!');
+      console.log('�Œ NF 230 não encontrada!');
       return;
     }
     
     const nf = nfResult.rows[0];
-    console.log(`✅ NF 230 encontrada (ID: ${nf.id})`);
+    console.log(`�œ… NF 230 encontrada (ID: ${nf.id})`);
     console.log(`   Fornecedor: ${nf.fornecedor}`);
     
     // 2. Buscar todos os itens da NF 230
-    console.log('\n📦 2. TODOS OS ITENS DA NF 230:');
+    console.log('\n�Ÿ“� 2. TODOS OS ITENS DA NF 230:');
     const itensResult = await client.query(`
       SELECT id, tipo_produto, dados_item
       FROM notas_fiscais_itens
@@ -56,7 +56,7 @@ async function buscarG3032() {
         // Verificar se é G 3032
         if (tatuagem.includes('3032')) {
           encontrouG3032 = true;
-          console.log(`✅ ${idx + 1}. ENCONTRADA! Tatuagem: ${tatuagem}`);
+          console.log(`�œ… ${idx + 1}. ENCONTRADA! Tatuagem: ${tatuagem}`);
           console.log(`   ID do item: ${item.id}`);
           console.log(`   Tipo: ${item.tipo_produto}`);
           console.log(`   Dados completos:`, JSON.stringify(dados, null, 2));
@@ -64,16 +64,16 @@ async function buscarG3032() {
           console.log(`${idx + 1}. Tatuagem: ${tatuagem}`);
         }
       } catch (e) {
-        console.log(`${idx + 1}. ⚠️ Erro ao parsear dados_item`);
+        console.log(`${idx + 1}. �š�️ Erro ao parsear dados_item`);
       }
     });
     
     if (!encontrouG3032) {
-      console.log('\n❌ G 3032 NÃO ENCONTRADA na NF 230!');
+      console.log('\n�Œ G 3032 N�ƒO ENCONTRADA na NF 230!');
     }
     
     // 3. Buscar G 3032 em TODAS as NFs
-    console.log('\n\n🔍 3. BUSCANDO G 3032 EM TODAS AS NFs:');
+    console.log('\n\n�Ÿ”� 3. BUSCANDO G 3032 EM TODAS AS NFs:');
     const todasNFsResult = await client.query(`
       SELECT 
         nf.numero_nf,
@@ -99,15 +99,15 @@ async function buscarG3032() {
           console.log(`   Item ID: ${row.item_id}`);
           console.log('');
         } catch (e) {
-          console.log(`${idx + 1}. ⚠️ Erro ao parsear dados_item`);
+          console.log(`${idx + 1}. �š�️ Erro ao parsear dados_item`);
         }
       });
     } else {
-      console.log('❌ G 3032 não encontrada em nenhuma NF!');
+      console.log('�Œ G 3032 não encontrada em nenhuma NF!');
     }
     
     // 4. Buscar na tabela animais
-    console.log('\n🐮 4. BUSCANDO NA TABELA ANIMAIS:');
+    console.log('\n�Ÿ�� 4. BUSCANDO NA TABELA ANIMAIS:');
     const animaisResult = await client.query(`
       SELECT id, serie, rg, tatuagem, nome, fornecedor
       FROM animais
@@ -124,14 +124,14 @@ async function buscarG3032() {
         console.log('');
       });
     } else {
-      console.log('❌ G 3032 não encontrada na tabela animais');
+      console.log('�Œ G 3032 não encontrada na tabela animais');
     }
     
     console.log('\n' + '='.repeat(80));
-    console.log('\n✅ Busca concluída!');
+    console.log('\n�œ… Busca concluída!');
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
     console.error(error);
   } finally {
     client.release();

@@ -76,13 +76,13 @@ export default function RegistrarVendaPage() {
               Registrar venda
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-              {serie && rg ? `Animal: ${ident}` : 'Preencha a identificação e os dados da venda.'}
+              {serie && rg ? `Animal: ${ident}` : 'Preencha a identificaÃ§Ã£o e os dados da venda.'}
             </p>
             <form onSubmit={handleSubmit} className="space-y-4">
               {(!serie || !rg) && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Série</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">SÃ©rie</label>
                     <input
                       type="text"
                       value={form.serie || ''}
@@ -143,7 +143,7 @@ export default function RegistrarVendaPage() {
                   value={form.numero_nf}
                   onChange={e => setForm(f => ({ ...f, numero_nf: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="Número da NF"
+                  placeholder="NÃºmero da NF"
                 />
               </div>
               {error && (
@@ -153,7 +153,7 @@ export default function RegistrarVendaPage() {
               )}
               {result && (
                 <div className="p-3 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 text-sm">
-                  ✅ {result.message} Redirecionando...
+                  âÅ“â€¦ {result.message} Redirecionando...
                 </div>
               )}
               <button

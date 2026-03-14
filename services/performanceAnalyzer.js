@@ -1,4 +1,4 @@
-// Sistema de análise de performance para Beef Sync
+// Sistema de anÃ¡lise de performance para Beef Sync
 import { query } from '../lib/database'
 
 class PerformanceAnalyzer {
@@ -18,10 +18,10 @@ class PerformanceAnalyzer {
   startMonitoring() {
     if (this.isMonitoring) return
 
-    console.log('📊 Iniciando monitoramento de performance...')
+    console.log('ðÅ¸â€œÅ  Iniciando monitoramento de performance...')
     this.isMonitoring = true
 
-    // Monitorar métricas a cada 30 segundos
+    // Monitorar mÃ©tricas a cada 30 segundos
     this.monitoringInterval = setInterval(() => {
       this.collectMetrics()
     }, 30000)
@@ -37,10 +37,10 @@ class PerformanceAnalyzer {
       this.monitoringInterval = null
     }
     this.isMonitoring = false
-    console.log('⏹️ Monitoramento de performance parado')
+    console.log('â�¹ï¸� Monitoramento de performance parado')
   }
 
-  // Coletar métricas do sistema
+  // Coletar mÃ©tricas do sistema
   async collectMetrics() {
     try {
       const metrics = {
@@ -53,7 +53,7 @@ class PerformanceAnalyzer {
       this.metrics.memoryUsage.push(metrics.memory)
       this.metrics.cpuUsage.push(metrics.cpu)
 
-      // Manter apenas as últimas 100 medições
+      // Manter apenas as Ãºltimas 100 mediÃ§Ãµes
       if (this.metrics.memoryUsage.length > 100) {
         this.metrics.memoryUsage = this.metrics.memoryUsage.slice(-100)
       }
@@ -62,21 +62,21 @@ class PerformanceAnalyzer {
       }
 
     } catch (error) {
-      console.error('❌ Erro ao coletar métricas:', error)
+      console.error('â�Å’ Erro ao coletar mÃ©tricas:', error)
     }
   }
 
   // Monitorar queries do banco de dados
   monitorQueries() {
-    // Não podemos reatribuir importações ES6, então vamos usar uma abordagem diferente
-    console.log('📊 Monitoramento de queries ativado (modo observação)')
-    // TODO: Implementar interceptação de queries de forma compatível com ES6
+    // NÃ£o podemos reatribuir importaÃ§Ãµes ES6, entÃ£o vamos usar uma abordagem diferente
+    console.log('ðÅ¸â€œÅ  Monitoramento de queries ativado (modo observaÃ§Ã£o)')
+    // TODO: Implementar interceptaÃ§Ã£o de queries de forma compatÃ­vel com ES6
   }
 
   // Analisar performance do banco de dados
   async analyzeDatabasePerformance() {
     try {
-      console.log('🔍 Analisando performance do banco de dados...')
+      console.log('ðÅ¸â€�� Analisando performance do banco de dados...')
 
       const analysis = {
         timestamp: new Date(),
@@ -90,19 +90,19 @@ class PerformanceAnalyzer {
         errors: {
           total: this.metrics.errors.length,
           recent: this.metrics.errors.filter(e => 
-            new Date() - new Date(e.timestamp) < 3600000 // Última hora
+            new Date() - new Date(e.timestamp) < 3600000 // ÃÅ¡ltima hora
           ).length
         },
         recommendations: []
       }
 
-      // Gerar recomendações
+      // Gerar recomendaÃ§Ãµes
       if (analysis.queries.slow > analysis.queries.total * 0.1) {
         analysis.recommendations.push({
           type: 'performance',
           priority: 'high',
           message: `${analysis.queries.slow} queries lentas detectadas`,
-          action: 'Otimizar queries ou adicionar índices'
+          action: 'Otimizar queries ou adicionar Ã­ndices'
         })
       }
 
@@ -110,7 +110,7 @@ class PerformanceAnalyzer {
         analysis.recommendations.push({
           type: 'reliability',
           priority: 'high',
-          message: `${analysis.errors.recent} erros na última hora`,
+          message: `${analysis.errors.recent} erros na Ãºltima hora`,
           action: 'Investigar e corrigir problemas de banco'
         })
       }
@@ -119,23 +119,23 @@ class PerformanceAnalyzer {
         analysis.recommendations.push({
           type: 'performance',
           priority: 'medium',
-          message: `Tempo médio de query: ${analysis.queries.average.toFixed(2)}ms`,
-          action: 'Considerar otimizações de performance'
+          message: `Tempo mÃ©dio de query: ${analysis.queries.average.toFixed(2)}ms`,
+          action: 'Considerar otimizaÃ§Ãµes de performance'
         })
       }
 
       return analysis
 
     } catch (error) {
-      console.error('❌ Erro ao analisar performance do banco:', error)
+      console.error('â�Å’ Erro ao analisar performance do banco:', error)
       return null
     }
   }
 
-  // Analisar performance da aplicação
+  // Analisar performance da aplicaÃ§Ã£o
   async analyzeApplicationPerformance() {
     try {
-      console.log('🔍 Analisando performance da aplicação...')
+      console.log('ðÅ¸â€�� Analisando performance da aplicaÃ§Ã£o...')
 
       const analysis = {
         timestamp: new Date(),
@@ -153,13 +153,13 @@ class PerformanceAnalyzer {
         recommendations: []
       }
 
-      // Gerar recomendações
+      // Gerar recomendaÃ§Ãµes
       if (analysis.memory.current.heapUsed > 100 * 1024 * 1024) { // 100MB
         analysis.recommendations.push({
           type: 'memory',
           priority: 'medium',
-          message: `Uso de memória alto: ${(analysis.memory.current.heapUsed / 1024 / 1024).toFixed(2)}MB`,
-          action: 'Monitorar vazamentos de memória'
+          message: `Uso de memÃ³ria alto: ${(analysis.memory.current.heapUsed / 1024 / 1024).toFixed(2)}MB`,
+          action: 'Monitorar vazamentos de memÃ³ria'
         })
       }
 
@@ -167,15 +167,15 @@ class PerformanceAnalyzer {
         analysis.recommendations.push({
           type: 'maintenance',
           priority: 'low',
-          message: `Sistema rodando há ${Math.floor(analysis.uptime / 3600)} horas`,
-          action: 'Considerar reinicialização preventiva'
+          message: `Sistema rodando hÃ¡ ${Math.floor(analysis.uptime / 3600)} horas`,
+          action: 'Considerar reinicializaÃ§Ã£o preventiva'
         })
       }
 
       return analysis
 
     } catch (error) {
-      console.error('❌ Erro ao analisar performance da aplicação:', error)
+      console.error('â�Å’ Erro ao analisar performance da aplicaÃ§Ã£o:', error)
       return null
     }
   }
@@ -183,7 +183,7 @@ class PerformanceAnalyzer {
   // Analisar performance geral do sistema
   async analyzeSystemPerformance() {
     try {
-      console.log('🔍 Analisando performance geral do sistema...')
+      console.log('ðÅ¸â€�� Analisando performance geral do sistema...')
 
       const [dbAnalysis, appAnalysis] = await Promise.all([
         this.analyzeDatabasePerformance(),
@@ -220,7 +220,7 @@ class PerformanceAnalyzer {
       analysis.overall.score = Math.max(0, score)
       analysis.overall.recommendations = allRecommendations
 
-      // Determinar saúde geral
+      // Determinar saÃºde geral
       if (score >= 80) analysis.overall.health = 'excellent'
       else if (score >= 60) analysis.overall.health = 'good'
       else if (score >= 40) analysis.overall.health = 'fair'
@@ -229,18 +229,18 @@ class PerformanceAnalyzer {
       return analysis
 
     } catch (error) {
-      console.error('❌ Erro ao analisar performance geral:', error)
+      console.error('â�Å’ Erro ao analisar performance geral:', error)
       return null
     }
   }
 
-  // Calcular média
+  // Calcular mÃ©dia
   calculateAverage(numbers) {
     if (numbers.length === 0) return 0
     return numbers.reduce((sum, num) => sum + num, 0) / numbers.length
   }
 
-  // Obter métricas em tempo real
+  // Obter mÃ©tricas em tempo real
   getRealTimeMetrics() {
     return {
       timestamp: new Date(),
@@ -248,14 +248,14 @@ class PerformanceAnalyzer {
       queries: {
         total: this.metrics.queries.length,
         recent: this.metrics.queries.filter(q => 
-          new Date() - new Date(q.timestamp) < 300000 // Últimos 5 minutos
+          new Date() - new Date(q.timestamp) < 300000 // ÃÅ¡ltimos 5 minutos
         ).length,
         average: this.calculateAverage(this.metrics.queries.slice(-10).map(q => q.duration))
       },
       errors: {
         total: this.metrics.errors.length,
         recent: this.metrics.errors.filter(e => 
-          new Date() - new Date(e.timestamp) < 300000 // Últimos 5 minutos
+          new Date() - new Date(e.timestamp) < 300000 // ÃÅ¡ltimos 5 minutos
         ).length
       },
       memory: process.memoryUsage(),
@@ -263,7 +263,7 @@ class PerformanceAnalyzer {
     }
   }
 
-  // Limpar métricas antigas
+  // Limpar mÃ©tricas antigas
   cleanupOldMetrics() {
     const oneHourAgo = new Date(Date.now() - 3600000)
     
@@ -278,16 +278,16 @@ class PerformanceAnalyzer {
     this.metrics.memoryUsage = this.metrics.memoryUsage.slice(-50)
     this.metrics.cpuUsage = this.metrics.cpuUsage.slice(-50)
     
-    console.log('🧹 Métricas antigas removidas')
+    console.log('ðÅ¸§¹ MÃ©tricas antigas removidas')
   }
 
-  // Gerar relatório de performance
+  // Gerar relatÃ³rio de performance
   async generatePerformanceReport() {
     try {
       const analysis = await this.analyzeSystemPerformance()
       
       if (!analysis) {
-        throw new Error('Não foi possível gerar análise de performance')
+        throw new Error('NÃ£o foi possÃ­vel gerar anÃ¡lise de performance')
       }
 
       const report = {
@@ -305,12 +305,12 @@ class PerformanceAnalyzer {
       return report
 
     } catch (error) {
-      console.error('❌ Erro ao gerar relatório de performance:', error)
+      console.error('â�Å’ Erro ao gerar relatÃ³rio de performance:', error)
       return null
     }
   }
 
-  // Gerar próximos passos baseados nas recomendações
+  // Gerar prÃ³ximos passos baseados nas recomendaÃ§Ãµes
   generateNextSteps(recommendations) {
     const nextSteps = []
 
@@ -323,10 +323,10 @@ class PerformanceAnalyzer {
           nextSteps.push('Investigar e corrigir erros do sistema')
           break
         case 'memory':
-          nextSteps.push('Monitorar uso de memória')
+          nextSteps.push('Monitorar uso de memÃ³ria')
           break
         case 'maintenance':
-          nextSteps.push('Planejar manutenção preventiva')
+          nextSteps.push('Planejar manutenÃ§Ã£o preventiva')
           break
       }
     })
@@ -335,7 +335,7 @@ class PerformanceAnalyzer {
   }
 }
 
-// Instância singleton
+// InstÃ¢ncia singleton
 const performanceAnalyzer = new PerformanceAnalyzer()
 
 export default performanceAnalyzer

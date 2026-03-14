@@ -27,7 +27,7 @@ export default function FormularioBovino({
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <h4 className="font-semibold text-green-900 dark:text-green-100">
-            🐄 Adicionar Bovino
+            ðÅ¸�â€ž Adicionar Bovino
           </h4>
           {setManterSerieAutomaticamente && (
             <label className="inline-flex items-center cursor-pointer ml-2">
@@ -38,7 +38,7 @@ export default function FormularioBovino({
                 className="sr-only peer"
               />
               <div className="relative w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-green-600"></div>
-              <span className="ms-2 text-xs font-medium text-gray-700 dark:text-gray-300">Série Automática</span>
+              <span className="ms-2 text-xs font-medium text-gray-700 dark:text-gray-300">SÃ©rie AutomÃ¡tica</span>
             </label>
           )}
         </div>
@@ -79,7 +79,7 @@ export default function FormularioBovino({
       {modoCadastro === 'categoria' && (
         <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-800">
           <p className="text-xs text-blue-800 dark:text-blue-200">
-            📋 <strong>Modo Categoria:</strong> Cadastre animais agrupados por tipo, sexo e faixa etária, sem necessidade de tatuagem individual (como na NF).
+            ðÅ¸â€œâ€¹ <strong>Modo Categoria:</strong> Cadastre animais agrupados por tipo, sexo e faixa etÃ¡ria, sem necessidade de tatuagem individual (como na NF).
           </p>
         </div>
       )}
@@ -104,10 +104,10 @@ export default function FormularioBovino({
           !ehReceptoras && (
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Tatuagem/Identificação *
+                Tatuagem/IdentificaÃ§Ã£o *
                 {tipo === 'saida' && (
                   <span className="text-xs text-blue-600 dark:text-blue-400 ml-2">
-                    🔍 Buscar animal cadastrado
+                    ðÅ¸â€�� Buscar animal cadastrado
                   </span>
                 )}
               </label>
@@ -149,7 +149,7 @@ export default function FormularioBovino({
                           {animal.serie}{animal.rg}
                         </div>
                         <div className="text-sm text-gray-600 dark:text-gray-400">
-                          {animal.raca} • {animal.sexo} • {animal.peso || 'N/A'}kg
+                          {animal.raca} ââ‚¬¢ {animal.sexo} ââ‚¬¢ {animal.peso || 'N/A'}kg
                         </div>
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400">
@@ -161,14 +161,14 @@ export default function FormularioBovino({
               </div>
             )}
             
-            {/* Mensagem quando não encontrar animais */}
+            {/* Mensagem quando nÃ£o encontrar animais */}
             {tipo === 'saida' && mostrarListaAnimais && buscaAnimais.length > 0 && filtrarAnimais().length === 0 && (
               <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg p-3">
                 <div className="text-yellow-600 dark:text-yellow-400 text-sm">
-                  ⚠️ Animal não encontrado
+                  âÅ¡ ï¸� Animal nÃ£o encontrado
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  O animal será cadastrado automaticamente ao salvar a nota.
+                  O animal serÃ¡ cadastrado automaticamente ao salvar a nota.
                 </div>
               </div>
             )}
@@ -177,10 +177,10 @@ export default function FormularioBovino({
             {tipo === 'saida' && animalSelecionado && (
               <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg">
                 <div className="text-sm text-green-800 dark:text-green-200">
-                  ✅ <strong>Animal selecionado:</strong> {animalSelecionado.serie}{animalSelecionado.rg}
+                  âÅ“â€¦ <strong>Animal selecionado:</strong> {animalSelecionado.serie}{animalSelecionado.rg}
                 </div>
                 <div className="text-xs text-green-600 dark:text-green-300 mt-1">
-                  {animalSelecionado.raca} • {animalSelecionado.sexo} • {animalSelecionado.peso || 'N/A'}kg • {animalSelecionado.situacao}
+                  {animalSelecionado.raca} ââ‚¬¢ {animalSelecionado.sexo} ââ‚¬¢ {animalSelecionado.peso || 'N/A'}kg ââ‚¬¢ {animalSelecionado.situacao}
                 </div>
               </div>
               )}
@@ -212,7 +212,7 @@ export default function FormularioBovino({
             Sexo *
             {ehReceptoras && (
               <span className="text-xs text-pink-600 dark:text-pink-400 ml-2">
-                🤰 Auto-preenchido para Receptoras
+                ðÅ¸¤° Auto-preenchido para Receptoras
               </span>
             )}
           </label>
@@ -226,7 +226,7 @@ export default function FormularioBovino({
           >
             <option value="">Selecione...</option>
             <option value="macho">Macho</option>
-            <option value="femea">Fêmea</option>
+            <option value="femea">FÃªmea</option>
           </select>
         </div>
 
@@ -235,7 +235,7 @@ export default function FormularioBovino({
             Era *
             {ehReceptoras && itens.length > 0 && (
               <span className="text-xs text-blue-600 dark:text-blue-400 ml-2">
-                💡 Copiado do 1º (edite se mudar)
+                ðÅ¸â€™¡ Copiado do 1Âº (edite se mudar)
               </span>
             )}
           </label>
@@ -253,10 +253,10 @@ export default function FormularioBovino({
 
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Raça
+            RaÃ§a
             {ehReceptoras && (
               <span className="text-xs text-pink-600 dark:text-pink-400 ml-2">
-                🤰 Auto-preenchido para Receptoras
+                ðÅ¸¤° Auto-preenchido para Receptoras
               </span>
             )}
           </label>
@@ -296,10 +296,10 @@ export default function FormularioBovino({
 
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Valor Unitário * (R$)
+            Valor UnitÃ¡rio * (R$)
             {ehReceptoras && itens.length > 0 && (
               <span className="text-xs text-blue-600 dark:text-blue-400 ml-2">
-                💡 Copiado do 1º (edite se mudar)
+                ðÅ¸â€™¡ Copiado do 1Âº (edite se mudar)
               </span>
             )}
           </label>

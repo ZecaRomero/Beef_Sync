@@ -8,7 +8,7 @@ const pool = new Pool({
 })
 
 async function runMigration() {
-  console.log('🚀 Iniciando migração da tabela de feedbacks...')
+  console.log('�Ÿš€ Iniciando migração da tabela de feedbacks...')
   
   try {
     // Ler o arquivo SQL
@@ -18,8 +18,8 @@ async function runMigration() {
     // Executar a migração
     await pool.query(sql)
     
-    console.log('✅ Tabela de feedbacks criada com sucesso!')
-    console.log('📋 Estrutura:')
+    console.log('�œ… Tabela de feedbacks criada com sucesso!')
+    console.log('�Ÿ“‹ Estrutura:')
     console.log('   - id (SERIAL PRIMARY KEY)')
     console.log('   - nome (VARCHAR)')
     console.log('   - sugestao (TEXT)')
@@ -30,7 +30,7 @@ async function runMigration() {
     console.log('   - updated_at (TIMESTAMP)')
     
   } catch (error) {
-    console.error('❌ Erro ao executar migração:', error.message)
+    console.error('�Œ Erro ao executar migração:', error.message)
     process.exit(1)
   } finally {
     await pool.end()

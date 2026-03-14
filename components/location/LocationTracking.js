@@ -40,7 +40,7 @@ const LocationTracking = () => {
         lastUpdate: '14/01/2025 15:30'
       })
     } catch (error) {
-      console.error('Erro ao carregar dados de localização:', error)
+      console.error('Erro ao carregar dados de localizaÃ§Ã£o:', error)
     }
   }
 
@@ -152,7 +152,7 @@ const LocationTracking = () => {
         id: 3,
         type: 'no_signal',
         animal: 'Touro 567',
-        message: 'Sem sinal do dispositivo há mais de 2 horas',
+        message: 'Sem sinal do dispositivo hÃ¡ mais de 2 horas',
         time: '12:30',
         severity: 'high'
       }
@@ -212,7 +212,7 @@ const LocationTracking = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <ClockIcon className="h-4 w-4 mr-2" />
-              <span>Última atualização: {animal.lastSeen}</span>
+              <span>ÃÅ¡ltima atualizaÃ§Ã£o: {animal.lastSeen}</span>
             </div>
             <div className={`flex items-center ${getBatteryColor(animal.batteryLevel)}`}>
               <SignalIcon className="h-4 w-4 mr-1" />
@@ -237,7 +237,7 @@ const LocationTracking = () => {
 
     const getStatusText = (status) => {
       switch (status) {
-        case 'optimal': return 'Ótimo'
+        case 'optimal': return 'Ãâ€œtimo'
         case 'good': return 'Bom'
         case 'crowded': return 'Lotado'
         case 'resting': return 'Descanso'
@@ -261,7 +261,7 @@ const LocationTracking = () => {
         <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
           <div className="flex items-center justify-between">
             <span>Animais: {pasture.animalsCount}/{pasture.capacity}</span>
-            <span>Área: {pasture.area}</span>
+            <span>Ã�rea: {pasture.area}</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div 
@@ -274,7 +274,7 @@ const LocationTracking = () => {
           </div>
           <div className="flex items-center">
             <ArrowPathIcon className="h-4 w-4 mr-2" />
-            <span>Última rotação: {pasture.lastRotation}</span>
+            <span>ÃÅ¡ltima rotaÃ§Ã£o: {pasture.lastRotation}</span>
           </div>
         </div>
       </div>
@@ -323,19 +323,19 @@ const LocationTracking = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
             <MapPinIcon className="h-8 w-8 text-blue-600 mr-3" />
-            Rastreamento e Localização
+            Rastreamento e LocalizaÃ§Ã£o
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Monitoramento em tempo real da localização do rebanho
+            Monitoramento em tempo real da localizaÃ§Ã£o do rebanho
           </p>
         </div>
         <div className="text-right">
-          <p className="text-sm text-gray-600 dark:text-gray-400">Última atualização</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">ÃÅ¡ltima atualizaÃ§Ã£o</p>
           <p className="text-sm font-medium text-gray-900 dark:text-white">{locationData.lastUpdate}</p>
         </div>
       </div>
 
-      {/* Estatísticas */}
+      {/* EstatÃ­sticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Total de Animais"
@@ -363,14 +363,14 @@ const LocationTracking = () => {
           value={locationData.alertsCount}
           icon={ExclamationTriangleIcon}
           color="text-red-600"
-          subtitle="Requer atenção"
+          subtitle="Requer atenÃ§Ã£o"
         />
       </div>
 
-      {/* Localização dos Animais */}
+      {/* LocalizaÃ§Ã£o dos Animais */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Localização dos Animais
+          LocalizaÃ§Ã£o dos Animais
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {animalLocations.map(animal => (
@@ -391,10 +391,10 @@ const LocationTracking = () => {
         </div>
       </div>
 
-      {/* Alertas de Localização */}
+      {/* Alertas de LocalizaÃ§Ã£o */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Alertas de Localização
+          Alertas de LocalizaÃ§Ã£o
         </h2>
         <div className="space-y-3">
           {locationAlerts.map(alert => (
@@ -403,7 +403,7 @@ const LocationTracking = () => {
         </div>
       </div>
 
-      {/* Ações Rápidas */}
+      {/* AÃ§Ãµes RÃ¡pidas */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <button className="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-xl shadow-lg transition-colors">
           <MapPinIcon className="h-8 w-8 mx-auto mb-3" />
@@ -419,14 +419,14 @@ const LocationTracking = () => {
         
         <button className="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-xl shadow-lg transition-colors">
           <ArrowPathIcon className="h-8 w-8 mx-auto mb-3" />
-          <h3 className="font-semibold">Rotação de Pastos</h3>
-          <p className="text-sm opacity-90 mt-1">Planejar movimentação</p>
+          <h3 className="font-semibold">RotaÃ§Ã£o de Pastos</h3>
+          <p className="text-sm opacity-90 mt-1">Planejar movimentaÃ§Ã£o</p>
         </button>
         
         <button className="bg-indigo-600 hover:bg-indigo-700 text-white p-6 rounded-xl shadow-lg transition-colors">
           <EyeIcon className="h-8 w-8 mx-auto mb-3" />
-          <h3 className="font-semibold">Relatório</h3>
-          <p className="text-sm opacity-90 mt-1">Histórico de localização</p>
+          <h3 className="font-semibold">RelatÃ³rio</h3>
+          <p className="text-sm opacity-90 mt-1">HistÃ³rico de localizaÃ§Ã£o</p>
         </button>
       </div>
     </div>

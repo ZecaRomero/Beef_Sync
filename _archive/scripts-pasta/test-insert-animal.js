@@ -12,11 +12,11 @@ async function testInsert() {
   const client = await pool.connect();
   
   try {
-    console.log('🧪 Testando INSERT direto no banco...');
+    console.log('�Ÿ�� Testando INSERT direto no banco...');
     
     // Verificar quantos animais existem antes
     const antes = await client.query('SELECT COUNT(*) as total FROM animais');
-    console.log(`📊 Animais antes do teste: ${antes.rows[0].total}`);
+    console.log(`�Ÿ“Š Animais antes do teste: ${antes.rows[0].total}`);
     
     // Tentar inserir um animal de teste
     const testAnimal = {
@@ -27,7 +27,7 @@ async function testInsert() {
       situacao: 'Ativo'
     };
     
-    console.log('📝 Inserindo animal de teste:', testAnimal);
+    console.log('�Ÿ“� Inserindo animal de teste:', testAnimal);
     
     const insertQuery = `
       INSERT INTO animais (
@@ -45,7 +45,7 @@ async function testInsert() {
     ]);
     
     const insertedAnimal = result.rows[0];
-    console.log('✅ Animal inserido:', insertedAnimal);
+    console.log('�œ… Animal inserido:', insertedAnimal);
     
     // Verificar se foi salvo
     const verificar = await client.query(
@@ -54,29 +54,29 @@ async function testInsert() {
     );
     
     if (verificar.rows.length > 0) {
-      console.log('✅ Animal encontrado no banco:', verificar.rows[0]);
+      console.log('�œ… Animal encontrado no banco:', verificar.rows[0]);
     } else {
-      console.error('❌ Animal NÃO encontrado após INSERT!');
+      console.error('�Œ Animal N�ƒO encontrado após INSERT!');
     }
     
     // Contar novamente
     const depois = await client.query('SELECT COUNT(*) as total FROM animais');
-    console.log(`📊 Animais depois do teste: ${depois.rows[0].total}`);
+    console.log(`�Ÿ“Š Animais depois do teste: ${depois.rows[0].total}`);
     
     // Limpar - remover animal de teste
     await client.query('DELETE FROM animais WHERE serie = $1 AND rg = $2', [
       testAnimal.serie,
       testAnimal.rg
     ]);
-    console.log('🧹 Animal de teste removido');
+    console.log('�Ÿ�� Animal de teste removido');
     
     const final = await client.query('SELECT COUNT(*) as total FROM animais');
-    console.log(`📊 Animais após limpeza: ${final.rows[0].total}`);
+    console.log(`�Ÿ“Š Animais após limpeza: ${final.rows[0].total}`);
     
-    console.log('✅ Teste concluído com sucesso!');
+    console.log('�œ… Teste concluído com sucesso!');
     
   } catch (error) {
-    console.error('❌ Erro no teste:', error);
+    console.error('�Œ Erro no teste:', error);
     console.error('Stack:', error.stack);
   } finally {
     client.release();

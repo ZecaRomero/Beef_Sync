@@ -37,7 +37,7 @@ const HealthMonitoring = () => {
         mortalityRate: 1.2
       })
     } catch (error) {
-      console.error('Erro ao carregar dados sanitários:', error)
+      console.error('Erro ao carregar dados sanitÃ¡rios:', error)
     }
   }
 
@@ -80,14 +80,14 @@ const HealthMonitoring = () => {
         id: 2,
         type: 'warning',
         animal: 'Touro 456',
-        condition: 'Claudicação observada',
+        condition: 'ClaudicaÃ§Ã£o observada',
         date: '2025-01-13'
       },
       {
         id: 3,
         type: 'info',
         animal: 'Bezerra 789',
-        condition: 'Exame de rotina necessário',
+        condition: 'Exame de rotina necessÃ¡rio',
         date: '2025-01-12'
       }
     ])
@@ -124,7 +124,7 @@ const HealthMonitoring = () => {
       switch (status) {
         case 'pending': return 'Pendente'
         case 'scheduled': return 'Agendada'
-        case 'completed': return 'Concluída'
+        case 'completed': return 'ConcluÃ­da'
         default: return 'Desconhecido'
       }
     }
@@ -182,15 +182,15 @@ const HealthMonitoring = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
             <ShieldCheckIcon className="h-8 w-8 text-emerald-600 mr-3" />
-            Monitoramento Sanitário
+            Monitoramento SanitÃ¡rio
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Controle de saúde e bem-estar do rebanho
+            Controle de saÃºde e bem-estar do rebanho
           </p>
         </div>
       </div>
 
-      {/* Estatísticas */}
+      {/* EstatÃ­sticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <StatCard
           title="Em Quarentena"
@@ -200,39 +200,39 @@ const HealthMonitoring = () => {
           subtitle="Animais isolados"
         />
         <StatCard
-          title="Vacinações Pendentes"
+          title="VacinaÃ§Ãµes Pendentes"
           value={healthData.pendingVaccinations}
           icon={BeakerIcon}
           color="text-yellow-600"
-          subtitle="Próximos 30 dias"
+          subtitle="PrÃ³ximos 30 dias"
         />
         <StatCard
           title="Exames Recentes"
           value={healthData.recentExams}
           icon={DocumentTextIcon}
           color="text-blue-600"
-          subtitle="Últimos 7 dias"
+          subtitle="ÃÅ¡ltimos 7 dias"
         />
         <StatCard
-          title="Alertas de Saúde"
+          title="Alertas de SaÃºde"
           value={healthData.healthAlerts}
           icon={ExclamationTriangleIcon}
           color="text-orange-600"
-          subtitle="Requer atenção"
+          subtitle="Requer atenÃ§Ã£o"
         />
         <StatCard
           title="Taxa de Mortalidade"
           value={`${healthData.mortalityRate}%`}
           icon={ChartBarIcon}
           color="text-purple-600"
-          subtitle="Últimos 12 meses"
+          subtitle="ÃÅ¡ltimos 12 meses"
         />
       </div>
 
-      {/* Vacinações Programadas */}
+      {/* VacinaÃ§Ãµes Programadas */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Vacinações Programadas
+          VacinaÃ§Ãµes Programadas
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {vaccinations.map(vaccination => (
@@ -241,10 +241,10 @@ const HealthMonitoring = () => {
         </div>
       </div>
 
-      {/* Alertas de Saúde */}
+      {/* Alertas de SaÃºde */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Alertas de Saúde
+          Alertas de SaÃºde
         </h2>
         <div className="space-y-3">
           {healthAlerts.map(alert => (
@@ -253,11 +253,11 @@ const HealthMonitoring = () => {
         </div>
       </div>
 
-      {/* Ações Rápidas */}
+      {/* AÃ§Ãµes RÃ¡pidas */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <button className="bg-emerald-600 hover:bg-emerald-700 text-white p-6 rounded-xl shadow-lg transition-colors">
           <ShieldCheckIcon className="h-8 w-8 mx-auto mb-3" />
-          <h3 className="font-semibold">Nova Vacinação</h3>
+          <h3 className="font-semibold">Nova VacinaÃ§Ã£o</h3>
           <p className="text-sm opacity-90 mt-1">Registrar vacina</p>
         </button>
         
@@ -275,8 +275,8 @@ const HealthMonitoring = () => {
         
         <button className="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-xl shadow-lg transition-colors">
           <DocumentTextIcon className="h-8 w-8 mx-auto mb-3" />
-          <h3 className="font-semibold">Relatório</h3>
-          <p className="text-sm opacity-90 mt-1">Relatório sanitário</p>
+          <h3 className="font-semibold">RelatÃ³rio</h3>
+          <p className="text-sm opacity-90 mt-1">RelatÃ³rio sanitÃ¡rio</p>
         </button>
       </div>
     </div>

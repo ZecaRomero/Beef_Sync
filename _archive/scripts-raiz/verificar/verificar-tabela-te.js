@@ -29,7 +29,7 @@ async function verificarTabelaTE() {
         console.log(`- ${row.table_name}`);
       });
     } else {
-      console.log('❌ Nenhuma tabela encontrada');
+      console.log('�Œ Nenhuma tabela encontrada');
     }
     
     // Verificar estrutura da tabela transferencias_embrioes
@@ -71,7 +71,7 @@ async function verificarTabelaTE() {
           console.log(`  Touro: ${te.touro || 'N/A'}`);
           console.log(`  Status: ${te.status || 'N/A'}`);
         } else {
-          console.log(`\n❌ M ${rg}: Nenhuma TE encontrada`);
+          console.log(`\n�Œ M ${rg}: Nenhuma TE encontrada`);
         }
       }
       
@@ -92,11 +92,11 @@ async function verificarTabelaTE() {
       });
       
     } else {
-      console.log('❌ Tabela transferencias_embrioes não existe ou está vazia');
+      console.log('�Œ Tabela transferencias_embrioes não existe ou está vazia');
     }
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
   } finally {
     client.release();
     await pool.end();

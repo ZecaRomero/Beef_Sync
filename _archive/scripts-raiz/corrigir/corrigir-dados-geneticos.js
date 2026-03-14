@@ -9,7 +9,7 @@ const { query } = require('./lib/database')
 
 async function corrigirDadosGeneticos() {
   try {
-    console.log('\n🔧 Iniciando correção de dados genéticos...\n')
+    console.log('\n�Ÿ”� Iniciando correção de dados genéticos...\n')
     
     // Buscar animais com situacao_abcz numérico (indica importação errada)
     const result = await query(`
@@ -20,16 +20,16 @@ async function corrigirDadosGeneticos() {
     `)
     
     if (result.rows.length === 0) {
-      console.log('✅ Nenhum animal com dados incorretos encontrado!')
+      console.log('�œ… Nenhum animal com dados incorretos encontrado!')
       return
     }
     
-    console.log(`📋 Encontrados ${result.rows.length} animais com dados incorretos:\n`)
+    console.log(`�Ÿ“‹ Encontrados ${result.rows.length} animais com dados incorretos:\n`)
     
     let corrigidos = 0
     
     for (const animal of result.rows) {
-      console.log(`\n🔍 Animal: ${animal.serie} ${animal.rg} (${animal.nome || 'Sem nome'})`)
+      console.log(`\n�Ÿ”� Animal: ${animal.serie} ${animal.rg} (${animal.nome || 'Sem nome'})`)
       console.log('   Valores ANTES da correção:')
       console.log(`   - iABCZ: ${animal.abczg}`)
       console.log(`   - DECA: ${animal.deca}`)
@@ -55,7 +55,7 @@ async function corrigirDadosGeneticos() {
         WHERE id = $3
       `, [novoIqg, novoPtIqg, animal.id])
       
-      console.log('   ✅ Valores DEPOIS da correção:')
+      console.log('   �œ… Valores DEPOIS da correção:')
       console.log(`   - iABCZ: ${animal.abczg}`)
       console.log(`   - DECA: ${animal.deca}`)
       console.log(`   - IQG: ${novoIqg}`)
@@ -65,10 +65,10 @@ async function corrigirDadosGeneticos() {
       corrigidos++
     }
     
-    console.log(`\n✅ Correção concluída! ${corrigidos} animais corrigidos.\n`)
+    console.log(`\n�œ… Correção concluída! ${corrigidos} animais corrigidos.\n`)
     
   } catch (error) {
-    console.error('❌ Erro:', error.message)
+    console.error('�Œ Erro:', error.message)
     console.error(error)
   } finally {
     process.exit(0)

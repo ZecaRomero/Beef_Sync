@@ -1,5 +1,5 @@
 // Script para testar a busca da receptora 8251
-console.log('🔍 Testando busca de receptora 8251...\n');
+console.log('�Ÿ”� Testando busca de receptora 8251...\n');
 
 // Simular dados de receptoras (como viriam da API)
 const receptoras = [
@@ -63,18 +63,18 @@ const testes = [
   '2141'
 ];
 
-console.log('📋 Testando diferentes termos de busca:\n');
+console.log('�Ÿ“‹ Testando diferentes termos de busca:\n');
 
 testes.forEach(termo => {
   const resultado = buscarReceptoras(receptoras, termo);
   const encontrou = resultado.length > 0;
-  console.log(`${encontrou ? '✅' : '❌'} Busca por "${termo}": ${resultado.length} resultado(s)`);
+  console.log(`${encontrou ? '�œ…' : '�Œ'} Busca por "${termo}": ${resultado.length} resultado(s)`);
   if (encontrou) {
     resultado.forEach(r => {
-      console.log(`   → RG: ${r.rg}, Série: ${r.serie}, Nome: ${r.nome}`);
+      console.log(`   �†’ RG: ${r.rg}, Série: ${r.serie}, Nome: ${r.nome}`);
     });
   }
   console.log('');
 });
 
-console.log('✅ Teste concluído!');
+console.log('�œ… Teste concluído!');

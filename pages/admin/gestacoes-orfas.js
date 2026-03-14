@@ -25,17 +25,17 @@ export default function GestacoesOrfasAdmin() {
       if (response.ok) {
         setResultado(data)
       } else {
-        setErro(data.error || 'Erro ao verificar gestações')
+        setErro(data.error || 'Erro ao verificar gestaÃ§Ãµes')
       }
     } catch (error) {
-      setErro('Erro de conexão: ' + error.message)
+      setErro('Erro de conexÃ£o: ' + error.message)
     } finally {
       setLoading(false)
     }
   }
 
   const excluirGestacoes = async () => {
-    if (!confirm('Tem certeza que deseja excluir as gestações órfãs?')) {
+    if (!confirm('Tem certeza que deseja excluir as gestaÃ§Ãµes Ã³rfÃ£s?')) {
       return
     }
 
@@ -56,12 +56,12 @@ export default function GestacoesOrfasAdmin() {
 
       if (response.ok) {
         setResultado(data)
-        alert(`✅ ${data.total} gestação(ões) excluída(s) com sucesso!`)
+        alert(`âÅ“â€¦ ${data.total} gestaÃ§Ã£o(Ãµes) excluÃ­da(s) com sucesso!`)
       } else {
-        setErro(data.error || 'Erro ao excluir gestações')
+        setErro(data.error || 'Erro ao excluir gestaÃ§Ãµes')
       }
     } catch (error) {
-      setErro('Erro de conexão: ' + error.message)
+      setErro('Erro de conexÃ£o: ' + error.message)
     } finally {
       setLoading(false)
     }
@@ -69,7 +69,7 @@ export default function GestacoesOrfasAdmin() {
 
   const forcarSincronizacaoMobile = async () => {
     if (!animalRg) {
-      alert('⚠️ Informe o RG do animal')
+      alert('âÅ¡ ï¸� Informe o RG do animal')
       return
     }
 
@@ -91,15 +91,15 @@ export default function GestacoesOrfasAdmin() {
 
       if (response.ok) {
         setSyncResult(data.sync)
-        alert(`✅ Sincronização concluída!\n\n` +
-              `Gestações órfãs removidas: ${data.sync.gestacoesOrfasRemovidas}\n` +
-              `Gestações ativas: ${data.sync.gestacoesAtivas}\n\n` +
-              `Agora feche e abra o app mobile para ver as mudanças.`)
+        alert(`âÅ“â€¦ SincronizaÃ§Ã£o concluÃ­da!\n\n` +
+              `GestaÃ§Ãµes Ã³rfÃ£s removidas: ${data.sync.gestacoesOrfasRemovidas}\n` +
+              `GestaÃ§Ãµes ativas: ${data.sync.gestacoesAtivas}\n\n` +
+              `Agora feche e abra o app mobile para ver as mudanÃ§as.`)
       } else {
         setErro(data.error || 'Erro ao sincronizar')
       }
     } catch (error) {
-      setErro('Erro de conexão: ' + error.message)
+      setErro('Erro de conexÃ£o: ' + error.message)
     } finally {
       setLoading(false)
     }
@@ -108,13 +108,13 @@ export default function GestacoesOrfasAdmin() {
   return (
     <>
       <Head>
-        <title>Gestões Órfãs - Administração</title>
+        <title>GestÃµes Ãâ€œrfÃ£s - AdministraÃ§Ã£o</title>
       </Head>
 
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
-            🧹 Limpeza de Gestações Órfãs
+            ðÅ¸§¹ Limpeza de GestaÃ§Ãµes Ãâ€œrfÃ£s
           </h1>
 
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
@@ -142,7 +142,7 @@ export default function GestacoesOrfasAdmin() {
                   disabled={loading}
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  {loading ? '🔄 Verificando...' : '🔍 Verificar Gestações Órfãs'}
+                  {loading ? 'ðÅ¸â€�â€ž Verificando...' : 'ðÅ¸â€�� Verificar GestaÃ§Ãµes Ãâ€œrfÃ£s'}
                 </button>
 
                 {resultado && resultado.total > 0 && (
@@ -151,7 +151,7 @@ export default function GestacoesOrfasAdmin() {
                     disabled={loading}
                     className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    {loading ? '🔄 Excluindo...' : '🗑️ Excluir Gestações Órfãs'}
+                    {loading ? 'ðÅ¸â€�â€ž Excluindo...' : 'ðÅ¸â€”â€˜ï¸� Excluir GestaÃ§Ãµes Ãâ€œrfÃ£s'}
                   </button>
                 )}
               </div>
@@ -161,26 +161,26 @@ export default function GestacoesOrfasAdmin() {
                 disabled={loading || !animalRg}
                 className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {loading ? '🔄 Sincronizando...' : '📱 Forçar Sincronização Mobile'}
+                {loading ? 'ðÅ¸â€�â€ž Sincronizando...' : 'ðÅ¸â€œ± ForÃ§ar SincronizaÃ§Ã£o Mobile'}
               </button>
             </div>
           </div>
 
           {erro && (
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
-              <p className="text-red-800 dark:text-red-200 font-semibold">❌ Erro</p>
+              <p className="text-red-800 dark:text-red-200 font-semibold">â�Å’ Erro</p>
               <p className="text-red-600 dark:text-red-300">{erro}</p>
             </div>
           )}
 
           {syncResult && (
             <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-6">
-              <p className="text-green-800 dark:text-green-200 font-semibold">✅ Sincronização Concluída</p>
+              <p className="text-green-800 dark:text-green-200 font-semibold">âÅ“â€¦ SincronizaÃ§Ã£o ConcluÃ­da</p>
               <div className="text-green-700 dark:text-green-300 mt-2">
-                <p>Gestações órfãs removidas: {syncResult.gestacoesOrfasRemovidas}</p>
-                <p>Gestações ativas: {syncResult.gestacoesAtivas}</p>
+                <p>GestaÃ§Ãµes Ã³rfÃ£s removidas: {syncResult.gestacoesOrfasRemovidas}</p>
+                <p>GestaÃ§Ãµes ativas: {syncResult.gestacoesAtivas}</p>
                 <p className="mt-2 text-sm">Timestamp: {new Date(syncResult.timestamp).toLocaleString('pt-BR')}</p>
-                <p className="mt-2 font-semibold">📱 Feche e abra o app mobile para ver as mudanças</p>
+                <p className="mt-2 font-semibold">ðÅ¸â€œ± Feche e abra o app mobile para ver as mudanÃ§as</p>
               </div>
             </div>
           )}
@@ -188,7 +188,7 @@ export default function GestacoesOrfasAdmin() {
           {resultado && (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                📊 Resultado
+                ðÅ¸â€œÅ  Resultado
               </h2>
 
               <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
@@ -196,7 +196,7 @@ export default function GestacoesOrfasAdmin() {
                   {resultado.message}
                 </p>
                 <p className="text-blue-700 dark:text-blue-300">
-                  Total: {resultado.total} gestação(ões)
+                  Total: {resultado.total} gestaÃ§Ã£o(Ãµes)
                 </p>
               </div>
 
@@ -212,13 +212,13 @@ export default function GestacoesOrfasAdmin() {
                           Data Cobertura
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                          Situação
+                          SituaÃ§Ã£o
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                           Receptora
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                          Mãe
+                          MÃ£e
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                           Pai
@@ -257,15 +257,15 @@ export default function GestacoesOrfasAdmin() {
 
           <div className="mt-8 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
             <h3 className="text-lg font-semibold text-yellow-900 dark:text-yellow-100 mb-2">
-              ⚠️ Informações Importantes
+              âÅ¡ ï¸� InformaÃ§Ãµes Importantes
             </h3>
             <ul className="list-disc list-inside text-yellow-800 dark:text-yellow-200 space-y-1">
-              <li>Gestações órfãs são aquelas sem nascimento vinculado</li>
-              <li>Gestações com nascimentos NUNCA são excluídas</li>
-              <li>A exclusão é permanente e não pode ser desfeita</li>
+              <li>GestaÃ§Ãµes Ã³rfÃ£s sÃ£o aquelas sem nascimento vinculado</li>
+              <li>GestaÃ§Ãµes com nascimentos NUNCA sÃ£o excluÃ­das</li>
+              <li>A exclusÃ£o Ã© permanente e nÃ£o pode ser desfeita</li>
               <li>Sempre verifique antes de excluir</li>
-              <li>Use "Forçar Sincronização Mobile" após excluir para atualizar o app</li>
-              <li>Feche e abra o app mobile após a sincronização</li>
+              <li>Use "ForÃ§ar SincronizaÃ§Ã£o Mobile" apÃ³s excluir para atualizar o app</li>
+              <li>Feche e abra o app mobile apÃ³s a sincronizaÃ§Ã£o</li>
             </ul>
           </div>
         </div>

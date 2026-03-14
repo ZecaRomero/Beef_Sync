@@ -25,7 +25,7 @@ async function corrigirRacas() {
   const client = await pool.connect()
   
   try {
-    console.log('🔍 Verificando animais que precisam correção de raça...\n')
+    console.log('�Ÿ”� Verificando animais que precisam correção de raça...\n')
     
     let totalCorrigidos = 0
     
@@ -38,10 +38,10 @@ async function corrigirRacas() {
       `, [serie, racaCorreta])
       
       if (animaisIncorretos.rows.length > 0) {
-        console.log(`📋 Encontrados ${animaisIncorretos.rows.length} animais da série ${serie} com raça incorreta:`)
+        console.log(`�Ÿ“‹ Encontrados ${animaisIncorretos.rows.length} animais da série ${serie} com raça incorreta:`)
         
         for (const animal of animaisIncorretos.rows) {
-          console.log(`  - ${animal.serie}-${animal.rg}: ${animal.raca} → ${racaCorreta}`)
+          console.log(`  - ${animal.serie}-${animal.rg}: ${animal.raca} �†’ ${racaCorreta}`)
           
           // Atualizar raça
           await client.query(`
@@ -53,18 +53,18 @@ async function corrigirRacas() {
           totalCorrigidos++
         }
         
-        console.log(`✅ ${animaisIncorretos.rows.length} animais da série ${serie} corrigidos\n`)
+        console.log(`�œ… ${animaisIncorretos.rows.length} animais da série ${serie} corrigidos\n`)
       }
     }
     
     if (totalCorrigidos === 0) {
-      console.log('✅ Nenhum animal precisa de correção de raça!')
+      console.log('�œ… Nenhum animal precisa de correção de raça!')
     } else {
-      console.log(`\n🎉 Total de ${totalCorrigidos} animais corrigidos com sucesso!`)
+      console.log(`\n�ŸŽ‰ Total de ${totalCorrigidos} animais corrigidos com sucesso!`)
     }
     
   } catch (error) {
-    console.error('❌ Erro ao corrigir raças:', error)
+    console.error('�Œ Erro ao corrigir raças:', error)
     throw error
   } finally {
     client.release()
@@ -75,11 +75,11 @@ async function corrigirRacas() {
 // Executar
 corrigirRacas()
   .then(() => {
-    console.log('\n✅ Script concluído!')
+    console.log('\n�œ… Script concluído!')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n❌ Erro fatal:', error)
+    console.error('\n�Œ Erro fatal:', error)
     process.exit(1)
   })
 

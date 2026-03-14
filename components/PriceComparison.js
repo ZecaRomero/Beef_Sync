@@ -11,12 +11,12 @@ export default function PriceComparison() {
   const [loading, setLoading] = useState(true);
 
   const states = [
-    { code: "SP", name: "São Paulo" },
+    { code: "SP", name: "SÃ£o Paulo" },
     { code: "MG", name: "Minas Gerais" },
-    { code: "GO", name: "Goiás" },
+    { code: "GO", name: "GoiÃ¡s" },
     { code: "MT", name: "Mato Grosso" },
     { code: "MS", name: "Mato Grosso do Sul" },
-    { code: "PR", name: "Paraná" },
+    { code: "PR", name: "ParanÃ¡" },
     { code: "RS", name: "Rio Grande do Sul" },
     { code: "BA", name: "Bahia" },
   ];
@@ -37,7 +37,7 @@ export default function PriceComparison() {
       setRegionalPrices(regional);
       calculateComparison(market, regional);
     } catch (error) {
-      console.error("Erro ao carregar preços:", error);
+      console.error("Erro ao carregar preÃ§os:", error);
     } finally {
       setLoading(false);
     }
@@ -48,9 +48,9 @@ export default function PriceComparison() {
     const activeAnimals = [];
     const soldAnimals = [];
 
-    // Estimar peso médio por idade (simulado)
+    // Estimar peso mÃ©dio por idade (simulado)
     const estimateWeight = (months, sex) => {
-      const baseWeight = sex === "Macho" ? 15 : 12; // kg por mês
+      const baseWeight = sex === "Macho" ? 15 : 12; // kg por mÃªs
       return Math.min(months * baseWeight, sex === "Macho" ? 550 : 450);
     };
 
@@ -73,7 +73,7 @@ export default function PriceComparison() {
             ? regional.prices.bezerro_macho
             : regional.prices.bezerro_femea;
       } else {
-        // Garrote/Novilha (preço intermediário)
+        // Garrote/Novilha (preÃ§o intermediÃ¡rio)
         const adultPrice =
           animal.sexo === "Macho"
             ? regional.prices.boi_gordo * arrobas
@@ -83,7 +83,7 @@ export default function PriceComparison() {
             ? regional.prices.bezerro_macho
             : regional.prices.bezerro_femea;
 
-        // Interpolação linear baseada na idade
+        // InterpolaÃ§Ã£o linear baseada na idade
         const ageRatio = (animal.meses - 12) / (30 - 12);
         marketPrice = calfPrice + (adultPrice - calfPrice) * ageRatio;
       }
@@ -161,13 +161,13 @@ export default function PriceComparison() {
   const getRecommendationText = (rec) => {
     switch (rec) {
       case "sell":
-        return "🟢 Vender";
+        return "ðÅ¸Å¸¢ Vender";
       case "hold":
-        return "🟡 Manter";
+        return "ðÅ¸Å¸¡ Manter";
       case "improve":
-        return "🔴 Melhorar";
+        return "ðÅ¸â€�´ Melhorar";
       default:
-        return "⚪ Analisar";
+        return "âÅ¡ª Analisar";
     }
   };
 
@@ -175,9 +175,9 @@ export default function PriceComparison() {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700">
         <div className="text-center">
-          <div className="animate-spin text-4xl mb-4">💰</div>
+          <div className="animate-spin text-4xl mb-4">ðÅ¸â€™°</div>
           <div className="text-lg font-semibold text-gray-900 dark:text-white">
-            Analisando preços de mercado...
+            Analisando preÃ§os de mercado...
           </div>
         </div>
       </div>
@@ -191,15 +191,15 @@ export default function PriceComparison() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-              💰 Comparação de Preços
+              ðÅ¸â€™° ComparaÃ§Ã£o de PreÃ§os
             </h2>
             <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Compare seus animais com os preços atuais do mercado
+              Compare seus animais com os preÃ§os atuais do mercado
             </p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Estado/Região
+              Estado/RegiÃ£o
             </label>
             <select
               value={selectedState}
@@ -263,7 +263,7 @@ export default function PriceComparison() {
                 {comparison.summary.averageROI.toFixed(1)}%
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                ROI Médio Potencial
+                ROI MÃ©dio Potencial
               </div>
               <div className="text-xs text-gray-500 mt-2">Retorno estimado</div>
             </div>
@@ -287,7 +287,7 @@ export default function PriceComparison() {
       {comparison && (
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
-            🐄 Análise Individual - Animais Ativos
+            ðÅ¸�â€ž AnÃ¡lise Individual - Animais Ativos
           </h3>
 
           <div className="overflow-x-auto">
@@ -316,7 +316,7 @@ export default function PriceComparison() {
                     ROI Pot.
                   </th>
                   <th className="text-center p-3 font-semibold text-gray-900 dark:text-white">
-                    Recomendação
+                    RecomendaÃ§Ã£o
                   </th>
                 </tr>
               </thead>
@@ -331,7 +331,7 @@ export default function PriceComparison() {
                         {animal.serie} {animal.rg}
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400">
-                        {animal.raca} • {animal.sexo}
+                        {animal.raca} ââ‚¬¢ {animal.sexo}
                       </div>
                     </td>
                     <td className="p-3 text-center text-gray-600 dark:text-gray-400">
@@ -384,11 +384,11 @@ export default function PriceComparison() {
         </div>
       )}
 
-      {/* Análise de Vendas Passadas */}
+      {/* AnÃ¡lise de Vendas Passadas */}
       {comparison && comparison.salesAnalysis.length > 0 && (
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
-            📊 Performance vs Mercado - Vendas Realizadas
+            ðÅ¸â€œÅ  Performance vs Mercado - Vendas Realizadas
           </h3>
 
           <div className="space-y-4">
@@ -403,7 +403,7 @@ export default function PriceComparison() {
                       {animal.serie} {animal.rg}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                      {animal.raca} • {animal.sexo} • {animal.meses} meses
+                      {animal.raca} ââ‚¬¢ {animal.sexo} ââ‚¬¢ {animal.meses} meses
                     </div>
                   </div>
                 </div>
@@ -420,7 +420,7 @@ export default function PriceComparison() {
                     <div className="font-medium text-gray-600 dark:text-gray-400">
                       {formatCurrency(animal.estimatedMarketPrice)}
                     </div>
-                    <div className="text-xs text-gray-500">Preço mercado</div>
+                    <div className="text-xs text-gray-500">PreÃ§o mercado</div>
                   </div>
 
                   <div className="text-center">
@@ -433,7 +433,7 @@ export default function PriceComparison() {
                     >
                       {formatCurrency(animal.marketDifference)}
                     </div>
-                    <div className="text-xs text-gray-500">Diferença</div>
+                    <div className="text-xs text-gray-500">DiferenÃ§a</div>
                   </div>
 
                   <div className="text-center">

@@ -26,7 +26,7 @@ export default function LoadingScreen({ message = 'Carregando...', fullScreen = 
           </div>
           <div className="relative flex items-center justify-center w-32 h-32 mx-auto">
             <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl rotate-45 animate-spin-slow shadow-2xl"></div>
-            <div className="absolute text-4xl animate-pulse">🐄</div>
+            <div className="absolute text-4xl animate-pulse">ðÅ¸�â€ž</div>
           </div>
         </div>
 
@@ -48,7 +48,7 @@ export default function LoadingScreen({ message = 'Carregando...', fullScreen = 
           </div>
         </div>
 
-        {/* Estatísticas de Loading (opcional) */}
+        {/* EstatÃ­sticas de Loading (opcional) */}
         {fullScreen && (
           <div className="mt-12 flex items-center justify-center gap-8 text-sm text-gray-500 dark:text-gray-400">
             <div className="flex items-center gap-2">
@@ -62,7 +62,7 @@ export default function LoadingScreen({ message = 'Carregando...', fullScreen = 
   )
 }
 
-// Skeleton Screens para diferentes tipos de conteúdo
+// Skeleton Screens para diferentes tipos de conteÃºdo
 export function SkeletonCard() {
   return (
     <div className="card p-6 animate-pulse">

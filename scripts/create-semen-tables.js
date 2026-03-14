@@ -13,9 +13,9 @@ async function createSemenTables() {
   const client = await pool.connect();
   
   try {
-    console.log('🔄 Criando estrutura de tabelas para sêmen...');
+    console.log('ðÅ¸â€�â€ž Criando estrutura de tabelas para sÃªmen...');
     
-    // 1. Criar tabela de entradas de sêmen
+    // 1. Criar tabela de entradas de sÃªmen
     await client.query(`
       CREATE TABLE IF NOT EXISTS entradas_semen (
         id SERIAL PRIMARY KEY,
@@ -44,7 +44,7 @@ async function createSemenTables() {
       )
     `);
     
-    // 2. Criar tabela de saídas de sêmen
+    // 2. Criar tabela de saÃ­das de sÃªmen
     await client.query(`
       CREATE TABLE IF NOT EXISTS saidas_semen (
         id SERIAL PRIMARY KEY,
@@ -59,7 +59,7 @@ async function createSemenTables() {
         valor_total DECIMAL(10,2),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         
-        -- Dados do touro (copiados da entrada para histórico)
+        -- Dados do touro (copiados da entrada para histÃ³rico)
         nome_touro VARCHAR(255),
         rg_touro VARCHAR(100),
         raca VARCHAR(100),
@@ -67,7 +67,7 @@ async function createSemenTables() {
       )
     `);
     
-    // 3. Criar índices para performance (um por vez para evitar erros)
+    // 3. Criar Ã­ndices para performance (um por vez para evitar erros)
     try {
       await client.query(`CREATE INDEX IF NOT EXISTS idx_entradas_semen_nome_touro ON entradas_semen(nome_touro)`);
       await client.query(`CREATE INDEX IF NOT EXISTS idx_entradas_semen_status ON entradas_semen(status)`);
@@ -76,11 +76,11 @@ async function createSemenTables() {
       await client.query(`CREATE INDEX IF NOT EXISTS idx_saidas_semen_data_saida ON saidas_semen(data_saida)`);
       await client.query(`CREATE INDEX IF NOT EXISTS idx_saidas_semen_destino ON saidas_semen(destino)`);
     } catch (indexError) {
-      console.log('⚠️  Alguns índices já existem, continuando...');
+      console.log('âÅ¡ ï¸�  Alguns Ã­ndices jÃ¡ existem, continuando...');
     }
     
     // 4. Migrar dados existentes da tabela estoque_semen
-    console.log('📦 Migrando dados existentes...');
+    console.log('ðÅ¸â€œ¦ Migrando dados existentes...');
     
     // Migrar entradas
     const existingEntradas = await client.query(`
@@ -122,7 +122,7 @@ async function createSemenTables() {
       ]);
     }
     
-    // Migrar saídas
+    // Migrar saÃ­das
     const existingSaidas = await client.query(`
       SELECT * FROM estoque_semen 
       WHERE tipo_operacao = 'saida'
@@ -145,7 +145,7 @@ async function createSemenTables() {
           ON CONFLICT DO NOTHING
         `, [
           entradaRef.rows[0].id,
-          saida.destino || 'Não informado',
+          saida.destino || 'NÃ£o informado',
           saida.quantidade_doses,
           saida.data_operacao || saida.created_at,
           saida.observacoes,
@@ -158,12 +158,12 @@ async function createSemenTables() {
       }
     }
     
-    // 5. Criar triggers para atualizar doses disponíveis automaticamente
+    // 5. Criar triggers para atualizar doses disponÃ­veis automaticamente
     await client.query(`
       CREATE OR REPLACE FUNCTION atualizar_doses_disponiveis()
       RETURNS TRIGGER AS $$
       BEGIN
-        -- Atualizar doses disponíveis na entrada
+        -- Atualizar doses disponÃ­veis na entrada
         UPDATE entradas_semen 
         SET 
           doses_usadas = COALESCE(doses_usadas, 0) + NEW.quantidade_doses,
@@ -230,15 +230,15 @@ async function createSemenTables() {
       ORDER BY e.created_at DESC;
     `);
     
-    console.log('✅ Tabelas de sêmen criadas com sucesso!');
-    console.log('📊 Estrutura criada:');
-    console.log('   - entradas_semen: Para registrar entradas de sêmen');
-    console.log('   - saidas_semen: Para registrar saídas de sêmen');
+    console.log('âÅ“â€¦ Tabelas de sÃªmen criadas com sucesso!');
+    console.log('ðÅ¸â€œÅ  Estrutura criada:');
+    console.log('   - entradas_semen: Para registrar entradas de sÃªmen');
+    console.log('   - saidas_semen: Para registrar saÃ­das de sÃªmen');
     console.log('   - view_estoque_semen: View consolidada para consultas');
-    console.log('   - Triggers automáticos para atualizar estoque');
+    console.log('   - Triggers automÃ¡ticos para atualizar estoque');
     
   } catch (error) {
-    console.error('❌ Erro ao criar tabelas:', error);
+    console.error('â�Å’ Erro ao criar tabelas:', error);
     throw error;
   } finally {
     client.release();
@@ -249,11 +249,11 @@ async function createSemenTables() {
 if (require.main === module) {
   createSemenTables()
     .then(() => {
-      console.log('🎉 Migração concluída!');
+      console.log('ðÅ¸Å½â€° MigraÃ§Ã£o concluÃ­da!');
       process.exit(0);
     })
     .catch((error) => {
-      console.error('💥 Erro na migração:', error);
+      console.error('ðÅ¸â€™¥ Erro na migraÃ§Ã£o:', error);
       process.exit(1);
     });
 }

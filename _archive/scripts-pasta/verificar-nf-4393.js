@@ -2,7 +2,7 @@ const { query } = require('../lib/database')
 
 async function verificarNF() {
   try {
-    console.log('🔍 Verificando Nota Fiscal 4393...\n')
+    console.log('�Ÿ”� Verificando Nota Fiscal 4393...\n')
 
     // Buscar a NF
     const nfResult = await query(`
@@ -25,10 +25,10 @@ async function verificarNF() {
     `, ['4393'])
 
     if (nfResult.rows.length > 0) {
-      console.log(`✅ Nota Fiscal encontrada: ${nfResult.rows.length} registro(s)\n`)
+      console.log(`�œ… Nota Fiscal encontrada: ${nfResult.rows.length} registro(s)\n`)
       
       for (const nf of nfResult.rows) {
-        console.log('📄 Dados da Nota Fiscal:')
+        console.log('�Ÿ“„ Dados da Nota Fiscal:')
         console.log(`   ID: ${nf.id}`)
         console.log(`   Número: ${nf.numero_nf}`)
         console.log(`   Tipo: ${nf.tipo}`)
@@ -72,10 +72,10 @@ async function verificarNF() {
         console.log('')
       }
     } else {
-      console.log('❌ Nota Fiscal 4393 não encontrada')
+      console.log('�Œ Nota Fiscal 4393 não encontrada')
       
       // Verificar se existe com variações
-      console.log('\n🔍 Buscando variações...')
+      console.log('\n�Ÿ”� Buscando variações...')
       const variacoes = await query(`
         SELECT 
           id,
@@ -100,7 +100,7 @@ async function verificarNF() {
       }
 
       // Verificar últimas NFs de saída
-      console.log('\n📋 Últimas 5 Notas Fiscais de Saída:')
+      console.log('\n�Ÿ“‹ �šltimas 5 Notas Fiscais de Saída:')
       const ultimas = await query(`
         SELECT 
           id,
@@ -125,7 +125,7 @@ async function verificarNF() {
     }
 
     // Verificar filtro de data
-    console.log('\n📅 Verificando filtro de data (01/01/2026 a 30/01/2026):')
+    console.log('\n�Ÿ“… Verificando filtro de data (01/01/2026 a 30/01/2026):')
     const hoje = new Date()
     const inicioMes = new Date(2026, 0, 1) // Janeiro 2026
     const fimMes = new Date(2026, 0, 31) // Janeiro 2026
@@ -147,7 +147,7 @@ async function verificarNF() {
     console.log(`   Valor total: R$ ${parseFloat(nfsPeriodo.rows[0].valor_total || 0).toFixed(2)}`)
 
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('�Œ Erro:', error)
     throw error
   }
 }
@@ -155,11 +155,11 @@ async function verificarNF() {
 if (require.main === module) {
   verificarNF()
     .then(() => {
-      console.log('\n✅ Verificação concluída!')
+      console.log('\n�œ… Verificação concluída!')
       process.exit(0)
     })
     .catch((error) => {
-      console.error('❌ Erro:', error)
+      console.error('�Œ Erro:', error)
       process.exit(1)
     })
 }

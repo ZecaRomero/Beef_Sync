@@ -50,7 +50,7 @@ export default function AnimalForm({ isOpen, onClose, animal, onSave }) {
         fornecedor: novaNF.fornecedor,
         origem: novaNF.origem,
         valorTotal: novaNF.valorTotal,
-        naturezaOperacao: 'Compra de Animais', // Padrão para este modal
+        naturezaOperacao: 'Compra de Animais', // PadrÃ£o para este modal
         tipo: 'entrada',
         tipoProduto: 'bovino',
         observacoes: novaNF.observacoes,
@@ -102,7 +102,7 @@ export default function AnimalForm({ isOpen, onClose, animal, onSave }) {
             <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg flex justify-between items-center border border-blue-200 dark:border-blue-700">
               <div>
                 <span className="font-semibold text-blue-800 dark:text-blue-200 block">
-                  ✨ Nascimento CJCJ
+                  âÅ“¨ Nascimento CJCJ
                 </span>
                 <span className="text-xs text-blue-600 dark:text-blue-300">
                   Preenchimento assistido para nascimentos
@@ -157,17 +157,17 @@ export default function AnimalForm({ isOpen, onClose, animal, onSave }) {
             updateField={updateField}
           />
 
-          {/* Observações */}
+          {/* ObservaÃ§Ãµes */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Observações
+              ObservaÃ§Ãµes
             </label>
             <textarea
               value={formData.observacoes}
               onChange={(e) => updateField('observacoes', e.target.value)}
               className="input-field"
               rows={2}
-              placeholder="Observações adicionais..."
+              placeholder="ObservaÃ§Ãµes adicionais..."
             />
           </div>
 
@@ -177,14 +177,14 @@ export default function AnimalForm({ isOpen, onClose, animal, onSave }) {
               type="button"
               variant="danger" // Assuming 'danger' or 'secondary' variant exists for clear
               onClick={() => {
-                 if(confirm('Limpar formulário?')) {
+                 if(confirm('Limpar formulÃ¡rio?')) {
                     // Logic to reset form (can be added to hook)
                     onClose(); // Simple hack: close and reopen or just close
                  }
               }}
               className="text-red-600"
             >
-              🗑️ Limpar
+              ðÅ¸â€”â€˜ï¸� Limpar
             </Button>
             <div className="flex space-x-3">
               <Button

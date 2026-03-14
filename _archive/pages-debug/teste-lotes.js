@@ -23,7 +23,7 @@ export default function TesteLotes() {
     setResultados(null);
     setLogs([]);
     
-    adicionarLog('🚀 Iniciando teste de cadastro em lote de receptoras...', 'info');
+    adicionarLog('�Ÿš€ Iniciando teste de cadastro em lote de receptoras...', 'info');
 
     try {
       // Dados de exemplo para teste
@@ -60,7 +60,7 @@ export default function TesteLotes() {
         }
       ];
 
-      adicionarLog(`📋 Preparando ${receptorasTeste.length} receptoras para cadastro...`, 'info');
+      adicionarLog(`�Ÿ“‹ Preparando ${receptorasTeste.length} receptoras para cadastro...`, 'info');
 
       const response = await fetch('/api/receptoras/batch', {
         method: 'POST',
@@ -76,17 +76,17 @@ export default function TesteLotes() {
       const data = await response.json();
 
       if (response.ok) {
-        adicionarLog(`✅ Lote ${data.lote} criado com sucesso!`, 'success');
-        adicionarLog(`📊 Processados: ${data.resumo.total_processados} | Sucessos: ${data.resumo.total_sucessos} | Erros: ${data.resumo.total_erros}`, 'info');
-        adicionarLog(`📈 Taxa de sucesso: ${data.resumo.taxa_sucesso}`, 'success');
+        adicionarLog(`�œ… Lote ${data.lote} criado com sucesso!`, 'success');
+        adicionarLog(`�Ÿ“Š Processados: ${data.resumo.total_processados} | Sucessos: ${data.resumo.total_sucessos} | Erros: ${data.resumo.total_erros}`, 'info');
+        adicionarLog(`�Ÿ“ˆ Taxa de sucesso: ${data.resumo.taxa_sucesso}`, 'success');
         
         setResultados(data);
       } else {
-        adicionarLog(`❌ Erro na API: ${data.message || 'Erro desconhecido'}`, 'error');
+        adicionarLog(`�Œ Erro na API: ${data.message || 'Erro desconhecido'}`, 'error');
       }
 
     } catch (error) {
-      adicionarLog(`💥 Erro no teste: ${error.message}`, 'error');
+      adicionarLog(`�Ÿ’� Erro no teste: ${error.message}`, 'error');
     } finally {
       setLoading(false);
     }
@@ -94,28 +94,28 @@ export default function TesteLotes() {
 
   const testarConsultaLotes = async () => {
     setLoading(true);
-    adicionarLog('🔍 Consultando lotes recentes...', 'info');
+    adicionarLog('�Ÿ”� Consultando lotes recentes...', 'info');
 
     try {
       const response = await fetch('/api/lotes?limit=10');
       const data = await response.json();
 
       if (response.ok) {
-        adicionarLog(`📋 Encontrados ${data.lotes.length} lotes`, 'info');
-        adicionarLog(`📊 Total de lotes no sistema: ${data.stats.total_lotes}`, 'info');
-        adicionarLog(`🏷️ Módulos ativos: ${data.stats.total_modulos}`, 'info');
-        adicionarLog(`⚙️ Tipos de operação: ${data.stats.total_tipos}`, 'info');
-        adicionarLog(`📝 Total de registros: ${data.stats.total_registros}`, 'info');
+        adicionarLog(`�Ÿ“‹ Encontrados ${data.lotes.length} lotes`, 'info');
+        adicionarLog(`�Ÿ“Š Total de lotes no sistema: ${data.stats.total_lotes}`, 'info');
+        adicionarLog(`�Ÿ��️ Módulos ativos: ${data.stats.total_modulos}`, 'info');
+        adicionarLog(`�š™️ Tipos de operação: ${data.stats.total_tipos}`, 'info');
+        adicionarLog(`�Ÿ“� Total de registros: ${data.stats.total_registros}`, 'info');
         
         // Mostrar últimos lotes
         data.lotes.slice(0, 3).forEach(lote => {
-          adicionarLog(`📦 Lote ${lote.numero_lote}: ${lote.descricao} (${lote.status})`, 'info');
+          adicionarLog(`�Ÿ“� Lote ${lote.numero_lote}: ${lote.descricao} (${lote.status})`, 'info');
         });
       } else {
-        adicionarLog(`❌ Erro ao consultar lotes: ${data.message}`, 'error');
+        adicionarLog(`�Œ Erro ao consultar lotes: ${data.message}`, 'error');
       }
     } catch (error) {
-      adicionarLog(`💥 Erro na consulta: ${error.message}`, 'error');
+      adicionarLog(`�Ÿ’� Erro na consulta: ${error.message}`, 'error');
     } finally {
       setLoading(false);
     }
@@ -233,7 +233,7 @@ export default function TesteLotes() {
                     <div className="space-y-1">
                       {resultados.resultados.erros.map((erro, index) => (
                         <div key={index} className="text-sm text-red-600">
-                          • {erro.brinco}: {erro.erro}
+                          �€� {erro.brinco}: {erro.erro}
                         </div>
                       ))}
                     </div>

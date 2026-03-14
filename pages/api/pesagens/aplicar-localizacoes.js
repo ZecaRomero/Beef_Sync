@@ -1,7 +1,7 @@
 /**
  * POST /api/pesagens/aplicar-localizacoes
- * Aplica localizações a partir das pesagens de um período (ex: mês 02).
- * Animais sem localização atual recebem a local informada na observação da pesagem.
+ * Aplica localizaÃ§Ãµes a partir das pesagens de um perÃ­odo (ex: mÃªs 02).
+ * Animais sem localizaÃ§Ã£o atual recebem a local informada na observaÃ§Ã£o da pesagem.
  *
  * Body: { mes?: number, ano?: number }
  * Default: mes=2 (fevereiro), ano=ano atual
@@ -10,7 +10,7 @@ const { query } = require('../../../lib/database')
 
 function extrairLocal(obs) {
   if (!obs || typeof obs !== 'string') return null
-  const s = obs.trim().replace(/CONFINAÇÃO/gi, 'CONFINA').replace(/CONFINACAO/gi, 'CONFINA')
+  const s = obs.trim().replace(/CONFINAÃâ€¡ÃÆ’O/gi, 'CONFINA').replace(/CONFINACAO/gi, 'CONFINA')
   const m = s.match(/(PIQUETE\s*\d+|PIQUETE\s*(CABANHA|CONF|GUARITA|PISTA)|PROJETO\s*[\dA-Za-z\-]+|LOTE\s*\d+|CONFINA\w*|GUARITA|CABANHA|PISTA\s*\d*)/i)
   if (m) {
     let loc = m[1].trim().toUpperCase().replace(/\s+/g, ' ')
@@ -23,7 +23,7 @@ function extrairLocal(obs) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Método não permitido' })
+    return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' })
   }
 
   try {
@@ -48,7 +48,7 @@ export default async function handler(req, res) {
       const aid = x.animal_id
       if (!aid) return
       const local = extrairLocal(x.observacoes)
-      if (!local || /^(não informado|nao informado|-)$/i.test(local)) return
+      if (!local || /^(nÃ£o informado|nao informado|-)$/i.test(local)) return
       const d = x.data || ''
       const prev = porAnimal[aid]
       if (!prev || (d > (prev.data || '')) || (d === (prev.data || '') && (x.id || 0) > (prev.id || 0))) {
@@ -64,7 +64,7 @@ export default async function handler(req, res) {
         success: true,
         aplicados: 0,
         ignorados: 0,
-        mensagem: `Nenhuma pesagem com local válido no período ${start} a ${end}`
+        mensagem: `Nenhuma pesagem com local vÃ¡lido no perÃ­odo ${start} a ${end}`
       })
     }
 
@@ -86,13 +86,13 @@ export default async function handler(req, res) {
           parseInt(aid, 10),
           p.local,
           p.data || start,
-          'Importado da Pesagem (mês ' + mes + '/' + ano + ')',
+          'Importado da Pesagem (mÃªs ' + mes + '/' + ano + ')',
           p.observacoes || null,
           'Sistema'
         ])
         aplicados++
       } catch (err) {
-        console.warn('Erro ao inserir localização para animal', aid, err.message)
+        console.warn('Erro ao inserir localizaÃ§Ã£o para animal', aid, err.message)
       }
     }
 
@@ -101,13 +101,13 @@ export default async function handler(req, res) {
       aplicados,
       ignorados: comLocal.length - aplicados,
       periodo: `${mes}/${ano}`,
-      mensagem: `✅ ${aplicados} localização(ões) aplicada(s) a partir das pesagens de ${mes}/${ano}. ${comLocal.length - aplicados} já tinham localização atual.`
+      mensagem: `âÅ“â€¦ ${aplicados} localizaÃ§Ã£o(Ãµes) aplicada(s) a partir das pesagens de ${mes}/${ano}. ${comLocal.length - aplicados} jÃ¡ tinham localizaÃ§Ã£o atual.`
     })
   } catch (error) {
     console.error('Erro em aplicar-localizacoes:', error)
     return res.status(500).json({
       success: false,
-      error: error.message || 'Erro ao aplicar localizações'
+      error: error.message || 'Erro ao aplicar localizaÃ§Ãµes'
     })
   }
 }

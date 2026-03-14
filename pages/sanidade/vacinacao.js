@@ -25,7 +25,7 @@ export default function Vacinacao() {
             return;
           }
         } catch (apiError) {
-          console.warn('API não disponível, usando localStorage:', apiError);
+          console.warn('API nÃ£o disponÃ­vel, usando localStorage:', apiError);
         }
 
         // Fallback para localStorage
@@ -59,7 +59,7 @@ export default function Vacinacao() {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando dados de vacinação...</p>
+          <p className="mt-4 text-gray-600">Carregando dados de vacinaÃ§Ã£o...</p>
         </div>
       </div>
     );
@@ -73,13 +73,13 @@ export default function Vacinacao() {
             <div className="flex items-center">
               <BeakerIcon className="h-8 w-8 text-emerald-600 mr-3" />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Controle de Vacinação</h1>
+                <h1 className="text-2xl font-bold text-gray-900">Controle de VacinaÃ§Ã£o</h1>
                 <p className="text-sm text-gray-600">Gerencie as vacinas do rebanho</p>
               </div>
             </div>
             <button className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700">
               <PlusIcon className="h-4 w-4 mr-2" />
-              Nova Vacinação
+              Nova VacinaÃ§Ã£o
             </button>
           </div>
         </div>
@@ -90,8 +90,8 @@ export default function Vacinacao() {
           <div className="bg-white shadow overflow-hidden sm:rounded-md">
             <div className="text-center py-12">
               <BeakerIcon className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">Nenhuma vacinação encontrada</h3>
-              <p className="mt-1 text-sm text-gray-500">Comece registrando uma nova vacinação.</p>
+              <h3 className="mt-2 text-sm font-medium text-gray-900">Nenhuma vacinaÃ§Ã£o encontrada</h3>
+              <p className="mt-1 text-sm text-gray-500">Comece registrando uma nova vacinaÃ§Ã£o.</p>
             </div>
           </div>
         ) : (
@@ -107,8 +107,8 @@ export default function Vacinacao() {
                         <div className="mt-2 flex items-center text-sm text-gray-500">
                           <CalendarIcon className="flex-shrink-0 mr-1.5 h-4 w-4" />
                           Aplicada em: {new Date(vacina.dataAplicacao).toLocaleDateString('pt-BR')}
-                          <span className="mx-2">•</span>
-                          Próxima dose: {new Date(vacina.proximaDose).toLocaleDateString('pt-BR')}
+                          <span className="mx-2">ââ‚¬¢</span>
+                          PrÃ³xima dose: {new Date(vacina.proximaDose).toLocaleDateString('pt-BR')}
                         </div>
                       </div>
                       <div className="text-right">

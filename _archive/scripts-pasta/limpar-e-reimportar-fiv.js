@@ -5,7 +5,7 @@ async function limparColetasFIVImportadas() {
   const client = await pool.connect()
   
   try {
-    console.log('🔍 Verificando coletas FIV importadas...\n')
+    console.log('�Ÿ”� Verificando coletas FIV importadas...\n')
     
     // Contar coletas que foram importadas (criadas em lote, geralmente na mesma data)
     const stats = await query(`
@@ -17,11 +17,11 @@ async function limparColetasFIVImportadas() {
       FROM coleta_fiv
     `)
     
-    console.log('📊 Estatísticas atuais:')
+    console.log('�Ÿ“Š Estatísticas atuais:')
     console.log(`   Total de coletas FIV: ${stats.rows[0].total}`)
     console.log(`   Dias de importação distintos: ${stats.rows[0].dias_importacao}`)
     console.log(`   Primeira importação: ${new Date(stats.rows[0].primeira_importacao).toLocaleString('pt-BR')}`)
-    console.log(`   Última importação: ${new Date(stats.rows[0].ultima_importacao).toLocaleString('pt-BR')}`)
+    console.log(`   �šltima importação: ${new Date(stats.rows[0].ultima_importacao).toLocaleString('pt-BR')}`)
     
     // Verificar quantas foram importadas recentemente (últimos 7 dias)
     const recentes = await query(`
@@ -36,14 +36,14 @@ async function limparColetasFIVImportadas() {
     const autoConfirm = args.includes('--yes') || args.includes('-y')
     
     if (!autoConfirm) {
-      console.log('\n⚠️  ATENÇÃO: Este script irá DELETAR TODAS as coletas FIV do banco!')
+      console.log('\n�š�️  ATEN�‡�ƒO: Este script irá DELETAR TODAS as coletas FIV do banco!')
       console.log('   Isso é irreversível. Certifique-se de ter um backup.')
       console.log('\n   Para executar, execute novamente com --yes ou -y')
       console.log('   Exemplo: node scripts/limpar-e-reimportar-fiv.js --yes\n')
       return
     }
     
-    console.log('\n🗑️  Iniciando limpeza de todas as coletas FIV...\n')
+    console.log('\n�Ÿ—‘️  Iniciando limpeza de todas as coletas FIV...\n')
     
     await client.query('BEGIN')
     
@@ -53,20 +53,20 @@ async function limparColetasFIVImportadas() {
       
       await client.query('COMMIT')
       
-      console.log(`✅ ${result.rows.length} coletas FIV deletadas com sucesso!`)
-      console.log('\n📋 Próximos passos:')
+      console.log(`�œ… ${result.rows.length} coletas FIV deletadas com sucesso!`)
+      console.log('\n�Ÿ“‹ Próximos passos:')
       console.log('   1. Reimporte o arquivo Excel através da interface web')
       console.log('   2. O código de importação foi melhorado e deve processar as datas corretamente')
       console.log('   3. Verifique as datas após a importação\n')
       
     } catch (error) {
       await client.query('ROLLBACK')
-      console.error('\n❌ Erro durante a limpeza. Rollback executado.')
+      console.error('\n�Œ Erro durante a limpeza. Rollback executado.')
       throw error
     }
     
   } catch (error) {
-    console.error('❌ Erro ao executar limpeza:', error)
+    console.error('�Œ Erro ao executar limpeza:', error)
     throw error
   } finally {
     client.release()
@@ -75,10 +75,10 @@ async function limparColetasFIVImportadas() {
 
 limparColetasFIVImportadas()
   .then(() => {
-    console.log('\n✅ Script finalizado')
+    console.log('\n�œ… Script finalizado')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n❌ Erro fatal:', error)
+    console.error('\n�Œ Erro fatal:', error)
     process.exit(1)
   })

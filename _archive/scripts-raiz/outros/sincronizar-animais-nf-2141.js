@@ -12,7 +12,7 @@ async function sincronizarAnimaisNF2141() {
   const client = await pool.connect()
   
   try {
-    console.log('🔍 Buscando animais da NF #2141...\n')
+    console.log('�Ÿ”� Buscando animais da NF #2141...\n')
     
     // Buscar a NF
     const nfResult = await client.query(`
@@ -23,12 +23,12 @@ async function sincronizarAnimaisNF2141() {
     `)
     
     if (nfResult.rows.length === 0) {
-      console.log('❌ NF #2141 não encontrada!')
+      console.log('�Œ NF #2141 não encontrada!')
       return
     }
     
     const nf = nfResult.rows[0]
-    console.log('✅ NF encontrada:', {
+    console.log('�œ… NF encontrada:', {
       id: nf.id,
       numero: nf.numero_nf,
       fornecedor: nf.fornecedor,
@@ -39,10 +39,10 @@ async function sincronizarAnimaisNF2141() {
     // Buscar itens da NF (estão no campo JSON)
     const itens = nf.itens || []
     
-    console.log(`\n📦 ${itens.length} itens encontrados na NF\n`)
+    console.log(`\n�Ÿ“� ${itens.length} itens encontrados na NF\n`)
     
     if (itens.length === 0) {
-      console.log('⚠️  Nenhum item encontrado na NF!')
+      console.log('�š�️  Nenhum item encontrado na NF!')
       return
     }
     
@@ -55,7 +55,7 @@ async function sincronizarAnimaisNF2141() {
         // Extrair série e RG do identificador
         const match = item.identificador?.match(/([A-Z]+)\s*(\d+)/)
         if (!match) {
-          console.log(`⚠️  Não foi possível extrair série/RG de: ${item.identificador}`)
+          console.log(`�š�️  Não foi possível extrair série/RG de: ${item.identificador}`)
           erros++
           continue
         }
@@ -70,7 +70,7 @@ async function sincronizarAnimaisNF2141() {
         `, [serie, rg])
         
         if (existeResult.rows.length > 0) {
-          console.log(`ℹ️  ${serie} ${rg} - Já existe (ID: ${existeResult.rows[0].id})`)
+          console.log(`�„�️  ${serie} ${rg} - Já existe (ID: ${existeResult.rows[0].id})`)
           jaExistentes++
           continue
         }
@@ -107,25 +107,25 @@ async function sincronizarAnimaisNF2141() {
           item.local || 'Rancharia'                // local_atual
         ])
         
-        console.log(`✅ ${serie} ${rg} - Criado com sucesso (ID: ${insertResult.rows[0].id})`)
+        console.log(`�œ… ${serie} ${rg} - Criado com sucesso (ID: ${insertResult.rows[0].id})`)
         criados++
         
       } catch (error) {
-        console.error(`❌ Erro ao processar ${item.identificador}:`, error.message)
+        console.error(`�Œ Erro ao processar ${item.identificador}:`, error.message)
         erros++
       }
     }
     
     console.log('\n' + '='.repeat(60))
-    console.log('📊 RESUMO:')
-    console.log(`   ✅ Criados: ${criados}`)
-    console.log(`   ℹ️  Já existentes: ${jaExistentes}`)
-    console.log(`   ❌ Erros: ${erros}`)
-    console.log(`   📦 Total processados: ${itens.length}`)
+    console.log('�Ÿ“Š RESUMO:')
+    console.log(`   �œ… Criados: ${criados}`)
+    console.log(`   �„�️  Já existentes: ${jaExistentes}`)
+    console.log(`   �Œ Erros: ${erros}`)
+    console.log(`   �Ÿ“� Total processados: ${itens.length}`)
     console.log('='.repeat(60))
     
   } catch (error) {
-    console.error('❌ Erro geral:', error)
+    console.error('�Œ Erro geral:', error)
   } finally {
     client.release()
     await pool.end()

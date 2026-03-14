@@ -110,11 +110,11 @@ export default function LimparDadosMock() {
   }
 
   const limparTodosDados = () => {
-    if (!confirm('⚠️ ATENÇÃO: Esta ação irá remover TODOS os dados do sistema, incluindo dados reais que você possa ter cadastrado. Tem certeza que deseja continuar?')) {
+    if (!confirm('�š�️ ATEN�‡�ƒO: Esta ação irá remover TODOS os dados do sistema, incluindo dados reais que você possa ter cadastrado. Tem certeza que deseja continuar?')) {
       return
     }
 
-    if (!confirm('🚨 CONFIRMAÇÃO FINAL: Todos os dados serão perdidos permanentemente. Esta ação não pode ser desfeita. Continuar?')) {
+    if (!confirm('�Ÿš� CONFIRMA�‡�ƒO FINAL: Todos os dados serão perdidos permanentemente. Esta ação não pode ser desfeita. Continuar?')) {
       return
     }
 
@@ -142,13 +142,13 @@ export default function LimparDadosMock() {
       setDadosEncontrados([])
       
       setTimeout(() => {
-        alert('✅ Limpeza concluída! Todos os dados mock foram removidos. A página será recarregada.')
+        alert('�œ… Limpeza concluída! Todos os dados mock foram removidos. A página será recarregada.')
         window.location.reload()
       }, 2000)
 
     } catch (error) {
       console.error('Erro durante a limpeza:', error)
-      alert('❌ Erro durante a limpeza: ' + error.message)
+      alert('�Œ Erro durante a limpeza: ' + error.message)
     } finally {
       setLoading(false)
     }
@@ -158,7 +158,7 @@ export default function LimparDadosMock() {
     if (confirm(`Remover todos os dados de "${chave}"?`)) {
       localStorage.removeItem(chave)
       verificarDadosMock() // Recarregar lista
-      alert(`✅ Dados de "${chave}" removidos com sucesso!`)
+      alert(`�œ… Dados de "${chave}" removidos com sucesso!`)
     }
   }
 
@@ -300,14 +300,14 @@ export default function LimparDadosMock() {
 
           <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <h3 className="font-medium text-gray-900 dark:text-white mb-2">
-              📋 Instruções:
+              �Ÿ“‹ Instruções:
             </h3>
             <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-              <li>• Esta ferramenta remove dados de teste/demonstração do sistema</li>
-              <li>• Verifique cuidadosamente se há dados reais que deseja manter</li>
-              <li>• A limpeza é irreversível - faça backup se necessário</li>
-              <li>• Configurações do sistema (tema, etc.) serão preservadas</li>
-              <li>• Acesse: <code>localhost:3020/limpar-dados-mock</code></li>
+              <li>�€� Esta ferramenta remove dados de teste/demonstração do sistema</li>
+              <li>�€� Verifique cuidadosamente se há dados reais que deseja manter</li>
+              <li>�€� A limpeza é irreversível - faça backup se necessário</li>
+              <li>�€� Configurações do sistema (tema, etc.) serão preservadas</li>
+              <li>�€� Acesse: <code>localhost:3020/limpar-dados-mock</code></li>
             </ul>
           </div>
         </div>

@@ -3,7 +3,7 @@
  * Configura o Beef-Sync para usar Supabase
  * Uso: node scripts/configurar-supabase.js [PROJECT_REF]
  * 
- * PROJECT_REF: encontre em Supabase Dashboard → Settings → General → Reference ID
+ * PROJECT_REF: encontre em Supabase Dashboard ââ€ â€™ Settings ââ€ â€™ General ââ€ â€™ Reference ID
  * Ou na URL: https://supabase.com/dashboard/project/SEU_PROJECT_REF
  */
 require('dotenv').config()
@@ -12,7 +12,7 @@ const path = require('path')
 const readline = require('readline')
 
 const SENHA_SUPABASE = 'jcromero1985zeca'
-const REGIAO_PADRAO = 'sa-east-1' // São Paulo
+const REGIAO_PADRAO = 'sa-east-1' // SÃ£o Paulo
 
 function ask(question) {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
@@ -29,15 +29,15 @@ async function main() {
   
   if (!projectRef) {
     console.log('')
-    console.log('📋 Para configurar o Supabase, preciso do Reference ID do seu projeto.')
-    console.log('   Encontre em: Supabase Dashboard → Settings → General → Reference ID')
+    console.log('ðÅ¸â€œâ€¹ Para configurar o Supabase, preciso do Reference ID do seu projeto.')
+    console.log('   Encontre em: Supabase Dashboard ââ€ â€™ Settings ââ€ â€™ General ââ€ â€™ Reference ID')
     console.log('   Ou na URL do projeto: .../project/XXXXXXXXXX')
     console.log('')
     projectRef = await ask('Cole o Reference ID (ex: apbkobhfnmcqqzqeeqss): ')
   }
 
   if (!projectRef) {
-    console.error('❌ Reference ID é obrigatório.')
+    console.error('â�Å’ Reference ID Ã© obrigatÃ³rio.')
     process.exit(1)
   }
 
@@ -60,7 +60,7 @@ async function main() {
 # ===========================================
 DATABASE_URL=${databaseUrl}
 NEXT_PUBLIC_SUPABASE_URL=${supabaseUrl}
-# NEXT_PUBLIC_SUPABASE_ANON_KEY=cole aqui em: Settings → API → anon key
+# NEXT_PUBLIC_SUPABASE_ANON_KEY=cole aqui em: Settings ââ€ â€™ API ââ€ â€™ anon key
 `
 
   if (!envContent.includes('DATABASE_URL=')) {
@@ -71,12 +71,12 @@ NEXT_PUBLIC_SUPABASE_URL=${supabaseUrl}
 
   fs.writeFileSync(envPath, envContent.trim() + '\n')
   console.log('')
-  console.log('✅ Arquivo .env configurado!')
+  console.log('âÅ“â€¦ Arquivo .env configurado!')
   console.log('')
-  console.log('📋 Próximos passos:')
-  console.log('   1. Obtenha a Anon Key em: Supabase → Settings → API')
+  console.log('ðÅ¸â€œâ€¹ PrÃ³ximos passos:')
+  console.log('   1. Obtenha a Anon Key em: Supabase ââ€ â€™ Settings ââ€ â€™ API')
   console.log('   2. Adicione no .env: NEXT_PUBLIC_SUPABASE_ANON_KEY=sua-anon-key')
-  console.log('   3. Faça backup: npm run backup:completo')
+  console.log('   3. FaÃ§a backup: npm run backup:completo')
   console.log('   4. Inicialize: npm run db:init')
   console.log('   5. Restaure: node scripts/restore-database.js backups/backup_completo_XXXX.json --force')
   console.log('')

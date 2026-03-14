@@ -23,8 +23,8 @@ export default function ClearData() {
         localStorage.clear();
         sessionStorage.clear();
         
-        setStatus('‚úÖ Dados mock removidos com sucesso!');
-        console.log('üßπ Dados mock removidos!');
+        setStatus('‚≈ì‚Ä¶ Dados mock removidos com sucesso!');
+        console.log('≈∏ßπ Dados mock removidos!');
         
         // Redirecionar para dashboard
         setTimeout(() => {
@@ -32,7 +32,7 @@ export default function ClearData() {
         }, 3000);
         
       } catch (error) {
-        setStatus('‚ùå Erro ao limpar dados: ' + error.message);
+        setStatus('‚ù≈í Erro ao limpar dados: ' + error.message);
         console.error('Erro:', error);
       }
     }

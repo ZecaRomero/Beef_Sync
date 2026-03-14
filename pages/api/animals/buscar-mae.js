@@ -1,6 +1,6 @@
 /**
- * Busca série e RG da mãe por nome ou via gestações/nascimentos.
- * Usado quando o animal tem mae (nome) mas não tem serie_mae/rg_mae.
+ * Busca sÃ©rie e RG da mÃ£e por nome ou via gestaÃ§Ãµes/nascimentos.
+ * Usado quando o animal tem mae (nome) mas nÃ£o tem serie_mae/rg_mae.
  */
 import { query } from '../../../lib/database'
 
@@ -14,12 +14,12 @@ export default async function handler(req, res) {
     const serieFilho = (animalSerie || '').trim()
 
     if (!mae || typeof mae !== 'string') {
-      return res.status(400).json({ success: false, message: 'Parâmetro mae é obrigatório' })
+      return res.status(400).json({ success: false, message: 'ParÃ¢metro mae Ã© obrigatÃ³rio' })
     }
 
     const maeNome = mae.trim()
     if (maeNome.length < 2) {
-      return res.status(400).json({ success: false, message: 'Nome da mãe muito curto' })
+      return res.status(400).json({ success: false, message: 'Nome da mÃ£e muito curto' })
     }
 
     let serie = null
@@ -67,7 +67,7 @@ export default async function handler(req, res) {
       rg = r.rows[0].rg
     }
 
-    // 2. Se não achou, buscar com LIKE
+    // 2. Se nÃ£o achou, buscar com LIKE
     if (!serie && !rg) {
       r = await query(
         `SELECT serie, rg FROM animais 
@@ -82,7 +82,7 @@ export default async function handler(req, res) {
       }
     }
 
-    // 3. Buscar em gestações (receptora_nome - receptora da gestação)
+    // 3. Buscar em gestaÃ§Ãµes (receptora_nome - receptora da gestaÃ§Ã£o)
     if (!serie && !rg) {
       r = await query(
         `SELECT receptora_serie as serie, receptora_rg as rg 
@@ -108,7 +108,7 @@ export default async function handler(req, res) {
       }
     }
 
-    // 3b. Buscar em gestações (mae_serie/mae_rg = doadora biológica) - mãe pode estar inativa
+    // 3b. Buscar em gestaÃ§Ãµes (mae_serie/mae_rg = doadora biolÃ³gica) - mÃ£e pode estar inativa
     if (!serie && !rg) {
       r = await query(
         `SELECT g.mae_serie as serie, g.mae_rg as rg 
@@ -127,7 +127,7 @@ export default async function handler(req, res) {
       }
     }
 
-    // 3c. Buscar em coleta_fiv (doadora com doadora_id - mãe pode ter coletas mesmo inativa)
+    // 3c. Buscar em coleta_fiv (doadora com doadora_id - mÃ£e pode ter coletas mesmo inativa)
     if (!serie && !rg) {
       r = await query(
         `SELECT a.serie, a.rg FROM coleta_fiv cf
@@ -145,7 +145,7 @@ export default async function handler(req, res) {
       }
     }
 
-    // 3d. coleta_fiv doadora_nome com formato "SÉRIE RG" ou "NOME SÉRIE RG" - extrair identificação
+    // 3d. coleta_fiv doadora_nome com formato "SÃâ€°RIE RG" ou "NOME SÃâ€°RIE RG" - extrair identificaÃ§Ã£o
     if (!serie && !rg) {
       const matchDoadora = maeNome.match(/([A-Za-z]{2,})\s+(\d+)\s*$/)
       if (matchDoadora) {
@@ -165,9 +165,9 @@ export default async function handler(req, res) {
       }
     }
 
-    // 3e. coleta_fiv: doadora_nome igual ao nome da mãe (doadora pode não ter doadora_id) - buscar em animais por nome
-    // Já coberto em 1 e 2 - mas se doadora_nome em coleta_fiv = maeNome e temos doadora_id, 3c cobre.
-    // Se doadora_nome contém identificação (ex: "MANEKA SANT ANNA CJCJ 16982"), tentar extrair
+    // 3e. coleta_fiv: doadora_nome igual ao nome da mÃ£e (doadora pode nÃ£o ter doadora_id) - buscar em animais por nome
+    // JÃ¡ coberto em 1 e 2 - mas se doadora_nome em coleta_fiv = maeNome e temos doadora_id, 3c cobre.
+    // Se doadora_nome contÃ©m identificaÃ§Ã£o (ex: "MANEKA SANT ANNA CJCJ 16982"), tentar extrair
     if (!serie && !rg) {
       r = await query(
         `SELECT doadora_nome FROM coleta_fiv 
@@ -194,7 +194,7 @@ export default async function handler(req, res) {
       }
     }
 
-    // 4. Buscar via nascimentos (gestação onde este animal nasceu)
+    // 4. Buscar via nascimentos (gestaÃ§Ã£o onde este animal nasceu)
     if (!serie && !rg && animalSerie && animalRg) {
       r = await query(
         `SELECT g.receptora_serie as serie, g.receptora_rg as rg 
@@ -215,12 +215,12 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, serie, rg })
     }
 
-    return res.status(200).json({ success: false, message: 'Mãe não encontrada' })
+    return res.status(200).json({ success: false, message: 'MÃ£e nÃ£o encontrada' })
   } catch (error) {
-    console.error('Erro ao buscar mãe:', error)
+    console.error('Erro ao buscar mÃ£e:', error)
     return res.status(500).json({
       success: false,
-      message: 'Erro ao buscar mãe',
+      message: 'Erro ao buscar mÃ£e',
       error: error.message
     })
   }

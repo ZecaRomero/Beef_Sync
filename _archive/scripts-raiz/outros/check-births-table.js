@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 async function checkBirthsTable() {
   try {
-    console.log('🔍 Verificando estrutura da tabela nascimentos...');
+    console.log('�Ÿ”� Verificando estrutura da tabela nascimentos...');
     
     // Tentar criar um nascimento simples
     const birthData = {
@@ -13,7 +13,7 @@ async function checkBirthsTable() {
       observacao: 'Teste'
     };
 
-    console.log('📝 Tentando criar nascimento:', JSON.stringify(birthData, null, 2));
+    console.log('�Ÿ“� Tentando criar nascimento:', JSON.stringify(birthData, null, 2));
 
     const response = await fetch('http://localhost:3020/api/births', {
       method: 'POST',
@@ -24,13 +24,13 @@ async function checkBirthsTable() {
     });
 
     const result = await response.text();
-    console.log('📊 Resposta:', result);
+    console.log('�Ÿ“Š Resposta:', result);
 
     if (response.ok) {
-      console.log('✅ Nascimento criado com sucesso!');
+      console.log('�œ… Nascimento criado com sucesso!');
       
       // Agora testar o relatório
-      console.log('\n🔍 Testando relatório com nascimento...');
+      console.log('\n�Ÿ”� Testando relatório com nascimento...');
       const reportResponse = await fetch('http://localhost:3020/api/reports/generate', {
         method: 'POST',
         headers: {
@@ -47,14 +47,14 @@ async function checkBirthsTable() {
 
       if (reportResponse.ok) {
         const reportData = await reportResponse.json();
-        console.log('📊 Dados do relatório:', JSON.stringify(reportData, null, 2));
+        console.log('�Ÿ“Š Dados do relatório:', JSON.stringify(reportData, null, 2));
       }
     } else {
-      console.log('❌ Erro ao criar nascimento');
+      console.log('�Œ Erro ao criar nascimento');
     }
 
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
   }
 }
 

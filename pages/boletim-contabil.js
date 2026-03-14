@@ -150,10 +150,10 @@ export default function BoletimContabil() {
       await boletimContabilService.sincronizarOperacoesExistentes()
       await loadBoletimAtual()
       await loadBoletins()
-      alert('✅ Sincronização concluída com sucesso!')
+      alert('âÅ“â€¦ SincronizaÃ§Ã£o concluÃ­da com sucesso!')
     } catch (error) {
-      console.error('Erro na sincronização:', error)
-      alert('❌ Erro na sincronização. Verifique o console.')
+      console.error('Erro na sincronizaÃ§Ã£o:', error)
+      alert('â�Å’ Erro na sincronizaÃ§Ã£o. Verifique o console.')
     } finally {
       setIsLoading(false)
     }
@@ -181,15 +181,15 @@ export default function BoletimContabil() {
         window.URL.revokeObjectURL(url)
       }
       
-      alert(`✅ Boletim exportado em formato ${formato.toUpperCase()}!`)
+      alert(`âÅ“â€¦ Boletim exportado em formato ${formato.toUpperCase()}!`)
     } catch (error) {
       console.error('Erro ao exportar:', error)
-      alert('❌ Erro ao exportar boletim')
+      alert('â�Å’ Erro ao exportar boletim')
     }
   }
 
   const fecharBoletim = async () => {
-    if (!confirm('Tem certeza que deseja fechar este boletim? Esta ação não pode ser desfeita.')) {
+    if (!confirm('Tem certeza que deseja fechar este boletim? Esta aÃ§Ã£o nÃ£o pode ser desfeita.')) {
       return
     }
 
@@ -197,10 +197,10 @@ export default function BoletimContabil() {
       await boletimContabilService.fecharBoletim(periodoSelecionado)
       await loadBoletimAtual()
       await loadBoletins()
-      alert('✅ Boletim fechado com sucesso!')
+      alert('âÅ“â€¦ Boletim fechado com sucesso!')
     } catch (error) {
       console.error('Erro ao fechar boletim:', error)
-      alert('❌ Erro ao fechar boletim')
+      alert('â�Å’ Erro ao fechar boletim')
     }
   }
 
@@ -220,7 +220,7 @@ export default function BoletimContabil() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando boletim contábil...</p>
+          <p className="mt-4 text-gray-600">Carregando boletim contÃ¡bil...</p>
         </div>
       </div>
     )
@@ -233,8 +233,8 @@ export default function BoletimContabil() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Boletim Contábil</h1>
-              <p className="text-gray-600">Controle automático das operações financeiras dos animais</p>
+              <h1 className="text-2xl font-bold text-gray-900">Boletim ContÃ¡bil</h1>
+              <p className="text-gray-600">Controle automÃ¡tico das operaÃ§Ãµes financeiras dos animais</p>
             </div>
             <div className="flex space-x-3">
               <button
@@ -257,13 +257,13 @@ export default function BoletimContabil() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Seletor de Período */}
+        {/* Seletor de PerÃ­odo */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center space-x-4 flex-1 min-w-[200px]">
               <CalendarIcon className="h-5 w-5 text-gray-400" />
               <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700">Período</label>
+                <label className="block text-sm font-medium text-gray-700">PerÃ­odo</label>
                 <select
                   value={periodoSelecionado}
                   onChange={(e) => handlePeriodoChange(e.target.value)}
@@ -301,7 +301,7 @@ export default function BoletimContabil() {
                 </div>
                 {localidadeBoletim && (
                   <p className="mt-1 text-xs text-blue-600 font-medium">
-                    📍 Gado entrará em: <strong>{localidadeBoletim}</strong>
+                    ðÅ¸â€œ� Gado entrarÃ¡ em: <strong>{localidadeBoletim}</strong>
                   </p>
                 )}
               </div>
@@ -352,7 +352,7 @@ export default function BoletimContabil() {
                 <CurrencyDollarIcon className="h-8 w-8 text-red-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Total Saídas</p>
+                <p className="text-sm font-medium text-gray-500">Total SaÃ­das</p>
                 <p className="text-2xl font-semibold text-gray-900">
                   {formatarValor(boletimAtual?.resumo.totalSaidas || 0)}
                 </p>
@@ -380,7 +380,7 @@ export default function BoletimContabil() {
                 <CurrencyDollarIcon className={`h-8 w-8 ${(boletimAtual?.resumo.saldoPeriodo || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`} />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Saldo do Período</p>
+                <p className="text-sm font-medium text-gray-500">Saldo do PerÃ­odo</p>
                 <p className="text-2xl font-semibold text-gray-900">
                   {formatarValor(boletimAtual?.resumo.saldoPeriodo || 0)}
                 </p>
@@ -389,14 +389,14 @@ export default function BoletimContabil() {
           </div>
         </div>
 
-        {/* Tabs de Navegação */}
+        {/* Tabs de NavegaÃ§Ã£o */}
         <div className="bg-white rounded-lg shadow-sm mb-6">
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8 px-6">
               {[
                 { id: 'resumo', name: 'Resumo', icon: ChartBarIcon },
                 { id: 'entradas', name: 'Entradas', icon: ArrowDownTrayIcon },
-                { id: 'saidas', name: 'Saídas', icon: ArrowDownTrayIcon },
+                { id: 'saidas', name: 'SaÃ­das', icon: ArrowDownTrayIcon },
                 { id: 'custos', name: 'Custos', icon: CurrencyDollarIcon },
                 { id: 'receitas', name: 'Receitas', icon: CurrencyDollarIcon }
               ].map(tab => (
@@ -416,11 +416,11 @@ export default function BoletimContabil() {
             </nav>
           </div>
 
-          {/* Conteúdo das Tabs */}
+          {/* ConteÃºdo das Tabs */}
           <div className="p-6">
             {activeTab === 'resumo' && (
               <div className="space-y-6">
-                <h3 className="text-lg font-medium text-gray-900">Resumo do Período</h3>
+                <h3 className="text-lg font-medium text-gray-900">Resumo do PerÃ­odo</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <h4 className="text-sm font-medium text-gray-700 mb-3">Entradas</h4>
@@ -440,7 +440,7 @@ export default function BoletimContabil() {
                     </div>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">Saídas</h4>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">SaÃ­das</h4>
                     <div className="space-y-2">
                       <div className="flex justify-between">
                         <span className="text-sm text-gray-600">Vendas:</span>
@@ -462,7 +462,7 @@ export default function BoletimContabil() {
 
             {activeTab === 'entradas' && (
               <div className="space-y-6">
-                <h3 className="text-lg font-medium text-gray-900">Entradas do Período</h3>
+                <h3 className="text-lg font-medium text-gray-900">Entradas do PerÃ­odo</h3>
                 
                 {/* Compras */}
                 <div>
@@ -513,7 +513,7 @@ export default function BoletimContabil() {
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Animal</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Observações</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ObservaÃ§Ãµes</th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
@@ -542,7 +542,7 @@ export default function BoletimContabil() {
 
             {activeTab === 'saidas' && (
               <div className="space-y-6">
-                <h3 className="text-lg font-medium text-gray-900">Saídas do Período</h3>
+                <h3 className="text-lg font-medium text-gray-900">SaÃ­das do PerÃ­odo</h3>
                 
                 {/* Vendas */}
                 <div>
@@ -618,7 +618,7 @@ export default function BoletimContabil() {
 
             {activeTab === 'custos' && (
               <div className="space-y-6">
-                <h3 className="text-lg font-medium text-gray-900">Custos do Período ({boletimAtual?.custos.length || 0})</h3>
+                <h3 className="text-lg font-medium text-gray-900">Custos do PerÃ­odo ({boletimAtual?.custos.length || 0})</h3>
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
@@ -627,7 +627,7 @@ export default function BoletimContabil() {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Animal</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Observações</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ObservaÃ§Ãµes</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -658,11 +658,11 @@ export default function BoletimContabil() {
 
             {activeTab === 'receitas' && (
               <div className="space-y-6">
-                <h3 className="text-lg font-medium text-gray-900">Receitas do Período ({boletimAtual?.receitas.length || 0})</h3>
+                <h3 className="text-lg font-medium text-gray-900">Receitas do PerÃ­odo ({boletimAtual?.receitas.length || 0})</h3>
                 <div className="text-center py-12 text-gray-500">
                   <CurrencyDollarIcon className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                  <p>Nenhuma receita registrada neste período</p>
-                  <p className="text-sm">As receitas serão registradas automaticamente conforme as operações</p>
+                  <p>Nenhuma receita registrada neste perÃ­odo</p>
+                  <p className="text-sm">As receitas serÃ£o registradas automaticamente conforme as operaÃ§Ãµes</p>
                 </div>
               </div>
             )}
@@ -670,7 +670,7 @@ export default function BoletimContabil() {
         </div>
       </div>
 
-      {/* Modal de Exportação */}
+      {/* Modal de ExportaÃ§Ã£o */}
       {showExportModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">

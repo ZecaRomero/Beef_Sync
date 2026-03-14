@@ -3,7 +3,7 @@ const fs = require('fs');
 
 async function debugExcelGeneration() {
   try {
-    console.log('🔍 Debugando geração de Excel...');
+    console.log('�Ÿ”� Debugando geração de Excel...');
     
     // Testar primeiro a API de geração de dados
     console.log('\n1. Testando API de geração de dados...');
@@ -22,15 +22,15 @@ async function debugExcelGeneration() {
     });
 
     if (!generateResponse.ok) {
-      console.log('❌ Erro na API generate:', generateResponse.status);
+      console.log('�Œ Erro na API generate:', generateResponse.status);
       const errorText = await generateResponse.text();
       console.log('Erro:', errorText);
       return;
     }
 
     const generateData = await generateResponse.json();
-    console.log('✅ API generate funcionando');
-    console.log('📊 Estrutura dos dados:');
+    console.log('�œ… API generate funcionando');
+    console.log('�Ÿ“Š Estrutura dos dados:');
     console.log('- success:', generateData.success);
     console.log('- data exists:', !!generateData.data);
     console.log('- data.data exists:', !!generateData.data?.data);
@@ -60,43 +60,43 @@ async function debugExcelGeneration() {
       })
     });
 
-    console.log('📊 Status download:', downloadResponse.status);
-    console.log('📊 Headers:', Object.fromEntries(downloadResponse.headers.entries()));
+    console.log('�Ÿ“Š Status download:', downloadResponse.status);
+    console.log('�Ÿ“Š Headers:', Object.fromEntries(downloadResponse.headers.entries()));
 
     if (!downloadResponse.ok) {
       const errorText = await downloadResponse.text();
-      console.log('❌ Erro no download:', errorText);
+      console.log('�Œ Erro no download:', errorText);
       return;
     }
 
     const buffer = await downloadResponse.buffer();
-    console.log('📊 Tamanho do buffer:', buffer.length, 'bytes');
+    console.log('�Ÿ“Š Tamanho do buffer:', buffer.length, 'bytes');
     
     if (buffer.length > 0) {
       fs.writeFileSync('debug-excel-output.xlsx', buffer);
-      console.log('💾 Arquivo salvo como debug-excel-output.xlsx');
+      console.log('�Ÿ’� Arquivo salvo como debug-excel-output.xlsx');
       
       // Verificar se o arquivo tem conteúdo
       const fileStats = fs.statSync('debug-excel-output.xlsx');
-      console.log('📁 Tamanho do arquivo salvo:', fileStats.size, 'bytes');
+      console.log('�Ÿ“� Tamanho do arquivo salvo:', fileStats.size, 'bytes');
       
       // Verificar os primeiros bytes para ver se é um arquivo Excel válido
       const firstBytes = buffer.slice(0, 4);
-      console.log('🔍 Primeiros 4 bytes (hex):', firstBytes.toString('hex'));
-      console.log('🔍 Primeiros 4 bytes (string):', firstBytes.toString());
+      console.log('�Ÿ”� Primeiros 4 bytes (hex):', firstBytes.toString('hex'));
+      console.log('�Ÿ”� Primeiros 4 bytes (string):', firstBytes.toString());
       
       // Arquivo Excel deve começar com PK (ZIP signature)
       if (firstBytes[0] === 0x50 && firstBytes[1] === 0x4B) {
-        console.log('✅ Arquivo parece ser um ZIP/Excel válido');
+        console.log('�œ… Arquivo parece ser um ZIP/Excel válido');
       } else {
-        console.log('❌ Arquivo não parece ser um Excel válido');
+        console.log('�Œ Arquivo não parece ser um Excel válido');
       }
     } else {
-      console.log('❌ Buffer está vazio!');
+      console.log('�Œ Buffer está vazio!');
     }
 
   } catch (error) {
-    console.error('❌ Erro no debug:', error.message);
+    console.error('�Œ Erro no debug:', error.message);
     console.error('Stack:', error.stack);
   }
 }

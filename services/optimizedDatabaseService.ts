@@ -1,5 +1,5 @@
 /**
- * Serviço de banco de dados otimizado com cache e pooling melhorado
+ * ServiÃ§o de banco de dados otimizado com cache e pooling melhorado
  */
 
 import { query as dbQuery } from '../lib/database';
@@ -13,7 +13,7 @@ import type {
 } from '../types';
 
 /**
- * Classe de serviço de banco de dados otimizado
+ * Classe de serviÃ§o de banco de dados otimizado
  */
 export class OptimizedDatabaseService {
   private static instance: OptimizedDatabaseService;
@@ -31,7 +31,7 @@ export class OptimizedDatabaseService {
   }
 
   /**
-   * Executar query com retry automático
+   * Executar query com retry automÃ¡tico
    */
   private async executeQuery<T = any>(
     query: string,
@@ -72,10 +72,10 @@ export class OptimizedDatabaseService {
     }
   }
 
-  // ============ OPERAÇÕES COM ANIMAIS ============
+  // ============ OPERAÃâ€¡Ãâ€¢ES COM ANIMAIS ============
 
   /**
-   * Buscar todos os animais com filtros e paginação
+   * Buscar todos os animais com filtros e paginaÃ§Ã£o
    */
   async getAnimals(
     filters?: AnimalFilter,
@@ -246,7 +246,7 @@ export class OptimizedDatabaseService {
    */
   async updateAnimal(id: number, updates: Partial<Animal>): Promise<Animal> {
     try {
-      // Construir query dinâmica apenas com campos fornecidos
+      // Construir query dinÃ¢mica apenas com campos fornecidos
       const fields: string[] = [];
       const values: any[] = [];
       let paramIndex = 1;
@@ -304,7 +304,7 @@ export class OptimizedDatabaseService {
     }
   }
 
-  // ============ OPERAÇÕES COM CUSTOS ============
+  // ============ OPERAÃâ€¡Ãâ€¢ES COM CUSTOS ============
 
   /**
    * Buscar custos de um animal
@@ -368,10 +368,10 @@ export class OptimizedDatabaseService {
     }
   }
 
-  // ============ ESTATÍSTICAS ============
+  // ============ ESTATÃ�STICAS ============
 
   /**
-   * Obter estatísticas do dashboard
+   * Obter estatÃ­sticas do dashboard
    */
   async getDashboardStats(): Promise<any> {
     const cacheKey = 'dashboard:stats';
@@ -431,7 +431,7 @@ export class OptimizedDatabaseService {
   }
 }
 
-// Exportar instância singleton
+// Exportar instÃ¢ncia singleton
 export const dbService = OptimizedDatabaseService.getInstance();
 export default dbService;
 

@@ -9,7 +9,7 @@ async function verificarTabela() {
       ORDER BY ordinal_position
     `);
     
-    console.log('📋 Estrutura da tabela animais:');
+    console.log('�Ÿ“‹ Estrutura da tabela animais:');
     result.rows.forEach(col => {
       console.log(`  - ${col.column_name} (${col.data_type}) ${col.is_nullable === 'YES' ? 'NULL' : 'NOT NULL'}`);
     });

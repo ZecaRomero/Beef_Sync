@@ -3,7 +3,7 @@ const { query } = require('../lib/database');
 
 async function addParentColumns() {
   try {
-    console.log('🔄 Iniciando migração para adicionar colunas de genealogia...');
+    console.log('�Ÿ”„ Iniciando migração para adicionar colunas de genealogia...');
 
     const columns = [
       'serie_pai',
@@ -27,9 +27,9 @@ async function addParentColumns() {
       `);
     }
 
-    console.log('✅ Migração concluída com sucesso!');
+    console.log('�œ… Migração concluída com sucesso!');
   } catch (error) {
-    console.error('❌ Erro durante a migração:', error);
+    console.error('�Œ Erro durante a migração:', error);
   } finally {
     process.exit(0);
   }

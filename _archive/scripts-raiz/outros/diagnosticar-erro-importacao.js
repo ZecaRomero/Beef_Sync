@@ -14,10 +14,10 @@ async function diagnosticar() {
   const client = await pool.connect()
   
   try {
-    console.log('🔍 Iniciando diagnóstico...\n')
+    console.log('�Ÿ”� Iniciando diagnóstico...\n')
     
     // 1. Verificar tipos de dados das colunas
-    console.log('1️⃣ Verificando tipos de dados das colunas serie e rg:')
+    console.log('1️�ƒ� Verificando tipos de dados das colunas serie e rg:')
     const tiposResult = await client.query(`
       SELECT column_name, data_type, character_maximum_length
       FROM information_schema.columns
@@ -29,7 +29,7 @@ async function diagnosticar() {
     console.table(tiposResult.rows)
     
     // 2. Verificar se há valores com letras no RG
-    console.log('\n2️⃣ Verificando RGs com letras (não numéricos):')
+    console.log('\n2️�ƒ� Verificando RGs com letras (não numéricos):')
     const rgsComLetras = await client.query(`
       SELECT serie, rg, COUNT(*) as quantidade
       FROM animais
@@ -40,14 +40,14 @@ async function diagnosticar() {
     `)
     
     if (rgsComLetras.rows.length > 0) {
-      console.log('   ⚠️ Encontrados RGs com letras:')
+      console.log('   �š�️ Encontrados RGs com letras:')
       console.table(rgsComLetras.rows)
     } else {
-      console.log('   ✅ Nenhum RG com letras encontrado')
+      console.log('   �œ… Nenhum RG com letras encontrado')
     }
     
     // 3. Verificar constraints
-    console.log('\n3️⃣ Verificando constraints na tabela animais:')
+    console.log('\n3️�ƒ� Verificando constraints na tabela animais:')
     const constraints = await client.query(`
       SELECT 
         conname as constraint_name,
@@ -61,11 +61,11 @@ async function diagnosticar() {
     if (constraints.rows.length > 0) {
       console.table(constraints.rows)
     } else {
-      console.log('   ℹ️ Nenhuma constraint encontrada')
+      console.log('   �„�️ Nenhuma constraint encontrada')
     }
     
     // 4. Verificar triggers
-    console.log('\n4️⃣ Verificando triggers na tabela animais:')
+    console.log('\n4️�ƒ� Verificando triggers na tabela animais:')
     const triggers = await client.query(`
       SELECT 
         trigger_name,
@@ -79,11 +79,11 @@ async function diagnosticar() {
     if (triggers.rows.length > 0) {
       console.table(triggers.rows)
     } else {
-      console.log('   ℹ️ Nenhum trigger encontrado')
+      console.log('   �„�️ Nenhum trigger encontrado')
     }
     
     // 5. Verificar índices
-    console.log('\n5️⃣ Verificando índices na tabela animais:')
+    console.log('\n5️�ƒ� Verificando índices na tabela animais:')
     const indices = await client.query(`
       SELECT 
         indexname,
@@ -96,11 +96,11 @@ async function diagnosticar() {
     if (indices.rows.length > 0) {
       console.table(indices.rows)
     } else {
-      console.log('   ℹ️ Nenhum índice encontrado')
+      console.log('   �„�️ Nenhum índice encontrado')
     }
     
     // 6. Testar inserção de um animal com RG contendo letras
-    console.log('\n6️⃣ Testando inserção de animal com RG contendo letras:')
+    console.log('\n6️�ƒ� Testando inserção de animal com RG contendo letras:')
     try {
       const testResult = await client.query(`
         INSERT INTO animais (serie, rg, nome, sexo, raca, situacao)
@@ -108,24 +108,24 @@ async function diagnosticar() {
         RETURNING id, serie, rg
       `)
       
-      console.log('   ✅ Inserção bem-sucedida:')
+      console.log('   �œ… Inserção bem-sucedida:')
       console.table(testResult.rows)
       
       // Limpar teste
       await client.query('DELETE FROM animais WHERE serie = $1 AND rg = $2', ['TEST', 'Lc CJCJ 17039'])
-      console.log('   🧹 Animal de teste removido')
+      console.log('   �Ÿ�� Animal de teste removido')
       
     } catch (error) {
-      console.log('   ❌ Erro ao inserir:')
+      console.log('   �Œ Erro ao inserir:')
       console.log('   Código:', error.code)
       console.log('   Mensagem:', error.message)
       console.log('   Detalhe:', error.detail)
     }
     
-    console.log('\n✅ Diagnóstico concluído!')
+    console.log('\n�œ… Diagnóstico concluído!')
     
   } catch (error) {
-    console.error('❌ Erro durante diagnóstico:', error)
+    console.error('�Œ Erro durante diagnóstico:', error)
     console.error('Stack:', error.stack)
   } finally {
     client.release()

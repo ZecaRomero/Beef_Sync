@@ -2,7 +2,7 @@ const { query } = require('../lib/database')
 
 async function testarAPI() {
   try {
-    console.log('🔍 Testando busca de notas fiscais via API...\n')
+    console.log('�Ÿ”� Testando busca de notas fiscais via API...\n')
 
     // Simular a query da API
     const result = await query(`
@@ -43,38 +43,38 @@ async function testarAPI() {
       ORDER BY nf.data DESC, nf.created_at DESC
     `)
 
-    console.log(`📊 Total de notas fiscais: ${result.rows.length}\n`)
+    console.log(`�Ÿ“Š Total de notas fiscais: ${result.rows.length}\n`)
 
     // Separar por tipo
     const entradas = result.rows.filter(nf => nf.tipo === 'entrada')
     const saidas = result.rows.filter(nf => nf.tipo === 'saida')
 
-    console.log(`📥 Entradas: ${entradas.length}`)
+    console.log(`�Ÿ“� Entradas: ${entradas.length}`)
     entradas.forEach(nf => {
       console.log(`   - NF ${nf.numero_nf}: R$ ${parseFloat(nf.valor_total || 0).toFixed(2)} - Data: ${nf.data || nf.data_compra || nf.created_at}`)
     })
 
-    console.log(`\n📤 Saídas: ${saidas.length}`)
+    console.log(`\n�Ÿ“� Saídas: ${saidas.length}`)
     saidas.forEach(nf => {
       console.log(`   - NF ${nf.numero_nf}: R$ ${parseFloat(nf.valor_total || 0).toFixed(2)} - Data: ${nf.data || nf.data_compra || nf.created_at}`)
       console.log(`     Destino: ${nf.destino || 'N/A'}`)
     })
 
     // Verificar NF 4393 especificamente
-    console.log('\n🔍 Verificando NF 4393:')
+    console.log('\n�Ÿ”� Verificando NF 4393:')
     const nf4393 = result.rows.find(nf => nf.numero_nf == '4393' || nf.numero_nf == 4393)
     if (nf4393) {
-      console.log(`   ✅ Encontrada!`)
+      console.log(`   �œ… Encontrada!`)
       console.log(`   Tipo: ${nf4393.tipo}`)
       console.log(`   Valor: R$ ${parseFloat(nf4393.valor_total || 0).toFixed(2)}`)
       console.log(`   Data: ${nf4393.data || nf4393.data_compra || nf4393.created_at}`)
       console.log(`   Destino: ${nf4393.destino || 'N/A'}`)
     } else {
-      console.log(`   ❌ Não encontrada na lista`)
+      console.log(`   �Œ Não encontrada na lista`)
     }
 
     // Verificar formato dos dados
-    console.log('\n📋 Exemplo de dados de uma saída:')
+    console.log('\n�Ÿ“‹ Exemplo de dados de uma saída:')
     if (saidas.length > 0) {
       const exemplo = saidas[0]
       console.log(`   ID: ${exemplo.id}`)
@@ -89,7 +89,7 @@ async function testarAPI() {
     }
 
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('�Œ Erro:', error)
     throw error
   }
 }
@@ -97,11 +97,11 @@ async function testarAPI() {
 if (require.main === module) {
   testarAPI()
     .then(() => {
-      console.log('\n✅ Teste concluído!')
+      console.log('\n�œ… Teste concluído!')
       process.exit(0)
     })
     .catch((error) => {
-      console.error('❌ Erro:', error)
+      console.error('�Œ Erro:', error)
       process.exit(1)
     })
 }

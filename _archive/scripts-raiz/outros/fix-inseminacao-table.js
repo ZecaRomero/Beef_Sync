@@ -2,7 +2,7 @@
 const { query } = require('./lib/database')
 
 async function fixInseminacaoTable() {
-  console.log('🔧 Corrigindo estrutura da tabela inseminacoes...\n')
+  console.log('�Ÿ”� Corrigindo estrutura da tabela inseminacoes...\n')
 
   try {
     // 1. Verificar se a tabela existe
@@ -16,7 +16,7 @@ async function fixInseminacaoTable() {
     `)
     
     if (!tableExists.rows[0].exists) {
-      console.log('   ❌ Tabela inseminacoes não existe. Criando...')
+      console.log('   �Œ Tabela inseminacoes não existe. Criando...')
       await query(`
         CREATE TABLE inseminacoes (
           id SERIAL PRIMARY KEY,
@@ -30,9 +30,9 @@ async function fixInseminacaoTable() {
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `)
-      console.log('   ✅ Tabela inseminacoes criada')
+      console.log('   �œ… Tabela inseminacoes criada')
     } else {
-      console.log('   ✅ Tabela inseminacoes existe')
+      console.log('   �œ… Tabela inseminacoes existe')
     }
 
     // 2. Adicionar colunas que podem estar faltando
@@ -67,12 +67,12 @@ async function fixInseminacaoTable() {
         if (!columnExists.rows[0].exists) {
           console.log(`   Adicionando coluna ${column.name}...`)
           await query(`ALTER TABLE inseminacoes ADD COLUMN ${column.name} ${column.type}`)
-          console.log(`   ✅ Coluna ${column.name} adicionada (${column.description})`)
+          console.log(`   �œ… Coluna ${column.name} adicionada (${column.description})`)
         } else {
-          console.log(`   ✅ Coluna ${column.name} já existe`)
+          console.log(`   �œ… Coluna ${column.name} já existe`)
         }
       } catch (error) {
-        console.error(`   ❌ Erro ao adicionar coluna ${column.name}:`, error.message)
+        console.error(`   �Œ Erro ao adicionar coluna ${column.name}:`, error.message)
       }
     }
 
@@ -88,9 +88,9 @@ async function fixInseminacaoTable() {
     for (const index of indexes) {
       try {
         await query(`CREATE INDEX IF NOT EXISTS ${index.name} ON inseminacoes(${index.column})`)
-        console.log(`   ✅ Índice ${index.name} criado`)
+        console.log(`   �œ… Índice ${index.name} criado`)
       } catch (error) {
-        console.log(`   ⚠️ Índice ${index.name} já existe ou erro:`, error.message)
+        console.log(`   �š�️ Índice ${index.name} já existe ou erro:`, error.message)
       }
     }
 
@@ -163,29 +163,29 @@ async function fixInseminacaoTable() {
           null
         ])
         
-        console.log('   ✅ Estrutura da tabela está correta para inserções')
+        console.log('   �œ… Estrutura da tabela está correta para inserções')
       } catch (error) {
-        console.error('   ❌ Erro no teste de estrutura:', error.message)
+        console.error('   �Œ Erro no teste de estrutura:', error.message)
       }
     } else {
-      console.log('   ⚠️ Nenhum animal fêmea encontrado para teste')
+      console.log('   �š�️ Nenhum animal fêmea encontrado para teste')
     }
 
-    console.log('\n✅ Correção da tabela inseminacoes concluída!')
+    console.log('\n�œ… Correção da tabela inseminacoes concluída!')
 
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('�Œ Erro:', error)
   }
 }
 
 // Executar
 fixInseminacaoTable()
   .then(() => {
-    console.log('\n🎯 RESULTADO:')
-    console.log('• Tabela inseminacoes corrigida')
-    console.log('• Todas as colunas necessárias adicionadas')
-    console.log('• Índices criados')
-    console.log('• Importação de Excel deve funcionar agora')
+    console.log('\n�ŸŽ� RESULTADO:')
+    console.log('�€� Tabela inseminacoes corrigida')
+    console.log('�€� Todas as colunas necessárias adicionadas')
+    console.log('�€� Índices criados')
+    console.log('�€� Importação de Excel deve funcionar agora')
     process.exit(0)
   })
   .catch(error => {

@@ -25,7 +25,7 @@ export default function Quarentena() {
             return;
           }
         } catch (apiError) {
-          console.warn('API não disponível, usando localStorage:', apiError);
+          console.warn('API nÃ£o disponÃ­vel, usando localStorage:', apiError);
         }
 
         // Fallback para localStorage
@@ -82,12 +82,12 @@ export default function Quarentena() {
               <ExclamationTriangleIcon className="h-8 w-8 text-yellow-600 mr-3" />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Quarentena</h1>
-                <p className="text-sm text-gray-600">Animais em isolamento sanitário</p>
+                <p className="text-sm text-gray-600">Animais em isolamento sanitÃ¡rio</p>
               </div>
             </div>
             <button className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700">
               <PlusIcon className="h-4 w-4 mr-2" />
-              Adicionar à Quarentena
+              Adicionar Ã  Quarentena
             </button>
           </div>
         </div>
@@ -125,7 +125,7 @@ export default function Quarentena() {
                 <div className="ml-5 w-0 flex-1">
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 truncate">
-                      Tempo Médio
+                      Tempo MÃ©dio
                     </dt>
                     <dd className="text-lg font-medium text-gray-900">
                       {animaisQuarentena.length > 0 
@@ -171,7 +171,7 @@ export default function Quarentena() {
             <div className="text-center py-12">
               <ExclamationTriangleIcon className="mx-auto h-12 w-12 text-gray-400" />
               <h3 className="mt-2 text-sm font-medium text-gray-900">Nenhum animal em quarentena</h3>
-              <p className="mt-1 text-sm text-gray-500">Nenhum animal está atualmente em quarentena.</p>
+              <p className="mt-1 text-sm text-gray-500">Nenhum animal estÃ¡ atualmente em quarentena.</p>
             </div>
           ) : (
             <ul className="divide-y divide-gray-200">
@@ -189,9 +189,9 @@ export default function Quarentena() {
                           <div className="mt-2 flex items-center text-sm text-gray-500">
                             <CalendarIcon className="flex-shrink-0 mr-1.5 h-4 w-4" />
                             Entrada: {new Date(animal.dataEntrada).toLocaleDateString('pt-BR')}
-                            <span className="mx-2">•</span>
-                            Previsão saída: {new Date(animal.previsaoSaida).toLocaleDateString('pt-BR')}
-                            <span className="mx-2">•</span>
+                            <span className="mx-2">ââ‚¬¢</span>
+                            PrevisÃ£o saÃ­da: {new Date(animal.previsaoSaida).toLocaleDateString('pt-BR')}
+                            <span className="mx-2">ââ‚¬¢</span>
                             <MapPinIcon className="flex-shrink-0 mr-1.5 h-4 w-4" />
                             {animal.localizacao}
                           </div>

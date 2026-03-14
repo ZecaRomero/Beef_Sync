@@ -146,24 +146,24 @@ async function testDatabaseConnection() {
 
 // Função principal
 async function verificarAPIs() {
-  console.log('🔍 VERIFICAÇÃO DE APIS DE IMPORTAÇÃO E CONEXÕES\n')
-  console.log(`📍 URL Base: ${BASE_URL}\n`)
+  console.log('�Ÿ”� VERIFICA�‡�ƒO DE APIS DE IMPORTA�‡�ƒO E CONEX�•ES\n')
+  console.log(`�Ÿ“� URL Base: ${BASE_URL}\n`)
   console.log('='.repeat(80))
   
   // Testar conexão com banco de dados
-  console.log('\n📊 TESTANDO CONEXÃO COM BANCO DE DADOS...')
+  console.log('\n�Ÿ“Š TESTANDO CONEX�ƒO COM BANCO DE DADOS...')
   const dbTest = await testDatabaseConnection()
   if (dbTest.success) {
-    console.log(`✅ ${dbTest.message}`)
+    console.log(`�œ… ${dbTest.message}`)
     console.log(`   Database: ${dbTest.database}`)
     console.log(`   Timestamp: ${dbTest.timestamp}`)
   } else {
-    console.log(`❌ ${dbTest.message}`)
+    console.log(`�Œ ${dbTest.message}`)
     console.log(`   Erro: ${dbTest.error}`)
   }
   
   console.log('\n' + '='.repeat(80))
-  console.log('\n🌐 TESTANDO APIs DE IMPORTAÇÃO...\n')
+  console.log('\n�ŸŒ� TESTANDO APIs DE IMPORTA�‡�ƒO...\n')
   
   const resultados = []
   
@@ -180,7 +180,7 @@ async function verificarAPIs() {
         }
       }
       
-      console.log(`\n📡 Testando: ${api.name}`)
+      console.log(`\n�Ÿ“� Testando: ${api.name}`)
       console.log(`   Endpoint: ${api.endpoint}`)
       console.log(`   Método: ${api.method}`)
       
@@ -202,24 +202,24 @@ async function verificarAPIs() {
       })
       
       if (isSuccess && isJson) {
-        console.log(`   ✅ Status: ${response.statusCode} (${duration}ms)`)
+        console.log(`   �œ… Status: ${response.statusCode} (${duration}ms)`)
         if (response.body?.success !== false) {
-          console.log(`   ✅ Resposta JSON válida`)
+          console.log(`   �œ… Resposta JSON válida`)
         } else {
-          console.log(`   ⚠️  Resposta indica erro: ${response.body?.message || 'Erro desconhecido'}`)
+          console.log(`   �š�️  Resposta indica erro: ${response.body?.message || 'Erro desconhecido'}`)
         }
       } else if (isSuccess && !isJson) {
-        console.log(`   ⚠️  Status: ${response.statusCode} mas resposta não é JSON`)
+        console.log(`   �š�️  Status: ${response.statusCode} mas resposta não é JSON`)
         console.log(`   Tipo: ${response.headers['content-type']}`)
       } else {
-        console.log(`   ❌ Status: ${response.statusCode}`)
+        console.log(`   �Œ Status: ${response.statusCode}`)
         if (response.body?.message) {
           console.log(`   Mensagem: ${response.body.message}`)
         }
       }
       
     } catch (error) {
-      console.log(`   ❌ Erro: ${error.message}`)
+      console.log(`   �Œ Erro: ${error.message}`)
       resultados.push({
         name: api.name,
         endpoint: api.endpoint,
@@ -231,25 +231,25 @@ async function verificarAPIs() {
   
   // Resumo
   console.log('\n' + '='.repeat(80))
-  console.log('\n📊 RESUMO DA VERIFICAÇÃO\n')
+  console.log('\n�Ÿ“Š RESUMO DA VERIFICA�‡�ƒO\n')
   
   const sucessos = resultados.filter(r => r.success && !r.hasError).length
   const erros = resultados.filter(r => !r.success || r.hasError).length
   
-  console.log(`✅ APIs funcionando: ${sucessos}/${resultados.length}`)
-  console.log(`❌ APIs com problemas: ${erros}/${resultados.length}`)
+  console.log(`�œ… APIs funcionando: ${sucessos}/${resultados.length}`)
+  console.log(`�Œ APIs com problemas: ${erros}/${resultados.length}`)
   
   if (dbTest.success) {
-    console.log(`✅ Banco de dados: Conectado`)
+    console.log(`�œ… Banco de dados: Conectado`)
   } else {
-    console.log(`❌ Banco de dados: Desconectado`)
+    console.log(`�Œ Banco de dados: Desconectado`)
   }
   
   console.log('\n' + '='.repeat(80))
-  console.log('\n📋 DETALHES POR API:\n')
+  console.log('\n�Ÿ“‹ DETALHES POR API:\n')
   
   resultados.forEach(r => {
-    const status = r.success && !r.hasError ? '✅' : '❌'
+    const status = r.success && !r.hasError ? '�œ…' : '�Œ'
     console.log(`${status} ${r.name}`)
     console.log(`   Endpoint: ${r.endpoint}`)
     if (r.statusCode) {
@@ -266,7 +266,7 @@ async function verificarAPIs() {
   
   // Verificar tabelas do banco
   console.log('\n' + '='.repeat(80))
-  console.log('\n🗄️  VERIFICANDO TABELAS DO BANCO DE DADOS...\n')
+  console.log('\n�Ÿ—„️  VERIFICANDO TABELAS DO BANCO DE DADOS...\n')
   
   try {
     const { pool } = require('../lib/database')
@@ -288,27 +288,27 @@ async function verificarAPIs() {
           SELECT COUNT(*) as total 
           FROM ${tabela}
         `)
-        console.log(`✅ ${tabela}: ${result.rows[0].total} registros`)
+        console.log(`�œ… ${tabela}: ${result.rows[0].total} registros`)
       } catch (error) {
         if (error.code === '42P01') {
-          console.log(`⚠️  ${tabela}: Tabela não existe`)
+          console.log(`�š�️  ${tabela}: Tabela não existe`)
         } else {
-          console.log(`❌ ${tabela}: Erro - ${error.message}`)
+          console.log(`�Œ ${tabela}: Erro - ${error.message}`)
         }
       }
     }
     
     client.release()
   } catch (error) {
-    console.log(`❌ Erro ao verificar tabelas: ${error.message}`)
+    console.log(`�Œ Erro ao verificar tabelas: ${error.message}`)
   }
   
   console.log('\n' + '='.repeat(80))
-  console.log('\n✅ Verificação concluída!\n')
+  console.log('\n�œ… Verificação concluída!\n')
 }
 
 // Executar
 verificarAPIs().catch(error => {
-  console.error('❌ Erro ao executar verificação:', error)
+  console.error('�Œ Erro ao executar verificação:', error)
   process.exit(1)
 })

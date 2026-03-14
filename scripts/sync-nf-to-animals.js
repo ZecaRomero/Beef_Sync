@@ -12,7 +12,7 @@ async function syncNFToAnimals() {
   const client = await pool.connect()
   
   try {
-    console.log('🔄 Sincronizando animais das notas fiscais para a tabela de animais...')
+    console.log('ðÅ¸â€�â€ž Sincronizando animais das notas fiscais para a tabela de animais...')
     
     // Buscar todas as notas fiscais
     const nfsResult = await client.query(`
@@ -22,7 +22,7 @@ async function syncNFToAnimals() {
       ORDER BY created_at DESC
     `)
     
-    console.log(`📄 Encontradas ${nfsResult.rows.length} notas fiscais de entrada`)
+    console.log(`ðÅ¸â€œâ€ž Encontradas ${nfsResult.rows.length} notas fiscais de entrada`)
     
     // Buscar animais existentes
     const animaisResult = await client.query('SELECT serie, rg FROM animais')
@@ -44,13 +44,13 @@ async function syncNFToAnimals() {
           const tatuagem = item.tatuagem
           if (!tatuagem) continue
           
-          // Verificar se animal já existe
+          // Verificar se animal jÃ¡ existe
           if (animaisExistentes.has(tatuagem)) {
-            console.log(`⚠️ Animal ${tatuagem} já existe`)
+            console.log(`âÅ¡ ï¸� Animal ${tatuagem} jÃ¡ existe`)
             continue
           }
           
-          // Extrair série e RG da tatuagem
+          // Extrair sÃ©rie e RG da tatuagem
           let serie, rg
           
           if (tatuagem.includes('-')) {
@@ -64,7 +64,7 @@ async function syncNFToAnimals() {
             serie = partes[0]
             rg = partes.slice(1).join(' ')
           } else {
-            console.log(`⚠️ Formato de tatuagem inválido: ${tatuagem}`)
+            console.log(`âÅ¡ ï¸� Formato de tatuagem invÃ¡lido: ${tatuagem}`)
             continue
           }
           
@@ -75,8 +75,8 @@ async function syncNFToAnimals() {
           const animalData = {
             serie: serie,
             rg: rg,
-            sexo: item.sexo === 'macho' ? 'Macho' : 'Fêmea',
-            raca: item.raca || 'Não informada',
+            sexo: item.sexo === 'macho' ? 'Macho' : 'FÃªmea',
+            raca: item.raca || 'NÃ£o informada',
             data_nascimento: nf.data_compra || new Date().toISOString().split('T')[0],
             peso: parseFloat(item.peso) || 0,
             meses: meses,
@@ -100,15 +100,15 @@ async function syncNFToAnimals() {
           
           animaisCriados++
           animaisExistentes.add(tatuagem) // Adicionar ao set para evitar duplicatas
-          console.log(`✅ Animal criado: ${tatuagem} (${item.raca})`)
+          console.log(`âÅ“â€¦ Animal criado: ${tatuagem} (${item.raca})`)
         }
         
       } catch (error) {
-        console.error(`❌ Erro ao processar NF ${nf.numero_nf}:`, error.message)
+        console.error(`â�Å’ Erro ao processar NF ${nf.numero_nf}:`, error.message)
       }
     }
     
-    console.log(`\n🎉 Sincronização concluída! ${animaisCriados} animais criados.`)
+    console.log(`\nðÅ¸Å½â€° SincronizaÃ§Ã£o concluÃ­da! ${animaisCriados} animais criados.`)
     
     // Verificar resultado final
     const animaisFinal = await client.query('SELECT COUNT(*) as total FROM animais')
@@ -119,15 +119,15 @@ async function syncNFToAnimals() {
       ORDER BY total DESC
     `)
     
-    console.log('\n📊 Resultado final:')
-    console.log(`🐄 Total de animais: ${animaisFinal.rows[0].total}`)
-    console.log('📈 Distribuição por raça:')
+    console.log('\nðÅ¸â€œÅ  Resultado final:')
+    console.log(`ðÅ¸�â€ž Total de animais: ${animaisFinal.rows[0].total}`)
+    console.log('ðÅ¸â€œË† DistribuiÃ§Ã£o por raÃ§a:')
     racasFinal.rows.forEach(raca => {
       console.log(`   ${raca.raca}: ${raca.total} animais`)
     })
     
   } catch (error) {
-    console.error('❌ Erro na sincronização:', error)
+    console.error('â�Å’ Erro na sincronizaÃ§Ã£o:', error)
     throw error
   } finally {
     client.release()
@@ -135,12 +135,12 @@ async function syncNFToAnimals() {
 }
 
 function calcularMesesDaEra(era) {
-  if (!era) return 12 // Padrão
+  if (!era) return 12 // PadrÃ£o
   
-  // IMPORTANTE: Verificar faixas específicas ANTES de verificar valores isolados
+  // IMPORTANTE: Verificar faixas especÃ­ficas ANTES de verificar valores isolados
   const eraLower = String(era).toLowerCase().trim()
   if (eraLower.includes('24/36') || eraLower.includes('24-36')) {
-    return 30 // Idade média da faixa 24/36 meses
+    return 30 // Idade mÃ©dia da faixa 24/36 meses
   }
   
   const eraMap = {
@@ -159,11 +159,11 @@ function calcularMesesDaEra(era) {
 if (require.main === module) {
   syncNFToAnimals()
     .then(() => {
-      console.log('🎉 Sincronização concluída!')
+      console.log('ðÅ¸Å½â€° SincronizaÃ§Ã£o concluÃ­da!')
       process.exit(0)
     })
     .catch((error) => {
-      console.error('💥 Erro na sincronização:', error)
+      console.error('ðÅ¸â€™¥ Erro na sincronizaÃ§Ã£o:', error)
       process.exit(1)
     })
 }

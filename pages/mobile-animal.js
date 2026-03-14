@@ -34,9 +34,9 @@ export default function MobileAnimal() {
   const [rankingCE, setRankingCE] = useState([])
   const [sincronizandoNascimento, setSincronizandoNascimento] = useState(false)
   const [toastSync, setToastSync] = useState(null)
-  const [maeLink, setMaeLink] = useState(null) // { serie, rg } quando mãe pode ser linkada
-  const [maeColetas, setMaeColetas] = useState(null) // resumo de coletas quando mãe não cadastrada mas tem histórico FIV
-  const [fichaDoadora, setFichaDoadora] = useState(null) // histórico FIV quando o animal é doadora (sua própria ficha)
+  const [maeLink, setMaeLink] = useState(null) // { serie, rg } quando mÃ£e pode ser linkada
+  const [maeColetas, setMaeColetas] = useState(null) // resumo de coletas quando mÃ£e nÃ£o cadastrada mas tem histÃ³rico FIV
+  const [fichaDoadora, setFichaDoadora] = useState(null) // histÃ³rico FIV quando o animal Ã© doadora (sua prÃ³pria ficha)
   const [custoTotal, setCustoTotal] = useState(0)
   const [custosLista, setCustosLista] = useState([])
   const [refreshingCustos, setRefreshingCustos] = useState(false)
@@ -59,7 +59,7 @@ export default function MobileAnimal() {
         setToastSync({ tipo: 'erro', msg: data.message || 'Erro ao sincronizar' })
       }
     } catch (e) {
-      setToastSync({ tipo: 'erro', msg: 'Erro de conexão' })
+      setToastSync({ tipo: 'erro', msg: 'Erro de conexÃ£o' })
     } finally {
       setSincronizandoNascimento(false)
       setTimeout(() => setToastSync(null), 4000)
@@ -136,7 +136,7 @@ export default function MobileAnimal() {
     const s = overrideSerie ?? serie
     const r = overrideRg ?? rg
     if (!s || !r) {
-      setError('Digite a Série e o RG')
+      setError('Digite a SÃ©rie e o RG')
       return
     }
     setSerie(s)
@@ -152,11 +152,11 @@ export default function MobileAnimal() {
         const animalEncontrado = data.data[0]
         setAnimal(animalEncontrado)
         
-        // Encontrar índice do animal na lista completa
+        // Encontrar Ã­ndice do animal na lista completa
         const idx = allAnimals.findIndex(a => a.id === animalEncontrado.id)
         setCurrentIndex(idx)
       } else {
-        setError('Animal não encontrado')
+        setError('Animal nÃ£o encontrado')
         setAnimal(null)
       }
     } catch (err) {
@@ -194,7 +194,7 @@ export default function MobileAnimal() {
     setCurrentIndex(-1)
   }
 
-  // Buscar serie/rg da mãe quando não vier do backend
+  // Buscar serie/rg da mÃ£e quando nÃ£o vier do backend
   useEffect(() => {
     if (!animal?.mae || (animal.serie_mae && animal.rg_mae)) {
       setMaeLink(null)
@@ -218,7 +218,7 @@ export default function MobileAnimal() {
           setMaeColetas(null)
         } else {
           setMaeLink(null)
-          // Mãe não cadastrada: buscar se tem histórico de coletas FIV
+          // MÃ£e nÃ£o cadastrada: buscar se tem histÃ³rico de coletas FIV
           fetch(`/api/animals/doadora-coletas?identificador=${encodeURIComponent(animal.mae.trim())}`)
             .then(r2 => r2.json())
             .then(d2 => {
@@ -268,7 +268,7 @@ export default function MobileAnimal() {
     refreshCustos()
   }, [animal?.id])
 
-  // Buscar resumo de baixas (próprias e como mãe)
+  // Buscar resumo de baixas (prÃ³prias e como mÃ£e)
   useEffect(() => {
     if (!animal?.serie || !animal?.rg) {
       setBaixasResumo(null)
@@ -284,8 +284,8 @@ export default function MobileAnimal() {
       .catch(() => setBaixasResumo(null))
   }, [animal?.serie, animal?.rg])
 
-  // Buscar histórico FIV quando o animal é doadora (sua própria ficha)
-  // Buscar posição MGTe do animal
+  // Buscar histÃ³rico FIV quando o animal Ã© doadora (sua prÃ³pria ficha)
+  // Buscar posiÃ§Ã£o MGTe do animal
   useEffect(() => {
     if (!animal?.serie || !animal?.rg) {
       setMgtePosicao(null)
@@ -347,7 +347,7 @@ export default function MobileAnimal() {
               onClick={sincronizarNascimentos}
               disabled={sincronizandoNascimento}
               className="p-2 rounded-lg bg-amber-500/80 hover:bg-amber-500 disabled:opacity-50 text-white"
-              title="Sincronizar data de nascimento (nascimentos → animais)"
+              title="Sincronizar data de nascimento (nascimentos ââ€ â€™ animais)"
             >
               <ArrowPathIcon className={`h-5 w-5 ${sincronizandoNascimento ? 'animate-spin' : ''}`} />
             </button>
@@ -361,7 +361,7 @@ export default function MobileAnimal() {
             <button
               onClick={() => router.push('/importacoes')}
               className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white"
-              title="Central de Importações"
+              title="Central de ImportaÃ§Ãµes"
             >
               <DocumentArrowUpIcon className="h-5 w-5" />
             </button>
@@ -377,7 +377,7 @@ export default function MobileAnimal() {
           </div>
         </div>
 
-        {/* Toast sincronização nascimentos */}
+        {/* Toast sincronizaÃ§Ã£o nascimentos */}
         {toastSync && (
           <div className={`fixed top-20 left-4 right-4 z-50 p-4 rounded-xl shadow-lg ${
             toastSync.tipo === 'ok' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
@@ -408,7 +408,7 @@ export default function MobileAnimal() {
                       r.posicao === 3 ? 'bg-amber-700 text-white' :
                       'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
                     }`}>
-                      {r.posicao === 1 ? '🥇' : r.posicao === 2 ? '🥈' : r.posicao === 3 ? '🥉' : r.posicao}
+                      {r.posicao === 1 ? 'ðÅ¸¥â€¡' : r.posicao === 2 ? 'ðÅ¸¥Ë†' : r.posicao === 3 ? 'ðÅ¸¥â€°' : r.posicao}
                     </span>
                     <span className="font-medium text-gray-900 dark:text-white">{r.identificacao}</span>
                   </div>
@@ -425,7 +425,7 @@ export default function MobileAnimal() {
               <TrophyIcon className="h-5 w-5 text-emerald-500" />
               Ranking DECA (Top 10)
             </h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Menor DECA = melhor (1º lugar)</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Menor DECA = melhor (1Âº lugar)</p>
             <div className="space-y-2 max-h-48 overflow-y-auto">
               {rankingDECA.map((r) => (
                 <div
@@ -440,7 +440,7 @@ export default function MobileAnimal() {
                       r.posicao === 3 ? 'bg-amber-700 text-white' :
                       'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
                     }`}>
-                      {r.posicao === 1 ? '🥇' : r.posicao === 2 ? '🥈' : r.posicao === 3 ? '🥉' : r.posicao}
+                      {r.posicao === 1 ? 'ðÅ¸¥â€¡' : r.posicao === 2 ? 'ðÅ¸¥Ë†' : r.posicao === 3 ? 'ðÅ¸¥â€°' : r.posicao}
                     </span>
                     <span className="font-medium text-gray-900 dark:text-white">{r.identificacao}</span>
                   </div>
@@ -472,7 +472,7 @@ export default function MobileAnimal() {
                       r.posicao === 3 ? 'bg-amber-700 text-white' :
                       'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
                     }`}>
-                      {r.posicao === 1 ? '🥇' : r.posicao === 2 ? '🥈' : r.posicao === 3 ? '🥉' : r.posicao}
+                      {r.posicao === 1 ? 'ðÅ¸¥â€¡' : r.posicao === 2 ? 'ðÅ¸¥Ë†' : r.posicao === 3 ? 'ðÅ¸¥â€°' : r.posicao}
                     </span>
                     <span className="font-medium text-gray-900 dark:text-white">{r.identificacao}</span>
                   </div>
@@ -504,7 +504,7 @@ export default function MobileAnimal() {
                       r.posicao === 3 ? 'bg-amber-700 text-white' :
                       'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
                     }`}>
-                      {r.posicao === 1 ? '🥇' : r.posicao === 2 ? '🥈' : r.posicao === 3 ? '🥉' : r.posicao}
+                      {r.posicao === 1 ? 'ðÅ¸¥â€¡' : r.posicao === 2 ? 'ðÅ¸¥Ë†' : r.posicao === 3 ? 'ðÅ¸¥â€°' : r.posicao}
                     </span>
                     <span className="font-medium text-gray-900 dark:text-white">{r.identificacao}</span>
                   </div>
@@ -536,7 +536,7 @@ export default function MobileAnimal() {
                       r.posicao === 3 ? 'bg-amber-700 text-white' :
                       'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
                     }`}>
-                      {r.posicao === 1 ? '🥇' : r.posicao === 2 ? '🥈' : r.posicao === 3 ? '🥉' : r.posicao}
+                      {r.posicao === 1 ? 'ðÅ¸¥â€¡' : r.posicao === 2 ? 'ðÅ¸¥Ë†' : r.posicao === 3 ? 'ðÅ¸¥â€°' : r.posicao}
                     </span>
                     <span className="font-medium text-gray-900 dark:text-white">{r.identificacao}</span>
                   </div>
@@ -569,7 +569,7 @@ export default function MobileAnimal() {
                       r.posicao === 3 ? 'bg-amber-700 text-white' :
                       'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
                     }`}>
-                      {r.posicao === 1 ? '🥇' : r.posicao === 2 ? '🥈' : r.posicao === 3 ? '🥉' : r.posicao}
+                      {r.posicao === 1 ? 'ðÅ¸¥â€¡' : r.posicao === 2 ? 'ðÅ¸¥Ë†' : r.posicao === 3 ? 'ðÅ¸¥â€°' : r.posicao}
                     </span>
                     <span className="font-medium text-gray-900 dark:text-white">{r.identificacao}</span>
                   </div>
@@ -587,7 +587,7 @@ export default function MobileAnimal() {
               <TrophyIcon className="h-5 w-5 text-purple-500" />
               Ranking CE (Top 10)
             </h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Maiores circunferências escrotais (machos)</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Maiores circunferÃªncias escrotais (machos)</p>
             <div className="space-y-2 max-h-48 overflow-y-auto">
               {rankingCE.map((r) => (
                 <div
@@ -602,7 +602,7 @@ export default function MobileAnimal() {
                       r.posicao === 3 ? 'bg-amber-700 text-white' :
                       'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
                     }`}>
-                      {r.posicao === 1 ? '🥇' : r.posicao === 2 ? '🥈' : r.posicao === 3 ? '🥉' : r.posicao}
+                      {r.posicao === 1 ? 'ðÅ¸¥â€¡' : r.posicao === 2 ? 'ðÅ¸¥Ë†' : r.posicao === 3 ? 'ðÅ¸¥â€°' : r.posicao}
                     </span>
                     <span className="font-medium text-gray-900 dark:text-white">{r.identificacao}</span>
                   </div>
@@ -617,19 +617,19 @@ export default function MobileAnimal() {
         {!animal && (
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6">
             <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 text-center">
-              🔍 Buscar Animal
+              ðÅ¸â€�� Buscar Animal
             </h2>
             
             <form onSubmit={buscarAnimal} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Série
+                  SÃ©rie
                 </label>
                 <input
                   type="text"
                   value={serie}
                   onChange={(e) => setSerie(e.target.value.toUpperCase())}
-                  placeholder="Digite a Série ( CJCJ) "
+                  placeholder="Digite a SÃ©rie ( CJCJ) "
                   className="w-full px-4 py-3 text-lg border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                   autoFocus
                 />
@@ -690,7 +690,7 @@ export default function MobileAnimal() {
                   onClick={limparBusca}
                   className="px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-lg text-sm font-medium"
                 >
-                  ← Voltar
+                  ââ€ � Voltar
                 </button>
                 <span className={`px-3 py-1 rounded-full text-xs font-bold ${
                   animal.situacao === 'Ativo' ? 'bg-green-500 text-white' :
@@ -706,26 +706,26 @@ export default function MobileAnimal() {
                 {animal.serie} {animal.rg}
               </h2>
               <p className="text-white/80 text-sm mb-1">
-                ID: {animal.id} • {animal.raca}
+                ID: {animal.id} ââ‚¬¢ {animal.raca}
               </p>
               <p className="text-white/90 text-sm font-medium">
-                {animal.sexo} • {animal.meses || 0} meses
+                {animal.sexo} ââ‚¬¢ {animal.meses || 0} meses
               </p>
               <p className="text-white/90 text-sm font-medium">
-                Situação ABCZ: {animal.situacao_abcz || animal.situacaoAbcz || 'Não informado'}
+                SituaÃ§Ã£o ABCZ: {animal.situacao_abcz || animal.situacaoAbcz || 'NÃ£o informado'}
               </p>
               {(animal.mgte || mgtePosicao) && (
                 <p className="text-white/90 text-sm font-bold mt-1">
-                  🏆 MGTe: {animal.mgte || mgtePosicao?.mgte || '-'}
+                  ðÅ¸�â€  MGTe: {animal.mgte || mgtePosicao?.mgte || '-'}
                   {mgtePosicao?.posicao != null && (
                     <span className="ml-2 px-2 py-0.5 rounded-full bg-amber-500/80 text-white text-xs">
-                      Posição {mgtePosicao.posicao} de {mgtePosicao.total}
+                      PosiÃ§Ã£o {mgtePosicao.posicao} de {mgtePosicao.total}
                     </span>
                   )}
                 </p>
               )}
 
-              {/* Navegação */}
+              {/* NavegaÃ§Ã£o */}
               {allAnimals.length > 0 && currentIndex >= 0 && (
                 <div className="flex items-center justify-center gap-3 mt-4 pt-4 border-t border-white/20">
                   <span className="text-white font-bold">
@@ -787,7 +787,7 @@ export default function MobileAnimal() {
                   {(parseFloat(animal.valor_venda || animal.valor_real || 0) || 0) > 0 && (
                     <p className="text-xs mt-1">
                       Venda: R$ {(parseFloat(animal.valor_venda || animal.valor_real || 0)).toFixed(2)}
-                      {' • '}
+                      {' ââ‚¬¢ '}
                       <span className={((parseFloat(animal.valor_venda || animal.valor_real || 0) - custoTotal) / (custoTotal || 1) * 100) >= 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
                         ROI {(((parseFloat(animal.valor_venda || animal.valor_real || 0) - custoTotal) / (custoTotal || 1)) * 100).toFixed(1)}%
                       </span>
@@ -800,11 +800,11 @@ export default function MobileAnimal() {
                     onClick={(e) => { e.stopPropagation(); refreshCustos() }}
                     disabled={refreshingCustos}
                     className="p-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50"
-                    title="Atualizar custos (alterações feitas no app)"
+                    title="Atualizar custos (alteraÃ§Ãµes feitas no app)"
                   >
                     <ArrowPathIcon className={`h-4 w-4 text-gray-600 dark:text-gray-300 ${refreshingCustos ? 'animate-spin' : ''}`} />
                   </button>
-                  <span className="text-blue-600 dark:text-blue-400 text-sm font-medium">Ver todos custos →</span>
+                  <span className="text-blue-600 dark:text-blue-400 text-sm font-medium">Ver todos custos ââ€ â€™</span>
                 </div>
               </div>
               {custosLista.length > 0 && (
@@ -832,12 +832,12 @@ export default function MobileAnimal() {
             {baixasResumo?.baixaPropria?.morto && !baixasResumo?.baixaPropria?.vendido && (
               <div className="bg-gradient-to-br from-gray-500/20 to-slate-600/20 dark:from-gray-900/30 dark:to-slate-900/30 rounded-xl shadow-lg p-4 border border-gray-200/50 dark:border-gray-700/50">
                 <h3 className="font-bold text-gray-800 dark:text-gray-200 text-lg mb-2 flex items-center gap-2">
-                  <span>⚠️</span> Morte/Baixa
+                  <span>âÅ¡ ï¸�</span> Morte/Baixa
                 </h3>
                 <p className="text-sm text-gray-700 dark:text-gray-300">
-                  Causa: {baixasResumo.baixaPropria.causa || 'Não informada'}
+                  Causa: {baixasResumo.baixaPropria.causa || 'NÃ£o informada'}
                   {baixasResumo.baixaPropria.data_baixa && (
-                    <span className="ml-2">• {new Date(baixasResumo.baixaPropria.data_baixa).toLocaleDateString('pt-BR')}</span>
+                    <span className="ml-2">ââ‚¬¢ {new Date(baixasResumo.baixaPropria.data_baixa).toLocaleDateString('pt-BR')}</span>
                   )}
                 </p>
               </div>
@@ -847,7 +847,7 @@ export default function MobileAnimal() {
             {baixasResumo?.baixaPropria?.vendido && (
               <div className="bg-gradient-to-br from-emerald-500/20 to-green-600/20 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl shadow-lg p-4 border border-emerald-200/50 dark:border-emerald-800/50">
                 <h3 className="font-bold text-emerald-800 dark:text-emerald-200 text-lg mb-3 flex items-center gap-2">
-                  <span>💰</span> Venda
+                  <span>ðÅ¸â€™°</span> Venda
                 </h3>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   {baixasResumo.baixaPropria.numero_nf && (
@@ -879,11 +879,11 @@ export default function MobileAnimal() {
               </div>
             )}
 
-            {/* Resumo Mãe - Filhos vendidos e mortes/abates */}
+            {/* Resumo MÃ£e - Filhos vendidos e mortes/abates */}
             {baixasResumo?.resumoMae && (baixasResumo.resumoMae.qtdVendidos > 0 || baixasResumo.resumoMae.qtdMortesBaixas > 0) && (
               <div className="bg-gradient-to-br from-amber-500/20 to-orange-600/20 dark:from-amber-900/30 dark:to-orange-900/30 rounded-xl shadow-lg p-4 border border-amber-200/50 dark:border-amber-800/50">
                 <h3 className="font-bold text-amber-800 dark:text-amber-200 text-lg mb-3 flex items-center gap-2">
-                  <span>📊</span> Prole (Baixas)
+                  <span>ðÅ¸â€œÅ </span> Prole (Baixas)
                 </h3>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   {baixasResumo.resumoMae.qtdVendidos > 0 && (
@@ -893,7 +893,7 @@ export default function MobileAnimal() {
                         <p className="font-bold text-amber-700 dark:text-amber-300">{baixasResumo.resumoMae.qtdVendidos}</p>
                       </div>
                       <div className="bg-white/50 dark:bg-gray-800/50 rounded-lg p-3">
-                        <p className="text-gray-500 dark:text-gray-400 text-xs">Média de vendas</p>
+                        <p className="text-gray-500 dark:text-gray-400 text-xs">MÃ©dia de vendas</p>
                         <p className="font-bold text-amber-700 dark:text-amber-300">
                           R$ {Number(baixasResumo.resumoMae.mediaVendas).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </p>
@@ -916,11 +916,11 @@ export default function MobileAnimal() {
               </div>
             )}
 
-            {/* Histórico FIV - Doadora de Oócitos */}
+            {/* HistÃ³rico FIV - Doadora de OÃ³citos */}
             {fichaDoadora?.resumo && (
               <div className="bg-gradient-to-br from-pink-500/20 to-purple-500/20 dark:from-pink-900/30 dark:to-purple-900/30 rounded-xl shadow-lg p-4 border border-pink-200/50 dark:border-pink-800/50">
                 <h3 className="font-bold text-pink-800 dark:text-pink-200 text-lg mb-3 flex items-center gap-2">
-                  <span>🧪</span> Histórico FIV (Doadora)
+                  <span>ðÅ¸§ª</span> HistÃ³rico FIV (Doadora)
                 </h3>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div className="bg-white/50 dark:bg-gray-800/50 rounded-lg p-3">
@@ -928,37 +928,37 @@ export default function MobileAnimal() {
                     <p className="font-bold text-pink-700 dark:text-pink-300">{fichaDoadora.resumo.totalColetas}</p>
                   </div>
                   <div className="bg-white/50 dark:bg-gray-800/50 rounded-lg p-3">
-                    <p className="text-gray-500 dark:text-gray-400 text-xs">Oócitos (média)</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs">OÃ³citos (mÃ©dia)</p>
                     <p className="font-bold text-pink-700 dark:text-pink-300">{fichaDoadora.resumo.mediaOocitos} / coleta</p>
                   </div>
                   <div className="bg-white/50 dark:bg-gray-800/50 rounded-lg p-3">
-                    <p className="text-gray-500 dark:text-gray-400 text-xs">Total oócitos</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs">Total oÃ³citos</p>
                     <p className="font-bold text-pink-700 dark:text-pink-300">{fichaDoadora.resumo.totalOocitos}</p>
                   </div>
                   <div className="bg-white/50 dark:bg-gray-800/50 rounded-lg p-3">
-                    <p className="text-gray-500 dark:text-gray-400 text-xs">Embriões (média)</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs">EmbriÃµes (mÃ©dia)</p>
                     <p className="font-bold text-pink-700 dark:text-pink-300">{fichaDoadora.resumo.mediaEmbrioesProduzidos} / coleta</p>
                   </div>
                   <div className="bg-white/50 dark:bg-gray-800/50 rounded-lg p-3 col-span-2">
-                    <p className="text-gray-500 dark:text-gray-400 text-xs">Transferidos (média)</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs">Transferidos (mÃ©dia)</p>
                     <p className="font-bold text-pink-700 dark:text-pink-300">{fichaDoadora.resumo.totalEmbrioesTransferidos} total ({fichaDoadora.resumo.mediaEmbrioesTransferidos} / coleta)</p>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Botões de Ação - Grid 2x2 */}
+            {/* BotÃµes de AÃ§Ã£o - Grid 2x2 */}
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => router.push(`/animals/${animal.id}`)}
                 className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl flex flex-col items-center justify-center gap-2 shadow-lg active:scale-95 transition-all"
               >
                 <PlusCircleIcon className="h-6 w-6" />
-                <span className="text-sm">Lançar</span>
+                <span className="text-sm">LanÃ§ar</span>
               </button>
 
               <button
-                onClick={() => alert('Função em desenvolvimento')}
+                onClick={() => alert('FunÃ§Ã£o em desenvolvimento')}
                 className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-xl flex flex-col items-center justify-center gap-2 shadow-lg active:scale-95 transition-all"
               >
                 <PlusCircleIcon className="h-6 w-6" />
@@ -966,7 +966,7 @@ export default function MobileAnimal() {
               </button>
 
               <button
-                onClick={() => alert('Função em desenvolvimento')}
+                onClick={() => alert('FunÃ§Ã£o em desenvolvimento')}
                 className="bg-pink-600 hover:bg-pink-700 text-white font-bold py-4 rounded-xl flex flex-col items-center justify-center gap-2 shadow-lg active:scale-95 transition-all"
               >
                 <DocumentArrowDownIcon className="h-6 w-6" />
@@ -982,11 +982,11 @@ export default function MobileAnimal() {
               </button>
             </div>
 
-            {/* Informações Detalhadas - Colapsáveis */}
+            {/* InformaÃ§Ãµes Detalhadas - ColapsÃ¡veis */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
               <div className="p-4 space-y-3">
                 <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-3">
-                  📋 Informações
+                  ðÅ¸â€œâ€¹ InformaÃ§Ãµes
                 </h3>
 
                 <div className="grid grid-cols-2 gap-3 text-sm">
@@ -998,7 +998,7 @@ export default function MobileAnimal() {
                   </div>
 
                   <div>
-                    <p className="text-gray-500 dark:text-gray-400 text-xs">Raça</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs">RaÃ§a</p>
                     <p className="font-semibold text-gray-900 dark:text-white">
                       {animal.raca || '-'}
                     </p>
@@ -1111,7 +1111,7 @@ export default function MobileAnimal() {
 
                   {animal.mae && (
                     <div className="col-span-2">
-                      <p className="text-gray-500 dark:text-gray-400 text-xs">Mãe</p>
+                      <p className="text-gray-500 dark:text-gray-400 text-xs">MÃ£e</p>
                       {(() => {
                         const s = animal.serie_mae || maeLink?.serie
                         const r = animal.rg_mae || maeLink?.rg
@@ -1128,16 +1128,16 @@ export default function MobileAnimal() {
                               {animal.mae}
                             </p>
                             <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
-                              ⚠️ Não encontrada no cadastro (pode estar inativa)
+                              âÅ¡ ï¸� NÃ£o encontrada no cadastro (pode estar inativa)
                             </p>
                             {maeColetas?.resumo && (
                               <div className="mt-2 p-2 rounded-lg bg-pink-50 dark:bg-pink-900/20 border border-pink-200 dark:border-pink-800">
-                                <p className="text-xs font-medium text-pink-800 dark:text-pink-200 mb-1">📋 Histórico de Coletas FIV</p>
+                                <p className="text-xs font-medium text-pink-800 dark:text-pink-200 mb-1">ðÅ¸â€œâ€¹ HistÃ³rico de Coletas FIV</p>
                                 <p className="text-xs text-pink-700 dark:text-pink-300">
-                                  Coletas: {maeColetas.resumo.totalColetas} • Oócitos viáveis: {maeColetas.resumo.totalOocitos} (média {maeColetas.resumo.mediaOocitos})
+                                  Coletas: {maeColetas.resumo.totalColetas} ââ‚¬¢ OÃ³citos viÃ¡veis: {maeColetas.resumo.totalOocitos} (mÃ©dia {maeColetas.resumo.mediaOocitos})
                                 </p>
                                 <p className="text-xs text-pink-700 dark:text-pink-300">
-                                  Embriões produzidos: {maeColetas.resumo.totalEmbrioesProduzidos} (média {maeColetas.resumo.mediaEmbrioesProduzidos}) • Transferidos: {maeColetas.resumo.totalEmbrioesTransferidos} (média {maeColetas.resumo.mediaEmbrioesTransferidos})
+                                  EmbriÃµes produzidos: {maeColetas.resumo.totalEmbrioesProduzidos} (mÃ©dia {maeColetas.resumo.mediaEmbrioesProduzidos}) ââ‚¬¢ Transferidos: {maeColetas.resumo.totalEmbrioesTransferidos} (mÃ©dia {maeColetas.resumo.mediaEmbrioesTransferidos})
                                 </p>
                               </div>
                             )}
@@ -1155,23 +1155,23 @@ export default function MobileAnimal() {
                   </div>
 
                   <div className="col-span-2">
-                    <p className="text-gray-500 dark:text-gray-400 text-xs">Localização (Piquete)</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs">LocalizaÃ§Ã£o (Piquete)</p>
                     <p className="font-semibold text-gray-900 dark:text-white">
-                      {animal.piquete_atual || animal.piqueteAtual || animal.pasto_atual || animal.pastoAtual || 'Não informado'}
+                      {animal.piquete_atual || animal.piqueteAtual || animal.pasto_atual || animal.pastoAtual || 'NÃ£o informado'}
                     </p>
                   </div>
 
                   <div className="col-span-2">
-                    <p className="text-gray-500 dark:text-gray-400 text-xs">Situação ABCZ</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs">SituaÃ§Ã£o ABCZ</p>
                     <p className="font-semibold text-gray-900 dark:text-white">
-                      {animal.situacao_abcz || animal.situacaoAbcz || 'Não informado'}
+                      {animal.situacao_abcz || animal.situacaoAbcz || 'NÃ£o informado'}
                     </p>
                   </div>
                 </div>
 
                 {animal.observacoes && (
                   <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
-                    <p className="text-gray-500 dark:text-gray-400 text-xs mb-1">Observações</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs mb-1">ObservaÃ§Ãµes</p>
                     <p className="text-sm text-gray-700 dark:text-gray-300">
                       {animal.observacoes}
                     </p>
@@ -1180,7 +1180,7 @@ export default function MobileAnimal() {
               </div>
             </div>
 
-            {/* Botão Ver Detalhes Completos */}
+            {/* BotÃ£o Ver Detalhes Completos */}
             <button
               onClick={() => router.push(`/animals/${animal.id}`)}
               className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-all"

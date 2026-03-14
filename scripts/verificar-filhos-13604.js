@@ -14,7 +14,7 @@ async function verificar() {
   const client = await pool.connect()
   
   try {
-    console.log('🔍 Verificando filhos da CJCJ 13604...\n')
+    console.log('ðÅ¸â€�� Verificando filhos da CJCJ 13604...\n')
     
     // 1. Buscar a CJCJ 13604
     const mae = await client.query(`
@@ -24,17 +24,17 @@ async function verificar() {
     `)
     
     if (mae.rows.length === 0) {
-      console.log('❌ CJCJ 13604 não encontrada')
+      console.log('â�Å’ CJCJ 13604 nÃ£o encontrada')
       return
     }
     
-    console.log('📋 Mãe encontrada:')
-    console.log(`  • ID: ${mae.rows[0].id}`)
-    console.log(`  • Nome: ${mae.rows[0].nome}`)
-    console.log(`  • Situação: ${mae.rows[0].situacao}\n`)
+    console.log('ðÅ¸â€œâ€¹ MÃ£e encontrada:')
+    console.log(`  ââ‚¬¢ ID: ${mae.rows[0].id}`)
+    console.log(`  ââ‚¬¢ Nome: ${mae.rows[0].nome}`)
+    console.log(`  ââ‚¬¢ SituaÃ§Ã£o: ${mae.rows[0].situacao}\n`)
     
     // 2. Buscar filhos cadastrados
-    console.log('👶 Filhos cadastrados (serie_mae/rg_mae):')
+    console.log('ðÅ¸â€˜¶ Filhos cadastrados (serie_mae/rg_mae):')
     const filhosCadastrados = await client.query(`
       SELECT id, serie, rg, nome, sexo, situacao, data_nascimento
       FROM animais
@@ -54,7 +54,7 @@ async function verificar() {
     }
     
     // 3. Buscar baixas (vendas) dos filhos
-    console.log('\n\n💰 Baixas (vendas) de filhos da CJCJ 13604:')
+    console.log('\n\nðÅ¸â€™° Baixas (vendas) de filhos da CJCJ 13604:')
     const baixasFilhos = await client.query(`
       SELECT b.id, b.serie, b.rg, b.tipo, b.valor, b.comprador, b.numero_nf, b.data_baixa,
              a.nome as animal_nome, a.id as animal_id
@@ -80,8 +80,8 @@ async function verificar() {
       })
     }
     
-    // 4. Verificar se há filhos sem serie_mae/rg_mae preenchidos
-    console.log('\n🔍 Verificando filhos que podem estar sem serie_mae/rg_mae...')
+    // 4. Verificar se hÃ¡ filhos sem serie_mae/rg_mae preenchidos
+    console.log('\nðÅ¸â€�� Verificando filhos que podem estar sem serie_mae/rg_mae...')
     const filhosSemMae = await client.query(`
       SELECT id, serie, rg, nome, mae, serie_mae, rg_mae
       FROM animais
@@ -90,16 +90,16 @@ async function verificar() {
     `)
     
     if (filhosSemMae.rows.length > 0) {
-      console.log(`  ⚠️  Encontrados ${filhosSemMae.rows.length} filhos com mae preenchida mas sem serie_mae/rg_mae:`)
+      console.log(`  âÅ¡ ï¸�  Encontrados ${filhosSemMae.rows.length} filhos com mae preenchida mas sem serie_mae/rg_mae:`)
       filhosSemMae.rows.forEach(f => {
-        console.log(`    • ${f.serie} ${f.rg} | ${f.nome} | mae: "${f.mae}" | serie_mae: ${f.serie_mae || 'NULL'} | rg_mae: ${f.rg_mae || 'NULL'}`)
+        console.log(`    ââ‚¬¢ ${f.serie} ${f.rg} | ${f.nome} | mae: "${f.mae}" | serie_mae: ${f.serie_mae || 'NULL'} | rg_mae: ${f.rg_mae || 'NULL'}`)
       })
     } else {
-      console.log('  ✅ Todos os filhos têm serie_mae/rg_mae preenchidos corretamente')
+      console.log('  âÅ“â€¦ Todos os filhos tÃªm serie_mae/rg_mae preenchidos corretamente')
     }
     
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('â�Å’ Erro:', error)
   } finally {
     client.release()
     await pool.end()

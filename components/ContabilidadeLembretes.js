@@ -27,7 +27,7 @@ export default function ContabilidadeLembretes() {
     calcularProximoVencimento
   } = useContabilidadeLembretes();
 
-  // Somente para o desenvolvedor Zeca (localhost) — não exibir para usuários externos nem mobile
+  // Somente para o desenvolvedor Zeca (localhost) ââ‚¬â€� nÃ£o exibir para usuÃ¡rios externos nem mobile
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const hostname = window.location.hostname;
@@ -38,32 +38,32 @@ export default function ContabilidadeLembretes() {
   }, []);
 
   useEffect(() => {
-    // Verificar se há lembretes pendentes para mostrar notificação
+    // Verificar se hÃ¡ lembretes pendentes para mostrar notificaÃ§Ã£o
     const lembretePendente = lembretes.find(l => 
       l.status === 'pendente' && 
       l.tipo === 'contabilidade'
     );
     
-    // Só mostrar notificação se houver lembrete pendente E não estiver mostrando já
+    // SÃ³ mostrar notificaÃ§Ã£o se houver lembrete pendente E nÃ£o estiver mostrando jÃ¡
     if (lembretePendente && !mostrarNotificacao && !lembreteAtivo) {
       setLembreteAtivo(lembretePendente);
       setMostrarNotificacao(true);
     } else if (!lembretePendente && mostrarNotificacao) {
-      // Se não há mais lembretes pendentes, fechar a notificação
+      // Se nÃ£o hÃ¡ mais lembretes pendentes, fechar a notificaÃ§Ã£o
       setMostrarNotificacao(false);
       setLembreteAtivo(null);
     }
   }, [lembretes]);
 
-  // Função para lidar com ações da notificação
+  // FunÃ§Ã£o para lidar com aÃ§Ãµes da notificaÃ§Ã£o
   const handleAcaoNotificacao = (acao) => {
     switch (acao) {
       case 'gerar_relatorio':
         const resultado = gerarRelatorioNascimentos();
         if (resultado.sucesso) {
-          alert(`✅ Relatório gerado com sucesso!\n${resultado.quantidade} nascimentos encontrados.`);
+          alert(`âÅ“â€¦ RelatÃ³rio gerado com sucesso!\n${resultado.quantidade} nascimentos encontrados.`);
         } else {
-          alert(`❌ Erro ao gerar relatório: ${resultado.erro}`);
+          alert(`â�Å’ Erro ao gerar relatÃ³rio: ${resultado.erro}`);
         }
         break;
       case 'marcar_concluido':
@@ -80,12 +80,12 @@ export default function ContabilidadeLembretes() {
     }
   };
 
-  // Bloquear para não-desenvolvedor (usuário externo ou mobile)
+  // Bloquear para nÃ£o-desenvolvedor (usuÃ¡rio externo ou mobile)
   if (!isDeveloper) return null;
 
   return (
     <>
-      {/* Notificação Toast */}
+      {/* NotificaÃ§Ã£o Toast */}
       {mostrarNotificacao && lembreteAtivo && (
         <NotificacaoContabilidade
           lembrete={lembreteAtivo}
@@ -97,7 +97,7 @@ export default function ContabilidadeLembretes() {
         />
       )}
 
-      {/* Botão flutuante de lembretes */}
+      {/* BotÃ£o flutuante de lembretes */}
       <div className="fixed top-20 left-6 z-40">
         <button
           onClick={() => setMostrarModal(true)}
@@ -139,12 +139,12 @@ export default function ContabilidadeLembretes() {
               </button>
             </div>
 
-            {/* Conteúdo */}
+            {/* ConteÃºdo */}
             <div className="p-6">
-              {/* Configurações */}
+              {/* ConfiguraÃ§Ãµes */}
               <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-600 rounded-lg">
                 <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-300 mb-3">
-                  ⚙️ Configurações
+                  âÅ¡â„¢ï¸� ConfiguraÃ§Ãµes
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -164,7 +164,7 @@ export default function ContabilidadeLembretes() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-blue-700 dark:text-blue-300 mb-1">
-                      Dias de Antecedência:
+                      Dias de AntecedÃªncia:
                     </label>
                     <select
                       value={configuracoes.diasAntecedencia}
@@ -193,15 +193,15 @@ export default function ContabilidadeLembretes() {
                     className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
                   />
                   <label htmlFor="ativarLembretes" className="ml-2 text-sm text-blue-700 dark:text-blue-300">
-                    Ativar lembretes automáticos
+                    Ativar lembretes automÃ¡ticos
                   </label>
                 </div>
               </div>
 
-              {/* Próximo Vencimento */}
+              {/* PrÃ³ximo Vencimento */}
               <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-600 rounded-lg">
                 <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-300 mb-2">
-                  📅 Próximo Vencimento
+                  ðÅ¸â€œâ€¦ PrÃ³ximo Vencimento
                 </h3>
                 <ProximoVencimento calcularProximoVencimento={calcularProximoVencimento} />
               </div>
@@ -209,7 +209,7 @@ export default function ContabilidadeLembretes() {
               {/* Lista de Lembretes */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  📋 Lembretes Recentes
+                  ðÅ¸â€œâ€¹ Lembretes Recentes
                 </h3>
                 
                 {lembretes.length === 0 ? (
@@ -229,10 +229,10 @@ export default function ContabilidadeLembretes() {
                 )}
               </div>
 
-              {/* Ações Rápidas */}
+              {/* AÃ§Ãµes RÃ¡pidas */}
               <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-600 rounded-lg">
                 <h3 className="text-lg font-semibold text-green-800 dark:text-green-300 mb-3">
-                  🚀 Ações Rápidas
+                  ðÅ¸Å¡â‚¬ AÃ§Ãµes RÃ¡pidas
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <button
@@ -240,7 +240,7 @@ export default function ContabilidadeLembretes() {
                     className="flex items-center justify-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
                   >
                     <DocumentTextIcon className="h-5 w-5 mr-2" />
-                    Gerar Relatório de Nascimentos
+                    Gerar RelatÃ³rio de Nascimentos
                   </button>
                   <button
                     onClick={() => {
@@ -251,7 +251,7 @@ export default function ContabilidadeLembretes() {
                     className="flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
                   >
                     <DocumentTextIcon className="h-5 w-5 mr-2" />
-                    Acessar Relatórios Gerais
+                    Acessar RelatÃ³rios Gerais
                   </button>
                 </div>
               </div>
@@ -263,7 +263,7 @@ export default function ContabilidadeLembretes() {
   );
 }
 
-// Componente para mostrar próximo vencimento
+// Componente para mostrar prÃ³ximo vencimento
 function ProximoVencimento({ calcularProximoVencimento }) {
 
   const proximoVencimento = calcularProximoVencimento();
@@ -281,7 +281,7 @@ function ProximoVencimento({ calcularProximoVencimento }) {
           })}
         </p>
         <p className="text-xs text-yellow-600 dark:text-yellow-400">
-          5º dia útil do mês
+          5Âº dia Ãºtil do mÃªs
         </p>
       </div>
       <div className="text-right">
@@ -336,7 +336,7 @@ function LembreteCard({ lembrete, onMarcarConcluido, onGerarRelatorio }) {
         <ul className="space-y-1">
           {lembrete.itens.map((item, index) => (
             <li key={index} className="text-sm text-gray-600 dark:text-gray-400 flex items-center">
-              <span className="mr-2">•</span>
+              <span className="mr-2">ââ‚¬¢</span>
               {item}
             </li>
           ))}
@@ -349,20 +349,20 @@ function LembreteCard({ lembrete, onMarcarConcluido, onGerarRelatorio }) {
             onClick={onGerarRelatorio}
             className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors"
           >
-            📊 Gerar Relatório
+            ðÅ¸â€œÅ  Gerar RelatÃ³rio
           </button>
           <button
             onClick={() => onMarcarConcluido(lembrete.id)}
             className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg transition-colors"
           >
-            ✅ Marcar como Enviado
+            âÅ“â€¦ Marcar como Enviado
           </button>
         </div>
       )}
 
       {lembrete.status === 'concluido' && (
         <div className="text-sm text-green-600 dark:text-green-400">
-          ✅ Concluído em {new Date(lembrete.concluidoEm).toLocaleDateString('pt-BR')}
+          âÅ“â€¦ ConcluÃ­do em {new Date(lembrete.concluidoEm).toLocaleDateString('pt-BR')}
         </div>
       )}
     </div>

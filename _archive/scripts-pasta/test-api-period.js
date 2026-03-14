@@ -2,7 +2,7 @@
 
 async function testAPIPeriod() {
   try {
-    console.log('🔍 Testando API com período válido...')
+    console.log('�Ÿ”� Testando API com período válido...')
     
     // Período do mês atual
     const now = new Date()
@@ -14,7 +14,7 @@ async function testAPIPeriod() {
       endDate: lastDay.toISOString().split('T')[0]
     }
     
-    console.log(`📅 Período: ${period.startDate} até ${period.endDate}`)
+    console.log(`�Ÿ“… Período: ${period.startDate} até ${period.endDate}`)
     
     const response = await fetch('http://localhost:3020/api/contabilidade/notas-fiscais', {
       method: 'POST',
@@ -26,21 +26,21 @@ async function testAPIPeriod() {
     
     if (response.ok) {
       const buffer = await response.buffer()
-      console.log('✅ API respondeu com sucesso!')
-      console.log(`📊 Tamanho do arquivo: ${buffer.length} bytes`)
+      console.log('�œ… API respondeu com sucesso!')
+      console.log(`�Ÿ“Š Tamanho do arquivo: ${buffer.length} bytes`)
       
       // Salvar arquivo para verificação
       const fs = require('fs')
       fs.writeFileSync('teste-relatorio-nfs.xlsx', buffer)
-      console.log('💾 Arquivo salvo como: teste-relatorio-nfs.xlsx')
+      console.log('�Ÿ’� Arquivo salvo como: teste-relatorio-nfs.xlsx')
       
     } else {
       const error = await response.text()
-      console.error('❌ Erro na API:', response.status, error)
+      console.error('�Œ Erro na API:', response.status, error)
     }
     
   } catch (error) {
-    console.error('💥 Erro no teste:', error.message)
+    console.error('�Ÿ’� Erro no teste:', error.message)
   }
 }
 
@@ -48,11 +48,11 @@ async function testAPIPeriod() {
 if (require.main === module) {
   testAPIPeriod()
     .then(() => {
-      console.log('🎉 Teste concluído!')
+      console.log('�ŸŽ‰ Teste concluído!')
       process.exit(0)
     })
     .catch((error) => {
-      console.error('💥 Erro no teste:', error)
+      console.error('�Ÿ’� Erro no teste:', error)
       process.exit(1)
     })
 }

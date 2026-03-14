@@ -86,14 +86,14 @@ async function recreateGerarProximoLoteFunction() {
 }
 
 async function main() {
-  console.log('🔧 Ajustando schema de lotes...')
+  console.log('�Ÿ”� Ajustando schema de lotes...')
   try {
     const tableStatus = await ensureTableExists()
     const colStatus = await fixNumeroLoteColumn()
-    console.log(`📦 coluna numero_lote: ${colStatus}`)
+    console.log(`�Ÿ“� coluna numero_lote: ${colStatus}`)
 
     await recreateGerarProximoLoteFunction()
-    console.log('✅ Função gerar_proximo_lote recriada com sucesso')
+    console.log('�œ… Função gerar_proximo_lote recriada com sucesso')
 
     // Smoke test: insert a sample lote
     const sample = await query(`
@@ -103,12 +103,12 @@ async function main() {
         gerar_proximo_lote(), 'TESTE_SCHEMA', 'Teste de ajuste de schema', '{"verificacao":true}', 'sistema', 1, 'SISTEMA'
       ) RETURNING numero_lote
     `)
-    console.log(`🧪 Lote gerado: ${sample.rows[0].numero_lote}`)
+    console.log(`�Ÿ�� Lote gerado: ${sample.rows[0].numero_lote}`)
 
-    console.log('🎉 Ajuste concluído')
+    console.log('�ŸŽ‰ Ajuste concluído')
     process.exit(0)
   } catch (err) {
-    console.error('❌ Erro no ajuste:', err.message)
+    console.error('�Œ Erro no ajuste:', err.message)
     process.exit(1)
   }
 }

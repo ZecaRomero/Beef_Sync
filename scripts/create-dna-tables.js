@@ -32,7 +32,7 @@ async function createDNATables() {
       )
     `)
 
-    // Adicionar colunas de DNA na tabela animais se não existirem
+    // Adicionar colunas de DNA na tabela animais se nÃ£o existirem
     await client.query(`
       DO $$ 
       BEGIN
@@ -59,7 +59,7 @@ async function createDNATables() {
       END $$;
     `)
 
-    // Criar índices
+    // Criar Ã­ndices
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_dna_envios_laboratorio ON dna_envios(laboratorio);
       CREATE INDEX IF NOT EXISTS idx_dna_envios_data ON dna_envios(data_envio);
@@ -69,10 +69,10 @@ async function createDNATables() {
     `)
 
     await client.query('COMMIT')
-    console.log('✅ Tabelas de DNA criadas com sucesso!')
+    console.log('âÅ“â€¦ Tabelas de DNA criadas com sucesso!')
   } catch (error) {
     await client.query('ROLLBACK')
-    console.error('❌ Erro ao criar tabelas de DNA:', error)
+    console.error('â�Å’ Erro ao criar tabelas de DNA:', error)
     throw error
   } finally {
     client.release()
@@ -83,11 +83,11 @@ async function createDNATables() {
 if (require.main === module) {
   createDNATables()
     .then(() => {
-      console.log('✅ Script concluído')
+      console.log('âÅ“â€¦ Script concluÃ­do')
       process.exit(0)
     })
     .catch((error) => {
-      console.error('❌ Erro:', error)
+      console.error('â�Å’ Erro:', error)
       process.exit(1)
     })
 }

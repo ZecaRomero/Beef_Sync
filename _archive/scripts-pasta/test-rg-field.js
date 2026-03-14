@@ -13,7 +13,7 @@ async function testRgField() {
   const client = await pool.connect();
   
   try {
-    console.log('🧪 Testando inserção de RG com 6 dígitos...');
+    console.log('�Ÿ�� Testando inserção de RG com 6 dígitos...');
     
     // Testar inserção direta
     try {
@@ -23,20 +23,20 @@ async function testRgField() {
         RETURNING *
       `);
       
-      console.log('✅ Inserção direta bem-sucedida:', result.rows[0]);
+      console.log('�œ… Inserção direta bem-sucedida:', result.rows[0]);
       
       // Limpar o teste
       await client.query(`
         DELETE FROM animais WHERE serie = 'TEST' AND rg = '123456'
       `);
-      console.log('🧹 Registro de teste removido.');
+      console.log('�Ÿ�� Registro de teste removido.');
       
     } catch (insertError) {
-      console.log('❌ Erro na inserção direta:', insertError.message);
+      console.log('�Œ Erro na inserção direta:', insertError.message);
       
       // Verificar se é erro de campo específico
       if (insertError.message.includes('character(1)')) {
-        console.log('🔍 Erro específico de campo character(1) detectado!');
+        console.log('�Ÿ”� Erro específico de campo character(1) detectado!');
         
         // Verificar estrutura da tabela novamente
         const structureResult = await client.query(`
@@ -46,7 +46,7 @@ async function testRgField() {
           ORDER BY ordinal_position
         `);
         
-        console.log('📊 Estrutura completa da tabela animais:');
+        console.log('�Ÿ“Š Estrutura completa da tabela animais:');
         console.table(structureResult.rows);
         
         // Verificar se há alguma constraint ou trigger
@@ -67,7 +67,7 @@ async function testRgField() {
           WHERE tc.table_name = 'animais'
         `);
         
-        console.log('🔒 Constraints da tabela animais:');
+        console.log('�Ÿ”’ Constraints da tabela animais:');
         console.table(constraintsResult.rows);
       }
     }
@@ -82,7 +82,7 @@ async function testRgField() {
           VALUES ('TEST', $1, 'Fêmea', 'Teste', 'Ativo')
         `, [rgValue]);
         
-        console.log(`✅ RG '${rgValue}' (${rgValue.length} dígitos) - OK`);
+        console.log(`�œ… RG '${rgValue}' (${rgValue.length} dígitos) - OK`);
         
         // Limpar
         await client.query(`
@@ -90,12 +90,12 @@ async function testRgField() {
         `, [rgValue]);
         
       } catch (error) {
-        console.log(`❌ RG '${rgValue}' (${rgValue.length} dígitos) - ERRO: ${error.message}`);
+        console.log(`�Œ RG '${rgValue}' (${rgValue.length} dígitos) - ERRO: ${error.message}`);
       }
     }
     
   } catch (error) {
-    console.error('❌ Erro geral no teste:', error);
+    console.error('�Œ Erro geral no teste:', error);
     throw error;
   } finally {
     client.release();
@@ -107,11 +107,11 @@ async function testRgField() {
 if (require.main === module) {
   testRgField()
     .then(() => {
-      console.log('🎉 Teste do campo RG concluído!');
+      console.log('�ŸŽ‰ Teste do campo RG concluído!');
       process.exit(0);
     })
     .catch((error) => {
-      console.error('💥 Falha no teste:', error);
+      console.error('�Ÿ’� Falha no teste:', error);
       process.exit(1);
     });
 }

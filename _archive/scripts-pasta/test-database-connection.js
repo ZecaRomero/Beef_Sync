@@ -8,34 +8,34 @@
 const { testConnection, initDatabase, createTables, closePool } = require('../lib/database');
 
 async function testDatabaseConnection() {
-  console.log('🧪 Iniciando teste de conexão com PostgreSQL...\n');
+  console.log('�Ÿ�� Iniciando teste de conexão com PostgreSQL...\n');
   
   try {
     // Inicializar pool
-    console.log('1️⃣ Inicializando pool de conexões...');
+    console.log('1️�ƒ� Inicializando pool de conexões...');
     const pool = initDatabase();
     
     if (!pool) {
       throw new Error('Falha ao inicializar pool de conexões');
     }
-    console.log('✅ Pool inicializado com sucesso\n');
+    console.log('�œ… Pool inicializado com sucesso\n');
     
     // Testar conexão
-    console.log('2️⃣ Testando conexão...');
+    console.log('2️�ƒ� Testando conexão...');
     const testResult = await testConnection();
-    console.log('✅ Conexão testada com sucesso:');
+    console.log('�œ… Conexão testada com sucesso:');
     console.log(`   - Timestamp: ${testResult.timestamp}`);
     console.log(`   - Versão: ${testResult.version}`);
     console.log(`   - Pool Info:`, testResult.poolInfo);
     console.log('');
     
     // Testar criação de tabelas
-    console.log('3️⃣ Testando criação de tabelas...');
+    console.log('3️�ƒ� Testando criação de tabelas...');
     await createTables();
-    console.log('✅ Tabelas criadas/verificadas com sucesso\n');
+    console.log('�œ… Tabelas criadas/verificadas com sucesso\n');
     
     // Testar algumas consultas básicas
-    console.log('4️⃣ Testando consultas básicas...');
+    console.log('4️�ƒ� Testando consultas básicas...');
     const { query } = require('../lib/database');
     
     // Contar animais
@@ -50,19 +50,19 @@ async function testDatabaseConnection() {
     const semenCount = await query('SELECT COUNT(*) as total FROM estoque_semen');
     console.log(`   - Total de itens no estoque: ${semenCount.rows[0].total}`);
     
-    console.log('✅ Consultas básicas executadas com sucesso\n');
+    console.log('�œ… Consultas básicas executadas com sucesso\n');
     
-    console.log('🎉 Todos os testes passaram! O banco de dados está funcionando corretamente.');
+    console.log('�ŸŽ‰ Todos os testes passaram! O banco de dados está funcionando corretamente.');
     
   } catch (error) {
-    console.error('❌ Erro durante o teste:', {
+    console.error('�Œ Erro durante o teste:', {
       message: error.message,
       code: error.code,
       detail: error.detail,
       hint: error.hint
     });
     
-    console.log('\n🔧 Possíveis soluções:');
+    console.log('\n�Ÿ”� Possíveis soluções:');
     console.log('   - Verifique se o PostgreSQL está rodando');
     console.log('   - Confirme as credenciais no arquivo .env');
     console.log('   - Verifique se o banco de dados existe');
@@ -71,9 +71,9 @@ async function testDatabaseConnection() {
     process.exit(1);
   } finally {
     // Fechar pool
-    console.log('\n5️⃣ Fechando pool de conexões...');
+    console.log('\n5️�ƒ� Fechando pool de conexões...');
     await closePool();
-    console.log('✅ Pool fechado com sucesso');
+    console.log('�œ… Pool fechado com sucesso');
   }
 }
 
@@ -81,11 +81,11 @@ async function testDatabaseConnection() {
 if (require.main === module) {
   testDatabaseConnection()
     .then(() => {
-      console.log('\n✨ Teste concluído com sucesso!');
+      console.log('\n�œ� Teste concluído com sucesso!');
       process.exit(0);
     })
     .catch((error) => {
-      console.error('\n💥 Teste falhou:', error.message);
+      console.error('\n�Ÿ’� Teste falhou:', error.message);
       process.exit(1);
     });
 }

@@ -5,7 +5,7 @@ import AlertasPartosAtrasados from '../../components/AlertasPartosAtrasados'
 export default function Nascimentos() {
   const [mounted, setMounted] = useState(false)
   const [gestacoes, setGestacoes] = useState([])
-  const [inseminacoesPrenhas, setInseminacoesPrenhas] = useState([]) // IAs com status Prenha (gestação de IA)
+  const [inseminacoesPrenhas, setInseminacoesPrenhas] = useState([]) // IAs com status Prenha (gestaÃ§Ã£o de IA)
   const [nascimentos, setNascimentos] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [alertas, setAlertas] = useState({ partosAtrasados: [], partosProximos: [] })
@@ -14,7 +14,7 @@ export default function Nascimentos() {
   const [modoListaNascimentos, setModoListaNascimentos] = useState('resumo') // 'resumo' | 'completa'
   const [expandirLista, setExpandirLista] = useState(false)
 
-  // Separar nascimentos REAIS (já ocorreram) de PREVISÕES (data futura - receptoras gestantes)
+  // Separar nascimentos REAIS (jÃ¡ ocorreram) de PREVISÃâ€¢ES (data futura - receptoras gestantes)
   const { nascimentosReais, previsoesParto, previsoesFIV, previsoesIA } = useMemo(() => {
     const hoje = new Date()
     hoje.setHours(23, 59, 59, 999)
@@ -25,11 +25,11 @@ export default function Nascimentos() {
       if (!isNaN(d.getTime()) && d <= hoje) {
         reais.push(n)
       } else {
-        previsoes.push({ ...n, origem: 'FIV' }) // nascimentos com data futura vêm do batch DG (FIV)
+        previsoes.push({ ...n, origem: 'FIV' }) // nascimentos com data futura vÃªm do batch DG (FIV)
       }
     })
 
-    // Incluir gestações ativas que ainda não têm nascimento registrado
+    // Incluir gestaÃ§Ãµes ativas que ainda nÃ£o tÃªm nascimento registrado
     const idsGestacaoComNascimento = new Set(nascimentos.map(n => n.gestacao_id).filter(Boolean))
     const add276Dias = (data) => {
       const d = new Date(data)
@@ -39,7 +39,7 @@ export default function Nascimentos() {
     gestacoes.forEach(g => {
       if (idsGestacaoComNascimento.has(g.id)) return
       const dataParto = add276Dias(g.data_cobertura)
-      if (dataParto <= hoje) return // já passou, não é previsão
+      if (dataParto <= hoje) return // jÃ¡ passou, nÃ£o Ã© previsÃ£o
       const ehFIV = !!(g.mae_serie || g.mae_rg)
       const receptoraNome = g.receptora_nome || (g.receptora_serie && g.receptora_rg ? `${g.receptora_serie} ${g.receptora_rg}` : '-')
       previsoes.push({
@@ -54,17 +54,17 @@ export default function Nascimentos() {
       })
     })
 
-    // Incluir inseminações com status Prenha (gestação de IA - ex: CJCJ 15639)
+    // Incluir inseminaÃ§Ãµes com status Prenha (gestaÃ§Ã£o de IA - ex: CJCJ 15639)
     const add285Dias = (data) => {
       const d = new Date(data)
-      d.setDate(d.getDate() + 285) // 9 meses gestação bovina (mesmo que animals/[id])
+      d.setDate(d.getDate() + 285) // 9 meses gestaÃ§Ã£o bovina (mesmo que animals/[id])
       return d
     }
     inseminacoesPrenhas.forEach(ia => {
       const dataIA = new Date(ia.data_ia || ia.data_inseminacao)
       if (isNaN(dataIA.getTime())) return
       const dataParto = add285Dias(dataIA)
-      if (dataParto <= hoje) return // já passou
+      if (dataParto <= hoje) return // jÃ¡ passou
       const serie = ia.serie || '-'
       const rg = ia.rg ? String(ia.rg) : '-'
       const receptora = ia.animal_nome || (serie !== '-' && rg !== '-' ? `${serie} ${rg}` : '-')
@@ -91,7 +91,7 @@ export default function Nascimentos() {
     return !isNaN(d.getTime()) && d > new Date()
   }
 
-  // Resumos - APENAS nascimentos REAIS (já ocorreram)
+  // Resumos - APENAS nascimentos REAIS (jÃ¡ ocorreram)
   const resumos = useMemo(() => {
     const hoje = new Date()
     const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1)
@@ -104,7 +104,7 @@ export default function Nascimentos() {
     }).length
     const femeas = nascimentosReais.filter(n => {
       const s = (n.sexo || '').toLowerCase()
-      return s.includes('fêmea') || s.includes('femea') || s === 'f'
+      return s.includes('fÃªmea') || s.includes('femea') || s === 'f'
     }).length
     const comPeso = nascimentosReais.filter(n => n.peso && parseFloat(n.peso) > 0)
     const pesoMedio = comPeso.length > 0
@@ -122,7 +122,7 @@ export default function Nascimentos() {
     return { machos, femeas, pesoMedio, esteMes, ultimos7Dias }
   }, [nascimentosReais])
 
-  // Resumo por data - separado em reais e previsões
+  // Resumo por data - separado em reais e previsÃµes
   const resumoPorDataReais = useMemo(() => {
     const formatarData = (d) => {
       if (!d) return 'N/A'
@@ -180,7 +180,7 @@ export default function Nascimentos() {
     }
   }, [mounted])
 
-  // Função para buscar nome completo do animal por série e RG
+  // FunÃ§Ã£o para buscar nome completo do animal por sÃ©rie e RG
   const buscarNomeAnimal = async (serie, rg) => {
     if (!serie || !rg) return null
     
@@ -209,18 +209,18 @@ export default function Nascimentos() {
     return null
   }
 
-  // Função para buscar touro nas transferências de embriões
+  // FunÃ§Ã£o para buscar touro nas transferÃªncias de embriÃµes
   const buscarTouroNasTEs = async (serie, rg) => {
     if (!serie || !rg) return null
     
     try {
-      // Buscar nas transferências de embriões pelo touro_id ou pelo nome
+      // Buscar nas transferÃªncias de embriÃµes pelo touro_id ou pelo nome
       const response = await fetch(`/api/transferencias-embrioes`)
       if (response.ok) {
         const data = await response.json()
         const transferencias = data.data || data || []
         
-        // Procurar transferência com touro que contenha a série e RG
+        // Procurar transferÃªncia com touro que contenha a sÃ©rie e RG
         const teEncontrada = transferencias.find(te => {
           if (te.touro) {
             const touroLower = te.touro.toLowerCase()
@@ -253,7 +253,7 @@ export default function Nascimentos() {
     const nomesMap = {}
     const promessas = []
 
-    // Buscar nomes dos touros, doadoras e receptoras das gestações
+    // Buscar nomes dos touros, doadoras e receptoras das gestaÃ§Ãµes
     gestacoesData.forEach(gestacao => {
       if (gestacao.pai_serie && gestacao.pai_rg) {
         promessas.push(
@@ -261,7 +261,7 @@ export default function Nascimentos() {
             if (nome) {
               nomesMap[`${gestacao.pai_serie}_${gestacao.pai_rg}`] = nome
             } else {
-              // Se não encontrou nos animais, buscar nas TEs
+              // Se nÃ£o encontrou nos animais, buscar nas TEs
               const touroTE = await buscarTouroNasTEs(gestacao.pai_serie, gestacao.pai_rg)
               if (touroTE) {
                 nomesMap[`${gestacao.pai_serie}_${gestacao.pai_rg}`] = touroTE
@@ -294,15 +294,15 @@ export default function Nascimentos() {
     try {
       setIsLoading(true)
       
-      // Carregar gestações ativas (pode ser 'Em Gestação' ou 'Ativa')
-      const gestacoesRes = await fetch('/api/gestacoes?situacao=Em Gestação')
+      // Carregar gestaÃ§Ãµes ativas (pode ser 'Em GestaÃ§Ã£o' ou 'Ativa')
+      const gestacoesRes = await fetch('/api/gestacoes?situacao=Em GestaÃ§Ã£o')
       let gestacoesAtivas = []
       if (gestacoesRes.ok) {
         const gestacoesData = await gestacoesRes.json()
         const todasGestacoes = gestacoesData.data || gestacoesData || []
-        // Filtrar apenas gestações ativas (Em Gestação ou Ativa)
+        // Filtrar apenas gestaÃ§Ãµes ativas (Em GestaÃ§Ã£o ou Ativa)
         gestacoesAtivas = todasGestacoes.filter(g => 
-          g.situacao === 'Em Gestação' || g.situacao === 'Ativa'
+          g.situacao === 'Em GestaÃ§Ã£o' || g.situacao === 'Ativa'
         )
         setGestacoes(gestacoesAtivas)
       }
@@ -316,7 +316,7 @@ export default function Nascimentos() {
         setNascimentos(nascimentosData)
       }
 
-      // Carregar inseminações prenhas (gestações de IA - ex: CJCJ 15639)
+      // Carregar inseminaÃ§Ãµes prenhas (gestaÃ§Ãµes de IA - ex: CJCJ 15639)
       const inseminacoesRes = await fetch('/api/inseminacoes')
       if (inseminacoesRes.ok) {
         const inseminacoesData = await inseminacoesRes.json()
@@ -331,13 +331,13 @@ export default function Nascimentos() {
       // Carregar nomes completos dos animais (incluindo busca nas TEs)
       await carregarNomesAnimais(gestacoesAtivas, nascimentosData)
       
-      // Buscar também touros das transferências de embriões que não foram encontrados nos animais
+      // Buscar tambÃ©m touros das transferÃªncias de embriÃµes que nÃ£o foram encontrados nos animais
       const nomesTEs = {}
       const promessasTEs = []
       gestacoesAtivas.forEach(gestacao => {
         if (gestacao.pai_serie && gestacao.pai_rg) {
           const chave = `${gestacao.pai_serie}_${gestacao.pai_rg}`
-          // Verificar se já foi carregado no carregarNomesAnimais
+          // Verificar se jÃ¡ foi carregado no carregarNomesAnimais
           promessasTEs.push(
             buscarTouroNasTEs(gestacao.pai_serie, gestacao.pai_rg).then(nome => {
               if (nome) {
@@ -374,7 +374,7 @@ export default function Nascimentos() {
   }
 
   const formatDate = (dateString) => {
-    if (!dateString) return 'Não informado'
+    if (!dateString) return 'NÃ£o informado'
     return new Date(dateString).toLocaleDateString('pt-BR')
   }
 
@@ -395,15 +395,15 @@ export default function Nascimentos() {
     return diff
   }
 
-  // Função para obter nome completo do animal (busca em animais e TEs)
+  // FunÃ§Ã£o para obter nome completo do animal (busca em animais e TEs)
   const obterNomeCompleto = async (serie, rg, nomeAlternativo = null) => {
     if (!serie || !rg) return nomeAlternativo || '-'
     const chave = `${serie}_${rg}`
     
-    // Se já está no mapa, retornar
+    // Se jÃ¡ estÃ¡ no mapa, retornar
     if (animaisMap[chave]) return animaisMap[chave]
     
-    // Tentar buscar nas TEs se não encontrou nos animais
+    // Tentar buscar nas TEs se nÃ£o encontrou nos animais
     const touroTE = await buscarTouroNasTEs(serie, rg)
     if (touroTE) {
       setAnimaisMap(prev => ({ ...prev, [chave]: touroTE }))
@@ -413,14 +413,14 @@ export default function Nascimentos() {
     return nomeAlternativo || `${serie} ${rg}`
   }
 
-  // Versão síncrona para uso em renderização (usa cache)
+  // VersÃ£o sÃ­ncrona para uso em renderizaÃ§Ã£o (usa cache)
   const obterNomeCompletoSync = (serie, rg, nomeAlternativo = null) => {
     if (!serie || !rg) return nomeAlternativo || '-'
     const chave = `${serie}_${rg}`
     return animaisMap[chave] || nomeAlternativo || `${serie} ${rg}`
   }
 
-  // Função para exportar relatório Excel
+  // FunÃ§Ã£o para exportar relatÃ³rio Excel
   const exportarRelatorio = async () => {
     try {
       setExporting(true)
@@ -430,23 +430,23 @@ export default function Nascimentos() {
       // Aba 1: Resumo
       const resumoSheet = workbook.addWorksheet('Resumo')
       resumoSheet.columns = [
-        { header: 'Métrica', key: 'metrica', width: 30 },
+        { header: 'MÃ©trica', key: 'metrica', width: 30 },
         { header: 'Valor', key: 'valor', width: 20 }
       ]
       
-      resumoSheet.addRow({ metrica: 'Gestações Ativas', valor: gestacoes.length })
+      resumoSheet.addRow({ metrica: 'GestaÃ§Ãµes Ativas', valor: gestacoes.length })
       resumoSheet.addRow({ metrica: 'Partos Atrasados', valor: alertas.partosAtrasados.length })
-      resumoSheet.addRow({ metrica: 'Partos Próximos (30 dias)', valor: alertas.partosProximos.length })
-      resumoSheet.addRow({ metrica: 'Nascimentos Registrados (já ocorreram)', valor: nascimentosReais.length })
-      resumoSheet.addRow({ metrica: 'Previsões de Parto (gestantes)', valor: previsoesParto.length })
+      resumoSheet.addRow({ metrica: 'Partos PrÃ³ximos (30 dias)', valor: alertas.partosProximos.length })
+      resumoSheet.addRow({ metrica: 'Nascimentos Registrados (jÃ¡ ocorreram)', valor: nascimentosReais.length })
+      resumoSheet.addRow({ metrica: 'PrevisÃµes de Parto (gestantes)', valor: previsoesParto.length })
       resumoSheet.addRow({ metrica: '', valor: '' })
       resumoSheet.addRow({ metrica: '--- RESUMO PARA PARIR (FIV vs IA) ---', valor: '' })
       resumoSheet.addRow({ metrica: 'Receptoras para parir de FIV', valor: previsoesFIV.length })
-      resumoSheet.addRow({ metrica: 'Fêmeas para parir de IA', valor: previsoesIA.length })
+      resumoSheet.addRow({ metrica: 'FÃªmeas para parir de IA', valor: previsoesIA.length })
       if (previsoesIA.length > 0 && previsoesIA.length <= 10) {
         previsoesIA.forEach(p => {
           const id = [p.serie, p.rg].filter(x => x && x !== '-').join(' ')
-          resumoSheet.addRow({ metrica: `  └ ${id || p.receptora || '-'}`, valor: formatDate(p.data_nascimento || p.data || p.nascimento) })
+          resumoSheet.addRow({ metrica: `  ââ€�â€� ${id || p.receptora || '-'}`, valor: formatDate(p.data_nascimento || p.data || p.nascimento) })
         })
       }
       
@@ -456,17 +456,17 @@ export default function Nascimentos() {
         return dias !== null && dias >= 0 && dias <= 30
       }).length
       
-      resumoSheet.addRow({ metrica: 'Gestações com Parto em 30 dias', valor: gestacoesProximas })
-      resumoSheet.addRow({ metrica: 'Data do Relatório', valor: new Date().toLocaleDateString('pt-BR') })
+      resumoSheet.addRow({ metrica: 'GestaÃ§Ãµes com Parto em 30 dias', valor: gestacoesProximas })
+      resumoSheet.addRow({ metrica: 'Data do RelatÃ³rio', valor: new Date().toLocaleDateString('pt-BR') })
 
-      // Aba 2: Gestações
-      const gestacoesSheet = workbook.addWorksheet('Gestações')
+      // Aba 2: GestaÃ§Ãµes
+      const gestacoesSheet = workbook.addWorksheet('GestaÃ§Ãµes')
       gestacoesSheet.columns = [
         { header: 'Receptora', key: 'receptora', width: 25 },
         { header: 'Doadora', key: 'doadora', width: 25 },
         { header: 'Touro', key: 'touro', width: 30 },
         { header: 'Data Cobertura', key: 'data_cobertura', width: 15 },
-        { header: 'Previsão Parto', key: 'previsao_parto', width: 15 },
+        { header: 'PrevisÃ£o Parto', key: 'previsao_parto', width: 15 },
         { header: 'Dias Restantes', key: 'dias_restantes', width: 15 },
         { header: 'Status', key: 'status', width: 15 }
       ]
@@ -487,17 +487,17 @@ export default function Nascimentos() {
           touro: nomeTouro,
           data_cobertura: formatDate(gestacao.data_cobertura),
           previsao_parto: dataEsperada ? formatDate(dataEsperada.toISOString()) : '-',
-          dias_restantes: diasRestantes !== null ? (diasRestantes < 0 ? `${Math.abs(diasRestantes)} dias atrás` : `${diasRestantes} dias`) : '-',
-          status: isAtrasado ? 'Atrasado' : isProximo ? 'Próximo' : gestacao.situacao || 'Em Gestação'
+          dias_restantes: diasRestantes !== null ? (diasRestantes < 0 ? `${Math.abs(diasRestantes)} dias atrÃ¡s` : `${diasRestantes} dias`) : '-',
+          status: isAtrasado ? 'Atrasado' : isProximo ? 'PrÃ³ximo' : gestacao.situacao || 'Em GestaÃ§Ã£o'
         })
       })
 
-      // Aba 3: Nascimentos (reais + previsões)
+      // Aba 3: Nascimentos (reais + previsÃµes)
       const nascimentosSheet = workbook.addWorksheet('Nascimentos')
       nascimentosSheet.columns = [
         { header: 'Tipo', key: 'tipo', width: 12 },
         { header: 'Origem', key: 'origem', width: 10 },
-        { header: 'Série', key: 'serie', width: 15 },
+        { header: 'SÃ©rie', key: 'serie', width: 15 },
         { header: 'RG', key: 'rg', width: 15 },
         { header: 'Nome', key: 'nome', width: 25 },
         { header: 'Sexo', key: 'sexo', width: 10 },
@@ -521,7 +521,7 @@ export default function Nascimentos() {
       })
       previsoesParto.forEach(n => {
         nascimentosSheet.addRow({
-          tipo: 'Previsão',
+          tipo: 'PrevisÃ£o',
           origem: n.origem || 'FIV',
           serie: n.serie || '-',
           rg: n.rg || '-',
@@ -569,10 +569,10 @@ export default function Nascimentos() {
       document.body.removeChild(link)
       window.URL.revokeObjectURL(url)
 
-      alert(`✅ Relatório exportado com sucesso!`)
+      alert(`âÅ“â€¦ RelatÃ³rio exportado com sucesso!`)
     } catch (error) {
-      console.error('Erro ao exportar relatório:', error)
-      alert('❌ Erro ao exportar relatório')
+      console.error('Erro ao exportar relatÃ³rio:', error)
+      alert('â�Å’ Erro ao exportar relatÃ³rio')
     } finally {
       setExporting(false)
     }
@@ -591,7 +591,7 @@ export default function Nascimentos() {
 
   return (
     <div className="space-y-6">
-      {/* Cabeçalho */}
+      {/* CabeÃ§alho */}
       <div className="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
@@ -601,7 +601,7 @@ export default function Nascimentos() {
             Nascimentos
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-2 ml-1">
-            Controle de gestações, previsões de parto e alertas
+            Controle de gestaÃ§Ãµes, previsÃµes de parto e alertas
           </p>
         </div>
         <button
@@ -610,17 +610,17 @@ export default function Nascimentos() {
           className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl shadow-md disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all font-medium"
         >
           <ArrowDownTrayIcon className="w-5 h-5" />
-          {exporting ? 'Exportando...' : 'Exportar Relatório'}
+          {exporting ? 'Exportando...' : 'Exportar RelatÃ³rio'}
         </button>
       </div>
 
-      {/* Alertas de Partos Atrasados e Próximos */}
+      {/* Alertas de Partos Atrasados e PrÃ³ximos */}
       <AlertasPartosAtrasados />
 
-      {/* Resumo Previsões FIV vs IA */}
+      {/* Resumo PrevisÃµes FIV vs IA */}
       {(previsoesFIV.length > 0 || previsoesIA.length > 0) && (
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-5">
-          <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Resumo das previsões de parto</h3>
+          <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Resumo das previsÃµes de parto</h3>
           <div className="flex flex-wrap gap-4 items-baseline">
             {previsoesFIV.length > 0 && (
               <span className="text-gray-900 dark:text-white">
@@ -631,7 +631,7 @@ export default function Nascimentos() {
             {previsoesIA.length > 0 && (
               <span className="text-gray-900 dark:text-white">
                 <strong className="text-amber-600 dark:text-amber-400">{previsoesIA.length}</strong>
-                {previsoesIA.length === 1 ? ' fêmea' : ' fêmeas'} para parir de <strong>IA</strong>
+                {previsoesIA.length === 1 ? ' fÃªmea' : ' fÃªmeas'} para parir de <strong>IA</strong>
                 {previsoesIA.length <= 3 && (
                   <span className="text-gray-600 dark:text-gray-400 ml-1">
                     ({previsoesIA.map(p => {
@@ -653,7 +653,7 @@ export default function Nascimentos() {
           <div className="relative flex items-center justify-between">
             <div>
               <p className="text-4xl font-bold">{gestacoes.length}</p>
-              <p className="text-rose-100 text-sm font-medium mt-1">Gestações Ativas</p>
+              <p className="text-rose-100 text-sm font-medium mt-1">GestaÃ§Ãµes Ativas</p>
             </div>
             <div className="p-4 bg-white/20 rounded-xl">
               <HeartIcon className="w-10 h-10" />
@@ -689,7 +689,7 @@ export default function Nascimentos() {
           <div className="relative flex items-center justify-between">
             <div>
               <p className="text-4xl font-bold">{alertas.partosProximos.length}</p>
-              <p className="text-amber-100 text-sm font-medium mt-1">Partos Próximos (30 dias)</p>
+              <p className="text-amber-100 text-sm font-medium mt-1">Partos PrÃ³ximos (30 dias)</p>
             </div>
             <div className="p-4 bg-white/20 rounded-xl">
               <ClockIcon className="w-10 h-10" />
@@ -702,7 +702,7 @@ export default function Nascimentos() {
           <div className="relative flex items-center justify-between">
             <div>
               <p className="text-4xl font-bold">{nascimentosReais.length}</p>
-              <p className="text-emerald-100 text-sm font-medium mt-1">Nascimentos (já ocorreram)</p>
+              <p className="text-emerald-100 text-sm font-medium mt-1">Nascimentos (jÃ¡ ocorreram)</p>
             </div>
             <div className="p-4 bg-white/20 rounded-xl">
               <CalendarIcon className="w-10 h-10" />
@@ -732,7 +732,7 @@ export default function Nascimentos() {
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">{resumos.femeas}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Fêmeas</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">FÃªmeas</p>
             </div>
           </div>
         </div>
@@ -746,7 +746,7 @@ export default function Nascimentos() {
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
                 {resumos.pesoMedio ? `${resumos.pesoMedio} kg` : '-'}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Peso Médio</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Peso MÃ©dio</p>
             </div>
           </div>
         </div>
@@ -758,7 +758,7 @@ export default function Nascimentos() {
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">{resumos.esteMes}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Este Mês</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Este MÃªs</p>
             </div>
           </div>
         </div>
@@ -770,13 +770,13 @@ export default function Nascimentos() {
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">{resumos.ultimos7Dias}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Últimos 7 dias</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">ÃÅ¡ltimos 7 dias</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Gestações Ativas */}
+      {/* GestaÃ§Ãµes Ativas */}
       {gestacoes.length > 0 && (
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
           <div className="px-6 py-5 bg-gradient-to-r from-rose-50 to-pink-50 dark:from-rose-900/20 dark:to-pink-900/20 border-b border-gray-200 dark:border-gray-700">
@@ -784,9 +784,9 @@ export default function Nascimentos() {
               <div className="p-2 bg-rose-100 dark:bg-rose-900/30 rounded-lg">
                 <HeartIcon className="w-5 h-5 text-rose-600 dark:text-rose-400" />
               </div>
-              Gestações Ativas ({gestacoes.length})
+              GestaÃ§Ãµes Ativas ({gestacoes.length})
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Receptoras em gestação com previsão de parto</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Receptoras em gestaÃ§Ã£o com previsÃ£o de parto</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -796,7 +796,7 @@ export default function Nascimentos() {
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Doadora</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Touro</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Data Cobertura</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Previsão Parto</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">PrevisÃ£o Parto</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Dias Restantes</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
                 </tr>
@@ -838,7 +838,7 @@ export default function Nascimentos() {
                               ? 'text-yellow-600 dark:text-yellow-400' 
                               : 'text-gray-600 dark:text-gray-400'
                           }`}>
-                            {diasRestantes < 0 ? `${Math.abs(diasRestantes)} dias atrás` : `${diasRestantes} dias`}
+                            {diasRestantes < 0 ? `${Math.abs(diasRestantes)} dias atrÃ¡s` : `${diasRestantes} dias`}
                           </span>
                         ) : '-'}
                       </td>
@@ -850,7 +850,7 @@ export default function Nascimentos() {
                             ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
                             : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
                         }`}>
-                          {isAtrasado ? 'Atrasado' : isProximo ? 'Próximo' : gestacao.situacao || 'Em Gestação'}
+                          {isAtrasado ? 'Atrasado' : isProximo ? 'PrÃ³ximo' : gestacao.situacao || 'Em GestaÃ§Ã£o'}
                         </span>
                       </td>
                     </tr>
@@ -862,7 +862,7 @@ export default function Nascimentos() {
         </div>
       )}
 
-      {/* Nascimentos Reais (já ocorreram) */}
+      {/* Nascimentos Reais (jÃ¡ ocorreram) */}
       {nascimentosReais.length > 0 && (
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
           <div className="px-6 py-5 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-b border-gray-200 dark:border-gray-700">
@@ -874,7 +874,7 @@ export default function Nascimentos() {
                   </div>
                   Nascimentos Registrados ({nascimentosReais.length})
                 </h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Bezerros que já nasceram</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Bezerros que jÃ¡ nasceram</p>
               </div>
               <div className="flex rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600">
                 <button
@@ -900,8 +900,8 @@ export default function Nascimentos() {
                     <p className="text-sm font-semibold text-gray-900 dark:text-white">{dataStr}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                       {dados.machos > 0 && `${dados.machos} macho${dados.machos > 1 ? 's' : ''}`}
-                      {dados.machos > 0 && dados.femeas > 0 && ' • '}
-                      {dados.femeas > 0 && `${dados.femeas} fêmea${dados.femeas > 1 ? 's' : ''}`}
+                      {dados.machos > 0 && dados.femeas > 0 && ' ââ‚¬¢ '}
+                      {dados.femeas > 0 && `${dados.femeas} fÃªmea${dados.femeas > 1 ? 's' : ''}`}
                     </p>
                   </div>
                   <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{dados.count}</span>
@@ -913,7 +913,7 @@ export default function Nascimentos() {
                 <table className="w-full">
                   <thead className="bg-gray-50 dark:bg-gray-900/50">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Série</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">SÃ©rie</th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">RG</th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Sexo</th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Data</th>
@@ -938,7 +938,7 @@ export default function Nascimentos() {
             ) : (
               <div className="border border-gray-200 dark:border-gray-600 rounded-xl overflow-hidden">
                 <div className="grid grid-cols-5 gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-900/50 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">
-                  <span>Série</span><span>RG</span><span>Sexo</span><span>Data</span><span>Receptora</span>
+                  <span>SÃ©rie</span><span>RG</span><span>Sexo</span><span>Data</span><span>Receptora</span>
                 </div>
                 {(expandirLista ? nascimentosReais : nascimentosReais.slice(0, 6)).map((n, idx) => (
                   <div key={n.id || `${n.serie}-${n.rg}-${idx}`} className="grid grid-cols-5 gap-2 px-4 py-2 text-sm border-t border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/30">
@@ -956,14 +956,14 @@ export default function Nascimentos() {
                 onClick={() => setExpandirLista(!expandirLista)}
                 className="w-full mt-3 py-2 text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-colors"
               >
-                {expandirLista ? '▲ Ver menos' : `▼ Ver todos (${nascimentosReais.length})`}
+                {expandirLista ? 'ââ€“² Ver menos' : `ââ€“¼ Ver todos (${nascimentosReais.length})`}
               </button>
             )}
           </div>
         </div>
       )}
 
-      {/* Previsões de Parto (receptoras gestantes - ainda não pariram) */}
+      {/* PrevisÃµes de Parto (receptoras gestantes - ainda nÃ£o pariram) */}
       {previsoesParto.length > 0 && (
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border-2 border-amber-200 dark:border-amber-800 overflow-hidden">
           <div className="px-6 py-5 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-b border-amber-200 dark:border-amber-800">
@@ -971,10 +971,10 @@ export default function Nascimentos() {
               <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
                 <ClockIcon className="w-5 h-5 text-amber-600 dark:text-amber-400" />
               </div>
-              Previsões de Parto ({previsoesParto.length})
+              PrevisÃµes de Parto ({previsoesParto.length})
             </h2>
             <p className="text-sm text-amber-700 dark:text-amber-400 mt-1 font-medium">
-              ⚠️ Receptoras (FIV) e fêmeas (IA) gestantes — ainda não pariram. Datas previstas (9 meses após TE ou cobertura).
+              âÅ¡ ï¸� Receptoras (FIV) e fÃªmeas (IA) gestantes ââ‚¬â€� ainda nÃ£o pariram. Datas previstas (9 meses apÃ³s TE ou cobertura).
             </p>
           </div>
           <div className="p-6">
@@ -982,10 +982,10 @@ export default function Nascimentos() {
               {resumoPorDataPrevisoes.map(([dataStr, dados]) => (
                 <div key={`prev-${dataStr}`} className="flex items-center justify-between p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-700">
                   <div>
-                    <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">Previsão: {dataStr}</p>
+                    <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">PrevisÃ£o: {dataStr}</p>
                     <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
-                      {dados.femeas > 0 && `${dados.femeas} fêmea${dados.femeas > 1 ? 's' : ''}`}
-                      {dados.machos > 0 && ` • ${dados.machos} macho${dados.machos > 1 ? 's' : ''}`}
+                      {dados.femeas > 0 && `${dados.femeas} fÃªmea${dados.femeas > 1 ? 's' : ''}`}
+                      {dados.machos > 0 && ` ââ‚¬¢ ${dados.machos} macho${dados.machos > 1 ? 's' : ''}`}
                     </p>
                   </div>
                   <span className="text-2xl font-bold text-amber-600 dark:text-amber-400">{dados.count}</span>
@@ -994,7 +994,7 @@ export default function Nascimentos() {
             </div>
             <div className="border border-amber-200 dark:border-amber-700 rounded-xl overflow-hidden">
               <div className="grid grid-cols-6 gap-2 px-4 py-2 bg-amber-100 dark:bg-amber-900/30 text-xs font-semibold text-amber-800 dark:text-amber-200 uppercase">
-                <span>Origem</span><span>Série</span><span>RG</span><span>Sexo</span><span>Previsão Parto</span><span>Receptora</span>
+                <span>Origem</span><span>SÃ©rie</span><span>RG</span><span>Sexo</span><span>PrevisÃ£o Parto</span><span>Receptora</span>
               </div>
               {(expandirLista ? previsoesParto : previsoesParto.slice(0, 6)).map((n, idx) => (
                 <div key={n.id || `prev-${n.serie}-${n.rg}-${idx}`} className="grid grid-cols-6 gap-2 px-4 py-2 text-sm border-t border-amber-200 dark:border-amber-800 hover:bg-amber-50 dark:hover:bg-amber-900/20">
@@ -1016,7 +1016,7 @@ export default function Nascimentos() {
                 onClick={() => setExpandirLista(!expandirLista)}
                 className="w-full mt-3 py-2 text-sm font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg transition-colors"
               >
-                {expandirLista ? '▲ Ver menos' : `▼ Ver todos (${previsoesParto.length})`}
+                {expandirLista ? 'ââ€“² Ver menos' : `ââ€“¼ Ver todos (${previsoesParto.length})`}
               </button>
             )}
           </div>
@@ -1029,10 +1029,10 @@ export default function Nascimentos() {
             <HeartIcon className="w-20 h-20 text-rose-400 dark:text-rose-500" />
           </div>
           <p className="text-gray-600 dark:text-gray-400 text-lg font-medium">
-            Nenhuma gestação ou nascimento registrado ainda
+            Nenhuma gestaÃ§Ã£o ou nascimento registrado ainda
           </p>
           <p className="text-gray-500 dark:text-gray-500 text-sm mt-2">
-            Registre gestações e nascimentos para acompanhar o rebanho
+            Registre gestaÃ§Ãµes e nascimentos para acompanhar o rebanho
           </p>
         </div>
       )}

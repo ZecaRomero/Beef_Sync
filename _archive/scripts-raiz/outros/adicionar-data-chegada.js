@@ -9,12 +9,12 @@ const pool = new Pool({
 });
 
 async function adicionarDataChegada() {
-  console.log('🔧 ADICIONANDO CAMPO DATA DE CHEGADA\n');
+  console.log('�Ÿ”� ADICIONANDO CAMPO DATA DE CHEGADA\n');
   console.log('='.repeat(60));
 
   try {
     // 1. Verificar se a coluna já existe
-    console.log('\n📊 1. Verificando se coluna data_chegada existe...');
+    console.log('\n�Ÿ“Š 1. Verificando se coluna data_chegada existe...');
     const colunaExiste = await pool.query(`
       SELECT EXISTS (
         SELECT FROM information_schema.columns 
@@ -24,9 +24,9 @@ async function adicionarDataChegada() {
     `);
 
     if (colunaExiste.rows[0].exists) {
-      console.log('✅ Coluna data_chegada já existe');
+      console.log('�œ… Coluna data_chegada já existe');
     } else {
-      console.log('⚠️ Coluna não existe. Criando...');
+      console.log('�š�️ Coluna não existe. Criando...');
       
       // 2. Adicionar coluna data_chegada
       await pool.query(`
@@ -34,11 +34,11 @@ async function adicionarDataChegada() {
         ADD COLUMN data_chegada DATE
       `);
       
-      console.log('✅ Coluna data_chegada criada');
+      console.log('�œ… Coluna data_chegada criada');
     }
 
     // 3. Verificar se a coluna data_dg_prevista existe
-    console.log('\n📊 2. Verificando se coluna data_dg_prevista existe...');
+    console.log('\n�Ÿ“Š 2. Verificando se coluna data_dg_prevista existe...');
     const colunaDGExiste = await pool.query(`
       SELECT EXISTS (
         SELECT FROM information_schema.columns 
@@ -48,9 +48,9 @@ async function adicionarDataChegada() {
     `);
 
     if (colunaDGExiste.rows[0].exists) {
-      console.log('✅ Coluna data_dg_prevista já existe');
+      console.log('�œ… Coluna data_dg_prevista já existe');
     } else {
-      console.log('⚠️ Coluna não existe. Criando...');
+      console.log('�š�️ Coluna não existe. Criando...');
       
       // 4. Adicionar coluna data_dg_prevista
       await pool.query(`
@@ -58,11 +58,11 @@ async function adicionarDataChegada() {
         ADD COLUMN data_dg_prevista DATE
       `);
       
-      console.log('✅ Coluna data_dg_prevista criada');
+      console.log('�œ… Coluna data_dg_prevista criada');
     }
 
     // 5. Criar função para calcular data DG automaticamente
-    console.log('\n📊 3. Criando trigger para calcular data DG...');
+    console.log('\n�Ÿ“Š 3. Criando trigger para calcular data DG...');
     
     await pool.query(`
       CREATE OR REPLACE FUNCTION calcular_data_dg()
@@ -86,10 +86,10 @@ async function adicionarDataChegada() {
       EXECUTE FUNCTION calcular_data_dg();
     `);
 
-    console.log('✅ Trigger criado para calcular data DG automaticamente');
+    console.log('�œ… Trigger criado para calcular data DG automaticamente');
 
     // 7. Criar tabela de alertas se não existir
-    console.log('\n📊 4. Criando tabela de alertas...');
+    console.log('\n�Ÿ“Š 4. Criando tabela de alertas...');
     
     await pool.query(`
       CREATE TABLE IF NOT EXISTS alertas_dg (
@@ -104,10 +104,10 @@ async function adicionarDataChegada() {
       )
     `);
 
-    console.log('✅ Tabela alertas_dg criada');
+    console.log('�œ… Tabela alertas_dg criada');
 
     // 8. Criar índices
-    console.log('\n📊 5. Criando índices...');
+    console.log('\n�Ÿ“Š 5. Criando índices...');
     
     await pool.query(`
       CREATE INDEX IF NOT EXISTS idx_animais_data_chegada ON animais(data_chegada);
@@ -116,23 +116,23 @@ async function adicionarDataChegada() {
       CREATE INDEX IF NOT EXISTS idx_alertas_dg_data_dg_prevista ON alertas_dg(data_dg_prevista);
     `);
 
-    console.log('✅ Índices criados');
+    console.log('�œ… Índices criados');
 
     console.log('\n' + '='.repeat(60));
-    console.log('✅ Configuração concluída!');
-    console.log('\n📋 Resumo:');
-    console.log('   ✅ Coluna data_chegada adicionada');
-    console.log('   ✅ Coluna data_dg_prevista adicionada');
-    console.log('   ✅ Trigger automático criado (DG = Chegada + 15 dias)');
-    console.log('   ✅ Tabela de alertas criada');
-    console.log('   ✅ Índices criados');
-    console.log('\n💡 Próximos passos:');
+    console.log('�œ… Configuração concluída!');
+    console.log('\n�Ÿ“‹ Resumo:');
+    console.log('   �œ… Coluna data_chegada adicionada');
+    console.log('   �œ… Coluna data_dg_prevista adicionada');
+    console.log('   �œ… Trigger automático criado (DG = Chegada + 15 dias)');
+    console.log('   �œ… Tabela de alertas criada');
+    console.log('   �œ… Índices criados');
+    console.log('\n�Ÿ’� Próximos passos:');
     console.log('   1. Recarregue a página de cadastro de animais');
     console.log('   2. Verá o campo "Data de Chegada"');
     console.log('   3. Ao preencher, a data do DG será calculada automaticamente');
 
   } catch (error) {
-    console.error('\n❌ Erro:', error.message);
+    console.error('\n�Œ Erro:', error.message);
   } finally {
     await pool.end();
   }

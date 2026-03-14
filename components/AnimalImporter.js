@@ -19,7 +19,7 @@ export default function AnimalImporter({ isOpen, onClose, onImport }) {
   const [localNascimentoPadrao, setLocalNascimentoPadrao] = useState("");
   const [pastoAtualPadrao, setPastoAtualPadrao] = useState("");
   const [availableLocations, setAvailableLocations] = useState([]);
-  const [modoAtualizacao, setModoAtualizacao] = useState(false); // Modo para atualizar apenas campos específicos de animais existentes
+  const [modoAtualizacao, setModoAtualizacao] = useState(false); // Modo para atualizar apenas campos especÃ­ficos de animais existentes
   const [camposSelecionados, setCamposSelecionados] = useState({
     nome: true,
     pai: true,
@@ -41,9 +41,9 @@ export default function AnimalImporter({ isOpen, onClose, onImport }) {
     isFiv: false,
     custoTotal: false,
     observacoes: false
-  }); // Campos que serão importados/atualizados
+  }); // Campos que serÃ£o importados/atualizados
 
-  // Carregar locais (usa utilitário que filtra nomes de touros cadastrados por engano como piquete)
+  // Carregar locais (usa utilitÃ¡rio que filtra nomes de touros cadastrados por engano como piquete)
   useEffect(() => {
     fetchAvailableLocations()
       .then(setAvailableLocations)
@@ -51,7 +51,7 @@ export default function AnimalImporter({ isOpen, onClose, onImport }) {
   }, [])
 
 
-  // Mapeamento de campos (manual/auto) para importação
+  // Mapeamento de campos (manual/auto) para importaÃ§Ã£o
   const [mappingMode, setMappingMode] = useState('auto')
   const [columnCount, setColumnCount] = useState(15)
   const [headersDetected, setHeadersDetected] = useState([])
@@ -102,14 +102,14 @@ export default function AnimalImporter({ isOpen, onClose, onImport }) {
       const cells = splitCells(first)
       setColumnCount(cells.length || 15)
       const lower = cells.map((c) => c.toLowerCase().trim())
-      // Normalizar para comparação (remover acentos e espaços extras)
+      // Normalizar para comparaÃ§Ã£o (remover acentos e espaÃ§os extras)
       const normalize = (str) => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ')
       const normalizedCells = lower.map(normalize)
       const maybeHeader = normalizedCells.some((s) =>
-        ['serie', 'série', 'rg', 'rgn', 'sexo', 'nasc', 'nascimento', 'meses', 'idade',
+        ['serie', 'sÃ©rie', 'rg', 'rgn', 'sexo', 'nasc', 'nascimento', 'meses', 'idade',
          'nome do pai', 'nomepai', 'pai', 'serie do pai', 'seriepai', 'serie pai', 'rg do pai', 'rgpai', 'rg pai',
-         'nome da mae', 'nome da mãe', 'nomemae', 'mae', 'mãe', 'serie da mae', 'serie da mãe', 'seriemae', 'serie mãe',
-         'rg da mae', 'rg da mãe', 'rgmae', 'rg mãe', 'avô materno', 'avo materno', 'avomaterno', 'avô', 'avo',
+         'nome da mae', 'nome da mÃ£e', 'nomemae', 'mae', 'mÃ£e', 'serie da mae', 'serie da mÃ£e', 'seriemae', 'serie mÃ£e',
+         'rg da mae', 'rg da mÃ£e', 'rgmae', 'rg mÃ£e', 'avÃ´ materno', 'avo materno', 'avomaterno', 'avÃ´', 'avo',
          'abczg', 'iabcz', 'iabczg', 'deca', 'receptora', 'rec', 'lote', 'peso'].some(term => s.includes(term) || term.includes(s))
       )
       setHeadersDetected(maybeHeader ? cells : [])
@@ -128,22 +128,22 @@ export default function AnimalImporter({ isOpen, onClose, onImport }) {
     } catch { }
   }, [])
 
-  // Ajustar mapeamento automático quando detectar cabeçalhos específicos ou poucas colunas
+  // Ajustar mapeamento automÃ¡tico quando detectar cabeÃ§alhos especÃ­ficos ou poucas colunas
   useEffect(() => {
     if (mappingMode === 'auto' && columnCount === 3) {
       if (headersDetected.length > 0) {
         const lowerHeaders = headersDetected.map(h => h.toLowerCase().trim())
         
-        // Se detectar apenas 3 colunas com padrão específico (Série, RGN/RG, Avô Materno)
-        const temSerie = lowerHeaders.some(h => h.includes('serie') || h.includes('série'))
+        // Se detectar apenas 3 colunas com padrÃ£o especÃ­fico (SÃ©rie, RGN/RG, AvÃ´ Materno)
+        const temSerie = lowerHeaders.some(h => h.includes('serie') || h.includes('sÃ©rie'))
         const temRg = lowerHeaders.some(h => h.includes('rg') || h.includes('rgn'))
-        const temAvo = lowerHeaders.some(h => h.includes('avô') || h.includes('avo') || h.includes('materno'))
+        const temAvo = lowerHeaders.some(h => h.includes('avÃ´') || h.includes('avo') || h.includes('materno'))
         
         if (temSerie && temRg && temAvo) {
           // Mapear automaticamente as 3 colunas
-          const serieIdx = lowerHeaders.findIndex(h => h.includes('serie') || h.includes('série'))
+          const serieIdx = lowerHeaders.findIndex(h => h.includes('serie') || h.includes('sÃ©rie'))
           const rgIdx = lowerHeaders.findIndex(h => h.includes('rg') || h.includes('rgn'))
-          const avoIdx = lowerHeaders.findIndex(h => h.includes('avô') || h.includes('avo') || h.includes('materno'))
+          const avoIdx = lowerHeaders.findIndex(h => h.includes('avÃ´') || h.includes('avo') || h.includes('materno'))
           
           setFieldMapping(prev => ({
             ...prev,
@@ -165,7 +165,7 @@ export default function AnimalImporter({ isOpen, onClose, onImport }) {
           }))
         }
       } else {
-        // Sem cabeçalhos detectados mas 3 colunas - assumir formato: Série, RG, Avô Materno
+        // Sem cabeÃ§alhos detectados mas 3 colunas - assumir formato: SÃ©rie, RG, AvÃ´ Materno
         setFieldMapping(prev => ({
           ...prev,
           serie: { enabled: true, source: 'Coluna 1' },
@@ -218,23 +218,23 @@ FFAL,100,F,08/03/2011,175,C.A.SANSAO MODELO,CJCJ,200,SANT ANNA,CJCJ,250,TE BRASI
 FELG\t931\tF\t17/09/2016\t109\tCOLOSSO FTV DA F.E.\tCJCJ\t179\tVAIDOSO DA SILVANIA\tCJCJ\t150\tVAIDOSO DA SILVANIA\t\t\tRPT 1001
 FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t250\tTE BRASILIA\t\t\tRPT 1002`;
 
-  // Função para calcular idade em meses
+  // FunÃ§Ã£o para calcular idade em meses
   const calcularIdade = (dataNascimento) => {
     const nascimento = new Date(dataNascimento);
     const hoje = new Date();
     const diffTime = Math.abs(hoje - nascimento);
-    const diffMonths = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 30.44)); // Média de dias por mês
+    const diffMonths = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 30.44)); // MÃ©dia de dias por mÃªs
     return diffMonths;
   };
 
-  // Função para converter data do formato brasileiro para ISO
+  // FunÃ§Ã£o para converter data do formato brasileiro para ISO
   const convertDateToISO = (dateStr) => {
     if (!dateStr) return null;
 
     // Limpar a string de data
     const cleanDateStr = dateStr.toString().trim();
 
-    // Se já está no formato ISO (YYYY-MM-DD)
+    // Se jÃ¡ estÃ¡ no formato ISO (YYYY-MM-DD)
     if (cleanDateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
       return cleanDateStr;
     }
@@ -244,13 +244,13 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
     if (parts.length === 3) {
       let [day, month, year] = parts.map((p) => p.trim());
 
-      // Se ano tem 2 dígitos, assumir 20XX
+      // Se ano tem 2 dÃ­gitos, assumir 20XX
       if (year.length === 2) {
         const currentYear = new Date().getFullYear();
         const currentCentury = Math.floor(currentYear / 100) * 100;
         const yearNum = parseInt(year);
 
-        // Se o ano for maior que os últimos 2 dígitos do ano atual + 10, assumir século anterior
+        // Se o ano for maior que os Ãºltimos 2 dÃ­gitos do ano atual + 10, assumir sÃ©culo anterior
         if (yearNum > (currentYear % 100) + 10) {
           year = (currentCentury - 100 + yearNum).toString();
         } else {
@@ -258,30 +258,30 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
         }
       }
 
-      // Validar se os valores são números válidos
+      // Validar se os valores sÃ£o nÃºmeros vÃ¡lidos
       const dayNum = parseInt(day);
       const monthNum = parseInt(month);
       const yearNum = parseInt(year);
 
       if (isNaN(dayNum) || isNaN(monthNum) || isNaN(yearNum)) {
-        throw new Error(`Formato de data inválido: ${dateStr}`);
+        throw new Error(`Formato de data invÃ¡lido: ${dateStr}`);
       }
 
       if (dayNum < 1 || dayNum > 31 || monthNum < 1 || monthNum > 12) {
-        throw new Error(`Data inválida: ${dateStr}`);
+        throw new Error(`Data invÃ¡lida: ${dateStr}`);
       }
 
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     }
 
-    throw new Error(`Formato de data inválido: ${dateStr}`);
+    throw new Error(`Formato de data invÃ¡lido: ${dateStr}`);
   };
 
-  // Função para validar e processar dados
+  // FunÃ§Ã£o para validar e processar dados
   const validateData = () => {
-    // Validar campos obrigatórios globais apenas no modo de importação
+    // Validar campos obrigatÃ³rios globais apenas no modo de importaÃ§Ã£o
     if (!modoAtualizacao && !boletimPadrao) {
-      alert("Por favor, selecione o Boletim (Local de Entrada) nas Configurações Gerais.");
+      alert("Por favor, selecione o Boletim (Local de Entrada) nas ConfiguraÃ§Ãµes Gerais.");
       return;
     }
 
@@ -291,14 +291,14 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
       let linhas = [];
 
       if (importMethod === "excel") {
-        // Processar dados do Excel (separados por TAB ou vírgula)
+        // Processar dados do Excel (separados por TAB ou vÃ­rgula)
         linhas = importData.trim().split("\n");
 
         if (linhas.length === 0) {
           throw new Error("Nenhum dado encontrado");
         }
 
-        // Detectar se a primeira linha é cabeçalho
+        // Detectar se a primeira linha Ã© cabeÃ§alho
         const primeiraLinha = linhas[0];
         const isHeader =
           primeiraLinha.toLowerCase().includes("serie") ||
@@ -306,14 +306,14 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
           primeiraLinha.toLowerCase().includes("nasc");
 
         if (isHeader) {
-          linhas = linhas.slice(1); // Remove cabeçalho
+          linhas = linhas.slice(1); // Remove cabeÃ§alho
         }
       } else if (importMethod === "csv") {
         // Processar CSV
         linhas = importData.trim().split("\n");
         const header = linhas[0].split(",").map((h) => h.trim());
 
-        // Verificar se tem o cabeçalho correto
+        // Verificar se tem o cabeÃ§alho correto
         const expectedHeaders = [
           "Serie",
           "RG",
@@ -324,11 +324,11 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
 
         if (!hasValidHeader) {
           console.warn(
-            "Cabeçalho CSV não corresponde ao formato esperado. Tentando detectar automaticamente..."
+            "CabeÃ§alho CSV nÃ£o corresponde ao formato esperado. Tentando detectar automaticamente..."
           );
         }
 
-        linhas = linhas.slice(1); // Remove cabeçalho
+        linhas = linhas.slice(1); // Remove cabeÃ§alho
       } else {
         // Processar entrada manual (uma linha por animal)
         linhas = importData.trim().split("\n");
@@ -345,48 +345,48 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
           let manualExtrasLocal = null;
 
           if (importMethod === "excel") {
-            // Processar dados do Excel - formato da planilha do usuário
-            // Detectar separador (TAB, vírgula ou espaços múltiplos)
+            // Processar dados do Excel - formato da planilha do usuÃ¡rio
+            // Detectar separador (TAB, vÃ­rgula ou espaÃ§os mÃºltiplos)
             let campos = [];
 
             if (linha.includes("\t")) {
               // Separado por TAB
               campos = linha.split("\t").map((c) => c.trim());
             } else if (linha.includes(",")) {
-              // Separado por vírgula
+              // Separado por vÃ­rgula
               campos = linha.split(",").map((c) => c.trim());
             } else {
-              // Separado por espaços múltiplos (formato da imagem)
+              // Separado por espaÃ§os mÃºltiplos (formato da imagem)
               // Exemplo real: CJCJ 15628 22 913 42 M 24,62 1 22,05 8 09/08/23 24 REM HERMOSO FIV GEN B2887 DA S.NICE
               campos = linha.split(/\s+/).filter((c) => c.trim() !== "");
 
               console.log("Campos encontrados:", campos.length, campos); // Debug
 
-              // Reagrupar os últimos campos que podem ter espaços (nomes)
+              // Reagrupar os Ãºltimos campos que podem ter espaÃ§os (nomes)
               if (campos.length > 12) {
                 // Baseado nos dados reais: CJCJ 16701 FIV 14 289 F 28,83 1 27,41 2 13/11/24 9 A978 FIV RSAN CRIVO SANT ANNA
-                // Os primeiros 12 campos são fixos até a data: CJCJ, 16701, FIV, 14, 289, F, 28,83, 1, 27,41, 2, 13/11/24, 9
+                // Os primeiros 12 campos sÃ£o fixos atÃ© a data: CJCJ, 16701, FIV, 14, 289, F, 28,83, 1, 27,41, 2, 13/11/24, 9
                 const primeiros12 = campos.slice(0, 12);
-                const restante = campos.slice(12); // Nome do Pai + Avô Materno
+                const restante = campos.slice(12); // Nome do Pai + AvÃ´ Materno
 
                 console.log("Primeiros 12:", primeiros12); // Debug
                 console.log("Restante para nomes:", restante); // Debug
 
-                // Estratégia específica para o padrão observado
-                // Procurar por códigos típicos de avô materno que começam com letra+número
+                // EstratÃ©gia especÃ­fica para o padrÃ£o observado
+                // Procurar por cÃ³digos tÃ­picos de avÃ´ materno que comeÃ§am com letra+nÃºmero
                 let indiceSeparacao = -1;
 
                 for (let i = 0; i < restante.length; i++) {
                   const campo = restante[i];
-                  // Procurar por padrões específicos observados: B2887, CJ, etc.
+                  // Procurar por padrÃµes especÃ­ficos observados: B2887, CJ, etc.
                   if (
-                    campo.match(/^[A-Z]\d{3,4}$/) || // B2887, C123, etc (letra + 3-4 números)
+                    campo.match(/^[A-Z]\d{3,4}$/) || // B2887, C123, etc (letra + 3-4 nÃºmeros)
                     campo.match(/^[A-Z]{2}$/) || // CJ, etc (2 letras)
                     campo === "DA" ||
                     campo === "DE" ||
                     campo === "DO"
                   ) {
-                    // Preposições
+                    // PreposiÃ§Ãµes
                     indiceSeparacao = i;
                     break;
                   }
@@ -397,32 +397,32 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                   const avoMaterno = restante.slice(indiceSeparacao).join(" ");
                   campos = [...primeiros12, nomePai, avoMaterno];
                   console.log(
-                    "Separação encontrada no índice",
+                    "SeparaÃ§Ã£o encontrada no Ã­ndice",
                     indiceSeparacao,
                     ":",
                     { nomePai, avoMaterno }
                   ); // Debug
                 } else {
-                  // Fallback mais inteligente: assumir que o avô materno tem 2-3 palavras no final
-                  // Baseado no padrão observado: "B2887 DA S.NICE" (3 palavras)
+                  // Fallback mais inteligente: assumir que o avÃ´ materno tem 2-3 palavras no final
+                  // Baseado no padrÃ£o observado: "B2887 DA S.NICE" (3 palavras)
                   const indiceFallback = Math.max(1, restante.length - 3);
                   const nomePai = restante.slice(0, indiceFallback).join(" ");
                   const avoMaterno = restante.slice(indiceFallback).join(" ");
                   campos = [...primeiros12, nomePai, avoMaterno];
-                  console.log("Usando fallback (últimas 3 palavras):", {
+                  console.log("Usando fallback (Ãºltimas 3 palavras):", {
                     nomePai,
                     avoMaterno,
                   }); // Debug
                 }
               } else if (campos.length === 14) {
-                // Exatamente 14 campos, assumir que está correto
-                console.log("Exatamente 14 campos, usando como está"); // Debug
+                // Exatamente 14 campos, assumir que estÃ¡ correto
+                console.log("Exatamente 14 campos, usando como estÃ¡"); // Debug
               } else if (campos.length < 14) {
                 console.log("Menos de 14 campos, pode haver erro no formato"); // Debug
               }
             }
 
-            // Construção via mapeamento MANUAL (se habilitado)
+            // ConstruÃ§Ã£o via mapeamento MANUAL (se habilitado)
             let __manualMappedDados = null;
             let __manualExtrasLocal = null;
             if (mappingMode === 'manual') {
@@ -455,23 +455,23 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
               });
             }
 
-            // Verificar número mínimo de colunas baseado no modo de mapeamento
-            // Se estiver usando mapeamento manual e apenas campos específicos habilitados, permitir menos colunas
+            // Verificar nÃºmero mÃ­nimo de colunas baseado no modo de mapeamento
+            // Se estiver usando mapeamento manual e apenas campos especÃ­ficos habilitados, permitir menos colunas
             const camposHabilitados = mappingMode === 'manual' 
               ? Object.values(fieldMapping).filter(f => f.enabled).length
-              : 4; // Modo automático espera pelo menos 4 colunas
+              : 4; // Modo automÃ¡tico espera pelo menos 4 colunas
             
             const minimoColunas = mappingMode === 'manual' 
-              ? Math.max(2, camposHabilitados) // Pelo menos Série e RG, mais os campos habilitados
-              : 4; // Modo automático: pelo menos 4 colunas
+              ? Math.max(2, camposHabilitados) // Pelo menos SÃ©rie e RG, mais os campos habilitados
+              : 4; // Modo automÃ¡tico: pelo menos 4 colunas
             
             if (campos.length < minimoColunas) {
               if (mappingMode === 'manual' && campos.length >= 2) {
-                // Permite importação parcial se tiver pelo menos Série e RG
-                console.log(`⚠️ Modo manual: Apenas ${campos.length} colunas detectadas. Permitindo importação parcial.`);
+                // Permite importaÃ§Ã£o parcial se tiver pelo menos SÃ©rie e RG
+                console.log(`âÅ¡ ï¸� Modo manual: Apenas ${campos.length} colunas detectadas. Permitindo importaÃ§Ã£o parcial.`);
               } else {
                 throw new Error(
-                  `Formato Excel inválido. Esperado pelo menos ${minimoColunas} colunas, encontrado ${campos.length}. Dados: ${linha}`
+                  `Formato Excel invÃ¡lido. Esperado pelo menos ${minimoColunas} colunas, encontrado ${campos.length}. Dados: ${linha}`
                 );
               }
             }
@@ -479,7 +479,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
             logger.debug("Processando linha:", linha);
             logger.debug("Total de campos:", campos.length);
 
-            // Encontrar a data (campo que contém "/") - apenas se nascimento estiver habilitado
+            // Encontrar a data (campo que contÃ©m "/") - apenas se nascimento estiver habilitado
             let dataIndex = -1;
             const nascimentoHabilitado = camposSelecionados.dataNascimento && (mappingMode === 'manual' 
               ? fieldMapping.nascimento?.enabled !== false
@@ -493,16 +493,16 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                 }
               }
               
-              // Só exigir data se nascimento estiver habilitado e não estiver usando mapeamento manual parcial
+              // SÃ³ exigir data se nascimento estiver habilitado e nÃ£o estiver usando mapeamento manual parcial
               if (dataIndex === -1 && mappingMode !== 'manual') {
                 throw new Error(
-                  "Data não encontrada. Esperado formato DD/MM/YY ou DD/MM/YYYY"
+                  "Data nÃ£o encontrada. Esperado formato DD/MM/YY ou DD/MM/YYYY"
                 );
               }
             }
 
             logger.debug(
-              "Data encontrada na posição:",
+              "Data encontrada na posiÃ§Ã£o:",
               dataIndex,
               "=",
               campos[dataIndex]
@@ -513,16 +513,16 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
               dados = __manualMappedDados;
               manualExtrasLocal = __manualExtrasLocal;
             } else if (headersDetected.length > 0) {
-              // Mapeamento Inteligente via Cabeçalhos Detectados
+              // Mapeamento Inteligente via CabeÃ§alhos Detectados
               const lowerHeaders = headersDetected.map(h => h.toLowerCase().trim());
               
-              // Verificar presença de colunas chave para desambiguação
+              // Verificar presenÃ§a de colunas chave para desambiguaÃ§Ã£o
               const hasRgn = lowerHeaders.some(h => h === 'rgn' || h.includes('rgn'));
               const hasRg = lowerHeaders.some(h => h === 'rg' && !h.includes('rgn'));
               
-              // Helper para encontrar valor pela coluna (melhorado para reconhecer variações)
+              // Helper para encontrar valor pela coluna (melhorado para reconhecer variaÃ§Ãµes)
               const getVal = (terms) => {
-                // Normalizar termos para comparação (remover espaços extras, acentos)
+                // Normalizar termos para comparaÃ§Ã£o (remover espaÃ§os extras, acentos)
                 const normalize = (str) => {
                   if (!str) return '';
                   return str.toLowerCase()
@@ -532,13 +532,13 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                     .replace(/[\u0300-\u036f]/g, '');
                 };
                 
-                // Tenta encontrar correspondência exata primeiro
+                // Tenta encontrar correspondÃªncia exata primeiro
                 let idx = lowerHeaders.findIndex(h => {
                   const normalizedH = normalize(h);
                   return terms.some(t => normalizedH === normalize(t));
                 });
                 
-                // Se não achar, tenta parcial (contém)
+                // Se nÃ£o achar, tenta parcial (contÃ©m)
                 if (idx === -1) {
                   idx = lowerHeaders.findIndex(h => {
                     const normalizedH = normalize(h);
@@ -552,39 +552,39 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                 return idx >= 0 ? campos[idx] : "";
               };
 
-              // Detectar qual coluna é o RG do animal vs RG da mãe
-              // Se temos RGN, então RGN é o RG do animal
-              // Se temos RG e não tem "RG da Mãe" ou "RGN Mãe", então RG pode ser da mãe se vier depois de MAE
+              // Detectar qual coluna Ã© o RG do animal vs RG da mÃ£e
+              // Se temos RGN, entÃ£o RGN Ã© o RG do animal
+              // Se temos RG e nÃ£o tem "RG da MÃ£e" ou "RGN MÃ£e", entÃ£o RG pode ser da mÃ£e se vier depois de MAE
               let rgAnimal = getVal(['rgn']);
               let rgMaeDetected = "";
               
               if (rgAnimal) {
-                // Temos RGN, então RG pode ser da mãe
-                rgMaeDetected = getVal(['rg da mae', 'rgmae', 'rg mãe', 'rg']);
+                // Temos RGN, entÃ£o RG pode ser da mÃ£e
+                rgMaeDetected = getVal(['rg da mae', 'rgmae', 'rg mÃ£e', 'rg']);
               } else {
-                // Não temos RGN, então RG é do animal
+                // NÃ£o temos RGN, entÃ£o RG Ã© do animal
                 rgAnimal = getVal(['rg']);
-                rgMaeDetected = getVal(['rg da mae', 'rgmae', 'rg mãe']);
+                rgMaeDetected = getVal(['rg da mae', 'rgmae', 'rg mÃ£e']);
               }
 
               dados = {
                 nome: getVal(['nome', 'nome do animal', 'animal']),
-                serie: getVal(['serie', 'série']),
-                rg: rgAnimal || getVal(['rg', 'rgn']), // Usar RGN se existir, senão RG
+                serie: getVal(['serie', 'sÃ©rie']),
+                rg: rgAnimal || getVal(['rg', 'rgn']), // Usar RGN se existir, senÃ£o RG
                 sexo: getVal(['sexo']),
                 nascimento: getVal(['nasc', 'nascimento', 'data']) || (dataIndex >= 0 ? campos[dataIndex] : ""),
                 meses: getVal(['meses', 'idade']),
                 nomePai: getVal(['nome do pai', 'nomepai', 'pai']),
                 seriePai: getVal(['serie do pai', 'seriepai', 'serie pai']),
                 rgPai: getVal(['rg do pai', 'rgpai', 'rg pai']),
-                // Mapear MAE: pode ser nome da mãe, série da mãe ou código da mãe
-                nomeMae: getVal(['nome da mae', 'nomemae', 'nome da mãe', 'nome mãe']),
-                // MAE pode ser série da mãe - tentar detectar pela posição também
-                serieMae: getVal(['serie da mae', 'seriemae', 'serie mãe', 'série mãe', 'mae', 'mãe']),
-                // RG da mãe - usar a detecção inteligente acima
-                rgMae: rgMaeDetected || getVal(['rg da mae', 'rgmae', 'rg mãe']),
-                avoMaterno: getVal(['avô materno', 'avô', 'avo materno', 'avo', 'materno']),
-                abczg: getVal(['abczg', 'iabcz', 'iabczg', '!abczg', '¡abczg']),
+                // Mapear MAE: pode ser nome da mÃ£e, sÃ©rie da mÃ£e ou cÃ³digo da mÃ£e
+                nomeMae: getVal(['nome da mae', 'nomemae', 'nome da mÃ£e', 'nome mÃ£e']),
+                // MAE pode ser sÃ©rie da mÃ£e - tentar detectar pela posiÃ§Ã£o tambÃ©m
+                serieMae: getVal(['serie da mae', 'seriemae', 'serie mÃ£e', 'sÃ©rie mÃ£e', 'mae', 'mÃ£e']),
+                // RG da mÃ£e - usar a detecÃ§Ã£o inteligente acima
+                rgMae: rgMaeDetected || getVal(['rg da mae', 'rgmae', 'rg mÃ£e']),
+                avoMaterno: getVal(['avÃ´ materno', 'avÃ´', 'avo materno', 'avo', 'materno']),
+                abczg: getVal(['abczg', 'iabcz', 'iabczg', '!abczg', 'Â¡abczg']),
                 deca: getVal(['deca']),
                 receptora: getVal(['receptora', 'rec']),
                 lote: getVal(['lote']),
@@ -593,7 +593,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
               };
               
               // Debug: log dos dados mapeados
-              console.log('🔍 Dados mapeados da linha:', {
+              console.log('ðÅ¸â€�� Dados mapeados da linha:', {
                 serie: dados.serie,
                 rg: dados.rg,
                 nomePai: dados.nomePai,
@@ -603,7 +603,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                 camposOriginais: campos
               });
             } else {
-              // Mapeamento automático para formato completo de 15 campos
+              // Mapeamento automÃ¡tico para formato completo de 15 campos
               // Se temos exatamente 15 campos ou mais, usar formato completo
               if (campos.length >= 15) {
                 dados = {
@@ -624,7 +624,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                   receptora: campos[14] || "",
                 };
               } else {
-                // Formato simplificado (compatibilidade com versão antiga)
+                // Formato simplificado (compatibilidade com versÃ£o antiga)
                 // Tentar detectar campos automaticamente
                 const mesesIndex = dataIndex + 1;
                 
@@ -671,7 +671,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
             const campos = linha.split("|").map((c) => c.trim());
             if (campos.length < 4) {
               throw new Error(
-                "Formato inválido. Use pelo menos: Serie|RG|Sexo|Nascimento|Meses|NomePai|SeriePai|RgPai|NomeMae|SerieMae|RgMae|AvoMaterno|ABCZg|DECA|Receptora"
+                "Formato invÃ¡lido. Use pelo menos: Serie|RG|Sexo|Nascimento|Meses|NomePai|SeriePai|RgPai|NomeMae|SerieMae|RgMae|AvoMaterno|ABCZg|DECA|Receptora"
               );
             }
 
@@ -694,7 +694,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
             };
           }
 
-          // Validações baseadas no método de importação
+          // ValidaÃ§Ãµes baseadas no mÃ©todo de importaÃ§Ã£o
           let rg, sexo, nascimento, pai, avoMaterno, meses, peso, lote, nome;
           let nomePai, seriePai, rgPai, nomeMae, serieMae, rgMae, receptora;
           let abczg, deca;
@@ -706,10 +706,10 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
               dados.sexo === "M"
                 ? "Macho"
                 : dados.sexo === "F"
-                  ? "Fêmea"
+                  ? "FÃªmea"
                   : dados.sexo;
 
-            // Debug: verificar qual campo está sendo usado como data
+            // Debug: verificar qual campo estÃ¡ sendo usado como data
             console.log(
               "Campo nascimento:",
               dados.nascimento,
@@ -717,8 +717,8 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
               typeof dados.nascimento
             );
 
-            // Verificar se o campo nascimento parece uma data válida
-            // Se nascimento não estiver habilitado ou não fornecido, permitir ausência
+            // Verificar se o campo nascimento parece uma data vÃ¡lida
+            // Se nascimento nÃ£o estiver habilitado ou nÃ£o fornecido, permitir ausÃªncia
             const nascimentoHabilitado = camposSelecionados.dataNascimento && (mappingMode === 'manual' 
               ? fieldMapping.nascimento?.enabled !== false
               : true);
@@ -727,22 +727,22 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
               if (dados.nascimento.toString().includes("/")) {
                 nascimento = convertDateToISO(dados.nascimento);
               } else if (dados.nascimento.toString().match(/^\d{4}-\d{2}-\d{2}$/)) {
-                nascimento = dados.nascimento; // Já está no formato ISO
+                nascimento = dados.nascimento; // JÃ¡ estÃ¡ no formato ISO
               } else if (nascimentoHabilitado) {
                 throw new Error(
-                  `Campo de data não parece válido: ${dados.nascimento}`
+                  `Campo de data nÃ£o parece vÃ¡lido: ${dados.nascimento}`
                 );
               } else {
-                // Nascimento não habilitado, usar null
+                // Nascimento nÃ£o habilitado, usar null
                 nascimento = null;
               }
             } else if (!nascimentoHabilitado) {
-              // Nascimento não fornecido e não habilitado - permitir ausência
+              // Nascimento nÃ£o fornecido e nÃ£o habilitado - permitir ausÃªncia
               nascimento = null;
             } else {
-              // Nascimento não fornecido mas é obrigatório
+              // Nascimento nÃ£o fornecido mas Ã© obrigatÃ³rio
               throw new Error(
-                `Campo de data não parece válido: ${dados.nascimento}`
+                `Campo de data nÃ£o parece vÃ¡lido: ${dados.nascimento}`
               );
             }
 
@@ -751,11 +751,11 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
             seriePai = dados.seriePai || "";
             rgPai = dados.rgPai || "";
             
-            // Campos da mãe - melhorar detecção quando MAE é série da mãe
+            // Campos da mÃ£e - melhorar detecÃ§Ã£o quando MAE Ã© sÃ©rie da mÃ£e
             nomeMae = dados.nomeMae || "";
-            // Se temos dados.mae, verificar se é série ou nome
+            // Se temos dados.mae, verificar se Ã© sÃ©rie ou nome
             if (dados.mae && !nomeMae && !dados.serieMae) {
-              // Se MAE parece ser código/série (curto, alfanumérico), tratar como série
+              // Se MAE parece ser cÃ³digo/sÃ©rie (curto, alfanumÃ©rico), tratar como sÃ©rie
               const maeValue = String(dados.mae).trim();
               if (maeValue.length <= 10 && /^[A-Z0-9\s-]+$/i.test(maeValue)) {
                 serieMae = maeValue;
@@ -768,9 +768,9 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
             rgMae = dados.rgMae || "";
             
             // Log para debug
-            console.log('🔍 Processando mãe:', { nomeMae, serieMae, rgMae, dadosMae: dados.mae });
+            console.log('ðÅ¸â€�� Processando mÃ£e:', { nomeMae, serieMae, rgMae, dadosMae: dados.mae });
             
-            // Se não temos nomePai mas temos pai, usar pai como nomePai
+            // Se nÃ£o temos nomePai mas temos pai, usar pai como nomePai
             if (!nomePai && dados.pai) {
               nomePai = dados.pai;
             }
@@ -783,7 +783,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
             peso = parseFloat(dados.peso) || null;
             lote = dados.lote;
             
-            // Construir campo pai completo se temos série e RG
+            // Construir campo pai completo se temos sÃ©rie e RG
             if (nomePai && (seriePai || rgPai)) {
               pai = `${seriePai || ""} ${rgPai || ""} ${nomePai}`.trim();
             } else {
@@ -797,7 +797,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
             if (dados.nascimento && dados.nascimento.toString().includes("/")) {
               nascimento = convertDateToISO(dados.nascimento);
             } else if (dados.nascimento && dados.nascimento.toString().match(/^\d{4}-\d{2}-\d{2}$/)) {
-              nascimento = dados.nascimento; // Já está no formato ISO
+              nascimento = dados.nascimento; // JÃ¡ estÃ¡ no formato ISO
             } else {
               nascimento = dados.nascimento || "";
             }
@@ -824,10 +824,10 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
             lote = null;
           }
 
-          // Construir campo mãe completo se temos série e RG
+          // Construir campo mÃ£e completo se temos sÃ©rie e RG
           let mae = null;
           if (nomeMae && (serieMae || rgMae)) {
-            // Temos nome e série/RG - combinar tudo
+            // Temos nome e sÃ©rie/RG - combinar tudo
             const partes = [serieMae, rgMae].filter(v => v && String(v).trim() !== "");
             if (partes.length > 0) {
               mae = `${partes.join("-")} ${nomeMae}`.trim();
@@ -835,7 +835,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
               mae = nomeMae;
             }
           } else if (serieMae || rgMae) {
-            // Temos apenas série e/ou RG - usar formato série-RG ou apenas série/RG
+            // Temos apenas sÃ©rie e/ou RG - usar formato sÃ©rie-RG ou apenas sÃ©rie/RG
             const partes = [serieMae, rgMae].filter(v => v && String(v).trim() !== "");
             mae = partes.length > 0 ? partes.join("-") : null;
           } else if (nomeMae) {
@@ -844,18 +844,18 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
           }
           
           // Log para debug
-          console.log('🔍 Campo mãe construído:', { mae, nomeMae, serieMae, rgMae });
+          console.log('ðÅ¸â€�� Campo mÃ£e construÃ­do:', { mae, nomeMae, serieMae, rgMae });
 
-          // Validações - campos obrigatórios sempre: Série e RG
+          // ValidaÃ§Ãµes - campos obrigatÃ³rios sempre: SÃ©rie e RG
           if (!dados.serie || dados.serie.trim() === "") {
-            throw new Error("Série é obrigatória");
+            throw new Error("SÃ©rie Ã© obrigatÃ³ria");
           }
           
           if (!rg || rg.toString().trim() === "") {
-            throw new Error("RG é obrigatório");
+            throw new Error("RG Ã© obrigatÃ³rio");
           }
 
-          // No modo de atualização, verificar se pelo menos um campo de atualização foi fornecido
+          // No modo de atualizaÃ§Ã£o, verificar se pelo menos um campo de atualizaÃ§Ã£o foi fornecido
           if (modoAtualizacao) {
             const foiFornecido = (valor) => {
               return valor !== undefined && valor !== null && valor !== ''
@@ -865,11 +865,11 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
             const temReceptora = foiFornecido(receptora);
             
             if (!temPai && !temMae && !temReceptora) {
-              throw new Error("No modo de atualização, é necessário fornecer pelo menos um dos campos: Pai, Mãe ou Receptora");
+              throw new Error("No modo de atualizaÃ§Ã£o, Ã© necessÃ¡rio fornecer pelo menos um dos campos: Pai, MÃ£e ou Receptora");
             }
           }
 
-          // Verificar quais campos são obrigatórios baseado no mapeamento
+          // Verificar quais campos sÃ£o obrigatÃ³rios baseado no mapeamento
           const sexoHabilitado = camposSelecionados.sexo && (mappingMode === 'manual' 
             ? fieldMapping.sexo?.enabled !== false
             : true);
@@ -879,24 +879,24 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
 
           // Validar sexo apenas se estiver habilitado e fornecido
           if (sexoHabilitado && sexo) {
-            if (!["Macho", "Fêmea", "Femea", "M", "F"].includes(sexo)) {
-              throw new Error("Sexo deve ser: Macho, Fêmea, M ou F");
+            if (!["Macho", "FÃªmea", "Femea", "M", "F"].includes(sexo)) {
+              throw new Error("Sexo deve ser: Macho, FÃªmea, M ou F");
             }
           } else if (sexoHabilitado && !sexo && mappingMode !== 'manual') {
-            // Modo automático exige sexo
-            throw new Error("Sexo é obrigatório");
+            // Modo automÃ¡tico exige sexo
+            throw new Error("Sexo Ã© obrigatÃ³rio");
           }
 
           // Validar nascimento apenas se estiver habilitado
           if (nascimentoHabilitado && !nascimento && mappingMode !== 'manual') {
-            throw new Error("Nascimento é obrigatório");
+            throw new Error("Nascimento Ã© obrigatÃ³rio");
           }
 
           // Validar data convertida apenas se nascimento foi fornecido
           if (nascimento) {
             const dataNascimento = new Date(nascimento);
             if (isNaN(dataNascimento.getTime())) {
-              throw new Error(`Data de nascimento inválida: ${dados.nascimento}`);
+              throw new Error(`Data de nascimento invÃ¡lida: ${dados.nascimento}`);
             }
           }
 
@@ -904,16 +904,16 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
           let isFiv = false
           let custos = []
           let custoTotal = 0
-          let tipoCobertura = 'IA' // Padrão
+          let tipoCobertura = 'IA' // PadrÃ£o
 
           if (importMethod === 'excel' && dados.tipo) {
             const tipo = dados.tipo.toUpperCase()
 
             if (tipo.includes('FIV') || tipo.includes('FV')) {
-              // É FIV - aplicar custos completos
+              // Ãâ€° FIV - aplicar custos completos
               isFiv = true
               tipoCobertura = 'FIV'
-              custoTotal = 120.00 // DNA Paternidade (40) + Genômica (80)
+              custoTotal = 120.00 // DNA Paternidade (40) + GenÃ´mica (80)
               custos = [
                 {
                   id: 1,
@@ -921,58 +921,58 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                   subtipo: 'Paternidade',
                   valor: 40.00,
                   data: nascimento,
-                  observacoes: 'DNA Paternidade - FIV (Importação)'
+                  observacoes: 'DNA Paternidade - FIV (ImportaÃ§Ã£o)'
                 },
                 {
                   id: 2,
                   tipo: 'DNA',
-                  subtipo: 'Genômica',
+                  subtipo: 'GenÃ´mica',
                   valor: 80.00,
                   data: nascimento,
-                  observacoes: 'DNA Genômica - FIV (Importação)'
+                  observacoes: 'DNA GenÃ´mica - FIV (ImportaÃ§Ã£o)'
                 }
               ]
             } else if (tipo.includes('IA') || tipo.includes('I.A')) {
-              // É IA - aplicar apenas genômica
+              // Ãâ€° IA - aplicar apenas genÃ´mica
               isFiv = false
               tipoCobertura = 'IA'
-              custoTotal = 80.00 // Apenas DNA Genômica
+              custoTotal = 80.00 // Apenas DNA GenÃ´mica
               custos = [
                 {
                   id: 1,
                   tipo: 'DNA',
-                  subtipo: 'Genômica',
+                  subtipo: 'GenÃ´mica',
                   valor: 80.00,
                   data: nascimento,
-                  observacoes: 'DNA Genômica - IA (Importação)'
+                  observacoes: 'DNA GenÃ´mica - IA (ImportaÃ§Ã£o)'
                 }
               ]
             } else {
-              // Outros tipos - sem custos automáticos
+              // Outros tipos - sem custos automÃ¡ticos
               isFiv = false
               tipoCobertura = tipo || 'Natural'
-              custoTotal = 0 // Sem custos automáticos
+              custoTotal = 0 // Sem custos automÃ¡ticos
               custos = []
             }
           } else {
-            // Método CSV ou manual - sem custos automáticos
+            // MÃ©todo CSV ou manual - sem custos automÃ¡ticos
             isFiv = false
             tipoCobertura = 'Natural'
             custoTotal = 0
             custos = []
           }
 
-          // Determinar raça baseada na série
+          // Determinar raÃ§a baseada na sÃ©rie
           const racaPorSerie = racasPorSerie[dados.serie] || 'Nelore';
           
-          // Usar valores padrão se campos não foram fornecidos (importação parcial)
+          // Usar valores padrÃ£o se campos nÃ£o foram fornecidos (importaÃ§Ã£o parcial)
           const sexoFinal = sexo || (mappingMode === 'manual' && !sexoHabilitado ? null : 'Macho');
           const nascimentoFinal = nascimento || null;
           const mesesFinal = meses || (nascimentoFinal ? calcularIdade(nascimentoFinal) : null);
           
           // Criar objeto do animal - apenas com campos selecionados
           const animal = {
-            id: Date.now() + Math.random(), // ID único temporário
+            id: Date.now() + Math.random(), // ID Ãºnico temporÃ¡rio
             nome: camposSelecionados.nome ? nome : null,
             serie: dados.serie,
             rg: rg,
@@ -1007,7 +1007,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
             localNascimento: modoAtualizacao ? null : localNascimentoPadrao || null,
             pastoAtual: modoAtualizacao ? null : pastoAtualPadrao || null,
             extras: modoAtualizacao ? null : manualExtrasLocal || undefined,
-            modoAtualizacao: modoAtualizacao, // Flag para indicar que é atualização
+            modoAtualizacao: modoAtualizacao, // Flag para indicar que Ã© atualizaÃ§Ã£o
             atualizarApenasVazios: true, // Flag para atualizar apenas campos vazios
           };
 
@@ -1044,31 +1044,31 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
 
     try {
       setIsImporting(true);
-      console.log('🔄 Iniciando importação de', validationResults.sucesso.length, 'animais');
+      console.log('ðÅ¸â€�â€ž Iniciando importaÃ§Ã£o de', validationResults.sucesso.length, 'animais');
       
-      // Verificar se onImport existe e é uma função
+      // Verificar se onImport existe e Ã© uma funÃ§Ã£o
       if (!onImport || typeof onImport !== 'function') {
-        throw new Error('Função de importação não está disponível');
+        throw new Error('FunÃ§Ã£o de importaÃ§Ã£o nÃ£o estÃ¡ disponÃ­vel');
       }
 
-      // Chamar a função de importação e aguardar
+      // Chamar a funÃ§Ã£o de importaÃ§Ã£o e aguardar
       await onImport(validationResults.sucesso);
       
-      console.log('✅ Importação concluída com sucesso');
+      console.log('âÅ“â€¦ ImportaÃ§Ã£o concluÃ­da com sucesso');
       
       // Limpar dados
       setImportData("");
       setValidationResults(null);
       
-      // Fechar modal após um pequeno delay para mostrar feedback
+      // Fechar modal apÃ³s um pequeno delay para mostrar feedback
       setTimeout(() => {
         setIsImporting(false);
         onClose();
       }, 500);
     } catch (error) {
-      console.error('❌ Erro ao importar animais:', error);
+      console.error('â�Å’ Erro ao importar animais:', error);
       setIsImporting(false);
-      alert(`❌ Erro ao importar animais: ${error.message || 'Erro desconhecido'}`);
+      alert(`â�Å’ Erro ao importar animais: ${error.message || 'Erro desconhecido'}`);
     }
   };
 
@@ -1096,7 +1096,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                 Importar Animais
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
-                Importe múltiplos animais de qualquer série
+                Importe mÃºltiplos animais de qualquer sÃ©rie
               </p>
             </div>
           </div>
@@ -1104,16 +1104,16 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl font-bold"
           >
-            ×
+            Ãâ€”
           </button>
         </div>
 
-        {/* Conteúdo */}
+        {/* ConteÃºdo */}
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
-          {/* Método de Importação */}
+          {/* MÃ©todo de ImportaÃ§Ã£o */}
           <div className="mb-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-              Escolha o Método de Importação
+              Escolha o MÃ©todo de ImportaÃ§Ã£o
             </h3>
             <div className="flex space-x-4">
               <label className="flex items-center">
@@ -1125,7 +1125,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                   className="mr-2"
                 />
                 <span className="text-gray-700 dark:text-white">
-                  📊 Excel/Planilha (Recomendado)
+                  ðÅ¸â€œÅ  Excel/Planilha (Recomendado)
                 </span>
               </label>
               <label className="flex items-center">
@@ -1151,20 +1151,20 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
             </div>
           </div>
 
-          {/* Seleção de Campos para Importação */}
+          {/* SeleÃ§Ã£o de Campos para ImportaÃ§Ã£o */}
           <div className="mb-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-              📋 Campos para Importar/Atualizar
+              ðÅ¸â€œâ€¹ Campos para Importar/Atualizar
             </h3>
             <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg mb-4 border border-gray-200 dark:border-gray-600">
               <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
-                <strong>Selecione quais campos deseja importar:</strong> Marque apenas os campos que você quer atualizar. 
-                Campos não marcados serão ignorados na importação.
+                <strong>Selecione quais campos deseja importar:</strong> Marque apenas os campos que vocÃª quer atualizar. 
+                Campos nÃ£o marcados serÃ£o ignorados na importaÃ§Ã£o.
               </p>
               
               {/* Campos de Genealogia */}
               <div className="mb-4">
-                <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">👨‍👩‍👧 Genealogia</h4>
+                <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">ðÅ¸â€˜¨ââ‚¬�ðÅ¸â€˜©ââ‚¬�ðÅ¸â€˜§ Genealogia</h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                   <label className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
                     <input
@@ -1173,7 +1173,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                       onChange={(e) => setCamposSelecionados({...camposSelecionados, pai: e.target.checked})}
                       className="rounded text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">👨 Pai</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸â€˜¨ Pai</span>
                   </label>
                   <label className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
                     <input
@@ -1182,7 +1182,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                       onChange={(e) => setCamposSelecionados({...camposSelecionados, mae: e.target.checked})}
                       className="rounded text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">👩 Mãe</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸â€˜© MÃ£e</span>
                   </label>
                   <label className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
                     <input
@@ -1191,7 +1191,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                       onChange={(e) => setCamposSelecionados({...camposSelecionados, receptora: e.target.checked})}
                       className="rounded text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">🐄 Receptora</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸�â€ž Receptora</span>
                   </label>
                   <label className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
                     <input
@@ -1200,14 +1200,14 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                       onChange={(e) => setCamposSelecionados({...camposSelecionados, avoMaterno: e.target.checked})}
                       className="rounded text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">👴 Avô Materno</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸â€˜´ AvÃ´ Materno</span>
                   </label>
                 </div>
               </div>
 
-              {/* Campos Genéticos */}
+              {/* Campos GenÃ©ticos */}
               <div className="mb-4">
-                <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">🧬 Genética</h4>
+                <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">ðÅ¸§¬ GenÃ©tica</h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                   <label className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
                     <input
@@ -1216,7 +1216,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                       onChange={(e) => setCamposSelecionados({...camposSelecionados, abczg: e.target.checked})}
                       className="rounded text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">📊 ABCZg</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸â€œÅ  ABCZg</span>
                   </label>
                   <label className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
                     <input
@@ -1225,14 +1225,14 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                       onChange={(e) => setCamposSelecionados({...camposSelecionados, deca: e.target.checked})}
                       className="rounded text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">📈 DECA</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸â€œË† DECA</span>
                   </label>
                 </div>
               </div>
 
-              {/* Campos Básicos */}
+              {/* Campos BÃ¡sicos */}
               <div className="mb-4">
-                <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">📝 Informações Básicas</h4>
+                <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">ðÅ¸â€œ� InformaÃ§Ãµes BÃ¡sicas</h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                   <label className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
                     <input
@@ -1241,7 +1241,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                       onChange={(e) => setCamposSelecionados({...camposSelecionados, nome: e.target.checked})}
                       className="rounded text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">🏷️ Nome</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸�·ï¸� Nome</span>
                   </label>
                   <label className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
                     <input
@@ -1250,7 +1250,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                       onChange={(e) => setCamposSelecionados({...camposSelecionados, tatuagem: e.target.checked})}
                       className="rounded text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">🔖 Tatuagem</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸â€�â€“ Tatuagem</span>
                   </label>
                   <label className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
                     <input
@@ -1259,7 +1259,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                       onChange={(e) => setCamposSelecionados({...camposSelecionados, sexo: e.target.checked})}
                       className="rounded text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">⚧️ Sexo</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">âÅ¡§ï¸� Sexo</span>
                   </label>
                   <label className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
                     <input
@@ -1268,7 +1268,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                       onChange={(e) => setCamposSelecionados({...camposSelecionados, raca: e.target.checked})}
                       className="rounded text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">🐂 Raça</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸�â€š RaÃ§a</span>
                   </label>
                   <label className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
                     <input
@@ -1277,7 +1277,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                       onChange={(e) => setCamposSelecionados({...camposSelecionados, dataNascimento: e.target.checked})}
                       className="rounded text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">📅 Data Nascimento</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸â€œâ€¦ Data Nascimento</span>
                   </label>
                   <label className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
                     <input
@@ -1286,7 +1286,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                       onChange={(e) => setCamposSelecionados({...camposSelecionados, meses: e.target.checked})}
                       className="rounded text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">📆 Idade (Meses)</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸â€œâ€  Idade (Meses)</span>
                   </label>
                   <label className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
                     <input
@@ -1295,7 +1295,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                       onChange={(e) => setCamposSelecionados({...camposSelecionados, peso: e.target.checked})}
                       className="rounded text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">⚖️ Peso</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">âÅ¡â€“ï¸� Peso</span>
                   </label>
                   <label className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
                     <input
@@ -1304,14 +1304,14 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                       onChange={(e) => setCamposSelecionados({...camposSelecionados, situacao: e.target.checked})}
                       className="rounded text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">📊 Situação</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">ðÅ¸â€œÅ  SituaÃ§Ã£o</span>
                   </label>
                 </div>
               </div>
 
-              {/* Botões de Ação Rápida */}
+              {/* BotÃµes de AÃ§Ã£o RÃ¡pida */}
               <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
-                <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Ações rápidas:</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">AÃ§Ãµes rÃ¡pidas:</p>
                 <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => setCamposSelecionados({
@@ -1322,7 +1322,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                     })}
                     className="text-xs px-3 py-1.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
                   >
-                    📋 Apenas Genealogia
+                    ðÅ¸â€œâ€¹ Apenas Genealogia
                   </button>
                   <button
                     onClick={() => setCamposSelecionados({
@@ -1333,7 +1333,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                     })}
                     className="text-xs px-3 py-1.5 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded hover:bg-green-200 dark:hover:bg-green-800 transition-colors"
                   >
-                    ✅ Todos os Campos
+                    âÅ“â€¦ Todos os Campos
                   </button>
                   <button
                     onClick={() => setCamposSelecionados({
@@ -1344,17 +1344,17 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                     })}
                     className="text-xs px-3 py-1.5 bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
                   >
-                    ❌ Desmarcar Todos
+                    â�Å’ Desmarcar Todos
                   </button>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Modo de Operação */}
+          {/* Modo de OperaÃ§Ã£o */}
           <div className="mb-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-              Modo de Operação
+              Modo de OperaÃ§Ã£o
             </h3>
             <div className="flex space-x-4 mb-4">
               <label className="flex items-center">
@@ -1366,7 +1366,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                   className="mr-2"
                 />
                 <span className="text-gray-700 dark:text-white">
-                  📥 Importar Novos Animais
+                  ðÅ¸â€œ¥ Importar Novos Animais
                 </span>
               </label>
               <label className="flex items-center">
@@ -1378,43 +1378,43 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                   className="mr-2"
                 />
                 <span className="text-gray-700 dark:text-white">
-                  🔄 Atualizar Animais Existentes (Pai, Mãe, Receptora)
+                  ðÅ¸â€�â€ž Atualizar Animais Existentes (Pai, MÃ£e, Receptora)
                 </span>
               </label>
             </div>
             {modoAtualizacao && (
               <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg mb-4">
                 <p className="text-sm text-yellow-800 dark:text-yellow-200 mb-2">
-                  <strong>⚠️ Modo de Atualização Inteligente:</strong> Este modo atualiza apenas os campos selecionados acima de animais que já existem no sistema. 
-                  Os animais serão identificados pela Série e RG. Se o animal não existir, será ignorado.
+                  <strong>âÅ¡ ï¸� Modo de AtualizaÃ§Ã£o Inteligente:</strong> Este modo atualiza apenas os campos selecionados acima de animais que jÃ¡ existem no sistema. 
+                  Os animais serÃ£o identificados pela SÃ©rie e RG. Se o animal nÃ£o existir, serÃ¡ ignorado.
                 </p>
                 <p className="text-sm text-yellow-800 dark:text-yellow-200 mb-2">
-                  <strong>🔄 Atualização Inteligente:</strong> Apenas campos que estão <strong>vazios ou null</strong> no banco de dados serão preenchidos. 
-                  Campos que já têm valor serão preservados (não serão sobrescritos).
+                  <strong>ðÅ¸â€�â€ž AtualizaÃ§Ã£o Inteligente:</strong> Apenas campos que estÃ£o <strong>vazios ou null</strong> no banco de dados serÃ£o preenchidos. 
+                  Campos que jÃ¡ tÃªm valor serÃ£o preservados (nÃ£o serÃ£o sobrescritos).
                 </p>
                 <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                  <strong>🛡️ Proteção contra Duplicatas:</strong> Se já existir um animal com a mesma Série e RG, ele será atualizado ao invés de criar duplicata.
+                  <strong>ðÅ¸â€º¡ï¸� ProteÃ§Ã£o contra Duplicatas:</strong> Se jÃ¡ existir um animal com a mesma SÃ©rie e RG, ele serÃ¡ atualizado ao invÃ©s de criar duplicata.
                 </p>
               </div>
             )}
             {!modoAtualizacao && (
               <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg mb-4">
                 <p className="text-sm text-blue-800 dark:text-blue-200 mb-2">
-                  <strong>📥 Modo de Importação:</strong> Importa novos animais ou atualiza animais existentes com os campos selecionados acima.
+                  <strong>ðÅ¸â€œ¥ Modo de ImportaÃ§Ã£o:</strong> Importa novos animais ou atualiza animais existentes com os campos selecionados acima.
                 </p>
                 <p className="text-sm text-blue-800 dark:text-blue-200">
-                  <strong>🛡️ Proteção contra Duplicatas:</strong> Se já existir um animal com a mesma Série e RG, apenas os campos <strong>vazios</strong> serão preenchidos. 
-                  Campos existentes não serão sobrescritos.
+                  <strong>ðÅ¸â€º¡ï¸� ProteÃ§Ã£o contra Duplicatas:</strong> Se jÃ¡ existir um animal com a mesma SÃ©rie e RG, apenas os campos <strong>vazios</strong> serÃ£o preenchidos. 
+                  Campos existentes nÃ£o serÃ£o sobrescritos.
                 </p>
               </div>
             )}
           </div>
 
-          {/* Configurações Gerais */}
+          {/* ConfiguraÃ§Ãµes Gerais */}
           {!modoAtualizacao && (
           <div className="mb-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-              Configurações Gerais
+              ConfiguraÃ§Ãµes Gerais
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
@@ -1450,7 +1450,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Localização Atual (Piquete)
+                  LocalizaÃ§Ã£o Atual (Piquete)
                 </label>
                 <select
                   value={pastoAtualPadrao}
@@ -1467,25 +1467,25 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
           </div>
           )}
 
-          {/* Template e Instruções */}
+          {/* Template e InstruÃ§Ãµes */}
           <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
             <h4 className="font-semibold text-blue-900 dark:text-blue-200 mb-2">
-              📋 Instruções de Importação
+              ðÅ¸â€œâ€¹ InstruÃ§Ãµes de ImportaÃ§Ã£o
             </h4>
 
             {importMethod === "excel" ? (
               <div className="space-y-2 text-sm text-blue-800 dark:text-blue-300">
                 <p>
-                  <strong>📊 Formato Excel:</strong> Cole os dados diretamente
-                  do Excel (com TAB ou vírgulas)
+                  <strong>ðÅ¸â€œÅ  Formato Excel:</strong> Cole os dados diretamente
+                  do Excel (com TAB ou vÃ­rgulas)
                 </p>
                 {modoAtualizacao ? (
                   <>
                     <p>
-                      <strong>Colunas (mínimo 3 campos):</strong> Série, RG, e pelo menos um dos campos: Pai, Mãe, Receptora
+                      <strong>Colunas (mÃ­nimo 3 campos):</strong> SÃ©rie, RG, e pelo menos um dos campos: Pai, MÃ£e, Receptora
                     </p>
                     <p>
-                      <strong>Formato completo (recomendado):</strong> Série, RG, Nome do Pai, Série do Pai, RG do Pai, Nome da Mãe, Série da Mãe, RG da Mãe, Receptora
+                      <strong>Formato completo (recomendado):</strong> SÃ©rie, RG, Nome do Pai, SÃ©rie do Pai, RG do Pai, Nome da MÃ£e, SÃ©rie da MÃ£e, RG da MÃ£e, Receptora
                     </p>
                     <p>
                       <strong>Exemplo:</strong> CJCJ	17000	COLOSSO FTV	CJCJ	179	VAIDOSO DA SILVANIA	CJCJ	150	RPT 1001
@@ -1494,10 +1494,10 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                 ) : (
                   <>
                 <p>
-                  <strong>Colunas (13 campos):</strong> Série, RG, Sexo, Nascimento, Meses, Nome do Pai, Série do Pai, RG do Pai, Nome da Mãe, Série da Mãe, RG da Mãe, Avô Materno, Receptora
+                  <strong>Colunas (13 campos):</strong> SÃ©rie, RG, Sexo, Nascimento, Meses, Nome do Pai, SÃ©rie do Pai, RG do Pai, Nome da MÃ£e, SÃ©rie da MÃ£e, RG da MÃ£e, AvÃ´ Materno, Receptora
                 </p>
                 <p>
-                  <strong>💡 Dica:</strong> Para atualizar apenas Pai, Mãe e Receptora de animais existentes, use o modo "Atualizar Animais Existentes" acima.
+                  <strong>ðÅ¸â€™¡ Dica:</strong> Para atualizar apenas Pai, MÃ£e e Receptora de animais existentes, use o modo "Atualizar Animais Existentes" acima.
                 </p>
                   </>
                 )}
@@ -1505,24 +1505,24 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                   <strong>Exemplo completo:</strong> FELG	931	F	17/09/2016	109	COLOSSO FTV	CJCJ	179	VAIDOSO DA SILVANIA	CJCJ	150	AVO MATERNO	RPT 1001
                 </p>
                 <p>
-                  <strong>💡 Dica:</strong> Selecione as linhas no Excel e cole
-                  aqui (Ctrl+C → Ctrl+V)
+                  <strong>ðÅ¸â€™¡ Dica:</strong> Selecione as linhas no Excel e cole
+                  aqui (Ctrl+C ââ€ â€™ Ctrl+V)
                 </p>
                 <button
                   onClick={downloadTemplate}
                   className="mt-2 px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
                 >
-                  📥 Baixar Template Excel
+                  ðÅ¸â€œ¥ Baixar Template Excel
                 </button>
               </div>
             ) : importMethod === "csv" ? (
               <div className="space-y-2 text-sm text-blue-800 dark:text-blue-300">
                 <p>
-                  <strong>Formato CSV:</strong> Use vírgulas para separar os
+                  <strong>Formato CSV:</strong> Use vÃ­rgulas para separar os
                   campos
                 </p>
                 <p>
-                  <strong>Cabeçalho:</strong>{" "}
+                  <strong>CabeÃ§alho:</strong>{" "}
                   Serie,RG,Sexo,Nascimento,Meses,NomePai,SeriePai,RgPai,NomeMae,SerieMae,RgMae,AvoMaterno,Receptora
                 </p>
                 <p>
@@ -1532,7 +1532,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                   onClick={downloadTemplate}
                   className="mt-2 px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
                 >
-                  📥 Baixar Template CSV
+                  ðÅ¸â€œ¥ Baixar Template CSV
                 </button>
               </div>
             ) : (
@@ -1556,23 +1556,23 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
 
             <div className="mt-3 text-sm text-blue-800 dark:text-blue-300">
               <p>
-                <strong>📅 Data:</strong> Use formato YYYY-MM-DD (ex:
+                <strong>ðÅ¸â€œâ€¦ Data:</strong> Use formato YYYY-MM-DD (ex:
                 2022-01-15)
               </p>
               <p>
-                <strong>👥 Sexo:</strong> Macho, Femea ou Fêmea
+                <strong>ðÅ¸â€˜¥ Sexo:</strong> Macho, Femea ou FÃªmea
               </p>
               <p>
-                <strong>🧬 Custos:</strong> Apenas aplicados para FIV (R$ 120) ou IA (R$ 80). Outros tipos: sem custos automáticos
+                <strong>ðÅ¸§¬ Custos:</strong> Apenas aplicados para FIV (R$ 120) ou IA (R$ 80). Outros tipos: sem custos automÃ¡ticos
               </p>
             </div>
           </div>
 
-          {/* Área de Entrada de Dados */}
+          {/* Ã�rea de Entrada de Dados */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {importMethod === "excel"
-                ? "📊 Cole os dados do Excel aqui (Ctrl+C → Ctrl+V):"
+                ? "ðÅ¸â€œÅ  Cole os dados do Excel aqui (Ctrl+C ââ€ â€™ Ctrl+V):"
                 : importMethod === "csv"
                   ? "Cole os dados CSV aqui:"
                   : "Digite os dados (uma linha por animal):"}
@@ -1592,9 +1592,9 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
             />
           </div>
 
-          {/* Configuração dos Campos */}
+          {/* ConfiguraÃ§Ã£o dos Campos */}
           <div className="mb-6">
-            <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Configuração dos Campos</h4>
+            <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">ConfiguraÃ§Ã£o dos Campos</h4>
             <div className="flex items-center space-x-4 mb-3">
               <label className="flex items-center text-gray-700 dark:text-white">
                 <input
@@ -1604,7 +1604,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                   onChange={(e) => setMappingMode(e.target.value)}
                   className="mr-2"
                 />
-                Automático
+                AutomÃ¡tico
               </label>
               <label className="flex items-center text-gray-700 dark:text-white">
                 <input
@@ -1617,7 +1617,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                 Manual (mapear colunas)
               </label>
               <span className="text-xs text-gray-500 dark:text-white">
-                {headersDetected.length ? 'Cabeçalhos detectados' : `${columnCount} colunas detectadas`}
+                {headersDetected.length ? 'CabeÃ§alhos detectados' : `${columnCount} colunas detectadas`}
               </span>
             </div>
 
@@ -1626,19 +1626,19 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {['serie', 'rg', 'sexo', 'nascimento', 'meses', 'nomePai', 'seriePai', 'rgPai', 'nomeMae', 'serieMae', 'rgMae', 'avoMaterno', 'abczg', 'deca', 'receptora', 'tipo', 'peso', 'lote'].map((key) => {
                     const labels = {
-                      serie: 'Série',
+                      serie: 'SÃ©rie',
                       rg: 'RG',
                       sexo: 'Sexo',
                       nascimento: 'Nascimento',
                       meses: 'Meses',
                       nomePai: 'Nome do Pai',
-                      seriePai: 'Série do Pai',
+                      seriePai: 'SÃ©rie do Pai',
                       rgPai: 'RG do Pai',
-                      nomeMae: 'Nome da Mãe',
-                      serieMae: 'Série da Mãe',
-                      rgMae: 'RG da Mãe',
-                      avoMaterno: 'Avô Materno',
-                      abczg: '¡ABCZg',
+                      nomeMae: 'Nome da MÃ£e',
+                      serieMae: 'SÃ©rie da MÃ£e',
+                      rgMae: 'RG da MÃ£e',
+                      avoMaterno: 'AvÃ´ Materno',
+                      abczg: 'Â¡ABCZg',
                       deca: 'DECA',
                       receptora: 'Receptora',
                       tipo: 'Tipo',
@@ -1758,7 +1758,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
             )}
           </div>
 
-          {/* Botão de Validação */}
+          {/* BotÃ£o de ValidaÃ§Ã£o */}
           <div className="mb-6">
             <button
               onClick={validateData}
@@ -1779,7 +1779,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
             </button>
           </div>
 
-          {/* Resultados da Validação */}
+          {/* Resultados da ValidaÃ§Ã£o */}
           {validationResults && (
             <div className="space-y-4">
               {/* Resumo */}
@@ -1789,7 +1789,7 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                     {validationResults.sucesso.length}
                   </div>
                   <div className="text-sm text-green-600 dark:text-green-400">
-                    Válidos
+                    VÃ¡lidos
                   </div>
                 </div>
                 <div className="text-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
@@ -1835,12 +1835,12 @@ FFAL\t100\tF\t08/03/2011\t175\tC.A.SANSAO MODELO\tCJCJ\t200\tSANT ANNA\tCJCJ\t25
                 </div>
               )}
 
-              {/* Preview dos Animais Válidos */}
+              {/* Preview dos Animais VÃ¡lidos */}
               {validationResults.sucesso.length > 0 && (
                 <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
                   <h4 className="font-semibold text-green-900 dark:text-green-200 mb-2 flex items-center">
                     <CheckCircleIcon className="h-5 w-5 mr-2" />
-                    Animais Prontos para Importação (
+                    Animais Prontos para ImportaÃ§Ã£o (
                     {validationResults.sucesso.length})
                   </h4>
                   <div className="space-y-2 max-h-40 overflow-y-auto">

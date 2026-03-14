@@ -5,7 +5,7 @@ async function corrigirDatasFIV() {
   const client = await pool.connect()
   
   try {
-    console.log('🔍 Verificando coletas FIV com datas incorretas (1900-1999)...\n')
+    console.log('�Ÿ”� Verificando coletas FIV com datas incorretas (1900-1999)...\n')
     
     // Buscar todas as coletas FIV
     const coletas = await query(`
@@ -14,7 +14,7 @@ async function corrigirDatasFIV() {
       ORDER BY data_fiv DESC
     `)
     
-    console.log(`📊 Total de coletas FIV encontradas: ${coletas.rows.length}\n`)
+    console.log(`�Ÿ“Š Total de coletas FIV encontradas: ${coletas.rows.length}\n`)
     
     // Filtrar coletas com datas entre 1900-1999
     const coletasIncorretas = coletas.rows.filter(coleta => {
@@ -24,16 +24,16 @@ async function corrigirDatasFIV() {
       return year >= 1900 && year < 2000
     })
     
-    console.log(`⚠️  Coletas com datas incorretas (1900-1999): ${coletasIncorretas.length}\n`)
+    console.log(`�š�️  Coletas com datas incorretas (1900-1999): ${coletasIncorretas.length}\n`)
     
     if (coletasIncorretas.length === 0) {
-      console.log('✅ Nenhuma data incorreta encontrada!')
+      console.log('�œ… Nenhuma data incorreta encontrada!')
       return
     }
     
     // Mostrar lista das coletas que serão corrigidas
-    console.log('📋 Coletas que serão corrigidas:')
-    console.log('─'.repeat(100))
+    console.log('�Ÿ“‹ Coletas que serão corrigidas:')
+    console.log('�”€'.repeat(100))
     coletasIncorretas.forEach((coleta, index) => {
       const dataOriginal = new Date(coleta.data_fiv)
       const dataCorrigida = new Date(dataOriginal)
@@ -46,12 +46,12 @@ async function corrigirDatasFIV() {
       }
       
       console.log(`${index + 1}. ID: ${coleta.id} | ${coleta.doadora_nome || 'N/A'}`)
-      console.log(`   Data FIV: ${dataOriginal.toLocaleDateString('pt-BR')} → ${dataCorrigida.toLocaleDateString('pt-BR')}`)
+      console.log(`   Data FIV: ${dataOriginal.toLocaleDateString('pt-BR')} �†’ ${dataCorrigida.toLocaleDateString('pt-BR')}`)
       if (dataTransfOriginal) {
-        console.log(`   Data Transf: ${dataTransfOriginal.toLocaleDateString('pt-BR')} → ${dataTransfCorrigida.toLocaleDateString('pt-BR')}`)
+        console.log(`   Data Transf: ${dataTransfOriginal.toLocaleDateString('pt-BR')} �†’ ${dataTransfCorrigida.toLocaleDateString('pt-BR')}`)
       }
     })
-    console.log('─'.repeat(100))
+    console.log('�”€'.repeat(100))
     console.log()
     
     // Perguntar confirmação
@@ -59,13 +59,13 @@ async function corrigirDatasFIV() {
     const autoConfirm = args.includes('--yes') || args.includes('-y')
     
     if (!autoConfirm) {
-      console.log('⚠️  Para executar a correção, execute novamente com --yes ou -y')
+      console.log('�š�️  Para executar a correção, execute novamente com --yes ou -y')
       console.log('   Exemplo: node scripts/corrigir-datas-fiv.js --yes\n')
       return
     }
     
     // Corrigir cada coleta
-    console.log('🔧 Iniciando correção...\n')
+    console.log('�Ÿ”� Iniciando correção...\n')
     let corrigidas = 0
     let erros = 0
     
@@ -101,34 +101,34 @@ async function corrigirDatasFIV() {
           
           if (result.rows.length > 0) {
             const atualizado = result.rows[0]
-            console.log(`✅ Corrigido ID ${atualizado.id} | ${atualizado.doadora_nome || 'N/A'}`)
-            console.log(`   ${dataOriginal.toLocaleDateString('pt-BR')} → ${new Date(atualizado.data_fiv).toLocaleDateString('pt-BR')}`)
+            console.log(`�œ… Corrigido ID ${atualizado.id} | ${atualizado.doadora_nome || 'N/A'}`)
+            console.log(`   ${dataOriginal.toLocaleDateString('pt-BR')} �†’ ${new Date(atualizado.data_fiv).toLocaleDateString('pt-BR')}`)
             corrigidas++
           } else {
-            console.log(`⚠️  Coleta ID ${coleta.id} não encontrada para atualização`)
+            console.log(`�š�️  Coleta ID ${coleta.id} não encontrada para atualização`)
             erros++
           }
         } catch (error) {
-          console.error(`❌ Erro ao corrigir coleta ID ${coleta.id}:`, error.message)
+          console.error(`�Œ Erro ao corrigir coleta ID ${coleta.id}:`, error.message)
           erros++
         }
       }
       
       await client.query('COMMIT')
       console.log('\n' + '='.repeat(100))
-      console.log(`✅ Correção concluída!`)
+      console.log(`�œ… Correção concluída!`)
       console.log(`   Corrigidas: ${corrigidas}`)
       console.log(`   Erros: ${erros}`)
       console.log('='.repeat(100))
       
     } catch (error) {
       await client.query('ROLLBACK')
-      console.error('\n❌ Erro durante a correção. Rollback executado.')
+      console.error('\n�Œ Erro durante a correção. Rollback executado.')
       throw error
     }
     
     // Verificar novamente após correção
-    console.log('\n🔍 Verificando novamente após correção...\n')
+    console.log('\n�Ÿ”� Verificando novamente após correção...\n')
     const verificacao = await query(`
       SELECT id, doadora_nome, data_fiv
       FROM coleta_fiv
@@ -136,16 +136,16 @@ async function corrigirDatasFIV() {
     `)
     
     if (verificacao.rows.length === 0) {
-      console.log('✅ Todas as datas foram corrigidas!')
+      console.log('�œ… Todas as datas foram corrigidas!')
     } else {
-      console.log(`⚠️  Ainda existem ${verificacao.rows.length} coletas com datas incorretas:`)
+      console.log(`�š�️  Ainda existem ${verificacao.rows.length} coletas com datas incorretas:`)
       verificacao.rows.forEach(coleta => {
         console.log(`   - ID: ${coleta.id} | ${coleta.doadora_nome || 'N/A'} | ${new Date(coleta.data_fiv).toLocaleDateString('pt-BR')}`)
       })
     }
     
   } catch (error) {
-    console.error('❌ Erro ao executar correção:', error)
+    console.error('�Œ Erro ao executar correção:', error)
     throw error
   } finally {
     client.release()
@@ -155,10 +155,10 @@ async function corrigirDatasFIV() {
 // Executar
 corrigirDatasFIV()
   .then(() => {
-    console.log('\n✅ Script finalizado')
+    console.log('\n�œ… Script finalizado')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n❌ Erro fatal:', error)
+    console.error('\n�Œ Erro fatal:', error)
     process.exit(1)
   })

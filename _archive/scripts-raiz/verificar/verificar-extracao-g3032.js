@@ -12,7 +12,7 @@ async function verificarExtracaoG3032() {
   const client = await pool.connect();
   
   try {
-    console.log('🔍 SIMULANDO EXTRAÇÃO DA API receptoras/lista-dg\n');
+    console.log('�Ÿ”� SIMULANDO EXTRA�‡�ƒO DA API receptoras/lista-dg\n');
     console.log('='.repeat(80));
     
     // Simular a query da API
@@ -51,7 +51,7 @@ async function verificarExtracaoG3032() {
     
     const result = await client.query(receptorasQuery);
     
-    console.log(`\n📋 Total de itens retornados: ${result.rows.length}\n`);
+    console.log(`\n�Ÿ“‹ Total de itens retornados: ${result.rows.length}\n`);
     
     let encontrouG3032 = false;
     
@@ -60,7 +60,7 @@ async function verificarExtracaoG3032() {
       
       if (tatuagem.includes('3032')) {
         encontrouG3032 = true;
-        console.log(`✅ ${idx + 1}. ENCONTRADA! Tatuagem: ${tatuagem}`);
+        console.log(`�œ… ${idx + 1}. ENCONTRADA! Tatuagem: ${tatuagem}`);
         console.log(`   NF: ${row.numero_nf}`);
         console.log(`   Fornecedor: ${row.fornecedor}`);
         console.log(`   Data Compra: ${row.data_compra}`);
@@ -79,7 +79,7 @@ async function verificarExtracaoG3032() {
         const letra = matchLetra ? matchLetra[1].toUpperCase() : '';
         const numero = matchNumero ? matchNumero[1] : '';
         
-        console.log(`   📝 Extração:`);
+        console.log(`   �Ÿ“� Extração:`);
         console.log(`      Letra extraída: ${letra}`);
         console.log(`      Número extraído: ${numero}`);
         console.log('');
@@ -89,16 +89,16 @@ async function verificarExtracaoG3032() {
     });
     
     if (!encontrouG3032) {
-      console.log('\n❌ G 3032 NÃO foi retornada pela query da API!');
+      console.log('\n�Œ G 3032 N�ƒO foi retornada pela query da API!');
     } else {
-      console.log('\n✅ G 3032 FOI retornada pela query da API!');
+      console.log('\n�œ… G 3032 FOI retornada pela query da API!');
     }
     
     console.log('\n' + '='.repeat(80));
-    console.log('\n✅ Verificação concluída!');
+    console.log('\n�œ… Verificação concluída!');
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
     console.error(error);
   } finally {
     client.release();

@@ -60,7 +60,7 @@ export default function DebugAnimalData() {
       const result = await response.json()
       
       if (result.status === 'success') {
-        alert('✅ Campos atualizados com sucesso!')
+        alert('�œ… Campos atualizados com sucesso!')
         fetchAnimalData()
       } else {
         setError(result.message || 'Erro ao atualizar')
@@ -81,10 +81,10 @@ export default function DebugAnimalData() {
             onClick={() => router.back()}
             className="mb-4"
           >
-            ← Voltar
+            �†� Voltar
           </Button>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            🔍 Verificação de Dados do Animal
+            �Ÿ”� Verificação de Dados do Animal
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
             Verifique e atualize os campos nome, ABCZg e DECA de um animal específico

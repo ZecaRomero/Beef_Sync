@@ -13,49 +13,49 @@ class OfflineService {
     this.retryDelay = 5000 // 5 segundos
   }
 
-  // Inicializar serviço offline
+  // Inicializar serviÃ§o offline
   initialize() {
-    console.log('📱 Inicializando serviço offline...')
+    console.log('ðÅ¸â€œ± Inicializando serviÃ§o offline...')
 
-    // Detectar status de conexão
+    // Detectar status de conexÃ£o
     this.detectConnectionStatus()
 
-    // Configurar listeners de conexão
+    // Configurar listeners de conexÃ£o
     this.setupConnectionListeners()
 
-    // Iniciar sincronização periódica
+    // Iniciar sincronizaÃ§Ã£o periÃ³dica
     this.startPeriodicSync()
 
     // Carregar dados offline salvos
     this.loadOfflineData()
 
-    console.log('✅ Serviço offline inicializado')
+    console.log('âÅ“â€¦ ServiÃ§o offline inicializado')
   }
 
-  // Detectar status de conexão
+  // Detectar status de conexÃ£o
   detectConnectionStatus() {
     if (typeof window !== 'undefined') {
       this.isOnline = navigator.onLine
     }
   }
 
-  // Configurar listeners de conexão
+  // Configurar listeners de conexÃ£o
   setupConnectionListeners() {
     if (typeof window === 'undefined') return
 
     window.addEventListener('online', () => {
-      console.log('🌐 Conexão restaurada')
+      console.log('ðÅ¸Å’� ConexÃ£o restaurada')
       this.isOnline = true
       this.syncPendingOperations()
     })
 
     window.addEventListener('offline', () => {
-      console.log('📱 Modo offline ativado')
+      console.log('ðÅ¸â€œ± Modo offline ativado')
       this.isOnline = false
     })
   }
 
-  // Iniciar sincronização periódica
+  // Iniciar sincronizaÃ§Ã£o periÃ³dica
   startPeriodicSync() {
     if (this.syncInterval) return
 
@@ -66,7 +66,7 @@ class OfflineService {
     }, 30000) // 30 segundos
   }
 
-  // Parar sincronização periódica
+  // Parar sincronizaÃ§Ã£o periÃ³dica
   stopPeriodicSync() {
     if (this.syncInterval) {
       clearInterval(this.syncInterval)
@@ -83,10 +83,10 @@ class OfflineService {
       if (savedData) {
         const parsedData = JSON.parse(savedData)
         this.offlineData = new Map(parsedData)
-        console.log(`📦 ${this.offlineData.size} itens carregados do armazenamento offline`)
+        console.log(`ðÅ¸â€œ¦ ${this.offlineData.size} itens carregados do armazenamento offline`)
       }
     } catch (error) {
-      console.error('❌ Erro ao carregar dados offline:', error)
+      console.error('â�Å’ Erro ao carregar dados offline:', error)
     }
   }
 
@@ -98,11 +98,11 @@ class OfflineService {
       const dataToSave = Array.from(this.offlineData.entries())
       localStorage.setItem('beef-sync-offline-data', JSON.stringify(dataToSave))
     } catch (error) {
-      console.error('❌ Erro ao salvar dados offline:', error)
+      console.error('â�Å’ Erro ao salvar dados offline:', error)
     }
   }
 
-  // Adicionar operação à fila de sincronização
+  // Adicionar operaÃ§Ã£o Ã  fila de sincronizaÃ§Ã£o
   addToSyncQueue(operation) {
     const syncOperation = {
       id: Date.now() + Math.random(),
@@ -113,7 +113,7 @@ class OfflineService {
     }
 
     this.syncQueue.push(syncOperation)
-    console.log(`📝 Operação adicionada à fila de sincronização: ${operation.type}`)
+    console.log(`ðÅ¸â€œ� OperaÃ§Ã£o adicionada Ã  fila de sincronizaÃ§Ã£o: ${operation.type}`)
 
     // Tentar sincronizar imediatamente se online
     if (this.isOnline) {
@@ -121,11 +121,11 @@ class OfflineService {
     }
   }
 
-  // Sincronizar operações pendentes
+  // Sincronizar operaÃ§Ãµes pendentes
   async syncPendingOperations() {
     if (!this.isOnline || this.syncQueue.length === 0) return
 
-    console.log(`🔄 Sincronizando ${this.syncQueue.length} operações pendentes...`)
+    console.log(`ðÅ¸â€�â€ž Sincronizando ${this.syncQueue.length} operaÃ§Ãµes pendentes...`)
 
     const operationsToSync = [...this.syncQueue]
     this.syncQueue = []
@@ -134,18 +134,18 @@ class OfflineService {
       try {
         await this.executeSyncOperation(syncOp)
         syncOp.status = 'completed'
-        console.log(`✅ Operação sincronizada: ${syncOp.operation.type}`)
+        console.log(`âÅ“â€¦ OperaÃ§Ã£o sincronizada: ${syncOp.operation.type}`)
       } catch (error) {
-        console.error(`❌ Erro ao sincronizar operação:`, error)
+        console.error(`â�Å’ Erro ao sincronizar operaÃ§Ã£o:`, error)
         syncOp.attempts++
         syncOp.status = 'failed'
 
-        // Recolocar na fila se não excedeu tentativas
+        // Recolocar na fila se nÃ£o excedeu tentativas
         if (syncOp.attempts < this.retryAttempts) {
           this.syncQueue.push(syncOp)
-          console.log(`🔄 Operação recolocada na fila (tentativa ${syncOp.attempts}/${this.retryAttempts})`)
+          console.log(`ðÅ¸â€�â€ž OperaÃ§Ã£o recolocada na fila (tentativa ${syncOp.attempts}/${this.retryAttempts})`)
         } else {
-          console.error(`❌ Operação falhou após ${this.retryAttempts} tentativas`)
+          console.error(`â�Å’ OperaÃ§Ã£o falhou apÃ³s ${this.retryAttempts} tentativas`)
         }
       }
     }
@@ -153,7 +153,7 @@ class OfflineService {
     this.lastSync = new Date()
   }
 
-  // Executar operação de sincronização
+  // Executar operaÃ§Ã£o de sincronizaÃ§Ã£o
   async executeSyncOperation(syncOp) {
     const { operation } = syncOp
 
@@ -177,11 +177,11 @@ class OfflineService {
         await this.syncDeleteCost(operation.data)
         break
       default:
-        throw new Error(`Tipo de operação não suportado: ${operation.type}`)
+        throw new Error(`Tipo de operaÃ§Ã£o nÃ£o suportado: ${operation.type}`)
     }
   }
 
-  // Sincronizar criação de animal
+  // Sincronizar criaÃ§Ã£o de animal
   async syncCreateAnimal(data) {
     const { serie, rg, sexo, raca, meses, situacao, observacoes } = data
 
@@ -191,7 +191,7 @@ class OfflineService {
     `, [serie, rg, sexo, raca, meses, situacao, observacoes])
   }
 
-  // Sincronizar atualização de animal
+  // Sincronizar atualizaÃ§Ã£o de animal
   async syncUpdateAnimal(data) {
     const { id, serie, rg, sexo, raca, meses, situacao, observacoes } = data
 
@@ -202,14 +202,14 @@ class OfflineService {
     `, [serie, rg, sexo, raca, meses, situacao, observacoes, id])
   }
 
-  // Sincronizar exclusão de animal
+  // Sincronizar exclusÃ£o de animal
   async syncDeleteAnimal(data) {
     const { id } = data
 
     await query('DELETE FROM animais WHERE id = $1', [id])
   }
 
-  // Sincronizar criação de custo
+  // Sincronizar criaÃ§Ã£o de custo
   async syncCreateCost(data) {
     const { animal_id, tipo, subtipo, valor, data: data_custo, observacoes, fornecedor, destino } = data
 
@@ -219,7 +219,7 @@ class OfflineService {
     `, [animal_id, tipo, subtipo, valor, data_custo, observacoes, fornecedor, destino])
   }
 
-  // Sincronizar atualização de custo
+  // Sincronizar atualizaÃ§Ã£o de custo
   async syncUpdateCost(data) {
     const { id, animal_id, tipo, subtipo, valor, data: data_custo, observacoes, fornecedor, destino } = data
 
@@ -230,7 +230,7 @@ class OfflineService {
     `, [animal_id, tipo, subtipo, valor, data_custo, observacoes, fornecedor, destino, id])
   }
 
-  // Sincronizar exclusão de custo
+  // Sincronizar exclusÃ£o de custo
   async syncDeleteCost(data) {
     const { id } = data
 
@@ -243,7 +243,7 @@ class OfflineService {
       // Se online, executar normalmente
       return await this.executeOperation(operation, data)
     } else {
-      // Se offline, salvar localmente e adicionar à fila
+      // Se offline, salvar localmente e adicionar Ã  fila
       const offlineId = `offline_${Date.now()}_${Math.random()}`
       const offlineData = { ...data, offlineId }
 
@@ -251,15 +251,15 @@ class OfflineService {
       this.offlineData.set(offlineId, { operation, data: offlineData })
       this.saveOfflineData()
 
-      // Adicionar à fila de sincronização
+      // Adicionar Ã  fila de sincronizaÃ§Ã£o
       this.addToSyncQueue({ type: operation, data: offlineData })
 
-      console.log(`📱 Operação salva offline: ${operation}`)
-      return { success: true, offlineId, message: 'Operação salva para sincronização' }
+      console.log(`ðÅ¸â€œ± OperaÃ§Ã£o salva offline: ${operation}`)
+      return { success: true, offlineId, message: 'OperaÃ§Ã£o salva para sincronizaÃ§Ã£o' }
     }
   }
 
-  // Executar operação online
+  // Executar operaÃ§Ã£o online
   async executeOperation(operation, data) {
     switch (operation) {
       case 'create_animal':
@@ -275,7 +275,7 @@ class OfflineService {
       case 'delete_cost':
         return await this.syncDeleteCost(data)
       default:
-        throw new Error(`Tipo de operação não suportado: ${operation}`)
+        throw new Error(`Tipo de operaÃ§Ã£o nÃ£o suportado: ${operation}`)
     }
   }
 
@@ -290,7 +290,7 @@ class OfflineService {
     this.saveOfflineData()
   }
 
-  // Obter status do serviço
+  // Obter status do serviÃ§o
   getStatus() {
     return {
       isOnline: this.isOnline,
@@ -301,7 +301,7 @@ class OfflineService {
     }
   }
 
-  // Obter estatísticas
+  // Obter estatÃ­sticas
   getStats() {
     const stats = {
       totalOperations: this.syncQueue.length,
@@ -313,7 +313,7 @@ class OfflineService {
       isOnline: this.isOnline
     }
 
-    // Contar operações por status
+    // Contar operaÃ§Ãµes por status
     this.syncQueue.forEach(op => {
       switch (op.status) {
         case 'completed':
@@ -335,26 +335,26 @@ class OfflineService {
   clearOfflineData() {
     this.offlineData.clear()
     this.saveOfflineData()
-    console.log('🗑️ Dados offline limpos')
+    console.log('ðÅ¸â€”â€˜ï¸� Dados offline limpos')
   }
 
-  // Forçar sincronização
+  // ForÃ§ar sincronizaÃ§Ã£o
   async forceSync() {
     if (!this.isOnline) {
-      throw new Error('Não é possível sincronizar offline')
+      throw new Error('NÃ£o Ã© possÃ­vel sincronizar offline')
     }
 
-    console.log('🔄 Forçando sincronização...')
+    console.log('ðÅ¸â€�â€ž ForÃ§ando sincronizaÃ§Ã£o...')
     await this.syncPendingOperations()
-    console.log('✅ Sincronização forçada concluída')
+    console.log('âÅ“â€¦ SincronizaÃ§Ã£o forÃ§ada concluÃ­da')
   }
 
-  // Verificar se há operações pendentes
+  // Verificar se hÃ¡ operaÃ§Ãµes pendentes
   hasPendingOperations() {
     return this.syncQueue.length > 0
   }
 
-  // Obter operações pendentes
+  // Obter operaÃ§Ãµes pendentes
   getPendingOperations() {
     return this.syncQueue.map(op => ({
       id: op.id,
@@ -365,15 +365,15 @@ class OfflineService {
     }))
   }
 
-  // Parar serviço
+  // Parar serviÃ§o
   stop() {
     this.stopPeriodicSync()
     this.saveOfflineData()
-    console.log('⏹️ Serviço offline parado')
+    console.log('â�¹ï¸� ServiÃ§o offline parado')
   }
 }
 
-// Instância singleton
+// InstÃ¢ncia singleton
 const offlineService = new OfflineService()
 
 export default offlineService

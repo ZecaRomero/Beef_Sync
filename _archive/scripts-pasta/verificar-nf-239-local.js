@@ -5,7 +5,7 @@ async function verificarNF239Local() {
   const client = await pool.connect()
   
   try {
-    console.log('🔍 Verificando localidade dos itens da NF 239...\n')
+    console.log('�Ÿ”� Verificando localidade dos itens da NF 239...\n')
     
     // Buscar itens da NF 239
     const result = await client.query(`
@@ -16,19 +16,19 @@ async function verificarNF239Local() {
       WHERE nota_fiscal_id = (SELECT id FROM notas_fiscais WHERE numero_nf = '239' LIMIT 1)
     `)
     
-    console.log(`📊 Total de itens encontrados: ${result.rows.length}\n`)
+    console.log(`�Ÿ“Š Total de itens encontrados: ${result.rows.length}\n`)
     
     for (const item of result.rows) {
       let dados = {}
       try {
         dados = typeof item.dados_item === 'string' ? JSON.parse(item.dados_item) : item.dados_item
       } catch (e) {
-        console.log(`⚠️ Erro ao parsear item ${item.id}:`, e.message)
+        console.log(`�š�️ Erro ao parsear item ${item.id}:`, e.message)
         continue
       }
       
       console.log(`Item ID: ${item.id}`)
-      console.log(`  Local: ${dados.local || 'NÃO DEFINIDO'}`)
+      console.log(`  Local: ${dados.local || 'N�ƒO DEFINIDO'}`)
       console.log(`  Sexo: ${dados.sexo || 'N/A'}`)
       console.log(`  Era: ${dados.era || 'N/A'}`)
       console.log(`  Quantidade: ${dados.quantidade || 1}`)
@@ -46,14 +46,14 @@ async function verificarNF239Local() {
     })
     
     if (itensSemLocal.length > 0) {
-      console.log(`⚠️ ${itensSemLocal.length} itens sem localidade "Pardinho" definida`)
-      console.log('💡 É necessário atualizar os itens para incluir local = "Pardinho"')
+      console.log(`�š�️ ${itensSemLocal.length} itens sem localidade "Pardinho" definida`)
+      console.log('�Ÿ’� �‰ necessário atualizar os itens para incluir local = "Pardinho"')
     } else {
-      console.log('✅ Todos os itens têm localidade "Pardinho" definida')
+      console.log('�œ… Todos os itens têm localidade "Pardinho" definida')
     }
     
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('�Œ Erro:', error)
     throw error
   } finally {
     client.release()
@@ -62,10 +62,10 @@ async function verificarNF239Local() {
 
 verificarNF239Local()
   .then(() => {
-    console.log('\n✅ Verificação concluída')
+    console.log('\n�œ… Verificação concluída')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n❌ Erro fatal:', error)
+    console.error('\n�Œ Erro fatal:', error)
     process.exit(1)
   })

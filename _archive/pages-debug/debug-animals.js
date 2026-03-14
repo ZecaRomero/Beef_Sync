@@ -55,7 +55,7 @@ export default function DebugAnimals() {
     const animals = JSON.parse(localStorage.getItem('animals') || '[]')
     
     if (animals.length === 0) {
-      alert('⚠️ Nenhum animal para sincronizar no localStorage.')
+      alert('�š�️ Nenhum animal para sincronizar no localStorage.')
       return
     }
 
@@ -67,7 +67,7 @@ export default function DebugAnimals() {
     let successCount = 0
     let errorCount = 0
     
-    console.log('🔄 Iniciando sincronização de', animals.length, 'animais...')
+    console.log('�Ÿ”„ Iniciando sincronização de', animals.length, 'animais...')
 
     for (const animal of animals) {
       try {
@@ -85,31 +85,31 @@ export default function DebugAnimals() {
         })
         
         if (response.ok) {
-          console.log('✅ Animal sincronizado:', animal.serie, animal.rg)
+          console.log('�œ… Animal sincronizado:', animal.serie, animal.rg)
           successCount++
         } else {
           const errorData = await response.json().catch(() => ({}))
-          console.error('❌ Erro ao sincronizar:', animal.serie, animal.rg, response.status, errorData)
+          console.error('�Œ Erro ao sincronizar:', animal.serie, animal.rg, response.status, errorData)
           errorCount++
         }
       } catch (error) {
-        console.error('❌ Erro ao sincronizar animal:', error)
+        console.error('�Œ Erro ao sincronizar animal:', error)
         errorCount++
       }
     }
     
     setLoading(false)
-    alert(`✅ Sincronização concluída!\nSucessos: ${successCount}\nErros: ${errorCount}\nVerifique o console para detalhes.`)
+    alert(`�œ… Sincronização concluída!\nSucessos: ${successCount}\nErros: ${errorCount}\nVerifique o console para detalhes.`)
     loadData()
   }
 
   const clearAllData = () => {
-    if (confirm('⚠️ Tem certeza que deseja limpar TODOS os dados?')) {
+    if (confirm('�š�️ Tem certeza que deseja limpar TODOS os dados?')) {
       localStorage.removeItem('animals')
       localStorage.removeItem('animalData')
       localStorage.removeItem('animalCosts')
       loadData()
-      alert('🗑️ Todos os dados foram removidos!')
+      alert('�Ÿ—‘️ Todos os dados foram removidos!')
     }
   }
 
@@ -129,13 +129,13 @@ export default function DebugAnimals() {
       <div className="max-w-6xl mx-auto px-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-            🔍 Debug - Animais
+            �Ÿ”� Debug - Animais
           </h1>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
               <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-200 mb-2">
-                📦 localStorage
+                �Ÿ“� localStorage
               </h3>
               <div className="space-y-2 text-sm">
                 <p><strong>animals:</strong> {localStorageData.animalsCount} itens</p>
@@ -146,20 +146,20 @@ export default function DebugAnimals() {
             
             <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
               <h3 className="text-lg font-semibold text-green-800 dark:text-green-200 mb-2">
-                🌐 API
+                �ŸŒ� API
               </h3>
               <div className="space-y-2 text-sm">
                 <p><strong>Animais:</strong> {apiData.length} itens</p>
-                <p><strong>Status:</strong> {apiData.length > 0 ? '✅ Conectada' : '❌ Vazia'}</p>
+                <p><strong>Status:</strong> {apiData.length > 0 ? '�œ… Conectada' : '�Œ Vazia'}</p>
               </div>
             </div>
             
             <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
               <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
-                ⚠️ Problema
+                �š�️ Problema
               </h3>
               <div className="space-y-2 text-sm">
-                <p><strong>Status:</strong> {localStorageData.animalsCount > 0 && apiData.length === 0 ? '❌ Desincronizado' : '✅ OK'}</p>
+                <p><strong>Status:</strong> {localStorageData.animalsCount > 0 && apiData.length === 0 ? '�Œ Desincronizado' : '�œ… OK'}</p>
                 <p><strong>Ação:</strong> {localStorageData.animalsCount > 0 && apiData.length === 0 ? 'Sincronizar' : 'Nenhuma'}</p>
               </div>
             </div>
@@ -170,28 +170,28 @@ export default function DebugAnimals() {
               onClick={syncData}
               className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              🔄 Sincronizar com API
+              �Ÿ”„ Sincronizar com API
             </button>
             
             <button
               onClick={loadData}
               className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              🔄 Recarregar Dados
+              �Ÿ”„ Recarregar Dados
             </button>
             
             <button
               onClick={clearAllData}
               className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              🗑️ Limpar Tudo
+              �Ÿ—‘️ Limpar Tudo
             </button>
             
             <a
               href="/animals"
               className="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-center"
             >
-              👀 Voltar para Animais
+              �Ÿ‘€ Voltar para Animais
             </a>
           </div>
         </div>
@@ -200,7 +200,7 @@ export default function DebugAnimals() {
         {localStorageData.animalsCount > 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              📦 Animais no localStorage ({localStorageData.animalsCount})
+              �Ÿ“� Animais no localStorage ({localStorageData.animalsCount})
             </h2>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -239,7 +239,7 @@ export default function DebugAnimals() {
         {apiData.length > 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              🌐 Animais na API ({apiData.length})
+              �ŸŒ� Animais na API ({apiData.length})
             </h2>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -277,7 +277,7 @@ export default function DebugAnimals() {
         {/* Dados brutos */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            🔧 Dados Brutos
+            �Ÿ”� Dados Brutos
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>

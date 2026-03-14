@@ -1,11 +1,11 @@
-// Sistema de Sincronização de Notas Fiscais entre Dispositivos
+// Sistema de SincronizaÃ§Ã£o de Notas Fiscais entre Dispositivos
 export class NotasFiscaisSync {
   constructor() {
     this.storageKey = 'notasFiscais'
     this.syncInterval = null
   }
 
-  // Exportar dados para sincronização
+  // Exportar dados para sincronizaÃ§Ã£o
   exportData() {
     try {
       const notasFiscais = JSON.parse(localStorage.getItem(this.storageKey) || '[]')
@@ -27,7 +27,7 @@ export class NotasFiscaisSync {
   importData(data) {
     try {
       if (!data || !data.notasFiscais) {
-        throw new Error('Dados inválidos')
+        throw new Error('Dados invÃ¡lidos')
       }
 
       // Fazer backup dos dados atuais
@@ -37,7 +37,7 @@ export class NotasFiscaisSync {
       // Importar novos dados
       localStorage.setItem(this.storageKey, JSON.stringify(data.notasFiscais))
       
-      console.log(`✅ ${data.notasFiscais.length} notas fiscais importadas com sucesso!`)
+      console.log(`âÅ“â€¦ ${data.notasFiscais.length} notas fiscais importadas com sucesso!`)
       return true
     } catch (error) {
       console.error('Erro ao importar dados:', error)
@@ -45,7 +45,7 @@ export class NotasFiscaisSync {
     }
   }
 
-  // Gerar ID único para o dispositivo
+  // Gerar ID Ãºnico para o dispositivo
   getDeviceId() {
     let deviceId = localStorage.getItem('deviceId')
     if (!deviceId) {
@@ -72,12 +72,12 @@ export class NotasFiscaisSync {
         }
       }
     } catch (error) {
-      console.warn('Sincronização via API falhou, usando localStorage:', error)
+      console.warn('SincronizaÃ§Ã£o via API falhou, usando localStorage:', error)
     }
     return false
   }
 
-  // Sincronização automática periódica
+  // SincronizaÃ§Ã£o automÃ¡tica periÃ³dica
   startAutoSync(intervalMinutes = 5) {
     if (this.syncInterval) {
       clearInterval(this.syncInterval)
@@ -87,19 +87,19 @@ export class NotasFiscaisSync {
       this.syncViaAPI()
     }, intervalMinutes * 60 * 1000)
 
-    console.log(`🔄 Sincronização automática iniciada (${intervalMinutes}min)`)
+    console.log(`ðÅ¸â€�â€ž SincronizaÃ§Ã£o automÃ¡tica iniciada (${intervalMinutes}min)`)
   }
 
-  // Parar sincronização automática
+  // Parar sincronizaÃ§Ã£o automÃ¡tica
   stopAutoSync() {
     if (this.syncInterval) {
       clearInterval(this.syncInterval)
       this.syncInterval = null
-      console.log('⏹️ Sincronização automática parada')
+      console.log('â�¹ï¸� SincronizaÃ§Ã£o automÃ¡tica parada')
     }
   }
 
-  // Verificar se há dados para sincronizar
+  // Verificar se hÃ¡ dados para sincronizar
   hasDataToSync() {
     const notasFiscais = JSON.parse(localStorage.getItem(this.storageKey) || '[]')
     return notasFiscais.length > 0
@@ -108,7 +108,7 @@ export class NotasFiscaisSync {
   // Limpar dados locais
   clearLocalData() {
     localStorage.removeItem(this.storageKey)
-    console.log('🗑️ Dados locais de notas fiscais removidos')
+    console.log('ðÅ¸â€”â€˜ï¸� Dados locais de notas fiscais removidos')
   }
 
   // Restaurar backup
@@ -118,7 +118,7 @@ export class NotasFiscaisSync {
       if (backup) {
         const backupData = JSON.parse(backup)
         this.importData(backupData)
-        console.log('🔄 Backup restaurado com sucesso!')
+        console.log('ðÅ¸â€�â€ž Backup restaurado com sucesso!')
         return true
       }
     } catch (error) {
@@ -128,10 +128,10 @@ export class NotasFiscaisSync {
   }
 }
 
-// Instância global para uso em toda a aplicação
+// InstÃ¢ncia global para uso em toda a aplicaÃ§Ã£o
 export const notasFiscaisSync = new NotasFiscaisSync()
 
-// Funções utilitárias para uso direto
+// FunÃ§Ãµes utilitÃ¡rias para uso direto
 export const exportNotasFiscais = () => notasFiscaisSync.exportData()
 export const importNotasFiscais = (data) => notasFiscaisSync.importData(data)
 export const syncNotasFiscais = () => notasFiscaisSync.syncViaAPI()

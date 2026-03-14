@@ -12,7 +12,7 @@ async function fixBreedNames() {
   const client = await pool.connect()
   
   try {
-    console.log('🔄 Corrigindo nomes das raças para evitar duplicatas...')
+    console.log('�Ÿ”„ Corrigindo nomes das raças para evitar duplicatas...')
     
     // Mapear variações de nomes para nomes padronizados
     const breedMapping = {
@@ -30,7 +30,7 @@ async function fixBreedNames() {
       ORDER BY raca
     `)
     
-    console.log('📊 Raças encontradas:')
+    console.log('�Ÿ“Š Raças encontradas:')
     racasResult.rows.forEach(raca => {
       console.log(`   ${raca.raca}: ${raca.total} animais`)
     })
@@ -47,11 +47,11 @@ async function fixBreedNames() {
       
       if (result.rowCount > 0) {
         animaisAtualizados += result.rowCount
-        console.log(`✅ ${result.rowCount} animais atualizados: ${nomeAntigo} → ${nomeNovo}`)
+        console.log(`�œ… ${result.rowCount} animais atualizados: ${nomeAntigo} �†’ ${nomeNovo}`)
       }
     }
     
-    console.log(`\n🎉 ${animaisAtualizados} animais atualizados!`)
+    console.log(`\n�ŸŽ‰ ${animaisAtualizados} animais atualizados!`)
     
     // Verificar resultado final
     const racasFinal = await client.query(`
@@ -61,13 +61,13 @@ async function fixBreedNames() {
       ORDER BY total DESC
     `)
     
-    console.log('\n📈 Distribuição final por raça:')
+    console.log('\n�Ÿ“ˆ Distribuição final por raça:')
     racasFinal.rows.forEach(raca => {
       console.log(`   ${raca.raca}: ${raca.total} animais`)
     })
     
   } catch (error) {
-    console.error('❌ Erro na correção:', error)
+    console.error('�Œ Erro na correção:', error)
     throw error
   } finally {
     client.release()
@@ -78,11 +78,11 @@ async function fixBreedNames() {
 if (require.main === module) {
   fixBreedNames()
     .then(() => {
-      console.log('🎉 Correção concluída!')
+      console.log('�ŸŽ‰ Correção concluída!')
       process.exit(0)
     })
     .catch((error) => {
-      console.error('💥 Erro na correção:', error)
+      console.error('�Ÿ’� Erro na correção:', error)
       process.exit(1)
     })
 }

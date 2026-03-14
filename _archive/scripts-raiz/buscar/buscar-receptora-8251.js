@@ -12,7 +12,7 @@ const pool = new Pool({
 
 async function buscarReceptora8251() {
   try {
-    console.log('🔍 Buscando receptora 8251...\n');
+    console.log('�Ÿ”� Buscando receptora 8251...\n');
     
     // Buscar por RG exato
     const resultRG = await pool.query(`
@@ -22,10 +22,10 @@ async function buscarReceptora8251() {
     `);
     
     if (resultRG.rows.length > 0) {
-      console.log('✅ Receptora encontrada por RG exato:');
+      console.log('�œ… Receptora encontrada por RG exato:');
       console.log(JSON.stringify(resultRG.rows[0], null, 2));
     } else {
-      console.log('❌ Receptora não encontrada por RG exato');
+      console.log('�Œ Receptora não encontrada por RG exato');
       
       // Buscar por RG parcial
       const resultParcial = await pool.query(`
@@ -36,12 +36,12 @@ async function buscarReceptora8251() {
       `);
       
       if (resultParcial.rows.length > 0) {
-        console.log('\n📋 Animais encontrados com "8251" no RG:');
+        console.log('\n�Ÿ“‹ Animais encontrados com "8251" no RG:');
         resultParcial.rows.forEach(animal => {
           console.log(`- RG: ${animal.rg}, Nome: ${animal.nome || 'Sem nome'}, Categoria: ${animal.categoria}, Situação: ${animal.situacao}, Inativo: ${animal.inativo}`);
         });
       } else {
-        console.log('\n❌ Nenhum animal encontrado com "8251" no RG');
+        console.log('\n�Œ Nenhum animal encontrado com "8251" no RG');
       }
     }
     
@@ -52,10 +52,10 @@ async function buscarReceptora8251() {
       WHERE categoria = 'Receptora' AND (inativo = false OR inativo IS NULL)
     `);
     
-    console.log(`\n📊 Total de receptoras ativas: ${resultReceptoras.rows[0].total}`);
+    console.log(`\n�Ÿ“Š Total de receptoras ativas: ${resultReceptoras.rows[0].total}`);
     
   } catch (error) {
-    console.error('❌ Erro ao buscar receptora:', error.message);
+    console.error('�Œ Erro ao buscar receptora:', error.message);
   } finally {
     await pool.end();
   }

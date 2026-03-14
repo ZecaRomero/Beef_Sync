@@ -9,7 +9,7 @@ const pool = new Pool({
 });
 
 async function criarTabelaNitrogenio() {
-  console.log('🔧 Criando tabela de Abastecimento de Nitrogênio...\n');
+  console.log('�Ÿ”� Criando tabela de Abastecimento de Nitrogênio...\n');
 
   try {
     await pool.query(`
@@ -28,7 +28,7 @@ async function criarTabelaNitrogenio() {
       )
     `);
 
-    console.log('✅ Tabela abastecimento_nitrogenio criada com sucesso!');
+    console.log('�œ… Tabela abastecimento_nitrogenio criada com sucesso!');
 
     // Criar índices
     await pool.query(`
@@ -41,18 +41,18 @@ async function criarTabelaNitrogenio() {
       ON abastecimento_nitrogenio(motorista);
     `);
 
-    console.log('✅ Índices criados com sucesso!');
+    console.log('�œ… Índices criados com sucesso!');
 
     // Verificar se foi criada
     const result = await pool.query(`
       SELECT COUNT(*) FROM abastecimento_nitrogenio
     `);
 
-    console.log(`\n📊 Tabela verificada: ${result.rows[0].count} registros`);
-    console.log('\n✅ Processo concluído!');
+    console.log(`\n�Ÿ“Š Tabela verificada: ${result.rows[0].count} registros`);
+    console.log('\n�œ… Processo concluído!');
 
   } catch (error) {
-    console.error('❌ Erro:', error);
+    console.error('�Œ Erro:', error);
   } finally {
     await pool.end();
   }

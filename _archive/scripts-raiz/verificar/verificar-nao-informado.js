@@ -19,7 +19,7 @@ async function verificar() {
     ORDER BY a.serie, a.rg
   `)
   
-  console.log(`📊 Total de animais "Não informado": ${result.rows.length}`)
+  console.log(`�Ÿ“Š Total de animais "Não informado": ${result.rows.length}`)
   console.log('\nLista de animais sem piquete:')
   
   result.rows.forEach((a, idx) => {

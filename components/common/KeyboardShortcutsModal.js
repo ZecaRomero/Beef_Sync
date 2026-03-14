@@ -6,18 +6,18 @@ import { XMarkIcon, CommandLineIcon } from '../ui/Icons'
 
 const shortcuts = [
   {
-    category: 'Navegação',
+    category: 'NavegaÃ§Ã£o',
     items: [
       { keys: ['Ctrl', 'H'], description: 'Ir para Home' },
       { keys: ['Ctrl', 'D'], description: 'Ir para Dashboard' },
       { keys: ['Ctrl', 'A'], description: 'Ir para Animais' },
-      { keys: ['Ctrl', 'S'], description: 'Ir para Estoque de Sêmen' },
+      { keys: ['Ctrl', 'S'], description: 'Ir para Estoque de SÃªmen' },
       { keys: ['Ctrl', 'N'], description: 'Ir para Nascimentos' },
-      { keys: ['Ctrl', 'R'], description: 'Ir para Relatórios' },
+      { keys: ['Ctrl', 'R'], description: 'Ir para RelatÃ³rios' },
     ]
   },
   {
-    category: 'Ações',
+    category: 'AÃ§Ãµes',
     items: [
       { keys: ['Ctrl', 'K'], description: 'Buscar' },
       { keys: ['Ctrl', 'P'], description: 'Adicionar Novo' },
@@ -84,7 +84,7 @@ export default function KeyboardShortcutsModal({ isOpen, onClose }) {
                   </button>
                 </div>
 
-                {/* Descrição */}
+                {/* DescriÃ§Ã£o */}
                 <p className="text-gray-600 dark:text-gray-400 mb-6">
                   Use estes atalhos para navegar mais rapidamente pelo sistema.
                 </p>
@@ -127,7 +127,7 @@ export default function KeyboardShortcutsModal({ isOpen, onClose }) {
                 {/* Footer */}
                 <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                    💡 Pressione <kbd className="px-2 py-1 text-xs font-semibold bg-gray-100 dark:bg-gray-700 rounded">Ctrl</kbd> + <kbd className="px-2 py-1 text-xs font-semibold bg-gray-100 dark:bg-gray-700 rounded">/</kbd> a qualquer momento para ver este menu
+                    ðÅ¸â€™¡ Pressione <kbd className="px-2 py-1 text-xs font-semibold bg-gray-100 dark:bg-gray-700 rounded">Ctrl</kbd> + <kbd className="px-2 py-1 text-xs font-semibold bg-gray-100 dark:bg-gray-700 rounded">/</kbd> a qualquer momento para ver este menu
                   </p>
                 </div>
               </Dialog.Panel>

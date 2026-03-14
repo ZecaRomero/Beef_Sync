@@ -8,29 +8,29 @@ const { query } = require('../lib/database')
 
 async function limpezaDefinitiva() {
   try {
-    console.log('🧹 LIMPEZA DEFINITIVA - REMOVENDO TODOS OS DADOS ANTIGOS...')
+    console.log('�Ÿ�� LIMPEZA DEFINITIVA - REMOVENDO TODOS OS DADOS ANTIGOS...')
     
     // Verificar conexão
     const connectionTest = await query('SELECT NOW() as timestamp')
-    console.log('✅ Conexão PostgreSQL OK:', connectionTest.rows[0].timestamp)
+    console.log('�œ… Conexão PostgreSQL OK:', connectionTest.rows[0].timestamp)
     
     // 1. Limpar TODAS as notas fiscais
-    console.log('\n🗑️ Removendo TODAS as notas fiscais...')
+    console.log('\n�Ÿ—‘️ Removendo TODAS as notas fiscais...')
     await query('DELETE FROM notas_fiscais_itens')
     await query('DELETE FROM notas_fiscais')
-    console.log('✅ Todas as notas fiscais removidas')
+    console.log('�œ… Todas as notas fiscais removidas')
     
     // 2. Limpar tabelas de sincronização
-    console.log('\n🧹 Limpando tabelas de sincronização...')
+    console.log('\n�Ÿ�� Limpando tabelas de sincronização...')
     try {
       await query('DROP TABLE IF EXISTS notas_fiscais_sincronizadas')
-      console.log('✅ Tabela de sincronização removida')
+      console.log('�œ… Tabela de sincronização removida')
     } catch (error) {
-      console.log('ℹ️ Tabela de sincronização não existia')
+      console.log('�„�️ Tabela de sincronização não existia')
     }
     
     // 3. Inserir APENAS a NF real do JOAOZINHO
-    console.log('\n📄 Inserindo APENAS a NF real do JOAOZINHO...')
+    console.log('\n�Ÿ“„ Inserindo APENAS a NF real do JOAOZINHO...')
     const nfResult = await query(`
       INSERT INTO notas_fiscais (
         numero_nf,
@@ -60,10 +60,10 @@ async function limpezaDefinitiva() {
     ])
     
     const nfId = nfResult.rows[0].id
-    console.log(`✅ NF real inserida com ID: ${nfId}`)
+    console.log(`�œ… NF real inserida com ID: ${nfId}`)
     
     // 4. Inserir os 2 itens reais
-    console.log('\n📦 Inserindo itens reais...')
+    console.log('\n�Ÿ“� Inserindo itens reais...')
     
     // Item 1
     await query(`
@@ -113,14 +113,14 @@ async function limpezaDefinitiva() {
       'bovino'
     ])
     
-    console.log('✅ 2 itens reais inseridos')
+    console.log('�œ… 2 itens reais inseridos')
     
     // 5. Verificar resultado final
     const countResult = await query('SELECT COUNT(*) as total FROM notas_fiscais')
     const totalNFs = countResult.rows[0].total
     
-    console.log('\n🎉 LIMPEZA DEFINITIVA CONCLUÍDA!')
-    console.log(`📊 Total de notas fiscais no banco: ${totalNFs}`)
+    console.log('\n�ŸŽ‰ LIMPEZA DEFINITIVA CONCLUÍDA!')
+    console.log(`�Ÿ“Š Total de notas fiscais no banco: ${totalNFs}`)
     
     // Mostrar detalhes da NF real
     const nfDetails = await query(`
@@ -136,7 +136,7 @@ async function limpezaDefinitiva() {
       GROUP BY nf.id, nf.numero_nf, nf.fornecedor, nf.valor_total, nf.tipo
     `)
     
-    console.log('\n📋 Detalhes da NF real:')
+    console.log('\n�Ÿ“‹ Detalhes da NF real:')
     nfDetails.rows.forEach(nf => {
       console.log(`  ID: ${nf.id}`)
       console.log(`  Número: ${nf.numero_nf}`)
@@ -146,18 +146,18 @@ async function limpezaDefinitiva() {
       console.log(`  Itens: ${nf.total_itens}`)
     })
     
-    console.log('\n✅ AGORA O APP DEVE MOSTRAR:')
+    console.log('\n�œ… AGORA O APP DEVE MOSTRAR:')
     console.log('  - 1 nota fiscal (JOAOZINHO)')
     console.log('  - Valor total: R$ 15.000,00')
     console.log('  - 2 itens')
     console.log('  - Contadores corretos')
     console.log('  - SEM dados antigos ao pressionar F5')
     
-    console.log('\n✅ LIMPEZA DEFINITIVA EXECUTADA COM SUCESSO!')
-    console.log('🔄 Agora recarregue o app - não deve mais voltar dados antigos.')
+    console.log('\n�œ… LIMPEZA DEFINITIVA EXECUTADA COM SUCESSO!')
+    console.log('�Ÿ”„ Agora recarregue o app - não deve mais voltar dados antigos.')
     
   } catch (error) {
-    console.error('❌ Erro na limpeza definitiva:', error)
+    console.error('�Œ Erro na limpeza definitiva:', error)
     throw error
   }
 }
@@ -166,12 +166,12 @@ async function limpezaDefinitiva() {
 if (require.main === module) {
   limpezaDefinitiva()
     .then(() => {
-      console.log('\n✅ SCRIPT EXECUTADO COM SUCESSO!')
-      console.log('🔄 Agora recarregue o app - problema do F5 resolvido!')
+      console.log('\n�œ… SCRIPT EXECUTADO COM SUCESSO!')
+      console.log('�Ÿ”„ Agora recarregue o app - problema do F5 resolvido!')
       process.exit(0)
     })
     .catch((error) => {
-      console.error('\n❌ Erro ao executar script:', error)
+      console.error('\n�Œ Erro ao executar script:', error)
       process.exit(1)
     })
 }

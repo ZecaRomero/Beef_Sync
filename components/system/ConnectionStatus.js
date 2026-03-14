@@ -40,7 +40,7 @@ const ConnectionStatus = ({ className = '' }) => {
         return { signal: controller.signal, cleanup: () => clearTimeout(timeoutId) }
       }
       
-      // Verificar conexão com banco com timeout
+      // Verificar conexÃ£o com banco com timeout
       const dbTimeout = createTimeout(5000)
       const dbPromise = fetch('/api/database/test', {
         method: 'GET',
@@ -88,7 +88,7 @@ const ConnectionStatus = ({ className = '' }) => {
         error: dbData.error || null
       })
     } catch (error) {
-      console.error('Erro ao verificar conexões:', error)
+      console.error('Erro ao verificar conexÃµes:', error)
       setStatus(prev => ({
         ...prev,
         database: 'error',
@@ -109,7 +109,7 @@ const ConnectionStatus = ({ className = '' }) => {
     // Verificar a cada 2 minutos
     const interval = setInterval(checkConnections, 2 * 60 * 1000)
     
-    // Listeners para mudanças de conectividade
+    // Listeners para mudanÃ§as de conectividade
     const handleOnline = () => {
       setStatus(prev => ({ ...prev, online: true }))
       checkConnections()
@@ -129,7 +129,7 @@ const ConnectionStatus = ({ className = '' }) => {
     }
   }, [mounted])
 
-  // Não renderizar nada até o componente estar hidratado no cliente
+  // NÃ£o renderizar nada atÃ© o componente estar hidratado no cliente
   if (!mounted) {
     return (
       <div className={`flex items-center space-x-2 ${className}`}>
@@ -198,8 +198,8 @@ const ConnectionStatus = ({ className = '' }) => {
         
         <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
           <div className="space-y-1">
-            <div>Internet: {status.online ? '✓' : '✗'}</div>
-            <div>Banco: {status.database === 'connected' ? '✓' : status.database === 'error' ? '✗' : '?'}</div>
+            <div>Internet: {status.online ? 'âÅ“â€œ' : 'âÅ“â€”'}</div>
+            <div>Banco: {status.database === 'connected' ? 'âÅ“â€œ' : status.database === 'error' ? 'âÅ“â€”' : '?'}</div>
             <div>APIs: {status.apiStats ? `${status.apiStats.working}/${status.apiStats.total}` : '?'}</div>
           </div>
           <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>

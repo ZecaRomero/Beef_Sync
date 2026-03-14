@@ -9,12 +9,12 @@ const pool = new Pool({
 });
 
 async function verificarPersistencia() {
-  console.log('🔍 VERIFICANDO PERSISTÊNCIA DE DADOS NO BANCO\n');
+  console.log('�Ÿ”� VERIFICANDO PERSIST�ŠNCIA DE DADOS NO BANCO\n');
   console.log('='.repeat(60));
 
   try {
     // 1. Verificar tabelas críticas
-    console.log('\n📊 1. TABELAS CRÍTICAS E SEUS DADOS:\n');
+    console.log('\n�Ÿ“Š 1. TABELAS CRÍTICAS E SEUS DADOS:\n');
     
     const tabelasCriticas = [
       { nome: 'animais', descricao: 'Cadastro de Animais' },
@@ -72,10 +72,10 @@ async function verificarPersistencia() {
             existe: true,
             registros: count,
             ultimaAtualizacao,
-            status: count > 0 ? '✅ COM DADOS' : '⚠️  VAZIA'
+            status: count > 0 ? '�œ… COM DADOS' : '�š�️  VAZIA'
           });
 
-          console.log(`${count > 0 ? '✅' : '⚠️ '} ${tabela.descricao.padEnd(35)} | ${count.toString().padStart(6)} registros | Última: ${ultimaAtualizacao}`);
+          console.log(`${count > 0 ? '�œ…' : '�š�️ '} ${tabela.descricao.padEnd(35)} | ${count.toString().padStart(6)} registros | �šltima: ${ultimaAtualizacao}`);
         } else {
           resultados.push({
             tabela: tabela.nome,
@@ -83,18 +83,18 @@ async function verificarPersistencia() {
             existe: false,
             registros: 0,
             ultimaAtualizacao: 'N/A',
-            status: '❌ NÃO EXISTE'
+            status: '�Œ N�ƒO EXISTE'
           });
 
-          console.log(`❌ ${tabela.descricao.padEnd(35)} | NÃO EXISTE`);
+          console.log(`�Œ ${tabela.descricao.padEnd(35)} | N�ƒO EXISTE`);
         }
       } catch (error) {
-        console.log(`❌ ${tabela.descricao.padEnd(35)} | ERRO: ${error.message}`);
+        console.log(`�Œ ${tabela.descricao.padEnd(35)} | ERRO: ${error.message}`);
       }
     }
 
     // 2. Verificar integridade dos dados
-    console.log('\n📋 2. VERIFICAÇÃO DE INTEGRIDADE:\n');
+    console.log('\n�Ÿ“‹ 2. VERIFICA�‡�ƒO DE INTEGRIDADE:\n');
 
     // Verificar animais com DNA registrado
     const animaisComDNA = await pool.query(`
@@ -120,61 +120,61 @@ async function verificarPersistencia() {
     console.log(`   Custos Andrológicos: ${custosAndrologicos.rows[0].count} registros | Total: R$ ${parseFloat(custosAndrologicos.rows[0].total).toFixed(2)}`);
 
     // 3. Verificar APIs que salvam no banco
-    console.log('\n🔌 3. APIS VERIFICADAS (salvam no PostgreSQL):\n');
+    console.log('\n�Ÿ”Œ 3. APIS VERIFICADAS (salvam no PostgreSQL):\n');
 
     const apisVerificadas = [
-      { endpoint: '/api/dna/enviar', metodo: 'POST', tabelas: ['dna_envios', 'dna_animais', 'custos', 'animais'], status: '✅' },
-      { endpoint: '/api/nitrogenio', metodo: 'POST', tabelas: ['abastecimento_nitrogenio', 'movimentacoes_contabeis'], status: '✅' },
-      { endpoint: '/api/reproducao/exames-andrologicos', metodo: 'POST', tabelas: ['exames_andrologicos', 'custos', 'historia_ocorrencias'], status: '✅' },
-      { endpoint: '/api/animals', metodo: 'POST', tabelas: ['animais'], status: '✅' },
-      { endpoint: '/api/births', metodo: 'POST', tabelas: ['nascimentos', 'animais'], status: '✅' },
-      { endpoint: '/api/deaths', metodo: 'POST', tabelas: ['mortes', 'animais'], status: '✅' },
-      { endpoint: '/api/semen', metodo: 'POST', tabelas: ['estoque_semen'], status: '✅' },
-      { endpoint: '/api/nf', metodo: 'POST', tabelas: ['notas_fiscais', 'notas_fiscais_itens'], status: '✅' },
+      { endpoint: '/api/dna/enviar', metodo: 'POST', tabelas: ['dna_envios', 'dna_animais', 'custos', 'animais'], status: '�œ…' },
+      { endpoint: '/api/nitrogenio', metodo: 'POST', tabelas: ['abastecimento_nitrogenio', 'movimentacoes_contabeis'], status: '�œ…' },
+      { endpoint: '/api/reproducao/exames-andrologicos', metodo: 'POST', tabelas: ['exames_andrologicos', 'custos', 'historia_ocorrencias'], status: '�œ…' },
+      { endpoint: '/api/animals', metodo: 'POST', tabelas: ['animais'], status: '�œ…' },
+      { endpoint: '/api/births', metodo: 'POST', tabelas: ['nascimentos', 'animais'], status: '�œ…' },
+      { endpoint: '/api/deaths', metodo: 'POST', tabelas: ['mortes', 'animais'], status: '�œ…' },
+      { endpoint: '/api/semen', metodo: 'POST', tabelas: ['estoque_semen'], status: '�œ…' },
+      { endpoint: '/api/nf', metodo: 'POST', tabelas: ['notas_fiscais', 'notas_fiscais_itens'], status: '�œ…' },
     ];
 
     apisVerificadas.forEach(api => {
-      console.log(`   ${api.status} ${api.metodo.padEnd(6)} ${api.endpoint.padEnd(45)} → ${api.tabelas.join(', ')}`);
+      console.log(`   ${api.status} ${api.metodo.padEnd(6)} ${api.endpoint.padEnd(45)} �†’ ${api.tabelas.join(', ')}`);
     });
 
     // 4. Resumo final
-    console.log('\n📊 4. RESUMO FINAL:\n');
+    console.log('\n�Ÿ“Š 4. RESUMO FINAL:\n');
 
     const tabelasComDados = resultados.filter(r => r.existe && r.registros > 0).length;
     const tabelasVazias = resultados.filter(r => r.existe && r.registros === 0).length;
     const tabelasInexistentes = resultados.filter(r => !r.existe).length;
     const totalRegistros = resultados.reduce((sum, r) => sum + r.registros, 0);
 
-    console.log(`   ✅ Tabelas com dados: ${tabelasComDados}`);
-    console.log(`   ⚠️  Tabelas vazias: ${tabelasVazias}`);
-    console.log(`   ❌ Tabelas inexistentes: ${tabelasInexistentes}`);
-    console.log(`   📦 Total de registros: ${totalRegistros.toLocaleString('pt-BR')}`);
+    console.log(`   �œ… Tabelas com dados: ${tabelasComDados}`);
+    console.log(`   �š�️  Tabelas vazias: ${tabelasVazias}`);
+    console.log(`   �Œ Tabelas inexistentes: ${tabelasInexistentes}`);
+    console.log(`   �Ÿ“� Total de registros: ${totalRegistros.toLocaleString('pt-BR')}`);
 
     // 5. Recomendações
-    console.log('\n💡 5. RECOMENDAÇÕES:\n');
+    console.log('\n�Ÿ’� 5. RECOMENDA�‡�•ES:\n');
 
     if (tabelasInexistentes > 0) {
-      console.log('   ⚠️  Algumas tabelas não existem. Execute as migrations necessárias.');
+      console.log('   �š�️  Algumas tabelas não existem. Execute as migrations necessárias.');
     }
 
     if (tabelasVazias > 0) {
       const vazias = resultados.filter(r => r.existe && r.registros === 0);
-      console.log('   ⚠️  Tabelas vazias encontradas:');
+      console.log('   �š�️  Tabelas vazias encontradas:');
       vazias.forEach(t => {
         console.log(`      - ${t.descricao} (${t.tabela})`);
       });
-      console.log('   💡 Comece a usar essas funcionalidades no APP para popular os dados.');
+      console.log('   �Ÿ’� Comece a usar essas funcionalidades no APP para popular os dados.');
     }
 
     if (tabelasComDados === tabelasCriticas.length) {
-      console.log('   ✅ Todas as tabelas críticas têm dados! Sistema funcionando corretamente.');
+      console.log('   �œ… Todas as tabelas críticas têm dados! Sistema funcionando corretamente.');
     }
 
     console.log('\n' + '='.repeat(60));
-    console.log('✅ Verificação concluída!\n');
+    console.log('�œ… Verificação concluída!\n');
 
   } catch (error) {
-    console.error('\n❌ Erro durante verificação:', error);
+    console.error('\n�Œ Erro durante verificação:', error);
   } finally {
     await pool.end();
   }

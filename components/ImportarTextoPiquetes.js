@@ -88,12 +88,12 @@ export default function ImportarTextoPiquetes({ onImportComplete }) {
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">
-        📝 Importar via Texto - Piquetes e Animais
+        ðÅ¸â€œ� Importar via Texto - Piquetes e Animais
       </h2>
 
       <div className="mb-6">
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-          <h3 className="font-semibold text-blue-900 mb-2">📋 Como usar:</h3>
+          <h3 className="font-semibold text-blue-900 mb-2">ðÅ¸â€œâ€¹ Como usar:</h3>
           <ol className="text-sm text-blue-800 list-decimal list-inside space-y-1">
             <li>Copie os dados do Excel (Ctrl+C)</li>
             <li>Cole aqui na caixa de texto (Ctrl+V)</li>
@@ -101,7 +101,7 @@ export default function ImportarTextoPiquetes({ onImportComplete }) {
             <li>Se estiver tudo OK, clique em "Importar"</li>
           </ol>
           <p className="text-xs text-blue-700 mt-2">
-            💡 As colunas devem estar separadas por TAB (copiar do Excel mantém isso automaticamente)
+            ðÅ¸â€™¡ As colunas devem estar separadas por TAB (copiar do Excel mantÃ©m isso automaticamente)
           </p>
         </div>
 
@@ -132,7 +132,7 @@ export default function ImportarTextoPiquetes({ onImportComplete }) {
                   : 'bg-blue-600 hover:bg-blue-700'
               }`}
             >
-              {validando ? '⏳ Validando...' : '🔍 Validar Dados'}
+              {validando ? 'â�³ Validando...' : 'ðÅ¸â€�� Validar Dados'}
             </button>
 
             {validacao && validacao.valido && (
@@ -145,7 +145,7 @@ export default function ImportarTextoPiquetes({ onImportComplete }) {
                     : 'bg-green-600 hover:bg-green-700'
                 }`}
               >
-                {importando ? '⏳ Importando...' : '✅ Importar Agora'}
+                {importando ? 'â�³ Importando...' : 'âÅ“â€¦ Importar Agora'}
               </button>
             )}
 
@@ -154,7 +154,7 @@ export default function ImportarTextoPiquetes({ onImportComplete }) {
               disabled={validando || importando}
               className="px-4 py-3 rounded-lg font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors"
             >
-              🗑️ Limpar
+              ðÅ¸â€”â€˜ï¸� Limpar
             </button>
           </div>
         </div>
@@ -162,7 +162,7 @@ export default function ImportarTextoPiquetes({ onImportComplete }) {
 
       {erro && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-          <p className="text-red-800 font-semibold">❌ Erro:</p>
+          <p className="text-red-800 font-semibold">â�Å’ Erro:</p>
           <p className="text-red-700 text-sm">{erro}</p>
         </div>
       )}
@@ -174,7 +174,7 @@ export default function ImportarTextoPiquetes({ onImportComplete }) {
           <h3 className={`font-semibold mb-3 ${
             validacao.valido ? 'text-green-900' : 'text-yellow-900'
           }`}>
-            {validacao.valido ? '✅ Validação OK!' : '⚠️ Erros Encontrados'}
+            {validacao.valido ? 'âÅ“â€¦ ValidaÃ§Ã£o OK!' : 'âÅ¡ ï¸� Erros Encontrados'}
           </h3>
           
           <div className="grid grid-cols-2 gap-4 mb-4">
@@ -194,7 +194,7 @@ export default function ImportarTextoPiquetes({ onImportComplete }) {
           {validacao.erros.length > 0 && (
             <div className="mt-4">
               <p className="text-sm font-semibold text-yellow-800 mb-2">
-                Erros de validação:
+                Erros de validaÃ§Ã£o:
               </p>
               <div className="max-h-40 overflow-y-auto bg-white rounded border p-2">
                 {validacao.erros.map((erro, index) => (
@@ -216,7 +216,7 @@ export default function ImportarTextoPiquetes({ onImportComplete }) {
                   <thead className="bg-gray-100 sticky top-0">
                     <tr>
                       <th className="px-2 py-1 text-left">Linha</th>
-                      <th className="px-2 py-1 text-left">Série</th>
+                      <th className="px-2 py-1 text-left">SÃ©rie</th>
                       <th className="px-2 py-1 text-left">RG</th>
                       <th className="px-2 py-1 text-left">Local</th>
                       <th className="px-2 py-1 text-left">Data IA</th>
@@ -244,7 +244,7 @@ export default function ImportarTextoPiquetes({ onImportComplete }) {
 
       {resultado && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-          <h3 className="font-semibold text-green-900 mb-3">✅ Importação Concluída!</h3>
+          <h3 className="font-semibold text-green-900 mb-3">âÅ“â€¦ ImportaÃ§Ã£o ConcluÃ­da!</h3>
           
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div className="bg-white rounded p-3 border border-green-200">
@@ -270,7 +270,7 @@ export default function ImportarTextoPiquetes({ onImportComplete }) {
           {resultado.erros && resultado.erros.length > 0 && (
             <div className="mt-4">
               <p className="text-sm font-semibold text-orange-800 mb-2">
-                ⚠️ Erros durante importação ({resultado.erros.length}):
+                âÅ¡ ï¸� Erros durante importaÃ§Ã£o ({resultado.erros.length}):
               </p>
               <div className="max-h-40 overflow-y-auto bg-white rounded border border-orange-200 p-2">
                 {resultado.erros.map((erro, index) => (

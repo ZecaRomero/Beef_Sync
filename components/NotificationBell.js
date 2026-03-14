@@ -17,7 +17,7 @@ export default function NotificationBell() {
         setNotificacoes(data.notificacoes || [])
       }
     } catch (error) {
-      console.error('Erro ao carregar notificações:', error)
+      console.error('Erro ao carregar notificaÃ§Ãµes:', error)
     }
   }
 
@@ -37,7 +37,7 @@ export default function NotificationBell() {
       <button
         onClick={() => setMostrarDropdown(!mostrarDropdown)}
         className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-        title="Notificações"
+        title="NotificaÃ§Ãµes"
       >
         {totalNaoLidas > 0 ? (
           <BellAlertIcon className="h-6 w-6 text-amber-500 animate-pulse" />
@@ -62,7 +62,7 @@ export default function NotificationBell() {
           <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-20 max-h-96 overflow-hidden flex flex-col">
             <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
               <h3 className="font-bold text-gray-900 dark:text-white">
-                Notificações
+                NotificaÃ§Ãµes
               </h3>
               {totalNaoLidas > 0 && (
                 <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full">
@@ -75,7 +75,7 @@ export default function NotificationBell() {
               {notificacoes.length === 0 ? (
                 <div className="p-8 text-center text-gray-500 dark:text-gray-400">
                   <BellIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">Nenhuma notificação</p>
+                  <p className="text-sm">Nenhuma notificaÃ§Ã£o</p>
                 </div>
               ) : (
                 <div className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -92,7 +92,7 @@ export default function NotificationBell() {
                         <div className="flex-shrink-0 mt-1">
                           {notif.tipo === 'feedback' && (
                             <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                              <span className="text-xl">💬</span>
+                              <span className="text-xl">ðÅ¸â€™¬</span>
                             </div>
                           )}
                         </div>
@@ -105,7 +105,7 @@ export default function NotificationBell() {
                           </p>
                           {notif.temAudio && (
                             <span className="inline-flex items-center gap-1 mt-2 text-xs text-blue-600 dark:text-blue-400">
-                              🎤 Com áudio
+                              ðÅ¸Å½¤ Com Ã¡udio
                             </span>
                           )}
                           <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">

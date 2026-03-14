@@ -54,40 +54,40 @@ const INDICES_REQUERIDOS = [
 ]
 
 async function verificarConexao() {
-  console.log('\nüîç VERIFICA√á√ÉO DE CONEX√ÉO COM POSTGRESQL\n')
+  console.log('\n≈∏‚Äùç VERIFICA√‚Ä°√∆íO DE CONEX√∆íO COM POSTGRESQL\n')
   console.log('=' .repeat(70))
   
   try {
     const resultado = await testConnection()
     
     if (resultado.success) {
-      console.log('‚úÖ Conex√£o estabelecida com sucesso!')
-      console.log(`   üìÖ Timestamp: ${resultado.timestamp}`)
-      console.log(`   üóÑÔ∏è  Banco: ${resultado.database}`)
-      console.log(`   üë§ Usu√°rio: ${resultado.user}`)
-      console.log(`   üìä Vers√£o: ${resultado.version}`)
+      console.log('‚≈ì‚Ä¶ Conex√£o estabelecida com sucesso!')
+      console.log(`   ≈∏‚Äú‚Ä¶ Timestamp: ${resultado.timestamp}`)
+      console.log(`   ≈∏‚Äî‚ÄûÔ∏è  Banco: ${resultado.database}`)
+      console.log(`   ≈∏‚Äò§ Usu√°rio: ${resultado.user}`)
+      console.log(`   ≈∏‚Äú≈† Vers√£o: ${resultado.version}`)
       
       if (resultado.poolInfo) {
-        console.log(`   üîó Conex√µes ativas: ${resultado.poolInfo.totalCount}`)
-        console.log(`   üí§ Conex√µes idle: ${resultado.poolInfo.idleCount}`)
+        console.log(`   ≈∏‚Äù‚Äî Conex√µes ativas: ${resultado.poolInfo.totalCount}`)
+        console.log(`   ≈∏‚Äô§ Conex√µes idle: ${resultado.poolInfo.idleCount}`)
         console.log(`   ‚è≥ Conex√µes esperando: ${resultado.poolInfo.waitingCount}`)
       }
       
       return true
     } else {
-      console.log('‚ùå Falha na conex√£o!')
-      console.log(`   ‚ö†Ô∏è  Erro: ${resultado.error}`)
-      console.log(`   üî¢ C√≥digo: ${resultado.code}`)
+      console.log('‚ù≈í Falha na conex√£o!')
+      console.log(`   ‚≈°†Ô∏è  Erro: ${resultado.error}`)
+      console.log(`   ≈∏‚Äù¢ C√≥digo: ${resultado.code}`)
       return false
     }
   } catch (error) {
-    console.log('‚ùå Erro ao testar conex√£o:', error.message)
+    console.log('‚ù≈í Erro ao testar conex√£o:', error.message)
     return false
   }
 }
 
 async function verificarTabelas() {
-  console.log('\nüìã VERIFICANDO TABELAS DO BANCO DE DADOS\n')
+  console.log('\n≈∏‚Äú‚Äπ VERIFICANDO TABELAS DO BANCO DE DADOS\n')
   console.log('=' .repeat(70))
   
   try {
@@ -109,9 +109,9 @@ async function verificarTabelas() {
         // Contar registros na tabela
         const countResult = await query(`SELECT COUNT(*) as count FROM ${tabela}`)
         const count = parseInt(countResult.rows[0].count)
-        console.log(`   ‚úÖ ${tabela.padEnd(30)} - ${count} registro(s)`)
+        console.log(`   ‚≈ì‚Ä¶ ${tabela.padEnd(30)} - ${count} registro(s)`)
       } else {
-        console.log(`   ‚ùå ${tabela.padEnd(30)} - TABELA N√ÉO ENCONTRADA!`)
+        console.log(`   ‚ù≈í ${tabela.padEnd(30)} - TABELA N√∆íO ENCONTRADA!`)
         todasEncontradas = false
       }
     }
@@ -119,19 +119,19 @@ async function verificarTabelas() {
     // Listar tabelas extras
     const tabelasExtras = tabelasExistentes.filter(t => !TABELAS_REQUERIDAS.includes(t))
     if (tabelasExtras.length > 0) {
-      console.log(`\n   ‚ÑπÔ∏è  Tabelas adicionais encontradas:`)
+      console.log(`\n   ‚‚ÄûπÔ∏è  Tabelas adicionais encontradas:`)
       tabelasExtras.forEach(t => console.log(`      - ${t}`))
     }
     
     return todasEncontradas
   } catch (error) {
-    console.log('‚ùå Erro ao verificar tabelas:', error.message)
+    console.log('‚ù≈í Erro ao verificar tabelas:', error.message)
     return false
   }
 }
 
 async function verificarIndices() {
-  console.log('\nüîç VERIFICANDO √çNDICES DO BANCO DE DADOS\n')
+  console.log('\n≈∏‚Äùç VERIFICANDO √çNDICES DO BANCO DE DADOS\n')
   console.log('=' .repeat(70))
   
   try {
@@ -150,22 +150,22 @@ async function verificarIndices() {
     
     for (const indice of INDICES_REQUERIDOS) {
       if (indicesExistentes.includes(indice)) {
-        console.log(`   ‚úÖ ${indice}`)
+        console.log(`   ‚≈ì‚Ä¶ ${indice}`)
       } else {
-        console.log(`   ‚ö†Ô∏è  ${indice} - N√ÉO ENCONTRADO (n√£o cr√≠tico)`)
+        console.log(`   ‚≈°†Ô∏è  ${indice} - N√∆íO ENCONTRADO (n√£o cr√≠tico)`)
         todosEncontrados = false
       }
     }
     
     return todosEncontrados
   } catch (error) {
-    console.log('‚ùå Erro ao verificar √≠ndices:', error.message)
+    console.log('‚ù≈í Erro ao verificar √≠ndices:', error.message)
     return false
   }
 }
 
 async function obterEstatisticas() {
-  console.log('\nüìä ESTAT√çSTICAS DO BANCO DE DADOS\n')
+  console.log('\n≈∏‚Äú≈† ESTAT√çSTICAS DO BANCO DE DADOS\n')
   console.log('=' .repeat(70))
   
   try {
@@ -188,33 +188,33 @@ async function obterEstatisticas() {
     // Total de transfer√™ncias de embri√µes
     const tes = await query('SELECT COUNT(*) as total FROM transferencias_embrioes')
     
-    console.log(`   üêÑ Animais:`)
+    console.log(`   ≈∏ê‚Äû Animais:`)
     console.log(`      - Total: ${animais.rows[0].total}`)
     console.log(`      - Ativos: ${animaisAtivos.rows[0].total}`)
     
-    console.log(`\n   üë∂ Nascimentos: ${nascimentos.rows[0].total}`)
+    console.log(`\n   ≈∏‚Äò∂ Nascimentos: ${nascimentos.rows[0].total}`)
     
-    console.log(`\n   üí∞ Custos:`)
+    console.log(`\n   ≈∏‚Äô∞ Custos:`)
     console.log(`      - Total de registros: ${custos.rows[0].total}`)
     console.log(`      - Soma total: R$ ${parseFloat(custos.rows[0].soma).toFixed(2)}`)
     
-    console.log(`\n   üß™ Estoque de S√™men:`)
+    console.log(`\n   ≈∏ß™ Estoque de S√™men:`)
     console.log(`      - Touros cadastrados: ${semen.rows[0].total}`)
     console.log(`      - Doses dispon√≠veis: ${semen.rows[0].doses}`)
     
-    console.log(`\n   üìÑ Notas Fiscais: ${nfs.rows[0].total}`)
+    console.log(`\n   ≈∏‚Äú‚Äû Notas Fiscais: ${nfs.rows[0].total}`)
     
-    console.log(`\n   üß¨ Transfer√™ncias de Embri√µes: ${tes.rows[0].total}`)
+    console.log(`\n   ≈∏ß¨ Transfer√™ncias de Embri√µes: ${tes.rows[0].total}`)
     
     return true
   } catch (error) {
-    console.log('‚ùå Erro ao obter estat√≠sticas:', error.message)
+    console.log('‚ù≈í Erro ao obter estat√≠sticas:', error.message)
     return false
   }
 }
 
 async function verificarIntegridade() {
-  console.log('\nüîê VERIFICANDO INTEGRIDADE REFERENCIAL\n')
+  console.log('\n≈∏‚Äùê VERIFICANDO INTEGRIDADE REFERENCIAL\n')
   console.log('=' .repeat(70))
   
   try {
@@ -227,9 +227,9 @@ async function verificarIntegridade() {
     `)
     
     if (parseInt(custosOrfaos.rows[0].total) > 0) {
-      console.log(`   ‚ö†Ô∏è  ${custosOrfaos.rows[0].total} custo(s) √≥rf√£o(s) encontrado(s)`)
+      console.log(`   ‚≈°†Ô∏è  ${custosOrfaos.rows[0].total} custo(s) √≥rf√£o(s) encontrado(s)`)
     } else {
-      console.log(`   ‚úÖ Integridade de custos OK`)
+      console.log(`   ‚≈ì‚Ä¶ Integridade de custos OK`)
     }
     
     // Verificar protocolos aplicados √≥rf√£os
@@ -241,24 +241,24 @@ async function verificarIntegridade() {
     `)
     
     if (parseInt(protocolosOrfaos.rows[0].total) > 0) {
-      console.log(`   ‚ö†Ô∏è  ${protocolosOrfaos.rows[0].total} protocolo(s) aplicado(s) √≥rf√£o(s)`)
+      console.log(`   ‚≈°†Ô∏è  ${protocolosOrfaos.rows[0].total} protocolo(s) aplicado(s) √≥rf√£o(s)`)
     } else {
-      console.log(`   ‚úÖ Integridade de protocolos aplicados OK`)
+      console.log(`   ‚≈ì‚Ä¶ Integridade de protocolos aplicados OK`)
     }
     
-    console.log(`   ‚úÖ Verifica√ß√£o de integridade conclu√≠da`)
+    console.log(`   ‚≈ì‚Ä¶ Verifica√ß√£o de integridade conclu√≠da`)
     
     return true
   } catch (error) {
-    console.log('‚ùå Erro ao verificar integridade:', error.message)
+    console.log('‚ù≈í Erro ao verificar integridade:', error.message)
     return false
   }
 }
 
 async function main() {
-  console.log('\n‚ïî‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïó')
-  console.log('‚ïë       BEEF SYNC - VERIFICA√á√ÉO COMPLETA DO POSTGRESQL            ‚ïë')
-  console.log('‚ïö‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïù')
+  console.log('\n‚‚Ä¢‚Äù‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢‚Äî')
+  console.log('‚‚Ä¢‚Äò       BEEF SYNC - VERIFICA√‚Ä°√∆íO COMPLETA DO POSTGRESQL            ‚‚Ä¢‚Äò')
+  console.log('‚‚Ä¢≈°‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ê‚‚Ä¢ù')
   
   const resultados = {
     conexao: false,
@@ -272,8 +272,8 @@ async function main() {
   resultados.conexao = await verificarConexao()
   
   if (!resultados.conexao) {
-    console.log('\n‚ùå FALHA: N√£o foi poss√≠vel conectar ao PostgreSQL!')
-    console.log('\nüí° Verifique se:')
+    console.log('\n‚ù≈í FALHA: N√£o foi poss√≠vel conectar ao PostgreSQL!')
+    console.log('\n≈∏‚Äô° Verifique se:')
     console.log('   - O PostgreSQL est√° rodando')
     console.log('   - As credenciais em lib/database.js est√£o corretas')
     console.log('   - O banco de dados "estoque_semen" existe')
@@ -284,8 +284,8 @@ async function main() {
   resultados.tabelas = await verificarTabelas()
   
   if (!resultados.tabelas) {
-    console.log('\n‚ö†Ô∏è  Algumas tabelas est√£o faltando!')
-    console.log('üí° Execute: npm run db:init')
+    console.log('\n‚≈°†Ô∏è  Algumas tabelas est√£o faltando!')
+    console.log('≈∏‚Äô° Execute: npm run db:init')
   }
   
   // 3. Verificar √≠ndices
@@ -299,27 +299,27 @@ async function main() {
   
   // Resumo final
   console.log('\n' + '=' .repeat(70))
-  console.log('üìã RESUMO DA VERIFICA√á√ÉO')
+  console.log('≈∏‚Äú‚Äπ RESUMO DA VERIFICA√‚Ä°√∆íO')
   console.log('=' .repeat(70))
   
-  console.log(`   ${resultados.conexao ? '‚úÖ' : '‚ùå'} Conex√£o com PostgreSQL`)
-  console.log(`   ${resultados.tabelas ? '‚úÖ' : '‚ö†Ô∏è '} Tabelas do banco`)
-  console.log(`   ${resultados.indices ? '‚úÖ' : '‚ö†Ô∏è '} √çndices do banco`)
-  console.log(`   ${resultados.estatisticas ? '‚úÖ' : '‚ùå'} Estat√≠sticas`)
-  console.log(`   ${resultados.integridade ? '‚úÖ' : '‚ö†Ô∏è '} Integridade referencial`)
+  console.log(`   ${resultados.conexao ? '‚≈ì‚Ä¶' : '‚ù≈í'} Conex√£o com PostgreSQL`)
+  console.log(`   ${resultados.tabelas ? '‚≈ì‚Ä¶' : '‚≈°†Ô∏è '} Tabelas do banco`)
+  console.log(`   ${resultados.indices ? '‚≈ì‚Ä¶' : '‚≈°†Ô∏è '} √çndices do banco`)
+  console.log(`   ${resultados.estatisticas ? '‚≈ì‚Ä¶' : '‚ù≈í'} Estat√≠sticas`)
+  console.log(`   ${resultados.integridade ? '‚≈ì‚Ä¶' : '‚≈°†Ô∏è '} Integridade referencial`)
   
   const todasOK = Object.values(resultados).every(r => r === true)
   
   if (todasOK) {
-    console.log('\n‚úÖ SISTEMA 100% FUNCIONAL E CONECTADO AO POSTGRESQL!')
+    console.log('\n‚≈ì‚Ä¶ SISTEMA 100% FUNCIONAL E CONECTADO AO POSTGRESQL!')
   } else if (resultados.conexao && resultados.tabelas) {
-    console.log('\n‚ö†Ô∏è  Sistema funcional com pequenas inconsist√™ncias')
+    console.log('\n‚≈°†Ô∏è  Sistema funcional com pequenas inconsist√™ncias')
   } else {
-    console.log('\n‚ùå Sistema com problemas cr√≠ticos!')
+    console.log('\n‚ù≈í Sistema com problemas cr√≠ticos!')
   }
   
   console.log('\n' + '=' .repeat(70))
-  console.log('üéâ Verifica√ß√£o conclu√≠da!')
+  console.log('≈∏≈Ω‚Ä∞ Verifica√ß√£o conclu√≠da!')
   console.log('=' .repeat(70) + '\n')
   
   process.exit(todasOK ? 0 : 1)
@@ -327,7 +327,7 @@ async function main() {
 
 // Executar script
 main().catch(error => {
-  console.error('\n‚ùå Erro fatal:', error.message)
+  console.error('\n‚ù≈í Erro fatal:', error.message)
   process.exit(1)
 })
 

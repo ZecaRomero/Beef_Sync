@@ -10,7 +10,7 @@ const pool = new Pool({
 
 async function buscarTodas() {
   try {
-    console.log('🔍 Buscando todas as 8251...\n')
+    console.log('�Ÿ”� Buscando todas as 8251...\n')
 
     const result = await pool.query(`
       SELECT 
@@ -32,7 +32,7 @@ async function buscarTodas() {
       ORDER BY id
     `)
 
-    console.log(`📊 Total: ${result.rows.length} animais\n`)
+    console.log(`�Ÿ“Š Total: ${result.rows.length} animais\n`)
 
     result.rows.forEach((a, i) => {
       console.log(`${i + 1}. ID ${a.id} - ${a.nome}`)
@@ -40,7 +40,7 @@ async function buscarTodas() {
       console.log(`   Raça: ${a.raca}`)
       console.log(`   Situação: ${a.situacao}`)
       console.log(`   Fornecedor: ${a.fornecedor || 'Não informado'}`)
-      console.log(`   DG: ${a.data_dg ? new Date(a.data_dg).toLocaleDateString('pt-BR') + ' - ' + a.resultado_dg : 'NÃO TEM'}`)
+      console.log(`   DG: ${a.data_dg ? new Date(a.data_dg).toLocaleDateString('pt-BR') + ' - ' + a.resultado_dg : 'N�ƒO TEM'}`)
       console.log(`   Criado: ${new Date(a.created_at).toLocaleString('pt-BR')}`)
       console.log('')
     })
@@ -51,7 +51,7 @@ async function buscarTodas() {
     )
 
     if (minerembryo) {
-      console.log('✅ Receptora MINEREMBRYO identificada:')
+      console.log('�œ… Receptora MINEREMBRYO identificada:')
       console.log(`   ID: ${minerembryo.id}`)
       console.log(`   Nome: ${minerembryo.nome}`)
       console.log(`   Esta é a que deve ser usada na tela de DG!\n`)
@@ -60,14 +60,14 @@ async function buscarTodas() {
     // Verificar se alguma tem DG
     const comDG = result.rows.filter(a => a.data_dg)
     if (comDG.length > 0) {
-      console.log(`📋 ${comDG.length} animal(is) com DG:`)
+      console.log(`�Ÿ“‹ ${comDG.length} animal(is) com DG:`)
       comDG.forEach(a => {
         console.log(`   - ID ${a.id}: ${a.resultado_dg} em ${new Date(a.data_dg).toLocaleDateString('pt-BR')}`)
       })
     }
 
   } catch (error) {
-    console.error('❌ Erro:', error.message)
+    console.error('�Œ Erro:', error.message)
   } finally {
     await pool.end()
   }

@@ -1,21 +1,21 @@
 require('dotenv').config();
 const { Pool } = require('pg');
 
-console.log('🔍 Testando conexão DIRETA com Supabase (sem pooler)...\n');
+console.log('�Ÿ”� Testando conexão DIRETA com Supabase (sem pooler)...\n');
 
 // Extrair informações da URL
 const dbUrl = process.env.DATABASE_URL;
 const match = dbUrl.match(/postgresql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/);
 
 if (!match) {
-  console.error('❌ URL do banco inválida');
+  console.error('�Œ URL do banco inválida');
   process.exit(1);
 }
 
 const [, user, password, host, port, database] = match;
 const hostDireto = host.replace('.pooler.', '.').replace('pooler.', '');
 
-console.log('📡 Tentando conexão direta (porta 5432)...');
+console.log('�Ÿ“� Tentando conexão direta (porta 5432)...');
 console.log('Host:', hostDireto);
 
 const poolDireto = new Pool({
@@ -33,30 +33,30 @@ async function testarConexao() {
     const client = await poolDireto.connect();
     const result = await client.query('SELECT NOW(), version(), current_database()');
     
-    console.log('✅ CONEXÃO DIRETA ESTABELECIDA COM SUCESSO!\n');
+    console.log('�œ… CONEX�ƒO DIRETA ESTABELECIDA COM SUCESSO!\n');
     console.log('⏰ Timestamp:', result.rows[0].now);
-    console.log('🗄️  Database:', result.rows[0].current_database);
-    console.log('📦 Versão:', result.rows[0].version.split(' ').slice(0, 2).join(' '));
+    console.log('�Ÿ—„️  Database:', result.rows[0].current_database);
+    console.log('�Ÿ“� Versão:', result.rows[0].version.split(' ').slice(0, 2).join(' '));
     
     // Testar query simples
     const testQuery = await client.query('SELECT COUNT(*) as total FROM animais');
-    console.log('🐄 Total de animais:', testQuery.rows[0].total);
+    console.log('�Ÿ�„ Total de animais:', testQuery.rows[0].total);
     
     client.release();
     await poolDireto.end();
     
-    console.log('\n✅ Conexão direta funcionando!');
-    console.log('\n💡 Use esta URL no .env:');
+    console.log('\n�œ… Conexão direta funcionando!');
+    console.log('\n�Ÿ’� Use esta URL no .env:');
     console.log(`DATABASE_URL=postgresql://${user}:${password}@${hostDireto}:5432/${database}`);
     
     process.exit(0);
     
   } catch (error) {
-    console.error('❌ ERRO NA CONEXÃO DIRETA:\n');
+    console.error('�Œ ERRO NA CONEX�ƒO DIRETA:\n');
     console.error('Código:', error.code);
     console.error('Mensagem:', error.message);
     
-    console.log('\n🔄 Tentando com porta 6543...');
+    console.log('\n�Ÿ”„ Tentando com porta 6543...');
     
     const pool6543 = new Pool({
       host: hostDireto,
@@ -72,8 +72,8 @@ async function testarConexao() {
       const client = await pool6543.connect();
       const result = await client.query('SELECT NOW()');
       
-      console.log('✅ CONEXÃO NA PORTA 6543 FUNCIONOU!\n');
-      console.log('💡 Use esta URL no .env:');
+      console.log('�œ… CONEX�ƒO NA PORTA 6543 FUNCIONOU!\n');
+      console.log('�Ÿ’� Use esta URL no .env:');
       console.log(`DATABASE_URL=postgresql://${user}:${password}@${hostDireto}:6543/${database}`);
       
       client.release();
@@ -81,17 +81,17 @@ async function testarConexao() {
       process.exit(0);
       
     } catch (error2) {
-      console.error('❌ Porta 6543 também falhou:', error2.message);
+      console.error('�Œ Porta 6543 também falhou:', error2.message);
       
-      console.log('\n⚠️  PROBLEMA DE REDE DETECTADO');
-      console.log('\n💡 POSSÍVEIS CAUSAS:');
-      console.log('1. 🔥 Firewall bloqueando conexões PostgreSQL');
-      console.log('2. 🛡️  Antivírus bloqueando a porta 5432/6543');
-      console.log('3. 🌐 Rede corporativa/escola bloqueando');
+      console.log('\n�š�️  PROBLEMA DE REDE DETECTADO');
+      console.log('\n�Ÿ’� POSSÍVEIS CAUSAS:');
+      console.log('1. �Ÿ”� Firewall bloqueando conexões PostgreSQL');
+      console.log('2. �Ÿ›�️  Antivírus bloqueando a porta 5432/6543');
+      console.log('3. �ŸŒ� Rede corporativa/escola bloqueando');
       console.log('4. ⏸️  Projeto Supabase pausado (inatividade)');
-      console.log('5. 📡 Problema de DNS/roteamento');
+      console.log('5. �Ÿ“� Problema de DNS/roteamento');
       
-      console.log('\n🔧 SOLUÇÕES:');
+      console.log('\n�Ÿ”� SOLU�‡�•ES:');
       console.log('1. Acesse https://supabase.com/dashboard e verifique se o projeto está ativo');
       console.log('2. Desative temporariamente o firewall/antivírus para testar');
       console.log('3. Tente usar outra rede (celular, VPN)');

@@ -10,7 +10,7 @@ const pool = new Pool({
 
 async function verificarDG8251() {
   try {
-    console.log('🔍 Verificando DG da receptora 8251...\n')
+    console.log('�Ÿ”� Verificando DG da receptora 8251...\n')
 
     // Buscar animal 8251
     const animal = await pool.query(`
@@ -33,13 +33,13 @@ async function verificarDG8251() {
     `)
 
     if (animal.rows.length === 0) {
-      console.log('❌ Animal 8251 não encontrado!')
+      console.log('�Œ Animal 8251 não encontrado!')
       return
     }
 
     const a = animal.rows[0]
-    console.log('📋 Dados do Animal 8251:')
-    console.log('─────────────────────────────────────')
+    console.log('�Ÿ“‹ Dados do Animal 8251:')
+    console.log('�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€')
     console.log(`ID: ${a.id}`)
     console.log(`RG: ${a.rg}`)
     console.log(`Brinco: ${a.brinco}`)
@@ -47,18 +47,18 @@ async function verificarDG8251() {
     console.log(`Série: ${a.serie}`)
     console.log(`Fornecedor: ${a.fornecedor}`)
     console.log(`Data TE: ${a.data_te ? new Date(a.data_te).toLocaleDateString('pt-BR') : 'Não informada'}`)
-    console.log(`Data DG: ${a.data_dg ? new Date(a.data_dg).toLocaleDateString('pt-BR') : 'NÃO TEM DG ❌'}`)
+    console.log(`Data DG: ${a.data_dg ? new Date(a.data_dg).toLocaleDateString('pt-BR') : 'N�ƒO TEM DG �Œ'}`)
     console.log(`Resultado DG: ${a.resultado_dg || 'Não informado'}`)
     console.log(`Veterinário: ${a.veterinario_dg || 'Não informado'}`)
     console.log(`Observações: ${a.observacoes || 'Nenhuma'}`)
-    console.log('─────────────────────────────────────\n')
+    console.log('�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€\n')
 
     // Verificar se tem DG
     if (!a.data_dg) {
-      console.log('⚠️ PROBLEMA: Animal 8251 NÃO tem data_dg no banco!')
+      console.log('�š�️ PROBLEMA: Animal 8251 N�ƒO tem data_dg no banco!')
       console.log('Isso significa que o salvamento não funcionou.\n')
     } else {
-      console.log('✅ Animal 8251 TEM DG salvo no banco!')
+      console.log('�œ… Animal 8251 TEM DG salvo no banco!')
       console.log(`Status: ${a.resultado_dg}\n`)
     }
 
@@ -80,18 +80,18 @@ async function verificarDG8251() {
 
     if (te.rows.length > 0) {
       const t = te.rows[0]
-      console.log('📋 Dados na tabela transferencias_embriao:')
-      console.log('─────────────────────────────────────')
+      console.log('�Ÿ“‹ Dados na tabela transferencias_embriao:')
+      console.log('�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€')
       console.log(`ID TE: ${t.id}`)
       console.log(`Animal ID: ${t.animal_id}`)
       console.log(`Data TE: ${t.data_te ? new Date(t.data_te).toLocaleDateString('pt-BR') : 'Não informada'}`)
-      console.log(`Data DG: ${t.data_dg ? new Date(t.data_dg).toLocaleDateString('pt-BR') : 'NÃO TEM DG ❌'}`)
+      console.log(`Data DG: ${t.data_dg ? new Date(t.data_dg).toLocaleDateString('pt-BR') : 'N�ƒO TEM DG �Œ'}`)
       console.log(`Resultado DG: ${t.resultado_dg || 'Não informado'}`)
       console.log(`Veterinário: ${t.veterinario || 'Não informado'}`)
       console.log(`Observações: ${t.observacoes || 'Nenhuma'}`)
-      console.log('─────────────────────────────────────\n')
+      console.log('�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€�”€\n')
     } else {
-      console.log('⚠️ Não encontrado na tabela transferencias_embriao\n')
+      console.log('�š�️ Não encontrado na tabela transferencias_embriao\n')
     }
 
     // Buscar todos os animais da MINEREMBRYO com DG
@@ -108,7 +108,7 @@ async function verificarDG8251() {
       ORDER BY rg, brinco
     `)
 
-    console.log(`📊 Total de animais MINEREMBRYO com DG: ${minerembryo.rows.length}`)
+    console.log(`�Ÿ“Š Total de animais MINEREMBRYO com DG: ${minerembryo.rows.length}`)
     if (minerembryo.rows.length > 0) {
       console.log('\nAnimais MINEREMBRYO com DG salvo:')
       minerembryo.rows.forEach(r => {
@@ -129,7 +129,7 @@ async function verificarDG8251() {
       ORDER BY rg, brinco
     `)
 
-    console.log(`\n📊 Total de animais MINEREMBRYO SEM DG: ${semDG.rows.length}`)
+    console.log(`\n�Ÿ“Š Total de animais MINEREMBRYO SEM DG: ${semDG.rows.length}`)
     if (semDG.rows.length > 0) {
       console.log('\nAnimais MINEREMBRYO pendentes de DG:')
       semDG.rows.slice(0, 10).forEach(r => {
@@ -141,7 +141,7 @@ async function verificarDG8251() {
     }
 
   } catch (error) {
-    console.error('❌ Erro:', error.message)
+    console.error('�Œ Erro:', error.message)
   } finally {
     await pool.end()
   }

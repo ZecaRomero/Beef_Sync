@@ -3,7 +3,7 @@ const {query} = require('./lib/database')
 async function verificar() {
   // Total geral de animais
   const totalGeral = await query('SELECT COUNT(*) as total FROM animais')
-  console.log('📊 Total GERAL de animais no sistema:', totalGeral.rows[0].total)
+  console.log('�Ÿ“Š Total GERAL de animais no sistema:', totalGeral.rows[0].total)
   
   // Por piquete
   const porPiquete = await query(`
@@ -14,7 +14,7 @@ async function verificar() {
     ORDER BY total DESC
   `)
   
-  console.log('\n📍 Animais por piquete:')
+  console.log('\n�Ÿ“� Animais por piquete:')
   porPiquete.rows.forEach(r => {
     console.log(`   ${r.piquete_atual}: ${r.total} animais`)
   })
@@ -30,7 +30,7 @@ async function verificar() {
     GROUP BY sexo
   `)
   
-  console.log('\n👥 Por sexo:')
+  console.log('\n�Ÿ‘� Por sexo:')
   porSexo.rows.forEach(r => {
     console.log(`   ${r.sexo || '(não informado)'}: ${r.total}`)
   })

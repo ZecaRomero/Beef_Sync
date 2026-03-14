@@ -1,4 +1,4 @@
-﻿
+
 import React, { useEffect, useState } from 'react'
 
 
@@ -15,16 +15,16 @@ export default function RecommendationReports() {
   const generateAnalysis = () => {
     // Simular estimativa de peso por idade
     const estimateWeight = (months, sex) => {
-      const baseWeight = sex === 'Macho' ? 15 : 12 // kg por mês
+      const baseWeight = sex === 'Macho' ? 15 : 12 // kg por mÃªs
       return Math.min(months * baseWeight, sex === 'Macho' ? 550 : 450)
     }
 
-    // Simular preços de mercado atuais
+    // Simular preÃ§os de mercado atuais
     const marketPrices = {
       boi_gordo: 280, // R$/arroba
       vaca_gorda: 260, // R$/arroba
-      bezerro_macho: 1800, // R$/cabeça
-      bezerro_femea: 1600 // R$/cabeça
+      bezerro_macho: 1800, // R$/cabeÃ§a
+      bezerro_femea: 1600 // R$/cabeÃ§a
     }
 
     const analyzedAnimals = mockAnimals.map(animal => {
@@ -43,7 +43,7 @@ export default function RecommendationReports() {
           ? marketPrices.bezerro_macho
           : marketPrices.bezerro_femea
       } else {
-        // Garrote/Novilha (interpolação)
+        // Garrote/Novilha (interpolaÃ§Ã£o)
         const adultPrice = animal.sexo === 'Macho' 
           ? marketPrices.boi_gordo * arrobas
           : marketPrices.vaca_gorda * arrobas
@@ -58,7 +58,7 @@ export default function RecommendationReports() {
       const potentialProfit = marketValue - animal.custoTotal
       const potentialROI = animal.custoTotal > 0 ? (potentialProfit / animal.custoTotal * 100) : 0
       
-      // Determinar recomendação
+      // Determinar recomendaÃ§Ã£o
       let recommendation = 'hold'
       let recommendationReason = ''
       let priority = 'medium'
@@ -81,7 +81,7 @@ export default function RecommendationReports() {
         priority = 'medium'
       } else {
         recommendation = 'improve'
-        recommendationReason = 'Prejuízo potencial - ação urgente necessária'
+        recommendationReason = 'PrejuÃ­zo potencial - aÃ§Ã£o urgente necessÃ¡ria'
         priority = 'high'
       }
 
@@ -120,26 +120,26 @@ export default function RecommendationReports() {
   const recommendations = [
     {
       id: 'all',
-      label: '📊 Todos',
+      label: 'ðÅ¸â€œÅ  Todos',
       description: 'Todos os animais',
       color: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
     },
     {
       id: 'sell',
-      label: '🟢 Vender',
+      label: 'ðÅ¸Å¸¢ Vender',
       description: 'Recomendados para venda',
       color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
     },
     {
       id: 'hold',
-      label: '🟡 Manter',
+      label: 'ðÅ¸Å¸¡ Manter',
       description: 'Aguardar melhor momento',
       color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
     },
     {
       id: 'improve',
-      label: '🔴 Melhorar',
-      description: 'Necessitam otimização',
+      label: 'ðÅ¸â€�´ Melhorar',
+      description: 'Necessitam otimizaÃ§Ã£o',
       color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
     }
   ]
@@ -151,7 +151,7 @@ export default function RecommendationReports() {
       ? analysisData 
       : analysisData.filter(a => a.recommendation === selectedRecommendation)
 
-    // Ordenação
+    // OrdenaÃ§Ã£o
     return filtered.sort((a, b) => {
       switch (sortBy) {
         case 'roi': return b.potentialROI - a.potentialROI
@@ -186,49 +186,49 @@ export default function RecommendationReports() {
     let content = ''
     
     if (format === 'whatsapp') {
-      content = `📊 *Relatório de Recomendações - Beef_Sync*\n\n`
-      content += `🐄 *Resumo Geral:*\n`
-      content += `• Total de Animais: ${analysisData.length}\n`
-      content += `• 🟢 Vender: ${stats.sell?.length || 0}\n`
-      content += `• 🟡 Manter: ${stats.hold?.length || 0}\n`
-      content += `• 🔴 Melhorar: ${stats.improve?.length || 0}\n\n`
-      content += `💰 *Financeiro:*\n`
-      content += `• Valor de Mercado: R$ ${stats.totalValue?.toLocaleString('pt-BR') || 0}\n`
-      content += `• Investido: R$ ${stats.totalInvested?.toLocaleString('pt-BR') || 0}\n`
-      content += `• Lucro Potencial: R$ ${stats.totalPotentialProfit?.toLocaleString('pt-BR') || 0}\n\n`
-      content += `📈 Gerado pelo Beef_Sync v3.0 Pro`
+      content = `ðÅ¸â€œÅ  *RelatÃ³rio de RecomendaÃ§Ãµes - Beef_Sync*\n\n`
+      content += `ðÅ¸�â€ž *Resumo Geral:*\n`
+      content += `ââ‚¬¢ Total de Animais: ${analysisData.length}\n`
+      content += `ââ‚¬¢ ðÅ¸Å¸¢ Vender: ${stats.sell?.length || 0}\n`
+      content += `ââ‚¬¢ ðÅ¸Å¸¡ Manter: ${stats.hold?.length || 0}\n`
+      content += `ââ‚¬¢ ðÅ¸â€�´ Melhorar: ${stats.improve?.length || 0}\n\n`
+      content += `ðÅ¸â€™° *Financeiro:*\n`
+      content += `ââ‚¬¢ Valor de Mercado: R$ ${stats.totalValue?.toLocaleString('pt-BR') || 0}\n`
+      content += `ââ‚¬¢ Investido: R$ ${stats.totalInvested?.toLocaleString('pt-BR') || 0}\n`
+      content += `ââ‚¬¢ Lucro Potencial: R$ ${stats.totalPotentialProfit?.toLocaleString('pt-BR') || 0}\n\n`
+      content += `ðÅ¸â€œË† Gerado pelo Beef_Sync v3.0 Pro`
       
       const url = `https://wa.me/?text=${encodeURIComponent(content)}`
       window.open(url, '_blank')
     } else if (format === 'email') {
-      const subject = `Relatório de Recomendações - ${selectedRecommendation === 'all' ? 'Todos os Animais' : recommendations.find(r => r.id === selectedRecommendation)?.description}`
+      const subject = `RelatÃ³rio de RecomendaÃ§Ãµes - ${selectedRecommendation === 'all' ? 'Todos os Animais' : recommendations.find(r => r.id === selectedRecommendation)?.description}`
       
-      content = `Relatório de Recomendações - Beef_Sync\n\n`
+      content = `RelatÃ³rio de RecomendaÃ§Ãµes - Beef_Sync\n\n`
       content += `Filtro: ${recommendations.find(r => r.id === selectedRecommendation)?.description}\n`
       content += `Data: ${new Date().toLocaleDateString('pt-BR')}\n\n`
       content += `RESUMO EXECUTIVO:\n`
-      content += `• Total de Animais Analisados: ${analysisData.length}\n`
-      content += `• Recomendados para Venda: ${stats.sell?.length || 0}\n`
-      content += `• Para Manter: ${stats.hold?.length || 0}\n`
-      content += `• Para Melhorar: ${stats.improve?.length || 0}\n\n`
-      content += `ANÁLISE FINANCEIRA:\n`
-      content += `• Valor Total de Mercado: R$ ${stats.totalValue?.toLocaleString('pt-BR') || 0}\n`
-      content += `• Total Investido: R$ ${stats.totalInvested?.toLocaleString('pt-BR') || 0}\n`
-      content += `• Lucro Potencial: R$ ${stats.totalPotentialProfit?.toLocaleString('pt-BR') || 0}\n\n`
+      content += `ââ‚¬¢ Total de Animais Analisados: ${analysisData.length}\n`
+      content += `ââ‚¬¢ Recomendados para Venda: ${stats.sell?.length || 0}\n`
+      content += `ââ‚¬¢ Para Manter: ${stats.hold?.length || 0}\n`
+      content += `ââ‚¬¢ Para Melhorar: ${stats.improve?.length || 0}\n\n`
+      content += `ANÃ�LISE FINANCEIRA:\n`
+      content += `ââ‚¬¢ Valor Total de Mercado: R$ ${stats.totalValue?.toLocaleString('pt-BR') || 0}\n`
+      content += `ââ‚¬¢ Total Investido: R$ ${stats.totalInvested?.toLocaleString('pt-BR') || 0}\n`
+      content += `ââ‚¬¢ Lucro Potencial: R$ ${stats.totalPotentialProfit?.toLocaleString('pt-BR') || 0}\n\n`
       
       if (animals.length > 0) {
         content += `DETALHAMENTO (Top 10):\n`
         animals.slice(0, 10).forEach((animal, index) => {
           content += `${index + 1}. ${animal.serie} ${animal.rg}\n`
-          content += `   • Recomendação: ${animal.recommendation === 'sell' ? 'VENDER' : animal.recommendation === 'hold' ? 'MANTER' : 'MELHORAR'}\n`
-          content += `   • ROI Potencial: ${animal.potentialROI.toFixed(1)}%\n`
-          content += `   • Valor de Mercado: R$ ${(animal.marketValue || 0).toLocaleString('pt-BR')}\n`
-          content += `   • Motivo: ${animal.recommendationReason}\n\n`
+          content += `   ââ‚¬¢ RecomendaÃ§Ã£o: ${animal.recommendation === 'sell' ? 'VENDER' : animal.recommendation === 'hold' ? 'MANTER' : 'MELHORAR'}\n`
+          content += `   ââ‚¬¢ ROI Potencial: ${animal.potentialROI.toFixed(1)}%\n`
+          content += `   ââ‚¬¢ Valor de Mercado: R$ ${(animal.marketValue || 0).toLocaleString('pt-BR')}\n`
+          content += `   ââ‚¬¢ Motivo: ${animal.recommendationReason}\n\n`
         })
       }
       
-      content += `\nRelatório gerado automaticamente pelo Beef_Sync v3.0 Pro\n`
-      content += `Sistema de Gestão Bovina Inteligente`
+      content += `\nRelatÃ³rio gerado automaticamente pelo Beef_Sync v3.0 Pro\n`
+      content += `Sistema de GestÃ£o Bovina Inteligente`
       
       const url = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(content)}`
       window.open(url)
@@ -244,9 +244,9 @@ export default function RecommendationReports() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin text-4xl mb-4">📊</div>
+          <div className="animate-spin text-4xl mb-4">ðÅ¸â€œÅ </div>
           <div className="text-lg font-semibold text-gray-900 dark:text-white">
-            Analisando recomendações...
+            Analisando recomendaÃ§Ãµes...
           </div>
         </div>
       </div>
@@ -262,13 +262,13 @@ export default function RecommendationReports() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold mb-3 flex items-center">
-                🎯 Relatórios de Recomendações
+                ðÅ¸Å½¯ RelatÃ³rios de RecomendaÃ§Ãµes
                 <span className="ml-4 px-4 py-2 bg-white/20 rounded-full text-sm font-medium backdrop-blur-sm">
                   IA Analytics
                 </span>
               </h1>
               <p className="text-green-100 text-lg">
-                Análise inteligente com recomendações personalizadas para cada animal
+                AnÃ¡lise inteligente com recomendaÃ§Ãµes personalizadas para cada animal
               </p>
             </div>
             <div className="text-right">
@@ -280,7 +280,7 @@ export default function RecommendationReports() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-32 -mt-32"></div>
       </div>
 
-      {/* Resumo das Recomendações */}
+      {/* Resumo das RecomendaÃ§Ãµes */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
@@ -290,7 +290,7 @@ export default function RecommendationReports() {
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">Vender</div>
             </div>
-            <div className="text-3xl">🟢</div>
+            <div className="text-3xl">ðÅ¸Å¸¢</div>
           </div>
           <div className="mt-2 text-xs text-gray-500">
             ROI &gt; 15% ou animais maduros
@@ -305,7 +305,7 @@ export default function RecommendationReports() {
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">Manter</div>
             </div>
-            <div className="text-3xl">🟡</div>
+            <div className="text-3xl">ðÅ¸Å¸¡</div>
           </div>
           <div className="mt-2 text-xs text-gray-500">
             ROI 5-15% - aguardar
@@ -320,7 +320,7 @@ export default function RecommendationReports() {
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">Melhorar</div>
             </div>
-            <div className="text-3xl">🔴</div>
+            <div className="text-3xl">ðÅ¸â€�´</div>
           </div>
           <div className="mt-2 text-xs text-gray-500">
             ROI &lt; 5% - otimizar
@@ -335,7 +335,7 @@ export default function RecommendationReports() {
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">Lucro Potencial</div>
             </div>
-            <div className="text-3xl">💰</div>
+            <div className="text-3xl">ðÅ¸â€™°</div>
           </div>
           <div className="mt-2 text-xs text-gray-500">
             Se vendidos hoje
@@ -386,7 +386,7 @@ export default function RecommendationReports() {
               onClick={() => setShowExportModal(true)}
               className="px-6 py-2 bg-gradient-to-r from-green-500 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center space-x-2"
             >
-              <span>📤</span>
+              <span>ðÅ¸â€œ¤</span>
               <span>Exportar</span>
             </button>
           </div>
@@ -397,7 +397,7 @@ export default function RecommendationReports() {
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
-            🐄 {recommendations.find(r => r.id === selectedRecommendation)?.description}
+            ðÅ¸�â€ž {recommendations.find(r => r.id === selectedRecommendation)?.description}
             <span className="ml-3 px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm font-medium rounded-full">
               {filteredAnimals.length} animais
             </span>
@@ -415,7 +415,7 @@ export default function RecommendationReports() {
                 <th className="text-center p-4 font-semibold text-gray-900 dark:text-white">Valor Mercado</th>
                 <th className="text-center p-4 font-semibold text-gray-900 dark:text-white">Lucro Pot.</th>
                 <th className="text-center p-4 font-semibold text-gray-900 dark:text-white">ROI Pot.</th>
-                <th className="text-center p-4 font-semibold text-gray-900 dark:text-white">Recomendação</th>
+                <th className="text-center p-4 font-semibold text-gray-900 dark:text-white">RecomendaÃ§Ã£o</th>
               </tr>
             </thead>
             <tbody>
@@ -434,7 +434,7 @@ export default function RecommendationReports() {
                           {animal.serie} {animal.rg}
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
-                          {animal.raca} • {animal.sexo}
+                          {animal.raca} ââ‚¬¢ {animal.sexo}
                         </div>
                       </div>
                     </div>
@@ -475,8 +475,8 @@ export default function RecommendationReports() {
                         animal.recommendation === 'hold' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
                         'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                       }`}>
-                        {animal.recommendation === 'sell' ? '🟢 Vender' :
-                         animal.recommendation === 'hold' ? '🟡 Manter' : '🔴 Melhorar'}
+                        {animal.recommendation === 'sell' ? 'ðÅ¸Å¸¢ Vender' :
+                         animal.recommendation === 'hold' ? 'ðÅ¸Å¸¡ Manter' : 'ðÅ¸â€�´ Melhorar'}
                       </span>
                       <div className="text-xs text-gray-500 dark:text-gray-400 max-w-32">
                         {animal.recommendationReason}
@@ -491,7 +491,7 @@ export default function RecommendationReports() {
 
         {filteredAnimals.length === 0 && (
           <div className="text-center py-12">
-            <div className="text-4xl mb-4">🔍</div>
+            <div className="text-4xl mb-4">ðÅ¸â€��</div>
             <div className="text-lg font-medium text-gray-900 dark:text-white mb-2">
               Nenhum animal encontrado
             </div>
@@ -502,13 +502,13 @@ export default function RecommendationReports() {
         )}
       </div>
 
-      {/* Modal de Exportação */}
+      {/* Modal de ExportaÃ§Ã£o */}
       {showExportModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                📤 Exportar Relatório
+                ðÅ¸â€œ¤ Exportar RelatÃ³rio
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mt-1">
                 Escolha como deseja compartilhar
@@ -520,7 +520,7 @@ export default function RecommendationReports() {
                 onClick={() => exportReport('whatsapp')}
                 className="w-full p-4 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors flex items-center space-x-3"
               >
-                <span className="text-2xl">📱</span>
+                <span className="text-2xl">ðÅ¸â€œ±</span>
                 <div className="text-left">
                   <div className="font-medium">WhatsApp</div>
                   <div className="text-sm opacity-90">Compartilhar resumo</div>
@@ -531,10 +531,10 @@ export default function RecommendationReports() {
                 onClick={() => exportReport('email')}
                 className="w-full p-4 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors flex items-center space-x-3"
               >
-                <span className="text-2xl">📧</span>
+                <span className="text-2xl">ðÅ¸â€œ§</span>
                 <div className="text-left">
                   <div className="font-medium">Email</div>
-                  <div className="text-sm opacity-90">Relatório detalhado</div>
+                  <div className="text-sm opacity-90">RelatÃ³rio detalhado</div>
                 </div>
               </button>
 
@@ -545,10 +545,10 @@ export default function RecommendationReports() {
                 }}
                 className="w-full p-4 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors flex items-center space-x-3"
               >
-                <span className="text-2xl">🖨️</span>
+                <span className="text-2xl">ðÅ¸â€“¨ï¸�</span>
                 <div className="text-left">
                   <div className="font-medium">Imprimir</div>
-                  <div className="text-sm opacity-90">Versão para impressão</div>
+                  <div className="text-sm opacity-90">VersÃ£o para impressÃ£o</div>
                 </div>
               </button>
             </div>

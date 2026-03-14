@@ -132,51 +132,51 @@ export default function RelatoriosEnvio() {
     // Categoria: Notas Fiscais
     { 
       key: 'nf_entrada_saida', 
-      label: 'Relatório de NF de Entrada e Saída', 
-      description: 'Notas fiscais de entrada e saída', 
+      label: 'RelatÃ³rio de NF de Entrada e SaÃ­da', 
+      description: 'Notas fiscais de entrada e saÃ­da', 
       category: 'Notas Fiscais',
       icon: DocumentTextIcon,
       color: 'blue'
     },
     
-    // Categoria: Reprodução
+    // Categoria: ReproduÃ§Ã£o
     { 
       key: 'femeas_ia', 
-      label: 'Fêmeas que Fizeram IA', 
-      description: 'Relatório de fêmeas inseminadas artificialmente', 
-      category: 'Reprodução',
+      label: 'FÃªmeas que Fizeram IA', 
+      description: 'RelatÃ³rio de fÃªmeas inseminadas artificialmente', 
+      category: 'ReproduÃ§Ã£o',
       icon: HeartIcon,
       color: 'pink'
     },
     { 
       key: 'transferencias_embrioes', 
-      label: 'Transferências de Embriões', 
-      description: 'Relatório completo de transferências de embriões (TE)', 
-      category: 'Reprodução',
+      label: 'TransferÃªncias de EmbriÃµes', 
+      description: 'RelatÃ³rio completo de transferÃªncias de embriÃµes (TE)', 
+      category: 'ReproduÃ§Ã£o',
       icon: BeakerIcon,
       color: 'purple'
     },
     { 
       key: 'gestacoes', 
-      label: 'Gestações', 
-      description: 'Relatório de gestações ativas e finalizadas', 
-      category: 'Reprodução',
+      label: 'GestaÃ§Ãµes', 
+      description: 'RelatÃ³rio de gestaÃ§Ãµes ativas e finalizadas', 
+      category: 'ReproduÃ§Ã£o',
       icon: UserGroupIcon,
       color: 'green'
     },
     { 
       key: 'nascimentos', 
       label: 'Nascimentos', 
-      description: 'Relatório completo de nascimentos', 
-      category: 'Reprodução',
+      description: 'RelatÃ³rio completo de nascimentos', 
+      category: 'ReproduÃ§Ã£o',
       icon: CalendarIcon,
       color: 'yellow'
     },
     { 
       key: 'previsoes_parto', 
-      label: 'Previsões de Parto (FIV vs IA)', 
-      description: 'Resumo de receptoras e fêmeas para parir - FIV e IA', 
-      category: 'Reprodução',
+      label: 'PrevisÃµes de Parto (FIV vs IA)', 
+      description: 'Resumo de receptoras e fÃªmeas para parir - FIV e IA', 
+      category: 'ReproduÃ§Ã£o',
       icon: HeartIcon,
       color: 'emerald'
     },
@@ -184,7 +184,7 @@ export default function RelatoriosEnvio() {
       key: 'receptoras_chegaram', 
       label: 'Receptoras que Chegaram', 
       description: 'Receptoras recebidas', 
-      category: 'Reprodução',
+      category: 'ReproduÃ§Ã£o',
       icon: TruckIcon,
       color: 'indigo'
     },
@@ -192,49 +192,49 @@ export default function RelatoriosEnvio() {
       key: 'receptoras_faltam_parir', 
       label: 'Receptoras que Faltam Parir', 
       description: 'Receptoras aguardando parto', 
-      category: 'Reprodução',
+      category: 'ReproduÃ§Ã£o',
       icon: ClipboardDocumentListIcon,
       color: 'orange'
     },
     { 
       key: 'receptoras_faltam_diagnostico', 
-      label: 'Receptoras que Faltam Diagnóstico', 
-      description: 'Receptoras aguardando diagnóstico de gestação', 
-      category: 'Reprodução',
+      label: 'Receptoras que Faltam DiagnÃ³stico', 
+      description: 'Receptoras aguardando diagnÃ³stico de gestaÃ§Ã£o', 
+      category: 'ReproduÃ§Ã£o',
       icon: ClipboardDocumentListIcon,
       color: 'amber'
     },
     { 
       key: 'exames_andrologicos', 
-      label: 'Exames Andrológicos', 
-      description: 'Relatório de exames andrológicos realizados', 
-      category: 'Reprodução',
+      label: 'Exames AndrolÃ³gicos', 
+      description: 'RelatÃ³rio de exames androlÃ³gicos realizados', 
+      category: 'ReproduÃ§Ã£o',
       icon: BeakerIcon,
       color: 'cyan'
     },
     { 
       key: 'coleta_fiv', 
       label: 'Coleta FIV', 
-      description: 'Relatório de coletas de oócitos (FIV)', 
-      category: 'Reprodução',
+      description: 'RelatÃ³rio de coletas de oÃ³citos (FIV)', 
+      category: 'ReproduÃ§Ã£o',
       icon: BeakerIcon,
       color: 'violet'
     },
     { 
       key: 'calendario_reprodutivo', 
-      label: 'Calendário Reprodutivo', 
+      label: 'CalendÃ¡rio Reprodutivo', 
       description: 'Agenda de eventos reprodutivos (IA, TE, DG, partos)', 
-      category: 'Reprodução',
+      category: 'ReproduÃ§Ã£o',
       icon: CalendarIcon,
       color: 'rose'
     },
     
-    // Categoria: Localização
+    // Categoria: LocalizaÃ§Ã£o
     { 
       key: 'animais_piquetes', 
       label: 'Animais que Entraram nos Piquetes', 
-      description: 'Relatório de movimentação de animais por piquete', 
-      category: 'Localização',
+      description: 'RelatÃ³rio de movimentaÃ§Ã£o de animais por piquete', 
+      category: 'LocalizaÃ§Ã£o',
       icon: MapPinIcon,
       color: 'emerald'
     },
@@ -243,15 +243,15 @@ export default function RelatoriosEnvio() {
     { 
       key: 'mortes', 
       label: 'Mortes', 
-      description: 'Relatório de mortes', 
+      description: 'RelatÃ³rio de mortes', 
       category: 'Sanidade',
       icon: XCircleIcon,
       color: 'red'
     },
     { 
       key: 'vacinacoes', 
-      label: 'Vacinações e Tratamentos', 
-      description: 'Relatório de vacinações e tratamentos veterinários', 
+      label: 'VacinaÃ§Ãµes e Tratamentos', 
+      description: 'RelatÃ³rio de vacinaÃ§Ãµes e tratamentos veterinÃ¡rios', 
       category: 'Sanidade',
       icon: BeakerIcon,
       color: 'teal'
@@ -260,8 +260,8 @@ export default function RelatoriosEnvio() {
     // Categoria: Financeiro
     { 
       key: 'movimentacoes_financeiras', 
-      label: 'Movimentações Financeiras', 
-      description: 'Relatório de receitas, despesas e saldo', 
+      label: 'MovimentaÃ§Ãµes Financeiras', 
+      description: 'RelatÃ³rio de receitas, despesas e saldo', 
       category: 'Financeiro',
       icon: BanknotesIcon,
       color: 'green'
@@ -270,27 +270,27 @@ export default function RelatoriosEnvio() {
     // Categoria: Estoque
     { 
       key: 'estoque_semen', 
-      label: 'Estoque de Sêmen', 
-      description: 'Relatório de estoque e movimentação de sêmen', 
+      label: 'Estoque de SÃªmen', 
+      description: 'RelatÃ³rio de estoque e movimentaÃ§Ã£o de sÃªmen', 
       category: 'Estoque',
       icon: CubeIcon,
       color: 'blue'
     },
     
-    // Categoria: Gestão
+    // Categoria: GestÃ£o
     { 
       key: 'boletim_gado', 
       label: 'Boletim de Gado', 
-      description: 'Relatório completo do rebanho por raça e idade', 
-      category: 'Gestão',
+      description: 'RelatÃ³rio completo do rebanho por raÃ§a e idade', 
+      category: 'GestÃ£o',
       icon: ChartBarIcon,
       color: 'indigo'
     },
     { 
       key: 'genealogia', 
       label: 'Genealogia', 
-      description: 'Relatório de árvore genealógica dos animais', 
-      category: 'Gestão',
+      description: 'RelatÃ³rio de Ã¡rvore genealÃ³gica dos animais', 
+      category: 'GestÃ£o',
       icon: UserGroupIcon,
       color: 'purple'
     },
@@ -299,7 +299,7 @@ export default function RelatoriosEnvio() {
     { 
       key: 'pesagens', 
       label: 'Pesagens', 
-      description: 'Relatório completo de pesagens dos animais', 
+      description: 'RelatÃ³rio completo de pesagens dos animais', 
       category: 'Manejo',
       icon: ScaleIcon,
       color: 'amber'
@@ -307,7 +307,7 @@ export default function RelatoriosEnvio() {
     { 
       key: 'resumo_pesagens', 
       label: 'Resumo de Pesagens', 
-      description: 'Resumo detalhado com estatísticas por sexo, local e período', 
+      description: 'Resumo detalhado com estatÃ­sticas por sexo, local e perÃ­odo', 
       category: 'Manejo',
       icon: ChartPieIcon,
       color: 'orange'
@@ -348,16 +348,16 @@ export default function RelatoriosEnvio() {
     },
     { 
       key: 'resumo_por_raca', 
-      label: 'Resumo por Raça', 
-      description: 'Nascimentos agrupados por raça', 
+      label: 'Resumo por RaÃ§a', 
+      description: 'Nascimentos agrupados por raÃ§a', 
       category: 'Resumos',
       icon: ChartPieIcon,
       color: 'purple'
     },
     { 
       key: 'resumo_por_mae', 
-      label: 'Resumo por Mãe', 
-      description: 'Nascimentos agrupados por mãe (TOP 5)', 
+      label: 'Resumo por MÃ£e', 
+      description: 'Nascimentos agrupados por mÃ£e (TOP 5)', 
       category: 'Resumos',
       icon: UserGroupIcon,
       color: 'pink'
@@ -365,15 +365,15 @@ export default function RelatoriosEnvio() {
     { 
       key: 'resumo_mortes', 
       label: 'Resumo de Mortes', 
-      description: 'Resumo de óbitos no período', 
+      description: 'Resumo de Ã³bitos no perÃ­odo', 
       category: 'Resumos',
       icon: XCircleIcon,
       color: 'red'
     },
     { 
       key: 'resumo_femeas_ia', 
-      label: 'Resumo de Fêmeas IA', 
-      description: 'Estatísticas de inseminação artificial', 
+      label: 'Resumo de FÃªmeas IA', 
+      description: 'EstatÃ­sticas de inseminaÃ§Ã£o artificial', 
       category: 'Resumos',
       icon: HeartIcon,
       color: 'pink'
@@ -381,15 +381,15 @@ export default function RelatoriosEnvio() {
     { 
       key: 'resumo_te', 
       label: 'Resumo de TE', 
-      description: 'Resumo de transferências de embriões', 
+      description: 'Resumo de transferÃªncias de embriÃµes', 
       category: 'Resumos',
       icon: BeakerIcon,
       color: 'purple'
     },
     { 
       key: 'resumo_gestacoes', 
-      label: 'Resumo de Gestações', 
-      description: 'Estatísticas de gestações', 
+      label: 'Resumo de GestaÃ§Ãµes', 
+      description: 'EstatÃ­sticas de gestaÃ§Ãµes', 
       category: 'Resumos',
       icon: UserGroupIcon,
       color: 'green'
@@ -404,24 +404,24 @@ export default function RelatoriosEnvio() {
     },
     { 
       key: 'resumo_estoque_semen', 
-      label: 'Resumo Estoque Sêmen', 
-      description: 'Entradas e saídas de sêmen', 
+      label: 'Resumo Estoque SÃªmen', 
+      description: 'Entradas e saÃ­das de sÃªmen', 
       category: 'Resumos',
       icon: CubeIcon,
       color: 'blue'
     },
     { 
       key: 'resumo_vacinacoes', 
-      label: 'Resumo de Vacinações', 
-      description: 'Vacinações e tratamentos realizados', 
+      label: 'Resumo de VacinaÃ§Ãµes', 
+      description: 'VacinaÃ§Ãµes e tratamentos realizados', 
       category: 'Resumos',
       icon: BeakerIcon,
       color: 'teal'
     },
     { 
       key: 'resumo_exames_andrologicos', 
-      label: 'Resumo Exames Andrológicos', 
-      description: 'Estatísticas de exames andrológicos', 
+      label: 'Resumo Exames AndrolÃ³gicos', 
+      description: 'EstatÃ­sticas de exames androlÃ³gicos', 
       category: 'Resumos',
       icon: BeakerIcon,
       color: 'cyan'
@@ -429,7 +429,7 @@ export default function RelatoriosEnvio() {
     { 
       key: 'agenda_atividades', 
       label: 'Agenda de Atividades', 
-      description: 'Brucelose (fêmeas 3-8 meses) e DGT (330-640 dias) em Excel', 
+      description: 'Brucelose (fÃªmeas 3-8 meses) e DGT (330-640 dias) em Excel', 
       category: 'Resumos',
       icon: CalendarIcon,
       color: 'amber'
@@ -460,7 +460,7 @@ export default function RelatoriosEnvio() {
         setDestinatarios([])
       }
     } catch (error) {
-      console.error('Erro ao carregar destinatários:', error)
+      console.error('Erro ao carregar destinatÃ¡rios:', error)
       setDestinatarios([])
     }
   }
@@ -484,26 +484,26 @@ export default function RelatoriosEnvio() {
     }
   }
 
-  // Função para validar formulário
+  // FunÃ§Ã£o para validar formulÃ¡rio
   const validateForm = () => {
     const errors = {}
     
     if (!formData.nome.trim()) {
-      errors.nome = 'Nome é obrigatório'
+      errors.nome = 'Nome Ã© obrigatÃ³rio'
     }
     
     if (!formData.email.trim()) {
-      errors.email = 'Email é obrigatório'
+      errors.email = 'Email Ã© obrigatÃ³rio'
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = 'Email inválido'
+      errors.email = 'Email invÃ¡lido'
     }
     
     if (!formData.cargo.trim()) {
-      errors.cargo = 'Cargo é obrigatório'
+      errors.cargo = 'Cargo Ã© obrigatÃ³rio'
     }
     
     if (formData.recebe_whatsapp && formData.whatsapp && !/^[\d\s\(\)\-\+]+$/.test(formData.whatsapp.replace(/\s/g, ''))) {
-      errors.whatsapp = 'WhatsApp deve conter apenas números e caracteres de formatação'
+      errors.whatsapp = 'WhatsApp deve conter apenas nÃºmeros e caracteres de formataÃ§Ã£o'
     }
     
     if (formData.agendamento_ativo && (!formData.intervalo_dias || formData.intervalo_dias < 1)) {
@@ -537,7 +537,7 @@ export default function RelatoriosEnvio() {
     if (c.includes('contador') || c.includes('finance')) {
       return ['nf_entrada_saida', 'movimentacoes_financeiras']
     }
-    if (c.includes('gerente') || c.includes('pecuária') || c.includes('pecuaria')) {
+    if (c.includes('gerente') || c.includes('pecuÃ¡ria') || c.includes('pecuaria')) {
       return ['calendario_reprodutivo', 'coleta_fiv', 'gestacoes', 'exames_andrologicos']
     }
     if (c.includes('adm') || c.includes('administr')) {
@@ -564,7 +564,7 @@ export default function RelatoriosEnvio() {
     e.preventDefault()
     
     if (!validateForm()) {
-      showToast('Por favor, corrija os erros no formulário', 'error')
+      showToast('Por favor, corrija os erros no formulÃ¡rio', 'error')
       return
     }
     
@@ -596,21 +596,21 @@ export default function RelatoriosEnvio() {
           intervalo_dias: null,
           ultimos_relatorios: []
         })
-        showToast(formData.id ? 'Destinatário atualizado com sucesso!' : 'Destinatário cadastrado com sucesso!', 'success')
+        showToast(formData.id ? 'DestinatÃ¡rio atualizado com sucesso!' : 'DestinatÃ¡rio cadastrado com sucesso!', 'success')
       } else {
         const error = await res.json()
-        showToast(`Erro: ${error.message || 'Erro ao salvar destinatário'}`, 'error')
+        showToast(`Erro: ${error.message || 'Erro ao salvar destinatÃ¡rio'}`, 'error')
       }
     } catch (error) {
-      console.error('Erro ao salvar destinatário:', error)
-      alert('Erro ao salvar destinatário')
+      console.error('Erro ao salvar destinatÃ¡rio:', error)
+      alert('Erro ao salvar destinatÃ¡rio')
     } finally {
       setLoading(false)
     }
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('Tem certeza que deseja excluir este destinatário?')) return
+    if (!confirm('Tem certeza que deseja excluir este destinatÃ¡rio?')) return
 
     try {
       const res = await fetch(`/api/relatorios-envio/destinatarios/${id}`, {
@@ -619,13 +619,13 @@ export default function RelatoriosEnvio() {
 
       if (res.ok) {
         await loadDestinatarios()
-        showToast('Destinatário excluído com sucesso!', 'success')
+        showToast('DestinatÃ¡rio excluÃ­do com sucesso!', 'success')
       } else {
-        showToast('Erro ao excluir destinatário', 'error')
+        showToast('Erro ao excluir destinatÃ¡rio', 'error')
       }
     } catch (error) {
-      console.error('Erro ao excluir destinatário:', error)
-      showToast('Erro ao excluir destinatário', 'error')
+      console.error('Erro ao excluir destinatÃ¡rio:', error)
+      showToast('Erro ao excluir destinatÃ¡rio', 'error')
     }
   }
 
@@ -642,7 +642,7 @@ export default function RelatoriosEnvio() {
 
   const handleDuplicate = (destinatario) => {
     setFormData({
-      nome: `${destinatario.nome} (Cópia)`,
+      nome: `${destinatario.nome} (CÃ³pia)`,
       email: '',
       whatsapp: destinatario.whatsapp || '',
       cargo: destinatario.cargo,
@@ -653,7 +653,7 @@ export default function RelatoriosEnvio() {
       ultimos_relatorios: []
     })
     setShowForm(true)
-    showToast('Destinatário duplicado. Complete o email e salve.', 'success')
+    showToast('DestinatÃ¡rio duplicado. Complete o email e salve.', 'success')
   }
 
   const calcularEstatisticas = () => {
@@ -686,11 +686,11 @@ export default function RelatoriosEnvio() {
   const validateDados = async () => {
     const selected = Object.keys(selectedReports).filter(key => selectedReports[key])
     if (selected.length === 0) {
-      showToast('⚠️ Selecione pelo menos um relatório para validar', 'error')
+      showToast('âÅ¡ ï¸� Selecione pelo menos um relatÃ³rio para validar', 'error')
       return
     }
     if (new Date(period.startDate) > new Date(period.endDate)) {
-      showToast('⚠️ A data inicial não pode ser maior que a data final', 'error')
+      showToast('âÅ¡ ï¸� A data inicial nÃ£o pode ser maior que a data final', 'error')
       return
     }
     setValidating(true)
@@ -709,7 +709,7 @@ export default function RelatoriosEnvio() {
         const entradasValor = entradas.reduce((s, x) => s + (parseFloat(x.valor_total || x.valor || 0) || 0), 0)
         const saidasValor = saidas.reduce((s, x) => s + (parseFloat(x.valor_total || x.valor || 0) || 0), 0)
         if (selected.includes('nf_entrada_saida')) {
-          results.push({ key: 'nf_entrada_saida', label: byKey('nf_entrada_saida')?.label || 'NF Entrada/Saída', info: { entradas: entradas.length, saidas: saidas.length, entradasValor, saidasValor } })
+          results.push({ key: 'nf_entrada_saida', label: byKey('nf_entrada_saida')?.label || 'NF Entrada/SaÃ­da', info: { entradas: entradas.length, saidas: saidas.length, entradasValor, saidasValor } })
         }
         if (selected.includes('receptoras_chegaram')) {
           const recs = entradas.reduce((s, x) => s + (parseInt(x.quantidade_animais || x.qtd_animais || 0) || 0), 0)
@@ -731,18 +731,18 @@ export default function RelatoriosEnvio() {
         }
         if (selected.includes('resumo_por_sexo')) {
           const m = births.filter(b => (b.sexo || '').toLowerCase() === 'macho').length
-          const f = births.filter(b => (b.sexo || '').toLowerCase() === 'fêmea' || (b.sexo || '').toLowerCase() === 'femea').length
+          const f = births.filter(b => (b.sexo || '').toLowerCase() === 'fÃªmea' || (b.sexo || '').toLowerCase() === 'femea').length
           results.push({ key: 'resumo_por_sexo', label: byKey('resumo_por_sexo')?.label || 'Resumo por Sexo', info: { machos: m, femeas: f } })
         }
         if (selected.includes('resumo_por_raca')) {
           const map = {}
-          births.forEach(b => { const raca = b.raca || 'Sem raça'; map[raca] = (map[raca] || 0) + 1 })
-          results.push({ key: 'resumo_por_raca', label: byKey('resumo_por_raca')?.label || 'Resumo por Raça', info: map })
+          births.forEach(b => { const raca = b.raca || 'Sem raÃ§a'; map[raca] = (map[raca] || 0) + 1 })
+          results.push({ key: 'resumo_por_raca', label: byKey('resumo_por_raca')?.label || 'Resumo por RaÃ§a', info: map })
         }
         if (selected.includes('resumo_por_mae')) {
           const map = {}
-          births.forEach(b => { const mae = b.mae || b.mae_id || 'Sem mãe'; map[mae] = (map[mae] || 0) + 1 })
-          results.push({ key: 'resumo_por_mae', label: byKey('resumo_por_mae')?.label || 'Resumo por Mãe', info: map })
+          births.forEach(b => { const mae = b.mae || b.mae_id || 'Sem mÃ£e'; map[mae] = (map[mae] || 0) + 1 })
+          results.push({ key: 'resumo_por_mae', label: byKey('resumo_por_mae')?.label || 'Resumo por MÃ£e', info: map })
         }
         if (selected.includes('resumo_nascimentos')) {
           results.push({ key: 'resumo_nascimentos', label: byKey('resumo_nascimentos')?.label || 'Resumo de Nascimentos', info: { total: births.length } })
@@ -760,7 +760,7 @@ export default function RelatoriosEnvio() {
         const rows = Array.isArray(d) ? d : d.data || []
         const femeas = rows.filter(x => {
           const sexo = (x.sexo || x.animal_sexo || '').toLowerCase()
-          return sexo === 'fêmea' || sexo === 'femea'
+          return sexo === 'fÃªmea' || sexo === 'femea'
         })
         const prenhas = femeas.filter(x => (x.status_gestacao || '').toLowerCase() === 'prenha').length
         const vazias = femeas.filter(x => (x.status_gestacao || '').toLowerCase() === 'vazia').length
@@ -768,19 +768,19 @@ export default function RelatoriosEnvio() {
           const s = (x.status_gestacao || '').toLowerCase()
           return s === '' || s === 'aguardando dg' || s === 'pendente'
         }).length
-        results.push({ key: 'femeas_ia', label: byKey('femeas_ia')?.label || 'Fêmeas IA', info: { total: femeas.length, prenhas, vazias, pendentes } })
+        results.push({ key: 'femeas_ia', label: byKey('femeas_ia')?.label || 'FÃªmeas IA', info: { total: femeas.length, prenhas, vazias, pendentes } })
       }
       if (selected.includes('transferencias_embrioes')) {
         const r = await fetch(`/api/transferencias-embrioes?startDate=${startDate}&endDate=${endDate}`)
         const d = await r.json()
         const rows = Array.isArray(d) ? d : d.data || []
-        results.push({ key: 'transferencias_embrioes', label: byKey('transferencias_embrioes')?.label || 'Transferências de Embriões', info: { total: rows.length } })
+        results.push({ key: 'transferencias_embrioes', label: byKey('transferencias_embrioes')?.label || 'TransferÃªncias de EmbriÃµes', info: { total: rows.length } })
       }
       if (selected.includes('gestacoes')) {
         const r = await fetch(`/api/gestacoes?startDate=${startDate}&endDate=${endDate}`)
         const d = await r.json()
         const rows = Array.isArray(d) ? d : d.data || []
-        results.push({ key: 'gestacoes', label: byKey('gestacoes')?.label || 'Gestações', info: { total: rows.length } })
+        results.push({ key: 'gestacoes', label: byKey('gestacoes')?.label || 'GestaÃ§Ãµes', info: { total: rows.length } })
       }
       if (selected.includes('exames_andrologicos') || selected.includes('resumo_exames_andrologicos')) {
         const r = await fetch(`/api/reproducao/exames-andrologicos`)
@@ -794,32 +794,32 @@ export default function RelatoriosEnvio() {
         })
         const aptos = periodo.filter(x => (x.resultado || '').toLowerCase() === 'apto').length
         const inaptos = periodo.filter(x => (x.resultado || '').toLowerCase() === 'inapto').length
-        results.push({ key: 'exames_andrologicos', label: byKey('exames_andrologicos')?.label || 'Exames Andrológicos', info: { total: periodo.length, aptos, inaptos } })
+        results.push({ key: 'exames_andrologicos', label: byKey('exames_andrologicos')?.label || 'Exames AndrolÃ³gicos', info: { total: periodo.length, aptos, inaptos } })
       }
       if (selected.includes('estoque_semen') || selected.includes('resumo_estoque_semen')) {
         const r = await fetch(`/api/estoque-semen`)
         const d = await r.json()
         const rows = Array.isArray(d) ? d : d.data || []
-        results.push({ key: 'estoque_semen', label: byKey('estoque_semen')?.label || 'Estoque de Sêmen', info: { total: rows.length } })
+        results.push({ key: 'estoque_semen', label: byKey('estoque_semen')?.label || 'Estoque de SÃªmen', info: { total: rows.length } })
       }
       if (selected.includes('pesagens') || selected.includes('resumo_pesagens')) {
         const r = await fetch(`/api/pesagens`)
         const d = await r.json()
         const pesagens = Array.isArray(d) ? d : d.pesagens || d.data || []
         
-        // Filtrar por período
+        // Filtrar por perÃ­odo
         const pesagensPeriodo = pesagens.filter(p => {
           const dataPesagem = p.data || ''
           return dataPesagem >= startDate && dataPesagem <= endDate
         })
         
-        // Estatísticas
+        // EstatÃ­sticas
         const machos = pesagensPeriodo.filter(p => p.animal_sexo === 'Macho')
-        const femeas = pesagensPeriodo.filter(p => p.animal_sexo === 'Fêmea')
+        const femeas = pesagensPeriodo.filter(p => p.animal_sexo === 'FÃªmea')
         const pesos = pesagensPeriodo.map(p => parseFloat(p.peso)).filter(n => !isNaN(n))
         const pesoMedio = pesos.length > 0 ? (pesos.reduce((a, b) => a + b, 0) / pesos.length).toFixed(1) : 0
         
-        // Agrupar por local (última pesagem por animal + normalizar PIQUETE X → PROJETO X)
+        // Agrupar por local (Ãºltima pesagem por animal + normalizar PIQUETE X ââ€ â€™ PROJETO X)
         const porAnimalUltimaVal = {}
         pesagensPeriodo.forEach(p => {
           const aid = p.animal_id ?? p.animal ?? `f${(p.peso || 0)}-${p.data || ''}`
@@ -831,12 +831,12 @@ export default function RelatoriosEnvio() {
         })
         const porLocal = {}
         Object.values(porAnimalUltimaVal).forEach(p => {
-          let local = (p.observacoes || '').match(/(PIQUETE\s*\d+|PROJETO\s*[\dA-Za-z\-]+|CONFINA\w*)/i)?.[0] || 'Não informado'
+          let local = (p.observacoes || '').match(/(PIQUETE\s*\d+|PROJETO\s*[\dA-Za-z\-]+|CONFINA\w*)/i)?.[0] || 'NÃ£o informado'
           if (/^PIQUETE\s+\d+$/i.test(local)) local = local.replace(/^PIQUETE\s+/i, 'PROJETO ')
           if (!porLocal[local]) porLocal[local] = { qtd: 0, machos: 0, femeas: 0 }
           porLocal[local].qtd++
           if (p.animal_sexo === 'Macho') porLocal[local].machos++
-          if (p.animal_sexo === 'Fêmea') porLocal[local].femeas++
+          if (p.animal_sexo === 'FÃªmea') porLocal[local].femeas++
         })
         
         if (selected.includes('pesagens')) {
@@ -868,7 +868,7 @@ export default function RelatoriosEnvio() {
         }
       }
       setValidationResults(results)
-      showToast('✅ Validação concluída', 'success')
+      showToast('âÅ“â€¦ ValidaÃ§Ã£o concluÃ­da', 'success')
     } catch (e) {
       showToast('Erro ao validar dados', 'error')
     } finally {
@@ -879,22 +879,22 @@ export default function RelatoriosEnvio() {
   const handleSend = async () => {
     const selected = Object.keys(selectedReports).filter(key => selectedReports[key])
     if (selected.length === 0) {
-      showToast('⚠️ Selecione pelo menos um relatório para enviar', 'error')
+      showToast('âÅ¡ ï¸� Selecione pelo menos um relatÃ³rio para enviar', 'error')
       return
     }
 
     if (selectedDestinatarios.length === 0) {
-      showToast('⚠️ Selecione pelo menos um destinatário marcando o checkbox ao lado do nome', 'error')
+      showToast('âÅ¡ ï¸� Selecione pelo menos um destinatÃ¡rio marcando o checkbox ao lado do nome', 'error')
       return
     }
     
-    // Validar período
+    // Validar perÃ­odo
     if (new Date(period.startDate) > new Date(period.endDate)) {
-      showToast('⚠️ A data inicial não pode ser maior que a data final', 'error')
+      showToast('âÅ¡ ï¸� A data inicial nÃ£o pode ser maior que a data final', 'error')
       return
     }
     
-    // Mostrar modal de confirmação
+    // Mostrar modal de confirmaÃ§Ã£o
     setShowConfirmModal(true)
   }
 
@@ -902,27 +902,27 @@ export default function RelatoriosEnvio() {
     setShowConfirmModal(false)
     const selected = Object.keys(selectedReports).filter(key => selectedReports[key])
     
-    // Verificar se os destinatários selecionados estão configurados para receber
+    // Verificar se os destinatÃ¡rios selecionados estÃ£o configurados para receber
     const destinatariosSelecionados = destinatarios.filter(d => selectedDestinatarios.includes(d.id))
     const temEmail = destinatariosSelecionados.some(d => d.recebe_email && d.email)
     const temWhatsApp = destinatariosSelecionados.some(d => d.recebe_whatsapp && d.whatsapp)
     
     if (!temEmail && !temWhatsApp) {
-      showToast('⚠️ Os destinatários selecionados não estão configurados para receber email ou WhatsApp', 'error')
+      showToast('âÅ¡ ï¸� Os destinatÃ¡rios selecionados nÃ£o estÃ£o configurados para receber email ou WhatsApp', 'error')
       return
     }
     
     if (temEmail && !destinatariosSelecionados.every(d => !d.recebe_email || d.email)) {
-      showToast('⚠️ Alguns destinatários estão marcados para receber email mas não têm email cadastrado', 'error')
+      showToast('âÅ¡ ï¸� Alguns destinatÃ¡rios estÃ£o marcados para receber email mas nÃ£o tÃªm email cadastrado', 'error')
       return
     }
     
     if (temWhatsApp && !destinatariosSelecionados.every(d => !d.recebe_whatsapp || d.whatsapp)) {
-      showToast('⚠️ Alguns destinatários estão marcados para receber WhatsApp mas não têm WhatsApp cadastrado', 'error')
+      showToast('âÅ¡ ï¸� Alguns destinatÃ¡rios estÃ£o marcados para receber WhatsApp mas nÃ£o tÃªm WhatsApp cadastrado', 'error')
       return
     }
     
-    console.log('📤 Iniciando envio:', { relatorios: selected, destinatarios: selectedDestinatarios.length })
+    console.log('ðÅ¸â€œ¤ Iniciando envio:', { relatorios: selected, destinatarios: selectedDestinatarios.length })
 
     setSending(true)
     setSendResults(null)
@@ -957,30 +957,30 @@ export default function RelatoriosEnvio() {
         const stats = data.stats || {}
         const results = data.results || []
         
-        let message = data.message || 'Envio concluído com sucesso!'
+        let message = data.message || 'Envio concluÃ­do com sucesso!'
         
         // Adicionar detalhes se houver resultados
         if (results.length > 0) {
           const emailsEnviados = results.filter(r => r.email === 'enviado').length
-          const whatsappsEnviados = results.filter(r => r.whatsapp === 'enviado' || r.whatsapp === 'enviado (sem gráfico)').length
+          const whatsappsEnviados = results.filter(r => r.whatsapp === 'enviado' || r.whatsapp === 'enviado (sem grÃ¡fico)').length
           const emailsErro = results.filter(r => r.email && r.email.startsWith('erro')).length
           const whatsappsErro = results.filter(r => r.whatsapp && r.whatsapp.startsWith('erro')).length
           
           if (emailsEnviados === 0 && whatsappsEnviados === 0) {
-            message = '⚠️ Nenhum relatório foi enviado!\n\n'
-            message += 'Possíveis causas:\n'
-            message += '• SMTP não configurado (adicione SMTP_HOST, SMTP_USER, SMTP_PASS no arquivo .env)\n'
-            message += '• WhatsApp não configurado (configure Evolution API ou Twilio)\n'
-            message += '• Destinatários não estão marcados para receber email/WhatsApp\n'
-            message += '• Email/WhatsApp não informados nos destinatários\n'
-            message += '• Nenhum relatório completo foi gerado\n\n'
-            message += 'Verifique os detalhes abaixo para cada destinatário.'
+            message = 'âÅ¡ ï¸� Nenhum relatÃ³rio foi enviado!\n\n'
+            message += 'PossÃ­veis causas:\n'
+            message += 'ââ‚¬¢ SMTP nÃ£o configurado (adicione SMTP_HOST, SMTP_USER, SMTP_PASS no arquivo .env)\n'
+            message += 'ââ‚¬¢ WhatsApp nÃ£o configurado (configure Evolution API ou Twilio)\n'
+            message += 'ââ‚¬¢ DestinatÃ¡rios nÃ£o estÃ£o marcados para receber email/WhatsApp\n'
+            message += 'ââ‚¬¢ Email/WhatsApp nÃ£o informados nos destinatÃ¡rios\n'
+            message += 'ââ‚¬¢ Nenhum relatÃ³rio completo foi gerado\n\n'
+            message += 'Verifique os detalhes abaixo para cada destinatÃ¡rio.'
           } else {
-            message += `\n\n📊 Resumo:\n`
-            if (emailsEnviados > 0) message += `✅ ${emailsEnviados} email(s) enviado(s)\n`
-            if (whatsappsEnviados > 0) message += `✅ ${whatsappsEnviados} WhatsApp(s) enviado(s)\n`
-            if (emailsErro > 0) message += `❌ ${emailsErro} erro(s) no envio de email\n`
-            if (whatsappsErro > 0) message += `❌ ${whatsappsErro} erro(s) no envio de WhatsApp\n`
+            message += `\n\nðÅ¸â€œÅ  Resumo:\n`
+            if (emailsEnviados > 0) message += `âÅ“â€¦ ${emailsEnviados} email(s) enviado(s)\n`
+            if (whatsappsEnviados > 0) message += `âÅ“â€¦ ${whatsappsEnviados} WhatsApp(s) enviado(s)\n`
+            if (emailsErro > 0) message += `â�Å’ ${emailsErro} erro(s) no envio de email\n`
+            if (whatsappsErro > 0) message += `â�Å’ ${whatsappsErro} erro(s) no envio de WhatsApp\n`
           }
         }
         
@@ -997,16 +997,16 @@ export default function RelatoriosEnvio() {
           setProgressoEnvio(0)
         }, 1000)
         
-        // Recarregar destinatários para atualizar informações de agendamento
+        // Recarregar destinatÃ¡rios para atualizar informaÃ§Ãµes de agendamento
         await loadDestinatarios()
         
         // Mostrar toast de sucesso
         if (stats.emailsEnviados > 0 || stats.whatsappsEnviados > 0) {
-          showToast(`✅ ${stats.emailsEnviados || 0} email(s) e ${stats.whatsappsEnviados || 0} WhatsApp(s) enviado(s) com sucesso!`, 'success')
+          showToast(`âÅ“â€¦ ${stats.emailsEnviados || 0} email(s) e ${stats.whatsappsEnviados || 0} WhatsApp(s) enviado(s) com sucesso!`, 'success')
         }
         
         // Mostrar modal com o resumo retornado pelo backend
-        console.log('📱 Processando resposta do backend...')
+        console.log('ðÅ¸â€œ± Processando resposta do backend...')
         console.log('   Dados recebidos:', Object.keys(data))
         console.log('   Summary presente:', !!data.summary)
         console.log('   ChartImage presente:', !!data.chartImage)
@@ -1015,62 +1015,62 @@ export default function RelatoriosEnvio() {
         const whatsappEnviado = stats.whatsappsEnviados > 0
         const whatsappErro = stats.whatsappsComErro > 0
         
-        // Sempre tentar exibir o modal se houver resumo ou gráfico
-        const temResumo = data.summary && data.summary !== 'Nenhum resumo disponível para os relatórios selecionados.'
+        // Sempre tentar exibir o modal se houver resumo ou grÃ¡fico
+        const temResumo = data.summary && data.summary !== 'Nenhum resumo disponÃ­vel para os relatÃ³rios selecionados.'
         const temGrafico = !!data.chartImage
         
         if (temResumo || temGrafico) {
-          console.log('📱 Exibindo modal com resumo do WhatsApp')
-          console.log('📝 Resumo:', temResumo ? `${data.summary.length} caracteres` : 'Não disponível')
-          console.log('📊 Gráfico:', temGrafico ? 'Disponível' : 'Não disponível')
+          console.log('ðÅ¸â€œ± Exibindo modal com resumo do WhatsApp')
+          console.log('ðÅ¸â€œ� Resumo:', temResumo ? `${data.summary.length} caracteres` : 'NÃ£o disponÃ­vel')
+          console.log('ðÅ¸â€œÅ  GrÃ¡fico:', temGrafico ? 'DisponÃ­vel' : 'NÃ£o disponÃ­vel')
           
-          let mensagemModal = data.summary || 'Resumo não disponível'
+          let mensagemModal = data.summary || 'Resumo nÃ£o disponÃ­vel'
           
-          // Adicionar mensagem sobre o status do envio automático
+          // Adicionar mensagem sobre o status do envio automÃ¡tico
           if (whatsappEnviado) {
-            mensagemModal = `✅ *WhatsApp enviado automaticamente!*\n\n` +
-                          `O resumo e gráfico foram enviados para seu WhatsApp.\n\n` +
-                          `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+            mensagemModal = `âÅ“â€¦ *WhatsApp enviado automaticamente!*\n\n` +
+                          `O resumo e grÃ¡fico foram enviados para seu WhatsApp.\n\n` +
+                          `ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��\n\n` +
                           mensagemModal
           } else if (whatsappErro) {
-            mensagemModal = `⚠️ *WhatsApp não foi enviado automaticamente*\n\n` +
+            mensagemModal = `âÅ¡ ï¸� *WhatsApp nÃ£o foi enviado automaticamente*\n\n` +
                           `Motivo: ${results.find(r => r.whatsapp && r.whatsapp.startsWith('erro'))?.whatsapp || 'Erro desconhecido'}\n\n` +
-                          `📋 Você pode copiar o resumo abaixo e enviar manualmente:\n\n` +
-                          `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+                          `ðÅ¸â€œâ€¹ VocÃª pode copiar o resumo abaixo e enviar manualmente:\n\n` +
+                          `ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��\n\n` +
                           mensagemModal
           } else {
-            mensagemModal = `📱 *RESUMO GERADO*\n\n` +
-                          `O resumo está disponível abaixo para visualização.\n\n` +
-                          `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+            mensagemModal = `ðÅ¸â€œ± *RESUMO GERADO*\n\n` +
+                          `O resumo estÃ¡ disponÃ­vel abaixo para visualizaÃ§Ã£o.\n\n` +
+                          `ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��\n\n` +
                           mensagemModal
           }
           
-          // Aguardar um pouco para garantir que a UI está atualizada
+          // Aguardar um pouco para garantir que a UI estÃ¡ atualizada
           setTimeout(() => {
             try {
               showWhatsAppModal(mensagemModal, data.chartImage, whatsappEnviado, destinatariosSelecionados)
-              console.log('✅ Modal exibido com sucesso')
+              console.log('âÅ“â€¦ Modal exibido com sucesso')
             } catch (error) {
-              console.error('❌ Erro ao exibir modal:', error)
+              console.error('â�Å’ Erro ao exibir modal:', error)
               // Fallback: mostrar resumo em alerta
-              alert('📱 RESUMO PARA WHATSAPP:\n\n' + mensagemModal.substring(0, 1000) + '\n\n... (resumo completo no console)')
-              console.log('📝 Resumo completo:', mensagemModal)
+              alert('ðÅ¸â€œ± RESUMO PARA WHATSAPP:\n\n' + mensagemModal.substring(0, 1000) + '\n\n... (resumo completo no console)')
+              console.log('ðÅ¸â€œ� Resumo completo:', mensagemModal)
             }
           }, 500)
         } else {
-          console.warn('⚠️ Nenhum resumo ou gráfico retornado pelo backend')
+          console.warn('âÅ¡ ï¸� Nenhum resumo ou grÃ¡fico retornado pelo backend')
           console.warn('   Dados completos:', JSON.stringify(data, null, 2))
           
-          // Mesmo sem resumo, tentar gerar um básico se houver relatórios selecionados
+          // Mesmo sem resumo, tentar gerar um bÃ¡sico se houver relatÃ³rios selecionados
           if (selected.length > 0) {
             const inicio = new Date(period.startDate).toLocaleDateString('pt-BR')
             const fim = new Date(period.endDate).toLocaleDateString('pt-BR')
-            const resumoBasico = `📧 Relatórios completos enviados por email.\n\n` +
-                                `📊 *RESUMO DE RELATÓRIOS*\n\n` +
-                                `Período: ${inicio} a ${fim}\n\n` +
-                                `Relatórios selecionados:\n` +
-                                selected.map(r => `• ${r}`).join('\n') +
-                                `\n_Beef-Sync - Sistema de Gestão Pecuária_`
+            const resumoBasico = `ðÅ¸â€œ§ RelatÃ³rios completos enviados por email.\n\n` +
+                                `ðÅ¸â€œÅ  *RESUMO DE RELATÃâ€œRIOS*\n\n` +
+                                `PerÃ­odo: ${inicio} a ${fim}\n\n` +
+                                `RelatÃ³rios selecionados:\n` +
+                                selected.map(r => `ââ‚¬¢ ${r}`).join('\n') +
+                                `\n_Beef-Sync - Sistema de GestÃ£o PecuÃ¡ria_`
             
             setTimeout(() => {
               showWhatsAppModal(resumoBasico, null, false, destinatariosSelecionados)
@@ -1078,12 +1078,12 @@ export default function RelatoriosEnvio() {
           }
         }
       } else {
-        throw new Error(data.message || 'Erro ao enviar relatórios')
+        throw new Error(data.message || 'Erro ao enviar relatÃ³rios')
       }
     } catch (error) {
       console.error('Erro ao enviar:', error)
       setSendResults({ success: false, message: 'Erro ao enviar: ' + error.message })
-      showToast('Erro ao enviar relatórios: ' + error.message, 'error')
+      showToast('Erro ao enviar relatÃ³rios: ' + error.message, 'error')
       setProgressoEnvio(0)
     } finally {
       setSending(false)
@@ -1095,23 +1095,23 @@ export default function RelatoriosEnvio() {
     const selected = Object.keys(selectedReports).filter(key => selectedReports[key])
     const destinatariosSelecionados = destinatarios.filter(d => selectedDestinatarios.includes(d.id))
     
-    let preview = `📊 *PREVIEW DO ENVIO DE RELATÓRIOS*\n`
-    preview += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`
-    preview += `📅 *Período:*\n`
-    preview += `${new Date(period.startDate).toLocaleDateString('pt-BR')} até ${new Date(period.endDate).toLocaleDateString('pt-BR')}\n\n`
-    preview += `👥 *Destinatários (${destinatariosSelecionados.length}):*\n`
+    let preview = `ðÅ¸â€œÅ  *PREVIEW DO ENVIO DE RELATÃâ€œRIOS*\n`
+    preview += `ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��\n\n`
+    preview += `ðÅ¸â€œâ€¦ *PerÃ­odo:*\n`
+    preview += `${new Date(period.startDate).toLocaleDateString('pt-BR')} atÃ© ${new Date(period.endDate).toLocaleDateString('pt-BR')}\n\n`
+    preview += `ðÅ¸â€˜¥ *DestinatÃ¡rios (${destinatariosSelecionados.length}):*\n`
     destinatariosSelecionados.forEach((d, idx) => {
       preview += `${idx + 1}. ${d.nome}`
-      if (d.recebe_email) preview += ` 📧`
-      if (d.recebe_whatsapp) preview += ` 💬`
+      if (d.recebe_email) preview += ` ðÅ¸â€œ§`
+      if (d.recebe_whatsapp) preview += ` ðÅ¸â€™¬`
       preview += `\n`
     })
-    preview += `\n📋 *Relatórios Selecionados (${selected.length}):*\n`
+    preview += `\nðÅ¸â€œâ€¹ *RelatÃ³rios Selecionados (${selected.length}):*\n`
     tiposRelatorios.filter(r => selectedReports[r.key]).forEach((r, idx) => {
       preview += `${idx + 1}. ${r.label}\n`
     })
-    preview += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`
-    preview += `_Beef-Sync - Sistema de Gestão Pecuária_`
+    preview += `\nââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��\n`
+    preview += `_Beef-Sync - Sistema de GestÃ£o PecuÃ¡ria_`
     
     return preview
   }
@@ -1119,20 +1119,20 @@ export default function RelatoriosEnvio() {
   return (
     <React.Fragment>
       <Head>
-        <title>Envio de Relatórios - Beef-Sync</title>
+        <title>Envio de RelatÃ³rios - Beef-Sync</title>
       </Head>
 
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Envio de Relatórios
+              Envio de RelatÃ³rios
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
-              Configure destinatários e envie relatórios por email e WhatsApp
+              Configure destinatÃ¡rios e envie relatÃ³rios por email e WhatsApp
             </p>
 
-            {/* Estatísticas Rápidas */}
+            {/* EstatÃ­sticas RÃ¡pidas */}
             {estatisticas && estatisticas.totalDestinatarios > 0 && (
               <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
@@ -1156,7 +1156,7 @@ export default function RelatoriosEnvio() {
                 <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
                   <div className="flex items-center gap-2 mb-1">
                     <DocumentTextIcon className="w-5 h-5 text-green-600 dark:text-green-400" />
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Relatórios</span>
+                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">RelatÃ³rios</span>
                   </div>
                   <div className="text-2xl font-bold text-green-700 dark:text-green-300">
                     {estatisticas.relatoriosSelecionados}
@@ -1174,11 +1174,11 @@ export default function RelatoriosEnvio() {
               </div>
             )}
 
-            {/* Seção de Destinatários */}
+            {/* SeÃ§Ã£o de DestinatÃ¡rios */}
             <div className="mb-8">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Destinatários {destinatarios.length > 0 && `(${destinatarios.length})`}
+                  DestinatÃ¡rios {destinatarios.length > 0 && `(${destinatarios.length})`}
                 </h2>
                 <div className="flex gap-2">
                   {destinatarios.length > 0 && (
@@ -1187,13 +1187,13 @@ export default function RelatoriosEnvio() {
                         onClick={() => {
                           if (selectedDestinatarios.length === destinatarios.length) {
                             setSelectedDestinatarios([])
-                            showToast('Todos os destinatários desmarcados', 'success')
+                            showToast('Todos os destinatÃ¡rios desmarcados', 'success')
                             updateSelectedReportsFromRecipients([])
                           } else {
                             const ids = destinatarios.map(d => d.id)
                             setSelectedDestinatarios(ids)
                             updateSelectedReportsFromRecipients(ids)
-                            showToast('Todos os destinatários selecionados', 'success')
+                            showToast('Todos os destinatÃ¡rios selecionados', 'success')
                           }
                         }}
                         className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
@@ -1234,7 +1234,7 @@ export default function RelatoriosEnvio() {
                           onChange={(e) => setAutoUseDefaults(e.target.checked)}
                           className="w-4 h-4"
                         />
-                        Usar preferências dos destinatários
+                        Usar preferÃªncias dos destinatÃ¡rios
                       </label>
                       <button
                         onClick={() => setShowFiltrosAvancados(!showFiltrosAvancados)}
@@ -1267,12 +1267,12 @@ export default function RelatoriosEnvio() {
                     className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
                     <PlusIcon className="w-5 h-5" />
-                    Adicionar Destinatário
+                    Adicionar DestinatÃ¡rio
                   </button>
                 </div>
               </div>
 
-              {/* Filtros Avançados */}
+              {/* Filtros AvanÃ§ados */}
               {showFiltrosAvancados && destinatarios.length > 0 && (
                 <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1287,7 +1287,7 @@ export default function RelatoriosEnvio() {
                       >
                         <option value="todos">Todos</option>
                         <option value="sim">Sim</option>
-                        <option value="nao">Não</option>
+                        <option value="nao">NÃ£o</option>
                       </select>
                     </div>
                     <div>
@@ -1301,7 +1301,7 @@ export default function RelatoriosEnvio() {
                       >
                         <option value="todos">Todos</option>
                         <option value="sim">Sim</option>
-                        <option value="nao">Não</option>
+                        <option value="nao">NÃ£o</option>
                       </select>
                     </div>
                     <div>
@@ -1335,7 +1335,7 @@ export default function RelatoriosEnvio() {
                 </div>
               )}
 
-              {/* Formulário de Destinatário */}
+              {/* FormulÃ¡rio de DestinatÃ¡rio */}
               {showForm && (
                 <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-4">
                   <form onSubmit={handleSubmit} className="space-y-4">
@@ -1445,7 +1445,7 @@ export default function RelatoriosEnvio() {
                     </div>
                     <div className="border-t border-gray-300 dark:border-gray-600 pt-4">
                       <h3 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-2">
-                        Preferências de Relatórios (padrão do destinatário)
+                        PreferÃªncias de RelatÃ³rios (padrÃ£o do destinatÃ¡rio)
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                         {tiposRelatorios.map(t => (
@@ -1469,7 +1469,7 @@ export default function RelatoriosEnvio() {
                         ))}
                       </div>
                       <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
-                        Estas preferências serão usadas como padrão ao selecionar este destinatário e nos envios automáticos.
+                        Estas preferÃªncias serÃ£o usadas como padrÃ£o ao selecionar este destinatÃ¡rio e nos envios automÃ¡ticos.
                       </p>
                     </div>
                     <div className="flex gap-4">
@@ -1493,11 +1493,11 @@ export default function RelatoriosEnvio() {
                       </label>
                     </div>
 
-                    {/* Configuração de Agendamento */}
+                    {/* ConfiguraÃ§Ã£o de Agendamento */}
                     <div className="border-t border-gray-300 dark:border-gray-600 pt-4 mt-4">
                       <h3 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center gap-2">
                         <CalendarIcon className="w-5 h-5" />
-                        Agendamento Automático
+                        Agendamento AutomÃ¡tico
                       </h3>
                       <label className="flex items-center gap-2 mb-3">
                         <input
@@ -1506,13 +1506,13 @@ export default function RelatoriosEnvio() {
                           onChange={(e) => setFormData({ ...formData, agendamento_ativo: e.target.checked })}
                           className="w-4 h-4"
                         />
-                        <span className="text-sm text-gray-700 dark:text-gray-300">Ativar envio automático de relatórios</span>
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Ativar envio automÃ¡tico de relatÃ³rios</span>
                       </label>
                       {formData.agendamento_ativo && (
                         <div className="ml-6 space-y-3">
                           <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                              Enviar relatórios a cada quantos dias?
+                              Enviar relatÃ³rios a cada quantos dias?
                             </label>
                             <input
                               type="number"
@@ -1537,14 +1537,14 @@ export default function RelatoriosEnvio() {
                               <p className="text-xs text-red-600 dark:text-red-400 mt-1">{formErrors.intervalo_dias}</p>
                             )}
                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                              O sistema enviará automaticamente os mesmos relatórios do último envio
+                              O sistema enviarÃ¡ automaticamente os mesmos relatÃ³rios do Ãºltimo envio
                             </p>
                           </div>
                           {formData.ultimo_envio && (
                             <div className="text-sm text-gray-600 dark:text-gray-400">
-                              <p>Último envio: {new Date(formData.ultimo_envio).toLocaleDateString('pt-BR')}</p>
+                              <p>ÃÅ¡ltimo envio: {new Date(formData.ultimo_envio).toLocaleDateString('pt-BR')}</p>
                               {formData.proximo_envio && (
-                                <p>Próximo envio: {new Date(formData.proximo_envio).toLocaleDateString('pt-BR')}</p>
+                                <p>PrÃ³ximo envio: {new Date(formData.proximo_envio).toLocaleDateString('pt-BR')}</p>
                               )}
                             </div>
                           )}
@@ -1584,14 +1584,14 @@ export default function RelatoriosEnvio() {
                 </div>
               )}
 
-              {/* Busca de Destinatários */}
+              {/* Busca de DestinatÃ¡rios */}
               {destinatarios.length > 0 && (
                 <div className="mb-4">
                   <div className="relative">
                     <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type="text"
-                      placeholder="Buscar destinatários por nome, email ou cargo..."
+                      placeholder="Buscar destinatÃ¡rios por nome, email ou cargo..."
                       value={searchDestinatario}
                       onChange={(e) => setSearchDestinatario(e.target.value)}
                       className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -1622,17 +1622,17 @@ export default function RelatoriosEnvio() {
                     return true
                   }).length === 0 && (
                     <div className="mt-2 text-sm text-gray-500 dark:text-gray-400 text-center py-2">
-                      Nenhum destinatário encontrado com os filtros aplicados
+                      Nenhum destinatÃ¡rio encontrado com os filtros aplicados
                     </div>
                   )}
                 </div>
               )}
 
-              {/* Lista de Destinatários */}
+              {/* Lista de DestinatÃ¡rios */}
               {destinatarios.length === 0 && (
                 <div className="text-center py-8 text-gray-500 dark:text-gray-400 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
-                  <p className="font-semibold mb-2">⚠️ Nenhum destinatário cadastrado</p>
-                  <p className="text-sm">Clique em "Adicionar Destinatário" para cadastrar destinatários que receberão os relatórios.</p>
+                  <p className="font-semibold mb-2">âÅ¡ ï¸� Nenhum destinatÃ¡rio cadastrado</p>
+                  <p className="text-sm">Clique em "Adicionar DestinatÃ¡rio" para cadastrar destinatÃ¡rios que receberÃ£o os relatÃ³rios.</p>
                 </div>
               )}
               {viewMode === 'compact' ? (
@@ -1685,25 +1685,25 @@ export default function RelatoriosEnvio() {
                               {dest.nome}
                             </div>
                             <div className="text-xs text-gray-600 dark:text-gray-400">
-                              {dest.email} • {dest.cargo}
+                              {dest.email} ââ‚¬¢ {dest.cargo}
                             </div>
                             <div className="flex gap-2 mt-1 flex-wrap">
                               {dest.recebe_email ? (
                                 <span className="text-[11px] bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-0.5 rounded">
-                                  📧 Email {dest.email ? '✅' : '❌'}
+                                  ðÅ¸â€œ§ Email {dest.email ? 'âÅ“â€¦' : 'â�Å’'}
                                 </span>
                               ) : (
                                 <span className="text-[11px] bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded">
-                                  📧 Email desabilitado
+                                  ðÅ¸â€œ§ Email desabilitado
                                 </span>
                               )}
                               {dest.recebe_whatsapp ? (
                                 <span className="text-[11px] bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-0.5 rounded">
-                                  💬 WhatsApp {dest.whatsapp ? '✅' : '❌'}
+                                  ðÅ¸â€™¬ WhatsApp {dest.whatsapp ? 'âÅ“â€¦' : 'â�Å’'}
                                 </span>
                               ) : (
                                 <span className="text-[11px] bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded">
-                                  💬 WhatsApp desabilitado
+                                  ðÅ¸â€™¬ WhatsApp desabilitado
                                 </span>
                               )}
                               {dest.agendamento_ativo && (
@@ -1712,7 +1712,7 @@ export default function RelatoriosEnvio() {
                                   Agendado: {dest.intervalo_dias} dias
                                   {dest.proximo_envio && (
                                     <span className="text-[11px]">
-                                      (Próximo: {new Date(dest.proximo_envio).toLocaleDateString('pt-BR')})
+                                      (PrÃ³ximo: {new Date(dest.proximo_envio).toLocaleDateString('pt-BR')})
                                     </span>
                                   )}
                                 </span>
@@ -1797,25 +1797,25 @@ export default function RelatoriosEnvio() {
                                 {dest.nome}
                               </div>
                               <div className="text-xs text-gray-600 dark:text-gray-400">
-                                {dest.email} • {dest.cargo}
+                                {dest.email} ââ‚¬¢ {dest.cargo}
                               </div>
                               <div className="flex gap-2 mt-2 flex-wrap">
                                 {dest.recebe_email ? (
                                   <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">
-                                    📧 Email {dest.email ? '✅' : '❌'}
+                                    ðÅ¸â€œ§ Email {dest.email ? 'âÅ“â€¦' : 'â�Å’'}
                                   </span>
                                 ) : (
                                   <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-2 py-1 rounded">
-                                    📧 Email desabilitado
+                                    ðÅ¸â€œ§ Email desabilitado
                                   </span>
                                 )}
                                 {dest.recebe_whatsapp ? (
                                   <span className="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded">
-                                    💬 WhatsApp {dest.whatsapp ? '✅' : '❌'}
+                                    ðÅ¸â€™¬ WhatsApp {dest.whatsapp ? 'âÅ“â€¦' : 'â�Å’'}
                                   </span>
                                 ) : (
                                   <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-2 py-1 rounded">
-                                    💬 WhatsApp desabilitado
+                                    ðÅ¸â€™¬ WhatsApp desabilitado
                                   </span>
                                 )}
                                 {dest.agendamento_ativo && (
@@ -1824,7 +1824,7 @@ export default function RelatoriosEnvio() {
                                     Agendado: {dest.intervalo_dias} dias
                                     {dest.proximo_envio && (
                                       <span className="text-xs">
-                                        (Próximo: {new Date(dest.proximo_envio).toLocaleDateString('pt-BR')})
+                                        (PrÃ³ximo: {new Date(dest.proximo_envio).toLocaleDateString('pt-BR')})
                                       </span>
                                     )}
                                   </span>
@@ -1836,21 +1836,21 @@ export default function RelatoriosEnvio() {
                             <button
                               onClick={() => handleDuplicate(dest)}
                               className="p-2 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900 rounded"
-                              title="Duplicar destinatário"
+                              title="Duplicar destinatÃ¡rio"
                             >
                               <DocumentDuplicateIcon className="w-5 h-5" />
                             </button>
                             <button
                               onClick={() => handleEdit(dest)}
                               className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900 rounded"
-                              title="Editar destinatário"
+                              title="Editar destinatÃ¡rio"
                             >
                               Editar
                             </button>
                             <button
                               onClick={() => handleDelete(dest.id)}
                               className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900 rounded"
-                              title="Excluir destinatário"
+                              title="Excluir destinatÃ¡rio"
                             >
                               <TrashIcon className="w-5 h-5" />
                             </button>
@@ -1862,13 +1862,13 @@ export default function RelatoriosEnvio() {
               )}
             </div>
 
-            {/* Seção de Seleção de Relatórios */}
+            {/* SeÃ§Ã£o de SeleÃ§Ã£o de RelatÃ³rios */}
             <div className="mb-8" data-section="relatorios">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                Selecionar Relatórios
+                Selecionar RelatÃ³rios
               </h2>
               
-              {/* Período */}
+              {/* PerÃ­odo */}
               <div className="mb-4">
                 <div className="flex gap-4 mb-3">
                   <div className="flex-1">
@@ -1894,7 +1894,7 @@ export default function RelatoriosEnvio() {
                     />
                   </div>
                 </div>
-                {/* Presets de Período */}
+                {/* Presets de PerÃ­odo */}
                 <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
@@ -1922,7 +1922,7 @@ export default function RelatoriosEnvio() {
                     }}
                     className="px-3 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
                   >
-                    Últimos 7 dias
+                    ÃÅ¡ltimos 7 dias
                   </button>
                   <button
                     type="button"
@@ -1937,7 +1937,7 @@ export default function RelatoriosEnvio() {
                     }}
                     className="px-3 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
                   >
-                    Último mês
+                    ÃÅ¡ltimo mÃªs
                   </button>
                   <button
                     type="button"
@@ -1951,7 +1951,7 @@ export default function RelatoriosEnvio() {
                     }}
                     className="px-3 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
                   >
-                    Este mês
+                    Este mÃªs
                   </button>
                   <button
                     type="button"
@@ -1966,24 +1966,24 @@ export default function RelatoriosEnvio() {
                     }}
                     className="px-3 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
                   >
-                    Últimos 3 meses
+                    ÃÅ¡ltimos 3 meses
                   </button>
                 </div>
               </div>
 
-              {/* Checkboxes de Relatórios - Organizados por Categoria */}
-              {['Notas Fiscais', 'Reprodução', 'Localização', 'Sanidade', 'Financeiro', 'Estoque', 'Gestão', 'Resumos'].map((categoria) => {
+              {/* Checkboxes de RelatÃ³rios - Organizados por Categoria */}
+              {['Notas Fiscais', 'ReproduÃ§Ã£o', 'LocalizaÃ§Ã£o', 'Sanidade', 'Financeiro', 'Estoque', 'GestÃ£o', 'Resumos'].map((categoria) => {
                 const relatoriosCategoria = tiposRelatorios.filter(r => r.category === categoria)
                 if (relatoriosCategoria.length === 0) return null
                 
                 const categoriaColors = {
                   'Notas Fiscais': 'border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/10',
-                  'Reprodução': 'border-pink-200 dark:border-pink-800 bg-pink-50 dark:bg-pink-900/10',
-                  'Localização': 'border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/10',
+                  'ReproduÃ§Ã£o': 'border-pink-200 dark:border-pink-800 bg-pink-50 dark:bg-pink-900/10',
+                  'LocalizaÃ§Ã£o': 'border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/10',
                   'Sanidade': 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/10',
                   'Financeiro': 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/10',
                   'Estoque': 'border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/10',
-                  'Gestão': 'border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/10',
+                  'GestÃ£o': 'border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/10',
                   'Resumos': 'border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20'
                 }
                 
@@ -1994,7 +1994,7 @@ export default function RelatoriosEnvio() {
                         <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
                           {categoria}
                           <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                            ({relatoriosCategoria.length} relatório{relatoriosCategoria.length !== 1 ? 's' : ''})
+                            ({relatoriosCategoria.length} relatÃ³rio{relatoriosCategoria.length !== 1 ? 's' : ''})
                           </span>
                         </h3>
                         <div className="flex gap-2">
@@ -2106,14 +2106,14 @@ export default function RelatoriosEnvio() {
               })}
             </div>
 
-            {/* Botão de Enviar */}
+            {/* BotÃ£o de Enviar */}
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-4">
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   {Object.keys(selectedReports).filter(key => selectedReports[key]).length > 0 && (
                     <span>
-                      {Object.keys(selectedReports).filter(key => selectedReports[key]).length} relatório(s) selecionado(s) • 
-                      {selectedDestinatarios.length} destinatário(s) selecionado(s)
+                      {Object.keys(selectedReports).filter(key => selectedReports[key]).length} relatÃ³rio(s) selecionado(s) ââ‚¬¢ 
+                      {selectedDestinatarios.length} destinatÃ¡rio(s) selecionado(s)
                     </span>
                   )}
                 </div>
@@ -2159,7 +2159,7 @@ export default function RelatoriosEnvio() {
                 ) : (
                   <>
                     <PaperAirplaneIcon className="w-5 h-5" />
-                    Enviar Relatórios
+                    Enviar RelatÃ³rios
                   </>
                 )}
               </button>
@@ -2170,7 +2170,7 @@ export default function RelatoriosEnvio() {
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Enviando relatórios...
+                    Enviando relatÃ³rios...
                   </span>
                   <span className="text-sm text-gray-600 dark:text-gray-400">
                     {progressoEnvio}%
@@ -2188,7 +2188,7 @@ export default function RelatoriosEnvio() {
             {validationResults && validationResults.length > 0 && (
               <div className="mb-6 p-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
                 <div className="text-sm font-semibold text-indigo-800 dark:text-indigo-200 mb-2">
-                  Validação dos dados do período {period.startDate} a {period.endDate}
+                  ValidaÃ§Ã£o dos dados do perÃ­odo {period.startDate} a {period.endDate}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {validationResults.map((r, idx) => (
@@ -2206,7 +2206,7 @@ export default function RelatoriosEnvio() {
               </div>
             )}
 
-            {/* Resultados do Envio - exibição ativa */}
+            {/* Resultados do Envio - exibiÃ§Ã£o ativa */}
             {sendResults && (
               <div className={`mt-6 p-4 rounded-lg ${
                 sendResults.success 
@@ -2225,7 +2225,7 @@ export default function RelatoriosEnvio() {
                         ? 'text-green-800 dark:text-green-200' 
                         : 'text-yellow-800 dark:text-yellow-200'
                     }`}>
-                      {sendResults.success ? 'Envio Concluído!' : 'Atenção'}
+                      {sendResults.success ? 'Envio ConcluÃ­do!' : 'AtenÃ§Ã£o'}
                     </div>
                     <div className={`text-sm mt-1 whitespace-pre-line ${
                       sendResults.success 
@@ -2238,7 +2238,7 @@ export default function RelatoriosEnvio() {
                     {sendResults.details && sendResults.details.length > 0 && (
                       <div className="mt-4 space-y-2">
                         <div className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                          Detalhes por destinatário:
+                          Detalhes por destinatÃ¡rio:
                         </div>
                         {sendResults.details.map((result, idx) => (
                           <div key={idx} className="text-xs bg-white dark:bg-gray-800 p-2 rounded border">
@@ -2246,12 +2246,12 @@ export default function RelatoriosEnvio() {
                             <div className="mt-1 space-y-1">
                               {result.email && (
                                 <div className={result.email === 'enviado' ? 'text-green-600' : result.email.startsWith('erro') ? 'text-red-600' : 'text-gray-500'}>
-                                  📧 Email: {result.email}
+                                  ðÅ¸â€œ§ Email: {result.email}
                                 </div>
                               )}
                               {result.whatsapp && (
-                                <div className={result.whatsapp === 'enviado' || result.whatsapp === 'enviado (sem gráfico)' ? 'text-green-600' : result.whatsapp.startsWith('erro') ? 'text-red-600' : 'text-gray-500'}>
-                                  💬 WhatsApp: {result.whatsapp}
+                                <div className={result.whatsapp === 'enviado' || result.whatsapp === 'enviado (sem grÃ¡fico)' ? 'text-green-600' : result.whatsapp.startsWith('erro') ? 'text-red-600' : 'text-gray-500'}>
+                                  ðÅ¸â€™¬ WhatsApp: {result.whatsapp}
                                 </div>
                               )}
                             </div>
@@ -2267,7 +2267,7 @@ export default function RelatoriosEnvio() {
         </div>
       </div>
       
-      {/* Modal de Confirmação de Envio */}
+      {/* Modal de ConfirmaÃ§Ã£o de Envio */}
       {showConfirmModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-lg w-full mx-4 p-6">
@@ -2278,19 +2278,19 @@ export default function RelatoriosEnvio() {
             
             <div className="mb-4 space-y-3">
               <div>
-                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Destinatários:</p>
+                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">DestinatÃ¡rios:</p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   {destinatarios.filter(d => selectedDestinatarios.includes(d.id)).map(d => d.nome).join(', ')}
                 </p>
               </div>
               <div>
-                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Período:</p>
+                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">PerÃ­odo:</p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {new Date(period.startDate).toLocaleDateString('pt-BR')} até {new Date(period.endDate).toLocaleDateString('pt-BR')}
+                  {new Date(period.startDate).toLocaleDateString('pt-BR')} atÃ© {new Date(period.endDate).toLocaleDateString('pt-BR')}
                 </p>
               </div>
               <div>
-                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Relatórios selecionados:</p>
+                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">RelatÃ³rios selecionados:</p>
                 <ul className="text-sm text-gray-600 dark:text-gray-400 list-disc list-inside max-h-40 overflow-y-auto">
                   {tiposRelatorios.filter(r => selectedReports[r.key]).map(r => (
                     <li key={r.key}>{r.label}</li>
@@ -2336,22 +2336,22 @@ export default function RelatoriosEnvio() {
             
             <div className="space-y-4">
               <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">📅 Período</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">ðÅ¸â€œâ€¦ PerÃ­odo</h3>
                 <p className="text-gray-700 dark:text-gray-300">
-                  {new Date(period.startDate).toLocaleDateString('pt-BR')} até {new Date(period.endDate).toLocaleDateString('pt-BR')}
+                  {new Date(period.startDate).toLocaleDateString('pt-BR')} atÃ© {new Date(period.endDate).toLocaleDateString('pt-BR')}
                 </p>
               </div>
               
               <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                  👥 Destinatários ({selectedDestinatarios.length})
+                  ðÅ¸â€˜¥ DestinatÃ¡rios ({selectedDestinatarios.length})
                 </h3>
                 <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
                   {destinatarios.filter(d => selectedDestinatarios.includes(d.id)).map(d => (
                     <li key={d.id}>
                       {d.nome}
-                      {d.recebe_email && <span className="ml-2">📧</span>}
-                      {d.recebe_whatsapp && <span className="ml-1">💬</span>}
+                      {d.recebe_email && <span className="ml-2">ðÅ¸â€œ§</span>}
+                      {d.recebe_whatsapp && <span className="ml-1">ðÅ¸â€™¬</span>}
                     </li>
                   ))}
                 </ul>
@@ -2359,7 +2359,7 @@ export default function RelatoriosEnvio() {
               
               <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                  📋 Relatórios Selecionados ({Object.keys(selectedReports).filter(key => selectedReports[key]).length})
+                  ðÅ¸â€œâ€¹ RelatÃ³rios Selecionados ({Object.keys(selectedReports).filter(key => selectedReports[key]).length})
                 </h3>
                 <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
                   {tiposRelatorios.filter(r => selectedReports[r.key]).map(r => (
@@ -2422,22 +2422,22 @@ export default function RelatoriosEnvio() {
         </div>
       )}
 
-      {/* Modal de Confirmação de Agendamento */}
+      {/* Modal de ConfirmaÃ§Ã£o de Agendamento */}
       {showAgendamentoModal && agendamentoPendente && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 p-6">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
               <CalendarIcon className="w-6 h-6" />
-              Agendamento de Relatórios
+              Agendamento de RelatÃ³rios
             </h2>
             
             <div className="mb-4">
               <p className="text-gray-700 dark:text-gray-300 mb-2">
-                <strong>{agendamentoPendente.nome}</strong> está agendado para receber relatórios hoje.
+                <strong>{agendamentoPendente.nome}</strong> estÃ¡ agendado para receber relatÃ³rios hoje.
               </p>
               <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-4">
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  <strong>Último envio:</strong> {agendamentoPendente.ultimo_envio 
+                  <strong>ÃÅ¡ltimo envio:</strong> {agendamentoPendente.ultimo_envio 
                     ? new Date(agendamentoPendente.ultimo_envio).toLocaleDateString('pt-BR')
                     : 'Nunca'}
                 </p>
@@ -2446,7 +2446,7 @@ export default function RelatoriosEnvio() {
                 </p>
                 {agendamentoPendente.ultimos_relatorios && agendamentoPendente.ultimos_relatorios.length > 0 && (
                   <div className="mt-2">
-                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Últimos relatórios enviados:</p>
+                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">ÃÅ¡ltimos relatÃ³rios enviados:</p>
                     <ul className="list-disc list-inside text-sm text-gray-600 dark:text-gray-400 mt-1">
                       {agendamentoPendente.ultimos_relatorios.map((rel, idx) => (
                         <li key={idx}>{rel}</li>
@@ -2460,17 +2460,17 @@ export default function RelatoriosEnvio() {
             <div className="flex gap-3">
               <button
                 onClick={async () => {
-                  // Enviar com os mesmos relatórios
+                  // Enviar com os mesmos relatÃ³rios
                   if (agendamentoPendente.ultimos_relatorios && agendamentoPendente.ultimos_relatorios.length > 0) {
-                    // Calcular período: do último envio até hoje
+                    // Calcular perÃ­odo: do Ãºltimo envio atÃ© hoje
                     let startDate
                     if (agendamentoPendente.ultimo_envio) {
                       const ultimaData = new Date(agendamentoPendente.ultimo_envio)
-                      // Começar do dia seguinte ao último envio
+                      // ComeÃ§ar do dia seguinte ao Ãºltimo envio
                       ultimaData.setDate(ultimaData.getDate() + 1)
                       startDate = ultimaData.toISOString().split('T')[0]
                     } else {
-                      // Se nunca foi enviado, usar início do mês atual
+                      // Se nunca foi enviado, usar inÃ­cio do mÃªs atual
                       startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0]
                     }
                     
@@ -2495,7 +2495,7 @@ export default function RelatoriosEnvio() {
                       handleSend()
                     }, 500)
                   } else {
-                    // Fallback: usar preferências padrão do destinatário (tipos_relatorios)
+                    // Fallback: usar preferÃªncias padrÃ£o do destinatÃ¡rio (tipos_relatorios)
                     const preferidos = Array.isArray(agendamentoPendente.tipos_relatorios) ? agendamentoPendente.tipos_relatorios : []
                     if (preferidos.length > 0) {
                       const period = {
@@ -2513,7 +2513,7 @@ export default function RelatoriosEnvio() {
                         handleSend()
                       }, 500)
                     } else {
-                      alert('Não há relatórios anteriores. Configure manualmente.')
+                      alert('NÃ£o hÃ¡ relatÃ³rios anteriores. Configure manualmente.')
                       setShowAgendamentoModal(false)
                       setAgendamentoPendente(null)
                     }
@@ -2521,15 +2521,15 @@ export default function RelatoriosEnvio() {
                 }}
                 className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
               >
-                Enviar Mesmos Relatórios
+                Enviar Mesmos RelatÃ³rios
               </button>
               <button
                 onClick={() => {
-                  // Selecionar o destinatário e permitir alterar relatórios manualmente
+                  // Selecionar o destinatÃ¡rio e permitir alterar relatÃ³rios manualmente
                   setSelectedDestinatarios([agendamentoPendente.id])
                   setShowAgendamentoModal(false)
                   setAgendamentoPendente(null)
-                  // Scroll para a seção de relatórios
+                  // Scroll para a seÃ§Ã£o de relatÃ³rios
                   setTimeout(() => {
                     document.querySelector('[data-section="relatorios"]')?.scrollIntoView({ behavior: 'smooth' })
                   }, 100)
@@ -2540,7 +2540,7 @@ export default function RelatoriosEnvio() {
               </button>
               <button
                 onClick={async () => {
-                  // Adiar para amanhã
+                  // Adiar para amanhÃ£
                   try {
                     const res = await fetch(`/api/relatorios-envio/destinatarios/${agendamentoPendente.id}`, {
                       method: 'PUT',

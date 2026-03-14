@@ -15,7 +15,7 @@ async function adicionarTESA001() {
   try {
     await client.query('BEGIN')
     
-    console.log('🐄 Adicionando fêmea TESA 001...')
+    console.log('�Ÿ�„ Adicionando fêmea TESA 001...')
     
     // 1. Inserir o animal TESA 001
     const animalResult = await client.query(`
@@ -42,10 +42,10 @@ async function adicionarTESA001() {
     `)
     
     const animalId = animalResult.rows[0].id
-    console.log(`✅ Animal TESA 001 criado com ID: ${animalId}`)
+    console.log(`�œ… Animal TESA 001 criado com ID: ${animalId}`)
     
     // 2. Adicionar histórico de movimentação
-    console.log('📍 Adicionando histórico de movimentação...')
+    console.log('�Ÿ“� Adicionando histórico de movimentação...')
     
     // Primeira localização: Piquete 01 (01/10/2025 - IA)
     await client.query(`
@@ -72,7 +72,7 @@ async function adicionarTESA001() {
       )
     `, [animalId])
     
-    console.log('✅ Localização 1: Piquete 01 (01/10/2025 - 10/10/2025)')
+    console.log('�œ… Localização 1: Piquete 01 (01/10/2025 - 10/10/2025)')
     
     // Segunda localização: Piquete 02 (10/10/2025 - atual)
     await client.query(`
@@ -99,22 +99,22 @@ async function adicionarTESA001() {
       )
     `, [animalId])
     
-    console.log('✅ Localização 2: Piquete 02 (10/10/2025 - atual)')
+    console.log('�œ… Localização 2: Piquete 02 (10/10/2025 - atual)')
     
     await client.query('COMMIT')
     
-    console.log('\n🎉 TESA 001 adicionada com sucesso!')
-    console.log('📋 Resumo:')
-    console.log(`   • Animal: TESA 001 (ID: ${animalId})`)
-    console.log('   • Raça: Nelore')
-    console.log('   • Sexo: Fêmea')
-    console.log('   • Situação: Ativo')
-    console.log('   • Localização atual: Piquete 02')
-    console.log('   • Histórico: 2 movimentações registradas')
+    console.log('\n�ŸŽ‰ TESA 001 adicionada com sucesso!')
+    console.log('�Ÿ“‹ Resumo:')
+    console.log(`   �€� Animal: TESA 001 (ID: ${animalId})`)
+    console.log('   �€� Raça: Nelore')
+    console.log('   �€� Sexo: Fêmea')
+    console.log('   �€� Situação: Ativo')
+    console.log('   �€� Localização atual: Piquete 02')
+    console.log('   �€� Histórico: 2 movimentações registradas')
     
   } catch (error) {
     await client.query('ROLLBACK')
-    console.error('❌ Erro ao adicionar TESA 001:', error)
+    console.error('�Œ Erro ao adicionar TESA 001:', error)
     throw error
   } finally {
     client.release()
@@ -125,7 +125,7 @@ async function verificarTESA001() {
   const client = await pool.connect()
   
   try {
-    console.log('\n🔍 Verificando dados da TESA 001...')
+    console.log('\n�Ÿ”� Verificando dados da TESA 001...')
     
     // Buscar animal
     const animalResult = await client.query(`
@@ -134,12 +134,12 @@ async function verificarTESA001() {
     `)
     
     if (animalResult.rows.length === 0) {
-      console.log('❌ Animal TESA 001 não encontrado')
+      console.log('�Œ Animal TESA 001 não encontrado')
       return
     }
     
     const animal = animalResult.rows[0]
-    console.log('✅ Animal encontrado:', {
+    console.log('�œ… Animal encontrado:', {
       id: animal.id,
       serie: animal.serie,
       rg: animal.rg,
@@ -160,14 +160,14 @@ async function verificarTESA001() {
       ORDER BY l.data_entrada
     `)
     
-    console.log(`✅ Localizações encontradas: ${localizacoesResult.rows.length}`)
+    console.log(`�œ… Localizações encontradas: ${localizacoesResult.rows.length}`)
     localizacoesResult.rows.forEach((loc, index) => {
       console.log(`   ${index + 1}. ${loc.piquete} (${loc.data_entrada} - ${loc.data_saida || 'atual'})`)
       console.log(`      Motivo: ${loc.motivo_movimentacao}`)
     })
     
   } catch (error) {
-    console.error('❌ Erro ao verificar TESA 001:', error)
+    console.error('�Œ Erro ao verificar TESA 001:', error)
   } finally {
     client.release()
   }
@@ -184,7 +184,7 @@ async function main() {
     client.release()
     
     if (existeResult.rows.length > 0) {
-      console.log('⚠️  TESA 001 já existe no banco de dados')
+      console.log('�š�️  TESA 001 já existe no banco de dados')
       await verificarTESA001()
     } else {
       await adicionarTESA001()
@@ -192,7 +192,7 @@ async function main() {
     }
     
   } catch (error) {
-    console.error('❌ Erro geral:', error)
+    console.error('�Œ Erro geral:', error)
   } finally {
     await pool.end()
   }

@@ -12,9 +12,9 @@ export default function KeyboardShortcuts() {
     { key: 'Alt + A', description: 'Ir para Animais', action: () => router.push('/animals') },
     { key: 'Alt + N', description: 'Ir para Nascimentos', action: () => router.push('/nascimentos') },
     { key: 'Alt + C', description: 'Ir para Custos', action: () => router.push('/custos') },
-    { key: 'Alt + G', description: 'Ir para Gestações', action: () => router.push('/gestacao') },
-    { key: 'Alt + R', description: 'Ir para Relatórios', action: () => router.push('/reports') },
-    { key: 'Alt + S', description: 'Ir para Configurações', action: () => router.push('/settings') },
+    { key: 'Alt + G', description: 'Ir para GestaÃ§Ãµes', action: () => router.push('/gestacao') },
+    { key: 'Alt + R', description: 'Ir para RelatÃ³rios', action: () => router.push('/reports') },
+    { key: 'Alt + S', description: 'Ir para ConfiguraÃ§Ãµes', action: () => router.push('/settings') },
     { key: 'Alt + H', description: 'Mostrar/Ocultar Atalhos', action: () => setShowShortcuts(!showShortcuts) },
     { key: 'Alt + D', description: 'Voltar ao Dashboard', action: () => router.push('/') }
   ]
@@ -66,7 +66,7 @@ export default function KeyboardShortcuts() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [router, showShortcuts])
 
-  // Limpar o último pressionado após 2 segundos
+  // Limpar o Ãºltimo pressionado apÃ³s 2 segundos
   useEffect(() => {
     if (lastPressed) {
       const timer = setTimeout(() => setLastPressed(''), 2000)
@@ -76,14 +76,14 @@ export default function KeyboardShortcuts() {
 
   return (
     <>
-      {/* Botão flutuante para mostrar atalhos */}
+      {/* BotÃ£o flutuante para mostrar atalhos */}
       <div className="fixed bottom-4 right-4 z-50">
         <button
           onClick={() => setShowShortcuts(!showShortcuts)}
           className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
           title="Atalhos de Teclado (Alt + H)"
         >
-          ⌨️
+          âÅ’¨ï¸�
         </button>
       </div>
 
@@ -105,22 +105,22 @@ export default function KeyboardShortcuts() {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-xl font-bold flex items-center">
-                    ⌨️ Atalhos de Teclado
+                    âÅ’¨ï¸� Atalhos de Teclado
                   </h2>
                   <p className="text-blue-100 text-sm mt-1">
-                    Navegue mais rápido pelo sistema
+                    Navegue mais rÃ¡pido pelo sistema
                   </p>
                 </div>
                 <button
                   onClick={() => setShowShortcuts(false)}
                   className="text-white hover:text-gray-200 text-2xl font-bold"
                 >
-                  ×
+                  Ãâ€”
                 </button>
               </div>
             </div>
 
-            {/* Conteúdo */}
+            {/* ConteÃºdo */}
             <div className="p-6 overflow-y-auto max-h-[60vh]">
               <div className="space-y-3">
                 {shortcuts.map((shortcut, index) => (
@@ -151,13 +151,13 @@ export default function KeyboardShortcuts() {
               {/* Dicas */}
               <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                 <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2 flex items-center">
-                  💡 Dicas
+                  ðÅ¸â€™¡ Dicas
                 </h3>
                 <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-                  <li>• Mantenha Alt pressionado e aperte a letra</li>
-                  <li>• Os atalhos funcionam em qualquer página</li>
-                  <li>• Use Alt + H para mostrar/ocultar esta janela</li>
-                  <li>• Clique nos atalhos acima para testá-los</li>
+                  <li>ââ‚¬¢ Mantenha Alt pressionado e aperte a letra</li>
+                  <li>ââ‚¬¢ Os atalhos funcionam em qualquer pÃ¡gina</li>
+                  <li>ââ‚¬¢ Use Alt + H para mostrar/ocultar esta janela</li>
+                  <li>ââ‚¬¢ Clique nos atalhos acima para testÃ¡-los</li>
                 </ul>
               </div>
             </div>
@@ -166,7 +166,7 @@ export default function KeyboardShortcuts() {
             <div className="bg-gray-50 dark:bg-gray-700 px-6 py-4">
               <div className="flex items-center justify-between">
                 <div className="text-sm text-gray-600 dark:text-gray-400">
-                  {shortcuts.length} atalhos disponíveis
+                  {shortcuts.length} atalhos disponÃ­veis
                 </div>
                 <button
                   onClick={() => setShowShortcuts(false)}

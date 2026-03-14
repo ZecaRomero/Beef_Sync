@@ -1,5 +1,5 @@
 /**
- * Página de entrada do usuário Adelso.
+ * PÃ¡gina de entrada do usuÃ¡rio Adelso.
  * Login via Supabase Auth - senha fixa adfaz2630, sem pedir email nem telefone.
  */
 import { useState, useEffect } from 'react'
@@ -22,7 +22,7 @@ export default function AdelsoPage() {
   const [confirmaSenha, setConfirmaSenha] = useState('')
   const [senhaAtual, setSenhaAtual] = useState('')
 
-  // Verificar se já está logado no Supabase como Adelso
+  // Verificar se jÃ¡ estÃ¡ logado no Supabase como Adelso
   useEffect(() => {
     if (!supabase) return
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -39,13 +39,13 @@ export default function AdelsoPage() {
     setError('')
 
     if (!supabase) {
-      setError('Supabase não configurado. Verifique o .env')
+      setError('Supabase nÃ£o configurado. Verifique o .env')
       return
     }
 
     setLoading(true)
     try {
-      // Garantir que o usuário Adelso existe no Supabase Auth
+      // Garantir que o usuÃ¡rio Adelso existe no Supabase Auth
       const res = await fetch('/api/adelso-supabase-auth', { method: 'POST' })
       const json = await res.json()
 
@@ -74,7 +74,7 @@ export default function AdelsoPage() {
   }
 
   const handleEscolha = (opcao) => {
-    // Compatibilidade com páginas que checam Adelso via localStorage
+    // Compatibilidade com pÃ¡ginas que checam Adelso via localStorage
     try {
       localStorage.setItem('beef_adelso_auth', JSON.stringify({
         nome: 'Adelso',
@@ -110,7 +110,7 @@ export default function AdelsoPage() {
             className="w-full max-w-md"
           >
             <div className="text-center mb-8">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">Olá, Adelso!</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">OlÃ¡, Adelso!</h1>
               <p className="text-gray-600 dark:text-gray-400">Para onde deseja ir?</p>
             </div>
 
@@ -125,10 +125,10 @@ export default function AdelsoPage() {
                   <ChartBarIcon className="w-8 h-8 text-teal-600 dark:text-teal-400" />
                 </div>
                 <div className="text-left flex-1">
-                  <h2 className="text-lg font-bold text-gray-900 dark:text-white">Relatórios</h2>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Acessar relatórios e dashboard do app</p>
+                  <h2 className="text-lg font-bold text-gray-900 dark:text-white">RelatÃ³rios</h2>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Acessar relatÃ³rios e dashboard do app</p>
                 </div>
-                <span className="text-teal-500">→</span>
+                <span className="text-teal-500">ââ€ â€™</span>
               </motion.button>
 
               <motion.button
@@ -144,7 +144,7 @@ export default function AdelsoPage() {
                   <h2 className="text-lg font-bold text-gray-900 dark:text-white">Boletim Campo</h2>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Importar/exportar Excel e alterar quantidades</p>
                 </div>
-                <span className="text-orange-500">→</span>
+                <span className="text-orange-500">ââ€ â€™</span>
               </motion.button>
             </div>
 
@@ -175,11 +175,11 @@ export default function AdelsoPage() {
       return
     }
     if (novaSenha !== confirmaSenha) {
-      setError('As senhas não coincidem')
+      setError('As senhas nÃ£o coincidem')
       return
     }
     if (!supabase) {
-      setError('Supabase não configurado')
+      setError('Supabase nÃ£o configurado')
       return
     }
     setLoading(true)
@@ -285,7 +285,7 @@ export default function AdelsoPage() {
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="p-4 bg-teal-50 dark:bg-teal-900/20 rounded-xl border border-teal-200 dark:border-teal-800">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Usuário</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">UsuÃ¡rio</p>
               <p className="text-xl font-bold text-teal-700 dark:text-teal-300">Adelso</p>
             </div>
 
@@ -305,7 +305,7 @@ export default function AdelsoPage() {
           </form>
 
           <p className="mt-6 text-center text-xs text-gray-500">
-            Senha configurada no sistema. Use &quot;Trocar senha&quot; após entrar para alterar.
+            Senha configurada no sistema. Use &quot;Trocar senha&quot; apÃ³s entrar para alterar.
           </p>
         </motion.div>
       </div>

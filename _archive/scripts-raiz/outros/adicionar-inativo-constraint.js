@@ -12,14 +12,14 @@ async function adicionarInativo() {
   const client = await pool.connect();
   
   try {
-    console.log('\n=== ADICIONANDO "Inativo" À CONSTRAINT ===\n');
+    console.log('\n=== ADICIONANDO "Inativo" �€ CONSTRAINT ===\n');
     
     // Remover constraint antiga
     console.log('1. Removendo constraint antiga...');
     await client.query(`
       ALTER TABLE animais DROP CONSTRAINT IF EXISTS animais_situacao_check
     `);
-    console.log('✅ Constraint antiga removida');
+    console.log('�œ… Constraint antiga removida');
     
     // Adicionar nova constraint com "Inativo"
     console.log('\n2. Adicionando nova constraint com "Inativo"...');
@@ -28,7 +28,7 @@ async function adicionarInativo() {
       ADD CONSTRAINT animais_situacao_check 
       CHECK (situacao IN ('Ativo', 'Vendido', 'Morto', 'Transferido', 'Inativo'))
     `);
-    console.log('✅ Nova constraint adicionada');
+    console.log('�œ… Nova constraint adicionada');
     
     console.log('\n=== VERIFICANDO NOVA CONSTRAINT ===\n');
     
@@ -49,10 +49,10 @@ async function adicionarInativo() {
       });
     }
     
-    console.log('\n✅ Agora você pode usar "Inativo" como situação!');
+    console.log('\n�œ… Agora você pode usar "Inativo" como situação!');
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
     console.error(error.stack);
   } finally {
     client.release();

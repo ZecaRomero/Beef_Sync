@@ -9,13 +9,13 @@ export default async function handler(req, res) {
   try {
     const { period } = req.body
 
-    console.log('📋 Recebida requisição para gerar relatório de mortes:', { period })
+    console.log('ðÅ¸â€œâ€¹ Recebida requisiÃ§Ã£o para gerar relatÃ³rio de mortes:', { period })
 
     if (!period || !period.startDate || !period.endDate) {
-      return res.status(400).json({ message: 'Período é obrigatório' })
+      return res.status(400).json({ message: 'PerÃ­odo Ã© obrigatÃ³rio' })
     }
 
-    // Buscar mortes do período (já vem com dados dos animais no JOIN)
+    // Buscar mortes do perÃ­odo (jÃ¡ vem com dados dos animais no JOIN)
     const mortes = await databaseService.buscarMortes({
       startDate: period.startDate,
       endDate: period.endDate
@@ -24,9 +24,9 @@ export default async function handler(req, res) {
     const workbook = new ExcelJS.Workbook()
     const sheet = workbook.addWorksheet('Mortes')
 
-    // Cabeçalho
+    // CabeÃ§alho
     sheet.mergeCells('A1:H1')
-    sheet.getCell('A1').value = '💀 RELATÓRIO DE MORTES - BEEF SYNC'
+    sheet.getCell('A1').value = 'ðÅ¸â€™â‚¬ RELATÃâ€œRIO DE MORTES - BEEF SYNC'
     sheet.getCell('A1').font = { size: 16, bold: true, color: { argb: 'DC2626' } }
     sheet.getCell('A1').alignment = { horizontal: 'center', vertical: 'middle' }
     sheet.getCell('A1').fill = {
@@ -36,14 +36,14 @@ export default async function handler(req, res) {
     }
     sheet.getRow(1).height = 30
 
-    // Período
+    // PerÃ­odo
     sheet.mergeCells('A2:H2')
-    sheet.getCell('A2').value = `Período: ${period.startDate} até ${period.endDate}`
+    sheet.getCell('A2').value = `PerÃ­odo: ${period.startDate} atÃ© ${period.endDate}`
     sheet.getCell('A2').font = { size: 12, bold: true }
     sheet.getCell('A2').alignment = { horizontal: 'center' }
     sheet.getRow(2).height = 20
 
-    // Data de geração
+    // Data de geraÃ§Ã£o
     sheet.mergeCells('A3:H3')
     sheet.getCell('A3').value = `Gerado em: ${new Date().toLocaleString('pt-BR')}`
     sheet.getCell('A3').font = { size: 10, italic: true }
@@ -56,11 +56,11 @@ export default async function handler(req, res) {
     const totalMortes = mortes.length
     const causas = {}
     mortes.forEach(morte => {
-      const causa = morte.causa_morte || morte.causa || 'Não informado'
+      const causa = morte.causa_morte || morte.causa || 'NÃ£o informado'
       causas[causa] = (causas[causa] || 0) + 1
     })
 
-    const resumoRow = sheet.addRow(['RESUMO DO PERÍODO'])
+    const resumoRow = sheet.addRow(['RESUMO DO PERÃ�ODO'])
     sheet.mergeCells(`A${resumoRow.number}:H${resumoRow.number}`)
     resumoRow.getCell(1).font = { bold: true, size: 14 }
     resumoRow.getCell(1).fill = {
@@ -79,16 +79,16 @@ export default async function handler(req, res) {
     })
     sheet.addRow([])
 
-    // Cabeçalho da tabela
+    // CabeÃ§alho da tabela
     const headerRow = sheet.addRow([
       'Data Morte',
-      'Animal (Série-RG)',
-      'Raça',
+      'Animal (SÃ©rie-RG)',
+      'RaÃ§a',
       'Sexo',
       'Idade',
       'Causa da Morte',
       'Valor da Perda (R$)',
-      'Observações'
+      'ObservaÃ§Ãµes'
     ])
     
     headerRow.font = { bold: true, color: { argb: 'FFFFFF' } }
@@ -108,7 +108,7 @@ export default async function handler(req, res) {
       }
     })
 
-    // Dados (os dados dos animais já vêm no JOIN do buscarMortes)
+    // Dados (os dados dos animais jÃ¡ vÃªm no JOIN do buscarMortes)
     mortes.forEach(morte => {
       const dataMorte = morte.data_morte || morte.data || ''
       const dataFormatada = dataMorte ? new Date(dataMorte).toLocaleDateString('pt-BR') : ''
@@ -133,7 +133,7 @@ export default async function handler(req, res) {
         morte.raca || '',
         morte.sexo || '',
         idade,
-        morte.causa_morte || morte.causa || 'Não informado',
+        morte.causa_morte || morte.causa || 'NÃ£o informado',
         morte.valor_perda || morte.valor_venda || morte.custo_total || '',
         morte.observacoes || morte.observacao || ''
       ])
@@ -143,12 +143,12 @@ export default async function handler(req, res) {
     sheet.columns = [
       { width: 15 }, // Data
       { width: 18 }, // Animal
-      { width: 15 }, // Raça
+      { width: 15 }, // RaÃ§a
       { width: 10 }, // Sexo
       { width: 12 }, // Idade
       { width: 20 }, // Causa
       { width: 18 }, // Valor
-      { width: 30 }  // Observações
+      { width: 30 }  // ObservaÃ§Ãµes
     ]
 
     // Gerar o arquivo
@@ -159,9 +159,9 @@ export default async function handler(req, res) {
     res.send(Buffer.from(buffer))
 
   } catch (error) {
-    console.error('Erro ao gerar relatório de mortes:', error)
+    console.error('Erro ao gerar relatÃ³rio de mortes:', error)
     res.status(500).json({ 
-      message: 'Erro ao gerar relatório de mortes',
+      message: 'Erro ao gerar relatÃ³rio de mortes',
       error: error.message 
     })
   }

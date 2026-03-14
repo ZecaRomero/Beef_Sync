@@ -2,10 +2,10 @@ const { Pool } = require('pg');
 const fs = require('fs');
 const path = require('path');
 
-// Carregar variáveis de ambiente
+// Carregar variÃ¡veis de ambiente
 require('dotenv').config();
 
-// Configuração do banco de dados
+// ConfiguraÃ§Ã£o do banco de dados
 const pool = new Pool({
   user: process.env.DB_USER || 'postgres',
   host: process.env.DB_HOST || 'localhost',
@@ -14,19 +14,19 @@ const pool = new Pool({
   port: process.env.DB_PORT || 5432,
 });
 
-console.log('🔧 Configuração do banco:');
+console.log('ðÅ¸â€�§ ConfiguraÃ§Ã£o do banco:');
 console.log(`  Host: ${process.env.DB_HOST || 'localhost'}`);
 console.log(`  Port: ${process.env.DB_PORT || 5432}`);
 console.log(`  Database: ${process.env.DB_NAME || 'beef_sync'}`);
 console.log(`  User: ${process.env.DB_USER || 'postgres'}`);
-console.log(`  Password: ${process.env.DB_PASSWORD ? '***' : 'não definida'}`);
+console.log(`  Password: ${process.env.DB_PASSWORD ? '***' : 'nÃ£o definida'}`);
 console.log('');
 
 async function initOcorrenciasDatabase() {
   const client = await pool.connect();
   
   try {
-    console.log('🔄 Iniciando criação das tabelas de ocorrências...');
+    console.log('ðÅ¸â€�â€ž Iniciando criaÃ§Ã£o das tabelas de ocorrÃªncias...');
     
     // Ler o arquivo SQL
     const sqlPath = path.join(__dirname, 'create-ocorrencias-tables.sql');
@@ -35,7 +35,7 @@ async function initOcorrenciasDatabase() {
     // Executar o SQL
     await client.query(sql);
     
-    console.log('✅ Tabelas de ocorrências criadas com sucesso!');
+    console.log('âÅ“â€¦ Tabelas de ocorrÃªncias criadas com sucesso!');
     
     // Verificar se as tabelas foram criadas
     const tablesQuery = `
@@ -48,12 +48,12 @@ async function initOcorrenciasDatabase() {
     
     const result = await client.query(tablesQuery);
     
-    console.log('📋 Tabelas criadas:');
+    console.log('ðÅ¸â€œâ€¹ Tabelas criadas:');
     result.rows.forEach(row => {
       console.log(`  - ${row.table_name}`);
     });
     
-    // Verificar índices
+    // Verificar Ã­ndices
     const indexesQuery = `
       SELECT indexname, tablename 
       FROM pg_indexes 
@@ -64,13 +64,13 @@ async function initOcorrenciasDatabase() {
     
     const indexResult = await client.query(indexesQuery);
     
-    console.log('🔍 Índices criados:');
+    console.log('ðÅ¸â€�� Ã�ndices criados:');
     indexResult.rows.forEach(row => {
       console.log(`  - ${row.indexname} (${row.tablename})`);
     });
     
-    // Testar inserção de dados de exemplo (opcional)
-    console.log('🧪 Testando inserção de dados...');
+    // Testar inserÃ§Ã£o de dados de exemplo (opcional)
+    console.log('ðÅ¸§ª Testando inserÃ§Ã£o de dados...');
     
     const testQuery = `
       INSERT INTO ocorrencias_animais (
@@ -83,16 +83,16 @@ async function initOcorrenciasDatabase() {
     const testResult = await client.query(testQuery);
     const testId = testResult.rows[0].id;
     
-    console.log(`✅ Registro de teste criado com ID: ${testId}`);
+    console.log(`âÅ“â€¦ Registro de teste criado com ID: ${testId}`);
     
     // Remover o registro de teste
     await client.query('DELETE FROM ocorrencias_animais WHERE id = $1', [testId]);
-    console.log('🗑️ Registro de teste removido');
+    console.log('ðÅ¸â€”â€˜ï¸� Registro de teste removido');
     
-    console.log('🎉 Inicialização das tabelas de ocorrências concluída com sucesso!');
+    console.log('ðÅ¸Å½â€° InicializaÃ§Ã£o das tabelas de ocorrÃªncias concluÃ­da com sucesso!');
     
   } catch (error) {
-    console.error('❌ Erro ao inicializar tabelas de ocorrências:', error);
+    console.error('â�Å’ Erro ao inicializar tabelas de ocorrÃªncias:', error);
     throw error;
   } finally {
     client.release();
@@ -104,11 +104,11 @@ async function initOcorrenciasDatabase() {
 if (require.main === module) {
   initOcorrenciasDatabase()
     .then(() => {
-      console.log('✅ Script executado com sucesso!');
+      console.log('âÅ“â€¦ Script executado com sucesso!');
       process.exit(0);
     })
     .catch((error) => {
-      console.error('❌ Erro na execução:', error);
+      console.error('â�Å’ Erro na execuÃ§Ã£o:', error);
       process.exit(1);
     });
 }

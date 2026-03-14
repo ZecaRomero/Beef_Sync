@@ -21,7 +21,7 @@ export default function IdentificationSection({
   return (
     <div className="space-y-4">
       <h4 className="text-base font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
-        Identificação
+        IdentificaÃ§Ã£o
       </h4>
       
       {/* Nome */}
@@ -43,10 +43,10 @@ export default function IdentificationSection({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {/* Série */}
+        {/* SÃ©rie */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Série *
+            SÃ©rie *
           </label>
           <select
             value={formData.serie}
@@ -81,7 +81,7 @@ export default function IdentificationSection({
               updateField('rg', value)
             }}
             className={`input-field ${errors.rg ? 'input-error' : ''}`}
-            placeholder={formData.serie === 'PA' ? "Ex: AA1234" : "Até 6 dígitos"}
+            placeholder={formData.serie === 'PA' ? "Ex: AA1234" : "AtÃ© 6 dÃ­gitos"}
             maxLength={20}
           />
           {errors.rg && (
@@ -89,10 +89,10 @@ export default function IdentificationSection({
           )}
         </div>
 
-        {/* Raça */}
+        {/* RaÃ§a */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Raça *
+            RaÃ§a *
           </label>
           <input
             type="text"
@@ -135,10 +135,10 @@ export default function IdentificationSection({
           )}
         </div>
 
-        {/* Localização Atual (Piquete) */}
+        {/* LocalizaÃ§Ã£o Atual (Piquete) */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Localização Atual (Piquete) *
+            LocalizaÃ§Ã£o Atual (Piquete) *
           </label>
           <input
             type="text"
@@ -175,18 +175,18 @@ export default function IdentificationSection({
                 : 'border-gray-300 dark:border-gray-600 hover:border-blue-300 text-gray-700 dark:text-gray-200'
             } ${formData.serie === 'RPT' ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            🐂 Macho
+            ðÅ¸�â€š Macho
           </button>
           <button
             type="button"
-            onClick={() => updateField('sexo', 'Fêmea')}
+            onClick={() => updateField('sexo', 'FÃªmea')}
             className={`flex-1 py-2 px-4 rounded-lg border-2 transition-colors ${
-              formData.sexo === 'Fêmea'
+              formData.sexo === 'FÃªmea'
                 ? 'border-pink-500 bg-pink-50 dark:bg-pink-900 text-pink-700 dark:text-pink-300'
                 : 'border-gray-300 dark:border-gray-600 hover:border-pink-300 text-gray-700 dark:text-gray-200'
             }`}
           >
-            🐄 Fêmea
+            ðÅ¸�â€ž FÃªmea
           </button>
         </div>
         {errors.sexo && (

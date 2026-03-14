@@ -23,9 +23,9 @@ async function addCamposIA() {
     `)
     if (checkNumeroIA.rows.length === 0) {
       await client.query('ALTER TABLE inseminacoes ADD COLUMN numero_ia INTEGER')
-      console.log('✅ Coluna numero_ia adicionada')
+      console.log('�œ… Coluna numero_ia adicionada')
     } else {
-      console.log('✅ Coluna numero_ia já existe')
+      console.log('�œ… Coluna numero_ia já existe')
     }
 
     // Verificar e adicionar rg_touro (RG do touro usado na IA)
@@ -37,9 +37,9 @@ async function addCamposIA() {
     `)
     if (checkRgTouro.rows.length === 0) {
       await client.query('ALTER TABLE inseminacoes ADD COLUMN rg_touro VARCHAR(50)')
-      console.log('✅ Coluna rg_touro adicionada')
+      console.log('�œ… Coluna rg_touro adicionada')
     } else {
-      console.log('✅ Coluna rg_touro já existe')
+      console.log('�œ… Coluna rg_touro já existe')
     }
 
     // Verificar e adicionar numero_dg (número do diagnóstico de gestação - 1ª DG da 1ª IA, etc.)
@@ -51,9 +51,9 @@ async function addCamposIA() {
     `)
     if (checkNumeroDG.rows.length === 0) {
       await client.query('ALTER TABLE inseminacoes ADD COLUMN numero_dg INTEGER')
-      console.log('✅ Coluna numero_dg adicionada')
+      console.log('�œ… Coluna numero_dg adicionada')
     } else {
-      console.log('✅ Coluna numero_dg já existe')
+      console.log('�œ… Coluna numero_dg já existe')
     }
 
     // Verificar e adicionar data_dg (data do diagnóstico de gestação)
@@ -65,9 +65,9 @@ async function addCamposIA() {
     `)
     if (checkDataDG.rows.length === 0) {
       await client.query('ALTER TABLE inseminacoes ADD COLUMN data_dg DATE')
-      console.log('✅ Coluna data_dg adicionada')
+      console.log('�œ… Coluna data_dg adicionada')
     } else {
-      console.log('✅ Coluna data_dg já existe')
+      console.log('�œ… Coluna data_dg já existe')
     }
 
     // Verificar e adicionar resultado_dg (resultado do diagnóstico - prenha, não prenha)
@@ -79,14 +79,14 @@ async function addCamposIA() {
     `)
     if (checkResultadoDG.rows.length === 0) {
       await client.query('ALTER TABLE inseminacoes ADD COLUMN resultado_dg VARCHAR(20)')
-      console.log('✅ Coluna resultado_dg adicionada')
+      console.log('�œ… Coluna resultado_dg adicionada')
     } else {
-      console.log('✅ Coluna resultado_dg já existe')
+      console.log('�œ… Coluna resultado_dg já existe')
     }
 
-    console.log('✅ Todos os campos foram adicionados/verificados com sucesso!')
+    console.log('�œ… Todos os campos foram adicionados/verificados com sucesso!')
   } catch (error) {
-    console.error('❌ Erro ao adicionar campos:', error)
+    console.error('�Œ Erro ao adicionar campos:', error)
     throw error
   } finally {
     client.release()

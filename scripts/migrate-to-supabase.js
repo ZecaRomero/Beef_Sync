@@ -48,14 +48,14 @@ async function executeSQLWithRetry(sql, label) {
     } catch (err) {
       if (err.message === 'RATE_LIMITED') {
         const wait = RETRY_DELAY_MS * attempt;
-        console.log(`  ⏳ Rate limited em "${label}" (tentativa ${attempt}/${MAX_RETRIES}). Aguardando ${wait/1000}s...`);
+        console.log(`  â�³ Rate limited em "${label}" (tentativa ${attempt}/${MAX_RETRIES}). Aguardando ${wait/1000}s...`);
         await sleep(wait);
       } else {
         throw err;
       }
     }
   }
-  throw new Error(`Rate limit persistente após ${MAX_RETRIES} tentativas`);
+  throw new Error(`Rate limit persistente apÃ³s ${MAX_RETRIES} tentativas`);
 }
 
 function parseInsertsByTable(lines) {
@@ -77,7 +77,7 @@ function parseInsertsByTable(lines) {
 }
 
 async function migrate() {
-  console.log('=== MIGRAÇÃO BEEF SYNC → SUPABASE ===\n');
+  console.log('=== MIGRAÃâ€¡ÃÆ’O BEEF SYNC ââ€ â€™ SUPABASE ===\n');
   console.log('Aguardando 5 minutos para reset do rate limit...');
   await sleep(300000);
 
@@ -128,7 +128,7 @@ async function migrate() {
     const count = parsed[0]?.cnt || 0;
     console.log(`Tabelas existentes: ${count}`);
     if (count >= 50) {
-      console.log('Schema já migrado. Pulando etapa 1.\n');
+      console.log('Schema jÃ¡ migrado. Pulando etapa 1.\n');
     } else {
       console.log('\n=== ETAPA 1/4: SCHEMA ===');
       const schemaSQL = schemaLines.join('\n');
@@ -213,7 +213,7 @@ async function migrate() {
   console.log(`Inserts com sucesso: ${totalSuccess}`);
   console.log(`Inserts com erro: ${totalError}`);
   console.log(`Total: ${totalSuccess + totalError}/${insertLines.length}`);
-  console.log('Migração concluída!');
+  console.log('MigraÃ§Ã£o concluÃ­da!');
 }
 
 migrate().catch(console.error);

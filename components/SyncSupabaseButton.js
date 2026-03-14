@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { ArrowUpCircleIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline'
 import { useAuth } from '../contexts/AuthContext'
 
-const TOTAL_TABLES = 17 // número de tabelas no sync
+const TOTAL_TABLES = 17 // nÃºmero de tabelas no sync
 
 export default function SyncSupabaseButton({ onSyncDone }) {
   const { user } = useAuth()
@@ -11,7 +11,7 @@ export default function SyncSupabaseButton({ onSyncDone }) {
   const [open, setOpen] = useState(false)
   const [progress, setProgress] = useState(0)       // 0-100
   const [currentTable, setCurrentTable] = useState('')
-  const [tablesCount, setTablesCount] = useState(0) // tabelas concluídas
+  const [tablesCount, setTablesCount] = useState(0) // tabelas concluÃ­das
   const [startTime, setStartTime] = useState(null)
   const [elapsed, setElapsed] = useState(0)
 
@@ -55,14 +55,14 @@ export default function SyncSupabaseButton({ onSyncDone }) {
               const msg = data.message
               setLogs(prev => [...prev, msg])
 
-              // Detectar início de tabela: "Sincronizando animais..."
+              // Detectar inÃ­cio de tabela: "Sincronizando animais..."
               const syncMatch = msg.match(/^Sincronizando (.+)\.\.\.$/)
               if (syncMatch) {
                 setCurrentTable(syncMatch[1])
               }
 
-              // Detectar conclusão de tabela: "  ✓ animais: 312 registros" ou "  → animais: vazia"
-              if (msg.trim().startsWith('✓') || msg.trim().startsWith('→') || msg.trim().startsWith('✗') || msg.trim().startsWith('⚠')) {
+              // Detectar conclusÃ£o de tabela: "  âÅ“â€œ animais: 312 registros" ou "  ââ€ â€™ animais: vazia"
+              if (msg.trim().startsWith('âÅ“â€œ') || msg.trim().startsWith('ââ€ â€™') || msg.trim().startsWith('âÅ“â€”') || msg.trim().startsWith('âÅ¡ ')) {
                 done_tables++
                 setTablesCount(done_tables)
                 setProgress(Math.min(5 + Math.round((done_tables / TOTAL_TABLES) * 90), 95))
@@ -83,7 +83,7 @@ export default function SyncSupabaseButton({ onSyncDone }) {
       }
     } catch (err) {
       setStatus('error')
-      setLogs(prev => [...prev, `Erro de conexão: ${err.message}`])
+      setLogs(prev => [...prev, `Erro de conexÃ£o: ${err.message}`])
     } finally {
       clearInterval(timer)
       setElapsed(Math.floor((Date.now() - t0) / 1000))
@@ -129,9 +129,9 @@ export default function SyncSupabaseButton({ onSyncDone }) {
         {status === 'syncing'
           ? `Sincronizando... ${progress}%`
           : status === 'done'
-          ? 'Sincronizado ✓'
+          ? 'Sincronizado âÅ“â€œ'
           : status === 'error'
-          ? 'Falhou — tentar de novo'
+          ? 'Falhou ââ‚¬â€� tentar de novo'
           : 'Enviar para Supabase'}
       </button>
 
@@ -143,9 +143,9 @@ export default function SyncSupabaseButton({ onSyncDone }) {
             <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <ArrowUpCircleIcon className="w-4 h-4 text-violet-400" />
-                <h3 className="text-white font-semibold text-sm">Sincronização Local → Supabase</h3>
+                <h3 className="text-white font-semibold text-sm">SincronizaÃ§Ã£o Local ââ€ â€™ Supabase</h3>
               </div>
-              <button onClick={() => setOpen(false)} className="text-white/30 hover:text-white/70 text-xl leading-none transition">×</button>
+              <button onClick={() => setOpen(false)} className="text-white/30 hover:text-white/70 text-xl leading-none transition">Ãâ€”</button>
             </div>
 
             {/* Progress bar */}
@@ -155,20 +155,20 @@ export default function SyncSupabaseButton({ onSyncDone }) {
                   {status === 'syncing' && currentTable
                     ? `Sincronizando ${currentTable}...`
                     : status === 'done'
-                    ? '✅ Concluído'
+                    ? 'âÅ“â€¦ ConcluÃ­do'
                     : status === 'error'
-                    ? '❌ Falhou'
+                    ? 'â�Å’ Falhou'
                     : 'Aguardando...'}
                 </span>
                 <span className="flex items-center gap-2">
                   {status === 'syncing' && (
                     <>
                       <span className="text-white/40">{tablesCount}/{TOTAL_TABLES} tabelas</span>
-                      <span className="text-white/30">·</span>
+                      <span className="text-white/30">Â·</span>
                       <span>{fmtTime(elapsed)}</span>
                       {etaVal && etaVal > 1 && (
                         <>
-                          <span className="text-white/30">·</span>
+                          <span className="text-white/30">Â·</span>
                           <span className="text-white/40">~{fmtTime(etaVal)} restante</span>
                         </>
                       )}
@@ -211,9 +211,9 @@ export default function SyncSupabaseButton({ onSyncDone }) {
               {logs.length === 0 && <p className="text-white/20">Iniciando...</p>}
               {logs.map((log, i) => (
                 <p key={i} className={
-                  log.startsWith('✓') || log.startsWith('✅') ? 'text-emerald-400' :
-                  log.startsWith('✗') || log.startsWith('❌') ? 'text-red-400' :
-                  log.startsWith('⚠') ? 'text-yellow-400' :
+                  log.startsWith('âÅ“â€œ') || log.startsWith('âÅ“â€¦') ? 'text-emerald-400' :
+                  log.startsWith('âÅ“â€”') || log.startsWith('â�Å’') ? 'text-red-400' :
+                  log.startsWith('âÅ¡ ') ? 'text-yellow-400' :
                   log.startsWith('Sincronizando') ? 'text-blue-300' :
                   'text-white/50'
                 }>

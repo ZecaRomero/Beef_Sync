@@ -49,7 +49,7 @@ async function verificarReceptoras() {
           }
         }
       } else {
-        console.log(`\n❌ ${receptora.serie} ${receptora.rg} NÃO ENCONTRADA`);
+        console.log(`\n�Œ ${receptora.serie} ${receptora.rg} N�ƒO ENCONTRADA`);
       }
     }
     
@@ -73,7 +73,7 @@ async function verificarReceptoras() {
     });
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
   } finally {
     client.release();
     await pool.end();

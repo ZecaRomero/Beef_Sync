@@ -1,4 +1,4 @@
-// Integração entre Notas Fiscais e Boletim de Animais
+// IntegraÃ§Ã£o entre Notas Fiscais e Boletim de Animais
 import animalDataManager from './animalDataManager'
 import boletimContabilService from './boletimContabilService'
 
@@ -7,7 +7,7 @@ class NotasFiscaisIntegration {
     this.animalDataManager = animalDataManager
   }
 
-  // Registrar NF de entrada como ocorrência no boletim
+  // Registrar NF de entrada como ocorrÃªncia no boletim
   async registrarNFEntrada(nfData) {
     try {
       const ocorrencias = []
@@ -22,11 +22,11 @@ class NotasFiscaisIntegration {
           let animal = await this.buscarAnimalPorTatuagem(item.tatuagem)
           
           if (!animal) {
-            // Criar novo animal se não existir
+            // Criar novo animal se nÃ£o existir
             animal = await this.criarAnimalDaNF(item, nfData)
           }
 
-          // Registrar ocorrência de entrada
+          // Registrar ocorrÃªncia de entrada
           const ocorrencia = {
             animalId: animal.id,
             tipo: 'entrada',
@@ -42,7 +42,7 @@ class NotasFiscaisIntegration {
 
           ocorrencias.push(ocorrencia)
 
-          // Registrar no boletim contábil
+          // Registrar no boletim contÃ¡bil
           await boletimContabilService.registrarCompra({
             dataCompra: nfData.data,
             serie: animal.serie,
@@ -57,12 +57,12 @@ class NotasFiscaisIntegration {
         }
       }
 
-      // Salvar todas as ocorrências
+      // Salvar todas as ocorrÃªncias
       await this.salvarOcorrencias(ocorrencias)
       
       return {
         success: true,
-        message: `${ocorrencias.length} ocorrência(s) de entrada registrada(s) no boletim`,
+        message: `${ocorrencias.length} ocorrÃªncia(s) de entrada registrada(s) no boletim`,
         ocorrencias: ocorrencias.length
       }
     } catch (error) {
@@ -75,21 +75,21 @@ class NotasFiscaisIntegration {
     }
   }
 
-  // Registrar NF de saída como ocorrência no boletim
+  // Registrar NF de saÃ­da como ocorrÃªncia no boletim
   async registrarNFSaida(nfData) {
-    console.log('🚀 Iniciando registrarNFSaida:', nfData);
+    console.log('ðÅ¸Å¡â‚¬ Iniciando registrarNFSaida:', nfData);
     try {
       const ocorrencias = []
       const animais = JSON.parse(localStorage.getItem('animals') || '[]')
-      console.log(`📊 Total de animais carregados do localStorage: ${animais.length}`);
+      console.log(`ðÅ¸â€œÅ  Total de animais carregados do localStorage: ${animais.length}`);
       let animaisAtualizados = false
       
-      // Para cada item da NF de saída
+      // Para cada item da NF de saÃ­da
       for (const item of nfData.itens || []) {
-        console.log('🔍 Processando item:', item);
+        console.log('ðÅ¸â€�� Processando item:', item);
         // Verificar tipo do produto (suporte a 'bovino', 'bovinos' e fallback)
         const isBovino = item.tipoProduto === 'bovino' || item.tipoItem === 'bovinos' || (!item.tipoProduto && !item.tipoItem && nfData.tipoProduto === 'bovino');
-        console.log(`🐂 É bovino? ${isBovino}`);
+        console.log(`ðÅ¸�â€š Ãâ€° bovino? ${isBovino}`);
 
         if (isBovino) {
           // Buscar animal existente na lista carregada
@@ -100,18 +100,18 @@ class NotasFiscaisIntegration {
             a.serie === item.tatuagem
           )
           
-          console.log(`🔎 Animal encontrado no índice: ${animalIndex}`);
+          console.log(`ðÅ¸â€�Å½ Animal encontrado no Ã­ndice: ${animalIndex}`);
 
           if (animalIndex >= 0) {
             const animal = animais[animalIndex]
-            console.log('✅ Animal encontrado:', animal);
+            console.log('âÅ“â€¦ Animal encontrado:', animal);
             
-            // Registrar ocorrência de saída
+            // Registrar ocorrÃªncia de saÃ­da
             const ocorrencia = {
               animalId: animal.id,
               tipo: 'saida',
               data: nfData.data,
-              descricao: `Saída via NF ${nfData.numeroNF}`,
+              descricao: `SaÃ­da via NF ${nfData.numeroNF}`,
               observacoes: `Destino: ${nfData.destino}\nValor: R$ ${item.valorUnitario}\nNatureza: ${nfData.naturezaOperacao}`,
               valor: item.valorUnitario,
               peso: item.peso,
@@ -127,7 +127,7 @@ class NotasFiscaisIntegration {
               ...animal,
               ativo: false,
               vendido: true,
-              situacao: 'Vendido', // Atualizar situacao também localmente
+              situacao: 'Vendido', // Atualizar situacao tambÃ©m localmente
               dataVenda: nfData.data,
               valorVenda: item.valorUnitario,
               comprador: nfData.destino,
@@ -138,7 +138,7 @@ class NotasFiscaisIntegration {
 
             // Tentar atualizar status via API para persistir no banco de dados
             try {
-              console.log(`📡 Enviando PUT para /api/animals/${animal.id}...`);
+              console.log(`ðÅ¸â€œ¡ Enviando PUT para /api/animals/${animal.id}...`);
               const response = await fetch(`/api/animals/${animal.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -150,17 +150,17 @@ class NotasFiscaisIntegration {
               });
               
               if (response.ok) {
-                console.log(`✅ Animal ${animal.id} atualizado com sucesso via API`);
+                console.log(`âÅ“â€¦ Animal ${animal.id} atualizado com sucesso via API`);
               } else {
-                console.error(`❌ Falha ao atualizar animal ${animal.id} via API: ${response.status} ${response.statusText}`);
+                console.error(`â�Å’ Falha ao atualizar animal ${animal.id} via API: ${response.status} ${response.statusText}`);
                 const errorData = await response.json().catch(() => ({}));
                 console.error('Detalhes do erro:', errorData);
               }
             } catch (apiError) {
-              console.error(`❌ Erro ao atualizar animal ${animal.id} via API:`, apiError);
+              console.error(`â�Å’ Erro ao atualizar animal ${animal.id} via API:`, apiError);
             }
 
-            // Registrar venda no boletim contábil
+            // Registrar venda no boletim contÃ¡bil
             await boletimContabilService.registrarVenda({
               dataVenda: nfData.data,
               serie: animal.serie,
@@ -173,8 +173,8 @@ class NotasFiscaisIntegration {
               observacoes: `Venda via NF ${nfData.numeroNF}`
             }, nfData.periodoBoletim)
           } else if (item.animalId) {
-            console.log(`⚠️ Animal não encontrado localmente, mas ID fornecido: ${item.animalId}. Tentando fallback via API.`);
-            // Fallback: Tentar atualizar status via API mesmo se não encontrado localmente
+            console.log(`âÅ¡ ï¸� Animal nÃ£o encontrado localmente, mas ID fornecido: ${item.animalId}. Tentando fallback via API.`);
+            // Fallback: Tentar atualizar status via API mesmo se nÃ£o encontrado localmente
             try {
               const response = await fetch(`/api/animals/${item.animalId}`, {
                 method: 'PUT',
@@ -187,12 +187,12 @@ class NotasFiscaisIntegration {
               });
 
               if (response.ok) {
-                console.log(`✅ Animal ${item.animalId} atualizado via API (fallback)`);
+                console.log(`âÅ“â€¦ Animal ${item.animalId} atualizado via API (fallback)`);
               } else {
-                console.error(`❌ Falha ao atualizar animal ${item.animalId} via API (fallback): ${response.status}`);
+                console.error(`â�Å’ Falha ao atualizar animal ${item.animalId} via API (fallback): ${response.status}`);
               }
 
-              // Registrar venda no boletim contábil (Fallback)
+              // Registrar venda no boletim contÃ¡bil (Fallback)
               await boletimContabilService.registrarVenda({
                 dataVenda: nfData.data,
                 serie: '', // Desconhecido no fallback
@@ -217,19 +217,19 @@ class NotasFiscaisIntegration {
         localStorage.setItem('animals', JSON.stringify(animais))
       }
 
-      // Salvar todas as ocorrências
+      // Salvar todas as ocorrÃªncias
       await this.salvarOcorrencias(ocorrencias)
       
       return {
         success: true,
-        message: `${ocorrencias.length} ocorrência(s) de saída registrada(s) no boletim`,
+        message: `${ocorrencias.length} ocorrÃªncia(s) de saÃ­da registrada(s) no boletim`,
         ocorrencias: ocorrencias.length
       }
     } catch (error) {
-      console.error('Erro ao registrar NF de saída:', error)
+      console.error('Erro ao registrar NF de saÃ­da:', error)
       return {
         success: false,
-        message: 'Erro ao registrar NF de saída no boletim',
+        message: 'Erro ao registrar NF de saÃ­da no boletim',
         error: error.message
       }
     }
@@ -258,8 +258,8 @@ class NotasFiscaisIntegration {
         serie: item.serie || '',
         rg: item.tatuagem,
         tatuagem: item.tatuagem,
-        sexo: item.sexo === 'macho' ? 'Macho' : 'Fêmea',
-        raca: item.raca || 'Não informado',
+        sexo: item.sexo === 'macho' ? 'Macho' : 'FÃªmea',
+        raca: item.raca || 'NÃ£o informado',
         dataNascimento: this.calcularDataNascimento(item.era),
         peso: parseFloat(item.peso) || 0,
         origem: 'NF Entrada',
@@ -314,7 +314,7 @@ class NotasFiscaisIntegration {
     return eraMap[era] || 0
   }
 
-  // Salvar ocorrências no histórico
+  // Salvar ocorrÃªncias no histÃ³rico
   async salvarOcorrencias(ocorrencias) {
     try {
       const historico = JSON.parse(localStorage.getItem('animalHistory') || '[]')
@@ -334,23 +334,23 @@ class NotasFiscaisIntegration {
       
       return true
     } catch (error) {
-      console.error('Erro ao salvar ocorrências:', error)
+      console.error('Erro ao salvar ocorrÃªncias:', error)
       throw error
     }
   }
 
-  // Buscar ocorrências relacionadas a uma NF
+  // Buscar ocorrÃªncias relacionadas a uma NF
   buscarOcorrenciasPorNF(nfId) {
     try {
       const historico = JSON.parse(localStorage.getItem('animalHistory') || '[]')
       return historico.filter(evento => evento.nfId === nfId)
     } catch (error) {
-      console.error('Erro ao buscar ocorrências da NF:', error)
+      console.error('Erro ao buscar ocorrÃªncias da NF:', error)
       return []
     }
   }
 
-  // Remover ocorrências de uma NF (quando NF é excluída)
+  // Remover ocorrÃªncias de uma NF (quando NF Ã© excluÃ­da)
   async removerOcorrenciasPorNF(nfId) {
     try {
       const historico = JSON.parse(localStorage.getItem('animalHistory') || '[]')
@@ -360,23 +360,23 @@ class NotasFiscaisIntegration {
       
       return true
     } catch (error) {
-      console.error('Erro ao remover ocorrências da NF:', error)
+      console.error('Erro ao remover ocorrÃªncias da NF:', error)
       throw error
     }
   }
 
-  // Verificar se NF já foi integrada
+  // Verificar se NF jÃ¡ foi integrada
   verificarNFIntegrada(nfId) {
     try {
       const historico = JSON.parse(localStorage.getItem('animalHistory') || '[]')
       return historico.some(evento => evento.nfId === nfId)
     } catch (error) {
-      console.error('Erro ao verificar integração da NF:', error)
+      console.error('Erro ao verificar integraÃ§Ã£o da NF:', error)
       return false
     }
   }
 
-  // Estatísticas de integração
+  // EstatÃ­sticas de integraÃ§Ã£o
   getEstatisticasIntegracao() {
     try {
       const historico = JSON.parse(localStorage.getItem('animalHistory') || '[]')
@@ -392,7 +392,7 @@ class NotasFiscaisIntegration {
         pendentesIntegracao: nfs.length - nfsIntegradas.length
       }
     } catch (error) {
-      console.error('Erro ao obter estatísticas:', error)
+      console.error('Erro ao obter estatÃ­sticas:', error)
       return {
         totalNFs: 0,
         nfsIntegradas: 0,
@@ -403,10 +403,10 @@ class NotasFiscaisIntegration {
   }
 }
 
-// Instância global
+// InstÃ¢ncia global
 export const notasFiscaisIntegration = new NotasFiscaisIntegration()
 
-// Funções utilitárias
+// FunÃ§Ãµes utilitÃ¡rias
 export const integrarNFEntrada = (nfData) => notasFiscaisIntegration.registrarNFEntrada(nfData)
 export const integrarNFSaida = (nfData) => notasFiscaisIntegration.registrarNFSaida(nfData)
 export const buscarOcorrenciasNF = (nfId) => notasFiscaisIntegration.buscarOcorrenciasPorNF(nfId)

@@ -2,15 +2,15 @@ const { query } = require('./lib/database');
 
 async function migrateSemenData() {
     try {
-        console.log('🔄 Migrando dados de entradas_semen para estoque_semen...\n');
+        console.log('�Ÿ”„ Migrando dados de entradas_semen para estoque_semen...\n');
 
         // Buscar todos os dados da tabela entradas_semen
         const entradasResult = await query('SELECT * FROM entradas_semen ORDER BY id');
 
-        console.log(`📊 Encontrados ${entradasResult.rows.length} registros em entradas_semen`);
+        console.log(`�Ÿ“Š Encontrados ${entradasResult.rows.length} registros em entradas_semen`);
 
         for (const entrada of entradasResult.rows) {
-            console.log(`\n🔄 Migrando: ${entrada.touro_nome}`);
+            console.log(`\n�Ÿ”„ Migrando: ${entrada.touro_nome}`);
 
             // Verificar se já existe na tabela estoque_semen
             const existsResult = await query(`
@@ -19,7 +19,7 @@ async function migrateSemenData() {
       `, [entrada.touro_nome, entrada.raca]);
 
             if (existsResult.rows.length > 0) {
-                console.log(`  ⚠️  Já existe - pulando`);
+                console.log(`  �š�️  Já existe - pulando`);
                 continue;
             }
 
@@ -49,18 +49,18 @@ async function migrateSemenData() {
                 entrada.observacoes
             ]);
 
-            console.log(`  ✅ Migrado com ID: ${insertResult.rows[0].id}`);
+            console.log(`  �œ… Migrado com ID: ${insertResult.rows[0].id}`);
         }
 
-        console.log('\n🎉 Migração concluída!');
+        console.log('\n�ŸŽ‰ Migração concluída!');
 
         // Verificar resultado
         const finalCount = await query('SELECT COUNT(*) as count FROM estoque_semen');
-        console.log(`📊 Total de registros em estoque_semen: ${finalCount.rows[0].count}`);
+        console.log(`�Ÿ“Š Total de registros em estoque_semen: ${finalCount.rows[0].count}`);
 
         process.exit(0);
     } catch (error) {
-        console.error('❌ Erro na migração:', error);
+        console.error('�Œ Erro na migração:', error);
         process.exit(1);
     }
 }

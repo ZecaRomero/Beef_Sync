@@ -2,12 +2,12 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 
 async function testAnimalsAPI() {
   try {
-    console.log('🔍 Testando API /api/animals...');
+    console.log('�Ÿ”� Testando API /api/animals...');
     
     const response = await fetch('http://localhost:3020/api/animals');
     if (response.ok) {
       const animals = await response.json();
-      console.log('\n📊 Total de animais da API:', animals.length);
+      console.log('\n�Ÿ“Š Total de animais da API:', animals.length);
       
       // Verificar animais por raça
       const breeds = {};
@@ -16,24 +16,24 @@ async function testAnimalsAPI() {
         breeds[raca] = (breeds[raca] || 0) + 1;
       });
       
-      console.log('\n📋 Animais por raça:');
+      console.log('\n�Ÿ“‹ Animais por raça:');
       Object.entries(breeds).forEach(([raca, count]) => {
         console.log('  -', raca + ':', count, 'animais');
       });
       
       // Verificar animais Nelore especificamente
       const neloreAnimals = animals.filter(a => a.raca === 'Nelore');
-      console.log('\n🔍 Animais Nelore encontrados:', neloreAnimals.length);
+      console.log('\n�Ÿ”� Animais Nelore encontrados:', neloreAnimals.length);
       neloreAnimals.forEach(animal => {
         console.log('  -', animal.serie, animal.rg, '(' + animal.peso + 'kg)');
       });
       
     } else {
-      console.log('❌ Erro na API:', response.status, response.statusText);
+      console.log('�Œ Erro na API:', response.status, response.statusText);
     }
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
   }
 }
 

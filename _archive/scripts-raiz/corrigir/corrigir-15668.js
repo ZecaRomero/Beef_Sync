@@ -7,7 +7,7 @@ const http = require('http')
 
 async function corrigirAnimal() {
   try {
-    console.log('\n🔧 Corrigindo animal CJCJ 15668...\n')
+    console.log('\n�Ÿ”� Corrigindo animal CJCJ 15668...\n')
     
     const data = JSON.stringify({
       serie: 'CJCJ',
@@ -46,14 +46,14 @@ async function corrigirAnimal() {
     })
     
     if (!response.success) {
-      console.log('❌ Erro:', response.message)
+      console.log('�Œ Erro:', response.message)
       return
     }
     
-    console.log('✅', response.message)
+    console.log('�œ…', response.message)
     console.log('')
-    console.log('📋 Detalhes da correção:')
-    console.log('─'.repeat(50))
+    console.log('�Ÿ“‹ Detalhes da correção:')
+    console.log('�”€'.repeat(50))
     console.log(`Animal: ${response.animal.serie} ${response.animal.rg}`)
     console.log(`Nome: ${response.animal.nome || 'Sem nome'}`)
     console.log('')
@@ -67,12 +67,12 @@ async function corrigirAnimal() {
     console.log(`  Pt IQG: ${response.animal.depois.pt_iqg}`)
     console.log(`  Situação ABCZ: ${response.animal.depois.situacao_abcz || 'NULL'}`)
     console.log('')
-    console.log('✅ Correção concluída! Atualize a página para ver as mudanças.')
+    console.log('�œ… Correção concluída! Atualize a página para ver as mudanças.')
     console.log('')
     
   } catch (error) {
-    console.error('❌ Erro:', error.message)
-    console.error('\n💡 Certifique-se de que o servidor está rodando em http://localhost:3020')
+    console.error('�Œ Erro:', error.message)
+    console.error('\n�Ÿ’� Certifique-se de que o servidor está rodando em http://localhost:3020')
   }
 }
 

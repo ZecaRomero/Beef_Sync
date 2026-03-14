@@ -41,11 +41,11 @@ async function adicionarUltraSom() {
   try {
     await client.query('BEGIN');
     
-    console.log(`\n🚀 Iniciando processamento...`);
-    console.log(`📊 Total de animais: ${animaisIds.length}`);
-    console.log(`💰 Custo total: R$ ${custoTotal.toFixed(2)}`);
-    console.log(`💵 Custo individual: R$ ${custoIndividual.toFixed(2)}`);
-    console.log(`📅 Data do ultrassom: ${dataUltraSom}\n`);
+    console.log(`\n�Ÿš€ Iniciando processamento...`);
+    console.log(`�Ÿ“Š Total de animais: ${animaisIds.length}`);
+    console.log(`�Ÿ’� Custo total: R$ ${custoTotal.toFixed(2)}`);
+    console.log(`�Ÿ’� Custo individual: R$ ${custoIndividual.toFixed(2)}`);
+    console.log(`�Ÿ“… Data do ultrassom: ${dataUltraSom}\n`);
 
     let sucessos = 0;
     let erros = 0;
@@ -60,14 +60,14 @@ async function adicionarUltraSom() {
         );
 
         if (animalCheck.rows.length === 0) {
-          console.log(`⚠️  Animal ID ${animalId} não encontrado`);
+          console.log(`�š�️  Animal ID ${animalId} não encontrado`);
           animaisComErro.push({ id: animalId, motivo: 'Animal não encontrado' });
           erros++;
           continue;
         }
 
         const animal = animalCheck.rows[0];
-        console.log(`✅ Processando animal ${animal.serie || ''}/${animal.rg || ''} (ID: ${animalId})`);
+        console.log(`�œ… Processando animal ${animal.serie || ''}/${animal.rg || ''} (ID: ${animalId})`);
 
         // 1. Adicionar custo
         const custoResult = await client.query(`
@@ -120,7 +120,7 @@ async function adicionarUltraSom() {
         sucessos++;
         
       } catch (error) {
-        console.error(`❌ Erro ao processar animal ID ${animalId}:`, error.message);
+        console.error(`�Œ Erro ao processar animal ID ${animalId}:`, error.message);
         animaisComErro.push({ id: animalId, motivo: error.message });
         erros++;
       }
@@ -128,12 +128,12 @@ async function adicionarUltraSom() {
 
     await client.query('COMMIT');
 
-    console.log(`\n✨ Processamento concluído!`);
-    console.log(`✅ Sucessos: ${sucessos}`);
-    console.log(`❌ Erros: ${erros}`);
+    console.log(`\n�œ� Processamento concluído!`);
+    console.log(`�œ… Sucessos: ${sucessos}`);
+    console.log(`�Œ Erros: ${erros}`);
     
     if (animaisComErro.length > 0) {
-      console.log(`\n⚠️  Animais com erro:`);
+      console.log(`\n�š�️  Animais com erro:`);
       animaisComErro.forEach(item => {
         console.log(`   - ID ${item.id}: ${item.motivo}`);
       });
@@ -141,7 +141,7 @@ async function adicionarUltraSom() {
 
   } catch (error) {
     await client.query('ROLLBACK');
-    console.error('\n❌ Erro crítico:', error);
+    console.error('\n�Œ Erro crítico:', error);
     throw error;
   } finally {
     client.release();

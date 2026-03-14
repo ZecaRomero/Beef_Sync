@@ -16,7 +16,7 @@ async function limpar() {
   try {
     await client.query('BEGIN')
     
-    console.log('🔍 Identificando baixas duplicadas...\n')
+    console.log('ðÅ¸â€�� Identificando baixas duplicadas...\n')
     
     // Buscar todas as baixas duplicadas
     const duplicadas = await client.query(`
@@ -28,12 +28,12 @@ async function limpar() {
     `)
     
     if (duplicadas.rows.length === 0) {
-      console.log('✅ Nenhuma baixa duplicada encontrada')
+      console.log('âÅ“â€¦ Nenhuma baixa duplicada encontrada')
       await client.query('ROLLBACK')
       return
     }
     
-    console.log(`⚠️  Encontradas ${duplicadas.rows.length} baixas duplicadas\n`)
+    console.log(`âÅ¡ ï¸�  Encontradas ${duplicadas.rows.length} baixas duplicadas\n`)
     
     let totalRemovidos = 0
     
@@ -52,22 +52,22 @@ async function limpar() {
       `, [dup.serie, dup.rg, dup.tipo])
       
       if (result.rowCount > 0) {
-        console.log(`✅ ${dup.serie} ${dup.rg} - ${dup.tipo}: removidos ${result.rowCount} duplicados`)
+        console.log(`âÅ“â€¦ ${dup.serie} ${dup.rg} - ${dup.tipo}: removidos ${result.rowCount} duplicados`)
         totalRemovidos += result.rowCount
       }
     }
     
     await client.query('COMMIT')
     
-    console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.log(`✅ LIMPEZA CONCLUÍDA!`)
-    console.log(`📊 Total de registros duplicados removidos: ${totalRemovidos}`)
-    console.log(`📋 Baixas únicas mantidas: ${duplicadas.rows.length}`)
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('\nââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��')
+    console.log(`âÅ“â€¦ LIMPEZA CONCLUÃ�DA!`)
+    console.log(`ðÅ¸â€œÅ  Total de registros duplicados removidos: ${totalRemovidos}`)
+    console.log(`ðÅ¸â€œâ€¹ Baixas Ãºnicas mantidas: ${duplicadas.rows.length}`)
+    console.log('ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��')
     
   } catch (error) {
     await client.query('ROLLBACK')
-    console.error('❌ Erro ao limpar duplicatas:', error)
+    console.error('â�Å’ Erro ao limpar duplicatas:', error)
     throw error
   } finally {
     client.release()
@@ -77,10 +77,10 @@ async function limpar() {
 
 limpar()
   .then(() => {
-    console.log('\n✨ Script finalizado')
+    console.log('\nâÅ“¨ Script finalizado')
     process.exit(0)
   })
   .catch(error => {
-    console.error('\n💥 Erro fatal:', error)
+    console.error('\nðÅ¸â€™¥ Erro fatal:', error)
     process.exit(1)
   })

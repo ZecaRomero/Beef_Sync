@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Script para atualizar a tabela nascimentos com os campos necessários
+ * Script para atualizar a tabela nascimentos com os campos necessÃ¡rios
  */
 
 require('dotenv').config()
@@ -19,7 +19,7 @@ async function updateNascimentosTable() {
   const pool = new Pool(dbConfig)
   
   try {
-    console.log('🔧 Atualizando tabela nascimentos...')
+    console.log('ðÅ¸â€�§ Atualizando tabela nascimentos...')
     
     // Drop a tabela antiga se existir e criar uma nova com a estrutura correta
     await pool.query(`
@@ -54,8 +54,8 @@ async function updateNascimentosTable() {
       CREATE INDEX idx_nascimentos_sexo ON nascimentos(sexo);
     `)
     
-    console.log('✅ Tabela nascimentos atualizada com sucesso!')
-    console.log('📊 Campos disponíveis:')
+    console.log('âÅ“â€¦ Tabela nascimentos atualizada com sucesso!')
+    console.log('ðÅ¸â€œÅ  Campos disponÃ­veis:')
     console.log('   - receptora, doador, rg, prev_parto')
     console.log('   - nascimento, tatuagem, cc, ps1, ps2')
     console.log('   - sexo, status, touro, data')
@@ -66,7 +66,7 @@ async function updateNascimentosTable() {
     process.exit(0)
     
   } catch (error) {
-    console.error('❌ Erro ao atualizar tabela:', error.message)
+    console.error('â�Å’ Erro ao atualizar tabela:', error.message)
     await pool.end()
     process.exit(1)
   }

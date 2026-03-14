@@ -6,11 +6,11 @@ export default async function handler(req, res) {
     if (req.method !== 'POST') {
       return res.status(405).json({
         status: 'error',
-        message: `Método ${req.method} não permitido`
+        message: `MÃ©todo ${req.method} nÃ£o permitido`
       })
     }
 
-    logger.info('🔄 Iniciando sincronização de mortes com boletim contábil...')
+    logger.info('ðÅ¸â€�â€ž Iniciando sincronizaÃ§Ã£o de mortes com boletim contÃ¡bil...')
 
     // Buscar todas as mortes registradas
     const mortes = await databaseService.buscarMortes()
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
     // Processar cada morte
     for (const morte of mortes) {
       try {
-        // Verificar se já existe movimentação para esta morte
+        // Verificar se jÃ¡ existe movimentaÃ§Ã£o para esta morte
         const movimentacaoExistente = await databaseService.query(`
           SELECT id FROM movimentacoes_contabeis 
           WHERE animal_id = $1 AND subtipo = 'morte' AND data_movimento = $2
@@ -40,13 +40,13 @@ export default async function handler(req, res) {
         if (movimentacaoExistente.rows.length > 0) {
           detalhes.push({
             animal: `${morte.serie} ${morte.rg}`,
-            status: 'já_sincronizada',
-            message: 'Movimentação já existe no boletim'
+            status: 'jÃ¡_sincronizada',
+            message: 'MovimentaÃ§Ã£o jÃ¡ existe no boletim'
           })
           continue
         }
 
-        // Registrar no boletim contábil
+        // Registrar no boletim contÃ¡bil
         const periodo = new Date(morte.data_morte).toISOString().slice(0, 7) // YYYY-MM
         
         await databaseService.registrarMovimentacao({
@@ -72,11 +72,11 @@ export default async function handler(req, res) {
         detalhes.push({
           animal: `${morte.serie} ${morte.rg}`,
           status: 'sincronizada',
-          message: 'Registrada no boletim contábil',
+          message: 'Registrada no boletim contÃ¡bil',
           valor: morte.valor_perda
         })
 
-        logger.info(`✅ Morte sincronizada: ${morte.serie} ${morte.rg}`)
+        logger.info(`âÅ“â€¦ Morte sincronizada: ${morte.serie} ${morte.rg}`)
 
       } catch (error) {
         erros++
@@ -85,15 +85,15 @@ export default async function handler(req, res) {
           status: 'erro',
           message: error.message
         })
-        logger.error(`❌ Erro ao sincronizar morte ${morte.serie} ${morte.rg}:`, error)
+        logger.error(`â�Å’ Erro ao sincronizar morte ${morte.serie} ${morte.rg}:`, error)
       }
     }
 
-    logger.info(`🎉 Sincronização concluída: ${sincronizadas} mortes sincronizadas, ${erros} erros`)
+    logger.info(`ðÅ¸Å½â€° SincronizaÃ§Ã£o concluÃ­da: ${sincronizadas} mortes sincronizadas, ${erros} erros`)
 
     res.status(200).json({
       status: 'success',
-      message: 'Sincronização concluída',
+      message: 'SincronizaÃ§Ã£o concluÃ­da',
       sincronizadas,
       erros,
       total: mortes.length,
@@ -102,7 +102,7 @@ export default async function handler(req, res) {
     })
 
   } catch (error) {
-    logger.error('Erro na sincronização de mortes:', error)
+    logger.error('Erro na sincronizaÃ§Ã£o de mortes:', error)
     
     res.status(500).json({
       status: 'error',

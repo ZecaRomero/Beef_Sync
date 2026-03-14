@@ -1,7 +1,7 @@
 /**
- * API para importar dados do Excel "AVALIAÇÃO - PROJEÇÃO DA CRIA"
- * Colunas: Série, RGN, LOTE, OBSERVAÇÃO (situação reprodutiva), PREV PARTO, CRIA, SEXO CRIA, PAI DA CRIA, iABCZg*, DECA, IQG, PtIQG, MGT, TOP
- * Permite aplicar carimbo de leilão aos animais importados
+ * API para importar dados do Excel "AVALIAÃâ€¡ÃÆ’O - PROJEÃâ€¡ÃÆ’O DA CRIA"
+ * Colunas: SÃ©rie, RGN, LOTE, OBSERVAÃâ€¡ÃÆ’O (situaÃ§Ã£o reprodutiva), PREV PARTO, CRIA, SEXO CRIA, PAI DA CRIA, iABCZg*, DECA, IQG, PtIQG, MGT, TOP
+ * Permite aplicar carimbo de leilÃ£o aos animais importados
  */
 import { query } from '../../../lib/database'
 import { asyncHandler } from '../../../utils/apiResponse'
@@ -29,7 +29,7 @@ const getVal = (row, keys) => {
 
 export default asyncHandler(async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, message: 'Método não permitido' })
+    return res.status(405).json({ success: false, message: 'MÃ©todo nÃ£o permitido' })
   }
 
   const { registros = [], carimboLeilao = '' } = req.body || {}
@@ -46,14 +46,14 @@ export default asyncHandler(async function handler(req, res) {
   try {
   for (const row of registros) {
     try {
-      const serie = getVal(row, ['Série', 'Serie', 'SERIE', 'serie'])
+      const serie = getVal(row, ['SÃ©rie', 'Serie', 'SERIE', 'serie'])
       const rg = getVal(row, ['RGN', 'RG', 'rg', 'rgn'])
       if (!serie || !rg) {
-        erros.push({ serie: String(row?.Série || row?.Serie || row?.RGN || ''), rg: String(row?.RG || row?.RGN || ''), motivo: 'Série ou RGN ausente' })
+        erros.push({ serie: String(row?.SÃ©rie || row?.Serie || row?.RGN || ''), rg: String(row?.RG || row?.RGN || ''), motivo: 'SÃ©rie ou RGN ausente' })
         continue
       }
 
-      const situacaoReprodutiva = getVal(row, ['OBSERVAÇÃO', 'OBSERVACAO', 'Observação', 'observacao', 'OBS'])
+      const situacaoReprodutiva = getVal(row, ['OBSERVAÃâ€¡ÃÆ’O', 'OBSERVACAO', 'ObservaÃ§Ã£o', 'observacao', 'OBS'])
       const prevParto = getVal(row, ['PREV PARTO', 'Prev Parto', 'prev_parto', 'PREV_PARTO'])
       const lote = getVal(row, ['LOTE', 'Lote', 'lote'])
       const cria = getVal(row, ['CRIA', 'Cria', 'cria'])
@@ -73,13 +73,13 @@ export default asyncHandler(async function handler(req, res) {
       )
 
       if (existente.rows.length === 0) {
-        erros.push({ serie: String(serie), rg: String(rg), motivo: 'Animal não encontrado no banco' })
+        erros.push({ serie: String(serie), rg: String(rg), motivo: 'Animal nÃ£o encontrado no banco' })
         continue
       }
 
       const animalId = existente.rows[0].id
 
-      // Montar UPDATE dinâmico
+      // Montar UPDATE dinÃ¢mico
       const updates = []
       const values = []
       let idx = 1
@@ -121,7 +121,7 @@ export default asyncHandler(async function handler(req, res) {
         values.push(top)
       }
 
-      // Concatenar observações existentes com LOTE, CRIA, SEXO CRIA, PAI DA CRIA se necessário
+      // Concatenar observaÃ§Ãµes existentes com LOTE, CRIA, SEXO CRIA, PAI DA CRIA se necessÃ¡rio
       if (lote || cria || sexoCria || paiCria) {
         const obsParts = []
         if (lote) obsParts.push(`Lote: ${lote}`)
@@ -147,12 +147,12 @@ export default asyncHandler(async function handler(req, res) {
       )
       atualizados++
     } catch (e) {
-      logger.error('Erro ao atualizar animal na importação leilão:', e)
+      logger.error('Erro ao atualizar animal na importaÃ§Ã£o leilÃ£o:', e)
       const msg = e.message || ''
       if (msg.includes('column') && msg.includes('does not exist')) {
-        throw new Error('Colunas do banco não encontradas. Reinicie o servidor para aplicar as migrações.')
+        throw new Error('Colunas do banco nÃ£o encontradas. Reinicie o servidor para aplicar as migraÃ§Ãµes.')
       }
-      erros.push({ serie: getVal(row, ['Série', 'Serie', 'SERIE']), rg: getVal(row, ['RGN', 'RG', 'rg']), motivo: msg })
+      erros.push({ serie: getVal(row, ['SÃ©rie', 'Serie', 'SERIE']), rg: getVal(row, ['RGN', 'RG', 'rg']), motivo: msg })
     }
   }
 
@@ -167,13 +167,13 @@ export default asyncHandler(async function handler(req, res) {
     message: `${atualizados} animal(is) atualizado(s)${carimbo ? ` com carimbo "${carimbo}"` : ''}`
   })
   } catch (dbError) {
-    logger.error('Erro na importação leilão:', dbError)
+    logger.error('Erro na importaÃ§Ã£o leilÃ£o:', dbError)
     const msg = dbError.message || ''
-    const isColumnError = msg.includes('column') && msg.includes('does not exist') || msg.includes('Colunas do banco não encontradas')
+    const isColumnError = msg.includes('column') && msg.includes('does not exist') || msg.includes('Colunas do banco nÃ£o encontradas')
     return res.status(500).json({
       success: false,
       message: isColumnError
-        ? 'Colunas do banco não encontradas. Reinicie o servidor (npm run dev) para aplicar as migrações (carimbo_leilao, situacao_reprodutiva, prev_parto).'
+        ? 'Colunas do banco nÃ£o encontradas. Reinicie o servidor (npm run dev) para aplicar as migraÃ§Ãµes (carimbo_leilao, situacao_reprodutiva, prev_parto).'
         : ('Erro ao importar: ' + (msg || 'Erro no servidor'))
     })
   }

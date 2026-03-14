@@ -10,7 +10,7 @@ const pool = new Pool({
 })
 
 async function verificarExamesAndrologicos() {
-  console.log('🔍 VERIFICANDO EXAMES ANDROLÓGICOS\n')
+  console.log('�Ÿ”� VERIFICANDO EXAMES ANDROL�“GICOS\n')
   console.log('=' .repeat(80))
   
   try {
@@ -24,8 +24,8 @@ async function verificarExamesAndrologicos() {
     `)
     
     if (!tabelaExiste.rows[0].exists) {
-      console.log('❌ Tabela exames_andrologicos NÃO EXISTE no PostgreSQL!')
-      console.log('\n📋 Estrutura esperada:')
+      console.log('�Œ Tabela exames_andrologicos N�ƒO EXISTE no PostgreSQL!')
+      console.log('\n�Ÿ“‹ Estrutura esperada:')
       console.log(`
 CREATE TABLE exames_andrologicos (
   id SERIAL PRIMARY KEY,
@@ -44,7 +44,7 @@ CREATE TABLE exames_andrologicos (
       return
     }
     
-    console.log('✅ Tabela exames_andrologicos existe\n')
+    console.log('�œ… Tabela exames_andrologicos existe\n')
     
     // 2. Verificar estrutura da tabela
     const colunas = await pool.query(`
@@ -54,7 +54,7 @@ CREATE TABLE exames_andrologicos (
       ORDER BY ordinal_position;
     `)
     
-    console.log('📊 ESTRUTURA DA TABELA:')
+    console.log('�Ÿ“Š ESTRUTURA DA TABELA:')
     console.log('-'.repeat(80))
     colunas.rows.forEach(col => {
       console.log(`  ${col.column_name.padEnd(20)} | ${col.data_type.padEnd(20)} | ${col.is_nullable === 'YES' ? 'NULL' : 'NOT NULL'}`)
@@ -65,14 +65,14 @@ CREATE TABLE exames_andrologicos (
     const count = await pool.query('SELECT COUNT(*) FROM exames_andrologicos')
     const totalExames = parseInt(count.rows[0].count)
     
-    console.log('📈 ESTATÍSTICAS:')
+    console.log('�Ÿ“ˆ ESTATÍSTICAS:')
     console.log('-'.repeat(80))
     console.log(`  Total de exames no PostgreSQL: ${totalExames}`)
     
     if (totalExames === 0) {
-      console.log('\n⚠️  BANCO DE DADOS VAZIO!')
+      console.log('\n�š�️  BANCO DE DADOS VAZIO!')
       console.log('   Os exames podem estar apenas no localStorage do navegador.')
-      console.log('\n💡 SOLUÇÕES:')
+      console.log('\n�Ÿ’� SOLU�‡�•ES:')
       console.log('   1. Abra o navegador e vá para a página de Exames Andrológicos')
       console.log('   2. Abra o Console (F12)')
       console.log('   3. Execute: localStorage.getItem("examesAndrologicos")')
@@ -89,7 +89,7 @@ CREATE TABLE exames_andrologicos (
         LIMIT 10
       `)
       
-      console.log(`\n📋 ÚLTIMOS ${ultimosExames.rows.length} EXAMES:`)
+      console.log(`\n�Ÿ“‹ �šLTIMOS ${ultimosExames.rows.length} EXAMES:`)
       console.log('-'.repeat(80))
       ultimosExames.rows.forEach((exame, idx) => {
         console.log(`\n${idx + 1}. ID: ${exame.id}`)
@@ -109,7 +109,7 @@ CREATE TABLE exames_andrologicos (
         ORDER BY total DESC
       `)
       
-      console.log('\n📊 EXAMES POR RESULTADO:')
+      console.log('\n�Ÿ“Š EXAMES POR RESULTADO:')
       console.log('-'.repeat(80))
       porResultado.rows.forEach(r => {
         console.log(`  ${(r.resultado || 'Não informado').padEnd(20)} : ${r.total}`)
@@ -127,7 +127,7 @@ CREATE TABLE exames_andrologicos (
         LIMIT 6
       `)
       
-      console.log('\n📅 EXAMES POR MÊS (últimos 6 meses):')
+      console.log('\n�Ÿ“… EXAMES POR M�ŠS (últimos 6 meses):')
       console.log('-'.repeat(80))
       porMes.rows.forEach(m => {
         console.log(`  ${m.mes} : ${m.total} exames`)
@@ -135,10 +135,10 @@ CREATE TABLE exames_andrologicos (
     }
     
     console.log('\n' + '='.repeat(80))
-    console.log('✅ Verificação concluída!')
+    console.log('�œ… Verificação concluída!')
     
   } catch (error) {
-    console.error('\n❌ ERRO:', error.message)
+    console.error('\n�Œ ERRO:', error.message)
     console.error('\nDetalhes:', error)
   } finally {
     await pool.end()

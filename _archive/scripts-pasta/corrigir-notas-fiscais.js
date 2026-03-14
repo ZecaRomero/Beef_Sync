@@ -9,20 +9,20 @@ const { query } = require('../lib/database')
 
 async function corrigirNotasFiscais() {
   try {
-    console.log('🧹 LIMPANDO TODAS AS NOTAS FISCAIS...')
+    console.log('�Ÿ�� LIMPANDO TODAS AS NOTAS FISCAIS...')
     
     // Verificar conexão
     const connectionTest = await query('SELECT NOW() as timestamp')
-    console.log('✅ Conexão PostgreSQL OK:', connectionTest.rows[0].timestamp)
+    console.log('�œ… Conexão PostgreSQL OK:', connectionTest.rows[0].timestamp)
     
     // Limpar TUDO
-    console.log('🗑️ Removendo todas as notas fiscais...')
+    console.log('�Ÿ—‘️ Removendo todas as notas fiscais...')
     await query('DELETE FROM notas_fiscais_itens')
     await query('DELETE FROM notas_fiscais')
-    console.log('✅ Todas as notas fiscais removidas')
+    console.log('�œ… Todas as notas fiscais removidas')
     
     // Inserir APENAS a NF real do JOAOZINHO
-    console.log('📄 Inserindo APENAS a NF real do JOAOZINHO...')
+    console.log('�Ÿ“„ Inserindo APENAS a NF real do JOAOZINHO...')
     
     const nfReal = {
       numeroNF: "NF-JOAOZINHO-001",
@@ -86,7 +86,7 @@ async function corrigirNotasFiscais() {
     ])
     
     const nfId = nfResult.rows[0].id
-    console.log(`✅ NF real inserida com ID: ${nfId}`)
+    console.log(`�œ… NF real inserida com ID: ${nfId}`)
     
     // Inserir itens da NF real
     for (const item of nfReal.itens) {
@@ -98,14 +98,14 @@ async function corrigirNotasFiscais() {
         ) VALUES ($1, $2, $3)
       `, [nfId, item.tipoProduto, JSON.stringify(item)])
     }
-    console.log(`✅ ${nfReal.itens.length} itens reais inseridos`)
+    console.log(`�œ… ${nfReal.itens.length} itens reais inseridos`)
     
     // Verificar resultado final
     const countResult = await query('SELECT COUNT(*) as total FROM notas_fiscais')
     const totalNFs = countResult.rows[0].total
     
-    console.log('\n🎉 CORREÇÃO CONCLUÍDA!')
-    console.log(`📊 Total de notas fiscais no banco: ${totalNFs}`)
+    console.log('\n�ŸŽ‰ CORRE�‡�ƒO CONCLUÍDA!')
+    console.log(`�Ÿ“Š Total de notas fiscais no banco: ${totalNFs}`)
     
     // Mostrar detalhes da NF real
     const nfDetails = await query(`
@@ -121,7 +121,7 @@ async function corrigirNotasFiscais() {
       GROUP BY nf.id, nf.numero_nf, nf.fornecedor, nf.valor_total, nf.tipo
     `)
     
-    console.log('\n📋 Detalhes da NF real:')
+    console.log('\n�Ÿ“‹ Detalhes da NF real:')
     nfDetails.rows.forEach(nf => {
       console.log(`  ID: ${nf.id}`)
       console.log(`  Número: ${nf.numero_nf}`)
@@ -131,14 +131,14 @@ async function corrigirNotasFiscais() {
       console.log(`  Itens: ${nf.total_itens}`)
     })
     
-    console.log('\n✅ AGORA O APP DEVE MOSTRAR:')
+    console.log('\n�œ… AGORA O APP DEVE MOSTRAR:')
     console.log('  - 1 nota fiscal (JOAOZINHO)')
     console.log('  - Valor total: R$ 15.000,00')
     console.log('  - 2 itens')
     console.log('  - Contadores corretos')
     
   } catch (error) {
-    console.error('❌ Erro na correção:', error)
+    console.error('�Œ Erro na correção:', error)
     throw error
   }
 }
@@ -147,12 +147,12 @@ async function corrigirNotasFiscais() {
 if (require.main === module) {
   corrigirNotasFiscais()
     .then(() => {
-      console.log('\n✅ CORREÇÃO EXECUTADA COM SUCESSO!')
-      console.log('🔄 Agora recarregue o app para ver os dados corretos.')
+      console.log('\n�œ… CORRE�‡�ƒO EXECUTADA COM SUCESSO!')
+      console.log('�Ÿ”„ Agora recarregue o app para ver os dados corretos.')
       process.exit(0)
     })
     .catch((error) => {
-      console.error('\n❌ Erro ao executar correção:', error)
+      console.error('\n�Œ Erro ao executar correção:', error)
       process.exit(1)
     })
 }

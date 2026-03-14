@@ -14,7 +14,7 @@ async function testar() {
   const client = await pool.connect()
   
   try {
-    console.log('🔍 Testando consulta de filhos da CJCJ 16013...\n')
+    console.log('ðÅ¸â€�� Testando consulta de filhos da CJCJ 16013...\n')
     
     const serie = 'CJCJ'
     const rg = '16013'
@@ -28,10 +28,10 @@ async function testar() {
       ORDER BY data_nascimento DESC
     `, [serie, rg, `%${serie}-${rg}%`, `${serie} ${rg}`])
     
-    console.log(`📊 Total de filhos encontrados: ${result.rows.length}\n`)
+    console.log(`ðÅ¸â€œÅ  Total de filhos encontrados: ${result.rows.length}\n`)
     
     if (result.rows.length > 0) {
-      console.log('📋 Lista de filhos:')
+      console.log('ðÅ¸â€œâ€¹ Lista de filhos:')
       result.rows.forEach((f, i) => {
         console.log(`${i + 1}. ${f.serie} ${f.rg} | ${f.nome || 'sem nome'} | ${f.sexo} | ${f.situacao}`)
         if (f.data_nascimento) {
@@ -42,7 +42,7 @@ async function testar() {
     }
     
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('â�Å’ Erro:', error)
   } finally {
     client.release()
     await pool.end()

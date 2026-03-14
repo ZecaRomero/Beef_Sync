@@ -18,7 +18,7 @@ import {
   InformationCircleIcon
 } from '../components/ui/Icons'
 
-// Funções utilitárias
+// FunÃ§Ãµes utilitÃ¡rias
 const calcularDiasRestantes = (proximoAbastecimento) => {
   if (!proximoAbastecimento) return null
   const hoje = new Date()
@@ -43,12 +43,12 @@ const calcularValorTotal = (quantidade, valorUnitario) => {
 const formatarMoeda = (valor) => {
   if (!valor) return 'R$ 0,00'
   
-  // Se já é string formatada, retorna como está
+  // Se jÃ¡ Ã© string formatada, retorna como estÃ¡
   if (typeof valor === 'string' && valor.includes('R$')) {
     return valor
   }
 
-  // Limpa o valor e converte para número
+  // Limpa o valor e converte para nÃºmero
   let valorLimpo = String(valor).replace(/[^\d,.]/g, '')
   valorLimpo = valorLimpo.replace(',', '.')
   const numero = parseFloat(valorLimpo) || 0
@@ -89,13 +89,13 @@ function Nitrogenio() {
   const [showObservationModal, setShowObservationModal] = useState(false)
   const [observationItem, setObservationItem] = useState(null)
 
-  // Estados para paginação
+  // Estados para paginaÃ§Ã£o
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(10)
   const [totalItems, setTotalItems] = useState(0)
   const [totalLitrosFromAPI, setTotalLitrosFromAPI] = useState(0)
 
-  // Estados para seleção múltipla
+  // Estados para seleÃ§Ã£o mÃºltipla
   const [selectedItems, setSelectedItems] = useState([])
   const [selectAll, setSelectAll] = useState(false)
   const [deletingMultiple, setDeletingMultiple] = useState(false)
@@ -107,7 +107,7 @@ function Nitrogenio() {
   const [showWhatsappModal, setShowWhatsappModal] = useState(false)
   const [newContato, setNewContato] = useState({ nome: '', whatsapp: '' })
 
-  // Função para atualizar formData com cálculo automático
+  // FunÃ§Ã£o para atualizar formData com cÃ¡lculo automÃ¡tico
   const updateFormData = useCallback((field, value) => {
     setFormData(prev => {
       const newFormData = { ...prev, [field]: value }
@@ -210,7 +210,7 @@ function Nitrogenio() {
 
   const handleEdit = useCallback((abastecimento) => {
     if (!abastecimento || !abastecimento.id) {
-      showToast('Dados do abastecimento inválidos', 'error')
+      showToast('Dados do abastecimento invÃ¡lidos', 'error')
       return
     }
 
@@ -228,7 +228,7 @@ function Nitrogenio() {
 
   const handleDelete = useCallback(async (id) => {
     if (!id) {
-      showToast('ID inválido', 'error')
+      showToast('ID invÃ¡lido', 'error')
       return
     }
 
@@ -244,7 +244,7 @@ function Nitrogenio() {
         throw new Error(errorData.message || `Erro HTTP ${response.status}: ${response.statusText}`)
       }
 
-      showToast('Abastecimento excluído com sucesso!')
+      showToast('Abastecimento excluÃ­do com sucesso!')
       await fetchAbastecimentos()
       setSelectedItems(prev => prev.filter(itemId => itemId !== id))
     } catch (error) {
@@ -305,12 +305,12 @@ function Nitrogenio() {
       const result = await response.json()
       const deletedCount = result.data?.deletedCount || selectedItems.length
 
-      showToast(`${deletedCount} abastecimento(s) excluído(s) com sucesso!`)
+      showToast(`${deletedCount} abastecimento(s) excluÃ­do(s) com sucesso!`)
       setSelectedItems([])
       setSelectAll(false)
       await fetchAbastecimentos()
     } catch (error) {
-      console.error('Erro ao excluir múltiplos:', error)
+      console.error('Erro ao excluir mÃºltiplos:', error)
       const errorMessage = error.message || 'Erro ao excluir registros selecionados. Tente novamente.'
       showToast(errorMessage, 'error')
     } finally {
@@ -319,26 +319,26 @@ function Nitrogenio() {
   }, [selectedItems, showToast, fetchAbastecimentos])
 
   const openObservation = useCallback((item) => {
-    console.log('🔍 openObservation chamado com:', item)
-    console.log('📝 Observação:', item?.observacoes)
+    console.log('ðÅ¸â€�� openObservation chamado com:', item)
+    console.log('ðÅ¸â€œ� ObservaÃ§Ã£o:', item?.observacoes)
     setObservationItem(item)
     setShowObservationModal(true)
-    console.log('✅ Modal de observação deve estar aberto agora')
+    console.log('âÅ“â€¦ Modal de observaÃ§Ã£o deve estar aberto agora')
   }, [])
 
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault()
 
-    // Validação dos campos obrigatórios
+    // ValidaÃ§Ã£o dos campos obrigatÃ³rios
     if (!formData.data_abastecimento || !formData.quantidade_litros || !formData.motorista?.trim()) {
-      showToast('Preencha todos os campos obrigatórios: Data, Quantidade e Motorista', 'error')
+      showToast('Preencha todos os campos obrigatÃ³rios: Data, Quantidade e Motorista', 'error')
       return
     }
 
-    // Validação de valores numéricos
+    // ValidaÃ§Ã£o de valores numÃ©ricos
     const quantidade = parseFloat(formData.quantidade_litros)
     if (isNaN(quantidade) || quantidade <= 0) {
-      showToast('A quantidade deve ser um valor numérico maior que zero', 'error')
+      showToast('A quantidade deve ser um valor numÃ©rico maior que zero', 'error')
       return
     }
 
@@ -378,14 +378,14 @@ function Nitrogenio() {
     }
   }, [formData, editingId, showToast, limparValorMoeda, fetchAbastecimentos, fetchMotoristas, resetForm])
 
-  // Cálculos memoizados
+  // CÃ¡lculos memoizados
   const totalPages = useMemo(() => Math.ceil(totalItems / itemsPerPage), [totalItems, itemsPerPage])
   const startItem = useMemo(() => (currentPage - 1) * itemsPerPage + 1, [currentPage, itemsPerPage])
   const endItem = useMemo(() => Math.min(currentPage * itemsPerPage, totalItems), [currentPage, itemsPerPage, totalItems])
 
-  // Estatísticas memoizadas
+  // EstatÃ­sticas memoizadas
   const totalLitros = useMemo(() => {
-    // Usar o valor da API se disponível, caso contrário calcular da página atual
+    // Usar o valor da API se disponÃ­vel, caso contrÃ¡rio calcular da pÃ¡gina atual
     if (totalLitrosFromAPI > 0) {
       return totalLitrosFromAPI
     }
@@ -474,7 +474,7 @@ function Nitrogenio() {
       return { 
         color: 'text-gray-600 bg-gray-50 dark:text-gray-400 dark:bg-gray-900/20', 
         icon: null, 
-        text: 'Não definido' 
+        text: 'NÃ£o definido' 
       }
     }
     
@@ -515,10 +515,10 @@ function Nitrogenio() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <BeakerIcon className="h-8 w-8 text-blue-600" />
-            Controle de Nitrogênio
+            Controle de NitrogÃªnio
           </h1>
           <p className="text-gray-600 dark:text-gray-300 mt-1">
-            Gerencie o abastecimento de nitrogênio e receba lembretes automáticos
+            Gerencie o abastecimento de nitrogÃªnio e receba lembretes automÃ¡ticos
           </p>
         </div>
         <div className="flex gap-2">
@@ -580,7 +580,7 @@ function Nitrogenio() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Próximos Vencimentos</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">PrÃ³ximos Vencimentos</p>
               <p className="text-2xl font-bold text-red-600">
                 {proximosVencimentos}
               </p>
@@ -596,12 +596,12 @@ function Nitrogenio() {
             <div className="mb-4 p-3 rounded-lg border border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-800 flex items-center gap-2">
               <ExclamationTriangleIcon className="h-5 w-5 text-yellow-600" />
               <span className="text-sm text-yellow-800 dark:text-yellow-300">
-                {observacoesCount === 1 ? 'Há 1 abastecimento com observação.' : `Há ${observacoesCount} abastecimentos com observação.`}
+                {observacoesCount === 1 ? 'HÃ¡ 1 abastecimento com observaÃ§Ã£o.' : `HÃ¡ ${observacoesCount} abastecimentos com observaÃ§Ã£o.`}
               </span>
             </div>
           )}
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Histórico de Abastecimentos</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">HistÃ³rico de Abastecimentos</h2>
             {selectedItems.length > 0 && (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600 dark:text-gray-300">
@@ -658,7 +658,7 @@ function Nitrogenio() {
                         Quantidade
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Valor Unitário
+                        Valor UnitÃ¡rio
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Valor Total
@@ -667,13 +667,13 @@ function Nitrogenio() {
                         Motorista
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Próximo Abastecimento
+                        PrÃ³ximo Abastecimento
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Status
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Ações
+                        AÃ§Ãµes
                       </th>
                     </tr>
                   </thead>
@@ -702,7 +702,7 @@ function Nitrogenio() {
                                 title={String(item.observacoes)}
                                 onClick={() => openObservation(item)}
                               >
-                                Observação
+                                ObservaÃ§Ã£o
                               </Badge>
                             )}
                           </div>
@@ -825,7 +825,7 @@ function Nitrogenio() {
                       variant="secondary"
                       size="sm"
                     >
-                      Próximo
+                      PrÃ³ximo
                     </Button>
                   </div>
                 </div>
@@ -874,7 +874,7 @@ function Nitrogenio() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Valor Unitário *
+              Valor UnitÃ¡rio *
             </label>
             <Input
               type="text"
@@ -912,7 +912,7 @@ function Nitrogenio() {
               placeholder="R$ 0,00"
             />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Calculado automaticamente (Quantidade × Valor Unitário)
+              Calculado automaticamente (Quantidade Ãâ€” Valor UnitÃ¡rio)
             </p>
           </div>
 
@@ -936,18 +936,18 @@ function Nitrogenio() {
               </datalist>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Digite o nome ou selecione um motorista já cadastrado
+              Digite o nome ou selecione um motorista jÃ¡ cadastrado
             </p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Observações
+              ObservaÃ§Ãµes
             </label>
             <textarea
               value={formData.observacoes || ''}
               onChange={(e) => updateFormData('observacoes', e.target.value)}
-              placeholder="Observações adicionais..."
+              placeholder="ObservaÃ§Ãµes adicionais..."
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
               rows="3"
               name="observacoes"
@@ -976,16 +976,16 @@ function Nitrogenio() {
       <Modal
         isOpen={showObservationModal}
         onClose={() => {
-          console.log('🔒 Fechando modal de observação')
+          console.log('ðÅ¸â€�â€™ Fechando modal de observaÃ§Ã£o')
           setShowObservationModal(false)
           setObservationItem(null)
         }}
-        title="Observação do Abastecimento"
+        title="ObservaÃ§Ã£o do Abastecimento"
         size="lg"
       >
         <div className="space-y-3">
-          {console.log('🎯 Renderizando modal - observationItem:', observationItem)}
-          {console.log('🎯 showObservationModal:', showObservationModal)}
+          {console.log('ðÅ¸Å½¯ Renderizando modal - observationItem:', observationItem)}
+          {console.log('ðÅ¸Å½¯ showObservationModal:', showObservationModal)}
           {observationItem ? (
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm text-gray-900 dark:text-gray-100">
@@ -1007,7 +1007,7 @@ function Nitrogenio() {
             </div>
           ) : (
             <div className="text-center py-4">
-              <p className="text-gray-500">Nenhuma observação selecionada</p>
+              <p className="text-gray-500">Nenhuma observaÃ§Ã£o selecionada</p>
               <p className="text-xs text-gray-400 mt-1">observationItem: {JSON.stringify(observationItem)}</p>
             </div>
           )}
@@ -1026,12 +1026,12 @@ function Nitrogenio() {
         <div className="space-y-4">
           <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
             <p className="text-sm text-blue-800 dark:text-blue-200">
-              <strong>ℹ️ Como funciona:</strong> Quando faltarem 2 dias para o próximo abastecimento de nitrogênio, 
-              todos os contatos cadastrados receberão uma notificação automática via WhatsApp.
+              <strong>ââ€ž¹ï¸� Como funciona:</strong> Quando faltarem 2 dias para o prÃ³ximo abastecimento de nitrogÃªnio, 
+              todos os contatos cadastrados receberÃ£o uma notificaÃ§Ã£o automÃ¡tica via WhatsApp.
             </p>
           </div>
 
-          {/* Formulário para adicionar novo contato */}
+          {/* FormulÃ¡rio para adicionar novo contato */}
           <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
             <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
               Adicionar Novo Contato
@@ -1045,7 +1045,7 @@ function Nitrogenio() {
                   type="text"
                   value={newContato.nome}
                   onChange={(e) => setNewContato({ ...newContato, nome: e.target.value })}
-                  placeholder="Ex: João Silva"
+                  placeholder="Ex: JoÃ£o Silva"
                 />
               </div>
               <div>
@@ -1062,7 +1062,7 @@ function Nitrogenio() {
                   placeholder="Ex: 11987654321"
                 />
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Apenas números (com DDD)
+                  Apenas nÃºmeros (com DDD)
                 </p>
               </div>
             </div>
@@ -1084,7 +1084,7 @@ function Nitrogenio() {
               <div className="text-center py-6 text-gray-500 dark:text-gray-400">
                 <PhoneIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
                 <p>Nenhum contato cadastrado</p>
-                <p className="text-xs mt-1">Adicione contatos para receber notificações automáticas</p>
+                <p className="text-xs mt-1">Adicione contatos para receber notificaÃ§Ãµes automÃ¡ticas</p>
               </div>
             ) : (
               <div className="space-y-2 max-h-64 overflow-y-auto">

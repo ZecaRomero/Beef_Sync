@@ -1,7 +1,7 @@
 // Script para identificar a nota fiscal no localStorage
 // Execute este código no console do navegador (F12)
 
-console.log('🔍 Identificando a nota fiscal no localStorage...')
+console.log('�Ÿ”� Identificando a nota fiscal no localStorage...')
 
 // Verificar notas fiscais
 const notasFiscais = localStorage.getItem('notasFiscais')
@@ -9,10 +9,10 @@ const notasFiscais = localStorage.getItem('notasFiscais')
 if (notasFiscais) {
   try {
     const nfs = JSON.parse(notasFiscais)
-    console.log(`📊 Encontradas ${nfs.length} nota(s) fiscal(is) no localStorage`)
+    console.log(`�Ÿ“Š Encontradas ${nfs.length} nota(s) fiscal(is) no localStorage`)
     
     if (nfs.length > 0) {
-      console.log('\n📋 Detalhes da(s) nota(s) fiscal(is):')
+      console.log('\n�Ÿ“‹ Detalhes da(s) nota(s) fiscal(is):')
       nfs.forEach((nf, index) => {
         console.log(`\n${index + 1}. Nota Fiscal:`)
         console.log(`   ID: ${nf.id}`)
@@ -38,34 +38,34 @@ if (notasFiscais) {
         }
       })
       
-      console.log('\n💡 Esta é a nota fiscal que aparece como "1" na interface!')
-      console.log('📋 Para migrar para PostgreSQL, use o script de migração.')
+      console.log('\n�Ÿ’� Esta é a nota fiscal que aparece como "1" na interface!')
+      console.log('�Ÿ“‹ Para migrar para PostgreSQL, use o script de migração.')
       
     } else {
-      console.log('❌ Array de notas fiscais está vazio')
+      console.log('�Œ Array de notas fiscais está vazio')
     }
   } catch (error) {
-    console.error('❌ Erro ao parsear notas fiscais:', error)
+    console.error('�Œ Erro ao parsear notas fiscais:', error)
   }
 } else {
-  console.log('❌ Nenhuma nota fiscal encontrada no localStorage')
+  console.log('�Œ Nenhuma nota fiscal encontrada no localStorage')
 }
 
 // Verificar outras informações relevantes
-console.log('\n🔍 Outras informações do localStorage:')
+console.log('\n�Ÿ”� Outras informações do localStorage:')
 const deviceId = localStorage.getItem('beefsync_device_id')
 if (deviceId) {
-  console.log(`🆔 Device ID: ${deviceId}`)
+  console.log(`�Ÿ†” Device ID: ${deviceId}`)
 }
 
 const lastSync = localStorage.getItem('beefsync_last_sync_time')
 if (lastSync) {
-  console.log(`⏰ Última Sincronização: ${lastSync}`)
+  console.log(`⏰ �šltima Sincronização: ${lastSync}`)
 }
 
 const integrationStatus = localStorage.getItem('nf_integracao_status')
 if (integrationStatus) {
-  console.log(`🔗 Status de Integração: ${integrationStatus}`)
+  console.log(`�Ÿ”— Status de Integração: ${integrationStatus}`)
 }
 
-console.log('\n✅ Identificação concluída!')
+console.log('\n�œ… Identificação concluída!')

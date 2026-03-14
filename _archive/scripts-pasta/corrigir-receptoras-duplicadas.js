@@ -173,15 +173,15 @@ async function executarCorrecao(duplicatas, dryRun = true) {
       const canonico = await escolherCanonico(client, animais)
       const paraRemover = animais.filter(a => a.id !== canonico.id)
 
-      console.log(`\n📋 Grupo: ${chave}`)
-      console.log(`   ✅ Manter: ID ${canonico.id} - ${canonico.nome} (${canonico.serie} ${canonico.rg})`)
+      console.log(`\n�Ÿ“‹ Grupo: ${chave}`)
+      console.log(`   �œ… Manter: ID ${canonico.id} - ${canonico.nome} (${canonico.serie} ${canonico.rg})`)
 
       for (const dup of paraRemover) {
-        console.log(`   ❌ Remover: ID ${dup.id} - ${dup.nome} (${dup.serie} ${dup.rg})`)
+        console.log(`   �Œ Remover: ID ${dup.id} - ${dup.nome} (${dup.serie} ${dup.rg})`)
 
         if (!dryRun) {
           const migrados = await migrarReferencias(client, dup.id, canonico.id)
-          if (migrados > 0) console.log(`      → ${migrados} referências migradas para ID ${canonico.id}`)
+          if (migrados > 0) console.log(`      �†’ ${migrados} referências migradas para ID ${canonico.id}`)
 
           await client.query(`DELETE FROM animais WHERE id = $1`, [dup.id])
           removidos++
@@ -197,9 +197,9 @@ async function executarCorrecao(duplicatas, dryRun = true) {
             `UPDATE animais SET serie = $1, nome = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3`,
             [serieCorreta, nomeCorreto, canonico.id]
           )
-          console.log(`   📝 Corrigido nome/série do canônico para: ${nomeCorreto}`)
+          console.log(`   �Ÿ“� Corrigido nome/série do canônico para: ${nomeCorreto}`)
         } else {
-          console.log(`   📝 Seria corrigido nome/série para: ${nomeCorreto}`)
+          console.log(`   �Ÿ“� Seria corrigido nome/série para: ${nomeCorreto}`)
         }
         corrigidos++
       }
@@ -215,14 +215,14 @@ async function main() {
   const args = process.argv.slice(2)
   const dryRun = !args.includes('--execute')
 
-  console.log('🔍 Beef-Sync - Correção de Receptoras Duplicadas')
-  console.log(dryRun ? '   Modo: DRY-RUN (use --execute para aplicar)\n' : '   Modo: EXECUÇÃO\n')
+  console.log('�Ÿ”� Beef-Sync - Correção de Receptoras Duplicadas')
+  console.log(dryRun ? '   Modo: DRY-RUN (use --execute para aplicar)\n' : '   Modo: EXECU�‡�ƒO\n')
 
   const duplicatas = await encontrarDuplicatas()
-  console.log(`📊 Encontradas ${duplicatas.length} grupos de receptoras duplicadas\n`)
+  console.log(`�Ÿ“Š Encontradas ${duplicatas.length} grupos de receptoras duplicadas\n`)
 
   if (duplicatas.length === 0) {
-    console.log('✅ Nenhuma duplicata encontrada.')
+    console.log('�œ… Nenhuma duplicata encontrada.')
     await pool.end()
     return
   }
@@ -231,11 +231,11 @@ async function main() {
 
   console.log('\n' + '='.repeat(50))
   if (dryRun) {
-    console.log('📌 Resumo (DRY-RUN):')
+    console.log('�Ÿ“Œ Resumo (DRY-RUN):')
     console.log(`   - ${duplicatas.length} grupos de duplicatas`)
     console.log('   Execute com --execute para aplicar as correções.')
   } else {
-    console.log('✅ Correção concluída:')
+    console.log('�œ… Correção concluída:')
     console.log(`   - ${removidos} duplicatas removidas`)
     console.log(`   - ${corrigidos} registros canônicos ajustados`)
   }
@@ -243,6 +243,6 @@ async function main() {
 }
 
 main().catch(err => {
-  console.error('❌ Erro:', err)
+  console.error('�Œ Erro:', err)
   process.exit(1)
 })

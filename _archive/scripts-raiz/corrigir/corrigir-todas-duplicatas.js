@@ -59,13 +59,13 @@ function identificarCorretoEDuplicatas(animais) {
 
 async function corrigirTodas() {
   try {
-    console.log('🔍 Buscando todas as duplicatas (RG com múltiplos registros)...\n')
+    console.log('�Ÿ”� Buscando todas as duplicatas (RG com múltiplos registros)...\n')
     
     const rgsDuplicados = await encontrarDuplicatas()
-    console.log(`📊 Encontrados ${rgsDuplicados.length} RGs com duplicatas:\n`)
+    console.log(`�Ÿ“Š Encontrados ${rgsDuplicados.length} RGs com duplicatas:\n`)
     
     if (rgsDuplicados.length === 0) {
-      console.log('✅ Nenhuma duplicata encontrada!')
+      console.log('�œ… Nenhuma duplicata encontrada!')
       return
     }
 
@@ -96,7 +96,7 @@ async function corrigirTodas() {
 
           await pool.query(`DELETE FROM animais WHERE id = $1`, [duplicata.id])
           corrigidos.push({ rg, mantido: correto.id, removido: duplicata.id })
-          console.log(`✅ ${rg}: mantido ID ${correto.id} (${correto.nome}), removido ID ${duplicata.id} (${duplicata.nome})`)
+          console.log(`�œ… ${rg}: mantido ID ${correto.id} (${correto.nome}), removido ID ${duplicata.id} (${duplicata.nome})`)
           totalRemovidos++
         }
 
@@ -105,20 +105,20 @@ async function corrigirTodas() {
       }
     }
 
-    console.log('\n' + '─'.repeat(60))
-    console.log(`\n📋 Resumo: ${corrigidos.length} duplicatas corrigidas`)
+    console.log('\n' + '�”€'.repeat(60))
+    console.log(`\n�Ÿ“‹ Resumo: ${corrigidos.length} duplicatas corrigidas`)
     
     if (semCorrecao.length > 0) {
-      console.log(`\n⚠️ ${semCorrecao.length} RGs com duplicatas que precisam de análise manual:`)
+      console.log(`\n�š�️ ${semCorrecao.length} RGs com duplicatas que precisam de análise manual:`)
       semCorrecao.forEach(({ rg, animais }) => {
         console.log(`\n   RG ${rg}:`)
         animais.forEach(a => console.log(`      - ID ${a.id}: ${a.nome} (${a.serie}) - ${a.raca}`))
       })
     }
 
-    console.log('\n✅ Correção concluída!')
+    console.log('\n�œ… Correção concluída!')
   } catch (error) {
-    console.error('❌ Erro:', error.message)
+    console.error('�Œ Erro:', error.message)
     console.error(error.stack)
   } finally {
     await pool.end()

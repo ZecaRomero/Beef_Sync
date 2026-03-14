@@ -57,7 +57,7 @@ export default function ModernAnimalForm({
   
   const [availableLocations, setAvailableLocations] = useState([])
 
-  // Carregar locais (usa utilitário que filtra nomes de touros cadastrados por engano como piquete)
+  // Carregar locais (usa utilitÃ¡rio que filtra nomes de touros cadastrados por engano como piquete)
   useEffect(() => {
     fetchAvailableLocations()
       .then(setAvailableLocations)
@@ -118,17 +118,17 @@ export default function ModernAnimalForm({
       newFormData.raca = serieOption.raca
     }
 
-    // Regras específicas para RPT
+    // Regras especÃ­ficas para RPT
     if (serie === 'RPT') {
-      newFormData.sexo = 'Fêmea'
+      newFormData.sexo = 'FÃªmea'
       newFormData.raca = 'Receptora'
       newFormData.meses = 30
       newFormData.dataNascimento = ''
     }
 
-    // Regras específicas para PA
+    // Regras especÃ­ficas para PA
     if (serie === 'PA') {
-      newFormData.sexo = 'Fêmea'
+      newFormData.sexo = 'FÃªmea'
       newFormData.raca = 'Nelore PA'
     }
 
@@ -152,22 +152,22 @@ export default function ModernAnimalForm({
   const validateForm = () => {
     const newErrors = {}
 
-    if (!formData.serie) newErrors.serie = 'Série é obrigatória'
-    if (!formData.rg) newErrors.rg = 'RG é obrigatório'
+    if (!formData.serie) newErrors.serie = 'SÃ©rie Ã© obrigatÃ³ria'
+    if (!formData.rg) newErrors.rg = 'RG Ã© obrigatÃ³rio'
     if (!formData.boletim) newErrors.boletim = 'Selecione o Boletim'
-    if (!formData.pastoAtual) newErrors.pastoAtual = 'Selecione a Localização Atual'
-    if (formData.rg.length > 6) newErrors.rg = 'RG deve ter no máximo 6 dígitos'
+    if (!formData.pastoAtual) newErrors.pastoAtual = 'Selecione a LocalizaÃ§Ã£o Atual'
+    if (formData.rg.length > 6) newErrors.rg = 'RG deve ter no mÃ¡ximo 6 dÃ­gitos'
     
-    // Validação específica para PA (2 letras + 4 números)
+    // ValidaÃ§Ã£o especÃ­fica para PA (2 letras + 4 nÃºmeros)
     if (formData.serie === 'PA') {
       if (!/^[A-Za-z]{2}\d{4}$/.test(formData.rg)) {
-        newErrors.rg = 'RG PA deve ter 2 letras e 4 números (ex: AA1234)'
+        newErrors.rg = 'RG PA deve ter 2 letras e 4 nÃºmeros (ex: AA1234)'
       }
     }
 
-    if (!formData.sexo) newErrors.sexo = 'Sexo é obrigatório'
-    if (!formData.raca) newErrors.raca = 'Raça é obrigatória'
-    if (!formData.situacao) newErrors.situacao = 'Situação é obrigatória'
+    if (!formData.sexo) newErrors.sexo = 'Sexo Ã© obrigatÃ³rio'
+    if (!formData.raca) newErrors.raca = 'RaÃ§a Ã© obrigatÃ³ria'
+    if (!formData.situacao) newErrors.situacao = 'SituaÃ§Ã£o Ã© obrigatÃ³ria'
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -177,17 +177,17 @@ export default function ModernAnimalForm({
     e.preventDefault()
     
     if (!validateForm()) {
-      alert('❌ Erro de validação: Verifique os campos obrigatórios')
+      alert('â�Å’ Erro de validaÃ§Ã£o: Verifique os campos obrigatÃ³rios')
       return
     }
 
     try {
       setLoading(true)
       await onSave(formData)
-      alert(`✅ Sucesso! ${animal ? 'Animal atualizado com sucesso!' : 'Novo animal adicionado ao rebanho!'}`)
+      alert(`âÅ“â€¦ Sucesso! ${animal ? 'Animal atualizado com sucesso!' : 'Novo animal adicionado ao rebanho!'}`)
       onClose()
     } catch (error) {
-      alert(`❌ Erro: ${error.message || 'Erro ao salvar animal'}`)
+      alert(`â�Å’ Erro: ${error.message || 'Erro ao salvar animal'}`)
     } finally {
       setLoading(false)
     }
@@ -209,16 +209,16 @@ export default function ModernAnimalForm({
       size="xl"
     >
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Botão de Importação - só aparece no modo de criação */}
+          {/* BotÃ£o de ImportaÃ§Ã£o - sÃ³ aparece no modo de criaÃ§Ã£o */}
           {!animal && onImportAnimals && (
             <div className="bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-700 rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-200">
-                    📊 Importação em Massa
+                    ðÅ¸â€œÅ  ImportaÃ§Ã£o em Massa
                   </h4>
                   <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
-                    Importe vários animais de uma vez usando Excel ou CSV
+                    Importe vÃ¡rios animais de uma vez usando Excel ou CSV
                   </p>
                 </div>
                 <Button
@@ -227,19 +227,19 @@ export default function ModernAnimalForm({
                   onClick={() => setShowImportModal(true)}
                   className="text-sm"
                 >
-                  📥 Importar Excel
+                  ðÅ¸â€œ¥ Importar Excel
                 </Button>
               </div>
             </div>
           )}
 
-        {/* Identificação */}
+        {/* IdentificaÃ§Ã£o */}
           <div className="space-y-3">
             <h4 className="text-base font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
-            Identificação
+            IdentificaÃ§Ã£o
           </h4>
 
-          {/* Localização e Origem */}
+          {/* LocalizaÃ§Ã£o e Origem */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
             {/* Boletim */}
             <div>
@@ -277,10 +277,10 @@ export default function ModernAnimalForm({
               </select>
             </div>
 
-            {/* Localização Atual */}
+            {/* LocalizaÃ§Ã£o Atual */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Localização Atual (Piquete) *
+                LocalizaÃ§Ã£o Atual (Piquete) *
               </label>
               <select
                 value={formData.pastoAtual}
@@ -308,7 +308,7 @@ export default function ModernAnimalForm({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Série *
+                SÃ©rie *
               </label>
               <select
                 value={formData.serie}
@@ -339,12 +339,12 @@ export default function ModernAnimalForm({
                  setFormData({ ...formData, rg: value })
                }}
               error={errors.rg}
-              placeholder={formData.serie === 'PA' ? "Ex: AA1234" : "Até 6 dígitos"}
+              placeholder={formData.serie === 'PA' ? "Ex: AA1234" : "AtÃ© 6 dÃ­gitos"}
               maxLength={20}
             />
 
               <Input
-                label="Raça *"
+                label="RaÃ§a *"
                 value={formData.raca}
                 onChange={(e) => setFormData({ ...formData, raca: e.target.value })}
                 error={errors.raca}
@@ -353,10 +353,10 @@ export default function ModernAnimalForm({
             </div>
         </div>
 
-          {/* Características Compactas */}
+          {/* CaracterÃ­sticas Compactas */}
           <div className="space-y-3">
             <h4 className="text-base font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
-            Características
+            CaracterÃ­sticas
           </h4>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -399,18 +399,18 @@ export default function ModernAnimalForm({
                       formData.serie === 'RPT' || formData.serie === 'PA' ? 'opacity-50 cursor-not-allowed' : ''
                     }`}
                   >
-                    🐂 Macho
+                    ðÅ¸�â€š Macho
                   </button>
                   <button
                     type="button"
-                    onClick={() => setFormData({ ...formData, sexo: 'Fêmea' })}
+                    onClick={() => setFormData({ ...formData, sexo: 'FÃªmea' })}
                     className={`py-2 px-4 rounded-lg border-2 text-sm font-medium transition-colors ${
-                      formData.sexo === 'Fêmea'
+                      formData.sexo === 'FÃªmea'
                         ? 'border-pink-500 bg-pink-50 dark:bg-pink-900 text-pink-700 dark:text-pink-300'
                         : 'border-gray-300 dark:border-gray-600 hover:border-pink-300'
                     }`}
                   >
-                    🐄 Fêmea
+                    ðÅ¸�â€ž FÃªmea
                   </button>
                 </div>
                 {errors.sexo && (
@@ -421,7 +421,7 @@ export default function ModernAnimalForm({
               {/* FIV - Compacto */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Este animal é FIV? 🧬
+                  Este animal Ã© FIV? ðÅ¸§¬
                 </label>
                 <div className="inline-flex gap-2">
                   <button
@@ -433,7 +433,7 @@ export default function ModernAnimalForm({
                         : 'border-gray-300 dark:border-gray-600 hover:border-purple-300'
                     }`}
                   >
-                    ✅ Sim
+                    âÅ“â€¦ Sim
                   </button>
                   <button
                     type="button"
@@ -444,7 +444,7 @@ export default function ModernAnimalForm({
                         : 'border-gray-300 dark:border-gray-600 hover:border-gray-300'
                     }`}
                   >
-                    ❌ Não
+                    â�Å’ NÃ£o
                   </button>
                 </div>
               </div>
@@ -453,7 +453,7 @@ export default function ModernAnimalForm({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Situação *
+                SituaÃ§Ã£o *
               </label>
               <select
                 value={formData.situacao}
@@ -471,7 +471,7 @@ export default function ModernAnimalForm({
                 )}
               </div>
 
-              {/* Receptora - só aparece se for FIV */}
+              {/* Receptora - sÃ³ aparece se for FIV */}
               {formData.isFiv && (
                 <Input
                   label="RG da Receptora (RPT)"
@@ -493,15 +493,15 @@ export default function ModernAnimalForm({
             {/* Pai */}
             <div className="space-y-2">
               <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                🐂 Pai
+                ðÅ¸�â€š Pai
               </h5>
               <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
                 <div className="md:col-span-1">
                   <Input
-                    label="Série"
+                    label="SÃ©rie"
                     value={formData.paiSerie}
                     onChange={(e) => setFormData({ ...formData, paiSerie: e.target.value })}
-                    placeholder="Série"
+                    placeholder="SÃ©rie"
                   />
                 </div>
                 <div className="md:col-span-1">
@@ -523,18 +523,18 @@ export default function ModernAnimalForm({
               </div>
             </div>
 
-            {/* Mãe */}
+            {/* MÃ£e */}
             <div className="space-y-2">
               <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                🐄 Mãe
+                ðÅ¸�â€ž MÃ£e
               </h5>
               <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
                 <div className="md:col-span-1">
                   <Input
-                    label="Série"
+                    label="SÃ©rie"
                     value={formData.maeSerie}
                     onChange={(e) => setFormData({ ...formData, maeSerie: e.target.value })}
-                    placeholder="Série"
+                    placeholder="SÃ©rie"
                   />
                 </div>
                 <div className="md:col-span-1">
@@ -550,7 +550,7 @@ export default function ModernAnimalForm({
                     label="Nome"
                     value={formData.mae}
                     onChange={(e) => setFormData({ ...formData, mae: e.target.value })}
-                    placeholder="Nome da mãe"
+                    placeholder="Nome da mÃ£e"
                   />
                 </div>
               </div>
@@ -585,17 +585,17 @@ export default function ModernAnimalForm({
             />
           </div>
 
-          {/* Observações - Compacta */}
+          {/* ObservaÃ§Ãµes - Compacta */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Observações
+              ObservaÃ§Ãµes
             </label>
             <textarea
               value={formData.observacoes}
               onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
               className="input-field"
               rows={2}
-              placeholder="Observações adicionais..."
+              placeholder="ObservaÃ§Ãµes adicionais..."
             />
           </div>
 
@@ -620,7 +620,7 @@ export default function ModernAnimalForm({
         </form>
       </Modal>
 
-      {/* Modal de Importação */}
+      {/* Modal de ImportaÃ§Ã£o */}
       {showImportModal && (
         <AnimalImporter
           isOpen={showImportModal}

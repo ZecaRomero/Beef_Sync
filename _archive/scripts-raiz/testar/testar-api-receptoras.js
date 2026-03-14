@@ -29,10 +29,10 @@ const req = http.request(options, (res) => {
       const m1815 = response.data?.find(a => a.serie === 'M1815' || (a.serie === 'M' && a.rg === '1815'));
       
       if (m1815) {
-        console.log('✅ M 1815 ENCONTRADA NA API!');
+        console.log('�œ… M 1815 ENCONTRADA NA API!');
         console.log(JSON.stringify(m1815, null, 2));
       } else {
-        console.log('❌ M 1815 NÃO ENCONTRADA NA API');
+        console.log('�Œ M 1815 N�ƒO ENCONTRADA NA API');
         
         // Mostrar alguns animais M
         const animaisM = response.data?.filter(a => a.serie?.startsWith('M')) || [];
@@ -50,8 +50,8 @@ const req = http.request(options, (res) => {
 });
 
 req.on('error', (error) => {
-  console.error('❌ Erro na requisição:', error.message);
-  console.log('\n⚠️  O servidor está rodando na porta 3020?');
+  console.error('�Œ Erro na requisição:', error.message);
+  console.log('\n�š�️  O servidor está rodando na porta 3020?');
   console.log('Execute: npm run dev');
 });
 

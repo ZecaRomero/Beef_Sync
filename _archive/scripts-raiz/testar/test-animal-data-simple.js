@@ -11,7 +11,7 @@ async function testAnimalData() {
       LIMIT 5
     `)
     
-    console.log('üêÑ Animais encontrados:\n')
+    console.log('≈∏ê‚Äû Animais encontrados:\n')
     
     result.rows.forEach(animal => {
       console.log(`${animal.serie}-${animal.rg}:`)
@@ -24,7 +24,7 @@ async function testAnimalData() {
     })
     
   } catch (error) {
-    console.error('‚ùå Erro:', error)
+    console.error('‚ù≈í Erro:', error)
   } finally {
     process.exit(0)
   }

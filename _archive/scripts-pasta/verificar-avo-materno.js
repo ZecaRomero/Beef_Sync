@@ -20,12 +20,12 @@ async function verificarAvoMaterno() {
     
     if (result.rows.length > 0) {
       const animal = result.rows[0]
-      console.log('📋 Animal BENT-6167 encontrado:')
+      console.log('�Ÿ“‹ Animal BENT-6167 encontrado:')
       console.log(JSON.stringify(animal, null, 2))
       
       if (!animal.avo_materno || animal.avo_materno.trim() === '') {
-        console.log('\n⚠️ Campo avo_materno está vazio!')
-        console.log('💡 Atualizando com o valor "CALVARIO SANT FIV 51"...')
+        console.log('\n�š�️ Campo avo_materno está vazio!')
+        console.log('�Ÿ’� Atualizando com o valor "CALVARIO SANT FIV 51"...')
         
         await client.query(`
           UPDATE animais 
@@ -33,16 +33,16 @@ async function verificarAvoMaterno() {
           WHERE id = $2
         `, ['CALVARIO SANT FIV 51', animal.id])
         
-        console.log('✅ Avô materno atualizado com sucesso!')
+        console.log('�œ… Avô materno atualizado com sucesso!')
       } else {
-        console.log(`\n✅ Avô materno já está preenchido: "${animal.avo_materno}"`)
+        console.log(`\n�œ… Avô materno já está preenchido: "${animal.avo_materno}"`)
       }
     } else {
-      console.log('❌ Animal BENT-6167 não encontrado!')
+      console.log('�Œ Animal BENT-6167 não encontrado!')
     }
     
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('�Œ Erro:', error)
     throw error
   } finally {
     client.release()

@@ -41,13 +41,13 @@ export default function ROICalculator({ isOpen, onClose }) {
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
-            🧮 Calculadora ROI
+            ðÅ¸§® Calculadora ROI
           </h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl"
           >
-            ×
+            Ãâ€”
           </button>
         </div>
 
@@ -55,7 +55,7 @@ export default function ROICalculator({ isOpen, onClose }) {
         <div className="p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              💰 Investimento Total (R$)
+              ðÅ¸â€™° Investimento Total (R$)
             </label>
             <input
               type="number"
@@ -68,7 +68,7 @@ export default function ROICalculator({ isOpen, onClose }) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              📈 Receita Esperada (R$)
+              ðÅ¸â€œË† Receita Esperada (R$)
             </label>
             <input
               type="number"
@@ -81,7 +81,7 @@ export default function ROICalculator({ isOpen, onClose }) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              📅 Período (meses)
+              ðÅ¸â€œâ€¦ PerÃ­odo (meses)
             </label>
             <input
               type="number"
@@ -97,7 +97,7 @@ export default function ROICalculator({ isOpen, onClose }) {
         {results && (
           <div className="p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              📊 Resultados
+              ðÅ¸â€œÅ  Resultados
             </h3>
             
             <div className="grid grid-cols-2 gap-4">
@@ -133,7 +133,7 @@ export default function ROICalculator({ isOpen, onClose }) {
             {results.breakEven > 0 && (
               <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
                 <div className="text-sm text-yellow-800 dark:text-yellow-200">
-                  ⏱️ Ponto de equilíbrio: {results.breakEven.toFixed(1)} meses
+                  â�±ï¸� Ponto de equilÃ­brio: {results.breakEven.toFixed(1)} meses
                 </div>
               </div>
             )}

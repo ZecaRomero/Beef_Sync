@@ -53,7 +53,7 @@ const BackupManager = () => {
           tables: {
             animals: 'Dados dos animais',
             costs: 'Dados de custos',
-            users: 'Dados de usuários',
+            users: 'Dados de usuÃ¡rios',
             sales: 'Dados de vendas'
           }
         }
@@ -77,18 +77,18 @@ const BackupManager = () => {
   }
 
   const restoreBackup = async (backupId) => {
-    if (!confirm('Tem certeza que deseja restaurar este backup? Todos os dados atuais serão substituídos.')) {
+    if (!confirm('Tem certeza que deseja restaurar este backup? Todos os dados atuais serÃ£o substituÃ­dos.')) {
       return
     }
 
-    toast.info('Iniciando restauração...')
+    toast.info('Iniciando restauraÃ§Ã£o...')
     
     try {
-      // Simular processo de restauração
+      // Simular processo de restauraÃ§Ã£o
       await new Promise(resolve => setTimeout(resolve, 2000))
       toast.success('Backup restaurado com sucesso!')
     } catch (error) {
-      console.error('Erro na restauração:', error)
+      console.error('Erro na restauraÃ§Ã£o:', error)
       toast.error('Erro ao restaurar backup.')
     }
   }
@@ -99,7 +99,7 @@ const BackupManager = () => {
     }
 
     setBackupHistory(prev => prev.filter(b => b.id !== backupId))
-    toast.success('Backup excluído com sucesso!')
+    toast.success('Backup excluÃ­do com sucesso!')
   }
 
   const formatDate = (dateString) => {
@@ -109,18 +109,18 @@ const BackupManager = () => {
   const getStatusIcon = (status) => {
     switch (status) {
       case 'success':
-        return '✅'
+        return 'âÅ“â€¦'
       case 'error':
-        return '❌'
+        return 'â�Å’'
       case 'in_progress':
-        return '⏳'
+        return 'â�³'
       default:
-        return '❓'
+        return 'â�â€œ'
     }
   }
 
   const getTypeIcon = (type) => {
-    return type === 'automatic' ? '🤖' : '👤'
+    return type === 'automatic' ? 'ðÅ¸¤â€“' : 'ðÅ¸â€˜¤'
   }
 
   return (
@@ -128,7 +128,7 @@ const BackupManager = () => {
       {/* Controles de Backup */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          💾 Gerenciamento de Backup
+          ðÅ¸â€™¾ Gerenciamento de Backup
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -136,7 +136,7 @@ const BackupManager = () => {
             <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
               {backupHistory.length}
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Backups Disponíveis</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Backups DisponÃ­veis</div>
           </div>
           <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
             <div className="text-2xl font-bold text-green-600 dark:text-green-400">
@@ -148,7 +148,7 @@ const BackupManager = () => {
             <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
               {backupHistory[0]?.size || '0 MB'}
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Último Backup</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">ÃÅ¡ltimo Backup</div>
           </div>
         </div>
 
@@ -165,20 +165,20 @@ const BackupManager = () => {
               </>
             ) : (
               <>
-                💾 Criar Backup Manual
+                ðÅ¸â€™¾ Criar Backup Manual
               </>
             )}
           </button>
           
           <label className="btn-secondary flex items-center justify-center cursor-pointer">
-            📁 Restaurar de Arquivo
+            ðÅ¸â€œ� Restaurar de Arquivo
             <input
               type="file"
               accept=".json,.backup"
               className="hidden"
               onChange={(e) => {
                 if (e.target.files[0]) {
-                  toast.info('Funcionalidade de restauração em desenvolvimento')
+                  toast.info('Funcionalidade de restauraÃ§Ã£o em desenvolvimento')
                 }
               }}
             />
@@ -188,20 +188,20 @@ const BackupManager = () => {
             onClick={() => createBackup('automatic')}
             className="btn-secondary"
           >
-            🤖 Simular Backup Automático
+            ðÅ¸¤â€“ Simular Backup AutomÃ¡tico
           </button>
         </div>
       </div>
 
-      {/* Histórico de Backups */}
+      {/* HistÃ³rico de Backups */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-4">
-          📋 Histórico de Backups
+          ðÅ¸â€œâ€¹ HistÃ³rico de Backups
         </h4>
         
         {backupHistory.length === 0 ? (
           <div className="text-center py-8">
-            <div className="text-gray-400 dark:text-gray-500 text-4xl mb-2">📦</div>
+            <div className="text-gray-400 dark:text-gray-500 text-4xl mb-2">ðÅ¸â€œ¦</div>
             <p className="text-gray-500 dark:text-gray-400">Nenhum backup encontrado</p>
           </div>
         ) : (
@@ -215,10 +215,10 @@ const BackupManager = () => {
                   </div>
                   <div>
                     <div className="font-medium text-gray-900 dark:text-white">
-                      Backup {backup.type === 'automatic' ? 'Automático' : 'Manual'}
+                      Backup {backup.type === 'automatic' ? 'AutomÃ¡tico' : 'Manual'}
                     </div>
                     <div className="text-sm text-gray-500 dark:text-gray-400">
-                      {formatDate(backup.date)} • {backup.size} • {backup.tables.length} tabelas
+                      {formatDate(backup.date)} ââ‚¬¢ {backup.size} ââ‚¬¢ {backup.tables.length} tabelas
                     </div>
                     <div className="text-xs text-gray-400 dark:text-gray-500">
                       Tabelas: {backup.tables.join(', ')}
@@ -232,7 +232,7 @@ const BackupManager = () => {
                     className="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded"
                     title="Restaurar"
                   >
-                    🔄 Restaurar
+                    ðÅ¸â€�â€ž Restaurar
                   </button>
                   <button
                     onClick={() => {
@@ -242,14 +242,14 @@ const BackupManager = () => {
                     className="px-3 py-1 text-sm text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 rounded"
                     title="Download"
                   >
-                    📥 Download
+                    ðÅ¸â€œ¥ Download
                   </button>
                   <button
                     onClick={() => deleteBackup(backup.id)}
                     className="px-3 py-1 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
                     title="Excluir"
                   >
-                    🗑️ Excluir
+                    ðÅ¸â€”â€˜ï¸� Excluir
                   </button>
                 </div>
               </div>
@@ -258,20 +258,20 @@ const BackupManager = () => {
         )}
       </div>
 
-      {/* Configurações de Backup Automático */}
+      {/* ConfiguraÃ§Ãµes de Backup AutomÃ¡tico */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-4">
-          ⚙️ Configurações de Backup Automático
+          âÅ¡â„¢ï¸� ConfiguraÃ§Ãµes de Backup AutomÃ¡tico
         </h4>
         
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm font-medium text-gray-900 dark:text-white">
-                Backup Automático Ativado
+                Backup AutomÃ¡tico Ativado
               </div>
               <div className="text-xs text-gray-500 dark:text-gray-400">
-                Realizar backup automático dos dados
+                Realizar backup automÃ¡tico dos dados
               </div>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
@@ -283,17 +283,17 @@ const BackupManager = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Frequência
+                FrequÃªncia
               </label>
               <select className="input-field">
-                <option value="daily">Diário</option>
+                <option value="daily">DiÃ¡rio</option>
                 <option value="weekly">Semanal</option>
                 <option value="monthly">Mensal</option>
               </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Horário
+                HorÃ¡rio
               </label>
               <input
                 type="time"
@@ -303,7 +303,7 @@ const BackupManager = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Retenção (dias)
+                RetenÃ§Ã£o (dias)
               </label>
               <input
                 type="number"

@@ -1,15 +1,15 @@
 const { query } = require('../lib/database')
 
 /**
- * Script para configurar verificação automática de notificações de nitrogênio
+ * Script para configurar verificaÃ§Ã£o automÃ¡tica de notificaÃ§Ãµes de nitrogÃªnio
  * Este script deve ser executado periodicamente (diariamente) via cron job ou task scheduler
  */
 
 async function checkNitrogenNotifications() {
-  console.log('🔍 Verificando necessidade de notificações de nitrogênio...')
+  console.log('ðÅ¸â€�� Verificando necessidade de notificaÃ§Ãµes de nitrogÃªnio...')
   
   try {
-    // Buscar abastecimentos que precisam de notificação
+    // Buscar abastecimentos que precisam de notificaÃ§Ã£o
     const result = await query(`
       SELECT 
         id,
@@ -27,11 +27,11 @@ async function checkNitrogenNotifications() {
     `)
 
     if (result.rows.length === 0) {
-      console.log('✅ Nenhuma notificação de nitrogênio necessária no momento.')
+      console.log('âÅ“â€¦ Nenhuma notificaÃ§Ã£o de nitrogÃªnio necessÃ¡ria no momento.')
       return { success: true, notifications: 0 }
     }
 
-    console.log(`📋 Encontrados ${result.rows.length} abastecimentos que precisam de notificação.`)
+    console.log(`ðÅ¸â€œâ€¹ Encontrados ${result.rows.length} abastecimentos que precisam de notificaÃ§Ã£o.`)
 
     let notificationsCreated = 0
 
@@ -40,9 +40,9 @@ async function checkNitrogenNotifications() {
         (new Date(abastecimento.proximo_abastecimento) - new Date()) / (1000 * 60 * 60 * 24)
       )
 
-      console.log(`📅 Processando abastecimento ID ${abastecimento.id} - ${diasRestantes} dias restantes`)
+      console.log(`ðÅ¸â€œâ€¦ Processando abastecimento ID ${abastecimento.id} - ${diasRestantes} dias restantes`)
 
-      // Criar notificação
+      // Criar notificaÃ§Ã£o
       const notificationResult = await query(`
         INSERT INTO notificacoes 
         (tipo, titulo, mensagem, prioridade, dados_extras)
@@ -50,8 +50,8 @@ async function checkNitrogenNotifications() {
         RETURNING *
       `, [
         'nitrogenio',
-        'Lembrete de Abastecimento de Nitrogênio',
-        `É hora de abastecer o nitrogênio! Último abastecimento foi em ${new Date(abastecimento.data_abastecimento).toLocaleDateString('pt-BR')} com ${abastecimento.quantidade_litros}L pelo motorista ${abastecimento.motorista}. ${diasRestantes <= 0 ? 'Prazo vencido!' : `Restam ${diasRestantes} dias.`}`,
+        'Lembrete de Abastecimento de NitrogÃªnio',
+        `Ãâ€° hora de abastecer o nitrogÃªnio! ÃÅ¡ltimo abastecimento foi em ${new Date(abastecimento.data_abastecimento).toLocaleDateString('pt-BR')} com ${abastecimento.quantidade_litros}L pelo motorista ${abastecimento.motorista}. ${diasRestantes <= 0 ? 'Prazo vencido!' : `Restam ${diasRestantes} dias.`}`,
         diasRestantes <= 0 ? 'high' : 'medium',
         JSON.stringify({
           abastecimento_id: abastecimento.id,
@@ -64,7 +64,7 @@ async function checkNitrogenNotifications() {
         })
       ])
 
-      // Marcar como notificação enviada
+      // Marcar como notificaÃ§Ã£o enviada
       await query(`
         UPDATE abastecimento_nitrogenio 
         SET notificacao_enviada = true, updated_at = CURRENT_TIMESTAMP
@@ -72,10 +72,10 @@ async function checkNitrogenNotifications() {
       `, [abastecimento.id])
 
       notificationsCreated++
-      console.log(`✅ Notificação criada para abastecimento ID ${abastecimento.id}`)
+      console.log(`âÅ“â€¦ NotificaÃ§Ã£o criada para abastecimento ID ${abastecimento.id}`)
     }
 
-    console.log(`🎉 ${notificationsCreated} notificações de nitrogênio criadas com sucesso!`)
+    console.log(`ðÅ¸Å½â€° ${notificationsCreated} notificaÃ§Ãµes de nitrogÃªnio criadas com sucesso!`)
     
     return { 
       success: true, 
@@ -89,7 +89,7 @@ async function checkNitrogenNotifications() {
     }
 
   } catch (error) {
-    console.error('❌ Erro ao verificar notificações de nitrogênio:', error)
+    console.error('â�Å’ Erro ao verificar notificaÃ§Ãµes de nitrogÃªnio:', error)
     return { success: false, error: error.message }
   }
 }
@@ -98,11 +98,11 @@ async function checkNitrogenNotifications() {
 if (require.main === module) {
   checkNitrogenNotifications()
     .then(result => {
-      console.log('📊 Resultado:', result)
+      console.log('ðÅ¸â€œÅ  Resultado:', result)
       process.exit(result.success ? 0 : 1)
     })
     .catch(error => {
-      console.error('💥 Erro fatal:', error)
+      console.error('ðÅ¸â€™¥ Erro fatal:', error)
       process.exit(1)
     })
 }

@@ -16,7 +16,7 @@ const AnimalCard = ({ animal, onEdit, onView, onDelete, onTimeline, selectMode, 
   }
 
   const getAnimalIcon = (sexo) => {
-    return sexo === 'Macho' ? '🐂' : '🐄'
+    return sexo === 'Macho' ? 'ðÅ¸�â€š' : 'ðÅ¸�â€ž'
   }
 
   const calculateAge = (birthDate) => {
@@ -92,7 +92,7 @@ const AnimalCard = ({ animal, onEdit, onView, onDelete, onTimeline, selectMode, 
               {(tooltipVenda?.animalId === animal.id && (tooltipVenda?.loading || tooltipVenda?.info)) && (
                 <div className="absolute right-0 top-full mt-2 z-50 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border-2 border-blue-200 dark:border-blue-700 p-4"
                   onMouseEnter={() => {
-                    // Manter tooltip visível quando mouse estiver sobre ele
+                    // Manter tooltip visÃ­vel quando mouse estiver sobre ele
                   }}
                 >
                   {tooltipVenda.loading ? (
@@ -103,13 +103,13 @@ const AnimalCard = ({ animal, onEdit, onView, onDelete, onTimeline, selectMode, 
                   ) : tooltipVenda.info ? (
                     <div className="space-y-3">
                       <h4 className="text-sm font-bold text-gray-900 dark:text-white border-b pb-2">
-                        📋 Dados da Venda
+                        ðÅ¸â€œâ€¹ Dados da Venda
                       </h4>
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-gray-600 dark:text-gray-400">NF:</span>
                           <span className="font-semibold text-gray-900 dark:text-white">
-                            {tooltipVenda.info.nfNumero || 'Não informado'}
+                            {tooltipVenda.info.nfNumero || 'NÃ£o informado'}
                           </span>
                         </div>
                         <div className="flex justify-between">
@@ -117,13 +117,13 @@ const AnimalCard = ({ animal, onEdit, onView, onDelete, onTimeline, selectMode, 
                           <span className="font-semibold text-gray-900 dark:text-white">
                             {tooltipVenda.info.dataVenda 
                               ? new Date(tooltipVenda.info.dataVenda).toLocaleDateString('pt-BR') 
-                              : 'Não informado'}
+                              : 'NÃ£o informado'}
                           </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600 dark:text-gray-400">Vendido:</span>
                           <span className="font-semibold text-gray-900 dark:text-white">
-                            {tooltipVenda.info.destino || 'Não informado'}
+                            {tooltipVenda.info.destino || 'NÃ£o informado'}
                           </span>
                         </div>
                         {tooltipVenda.info.valorVenda > 0 && (
@@ -141,7 +141,7 @@ const AnimalCard = ({ animal, onEdit, onView, onDelete, onTimeline, selectMode, 
                     </div>
                   ) : (
                     <div className="text-center py-3">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Dados de venda não encontrados</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Dados de venda nÃ£o encontrados</p>
                     </div>
                   )}
                 </div>
@@ -154,14 +154,14 @@ const AnimalCard = ({ animal, onEdit, onView, onDelete, onTimeline, selectMode, 
           )}
         </div>
 
-        {/* Informações Essenciais - Inline */}
+        {/* InformaÃ§Ãµes Essenciais - Inline */}
         <div className="flex items-center justify-between mb-2 text-xs">
           <span className="text-gray-500 dark:text-gray-400">
-            {animal.meses}m • {formatCurrency(animal.custoTotal || 0)}
+            {animal.meses}m ââ‚¬¢ {formatCurrency(animal.custoTotal || 0)}
           </span>
         </div>
 
-        {/* Ações Ultra Compactas - Apenas Ícones */}
+        {/* AÃ§Ãµes Ultra Compactas - Apenas Ã�cones */}
         {!selectMode && (
           <div className="flex gap-1 pt-2 border-t border-gray-200 dark:border-gray-700">
             <button
@@ -178,7 +178,7 @@ const AnimalCard = ({ animal, onEdit, onView, onDelete, onTimeline, selectMode, 
               className="flex-1 px-2 py-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors flex items-center justify-center"
               title="Ver Detalhes"
             >
-              👁️
+              ðÅ¸â€˜�ï¸�
             </button>
             <button
               onClick={(e) => {
@@ -194,7 +194,7 @@ const AnimalCard = ({ animal, onEdit, onView, onDelete, onTimeline, selectMode, 
               className="flex-1 px-2 py-2 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded transition-colors flex items-center justify-center"
               title="Timeline"
             >
-              ⏱️
+              â�±ï¸�
             </button>
             <button
               onClick={(e) => {
@@ -210,12 +210,12 @@ const AnimalCard = ({ animal, onEdit, onView, onDelete, onTimeline, selectMode, 
               className="flex-1 px-2 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition-colors flex items-center justify-center"
               title="Editar"
             >
-              ✏️
+              âÅ“�ï¸�
             </button>
           </div>
         )}
         
-        {/* Modo de Seleção - Compacto */}
+        {/* Modo de SeleÃ§Ã£o - Compacto */}
         {selectMode && (
           <div 
             className="pt-2 border-t border-gray-200 dark:border-gray-700 cursor-pointer"
@@ -229,7 +229,7 @@ const AnimalCard = ({ animal, onEdit, onView, onDelete, onTimeline, selectMode, 
             }}
           >
             <div className="text-center text-xs text-gray-500 dark:text-gray-400">
-              {isSelected ? '✅' : '☑️'}
+              {isSelected ? 'âÅ“â€¦' : 'âËœâ€˜ï¸�'}
             </div>
           </div>
         )}

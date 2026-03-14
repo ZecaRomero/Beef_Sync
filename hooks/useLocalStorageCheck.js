@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router';
 
 /**
- * Hook para verificar se há dados no localStorage que precisam ser migrados
+ * Hook para verificar se hÃ¡ dados no localStorage que precisam ser migrados
  */
 export default function useLocalStorageCheck(options = {}) {
   const {
@@ -44,23 +44,23 @@ export default function useLocalStorageCheck(options = {}) {
 
       // Mostrar alerta se houver dados
       if (total > 0 && showAlert) {
-        // Verificar se já mostrou o alerta hoje
+        // Verificar se jÃ¡ mostrou o alerta hoje
         const ultimoAlerta = localStorage.getItem('ultimoAlertaMigracao');
         const hoje = new Date().toDateString();
 
         if (ultimoAlerta !== hoje) {
           const migrar = window.confirm(
-            `⚠️ ATENÇÃO: Dados Antigos Encontrados!\n\n` +
+            `âÅ¡ ï¸� ATENÃâ€¡ÃÆ’O: Dados Antigos Encontrados!\n\n` +
             `Foram encontrados ${total} item(ns) salvos no localStorage do navegador.\n\n` +
-            `Para garantir a segurança dos seus dados, recomendamos migrar para o banco de dados PostgreSQL.\n\n` +
-            `Deseja ir para a página de migração agora?`
+            `Para garantir a seguranÃ§a dos seus dados, recomendamos migrar para o banco de dados PostgreSQL.\n\n` +
+            `Deseja ir para a pÃ¡gina de migraÃ§Ã£o agora?`
           );
 
           if (migrar && autoRedirect) {
             router.push('/migrar-dados');
           }
 
-          // Marcar que já mostrou o alerta hoje
+          // Marcar que jÃ¡ mostrou o alerta hoje
           localStorage.setItem('ultimoAlertaMigracao', hoje);
         }
       }

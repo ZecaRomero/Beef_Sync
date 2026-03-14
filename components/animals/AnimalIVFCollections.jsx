@@ -33,8 +33,8 @@ export default function AnimalIVFCollections({ fivs }) {
           )}
         </div>
         <p className="text-sm text-gray-700 dark:text-gray-300 mt-1 font-medium">
-          {fivs.length} coleta(s) • {totalOocitos} oócitos totais
-          {mediaOocitos > 0 && ` • Média: ${mediaOocitos}/coleta`}
+          {fivs.length} coleta(s) ââ‚¬¢ {totalOocitos} oÃ³citos totais
+          {mediaOocitos > 0 && ` ââ‚¬¢ MÃ©dia: ${mediaOocitos}/coleta`}
         </p>
       </button>
       <div className={`overflow-hidden transition-all ${isExpanded ? 'max-h-[999px]' : 'max-h-0'}`}>
@@ -61,7 +61,7 @@ export default function AnimalIVFCollections({ fivs }) {
                   )}
                 </div>
                 <span className="px-3 py-1 rounded-lg text-sm font-bold bg-violet-100 text-violet-900 dark:bg-violet-900/50 dark:text-violet-100 border border-violet-300 dark:border-violet-700 shrink-0">
-                  {(fiv.quantidade_oocitos || 0)} oócitos
+                  {(fiv.quantidade_oocitos || 0)} oÃ³citos
                 </span>
               </div>
             </div>

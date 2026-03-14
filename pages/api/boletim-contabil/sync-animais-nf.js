@@ -3,11 +3,11 @@ import logger from '../../../utils/logger'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Método não permitido' })
+    return res.status(405).json({ message: 'MÃ©todo nÃ£o permitido' })
   }
 
   try {
-    logger.info('Iniciando sincronização de animais com notas fiscais')
+    logger.info('Iniciando sincronizaÃ§Ã£o de animais com notas fiscais')
 
     // Buscar todos os animais
     const animais = await databaseService.buscarAnimais()
@@ -19,23 +19,23 @@ export default async function handler(req, res) {
     // Processar cada animal
     for (const animal of animais) {
       try {
-        // IMPORTANTE: Pular animais de nascimento - eles NÃO devem ter NF de entrada
-        // Animais de nascimento são identificados pelo campo tipo_nascimento preenchido
-        // ou pela ausência de fornecedor/valor_compra
+        // IMPORTANTE: Pular animais de nascimento - eles NÃÆ’O devem ter NF de entrada
+        // Animais de nascimento sÃ£o identificados pelo campo tipo_nascimento preenchido
+        // ou pela ausÃªncia de fornecedor/valor_compra
         if (animal.tipo_nascimento || (!animal.fornecedor && !animal.valor_compra)) {
-          logger.info(`Animal ${animal.serie}${animal.rg} é de nascimento - pulando criação de NF`)
+          logger.info(`Animal ${animal.serie}${animal.rg} Ã© de nascimento - pulando criaÃ§Ã£o de NF`)
           continue
         }
         
-        // Verificar se já existe NF para este animal
+        // Verificar se jÃ¡ existe NF para este animal
         const jaExisteNF = await verificarNFExistente(animal)
         if (jaExisteNF) {
-          logger.info(`NF já existe para animal ${animal.serie}${animal.rg}`)
+          logger.info(`NF jÃ¡ existe para animal ${animal.serie}${animal.rg}`)
           continue
         }
 
-        // DESABILITADO COMPLETAMENTE: Não criar notas fiscais automaticamente
-        // As NFs devem ser criadas manualmente através do módulo de Notas Fiscais
+        // DESABILITADO COMPLETAMENTE: NÃ£o criar notas fiscais automaticamente
+        // As NFs devem ser criadas manualmente atravÃ©s do mÃ³dulo de Notas Fiscais
         // Apenas animais comprados (com NF manual) devem ter notas fiscais
         // if (animal.situacao === 'Ativo') {
         //   await criarNotaFiscalEntradaAutomatica(animal)
@@ -46,7 +46,7 @@ export default async function handler(req, res) {
         // if (animal.situacao === 'Vendido' && animal.valor_venda) {
         //   await criarNotaFiscalSaidaAutomatica(animal)
         //   nfsCriadas++
-        //   logger.info(`NF de saída criada para: ${animal.serie}${animal.rg}`)
+        //   logger.info(`NF de saÃ­da criada para: ${animal.serie}${animal.rg}`)
         // }
 
       } catch (error) {
@@ -57,19 +57,19 @@ export default async function handler(req, res) {
 
     const resultado = {
       success: true,
-      message: `Sincronização concluída: ${nfsCriadas} notas fiscais criadas, ${erros} erros. Nota: Criação automática de NFs foi desabilitada.`,
+      message: `SincronizaÃ§Ã£o concluÃ­da: ${nfsCriadas} notas fiscais criadas, ${erros} erros. Nota: CriaÃ§Ã£o automÃ¡tica de NFs foi desabilitada.`,
       detalhes: {
         totalAnimais: animais.length,
-        nfsCriadas: 0, // Sempre 0 agora, pois está desabilitado
+        nfsCriadas: 0, // Sempre 0 agora, pois estÃ¡ desabilitado
         erros
       }
     }
 
-    logger.info('Sincronização de animais com NFs concluída', resultado)
+    logger.info('SincronizaÃ§Ã£o de animais com NFs concluÃ­da', resultado)
     res.status(200).json(resultado)
 
   } catch (error) {
-    logger.error('Erro na sincronização de animais com NFs:', error)
+    logger.error('Erro na sincronizaÃ§Ã£o de animais com NFs:', error)
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
@@ -135,7 +135,7 @@ async function criarNotaFiscalEntradaAutomatica(animal) {
 
     return await response.json()
   } catch (error) {
-    logger.error('Erro ao criar NF de entrada automática:', error)
+    logger.error('Erro ao criar NF de entrada automÃ¡tica:', error)
     throw error
   }
 }
@@ -175,19 +175,19 @@ async function criarNotaFiscalSaidaAutomatica(animal) {
 
     return await response.json()
   } catch (error) {
-    logger.error('Erro ao criar NF de saída automática:', error)
+    logger.error('Erro ao criar NF de saÃ­da automÃ¡tica:', error)
     throw error
   }
 }
 
 function calcularEra(meses, sexo) {
-  if (!meses || meses <= 0) return 'Não informado'
+  if (!meses || meses <= 0) return 'NÃ£o informado'
   
-  const isFemea = sexo && (sexo.toLowerCase().includes('fêmea') || sexo.toLowerCase().includes('femea') || sexo === 'F')
+  const isFemea = sexo && (sexo.toLowerCase().includes('fÃªmea') || sexo.toLowerCase().includes('femea') || sexo === 'F')
   const isMacho = sexo && (sexo.toLowerCase().includes('macho') || sexo === 'M')
   
   if (isFemea) {
-    // FÊMEA: 0-7 / 7-12 / 12-18 / 18-24 / 24+
+    // FÃÅ MEA: 0-7 / 7-12 / 12-18 / 18-24 / 24+
     if (meses <= 7) return '0/7'
     if (meses <= 12) return '7/12'
     if (meses <= 18) return '12/18'
@@ -202,7 +202,7 @@ function calcularEra(meses, sexo) {
     return '22+'
   }
   
-  // Se não tem sexo definido, usar padrão antigo para compatibilidade
+  // Se nÃ£o tem sexo definido, usar padrÃ£o antigo para compatibilidade
   if (meses <= 7) return '0/7'
   if (meses <= 12) return '7/12'
   if (meses <= 18) return '12/18'

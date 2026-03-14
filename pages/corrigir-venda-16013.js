@@ -26,7 +26,7 @@ export default function CorrigirVenda16013() {
         setError(data.message || 'Erro ao corrigir')
       }
     } catch (err) {
-      setError('Erro ao executar correção: ' + err.message)
+      setError('Erro ao executar correÃ§Ã£o: ' + err.message)
     } finally {
       setLoading(false)
     }
@@ -46,10 +46,10 @@ export default function CorrigirVenda16013() {
 
             <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-6">
               <p className="text-sm text-amber-800 dark:text-amber-200 mb-2">
-                <strong>Problema:</strong> A venda da CJCJ 16013 (NF 4145, comprador CLEBER, R$ 28.800) foi importada incorretamente na ficha da CJCJ 17037 (JATAUBA SANT ANNA — filha).
+                <strong>Problema:</strong> A venda da CJCJ 16013 (NF 4145, comprador CLEBER, R$ 28.800) foi importada incorretamente na ficha da CJCJ 17037 (JATAUBA SANT ANNA ââ‚¬â€� filha).
               </p>
               <p className="text-sm text-amber-800 dark:text-amber-200">
-                <strong>Correção:</strong> Esta ação irá mover a venda para a ficha correta (CJCJ 16013), corrigir o valor (28,80 → R$ 28.800) e atualizar a situação de ambos os animais.
+                <strong>CorreÃ§Ã£o:</strong> Esta aÃ§Ã£o irÃ¡ mover a venda para a ficha correta (CJCJ 16013), corrigir o valor (28,80 ââ€ â€™ R$ 28.800) e atualizar a situaÃ§Ã£o de ambos os animais.
               </p>
             </div>
 
@@ -58,7 +58,7 @@ export default function CorrigirVenda16013() {
               disabled={loading}
               className="w-full px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
             >
-              {loading ? 'Corrigindo...' : 'Executar Correção'}
+              {loading ? 'Corrigindo...' : 'Executar CorreÃ§Ã£o'}
             </button>
 
             {error && (
@@ -70,18 +70,18 @@ export default function CorrigirVenda16013() {
             {result && (
               <div className="mt-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
                 <p className="text-sm font-semibold text-green-800 dark:text-green-200 mb-2">
-                  ✅ {result.message}
+                  âÅ“â€¦ {result.message}
                 </p>
                 {result.corrigido && result.detalhes && (
                   <div className="mt-3 text-xs text-green-700 dark:text-green-300 space-y-1">
-                    <p>• Venda movida de {result.detalhes.de} para {result.detalhes.para}</p>
-                    <p>• Valor corrigido: R$ {result.detalhes.valorAnterior} → R$ {result.detalhes.valorCorrigido?.toLocaleString('pt-BR')}</p>
-                    <p>• NF: {result.detalhes.numeroNf} | Comprador: {result.detalhes.comprador}</p>
+                    <p>ââ‚¬¢ Venda movida de {result.detalhes.de} para {result.detalhes.para}</p>
+                    <p>ââ‚¬¢ Valor corrigido: R$ {result.detalhes.valorAnterior} ââ€ â€™ R$ {result.detalhes.valorCorrigido?.toLocaleString('pt-BR')}</p>
+                    <p>ââ‚¬¢ NF: {result.detalhes.numeroNf} | Comprador: {result.detalhes.comprador}</p>
                   </div>
                 )}
                 <div className="mt-4 pt-4 border-t border-green-200 dark:border-green-800">
                   <Link href="/consulta-animal/CJCJ-16013" className="text-sm font-medium text-green-700 dark:text-green-300 hover:underline">
-                    → Ver ficha da CJCJ 16013
+                    ââ€ â€™ Ver ficha da CJCJ 16013
                   </Link>
                 </div>
               </div>

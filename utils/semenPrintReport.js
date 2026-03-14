@@ -1,7 +1,7 @@
 /**
- * Gera relatório de estoque de sêmen formatado para impressão
- * Layout: BEEF-SYNC - CONTROLE DE ESTOQUE DE SÊMEN BOVINO
- * Com título, subtítulo, caixas de resumo e tabela
+ * Gera relatÃ³rio de estoque de sÃªmen formatado para impressÃ£o
+ * Layout: BEEF-SYNC - CONTROLE DE ESTOQUE DE SÃÅ MEN BOVINO
+ * Com tÃ­tulo, subtÃ­tulo, caixas de resumo e tabela
  */
 
 const formatDate = (val) => {
@@ -31,8 +31,8 @@ const formatMoney = (v) => {
   return `R$ ${n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 };
 
-export function generateSemenPrintHTML(data, tipo = 'SAÍDAS') {
-  const isSaida = tipo === 'SAÍDAS';
+export function generateSemenPrintHTML(data, tipo = 'SAÃ�DAS') {
+  const isSaida = tipo === 'SAÃ�DAS';
   const now = new Date();
   const dataStr = now.toLocaleDateString('pt-BR');
   const horaStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -42,13 +42,13 @@ export function generateSemenPrintHTML(data, tipo = 'SAÍDAS') {
   const disponiveis = isSaida ? 0 : data.reduce((acc, s) => acc + safeNum(s.dosesDisponiveis || s.doses_disponiveis), 0);
 
   const colunas = isSaida
-    ? ['Nome do Touro', 'RG/Registro', 'Raça', 'Localização', 'Tipo', 'Destino', 'Nº NF', 'Valor (R$)', 'Data Compra', 'Qtd Doses', 'Disponíveis', 'Usadas']
-    : ['Nome do Touro', 'RG/Registro', 'Raça', 'Localização', 'Rack', 'Botijão', 'Caneca', 'Tipo', 'Fornecedor', 'Nº NF', 'Valor (R$)', 'Data Compra', 'Qtd Doses', 'Disponíveis', 'Usadas'];
+    ? ['Nome do Touro', 'RG/Registro', 'RaÃ§a', 'LocalizaÃ§Ã£o', 'Tipo', 'Destino', 'NÂº NF', 'Valor (R$)', 'Data Compra', 'Qtd Doses', 'DisponÃ­veis', 'Usadas']
+    : ['Nome do Touro', 'RG/Registro', 'RaÃ§a', 'LocalizaÃ§Ã£o', 'Rack', 'BotijÃ£o', 'Caneca', 'Tipo', 'Fornecedor', 'NÂº NF', 'Valor (R$)', 'Data Compra', 'Qtd Doses', 'DisponÃ­veis', 'Usadas'];
 
   const linhas = data.map(s => {
     const isS = s.tipoOperacao === 'saida' || s.tipo_operacao === 'saida';
-    const loc = isS ? `Saída → ${s.destino || 'N/A'}` : (s.localizacao || '');
-    const tipo = isS ? `Saída ${s.destino || ''}` : 'Entrada';
+    const loc = isS ? `SaÃ­da ââ€ â€™ ${s.destino || 'N/A'}` : (s.localizacao || '');
+    const tipo = isS ? `SaÃ­da ${s.destino || ''}` : 'Entrada';
     const qtd = safeNum(s.quantidadeDoses || s.quantidade_doses);
     const disp = safeNum(s.dosesDisponiveis || s.doses_disponiveis);
     const usadas = safeNum(s.dosesUsadas || s.doses_usadas);
@@ -98,7 +98,7 @@ export function generateSemenPrintHTML(data, tipo = 'SAÍDAS') {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>BEEF-SYNC - Estoque de Sêmen - ${tipo}</title>
+  <title>BEEF-SYNC - Estoque de SÃªmen - ${tipo}</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', Calibri, Arial, sans-serif; font-size: 11px; color: #333; padding: 20px; }
@@ -168,13 +168,13 @@ export function generateSemenPrintHTML(data, tipo = 'SAÍDAS') {
   </style>
 </head>
 <body>
-  <div class="report-header">BEEF-SYNC - CONTROLE DE ESTOQUE DE SÊMEN BOVINO - ${tipo}</div>
-  <div class="report-subtitle">Relatório gerado em ${dataStr} às ${horaStr} | Total de registros: ${data.length}</div>
+  <div class="report-header">BEEF-SYNC - CONTROLE DE ESTOQUE DE SÃÅ MEN BOVINO - ${tipo}</div>
+  <div class="report-subtitle">RelatÃ³rio gerado em ${dataStr} Ã s ${horaStr} | Total de registros: ${data.length}</div>
   
   <div class="stats-row">
-    <div class="stat-box touros">🐂 Touros<br>${totalTouros}</div>
-    <div class="stat-box total-dose">📦 Total Dose<br>${totalDoses}</div>
-    <div class="stat-box disponiveis">✓ Disponíveis<br>${disponiveis}</div>
+    <div class="stat-box touros">ðÅ¸�â€š Touros<br>${totalTouros}</div>
+    <div class="stat-box total-dose">ðÅ¸â€œ¦ Total Dose<br>${totalDoses}</div>
+    <div class="stat-box disponiveis">âÅ“â€œ DisponÃ­veis<br>${disponiveis}</div>
   </div>
 
   <table>
@@ -182,7 +182,7 @@ export function generateSemenPrintHTML(data, tipo = 'SAÍDAS') {
     <tbody>${trRows}</tbody>
   </table>
 
-  <div class="page-footer">Beef-Sync - Sistema de Gestão Pecuária</div>
+  <div class="page-footer">Beef-Sync - Sistema de GestÃ£o PecuÃ¡ria</div>
   <script>
     window.onload = function() { window.print(); };
   </script>
@@ -190,7 +190,7 @@ export function generateSemenPrintHTML(data, tipo = 'SAÍDAS') {
 </html>`;
 }
 
-export function openSemenPrintReport(data, tipo = 'SAÍDAS') {
+export function openSemenPrintReport(data, tipo = 'SAÃ�DAS') {
   if (!data || data.length === 0) {
     if (typeof alert === 'function') alert('Nenhum dado para imprimir');
     return;
@@ -198,7 +198,7 @@ export function openSemenPrintReport(data, tipo = 'SAÍDAS') {
   const html = generateSemenPrintHTML(data, tipo);
   const win = window.open('', '_blank');
   if (!win) {
-    if (typeof alert === 'function') alert('Permita pop-ups para imprimir o relatório.');
+    if (typeof alert === 'function') alert('Permita pop-ups para imprimir o relatÃ³rio.');
     return;
   }
   win.document.write(html);

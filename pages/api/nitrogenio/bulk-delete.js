@@ -23,7 +23,7 @@ async function bulkDeleteHandler(req, res) {
   const { ids } = req.body
 
   if (!ids || !Array.isArray(ids) || ids.length === 0) {
-    return sendValidationError(res, 'IDs não fornecidos ou inválidos', {
+    return sendValidationError(res, 'IDs nÃ£o fornecidos ou invÃ¡lidos', {
       required: ['ids'],
       provided: { ids: !!ids }
     })
@@ -41,13 +41,13 @@ async function bulkDeleteHandler(req, res) {
     const deletedCount = result.rowCount
     const deletedIds = result.rows.map(row => row.id)
 
-    console.log(`✅ ${deletedCount} abastecimento(s) de nitrogênio excluído(s)`)
+    console.log(`âÅ“â€¦ ${deletedCount} abastecimento(s) de nitrogÃªnio excluÃ­do(s)`)
 
     return sendSuccess(res, {
       deletedCount,
       deletedIds,
       requestedIds: ids
-    }, `${deletedCount} abastecimento(s) excluído(s) com sucesso`)
+    }, `${deletedCount} abastecimento(s) excluÃ­do(s) com sucesso`)
 
   } catch (error) {
     console.error('Erro ao excluir abastecimentos:', error)

@@ -3,7 +3,7 @@ import Button from '../ui/Button'
 import ModernCard, { ModernCardHeader, ModernCardBody } from '../ui/ModernCard'
 
 /**
- * Componente para lista de destinatários
+ * Componente para lista de destinatÃ¡rios
  */
 const RecipientsList = ({
   recipients,
@@ -22,7 +22,7 @@ const RecipientsList = ({
             </div>
             <div>
               <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                Destinatários
+                DestinatÃ¡rios
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Gerencie contatos para envio
@@ -47,7 +47,7 @@ const RecipientsList = ({
           <div className="text-center py-8">
             <UserGroupIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500 dark:text-gray-400 mb-4">
-              Nenhum destinatário cadastrado
+              Nenhum destinatÃ¡rio cadastrado
             </p>
             <Button
               variant="primary"
@@ -55,7 +55,7 @@ const RecipientsList = ({
               leftIcon={<PlusIcon className="h-4 w-4" />}
               modern={true}
             >
-              Adicionar Destinatário
+              Adicionar DestinatÃ¡rio
             </Button>
           </div>
         ) : (
@@ -78,12 +78,12 @@ const RecipientsList = ({
                     </h4>
                     {recipient.email && (
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        📧 {recipient.email}
+                        ðÅ¸â€œ§ {recipient.email}
                       </p>
                     )}
                     {recipient.whatsapp && (
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        📱 {recipient.whatsapp}
+                        ðÅ¸â€œ± {recipient.whatsapp}
                       </p>
                     )}
                     <span className="inline-block mt-1 px-2 py-1 text-xs rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
@@ -100,7 +100,7 @@ const RecipientsList = ({
                     <button
                       onClick={() => onRemoveRecipient(recipient.id)}
                       className="text-red-500 hover:text-red-700 p-1"
-                      title="Remover destinatário"
+                      title="Remover destinatÃ¡rio"
                     >
                       <TrashIcon className="h-4 w-4" />
                     </button>

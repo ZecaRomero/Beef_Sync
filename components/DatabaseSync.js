@@ -23,7 +23,7 @@ export default function DatabaseSync() {
       setSyncResult(result);
       
       if (result.success) {
-        // Recarregar a página após 2 segundos para mostrar os novos dados
+        // Recarregar a pÃ¡gina apÃ³s 2 segundos para mostrar os novos dados
         setTimeout(() => {
           window.location.reload();
         }, 2000);
@@ -47,10 +47,10 @@ export default function DatabaseSync() {
         </div>
         <div className="flex-1">
           <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200">
-            Sincronização de Dados
+            SincronizaÃ§Ã£o de Dados
           </h3>
           <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
-            Se você não está vendo todos os touros do PostgreSQL, clique em sincronizar para importar os dados da tabela entradas_semen.
+            Se vocÃª nÃ£o estÃ¡ vendo todos os touros do PostgreSQL, clique em sincronizar para importar os dados da tabela entradas_semen.
           </p>
           
           {syncResult && (
@@ -69,10 +69,10 @@ export default function DatabaseSync() {
               </div>
               {syncResult.success && (
                 <div className="mt-2 text-sm">
-                  <p>• {syncResult.migrated} novos registros importados</p>
-                  <p>• {syncResult.skipped} registros já existentes</p>
-                  <p>• Total de {syncResult.totalRecords} touros no estoque</p>
-                  <p className="mt-2 font-medium">A página será recarregada automaticamente...</p>
+                  <p>ââ‚¬¢ {syncResult.migrated} novos registros importados</p>
+                  <p>ââ‚¬¢ {syncResult.skipped} registros jÃ¡ existentes</p>
+                  <p>ââ‚¬¢ Total de {syncResult.totalRecords} touros no estoque</p>
+                  <p className="mt-2 font-medium">A pÃ¡gina serÃ¡ recarregada automaticamente...</p>
                 </div>
               )}
             </div>

@@ -2,7 +2,7 @@
 const { query } = require('./lib/database')
 
 async function checkAnimalGenders() {
-  console.log('🔍 Verificando sexos dos animais mencionados no erro...\n')
+  console.log('�Ÿ”� Verificando sexos dos animais mencionados no erro...\n')
 
   try {
     // Animais mencionados no erro
@@ -32,14 +32,14 @@ async function checkAnimalGenders() {
           console.log(`     - Data Nascimento: ${animalData.data_nascimento || 'N/A'}`)
           
           if (animalData.sexo === 'Macho' || animalData.sexo === 'M') {
-            console.log(`     ❌ PROBLEMA: Animal é macho, não pode ser inseminado`)
+            console.log(`     �Œ PROBLEMA: Animal é macho, não pode ser inseminado`)
           } else if (animalData.sexo === 'Fêmea' || animalData.sexo === 'F') {
-            console.log(`     ✅ OK: Animal é fêmea, pode ser inseminado`)
+            console.log(`     �œ… OK: Animal é fêmea, pode ser inseminado`)
           } else {
-            console.log(`     ⚠️ ATENÇÃO: Sexo não reconhecido: "${animalData.sexo}"`)
+            console.log(`     �š�️ ATEN�‡�ƒO: Sexo não reconhecido: "${animalData.sexo}"`)
           }
         } else {
-          console.log(`   ${animal.serie} ${animal.rg}: ❌ Animal não encontrado`)
+          console.log(`   ${animal.serie} ${animal.rg}: �Œ Animal não encontrado`)
         }
         console.log('')
       } catch (error) {
@@ -82,7 +82,7 @@ async function checkAnimalGenders() {
         console.log(`   - ${animal.serie} ${animal.rg}: "${animal.sexo}" (${animal.quantidade} registros)`)
       })
     } else {
-      console.log('   ✅ Todos os animais têm sexo padronizado')
+      console.log('   �œ… Todos os animais têm sexo padronizado')
     }
 
     // 4. Sugestões de correção
@@ -124,17 +124,17 @@ async function checkAnimalGenders() {
       }
     }
 
-    console.log('\n✅ Verificação concluída!')
+    console.log('\n�œ… Verificação concluída!')
 
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('�Œ Erro:', error)
   }
 }
 
 // Executar
 checkAnimalGenders()
   .then(() => {
-    console.log('\n🎯 PRÓXIMOS PASSOS:')
+    console.log('\n�ŸŽ� PR�“XIMOS PASSOS:')
     console.log('1. Verificar a planilha Excel e remover machos da lista de inseminação')
     console.log('2. Ou corrigir o sexo dos animais no banco se estiver incorreto')
     console.log('3. Tentar importar novamente após as correções')

@@ -24,9 +24,9 @@ async function fixSequence() {
     const nextVal = maxId + 1;
     
     await client.query(`SELECT setval('notas_fiscais_id_seq', $1)`, [nextVal]);
-    console.log(`✅ Sequência notas_fiscais_id_seq corrigida. Próximo ID será: ${nextVal}`);
+    console.log(`�œ… Sequência notas_fiscais_id_seq corrigida. Próximo ID será: ${nextVal}`);
   } catch (err) {
-    console.error('❌ Erro:', err.message);
+    console.error('�Œ Erro:', err.message);
     process.exit(1);
   } finally {
     client.release();

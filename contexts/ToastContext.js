@@ -1,6 +1,6 @@
 /**
- * Sistema unificado de notificações Toast
- * Centraliza todas as notificações do sistema em um único Context
+ * Sistema unificado de notificaÃ§Ãµes Toast
+ * Centraliza todas as notificaÃ§Ãµes do sistema em um Ãºnico Context
  */
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom';
@@ -16,7 +16,7 @@ const ToastContext = createContext(null);
 
 /**
  * Hook para acessar o sistema de toast
- * @returns {Object} Objeto com métodos de toast (success, error, warning, info)
+ * @returns {Object} Objeto com mÃ©todos de toast (success, error, warning, info)
  * @throws {Error} Se usado fora do ToastProvider
  */
 export function useToast() {
@@ -34,7 +34,7 @@ export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
 
   const addToast = useCallback((message, type = 'info', duration = 5000) => {
-    // Verificação de segurança para evitar erros
+    // VerificaÃ§Ã£o de seguranÃ§a para evitar erros
     if (!message || typeof message !== 'string') {
       console.warn('ToastContext: message is invalid', message);
       return null;
@@ -65,19 +65,19 @@ export function ToastProvider({ children }) {
 
   const toast = {
     success: (message, duration = 5000) => {
-      console.log('🟢 Toast Success:', message);
+      console.log('ðÅ¸Å¸¢ Toast Success:', message);
       return addToast(message, 'success', duration);
     },
     error: (message, duration = 5000) => {
-      console.log('🔴 Toast Error:', message);
+      console.log('ðÅ¸â€�´ Toast Error:', message);
       return addToast(message, 'error', duration);
     },
     warning: (message, duration = 5000) => {
-      console.log('🟡 Toast Warning:', message);
+      console.log('ðÅ¸Å¸¡ Toast Warning:', message);
       return addToast(message, 'warning', duration);
     },
     info: (message, duration = 5000) => {
-      console.log('🔵 Toast Info:', message);
+      console.log('ðÅ¸â€�µ Toast Info:', message);
       return addToast(message, 'info', duration);
     }
   };
@@ -112,7 +112,7 @@ function ToastContainer({ toasts, removeToast }) {
         position: 'fixed',
         top: '70px', 
         right: '24px', 
-        zIndex: 2147483647, // Máximo z-index possível
+        zIndex: 2147483647, // MÃ¡ximo z-index possÃ­vel
         maxWidth: '384px',
         pointerEvents: 'none',
         fontFamily: 'system-ui, -apple-system, sans-serif'
@@ -141,13 +141,13 @@ function ToastItem({ toast, onClose, index }) {
   const [isLeaving, setIsLeaving] = useState(false);
   const [isEntering, setIsEntering] = useState(true);
 
-  // Verificação de segurança para evitar erros com propriedades undefined
+  // VerificaÃ§Ã£o de seguranÃ§a para evitar erros com propriedades undefined
   if (!toast || typeof toast !== 'object') {
     console.warn('ToastItem: toast prop is invalid', toast);
     return null;
   }
 
-  // Animação de entrada
+  // AnimaÃ§Ã£o de entrada
   useEffect(() => {
     const timer = setTimeout(() => setIsEntering(false), 100 + (index * 50));
     return () => clearTimeout(timer);
@@ -256,7 +256,7 @@ function ToastItem({ toast, onClose, index }) {
               lineHeight: '1.4',
               margin: 0
             }}>
-              {toast?.message || 'Mensagem não disponível'}
+              {toast?.message || 'Mensagem nÃ£o disponÃ­vel'}
             </p>
           </div>
         </div>

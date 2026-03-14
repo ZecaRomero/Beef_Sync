@@ -3,7 +3,7 @@ const { query } = require('./lib/database')
 
 async function testBuscarPaisMelhorado() {
   try {
-    console.log('🔍 Testando busca melhorada de pais...\n')
+    console.log('�Ÿ”� Testando busca melhorada de pais...\n')
     
     // Buscar um animal específico do PDF
     const result = await query(`
@@ -14,18 +14,18 @@ async function testBuscarPaisMelhorado() {
     `)
     
     if (result.rows.length === 0) {
-      console.log('❌ Animal CJCJ-17671 não encontrado')
+      console.log('�Œ Animal CJCJ-17671 não encontrado')
       return
     }
     
     const animal = result.rows[0]
-    console.log(`🐄 Animal: ${animal.serie}-${animal.rg}`)
+    console.log(`�Ÿ�„ Animal: ${animal.serie}-${animal.rg}`)
     console.log(`  Pai registrado: "${animal.pai}"`)
     console.log(`  Mãe registrada: "${animal.mae}"\n`)
     
     // Buscar pai - tentar várias estratégias
     if (animal.pai) {
-      console.log(`👨 Buscando pai: "${animal.pai}"`)
+      console.log(`�Ÿ‘� Buscando pai: "${animal.pai}"`)
       
       // Estratégia 1: Nome exato
       let paiResult = await query(
@@ -34,7 +34,7 @@ async function testBuscarPaisMelhorado() {
       )
       
       if (paiResult.rows.length > 0) {
-        console.log(`  ✅ Encontrado por nome exato:`, paiResult.rows[0])
+        console.log(`  �œ… Encontrado por nome exato:`, paiResult.rows[0])
       } else {
         // Estratégia 2: Série exata
         paiResult = await query(
@@ -43,7 +43,7 @@ async function testBuscarPaisMelhorado() {
         )
         
         if (paiResult.rows.length > 0) {
-          console.log(`  ✅ Encontrado por série:`, paiResult.rows[0])
+          console.log(`  �œ… Encontrado por série:`, paiResult.rows[0])
         } else {
           // Estratégia 3: Busca parcial no nome
           paiResult = await query(
@@ -52,13 +52,13 @@ async function testBuscarPaisMelhorado() {
           )
           
           if (paiResult.rows.length > 0) {
-            console.log(`  💡 Encontrados por busca parcial:`)
+            console.log(`  �Ÿ’� Encontrados por busca parcial:`)
             paiResult.rows.forEach(p => console.log(`     - ${p.serie}-${p.rg} (${p.nome || 'sem nome'})`))
           } else {
             // Estratégia 4: Extrair possível série do nome (ex: "C2747 DA S.NICE" -> "C2747")
             const possiveisSeries = animal.pai.match(/[A-Z]+\d+/g)
             if (possiveisSeries && possiveisSeries.length > 0) {
-              console.log(`  🔍 Tentando séries extraídas: ${possiveisSeries.join(', ')}`)
+              console.log(`  �Ÿ”� Tentando séries extraídas: ${possiveisSeries.join(', ')}`)
               
               for (const serie of possiveisSeries) {
                 const serieResult = await query(
@@ -67,12 +67,12 @@ async function testBuscarPaisMelhorado() {
                 )
                 
                 if (serieResult.rows.length > 0) {
-                  console.log(`  ✅ Encontrado pela série extraída "${serie}":`, serieResult.rows[0])
+                  console.log(`  �œ… Encontrado pela série extraída "${serie}":`, serieResult.rows[0])
                   break
                 }
               }
             } else {
-              console.log(`  ❌ Pai não encontrado por nenhuma estratégia`)
+              console.log(`  �Œ Pai não encontrado por nenhuma estratégia`)
             }
           }
         }
@@ -81,7 +81,7 @@ async function testBuscarPaisMelhorado() {
     
     // Buscar mãe - tentar várias estratégias
     if (animal.mae) {
-      console.log(`\n👩 Buscando mãe: "${animal.mae}"`)
+      console.log(`\n�Ÿ‘� Buscando mãe: "${animal.mae}"`)
       
       // Estratégia 1: Nome exato
       let maeResult = await query(
@@ -90,7 +90,7 @@ async function testBuscarPaisMelhorado() {
       )
       
       if (maeResult.rows.length > 0) {
-        console.log(`  ✅ Encontrada por nome exato:`, maeResult.rows[0])
+        console.log(`  �œ… Encontrada por nome exato:`, maeResult.rows[0])
       } else {
         // Estratégia 2: Série exata
         maeResult = await query(
@@ -99,7 +99,7 @@ async function testBuscarPaisMelhorado() {
         )
         
         if (maeResult.rows.length > 0) {
-          console.log(`  ✅ Encontrada por série:`, maeResult.rows[0])
+          console.log(`  �œ… Encontrada por série:`, maeResult.rows[0])
         } else {
           // Estratégia 3: Busca parcial no nome
           maeResult = await query(
@@ -108,13 +108,13 @@ async function testBuscarPaisMelhorado() {
           )
           
           if (maeResult.rows.length > 0) {
-            console.log(`  💡 Encontradas por busca parcial:`)
+            console.log(`  �Ÿ’� Encontradas por busca parcial:`)
             maeResult.rows.forEach(m => console.log(`     - ${m.serie}-${m.rg} (${m.nome || 'sem nome'})`))
           } else {
             // Estratégia 4: Extrair possível série do nome (ex: "CJ SANT ANNA 13534" -> "CJCJ", "13534")
             const possiveisSeries = animal.mae.match(/[A-Z]+\d+/g)
             if (possiveisSeries && possiveisSeries.length > 0) {
-              console.log(`  🔍 Tentando séries extraídas: ${possiveisSeries.join(', ')}`)
+              console.log(`  �Ÿ”� Tentando séries extraídas: ${possiveisSeries.join(', ')}`)
               
               for (const serie of possiveisSeries) {
                 const serieResult = await query(
@@ -123,7 +123,7 @@ async function testBuscarPaisMelhorado() {
                 )
                 
                 if (serieResult.rows.length > 0) {
-                  console.log(`  ✅ Encontrada pela série extraída "${serie}":`, serieResult.rows[0])
+                  console.log(`  �œ… Encontrada pela série extraída "${serie}":`, serieResult.rows[0])
                   break
                 }
               }
@@ -132,7 +132,7 @@ async function testBuscarPaisMelhorado() {
             // Estratégia 5: Tentar extrair RG (ex: "CJ SANT ANNA 13534" -> RG "13534")
             const possiveisRGs = animal.mae.match(/\d{4,}/g)
             if (possiveisRGs && possiveisRGs.length > 0) {
-              console.log(`  🔍 Tentando RGs extraídos: ${possiveisRGs.join(', ')}`)
+              console.log(`  �Ÿ”� Tentando RGs extraídos: ${possiveisRGs.join(', ')}`)
               
               for (const rg of possiveisRGs) {
                 const rgResult = await query(
@@ -141,24 +141,24 @@ async function testBuscarPaisMelhorado() {
                 )
                 
                 if (rgResult.rows.length > 0) {
-                  console.log(`  ✅ Encontrada pelo RG extraído "${rg}":`, rgResult.rows[0])
+                  console.log(`  �œ… Encontrada pelo RG extraído "${rg}":`, rgResult.rows[0])
                   break
                 }
               }
             }
             
             if (maeResult.rows.length === 0) {
-              console.log(`  ❌ Mãe não encontrada por nenhuma estratégia`)
+              console.log(`  �Œ Mãe não encontrada por nenhuma estratégia`)
             }
           }
         }
       }
     }
     
-    console.log('\n✅ Teste concluído!')
+    console.log('\n�œ… Teste concluído!')
     
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('�Œ Erro:', error)
   } finally {
     process.exit(0)
   }

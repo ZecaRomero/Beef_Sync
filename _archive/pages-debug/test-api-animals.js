@@ -9,21 +9,21 @@ export default function TestApiAnimals() {
     const testAPI = async () => {
       try {
         setLoading(true)
-        console.log('🔍 Testando API de animais...')
+        console.log('�Ÿ”� Testando API de animais...')
         
         const response = await fetch('/api/animals')
-        console.log('📡 Response status:', response.status)
-        console.log('📡 Response ok:', response.ok)
+        console.log('�Ÿ“� Response status:', response.status)
+        console.log('�Ÿ“� Response ok:', response.ok)
         
         if (response.ok) {
           const data = await response.json()
-          console.log('📊 Dados recebidos:', data)
+          console.log('�Ÿ“Š Dados recebidos:', data)
           setApiResponse(data)
         } else {
           throw new Error(`HTTP ${response.status}`)
         }
       } catch (err) {
-        console.error('❌ Erro:', err)
+        console.error('�Œ Erro:', err)
         setError(err.message)
       } finally {
         setLoading(false)
@@ -38,7 +38,7 @@ export default function TestApiAnimals() {
       <div className="max-w-4xl mx-auto px-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-            🧪 Teste da API de Animais
+            �Ÿ�� Teste da API de Animais
           </h1>
 
           {loading && (
@@ -58,10 +58,10 @@ export default function TestApiAnimals() {
           {apiResponse && (
             <div className="space-y-6">
               <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                <h3 className="text-green-800 dark:text-green-200 font-medium mb-2">✅ API Funcionando</h3>
+                <h3 className="text-green-800 dark:text-green-200 font-medium mb-2">�œ… API Funcionando</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                   <div>
-                    <strong>Success:</strong> {apiResponse.success ? '✅' : '❌'}
+                    <strong>Success:</strong> {apiResponse.success ? '�œ…' : '�Œ'}
                   </div>
                   <div>
                     <strong>Total de Animais:</strong> {apiResponse.data?.length || 0}
@@ -73,7 +73,7 @@ export default function TestApiAnimals() {
               </div>
 
               <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                <h3 className="text-blue-800 dark:text-blue-200 font-medium mb-4">📊 Dados dos Animais</h3>
+                <h3 className="text-blue-800 dark:text-blue-200 font-medium mb-4">�Ÿ“Š Dados dos Animais</h3>
                 
                 {apiResponse.data && apiResponse.data.length > 0 ? (
                   <div className="space-y-4">
@@ -112,7 +112,7 @@ export default function TestApiAnimals() {
               </div>
 
               <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                <h3 className="text-gray-800 dark:text-gray-200 font-medium mb-2">🔍 Resposta Completa da API</h3>
+                <h3 className="text-gray-800 dark:text-gray-200 font-medium mb-2">�Ÿ”� Resposta Completa da API</h3>
                 <pre className="text-xs bg-gray-100 dark:bg-gray-800 p-3 rounded overflow-x-auto">
                   {JSON.stringify(apiResponse, null, 2)}
                 </pre>
@@ -125,13 +125,13 @@ export default function TestApiAnimals() {
               href="/animals"
               className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              🐄 Ir para Página de Animais
+              �Ÿ�„ Ir para Página de Animais
             </a>
             <a
               href="/dashboard"
               className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              📊 Voltar ao Dashboard
+              �Ÿ“Š Voltar ao Dashboard
             </a>
           </div>
         </div>

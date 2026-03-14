@@ -1,6 +1,6 @@
 /**
- * Serviço de busca automática de informações de animais na internet
- * Busca dados públicos sobre animais bovinos por série e RG
+ * ServiÃ§o de busca automÃ¡tica de informaÃ§Ãµes de animais na internet
+ * Busca dados pÃºblicos sobre animais bovinos por sÃ©rie e RG
  */
 
 import logger from '../utils/logger'
@@ -12,8 +12,8 @@ class AnimalSearchService {
   }
 
   /**
-   * Busca informações de um animal na internet
-   * @param {string} serie - Série do animal (ex: CJCA)
+   * Busca informaÃ§Ãµes de um animal na internet
+   * @param {string} serie - SÃ©rie do animal (ex: CJCA)
    * @param {string} rg - RG do animal (ex: 12345)
    * @returns {Promise<Object>} Dados encontrados do animal
    */
@@ -28,9 +28,9 @@ class AnimalSearchService {
     }
 
     try {
-      logger.info(`🔍 Buscando informações na internet para ${serie}${rg}...`)
+      logger.info(`ðÅ¸â€�� Buscando informaÃ§Ãµes na internet para ${serie}${rg}...`)
       
-      // Buscar em múltiplas fontes
+      // Buscar em mÃºltiplas fontes
       const results = await Promise.allSettled([
         this.searchInRegistryDatabases(serie, rg),
         this.searchInBreedAssociations(serie, rg),
@@ -46,7 +46,7 @@ class AnimalSearchService {
         timestamp: Date.now()
       })
 
-      logger.info(`✅ Busca concluída para ${serie}${rg}`)
+      logger.info(`âÅ“â€¦ Busca concluÃ­da para ${serie}${rg}`)
       return animalData
     } catch (error) {
       logger.error(`Erro ao buscar animal ${serie}${rg}:`, error)
@@ -59,37 +59,37 @@ class AnimalSearchService {
    */
   async searchInRegistryDatabases(serie, rg) {
     try {
-      // Simular busca em bases de registro (implementar com APIs reais quando disponíveis)
-      // Por enquanto, retorna dados simulados baseados em padrões conhecidos
+      // Simular busca em bases de registro (implementar com APIs reais quando disponÃ­veis)
+      // Por enquanto, retorna dados simulados baseados em padrÃµes conhecidos
       
       const identificacao = `${serie}${rg}`
       
-      // Padrões conhecidos de séries brasileiras
+      // PadrÃµes conhecidos de sÃ©ries brasileiras
       const seriesPatterns = {
-        'CJCA': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' },
-        'CJCC': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' },
-        'CJCJ': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' },
-        'CJCG': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' },
-        'CJCE': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' },
-        'CJCF': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' },
-        'CJCH': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' },
-        'CJCI': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' },
-        'CJCK': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' },
-        'CJCL': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' },
-        'CJCM': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' },
-        'CJCN': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' },
-        'CJCO': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' },
-        'CJCP': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' },
-        'CJCQ': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' },
-        'CJCR': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' },
-        'CJCS': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' },
-        'CJCT': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' },
-        'CJCU': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' },
-        'CJCV': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' },
-        'CJCW': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' },
-        'CJCX': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' },
-        'CJCY': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' },
-        'CJCZ': { tipo: 'Gado de Corte', origem: 'Associação Brasileira de Criadores de Zebu' }
+        'CJCA': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' },
+        'CJCC': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' },
+        'CJCJ': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' },
+        'CJCG': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' },
+        'CJCE': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' },
+        'CJCF': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' },
+        'CJCH': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' },
+        'CJCI': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' },
+        'CJCK': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' },
+        'CJCL': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' },
+        'CJCM': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' },
+        'CJCN': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' },
+        'CJCO': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' },
+        'CJCP': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' },
+        'CJCQ': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' },
+        'CJCR': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' },
+        'CJCS': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' },
+        'CJCT': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' },
+        'CJCU': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' },
+        'CJCV': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' },
+        'CJCW': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' },
+        'CJCX': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' },
+        'CJCY': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' },
+        'CJCZ': { tipo: 'Gado de Corte', origem: 'AssociaÃ§Ã£o Brasileira de Criadores de Zebu' }
       }
 
       const serieInfo = seriesPatterns[serie] || { tipo: 'Gado de Corte', origem: 'Registro Nacional' }
@@ -104,7 +104,7 @@ class AnimalSearchService {
           tipo: serieInfo.tipo,
           origem_registro: serieInfo.origem,
           registro_valido: true,
-          observacoes: `Animal registrado na série ${serie}`
+          observacoes: `Animal registrado na sÃ©rie ${serie}`
         }
       }
     } catch (error) {
@@ -114,41 +114,41 @@ class AnimalSearchService {
   }
 
   /**
-   * Busca em associações de criadores
+   * Busca em associaÃ§Ãµes de criadores
    */
   async searchInBreedAssociations(serie, rg) {
     try {
-      // Simular busca em associações (implementar com APIs reais quando disponíveis)
+      // Simular busca em associaÃ§Ãµes (implementar com APIs reais quando disponÃ­veis)
       return {
         source: 'breed_associations',
         found: false,
         data: null
       }
     } catch (error) {
-      logger.error('Erro ao buscar em associações:', error)
+      logger.error('Erro ao buscar em associaÃ§Ãµes:', error)
       return { source: 'breed_associations', found: false, data: null }
     }
   }
 
   /**
-   * Busca em bases de dados públicas
+   * Busca em bases de dados pÃºblicas
    */
   async searchInPublicDatabases(serie, rg) {
     try {
-      // Simular busca em bases públicas (implementar com web scraping ou APIs quando disponíveis)
+      // Simular busca em bases pÃºblicas (implementar com web scraping ou APIs quando disponÃ­veis)
       return {
         source: 'public_databases',
         found: false,
         data: null
       }
     } catch (error) {
-      logger.error('Erro ao buscar em bases públicas:', error)
+      logger.error('Erro ao buscar em bases pÃºblicas:', error)
       return { source: 'public_databases', found: false, data: null }
     }
   }
 
   /**
-   * Consolida resultados de múltiplas fontes
+   * Consolida resultados de mÃºltiplas fontes
    */
   consolidateResults(results, serie, rg) {
     const consolidated = {
@@ -171,7 +171,7 @@ class AnimalSearchService {
       }
     })
 
-    // Se não encontrou nada, retornar dados padrão
+    // Se nÃ£o encontrou nada, retornar dados padrÃ£o
     if (!consolidated.dados_encontrados) {
       return this.getDefaultData(serie, rg)
     }
@@ -180,7 +180,7 @@ class AnimalSearchService {
   }
 
   /**
-   * Retorna dados padrão quando não encontra informações
+   * Retorna dados padrÃ£o quando nÃ£o encontra informaÃ§Ãµes
    */
   getDefaultData(serie, rg) {
     return {
@@ -190,7 +190,7 @@ class AnimalSearchService {
       dados_encontrados: false,
       fontes: [],
       informacoes: {
-        observacoes: 'Informações não encontradas em bases públicas. Dados devem ser preenchidos manualmente.'
+        observacoes: 'InformaÃ§Ãµes nÃ£o encontradas em bases pÃºblicas. Dados devem ser preenchidos manualmente.'
       }
     }
   }

@@ -30,7 +30,7 @@ const AdvancedReports = ({ animals, costs, sales = [] }) => {
         startDate.setDate(now.getDate() - 30)
     }
 
-    // Filtrar dados por período
+    // Filtrar dados por perÃ­odo
     const filteredCosts = costs?.filter(cost => {
       if (!cost.data) return false
       return new Date(cost.data) >= startDate
@@ -41,7 +41,7 @@ const AdvancedReports = ({ animals, costs, sales = [] }) => {
       return new Date(sale.data) >= startDate
     }) || []
 
-    // Relatório Financeiro
+    // RelatÃ³rio Financeiro
     if (reportType === 'financial') {
       const totalCosts = filteredCosts.reduce((sum, cost) => sum + (parseFloat(cost.valor) || 0), 0)
       const totalRevenue = filteredSales.reduce((sum, sale) => sum + (parseFloat(sale.valor) || 0), 0)
@@ -73,7 +73,7 @@ const AdvancedReports = ({ animals, costs, sales = [] }) => {
       }
     }
 
-    // Relatório de Produtividade
+    // RelatÃ³rio de Produtividade
     if (reportType === 'productivity') {
       const activeAnimals = animals.filter(a => a.situacao === 'Ativo')
       const births = animals.filter(a => {
@@ -104,7 +104,7 @@ const AdvancedReports = ({ animals, costs, sales = [] }) => {
         details: {
           topPerformers: weightGainData.slice(0, 5),
           breedPerformance: animals.reduce((acc, animal) => {
-            const breed = animal.raca || 'Não informado'
+            const breed = animal.raca || 'NÃ£o informado'
             if (!acc[breed]) {
               acc[breed] = { count: 0, totalWeight: 0, avgWeight: 0 }
             }
@@ -117,10 +117,10 @@ const AdvancedReports = ({ animals, costs, sales = [] }) => {
       }
     }
 
-    // Relatório de Saúde
+    // RelatÃ³rio de SaÃºde
     if (reportType === 'health') {
       const healthCosts = filteredCosts.filter(c => 
-        c.tipo === 'Medicamentos' || c.tipo === 'Veterinários'
+        c.tipo === 'Medicamentos' || c.tipo === 'VeterinÃ¡rios'
       )
       
       const totalHealthCosts = healthCosts.reduce((sum, c) => sum + (parseFloat(c.valor) || 0), 0)
@@ -170,45 +170,45 @@ const AdvancedReports = ({ animals, costs, sales = [] }) => {
   if (!reportData) {
     return (
       <div className="text-center py-8">
-        <div className="text-gray-400 dark:text-gray-500 text-4xl mb-4">📊</div>
-        <p className="text-gray-500 dark:text-gray-400">Carregando dados do relatório...</p>
+        <div className="text-gray-400 dark:text-gray-500 text-4xl mb-4">ðÅ¸â€œÅ </div>
+        <p className="text-gray-500 dark:text-gray-400">Carregando dados do relatÃ³rio...</p>
       </div>
     )
   }
 
   return (
     <div className="space-y-6">
-      {/* Controles do Relatório */}
+      {/* Controles do RelatÃ³rio */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
           <div className="flex space-x-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Tipo de Relatório
+                Tipo de RelatÃ³rio
               </label>
               <select
                 value={reportType}
                 onChange={(e) => setReportType(e.target.value)}
                 className="input-field"
               >
-                <option value="financial">💰 Financeiro</option>
-                <option value="productivity">📈 Produtividade</option>
-                <option value="health">🏥 Saúde</option>
+                <option value="financial">ðÅ¸â€™° Financeiro</option>
+                <option value="productivity">ðÅ¸â€œË† Produtividade</option>
+                <option value="health">ðÅ¸�¥ SaÃºde</option>
               </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Período
+                PerÃ­odo
               </label>
               <select
                 value={dateRange}
                 onChange={(e) => setDateRange(e.target.value)}
                 className="input-field"
               >
-                <option value="last7days">Últimos 7 dias</option>
-                <option value="last30days">Últimos 30 dias</option>
-                <option value="last90days">Últimos 90 dias</option>
-                <option value="lastyear">Último ano</option>
+                <option value="last7days">ÃÅ¡ltimos 7 dias</option>
+                <option value="last30days">ÃÅ¡ltimos 30 dias</option>
+                <option value="last90days">ÃÅ¡ltimos 90 dias</option>
+                <option value="lastyear">ÃÅ¡ltimo ano</option>
               </select>
             </div>
           </div>
@@ -216,12 +216,12 @@ const AdvancedReports = ({ animals, costs, sales = [] }) => {
             onClick={exportReport}
             className="btn-secondary flex items-center"
           >
-            📥 Exportar Relatório
+            ðÅ¸â€œ¥ Exportar RelatÃ³rio
           </button>
         </div>
       </div>
 
-      {/* Resumo do Relatório */}
+      {/* Resumo do RelatÃ³rio */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {Object.entries(reportData.summary).map(([key, value]) => (
           <div key={key} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
@@ -242,10 +242,10 @@ const AdvancedReports = ({ animals, costs, sales = [] }) => {
         ))}
       </div>
 
-      {/* Detalhes do Relatório */}
+      {/* Detalhes do RelatÃ³rio */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Detalhes do Relatório
+          Detalhes do RelatÃ³rio
         </h3>
         
         {reportData.type === 'financial' && (
@@ -276,7 +276,7 @@ const AdvancedReports = ({ animals, costs, sales = [] }) => {
                     </span>
                     <div className="text-right">
                       <div className="font-medium text-gray-900 dark:text-white">{animal.peso}kg</div>
-                      <div className="text-xs text-gray-500">Eficiência: {animal.efficiency.toFixed(2)}</div>
+                      <div className="text-xs text-gray-500">EficiÃªncia: {animal.efficiency.toFixed(2)}</div>
                     </div>
                   </div>
                 ))}

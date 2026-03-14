@@ -2,7 +2,7 @@ const { pool } = require('./lib/database')
 
 async function criarTabelaHistoricoImportacoes() {
   try {
-    console.log('🔄 Criando tabela importacoes_historico...')
+    console.log('�Ÿ”„ Criando tabela importacoes_historico...')
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS importacoes_historico (
@@ -18,7 +18,7 @@ async function criarTabelaHistoricoImportacoes() {
       )
     `)
 
-    console.log('✅ Tabela importacoes_historico criada com sucesso!')
+    console.log('�œ… Tabela importacoes_historico criada com sucesso!')
 
     // Criar índices para melhor performance
     await pool.query(`
@@ -31,7 +31,7 @@ async function criarTabelaHistoricoImportacoes() {
       ON importacoes_historico(tipo)
     `)
 
-    console.log('✅ Índices criados com sucesso!')
+    console.log('�œ… Índices criados com sucesso!')
 
     // Inserir alguns dados de exemplo
     await pool.query(`
@@ -44,12 +44,12 @@ async function criarTabelaHistoricoImportacoes() {
         ('Pesagens', 'Pesagem mensal - Fevereiro', 150, 'Admin', 'sucesso')
     `)
 
-    console.log('✅ Dados de exemplo inseridos!')
-    console.log('✨ Migração concluída com sucesso!')
+    console.log('�œ… Dados de exemplo inseridos!')
+    console.log('�œ� Migração concluída com sucesso!')
 
     process.exit(0)
   } catch (error) {
-    console.error('❌ Erro na migração:', error)
+    console.error('�Œ Erro na migração:', error)
     process.exit(1)
   }
 }

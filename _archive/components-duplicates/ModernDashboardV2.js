@@ -292,7 +292,7 @@ export default function ModernDashboardV2() {
                   Ações Recentes
                 </CardTitle>
                 <CardDescription>
-                  Últimas atividades do sistema
+                  �šltimas atividades do sistema
                 </CardDescription>
               </CardHeader>
               <CardBody>
@@ -326,7 +326,7 @@ export default function ModernDashboardV2() {
               Sistema operacional
             </div>
             <div>
-              Última atualização: {new Date().toLocaleString('pt-BR')}
+              �šltima atualização: {new Date().toLocaleString('pt-BR')}
             </div>
           </div>
         </div>

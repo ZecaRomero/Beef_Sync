@@ -3,7 +3,7 @@ const { query } = require('./lib/database')
 
 async function verificarIncricoes() {
   try {
-    console.log('🔍 Verificando incrições das Notas Fiscais...\n')
+    console.log('�Ÿ”� Verificando incrições das Notas Fiscais...\n')
     
     // Buscar todas as NFs
     const result = await query(`
@@ -21,7 +21,7 @@ async function verificarIncricoes() {
       LIMIT 50
     `)
     
-    console.log(`📋 Total de NFs encontradas: ${result.rows.length}\n`)
+    console.log(`�Ÿ“‹ Total de NFs encontradas: ${result.rows.length}\n`)
     
     const semIncricao = []
     const incricaoInvalida = []
@@ -41,13 +41,13 @@ async function verificarIncricoes() {
       }
     })
     
-    console.log('📊 Resumo:')
-    console.log(`  ✅ Com incrição válida: ${incricaoValida.length}`)
-    console.log(`  ⚠️  Sem incrição: ${semIncricao.length}`)
-    console.log(`  ❌ Com incrição inválida: ${incricaoInvalida.length}\n`)
+    console.log('�Ÿ“Š Resumo:')
+    console.log(`  �œ… Com incrição válida: ${incricaoValida.length}`)
+    console.log(`  �š�️  Sem incrição: ${semIncricao.length}`)
+    console.log(`  �Œ Com incrição inválida: ${incricaoInvalida.length}\n`)
     
     if (semIncricao.length > 0) {
-      console.log('⚠️  NFs SEM INCRIÇÃO:')
+      console.log('�š�️  NFs SEM INCRI�‡�ƒO:')
       semIncricao.slice(0, 10).forEach(nf => {
         console.log(`  - NF ${nf.numero_nf} (${nf.tipo}) - ${nf.fornecedor || nf.destino || 'Sem fornecedor/destino'}`)
       })
@@ -59,7 +59,7 @@ async function verificarIncricoes() {
     }
     
     if (incricaoInvalida.length > 0) {
-      console.log('❌ NFs COM INCRIÇÃO INVÁLIDA:')
+      console.log('�Œ NFs COM INCRI�‡�ƒO INVÁLIDA:')
       incricaoInvalida.slice(0, 10).forEach(nf => {
         console.log(`  - NF ${nf.numero_nf} (${nf.tipo}) - Incrição: "${nf.incricao}"`)
       })
@@ -70,11 +70,11 @@ async function verificarIncricoes() {
       }
     }
     
-    console.log('\n💡 Sugestão:')
+    console.log('\n�Ÿ’� Sugestão:')
     console.log('Execute o script "corrigir-incricoes-nf.js" para corrigir automaticamente as incrições')
     
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('�Œ Erro:', error)
   } finally {
     process.exit(0)
   }

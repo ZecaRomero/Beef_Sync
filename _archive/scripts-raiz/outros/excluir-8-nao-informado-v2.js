@@ -34,7 +34,7 @@ async function excluirNaoInformados() {
       WHERE id = ANY($1::int[])
     `, [ids])
     
-    console.log(`\n✓ ${updateResult.rowCount} animais marcados como INATIVOS com sucesso!`)
+    console.log(`\n�œ“ ${updateResult.rowCount} animais marcados como INATIVOS com sucesso!`)
     
   } catch (error) {
     console.error('Erro:', error.message)

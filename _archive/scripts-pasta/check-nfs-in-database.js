@@ -10,7 +10,7 @@ const pool = new Pool({
 })
 
 async function checkNFsInDatabase() {
-  console.log('🔍 Verificando notas fiscais no PostgreSQL...')
+  console.log('�Ÿ”� Verificando notas fiscais no PostgreSQL...')
   
   try {
     const client = await pool.connect()
@@ -33,12 +33,12 @@ async function checkNFsInDatabase() {
         ORDER BY created_at DESC
       `)
       
-      console.log(`📊 Total de notas fiscais encontradas: ${result.rows.length}`)
+      console.log(`�Ÿ“Š Total de notas fiscais encontradas: ${result.rows.length}`)
       
       if (result.rows.length === 0) {
-        console.log('❌ Nenhuma nota fiscal encontrada no PostgreSQL')
+        console.log('�Œ Nenhuma nota fiscal encontrada no PostgreSQL')
       } else {
-        console.log('\n📋 Detalhes das notas fiscais:')
+        console.log('\n�Ÿ“‹ Detalhes das notas fiscais:')
         result.rows.forEach((nf, index) => {
           console.log(`\n${index + 1}. ID: ${nf.id}`)
           console.log(`   Número NF: ${nf.numero_nf}`)
@@ -61,7 +61,7 @@ async function checkNFsInDatabase() {
         ORDER BY ordinal_position
       `)
       
-      console.log('\n📋 Estrutura da tabela:')
+      console.log('\n�Ÿ“‹ Estrutura da tabela:')
       structure.rows.forEach(col => {
         console.log(`  ${col.column_name}: ${col.data_type} (nullable: ${col.is_nullable})`)
       })
@@ -71,7 +71,7 @@ async function checkNFsInDatabase() {
     }
     
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('�Œ Erro:', error)
   } finally {
     await pool.end()
   }

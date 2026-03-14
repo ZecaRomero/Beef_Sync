@@ -14,7 +14,7 @@ async function criar() {
   const client = await pool.connect()
   
   try {
-    console.log('🔍 Buscando filhos faltantes...\n')
+    console.log('ðÅ¸â€�� Buscando filhos faltantes...\n')
     
     // Buscar filhos faltantes
     const filhosResult = await client.query(`
@@ -30,14 +30,14 @@ async function criar() {
       ORDER BY b.serie, b.rg
     `)
     
-    console.log(`📊 Total de filhos faltantes: ${filhosResult.rows.length}\n`)
+    console.log(`ðÅ¸â€œÅ  Total de filhos faltantes: ${filhosResult.rows.length}\n`)
     
     let filhosCriados = 0
     let erros = 0
     
     for (const filho of filhosResult.rows) {
       try {
-        // Determinar situação
+        // Determinar situaÃ§Ã£o
         let situacao = 'Ativo'
         if (filho.tipo === 'VENDA') {
           situacao = 'Vendido'
@@ -68,7 +68,7 @@ async function criar() {
           serieFilho,
           rgFilho,
           nomeFilho,
-          'Macho', // Sexo padrão válido
+          'Macho', // Sexo padrÃ£o vÃ¡lido
           situacao,
           serieMaeFilho,
           rgMaeFilho,
@@ -77,32 +77,32 @@ async function criar() {
         
         filhosCriados++
         if (filhosCriados % 100 === 0) {
-          console.log(`✅ ${filhosCriados} filhos criados...`)
+          console.log(`âÅ“â€¦ ${filhosCriados} filhos criados...`)
         }
         
       } catch (error) {
         erros++
-        console.error(`❌ Erro ao criar filho ${filho.serie} ${filho.rg}:`, error.message)
+        console.error(`â�Å’ Erro ao criar filho ${filho.serie} ${filho.rg}:`, error.message)
         console.error(`   Serie: "${filho.serie}" (${filho.serie?.length} chars)`)
         console.error(`   RG: "${filho.rg}" (${filho.rg?.length} chars)`)
-        console.error(`   Serie Mãe: "${filho.serie_mae}" (${filho.serie_mae?.length} chars)`)
-        console.error(`   RG Mãe: "${filho.rg_mae}" (${filho.rg_mae?.length} chars)`)
+        console.error(`   Serie MÃ£e: "${filho.serie_mae}" (${filho.serie_mae?.length} chars)`)
+        console.error(`   RG MÃ£e: "${filho.rg_mae}" (${filho.rg_mae?.length} chars)`)
         
-        // Parar após 5 erros para análise
+        // Parar apÃ³s 5 erros para anÃ¡lise
         if (erros >= 5) {
-          console.log('\n⚠️ Parando após 5 erros para análise')
+          console.log('\nâÅ¡ ï¸� Parando apÃ³s 5 erros para anÃ¡lise')
           break
         }
       }
     }
     
-    console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
-    console.log(`✅ Filhos criados: ${filhosCriados}`)
-    console.log(`❌ Erros: ${erros}`)
-    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
+    console.log(`\nââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��`)
+    console.log(`âÅ“â€¦ Filhos criados: ${filhosCriados}`)
+    console.log(`â�Å’ Erros: ${erros}`)
+    console.log(`ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��ââ€��`)
     
   } catch (error) {
-    console.error('❌ Erro geral:', error)
+    console.error('â�Å’ Erro geral:', error)
   } finally {
     client.release()
     await pool.end()
@@ -112,6 +112,6 @@ async function criar() {
 criar()
   .then(() => process.exit(0))
   .catch(error => {
-    console.error('💥 Erro fatal:', error)
+    console.error('ðÅ¸â€™¥ Erro fatal:', error)
     process.exit(1)
   })

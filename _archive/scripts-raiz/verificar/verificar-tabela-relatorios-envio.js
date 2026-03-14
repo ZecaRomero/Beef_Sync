@@ -10,7 +10,7 @@ const pool = new Pool({
 
 async function verificarTabela() {
   try {
-    console.log('🔍 Verificando estrutura da tabela relatorios_envio...\n')
+    console.log('�Ÿ”� Verificando estrutura da tabela relatorios_envio...\n')
     
     // Verificar se a tabela existe
     const tabelaExiste = await pool.query(`
@@ -33,22 +33,22 @@ async function verificarTabela() {
         ORDER BY ordinal_position
       `)
       
-      console.log('\n📋 Colunas da tabela relatorios_envio:')
+      console.log('\n�Ÿ“‹ Colunas da tabela relatorios_envio:')
       colunas.rows.forEach(col => {
         console.log(`  - ${col.column_name} (${col.data_type}) ${col.is_nullable === 'NO' ? 'NOT NULL' : 'NULL'} ${col.column_default ? `DEFAULT ${col.column_default}` : ''}`)
       })
       
       // Verificar se existe coluna referencias
       const temReferencias = colunas.rows.some(col => col.column_name === 'referencias')
-      console.log('\n❓ Tem coluna "referencias":', temReferencias)
+      console.log('\n�“ Tem coluna "referencias":', temReferencias)
       
       // Contar registros
       const count = await pool.query('SELECT COUNT(*) FROM relatorios_envio')
-      console.log('\n📊 Total de registros:', count.rows[0].count)
+      console.log('\n�Ÿ“Š Total de registros:', count.rows[0].count)
     }
     
   } catch (error) {
-    console.error('❌ Erro:', error.message)
+    console.error('�Œ Erro:', error.message)
   } finally {
     await pool.end()
   }

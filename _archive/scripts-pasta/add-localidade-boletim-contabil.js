@@ -5,7 +5,7 @@ async function addLocalidadeBoletimContabil() {
   const client = await pool.connect()
   
   try {
-    console.log('🔧 Adicionando coluna localidade à tabela boletim_contabil...\n')
+    console.log('�Ÿ”� Adicionando coluna localidade à tabela boletim_contabil...\n')
     
     await client.query('BEGIN')
     
@@ -16,11 +16,11 @@ async function addLocalidadeBoletimContabil() {
         ADD COLUMN IF NOT EXISTS localidade VARCHAR(50) CHECK (localidade IN ('Pardinho', 'Rancharia', NULL))
       `)
       
-      console.log('✅ Coluna localidade adicionada com sucesso!')
+      console.log('�œ… Coluna localidade adicionada com sucesso!')
       
       await client.query('COMMIT')
       
-      console.log('\n📋 Próximos passos:')
+      console.log('\n�Ÿ“‹ Próximos passos:')
       console.log('   1. Atualize os boletins existentes com a localidade (Pardinho ou Rancharia)')
       console.log('   2. O formulário de nota fiscal agora mostrará a localidade do boletim selecionado\n')
       
@@ -30,7 +30,7 @@ async function addLocalidadeBoletimContabil() {
     }
     
   } catch (error) {
-    console.error('❌ Erro ao adicionar coluna:', error)
+    console.error('�Œ Erro ao adicionar coluna:', error)
     throw error
   } finally {
     client.release()
@@ -39,10 +39,10 @@ async function addLocalidadeBoletimContabil() {
 
 addLocalidadeBoletimContabil()
   .then(() => {
-    console.log('\n✅ Script finalizado')
+    console.log('\n�œ… Script finalizado')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n❌ Erro fatal:', error)
+    console.error('\n�Œ Erro fatal:', error)
     process.exit(1)
   })

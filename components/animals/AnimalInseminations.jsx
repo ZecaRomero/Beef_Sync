@@ -9,7 +9,7 @@ import {
 import { TrophyIcon as TrophySolid } from '@heroicons/react/24/solid'
 import { formatDate } from '../../utils/formatters'
 
-/** Calcula idade em meses na data da concepção */
+/** Calcula idade em meses na data da concepÃ§Ã£o */
 function calcularIdadeConcepcao(dataNascimento, dataConcepcao) {
   if (!dataNascimento || !dataConcepcao) return null
   const nasc = new Date(dataNascimento)
@@ -22,11 +22,11 @@ function calcularIdadeConcepcao(dataNascimento, dataConcepcao) {
   return { meses, diasExtras, superPrecoce: meses < 14 }
 }
 
-/** Ícone/cor por posição no ranking */
+/** Ã�cone/cor por posiÃ§Ã£o no ranking */
 function PosicaoRanking({ pos }) {
-  if (pos === 1) return <span className="text-2xl">🥇</span>
-  if (pos === 2) return <span className="text-2xl">🥈</span>
-  if (pos === 3) return <span className="text-2xl">🥉</span>
+  if (pos === 1) return <span className="text-2xl">ðÅ¸¥â€¡</span>
+  if (pos === 2) return <span className="text-2xl">ðÅ¸¥Ë†</span>
+  if (pos === 3) return <span className="text-2xl">ðÅ¸¥â€°</span>
   return <span className="text-base font-black text-gray-500 dark:text-gray-400 w-7 text-center">#{pos}</span>
 }
 
@@ -43,7 +43,7 @@ export default function AnimalInseminations({ inseminacoes, dataNascimento, anim
   const [posicaoAnimal, setPosicaoAnimal] = useState(null)
   const [loadingRanking, setLoadingRanking] = useState(false)
 
-  // ── Cálculo da primeira prenha deste animal
+  // ââ€�â‚¬ââ€�â‚¬ CÃ¡lculo da primeira prenha deste animal
   const inseminacoesPrenhas = (inseminacoes || []).filter(ia =>
     /pren/i.test(String(ia.resultado_dg || ia.status_gestacao || ''))
   )
@@ -58,7 +58,7 @@ export default function AnimalInseminations({ inseminacoes, dataNascimento, anim
     ? calcularIdadeConcepcao(dataNascimento, primeiraPrenha.data_ia || primeiraPrenha.data)
     : null
 
-  // ── Carrega ranking de precocidade
+  // ââ€�â‚¬ââ€�â‚¬ Carrega ranking de precocidade
   useEffect(() => {
     if (!inseminacoesPrenhas.length) return
     setLoadingRanking(true)
@@ -79,7 +79,7 @@ export default function AnimalInseminations({ inseminacoes, dataNascimento, anim
   const isTop3    = posicaoAnimal && posicaoAnimal.posicao <= 3
   const isTop10   = posicaoAnimal && posicaoAnimal.posicao <= 10
 
-  // ── Dados gerais
+  // ââ€�â‚¬ââ€�â‚¬ Dados gerais
   const prenhas = inseminacoesPrenhas.length
   const taxaSucessoIA = (inseminacoes || []).length > 0
     ? Math.round((prenhas / inseminacoes.length) * 100)
@@ -90,7 +90,7 @@ export default function AnimalInseminations({ inseminacoes, dataNascimento, anim
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
 
-      {/* ── Header clicável ── */}
+      {/* ââ€�â‚¬ââ€�â‚¬ Header clicÃ¡vel ââ€�â‚¬ââ€�â‚¬ */}
       <button
         type="button"
         onClick={() => setIsExpanded(!isExpanded)}
@@ -99,7 +99,7 @@ export default function AnimalInseminations({ inseminacoes, dataNascimento, anim
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <HeartIcon className="h-6 w-6 text-pink-600 dark:text-pink-400" />
-            <h2 className="font-bold text-gray-900 dark:text-white">Reprodução / Inseminações</h2>
+            <h2 className="font-bold text-gray-900 dark:text-white">ReproduÃ§Ã£o / InseminaÃ§Ãµes</h2>
           </div>
           <div className="flex items-center gap-2">
             {taxaSucessoIA != null && (
@@ -112,8 +112,8 @@ export default function AnimalInseminations({ inseminacoes, dataNascimento, anim
               </span>
             )}
             {isTop3 && (
-              <span className="text-xl" title={`${posicaoAnimal.posicao}º mais precoce`}>
-                {posicaoAnimal.posicao === 1 ? '🥇' : posicaoAnimal.posicao === 2 ? '🥈' : '🥉'}
+              <span className="text-xl" title={`${posicaoAnimal.posicao}Âº mais precoce`}>
+                {posicaoAnimal.posicao === 1 ? 'ðÅ¸¥â€¡' : posicaoAnimal.posicao === 2 ? 'ðÅ¸¥Ë†' : 'ðÅ¸¥â€°'}
               </span>
             )}
             {isExpanded ? <ChevronUpIcon className="h-5 w-5" /> : <ChevronDownIcon className="h-5 w-5" />}
@@ -121,14 +121,14 @@ export default function AnimalInseminations({ inseminacoes, dataNascimento, anim
         </div>
         <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
           {inseminacoes.length} registro(s)
-          {prenhas > 0 && ` • ${prenhas} prenha(s)`}
-          {idadePrimeiraPrenha && ` • 1ª prenha com ${idadePrimeiraPrenha.meses}m`}
+          {prenhas > 0 && ` ââ‚¬¢ ${prenhas} prenha(s)`}
+          {idadePrimeiraPrenha && ` ââ‚¬¢ 1Âª prenha com ${idadePrimeiraPrenha.meses}m`}
         </p>
       </button>
 
       <div className={`overflow-hidden transition-all ${isExpanded ? 'max-h-[9999px]' : 'max-h-0'}`}>
 
-        {/* ══ DESTAQUE DE PRECOCIDADE deste animal ══ */}
+        {/* ââ€¢�ââ€¢� DESTAQUE DE PRECOCIDADE deste animal ââ€¢�ââ€¢� */}
         {idadePrimeiraPrenha && (
           <div className={`mx-4 mt-4 rounded-2xl overflow-hidden shadow-md ${
             posicaoAnimal?.posicao === 1
@@ -144,28 +144,28 @@ export default function AnimalInseminations({ inseminacoes, dataNascimento, anim
                 ? 'bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500'
                 : 'bg-gradient-to-r from-pink-500 to-rose-600'
             }`}>
-              {/* ícone/posição */}
+              {/* Ã­cone/posiÃ§Ã£o */}
               <div className="shrink-0 text-center">
                 {posicaoAnimal ? (
                   <div>
                     <div className="text-3xl">
-                      {posicaoAnimal.posicao === 1 ? '🥇' :
-                       posicaoAnimal.posicao === 2 ? '🥈' :
-                       posicaoAnimal.posicao === 3 ? '🥉' : '🏅'}
+                      {posicaoAnimal.posicao === 1 ? 'ðÅ¸¥â€¡' :
+                       posicaoAnimal.posicao === 2 ? 'ðÅ¸¥Ë†' :
+                       posicaoAnimal.posicao === 3 ? 'ðÅ¸¥â€°' : 'ðÅ¸�â€¦'}
                     </div>
                     <p className="text-white/80 text-[10px] font-bold mt-0.5">
-                      {posicaoAnimal.posicao}º lugar
+                      {posicaoAnimal.posicao}Âº lugar
                     </p>
                   </div>
                 ) : (
-                  <div className="text-3xl">{idadePrimeiraPrenha.superPrecoce ? '⭐' : '💕'}</div>
+                  <div className="text-3xl">{idadePrimeiraPrenha.superPrecoce ? 'â­�' : 'ðÅ¸â€™â€¢'}</div>
                 )}
               </div>
 
               {/* dados principais */}
               <div className="flex-1">
                 <p className="text-white/80 text-xs font-semibold uppercase tracking-wide">
-                  {idadePrimeiraPrenha.superPrecoce ? '⚡ Super Precoce!' : 'Primeira Prenha'}
+                  {idadePrimeiraPrenha.superPrecoce ? 'âÅ¡¡ Super Precoce!' : 'Primeira Prenha'}
                 </p>
                 <p className="text-white text-2xl font-black leading-none">
                   {idadePrimeiraPrenha.meses} meses
@@ -178,7 +178,7 @@ export default function AnimalInseminations({ inseminacoes, dataNascimento, anim
                 </p>
               </div>
 
-              {/* posição no ranking */}
+              {/* posiÃ§Ã£o no ranking */}
               {posicaoAnimal && (
                 <div className="text-right shrink-0">
                   <p className="text-white/70 text-[10px] font-semibold uppercase">Ranking</p>
@@ -190,13 +190,13 @@ export default function AnimalInseminations({ inseminacoes, dataNascimento, anim
           </div>
         )}
 
-        {/* ══ RANKING TOP 3 DAS MAIS PRECOCES ══ */}
+        {/* ââ€¢�ââ€¢� RANKING TOP 3 DAS MAIS PRECOCES ââ€¢�ââ€¢� */}
         {top3.length > 0 && (
           <div className="mx-4 mt-4">
             <div className="flex items-center gap-2 mb-2">
               <TrophySolid className="h-5 w-5 text-amber-500" />
-              <h3 className="font-bold text-gray-900 dark:text-white text-sm">Ranking — Fêmeas Mais Precoces</h3>
-              <span className="ml-auto text-xs text-gray-400 dark:text-gray-500">1ª prenha mais cedo</span>
+              <h3 className="font-bold text-gray-900 dark:text-white text-sm">Ranking ââ‚¬â€� FÃªmeas Mais Precoces</h3>
+              <span className="ml-auto text-xs text-gray-400 dark:text-gray-500">1Âª prenha mais cedo</span>
             </div>
 
             <div className="space-y-2">
@@ -213,7 +213,7 @@ export default function AnimalInseminations({ inseminacoes, dataNascimento, anim
                         : 'border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/40'
                     }`}
                   >
-                    {/* Posição */}
+                    {/* PosiÃ§Ã£o */}
                     <div className="shrink-0 w-8 text-center">
                       <PosicaoRanking pos={pos} />
                     </div>
@@ -224,16 +224,16 @@ export default function AnimalInseminations({ inseminacoes, dataNascimento, anim
                         isEstaAnimal ? 'text-pink-700 dark:text-pink-300' : 'text-gray-900 dark:text-white'
                       }`}>
                         {animal.nome}
-                        {isEstaAnimal && <span className="ml-1 text-[10px] font-semibold text-pink-500"> ← este animal</span>}
+                        {isEstaAnimal && <span className="ml-1 text-[10px] font-semibold text-pink-500"> ââ€ � este animal</span>}
                       </p>
                       <p className="text-[10px] text-gray-500 dark:text-gray-400">
-                        {[animal.serie, animal.rg].filter(Boolean).join(' · ')}
+                        {[animal.serie, animal.rg].filter(Boolean).join(' Â· ')}
                       </p>
                     </div>
 
                     {/* Meses */}
                     <div className={`shrink-0 text-center px-3 py-1.5 rounded-xl font-black ${badgePosicao(pos)}`}>
-                      <p className="text-xs opacity-80 font-semibold leading-none">{animal.superPrecoce ? '⚡' : '📅'}</p>
+                      <p className="text-xs opacity-80 font-semibold leading-none">{animal.superPrecoce ? 'âÅ¡¡' : 'ðÅ¸â€œâ€¦'}</p>
                       <p className="text-base leading-tight">
                         {animal.meses}m
                         {animal.diasExtras > 0 && <span className="text-xs opacity-75">+{animal.diasExtras}d</span>}
@@ -244,7 +244,7 @@ export default function AnimalInseminations({ inseminacoes, dataNascimento, anim
               })}
             </div>
 
-            {/* Se este animal está no ranking mas fora do top 3 */}
+            {/* Se este animal estÃ¡ no ranking mas fora do top 3 */}
             {posicaoAnimal && posicaoAnimal.posicao > 3 && (
               <div className="mt-2 flex items-center gap-3 rounded-xl px-3 py-2.5 border-2 border-pink-300 dark:border-pink-700 bg-pink-50 dark:bg-pink-900/20">
                 <span className="text-base font-black text-gray-500 w-8 text-center">#{posicaoAnimal.posicao}</span>
@@ -265,7 +265,7 @@ export default function AnimalInseminations({ inseminacoes, dataNascimento, anim
           </div>
         )}
 
-        {/* ══ LISTA DE INSEMINAÇÕES ══ */}
+        {/* ââ€¢�ââ€¢� LISTA DE INSEMINAÃâ€¡Ãâ€¢ES ââ€¢�ââ€¢� */}
         <div className="divide-y divide-gray-100 dark:divide-gray-700 mt-4">
           {inseminacoes.map((ia, i) => {
             const dataIA    = ia.data_ia || ia.data_inseminacao || ia.data
@@ -283,7 +283,7 @@ export default function AnimalInseminations({ inseminacoes, dataNascimento, anim
                     {formatDate(dataIA)}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                    {ia.touro_nome || ia.touro || '—'}
+                    {ia.touro_nome || ia.touro || 'ââ‚¬â€�'}
                   </p>
                   <div className="flex flex-wrap items-center gap-1.5 mt-1">
                     {ia.resultado_dg && (
@@ -304,20 +304,20 @@ export default function AnimalInseminations({ inseminacoes, dataNascimento, anim
                             ? 'bg-amber-200 text-amber-900 dark:bg-amber-500/50 dark:text-amber-100'
                             : 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200'
                         }`}>
-                          {infoConcep.superPrecoce && <span>⚡</span>}
+                          {infoConcep.superPrecoce && <span>âÅ¡¡</span>}
                           Emprenhou com {infoConcep.meses}m
                           {infoConcep.diasExtras > 0 && ` +${infoConcep.diasExtras}d`}
                         </span>
                         {infoConcep.superPrecoce && (
                           <span className="inline-block px-2 py-0.5 rounded text-xs font-black bg-gradient-to-r from-amber-400 to-yellow-500 text-white">
-                            ⭐ Super precoce
+                            â­� Super precoce
                           </span>
                         )}
                       </>
                     )}
                     {invalida && (
                       <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 font-medium">
-                        Inválida
+                        InvÃ¡lida
                       </span>
                     )}
                   </div>

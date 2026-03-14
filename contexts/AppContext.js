@@ -1,7 +1,7 @@
 /**
- * Context global da aplicação
+ * Context global da aplicaÃ§Ã£o
  * Gerencia estado compartilhado entre componentes
- * Refatorado para usar PostgreSQL ao invés de localStorage
+ * Refatorado para usar PostgreSQL ao invÃ©s de localStorage
  */
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import apiClient from '../utils/apiClient'
@@ -12,7 +12,7 @@ import { useAuth } from './AuthContext'
 const AppContext = createContext(null)
 
 /**
- * Hook para acessar o contexto da aplicação
+ * Hook para acessar o contexto da aplicaÃ§Ã£o
  */
 export function useApp() {
   const context = useContext(AppContext)
@@ -23,29 +23,29 @@ export function useApp() {
 }
 
 /**
- * Provider do contexto da aplicação
- * Agora carrega dados do PostgreSQL através das APIs
+ * Provider do contexto da aplicaÃ§Ã£o
+ * Agora carrega dados do PostgreSQL atravÃ©s das APIs
  */
 export function AppProvider({ children }) {
   const { user } = useAuth()
   // Estados dos dados (carregados do PostgreSQL)
   const [animals, setAnimals] = useState([])
   const [birthData, setBirthData] = useState([])
-  // const [costs, setCosts] = useState([]) // Removido para otimização - carregado sob demanda
+  // const [costs, setCosts] = useState([]) // Removido para otimizaÃ§Ã£o - carregado sob demanda
   const [semenStock, setSemenStock] = useState([])
   const [notasFiscais, setNotasFiscais] = useState([])
 
-  // Estados temporários
+  // Estados temporÃ¡rios
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [initialized, setInitialized] = useState(false)
 
-  // Funções auxiliares
+  // FunÃ§Ãµes auxiliares
   const clearError = useCallback(() => setError(null), [])
 
   /**
    * Carrega todos os dados do PostgreSQL
-   * Não bloqueia a UI - carrega em background
+   * NÃ£o bloqueia a UI - carrega em background
    */
   const loadAllData = useCallback(async ({ background = false } = {}) => {
     if (!user) {
@@ -59,7 +59,7 @@ export function AppProvider({ children }) {
         setLoading(true)
       }
 
-      // Carregar primeiro apenas o que é mais crítico para abrir o app rápido
+      // Carregar primeiro apenas o que Ã© mais crÃ­tico para abrir o app rÃ¡pido
       const criticalFetchOpts = { timeout: 8000 }
       const animalsRes = await apiClient.get('/api/animals', criticalFetchOpts)
       setAnimals(Array.isArray(animalsRes?.data) ? animalsRes.data : [])
@@ -104,7 +104,7 @@ export function AppProvider({ children }) {
   }, [user])
 
   /**
-   * Recarrega dados específicos
+   * Recarrega dados especÃ­ficos
    */
   const refreshData = useCallback(async (dataType) => {
     try {
@@ -146,13 +146,13 @@ export function AppProvider({ children }) {
   }, [])
 
   /**
-   * Resetar todos os dados (apenas limpa o estado, não deleta do banco)
+   * Resetar todos os dados (apenas limpa o estado, nÃ£o deleta do banco)
    */
   const resetAllData = useCallback(() => {
     if (typeof window === 'undefined') return
     
     const confirmed = window.confirm(
-      'Tem certeza que deseja limpar todos os dados do contexto? Esta ação não afeta os dados no banco de dados.'
+      'Tem certeza que deseja limpar todos os dados do contexto? Esta aÃ§Ã£o nÃ£o afeta os dados no banco de dados.'
     )
     
     if (confirmed) {
@@ -165,7 +165,7 @@ export function AppProvider({ children }) {
     }
   }, [])
 
-  // Carregar dados na inicialização (não bloqueia - UI abre imediatamente)
+  // Carregar dados na inicializaÃ§Ã£o (nÃ£o bloqueia - UI abre imediatamente)
   useEffect(() => {
     if (!user) {
       setLoading(false)
@@ -177,18 +177,18 @@ export function AppProvider({ children }) {
 
     if (!initialized) {
       setInitialized(true)
-      // Evita travar navegação de entrada; carrega em background.
+      // Evita travar navegaÃ§Ã£o de entrada; carrega em background.
       loadAllData({ background: true })
     }
   }, [user, initialized, loadAllData])
 
-  // Ref para throttle do refreshData via SSE (evita múltiplos refreshes simultâneos)
+  // Ref para throttle do refreshData via SSE (evita mÃºltiplos refreshes simultÃ¢neos)
   const refreshTimers = useRef({})
 
-  // Opção 3: SSE — auto-refresh quando servidor emite evento de mudança
+  // OpÃ§Ã£o 3: SSE ââ‚¬â€� auto-refresh quando servidor emite evento de mudanÃ§a
   useServerEvents(useCallback((event) => {
     const throttledRefresh = (dataType, delayMs = 800) => {
-      if (refreshTimers.current[dataType]) return // já agendado
+      if (refreshTimers.current[dataType]) return // jÃ¡ agendado
       refreshTimers.current[dataType] = setTimeout(() => {
         refreshData(dataType)
         delete refreshTimers.current[dataType]
@@ -227,7 +227,7 @@ export function AppProvider({ children }) {
     }
   }, [refreshData]))
 
-  // Estatísticas computadas
+  // EstatÃ­sticas computadas
   const stats = {
     totalAnimals: Array.isArray(animals) ? animals.length : 0,
     activeAnimals: Array.isArray(animals) ? animals.filter(a => a?.situacao === 'Ativo').length : 0,
@@ -257,12 +257,12 @@ export function AppProvider({ children }) {
     clearError,
     initialized,
     
-    // Funções
+    // FunÃ§Ãµes
     resetAllData,
     refreshData,
     loadAllData,
     
-    // Estatísticas
+    // EstatÃ­sticas
     stats,
   }
 

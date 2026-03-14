@@ -5,7 +5,7 @@ async function verificarNFsPardinho() {
   const client = await pool.connect()
   
   try {
-    console.log('🔍 Verificando Notas Fiscais de Pardinho...\n')
+    console.log('�Ÿ”� Verificando Notas Fiscais de Pardinho...\n')
     
     // Buscar todas as NFs de entrada relacionadas a Pardinho
     const result = await client.query(`
@@ -33,7 +33,7 @@ async function verificarNFsPardinho() {
       LIMIT 20
     `)
     
-    console.log(`📊 Total de NFs encontradas: ${result.rows.length}\n`)
+    console.log(`�Ÿ“Š Total de NFs encontradas: ${result.rows.length}\n`)
     
     for (const nf of result.rows) {
       let itens = []
@@ -82,7 +82,7 @@ async function verificarNFsPardinho() {
     }
     
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('�Œ Erro:', error)
     throw error
   } finally {
     client.release()
@@ -91,10 +91,10 @@ async function verificarNFsPardinho() {
 
 verificarNFsPardinho()
   .then(() => {
-    console.log('\n✅ Verificação concluída')
+    console.log('\n�œ… Verificação concluída')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n❌ Erro fatal:', error)
+    console.error('\n�Œ Erro fatal:', error)
     process.exit(1)
   })

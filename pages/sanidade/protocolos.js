@@ -39,7 +39,7 @@ export default function ProtocolosSanitarios() {
             return;
           }
         } catch (apiError) {
-          console.warn('API não disponível, usando localStorage:', apiError);
+          console.warn('API nÃ£o disponÃ­vel, usando localStorage:', apiError);
         }
 
         // Fallback para localStorage
@@ -83,9 +83,9 @@ export default function ProtocolosSanitarios() {
 
   const getTipoColor = (tipo) => {
     switch (tipo) {
-      case 'Vacinação':
+      case 'VacinaÃ§Ã£o':
         return 'bg-blue-100 text-blue-800';
-      case 'Vermifugação':
+      case 'VermifugaÃ§Ã£o':
         return 'bg-purple-100 text-purple-800';
       case 'Exames':
         return 'bg-indigo-100 text-indigo-800';
@@ -98,7 +98,7 @@ export default function ProtocolosSanitarios() {
     e.preventDefault();
 
     if (!formData.nome || !formData.tipo || !formData.responsavel) {
-      alert('Por favor, preencha os campos obrigatórios (Nome, Tipo e Responsável)');
+      alert('Por favor, preencha os campos obrigatÃ³rios (Nome, Tipo e ResponsÃ¡vel)');
       return;
     }
 
@@ -176,7 +176,7 @@ export default function ProtocolosSanitarios() {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando protocolos sanitários...</p>
+          <p className="mt-4 text-gray-600">Carregando protocolos sanitÃ¡rios...</p>
         </div>
       </div>
     );
@@ -191,8 +191,8 @@ export default function ProtocolosSanitarios() {
             <div className="flex items-center">
               <ShieldCheckIcon className="h-8 w-8 text-emerald-600 mr-3" />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Protocolos Sanitários</h1>
-                <p className="text-sm text-gray-600">Gerencie os protocolos de saúde do rebanho</p>
+                <h1 className="text-2xl font-bold text-gray-900">Protocolos SanitÃ¡rios</h1>
+                <p className="text-sm text-gray-600">Gerencie os protocolos de saÃºde do rebanho</p>
               </div>
             </div>
             <button
@@ -297,14 +297,14 @@ export default function ProtocolosSanitarios() {
               Lista de Protocolos
             </h3>
             <p className="mt-1 max-w-2xl text-sm text-gray-500">
-              Protocolos sanitários cadastrados no sistema
+              Protocolos sanitÃ¡rios cadastrados no sistema
             </p>
           </div>
           {protocolos.length === 0 ? (
             <div className="text-center py-12">
               <ShieldCheckIcon className="mx-auto h-12 w-12 text-gray-400" />
               <h3 className="mt-2 text-sm font-medium text-gray-900">Nenhum protocolo encontrado</h3>
-              <p className="mt-1 text-sm text-gray-500">Comece criando um novo protocolo sanitário.</p>
+              <p className="mt-1 text-sm text-gray-500">Comece criando um novo protocolo sanitÃ¡rio.</p>
             </div>
           ) : (
             <ul className="divide-y divide-gray-200">
@@ -330,11 +330,11 @@ export default function ProtocolosSanitarios() {
                           </p>
                           <div className="mt-2 flex items-center text-sm text-gray-500">
                             <CalendarIcon className="flex-shrink-0 mr-1.5 h-4 w-4" />
-                            Próxima aplicação: {new Date(protocolo.proximaAplicacao).toLocaleDateString('pt-BR')}
-                            <span className="mx-2">•</span>
+                            PrÃ³xima aplicaÃ§Ã£o: {new Date(protocolo.proximaAplicacao).toLocaleDateString('pt-BR')}
+                            <span className="mx-2">ââ‚¬¢</span>
                             <UserIcon className="flex-shrink-0 mr-1.5 h-4 w-4" />
                             {protocolo.responsavel}
-                            <span className="mx-2">•</span>
+                            <span className="mx-2">ââ‚¬¢</span>
                             {protocolo.animaisAfetados} animais
                           </div>
                         </div>

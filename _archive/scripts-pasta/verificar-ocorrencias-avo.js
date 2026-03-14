@@ -21,7 +21,7 @@ async function verificarOcorrencias() {
       LIMIT 10
     `)
     
-    console.log(`📋 Ocorrências encontradas para animal ID 1149 (CJCJ-16173): ${result.rows.length}`)
+    console.log(`�Ÿ“‹ Ocorrências encontradas para animal ID 1149 (CJCJ-16173): ${result.rows.length}`)
     
     if (result.rows.length > 0) {
       result.rows.forEach((oc, index) => {
@@ -35,8 +35,8 @@ async function verificarOcorrencias() {
       // Verificar se alguma ocorrência tem avô materno
       const comAvo = result.rows.find(oc => oc.avo_materno && oc.avo_materno.trim() !== '')
       if (comAvo) {
-        console.log(`\n✅ Encontrado avô materno em ocorrência: "${comAvo.avo_materno}"`)
-        console.log('💡 Atualizando animal com esse valor...')
+        console.log(`\n�œ… Encontrado avô materno em ocorrência: "${comAvo.avo_materno}"`)
+        console.log('�Ÿ’� Atualizando animal com esse valor...')
         
         await client.query(`
           UPDATE animais 
@@ -44,18 +44,18 @@ async function verificarOcorrencias() {
           WHERE id = $2
         `, [comAvo.avo_materno, 1149])
         
-        console.log('✅ Animal atualizado!')
+        console.log('�œ… Animal atualizado!')
       } else {
-        console.log('\n⚠️ Nenhuma ocorrência tem avô materno preenchido')
+        console.log('\n�š�️ Nenhuma ocorrência tem avô materno preenchido')
       }
     } else {
-      console.log('\n⚠️ Nenhuma ocorrência encontrada para este animal')
+      console.log('\n�š�️ Nenhuma ocorrência encontrada para este animal')
     }
     
   } catch (error) {
-    console.error('❌ Erro:', error.message)
+    console.error('�Œ Erro:', error.message)
     if (error.message.includes('does not exist')) {
-      console.log('\n💡 Tabela de ocorrências não existe ainda. Isso é normal.')
+      console.log('\n�Ÿ’� Tabela de ocorrências não existe ainda. Isso é normal.')
     } else {
       throw error
     }
@@ -67,11 +67,11 @@ async function verificarOcorrencias() {
 
 verificarOcorrencias()
   .then(() => {
-    console.log('\n✅ Script concluído!')
+    console.log('\n�œ… Script concluído!')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n❌ Erro fatal:', error)
+    console.error('\n�Œ Erro fatal:', error)
     process.exit(1)
   })
 

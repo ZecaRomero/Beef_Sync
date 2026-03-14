@@ -1,6 +1,6 @@
 /**
- * API para importar localizações via texto colado
- * POST - Processa dados de localização colados do Excel
+ * API para importar localizaÃ§Ãµes via texto colado
+ * POST - Processa dados de localizaÃ§Ã£o colados do Excel
  */
 import { query } from '../../../lib/database'
 import { sendSuccess, sendError, sendMethodNotAllowed } from '../../../utils/apiResponse'
@@ -14,10 +14,10 @@ export default async function handler(req, res) {
     const { dados } = req.body
 
     if (!dados || !Array.isArray(dados) || dados.length === 0) {
-      return sendError(res, 'Nenhum dado válido fornecido', 400)
+      return sendError(res, 'Nenhum dado vÃ¡lido fornecido', 400)
     }
 
-    console.log(`Iniciando importação de ${dados.length} linhas...`)
+    console.log(`Iniciando importaÃ§Ã£o de ${dados.length} linhas...`)
 
     const resultados = {
       animaisAtualizados: 0,
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
         // Validar dados da linha
         if (!serie || !rg || !local) {
           const camposFaltando = []
-          if (!serie) camposFaltando.push('SÉRIE')
+          if (!serie) camposFaltando.push('SÃâ€°RIE')
           if (!rg) camposFaltando.push('RG')
           if (!local) camposFaltando.push('LOCAL')
           
@@ -48,13 +48,13 @@ export default async function handler(req, res) {
             serie: serie || '(vazio)',
             rg: rg || '(vazio)',
             local: local || '(vazio)',
-            motivo: `Campos obrigatórios faltando: ${camposFaltando.join(', ')}`
+            motivo: `Campos obrigatÃ³rios faltando: ${camposFaltando.join(', ')}`
           })
           return
         }
 
         try {
-          // Buscar animal por série e RG (busca flexível: trim, case-insensitive, rg com/sem zeros à esquerda)
+          // Buscar animal por sÃ©rie e RG (busca flexÃ­vel: trim, case-insensitive, rg com/sem zeros Ã  esquerda)
           const serieNorm = String(serie || '').trim()
           const rgNorm = String(rg || '').trim()
 
@@ -76,7 +76,7 @@ export default async function handler(req, res) {
               serie: serie,
               rg: rg,
               local: local,
-              motivo: 'Animal não encontrado no banco de dados'
+              motivo: 'Animal nÃ£o encontrado no banco de dados'
             })
             return
           }
@@ -94,7 +94,7 @@ export default async function handler(req, res) {
           )
           resultados.animaisAtualizados++
 
-          // Registrar na tabela de localizações (UPSERT: tabela tem UNIQUE(animal_id))
+          // Registrar na tabela de localizaÃ§Ãµes (UPSERT: tabela tem UNIQUE(animal_id))
           const observacoesVal = observacoes || `Importado em ${new Date().toLocaleString('pt-BR')}`
           const locExist = await query(
             'SELECT id FROM localizacoes_animais WHERE animal_id = $1',
@@ -106,14 +106,14 @@ export default async function handler(req, res) {
                SET piquete = $1, data_entrada = CURRENT_DATE, data_saida = NULL,
                    motivo_movimentacao = $2, observacoes = $3, usuario_responsavel = $4, updated_at = CURRENT_TIMESTAMP
                WHERE animal_id = $5`,
-              [local, 'Importação via texto', observacoesVal, 'Sistema', animalId]
+              [local, 'ImportaÃ§Ã£o via texto', observacoesVal, 'Sistema', animalId]
             )
           } else {
             await query(
               `INSERT INTO localizacoes_animais 
                (animal_id, piquete, data_entrada, motivo_movimentacao, observacoes, usuario_responsavel)
                VALUES ($1, $2, CURRENT_DATE, $3, $4, $5)`,
-              [animalId, local, 'Importação via texto', observacoesVal, 'Sistema']
+              [animalId, local, 'ImportaÃ§Ã£o via texto', observacoesVal, 'Sistema']
             )
           }
           resultados.localizacoesRegistradas++
@@ -131,16 +131,16 @@ export default async function handler(req, res) {
       }))
     }
 
-    console.log(`Importação concluída: ${resultados.animaisAtualizados} atualizados, ${resultados.naoEncontrados.length} não encontrados, ${resultados.erros.length} erros`)
+    console.log(`ImportaÃ§Ã£o concluÃ­da: ${resultados.animaisAtualizados} atualizados, ${resultados.naoEncontrados.length} nÃ£o encontrados, ${resultados.erros.length} erros`)
 
     return sendSuccess(res, {
       success: true,
-      message: `Importação concluída! ${resultados.animaisAtualizados} animais atualizados.`,
+      message: `ImportaÃ§Ã£o concluÃ­da! ${resultados.animaisAtualizados} animais atualizados.`,
       resultados
     })
 
   } catch (error) {
     console.error('Erro ao importar texto:', error)
-    return sendError(res, error.message || 'Erro ao processar importação', 500)
+    return sendError(res, error.message || 'Erro ao processar importaÃ§Ã£o', 500)
   }
 }

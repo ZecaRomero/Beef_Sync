@@ -1,5 +1,5 @@
 /**
- * Componente para exibir detalhes de Sêmen
+ * Componente para exibir detalhes de SÃªmen
  */
 export default function DetalhesSemen({ body }) {
   if (!body.touro && !body.nome_touro && !body.nomeTouro && !body.quantidade_doses && !body.quantidadeDoses) return null;
@@ -7,7 +7,7 @@ export default function DetalhesSemen({ body }) {
   return (
     <div className="bg-gradient-to-r from-indigo-900/30 to-indigo-800/20 p-4 rounded-lg border border-indigo-500/30">
       <h4 className="font-bold text-indigo-300 mb-3 flex items-center gap-2">
-        🧬 INFORMAÇÕES DO SÊMEN
+        ðÅ¸§¬ INFORMAÃâ€¡Ãâ€¢ES DO SÃÅ MEN
       </h4>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <SecaoTouro body={body} />
@@ -21,7 +21,7 @@ export default function DetalhesSemen({ body }) {
 function SecaoTouro({ body }) {
   return (
     <div className="bg-gray-800/50 p-3 rounded">
-      <h5 className="text-indigo-200 font-semibold mb-2">🐂 Touro</h5>
+      <h5 className="text-indigo-200 font-semibold mb-2">ðÅ¸�â€š Touro</h5>
       {(body.touro || body.nome_touro || body.nomeTouro) && (
         <div className="mb-1">
           <span className="text-gray-400">Nome:</span>{' '}
@@ -36,7 +36,7 @@ function SecaoTouro({ body }) {
       )}
       {body.raca && (
         <div className="mb-1">
-          <span className="text-gray-400">Raça:</span>{' '}
+          <span className="text-gray-400">RaÃ§a:</span>{' '}
           <span className="text-white">{body.raca}</span>
         </div>
       )}
@@ -47,7 +47,7 @@ function SecaoTouro({ body }) {
 function SecaoEstoque({ body }) {
   return (
     <div className="bg-gray-800/50 p-3 rounded">
-      <h5 className="text-indigo-200 font-semibold mb-2">📦 Estoque</h5>
+      <h5 className="text-indigo-200 font-semibold mb-2">ðÅ¸â€œ¦ Estoque</h5>
       {(body.quantidade_doses || body.quantidadeDoses) && (
         <div className="mb-1">
           <span className="text-gray-400">Doses:</span>{' '}
@@ -56,7 +56,7 @@ function SecaoEstoque({ body }) {
       )}
       {(body.doses_disponiveis || body.dosesDisponiveis) && (
         <div className="mb-1">
-          <span className="text-gray-400">Disponíveis:</span>{' '}
+          <span className="text-gray-400">DisponÃ­veis:</span>{' '}
           <span className="text-white">{body.doses_disponiveis || body.dosesDisponiveis}</span>
         </div>
       )}
@@ -73,7 +73,7 @@ function SecaoEstoque({ body }) {
 function SecaoLocalizacao({ body }) {
   return (
     <div className="bg-gray-800/50 p-3 rounded">
-      <h5 className="text-indigo-200 font-semibold mb-2">🏠 Localização</h5>
+      <h5 className="text-indigo-200 font-semibold mb-2">ðÅ¸�  LocalizaÃ§Ã£o</h5>
       {(body.localizacao || body.local) && (
         <div className="mb-1">
           <span className="text-gray-400">Local:</span>{' '}
@@ -88,7 +88,7 @@ function SecaoLocalizacao({ body }) {
       )}
       {body.botijao && (
         <div className="mb-1">
-          <span className="text-gray-400">Botijão:</span>{' '}
+          <span className="text-gray-400">BotijÃ£o:</span>{' '}
           <span className="text-white font-bold">{body.botijao}</span>
         </div>
       )}

@@ -18,8 +18,8 @@ const substituicoes = [
   },
   // Células A2 com Período de chegada:
   {
-    de: `sheet.getCell('A2').value = \`Período de chegada: \${period.startDate} até \${period.endDate} • DG previsto em 15 dias\``,
-    para: `sheet.getCell('A2').value = \`Período de chegada: \${formatDateBR(period.startDate)} até \${formatDateBR(period.endDate)} • DG previsto em 15 dias\``
+    de: `sheet.getCell('A2').value = \`Período de chegada: \${period.startDate} até \${period.endDate} �€� DG previsto em 15 dias\``,
+    para: `sheet.getCell('A2').value = \`Período de chegada: \${formatDateBR(period.startDate)} até \${formatDateBR(period.endDate)} �€� DG previsto em 15 dias\``
   },
   // sheetDashboard
   {
@@ -28,8 +28,8 @@ const substituicoes = [
   },
   // Calendário Reprodutivo com Gerado em
   {
-    de: `sheet.getCell('A2').value = \`Período: \${period.startDate} até \${period.endDate} • Gerado em: \${new Date().toLocaleString('pt-BR')}\``,
-    para: `sheet.getCell('A2').value = \`Período: \${formatDateBR(period.startDate)} até \${formatDateBR(period.endDate)} • Gerado em: \${new Date().toLocaleString('pt-BR')}\``
+    de: `sheet.getCell('A2').value = \`Período: \${period.startDate} até \${period.endDate} �€� Gerado em: \${new Date().toLocaleString('pt-BR')}\``,
+    para: `sheet.getCell('A2').value = \`Período: \${formatDateBR(period.startDate)} até \${formatDateBR(period.endDate)} �€� Gerado em: \${new Date().toLocaleString('pt-BR')}\``
   }
 ]
 
@@ -42,14 +42,14 @@ substituicoes.forEach((sub, idx) => {
   
   if (count > 0) {
     content = content.replace(regex, sub.para)
-    console.log(`✅ Substituição ${idx + 1}: ${count} ocorrência(s)`)
+    console.log(`�œ… Substituição ${idx + 1}: ${count} ocorrência(s)`)
     totalSubstituicoes += count
   } else {
-    console.log(`⚠️  Substituição ${idx + 1}: 0 ocorrências (pode já estar correta)`)
+    console.log(`�š�️  Substituição ${idx + 1}: 0 ocorrências (pode já estar correta)`)
   }
 })
 
 fs.writeFileSync(filePath, content, 'utf8')
 
-console.log(`\n✅ Total de substituições: ${totalSubstituicoes}`)
-console.log(`📁 Arquivo atualizado: ${filePath}`)
+console.log(`\n�œ… Total de substituições: ${totalSubstituicoes}`)
+console.log(`�Ÿ“� Arquivo atualizado: ${filePath}`)

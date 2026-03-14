@@ -1,6 +1,6 @@
 /**
- * Página central de Importações - todos os tipos em um só lugar
- * Evita poluição das páginas específicas
+ * PÃ¡gina central de ImportaÃ§Ãµes - todos os tipos em um sÃ³ lugar
+ * Evita poluiÃ§Ã£o das pÃ¡ginas especÃ­ficas
  */
 import React, { useState, useEffect } from 'react'
 import Head from 'next/head'
@@ -34,23 +34,23 @@ const IMPORT_TIPOS = [
   {
     id: 'excel-universal',
     titulo: 'Excel Universal',
-    descricao: 'Animais, IA, FIV, Nascimentos, Diagnóstico de Gestação, Notas Fiscais',
+    descricao: 'Animais, IA, FIV, Nascimentos, DiagnÃ³stico de GestaÃ§Ã£o, Notas Fiscais',
     icon: DocumentArrowUpIcon,
     color: 'blue',
     tipos: ['Animais', 'IA', 'FIV', 'Nascimentos', 'DG', 'Notas Fiscais', 'Baixas']
   },
   {
     id: 'genetica',
-    titulo: 'Genética',
-    descricao: 'iABCZ, DECA, IQG, Pt IQG, Situação ABCZ',
+    titulo: 'GenÃ©tica',
+    descricao: 'iABCZ, DECA, IQG, Pt IQG, SituaÃ§Ã£o ABCZ',
     icon: BeakerIcon,
     color: 'emerald',
     tipos: ['iABCZ', 'DECA', 'IQG', 'Pt IQG']
   },
   {
     id: 'localizacao',
-    titulo: 'Localização',
-    descricao: 'Onde estão os animais (piquetes)',
+    titulo: 'LocalizaÃ§Ã£o',
+    descricao: 'Onde estÃ£o os animais (piquetes)',
     icon: MapPinIcon,
     color: 'purple',
     href: '/movimentacao/localizacao',
@@ -66,7 +66,7 @@ const IMPORT_TIPOS = [
   },
   {
     id: 'obitos',
-    titulo: 'Óbitos',
+    titulo: 'Ãâ€œbitos',
     descricao: 'Registro de mortes do rebanho',
     icon: ClipboardDocumentListIcon,
     color: 'gray',
@@ -75,7 +75,7 @@ const IMPORT_TIPOS = [
   },
   {
     id: 'te',
-    titulo: 'Transferência de Embriões (TE)',
+    titulo: 'TransferÃªncia de EmbriÃµes (TE)',
     descricao: 'Importar TEs do Excel',
     icon: HeartIcon,
     color: 'pink',
@@ -84,8 +84,8 @@ const IMPORT_TIPOS = [
   },
   {
     id: 'observacoes',
-    titulo: 'Observações',
-    descricao: 'Observações por animal (Série, RG, Observação)',
+    titulo: 'ObservaÃ§Ãµes',
+    descricao: 'ObservaÃ§Ãµes por animal (SÃ©rie, RG, ObservaÃ§Ã£o)',
     icon: ClipboardDocumentListIcon,
     color: 'cyan',
     tipos: ['Texto']
@@ -155,7 +155,7 @@ export default function ImportacoesPage() {
   return (
     <Layout>
       <Head>
-        <title>Importações | Beef Sync</title>
+        <title>ImportaÃ§Ãµes | Beef Sync</title>
       </Head>
 
       <div className="max-w-6xl mx-auto p-6">
@@ -164,10 +164,10 @@ export default function ImportacoesPage() {
             <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
               <DocumentArrowUpIcon className="h-8 w-8" />
             </div>
-            Central de Importações
+            Central de ImportaÃ§Ãµes
           </h1>
           <p className="text-gray-700 dark:text-gray-200 mt-2 font-medium">
-            Todas as importações em um só lugar. Escolha o tipo e importe os dados.
+            Todas as importaÃ§Ãµes em um sÃ³ lugar. Escolha o tipo e importe os dados.
           </p>
         </div>
 
@@ -176,7 +176,7 @@ export default function ImportacoesPage() {
           <div className="mb-6 p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 flex items-center gap-2">
             <CheckCircleIcon className="h-5 w-5 text-green-600" />
             <span className="text-green-800 dark:text-green-200">
-              ✅ {importSuccess.count} registros de {importSuccess.type} importados com sucesso!
+              âÅ“â€¦ {importSuccess.count} registros de {importSuccess.type} importados com sucesso!
             </span>
           </div>
         )}
@@ -278,7 +278,7 @@ export default function ImportacoesPage() {
           })}
         </div>
 
-        {/* Seções inline: Piquetes, Observações, Pesagens */}
+        {/* SeÃ§Ãµes inline: Piquetes, ObservaÃ§Ãµes, Pesagens */}
         <div className="mt-10 space-y-8">
           <section className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800">
             <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-amber-500/10 to-amber-600/10 border-b border-gray-200 dark:border-gray-700">
@@ -292,14 +292,14 @@ export default function ImportacoesPage() {
                   onClick={() => setModoPiquetes('texto')}
                   className={`px-4 py-2 rounded-lg font-medium ${modoPiquetes === 'texto' ? 'bg-amber-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'}`}
                 >
-                  📝 Texto
+                  ðÅ¸â€œ� Texto
                 </button>
                 <button
                   type="button"
                   onClick={() => setModoPiquetes('excel')}
                   className={`px-4 py-2 rounded-lg font-medium ${modoPiquetes === 'excel' ? 'bg-amber-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'}`}
                 >
-                  📊 Excel
+                  ðÅ¸â€œÅ  Excel
                 </button>
               </div>
               {modoPiquetes === 'texto' ? (
@@ -313,27 +313,27 @@ export default function ImportacoesPage() {
           <section className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800">
             <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-amber-500/10 to-orange-600/10 border-b border-gray-200 dark:border-gray-700">
               <DocumentArrowUpIcon className="h-6 w-6 text-amber-600" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Corrigir Série, RG e Nome</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Corrigir SÃ©rie, RG e Nome</h2>
             </div>
             <div className="p-4">
-              <ImportarSerieRgNome onImportComplete={(count) => handleImportSuccess('Correção Série/RG/Nome', count)} />
+              <ImportarSerieRgNome onImportComplete={(count) => handleImportSuccess('CorreÃ§Ã£o SÃ©rie/RG/Nome', count)} />
             </div>
           </section>
 
           <section className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800">
             <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-emerald-500/10 to-teal-600/10 border-b border-gray-200 dark:border-gray-700">
               <UserGroupIcon className="h-6 w-6 text-emerald-600" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Série e RG da Mãe</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">SÃ©rie e RG da MÃ£e</h2>
             </div>
             <div className="p-4">
-              <ImportarSerieRgMae onImportComplete={(count) => handleImportSuccess('Série/RG da Mãe', count)} />
+              <ImportarSerieRgMae onImportComplete={(count) => handleImportSuccess('SÃ©rie/RG da MÃ£e', count)} />
             </div>
           </section>
 
           <section className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800">
             <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-rose-500/10 to-red-600/10 border-b border-gray-200 dark:border-gray-700">
               <ExclamationTriangleIcon className="h-6 w-6 text-rose-600" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Corrigir Pai/Mãe = Nome</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Corrigir Pai/MÃ£e = Nome</h2>
             </div>
             <div className="p-4">
               <CorrigirPaiMaeNome />
@@ -343,7 +343,7 @@ export default function ImportacoesPage() {
           <section className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800">
             <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-cyan-500/10 to-cyan-600/10 border-b border-gray-200 dark:border-gray-700">
               <ClipboardDocumentListIcon className="h-6 w-6 text-cyan-600" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Observações</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">ObservaÃ§Ãµes</h2>
             </div>
             <div className="p-4">
               <ImportarObservacoesAnimais />
@@ -374,11 +374,11 @@ export default function ImportacoesPage() {
             </div>
           </section>
 
-          {/* Histórico de Movimentações */}
+          {/* HistÃ³rico de MovimentaÃ§Ãµes */}
           <section className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800">
             <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-indigo-500/10 to-indigo-600/10 border-b border-gray-200 dark:border-gray-700">
               <ArrowPathIcon className="h-6 w-6 text-indigo-600" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Histórico de Movimentações</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">HistÃ³rico de MovimentaÃ§Ãµes</h2>
             </div>
             <div className="p-4">
               <HistoricoMovimentacoes />
@@ -396,13 +396,13 @@ export default function ImportacoesPage() {
       <ImportGeneticaModal
         isOpen={showGenetica}
         onClose={() => setShowGenetica(false)}
-        onSuccess={() => handleImportSuccess('Genética', 0)}
+        onSuccess={() => handleImportSuccess('GenÃ©tica', 0)}
       />
     </Layout>
   )
 }
 
-// Componente para corrigir animais com pai/mae = nome (bug de importação)
+// Componente para corrigir animais com pai/mae = nome (bug de importaÃ§Ã£o)
 function CorrigirPaiMaeNome() {
   const [total, setTotal] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -424,14 +424,14 @@ function CorrigirPaiMaeNome() {
   }
 
   const corrigir = async () => {
-    if (!confirm(`Corrigir ${total} animal(is) com pai/mãe incorretos? Os campos serão zerados.`)) return
+    if (!confirm(`Corrigir ${total} animal(is) com pai/mÃ£e incorretos? Os campos serÃ£o zerados.`)) return
     setCorrigindo(true)
     setMsg(null)
     try {
       const res = await fetch('/api/animals/corrigir-pai-mae-nome', { method: 'POST' })
       const data = await res.json()
       if (data.success) {
-        setMsg(`✅ ${data.corrigidos} corrigido(s)`)
+        setMsg(`âÅ“â€¦ ${data.corrigidos} corrigido(s)`)
         setTotal(0)
       } else {
         setMsg(data.message || 'Erro')
@@ -448,14 +448,14 @@ function CorrigirPaiMaeNome() {
   return (
     <div className="space-y-3">
       <p className="text-sm text-gray-600 dark:text-gray-400">
-        Animais onde pai ou mãe estão preenchidos com o nome do próprio animal (bug de importação).
+        Animais onde pai ou mÃ£e estÃ£o preenchidos com o nome do prÃ³prio animal (bug de importaÃ§Ã£o).
       </p>
       {loading ? (
         <p className="text-sm">Verificando...</p>
       ) : (
         <>
           <p className="text-sm font-semibold">
-            {total != null ? `${total} animal(is) afetado(s)` : '—'}
+            {total != null ? `${total} animal(is) afetado(s)` : 'ââ‚¬â€�'}
           </p>
           <div className="flex gap-2">
             <button
@@ -482,7 +482,7 @@ function CorrigirPaiMaeNome() {
   )
 }
 
-// Componente de Histórico de Movimentações
+// Componente de HistÃ³rico de MovimentaÃ§Ãµes
 function HistoricoMovimentacoes() {
   const [historico, setHistorico] = useState([])
   const [loading, setLoading] = useState(true)
@@ -498,14 +498,14 @@ function HistoricoMovimentacoes() {
       const data = await res.json()
       setHistorico(data.historico || [])
     } catch (error) {
-      console.error('Erro ao carregar histórico:', error)
+      console.error('Erro ao carregar histÃ³rico:', error)
     } finally {
       setLoading(false)
     }
   }
 
   const excluirRegistro = async (id) => {
-    if (!confirm('Tem certeza que deseja excluir este registro do histórico?')) {
+    if (!confirm('Tem certeza que deseja excluir este registro do histÃ³rico?')) {
       return
     }
 
@@ -532,7 +532,7 @@ function HistoricoMovimentacoes() {
     return (
       <div className="flex items-center justify-center py-8">
         <ArrowPathIcon className="h-6 w-6 animate-spin text-indigo-600" />
-        <span className="ml-2 text-gray-600 dark:text-gray-400">Carregando histórico...</span>
+        <span className="ml-2 text-gray-600 dark:text-gray-400">Carregando histÃ³rico...</span>
       </div>
     )
   }
@@ -541,7 +541,7 @@ function HistoricoMovimentacoes() {
     return (
       <div className="text-center py-8 text-gray-500 dark:text-gray-400">
         <ClipboardDocumentListIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
-        <p>Nenhuma movimentação registrada ainda</p>
+        <p>Nenhuma movimentaÃ§Ã£o registrada ainda</p>
       </div>
     )
   }
@@ -553,11 +553,11 @@ function HistoricoMovimentacoes() {
           <tr className="border-b border-gray-200 dark:border-gray-700">
             <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Data/Hora</th>
             <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Tipo</th>
-            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Descrição</th>
+            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">DescriÃ§Ã£o</th>
             <th className="text-center py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Registros</th>
-            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Usuário</th>
+            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">UsuÃ¡rio</th>
             <th className="text-center py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Status</th>
-            <th className="text-center py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Ações</th>
+            <th className="text-center py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">AÃ§Ãµes</th>
           </tr>
         </thead>
         <tbody>
@@ -580,7 +580,7 @@ function HistoricoMovimentacoes() {
                 {item.status === 'sucesso' ? (
                   <CheckCircleIcon className="h-5 w-5 text-green-600 mx-auto" />
                 ) : (
-                  <span className="text-red-600">❌</span>
+                  <span className="text-red-600">â�Å’</span>
                 )}
               </td>
               <td className="py-3 px-4 text-center">
@@ -594,7 +594,7 @@ function HistoricoMovimentacoes() {
                   {excluindo === item.id ? (
                     <ArrowPathIcon className="h-5 w-5 animate-spin" />
                   ) : (
-                    '🗑️'
+                    'ðÅ¸â€”â€˜ï¸�'
                   )}
                 </button>
               </td>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { ClockIcon, MapPinIcon, MagnifyingGlassIcon, FunnelIcon, ArrowPathIcon, DocumentArrowDownIcon, XMarkIcon, TrashIcon } from '../../components/ui/Icons'
 
-// Ícone de cerca/porteira
+// Ã�cone de cerca/porteira
 const FenceIcon = ({ className = "w-6 h-6" }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M3 8V20M7 8V20M11 8V20M15 8V20M19 8V20" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
@@ -36,12 +36,12 @@ export default function HistoricoMovimentacoes() {
     }
   }, [mounted, filtroAvancado])
 
-  // Considerar ativo: sem data_saida (mesma lógica do app mobile)
+  // Considerar ativo: sem data_saida (mesma lÃ³gica do app mobile)
   const ehLocalizacaoAtiva = (m) => {
     return !m.data_saida
   }
 
-  // Calcular resumo por piquete (localizações ativas)
+  // Calcular resumo por piquete (localizaÃ§Ãµes ativas)
   const resumoPorPiquete = React.useMemo(() => {
     const ativos = movimentacoes.filter(ehLocalizacaoAtiva)
     const porPiquete = {}
@@ -54,14 +54,14 @@ export default function HistoricoMovimentacoes() {
       const sexo = (mov.sexo || '').toLowerCase()
       if (sexo.includes('macho') || sexo === 'm') {
         porPiquete[piquete].machos++
-      } else if (sexo.includes('fêmea') || sexo.includes('femea') || sexo === 'f') {
+      } else if (sexo.includes('fÃªmea') || sexo.includes('femea') || sexo === 'f') {
         porPiquete[piquete].femeas++
       }
     })
     return Object.entries(porPiquete)
       .map(([nome, dados]) => ({ piquete: nome, ...dados }))
       .sort((a, b) => {
-        // Extrair números dos nomes dos piquetes
+        // Extrair nÃºmeros dos nomes dos piquetes
         const numA = parseInt(a.piquete.match(/\d+/)?.[0] || '999999')
         const numB = parseInt(b.piquete.match(/\d+/)?.[0] || '999999')
         return numA - numB
@@ -71,7 +71,7 @@ export default function HistoricoMovimentacoes() {
   const totais = React.useMemo(() => {
     const ativos = movimentacoes.filter(ehLocalizacaoAtiva)
     const machos = ativos.filter(m => (m.sexo || '').toLowerCase().includes('macho') || (m.sexo || '').toLowerCase() === 'm').length
-    const femeas = ativos.filter(m => (m.sexo || '').toLowerCase().includes('fêmea') || (m.sexo || '').toLowerCase().includes('femea') || (m.sexo || '').toLowerCase() === 'f').length
+    const femeas = ativos.filter(m => (m.sexo || '').toLowerCase().includes('fÃªmea') || (m.sexo || '').toLowerCase().includes('femea') || (m.sexo || '').toLowerCase() === 'f').length
     return { total: ativos.length, machos, femeas }
   }, [movimentacoes])
 
@@ -90,9 +90,9 @@ export default function HistoricoMovimentacoes() {
       const sheetName = (piqueteModal === '__TODOS__' ? 'Todos' : piqueteModal).replace(/[^\w\s]/g, '').substring(0, 31)
       const worksheet = workbook.addWorksheet(sheetName || 'Animais')
       worksheet.columns = [
-        { header: 'Série', key: 'serie', width: 12 },
+        { header: 'SÃ©rie', key: 'serie', width: 12 },
         { header: 'RG', key: 'rg', width: 12 },
-        { header: 'Raça', key: 'raca', width: 15 },
+        { header: 'RaÃ§a', key: 'raca', width: 15 },
         { header: 'Sexo', key: 'sexo', width: 10 },
         { header: 'Piquete', key: 'piquete', width: 15 },
         { header: 'Data Entrada', key: 'data_entrada', width: 15 },
@@ -184,11 +184,11 @@ export default function HistoricoMovimentacoes() {
         
         setMovimentacoes(movimentacoesData)
       } else {
-        console.error('Erro ao carregar movimentações:', response.status)
+        console.error('Erro ao carregar movimentaÃ§Ãµes:', response.status)
         setMovimentacoes([])
       }
     } catch (error) {
-      console.error('Erro ao carregar movimentações:', error)
+      console.error('Erro ao carregar movimentaÃ§Ãµes:', error)
       setMovimentacoes([])
     } finally {
       setIsLoading(false)
@@ -196,13 +196,13 @@ export default function HistoricoMovimentacoes() {
   }
 
   const limparLocalizacoesPorPiquete = async (piquete) => {
-    // Primeira confirmação
-    if (!confirm(`⚠️ ATENÇÃO!\n\nVocê está prestes a excluir TODAS as localizações do piquete "${piquete}".\n\nEsta ação NÃO pode ser desfeita.\n\nDeseja continuar?`)) {
+    // Primeira confirmaÃ§Ã£o
+    if (!confirm(`âÅ¡ ï¸� ATENÃâ€¡ÃÆ’O!\n\nVocÃª estÃ¡ prestes a excluir TODAS as localizaÃ§Ãµes do piquete "${piquete}".\n\nEsta aÃ§Ã£o NÃÆ’O pode ser desfeita.\n\nDeseja continuar?`)) {
       return
     }
 
-    // Segunda confirmação
-    if (!confirm(`🔴 CONFIRMAÇÃO FINAL\n\nTem CERTEZA ABSOLUTA que deseja excluir todas as localizações do piquete "${piquete}"?\n\nEsta é sua última chance de cancelar!`)) {
+    // Segunda confirmaÃ§Ã£o
+    if (!confirm(`ðÅ¸â€�´ CONFIRMAÃâ€¡ÃÆ’O FINAL\n\nTem CERTEZA ABSOLUTA que deseja excluir todas as localizaÃ§Ãµes do piquete "${piquete}"?\n\nEsta Ã© sua Ãºltima chance de cancelar!`)) {
       return
     }
 
@@ -214,15 +214,15 @@ export default function HistoricoMovimentacoes() {
       const data = await response.json()
 
       if (response.ok && data.success) {
-        alert(`✅ ${data.message}\n\n• Localizações removidas: ${data.deleted}\n• Animais afetados: ${data.animais_afetados}`)
+        alert(`âÅ“â€¦ ${data.message}\n\nââ‚¬¢ LocalizaÃ§Ãµes removidas: ${data.deleted}\nââ‚¬¢ Animais afetados: ${data.animais_afetados}`)
         // Recarregar dados
         await carregarMovimentacoes()
       } else {
-        alert(`❌ Erro: ${data.error || 'Falha ao limpar localizações'}`)
+        alert(`â�Å’ Erro: ${data.error || 'Falha ao limpar localizaÃ§Ãµes'}`)
       }
     } catch (error) {
-      console.error('Erro ao limpar localizações do piquete:', error)
-      alert('❌ Erro ao limpar localizações. Verifique a conexão.')
+      console.error('Erro ao limpar localizaÃ§Ãµes do piquete:', error)
+      alert('â�Å’ Erro ao limpar localizaÃ§Ãµes. Verifique a conexÃ£o.')
     }
   }
 
@@ -243,10 +243,10 @@ export default function HistoricoMovimentacoes() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <ClockIcon className="w-8 h-8 text-purple-600" />
-            Histórico de Movimentações
+            HistÃ³rico de MovimentaÃ§Ãµes
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-2">
-            Visualize todo o histórico de transferências e movimentações dos animais
+            Visualize todo o histÃ³rico de transferÃªncias e movimentaÃ§Ãµes dos animais
           </p>
         </div>
       </div>
@@ -269,7 +269,7 @@ export default function HistoricoMovimentacoes() {
         <details className="mt-2">
           <summary className="cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
             <FunnelIcon className="w-4 h-4" />
-            Filtros Avançados
+            Filtros AvanÃ§ados
           </summary>
           <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
@@ -298,7 +298,7 @@ export default function HistoricoMovimentacoes() {
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Data Início
+                Data InÃ­cio
               </label>
               <input
                 type="date"
@@ -341,10 +341,10 @@ export default function HistoricoMovimentacoes() {
         <div className="space-y-4">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
             <MapPinIcon className="w-5 h-5 text-purple-600" />
-            Resumo por Piquete (localizações ativas)
+            Resumo por Piquete (localizaÃ§Ãµes ativas)
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Card total geral - clicável */}
+            {/* Card total geral - clicÃ¡vel */}
             <button
               type="button"
               onClick={() => setPiqueteModal('__TODOS__')}
@@ -353,12 +353,12 @@ export default function HistoricoMovimentacoes() {
               <div className="text-sm font-medium opacity-90">Total de Animais</div>
               <div className="text-3xl font-bold mt-1">{totais.total}</div>
               <div className="mt-2 text-sm opacity-90 flex gap-4">
-                <span>🐂 {totais.machos} machos</span>
-                <span>🐄 {totais.femeas} fêmeas</span>
+                <span>ðÅ¸�â€š {totais.machos} machos</span>
+                <span>ðÅ¸�â€ž {totais.femeas} fÃªmeas</span>
               </div>
-              <div className="text-xs opacity-75 mt-2">Clique para ver todos →</div>
+              <div className="text-xs opacity-75 mt-2">Clique para ver todos ââ€ â€™</div>
             </button>
-            {/* Cards por piquete - clicáveis */}
+            {/* Cards por piquete - clicÃ¡veis */}
             {resumoPorPiquete.slice(0, 11).map((item) => (
               <div
                 key={item.piquete}
@@ -382,13 +382,13 @@ export default function HistoricoMovimentacoes() {
                   </div>
                   <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{item.total}</div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    🐂 {item.machos} machos • 🐄 {item.femeas} fêmeas
+                    ðÅ¸�â€š {item.machos} machos ââ‚¬¢ ðÅ¸�â€ž {item.femeas} fÃªmeas
                   </div>
                   <div className="text-xs text-purple-500 dark:text-purple-400 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    Clique para ver animais →
+                    Clique para ver animais ââ€ â€™
                   </div>
                 </button>
-                {/* Botão de excluir localizações do piquete */}
+                {/* BotÃ£o de excluir localizaÃ§Ãµes do piquete */}
                 <button
                   type="button"
                   onClick={(e) => {
@@ -396,7 +396,7 @@ export default function HistoricoMovimentacoes() {
                     limparLocalizacoesPorPiquete(item.piquete)
                   }}
                   className="absolute top-2 right-2 p-1.5 bg-red-500/10 hover:bg-red-500 text-red-600 hover:text-white rounded-lg transition-all opacity-0 group-hover:opacity-100 z-20"
-                  title={`Limpar localizações do ${item.piquete}`}
+                  title={`Limpar localizaÃ§Ãµes do ${item.piquete}`}
                 >
                   <TrashIcon className="w-4 h-4" />
                 </button>
@@ -414,18 +414,18 @@ export default function HistoricoMovimentacoes() {
       {isLoading ? (
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <div className="text-gray-500">Carregando histórico...</div>
+          <div className="text-gray-500">Carregando histÃ³rico...</div>
         </div>
       ) : movimentacoes.length === 0 ? (
         <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-12 text-center">
           <ArrowPathIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            Nenhuma movimentação encontrada
+            Nenhuma movimentaÃ§Ã£o encontrada
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
             {filtro || Object.values(filtroAvancado).some(v => v) 
-              ? 'Nenhuma movimentação corresponde aos filtros aplicados'
-              : 'Registre movimentações na página de Localização de Animais'}
+              ? 'Nenhuma movimentaÃ§Ã£o corresponde aos filtros aplicados'
+              : 'Registre movimentaÃ§Ãµes na pÃ¡gina de LocalizaÃ§Ã£o de Animais'}
           </p>
         </div>
       ) : (
@@ -444,7 +444,7 @@ export default function HistoricoMovimentacoes() {
                     Data Entrada
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Data Saída
+                    Data SaÃ­da
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     Motivo
@@ -463,7 +463,7 @@ export default function HistoricoMovimentacoes() {
                       </div>
                       {(mov.raca || mov.sexo) && (
                         <div className="text-xs text-gray-500 dark:text-gray-400">
-                          {mov.raca} {mov.sexo ? `• ${mov.sexo}` : ''}
+                          {mov.raca} {mov.sexo ? `ââ‚¬¢ ${mov.sexo}` : ''}
                         </div>
                       )}
                     </td>
@@ -512,7 +512,7 @@ export default function HistoricoMovimentacoes() {
           {movimentacoes.length > 0 && (
             <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Total de {movimentacoes.length} movimentação(ões) registrada(s)
+                Total de {movimentacoes.length} movimentaÃ§Ã£o(Ãµes) registrada(s)
               </p>
             </div>
           )}
@@ -572,7 +572,7 @@ export default function HistoricoMovimentacoes() {
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
               >
                 <MapPinIcon className="w-5 h-5" />
-                Página de Localização
+                PÃ¡gina de LocalizaÃ§Ã£o
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-4">
@@ -580,7 +580,7 @@ export default function HistoricoMovimentacoes() {
                 <thead>
                   <tr className="border-b border-gray-200 dark:border-gray-700">
                     <th className="text-left py-2 font-medium text-gray-700 dark:text-gray-300">Animal</th>
-                    <th className="text-left py-2 font-medium text-gray-700 dark:text-gray-300">Raça</th>
+                    <th className="text-left py-2 font-medium text-gray-700 dark:text-gray-300">RaÃ§a</th>
                     <th className="text-left py-2 font-medium text-gray-700 dark:text-gray-300">Sexo</th>
                     <th className="text-left py-2 font-medium text-gray-700 dark:text-gray-300">Data Entrada</th>
                   </tr>

@@ -24,7 +24,7 @@ export default function AnimalSearchModal({
     idadeMax: ''
   })
 
-  // Obter raças únicas
+  // Obter raÃ§as Ãºnicas
   const racasUnicas = useMemo(() => {
     const racas = new Set()
     animals.forEach(animal => {
@@ -43,7 +43,7 @@ export default function AnimalSearchModal({
         animal.raca?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         animal.observacoes?.toLowerCase().includes(searchTerm.toLowerCase())
 
-      // Filtros específicos
+      // Filtros especÃ­ficos
       const matchSexo = !filters.sexo || animal.sexo === filters.sexo
       const matchRaca = !filters.raca || animal.raca === filters.raca
       const matchSituacao = !filters.situacao || animal.situacao === filters.situacao
@@ -98,7 +98,7 @@ export default function AnimalSearchModal({
             <div className="flex items-center space-x-3">
               <MagnifyingGlassIcon className="h-8 w-8" />
               <div>
-                <h2 className="text-2xl font-bold">Busca Avançada de Animais</h2>
+                <h2 className="text-2xl font-bold">Busca AvanÃ§ada de Animais</h2>
                 <p className="text-blue-100">Encontre animais com filtros detalhados</p>
               </div>
             </div>
@@ -121,7 +121,7 @@ export default function AnimalSearchModal({
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Buscar por série, RG, raça ou observações..."
+                placeholder="Buscar por sÃ©rie, RG, raÃ§a ou observaÃ§Ãµes..."
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
@@ -139,14 +139,14 @@ export default function AnimalSearchModal({
                 className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="">Todos</option>
-                <option value="Macho">🐂 Macho</option>
-                <option value="Femea">🐄 Fêmea</option>
+                <option value="Macho">ðÅ¸�â€š Macho</option>
+                <option value="Femea">ðÅ¸�â€ž FÃªmea</option>
               </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Raça
+                RaÃ§a
               </label>
               <select
                 value={filters.raca}
@@ -162,7 +162,7 @@ export default function AnimalSearchModal({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Situação
+                SituaÃ§Ã£o
               </label>
               <select
                 value={filters.situacao}
@@ -170,10 +170,10 @@ export default function AnimalSearchModal({
                 className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="">Todas</option>
-                <option value="Ativo">🟢 Ativo</option>
-                <option value="Inativo">🟡 Inativo</option>
-                <option value="Morto">🔴 Morto</option>
-                <option value="Vendido">💰 Vendido</option>
+                <option value="Ativo">ðÅ¸Å¸¢ Ativo</option>
+                <option value="Inativo">ðÅ¸Å¸¡ Inativo</option>
+                <option value="Morto">ðÅ¸â€�´ Morto</option>
+                <option value="Vendido">ðÅ¸â€™° Vendido</option>
               </select>
             </div>
 
@@ -235,7 +235,7 @@ export default function AnimalSearchModal({
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {animaisFiltrados.map(animal => {
-                const sexoIcon = animal.sexo === 'Macho' ? '🐂' : '🐄'
+                const sexoIcon = animal.sexo === 'Macho' ? 'ðÅ¸�â€š' : 'ðÅ¸�â€ž'
                 const idade = animal.data_nascimento ? 
                   Math.floor((new Date() - new Date(animal.data_nascimento)) / (365.25 * 24 * 60 * 60 * 1000)) : null
 
@@ -252,7 +252,7 @@ export default function AnimalSearchModal({
                           {animal.serie} - {animal.rg}
                         </h3>
                         <p className="text-gray-600 dark:text-gray-300">
-                          {animal.raca} • {animal.sexo}
+                          {animal.raca} ââ‚¬¢ {animal.sexo}
                         </p>
                         
                         <div className="flex flex-wrap gap-2 mt-2">
@@ -266,13 +266,13 @@ export default function AnimalSearchModal({
                           
                           {animal.peso && (
                             <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-full text-xs font-medium">
-                              ⚖️ {animal.peso}kg
+                              âÅ¡â€“ï¸� {animal.peso}kg
                             </span>
                           )}
                           
                           {idade && (
                             <span className="px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 rounded-full text-xs font-medium">
-                              📅 {idade} anos
+                              ðÅ¸â€œâ€¦ {idade} anos
                             </span>
                           )}
                         </div>

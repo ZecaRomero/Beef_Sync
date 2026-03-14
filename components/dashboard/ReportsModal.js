@@ -1,4 +1,4 @@
-﻿
+
 import React, { useState } from 'react'
 
 
@@ -6,13 +6,13 @@ export default function ReportsModal({ reportType, onClose, timeRange }) {
   const [selectedTab, setSelectedTab] = useState('overview')
   const [exportFormat, setExportFormat] = useState('excel')
 
-  // Gerar dados do relatório baseado no tipo
+  // Gerar dados do relatÃ³rio baseado no tipo
   const generateReportData = () => {
     switch (reportType) {
       case 'invested':
         return {
-          title: '💰 Relatório de Investimentos',
-          description: 'Análise detalhada dos investimentos realizados',
+          title: 'ðÅ¸â€™° RelatÃ³rio de Investimentos',
+          description: 'AnÃ¡lise detalhada dos investimentos realizados',
           data: mockAnimals.map(animal => ({
             animal: `${animal.serie} ${animal.rg}`,
             raca: animal.raca,
@@ -32,8 +32,8 @@ export default function ReportsModal({ reportType, onClose, timeRange }) {
       case 'revenue':
         const soldAnimals = mockAnimals.filter(a => a.valorVenda)
         return {
-          title: '📈 Relatório de Receitas',
-          description: 'Análise das receitas obtidas com vendas',
+          title: 'ðÅ¸â€œË† RelatÃ³rio de Receitas',
+          description: 'AnÃ¡lise das receitas obtidas com vendas',
           data: soldAnimals.map(animal => ({
             animal: `${animal.serie} ${animal.rg}`,
             raca: animal.raca,
@@ -57,8 +57,8 @@ export default function ReportsModal({ reportType, onClose, timeRange }) {
       case 'profit':
         const profitableAnimals = mockAnimals.filter(a => a.valorVenda)
         return {
-          title: '🎯 Relatório de Lucros',
-          description: 'Análise da lucratividade das operações',
+          title: 'ðÅ¸Å½¯ RelatÃ³rio de Lucros',
+          description: 'AnÃ¡lise da lucratividade das operaÃ§Ãµes',
           data: profitableAnimals.map(animal => ({
             animal: `${animal.serie} ${animal.rg}`,
             raca: animal.raca,
@@ -104,8 +104,8 @@ export default function ReportsModal({ reportType, onClose, timeRange }) {
       case 'roi':
         const roiAnimals = mockAnimals.filter(a => a.valorVenda)
         return {
-          title: '📊 Relatório de ROI',
-          description: 'Análise do retorno sobre investimento',
+          title: 'ðÅ¸â€œÅ  RelatÃ³rio de ROI',
+          description: 'AnÃ¡lise do retorno sobre investimento',
           data: roiAnimals.map(animal => ({
             animal: `${animal.serie} ${animal.rg}`,
             raca: animal.raca,
@@ -153,8 +153,8 @@ export default function ReportsModal({ reportType, onClose, timeRange }) {
 
       default:
         return {
-          title: '📋 Relatório Geral',
-          description: 'Visão geral dos dados',
+          title: 'ðÅ¸â€œâ€¹ RelatÃ³rio Geral',
+          description: 'VisÃ£o geral dos dados',
           data: [],
           summary: {}
         }
@@ -164,23 +164,23 @@ export default function ReportsModal({ reportType, onClose, timeRange }) {
   const reportData = generateReportData()
 
   const tabs = [
-    { id: 'overview', label: '📊 Visão Geral', icon: '📊' },
-    { id: 'details', label: '📋 Detalhes', icon: '📋' },
-    { id: 'charts', label: '📈 Gráficos', icon: '📈' },
-    { id: 'export', label: '📤 Exportar', icon: '📤' }
+    { id: 'overview', label: 'ðÅ¸â€œÅ  VisÃ£o Geral', icon: 'ðÅ¸â€œÅ ' },
+    { id: 'details', label: 'ðÅ¸â€œâ€¹ Detalhes', icon: 'ðÅ¸â€œâ€¹' },
+    { id: 'charts', label: 'ðÅ¸â€œË† GrÃ¡ficos', icon: 'ðÅ¸â€œË†' },
+    { id: 'export', label: 'ðÅ¸â€œ¤ Exportar', icon: 'ðÅ¸â€œ¤' }
   ]
 
   const handleExport = () => {
-    // Simular exportação
+    // Simular exportaÃ§Ã£o
     const formats = {
       excel: 'Excel (.xlsx)',
       pdf: 'PDF (.pdf)',
       csv: 'CSV (.csv)'
     }
     
-    alert(`Exportando relatório em formato ${formats[exportFormat]}...`)
+    alert(`Exportando relatÃ³rio em formato ${formats[exportFormat]}...`)
     setTimeout(() => {
-      alert('✅ Relatório exportado com sucesso!')
+      alert('âÅ“â€¦ RelatÃ³rio exportado com sucesso!')
     }, 2000)
   }
 
@@ -208,27 +208,27 @@ export default function ReportsModal({ reportType, onClose, timeRange }) {
       {/* Insights */}
       <div className="p-6 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-lg">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-          <span className="mr-2">💡</span>
+          <span className="mr-2">ðÅ¸â€™¡</span>
           Insights Principais
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {reportType === 'invested' && (
             <>
               <div className="flex items-start space-x-3">
-                <span className="text-green-500">✅</span>
+                <span className="text-green-500">âÅ“â€¦</span>
                 <div>
-                  <div className="font-medium">Diversificação Adequada</div>
+                  <div className="font-medium">DiversificaÃ§Ã£o Adequada</div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
-                    Investimentos distribuídos entre diferentes raças
+                    Investimentos distribuÃ­dos entre diferentes raÃ§as
                   </div>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
-                <span className="text-yellow-500">⚠️</span>
+                <span className="text-yellow-500">âÅ¡ ï¸�</span>
                 <div>
                   <div className="font-medium">Monitorar Custos Altos</div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
-                    Alguns animais com investimento acima da média
+                    Alguns animais com investimento acima da mÃ©dia
                   </div>
                 </div>
               </div>
@@ -237,20 +237,20 @@ export default function ReportsModal({ reportType, onClose, timeRange }) {
           {reportType === 'revenue' && (
             <>
               <div className="flex items-start space-x-3">
-                <span className="text-green-500">📈</span>
+                <span className="text-green-500">ðÅ¸â€œË†</span>
                 <div>
                   <div className="font-medium">Receita Crescente</div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
-                    Tendência positiva nas vendas realizadas
+                    TendÃªncia positiva nas vendas realizadas
                   </div>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
-                <span className="text-blue-500">🎯</span>
+                <span className="text-blue-500">ðÅ¸Å½¯</span>
                 <div>
                   <div className="font-medium">Oportunidade de Melhoria</div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
-                    Potencial para aumentar preços de venda
+                    Potencial para aumentar preÃ§os de venda
                   </div>
                 </div>
               </div>
@@ -268,7 +268,7 @@ export default function ReportsModal({ reportType, onClose, timeRange }) {
           <thead>
             <tr className="border-b border-gray-200 dark:border-gray-700">
               <th className="text-left p-3 font-semibold text-gray-900 dark:text-white">Animal</th>
-              <th className="text-left p-3 font-semibold text-gray-900 dark:text-white">Raça</th>
+              <th className="text-left p-3 font-semibold text-gray-900 dark:text-white">RaÃ§a</th>
               {reportData.data[0] && Object.keys(reportData.data[0]).slice(2).map(key => (
                 <th key={key} className="text-left p-3 font-semibold text-gray-900 dark:text-white capitalize">
                   {key.replace(/([A-Z])/g, ' $1').trim()}
@@ -308,25 +308,25 @@ export default function ReportsModal({ reportType, onClose, timeRange }) {
   const renderCharts = () => (
     <div className="space-y-6">
       <div className="text-center p-8 text-gray-500 dark:text-gray-400">
-        <div className="text-4xl mb-4">📊</div>
-        <div className="text-lg font-medium mb-2">Gráficos Interativos</div>
+        <div className="text-4xl mb-4">ðÅ¸â€œÅ </div>
+        <div className="text-lg font-medium mb-2">GrÃ¡ficos Interativos</div>
         <div className="text-sm">
-          Visualizações avançadas dos dados do relatório
+          VisualizaÃ§Ãµes avanÃ§adas dos dados do relatÃ³rio
         </div>
       </div>
       
-      {/* Placeholder para gráficos */}
+      {/* Placeholder para grÃ¡ficos */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="h-64 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg flex items-center justify-center">
           <div className="text-center">
-            <div className="text-2xl mb-2">📈</div>
-            <div className="font-medium">Gráfico de Tendência</div>
+            <div className="text-2xl mb-2">ðÅ¸â€œË†</div>
+            <div className="font-medium">GrÃ¡fico de TendÃªncia</div>
           </div>
         </div>
         <div className="h-64 bg-gradient-to-br from-green-100 to-blue-100 dark:from-green-900/20 dark:to-blue-900/20 rounded-lg flex items-center justify-center">
           <div className="text-center">
-            <div className="text-2xl mb-2">🥧</div>
-            <div className="font-medium">Distribuição</div>
+            <div className="text-2xl mb-2">ðÅ¸¥§</div>
+            <div className="font-medium">DistribuiÃ§Ã£o</div>
           </div>
         </div>
       </div>
@@ -336,20 +336,20 @@ export default function ReportsModal({ reportType, onClose, timeRange }) {
   const renderExport = () => (
     <div className="space-y-6">
       <div className="text-center">
-        <div className="text-4xl mb-4">📤</div>
+        <div className="text-4xl mb-4">ðÅ¸â€œ¤</div>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-          Exportar Relatório
+          Exportar RelatÃ³rio
         </h3>
         <p className="text-gray-600 dark:text-gray-400">
-          Escolha o formato desejado para exportação
+          Escolha o formato desejado para exportaÃ§Ã£o
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-          { id: 'excel', label: 'Excel', icon: '📊', desc: 'Planilha completa com dados' },
-          { id: 'pdf', label: 'PDF', icon: '📄', desc: 'Relatório formatado para impressão' },
-          { id: 'csv', label: 'CSV', icon: '📋', desc: 'Dados em formato texto' }
+          { id: 'excel', label: 'Excel', icon: 'ðÅ¸â€œÅ ', desc: 'Planilha completa com dados' },
+          { id: 'pdf', label: 'PDF', icon: 'ðÅ¸â€œâ€ž', desc: 'RelatÃ³rio formatado para impressÃ£o' },
+          { id: 'csv', label: 'CSV', icon: 'ðÅ¸â€œâ€¹', desc: 'Dados em formato texto' }
         ].map(format => (
           <button
             key={format.id}
@@ -376,7 +376,7 @@ export default function ReportsModal({ reportType, onClose, timeRange }) {
           onClick={handleExport}
           className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105"
         >
-          Exportar Relatório
+          Exportar RelatÃ³rio
         </button>
       </div>
     </div>
@@ -392,14 +392,14 @@ export default function ReportsModal({ reportType, onClose, timeRange }) {
               {reportData.title}
             </h2>
             <p className="text-gray-600 dark:text-gray-400 mt-1">
-              {reportData.description} • Período: {timeRange}
+              {reportData.description} ââ‚¬¢ PerÃ­odo: {timeRange}
             </p>
           </div>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-3xl font-bold transition-colors"
           >
-            ×
+            Ãâ€”
           </button>
         </div>
 

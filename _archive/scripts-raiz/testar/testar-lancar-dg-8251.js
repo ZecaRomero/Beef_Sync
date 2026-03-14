@@ -12,7 +12,7 @@ const pool = new Pool({
 
 async function testarLancarDG() {
   try {
-    console.log('🧪 Testando lançamento de DG para receptora 8251...\n');
+    console.log('�Ÿ�� Testando lançamento de DG para receptora 8251...\n');
     
     const dataDG = '2026-02-19';
     const veterinario = 'Dr. Teste';
@@ -27,19 +27,19 @@ async function testarLancarDG() {
     `);
     
     if (animalResult.rows.length === 0) {
-      console.log('❌ Animal não encontrado');
+      console.log('�Œ Animal não encontrado');
       return;
     }
     
     const animal = animalResult.rows[0];
-    console.log('✅ Animal encontrado:');
+    console.log('�œ… Animal encontrado:');
     console.log(`ID: ${animal.id}`);
     console.log(`RG: ${animal.rg}`);
     console.log(`Série: ${animal.serie}`);
     console.log(`Nome: ${animal.nome}`);
     
     // Atualizar o DG
-    console.log('\n📝 Atualizando DG...');
+    console.log('\n�Ÿ“� Atualizando DG...');
     const updateResult = await pool.query(`
       UPDATE animais 
       SET 
@@ -53,18 +53,18 @@ async function testarLancarDG() {
     `, [dataDG, veterinario, resultadoDG, observacoes, animal.id]);
     
     if (updateResult.rows.length > 0) {
-      console.log('\n✅ DG atualizado com sucesso!');
+      console.log('\n�œ… DG atualizado com sucesso!');
       const updated = updateResult.rows[0];
       console.log(`Data DG: ${new Date(updated.data_dg).toLocaleDateString('pt-BR')}`);
       console.log(`Veterinário: ${updated.veterinario_dg}`);
       console.log(`Resultado: ${updated.resultado_dg}`);
       console.log(`Observações: ${updated.observacoes_dg}`);
     } else {
-      console.log('❌ Falha ao atualizar DG');
+      console.log('�Œ Falha ao atualizar DG');
     }
     
     // Verificar se foi salvo
-    console.log('\n🔍 Verificando se foi salvo...');
+    console.log('\n�Ÿ”� Verificando se foi salvo...');
     const verificacao = await pool.query(`
       SELECT data_dg, veterinario_dg, resultado_dg, observacoes_dg
       FROM animais 
@@ -73,7 +73,7 @@ async function testarLancarDG() {
     
     if (verificacao.rows.length > 0) {
       const v = verificacao.rows[0];
-      console.log('\n📊 Dados salvos no banco:');
+      console.log('\n�Ÿ“Š Dados salvos no banco:');
       console.log(`Data DG: ${v.data_dg ? new Date(v.data_dg).toLocaleDateString('pt-BR') : 'NULL'}`);
       console.log(`Veterinário: ${v.veterinario_dg || 'NULL'}`);
       console.log(`Resultado: ${v.resultado_dg || 'NULL'}`);
@@ -81,7 +81,7 @@ async function testarLancarDG() {
     }
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
     console.error(error.stack);
   } finally {
     await pool.end();

@@ -10,7 +10,7 @@ export default function ImportarExcelPiquetes({ onImportComplete }) {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validar extensão
+      // Validar extensÃ£o
       const ext = file.name.split('.').pop().toLowerCase();
       if (ext !== 'xlsx' && ext !== 'xls') {
         setErro('Por favor, selecione um arquivo Excel (.xlsx ou .xls)');
@@ -70,24 +70,24 @@ export default function ImportarExcelPiquetes({ onImportComplete }) {
       <ImportProgressOverlay importando={importando} progress={{ etapa: 'Importando piquetes e animais...' }} />
       <div className="bg-white rounded-lg shadow-md p-6">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">
-        📊 Importar Excel - Piquetes e Animais
+        ðÅ¸â€œÅ  Importar Excel - Piquetes e Animais
       </h2>
 
       <div className="mb-6">
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-          <h3 className="font-semibold text-blue-900 mb-2">📋 Formato do Excel:</h3>
+          <h3 className="font-semibold text-blue-900 mb-2">ðÅ¸â€œâ€¹ Formato do Excel:</h3>
           <p className="text-sm text-blue-800 mb-2">
             O arquivo deve conter as seguintes colunas (nesta ordem):
           </p>
           <ol className="text-sm text-blue-800 list-decimal list-inside space-y-1">
-            <li>SÉRIE (ex: M, G, CJCJ)</li>
-            <li>RG (número do animal)</li>
+            <li>SÃâ€°RIE (ex: M, G, CJCJ)</li>
+            <li>RG (nÃºmero do animal)</li>
             <li>LOCAL (nome do piquete)</li>
-            <li>TOURO_1ª I.A (nome do touro usado na IA)</li>
-            <li>SÉRIE (pai) - série do touro</li>
+            <li>TOURO_1Âª I.A (nome do touro usado na IA)</li>
+            <li>SÃâ€°RIE (pai) - sÃ©rie do touro</li>
             <li>RG (pai) - RG do touro</li>
-            <li>DATA I.A (data da inseminação)</li>
-            <li>DATA DG 1ª I.A (data do diagnóstico de gestação)</li>
+            <li>DATA I.A (data da inseminaÃ§Ã£o)</li>
+            <li>DATA DG 1Âª I.A (data do diagnÃ³stico de gestaÃ§Ã£o)</li>
             <li>Result (resultado: Prenha, Vazia, Pendente, etc.)</li>
           </ol>
         </div>
@@ -113,7 +113,7 @@ export default function ImportarExcelPiquetes({ onImportComplete }) {
             />
             {arquivo && (
               <p className="mt-2 text-sm text-green-600">
-                ✓ Arquivo selecionado: {arquivo.name}
+                âÅ“â€œ Arquivo selecionado: {arquivo.name}
               </p>
             )}
           </div>
@@ -136,7 +136,7 @@ export default function ImportarExcelPiquetes({ onImportComplete }) {
                 Importando...
               </span>
             ) : (
-              '📤 Importar Dados'
+              'ðÅ¸â€œ¤ Importar Dados'
             )}
           </button>
         </div>
@@ -144,14 +144,14 @@ export default function ImportarExcelPiquetes({ onImportComplete }) {
 
       {erro && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-          <p className="text-red-800 font-semibold">❌ Erro:</p>
+          <p className="text-red-800 font-semibold">â�Å’ Erro:</p>
           <p className="text-red-700 text-sm">{erro}</p>
         </div>
       )}
 
       {resultado && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-          <h3 className="font-semibold text-green-900 mb-3">✅ Importação Concluída!</h3>
+          <h3 className="font-semibold text-green-900 mb-3">âÅ“â€¦ ImportaÃ§Ã£o ConcluÃ­da!</h3>
           
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div className="bg-white rounded p-3 border border-green-200">
@@ -172,7 +172,7 @@ export default function ImportarExcelPiquetes({ onImportComplete }) {
           {resultado.erros && resultado.erros.length > 0 && (
             <div className="mt-4">
               <p className="text-sm font-semibold text-orange-800 mb-2">
-                ⚠️ Erros encontrados ({resultado.erros.length}):
+                âÅ¡ ï¸� Erros encontrados ({resultado.erros.length}):
               </p>
               <div className="max-h-40 overflow-y-auto bg-white rounded border border-orange-200 p-2">
                 {resultado.erros.map((erro, index) => (

@@ -2,15 +2,15 @@ import { query } from '../../../lib/database'
 import { broadcast } from '../../../lib/sseClients'
 
 /**
- * GET    /api/inseminacoes/:id  → busca inseminação por ID
- * PUT    /api/inseminacoes/:id  → atualiza inseminação (inclui confirmação de prenhez)
- * DELETE /api/inseminacoes/:id  → remove inseminação
+ * GET    /api/inseminacoes/:id  ââ€ â€™ busca inseminaÃ§Ã£o por ID
+ * PUT    /api/inseminacoes/:id  ââ€ â€™ atualiza inseminaÃ§Ã£o (inclui confirmaÃ§Ã£o de prenhez)
+ * DELETE /api/inseminacoes/:id  ââ€ â€™ remove inseminaÃ§Ã£o
  */
 export default async function handler(req, res) {
   const { id } = req.query
   const inseminacaoId = parseInt(id)
   if (!inseminacaoId || isNaN(inseminacaoId)) {
-    return res.status(400).json({ success: false, message: 'ID inválido' })
+    return res.status(400).json({ success: false, message: 'ID invÃ¡lido' })
   }
 
   try {
@@ -23,7 +23,7 @@ export default async function handler(req, res) {
         [inseminacaoId]
       )
       if (result.rows.length === 0) {
-        return res.status(404).json({ success: false, message: 'Inseminação não encontrada' })
+        return res.status(404).json({ success: false, message: 'InseminaÃ§Ã£o nÃ£o encontrada' })
       }
       return res.status(200).json({ success: true, data: result.rows[0] })
     }
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
     if (req.method === 'PUT') {
       const insAtual = await query('SELECT * FROM inseminacoes WHERE id = $1', [inseminacaoId])
       if (insAtual.rows.length === 0) {
-        return res.status(404).json({ success: false, message: 'Inseminação não encontrada' })
+        return res.status(404).json({ success: false, message: 'InseminaÃ§Ã£o nÃ£o encontrada' })
       }
       const atual = insAtual.rows[0]
 
@@ -51,7 +51,7 @@ export default async function handler(req, res) {
         custo_dose,
       } = req.body
 
-      // Atualizar inseminação
+      // Atualizar inseminaÃ§Ã£o
       const updated = await query(
         `UPDATE inseminacoes SET
           data_ia         = COALESCE($1, data_ia),
@@ -128,12 +128,12 @@ export default async function handler(req, res) {
                 inseminacao.serie_touro || 'N/A',
                 inseminacao.touro_rg    || 'N/A',
                 inseminacao.data_ia,
-                `IA confirmada - inseminação ID ${inseminacaoId}`,
+                `IA confirmada - inseminaÃ§Ã£o ID ${inseminacaoId}`,
               ]
             )
           }
 
-          // Atualizar situação do animal para Gestante
+          // Atualizar situaÃ§Ã£o do animal para Gestante
           await query(
             `UPDATE animais SET situacao = 'Gestante', updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
             [a.id]
@@ -153,15 +153,15 @@ export default async function handler(req, res) {
     if (req.method === 'DELETE') {
       const existing = await query('SELECT animal_id FROM inseminacoes WHERE id = $1', [inseminacaoId])
       if (existing.rows.length === 0) {
-        return res.status(404).json({ success: false, message: 'Inseminação não encontrada' })
+        return res.status(404).json({ success: false, message: 'InseminaÃ§Ã£o nÃ£o encontrada' })
       }
       await query('DELETE FROM inseminacoes WHERE id = $1', [inseminacaoId])
       broadcast('inseminacao.deleted', { inseminacaoId, animalId: existing.rows[0].animal_id })
-      return res.status(200).json({ success: true, message: 'Inseminação removida' })
+      return res.status(200).json({ success: true, message: 'InseminaÃ§Ã£o removida' })
     }
 
     res.setHeader('Allow', ['GET', 'PUT', 'DELETE'])
-    return res.status(405).json({ success: false, message: `Método ${req.method} não permitido` })
+    return res.status(405).json({ success: false, message: `MÃ©todo ${req.method} nÃ£o permitido` })
   } catch (error) {
     console.error('Erro em /api/inseminacoes/[id]:', error)
     return res.status(500).json({ success: false, message: error.message })

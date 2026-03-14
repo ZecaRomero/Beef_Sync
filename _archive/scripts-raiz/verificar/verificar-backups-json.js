@@ -4,7 +4,7 @@ const path = require('path');
 const backupsDir = 'backups';
 const files = fs.readdirSync(backupsDir).filter(f => f.endsWith('.json'));
 
-console.log('🔍 Verificando backups JSON para dados de DNA, Nitrogênio e Andrológicos...\n');
+console.log('�Ÿ”� Verificando backups JSON para dados de DNA, Nitrogênio e Andrológicos...\n');
 
 const tabelasProcuradas = ['dna_envios', 'abastecimento_nitrogenio', 'exames_andrologicos'];
 
@@ -21,17 +21,17 @@ for (const file of files) {
       for (const tabela of tabelasProcuradas) {
         if (data.data[tabela] && data.data[tabela].length > 0) {
           if (!encontrou) {
-            console.log(`📦 ${file}:`);
+            console.log(`�Ÿ“� ${file}:`);
             encontrou = true;
           }
-          console.log(`   ✅ ${tabela}: ${data.data[tabela].length} registros`);
+          console.log(`   �œ… ${tabela}: ${data.data[tabela].length} registros`);
         }
       }
     }
     
   } catch (err) {
-    console.log(`   ⚠️  ${file}: Erro ao ler - ${err.message}`);
+    console.log(`   �š�️  ${file}: Erro ao ler - ${err.message}`);
   }
 }
 
-console.log('\n✅ Verificação concluída!');
+console.log('\n�œ… Verificação concluída!');

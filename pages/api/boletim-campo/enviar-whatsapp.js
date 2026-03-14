@@ -7,7 +7,7 @@ import { sendWhatsAppMedia } from '../../../utils/whatsappService'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
-const HEADERS = ['LOCAL', 'LOCAL 1', 'SUB_LOCAL_2', 'QUANT.', 'SEXO', 'CATEGORIA', 'RAÇA', 'ERA', 'OBSERVAÇÃO']
+const HEADERS = ['LOCAL', 'LOCAL 1', 'SUB_LOCAL_2', 'QUANT.', 'SEXO', 'CATEGORIA', 'RAÃâ€¡A', 'ERA', 'OBSERVAÃâ€¡ÃÆ’O']
 
 function normalizeWhatsApp(whatsapp) {
   if (!whatsapp) return ''
@@ -17,7 +17,7 @@ function normalizeWhatsApp(whatsapp) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Método não permitido' })
+    return res.status(405).json({ message: 'MÃ©todo nÃ£o permitido' })
   }
 
   try {
@@ -34,7 +34,7 @@ export default async function handler(req, res) {
     if (!whatsapp) {
       return res.status(400).json({
         success: false,
-        message: 'Cadastre seu WhatsApp primeiro em Configurações'
+        message: 'Cadastre seu WhatsApp primeiro em ConfiguraÃ§Ãµes'
       })
     }
 
@@ -56,7 +56,7 @@ export default async function handler(req, res) {
     const historico = historicoResult.rows || []
 
     const recipient = { name: 'Adelso', whatsapp: normalizeWhatsApp(whatsapp) }
-    const caption = `📋 Boletim Campo - ${new Date().toLocaleDateString('pt-BR')}\n\nSistema Beef-Sync`
+    const caption = `ðÅ¸â€œâ€¹ Boletim Campo - ${new Date().toLocaleDateString('pt-BR')}\n\nSistema Beef-Sync`
 
     if (formato === 'excel') {
       const workbook = await generateBoletimCampoWorkbook(dados, historico)
@@ -70,12 +70,12 @@ export default async function handler(req, res) {
         return res.status(200).json({ success: true, message: 'Enviado para WhatsApp!' })
       } catch (apiErr) {
         const waNum = telefone ? normalizeWhatsApp(telefone) : recipient.whatsapp
-        const msg = `📋 Boletim Campo - ${new Date().toLocaleDateString('pt-BR')}\nSistema Beef-Sync`
+        const msg = `ðÅ¸â€œâ€¹ Boletim Campo - ${new Date().toLocaleDateString('pt-BR')}\nSistema Beef-Sync`
         const waLink = `https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`
         return res.status(200).json({
           success: true,
           fallback: true,
-          message: 'WhatsApp API não configurada. Arquivo pronto para download.',
+          message: 'WhatsApp API nÃ£o configurada. Arquivo pronto para download.',
           downloadUrl: `/api/boletim-campo/download-excel`,
           waLink
         })
@@ -124,19 +124,19 @@ export default async function handler(req, res) {
         return res.status(200).json({ success: true, message: 'Enviado para WhatsApp!' })
       } catch (apiErr) {
         const waNum = telefone ? normalizeWhatsApp(telefone) : recipient.whatsapp
-        const msg = `📋 Boletim Campo - ${new Date().toLocaleDateString('pt-BR')}\nSistema Beef-Sync`
+        const msg = `ðÅ¸â€œâ€¹ Boletim Campo - ${new Date().toLocaleDateString('pt-BR')}\nSistema Beef-Sync`
         const waLink = `https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`
         return res.status(200).json({
           success: true,
           fallback: true,
-          message: 'WhatsApp API não configurada. Arquivo pronto para download.',
+          message: 'WhatsApp API nÃ£o configurada. Arquivo pronto para download.',
           downloadUrl: `/api/boletim-campo/download-pdf`,
           waLink
         })
       }
     }
 
-    return res.status(400).json({ success: false, message: 'Formato inválido' })
+    return res.status(400).json({ success: false, message: 'Formato invÃ¡lido' })
   } catch (error) {
     console.error('Erro ao enviar Boletim Campo:', error)
     return res.status(500).json({

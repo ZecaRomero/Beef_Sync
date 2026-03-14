@@ -5,7 +5,7 @@ async function verificarMovimentacoesPardinho() {
   const client = await pool.connect()
   
   try {
-    console.log('🔍 Verificando movimentações de Pardinho...\n')
+    console.log('�Ÿ”� Verificando movimentações de Pardinho...\n')
     
     // Buscar todas as movimentações de entrada com localidade Pardinho
     const result = await client.query(`
@@ -30,7 +30,7 @@ async function verificarMovimentacoesPardinho() {
       LIMIT 100
     `)
     
-    console.log(`📊 Total de movimentações encontradas: ${result.rows.length}\n`)
+    console.log(`�Ÿ“Š Total de movimentações encontradas: ${result.rows.length}\n`)
     
     // Contar por sexo e idade
     const femeas36Mais = result.rows.filter(r => {
@@ -47,7 +47,7 @@ async function verificarMovimentacoesPardinho() {
              (meses >= 36 || era.includes('36') || era.includes('+36'))
     })
     
-    console.log(`👩 Fêmeas +36 meses encontradas: ${femeas36Mais.length}`)
+    console.log(`�Ÿ‘� Fêmeas +36 meses encontradas: ${femeas36Mais.length}`)
     if (femeas36Mais.length > 0) {
       console.log('\nDetalhes das fêmeas +36 meses:')
       femeas36Mais.slice(0, 20).forEach((r, i) => {
@@ -57,16 +57,16 @@ async function verificarMovimentacoesPardinho() {
     
     // Contar total de animais
     const totalAnimais = result.rows.length
-    console.log(`\n📈 Total de animais em movimentações: ${totalAnimais}`)
+    console.log(`\n�Ÿ“ˆ Total de animais em movimentações: ${totalAnimais}`)
     
     // Verificar últimas 5 movimentações
-    console.log('\n📋 Últimas 5 movimentações:')
+    console.log('\n�Ÿ“‹ �šltimas 5 movimentações:')
     result.rows.slice(0, 5).forEach((r, i) => {
       console.log(`  ${i+1}. ${r.data_movimento} - ${r.descricao} - Localidade: ${r.localidade}`)
     })
     
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('�Œ Erro:', error)
     throw error
   } finally {
     client.release()
@@ -75,10 +75,10 @@ async function verificarMovimentacoesPardinho() {
 
 verificarMovimentacoesPardinho()
   .then(() => {
-    console.log('\n✅ Verificação concluída')
+    console.log('\n�œ… Verificação concluída')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n❌ Erro fatal:', error)
+    console.error('\n�Œ Erro fatal:', error)
     process.exit(1)
   })

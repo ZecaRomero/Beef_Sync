@@ -34,7 +34,7 @@ export default function EditablePriceCard({
       savedPrices[id] = parseFloat(tempPrice)
       localStorage.setItem('customPrices', JSON.stringify(savedPrices))
     } else {
-      alert('Por favor, insira um preço válido')
+      alert('Por favor, insira um preÃ§o vÃ¡lido')
     }
   }
 
@@ -64,7 +64,7 @@ export default function EditablePriceCard({
           <button
             onClick={handleEdit}
             className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 p-1"
-            title="Editar preço"
+            title="Editar preÃ§o"
           >
             <PencilIcon className="h-4 w-4" />
           </button>
@@ -108,10 +108,10 @@ export default function EditablePriceCard({
           <div className={`text-sm flex items-center justify-center mb-2 ${
             trend === 'up' ? 'text-green-600' : 'text-red-600'
           }`}>
-            {trend === 'up' ? '↗' : '↘'} {Math.abs(change).toFixed(1)}%
+            {trend === 'up' ? 'ââ€ â€”' : 'ââ€ Ëœ'} {Math.abs(change).toFixed(1)}%
           </div>
           <div className="text-xs text-gray-500 dark:text-gray-400">
-            Clique no lápis para editar
+            Clique no lÃ¡pis para editar
           </div>
         </>
       )}

@@ -45,7 +45,7 @@ async function testarAPI(endpoint, metodo = 'GET', body = null) {
 }
 
 async function verificarAPIs() {
-  console.log('🔍 Verificando APIs de Nitrogênio...\n')
+  console.log('�Ÿ”� Verificando APIs de Nitrogênio...\n')
 
   const testes = [
     { endpoint: '/api/nitrogenio', metodo: 'GET', descricao: 'Listar abastecimentos (com paginação)' },
@@ -61,23 +61,23 @@ async function verificarAPIs() {
     resultados.push({ ...teste, resultado })
     
     if (resultado.ok) {
-      console.log(`✅ Status: ${resultado.status}`)
+      console.log(`�œ… Status: ${resultado.status}`)
       console.log(`   Estrutura:`, resultado.estrutura)
     } else {
-      console.log(`❌ Erro: ${resultado.erro || 'Status ' + resultado.status}`)
+      console.log(`�Œ Erro: ${resultado.erro || 'Status ' + resultado.status}`)
     }
     console.log('')
   }
 
   // Resumo
-  console.log('\n📊 RESUMO DA VERIFICAÇÃO:\n')
+  console.log('\n�Ÿ“Š RESUMO DA VERIFICA�‡�ƒO:\n')
   
   const apisComProblema = resultados.filter(r => !r.resultado.ok || !r.resultado.estrutura?.estruturaEsperada)
   
   if (apisComProblema.length === 0) {
-    console.log('✅ Todas as APIs estão retornando dados corretamente!')
+    console.log('�œ… Todas as APIs estão retornando dados corretamente!')
   } else {
-    console.log(`⚠️  ${apisComProblema.length} API(s) com problemas:`)
+    console.log(`�š�️  ${apisComProblema.length} API(s) com problemas:`)
     apisComProblema.forEach(item => {
       console.log(`   - ${item.descricao}: ${item.endpoint}`)
       if (item.resultado.erro) {
@@ -88,7 +88,7 @@ async function verificarAPIs() {
     })
   }
 
-  console.log('\n📋 Estrutura esperada para GET /api/nitrogenio:')
+  console.log('\n�Ÿ“‹ Estrutura esperada para GET /api/nitrogenio:')
   console.log(`   {
      data: [...],
      meta: {
@@ -97,7 +97,7 @@ async function verificarAPIs() {
      }
    }`)
 
-  console.log('\n📋 Estrutura esperada para GET /api/motoristas-nitrogenio:')
+  console.log('\n�Ÿ“‹ Estrutura esperada para GET /api/motoristas-nitrogenio:')
   console.log(`   {
      success: true,
      data: [...],

@@ -9,12 +9,12 @@ const pool = new Pool({
 });
 
 async function corrigirRacasDuplicadas() {
-  console.log('🔧 CORRIGINDO RAÇAS DUPLICADAS\n');
+  console.log('�Ÿ”� CORRIGINDO RA�‡AS DUPLICADAS\n');
   console.log('='.repeat(60));
 
   try {
     // 1. Verificar raças atuais
-    console.log('\n📊 1. Verificando raças cadastradas...');
+    console.log('\n�Ÿ“Š 1. Verificando raças cadastradas...');
     const racasResult = await pool.query(`
       SELECT raca, COUNT(*) as total
       FROM animais
@@ -23,13 +23,13 @@ async function corrigirRacasDuplicadas() {
       ORDER BY raca
     `);
 
-    console.log('✅ Raças encontradas:');
+    console.log('�œ… Raças encontradas:');
     racasResult.rows.forEach(r => {
       console.log(`   - ${r.raca}: ${r.total} animais`);
     });
 
     // 2. Identificar raças duplicadas (case-insensitive e sem acentos)
-    console.log('\n📊 2. Identificando duplicatas...');
+    console.log('\n�Ÿ“Š 2. Identificando duplicatas...');
     const racasMap = new Map();
     
     // Função para normalizar raça (remover acentos e converter para minúscula)
@@ -56,11 +56,11 @@ async function corrigirRacasDuplicadas() {
     });
 
     if (duplicatas.length === 0) {
-      console.log('✅ Nenhuma duplicata encontrada!');
+      console.log('�œ… Nenhuma duplicata encontrada!');
       return;
     }
 
-    console.log(`⚠️ Encontradas ${duplicatas.length} raças com duplicatas:`);
+    console.log(`�š�️ Encontradas ${duplicatas.length} raças com duplicatas:`);
     duplicatas.forEach(d => {
       console.log(`\n   ${d.racaNormalizada.toUpperCase()}:`);
       d.variantes.forEach(v => {
@@ -86,13 +86,13 @@ async function corrigirRacasDuplicadas() {
     };
 
     // 4. Corrigir cada duplicata
-    console.log('\n📊 3. Corrigindo duplicatas...');
+    console.log('\n�Ÿ“Š 3. Corrigindo duplicatas...');
     let totalCorrigidos = 0;
 
     for (const dup of duplicatas) {
       const racaPadrao = padroes[dup.racaNormalizada] || dup.variantes[0].original;
       
-      console.log(`\n🔧 Padronizando "${dup.racaNormalizada}" para "${racaPadrao}"...`);
+      console.log(`\n�Ÿ”� Padronizando "${dup.racaNormalizada}" para "${racaPadrao}"...`);
       
       for (const variante of dup.variantes) {
         if (variante.original !== racaPadrao) {
@@ -102,14 +102,14 @@ async function corrigirRacasDuplicadas() {
             WHERE raca = $2
           `, [racaPadrao, variante.original]);
           
-          console.log(`   ✅ Corrigidos ${result.rowCount} animais de "${variante.original}" para "${racaPadrao}"`);
+          console.log(`   �œ… Corrigidos ${result.rowCount} animais de "${variante.original}" para "${racaPadrao}"`);
           totalCorrigidos += result.rowCount;
         }
       }
     }
 
     // 5. Verificar resultado
-    console.log('\n📊 4. Verificando resultado...');
+    console.log('\n�Ÿ“Š 4. Verificando resultado...');
     const racasAposCorrecao = await pool.query(`
       SELECT raca, COUNT(*) as total
       FROM animais
@@ -118,16 +118,16 @@ async function corrigirRacasDuplicadas() {
       ORDER BY raca
     `);
 
-    console.log('✅ Raças após correção:');
+    console.log('�œ… Raças após correção:');
     racasAposCorrecao.rows.forEach(r => {
       console.log(`   - ${r.raca}: ${r.total} animais`);
     });
 
     console.log('\n' + '='.repeat(60));
-    console.log(`✅ Correção concluída! ${totalCorrigidos} animais atualizados.`);
+    console.log(`�œ… Correção concluída! ${totalCorrigidos} animais atualizados.`);
 
   } catch (error) {
-    console.error('\n❌ Erro durante correção:', error);
+    console.error('\n�Œ Erro durante correção:', error);
     console.error('Detalhes:', error.message);
   } finally {
     await pool.end();

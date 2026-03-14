@@ -7,15 +7,15 @@ export default function ReportsDashboard({ onCreateReport, onViewReport }) {
     <div className="space-y-6 p-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          📊 Dashboard de Relatórios
+          ðÅ¸â€œÅ  Dashboard de RelatÃ³rios
         </h1>
         <p className="text-gray-600 dark:text-gray-400 mt-1">
-          Visão geral e acesso rápido aos seus relatórios
+          VisÃ£o geral e acesso rÃ¡pido aos seus relatÃ³rios
         </p>
       </div>
 
       <Button onClick={onCreateReport}>
-        Criar Relatório
+        Criar RelatÃ³rio
       </Button>
     </div>
   )

@@ -37,13 +37,13 @@ export function useExamesAndrologicosAlerts() {
             id: `exame-vencido-${exame.id}`,
             type: 'exame-andrologico',
             priority: 'high',
-            title: 'Exame Andrológico Vencido',
+            title: 'Exame AndrolÃ³gico Vencido',
             message: `${exame.touro} (RG: ${exame.rg}) - ${Math.abs(diasAteExame)} dias de atraso`,
             animal: exame.touro,
             animalRg: exame.rg,
             exameId: exame.id,
             action: 'Realizar exame',
-            icon: '🔬',
+            icon: 'ðÅ¸â€�¬',
             color: 'red',
             createdAt: now.toISOString(),
             metadata: {
@@ -53,18 +53,18 @@ export function useExamesAndrologicosAlerts() {
             }
           })
         } else if (diasAteExame <= 7) {
-          // Exame próximo - prioridade média
+          // Exame prÃ³ximo - prioridade mÃ©dia
           alertsGenerated.push({
             id: `exame-proximo-${exame.id}`,
             type: 'exame-andrologico',
             priority: 'medium',
-            title: 'Exame Andrológico Próximo',
+            title: 'Exame AndrolÃ³gico PrÃ³ximo',
             message: `${exame.touro} (RG: ${exame.rg}) - em ${diasAteExame} dias`,
             animal: exame.touro,
             animalRg: exame.rg,
             exameId: exame.id,
             action: 'Preparar exame',
-            icon: '📅',
+            icon: 'ðÅ¸â€œâ€¦',
             color: 'yellow',
             createdAt: now.toISOString(),
             metadata: {
@@ -76,7 +76,7 @@ export function useExamesAndrologicosAlerts() {
         }
       })
 
-      // Verificar animais que precisam de exame andrológico inicial
+      // Verificar animais que precisam de exame androlÃ³gico inicial
       try {
         const animalsResponse = await fetch('/api/animals')
         if (animalsResponse.ok) {
@@ -102,13 +102,13 @@ export function useExamesAndrologicosAlerts() {
                   id: `exame-inicial-${touro.id}`,
                   type: 'exame-andrologico',
                   priority: 'medium',
-                  title: 'Exame Andrológico Necessário',
-                  message: `${touro.nome || touro.numero} precisa do primeiro exame andrológico`,
+                  title: 'Exame AndrolÃ³gico NecessÃ¡rio',
+                  message: `${touro.nome || touro.numero} precisa do primeiro exame androlÃ³gico`,
                   animal: touro.nome || touro.numero,
                   animalId: touro.id,
                   animalRg: touro.numero,
                   action: 'Agendar exame',
-                  icon: '🔬',
+                  icon: 'ðÅ¸â€�¬',
                   color: 'blue',
                   createdAt: now.toISOString(),
                   metadata: {
@@ -121,12 +121,12 @@ export function useExamesAndrologicosAlerts() {
           })
         }
       } catch (error) {
-        console.warn('Erro ao carregar animais para verificação de exames:', error)
+        console.warn('Erro ao carregar animais para verificaÃ§Ã£o de exames:', error)
       }
 
       setAlerts(alertsGenerated)
     } catch (error) {
-      console.error('Erro ao carregar alertas de exames andrológicos:', error)
+      console.error('Erro ao carregar alertas de exames androlÃ³gicos:', error)
       setAlerts([])
     } finally {
       setLoading(false)

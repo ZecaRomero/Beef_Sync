@@ -91,12 +91,12 @@ class ApiTester {
       }
       
       if (isWorking) {
-        console.log(`    ✅ OK (${responseTime}ms) - Status: ${response.status}`)
+        console.log(`    �œ… OK (${responseTime}ms) - Status: ${response.status}`)
         if (responseData && responseData.data) {
-          console.log(`    📊 Dados: ${Array.isArray(responseData.data) ? responseData.data.length + ' registros' : 'objeto'}`)
+          console.log(`    �Ÿ“Š Dados: ${Array.isArray(responseData.data) ? responseData.data.length + ' registros' : 'objeto'}`)
         }
       } else {
-        console.log(`    ❌ ERRO ${response.status} (${responseTime}ms)`)
+        console.log(`    �Œ ERRO ${response.status} (${responseTime}ms)`)
       }
       
       return result
@@ -104,7 +104,7 @@ class ApiTester {
     } catch (error) {
       const responseTime = Date.now() - startTime
       
-      console.log(`    ❌ FALHA: ${error.message} (${responseTime}ms)`)
+      console.log(`    �Œ FALHA: ${error.message} (${responseTime}ms)`)
       
       return {
         name: api.name,
@@ -147,10 +147,10 @@ class ApiTester {
 
   // Testar todas as APIs
   async testAllApis() {
-    console.log('🧪 Testando APIs do Beef Sync...\n')
+    console.log('�Ÿ�� Testando APIs do Beef Sync...\n')
     
     // Testar APIs críticas
-    console.log('🔴 Testando APIs Críticas:')
+    console.log('�Ÿ”� Testando APIs Críticas:')
     const criticalApis = this.getCriticalApis()
     
     for (const api of criticalApis) {
@@ -167,7 +167,7 @@ class ApiTester {
       }
     }
     
-    console.log('\n🟡 Testando APIs Importantes:')
+    console.log('\n�ŸŸ� Testando APIs Importantes:')
     const importantApis = this.getImportantApis()
     
     for (const api of importantApis) {
@@ -186,7 +186,7 @@ class ApiTester {
 
   // Testar conectividade básica
   async testConnectivity() {
-    console.log('🌐 Testando conectividade básica...')
+    console.log('�ŸŒ� Testando conectividade básica...')
     
     try {
       const response = await fetch('http://localhost:3020/api/healthz', {
@@ -195,26 +195,26 @@ class ApiTester {
       })
       
       if (response.ok) {
-        console.log('  ✅ Servidor respondendo na porta 3020')
+        console.log('  �œ… Servidor respondendo na porta 3020')
         return true
       } else {
-        console.log('  ❌ Servidor retornou erro:', response.status)
+        console.log('  �Œ Servidor retornou erro:', response.status)
         return false
       }
     } catch (error) {
-      console.log('  ❌ Falha na conectividade:', error.message)
-      console.log('  💡 Certifique-se de que o servidor está rodando: npm run dev')
+      console.log('  �Œ Falha na conectividade:', error.message)
+      console.log('  �Ÿ’� Certifique-se de que o servidor está rodando: npm run dev')
       return false
     }
   }
 
   // Gerar relatório detalhado
   generateReport() {
-    console.log('\n📋 RELATÓRIO DE TESTES DAS APIs')
+    console.log('\n�Ÿ“‹ RELAT�“RIO DE TESTES DAS APIs')
     console.log('=' .repeat(60))
     
     // Estatísticas gerais
-    console.log(`📊 Estatísticas Gerais:`)
+    console.log(`�Ÿ“Š Estatísticas Gerais:`)
     console.log(`  Total de APIs testadas: ${this.stats.total}`)
     console.log(`  APIs funcionando: ${this.stats.working} (${((this.stats.working / this.stats.total) * 100).toFixed(1)}%)`)
     console.log(`  APIs com erro: ${this.stats.errors} (${((this.stats.errors / this.stats.total) * 100).toFixed(1)}%)`)
@@ -223,9 +223,9 @@ class ApiTester {
     // APIs funcionando
     const workingApis = this.results.filter(r => r.status === 'working')
     if (workingApis.length > 0) {
-      console.log(`\n✅ APIs Funcionando (${workingApis.length}):`)
+      console.log(`\n�œ… APIs Funcionando (${workingApis.length}):`)
       workingApis.forEach(api => {
-        const criticalMark = api.critical ? '🔴' : '🟡'
+        const criticalMark = api.critical ? '�Ÿ”�' : '�ŸŸ�'
         console.log(`  ${criticalMark} ${api.name} - ${api.responseTime}ms`)
       })
     }
@@ -233,9 +233,9 @@ class ApiTester {
     // APIs com erro
     const errorApis = this.results.filter(r => r.status === 'error')
     if (errorApis.length > 0) {
-      console.log(`\n❌ APIs com Erro (${errorApis.length}):`)
+      console.log(`\n�Œ APIs com Erro (${errorApis.length}):`)
       errorApis.forEach(api => {
-        const criticalMark = api.critical ? '🔴' : '🟡'
+        const criticalMark = api.critical ? '�Ÿ”�' : '�ŸŸ�'
         console.log(`  ${criticalMark} ${api.name} - ${api.error}`)
       })
     }
@@ -248,43 +248,43 @@ class ApiTester {
     console.log(`\n⏱️  Tempo de Resposta Médio: ${avgResponseTime}ms`)
     
     // Recomendações
-    console.log('\n💡 Recomendações:')
+    console.log('\n�Ÿ’� Recomendações:')
     
     if (this.stats.critical > 0) {
-      console.log('  🚨 CRÍTICO: APIs essenciais estão falhando!')
+      console.log('  �Ÿš� CRÍTICO: APIs essenciais estão falhando!')
       console.log('     - Verifique se o servidor está rodando')
       console.log('     - Verifique a conexão com o banco de dados')
       console.log('     - Execute: npm run dev')
     }
     
     if (this.stats.errors > this.stats.critical) {
-      console.log('  ⚠️  Algumas APIs não críticas estão com problemas')
+      console.log('  �š�️  Algumas APIs não críticas estão com problemas')
       console.log('     - Verifique os logs do servidor')
       console.log('     - Execute: npm run check:apis')
     }
     
     if (avgResponseTime > 1000) {
-      console.log('  🐌 Tempo de resposta alto detectado')
+      console.log('  �Ÿ�Œ Tempo de resposta alto detectado')
       console.log('     - Verifique a performance do banco de dados')
       console.log('     - Considere otimizar as queries')
     }
     
     if (this.stats.working === this.stats.total) {
-      console.log('  🎉 Todas as APIs estão funcionando perfeitamente!')
+      console.log('  �ŸŽ‰ Todas as APIs estão funcionando perfeitamente!')
     }
     
     // Status final
     const successRate = (this.stats.working / this.stats.total) * 100
-    console.log(`\n🎯 Status Final: ${successRate.toFixed(1)}% das APIs funcionando`)
+    console.log(`\n�ŸŽ� Status Final: ${successRate.toFixed(1)}% das APIs funcionando`)
     
     if (successRate >= 95) {
-      console.log('🟢 EXCELENTE - Sistema totalmente operacional')
+      console.log('�ŸŸ� EXCELENTE - Sistema totalmente operacional')
     } else if (successRate >= 80) {
-      console.log('🟡 BOM - Sistema operacional com pequenos problemas')
+      console.log('�ŸŸ� BOM - Sistema operacional com pequenos problemas')
     } else if (successRate >= 60) {
-      console.log('🟠 ATENÇÃO - Sistema com problemas significativos')
+      console.log('�ŸŸ� ATEN�‡�ƒO - Sistema com problemas significativos')
     } else {
-      console.log('🔴 CRÍTICO - Sistema com falhas graves')
+      console.log('�Ÿ”� CRÍTICO - Sistema com falhas graves')
     }
   }
 
@@ -307,19 +307,19 @@ class ApiTester {
     const reportPath = path.join(process.cwd(), 'api-test-report.json')
     fs.writeFileSync(reportPath, JSON.stringify(reportData, null, 2))
     
-    console.log(`\n💾 Relatório salvo em: ${reportPath}`)
+    console.log(`\n�Ÿ’� Relatório salvo em: ${reportPath}`)
   }
 
   // Executar todos os testes
   async run() {
-    console.log('🚀 Iniciando testes das APIs do Beef Sync...\n')
+    console.log('�Ÿš€ Iniciando testes das APIs do Beef Sync...\n')
     
     try {
       // Testar conectividade básica primeiro
       const isConnected = await this.testConnectivity()
       
       if (!isConnected) {
-        console.log('\n❌ Não foi possível conectar ao servidor. Verifique se está rodando.')
+        console.log('\n�Œ Não foi possível conectar ao servidor. Verifique se está rodando.')
         return
       }
       
@@ -332,7 +332,7 @@ class ApiTester {
       // Salvar relatório
       this.saveReport()
       
-      console.log('\n✅ Testes concluídos!')
+      console.log('\n�œ… Testes concluídos!')
       
       // Exit code baseado no resultado
       if (this.stats.critical > 0) {
@@ -344,7 +344,7 @@ class ApiTester {
       }
       
     } catch (error) {
-      console.error('\n❌ Erro durante os testes:', error)
+      console.error('\n�Œ Erro durante os testes:', error)
       process.exit(1)
     }
   }

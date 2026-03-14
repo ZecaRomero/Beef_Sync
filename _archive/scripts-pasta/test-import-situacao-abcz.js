@@ -5,7 +5,7 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3020'
 
 async function testarImportacao() {
-  console.log('🧪 Testando importação de Situação ABCZ...\n')
+  console.log('�Ÿ�� Testando importação de Situação ABCZ...\n')
 
   // Teste 1: JSON (colar texto - formato Série, RGN, Status)
   const dadosTeste = [
@@ -23,7 +23,7 @@ async function testarImportacao() {
     const json = await res.json()
 
     if (res.ok) {
-      console.log('✅ Importação concluída com sucesso!')
+      console.log('�œ… Importação concluída com sucesso!')
       console.log(`   Animais atualizados: ${json.resultados?.animaisAtualizados ?? 0}`)
       if (json.resultados?.naoEncontrados?.length > 0) {
         console.log(`   Não encontrados: ${json.resultados.naoEncontrados.length}`)
@@ -33,11 +33,11 @@ async function testarImportacao() {
         console.log(`   Ignorados (inativos): ${json.resultados.ignoradosInativos.length}`)
       }
     } else {
-      console.log('❌ Erro na importação:', json.error || json.details)
+      console.log('�Œ Erro na importação:', json.error || json.details)
     }
   } catch (err) {
-    console.error('❌ Erro de conexão:', err.message)
-    console.log('\n💡 Certifique-se de que o servidor está rodando: npm run dev')
+    console.error('�Œ Erro de conexão:', err.message)
+    console.log('\n�Ÿ’� Certifique-se de que o servidor está rodando: npm run dev')
   }
 }
 

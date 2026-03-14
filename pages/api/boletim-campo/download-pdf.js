@@ -2,11 +2,11 @@ import { query } from '../../../lib/database'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
-const HEADERS = ['LOCAL', 'LOCAL 1', 'SUB_LOCAL_2', 'QUANT.', 'SEXO', 'CATEGORIA', 'RAÇA', 'ERA', 'OBSERVAÇÃO']
+const HEADERS = ['LOCAL', 'LOCAL 1', 'SUB_LOCAL_2', 'QUANT.', 'SEXO', 'CATEGORIA', 'RAÃâ€¡A', 'ERA', 'OBSERVAÃâ€¡ÃÆ’O']
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
-    return res.status(405).json({ message: 'Método não permitido' })
+    return res.status(405).json({ message: 'MÃ©todo nÃ£o permitido' })
   }
 
   try {

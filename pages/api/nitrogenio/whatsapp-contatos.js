@@ -17,7 +17,7 @@ async function handler(req, res) {
         return sendMethodNotAllowed(res, req.method)
     }
   } catch (error) {
-    console.error('Erro na API de contatos WhatsApp nitrogênio:', error)
+    console.error('Erro na API de contatos WhatsApp nitrogÃªnio:', error)
     return sendError(res, 'Erro interno do servidor', 500)
   }
 }
@@ -49,31 +49,31 @@ async function handleGet(req, res) {
 async function handlePost(req, res) {
   const { nome, whatsapp } = req.body
 
-  // Validações
+  // ValidaÃ§Ãµes
   if (!nome || !nome.trim()) {
-    return sendValidationError(res, 'Nome é obrigatório')
+    return sendValidationError(res, 'Nome Ã© obrigatÃ³rio')
   }
 
   if (!whatsapp || !whatsapp.trim()) {
-    return sendValidationError(res, 'Número de WhatsApp é obrigatório')
+    return sendValidationError(res, 'NÃºmero de WhatsApp Ã© obrigatÃ³rio')
   }
 
-  // Limpar e validar número de WhatsApp
+  // Limpar e validar nÃºmero de WhatsApp
   const whatsappLimpo = whatsapp.replace(/\D/g, '')
   
   if (whatsappLimpo.length < 10 || whatsappLimpo.length > 15) {
-    return sendValidationError(res, 'Número de WhatsApp inválido. Deve ter entre 10 e 15 dígitos')
+    return sendValidationError(res, 'NÃºmero de WhatsApp invÃ¡lido. Deve ter entre 10 e 15 dÃ­gitos')
   }
 
   try {
-    // Verificar se já existe
+    // Verificar se jÃ¡ existe
     const existeResult = await query(`
       SELECT id FROM nitrogenio_whatsapp_contatos 
       WHERE whatsapp = $1
     `, [whatsappLimpo])
 
     if (existeResult.rows.length > 0) {
-      return sendValidationError(res, 'Este número de WhatsApp já está cadastrado')
+      return sendValidationError(res, 'Este nÃºmero de WhatsApp jÃ¡ estÃ¡ cadastrado')
     }
 
     // Inserir novo contato
@@ -83,7 +83,7 @@ async function handlePost(req, res) {
       RETURNING *
     `, [nome.trim(), whatsappLimpo])
 
-    console.log(`✅ Novo contato WhatsApp cadastrado: ${nome} - ${whatsappLimpo}`)
+    console.log(`âÅ“â€¦ Novo contato WhatsApp cadastrado: ${nome} - ${whatsappLimpo}`)
 
     return sendSuccess(res, {
       contato: result.rows[0]
@@ -98,7 +98,7 @@ async function handleDelete(req, res) {
   const { id } = req.query
 
   if (!id) {
-    return sendValidationError(res, 'ID do contato é obrigatório')
+    return sendValidationError(res, 'ID do contato Ã© obrigatÃ³rio')
   }
 
   try {
@@ -108,7 +108,7 @@ async function handleDelete(req, res) {
     `, [id])
 
     if (existeResult.rows.length === 0) {
-      return sendError(res, 'Contato não encontrado', 404)
+      return sendError(res, 'Contato nÃ£o encontrado', 404)
     }
 
     // Remover contato
@@ -116,7 +116,7 @@ async function handleDelete(req, res) {
       DELETE FROM nitrogenio_whatsapp_contatos WHERE id = $1
     `, [id])
 
-    console.log(`✅ Contato WhatsApp removido: ID ${id}`)
+    console.log(`âÅ“â€¦ Contato WhatsApp removido: ID ${id}`)
 
     return sendSuccess(res, null, 'Contato removido com sucesso')
   } catch (error) {

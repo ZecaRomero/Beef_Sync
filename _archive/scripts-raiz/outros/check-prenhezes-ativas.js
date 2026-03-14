@@ -7,7 +7,7 @@
 const { query } = require('./lib/database')
 
 async function checkPrenhezes() {
-  console.log('🔍 Verificando prenhezes ativas de todos os animais...\n')
+  console.log('�Ÿ”� Verificando prenhezes ativas de todos os animais...\n')
 
   try {
     // 1. Buscar animal CJCA6 especificamente
@@ -21,12 +21,12 @@ async function checkPrenhezes() {
     `)
     
     if (cjca6.rows.length === 0) {
-      console.log('   ❌ Animal CJCA6 não encontrado')
+      console.log('   �Œ Animal CJCA6 não encontrado')
       return
     }
 
     const animal = cjca6.rows[0]
-    console.log(`   ✅ Animal encontrado:`)
+    console.log(`   �œ… Animal encontrado:`)
     console.log(`   ID: ${animal.id}`)
     console.log(`   Identificação: ${animal.serie} ${animal.rg}`)
     console.log(`   Nome: ${animal.nome || 'Não informado'}`)
@@ -50,7 +50,7 @@ async function checkPrenhezes() {
         ORDER BY data_te DESC
       `)
       
-      console.log(`   📊 Transferências como doadora: ${transferenciasDoadora.rows.length}`)
+      console.log(`   �Ÿ“Š Transferências como doadora: ${transferenciasDoadora.rows.length}`)
       
       if (transferenciasDoadora.rows.length > 0) {
         transferenciasDoadora.rows.forEach((te, index) => {
@@ -75,11 +75,11 @@ async function checkPrenhezes() {
           // Verificar se é prenhez ativa
           const status = (te.status || '').toLowerCase()
           const isFinished = ['nascido', 'parida', 'concluída', 'concluida', 'falha', 'negativo', 'aborto'].some(s => status.includes(s))
-          console.log(`      Prenhez Ativa: ${!isFinished ? '✅ SIM' : '❌ NÃO'}`)
+          console.log(`      Prenhez Ativa: ${!isFinished ? '�œ… SIM' : '�Œ N�ƒO'}`)
           console.log('')
         })
       } else {
-        console.log('   ❌ Nenhuma transferência encontrada como doadora')
+        console.log('   �Œ Nenhuma transferência encontrada como doadora')
       }
     }
 
@@ -92,7 +92,7 @@ async function checkPrenhezes() {
         ORDER BY data_te DESC
       `)
       
-      console.log(`   📊 Transferências como touro: ${transferenciasTouro.rows.length}`)
+      console.log(`   �Ÿ“Š Transferências como touro: ${transferenciasTouro.rows.length}`)
       
       if (transferenciasTouro.rows.length > 0) {
         transferenciasTouro.rows.forEach((te, index) => {
@@ -105,11 +105,11 @@ async function checkPrenhezes() {
           // Verificar se é prenhez ativa
           const status = (te.status || '').toLowerCase()
           const isFinished = ['nascido', 'parida', 'concluída', 'concluida', 'falha', 'negativo', 'aborto'].some(s => status.includes(s))
-          console.log(`      Prenhez Ativa: ${!isFinished ? '✅ SIM' : '❌ NÃO'}`)
+          console.log(`      Prenhez Ativa: ${!isFinished ? '�œ… SIM' : '�Œ N�ƒO'}`)
           console.log('')
         })
       } else {
-        console.log('   ❌ Nenhuma transferência encontrada como touro')
+        console.log('   �Œ Nenhuma transferência encontrada como touro')
       }
     }
 
@@ -121,7 +121,7 @@ async function checkPrenhezes() {
       ORDER BY data_te DESC
     `, [animal.id])
     
-    console.log(`   📊 Transferências por ID: ${transferenciasById.rows.length}`)
+    console.log(`   �Ÿ“Š Transferências por ID: ${transferenciasById.rows.length}`)
     
     if (transferenciasById.rows.length > 0) {
       transferenciasById.rows.forEach((te, index) => {
@@ -134,11 +134,11 @@ async function checkPrenhezes() {
         // Verificar se é prenhez ativa
         const status = (te.status || '').toLowerCase()
         const isFinished = ['nascido', 'parida', 'concluída', 'concluida', 'falha', 'negativo', 'aborto'].some(s => status.includes(s))
-        console.log(`      Prenhez Ativa: ${!isFinished ? '✅ SIM' : '❌ NÃO'}`)
+        console.log(`      Prenhez Ativa: ${!isFinished ? '�œ… SIM' : '�Œ N�ƒO'}`)
         console.log('')
       })
     } else {
-      console.log('   ❌ Nenhuma transferência encontrada por ID')
+      console.log('   �Œ Nenhuma transferência encontrada por ID')
     }
 
     // 4. Verificar estrutura da tabela de transferências
@@ -150,7 +150,7 @@ async function checkPrenhezes() {
       ORDER BY ordinal_position
     `)
     
-    console.log(`   📊 Colunas da tabela (${tableStructure.rows.length}):`)
+    console.log(`   �Ÿ“Š Colunas da tabela (${tableStructure.rows.length}):`)
     tableStructure.rows.forEach(col => {
       console.log(`   - ${col.column_name} (${col.data_type}) ${col.is_nullable === 'YES' ? 'NULL' : 'NOT NULL'}`)
     })
@@ -168,7 +168,7 @@ async function checkPrenhezes() {
       ORDER BY data_te DESC
     `)
     
-    console.log(`   📊 Total de prenhezes ativas: ${allActivePregnancies.rows.length}`)
+    console.log(`   �Ÿ“Š Total de prenhezes ativas: ${allActivePregnancies.rows.length}`)
     
     if (allActivePregnancies.rows.length > 0) {
       console.log('\n   Prenhezes ativas encontradas:')
@@ -182,20 +182,20 @@ async function checkPrenhezes() {
         console.log('')
       })
     } else {
-      console.log('   ❌ Nenhuma prenhez ativa encontrada no sistema')
+      console.log('   �Œ Nenhuma prenhez ativa encontrada no sistema')
     }
 
-    console.log('\n✅ Verificação concluída!')
+    console.log('\n�œ… Verificação concluída!')
 
   } catch (error) {
-    console.error('❌ Erro durante verificação:', error)
+    console.error('�Œ Erro durante verificação:', error)
   }
 }
 
 // Executar
 checkPrenhezes()
   .then(() => {
-    console.log('\n🎯 DIAGNÓSTICO COMPLETO REALIZADO')
+    console.log('\n�ŸŽ� DIAGN�“STICO COMPLETO REALIZADO')
     process.exit(0)
   })
   .catch(error => {

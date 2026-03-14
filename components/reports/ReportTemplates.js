@@ -22,33 +22,33 @@ const REPORT_TEMPLATES = [
   {
     id: 'executive_summary',
     name: 'Resumo Executivo',
-    description: 'Visão geral completa para tomada de decisões estratégicas',
+    description: 'VisÃ£o geral completa para tomada de decisÃµes estratÃ©gicas',
     icon: DocumentTextIcon,
     color: 'blue',
-    category: 'Gestão',
+    category: 'GestÃ£o',
     sections: [
-      'Métricas principais',
+      'MÃ©tricas principais',
       'Performance financeira',
       'Indicadores de produtividade',
-      'Alertas e recomendações'
+      'Alertas e recomendaÃ§Ãµes'
     ],
     estimatedTime: '5-8 min',
-    complexity: 'Médio',
+    complexity: 'MÃ©dio',
     frequency: 'Mensal'
   },
   {
     id: 'financial_analysis',
-    name: 'Análise Financeira Completa',
-    description: 'Relatório detalhado de custos, receitas e rentabilidade',
+    name: 'AnÃ¡lise Financeira Completa',
+    description: 'RelatÃ³rio detalhado de custos, receitas e rentabilidade',
     icon: CurrencyDollarIcon,
     color: 'green',
     category: 'Financeiro',
     sections: [
       'Fluxo de caixa',
-      'Análise de custos',
+      'AnÃ¡lise de custos',
       'ROI por animal',
-      'Projeções financeiras',
-      'Comparativo histórico'
+      'ProjeÃ§Ãµes financeiras',
+      'Comparativo histÃ³rico'
     ],
     estimatedTime: '8-12 min',
     complexity: 'Alto',
@@ -57,16 +57,16 @@ const REPORT_TEMPLATES = [
   {
     id: 'breeding_performance',
     name: 'Performance Reprodutiva',
-    description: 'Análise completa do programa reprodutivo do rebanho',
+    description: 'AnÃ¡lise completa do programa reprodutivo do rebanho',
     icon: HeartIcon,
     color: 'pink',
-    category: 'Reprodução',
+    category: 'ReproduÃ§Ã£o',
     sections: [
       'Taxa de prenhez',
-      'Análise genealógica',
+      'AnÃ¡lise genealÃ³gica',
       'Performance de touros',
-      'Previsão de partos',
-      'Eficiência reprodutiva'
+      'PrevisÃ£o de partos',
+      'EficiÃªncia reprodutiva'
     ],
     estimatedTime: '6-10 min',
     complexity: 'Alto',
@@ -74,17 +74,17 @@ const REPORT_TEMPLATES = [
   },
   {
     id: 'location_tracking',
-    name: 'Rastreamento e Localização',
-    description: 'Monitoramento detalhado da movimentação dos animais',
+    name: 'Rastreamento e LocalizaÃ§Ã£o',
+    description: 'Monitoramento detalhado da movimentaÃ§Ã£o dos animais',
     icon: MapPinIcon,
     color: 'orange',
     category: 'Operacional',
     sections: [
-      'Localização atual',
-      'Histórico de movimentações',
-      'Ocupação de piquetes',
-      'Animais sem localização',
-      'Eficiência de manejo'
+      'LocalizaÃ§Ã£o atual',
+      'HistÃ³rico de movimentaÃ§Ãµes',
+      'OcupaÃ§Ã£o de piquetes',
+      'Animais sem localizaÃ§Ã£o',
+      'EficiÃªncia de manejo'
     ],
     estimatedTime: '4-6 min',
     complexity: 'Baixo',
@@ -92,52 +92,52 @@ const REPORT_TEMPLATES = [
   },
   {
     id: 'health_monitoring',
-    name: 'Monitoramento Sanitário',
-    description: 'Acompanhamento da saúde e bem-estar do rebanho',
+    name: 'Monitoramento SanitÃ¡rio',
+    description: 'Acompanhamento da saÃºde e bem-estar do rebanho',
     icon: BeakerIcon,
     color: 'red',
     category: 'Sanidade',
     sections: [
-      'Histórico de medicamentos',
-      'Protocolos sanitários',
+      'HistÃ³rico de medicamentos',
+      'Protocolos sanitÃ¡rios',
       'Mortalidade e causas',
-      'Alertas de saúde',
-      'Custos veterinários'
+      'Alertas de saÃºde',
+      'Custos veterinÃ¡rios'
     ],
     estimatedTime: '7-9 min',
-    complexity: 'Médio',
+    complexity: 'MÃ©dio',
     frequency: 'Mensal'
   },
   {
     id: 'inventory_management',
-    name: 'Gestão de Estoque',
-    description: 'Controle completo do estoque de sêmen',
+    name: 'GestÃ£o de Estoque',
+    description: 'Controle completo do estoque de sÃªmen',
     icon: ClipboardDocumentListIcon,
     color: 'purple',
     category: 'Estoque',
     sections: [
       'Estoque atual',
-      'Movimentações',
+      'MovimentaÃ§Ãµes',
       'Alertas de estoque baixo',
-      'Análise de fornecedores',
+      'AnÃ¡lise de fornecedores',
       'Custos de estoque'
     ],
     estimatedTime: '5-7 min',
-    complexity: 'Médio',
+    complexity: 'MÃ©dio',
     frequency: 'Quinzenal'
   },
   {
     id: 'productivity_analysis',
-    name: 'Análise de Produtividade',
-    description: 'Métricas de eficiência e produtividade do rebanho',
+    name: 'AnÃ¡lise de Produtividade',
+    description: 'MÃ©tricas de eficiÃªncia e produtividade do rebanho',
     icon: ChartBarIcon,
     color: 'emerald',
     category: 'Produtividade',
     sections: [
       'KPIs de produtividade',
-      'Análise por raça',
-      'Eficiência por idade',
-      'Comparativo de períodos',
+      'AnÃ¡lise por raÃ§a',
+      'EficiÃªncia por idade',
+      'Comparativo de perÃ­odos',
       'Benchmarking'
     ],
     estimatedTime: '6-8 min',
@@ -146,35 +146,35 @@ const REPORT_TEMPLATES = [
   },
   {
     id: 'logistics_report',
-    name: 'Relatório Logístico',
-    description: 'Análise de transporte, movimentação e logística',
+    name: 'RelatÃ³rio LogÃ­stico',
+    description: 'AnÃ¡lise de transporte, movimentaÃ§Ã£o e logÃ­stica',
     icon: TruckIcon,
     color: 'indigo',
-    category: 'Logística',
+    category: 'LogÃ­stica',
     sections: [
-      'Movimentações de animais',
+      'MovimentaÃ§Ãµes de animais',
       'Custos de transporte',
-      'Eficiência logística',
+      'EficiÃªncia logÃ­stica',
       'Rotas otimizadas',
       'Cronograma de atividades'
     ],
     estimatedTime: '4-6 min',
-    complexity: 'Médio',
+    complexity: 'MÃ©dio',
     frequency: 'Semanal'
   },
   {
     id: 'compliance_audit',
     name: 'Auditoria e Conformidade',
-    description: 'Verificação de conformidade com normas e regulamentações',
+    description: 'VerificaÃ§Ã£o de conformidade com normas e regulamentaÃ§Ãµes',
     icon: ClipboardDocumentListIcon,
     color: 'yellow',
     category: 'Conformidade',
     sections: [
       'Checklist de conformidade',
-      'Documentação obrigatória',
-      'Certificações',
-      'Não conformidades',
-      'Plano de ação'
+      'DocumentaÃ§Ã£o obrigatÃ³ria',
+      'CertificaÃ§Ãµes',
+      'NÃ£o conformidades',
+      'Plano de aÃ§Ã£o'
     ],
     estimatedTime: '8-12 min',
     complexity: 'Alto',
@@ -184,20 +184,20 @@ const REPORT_TEMPLATES = [
 
 const CATEGORIES = [
   'Todos',
-  'Gestão',
+  'GestÃ£o',
   'Financeiro',
-  'Reprodução',
+  'ReproduÃ§Ã£o',
   'Operacional',
   'Sanidade',
   'Estoque',
   'Produtividade',
-  'Logística',
+  'LogÃ­stica',
   'Conformidade'
 ]
 
 const COMPLEXITY_COLORS = {
   'Baixo': 'green',
-  'Médio': 'yellow',
+  'MÃ©dio': 'yellow',
   'Alto': 'red'
 }
 
@@ -225,7 +225,7 @@ export default function ReportTemplates({ onSelectTemplate, onCreateCustom }) {
     const duplicatedTemplate = {
       ...template,
       id: `${template.id}_copy_${Date.now()}`,
-      name: `${template.name} (Cópia)`,
+      name: `${template.name} (CÃ³pia)`,
       isCustom: true
     }
     onSelectTemplate(duplicatedTemplate)
@@ -237,10 +237,10 @@ export default function ReportTemplates({ onSelectTemplate, onCreateCustom }) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-            📋 Templates de Relatórios
+            ðÅ¸â€œâ€¹ Templates de RelatÃ³rios
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Escolha um template pré-configurado ou crie um personalizado
+            Escolha um template prÃ©-configurado ou crie um personalizado
           </p>
         </div>
         <Button
@@ -323,19 +323,19 @@ export default function ReportTemplates({ onSelectTemplate, onCreateCustom }) {
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-500 dark:text-gray-500">Frequência:</span>
+                    <span className="text-gray-500 dark:text-gray-500">FrequÃªncia:</span>
                     <span className="font-medium">{template.frequency}</span>
                   </div>
                 </div>
 
                 <div className="mb-4">
                   <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Seções incluídas:
+                    SeÃ§Ãµes incluÃ­das:
                   </h4>
                   <div className="space-y-1">
                     {template.sections.slice(0, 3).map((section, index) => (
                       <div key={index} className="text-xs text-gray-600 dark:text-gray-400">
-                        • {section}
+                        ââ‚¬¢ {section}
                       </div>
                     ))}
                     {template.sections.length > 3 && (
@@ -406,7 +406,7 @@ export default function ReportTemplates({ onSelectTemplate, onCreateCustom }) {
                 {REPORT_TEMPLATES.length}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                Templates Disponíveis
+                Templates DisponÃ­veis
               </div>
             </div>
             <div>
@@ -422,7 +422,7 @@ export default function ReportTemplates({ onSelectTemplate, onCreateCustom }) {
                 {REPORT_TEMPLATES.filter(t => t.complexity === 'Alto').length}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                Templates Avançados
+                Templates AvanÃ§ados
               </div>
             </div>
             <div>
@@ -431,7 +431,7 @@ export default function ReportTemplates({ onSelectTemplate, onCreateCustom }) {
                   acc + parseInt(t.estimatedTime.split('-')[0]), 0) / REPORT_TEMPLATES.length)}min
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                Tempo Médio
+                Tempo MÃ©dio
               </div>
             </div>
           </div>

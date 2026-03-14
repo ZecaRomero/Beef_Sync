@@ -2,7 +2,7 @@ const { query } = require('./lib/database')
 
 async function limparInfoDNA() {
   try {
-    console.log('🔍 Procurando animais com informações de DNA...\n')
+    console.log('�Ÿ”� Procurando animais com informações de DNA...\n')
 
     // Buscar animais com DNA
     const animaisResult = await query(`
@@ -22,12 +22,12 @@ async function limparInfoDNA() {
     `)
 
     if (animaisResult.rows.length === 0) {
-      console.log('✅ Nenhum animal com informações de DNA encontrado.')
+      console.log('�œ… Nenhum animal com informações de DNA encontrado.')
       process.exit(0)
       return
     }
 
-    console.log(`🐄 ${animaisResult.rows.length} animal(is) com informações de DNA:\n`)
+    console.log(`�Ÿ�„ ${animaisResult.rows.length} animal(is) com informações de DNA:\n`)
     
     animaisResult.rows.forEach(animal => {
       console.log(`  ID: ${animal.id}`)
@@ -39,7 +39,7 @@ async function limparInfoDNA() {
     })
 
     // Limpar as informações de DNA dos animais
-    console.log('🗑️ Limpando informações de DNA dos animais...')
+    console.log('�Ÿ—‘️ Limpando informações de DNA dos animais...')
     
     const updateResult = await query(`
       UPDATE animais
@@ -53,11 +53,11 @@ async function limparInfoDNA() {
       OR custo_dna IS NOT NULL
     `)
 
-    console.log(`✅ ${updateResult.rowCount} animal(is) atualizado(s) com sucesso!`)
-    console.log('\n✅ Informações de DNA removidas dos animais.')
+    console.log(`�œ… ${updateResult.rowCount} animal(is) atualizado(s) com sucesso!`)
+    console.log('\n�œ… Informações de DNA removidas dos animais.')
 
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('�Œ Erro:', error)
   } finally {
     process.exit(0)
   }

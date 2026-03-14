@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useNetworkStatus } from '../../hooks/useNetworkStatus'
 
-// Gera um favicon SVG como data URL — sem precisar de arquivos em /public
+// Gera um favicon SVG como data URL ââ‚¬â€� sem precisar de arquivos em /public
 function gerarFaviconSVG(isLocal) {
   const bg = isLocal ? '#2563eb' : '#16a34a'
   const label = isLocal ? 'L' : 'R'

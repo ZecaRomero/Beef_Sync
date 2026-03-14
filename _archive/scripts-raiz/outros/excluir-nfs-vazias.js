@@ -3,7 +3,7 @@ const API_URL = 'http://localhost:3020';
 
 async function excluirNFsVazias() {
   try {
-    console.log('🔍 Buscando notas fiscais sem itens...\n');
+    console.log('�Ÿ”� Buscando notas fiscais sem itens...\n');
     
     const response = await fetch(`${API_URL}/api/notas-fiscais`);
     const data = await response.json();
@@ -11,7 +11,7 @@ async function excluirNFsVazias() {
     const nfs = data.data || data;
     
     if (!Array.isArray(nfs)) {
-      console.error('❌ Erro: resposta da API não é um array');
+      console.error('�Œ Erro: resposta da API não é um array');
       return;
     }
     
@@ -23,12 +23,12 @@ async function excluirNFsVazias() {
     });
     
     if (nfsSemItens.length === 0) {
-      console.log('✅ Não há NFs automáticas vazias para excluir!');
+      console.log('�œ… Não há NFs automáticas vazias para excluir!');
       return;
     }
     
-    console.log(`⚠️ Encontradas ${nfsSemItens.length} NFs automáticas SEM itens\n`);
-    console.log('🗑️ Iniciando exclusão...\n');
+    console.log(`�š�️ Encontradas ${nfsSemItens.length} NFs automáticas SEM itens\n`);
+    console.log('�Ÿ—‘️ Iniciando exclusão...\n');
     
     let excluidas = 0;
     let erros = 0;
@@ -44,25 +44,25 @@ async function excluirNFsVazias() {
         
         if (deleteResponse.ok) {
           excluidas++;
-          console.log(`✅ NF ${nf.numero_nf} (ID: ${nf.id}) excluída`);
+          console.log(`�œ… NF ${nf.numero_nf} (ID: ${nf.id}) excluída`);
         } else {
           erros++;
-          console.log(`❌ Erro ao excluir NF ${nf.numero_nf} (ID: ${nf.id})`);
+          console.log(`�Œ Erro ao excluir NF ${nf.numero_nf} (ID: ${nf.id})`);
         }
       } catch (error) {
         erros++;
-        console.log(`❌ Erro ao excluir NF ${nf.numero_nf} (ID: ${nf.id}): ${error.message}`);
+        console.log(`�Œ Erro ao excluir NF ${nf.numero_nf} (ID: ${nf.id}): ${error.message}`);
       }
     }
     
-    console.log(`\n📊 Resumo:`);
+    console.log(`\n�Ÿ“Š Resumo:`);
     console.log(`   Total de NFs vazias: ${nfsSemItens.length}`);
     console.log(`   Excluídas com sucesso: ${excluidas}`);
     console.log(`   Erros: ${erros}`);
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
-    console.log('\n💡 Certifique-se de que o servidor está rodando em http://localhost:3020');
+    console.error('�Œ Erro:', error.message);
+    console.log('\n�Ÿ’� Certifique-se de que o servidor está rodando em http://localhost:3020');
   }
 }
 

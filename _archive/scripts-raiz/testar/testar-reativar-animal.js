@@ -50,14 +50,14 @@ function fazerRequisicao(situacao) {
 async function executarTestes() {
   try {
     // Teste 1: Inativar
-    console.log('📝 TESTE 1: Inativando animal...');
+    console.log('�Ÿ“� TESTE 1: Inativando animal...');
     const resultInativar = await fazerRequisicao('Inativo');
     
     if (resultInativar.status === 200) {
-      console.log('✅ Animal inativado com sucesso!');
+      console.log('�œ… Animal inativado com sucesso!');
       console.log(`   Situação: ${resultInativar.data.data?.situacao}`);
     } else {
-      console.log('❌ Erro ao inativar:', resultInativar.data);
+      console.log('�Œ Erro ao inativar:', resultInativar.data);
       return;
     }
     
@@ -66,24 +66,24 @@ async function executarTestes() {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     // Teste 2: Reativar
-    console.log('📝 TESTE 2: Reativando animal...');
+    console.log('�Ÿ“� TESTE 2: Reativando animal...');
     const resultReativar = await fazerRequisicao('Ativo');
     
     if (resultReativar.status === 200) {
-      console.log('✅ Animal reativado com sucesso!');
+      console.log('�œ… Animal reativado com sucesso!');
       console.log(`   Situação: ${resultReativar.data.data?.situacao}`);
     } else {
-      console.log('❌ Erro ao reativar:', resultReativar.data);
+      console.log('�Œ Erro ao reativar:', resultReativar.data);
       return;
     }
     
-    console.log('\n🎉 TODOS OS TESTES PASSARAM!');
-    console.log('\n📊 Resumo:');
-    console.log('   ✅ Inativação: OK');
-    console.log('   ✅ Reativação: OK');
+    console.log('\n�ŸŽ‰ TODOS OS TESTES PASSARAM!');
+    console.log('\n�Ÿ“Š Resumo:');
+    console.log('   �œ… Inativação: OK');
+    console.log('   �œ… Reativação: OK');
     
   } catch (error) {
-    console.error('\n❌ Erro durante os testes:', error.message);
+    console.error('\n�Œ Erro durante os testes:', error.message);
   }
 }
 

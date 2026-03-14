@@ -10,7 +10,7 @@ const pool = new Pool({
 });
 
 async function gerarRelatorioCSV() {
-  console.log('📊 GERANDO RELATÓRIO CSV DE RGs FALTANTES\n');
+  console.log('�Ÿ“Š GERANDO RELAT�“RIO CSV DE RGs FALTANTES\n');
   console.log('='.repeat(60));
 
   try {
@@ -23,7 +23,7 @@ async function gerarRelatorioCSV() {
     `);
     
     const series = seriesResult.rows.map(r => r.serie);
-    console.log(`✅ Encontradas ${series.length} séries`);
+    console.log(`�œ… Encontradas ${series.length} séries`);
 
     // Criar CSV
     let csvContent = 'Série;RG Faltante;Identificação Completa\n';
@@ -60,7 +60,7 @@ async function gerarRelatorioCSV() {
         }
       }
 
-      console.log(`✅ ${serie}: ${animais.length} animais`);
+      console.log(`�œ… ${serie}: ${animais.length} animais`);
     }
 
     // Salvar CSV
@@ -68,15 +68,15 @@ async function gerarRelatorioCSV() {
     fs.writeFileSync(nomeArquivo, csvContent, 'utf8');
 
     console.log('\n' + '='.repeat(60));
-    console.log(`✅ Relatório CSV salvo: ${nomeArquivo}`);
-    console.log(`📊 Total de RGs faltantes: ${totalFaltantes}`);
-    console.log('\n💡 Abra o arquivo no Excel:');
+    console.log(`�œ… Relatório CSV salvo: ${nomeArquivo}`);
+    console.log(`�Ÿ“Š Total de RGs faltantes: ${totalFaltantes}`);
+    console.log('\n�Ÿ’� Abra o arquivo no Excel:');
     console.log('   1. Clique duas vezes no arquivo');
     console.log('   2. Ou abra o Excel e vá em Arquivo > Abrir');
     console.log('   3. Selecione "Todos os arquivos" e escolha o CSV');
 
   } catch (error) {
-    console.error('\n❌ Erro:', error.message);
+    console.error('\n�Œ Erro:', error.message);
   } finally {
     await pool.end();
   }

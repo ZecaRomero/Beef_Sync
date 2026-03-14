@@ -1,5 +1,5 @@
-// Serviço alternativo de WhatsApp usando whatsapp-web.js
-// Mais simples que Twilio, não requer conta externa
+// ServiÃ§o alternativo de WhatsApp usando whatsapp-web.js
+// Mais simples que Twilio, nÃ£o requer conta externa
 
 let client = null
 let qrCode = null
@@ -9,7 +9,7 @@ let qrCodeCallbacks = []
 // Inicializar cliente WhatsApp Web
 async function initWhatsAppClient() {
   try {
-    // Importar dinamicamente para evitar erro se não estiver instalado
+    // Importar dinamicamente para evitar erro se nÃ£o estiver instalado
     const whatsappModule = await import('whatsapp-web.js')
     const qrcodeModule = await import('qrcode-terminal')
     const { Client, LocalAuth } = whatsappModule.default || whatsappModule
@@ -32,7 +32,7 @@ async function initWhatsAppClient() {
     // Eventos
     client.on('qr', (qr) => {
       qrCode = qr
-      console.log('\n📱 Escaneie este QR Code com seu WhatsApp:\n')
+      console.log('\nðÅ¸â€œ± Escaneie este QR Code com seu WhatsApp:\n')
       qrcode.generate(qr, { small: true })
       console.log('\n')
       
@@ -43,20 +43,20 @@ async function initWhatsAppClient() {
     client.on('ready', () => {
       isReady = true
       qrCode = null
-      console.log('✅ WhatsApp conectado e pronto!')
+      console.log('âÅ“â€¦ WhatsApp conectado e pronto!')
     })
 
     client.on('authenticated', () => {
-      console.log('✅ WhatsApp autenticado!')
+      console.log('âÅ“â€¦ WhatsApp autenticado!')
     })
 
     client.on('auth_failure', (msg) => {
-      console.error('❌ Falha na autenticação:', msg)
+      console.error('â�Å’ Falha na autenticaÃ§Ã£o:', msg)
       isReady = false
     })
 
     client.on('disconnected', (reason) => {
-      console.log('⚠️ WhatsApp desconectado:', reason)
+      console.log('âÅ¡ ï¸� WhatsApp desconectado:', reason)
       isReady = false
       client = null
     })
@@ -67,8 +67,8 @@ async function initWhatsAppClient() {
     return client
   } catch (error) {
     if (error.code === 'MODULE_NOT_FOUND') {
-      console.warn('⚠️ whatsapp-web.js não instalado. Execute: npm install whatsapp-web.js qrcode-terminal')
-      throw new Error('whatsapp-web.js não instalado. Execute: npm install whatsapp-web.js qrcode-terminal')
+      console.warn('âÅ¡ ï¸� whatsapp-web.js nÃ£o instalado. Execute: npm install whatsapp-web.js qrcode-terminal')
+      throw new Error('whatsapp-web.js nÃ£o instalado. Execute: npm install whatsapp-web.js qrcode-terminal')
     }
     throw error
   }
@@ -78,7 +78,7 @@ async function initWhatsAppClient() {
 export async function getQRCode() {
   return new Promise(async (resolve, reject) => {
     if (isReady) {
-      resolve(null) // Já está conectado
+      resolve(null) // JÃ¡ estÃ¡ conectado
       return
     }
     
@@ -91,7 +91,7 @@ export async function getQRCode() {
       }
     }
     
-    // Se já tem QR Code, retornar
+    // Se jÃ¡ tem QR Code, retornar
     if (qrCode) {
       resolve(qrCode)
       return
@@ -105,7 +105,7 @@ export async function getQRCode() {
     
     qrCodeCallbacks.push(callback)
     
-    // Timeout após 30 segundos
+    // Timeout apÃ³s 30 segundos
     setTimeout(() => {
       qrCodeCallbacks = qrCodeCallbacks.filter(cb => cb !== callback)
       if (!isReady && !qrCode) {
@@ -115,7 +115,7 @@ export async function getQRCode() {
   })
 }
 
-// Verificar se está pronto
+// Verificar se estÃ¡ pronto
 export async function isWhatsAppReady() {
   if (isReady) {
     return true
@@ -141,7 +141,7 @@ export async function sendWhatsAppWeb(recipient, message) {
       await initWhatsAppClient()
     }
     
-    // Aguardar estar pronto (máximo 30 segundos)
+    // Aguardar estar pronto (mÃ¡ximo 30 segundos)
     let attempts = 0
     while (!isReady && attempts < 30) {
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -149,13 +149,13 @@ export async function sendWhatsAppWeb(recipient, message) {
     }
     
     if (!isReady) {
-      throw new Error('WhatsApp não está pronto. Escaneie o QR Code primeiro. Execute o servidor e escaneie o QR Code que aparecer no terminal.')
+      throw new Error('WhatsApp nÃ£o estÃ¡ pronto. Escaneie o QR Code primeiro. Execute o servidor e escaneie o QR Code que aparecer no terminal.')
     }
     
-    // Formatar número (remover caracteres não numéricos e adicionar código do país)
+    // Formatar nÃºmero (remover caracteres nÃ£o numÃ©ricos e adicionar cÃ³digo do paÃ­s)
     let phoneNumber = recipient.whatsapp.replace(/\D/g, '')
     
-    // Se não começar com 55 (Brasil), adicionar
+    // Se nÃ£o comeÃ§ar com 55 (Brasil), adicionar
     if (!phoneNumber.startsWith('55')) {
       phoneNumber = `55${phoneNumber}`
     }
@@ -166,11 +166,11 @@ export async function sendWhatsAppWeb(recipient, message) {
     // Enviar mensagem
     await client.sendMessage(chatId, message)
     
-    console.log(`✅ Mensagem WhatsApp enviada para ${recipient.name} (${phoneNumber})`)
+    console.log(`âÅ“â€¦ Mensagem WhatsApp enviada para ${recipient.name} (${phoneNumber})`)
     
     return { success: true, messageId: Date.now().toString() }
   } catch (error) {
-    console.error('❌ Erro ao enviar WhatsApp:', error)
+    console.error('â�Å’ Erro ao enviar WhatsApp:', error)
     throw error
   }
 }
@@ -186,7 +186,7 @@ export async function sendWhatsAppWebMedia(recipient, mediaBuffer, filename, cap
       attempts++
     }
     if (!isReady) {
-      throw new Error('WhatsApp não está pronto. Escaneie o QR Code primeiro.')
+      throw new Error('WhatsApp nÃ£o estÃ¡ pronto. Escaneie o QR Code primeiro.')
     }
     let phoneNumber = recipient.whatsapp.replace(/\D/g, '')
     if (!phoneNumber.startsWith('55')) {
@@ -208,11 +208,11 @@ export async function sendWhatsAppWebMedia(recipient, mediaBuffer, filename, cap
     throw error
   }
 }
-// Inicializar na importação (opcional)
+// Inicializar na importaÃ§Ã£o (opcional)
 if (typeof window === 'undefined') {
   // Apenas no servidor
   initWhatsAppClient().catch(err => {
-    if (!err.message.includes('não instalado')) {
+    if (!err.message.includes('nÃ£o instalado')) {
       console.error('Erro ao inicializar WhatsApp:', err)
     }
   })

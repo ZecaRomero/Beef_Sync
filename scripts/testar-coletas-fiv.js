@@ -5,7 +5,7 @@ const { query } = require('../lib/database')
 
 async function testarColetasFIV() {
   try {
-    console.log('🔍 Testando busca de coletas FIV para CJCJ 16013...\n')
+    console.log('ðÅ¸â€�� Testando busca de coletas FIV para CJCJ 16013...\n')
     
     // Teste 1: Buscar por doadora_nome exato
     console.log('Teste 1: Buscar por doadora_nome = "CJCJ 16013"')
@@ -47,7 +47,7 @@ async function testarColetasFIV() {
     }
     
     // Teste 4: Listar todas as coletas para ver os nomes
-    console.log('\nTeste 4: Listar todas as doadoras únicas')
+    console.log('\nTeste 4: Listar todas as doadoras Ãºnicas')
     const result4 = await query(
       `SELECT DISTINCT doadora_nome, doadora_identificador, COUNT(*) as total_coletas
        FROM coleta_fiv
@@ -68,20 +68,20 @@ async function testarColetasFIV() {
       const totalEmbrioes = coletas.reduce((s, c) => s + (parseInt(c.embrioes_produzidos) || 0), 0)
       const totalTransferidos = coletas.reduce((s, c) => s + (parseInt(c.embrioes_transferidos) || 0), 0)
       
-      console.log('\n📊 Resumo das coletas:')
+      console.log('\nðÅ¸â€œÅ  Resumo das coletas:')
       console.log(`   Total de coletas: ${totalColetas}`)
-      console.log(`   Total de oócitos: ${totalOocitos}`)
-      console.log(`   Média de oócitos: ${(totalOocitos / totalColetas).toFixed(1)}`)
-      console.log(`   Total de embriões: ${totalEmbrioes}`)
-      console.log(`   Média de embriões: ${(totalEmbrioes / totalColetas).toFixed(1)}`)
+      console.log(`   Total de oÃ³citos: ${totalOocitos}`)
+      console.log(`   MÃ©dia de oÃ³citos: ${(totalOocitos / totalColetas).toFixed(1)}`)
+      console.log(`   Total de embriÃµes: ${totalEmbrioes}`)
+      console.log(`   MÃ©dia de embriÃµes: ${(totalEmbrioes / totalColetas).toFixed(1)}`)
       console.log(`   Total transferidos: ${totalTransferidos}`)
-      console.log(`   Média transferidos: ${(totalTransferidos / totalColetas).toFixed(1)}`)
+      console.log(`   MÃ©dia transferidos: ${(totalTransferidos / totalColetas).toFixed(1)}`)
     }
     
-    console.log('\n✅ Teste concluído!')
+    console.log('\nâÅ“â€¦ Teste concluÃ­do!')
     process.exit(0)
   } catch (error) {
-    console.error('❌ Erro ao testar:', error)
+    console.error('â�Å’ Erro ao testar:', error)
     process.exit(1)
   }
 }

@@ -78,7 +78,7 @@ async function checkPiquete4() {
       ORDER BY a.serie, a.rg
     `);
     
-    console.log('\n=== ANIMAIS ATIVOS SEM LOCALIZAÇÃO ===');
+    console.log('\n=== ANIMAIS ATIVOS SEM LOCALIZA�‡�ƒO ===');
     console.log('Total:', semLocalizacaoResult.rows.length);
     if (semLocalizacaoResult.rows.length > 0) {
       semLocalizacaoResult.rows.slice(0, 10).forEach((animal, index) => {

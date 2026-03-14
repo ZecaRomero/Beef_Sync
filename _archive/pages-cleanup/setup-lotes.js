@@ -70,7 +70,7 @@ export default function SetupLotes() {
         {/* Instruções Detalhadas */}
         <div className="mt-8 bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            📋 Instruções para Resolver o Problema
+            �Ÿ“‹ Instruções para Resolver o Problema
           </h2>
 
           <div className="space-y-6">
@@ -118,13 +118,13 @@ export default function SetupLotes() {
                   href="/relatorios-lotes" 
                   className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
                 >
-                  📊 Acessar Lançamento no APP
+                  �Ÿ“Š Acessar Lançamento no APP
                 </a>
                 <a 
                   href="/teste-lotes" 
                   className="inline-block bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 ml-2"
                 >
-                  🔬 Testar Sistema de Lotes
+                  �Ÿ”� Testar Sistema de Lotes
                 </a>
               </div>
             </div>
@@ -134,20 +134,20 @@ export default function SetupLotes() {
         {/* Informações Adicionais */}
         <div className="mt-8 bg-blue-50 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-blue-900 mb-2">
-            💡 Informações Importantes
+            �Ÿ’� Informações Importantes
           </h3>
           <ul className="text-blue-800 space-y-2">
-            <li>• O script criará a tabela <code>lotes_operacoes</code> automaticamente</li>
-            <li>• Serão inseridos 5 registros de exemplo para demonstração</li>
-            <li>• Índices serão criados para melhor performance</li>
-            <li>• A função <code>gerar_proximo_lote()</code> será criada</li>
+            <li>�€� O script criará a tabela <code>lotes_operacoes</code> automaticamente</li>
+            <li>�€� Serão inseridos 5 registros de exemplo para demonstração</li>
+            <li>�€� Índices serão criados para melhor performance</li>
+            <li>�€� A função <code>gerar_proximo_lote()</code> será criada</li>
           </ul>
         </div>
 
         {/* Status */}
         <div className="mt-8 bg-yellow-50 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-yellow-900 mb-2">
-            ⚠️ Status Atual
+            �š�️ Status Atual
           </h3>
           <p className="text-yellow-800">
             O sistema de lotes está implementado, mas precisa da tabela no banco de dados para funcionar.

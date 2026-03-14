@@ -11,21 +11,21 @@ export default async function handler(req, res) {
     const { relatorioId, formato = 'xlsx' } = req.body
 
     if (!relatorioId) {
-      return res.status(400).json({ message: 'ID do relatório é obrigatório' })
+      return res.status(400).json({ message: 'ID do relatÃ³rio Ã© obrigatÃ³rio' })
     }
 
-    // Buscar configuração do relatório
+    // Buscar configuraÃ§Ã£o do relatÃ³rio
     const relatorioResult = await query(
       'SELECT * FROM relatorios_personalizados WHERE id = $1',
       [relatorioId]
     )
     if (relatorioResult.rows.length === 0) {
-      return res.status(404).json({ message: 'Relatório não encontrado' })
+      return res.status(404).json({ message: 'RelatÃ³rio nÃ£o encontrado' })
     }
 
     const relatorio = relatorioResult.rows[0]
     
-    // Parse dos campos JSON se necessário
+    // Parse dos campos JSON se necessÃ¡rio
     let camposExibicao = []
     try {
       if (typeof relatorio.campos_exibicao === 'string') {
@@ -52,7 +52,7 @@ export default async function handler(req, res) {
 
     const tipo = relatorio.tipo
 
-    // Buscar dados baseado no tipo de relatório
+    // Buscar dados baseado no tipo de relatÃ³rio
     let dados = []
     let headers = []
 
@@ -62,12 +62,12 @@ export default async function handler(req, res) {
         if (camposExibicao.length > 0) {
           headers = camposExibicao.map(campo => {
             const labels = {
-              serie: 'Série',
+              serie: 'SÃ©rie',
               rg: 'RG',
-              raca: 'Raça',
+              raca: 'RaÃ§a',
               data_nascimento: 'Data de Nascimento',
-              situacao: 'Situação',
-              custo_aquisicao: 'Custo de Aquisição',
+              situacao: 'SituaÃ§Ã£o',
+              custo_aquisicao: 'Custo de AquisiÃ§Ã£o',
               custo_total: 'Custo Total',
               valor_venda: 'Valor de Venda'
             }
@@ -76,12 +76,12 @@ export default async function handler(req, res) {
         } else if (dados.length > 0) {
           headers = Object.keys(dados[0]).map(key => {
             const labels = {
-              serie: 'Série',
+              serie: 'SÃ©rie',
               rg: 'RG',
-              raca: 'Raça',
+              raca: 'RaÃ§a',
               data_nascimento: 'Data de Nascimento',
-              situacao: 'Situação',
-              custo_aquisicao: 'Custo de Aquisição',
+              situacao: 'SituaÃ§Ã£o',
+              custo_aquisicao: 'Custo de AquisiÃ§Ã£o',
               custo_total: 'Custo Total',
               valor_venda: 'Valor de Venda'
             }
@@ -95,7 +95,7 @@ export default async function handler(req, res) {
         if (camposExibicao.length > 0) {
           headers = camposExibicao.map(campo => {
             const labels = {
-              numero_te: 'Número TE',
+              numero_te: 'NÃºmero TE',
               data_te: 'Data TE',
               receptora: 'Receptora',
               doadora: 'Doadora',
@@ -108,7 +108,7 @@ export default async function handler(req, res) {
         } else if (dados.length > 0) {
           headers = Object.keys(dados[0]).map(key => {
             const labels = {
-              numero_te: 'Número TE',
+              numero_te: 'NÃºmero TE',
               data_te: 'Data TE',
               receptora: 'Receptora',
               doadora: 'Doadora',
@@ -127,7 +127,7 @@ export default async function handler(req, res) {
           headers = Object.keys(dados[0]).map(key => {
             const labels = {
               animal: 'Animal',
-              custo_aquisicao: 'Custo Aquisição',
+              custo_aquisicao: 'Custo AquisiÃ§Ã£o',
               custo_total: 'Custo Total',
               valor_venda: 'Valor Venda',
               lucro: 'Lucro',
@@ -144,9 +144,9 @@ export default async function handler(req, res) {
           headers = Object.keys(dados[0]).map(key => {
             const labels = {
               touro: 'Touro',
-              raca: 'Raça',
+              raca: 'RaÃ§a',
               quantidade: 'Quantidade',
-              preco_unitario: 'Preço Unitário',
+              preco_unitario: 'PreÃ§o UnitÃ¡rio',
               valor_total: 'Valor Total'
             }
             return labels[key] || key
@@ -155,26 +155,26 @@ export default async function handler(req, res) {
         break
 
       default:
-        return res.status(400).json({ message: 'Tipo de relatório não suportado' })
+        return res.status(400).json({ message: 'Tipo de relatÃ³rio nÃ£o suportado' })
     }
 
-    console.log('✅ Dados obtidos:', dados.length, 'registros')
-    console.log('📋 Headers:', headers.length)
+    console.log('âÅ“â€¦ Dados obtidos:', dados.length, 'registros')
+    console.log('ðÅ¸â€œâ€¹ Headers:', headers.length)
 
-    // Garantir que dados é um array
+    // Garantir que dados Ã© um array
     if (!Array.isArray(dados)) {
       dados = []
     }
 
     if (formato === 'xlsx' || formato === 'excel') {
-      console.log('📄 Gerando arquivo Excel...')
+      console.log('ðÅ¸â€œâ€ž Gerando arquivo Excel...')
       try {
         // Gerar arquivo Excel
         const workbook = new ExcelJS.Workbook()
-        const worksheetName = (relatorio.nome || 'Relatório').substring(0, 31) // Excel limita a 31 caracteres
+        const worksheetName = (relatorio.nome || 'RelatÃ³rio').substring(0, 31) // Excel limita a 31 caracteres
         const worksheet = workbook.addWorksheet(worksheetName)
 
-        // Determinar número de colunas
+        // Determinar nÃºmero de colunas
         let numCols = 1
         if (headers.length > 0) {
           numCols = headers.length
@@ -182,8 +182,8 @@ export default async function handler(req, res) {
           numCols = Object.keys(dados[0]).length
         }
 
-        // Adicionar cabeçalho
-        worksheet.addRow([relatorio.nome || 'Relatório Personalizado'])
+        // Adicionar cabeÃ§alho
+        worksheet.addRow([relatorio.nome || 'RelatÃ³rio Personalizado'])
         if (numCols > 1) {
           worksheet.mergeCells(1, 1, 1, numCols)
         }
@@ -191,7 +191,7 @@ export default async function handler(req, res) {
         worksheet.getRow(1).alignment = { horizontal: 'center' }
         worksheet.addRow([]) // Linha em branco
 
-        // Adicionar cabeçalhos das colunas
+        // Adicionar cabeÃ§alhos das colunas
         if (headers.length > 0) {
           worksheet.addRow(headers)
           const headerRow = worksheet.getRow(worksheet.rowCount)
@@ -221,7 +221,7 @@ export default async function handler(req, res) {
             })
           }
         } else if (dados.length > 0 && dados[0]) {
-          // Se não houver campos específicos, adicionar todos os dados
+          // Se nÃ£o houver campos especÃ­ficos, adicionar todos os dados
           const firstRow = dados[0]
           const allHeaders = Object.keys(firstRow)
           worksheet.addRow(allHeaders)
@@ -265,7 +265,7 @@ export default async function handler(req, res) {
         await workbook.xlsx.write(res)
         return res.end()
       } catch (excelError) {
-        console.error('❌ Erro ao gerar Excel:', excelError)
+        console.error('â�Å’ Erro ao gerar Excel:', excelError)
         throw excelError
       }
     } else {
@@ -279,12 +279,12 @@ export default async function handler(req, res) {
       })
     }
   } catch (error) {
-    logger.error('Erro ao gerar relatório', { error: error?.message, stack: error?.stack })
+    logger.error('Erro ao gerar relatÃ³rio', { error: error?.message, stack: error?.stack })
     
-    // Se a resposta já foi enviada, não tente enviar novamente
+    // Se a resposta jÃ¡ foi enviada, nÃ£o tente enviar novamente
     if (!res.headersSent) {
       res.status(500).json({ 
-        message: 'Erro ao gerar relatório', 
+        message: 'Erro ao gerar relatÃ³rio', 
         error: error.message,
         stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
       })
@@ -293,12 +293,12 @@ export default async function handler(req, res) {
 }
 
 async function buscarDadosAnimais(campos, filtros = {}) {
-  // Se não houver campos especificados, usar campos padrão
+  // Se nÃ£o houver campos especificados, usar campos padrÃ£o
   if (!campos || campos.length === 0) {
     campos = ['serie', 'rg', 'raca', 'data_nascimento', 'situacao']
   }
 
-  // Validar campos permitidos (removido custo_aquisicao que não existe na tabela)
+  // Validar campos permitidos (removido custo_aquisicao que nÃ£o existe na tabela)
   const camposValidos = ['serie', 'rg', 'raca', 'data_nascimento', 'situacao', 'custo_total', 'valor_venda']
   const camposFiltrados = campos.filter(c => camposValidos.includes(c))
   
@@ -324,7 +324,7 @@ async function buscarDadosAnimais(campos, filtros = {}) {
 }
 
 async function buscarDadosReprodutivo(campos, filtros = {}) {
-  // Se não houver campos especificados, usar campos padrão
+  // Se nÃ£o houver campos especificados, usar campos padrÃ£o
   if (!campos || campos.length === 0) {
     campos = ['numero_te', 'data_te', 'receptora', 'doadora', 'touro', 'resultado', 'status']
   }

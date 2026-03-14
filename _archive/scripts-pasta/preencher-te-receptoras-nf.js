@@ -26,11 +26,11 @@ async function preencherTEReceptoras() {
     `)
 
     if (nfsResult.rows.length === 0) {
-      console.log('⚠️ Nenhuma NF de receptoras com data_te encontrada.')
+      console.log('�š�️ Nenhuma NF de receptoras com data_te encontrada.')
       return
     }
 
-    console.log(`📋 Encontradas ${nfsResult.rows.length} NFs de receptoras com data_te\n`)
+    console.log(`�Ÿ“‹ Encontradas ${nfsResult.rows.length} NFs de receptoras com data_te\n`)
 
     let teCriadas = 0
     let teJaExistiam = 0
@@ -40,7 +40,7 @@ async function preencherTEReceptoras() {
       const dataTEStr = nf.data_te ? new Date(nf.data_te).toISOString().split('T')[0] : null
       if (!dataTEStr) continue
 
-      console.log(`\n📄 NF ${nf.numero_nf} - Data TE: ${dataTEStr}`)
+      console.log(`\n�Ÿ“„ NF ${nf.numero_nf} - Data TE: ${dataTEStr}`)
 
       // 2. Buscar itens da NF (receptoras)
       const itensResult = await query(`
@@ -76,7 +76,7 @@ async function preencherTEReceptoras() {
               `, [numeroTE, animal.id, dataTEStr, nf.fornecedor || 'Não informado',
                   `NF de Entrada: ${nf.numero_nf} - Preenchido por script`])
               teCriadas++
-              console.log(`  ✅ TE criada para ${nomeReceptora}`)
+              console.log(`  �œ… TE criada para ${nomeReceptora}`)
             } else {
               teJaExistiam++
             }
@@ -107,7 +107,7 @@ async function preencherTEReceptoras() {
         `, [serieReceptora, rgReceptora, `${serieReceptora}${rgReceptora}`, tatuagem])
 
         if (animalRes.rows.length === 0) {
-          console.log(`  ⚠️ Animal não encontrado: ${tatuagem}`)
+          console.log(`  �š�️ Animal não encontrado: ${tatuagem}`)
           continue
         }
 
@@ -129,7 +129,7 @@ async function preencherTEReceptoras() {
           `, [numeroTE, animal.id, dataTEStr, nf.fornecedor || 'Não informado',
               `NF de Entrada: ${nf.numero_nf} - Preenchido por script`])
           teCriadas++
-          console.log(`  ✅ TE criada para ${nomeReceptora} (${tatuagem})`)
+          console.log(`  �œ… TE criada para ${nomeReceptora} (${tatuagem})`)
         } else {
           teJaExistiam++
         }
@@ -147,14 +147,14 @@ async function preencherTEReceptoras() {
     }
 
     console.log('\n=== RESUMO ===')
-    console.log(`✅ TEs criadas: ${teCriadas}`)
-    console.log(`ℹ️ TEs já existiam: ${teJaExistiam}`)
-    console.log(`📅 Animais com data_chegada atualizada: ${animaisAtualizados}`)
-    console.log('\n💡 Previsão de parto (9 meses após TE) é exibida apenas para receptoras Prenha no DG.')
-    console.log('   Receptoras com DG vazia NÃO recebem previsão de parto.\n')
+    console.log(`�œ… TEs criadas: ${teCriadas}`)
+    console.log(`�„�️ TEs já existiam: ${teJaExistiam}`)
+    console.log(`�Ÿ“… Animais com data_chegada atualizada: ${animaisAtualizados}`)
+    console.log('\n�Ÿ’� Previsão de parto (9 meses após TE) é exibida apenas para receptoras Prenha no DG.')
+    console.log('   Receptoras com DG vazia N�ƒO recebem previsão de parto.\n')
 
   } catch (err) {
-    console.error('❌ Erro:', err.message)
+    console.error('�Œ Erro:', err.message)
     throw err
   }
 }

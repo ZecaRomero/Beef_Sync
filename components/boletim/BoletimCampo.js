@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { ArrowDownTrayIcon, ArrowUpTrayIcon, PaperAirplaneIcon, Cog6ToothIcon } from '@heroicons/react/24/outline'
 
-const HEADERS = ['LOCAL', 'LOCAL 1', 'SUB_LOCAL_2', 'QUANT.', 'SEXO', 'CATEGORIA', 'RAÇA', 'ERA', 'OBSERVAÇÃO']
+const HEADERS = ['LOCAL', 'LOCAL 1', 'SUB_LOCAL_2', 'QUANT.', 'SEXO', 'CATEGORIA', 'RAÃâ€¡A', 'ERA', 'OBSERVAÃâ€¡ÃÆ’O']
 
 export default function BoletimCampo({ usuario, isAdelso }) {
   const [dados, setDados] = useState([])
@@ -113,7 +113,7 @@ export default function BoletimCampo({ usuario, isAdelso }) {
       carregarDados()
     } catch (e) {
       console.error(e)
-      alert('Erro ao registrar movimentação')
+      alert('Erro ao registrar movimentaÃ§Ã£o')
     }
   }
 
@@ -137,10 +137,10 @@ export default function BoletimCampo({ usuario, isAdelso }) {
       })
       const json = await res.json()
       if (json.success) {
-        alert(`Importação concluída: ${json.inseridos} registros`)
+        alert(`ImportaÃ§Ã£o concluÃ­da: ${json.inseridos} registros`)
         carregarDados()
       } else {
-        alert(json.error || json.details || 'Erro na importação')
+        alert(json.error || json.details || 'Erro na importaÃ§Ã£o')
       }
     } catch (err) {
       alert('Erro ao importar')
@@ -161,7 +161,7 @@ export default function BoletimCampo({ usuario, isAdelso }) {
   const salvarWhatsapp = async () => {
     const digits = (whatsappInput || '').replace(/\D/g, '')
     if (digits.length < 10) {
-      alert('Informe DDD + número (ex: 11999999999)')
+      alert('Informe DDD + nÃºmero (ex: 11999999999)')
       return
     }
     try {
@@ -279,7 +279,7 @@ export default function BoletimCampo({ usuario, isAdelso }) {
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Cadastrar WhatsApp</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-              Informe seu número uma única vez. Os relatórios serão enviados sempre para este WhatsApp.
+              Informe seu nÃºmero uma Ãºnica vez. Os relatÃ³rios serÃ£o enviados sempre para este WhatsApp.
             </p>
             <input
               type="tel"
@@ -385,15 +385,15 @@ export default function BoletimCampo({ usuario, isAdelso }) {
         </p>
       )}
 
-      {/* Modal Saída */}
+      {/* Modal SaÃ­da */}
       {modalMovimentacao?.tipo === 'saida' && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Saída de animais</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">SaÃ­da de animais</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {modalMovimentacao.registro.local} / {modalMovimentacao.registro.sub_local_2 || modalMovimentacao.registro.local_1 || '-'} — Quantidade: {modalMovimentacao.quantidade}
+              {modalMovimentacao.registro.local} / {modalMovimentacao.registro.sub_local_2 || modalMovimentacao.registro.local_1 || '-'} ââ‚¬â€� Quantidade: {modalMovimentacao.quantidade}
             </p>
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Para onde vão os animais?</p>
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Para onde vÃ£o os animais?</p>
             <div className="space-y-2">
               <button
                 onClick={() => confirmarMovimentacao(null, null, 'piquete')}
@@ -430,7 +430,7 @@ export default function BoletimCampo({ usuario, isAdelso }) {
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Entrada de animais</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {modalMovimentacao.registro.local} / {modalMovimentacao.registro.sub_local_2 || modalMovimentacao.registro.local_1 || '-'} — Quantidade: +{modalMovimentacao.quantidade}
+              {modalMovimentacao.registro.local} / {modalMovimentacao.registro.sub_local_2 || modalMovimentacao.registro.local_1 || '-'} ââ‚¬â€� Quantidade: +{modalMovimentacao.quantidade}
             </p>
             <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Qual a origem?</p>
             <div className="space-y-2">

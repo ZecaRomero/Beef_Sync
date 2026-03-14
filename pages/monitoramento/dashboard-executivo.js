@@ -102,13 +102,13 @@ export default function ExecutiveDashboard() {
       description: 'Despesas operacionais'
     },
     {
-      title: 'Lucro Líquido',
+      title: 'Lucro LÃ­quido',
       value: formatCurrency(businessData.profit),
       icon: TrendingUpIcon,
       color: 'bg-blue-500',
       trend: businessData.profit >= 0 ? 'up' : 'down',
       percentage: businessData.profit >= 0 ? 12.5 : -5.3,
-      description: 'Resultado da operação'
+      description: 'Resultado da operaÃ§Ã£o'
     },
     {
       title: 'ROI',
@@ -131,7 +131,7 @@ export default function ExecutiveDashboard() {
             Dashboard Executivo
           </h1>
           <p className="text-gray-600 dark:text-gray-300 mt-2">
-            Visão gerencial de KPIs e indicadores estratégicos
+            VisÃ£o gerencial de KPIs e indicadores estratÃ©gicos
           </p>
         </div>
       </div>
@@ -160,7 +160,7 @@ export default function ExecutiveDashboard() {
                 <span className={`text-sm font-medium ${
                   kpi.trend === 'up' ? 'text-green-600' : 'text-red-600'
                 }`}>
-                  {kpi.trend === 'up' ? '↑' : '↓'} {Math.abs(kpi.percentage)}%
+                  {kpi.trend === 'up' ? 'ââ€ â€˜' : 'ââ€ â€œ'} {Math.abs(kpi.percentage)}%
                 </span>
                 <span className="text-xs text-gray-500 dark:text-gray-400">
                   {kpi.description}
@@ -177,7 +177,7 @@ export default function ExecutiveDashboard() {
         <Card className="p-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
             <UserGroupIcon className="h-5 w-5" />
-            Visão do Rebanho
+            VisÃ£o do Rebanho
           </h2>
           
           <div className="space-y-4">
@@ -228,7 +228,7 @@ export default function ExecutiveDashboard() {
                 : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
             }`}>
               <span className={businessData.profit >= 0 ? 'text-green-900 dark:text-green-100' : 'text-red-900 dark:text-red-100'}>
-                Lucro Líquido
+                Lucro LÃ­quido
               </span>
               <span className={`font-bold ${businessData.profit >= 0 ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}>
                 {formatCurrency(businessData.profit)}
@@ -241,7 +241,7 @@ export default function ExecutiveDashboard() {
       {/* Strategic Indicators */}
       <Card className="p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          📊 Indicadores Estratégicos
+          ðÅ¸â€œÅ  Indicadores EstratÃ©gicos
         </h2>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -280,34 +280,34 @@ export default function ExecutiveDashboard() {
       {/* Recommendations */}
       <Card className="p-6 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          🎯 Recomendações Executivas
+          ðÅ¸Å½¯ RecomendaÃ§Ãµes Executivas
         </h2>
         
         <ul className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
           {businessData.roi < 10 && (
             <li className="flex items-start gap-2">
               <span className="text-orange-600 dark:text-orange-400 font-bold mt-1">!</span>
-              <span><strong>Otimizar ROI:</strong> Considere revisar estratégias de custo para melhorar o retorno sobre investimento</span>
+              <span><strong>Otimizar ROI:</strong> Considere revisar estratÃ©gias de custo para melhorar o retorno sobre investimento</span>
             </li>
           )}
           
           {businessData.profit < 0 && (
             <li className="flex items-start gap-2">
               <span className="text-red-600 dark:text-red-400 font-bold mt-1">!</span>
-              <span><strong>Análise de Viabilidade:</strong> Lucratividade negativa requer revisão urgente de custos e preços</span>
+              <span><strong>AnÃ¡lise de Viabilidade:</strong> Lucratividade negativa requer revisÃ£o urgente de custos e preÃ§os</span>
             </li>
           )}
           
           {businessData.rebanhoSize > 500 && (
             <li className="flex items-start gap-2">
-              <span className="text-blue-600 dark:text-blue-400 font-bold mt-1">✓</span>
+              <span className="text-blue-600 dark:text-blue-400 font-bold mt-1">âÅ“â€œ</span>
               <span><strong>Escala Atingida:</strong> Com {businessData.rebanhoSize} animais, aproveite economias de escala</span>
             </li>
           )}
           
           <li className="flex items-start gap-2">
-            <span className="text-green-600 dark:text-green-400 font-bold mt-1">✓</span>
-            <span><strong>Monitoramento Contínuo:</strong> Acompanhe KPIs mensalmente para identificar tendências cedo</span>
+            <span className="text-green-600 dark:text-green-400 font-bold mt-1">âÅ“â€œ</span>
+            <span><strong>Monitoramento ContÃ­nuo:</strong> Acompanhe KPIs mensalmente para identificar tendÃªncias cedo</span>
           </li>
         </ul>
       </Card>

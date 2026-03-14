@@ -4,8 +4,8 @@ import { CurrencyDollarIcon, ChevronDownIcon, ChevronUpIcon, PencilIcon, TrashIc
 import { formatDate, formatCurrency } from '../../utils/formatters'
 
 const TIPOS_CUSTO = [
-  'Protocolo Sanitário', 'DNA', 'Medicamento', 'Vacina',
-  'Veterinário', 'Manejo', 'Pesagens', 'Transporte', 'ABCZ', 'Exame', 'Outros'
+  'Protocolo SanitÃ¡rio', 'DNA', 'Medicamento', 'Vacina',
+  'VeterinÃ¡rio', 'Manejo', 'Pesagens', 'Transporte', 'ABCZ', 'Exame', 'Outros'
 ]
 
 export default function AnimalCosts({ animal, onCustosUpdated }) {
@@ -28,7 +28,7 @@ export default function AnimalCosts({ animal, onCustosUpdated }) {
         }
       } catch (_) {}
 
-      // Permite edição se for localhost ou se o usuário identificado for "Zeca Desenvolvedor"
+      // Permite ediÃ§Ã£o se for localhost ou se o usuÃ¡rio identificado for "Zeca Desenvolvedor"
       if (isLocal || (userName && userName.toLowerCase() === 'zeca desenvolvedor')) {
         setCanEdit(true)
       }
@@ -36,7 +36,7 @@ export default function AnimalCosts({ animal, onCustosUpdated }) {
   }, [])
 
   const custosArray = animal?.custos || []
-  const [margin, setMargin] = useState(30) // Margem de lucro padrão 30%
+  const [margin, setMargin] = useState(30) // Margem de lucro padrÃ£o 30%
 
   const custoTotal = custosArray.reduce((acc, curr) => acc + (Number(curr.valor) || 0), 0)
   const temCustos = custosArray.length > 0 && custoTotal > 0
@@ -66,7 +66,7 @@ export default function AnimalCosts({ animal, onCustosUpdated }) {
     if (!canEdit) return
     if (!editingCusto || !animal?.id) return
     if (!editingCusto.tipo || !editingCusto.valor) {
-      alert('Tipo e valor são obrigatórios')
+      alert('Tipo e valor sÃ£o obrigatÃ³rios')
       return
     }
     try {
@@ -85,13 +85,13 @@ export default function AnimalCosts({ animal, onCustosUpdated }) {
       const data = await res.json()
       if (!data.success) throw new Error(data.message || 'Erro ao atualizar')
       const msg = data.data?.aplicadosTodos
-        ? `✅ Atualizado! Aplicado a ${data.data.aplicadosTodos.atualizados} lançamento(s) em ${data.data.aplicadosTodos.animais} animal(is).`
-        : '✅ Custo atualizado!'
+        ? `âÅ“â€¦ Atualizado! Aplicado a ${data.data.aplicadosTodos.atualizados} lanÃ§amento(s) em ${data.data.aplicadosTodos.animais} animal(is).`
+        : 'âÅ“â€¦ Custo atualizado!'
       alert(msg)
       setEditingCusto(null)
       onCustosUpdated?.()
     } catch (e) {
-      alert('❌ Erro: ' + (e.message || e))
+      alert('â�Å’ Erro: ' + (e.message || e))
     }
   }
 
@@ -105,7 +105,7 @@ export default function AnimalCosts({ animal, onCustosUpdated }) {
       setEditingCusto(null)
       onCustosUpdated?.()
     } catch (e) {
-      alert('❌ Erro: ' + (e.message || e))
+      alert('â�Å’ Erro: ' + (e.message || e))
     }
   }
 
@@ -125,7 +125,7 @@ export default function AnimalCosts({ animal, onCustosUpdated }) {
         </div>
         <p className="text-xl font-bold text-green-600 dark:text-green-400 mt-1">{formatCurrency(custoTotal)}</p>
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-          {temCustos ? `${custosArray.length} lançamento(s)` : 'Nenhum custo registrado'}
+          {temCustos ? `${custosArray.length} lanÃ§amento(s)` : 'Nenhum custo registrado'}
         </p>
         {!temCustos && canEdit && (
           <Link
@@ -133,7 +133,7 @@ export default function AnimalCosts({ animal, onCustosUpdated }) {
             onClick={(e) => e.stopPropagation()}
             className="inline-block mt-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
           >
-            Registrar custos ou aplicar automáticos →
+            Registrar custos ou aplicar automÃ¡ticos ââ€ â€™
           </Link>
         )}
       </button>
@@ -143,7 +143,7 @@ export default function AnimalCosts({ animal, onCustosUpdated }) {
             <p className="text-sm mb-2">Nenhum custo registrado para este animal.</p>
             {canEdit && (
               <Link href="/custos" className="text-blue-600 dark:text-blue-400 font-medium hover:underline">
-                Ir para Custos por Animal →
+                Ir para Custos por Animal ââ€ â€™
               </Link>
             )}
           </div>
@@ -152,7 +152,7 @@ export default function AnimalCosts({ animal, onCustosUpdated }) {
         <>
         <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
           <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">
-            {custosArray.length} lançamento{custosArray.length !== 1 ? 's' : ''}
+            {custosArray.length} lanÃ§amento{custosArray.length !== 1 ? 's' : ''}
           </span>
           {canEdit && (
             <Link
@@ -215,9 +215,9 @@ export default function AnimalCosts({ animal, onCustosUpdated }) {
           ))}
         </div>
 
-        {/* Simulação de Lucro */}
+        {/* SimulaÃ§Ã£o de Lucro */}
         <div className="bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-700 p-4">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Simulação de Venda e Lucro</h3>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">SimulaÃ§Ã£o de Venda e Lucro</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Margem de Lucro Desejada (%)</label>
@@ -238,7 +238,7 @@ export default function AnimalCosts({ animal, onCustosUpdated }) {
                 <span className="font-medium text-green-600 dark:text-green-400">+{formatCurrency(lucroProjetado)}</span>
               </div>
               <div className="flex justify-between text-base font-bold pt-2 border-t border-gray-200 dark:border-gray-700">
-                <span className="text-gray-900 dark:text-white">Preço de Venda:</span>
+                <span className="text-gray-900 dark:text-white">PreÃ§o de Venda:</span>
                 <span className="text-blue-600 dark:text-blue-400">{formatCurrency(precoVendaSugerido)}</span>
               </div>
             </div>
@@ -295,7 +295,7 @@ export default function AnimalCosts({ animal, onCustosUpdated }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Observações</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ObservaÃ§Ãµes</label>
                 <textarea
                   value={editingCusto.observacoes}
                   onChange={e => setEditingCusto({ ...editingCusto, observacoes: e.target.value })}
@@ -311,7 +311,7 @@ export default function AnimalCosts({ animal, onCustosUpdated }) {
                   className="rounded"
                 />
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  Aplicar esta alteração a todos os animais com este mesmo custo (tipo + subtipo)
+                  Aplicar esta alteraÃ§Ã£o a todos os animais com este mesmo custo (tipo + subtipo)
                 </span>
               </label>
             </div>

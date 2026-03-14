@@ -35,21 +35,21 @@ export default function BackupSystem() {
   
   const toast = useToast()
 
-  // Memoização dos tipos de backup
+  // MemoizaÃ§Ã£o dos tipos de backup
   const backupTypes = useMemo(() => [
-    { value: 'completo', label: 'Backup Completo', description: 'Todos os dados do sistema', icon: '🗄️' },
-    { value: 'animais', label: 'Animais', description: 'Dados de animais e custos', icon: '🐄' },
-    { value: 'reprodutivo', label: 'Reprodutivo', description: 'TE, gestações, nascimentos', icon: '🐄' },
-    { value: 'comercial', label: 'Comercial', description: 'Notas fiscais e serviços', icon: '🏢' },
-    { value: 'financeiro', label: 'Financeiro', description: 'Custos e valores', icon: '💰' }
+    { value: 'completo', label: 'Backup Completo', description: 'Todos os dados do sistema', icon: 'ðÅ¸â€”â€žï¸�' },
+    { value: 'animais', label: 'Animais', description: 'Dados de animais e custos', icon: 'ðÅ¸�â€ž' },
+    { value: 'reprodutivo', label: 'Reprodutivo', description: 'TE, gestaÃ§Ãµes, nascimentos', icon: 'ðÅ¸�â€ž' },
+    { value: 'comercial', label: 'Comercial', description: 'Notas fiscais e serviÃ§os', icon: 'ðÅ¸�¢' },
+    { value: 'financeiro', label: 'Financeiro', description: 'Custos e valores', icon: 'ðÅ¸â€™°' }
   ], [])
 
   const formats = useMemo(() => [
-    { value: 'json', label: 'JSON', description: 'Formato JSON para importação' },
-    { value: 'sql', label: 'SQL', description: 'Script SQL para restauração' }
+    { value: 'json', label: 'JSON', description: 'Formato JSON para importaÃ§Ã£o' },
+    { value: 'sql', label: 'SQL', description: 'Script SQL para restauraÃ§Ã£o' }
   ], [])
 
-  // Função auxiliar para gerar SQL (não é hook, mas precisa estar antes dos callbacks)
+  // FunÃ§Ã£o auxiliar para gerar SQL (nÃ£o Ã© hook, mas precisa estar antes dos callbacks)
   const generateSQLFromBackup = (backup) => {
     let sql = '-- Backup do Sistema Beef-Sync\n'
     sql += `-- Gerado em: ${new Date().toISOString()}\n`
@@ -85,9 +85,9 @@ export default function BackupSystem() {
 
   const loadBackupHistory = useCallback(async () => {
     try {
-      logger.debug('Carregando histórico de backups')
+      logger.debug('Carregando histÃ³rico de backups')
       
-      // Simular histórico de backups (em produção, viria de uma API)
+      // Simular histÃ³rico de backups (em produÃ§Ã£o, viria de uma API)
       const history = [
         {
           id: 1,
@@ -108,7 +108,7 @@ export default function BackupSystem() {
       ]
       setBackupHistory(history)
     } catch (error) {
-      logger.error('Erro ao carregar histórico:', error)
+      logger.error('Erro ao carregar histÃ³rico:', error)
     }
   }, [])
 
@@ -140,15 +140,15 @@ export default function BackupSystem() {
         try {
           backup = text ? JSON.parse(text) : null
         } catch (parseError) {
-          logger.error('Resposta do backup inválida', { text: text?.substring(0, 200) })
-          throw new Error('Resposta do servidor inválida. O backup pode ter expirado por tempo limite.')
+          logger.error('Resposta do backup invÃ¡lida', { text: text?.substring(0, 200) })
+          throw new Error('Resposta do servidor invÃ¡lida. O backup pode ter expirado por tempo limite.')
         }
         if (!backup) {
           throw new Error('Resposta vazia do servidor. Tente um backup parcial (ex: apenas Animais).')
         }
         setLastBackup(backup)
         
-        // FAZER DOWNLOAD AUTOMÁTICO DO ARQUIVO
+        // FAZER DOWNLOAD AUTOMÃ�TICO DO ARQUIVO
         const timestamp = new Date().toISOString().split('T')[0]
         const fileName = `backup_${selectedType}_${timestamp}.${selectedFormat}`
         
@@ -175,12 +175,12 @@ export default function BackupSystem() {
         
         toast.success(
           saveFile 
-            ? `✅ Backup criado! Arquivo baixado e salvo no servidor` 
-            : `✅ Backup criado e baixado! Escolha onde salvar`
+            ? `âÅ“â€¦ Backup criado! Arquivo baixado e salvo no servidor` 
+            : `âÅ“â€¦ Backup criado e baixado! Escolha onde salvar`
         )
         logger.info('Backup criado e baixado', { backup, fileName })
         
-        // Atualizar histórico
+        // Atualizar histÃ³rico
         await loadBackupHistory()
       } else {
         let errorMsg = 'Erro ao criar backup'
@@ -277,16 +277,16 @@ export default function BackupSystem() {
         if (file.name.endsWith('.json')) {
           backupData = JSON.parse(content)
         } else if (file.name.endsWith('.sql')) {
-          // Para SQL, apenas mostrar preview básico
+          // Para SQL, apenas mostrar preview bÃ¡sico
           backupData = { tipo: 'sql', content: content.substring(0, 500) }
         } else {
-          throw new Error('Formato de arquivo não suportado')
+          throw new Error('Formato de arquivo nÃ£o suportado')
         }
 
         // Validar estrutura do backup
         if (file.name.endsWith('.json')) {
           if (!backupData.metadata || !backupData.data) {
-            throw new Error('Arquivo de backup inválido')
+            throw new Error('Arquivo de backup invÃ¡lido')
           }
           setRestorePreview({
             tipo: backupData.metadata.tipo,
@@ -320,7 +320,7 @@ export default function BackupSystem() {
       setRestoreLoading(true)
       logger.info('Restaurando backup', { fileName: restoreFile.name })
 
-      // Ler conteúdo do arquivo
+      // Ler conteÃºdo do arquivo
       const reader = new FileReader()
       reader.onload = async (e) => {
         try {
@@ -340,7 +340,7 @@ export default function BackupSystem() {
 
           if (response.ok) {
             const result = await response.json()
-            toast.success(`✅ Backup restaurado com sucesso! ${result.data?.registrosRestaurados || 0} registros restaurados.`)
+            toast.success(`âÅ“â€¦ Backup restaurado com sucesso! ${result.data?.registrosRestaurados || 0} registros restaurados.`)
             logger.info('Backup restaurado', result)
             
             // Limpar estado
@@ -348,7 +348,7 @@ export default function BackupSystem() {
             setRestorePreview(null)
             setShowRestoreConfirm(false)
             
-            // Recarregar histórico
+            // Recarregar histÃ³rico
             await loadBackupHistory()
           } else {
             const error = await response.json()
@@ -380,7 +380,7 @@ export default function BackupSystem() {
     loadBackupHistory()
   }, [loadBackupHistory])
 
-  // ========== DEPOIS DE TODOS OS HOOKS, VERIFICAR PERMISSÕES ==========
+  // ========== DEPOIS DE TODOS OS HOOKS, VERIFICAR PERMISSÃâ€¢ES ==========
   if (!permissions.canBackup) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-900/20 dark:to-indigo-900/20 flex items-center justify-center p-6">
@@ -390,10 +390,10 @@ export default function BackupSystem() {
               <LockClosedIcon className="h-12 w-12 text-red-600 dark:text-red-400" />
             </div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              🔒 Acesso Restrito
+              ðÅ¸â€�â€™ Acesso Restrito
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Esta funcionalidade está disponível apenas para acesso local (desenvolvedor)
+              Esta funcionalidade estÃ¡ disponÃ­vel apenas para acesso local (desenvolvedor)
             </p>
           </div>
           
@@ -402,11 +402,11 @@ export default function BackupSystem() {
               <ExclamationTriangleIcon className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mt-0.5" />
               <div className="text-sm text-left">
                 <p className="font-semibold text-yellow-800 dark:text-yellow-200 mb-1">
-                  Permissões do Usuário
+                  PermissÃµes do UsuÃ¡rio
                 </p>
                 <p className="text-yellow-700 dark:text-yellow-300">
-                  Você está acessando via <strong>rede</strong> ({permissions.userName}). 
-                  Usuários da rede podem <strong>incluir e alterar</strong> dados, mas não podem fazer backup, restaurar ou excluir informações.
+                  VocÃª estÃ¡ acessando via <strong>rede</strong> ({permissions.userName}). 
+                  UsuÃ¡rios da rede podem <strong>incluir e alterar</strong> dados, mas nÃ£o podem fazer backup, restaurar ou excluir informaÃ§Ãµes.
                 </p>
               </div>
             </div>
@@ -414,8 +414,8 @@ export default function BackupSystem() {
           
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
             <p className="text-sm text-blue-800 dark:text-blue-200">
-              💡 <strong>Para acessar esta funcionalidade:</strong><br />
-              Use <code className="bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded">http://localhost:3020</code> ao invés do IP da rede.
+              ðÅ¸â€™¡ <strong>Para acessar esta funcionalidade:</strong><br />
+              Use <code className="bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded">http://localhost:3020</code> ao invÃ©s do IP da rede.
             </p>
           </div>
         </div>
@@ -502,18 +502,18 @@ export default function BackupSystem() {
               </div>
             </div>
 
-            {/* Info Download Automático */}
+            {/* Info Download AutomÃ¡tico */}
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
               <div className="flex items-start gap-3">
                 <InformationCircleIcon className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                 <div className="text-sm text-blue-900 dark:text-blue-200">
-                  <div className="font-semibold mb-1">📥 Download Automático</div>
-                  <div>O arquivo será <strong>baixado automaticamente</strong> e você poderá escolher onde salvá-lo no seu computador.</div>
+                  <div className="font-semibold mb-1">ðÅ¸â€œ¥ Download AutomÃ¡tico</div>
+                  <div>O arquivo serÃ¡ <strong>baixado automaticamente</strong> e vocÃª poderÃ¡ escolher onde salvÃ¡-lo no seu computador.</div>
                 </div>
               </div>
             </div>
 
-            {/* Opções Adicionais */}
+            {/* OpÃ§Ãµes Adicionais */}
             <div className="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
@@ -524,16 +524,16 @@ export default function BackupSystem() {
                 />
                 <div className="flex-1">
                   <div className="text-sm font-medium text-gray-900 dark:text-white">
-                    💾 Salvar cópia no servidor também
+                    ðÅ¸â€™¾ Salvar cÃ³pia no servidor tambÃ©m
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Além do download, manter uma cópia de segurança na pasta backups/ do servidor
+                    AlÃ©m do download, manter uma cÃ³pia de seguranÃ§a na pasta backups/ do servidor
                   </div>
                 </div>
               </label>
             </div>
 
-            {/* Botão Criar */}
+            {/* BotÃ£o Criar */}
             <Button
               onClick={createBackup}
               disabled={loading}
@@ -566,8 +566,8 @@ export default function BackupSystem() {
               <div className="flex items-start gap-3">
                 <ExclamationTriangleIcon className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
                 <div className="text-sm text-red-900 dark:text-red-200">
-                  <div className="font-semibold mb-1">⚠️ Atenção</div>
-                  <div>A restauração irá <strong>substituir</strong> os dados existentes no banco. Faça um backup antes de restaurar!</div>
+                  <div className="font-semibold mb-1">âÅ¡ ï¸� AtenÃ§Ã£o</div>
+                  <div>A restauraÃ§Ã£o irÃ¡ <strong>substituir</strong> os dados existentes no banco. FaÃ§a um backup antes de restaurar!</div>
                 </div>
               </div>
             </div>
@@ -599,7 +599,7 @@ export default function BackupSystem() {
             {restorePreview && (
               <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                 <div className="text-sm text-blue-900 dark:text-blue-200">
-                  <div className="font-semibold mb-2">📋 Preview do Backup</div>
+                  <div className="font-semibold mb-2">ðÅ¸â€œâ€¹ Preview do Backup</div>
                   {restorePreview.tipo !== 'sql' ? (
                     <div className="space-y-1">
                       <p><strong>Tipo:</strong> {getTypeInfo(restorePreview.tipo).label}</p>
@@ -607,7 +607,7 @@ export default function BackupSystem() {
                       <p><strong>Registros:</strong> {restorePreview.totalRegistros}</p>
                       <p><strong>Tabelas:</strong> {restorePreview.tabelas?.length || 0}</p>
                       {restorePreview.versao && (
-                        <p><strong>Versão:</strong> {restorePreview.versao}</p>
+                        <p><strong>VersÃ£o:</strong> {restorePreview.versao}</p>
                       )}
                     </div>
                   ) : (
@@ -623,7 +623,7 @@ export default function BackupSystem() {
               </div>
             )}
 
-            {/* Botão Restaurar */}
+            {/* BotÃ£o Restaurar */}
             <Button
               onClick={() => setShowRestoreConfirm(true)}
               disabled={!restoreFile || restoreLoading}
@@ -644,10 +644,10 @@ export default function BackupSystem() {
           </div>
         </div>
 
-        {/* Histórico de Backups */}
+        {/* HistÃ³rico de Backups */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Histórico de Backups
+            HistÃ³rico de Backups
           </h2>
 
           <div className="space-y-3">
@@ -671,7 +671,7 @@ export default function BackupSystem() {
                           </span>
                         </div>
                         <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {formatDate(backup.dataCriacao)} • {backup.totalRegistros} registros • {formatBytes(backup.tamanho)}
+                          {formatDate(backup.dataCriacao)} ââ‚¬¢ {backup.totalRegistros} registros ââ‚¬¢ {formatBytes(backup.tamanho)}
                         </div>
                       </div>
                     </div>
@@ -692,7 +692,7 @@ export default function BackupSystem() {
         </div>
       </div>
 
-      {/* Modal de Confirmação */}
+      {/* Modal de ConfirmaÃ§Ã£o */}
       {showRestoreConfirm && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
@@ -700,11 +700,11 @@ export default function BackupSystem() {
               <div className="flex items-center space-x-3 mb-2">
                 <ExclamationTriangleIcon className="h-8 w-8 text-red-600 dark:text-red-400" />
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                  Confirmar Restauração
+                  Confirmar RestauraÃ§Ã£o
                 </h3>
               </div>
               <p className="text-gray-600 dark:text-gray-400">
-                Esta ação irá <strong>substituir</strong> todos os dados existentes no banco de dados pelos dados do backup selecionado.
+                Esta aÃ§Ã£o irÃ¡ <strong>substituir</strong> todos os dados existentes no banco de dados pelos dados do backup selecionado.
               </p>
             </div>
 
@@ -733,14 +733,14 @@ export default function BackupSystem() {
                 disabled={restoreLoading}
                 className="flex-1 bg-red-600 hover:bg-red-700 text-white"
               >
-                {restoreLoading ? 'Restaurando...' : 'Confirmar Restauração'}
+                {restoreLoading ? 'Restaurando...' : 'Confirmar RestauraÃ§Ã£o'}
               </Button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Último Backup */}
+      {/* ÃÅ¡ltimo Backup */}
       {lastBackup && (
         <div className="mt-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
           <div className="flex items-center space-x-2 mb-2">
@@ -761,21 +761,21 @@ export default function BackupSystem() {
         </div>
       )}
 
-      {/* Informações do Sistema */}
+      {/* InformaÃ§Ãµes do Sistema */}
       <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
         <div className="flex items-center space-x-2 mb-2">
           <InformationCircleIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           <h3 className="font-medium text-blue-800 dark:text-blue-200">
-            Informações do Sistema
+            InformaÃ§Ãµes do Sistema
           </h3>
         </div>
         <div className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
-          <p>• <strong>Banco de Dados:</strong> PostgreSQL</p>
-          <p>• <strong>Backup Completo:</strong> Inclui todas as tabelas do sistema</p>
-          <p>• <strong>Backup Parcial:</strong> Seleciona dados específicos por categoria</p>
-          <p>• <strong>Formato JSON:</strong> Para importação e análise de dados</p>
-          <p>• <strong>Formato SQL:</strong> Para restauração direta no banco</p>
-          <p>• <strong>Recomendação:</strong> Faça backup completo semanalmente</p>
+          <p>ââ‚¬¢ <strong>Banco de Dados:</strong> PostgreSQL</p>
+          <p>ââ‚¬¢ <strong>Backup Completo:</strong> Inclui todas as tabelas do sistema</p>
+          <p>ââ‚¬¢ <strong>Backup Parcial:</strong> Seleciona dados especÃ­ficos por categoria</p>
+          <p>ââ‚¬¢ <strong>Formato JSON:</strong> Para importaÃ§Ã£o e anÃ¡lise de dados</p>
+          <p>ââ‚¬¢ <strong>Formato SQL:</strong> Para restauraÃ§Ã£o direta no banco</p>
+          <p>ââ‚¬¢ <strong>RecomendaÃ§Ã£o:</strong> FaÃ§a backup completo semanalmente</p>
         </div>
       </div>
     </div>

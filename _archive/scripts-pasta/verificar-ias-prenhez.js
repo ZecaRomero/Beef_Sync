@@ -8,7 +8,7 @@ require('dotenv').config({ path: '.env.local' })
 const { query } = require('../lib/database')
 
 async function verificar() {
-  console.log('🔍 Verificando IAs e prenhez...\n')
+  console.log('�Ÿ”� Verificando IAs e prenhez...\n')
 
   try {
     const cols = await query(`
@@ -95,27 +95,27 @@ async function verificar() {
 
     // Listar todos os animais com 2+ IAs para revisão
     const multiIA = [...porAnimal.entries()].filter(([, ias]) => ias.length >= 2)
-    console.log(`   📊 Animais com 2+ IAs: ${multiIA.length}\n`)
+    console.log(`   �Ÿ“Š Animais com 2+ IAs: ${multiIA.length}\n`)
 
     if (suspeitos.length === 0) {
-      console.log('   ✅ Nenhum animal com "última IA vazia" e "IA prenha mais antiga" encontrado.')
-      console.log('   (Sistema prioriza IA prenha → touro correto exibido.)\n')
+      console.log('   �œ… Nenhum animal com "última IA vazia" e "IA prenha mais antiga" encontrado.')
+      console.log('   (Sistema prioriza IA prenha �†’ touro correto exibido.)\n')
     } else {
-      console.log(`   ⚠️ ${suspeitos.length} animal(is) com última IA vazia e IA prenha mais antiga:\n`)
-      console.log('   (Última IA = vazia, mas existe IA prenha mais antiga → sistema mostra touro da IA prenha)\n')
+      console.log(`   �š�️ ${suspeitos.length} animal(is) com última IA vazia e IA prenha mais antiga:\n`)
+      console.log('   (�šltima IA = vazia, mas existe IA prenha mais antiga �†’ sistema mostra touro da IA prenha)\n')
       suspeitos.forEach((s, i) => {
         console.log(`   ${i + 1}. ${s.nome} (ID ${s.animalId})`)
-        console.log(`      Última IA: ${s.ultimaIA.data} | ${s.ultimaIA.touro || '-'} | ${s.ultimaIA.status || '-'}`)
+        console.log(`      �šltima IA: ${s.ultimaIA.data} | ${s.ultimaIA.touro || '-'} | ${s.ultimaIA.status || '-'}`)
         if (s.iaPrenha) {
           console.log(`      IA Prenha: ${s.iaPrenha.data} | ${s.iaPrenha.touro || '-'} | ${s.iaPrenha.status || '-'}`)
         }
         console.log('')
       })
-      console.log('   💡 Para corrigir dados no banco: node scripts/corrigir-ias-prenhez.js')
+      console.log('   �Ÿ’� Para corrigir dados no banco: node scripts/corrigir-ias-prenhez.js')
     }
-    console.log('\n   📋 Lógica: 1) IA prenha, 2) IA não-vazia, 3) última IA cronológica')
+    console.log('\n   �Ÿ“‹ Lógica: 1) IA prenha, 2) IA não-vazia, 3) última IA cronológica')
   } catch (err) {
-    console.error('❌ Erro:', err.message)
+    console.error('�Œ Erro:', err.message)
     process.exit(1)
   }
   process.exit(0)

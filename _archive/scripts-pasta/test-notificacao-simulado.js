@@ -14,7 +14,7 @@ async function testarEnvioDireto() {
   const pool = new Pool(dbConfig)
   
   try {
-    console.log('🧪 TESTE DIRETO DE ENVIO DE NOTIFICAÇÃO\n')
+    console.log('�Ÿ�� TESTE DIRETO DE ENVIO DE NOTIFICA�‡�ƒO\n')
     
     // Buscar o último abastecimento
     const abastecimento = await pool.query(`
@@ -30,7 +30,7 @@ async function testarEnvioDireto() {
     `)
     
     if (abastecimento.rows.length === 0) {
-      console.log('❌ Nenhum abastecimento encontrado!')
+      console.log('�Œ Nenhum abastecimento encontrado!')
       await pool.end()
       return
     }
@@ -45,12 +45,12 @@ async function testarEnvioDireto() {
     `)
     
     if (contatos.rows.length === 0) {
-      console.log('❌ Nenhum contato WhatsApp cadastrado!')
+      console.log('�Œ Nenhum contato WhatsApp cadastrado!')
       await pool.end()
       return
     }
     
-    console.log('📊 Dados do teste:')
+    console.log('�Ÿ“Š Dados do teste:')
     console.log(`   Abastecimento ID: ${abast.id}`)
     console.log(`   Data último abastecimento: ${abast.data_abastecimento}`)
     console.log(`   Quantidade: ${abast.quantidade_litros}L`)
@@ -65,22 +65,22 @@ async function testarEnvioDireto() {
     const diasRestantes = Math.ceil((proximo - hoje) / (1000 * 60 * 60 * 24))
     
     console.log(`   Dias restantes: ${diasRestantes}`)
-    console.log(`\n📱 Contatos que receberão: ${contatos.rows.length}`)
+    console.log(`\n�Ÿ“� Contatos que receberão: ${contatos.rows.length}`)
     contatos.rows.forEach(c => {
       console.log(`   - ${c.nome}: ${c.whatsapp}`)
     })
     
     // Criar mensagem de teste
-    const mensagem = `🔔 *TESTE - LEMBRETE DE ABASTECIMENTO DE NITROGÊNIO*
+    const mensagem = `�Ÿ”” *TESTE - LEMBRETE DE ABASTECIMENTO DE NITROG�ŠNIO*
 
-⚠️ Faltam apenas *${diasRestantes} dias* para o próximo abastecimento!
+�š�️ Faltam apenas *${diasRestantes} dias* para o próximo abastecimento!
 
-📅 *Último abastecimento:*
-• Data: ${new Date(abast.data_abastecimento).toLocaleDateString('pt-BR')}
-• Quantidade: ${abast.quantidade_litros}L
-• Motorista: ${abast.motorista}
+�Ÿ“… *�šltimo abastecimento:*
+�€� Data: ${new Date(abast.data_abastecimento).toLocaleDateString('pt-BR')}
+�€� Quantidade: ${abast.quantidade_litros}L
+�€� Motorista: ${abast.motorista}
 
-📅 *Próximo abastecimento:*
+�Ÿ“… *Próximo abastecimento:*
 ${new Date(abast.proximo_abastecimento).toLocaleDateString('pt-BR', { 
   weekday: 'long', 
   year: 'numeric', 
@@ -92,7 +92,7 @@ Por favor, programe o abastecimento para evitar falta de nitrogênio.
 
 _Sistema Beef-Sync - TESTE_`
     
-    console.log('\n🚀 Enviando mensagens...\n')
+    console.log('\n�Ÿš€ Enviando mensagens...\n')
     
     const resultados = {
       sucessos: [],
@@ -101,7 +101,7 @@ _Sistema Beef-Sync - TESTE_`
     
     for (const contato of contatos.rows) {
       try {
-        console.log(`📤 Enviando para ${contato.nome} (${contato.whatsapp})...`)
+        console.log(`�Ÿ“� Enviando para ${contato.nome} (${contato.whatsapp})...`)
         
         await sendWhatsApp(
           { name: contato.nome, whatsapp: contato.whatsapp },
@@ -113,7 +113,7 @@ _Sistema Beef-Sync - TESTE_`
           whatsapp: contato.whatsapp
         })
         
-        console.log(`   ✅ Enviado com sucesso!`)
+        console.log(`   �œ… Enviado com sucesso!`)
       } catch (error) {
         resultados.erros.push({
           contato: contato.nome,
@@ -121,32 +121,32 @@ _Sistema Beef-Sync - TESTE_`
           erro: error.message
         })
         
-        console.log(`   ❌ Erro: ${error.message}`)
+        console.log(`   �Œ Erro: ${error.message}`)
       }
     }
     
-    console.log('\n📊 RESUMO DO TESTE:')
-    console.log(`   ✅ Sucessos: ${resultados.sucessos.length}`)
-    console.log(`   ❌ Erros: ${resultados.erros.length}`)
+    console.log('\n�Ÿ“Š RESUMO DO TESTE:')
+    console.log(`   �œ… Sucessos: ${resultados.sucessos.length}`)
+    console.log(`   �Œ Erros: ${resultados.erros.length}`)
     
     if (resultados.sucessos.length > 0) {
-      console.log('\n   ✅ Mensagens enviadas com sucesso para:')
+      console.log('\n   �œ… Mensagens enviadas com sucesso para:')
       resultados.sucessos.forEach(s => {
         console.log(`      - ${s.contato} (${s.whatsapp})`)
       })
     }
     
     if (resultados.erros.length > 0) {
-      console.log('\n   ❌ Erros:')
+      console.log('\n   �Œ Erros:')
       resultados.erros.forEach(e => {
         console.log(`      - ${e.contato}: ${e.erro}`)
       })
     }
     
     await pool.end()
-    console.log('\n✅ Teste concluído!')
+    console.log('\n�œ… Teste concluído!')
   } catch (error) {
-    console.error('❌ Erro:', error.message)
+    console.error('�Œ Erro:', error.message)
     console.error(error.stack)
     await pool.end()
     process.exit(1)

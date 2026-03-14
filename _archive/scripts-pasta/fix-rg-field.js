@@ -13,7 +13,7 @@ async function fixRgField() {
   const client = await pool.connect();
   
   try {
-    console.log('🔧 Iniciando correção do campo RG...');
+    console.log('�Ÿ”� Iniciando correção do campo RG...');
     
     // Verificar estrutura atual
     const checkResult = await client.query(`
@@ -28,21 +28,21 @@ async function fixRgField() {
     `);
     
     if (checkResult.rows.length === 0) {
-      console.log('❌ Tabela animais não encontrada!');
+      console.log('�Œ Tabela animais não encontrada!');
       return;
     }
     
     const currentField = checkResult.rows[0];
-    console.log('📊 Campo RG atual:', currentField);
+    console.log('�Ÿ“Š Campo RG atual:', currentField);
     
     // Se já está correto, não precisa alterar
     if (currentField.data_type === 'character varying' && currentField.character_maximum_length >= 20) {
-      console.log('✅ Campo RG já está correto!');
+      console.log('�œ… Campo RG já está correto!');
       return;
     }
     
     // Alterar o campo RG
-    console.log('🔨 Alterando campo RG para VARCHAR(20)...');
+    console.log('�Ÿ”� Alterando campo RG para VARCHAR(20)...');
     await client.query(`
       ALTER TABLE animais ALTER COLUMN rg TYPE VARCHAR(20)
     `);
@@ -60,30 +60,30 @@ async function fixRgField() {
     `);
     
     const updatedField = verifyResult.rows[0];
-    console.log('✅ Campo RG atualizado:', updatedField);
+    console.log('�œ… Campo RG atualizado:', updatedField);
     
     // Testar com um valor de 6 dígitos
-    console.log('🧪 Testando com valor de 6 dígitos...');
+    console.log('�Ÿ�� Testando com valor de 6 dígitos...');
     try {
       await client.query(`
         INSERT INTO animais (serie, rg, sexo, raca, situacao) 
         VALUES ('TEST', '123456', 'Fêmea', 'Teste', 'Ativo')
         ON CONFLICT (serie, rg) DO NOTHING
       `);
-      console.log('✅ Teste bem-sucedido! Campo RG aceita 6 dígitos.');
+      console.log('�œ… Teste bem-sucedido! Campo RG aceita 6 dígitos.');
       
       // Limpar o teste
       await client.query(`
         DELETE FROM animais WHERE serie = 'TEST' AND rg = '123456'
       `);
-      console.log('🧹 Registro de teste removido.');
+      console.log('�Ÿ�� Registro de teste removido.');
       
     } catch (testError) {
-      console.log('❌ Erro no teste:', testError.message);
+      console.log('�Œ Erro no teste:', testError.message);
     }
     
   } catch (error) {
-    console.error('❌ Erro ao corrigir campo RG:', error);
+    console.error('�Œ Erro ao corrigir campo RG:', error);
     throw error;
   } finally {
     client.release();
@@ -95,11 +95,11 @@ async function fixRgField() {
 if (require.main === module) {
   fixRgField()
     .then(() => {
-      console.log('🎉 Correção do campo RG concluída!');
+      console.log('�ŸŽ‰ Correção do campo RG concluída!');
       process.exit(0);
     })
     .catch((error) => {
-      console.error('💥 Falha na correção:', error);
+      console.error('�Ÿ’� Falha na correção:', error);
       process.exit(1);
     });
 }

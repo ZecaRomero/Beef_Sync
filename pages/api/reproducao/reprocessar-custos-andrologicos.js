@@ -12,13 +12,13 @@ const pool = new Pool({
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Método não permitido' })
+    return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' })
   }
 
   const client = await pool.connect()
 
   try {
-    // Corrigir sequência de custos se estiver desatualizada (evita erro custos_pkey)
+    // Corrigir sequÃªncia de custos se estiver desatualizada (evita erro custos_pkey)
     try {
       await client.query(`
         SELECT setval(
@@ -27,7 +27,7 @@ export default async function handler(req, res) {
         )
       `)
     } catch (seqErr) {
-      console.warn('Aviso ao corrigir sequência custos:', seqErr.message)
+      console.warn('Aviso ao corrigir sequÃªncia custos:', seqErr.message)
     }
 
     // Buscar protocolo "ANDROLOGICO+EXAMES"
@@ -44,7 +44,7 @@ export default async function handler(req, res) {
         LIMIT 1
       `)
     } catch (error) {
-      // Se a coluna por_animal não existir, tentar sem ela
+      // Se a coluna por_animal nÃ£o existir, tentar sem ela
       try {
         protocoloResult = await client.query(`
           SELECT id, nome, preco, unidade
@@ -74,12 +74,12 @@ export default async function handler(req, res) {
         165.00
       )
       nomeProtocolo = protocolo.nome || 'ANDROLOGICO+EXAMES'
-      console.log(`✅ Protocolo encontrado: ${nomeProtocolo} - Valor: R$ ${valorProtocolo.toFixed(2)}`)
+      console.log(`âÅ“â€¦ Protocolo encontrado: ${nomeProtocolo} - Valor: R$ ${valorProtocolo.toFixed(2)}`)
     } else {
-      console.log(`ℹ️ Protocolo não encontrado, usando valor padrão: R$ ${valorProtocolo.toFixed(2)}`)
+      console.log(`ââ€ž¹ï¸� Protocolo nÃ£o encontrado, usando valor padrÃ£o: R$ ${valorProtocolo.toFixed(2)}`)
     }
 
-    // Buscar todos os exames andrológicos que não têm custo criado
+    // Buscar todos os exames androlÃ³gicos que nÃ£o tÃªm custo criado
     const examesResult = await client.query(`
       SELECT e.*
       FROM exames_andrologicos e
@@ -91,14 +91,14 @@ export default async function handler(req, res) {
             SELECT id FROM animais WHERE rg = e.rg
           )
           AND c.tipo = 'Exame'
-          AND c.subtipo = 'Andrológico'
+          AND c.subtipo = 'AndrolÃ³gico'
           AND c.data = e.data_exame
           AND c.observacoes LIKE '%Exame ID: ' || e.id || '%'
         )
       ORDER BY e.data_exame DESC
     `)
 
-    console.log(`📊 Encontrados ${examesResult.rows.length} exames sem custo`)
+    console.log(`ðÅ¸â€œÅ  Encontrados ${examesResult.rows.length} exames sem custo`)
 
     let custosCriados = 0
     let erros = 0
@@ -119,7 +119,7 @@ export default async function handler(req, res) {
           LIMIT 1
         `, [rgNormalizadoBusca])
 
-        // Se não encontrou, tentar busca mais ampla
+        // Se nÃ£o encontrou, tentar busca mais ampla
         if (animalResult.rows.length === 0) {
           const rgNormalizado = String(exame.rg).replace(/[^0-9]/g, '')
           if (rgNormalizado.length > 0) {
@@ -137,19 +137,19 @@ export default async function handler(req, res) {
 
         if (animalResult.rows.length === 0) {
           erros++
-          errosDetalhes.push(`RG ${exame.rg} não encontrado`)
+          errosDetalhes.push(`RG ${exame.rg} nÃ£o encontrado`)
           continue
         }
 
         const animal = animalResult.rows[0]
 
-        // Verificar se já existe custo para este exame
+        // Verificar se jÃ¡ existe custo para este exame
         const custoExistente = await client.query(`
           SELECT id
           FROM custos
           WHERE animal_id = $1
             AND tipo = 'Exame'
-            AND subtipo = 'Andrológico'
+            AND subtipo = 'AndrolÃ³gico'
             AND data = $2
             AND observacoes LIKE $3
           LIMIT 1
@@ -160,7 +160,7 @@ export default async function handler(req, res) {
         ])
 
         if (custoExistente.rows.length > 0) {
-          continue // Já existe custo
+          continue // JÃ¡ existe custo
         }
 
         // Criar custo
@@ -177,10 +177,10 @@ export default async function handler(req, res) {
         `, [
           animal.id,
           'Exame',
-          'Andrológico',
+          'AndrolÃ³gico',
           valorProtocolo,
           exame.data_exame,
-          `Exame Andrológico - ${exame.touro || `RG: ${exame.rg}`} | Resultado: ${exame.resultado || 'Pendente'} | Exame ID: ${exame.id}`,
+          `Exame AndrolÃ³gico - ${exame.touro || `RG: ${exame.rg}`} | Resultado: ${exame.resultado || 'Pendente'} | Exame ID: ${exame.id}`,
           JSON.stringify({
             exame_id: exame.id,
             protocolo: nomeProtocolo,
@@ -205,12 +205,12 @@ export default async function handler(req, res) {
         `, [animal.id])
 
         custosCriados++
-        console.log(`✅ Custo criado para animal ${animal.serie}-${animal.rg} (exame ID: ${exame.id})`)
+        console.log(`âÅ“â€¦ Custo criado para animal ${animal.serie}-${animal.rg} (exame ID: ${exame.id})`)
 
       } catch (error) {
         erros++
         errosDetalhes.push(`Erro ao processar exame ID ${exame.id}: ${error.message}`)
-        console.error(`❌ Erro ao criar custo para exame ${exame.id}:`, error)
+        console.error(`â�Å’ Erro ao criar custo para exame ${exame.id}:`, error)
       }
     }
 
@@ -218,7 +218,7 @@ export default async function handler(req, res) {
 
     res.status(200).json({
       success: true,
-      message: `Processamento concluído`,
+      message: `Processamento concluÃ­do`,
       custosCriados,
       erros,
       totalExames: examesResult.rows.length,

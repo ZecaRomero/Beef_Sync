@@ -2,7 +2,7 @@ const databaseService = require('./services/databaseService.js');
 
 async function testarImportacaoBent() {
   try {
-    console.log('🧪 Testando importação de animais BENT...');
+    console.log('�Ÿ�� Testando importação de animais BENT...');
     
     // Dados de teste para animais BENT
     const animalTeste = {
@@ -33,28 +33,28 @@ async function testarImportacaoBent() {
       observacoes: 'Teste de importação BENT'
     };
     
-    console.log('📝 Tentando criar animal BENT de teste...');
+    console.log('�Ÿ“� Tentando criar animal BENT de teste...');
     const resultado = await databaseService.criarAnimal(animalTeste);
     
     if (resultado._duplicate) {
-      console.log('⚠️ Animal já existe:', resultado._duplicateMessage);
+      console.log('�š�️ Animal já existe:', resultado._duplicateMessage);
     } else {
-      console.log('✅ Animal BENT criado com sucesso:', resultado.serie + '-' + resultado.rg);
+      console.log('�œ… Animal BENT criado com sucesso:', resultado.serie + '-' + resultado.rg);
     }
     
     // Verificar se foi salvo
     const animaisBent = await databaseService.buscarAnimais({ serie: 'BENT' });
-    console.log('🔍 Animais BENT após teste:', animaisBent.length);
+    console.log('�Ÿ”� Animais BENT após teste:', animaisBent.length);
     
     if (animaisBent.length > 0) {
-      console.log('📋 Animais BENT encontrados:');
+      console.log('�Ÿ“‹ Animais BENT encontrados:');
       animaisBent.forEach((animal, i) => {
         console.log(`  ${i+1}. ${animal.serie}-${animal.rg} (${animal.sexo}) - ${animal.situacao}`);
       });
     }
     
   } catch (error) {
-    console.error('❌ Erro ao testar importação:', error.message);
+    console.error('�Œ Erro ao testar importação:', error.message);
     console.error('Stack:', error.stack);
   }
 }

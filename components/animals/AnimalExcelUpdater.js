@@ -4,13 +4,13 @@ import Modal from '../ui/Modal'
 import Button from '../ui/Button'
 import Checkbox from '../ui/Checkbox'
 
-// Importação dinâmica do XLSX
+// ImportaÃ§Ã£o dinÃ¢mica do XLSX
 let XLSX = null
 if (typeof window !== 'undefined') {
   try {
     XLSX = require('xlsx')
   } catch (e) {
-    console.warn('Biblioteca xlsx não encontrada. Use arquivos CSV.')
+    console.warn('Biblioteca xlsx nÃ£o encontrada. Use arquivos CSV.')
   }
 }
 
@@ -26,7 +26,7 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
   const [parsedRows, setParsedRows] = useState([])
   const [bulkMode, setBulkMode] = useState(false)
   
-  // Campos disponíveis para seleção (sempre visíveis)
+  // Campos disponÃ­veis para seleÃ§Ã£o (sempre visÃ­veis)
   const [camposSelecionados, setCamposSelecionados] = useState({
     pai: true,
     mae: true,
@@ -110,9 +110,9 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
       const normalizeSexo = (value) => {
         const s = String(value || '').trim().toUpperCase()
         if (!s) return null
-        if (s === 'F' || s === 'FEMEA' || s === 'FÊMEA') return 'Fêmea'
+        if (s === 'F' || s === 'FEMEA' || s === 'FÃÅ MEA') return 'FÃªmea'
         if (s === 'M' || s === 'MACHO') return 'Macho'
-        if (s === 'FÊMEA') return 'Fêmea'
+        if (s === 'FÃÅ MEA') return 'FÃªmea'
         return String(value).trim()
       }
 
@@ -121,7 +121,7 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
         const foundFields = {}
 
         const getMappedValue = (targetField, sourceKeys) => {
-          // Função para normalizar chaves (remover acentos, espaços, case-insensitive)
+          // FunÃ§Ã£o para normalizar chaves (remover acentos, espaÃ§os, case-insensitive)
           const normalizeKey = (k) => {
             if (!k) return ''
             return String(k)
@@ -137,7 +137,7 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
             return data[targetField]
           }
           
-          // Tentar todas as variações de chave (case-insensitive e normalizado)
+          // Tentar todas as variaÃ§Ãµes de chave (case-insensitive e normalizado)
           const dataKeys = Object.keys(data)
           
           // Buscar exato primeiro
@@ -153,11 +153,11 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
             const matchingKey = dataKeys.find(dk => {
               const normalizedDataKey = normalizeKey(dk)
 
-              // Proteção contra falsos positivos:
-              // Se estamos procurando campos do próprio animal (nome, rg, serie), 
-              // a coluna não deve conter referências a parentes (pai, mãe, avô, receptora)
+              // ProteÃ§Ã£o contra falsos positivos:
+              // Se estamos procurando campos do prÃ³prio animal (nome, rg, serie), 
+              // a coluna nÃ£o deve conter referÃªncias a parentes (pai, mÃ£e, avÃ´, receptora)
               if (['nome', 'rg', 'serie', 'raca', 'sexo'].includes(targetField)) {
-                const termosProibidos = ['pai', 'mae', 'mãe', 'avo', 'avô', 'receptora', 'rec']
+                const termosProibidos = ['pai', 'mae', 'mÃ£e', 'avo', 'avÃ´', 'receptora', 'rec']
                 if (termosProibidos.some(termo => normalizedDataKey.includes(termo))) {
                   return false
                 }
@@ -177,18 +177,18 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
 
         const fieldMappings = {
           nome: ['nome', 'name', 'animal'],
-          abczg: ['abczg', 'iabcz', 'iabczg', '!abczg', '¡abczg'],
+          abczg: ['abczg', 'iabcz', 'iabczg', '!abczg', 'Â¡abczg'],
           deca: ['deca'],
           pai: ['pai', 'pai_nome', 'nome_pai', 'nome do pai', 'pat', 'pat (pai)'],
-          mae: ['mae', 'mãe', 'mae_nome', 'nome_mae', 'nome da mãe', 'nome da mae'],
-          mae_serie: ['mae_serie', 'serie_mae', 'série mãe', 'serie mãe', 'serie_mae', 'serie mae', 'série mãe', 'serie mãe', 'seriemae', 'sériemãe', 'serie_mãe'],
-          mae_rg: ['mae_rg', 'rg_mae', 'rgn mãe', 'rgnmae', 'rgn mãe', 'rg mãe', 'rg_mae', 'rgnmãe', 'rgn_mãe', 'rg_mãe'],
-          avo_materno: ['avo_materno', 'avô materno', 'avo materno'],
-          serie: ['serie', 'série'],
+          mae: ['mae', 'mÃ£e', 'mae_nome', 'nome_mae', 'nome da mÃ£e', 'nome da mae'],
+          mae_serie: ['mae_serie', 'serie_mae', 'sÃ©rie mÃ£e', 'serie mÃ£e', 'serie_mae', 'serie mae', 'sÃ©rie mÃ£e', 'serie mÃ£e', 'seriemae', 'sÃ©riemÃ£e', 'serie_mÃ£e'],
+          mae_rg: ['mae_rg', 'rg_mae', 'rgn mÃ£e', 'rgnmae', 'rgn mÃ£e', 'rg mÃ£e', 'rg_mae', 'rgnmÃ£e', 'rgn_mÃ£e', 'rg_mÃ£e'],
+          avo_materno: ['avo_materno', 'avÃ´ materno', 'avo materno'],
+          serie: ['serie', 'sÃ©rie'],
           rg: ['rg', 'registro', 'rgn', 'rgd'],
           receptora: ['receptora', 'rec', 'nome_receptora'],
           sexo: ['sexo'],
-          raca: ['raca', 'raça'],
+          raca: ['raca', 'raÃ§a'],
           cor: ['cor', 'pelagem'],
           peso: ['peso'],
           data_nascimento: ['data_nascimento', 'nascimento', 'nasc', 'dta_nasc']
@@ -210,7 +210,7 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
           }
         })
 
-        // Combinar dados da mãe se temos série e RG separados
+        // Combinar dados da mÃ£e se temos sÃ©rie e RG separados
         if (mappedData.mae_serie || mappedData.mae_rg) {
           const maeNome = mappedData.mae || ''
           const maeSerie = mappedData.mae_serie || ''
@@ -236,7 +236,7 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
         const text = await file.text()
         const lines = text.split('\n').filter(line => line.trim())
         if (lines.length < 2) {
-          setError('Arquivo CSV deve ter pelo menos 2 linhas (cabeçalho + dados)')
+          setError('Arquivo CSV deve ter pelo menos 2 linhas (cabeÃ§alho + dados)')
           return
         }
 
@@ -252,7 +252,7 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
         })
       } else {
         if (!XLSX) {
-          setError('Biblioteca Excel não disponível. Por favor, use arquivo CSV ou instale a biblioteca xlsx.')
+          setError('Biblioteca Excel nÃ£o disponÃ­vel. Por favor, use arquivo CSV ou instale a biblioteca xlsx.')
           return
         }
 
@@ -261,50 +261,50 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
         const firstSheet = workbook.Sheets[workbook.SheetNames[0]]
         const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' })
 
-        console.log('🔍 Arquivo Excel parseado:', {
+        console.log('ðÅ¸â€�� Arquivo Excel parseado:', {
           totalLinhas: jsonData.length,
           primeiraLinha: jsonData[0],
           segundaLinha: jsonData[1]
         })
 
         if (jsonData.length < 2) {
-          setError('Arquivo Excel deve ter pelo menos 2 linhas (cabeçalho + dados)')
+          setError('Arquivo Excel deve ter pelo menos 2 linhas (cabeÃ§alho + dados)')
           return
         }
 
         const row0 = (jsonData[0] || []).map(h => String(h || '').trim().toUpperCase())
         const row1 = (jsonData[1] || []).map(h => String(h || '').trim().toUpperCase())
 
-        const categorySet = new Set(['ANIMAL', 'PAI', 'MAE', 'MÃE', 'AVÔ MATERNO', 'AVO MATERNO', 'RECEPTORA'])
+        const categorySet = new Set(['ANIMAL', 'PAI', 'MAE', 'MÃÆ’E', 'AVÃâ€� MATERNO', 'AVO MATERNO', 'RECEPTORA'])
         
-        // Verificar se é cabeçalho duplo
-        // Critério 1: Alguma coluna do cabeçalho é uma categoria conhecida
+        // Verificar se Ã© cabeÃ§alho duplo
+        // CritÃ©rio 1: Alguma coluna do cabeÃ§alho Ã© uma categoria conhecida
         const hasCategory = row0.some(h => categorySet.has(h))
         
-        // Critério 2: Verificar se NÃO parece ser um cabeçalho simples (que mistura categoria e campo, ex: "Nome do Pai")
+        // CritÃ©rio 2: Verificar se NÃÆ’O parece ser um cabeÃ§alho simples (que mistura categoria e campo, ex: "Nome do Pai")
         const singleHeaderIndicators = [
             'NOME DO PAI', 'NOME_PAI', 
-            'SÉRIE MÃE', 'SERIE MAE', 'SERIEMÃE', 'SERIEMAE', 'SÉRIE_MÃE', 'SERIE_MAE',
-            'RGN MÃE', 'RGN MAE', 'RGNMÃE', 'RGNMAE', 'RGN_MÃE', 'RGN_MAE',
-            'NOME DA MÃE', 'NOME DA MAE',
-            'SÉRIE PAI', 'SERIE PAI', 'RGN PAI', 'RG PAI'
+            'SÃâ€°RIE MÃÆ’E', 'SERIE MAE', 'SERIEMÃÆ’E', 'SERIEMAE', 'SÃâ€°RIE_MÃÆ’E', 'SERIE_MAE',
+            'RGN MÃÆ’E', 'RGN MAE', 'RGNMÃÆ’E', 'RGNMAE', 'RGN_MÃÆ’E', 'RGN_MAE',
+            'NOME DA MÃÆ’E', 'NOME DA MAE',
+            'SÃâ€°RIE PAI', 'SERIE PAI', 'RGN PAI', 'RG PAI'
         ]
         const hasSingleHeaderIndicator = row0.some(h => {
-            const normalized = h.replace(/\s+/g, ' ') // Normalizar espaços
+            const normalized = h.replace(/\s+/g, ' ') // Normalizar espaÃ§os
             return singleHeaderIndicators.some(indicator => normalized.includes(indicator) || indicator.includes(normalized))
         })
 
-        // Critério 3: Verificar se a linha 2 parece conter sub-cabeçalhos (Série, RG, Nome, etc)
-        const subHeaderKeywords = ['SERIE', 'SÉRIE', 'RG', 'RGN', 'NOME', 'SEXO', 'DATA', 'PESO', 'RAÇA', 'RACA', 'COR', 'PELAGEM']
+        // CritÃ©rio 3: Verificar se a linha 2 parece conter sub-cabeÃ§alhos (SÃ©rie, RG, Nome, etc)
+        const subHeaderKeywords = ['SERIE', 'SÃâ€°RIE', 'RG', 'RGN', 'NOME', 'SEXO', 'DATA', 'PESO', 'RAÃâ€¡A', 'RACA', 'COR', 'PELAGEM']
         const row1HasKeywords = row1.some(h => subHeaderKeywords.some(k => h.includes(k)))
 
-        // É cabeçalho duplo se tem categoria, NÃO tem indicadores de cabeçalho simples explícitos,
-        // E a segunda linha parece ter cabeçalhos (ou tem pelo menos uma keyword)
+        // Ãâ€° cabeÃ§alho duplo se tem categoria, NÃÆ’O tem indicadores de cabeÃ§alho simples explÃ­citos,
+        // E a segunda linha parece ter cabeÃ§alhos (ou tem pelo menos uma keyword)
         const isDoubleHeader = hasCategory && !hasSingleHeaderIndicator && row1HasKeywords
 
         if (isDoubleHeader) {
           if (jsonData.length < 3) {
-            setError('Arquivo Excel com cabeçalho duplo deve ter pelo menos 3 linhas (2 de cabeçalho + dados)')
+            setError('Arquivo Excel com cabeÃ§alho duplo deve ter pelo menos 3 linhas (2 de cabeÃ§alho + dados)')
             return
           }
 
@@ -318,42 +318,42 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
 
             if (currentCategory === 'ANIMAL') {
               if (colName.includes('NOME')) columnMap[idx] = 'nome'
-              if (colName.includes('SERIE') || colName.includes('SÉRIE')) columnMap[idx] = 'serie'
+              if (colName.includes('SERIE') || colName.includes('SÃâ€°RIE')) columnMap[idx] = 'serie'
               if (colName === 'RG' || colName === 'RGN' || colName === 'RGD' || colName.includes('REGISTRO')) columnMap[idx] = 'rg'
               if (colName.includes('SEXO')) columnMap[idx] = 'sexo'
               if (colName.includes('NASC') || colName.includes('DATA')) columnMap[idx] = 'data_nascimento'
               if (colName.includes('IABCZ') || colName.includes('ABCZ')) columnMap[idx] = 'abczg'
               if (colName === 'DECA') columnMap[idx] = 'deca'
               if (colName.includes('PESO')) columnMap[idx] = 'peso'
-              if (colName.includes('RACA') || colName.includes('RAÇA')) columnMap[idx] = 'raca'
+              if (colName.includes('RACA') || colName.includes('RAÃâ€¡A')) columnMap[idx] = 'raca'
               if (colName.includes('COR') || colName.includes('PELAGEM')) columnMap[idx] = 'cor'
               return
             }
 
             if (currentCategory === 'PAI') {
               if (colName.includes('NOME') || colName === 'PAI') columnMap[idx] = 'pai_nome'
-              if (colName.includes('SERIE') || colName.includes('SÉRIE')) columnMap[idx] = 'pai_serie'
+              if (colName.includes('SERIE') || colName.includes('SÃâ€°RIE')) columnMap[idx] = 'pai_serie'
               if (colName === 'RG' || colName === 'RGN' || colName === 'RGD') columnMap[idx] = 'pai_rg'
               return
             }
 
-            if (['MAE', 'MÃE'].includes(currentCategory)) {
-              if (colName.includes('NOME') || colName === 'MAE' || colName === 'MÃE') columnMap[idx] = 'mae_nome'
-              if (colName.includes('SERIE') || colName.includes('SÉRIE')) columnMap[idx] = 'mae_serie'
+            if (['MAE', 'MÃÆ’E'].includes(currentCategory)) {
+              if (colName.includes('NOME') || colName === 'MAE' || colName === 'MÃÆ’E') columnMap[idx] = 'mae_nome'
+              if (colName.includes('SERIE') || colName.includes('SÃâ€°RIE')) columnMap[idx] = 'mae_serie'
               if (colName === 'RG' || colName === 'RGN' || colName === 'RGD') columnMap[idx] = 'mae_rg'
               return
             }
 
-            if (['AVÔ MATERNO', 'AVO MATERNO'].includes(currentCategory)) {
-              if (colName.includes('NOME') || colName.includes('AVO') || colName.includes('AVÔ')) columnMap[idx] = 'avo_materno_nome'
-              if (colName.includes('SERIE') || colName.includes('SÉRIE')) columnMap[idx] = 'avo_materno_serie'
+            if (['AVÃâ€� MATERNO', 'AVO MATERNO'].includes(currentCategory)) {
+              if (colName.includes('NOME') || colName.includes('AVO') || colName.includes('AVÃâ€�')) columnMap[idx] = 'avo_materno_nome'
+              if (colName.includes('SERIE') || colName.includes('SÃâ€°RIE')) columnMap[idx] = 'avo_materno_serie'
               if (colName === 'RG' || colName === 'RGN' || colName === 'RGD') columnMap[idx] = 'avo_materno_rg'
               return
             }
 
             if (currentCategory === 'RECEPTORA') {
               if (colName.includes('NOME') || colName.includes('RECEPTORA')) columnMap[idx] = 'receptora_nome'
-              if (colName.includes('SERIE') || colName.includes('SÉRIE')) columnMap[idx] = 'receptora_serie'
+              if (colName.includes('SERIE') || colName.includes('SÃâ€°RIE')) columnMap[idx] = 'receptora_serie'
               if (colName === 'RG' || colName === 'RGN' || colName === 'RGD') columnMap[idx] = 'receptora_rg'
               return
             }
@@ -379,15 +379,15 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
               raw[fieldKey] = val
             })
 
-            // Combinar dados da mãe - verificar diferentes formatos de cabeçalho
+            // Combinar dados da mÃ£e - verificar diferentes formatos de cabeÃ§alho
             let maeCompleta = ''
             if (raw.mae_nome || raw.mae_serie || raw.mae_rg) {
               maeCompleta = combineFiliation(raw.mae_nome, raw.mae_serie, raw.mae_rg) || ''
-            } else if (raw['série mãe'] || raw['serie mãe'] || raw['serie_mae'] || raw['serie mae']) {
-              // Formato alternativo: Série Mãe e RgnMãe separados
-              const serieMae = raw['série mãe'] || raw['serie mãe'] || raw['serie_mae'] || raw['serie mae'] || ''
-              const rgMae = raw['rgn mãe'] || raw['rgnmae'] || raw['rgn mãe'] || raw['rg mãe'] || raw['rg_mae'] || ''
-              const nomeMae = raw['nome da mãe'] || raw['nome da mae'] || raw['mae'] || raw['mãe'] || ''
+            } else if (raw['sÃ©rie mÃ£e'] || raw['serie mÃ£e'] || raw['serie_mae'] || raw['serie mae']) {
+              // Formato alternativo: SÃ©rie MÃ£e e RgnMÃ£e separados
+              const serieMae = raw['sÃ©rie mÃ£e'] || raw['serie mÃ£e'] || raw['serie_mae'] || raw['serie mae'] || ''
+              const rgMae = raw['rgn mÃ£e'] || raw['rgnmae'] || raw['rgn mÃ£e'] || raw['rg mÃ£e'] || raw['rg_mae'] || ''
+              const nomeMae = raw['nome da mÃ£e'] || raw['nome da mae'] || raw['mae'] || raw['mÃ£e'] || ''
               maeCompleta = combineFiliation(nomeMae, serieMae, rgMae) || ''
             }
 
@@ -413,9 +413,9 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
             }
           }
         } else {
-          // Cabeçalho simples - mapear diretamente
+          // CabeÃ§alho simples - mapear diretamente
           headers = (jsonData[0] || []).map(h => String(h || '').trim())
-          console.log('🔍 Cabeçalhos encontrados (simples):', headers)
+          console.log('ðÅ¸â€�� CabeÃ§alhos encontrados (simples):', headers)
           
           rowsData = []
           for (let i = 1; i < jsonData.length; i++) {
@@ -428,10 +428,10 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
               const headerNormalized = headerUpper.replace(/\s+/g, ' ').trim()
               const value = values[index] ?? ''
               
-              // Mapear campos específicos da planilha do usuário (case-insensitive e tolerante a espaços)
-              if (headerNormalized === 'SÉRIE' || headerNormalized === 'SERIE') {
+              // Mapear campos especÃ­ficos da planilha do usuÃ¡rio (case-insensitive e tolerante a espaÃ§os)
+              if (headerNormalized === 'SÃâ€°RIE' || headerNormalized === 'SERIE') {
                 data['serie'] = value
-                data['série'] = value
+                data['sÃ©rie'] = value
               } else if (headerNormalized === 'RGN' || headerNormalized === 'RG' || headerNormalized === 'RGD') {
                 data['rg'] = value
                 data['rgn'] = value
@@ -440,14 +440,14 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
                 data['pai'] = value
                 data['nome_pai'] = value
                 data['pai_nome'] = value
-              } else if (headerNormalized.includes('SÉRIE') && (headerNormalized.includes('MÃE') || headerNormalized.includes('MAE'))) {
-                data['serie mãe'] = value
-                data['série mãe'] = value
+              } else if (headerNormalized.includes('SÃâ€°RIE') && (headerNormalized.includes('MÃÆ’E') || headerNormalized.includes('MAE'))) {
+                data['serie mÃ£e'] = value
+                data['sÃ©rie mÃ£e'] = value
                 data['mae_serie'] = value
                 data['serie_mae'] = value
-              } else if ((headerNormalized.includes('RGN') || headerNormalized.includes('RG')) && (headerNormalized.includes('MÃE') || headerNormalized.includes('MAE'))) {
-                data['rgn mãe'] = value
-                data['rgnmãe'] = value
+              } else if ((headerNormalized.includes('RGN') || headerNormalized.includes('RG')) && (headerNormalized.includes('MÃÆ’E') || headerNormalized.includes('MAE'))) {
+                data['rgn mÃ£e'] = value
+                data['rgnmÃ£e'] = value
                 data['mae_rg'] = value
                 data['rg_mae'] = value
               } else if (headerNormalized.includes('RECEPTORA')) {
@@ -455,19 +455,19 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
                 data['rec'] = value
                 data['nome_receptora'] = value
               } else {
-                // Mapeamento padrão - salvar com o nome original e lowercase
+                // Mapeamento padrÃ£o - salvar com o nome original e lowercase
                 data[headerLower] = value
-                data[header] = value // Também salvar com o nome original
+                data[header] = value // TambÃ©m salvar com o nome original
               }
             })
             
-            // Combinar dados da mãe se temos série e RG separados
-            if (data['serie mãe'] || data['rgn mãe'] || data['mae_serie'] || data['mae_rg']) {
-              const serieMae = data['serie mãe'] || data['mae_serie'] || ''
-              const rgMae = data['rgn mãe'] || data['mae_rg'] || ''
-              const nomeMae = data['nome da mãe'] || data['mae'] || data['mãe'] || ''
+            // Combinar dados da mÃ£e se temos sÃ©rie e RG separados
+            if (data['serie mÃ£e'] || data['rgn mÃ£e'] || data['mae_serie'] || data['mae_rg']) {
+              const serieMae = data['serie mÃ£e'] || data['mae_serie'] || ''
+              const rgMae = data['rgn mÃ£e'] || data['mae_rg'] || ''
+              const nomeMae = data['nome da mÃ£e'] || data['mae'] || data['mÃ£e'] || ''
               
-              // Formato: Série-RG ou apenas Série RG se não tiver nome
+              // Formato: SÃ©rie-RG ou apenas SÃ©rie RG se nÃ£o tiver nome
               if (serieMae || rgMae) {
                 const partes = [serieMae, rgMae].filter(v => v && String(v).trim())
                 let maeCompleta = partes.length > 0 ? partes.join('-') : nomeMae
@@ -480,16 +480,16 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
               }
             }
             
-            // Só adicionar se tiver pelo menos um campo com valor
+            // SÃ³ adicionar se tiver pelo menos um campo com valor
             const hasData = Object.values(data).some(v => v !== null && v !== undefined && String(v).trim() !== '')
             if (hasData) {
               rowsData.push({ rowNumber: i + 1, data })
             }
           }
           
-          console.log('🔍 Linhas de dados processadas:', rowsData.length)
+          console.log('ðÅ¸â€�� Linhas de dados processadas:', rowsData.length)
           if (rowsData.length > 0) {
-            console.log('🔍 Primeira linha processada:', rowsData[0])
+            console.log('ðÅ¸â€�� Primeira linha processada:', rowsData[0])
           }
         }
       }
@@ -500,12 +500,12 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
       }).filter(r => Object.keys(r.mappedData).length > 0)
 
       // Debug: mostrar dados brutos antes do mapeamento
-      console.log('🔍 Total de linhas processadas:', rowsData.length)
-      console.log('🔍 Primeira linha de dados brutos:', rowsData[0])
+      console.log('ðÅ¸â€�� Total de linhas processadas:', rowsData.length)
+      console.log('ðÅ¸â€�� Primeira linha de dados brutos:', rowsData[0])
       if (rowsData.length > 0 && rowsData[0]?.data) {
         const allFields = Object.keys(rowsData[0].data)
-        console.log('🔍 Campos encontrados no arquivo:', allFields.join(', '))
-        console.log('🔍 Valores da primeira linha:', rowsData[0].data)
+        console.log('ðÅ¸â€�� Campos encontrados no arquivo:', allFields.join(', '))
+        console.log('ðÅ¸â€�� Valores da primeira linha:', rowsData[0].data)
       }
 
       if (mappedRows.length === 0) {
@@ -517,10 +517,10 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
           }
         })
         const fieldsList = Array.from(allFields).join(', ')
-        console.log('🔍 Campos encontrados no arquivo (após mapeamento):', fieldsList)
-        console.log('🔍 Primeira linha de dados:', rowsData[0]?.data)
+        console.log('ðÅ¸â€�� Campos encontrados no arquivo (apÃ³s mapeamento):', fieldsList)
+        console.log('ðÅ¸â€�� Primeira linha de dados:', rowsData[0]?.data)
         
-        setError(`Nenhum campo compatível encontrado no arquivo. Campos encontrados: ${fieldsList || 'nenhum'}. Verifique se os cabeçalhos correspondem aos campos esperados (Série, RGN, Nome do Pai, Série Mãe, RgnMãe, Receptora).`)
+        setError(`Nenhum campo compatÃ­vel encontrado no arquivo. Campos encontrados: ${fieldsList || 'nenhum'}. Verifique se os cabeÃ§alhos correspondem aos campos esperados (SÃ©rie, RGN, Nome do Pai, SÃ©rie MÃ£e, RgnMÃ£e, Receptora).`)
         setPreview(null)
         setAvailableFields([])
         setParsedRows([])
@@ -563,11 +563,11 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
         }
 
         if (foundByExactMatch) {
-          setMatchStatus({ found: true, message: `Animal identificado por Série/RG na linha ${selectedRow.rowNumber}` })
+          setMatchStatus({ found: true, message: `Animal identificado por SÃ©rie/RG na linha ${selectedRow.rowNumber}` })
         } else if (foundByName) {
           setMatchStatus({ found: true, message: `Animal identificado por Nome na linha ${selectedRow.rowNumber}` })
         } else {
-          setMatchStatus({ found: false, message: `Animal não encontrado automaticamente. Mostrando linha ${selectedRow.rowNumber} (primeira com dados).` })
+          setMatchStatus({ found: false, message: `Animal nÃ£o encontrado automaticamente. Mostrando linha ${selectedRow.rowNumber} (primeira com dados).` })
         }
       }
 
@@ -595,14 +595,14 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
   const handleUpdate = async () => {
     if (bulkMode) {
       if (!parsedRows || parsedRows.length === 0) {
-        setError('Nenhum dado válido encontrado no arquivo')
+        setError('Nenhum dado vÃ¡lido encontrado no arquivo')
         return
       }
 
       const animals = []
       let skippedNoId = 0
 
-      // Helper para combinar campos de filiação (Nome + Série + RG)
+      // Helper para combinar campos de filiaÃ§Ã£o (Nome + SÃ©rie + RG)
       const combineFiliation = (name, serie, rg) => {
         const nameStr = String(name || '').trim()
         const extra = [serie, rg].map(v => String(v || '').trim()).filter(Boolean).join('-')
@@ -622,15 +622,15 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
 
         const payload = { serie, rg }
 
-        // Pré-processar filiação antes de montar o payload
+        // PrÃ©-processar filiaÃ§Ã£o antes de montar o payload
         const roles = ['mae', 'pai', 'receptora', 'avo_materno']
         roles.forEach(role => {
           const serieKey = `${role}_serie`
           const rgKey = `${role}_rg`
           
-          // Se houver campos de série ou RG para atualizar
+          // Se houver campos de sÃ©rie ou RG para atualizar
           if (r.mappedData[serieKey] || r.mappedData[rgKey]) {
-             // Verificar se o usuário quer atualizar este campo (verificando o campo principal ou os componentes)
+             // Verificar se o usuÃ¡rio quer atualizar este campo (verificando o campo principal ou os componentes)
              const shouldUpdate = camposSelecionados[role] || selectedFields[role] || 
                                   camposSelecionados[serieKey] || selectedFields[serieKey] ||
                                   camposSelecionados[rgKey] || selectedFields[rgKey]
@@ -651,10 +651,10 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
         availableFields.forEach(key => {
           if (key === 'serie' || key === 'rg') return
           
-          // Ignorar campos de filiação que já foram tratados acima (para não sobrescrever ou enviar dados parciais)
+          // Ignorar campos de filiaÃ§Ã£o que jÃ¡ foram tratados acima (para nÃ£o sobrescrever ou enviar dados parciais)
           if (['mae_serie', 'mae_rg', 'pai_serie', 'pai_rg', 'receptora_serie', 'receptora_rg', 'avo_materno_serie', 'avo_materno_rg'].includes(key)) return
           
-          // Verificar se o campo está marcado em camposSelecionados OU selectedFields
+          // Verificar se o campo estÃ¡ marcado em camposSelecionados OU selectedFields
           const estaMarcado = camposSelecionados[key] || selectedFields[key]
           if (!estaMarcado) return
           const value = r.mappedData[key]
@@ -667,14 +667,14 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
       })
 
       if (animals.length === 0) {
-        setError('Nenhum animal com Série e RG encontrado no arquivo')
+        setError('Nenhum animal com SÃ©rie e RG encontrado no arquivo')
         return
       }
 
       setLoading(true)
       setError('')
 
-      console.log('📦 Enviando payload para batch update:', {
+      console.log('ðÅ¸â€œ¦ Enviando payload para batch update:', {
         quantidade: animals.length,
         exemplo: animals[0],
         usuario: 'excel'
@@ -692,7 +692,7 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
           result = await response.json()
         } catch (parseError) {
           console.error('Erro ao fazer parse da resposta:', parseError)
-          setError(`Erro no servidor (${response.status}): ${response.statusText || 'Resposta inválida'}`)
+          setError(`Erro no servidor (${response.status}): ${response.statusText || 'Resposta invÃ¡lida'}`)
           return
         }
 
@@ -711,11 +711,11 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
         const resumo = result.data?.resumo || {}
         const resultados = result.data?.resultados || {}
 
-        let msg = `✅ Processamento concluído!\n\n`
+        let msg = `âÅ“â€¦ Processamento concluÃ­do!\n\n`
         msg += `Processados: ${resumo.total_processados ?? animals.length}\n`
         msg += `Sucessos: ${resumo.total_sucessos ?? 0}\n`
         msg += `Erros: ${resumo.total_erros ?? 0}\n`
-        if (skippedNoId > 0) msg += `Ignorados (sem Série/RG): ${skippedNoId}\n`
+        if (skippedNoId > 0) msg += `Ignorados (sem SÃ©rie/RG): ${skippedNoId}\n`
         if (result.data?.lote) msg += `Lote: ${result.data.lote}\n`
 
         if (Array.isArray(resultados.erros) && resultados.erros.length > 0) {
@@ -739,14 +739,14 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
     }
 
     if (!preview || Object.keys(preview).length === 0) {
-      setError('Nenhum dado válido encontrado no arquivo')
+      setError('Nenhum dado vÃ¡lido encontrado no arquivo')
       return
     }
 
     // Filtrar apenas campos selecionados (usar camposSelecionados + selectedFields)
     const dataToUpdate = {}
     Object.keys(preview).forEach(key => {
-      // Verificar se o campo está marcado em camposSelecionados OU selectedFields
+      // Verificar se o campo estÃ¡ marcado em camposSelecionados OU selectedFields
       const estaMarcado = camposSelecionados[key] || selectedFields[key]
       if (estaMarcado) {
         dataToUpdate[key] = preview[key]
@@ -758,7 +758,7 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
       return
     }
 
-    // Helper para combinar campos de filiação (Nome + Série + RG)
+    // Helper para combinar campos de filiaÃ§Ã£o (Nome + SÃ©rie + RG)
     const combineFiliation = (name, serie, rg) => {
       const nameStr = String(name || '').trim()
       const extra = [serie, rg].map(v => String(v || '').trim()).filter(Boolean).join('-')
@@ -774,9 +774,9 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
       const serieKey = `${role}_serie`
       const rgKey = `${role}_rg`
       
-      // Se houver campos de série ou RG para atualizar, OU se o campo principal estiver sendo atualizado
+      // Se houver campos de sÃ©rie ou RG para atualizar, OU se o campo principal estiver sendo atualizado
       if (dataToUpdate[serieKey] || dataToUpdate[rgKey] || dataToUpdate[role]) {
-        // Obter valores (priorizando o que está no dataToUpdate, fallback para preview)
+        // Obter valores (priorizando o que estÃ¡ no dataToUpdate, fallback para preview)
         const name = dataToUpdate[role] || preview[role] || ''
         const serie = dataToUpdate[serieKey] || preview[serieKey] || ''
         const rg = dataToUpdate[rgKey] || preview[rgKey] || ''
@@ -787,7 +787,7 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
           dataToUpdate[role] = combined
         }
         
-        // Remover campos auxiliares que não existem no banco
+        // Remover campos auxiliares que nÃ£o existem no banco
         delete dataToUpdate[serieKey]
         delete dataToUpdate[rgKey]
       }
@@ -811,14 +811,14 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
         if (onUpdate) {
           onUpdate(result.data || dataToUpdate)
         }
-        alert('✅ Dados atualizados com sucesso!')
+        alert('âÅ“â€¦ Dados atualizados com sucesso!')
         handleClose()
       } else {
         let msg = result.message || 'Erro ao atualizar dados'
         
         // Tratamento de erro de duplicidade (Unique Constraint)
         if (msg.includes('animais_serie_rg_key') || msg.includes('duplicate key') || msg.includes('duplicar valor')) {
-          msg = `Erro: Já existe outro animal cadastrado com a Série "${dataToUpdate.serie || '?'}" e RG "${dataToUpdate.rg || '?'}".\n\nDica: Se você deseja atualizar apenas as outras informações (Peso, ABCZ, etc.), desmarque as opções "Série" e "Rg" na lista abaixo e tente novamente.`
+          msg = `Erro: JÃ¡ existe outro animal cadastrado com a SÃ©rie "${dataToUpdate.serie || '?'}" e RG "${dataToUpdate.rg || '?'}".\n\nDica: Se vocÃª deseja atualizar apenas as outras informaÃ§Ãµes (Peso, ABCZ, etc.), desmarque as opÃ§Ãµes "SÃ©rie" e "Rg" na lista abaixo e tente novamente.`
         }
         
         setError(msg)
@@ -845,21 +845,21 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
       let headers = []
       let rowsData = []
 
-      // Processar dados colados como CSV (separado por tab ou vírgula)
+      // Processar dados colados como CSV (separado por tab ou vÃ­rgula)
       const lines = text.split(/\r?\n/).filter(line => line.trim())
       if (lines.length < 2) {
-        setError('Dados devem ter pelo menos 2 linhas (cabeçalho + dados)')
+        setError('Dados devem ter pelo menos 2 linhas (cabeÃ§alho + dados)')
         setLoading(false)
         return
       }
 
-      // Detectar separador: tab (quando copiado do Excel) ou vírgula
+      // Detectar separador: tab (quando copiado do Excel) ou vÃ­rgula
       const firstLine = lines[0]
       const hasTab = firstLine.includes('\t')
       const separator = hasTab ? '\t' : ','
 
       headers = firstLine.split(separator).map(h => String(h || '').trim())
-      console.log('🔍 Cabeçalhos encontrados (colado):', headers)
+      console.log('ðÅ¸â€�� CabeÃ§alhos encontrados (colado):', headers)
 
       rowsData = []
       for (let i = 1; i < lines.length; i++) {
@@ -872,10 +872,10 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
           const headerNormalized = headerUpper.replace(/\s+/g, ' ').trim()
           const value = values[index] ?? ''
 
-          // Mapear campos específicos da planilha do usuário
-          if (headerNormalized === 'SÉRIE' || headerNormalized === 'SERIE') {
+          // Mapear campos especÃ­ficos da planilha do usuÃ¡rio
+          if (headerNormalized === 'SÃâ€°RIE' || headerNormalized === 'SERIE') {
             data['serie'] = value
-            data['série'] = value
+            data['sÃ©rie'] = value
           } else if (headerNormalized === 'RGN' || headerNormalized === 'RG' || headerNormalized === 'RGD') {
             data['rg'] = value
             data['rgn'] = value
@@ -884,14 +884,14 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
             data['pai'] = value
             data['nome_pai'] = value
             data['pai_nome'] = value
-          } else if (headerNormalized.includes('SÉRIE') && (headerNormalized.includes('MÃE') || headerNormalized.includes('MAE'))) {
-            data['serie mãe'] = value
-            data['série mãe'] = value
+          } else if (headerNormalized.includes('SÃâ€°RIE') && (headerNormalized.includes('MÃÆ’E') || headerNormalized.includes('MAE'))) {
+            data['serie mÃ£e'] = value
+            data['sÃ©rie mÃ£e'] = value
             data['mae_serie'] = value
             data['serie_mae'] = value
-          } else if ((headerNormalized.includes('RGN') || headerNormalized.includes('RG')) && (headerNormalized.includes('MÃE') || headerNormalized.includes('MAE'))) {
-            data['rgn mãe'] = value
-            data['rgnmãe'] = value
+          } else if ((headerNormalized.includes('RGN') || headerNormalized.includes('RG')) && (headerNormalized.includes('MÃÆ’E') || headerNormalized.includes('MAE'))) {
+            data['rgn mÃ£e'] = value
+            data['rgnmÃ£e'] = value
             data['mae_rg'] = value
             data['rg_mae'] = value
           } else if (headerNormalized.includes('RECEPTORA')) {
@@ -904,11 +904,11 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
           }
         })
 
-        // Combinar dados da mãe se temos série e RG separados
-        if (data['serie mãe'] || data['rgn mãe'] || data['mae_serie'] || data['mae_rg']) {
-          const serieMae = data['serie mãe'] || data['mae_serie'] || ''
-          const rgMae = data['rgn mãe'] || data['mae_rg'] || ''
-          const nomeMae = data['nome da mãe'] || data['mae'] || data['mãe'] || ''
+        // Combinar dados da mÃ£e se temos sÃ©rie e RG separados
+        if (data['serie mÃ£e'] || data['rgn mÃ£e'] || data['mae_serie'] || data['mae_rg']) {
+          const serieMae = data['serie mÃ£e'] || data['mae_serie'] || ''
+          const rgMae = data['rgn mÃ£e'] || data['mae_rg'] || ''
+          const nomeMae = data['nome da mÃ£e'] || data['mae'] || data['mÃ£e'] || ''
 
           if (serieMae || rgMae) {
             const partes = [serieMae, rgMae].filter(v => v && String(v).trim())
@@ -925,12 +925,12 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
         }
       }
 
-      console.log('🔍 Linhas de dados processadas (colado):', rowsData.length)
+      console.log('ðÅ¸â€�� Linhas de dados processadas (colado):', rowsData.length)
       if (rowsData.length > 0) {
-        console.log('🔍 Primeira linha processada:', rowsData[0])
+        console.log('ðÅ¸â€�� Primeira linha processada:', rowsData[0])
       }
 
-      // Processar dados usando a mesma lógica do arquivo - criar funções auxiliares
+      // Processar dados usando a mesma lÃ³gica do arquivo - criar funÃ§Ãµes auxiliares
       const normalizeDecimalString = (value) => {
         if (value === null || value === undefined) return value
         const s = String(value).trim()
@@ -969,7 +969,7 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
       const normalizeSexo = (value) => {
         const s = String(value || '').trim().toUpperCase()
         if (!s) return null
-        if (s === 'F' || s === 'FEMEA' || s === 'FÊMEA') return 'Fêmea'
+        if (s === 'F' || s === 'FEMEA' || s === 'FÃÅ MEA') return 'FÃªmea'
         if (s === 'M' || s === 'MACHO') return 'Macho'
         return String(value).trim()
       }
@@ -1018,18 +1018,18 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
 
         const fieldMappings = {
           nome: ['nome', 'name', 'animal'],
-          abczg: ['abczg', 'iabcz', 'iabczg', '!abczg', '¡abczg'],
+          abczg: ['abczg', 'iabcz', 'iabczg', '!abczg', 'Â¡abczg'],
           deca: ['deca'],
           pai: ['pai', 'pai_nome', 'nome_pai', 'nome do pai', 'pat', 'pat (pai)'],
-          mae: ['mae', 'mãe', 'mae_nome', 'nome_mae', 'nome da mãe', 'nome da mae'],
-          mae_serie: ['mae_serie', 'serie_mae', 'série mãe', 'serie mãe', 'serie_mae', 'serie mae'],
-          mae_rg: ['mae_rg', 'rg_mae', 'rgn mãe', 'rgnmae', 'rgn mãe', 'rg mãe', 'rg_mae', 'rgnmãe'],
-          avo_materno: ['avo_materno', 'avô materno', 'avo materno'],
-          serie: ['serie', 'série'],
+          mae: ['mae', 'mÃ£e', 'mae_nome', 'nome_mae', 'nome da mÃ£e', 'nome da mae'],
+          mae_serie: ['mae_serie', 'serie_mae', 'sÃ©rie mÃ£e', 'serie mÃ£e', 'serie_mae', 'serie mae'],
+          mae_rg: ['mae_rg', 'rg_mae', 'rgn mÃ£e', 'rgnmae', 'rgn mÃ£e', 'rg mÃ£e', 'rg_mae', 'rgnmÃ£e'],
+          avo_materno: ['avo_materno', 'avÃ´ materno', 'avo materno'],
+          serie: ['serie', 'sÃ©rie'],
           rg: ['rg', 'registro', 'rgn', 'rgd'],
           receptora: ['receptora', 'rec', 'nome_receptora'],
           sexo: ['sexo'],
-          raca: ['raca', 'raça'],
+          raca: ['raca', 'raÃ§a'],
           cor: ['cor', 'pelagem'],
           peso: ['peso'],
           data_nascimento: ['data_nascimento', 'nascimento', 'nasc', 'dta_nasc']
@@ -1081,8 +1081,8 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
           }
         })
         const fieldsList = Array.from(allFields).join(', ')
-        console.log('🔍 Campos encontrados no arquivo (após mapeamento):', fieldsList)
-        setError(`Nenhum campo compatível encontrado. Campos encontrados: ${fieldsList || 'nenhum'}. Verifique se os cabeçalhos correspondem aos campos esperados (Série, RGN, Nome do Pai, Série Mãe, RgnMãe, Receptora).`)
+        console.log('ðÅ¸â€�� Campos encontrados no arquivo (apÃ³s mapeamento):', fieldsList)
+        setError(`Nenhum campo compatÃ­vel encontrado. Campos encontrados: ${fieldsList || 'nenhum'}. Verifique se os cabeÃ§alhos correspondem aos campos esperados (SÃ©rie, RGN, Nome do Pai, SÃ©rie MÃ£e, RgnMÃ£e, Receptora).`)
         setPreview(null)
         setAvailableFields([])
         setParsedRows([])
@@ -1125,11 +1125,11 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
       }
 
       if (foundByExactMatch) {
-        setMatchStatus({ found: true, message: 'Animal encontrado automaticamente pela Série e RG!' })
+        setMatchStatus({ found: true, message: 'Animal encontrado automaticamente pela SÃ©rie e RG!' })
       } else if (foundByName) {
         setMatchStatus({ found: true, message: 'Animal encontrado automaticamente pelo nome!' })
       } else {
-        setMatchStatus({ found: false, message: `Animal não encontrado automaticamente. Mostrando linha ${selectedRow.rowNumber} (primeira com dados).` })
+        setMatchStatus({ found: false, message: `Animal nÃ£o encontrado automaticamente. Mostrando linha ${selectedRow.rowNumber} (primeira com dados).` })
       }
 
       const initialSelected = {}
@@ -1163,12 +1163,12 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
 
   const downloadTemplate = () => {
     const headers = [
-      'Nome', 'Série', 'RG', 'Sexo', 'Nascimento', 'Peso', 'Raça', 'Cor',
-      'Pai', 'Mãe', 'Receptora', 'Avô Materno', 'ABCZg', 'DECA'
+      'Nome', 'SÃ©rie', 'RG', 'Sexo', 'Nascimento', 'Peso', 'RaÃ§a', 'Cor',
+      'Pai', 'MÃ£e', 'Receptora', 'AvÃ´ Materno', 'ABCZg', 'DECA'
     ]
     
     if (!XLSX) {
-      // Se XLSX não estiver disponível, criar CSV
+      // Se XLSX nÃ£o estiver disponÃ­vel, criar CSV
       const csvContent = headers.join(',') + '\n' + Array(headers.length).fill('').join(',')
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
       const link = document.createElement('a')
@@ -1211,18 +1211,18 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
         </div>
 
           <div className="space-y-4">
-          {/* Seleção de Campos para Importação */}
+          {/* SeleÃ§Ã£o de Campos para ImportaÃ§Ã£o */}
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-              📋 Campos para Importar/Atualizar
+              ðÅ¸â€œâ€¹ Campos para Importar/Atualizar
             </h3>
             <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-              Selecione quais campos deseja importar. Campos não marcados serão ignorados.
+              Selecione quais campos deseja importar. Campos nÃ£o marcados serÃ£o ignorados.
             </p>
             
             {/* Campos de Genealogia */}
             <div className="mb-3">
-              <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">👨‍👩‍👧 Genealogia</h4>
+              <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">ðÅ¸â€˜¨ââ‚¬�ðÅ¸â€˜©ââ‚¬�ðÅ¸â€˜§ Genealogia</h4>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 <label className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
                   <input
@@ -1231,7 +1231,7 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
                     onChange={(e) => setCamposSelecionados({...camposSelecionados, pai: e.target.checked})}
                     className="rounded text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="text-xs text-gray-700 dark:text-gray-300">👨 Pai</span>
+                  <span className="text-xs text-gray-700 dark:text-gray-300">ðÅ¸â€˜¨ Pai</span>
                 </label>
                 <label className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
                   <input
@@ -1240,7 +1240,7 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
                     onChange={(e) => setCamposSelecionados({...camposSelecionados, mae: e.target.checked})}
                     className="rounded text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="text-xs text-gray-700 dark:text-gray-300">👩 Mãe</span>
+                  <span className="text-xs text-gray-700 dark:text-gray-300">ðÅ¸â€˜© MÃ£e</span>
                 </label>
                 <label className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
                   <input
@@ -1249,7 +1249,7 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
                     onChange={(e) => setCamposSelecionados({...camposSelecionados, receptora: e.target.checked})}
                     className="rounded text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="text-xs text-gray-700 dark:text-gray-300">🐄 Receptora</span>
+                  <span className="text-xs text-gray-700 dark:text-gray-300">ðÅ¸�â€ž Receptora</span>
                 </label>
                 <label className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
                   <input
@@ -1258,14 +1258,14 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
                     onChange={(e) => setCamposSelecionados({...camposSelecionados, avo_materno: e.target.checked})}
                     className="rounded text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="text-xs text-gray-700 dark:text-gray-300">👴 Avô Materno</span>
+                  <span className="text-xs text-gray-700 dark:text-gray-300">ðÅ¸â€˜´ AvÃ´ Materno</span>
                 </label>
               </div>
             </div>
 
-            {/* Campos Genéticos */}
+            {/* Campos GenÃ©ticos */}
             <div className="mb-3">
-              <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">🧬 Genética</h4>
+              <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">ðÅ¸§¬ GenÃ©tica</h4>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 <label className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
                   <input
@@ -1274,7 +1274,7 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
                     onChange={(e) => setCamposSelecionados({...camposSelecionados, abczg: e.target.checked})}
                     className="rounded text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="text-xs text-gray-700 dark:text-gray-300">📊 ABCZg</span>
+                  <span className="text-xs text-gray-700 dark:text-gray-300">ðÅ¸â€œÅ  ABCZg</span>
                 </label>
                 <label className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
                   <input
@@ -1283,12 +1283,12 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
                     onChange={(e) => setCamposSelecionados({...camposSelecionados, deca: e.target.checked})}
                     className="rounded text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="text-xs text-gray-700 dark:text-gray-300">📈 DECA</span>
+                  <span className="text-xs text-gray-700 dark:text-gray-300">ðÅ¸â€œË† DECA</span>
                 </label>
               </div>
             </div>
 
-            {/* Botões de Ação Rápida */}
+            {/* BotÃµes de AÃ§Ã£o RÃ¡pida */}
             <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
               <div className="flex flex-wrap gap-2">
                 <button
@@ -1299,7 +1299,7 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
                   })}
                   className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded hover:bg-blue-200 dark:hover:bg-blue-800"
                 >
-                  📋 Apenas Genealogia
+                  ðÅ¸â€œâ€¹ Apenas Genealogia
                 </button>
                 <button
                   onClick={() => setCamposSelecionados({
@@ -1309,7 +1309,7 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
                   })}
                   className="text-xs px-2 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded hover:bg-green-200 dark:hover:bg-green-800"
                 >
-                  ✅ Todos
+                  âÅ“â€¦ Todos
                 </button>
               </div>
             </div>
@@ -1317,17 +1317,17 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
 
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
             <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-2">
-              📋 Formato do Arquivo
+              ðÅ¸â€œâ€¹ Formato do Arquivo
             </h3>
             <p className="text-sm text-blue-800 dark:text-blue-400 mb-2">
-              O arquivo Excel/CSV pode ter 1 ou 2 linhas de cabeçalho e os dados na linha seguinte:
+              O arquivo Excel/CSV pode ter 1 ou 2 linhas de cabeÃ§alho e os dados na linha seguinte:
             </p>
             <ul className="text-sm text-blue-800 dark:text-blue-400 list-disc list-inside space-y-1">
               <li><strong>Nome</strong> - Nome do animal</li>
-              <li><strong>Série</strong> e <strong>RG</strong> - Identificação</li>
-              <li><strong>Pai</strong> e <strong>Mãe</strong> - Genealogia</li>
+              <li><strong>SÃ©rie</strong> e <strong>RG</strong> - IdentificaÃ§Ã£o</li>
+              <li><strong>Pai</strong> e <strong>MÃ£e</strong> - Genealogia</li>
               <li><strong>Receptora</strong> - Se houver</li>
-              <li><strong>ABCZg</strong> ou <strong>IABCZ</strong> - Valor genético</li>
+              <li><strong>ABCZg</strong> ou <strong>IABCZ</strong> - Valor genÃ©tico</li>
               <li><strong>DECA</strong> - Valor DECA</li>
             </ul>
             <Button
@@ -1335,7 +1335,7 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
               onClick={downloadTemplate}
               className="mt-3 text-sm"
             >
-              📥 Baixar Template Excel
+              ðÅ¸â€œ¥ Baixar Template Excel
             </Button>
           </div>
 
@@ -1373,7 +1373,7 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
             }`}>
               <div className="flex items-center gap-2">
                 <span className={`text-lg ${matchStatus.found ? 'text-green-500' : 'text-yellow-500'}`}>
-                  {matchStatus.found ? '✓' : '⚠️'}
+                  {matchStatus.found ? 'âÅ“â€œ' : 'âÅ¡ ï¸�'}
                 </span>
                 <p className={`text-sm ${
                   matchStatus.found 
@@ -1399,14 +1399,14 @@ export default function AnimalExcelUpdater({ isOpen, onClose, animalId, onUpdate
           {availableFields && availableFields.length > 0 && (
             <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-                📊 Campos encontrados no arquivo (adicional à seleção acima):
+                ðÅ¸â€œÅ  Campos encontrados no arquivo (adicional Ã  seleÃ§Ã£o acima):
               </h3>
               <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-                Estes campos foram detectados no arquivo. Marque apenas os que você quer importar além dos já selecionados acima.
+                Estes campos foram detectados no arquivo. Marque apenas os que vocÃª quer importar alÃ©m dos jÃ¡ selecionados acima.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {availableFields.map((key) => {
-                  // Pular campos que já estão em camposSelecionados
+                  // Pular campos que jÃ¡ estÃ£o em camposSelecionados
                   if (camposSelecionados[key]) return null
                   
                   const value = preview ? preview[key] : ''

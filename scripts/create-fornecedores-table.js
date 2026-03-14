@@ -3,10 +3,10 @@ const { query, initDatabase } = require('../lib/database')
 
 async function createFornecedoresTable() {
   try {
-    console.log('🔗 Conectando ao banco de dados...')
+    console.log('ðÅ¸â€�â€” Conectando ao banco de dados...')
     initDatabase()
     
-    console.log('📊 Criando tabela fornecedores_destinatarios...')
+    console.log('ðÅ¸â€œÅ  Criando tabela fornecedores_destinatarios...')
     
     await query(`
       CREATE TABLE IF NOT EXISTS fornecedores_destinatarios (
@@ -39,10 +39,10 @@ async function createFornecedoresTable() {
       CREATE INDEX IF NOT EXISTS idx_fornecedores_cnpj ON fornecedores_destinatarios(cnpj_cpf)
     `)
     
-    console.log('✅ Tabela fornecedores_destinatarios criada com sucesso!')
+    console.log('âÅ“â€¦ Tabela fornecedores_destinatarios criada com sucesso!')
     process.exit(0)
   } catch (error) {
-    console.error('❌ Erro ao criar tabela:', error.message)
+    console.error('â�Å’ Erro ao criar tabela:', error.message)
     process.exit(1)
   }
 }

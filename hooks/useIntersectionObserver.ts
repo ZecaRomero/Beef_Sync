@@ -1,6 +1,6 @@
 /**
- * Hook para detectar quando um elemento está visível no viewport
- * Útil para lazy loading e scroll infinito
+ * Hook para detectar quando um elemento estÃ¡ visÃ­vel no viewport
+ * ÃÅ¡til para lazy loading e scroll infinito
  */
 import { RefObject, useEffect, useState } from 'react'
 
@@ -49,7 +49,7 @@ export function useIntersectionObserver(
 }
 
 /**
- * Hook simplificado que retorna apenas se o elemento está visível
+ * Hook simplificado que retorna apenas se o elemento estÃ¡ visÃ­vel
  */
 export function useIsVisible(
   elementRef: RefObject<Element>,

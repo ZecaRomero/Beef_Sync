@@ -10,7 +10,7 @@ const pool = new Pool({
 
 async function corrigirDuplicata() {
   try {
-    console.log('🔧 Corrigindo duplicata 8251...\n')
+    console.log('�Ÿ”� Corrigindo duplicata 8251...\n')
 
     // Buscar todas as 8251 para identificar qual manter
     const todos = await pool.query(`
@@ -19,7 +19,7 @@ async function corrigirDuplicata() {
     `)
 
     if (todos.rows.length < 2) {
-      console.log('✅ Não há duplicatas. Total de animais 8251:', todos.rows.length)
+      console.log('�œ… Não há duplicatas. Total de animais 8251:', todos.rows.length)
       return
     }
 
@@ -29,40 +29,40 @@ async function corrigirDuplicata() {
     const duplicata = todos.rows.find(a => a.serie === 'M8251' || (a.raca === 'Mestiça' && a.rg === '8251'))
 
     if (!correto) {
-      console.log('⚠️ Receptora M 8251 não encontrada. Verifique manualmente.')
+      console.log('�š�️ Receptora M 8251 não encontrada. Verifique manualmente.')
       todos.rows.forEach(a => console.log(`   ID ${a.id}: ${a.nome} (${a.raca})`))
       return
     }
 
     if (!duplicata) {
-      console.log('⚠️ Duplicata não identificada. Animais encontrados:')
+      console.log('�š�️ Duplicata não identificada. Animais encontrados:')
       todos.rows.forEach(a => console.log(`   ID ${a.id}: ${a.nome} (${a.raca})`))
       return
     }
 
-    console.log('📋 Manter (correto):')
+    console.log('�Ÿ“‹ Manter (correto):')
     console.log(`   ID ${correto.id}: ${correto.nome} - ${correto.raca}`)
     console.log(`   DG: ${correto.data_dg ? new Date(correto.data_dg).toLocaleDateString('pt-BR') + ' - ' + correto.resultado_dg : 'Não tem'}`)
     console.log('')
-    console.log('📋 Remover (duplicata):')
+    console.log('�Ÿ“‹ Remover (duplicata):')
     console.log(`   ID ${duplicata.id}: ${duplicata.nome} - ${duplicata.raca}`)
     console.log('')
 
     // Se a duplicata tiver DG e a correta não, copiar antes de deletar
     if (duplicata.data_dg && !correto.data_dg) {
-      console.log('⚠️ Duplicata tem DG, copiando para o registro correto...')
+      console.log('�š�️ Duplicata tem DG, copiando para o registro correto...')
       await pool.query(`
         UPDATE animais SET data_dg = $1, veterinario_dg = $2, resultado_dg = $3, updated_at = CURRENT_TIMESTAMP
         WHERE id = $4
       `, [duplicata.data_dg, duplicata.veterinario_dg, duplicata.resultado_dg, correto.id])
-      console.log('✅ DG copiado!\n')
+      console.log('�œ… DG copiado!\n')
     }
 
     // Deletar a duplicata
-    console.log(`🗑️ Deletando duplicata ID ${duplicata.id}...`)
+    console.log(`�Ÿ—‘️ Deletando duplicata ID ${duplicata.id}...`)
     await pool.query(`DELETE FROM animais WHERE id = $1`, [duplicata.id])
     
-    console.log('✅ Duplicata deletada!\n')
+    console.log('�œ… Duplicata deletada!\n')
 
     // Verificar resultado final
     const final = await pool.query(`
@@ -71,7 +71,7 @@ async function corrigirDuplicata() {
       WHERE rg = '8251'
     `)
 
-    console.log('📊 Resultado final:')
+    console.log('�Ÿ“Š Resultado final:')
     console.log(`   Total de animais 8251: ${final.rows.length}`)
     if (final.rows.length > 0) {
       final.rows.forEach(a => {
@@ -80,11 +80,11 @@ async function corrigirDuplicata() {
       })
     }
 
-    console.log('\n✅ Correção concluída!')
+    console.log('\n�œ… Correção concluída!')
     console.log('Agora a tela de DG deve funcionar corretamente.')
 
   } catch (error) {
-    console.error('❌ Erro:', error.message)
+    console.error('�Œ Erro:', error.message)
     console.error(error.stack)
   } finally {
     await pool.end()

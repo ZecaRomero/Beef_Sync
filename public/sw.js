@@ -15,27 +15,27 @@ const CACHE_FILES = [
 
 // Instalar Service Worker
 self.addEventListener('install', (event) => {
-  console.log('🔧 Service Worker instalando...')
+  console.log('ðÅ¸â€�§ Service Worker instalando...')
   
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('📦 Cache aberto')
+        console.log('ðÅ¸â€œ¦ Cache aberto')
         return cache.addAll(CACHE_FILES)
       })
       .then(() => {
-        console.log('✅ Service Worker instalado')
+        console.log('âÅ“â€¦ Service Worker instalado')
         return self.skipWaiting()
       })
       .catch((error) => {
-        console.error('❌ Erro na instalação do Service Worker:', error)
+        console.error('â�Å’ Erro na instalaÃ§Ã£o do Service Worker:', error)
       })
   )
 })
 
 // Ativar Service Worker
 self.addEventListener('activate', (event) => {
-  console.log('🚀 Service Worker ativando...')
+  console.log('ðÅ¸Å¡â‚¬ Service Worker ativando...')
   
   event.waitUntil(
     caches.keys()
@@ -43,27 +43,27 @@ self.addEventListener('activate', (event) => {
         return Promise.all(
           cacheNames.map((cacheName) => {
             if (cacheName !== CACHE_NAME) {
-              console.log('🗑️ Removendo cache antigo:', cacheName)
+              console.log('ðÅ¸â€”â€˜ï¸� Removendo cache antigo:', cacheName)
               return caches.delete(cacheName)
             }
           })
         )
       })
       .then(() => {
-        console.log('✅ Service Worker ativado')
+        console.log('âÅ“â€¦ Service Worker ativado')
         return self.clients.claim()
       })
   )
 })
 
-// Interceptar requisições
+// Interceptar requisiÃ§Ãµes
 self.addEventListener('fetch', (event) => {
-  // Ignorar requisições que não são GET
+  // Ignorar requisiÃ§Ãµes que nÃ£o sÃ£o GET
   if (event.request.method !== 'GET') {
     return
   }
 
-  // Ignorar requisições de API
+  // Ignorar requisiÃ§Ãµes de API
   if (event.request.url.includes('/api/')) {
     return
   }
@@ -71,7 +71,7 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
-        // Retornar do cache se disponível
+        // Retornar do cache se disponÃ­vel
         if (response) {
           return response
         }
@@ -79,7 +79,7 @@ self.addEventListener('fetch', (event) => {
         // Tentar buscar da rede
         return fetch(event.request)
           .then((response) => {
-            // Verificar se a resposta é válida
+            // Verificar se a resposta Ã© vÃ¡lida
             if (!response || response.status !== 200 || response.type !== 'basic') {
               return response
             }
@@ -96,7 +96,7 @@ self.addEventListener('fetch', (event) => {
             return response
           })
           .catch(() => {
-            // Se offline, retornar página offline para navegação
+            // Se offline, retornar pÃ¡gina offline para navegaÃ§Ã£o
             if (event.request.destination === 'document') {
               return caches.match(OFFLINE_URL)
             }
@@ -108,9 +108,9 @@ self.addEventListener('fetch', (event) => {
   )
 })
 
-// Sincronização em background
+// SincronizaÃ§Ã£o em background
 self.addEventListener('sync', (event) => {
-  console.log('🔄 Sincronização em background:', event.tag)
+  console.log('ðÅ¸â€�â€ž SincronizaÃ§Ã£o em background:', event.tag)
   
   if (event.tag === 'background-sync') {
     event.waitUntil(
@@ -119,16 +119,16 @@ self.addEventListener('sync', (event) => {
   }
 })
 
-// Função de sincronização offline
+// FunÃ§Ã£o de sincronizaÃ§Ã£o offline
 async function syncOfflineData() {
   try {
-    console.log('📱 Sincronizando dados offline...')
+    console.log('ðÅ¸â€œ± Sincronizando dados offline...')
     
     // Obter dados offline do IndexedDB
     const offlineData = await getOfflineData()
     
     if (offlineData.length === 0) {
-      console.log('📦 Nenhum dado offline para sincronizar')
+      console.log('ðÅ¸â€œ¦ Nenhum dado offline para sincronizar')
       return
     }
 
@@ -137,15 +137,15 @@ async function syncOfflineData() {
       try {
         await syncItem(item)
         await removeOfflineData(item.id)
-        console.log(`✅ Item sincronizado: ${item.id}`)
+        console.log(`âÅ“â€¦ Item sincronizado: ${item.id}`)
       } catch (error) {
-        console.error(`❌ Erro ao sincronizar item ${item.id}:`, error)
+        console.error(`â�Å’ Erro ao sincronizar item ${item.id}:`, error)
       }
     }
 
-    console.log('✅ Sincronização offline concluída')
+    console.log('âÅ“â€¦ SincronizaÃ§Ã£o offline concluÃ­da')
   } catch (error) {
-    console.error('❌ Erro na sincronização offline:', error)
+    console.error('â�Å’ Erro na sincronizaÃ§Ã£o offline:', error)
   }
 }
 
@@ -160,7 +160,7 @@ async function syncItem(item) {
   })
 
   if (!response.ok) {
-    throw new Error(`Erro na sincronização: ${response.status}`)
+    throw new Error(`Erro na sincronizaÃ§Ã£o: ${response.status}`)
   }
 
   return response.json()
@@ -202,12 +202,12 @@ async function removeOfflineData(id) {
   })
 }
 
-// Notificações push
+// NotificaÃ§Ãµes push
 self.addEventListener('push', (event) => {
-  console.log('📨 Push recebido:', event.data)
+  console.log('ðÅ¸â€œ¨ Push recebido:', event.data)
   
   const options = {
-    body: event.data ? event.data.text() : 'Nova notificação do Beef Sync',
+    body: event.data ? event.data.text() : 'Nova notificaÃ§Ã£o do Beef Sync',
     icon: '/beef-sync-icon.svg',
     badge: '/beef-sync-icon.svg',
     vibrate: [100, 50, 100],
@@ -234,9 +234,9 @@ self.addEventListener('push', (event) => {
   )
 })
 
-// Clique em notificação
+// Clique em notificaÃ§Ã£o
 self.addEventListener('notificationclick', (event) => {
-  console.log('🔔 Notificação clicada:', event.action)
+  console.log('ðÅ¸â€�â€� NotificaÃ§Ã£o clicada:', event.action)
   
   event.notification.close()
 
@@ -249,7 +249,7 @@ self.addEventListener('notificationclick', (event) => {
 
 // Mensagens do cliente
 self.addEventListener('message', (event) => {
-  console.log('💬 Mensagem recebida:', event.data)
+  console.log('ðÅ¸â€™¬ Mensagem recebida:', event.data)
   
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting()
@@ -262,10 +262,10 @@ self.addEventListener('message', (event) => {
 
 // Erro no Service Worker
 self.addEventListener('error', (event) => {
-  console.error('❌ Erro no Service Worker:', event.error)
+  console.error('â�Å’ Erro no Service Worker:', event.error)
 })
 
-// Rejeição não tratada
+// RejeiÃ§Ã£o nÃ£o tratada
 self.addEventListener('unhandledrejection', (event) => {
-  console.error('❌ Rejeição não tratada no Service Worker:', event.reason)
+  console.error('â�Å’ RejeiÃ§Ã£o nÃ£o tratada no Service Worker:', event.reason)
 })

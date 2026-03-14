@@ -12,11 +12,11 @@ async function verificarNF240Marcelo() {
   const client = await pool.connect();
   
   try {
-    console.log('🔍 VERIFICANDO NF 240 DO MARCELO\n');
+    console.log('�Ÿ”� VERIFICANDO NF 240 DO MARCELO\n');
     console.log('='.repeat(80));
     
     // 1. Buscar NF 240
-    console.log('\n📋 1. BUSCANDO NF 240:');
+    console.log('\n�Ÿ“‹ 1. BUSCANDO NF 240:');
     const nfResult = await client.query(`
       SELECT id, numero_nf, fornecedor, data_compra, eh_receptoras
       FROM notas_fiscais
@@ -24,11 +24,11 @@ async function verificarNF240Marcelo() {
     `);
     
     if (nfResult.rows.length === 0) {
-      console.log('❌ NF 240 não encontrada!');
-      console.log('\n💡 A NF 240 precisa ser cadastrada primeiro.');
+      console.log('�Œ NF 240 não encontrada!');
+      console.log('\n�Ÿ’� A NF 240 precisa ser cadastrada primeiro.');
       
       // Buscar todas as NFs do Marcelo
-      console.log('\n📋 NFs do Marcelo cadastradas:');
+      console.log('\n�Ÿ“‹ NFs do Marcelo cadastradas:');
       const todasNFsResult = await client.query(`
         SELECT numero_nf, data_compra, eh_receptoras
         FROM notas_fiscais
@@ -37,20 +37,20 @@ async function verificarNF240Marcelo() {
       `);
       
       todasNFsResult.rows.forEach(nf => {
-        console.log(`   - NF ${nf.numero_nf} | Data: ${nf.data_compra} | Receptoras: ${nf.eh_receptoras ? 'SIM' : 'NÃO'}`);
+        console.log(`   - NF ${nf.numero_nf} | Data: ${nf.data_compra} | Receptoras: ${nf.eh_receptoras ? 'SIM' : 'N�ƒO'}`);
       });
       
       return;
     }
     
     const nf = nfResult.rows[0];
-    console.log(`✅ NF 240 encontrada (ID: ${nf.id})`);
+    console.log(`�œ… NF 240 encontrada (ID: ${nf.id})`);
     console.log(`   Fornecedor: ${nf.fornecedor}`);
     console.log(`   Data: ${nf.data_compra}`);
-    console.log(`   É Receptoras: ${nf.eh_receptoras ? 'SIM' : 'NÃO'}`);
+    console.log(`   �‰ Receptoras: ${nf.eh_receptoras ? 'SIM' : 'N�ƒO'}`);
     
     // 2. Buscar itens da NF 240
-    console.log('\n📦 2. ITENS DA NF 240:');
+    console.log('\n�Ÿ“� 2. ITENS DA NF 240:');
     const itensResult = await client.query(`
       SELECT id, tipo_produto, dados_item
       FROM notas_fiscais_itens
@@ -61,8 +61,8 @@ async function verificarNF240Marcelo() {
     console.log(`\nTotal de itens: ${itensResult.rows.length}\n`);
     
     if (itensResult.rows.length === 0) {
-      console.log('❌ Nenhum item cadastrado na NF 240!');
-      console.log('\n💡 Você precisa adicionar os 33 itens (receptoras) na NF 240.');
+      console.log('�Œ Nenhum item cadastrado na NF 240!');
+      console.log('\n�Ÿ’� Você precisa adicionar os 33 itens (receptoras) na NF 240.');
       return;
     }
     
@@ -80,26 +80,26 @@ async function verificarNF240Marcelo() {
         
         if (tatuagem.includes('363')) {
           encontrouG363 = true;
-          console.log(`✅ ${idx + 1}. ENCONTRADA! Tatuagem: ${tatuagem}`);
+          console.log(`�œ… ${idx + 1}. ENCONTRADA! Tatuagem: ${tatuagem}`);
         } else {
           console.log(`${idx + 1}. Tatuagem: ${tatuagem}`);
         }
       } catch (e) {
-        console.log(`${idx + 1}. ⚠️ Erro ao parsear dados_item`);
+        console.log(`${idx + 1}. �š�️ Erro ao parsear dados_item`);
       }
     });
     
-    console.log(`\n📊 Total de itens na NF 240: ${itensResult.rows.length}`);
+    console.log(`\n�Ÿ“Š Total de itens na NF 240: ${itensResult.rows.length}`);
     
     if (!encontrouG363) {
-      console.log('\n❌ G 363 NÃO ENCONTRADA na NF 240!');
-      console.log('\n💡 Você precisa adicionar a G 363 nos itens da NF 240.');
+      console.log('\n�Œ G 363 N�ƒO ENCONTRADA na NF 240!');
+      console.log('\n�Ÿ’� Você precisa adicionar a G 363 nos itens da NF 240.');
     } else {
-      console.log('\n✅ G 363 ENCONTRADA na NF 240!');
+      console.log('\n�œ… G 363 ENCONTRADA na NF 240!');
     }
     
     // 3. Verificar se G 363 existe como animal
-    console.log('\n\n🐮 3. VERIFICANDO G 363 NA TABELA ANIMAIS:');
+    console.log('\n\n�Ÿ�� 3. VERIFICANDO G 363 NA TABELA ANIMAIS:');
     const animalResult = await client.query(`
       SELECT id, serie, rg, nome, fornecedor
       FROM animais
@@ -107,20 +107,20 @@ async function verificarNF240Marcelo() {
     `);
     
     if (animalResult.rows.length > 0) {
-      console.log('✅ G 363 existe como animal!');
+      console.log('�œ… G 363 existe como animal!');
       console.log(`   ID: ${animalResult.rows[0].id}`);
       console.log(`   Nome: ${animalResult.rows[0].nome}`);
       console.log(`   Fornecedor: ${animalResult.rows[0].fornecedor}`);
     } else {
-      console.log('❌ G 363 NÃO existe como animal!');
-      console.log('\n💡 Precisa criar o animal G 363.');
+      console.log('�Œ G 363 N�ƒO existe como animal!');
+      console.log('\n�Ÿ’� Precisa criar o animal G 363.');
     }
     
     console.log('\n' + '='.repeat(80));
-    console.log('\n✅ Verificação concluída!');
+    console.log('\n�œ… Verificação concluída!');
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
     console.error(error);
   } finally {
     client.release();

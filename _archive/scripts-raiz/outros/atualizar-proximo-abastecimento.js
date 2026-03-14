@@ -12,7 +12,7 @@ const pool = new Pool({
 
 async function atualizarProximoAbastecimento() {
   try {
-    console.log('🔄 Atualizando próximo abastecimento...\n');
+    console.log('�Ÿ”„ Atualizando próximo abastecimento...\n');
     
     // Buscar o último abastecimento
     const ultimoResult = await pool.query(`
@@ -23,7 +23,7 @@ async function atualizarProximoAbastecimento() {
     `);
     
     if (ultimoResult.rows.length === 0) {
-      console.log('❌ Nenhum abastecimento encontrado!');
+      console.log('�Œ Nenhum abastecimento encontrado!');
       return;
     }
     
@@ -34,8 +34,8 @@ async function atualizarProximoAbastecimento() {
     const proximoAbastecimento = new Date(dataAbastecimento);
     proximoAbastecimento.setDate(proximoAbastecimento.getDate() + 30);
     
-    console.log(`📅 Último abastecimento: ${dataAbastecimento.toLocaleDateString('pt-BR')}`);
-    console.log(`📅 Próximo abastecimento: ${proximoAbastecimento.toLocaleDateString('pt-BR')}\n`);
+    console.log(`�Ÿ“… �šltimo abastecimento: ${dataAbastecimento.toLocaleDateString('pt-BR')}`);
+    console.log(`�Ÿ“… Próximo abastecimento: ${proximoAbastecimento.toLocaleDateString('pt-BR')}\n`);
     
     // Atualizar o registro
     const updateResult = await pool.query(`
@@ -47,7 +47,7 @@ async function atualizarProximoAbastecimento() {
     
     if (updateResult.rows.length > 0) {
       const atualizado = updateResult.rows[0];
-      console.log('✅ Próximo abastecimento atualizado com sucesso!\n');
+      console.log('�œ… Próximo abastecimento atualizado com sucesso!\n');
       console.log('--- Registro Atualizado ---');
       console.log(`ID: ${atualizado.id}`);
       console.log(`Data Abastecimento: ${new Date(atualizado.data_abastecimento).toLocaleDateString('pt-BR')}`);
@@ -58,7 +58,7 @@ async function atualizarProximoAbastecimento() {
     }
     
   } catch (error) {
-    console.error('❌ Erro ao atualizar próximo abastecimento:', error.message);
+    console.error('�Œ Erro ao atualizar próximo abastecimento:', error.message);
   } finally {
     await pool.end();
   }

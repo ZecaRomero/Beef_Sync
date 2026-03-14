@@ -1,6 +1,6 @@
 /**
  * Constantes centralizadas do sistema Beef Sync
- * Fonte única de verdade para opções de formulários e configurações estáticas.
+ * Fonte Ãºnica de verdade para opÃ§Ãµes de formulÃ¡rios e configuraÃ§Ãµes estÃ¡ticas.
  * 
  * Regra: qualquer lista que aparece em mais de um lugar deve estar aqui.
  */
@@ -10,7 +10,7 @@
 // ---------------------------------------------------------------------------
 
 /**
- * Situações possíveis de um animal — deve corresponder exatamente ao
+ * SituaÃ§Ãµes possÃ­veis de um animal ââ‚¬â€� deve corresponder exatamente ao
  * CHECK constraint `animais_situacao_check` no PostgreSQL.
  */
 export const SITUACOES_ANIMAL = [
@@ -22,17 +22,17 @@ export const SITUACOES_ANIMAL = [
   'Gestante',
   'Lactante',
   'Desmamado',
-  'Em Observação',
+  'Em ObservaÃ§Ã£o',
   'Doado',
 ]
 
 /**
- * Situações de uma gestação — corresponde ao CHECK constraint
+ * SituaÃ§Ãµes de uma gestaÃ§Ã£o ââ‚¬â€� corresponde ao CHECK constraint
  * `gestacoes_situacao_check` no PostgreSQL.
  */
 export const SITUACOES_GESTACAO = ['Ativa', 'Gestante', 'Nasceu', 'Perdeu', 'Cancelada', 'Parida']
 
-/** Séries de identificação e suas raças correspondentes */
+/** SÃ©ries de identificaÃ§Ã£o e suas raÃ§as correspondentes */
 export const RACAS_POR_SERIE = {
   RPT:  'Receptora',
   BENT: 'Brahman',
@@ -46,11 +46,11 @@ export const RACAS_POR_SERIE = {
   PA:   'Nelore PA',
 }
 
-/** Séries disponíveis para seleção em formulários */
+/** SÃ©ries disponÃ­veis para seleÃ§Ã£o em formulÃ¡rios */
 export const SERIES_OPTIONS = Object.keys(RACAS_POR_SERIE)
 
-/** Sexos disponíveis */
-export const SEXOS_ANIMAL = ['Fêmea', 'Macho']
+/** Sexos disponÃ­veis */
+export const SEXOS_ANIMAL = ['FÃªmea', 'Macho']
 
 /** Categorias de animal */
 export const CATEGORIAS_ANIMAL = [
@@ -64,10 +64,10 @@ export const CATEGORIAS_ANIMAL = [
 ]
 
 // ---------------------------------------------------------------------------
-// REPRODUÇÃO
+// REPRODUÃâ€¡ÃÆ’O
 // ---------------------------------------------------------------------------
 
-/** Resultados de diagnóstico de gestação (DG) */
+/** Resultados de diagnÃ³stico de gestaÃ§Ã£o (DG) */
 export const RESULTADOS_DG = ['Prenha', 'Vazia', 'Pendente', 'Indefinido']
 
 /** Tipos de protocolo reprodutivo */
@@ -78,35 +78,35 @@ export const TIPOS_PROTOCOLO = ['IATF', 'IA Convencional', 'Monta Natural', 'TE'
 // ---------------------------------------------------------------------------
 
 export const TIPOS_CUSTO = [
-  'Aquisição',
+  'AquisiÃ§Ã£o',
   'Nascimento',
   'DNA',
   'Medicamentos',
-  'Veterinário',
+  'VeterinÃ¡rio',
   'Manejo',
-  'Reprodução',
+  'ReproduÃ§Ã£o',
   'Infraestrutura',
   'Transporte',
   'Outros',
 ]
 
 export const SUBTIPOS_CUSTO = {
-  DNA:            ['Teste de Paternidade', 'Perfil Genético', 'Genealogia'],
-  Medicamentos:   ['Vacina', 'Antiparasitário', 'Antibiótico', 'Vitamina', 'Hormônio', 'Outros'],
-  Veterinário:    ['Consulta', 'Cirurgia', 'Exame', 'Procedimento'],
-  Manejo:         ['Pesagem', 'Marcação', 'Castração', 'Descorna', 'Casqueamento'],
-  Infraestrutura: ['Cerca', 'Instalações', 'Equipamentos', 'Manutenção'],
-  Reprodução:     ['Sêmen', 'Protocolo IA', 'Embrião', 'FIV', 'Diagnóstico'],
+  DNA:            ['Teste de Paternidade', 'Perfil GenÃ©tico', 'Genealogia'],
+  Medicamentos:   ['Vacina', 'AntiparasitÃ¡rio', 'AntibiÃ³tico', 'Vitamina', 'HormÃ´nio', 'Outros'],
+  VeterinÃ¡rio:    ['Consulta', 'Cirurgia', 'Exame', 'Procedimento'],
+  Manejo:         ['Pesagem', 'MarcaÃ§Ã£o', 'CastraÃ§Ã£o', 'Descorna', 'Casqueamento'],
+  Infraestrutura: ['Cerca', 'InstalaÃ§Ãµes', 'Equipamentos', 'ManutenÃ§Ã£o'],
+  ReproduÃ§Ã£o:     ['SÃªmen', 'Protocolo IA', 'EmbriÃ£o', 'FIV', 'DiagnÃ³stico'],
 }
 
 // ---------------------------------------------------------------------------
-// SÊMEN / ESTOQUE
+// SÃÅ MEN / ESTOQUE
 // ---------------------------------------------------------------------------
 
-export const RACAS_SEMEN = ['Nelore', 'Angus', 'Brahman', 'Simental', 'Gir', 'Girolando', 'Holandês', 'Outros']
+export const RACAS_SEMEN = ['Nelore', 'Angus', 'Brahman', 'Simental', 'Gir', 'Girolando', 'HolandÃªs', 'Outros']
 
 // ---------------------------------------------------------------------------
-// NOTIFICAÇÕES
+// NOTIFICAÃâ€¡Ãâ€¢ES
 // ---------------------------------------------------------------------------
 
 export const TIPOS_NOTIFICACAO = ['info', 'warning', 'error', 'success']

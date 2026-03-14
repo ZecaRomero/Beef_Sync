@@ -2,13 +2,13 @@
 const { query } = require('./lib/database')
 
 async function testCoverageCard() {
-  console.log('🧪 TESTANDO CARD DE COBERTURAS')
+  console.log('�Ÿ�� TESTANDO CARD DE COBERTURAS')
   console.log('=' .repeat(50))
   console.log('')
 
   try {
     // 1. Testar dados básicos
-    console.log('1️⃣ DADOS BÁSICOS:')
+    console.log('1️�ƒ� DADOS BÁSICOS:')
     console.log('-'.repeat(30))
     
     const totals = await query(`
@@ -28,7 +28,7 @@ async function testCoverageCard() {
     
     // 2. Testar dados mensais
     console.log('')
-    console.log('2️⃣ DADOS MENSAIS:')
+    console.log('2️�ƒ� DADOS MENSAIS:')
     console.log('-'.repeat(30))
     
     const monthly = await query(`
@@ -50,7 +50,7 @@ async function testCoverageCard() {
     
     // 3. Testar coberturas recentes
     console.log('')
-    console.log('3️⃣ COBERTURAS RECENTES:')
+    console.log('3️�ƒ� COBERTURAS RECENTES:')
     console.log('-'.repeat(30))
     
     const recent = await query(`
@@ -77,7 +77,7 @@ async function testCoverageCard() {
     })
     
     // 4. Testar estrutura da API
-    console.log('4️⃣ ESTRUTURA DA API:')
+    console.log('4️�ƒ� ESTRUTURA DA API:')
     console.log('-'.repeat(30))
     
     // Simular resposta da API
@@ -132,7 +132,7 @@ async function testCoverageCard() {
     
     // 5. Calcular percentuais
     console.log('')
-    console.log('5️⃣ ESTATÍSTICAS:')
+    console.log('5️�ƒ� ESTATÍSTICAS:')
     console.log('-'.repeat(30))
     
     const total = totalIA + totalFIV
@@ -145,7 +145,7 @@ async function testCoverageCard() {
     
     // 6. Verificar integridade
     console.log('')
-    console.log('6️⃣ VERIFICAÇÃO DE INTEGRIDADE:')
+    console.log('6️�ƒ� VERIFICA�‡�ƒO DE INTEGRIDADE:')
     console.log('-'.repeat(30))
     
     const integrity = await query(`
@@ -162,16 +162,16 @@ async function testCoverageCard() {
     console.log(`Sem tipo definido: ${integrityData.sem_tipo}`)
     
     if (parseInt(integrityData.sem_tipo) === 0) {
-      console.log('✅ Integridade OK - Todas as gestações têm tipo definido')
+      console.log('�œ… Integridade OK - Todas as gestações têm tipo definido')
     } else {
-      console.log('⚠️ Algumas gestações não têm tipo definido')
+      console.log('�š�️ Algumas gestações não têm tipo definido')
     }
     
     console.log('')
-    console.log('✅ TESTE CONCLUÍDO!')
+    console.log('�œ… TESTE CONCLUÍDO!')
     
   } catch (error) {
-    console.error('❌ Erro no teste:', error)
+    console.error('�Œ Erro no teste:', error)
   }
 }
 
@@ -179,11 +179,11 @@ async function testCoverageCard() {
 testCoverageCard()
   .then(() => {
     console.log('')
-    console.log('🎯 RESULTADO:')
-    console.log('• Card de coberturas pronto para uso')
-    console.log('• API funcionando corretamente')
-    console.log('• Dados de IA e FIV disponíveis')
-    console.log('• Integração com dashboard completa')
+    console.log('�ŸŽ� RESULTADO:')
+    console.log('�€� Card de coberturas pronto para uso')
+    console.log('�€� API funcionando corretamente')
+    console.log('�€� Dados de IA e FIV disponíveis')
+    console.log('�€� Integração com dashboard completa')
     process.exit(0)
   })
   .catch(error => {

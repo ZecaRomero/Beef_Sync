@@ -6,7 +6,7 @@ require('dotenv').config({ path: '.env.local' })
 const { query } = require('../lib/database')
 
 async function corrigir() {
-  console.log('🔧 Corrigindo Situação ABCZ do CJCJ 16974...\n')
+  console.log('�Ÿ”� Corrigindo Situação ABCZ do CJCJ 16974...\n')
 
   try {
     const res = await query(
@@ -17,15 +17,15 @@ async function corrigir() {
     )
 
     if (res.rows.length > 0) {
-      console.log('✅ Corrigido com sucesso!')
+      console.log('�œ… Corrigido com sucesso!')
       console.log(`   ID: ${res.rows[0].id}`)
       console.log(`   Série: ${res.rows[0].serie} | RG: ${res.rows[0].rg}`)
       console.log(`   Situação ABCZ: ${res.rows[0].situacao_abcz}`)
     } else {
-      console.log('⚠️ Animal CJCJ 16974 não encontrado no banco.')
+      console.log('�š�️ Animal CJCJ 16974 não encontrado no banco.')
     }
   } catch (err) {
-    console.error('❌ Erro:', err.message)
+    console.error('�Œ Erro:', err.message)
     process.exit(1)
   }
   process.exit(0)

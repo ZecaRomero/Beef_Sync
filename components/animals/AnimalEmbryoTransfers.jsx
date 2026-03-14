@@ -17,7 +17,7 @@ export default function AnimalEmbryoTransfers({ transferencias }) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <CubeTransparentIcon className="h-5 w-5 text-violet-600 dark:text-violet-400" />
-            <h2 className="font-semibold text-gray-900 dark:text-white">Transferências (TE)</h2>
+            <h2 className="font-semibold text-gray-900 dark:text-white">TransferÃªncias (TE)</h2>
           </div>
           {isExpanded ? <ChevronUpIcon className="h-5 w-5" /> : <ChevronDownIcon className="h-5 w-5" />}
         </div>
@@ -34,7 +34,7 @@ export default function AnimalEmbryoTransfers({ transferencias }) {
                 {te.numero_te && <span className="ml-2 text-xs text-gray-500">#{te.numero_te}</span>}
               </p>
               <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
-                Doadora: {formatDoadoraIdentificacao(te.doadora_nome || te.doadora) || '-'} • Touro: {te.touro || '-'}
+                Doadora: {formatDoadoraIdentificacao(te.doadora_nome || te.doadora) || '-'} ââ‚¬¢ Touro: {te.touro || '-'}
               </p>
               {(te.resultado || te.status) && (
                 <span className={`inline-block mt-1 px-2 py-0.5 rounded text-xs font-medium ${

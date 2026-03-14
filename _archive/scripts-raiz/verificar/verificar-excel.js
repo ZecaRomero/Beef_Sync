@@ -3,7 +3,7 @@ const fs = require('fs')
 
 async function verificarExcel() {
   try {
-    console.log('🔍 Verificando arquivo Excel gerado...')
+    console.log('�Ÿ”� Verificando arquivo Excel gerado...')
     
     // Ler o arquivo Excel
     const workbook = new ExcelJS.Workbook()
@@ -11,19 +11,19 @@ async function verificarExcel() {
     
     const worksheet = workbook.getWorksheet('Detalhes dos Animais')
     
-    console.log(`📊 Planilha: ${worksheet.name}`)
-    console.log(`📏 Total de linhas: ${worksheet.rowCount}`)
-    console.log(`📏 Total de colunas: ${worksheet.columnCount}`)
+    console.log(`�Ÿ“Š Planilha: ${worksheet.name}`)
+    console.log(`�Ÿ“� Total de linhas: ${worksheet.rowCount}`)
+    console.log(`�Ÿ“� Total de colunas: ${worksheet.columnCount}`)
     
     // Verificar cabeçalhos
-    console.log('\n📋 Cabeçalhos das colunas:')
+    console.log('\n�Ÿ“‹ Cabeçalhos das colunas:')
     const headerRow = worksheet.getRow(1)
     headerRow.eachCell((cell, colNumber) => {
       console.log(`${colNumber}. ${cell.value}`)
     })
     
     // Verificar dados dos animais mortos
-    console.log('\n💀 Animais mortos encontrados:')
+    console.log('\n�Ÿ’€ Animais mortos encontrados:')
     let animaisMortos = 0
     
     worksheet.eachRow((row, rowNumber) => {
@@ -43,18 +43,18 @@ async function verificarExcel() {
       }
     })
     
-    console.log(`\n📊 Resumo:`)
+    console.log(`\n�Ÿ“Š Resumo:`)
     console.log(`   Total de animais mortos: ${animaisMortos}`)
     console.log(`   Total de linhas de dados: ${worksheet.rowCount - 1}`)
     
     if (animaisMortos > 0) {
-      console.log('✅ Dados de morte estão incluídos no Excel!')
+      console.log('�œ… Dados de morte estão incluídos no Excel!')
     } else {
-      console.log('❌ Nenhum animal morto encontrado no Excel')
+      console.log('�Œ Nenhum animal morto encontrado no Excel')
     }
     
   } catch (error) {
-    console.error('❌ Erro ao verificar Excel:', error.message)
+    console.error('�Œ Erro ao verificar Excel:', error.message)
   }
 }
 

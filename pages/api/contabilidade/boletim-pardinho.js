@@ -1,18 +1,18 @@
 import ExcelJS from 'exceljs'
 import { query } from '../../../lib/database'
 
-// Função auxiliar para calcular meses a partir da era
+// FunÃ§Ã£o auxiliar para calcular meses a partir da era
 function calcularMesesDaEra(eraStr) {
   if (!eraStr) return null
   const eraLower = String(eraStr).toLowerCase().trim()
-  // IMPORTANTE: Verificar faixas específicas ANTES de verificar valores isolados
+  // IMPORTANTE: Verificar faixas especÃ­ficas ANTES de verificar valores isolados
   if (eraLower.includes('24/36') || eraLower.includes('24-36')) {
-    return 30 // Idade média da faixa 24/36 meses
+    return 30 // Idade mÃ©dia da faixa 24/36 meses
   }
   if (eraLower.includes('12/24') || eraLower.includes('12-24')) {
-    return 18 // Idade média da faixa 12/24 meses
+    return 18 // Idade mÃ©dia da faixa 12/24 meses
   }
-  // Tentar parsear como número
+  // Tentar parsear como nÃºmero
   const eraNum = parseInt(eraStr)
   if (!isNaN(eraNum)) {
     return eraNum
@@ -50,13 +50,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log('📥 Recebendo requisição para gerar boletim PARDINHO')
+    console.log('ðÅ¸â€œ¥ Recebendo requisiÃ§Ã£o para gerar boletim PARDINHO')
     const { period, sendToAccounting } = req.body
-    console.log('📋 Período recebido:', period)
+    console.log('ðÅ¸â€œâ€¹ PerÃ­odo recebido:', period)
 
     if (!period || !period.startDate || !period.endDate) {
-      console.error('❌ Período não fornecido')
-      return res.status(400).json({ message: 'Período é obrigatório' })
+      console.error('â�Å’ PerÃ­odo nÃ£o fornecido')
+      return res.status(400).json({ message: 'PerÃ­odo Ã© obrigatÃ³rio' })
     }
 
     // Normalizar datas para formato YYYY-MM-DD aceito pelo PostgreSQL
@@ -73,7 +73,7 @@ export default async function handler(req, res) {
           const [d, m, y] = value.split('/')
           return `${y}-${m}-${d}`
         }
-        // Tentar parse genérico
+        // Tentar parse genÃ©rico
         const d = new Date(value)
         if (!isNaN(d.getTime())) return d.toISOString().split('T')[0]
         return null
@@ -86,21 +86,21 @@ export default async function handler(req, res) {
     const pgStart = toPgDate(period.startDate)
     const pgEnd = toPgDate(period.endDate)
     if (!pgStart || !pgEnd) {
-      console.error('❌ Formato de data inválido:', period)
-      return res.status(400).json({ message: 'Formato de data inválido. Use YYYY-MM-DD ou dd/MM/yyyy.' })
+      console.error('â�Å’ Formato de data invÃ¡lido:', period)
+      return res.status(400).json({ message: 'Formato de data invÃ¡lido. Use YYYY-MM-DD ou dd/MM/yyyy.' })
     }
     
-    // Garantir que início <= fim
+    // Garantir que inÃ­cio <= fim
     if (new Date(pgStart) > new Date(pgEnd)) {
       return res.status(400).json({ message: 'Data inicial maior que a final.' })
     }
     
-    console.log(`📅 Período recebido: ${period.startDate} até ${period.endDate}`)
-    console.log(`📅 Período convertido: ${pgStart} até ${pgEnd}`)
+    console.log(`ðÅ¸â€œâ€¦ PerÃ­odo recebido: ${period.startDate} atÃ© ${period.endDate}`)
+    console.log(`ðÅ¸â€œâ€¦ PerÃ­odo convertido: ${pgStart} atÃ© ${pgEnd}`)
 
-    console.log('🔍 Validando esquema e buscando movimentações de entrada...')
+    console.log('ðÅ¸â€�� Validando esquema e buscando movimentaÃ§Ãµes de entrada...')
 
-    // Verificar existência da tabela e colunas opcionais
+    // Verificar existÃªncia da tabela e colunas opcionais
     let hasTable = true
     let hasLocalidade = true
     let hasDadosExtras = true
@@ -114,12 +114,12 @@ export default async function handler(req, res) {
       `)
       hasTable = !!tbl.rows?.[0]?.exists
     } catch (e) {
-      console.warn('⚠️ Não foi possível verificar existência da tabela movimentacoes_contabeis:', e.message)
+      console.warn('âÅ¡ ï¸� NÃ£o foi possÃ­vel verificar existÃªncia da tabela movimentacoes_contabeis:', e.message)
     }
 
     if (!hasTable) {
       return res.status(400).json({
-        message: 'Tabela movimentacoes_contabeis não encontrada. Execute a inicialização do banco.'
+        message: 'Tabela movimentacoes_contabeis nÃ£o encontrada. Execute a inicializaÃ§Ã£o do banco.'
       })
     }
 
@@ -132,7 +132,7 @@ export default async function handler(req, res) {
       `)
       hasLocalidade = !!col.rows?.[0]?.exists
     } catch (e) {
-      console.warn('⚠️ Não foi possível verificar coluna localidade:', e.message)
+      console.warn('âÅ¡ ï¸� NÃ£o foi possÃ­vel verificar coluna localidade:', e.message)
     }
 
     try {
@@ -144,7 +144,7 @@ export default async function handler(req, res) {
       `)
       hasDadosExtras = !!col.rows?.[0]?.exists
     } catch (e) {
-      console.warn('⚠️ Não foi possível verificar coluna dados_extras:', e.message)
+      console.warn('âÅ¡ ï¸� NÃ£o foi possÃ­vel verificar coluna dados_extras:', e.message)
     }
 
     try {
@@ -156,10 +156,10 @@ export default async function handler(req, res) {
       `)
       hasEraOnAnimais = !!col.rows?.[0]?.exists
     } catch (e) {
-      console.warn('⚠️ Não foi possível verificar coluna era na tabela animais:', e.message)
+      console.warn('âÅ¡ ï¸� NÃ£o foi possÃ­vel verificar coluna era na tabela animais:', e.message)
     }
 
-    // Construir query condicionalmente conforme existência da coluna 'localidade'
+    // Construir query condicionalmente conforme existÃªncia da coluna 'localidade'
     let animaisResult
     try {
       // Montar lista de colunas dinamicamente para evitar erros em bancos mais antigos
@@ -189,27 +189,27 @@ export default async function handler(req, res) {
       `
       const params = [pgStart, pgEnd]
       if (hasLocalidade) {
-        // Tornar o filtro de localidade mais flexível para variações de nomenclatura
-        // Ex.: "AGROPECUÁRIA PARDINHO", "AGROPECUARIA PARDINHO", "Agropecuária Pardinho LTDA"
+        // Tornar o filtro de localidade mais flexÃ­vel para variaÃ§Ãµes de nomenclatura
+        // Ex.: "AGROPECUÃ�RIA PARDINHO", "AGROPECUARIA PARDINHO", "AgropecuÃ¡ria Pardinho LTDA"
         sql += ` AND COALESCE(mc.localidade, '') ILIKE $3`
         params.push('%pardinho%')
       } else {
-        console.warn('⚠️ Coluna localidade ausente em movimentacoes_contabeis. Prosseguindo sem filtro de localidade.')
+        console.warn('âÅ¡ ï¸� Coluna localidade ausente em movimentacoes_contabeis. Prosseguindo sem filtro de localidade.')
       }
 
       sql += ` ORDER BY a.raca, a.sexo, a.meses`
 
       animaisResult = await query(sql, params)
-      console.log('✅ Query executada com sucesso')
+      console.log('âÅ“â€¦ Query executada com sucesso')
     } catch (queryError) {
-      console.error('❌ Erro na query SQL:', queryError)
+      console.error('â�Å’ Erro na query SQL:', queryError)
       throw new Error(`Erro ao buscar animais: ${queryError.message}`)
     }
 
     let animais = animaisResult.rows || []
-    console.log(`📊 Encontrados ${animais.length} animais nas movimentações de entrada da AGROPECUÁRIA PARDINHO`)
+    console.log(`ðÅ¸â€œÅ  Encontrados ${animais.length} animais nas movimentaÃ§Ãµes de entrada da AGROPECUÃ�RIA PARDINHO`)
 
-    // IMPORTANTE: Buscar também SAÍDAS (NF de venda) para subtrair do saldo
+    // IMPORTANTE: Buscar tambÃ©m SAÃ�DAS (NF de venda) para subtrair do saldo
     let saidasResult = []
     try {
       let sqlSaidas = `
@@ -234,25 +234,25 @@ export default async function handler(req, res) {
       }
       sqlSaidas += ` ORDER BY mc.data_movimento`
       saidasResult = (await query(sqlSaidas, paramsSaidas)).rows || []
-      console.log(`📤 Encontradas ${saidasResult.length} movimentações de SAÍDA da AGROPECUÁRIA PARDINHO (serão subtraídas do saldo)`)
+      console.log(`ðÅ¸â€œ¤ Encontradas ${saidasResult.length} movimentaÃ§Ãµes de SAÃ�DA da AGROPECUÃ�RIA PARDINHO (serÃ£o subtraÃ­das do saldo)`)
     } catch (saidasError) {
-      console.warn('⚠️ Erro ao buscar saídas (continuando sem subtrair):', saidasError.message)
+      console.warn('âÅ¡ ï¸� Erro ao buscar saÃ­das (continuando sem subtrair):', saidasError.message)
     }
 
-    // Se não encontrou animais em movimentacoes_contabeis, buscar diretamente das notas fiscais
+    // Se nÃ£o encontrou animais em movimentacoes_contabeis, buscar diretamente das notas fiscais
     if (animais.length === 0) {
-      console.log('⚠️ Nenhum animal encontrado em movimentacoes_contabeis. Buscando diretamente das notas fiscais...')
+      console.log('âÅ¡ ï¸� Nenhum animal encontrado em movimentacoes_contabeis. Buscando diretamente das notas fiscais...')
       
       try {
-        // CNPJs relacionados à AGROPECUÁRIA PARDINHO
+        // CNPJs relacionados Ã  AGROPECUÃ�RIA PARDINHO
         // CNPJ de destino (quem comprou): 18978214000445
         // CNPJ do fornecedor (quem vendeu): 44017440001018
         const cnpjDestinoPardinho = '18978214000445'
         const cnpjFornecedorPardinho = '44017440001018'
         
-        console.log(`📅 Período selecionado: ${pgStart} até ${pgEnd}`)
+        console.log(`ðÅ¸â€œâ€¦ PerÃ­odo selecionado: ${pgStart} atÃ© ${pgEnd}`)
         
-        // Primeiro, buscar NFs de entrada do período onde o CNPJ de destino OU fornecedor é relacionado à AGROPECUÁRIA PARDINHO
+        // Primeiro, buscar NFs de entrada do perÃ­odo onde o CNPJ de destino OU fornecedor Ã© relacionado Ã  AGROPECUÃ�RIA PARDINHO
         // Para NF de entrada: fornecedor vendeu (CNPJ 44017440001018), destino comprou (CNPJ 18978214000445)
         // O campo cnpj_origem_destino pode conter qualquer um dos dois CNPJs
         let nfsResult = await query(`
@@ -282,7 +282,7 @@ export default async function handler(req, res) {
           ORDER BY COALESCE(nf.data_compra, nf.data) DESC
         `, [pgStart, pgEnd, cnpjDestinoPardinho, cnpjFornecedorPardinho, '%pardinho%'])
         
-        console.log(`📋 Encontradas ${nfsResult.rows?.length || 0} notas fiscais de entrada no período relacionadas à AGROPECUÁRIA PARDINHO`)
+        console.log(`ðÅ¸â€œâ€¹ Encontradas ${nfsResult.rows?.length || 0} notas fiscais de entrada no perÃ­odo relacionadas Ã  AGROPECUÃ�RIA PARDINHO`)
         console.log(`   (Buscando por CNPJ destino: ${cnpjDestinoPardinho} ou CNPJ fornecedor: ${cnpjFornecedorPardinho})`)
         if (nfsResult.rows?.length > 0) {
           nfsResult.rows.forEach((nf, idx) => {
@@ -290,9 +290,9 @@ export default async function handler(req, res) {
           })
         }
         
-        // SEMPRE buscar também pela NF 4346 especificamente (IGNORANDO o período)
+        // SEMPRE buscar tambÃ©m pela NF 4346 especificamente (IGNORANDO o perÃ­odo)
         // A NF 4346 saiu do CNPJ 44017440001018 e entrou no CNPJ 18978214000445
-        console.log('🔍 Buscando especificamente pela NF 4346 (ignorando período)...')
+        console.log('ðÅ¸â€�� Buscando especificamente pela NF 4346 (ignorando perÃ­odo)...')
         const nf4346Result = await query(`
           SELECT 
             nf.id,
@@ -314,7 +314,7 @@ export default async function handler(req, res) {
             )
           ORDER BY COALESCE(nf.data_compra, nf.data) DESC
         `, ['4346', '%4346%', '4346%'])
-        console.log(`📋 Encontradas ${nf4346Result.rows?.length || 0} notas fiscais com número 4346 (sem filtro de período)`)
+        console.log(`ðÅ¸â€œâ€¹ Encontradas ${nf4346Result.rows?.length || 0} notas fiscais com nÃºmero 4346 (sem filtro de perÃ­odo)`)
         
         if (nf4346Result.rows?.length > 0) {
           nf4346Result.rows.forEach((nf, idx) => {
@@ -322,7 +322,7 @@ export default async function handler(req, res) {
             const dentroPeriodo = dataNF !== 'N/A' && 
               ((dataNF >= pgStart && dataNF <= pgEnd) || 
                (nf.data_compra >= pgStart && nf.data_compra <= pgEnd))
-            console.log(`   ${idx + 1}. NF ${nf.numero_nf} - Data: ${dataNF} - CNPJ: ${nf.cnpj_origem_destino || 'N/A'} - ${dentroPeriodo ? '✅ DENTRO' : '⚠️ FORA'} do período`)
+            console.log(`   ${idx + 1}. NF ${nf.numero_nf} - Data: ${dataNF} - CNPJ: ${nf.cnpj_origem_destino || 'N/A'} - ${dentroPeriodo ? 'âÅ“â€¦ DENTRO' : 'âÅ¡ ï¸� FORA'} do perÃ­odo`)
           })
         }
         
@@ -334,10 +334,10 @@ export default async function handler(req, res) {
         ;(nf4346Result.rows || []).forEach(nf => {
           nfsMap.set(nf.id, nf)
         })
-        console.log(`📋 Total de NFs únicas encontradas (busca inicial): ${nfsMap.size}`)
+        console.log(`ðÅ¸â€œâ€¹ Total de NFs Ãºnicas encontradas (busca inicial): ${nfsMap.size}`)
         
-        // Buscar também as últimas 20 NFs de entrada (independente do período) para garantir que nada seja perdido
-        console.log('🔍 Buscando últimas 20 NFs de entrada (sem filtro de período) para garantir inclusão completa...')
+        // Buscar tambÃ©m as Ãºltimas 20 NFs de entrada (independente do perÃ­odo) para garantir que nada seja perdido
+        console.log('ðÅ¸â€�� Buscando Ãºltimas 20 NFs de entrada (sem filtro de perÃ­odo) para garantir inclusÃ£o completa...')
         const ultimasNFs = await query(`
           SELECT 
             nf.id,
@@ -353,22 +353,22 @@ export default async function handler(req, res) {
           ORDER BY nf.id DESC
           LIMIT 20
         `)
-        console.log(`📋 Encontradas ${ultimasNFs.rows?.length || 0} últimas NFs de entrada (top 20)`)
+        console.log(`ðÅ¸â€œâ€¹ Encontradas ${ultimasNFs.rows?.length || 0} Ãºltimas NFs de entrada (top 20)`)
         
-        // Adicionar às NFs encontradas se ainda não estiverem lá
+        // Adicionar Ã s NFs encontradas se ainda nÃ£o estiverem lÃ¡
         let novasAdicionadas = 0
         ultimasNFs.rows.forEach(nf => {
           if (!nfsMap.has(nf.id)) {
             nfsMap.set(nf.id, nf)
             novasAdicionadas++
-            console.log(`   ➕ Adicionando NF ${nf.numero_nf} (ID: ${nf.id}) que não estava na busca anterior`)
+            console.log(`   âÅ¾â€¢ Adicionando NF ${nf.numero_nf} (ID: ${nf.id}) que nÃ£o estava na busca anterior`)
           }
         })
-        console.log(`📋 Total de novas NFs adicionadas: ${novasAdicionadas}`)
+        console.log(`ðÅ¸â€œâ€¹ Total de novas NFs adicionadas: ${novasAdicionadas}`)
         
-        // Se não encontrou NF 4346 especificamente, mostrar debug
+        // Se nÃ£o encontrou NF 4346 especificamente, mostrar debug
         if (nf4346Result.rows?.length === 0) {
-          console.log('⚠️ NF 4346 não encontrada. Últimas 10 NFs de entrada:')
+          console.log('âÅ¡ ï¸� NF 4346 nÃ£o encontrada. ÃÅ¡ltimas 10 NFs de entrada:')
           ultimasNFs.rows.slice(0, 10).forEach((nf, idx) => {
             console.log(`   ${idx + 1}. NF ${nf.numero_nf} - CNPJ: ${nf.cnpj_origem_destino || 'N/A'} - Fornecedor: ${nf.fornecedor || 'N/A'} - Data: ${nf.data_compra || nf.data || 'N/A'}`)
           })
@@ -377,7 +377,7 @@ export default async function handler(req, res) {
         // Log detalhado da NF 4346 se encontrada
         if (nf4346Result.rows?.length > 0) {
           nf4346Result.rows.forEach(nf => {
-            console.log(`📋 NF 4346 encontrada:`)
+            console.log(`ðÅ¸â€œâ€¹ NF 4346 encontrada:`)
             console.log(`   - ID: ${nf.id}`)
             console.log(`   - CNPJ origem/destino: ${nf.cnpj_origem_destino || 'N/A'}`)
             console.log(`   - Fornecedor: ${nf.fornecedor || 'N/A'}`)
@@ -386,11 +386,11 @@ export default async function handler(req, res) {
         }
         
         nfsResult.rows = Array.from(nfsMap.values())
-        console.log(`📋 Total final de NFs únicas encontradas: ${nfsResult.rows.length}`)
+        console.log(`ðÅ¸â€œâ€¹ Total final de NFs Ãºnicas encontradas: ${nfsResult.rows.length}`)
         
         // Log detalhado de cada NF encontrada
         if (nfsResult.rows?.length > 0) {
-          console.log('📋 Notas fiscais encontradas:')
+          console.log('ðÅ¸â€œâ€¹ Notas fiscais encontradas:')
           nfsResult.rows.forEach((nf, idx) => {
             console.log(`  ${idx + 1}. NF ${nf.numero_nf} - CNPJ: ${nf.cnpj_origem_destino || 'N/A'} - Fornecedor: ${nf.fornecedor || 'N/A'} - Data: ${nf.data_compra || nf.data || 'N/A'}`)
             console.log(`     Itens (tipo): ${typeof nf.itens}`)
@@ -412,10 +412,10 @@ export default async function handler(req, res) {
         // Processar itens das notas fiscais para criar registros de animais
         const animaisDasNFs = []
         
-        console.log(`🔄 Processando ${nfsResult.rows?.length || 0} notas fiscais...`)
+        console.log(`ðÅ¸â€�â€ž Processando ${nfsResult.rows?.length || 0} notas fiscais...`)
         
         for (const nf of nfsResult.rows || []) {
-          console.log(`\n📄 Processando NF ${nf.numero_nf} (ID: ${nf.id})`)
+          console.log(`\nðÅ¸â€œâ€ž Processando NF ${nf.numero_nf} (ID: ${nf.id})`)
           console.log(`   Tipo de itens: ${typeof nf.itens}`)
           console.log(`   Itens raw: ${JSON.stringify(nf.itens).substring(0, 500)}`)
           
@@ -427,10 +427,10 @@ export default async function handler(req, res) {
                 console.log(`   Parseando itens como string JSON...`)
                 itens = JSON.parse(nf.itens)
               } else if (Array.isArray(nf.itens)) {
-                console.log(`   Itens já é um array`)
+                console.log(`   Itens jÃ¡ Ã© um array`)
                 itens = nf.itens
               } else if (nf.itens && typeof nf.itens === 'object') {
-                console.log(`   Itens é um objeto, tentando extrair array...`)
+                console.log(`   Itens Ã© um objeto, tentando extrair array...`)
                 itens = Array.isArray(nf.itens.itens) ? nf.itens.itens : []
                 if (itens.length === 0 && nf.itens.length !== undefined) {
                   // Pode ser um objeto array-like
@@ -439,9 +439,9 @@ export default async function handler(req, res) {
               }
             }
             
-            // Se não encontrou itens no campo JSONB, buscar da tabela notas_fiscais_itens
+            // Se nÃ£o encontrou itens no campo JSONB, buscar da tabela notas_fiscais_itens
             if ((!itens || itens.length === 0) && nf.id) {
-              console.log(`   ⚠️ Campo itens vazio, buscando da tabela notas_fiscais_itens...`)
+              console.log(`   âÅ¡ ï¸� Campo itens vazio, buscando da tabela notas_fiscais_itens...`)
               try {
                 const itensTabela = await query(`
                   SELECT 
@@ -452,7 +452,7 @@ export default async function handler(req, res) {
                   ORDER BY nfi.id
                 `, [nf.id])
                 
-                console.log(`   📋 Encontrados ${itensTabela.rows?.length || 0} itens na tabela notas_fiscais_itens`)
+                console.log(`   ðÅ¸â€œâ€¹ Encontrados ${itensTabela.rows?.length || 0} itens na tabela notas_fiscais_itens`)
                 
                 if (itensTabela.rows && itensTabela.rows.length > 0) {
                   // Converter itens da tabela para o formato esperado
@@ -462,7 +462,7 @@ export default async function handler(req, res) {
                       try {
                         dadosItem = JSON.parse(dadosItem)
                       } catch (e) {
-                        console.warn(`     ⚠️ Erro ao parsear dados_item: ${e.message}`)
+                        console.warn(`     âÅ¡ ï¸� Erro ao parsear dados_item: ${e.message}`)
                         dadosItem = {}
                       }
                     }
@@ -483,33 +483,33 @@ export default async function handler(req, res) {
                     }
                   })
                   
-                  console.log(`   ✅ ${itens.length} itens convertidos da tabela`)
+                  console.log(`   âÅ“â€¦ ${itens.length} itens convertidos da tabela`)
                   if (itens.length > 0) {
                     console.log(`   Primeiro item da tabela: ${JSON.stringify(itens[0]).substring(0, 300)}`)
                   }
                 }
               } catch (e) {
-                console.warn(`   ⚠️ Erro ao buscar itens da tabela: ${e.message}`)
+                console.warn(`   âÅ¡ ï¸� Erro ao buscar itens da tabela: ${e.message}`)
                 // Continuar mesmo se der erro na busca da tabela
               }
             }
             
-            console.log(`   ✅ Itens processados: ${itens.length} itens encontrados`)
+            console.log(`   âÅ“â€¦ Itens processados: ${itens.length} itens encontrados`)
             if (itens.length > 0) {
               console.log(`   Primeiro item: ${JSON.stringify(itens[0]).substring(0, 300)}`)
             }
           } catch (e) {
-            console.error(`   ❌ Erro ao processar itens da NF ${nf.numero_nf}:`, e.message)
+            console.error(`   â�Å’ Erro ao processar itens da NF ${nf.numero_nf}:`, e.message)
             console.error(`   Stack:`, e.stack)
             itens = []
           }
           
           if (!Array.isArray(itens)) {
-            console.warn(`   ⚠️ Itens não é um array, convertendo...`)
+            console.warn(`   âÅ¡ ï¸� Itens nÃ£o Ã© um array, convertendo...`)
             itens = []
           }
           
-          console.log(`   📊 Total de itens para processar: ${itens.length}`)
+          console.log(`   ðÅ¸â€œÅ  Total de itens para processar: ${itens.length}`)
           
           // Para cada item, criar um registro de animal
           for (const item of itens) {
@@ -518,9 +518,9 @@ export default async function handler(req, res) {
             // Extrair dados do item (suportar diferentes estruturas)
             const sexo = item.sexo || item.sexo_animal || item.sexoAnimal || 
                         (typeof item === 'string' && item.toLowerCase().includes('macho') ? 'Macho' : null) ||
-                        (typeof item === 'string' && item.toLowerCase().includes('fêmea') ? 'Fêmea' : null)
+                        (typeof item === 'string' && item.toLowerCase().includes('fÃªmea') ? 'FÃªmea' : null)
             
-            const raca = item.raca || item.raca_animal || item.racaAnimal || 'Não informado'
+            const raca = item.raca || item.raca_animal || item.racaAnimal || 'NÃ£o informado'
             
             // Tentar extrair idade/era de diferentes campos
             let meses = null
@@ -557,52 +557,52 @@ export default async function handler(req, res) {
               }
             }
             
-            // Se o item tem quantidade > 1, criar múltiplos registros
+            // Se o item tem quantidade > 1, criar mÃºltiplos registros
             const quantidade = parseInt(item.quantidade) || 1
-            console.log(`  📊 Item processado: Quantidade=${quantidade}, Sexo=${animalData.sexo}, Raça=${animalData.raca}, Meses=${animalData.meses}, Era=${animalData.era}`)
+            console.log(`  ðÅ¸â€œÅ  Item processado: Quantidade=${quantidade}, Sexo=${animalData.sexo}, RaÃ§a=${animalData.raca}, Meses=${animalData.meses}, Era=${animalData.era}`)
             
             for (let i = 0; i < quantidade; i++) {
               animaisDasNFs.push({ ...animalData })
             }
             
             if (quantidade > 1) {
-              console.log(`  ✅ Criados ${quantidade} registros de animais para este item`)
+              console.log(`  âÅ“â€¦ Criados ${quantidade} registros de animais para este item`)
             }
           }
         }
         
         animais = animaisDasNFs
-        console.log(`\n✅ Total de animais processados das notas fiscais: ${animais.length}`)
+        console.log(`\nâÅ“â€¦ Total de animais processados das notas fiscais: ${animais.length}`)
         
         if (animais.length > 0) {
-          console.log(`📋 Primeiros 3 animais processados:`)
+          console.log(`ðÅ¸â€œâ€¹ Primeiros 3 animais processados:`)
           animais.slice(0, 3).forEach((animal, idx) => {
-            console.log(`   ${idx + 1}. Sexo: ${animal.sexo}, Raça: ${animal.raca}, Meses: ${animal.meses}, Era: ${animal.era}`)
+            console.log(`   ${idx + 1}. Sexo: ${animal.sexo}, RaÃ§a: ${animal.raca}, Meses: ${animal.meses}, Era: ${animal.era}`)
           })
         } else {
-          console.warn('⚠️ Nenhum animal encontrado nas notas fiscais — gerando Excel vazio com aviso')
-          console.warn('⚠️ Verifique se:')
+          console.warn('âÅ¡ ï¸� Nenhum animal encontrado nas notas fiscais ââ‚¬â€� gerando Excel vazio com aviso')
+          console.warn('âÅ¡ ï¸� Verifique se:')
           console.warn('   1. A NF 4346 existe no banco de dados')
           console.warn('   2. A NF 4346 tem itens cadastrados')
-          console.warn('   3. Os itens têm os campos sexo, raça e idade/era preenchidos')
+          console.warn('   3. Os itens tÃªm os campos sexo, raÃ§a e idade/era preenchidos')
         }
       } catch (nfError) {
-        console.error('❌ Erro ao buscar animais das notas fiscais:', nfError)
-        console.warn('⚠️ Continuando com lista vazia de animais')
+        console.error('â�Å’ Erro ao buscar animais das notas fiscais:', nfError)
+        console.warn('âÅ¡ ï¸� Continuando com lista vazia de animais')
       }
     }
 
-    console.log(`📊 Processando ${animais.length} animais das movimentações de entrada da AGROPECUÁRIA PARDINHO`)
+    console.log(`ðÅ¸â€œÅ  Processando ${animais.length} animais das movimentaÃ§Ãµes de entrada da AGROPECUÃ�RIA PARDINHO`)
 
-    console.log('📝 Criando workbook Excel...')
+    console.log('ðÅ¸â€œ� Criando workbook Excel...')
     const workbook = new ExcelJS.Workbook()
-    const sheet = workbook.addWorksheet('Boletim AGROPECUÁRIA PARDINHO')
-    console.log('✅ Workbook criado')
+    const sheet = workbook.addWorksheet('Boletim AGROPECUÃ�RIA PARDINHO')
+    console.log('âÅ“â€¦ Workbook criado')
 
-    // Cabeçalho principal com bordas
+    // CabeÃ§alho principal com bordas
     sheet.mergeCells('A1:L1')
     const headerCell = sheet.getCell('A1')
-    headerCell.value = '🐄 BOLETIM DE GADO - AGROPECUÁRIA PARDINHO LTDA'
+    headerCell.value = 'ðÅ¸�â€ž BOLETIM DE GADO - AGROPECUÃ�RIA PARDINHO LTDA'
     headerCell.font = { size: 18, bold: true, color: { argb: 'FFFFFF' } }
     headerCell.alignment = { horizontal: 'center', vertical: 'middle' }
     headerCell.fill = {
@@ -618,15 +618,15 @@ export default async function handler(req, res) {
     }
     sheet.getRow(1).height = 35
 
-    // Subtítulo
+    // SubtÃ­tulo
     sheet.mergeCells('A2:L2')
     const subtitleCell = sheet.getCell('A2')
-    subtitleCell.value = 'RELATÓRIO CONTÁBIL PARA CONTABILIDADE'
+    subtitleCell.value = 'RELATÃâ€œRIO CONTÃ�BIL PARA CONTABILIDADE'
     subtitleCell.font = { size: 12, bold: true, color: { argb: '1E40AF' } }
     subtitleCell.alignment = { horizontal: 'center', vertical: 'middle' }
     sheet.getRow(2).height = 20
 
-    // Função auxiliar para formatar data de forma segura
+    // FunÃ§Ã£o auxiliar para formatar data de forma segura
     const formatarData = (dateString) => {
       try {
         if (!dateString) return 'N/A'
@@ -641,17 +641,17 @@ export default async function handler(req, res) {
       }
     }
 
-    // Período com bordas
+    // PerÃ­odo com bordas
     sheet.mergeCells('A3:L3')
     const periodCell = sheet.getCell('A3')
     const dataInicio = formatarData(period.startDate)
     const dataFim = formatarData(period.endDate)
-    periodCell.value = `Período: ${dataInicio} até ${dataFim}`
+    periodCell.value = `PerÃ­odo: ${dataInicio} atÃ© ${dataFim}`
     periodCell.font = { size: 11, bold: true }
     periodCell.alignment = { horizontal: 'center', vertical: 'middle' }
     sheet.getRow(3).height = 18
 
-    // Data de geração
+    // Data de geraÃ§Ã£o
     sheet.mergeCells('A4:L4')
     const dateCell = sheet.getCell('A4')
     const agora = new Date()
@@ -668,14 +668,14 @@ export default async function handler(req, res) {
 
     sheet.addRow([]) // Linha vazia
 
-    // Cabeçalhos da tabela principal - separados por sexo
+    // CabeÃ§alhos da tabela principal - separados por sexo
     const headerRow = sheet.addRow([
-      'Raça',
-      'FÊMEA - 0-7 meses',
-      'FÊMEA - 7-12 meses',
-      'FÊMEA - 12-18 meses',
-      'FÊMEA - 18-24 meses',
-      'FÊMEA - 24+ meses',
+      'RaÃ§a',
+      'FÃÅ MEA - 0-7 meses',
+      'FÃÅ MEA - 7-12 meses',
+      'FÃÅ MEA - 12-18 meses',
+      'FÃÅ MEA - 18-24 meses',
+      'FÃÅ MEA - 24+ meses',
       'MACHO - 0-7 meses',
       'MACHO - 7-15 meses',
       'MACHO - 15-18 meses',
@@ -701,19 +701,19 @@ export default async function handler(req, res) {
       }
     })
 
-    console.log('📊 Calculando dados dos animais agrupados por raça, sexo e faixa etária...')
-    // Calcular dados dos animais agrupados por raça, sexo e faixa etária (entradas - saídas)
-    const racasEntrada = animais.map(a => a.raca || 'Não informado')
+    console.log('ðÅ¸â€œÅ  Calculando dados dos animais agrupados por raÃ§a, sexo e faixa etÃ¡ria...')
+    // Calcular dados dos animais agrupados por raÃ§a, sexo e faixa etÃ¡ria (entradas - saÃ­das)
+    const racasEntrada = animais.map(a => a.raca || 'NÃ£o informado')
     const racasSaida = saidasResult.map(s => {
       const dex = typeof s.dados_extras === 'string' ? (() => { try { return JSON.parse(s.dados_extras) } catch { return {} } })() : (s.dados_extras || {})
       if (dex && typeof dex === 'object' && dex.raca) return dex.raca
-      return s.raca || 'Não informado'
+      return s.raca || 'NÃ£o informado'
     })
     const racas = [...new Set([...racasEntrada, ...racasSaida])]
-    console.log(`📋 Raças encontradas: ${racas.join(', ')}`)
+    console.log(`ðÅ¸â€œâ€¹ RaÃ§as encontradas: ${racas.join(', ')}`)
     const dadosPorRaca = {}
     
-    // Inicializar contadores para cada raça
+    // Inicializar contadores para cada raÃ§a
     racas.forEach(raca => {
       dadosPorRaca[raca] = {
         'femea_0-7': 0,
@@ -748,12 +748,12 @@ export default async function handler(req, res) {
           }
         }
         
-        // Se não tem data de nascimento, usar campo meses
+        // Se nÃ£o tem data de nascimento, usar campo meses
         if ((!idadeMeses || idadeMeses === 0) && animal.meses) {
           idadeMeses = parseInt(animal.meses) || 0
         }
 
-        // Fallback via dados_extras (ex.: era: '36+', '7-15', '18-22', ou meses numérico)
+        // Fallback via dados_extras (ex.: era: '36+', '7-15', '18-22', ou meses numÃ©rico)
         if ((!idadeMeses || idadeMeses === 0) && dadosExtras && typeof dadosExtras === 'object') {
           const mesesInfo = dadosExtras.meses
           const era = dadosExtras.era ? String(dadosExtras.era).toLowerCase() : ''
@@ -761,21 +761,21 @@ export default async function handler(req, res) {
             idadeMeses = mesesInfo
           } else if (era) {
             // Processar era como "24/36", "24-36", "36+", "36+ meses", etc.
-            // IMPORTANTE: Verificar faixas específicas ANTES de verificar valores isolados
+            // IMPORTANTE: Verificar faixas especÃ­ficas ANTES de verificar valores isolados
             if (era.includes('24/36') || era.includes('24-36')) {
-              // Faixa 24/36 meses: usar idade média de 30 meses
+              // Faixa 24/36 meses: usar idade mÃ©dia de 30 meses
               idadeMeses = 30
             } else if (era.includes('18-22') || era.includes('18/22')) {
-              idadeMeses = 20 // Idade média da faixa
+              idadeMeses = 20 // Idade mÃ©dia da faixa
             } else if (era.includes('7-15') || era.includes('7/15')) {
-              idadeMeses = 11 // Idade média da faixa
+              idadeMeses = 11 // Idade mÃ©dia da faixa
             } else if (era.includes('15-18') || era.includes('15/18')) {
-              idadeMeses = 16.5 // Idade média da faixa
+              idadeMeses = 16.5 // Idade mÃ©dia da faixa
             } else if (era.includes('12-18') || era.includes('12/18')) {
-              idadeMeses = 15 // Idade média da faixa
+              idadeMeses = 15 // Idade mÃ©dia da faixa
             } else if (era.includes('36') || era.includes('+36')) {
-              // Verificar "36+" isoladamente apenas se não for "24/36"
-              idadeMeses = 36 // Machos com 36+ meses vão para a categoria 36+
+              // Verificar "36+" isoladamente apenas se nÃ£o for "24/36"
+              idadeMeses = 36 // Machos com 36+ meses vÃ£o para a categoria 36+
             } else if (era.includes('24') || era.includes('+24')) {
               idadeMeses = 24
             } else if (era.includes('22') || era.includes('+22')) {
@@ -792,25 +792,25 @@ export default async function handler(req, res) {
           }
         }
         
-        // Também verificar o campo era diretamente no animal (quando vem de notas fiscais)
+        // TambÃ©m verificar o campo era diretamente no animal (quando vem de notas fiscais)
         if ((!idadeMeses || idadeMeses === 0) && animal.era) {
           const era = String(animal.era).toLowerCase()
-          // IMPORTANTE: Verificar faixas específicas ANTES de verificar valores isolados
+          // IMPORTANTE: Verificar faixas especÃ­ficas ANTES de verificar valores isolados
           if (era.includes('24/36') || era.includes('24-36')) {
-            // Faixa 24/36 meses: usar idade média de 30 meses
+            // Faixa 24/36 meses: usar idade mÃ©dia de 30 meses
             idadeMeses = 30
           } else if (era.includes('18-22') || era.includes('18/22')) {
-            idadeMeses = 20 // Idade média da faixa
+            idadeMeses = 20 // Idade mÃ©dia da faixa
           } else if (era.includes('7-15') || era.includes('7/15')) {
-            idadeMeses = 11 // Idade média da faixa
+            idadeMeses = 11 // Idade mÃ©dia da faixa
           } else if (era.includes('15-18') || era.includes('15/18')) {
-            idadeMeses = 16.5 // Idade média da faixa
+            idadeMeses = 16.5 // Idade mÃ©dia da faixa
           } else if (era.includes('12/24') || era.includes('12-24')) {
-            idadeMeses = 18 // Idade média da faixa 12/24 meses
+            idadeMeses = 18 // Idade mÃ©dia da faixa 12/24 meses
           } else if (era.includes('12-18') || era.includes('12/18')) {
-            idadeMeses = 15 // Idade média da faixa
+            idadeMeses = 15 // Idade mÃ©dia da faixa
           } else if (era.includes('36') || era.includes('+36')) {
-            // Verificar "36+" isoladamente apenas se não for "24/36"
+            // Verificar "36+" isoladamente apenas se nÃ£o for "24/36"
             idadeMeses = 36
           } else if (era.includes('24') || era.includes('+24')) {
             idadeMeses = 24
@@ -827,39 +827,39 @@ export default async function handler(req, res) {
           }
         }
         
-        // Se não tem idade mas tem era, tentar processar novamente
+        // Se nÃ£o tem idade mas tem era, tentar processar novamente
         if ((!idadeMeses || idadeMeses === 0) && animal.era) {
           const eraStr = String(animal.era).toLowerCase()
-          // Verificar faixas específicas primeiro
+          // Verificar faixas especÃ­ficas primeiro
           if (eraStr.includes('24/36') || eraStr.includes('24-36')) {
             idadeMeses = 30
-            console.log(`   ✅ Animal sem idade mas com era "${animal.era}" - usando 30 meses (média de 24/36)`)
+            console.log(`   âÅ“â€¦ Animal sem idade mas com era "${animal.era}" - usando 30 meses (mÃ©dia de 24/36)`)
           } else if (eraStr.includes('12/24') || eraStr.includes('12-24')) {
             idadeMeses = 18
-            console.log(`   ✅ Animal sem idade mas com era "${animal.era}" - usando 18 meses (média de 12/24)`)
+            console.log(`   âÅ“â€¦ Animal sem idade mas com era "${animal.era}" - usando 18 meses (mÃ©dia de 12/24)`)
           } else if (eraStr.includes('36') || eraStr.includes('+36')) {
             idadeMeses = 36
-            console.log(`   ✅ Animal sem idade mas com era "${animal.era}" - usando 36 meses`)
+            console.log(`   âÅ“â€¦ Animal sem idade mas com era "${animal.era}" - usando 36 meses`)
           }
         }
         
         if (!idadeMeses || idadeMeses === 0) {
           animaisSemIdade++
-          console.log(`   ⚠️ Animal ${index} sem idade válida - sexo: ${animal.sexo}, era: ${animal.era}, meses: ${animal.meses}`)
-          return // Pular animais sem idade válida
+          console.log(`   âÅ¡ ï¸� Animal ${index} sem idade vÃ¡lida - sexo: ${animal.sexo}, era: ${animal.era}, meses: ${animal.meses}`)
+          return // Pular animais sem idade vÃ¡lida
         }
         
         animaisProcessados++
         
-        const raca = animal.raca || (dadosExtras && dadosExtras.raca) || 'Não informado'
+        const raca = animal.raca || (dadosExtras && dadosExtras.raca) || 'NÃ£o informado'
         const sexoRaw = animal.sexo || ''
         const sexoExtra = dadosExtras && dadosExtras.sexo ? String(dadosExtras.sexo) : ''
         const sexoFinal = (sexoRaw || sexoExtra).toLowerCase()
-        const isFemea = sexoFinal.includes('fêmea') || sexoFinal.includes('femea') || sexoFinal === 'f' || sexoFinal === 'fêmea'
+        const isFemea = sexoFinal.includes('fÃªmea') || sexoFinal.includes('femea') || sexoFinal === 'f' || sexoFinal === 'fÃªmea'
         const isMacho = sexoFinal.includes('macho') || sexoFinal === 'm' || sexoFinal === 'macho'
         
         // Log para debug
-        if (index < 5) { // Log apenas os primeiros 5 para não poluir
+        if (index < 5) { // Log apenas os primeiros 5 para nÃ£o poluir
           console.log(`Animal ${index}: sexoRaw="${sexoRaw}", sexoFinal="${sexoFinal}", isMacho=${isMacho}, isFemea=${isFemea}, idadeMeses=${idadeMeses}`)
         }
         
@@ -871,10 +871,10 @@ export default async function handler(req, res) {
           }
         }
         
-        // Quantidade (se houver em dados_extras), padrão 1
+        // Quantidade (se houver em dados_extras), padrÃ£o 1
         const quantidade = dadosExtras && typeof dadosExtras === 'object' && Number.isInteger(dadosExtras.quantidade) ? Math.max(1, dadosExtras.quantidade) : 1
 
-        // Categorizar por faixa etária baseado no sexo
+        // Categorizar por faixa etÃ¡ria baseado no sexo
         if (isFemea) {
           if (idadeMeses >= 0 && idadeMeses <= 7) {
             dadosPorRaca[raca]['femea_0-7'] += quantidade
@@ -897,19 +897,19 @@ export default async function handler(req, res) {
           } else if (idadeMeses > 18 && idadeMeses <= 22) {
             dadosPorRaca[raca]['macho_18-22'] += quantidade
           } else if (idadeMeses > 22) {
-            // Machos com mais de 22 meses vão para a categoria 36+ meses
+            // Machos com mais de 22 meses vÃ£o para a categoria 36+ meses
             dadosPorRaca[raca]['macho_36+'] += quantidade
           }
         }
         
         dadosPorRaca[raca].total += quantidade
       } catch (animalError) {
-        console.error(`❌ Erro ao processar animal ${index}:`, animalError)
+        console.error(`â�Å’ Erro ao processar animal ${index}:`, animalError)
         console.error('Animal:', animal)
       }
     })
 
-    // SUBTRAIR SAÍDAS (NF de venda) do saldo
+    // SUBTRAIR SAÃ�DAS (NF de venda) do saldo
     let saidasProcessadas = 0
     saidasResult.forEach((saida, index) => {
       try {
@@ -947,10 +947,10 @@ export default async function handler(req, res) {
           else if (era.includes('36') || era.includes('+36')) idadeMeses = 36
         }
         if (!idadeMeses || idadeMeses === 0) return
-        const raca = saida.raca || (dadosExtras && dadosExtras.raca) || 'Não informado'
+        const raca = saida.raca || (dadosExtras && dadosExtras.raca) || 'NÃ£o informado'
         const sexoRaw = saida.sexo || (dadosExtras && dadosExtras.sexo) || ''
         const sexoFinal = String(sexoRaw).toLowerCase()
-        const isFemea = sexoFinal.includes('fêmea') || sexoFinal.includes('femea') || sexoFinal === 'f'
+        const isFemea = sexoFinal.includes('fÃªmea') || sexoFinal.includes('femea') || sexoFinal === 'f'
         const isMacho = sexoFinal.includes('macho') || sexoFinal === 'm'
         if (!dadosPorRaca[raca]) {
           dadosPorRaca[raca] = { 'femea_0-7': 0, 'femea_7-12': 0, 'femea_12-18': 0, 'femea_18-24': 0, 'femea_24+': 0, 'macho_0-7': 0, 'macho_7-15': 0, 'macho_15-18': 0, 'macho_18-22': 0, 'macho_36+': 0, total: 0 }
@@ -972,18 +972,18 @@ export default async function handler(req, res) {
         dadosPorRaca[raca].total -= quantidade
         saidasProcessadas++
       } catch (err) {
-        console.warn(`⚠️ Erro ao processar saída ${index}:`, err.message)
+        console.warn(`âÅ¡ ï¸� Erro ao processar saÃ­da ${index}:`, err.message)
       }
     })
 
-    console.log(`✅ Processados ${animaisProcessados} entradas, ${saidasProcessadas} saídas subtraídas (${animaisSemIdade} sem idade válida)`)
+    console.log(`âÅ“â€¦ Processados ${animaisProcessados} entradas, ${saidasProcessadas} saÃ­das subtraÃ­das (${animaisSemIdade} sem idade vÃ¡lida)`)
 
-    // Adicionar linhas com dados (ordenadas por raça)
+    // Adicionar linhas com dados (ordenadas por raÃ§a)
     const racasOrdenadas = racas.sort()
     
     if (racasOrdenadas.length === 0) {
-      console.warn('⚠️ Nenhuma raça encontrada após processamento')
-      sheet.addRow(['Nenhum dado disponível'])
+      console.warn('âÅ¡ ï¸� Nenhuma raÃ§a encontrada apÃ³s processamento')
+      sheet.addRow(['Nenhum dado disponÃ­vel'])
     } else {
       racasOrdenadas.forEach(raca => {
         const dados = dadosPorRaca[raca] || {
@@ -1041,7 +1041,7 @@ export default async function handler(req, res) {
       total: racasOrdenadas.reduce((sum, raca) => sum + (dadosPorRaca[raca]?.total || 0), 0)
     }
 
-    // Linha de total (só adicionar se houver dados)
+    // Linha de total (sÃ³ adicionar se houver dados)
     if (racasOrdenadas.length > 0) {
       const totalRow = sheet.addRow([
         'TOTAL GERAL',
@@ -1058,7 +1058,7 @@ export default async function handler(req, res) {
         totais.total || 0
       ])
       totalRow.font = { bold: true, color: { argb: 'FFFFFF' } }
-      // Usar o índice da coluna fornecido pelo eachCell para evitar acessar propriedades inexistentes
+      // Usar o Ã­ndice da coluna fornecido pelo eachCell para evitar acessar propriedades inexistentes
       totalRow.eachCell((cell, colNumber) => {
         if (colNumber > 1) {
           cell.alignment = { horizontal: 'center', vertical: 'middle' }
@@ -1077,8 +1077,8 @@ export default async function handler(req, res) {
       })
     }
 
-    // Formatar largura das colunas de forma compatível com ExcelJS
-    // Em algumas versões, sheet.columns pode estar indefinido se não configurado explicitamente.
+    // Formatar largura das colunas de forma compatÃ­vel com ExcelJS
+    // Em algumas versÃµes, sheet.columns pode estar indefinido se nÃ£o configurado explicitamente.
     // Usamos getColumn(index) para garantir que a coluna exista.
     const totalColumns = 12 // A1..L1
     for (let i = 1; i <= totalColumns; i++) {
@@ -1086,25 +1086,25 @@ export default async function handler(req, res) {
       column.width = i === 1 ? 20 : 15
     }
 
-    console.log('💾 Gerando buffer do Excel...')
+    console.log('ðÅ¸â€™¾ Gerando buffer do Excel...')
     // Gerar buffer
     let buffer
     try {
       buffer = await workbook.xlsx.writeBuffer()
-      console.log('✅ Buffer gerado com sucesso')
+      console.log('âÅ“â€¦ Buffer gerado com sucesso')
     } catch (bufferError) {
-      console.error('❌ Erro ao gerar buffer:', bufferError)
+      console.error('â�Å’ Erro ao gerar buffer:', bufferError)
       throw new Error(`Erro ao gerar arquivo Excel: ${bufferError.message}`)
     }
 
-    console.log('📤 Enviando resposta...')
+    console.log('ðÅ¸â€œ¤ Enviando resposta...')
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     res.setHeader('Content-Disposition', `attachment; filename=boletim-agropecuaria-pardinho-${pgStart}-${pgEnd}.xlsx`)
     res.send(Buffer.from(buffer))
-    console.log('✅ Arquivo enviado com sucesso')
+    console.log('âÅ“â€¦ Arquivo enviado com sucesso')
 
   } catch (error) {
-    console.error('Erro ao gerar boletim AGROPECUÁRIA PARDINHO:', error)
+    console.error('Erro ao gerar boletim AGROPECUÃ�RIA PARDINHO:', error)
     console.error('Stack trace:', error.stack)
     
     // Retornar mensagem de erro mais detalhada em desenvolvimento

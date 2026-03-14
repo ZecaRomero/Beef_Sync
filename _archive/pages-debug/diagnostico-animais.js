@@ -70,15 +70,15 @@ export default function DiagnosticoAnimais() {
       }
       
       if (diag.localStorage > 0 && diag.api === 0) {
-        diag.problemas.push('❌ API não está retornando animais (possível problema no PostgreSQL)')
+        diag.problemas.push('�Œ API não está retornando animais (possível problema no PostgreSQL)')
       }
       
       if (diag.localStorage === 0) {
-        diag.problemas.push('⚠️ Nenhum animal no localStorage')
+        diag.problemas.push('�š�️ Nenhum animal no localStorage')
       }
       
       if (diag.diferenca > 0) {
-        diag.problemas.push(`⚠️ ${diag.diferenca} animal(is) no localStorage não aparecem na API`)
+        diag.problemas.push(`�š�️ ${diag.diferenca} animal(is) no localStorage não aparecem na API`)
       }
       
       setDiagnostico(diag)
@@ -119,16 +119,16 @@ export default function DiagnosticoAnimais() {
         })
         
         if (response.ok) {
-          console.log('✅ Animal sincronizado:', animal.serie, animal.rg)
+          console.log('�œ… Animal sincronizado:', animal.serie, animal.rg)
         } else {
-          console.error('❌ Erro ao sincronizar:', animal.serie, animal.rg)
+          console.error('�Œ Erro ao sincronizar:', animal.serie, animal.rg)
         }
       } catch (error) {
-        console.error('❌ Erro na sincronização:', error)
+        console.error('�Œ Erro na sincronização:', error)
       }
     })
     
-    alert('🔄 Sincronização iniciada! Verifique o console para detalhes.')
+    alert('�Ÿ”„ Sincronização iniciada! Verifique o console para detalhes.')
     setTimeout(() => carregarDiagnostico(), 2000)
   }
 
@@ -255,12 +255,12 @@ export default function DiagnosticoAnimais() {
         </SimpleCard>
       )}
 
-      {/* Últimos 10 Animais Cadastrados */}
+      {/* �šltimos 10 Animais Cadastrados */}
       <SimpleCard>
         <CardHeader>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
             <InformationCircleIcon className="h-5 w-5 mr-2 text-blue-600" />
-            Últimos 10 Animais Cadastrados
+            �šltimos 10 Animais Cadastrados
           </h3>
         </CardHeader>
         <CardBody>
@@ -338,30 +338,30 @@ export default function DiagnosticoAnimais() {
       <SimpleCard>
         <CardHeader>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            📋 Instruções para Resolver Problemas
+            �Ÿ“‹ Instruções para Resolver Problemas
           </h3>
         </CardHeader>
         <CardBody>
           <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
             <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
               <p><strong>1. Se animais não aparecem na lista:</strong></p>
-              <p>• Verifique se o PostgreSQL está rodando</p>
-              <p>• Use o botão "Sincronizar com API" acima</p>
-              <p>• Verifique os logs do servidor</p>
+              <p>�€� Verifique se o PostgreSQL está rodando</p>
+              <p>�€� Use o botão "Sincronizar com API" acima</p>
+              <p>�€� Verifique os logs do servidor</p>
             </div>
             
             <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
               <p><strong>2. Para cadastrar novos animais:</strong></p>
-              <p>• Vá em "Animais" → "Lista de Animais"</p>
-              <p>• Clique em "+ Novo Animal"</p>
-              <p>• Preencha os dados obrigatórios</p>
+              <p>�€� Vá em "Animais" �†’ "Lista de Animais"</p>
+              <p>�€� Clique em "+ Novo Animal"</p>
+              <p>�€� Preencha os dados obrigatórios</p>
             </div>
             
             <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
               <p><strong>3. Se o problema persistir:</strong></p>
-              <p>• Reinicie o servidor (Ctrl+C e npm run dev)</p>
-              <p>• Verifique a conexão com o banco de dados</p>
-              <p>• Limpe o cache do navegador</p>
+              <p>�€� Reinicie o servidor (Ctrl+C e npm run dev)</p>
+              <p>�€� Verifique a conexão com o banco de dados</p>
+              <p>�€� Limpe o cache do navegador</p>
             </div>
           </div>
         </CardBody>

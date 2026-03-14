@@ -1,26 +1,26 @@
 /**
- * API para aplicar custos automáticos aos animais conforme regras:
- * - Situação ABCZ POSSUI RGN → R$ 36,90
- * - Situação ABCZ POSSUI RGD → R$ 89,10
- * - Fêmeas 8+ meses → Vacina Brucelose R$ 2,76
- * - Receptoras → DNA VRGEN R$ 50,00
- * - Receptoras sem DNA Genômica → R$ 80,00
- * - Todos os animais → Brinco Amarelo R$ 2,70
- * - Todos os animais → Botton Eletrônico R$ 6,00
- * - Machos 15-32 meses → Exame Andrológico + Exames R$ 165,00
+ * API para aplicar custos automÃ¡ticos aos animais conforme regras:
+ * - SituaÃ§Ã£o ABCZ POSSUI RGN ââ€ â€™ R$ 36,90
+ * - SituaÃ§Ã£o ABCZ POSSUI RGD ââ€ â€™ R$ 89,10
+ * - FÃªmeas 8+ meses ââ€ â€™ Vacina Brucelose R$ 2,76
+ * - Receptoras ââ€ â€™ DNA VRGEN R$ 50,00
+ * - Receptoras sem DNA GenÃ´mica ââ€ â€™ R$ 80,00
+ * - Todos os animais ââ€ â€™ Brinco Amarelo R$ 2,70
+ * - Todos os animais ââ€ â€™ Botton EletrÃ´nico R$ 6,00
+ * - Machos 15-32 meses ââ€ â€™ Exame AndrolÃ³gico + Exames R$ 165,00
  */
 const { query } = require('../../../lib/database')
 const databaseService = require('../../../services/databaseService').default || require('../../../services/databaseService')
 
 const CUSTOS = {
-  RGN: { tipo: 'ABCZ', subtipo: 'RGN', valor: 36.90, desc: 'Situação ABCZ POSSUI RGN' },
-  RGD: { tipo: 'ABCZ', subtipo: 'RGD', valor: 89.10, desc: 'Situação ABCZ POSSUI RGD' },
-  BRUCELOSE: { tipo: 'Veterinário', subtipo: 'Vacina Brucelose', valor: 2.76, desc: 'Vacina Brucelose (fêmeas 8+ meses)' },
+  RGN: { tipo: 'ABCZ', subtipo: 'RGN', valor: 36.90, desc: 'SituaÃ§Ã£o ABCZ POSSUI RGN' },
+  RGD: { tipo: 'ABCZ', subtipo: 'RGD', valor: 89.10, desc: 'SituaÃ§Ã£o ABCZ POSSUI RGD' },
+  BRUCELOSE: { tipo: 'VeterinÃ¡rio', subtipo: 'Vacina Brucelose', valor: 2.76, desc: 'Vacina Brucelose (fÃªmeas 8+ meses)' },
   DNA_VRGEN: { tipo: 'DNA', subtipo: 'DNA VRGEN', valor: 50.00, desc: 'DNA VRGEN (receptoras)' },
-  DNA_GENOMICA_RECEPTORA: { tipo: 'DNA', subtipo: 'DNA Genômica Receptora', valor: 80.00, desc: 'DNA Genômica (receptoras sem genômica)' },
-  BRINCO_AMARELO: { tipo: 'Manejo', subtipo: 'Brinco Amarelo', valor: 2.70, desc: 'Brinco amarelo de identificação' },
-  BOTTON: { tipo: 'Manejo', subtipo: 'Botton Eletrônico', valor: 6.00, desc: 'Botton eletrônico' },
-  ANDROLOGICO: { tipo: 'Exame', subtipo: 'Andrológico + Exames', valor: 165.00, desc: 'Exame andrológico e exames complementares (machos 15-32 meses)' }
+  DNA_GENOMICA_RECEPTORA: { tipo: 'DNA', subtipo: 'DNA GenÃ´mica Receptora', valor: 80.00, desc: 'DNA GenÃ´mica (receptoras sem genÃ´mica)' },
+  BRINCO_AMARELO: { tipo: 'Manejo', subtipo: 'Brinco Amarelo', valor: 2.70, desc: 'Brinco amarelo de identificaÃ§Ã£o' },
+  BOTTON: { tipo: 'Manejo', subtipo: 'Botton EletrÃ´nico', valor: 6.00, desc: 'Botton eletrÃ´nico' },
+  ANDROLOGICO: { tipo: 'Exame', subtipo: 'AndrolÃ³gico + Exames', valor: 165.00, desc: 'Exame androlÃ³gico e exames complementares (machos 15-32 meses)' }
 }
 
 function hoje() {
@@ -45,7 +45,7 @@ async function animalTemCustoDNA(animalId, subtipoContem) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Método não permitido' })
+    return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' })
   }
 
   const dryRun = req.body?.dryRun === true
@@ -63,7 +63,7 @@ export default async function handler(req, res) {
       erros: []
     }
 
-    // 1. Animais com Situação ABCZ POSSUI RGN
+    // 1. Animais com SituaÃ§Ã£o ABCZ POSSUI RGN
     const rgnAnimais = await query(`
       SELECT id, serie, rg, situacao_abcz FROM animais
       WHERE situacao_abcz IS NOT NULL AND TRIM(situacao_abcz) != ''
@@ -89,7 +89,7 @@ export default async function handler(req, res) {
       resultados.rgn.aplicados++
     }
 
-    // 2. Animais com Situação ABCZ POSSUI RGD
+    // 2. Animais com SituaÃ§Ã£o ABCZ POSSUI RGD
     const rgdAnimais = await query(`
       SELECT id, serie, rg, situacao_abcz FROM animais
       WHERE situacao_abcz IS NOT NULL AND TRIM(situacao_abcz) != ''
@@ -115,12 +115,12 @@ export default async function handler(req, res) {
       resultados.rgd.aplicados++
     }
 
-    // 3. Fêmeas 8+ meses → Vacina Brucelose
+    // 3. FÃªmeas 8+ meses ââ€ â€™ Vacina Brucelose
     const femeas8m = await query(`
       SELECT id, serie, rg, sexo, data_nascimento, meses
       FROM animais
       WHERE situacao = 'Ativo'
-        AND (UPPER(sexo) LIKE '%FÊMEA%' OR UPPER(sexo) LIKE '%FEMEA%' OR sexo = 'F')
+        AND (UPPER(sexo) LIKE '%FÃÅ MEA%' OR UPPER(sexo) LIKE '%FEMEA%' OR sexo = 'F')
         AND (
           (meses IS NOT NULL AND meses >= 8)
           OR (data_nascimento IS NOT NULL AND AGE(CURRENT_DATE, data_nascimento) >= INTERVAL '8 months')
@@ -145,7 +145,7 @@ export default async function handler(req, res) {
       resultados.brucelose.aplicados++
     }
 
-    // 4. Receptoras → DNA VRGEN R$ 50
+    // 4. Receptoras ââ€ â€™ DNA VRGEN R$ 50
     const receptoras = await query(`
       SELECT id, serie, rg, raca, receptora, laboratorio_dna
       FROM animais
@@ -179,9 +179,9 @@ export default async function handler(req, res) {
       resultados.dnaVrgen.aplicados++
     }
 
-    // 5. Receptoras sem DNA Genômica → R$ 80
+    // 5. Receptoras sem DNA GenÃ´mica ââ€ â€™ R$ 80
     for (const a of receptoras.rows) {
-      const jaTemGenomica = await animalTemCustoDNA(a.id, 'Genômica')
+      const jaTemGenomica = await animalTemCustoDNA(a.id, 'GenÃ´mica')
       if (jaTemGenomica) {
         resultados.dnaGenomicaReceptora.pulados++
         continue
@@ -203,7 +203,7 @@ export default async function handler(req, res) {
       resultados.dnaGenomicaReceptora.aplicados++
     }
 
-    // 6. Todos os animais → Brinco Amarelo R$ 2,70
+    // 6. Todos os animais ââ€ â€™ Brinco Amarelo R$ 2,70
     const todosAnimais = await query(`SELECT id FROM animais WHERE situacao = 'Ativo'`)
     for (const a of todosAnimais.rows) {
       const jaTem = await animalJaTemCusto(a.id, CUSTOS.BRINCO_AMARELO.tipo, CUSTOS.BRINCO_AMARELO.subtipo)
@@ -223,7 +223,7 @@ export default async function handler(req, res) {
       resultados.brincoAmarelo.aplicados++
     }
 
-    // 7. Todos os animais → Botton Eletrônico R$ 6,00
+    // 7. Todos os animais ââ€ â€™ Botton EletrÃ´nico R$ 6,00
     for (const a of todosAnimais.rows) {
       const jaTem = await animalJaTemCusto(a.id, CUSTOS.BOTTON.tipo, CUSTOS.BOTTON.subtipo)
       if (jaTem) {
@@ -242,7 +242,7 @@ export default async function handler(req, res) {
       resultados.botton.aplicados++
     }
 
-    // 9. Machos 15-32 meses → Exame Andrológico + Exames R$ 165,00
+    // 9. Machos 15-32 meses ââ€ â€™ Exame AndrolÃ³gico + Exames R$ 165,00
     const machos1532 = await query(`
       SELECT id, serie, rg, sexo, meses, data_nascimento
       FROM animais
@@ -284,12 +284,12 @@ export default async function handler(req, res) {
       success: true,
       dryRun,
       message: dryRun
-        ? `Pré-visualização: ${totalAplicados} custos seriam aplicados`
+        ? `PrÃ©-visualizaÃ§Ã£o: ${totalAplicados} custos seriam aplicados`
         : `${totalAplicados} custos aplicados com sucesso`,
       resultados
     })
   } catch (error) {
-    console.error('Erro ao aplicar custos automáticos:', error)
+    console.error('Erro ao aplicar custos automÃ¡ticos:', error)
     return res.status(500).json({
       success: false,
       error: error.message

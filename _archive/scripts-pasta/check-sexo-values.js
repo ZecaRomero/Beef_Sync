@@ -10,24 +10,24 @@ const pool = new Pool({
 
 async function checkSexoValues() {
   try {
-    console.log('🔍 Verificando valores válidos para sexo...');
+    console.log('�Ÿ”� Verificando valores válidos para sexo...');
     
     const result = await pool.query('SELECT DISTINCT sexo FROM animais WHERE sexo IS NOT NULL');
     
-    console.log('\n📊 Valores de sexo existentes:');
+    console.log('\n�Ÿ“Š Valores de sexo existentes:');
     result.rows.forEach(row => {
       console.log('  -', row.sexo);
     });
     
     // Verificar constraint
     const constraintResult = await pool.query("SELECT conname, consrc FROM pg_constraint WHERE conname LIKE '%sexo%'");
-    console.log('\n🔍 Constraints de sexo:');
+    console.log('\n�Ÿ”� Constraints de sexo:');
     constraintResult.rows.forEach(row => {
       console.log('  -', row.conname, ':', row.consrc);
     });
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
   } finally {
     await pool.end();
   }

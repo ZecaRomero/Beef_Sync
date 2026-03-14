@@ -1,6 +1,6 @@
 /**
- * Relatórios visíveis no mobile.
- * Gráficos, KPI cards, animações e visual aprimorado.
+ * RelatÃ³rios visÃ­veis no mobile.
+ * GrÃ¡ficos, KPI cards, animaÃ§Ãµes e visual aprimorado.
  */
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import Head from 'next/head'
@@ -56,7 +56,7 @@ if (typeof window !== 'undefined') {
 
 function formatDate(d) {
   if (!d) return '-'
-  // Strings YYYY-MM-DD são interpretadas como UTC pelo JS, causando dia errado no Brasil.
+  // Strings YYYY-MM-DD sÃ£o interpretadas como UTC pelo JS, causando dia errado no Brasil.
   // Parse como data local para exibir corretamente.
   if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}/.test(d)) {
     const [y, m, day] = d.split(/[-T]/).map(Number)
@@ -81,12 +81,12 @@ const CORES_PIQUETE = [
 
 const ICONE_POR_CATEGORIA = {
   Manejo: ScaleIcon,
-  Reprodução: HeartIcon,
+  ReproduÃ§Ã£o: HeartIcon,
   Sanidade: UserGroupIcon,
   Estoque: DocumentTextIcon,
-  Localização: MapPinIcon,
+  LocalizaÃ§Ã£o: MapPinIcon,
   Financeiro: CurrencyDollarIcon,
-  Gestão: ChartBarIcon,
+  GestÃ£o: ChartBarIcon,
   Documentos: DocumentTextIcon,
   Outros: ChartBarIcon
 }
@@ -105,10 +105,10 @@ export default function MobileRelatorios() {
   const [isDarkMode, setIsDarkMode] = useState(false)
 
   const CATS = [
-    { key: 'Piquetes',     emoji: '🌿', test: s => /piquete|^piq\s/i.test(s),  colors: 'from-green-500 to-emerald-600' },
-    { key: 'Cabanha',      emoji: '🏠', test: s => /cabanha/i.test(s),          colors: 'from-violet-500 to-purple-600' },
-    { key: 'Confinamento', emoji: '🏗️', test: s => /confina|^conf\b/i.test(s),  colors: 'from-orange-500 to-amber-600' },
-    { key: 'Projetos',     emoji: '🔬', test: s => /projeto/i.test(s),          colors: 'from-cyan-500 to-teal-600' },
+    { key: 'Piquetes',     emoji: 'ðÅ¸Å’¿', test: s => /piquete|^piq\s/i.test(s),  colors: 'from-green-500 to-emerald-600' },
+    { key: 'Cabanha',      emoji: 'ðÅ¸� ', test: s => /cabanha/i.test(s),          colors: 'from-violet-500 to-purple-600' },
+    { key: 'Confinamento', emoji: 'ðÅ¸�â€”ï¸�', test: s => /confina|^conf\b/i.test(s),  colors: 'from-orange-500 to-amber-600' },
+    { key: 'Projetos',     emoji: 'ðÅ¸â€�¬', test: s => /projeto/i.test(s),          colors: 'from-cyan-500 to-teal-600' },
   ]
   
   const getGreeting = () => {
@@ -178,7 +178,7 @@ export default function MobileRelatorios() {
   const [acasalamentosRaca, setAcasalamentosRaca] = useState([])
   const [resumoDetalheModal, setResumoDetalheModal] = useState({ open: false, tipo: null, valor: null, titulo: '', qtd: 0 })
 
-  // ── Medicamentos ──────────────────────────────────────────────────────────
+  // ââ€�â‚¬ââ€�â‚¬ Medicamentos ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬
   const [medicamentos, setMedicamentos] = useState({})
   const [modalMed, setModalMed] = useState(null) // { row }
   const [formMed, setFormMed] = useState({ medicamento: '', dataAplicacao: '', dataProxima: '', observacao: '' })
@@ -235,7 +235,7 @@ export default function MobileRelatorios() {
 
   const salvarMedicamentoRel = async () => {
     if (!formMed.medicamento.trim() || !formMed.dataAplicacao) {
-      alert('Informe o medicamento e a data de aplicação')
+      alert('Informe o medicamento e a data de aplicaÃ§Ã£o')
       return
     }
     setSalvandoMed(true)
@@ -264,7 +264,7 @@ export default function MobileRelatorios() {
     } catch (_) { alert('Erro ao salvar') }
     finally { setSalvandoMed(false) }
   }
-  // ─────────────────────────────────────────────────────────────────────────
+  // ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬ââ€�â‚¬
   const [cardInfoModal, setCardInfoModal] = useState({ open: false, title: '', value: '', description: '', reportKey: null })
 
   useEffect(() => {
@@ -273,13 +273,13 @@ export default function MobileRelatorios() {
       .then(d => {
         if (d.success && d.data) {
           setConfig(d.data)
-          // Debug: verificar configuração
-          console.log('📅 Config recebida:', d.data)
-          console.log('📅 Relatórios habilitados:', d.data.enabled)
-          console.log('📅 Calendário está habilitado?', d.data.enabled?.includes('calendario_reprodutivo'))
+          // Debug: verificar configuraÃ§Ã£o
+          console.log('ðÅ¸â€œâ€¦ Config recebida:', d.data)
+          console.log('ðÅ¸â€œâ€¦ RelatÃ³rios habilitados:', d.data.enabled)
+          console.log('ðÅ¸â€œâ€¦ CalendÃ¡rio estÃ¡ habilitado?', d.data.enabled?.includes('calendario_reprodutivo'))
         } else if (d.enabled && d.allTypes) {
           setConfig({ enabled: d.enabled, allTypes: d.allTypes })
-          console.log('📅 Config alternativa:', { enabled: d.enabled, allTypes: d.allTypes })
+          console.log('ðÅ¸â€œâ€¦ Config alternativa:', { enabled: d.enabled, allTypes: d.allTypes })
         }
       })
       .catch(() => {})
@@ -295,7 +295,7 @@ export default function MobileRelatorios() {
     setIsDarkMode(shouldBeDark)
   }, [])
 
-  // Carregar dashboard (resumo geral) na entrada e ao mudar período
+  // Carregar dashboard (resumo geral) na entrada e ao mudar perÃ­odo
   useEffect(() => {
     if (!config?.enabled?.includes('resumo_geral')) return
     const params = new URLSearchParams({
@@ -374,7 +374,7 @@ export default function MobileRelatorios() {
         params.set('serie', serieFilter)
       }
       
-      // Buscar dados sem mostrar loading para não interromper a visualização
+      // Buscar dados sem mostrar loading para nÃ£o interromper a visualizaÃ§Ã£o
       fetch(`/api/mobile-reports?${params}`)
         .then(r => r.json())
         .then(d => {
@@ -389,7 +389,7 @@ export default function MobileRelatorios() {
     return () => clearInterval(intervalId)
   }, [selectedTipo, period.startDate, period.endDate, serieFilter])
 
-  // Atualizar o texto "há Xmin" a cada minuto
+  // Atualizar o texto "hÃ¡ Xmin" a cada minuto
   useEffect(() => {
     if (!lastUpdate) return
     
@@ -406,14 +406,14 @@ export default function MobileRelatorios() {
     }
   }, [selectedTipo])
 
-  // Ao selecionar um relatório, rolar para o topo para exibir o conteúdo
+  // Ao selecionar um relatÃ³rio, rolar para o topo para exibir o conteÃºdo
   useEffect(() => {
     if (selectedTipo) {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }, [selectedTipo])
 
-  // Ao navegar o calendário, buscar dados do mês exibido
+  // Ao navegar o calendÃ¡rio, buscar dados do mÃªs exibido
   useEffect(() => {
     if (selectedTipo === 'calendario_reprodutivo' && viewMode === 'calendar' && calendarMonth) {
       const start = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), 1)
@@ -442,7 +442,7 @@ export default function MobileRelatorios() {
   useEffect(() => {
     if (!cardFilterModal.open || !cardFilterModal.filter) return
     
-    // Se está mostrando a lista de piquetes (resumo)
+    // Se estÃ¡ mostrando a lista de piquetes (resumo)
     if (cardFilterModal.dataType === 'piquetes') {
       const rows = reportData?.data || []
       setCardAnimalsList(rows.filter(r => r.Piquete != null && !r._resumo))
@@ -450,7 +450,7 @@ export default function MobileRelatorios() {
       return
     }
     
-    // piquete_animais: se skipFetch, lista já foi setada no click (animais_piquetes)
+    // piquete_animais: se skipFetch, lista jÃ¡ foi setada no click (animais_piquetes)
     if (cardFilterModal.dataType === 'piquete_animais' && cardFilterModal.skipFetch) {
       setCardListLoading(false)
       return
@@ -458,16 +458,16 @@ export default function MobileRelatorios() {
     
     setCardListLoading(true)
     
-    // Se o filtro tem piquete, usar a API de localizações para buscar animais
+    // Se o filtro tem piquete, usar a API de localizaÃ§Ãµes para buscar animais
     if (cardFilterModal.filter.piquete) {
       const piqueteNome = cardFilterModal.filter.piquete
       console.log('Buscando animais do piquete:', piqueteNome)
       fetch(`/api/localizacoes?piquete=${encodeURIComponent(piqueteNome)}&atual=true`)
         .then(r => r.json())
         .then(d => {
-          console.log('Dados recebidos da API de localizações:', d)
+          console.log('Dados recebidos da API de localizaÃ§Ãµes:', d)
           if (d.success && Array.isArray(d.data)) {
-            // Transformar dados de localização em formato de animal
+            // Transformar dados de localizaÃ§Ã£o em formato de animal
             const animais = d.data.map(loc => {
               const animal = {
                 id: loc.animal_id,
@@ -484,7 +484,7 @@ export default function MobileRelatorios() {
             console.log('Total de animais encontrados:', animais.length)
             setCardAnimalsList(animais)
           } else {
-            console.log('Nenhum animal encontrado ou resposta inválida')
+            console.log('Nenhum animal encontrado ou resposta invÃ¡lida')
             setCardAnimalsList([])
           }
         })
@@ -496,7 +496,7 @@ export default function MobileRelatorios() {
       return
     }
     
-    // Caso contrário, usar a API de animais normal
+    // Caso contrÃ¡rio, usar a API de animais normal
     const params = new URLSearchParams(cardFilterModal.filter)
     fetch(`/api/animals?${params}`)
       .then(r => r.json())
@@ -508,7 +508,7 @@ export default function MobileRelatorios() {
       .finally(() => setCardListLoading(false))
   }, [cardFilterModal.open, cardFilterModal.filter, cardFilterModal.dataType, reportData?.data])
 
-  // Formatar valor monetário com 2 casas decimais (padrão BR)
+  // Formatar valor monetÃ¡rio com 2 casas decimais (padrÃ£o BR)
   const formatMoney = useCallback((val) => {
     let n
     if (typeof val === 'number') {
@@ -523,7 +523,7 @@ export default function MobileRelatorios() {
     return 'R$ ' + n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   }, [])
 
-  // Função helper para formatar valores de forma segura
+  // FunÃ§Ã£o helper para formatar valores de forma segura
   const formatValue = useCallback((v) => {
     if (v == null) return '-'
     
@@ -532,7 +532,7 @@ export default function MobileRelatorios() {
       // Se for array, retornar o tamanho
       if (Array.isArray(v)) return v.length
       
-      // Se for objeto com propriedades específicas conhecidas, extrair valor principal
+      // Se for objeto com propriedades especÃ­ficas conhecidas, extrair valor principal
       if (v.total !== undefined) return v.total
       if (v.valor !== undefined) return v.valor
       if (v.quantidade !== undefined) return v.quantidade
@@ -543,7 +543,7 @@ export default function MobileRelatorios() {
         return `${v.label}: ${v.valor}`
       }
       
-      // Se for um objeto com poucas propriedades, tentar formatar de forma legível
+      // Se for um objeto com poucas propriedades, tentar formatar de forma legÃ­vel
       const keys = Object.keys(v)
       if (keys.length === 1) return formatValue(v[keys[0]])
       
@@ -556,7 +556,7 @@ export default function MobileRelatorios() {
       return `${keys.length} itens`
     }
     
-    // Valores monetários (R$ X): sempre 2 casas decimais + separador de milhares
+    // Valores monetÃ¡rios (R$ X): sempre 2 casas decimais + separador de milhares
     const s = String(v).trim()
     if (s.startsWith('R$')) {
       const numStr = s.replace(/[^\d,.-]/g, '').replace(',', '.')
@@ -567,37 +567,37 @@ export default function MobileRelatorios() {
     return String(v)
   }, [formatMoney])
 
-  // Descrições dos cards para modal de informação (clicáveis em todo o app)
+  // DescriÃ§Ãµes dos cards para modal de informaÃ§Ã£o (clicÃ¡veis em todo o app)
   const DESCRICOES_CARDS = useMemo(() => ({
-    Total: 'Total de cabeças no rebanho conforme o Boletim de Campo.',
+    Total: 'Total de cabeÃ§as no rebanho conforme o Boletim de Campo.',
     Machos: 'Quantidade de machos no rebanho.',
-    Fêmeas: 'Quantidade de fêmeas no rebanho.',
-    Bezerros: 'Animais com até 12 meses de idade.',
+    FÃªmeas: 'Quantidade de fÃªmeas no rebanho.',
+    Bezerros: 'Animais com atÃ© 12 meses de idade.',
     Novilhas: 'Animais entre 12 e 24 meses de idade.',
     Adultos: 'Animais com mais de 24 meses de idade.',
-    Custos: 'Soma dos custos registrados no período selecionado.',
-    Vendas: 'Total de vendas de animais no período.',
-    'Gestações Ativas': 'Fêmeas em gestação (gestações cadastradas + prenhas por IA).',
-    'Para Parir (30d)': 'Partos previstos nos próximos 30 dias.',
-    Nascimentos: 'Nascimentos registrados no período.',
-    'Média Recente': 'Peso médio das últimas pesagens (90 dias).',
-    Vacinações: 'Vacinações aplicadas no período.',
-    Mortes: 'Mortes registradas no período.',
-    'Touros (sêmen)': 'Quantidade de touros com doses de sêmen em estoque.',
-    'Doses Sêmen': 'Total de doses de sêmen disponíveis.',
+    Custos: 'Soma dos custos registrados no perÃ­odo selecionado.',
+    Vendas: 'Total de vendas de animais no perÃ­odo.',
+    'GestaÃ§Ãµes Ativas': 'FÃªmeas em gestaÃ§Ã£o (gestaÃ§Ãµes cadastradas + prenhas por IA).',
+    'Para Parir (30d)': 'Partos previstos nos prÃ³ximos 30 dias.',
+    Nascimentos: 'Nascimentos registrados no perÃ­odo.',
+    'MÃ©dia Recente': 'Peso mÃ©dio das Ãºltimas pesagens (90 dias).',
+    VacinaÃ§Ãµes: 'VacinaÃ§Ãµes aplicadas no perÃ­odo.',
+    Mortes: 'Mortes registradas no perÃ­odo.',
+    'Touros (sÃªmen)': 'Quantidade de touros com doses de sÃªmen em estoque.',
+    'Doses SÃªmen': 'Total de doses de sÃªmen disponÃ­veis.',
     Acasalamentos: 'Quantidade de acasalamentos cadastrados.',
-    'Embriões Disp.': 'Embriões disponíveis em estoque.',
-    rebanho: 'Resumo do rebanho: total de animais, machos, fêmeas e distribuição por idade.',
-    reproducao: 'Resumo reprodutivo: gestações ativas, nascimentos e partos previstos.',
-    peso: 'Média de peso recente dos animais.',
-    financeiro: 'Resumo financeiro: custos e vendas no período.',
-    estoque: 'Estoque de sêmen e embriões disponíveis.',
-    'Valor total': 'Soma total dos valores no relatório.',
+    'EmbriÃµes Disp.': 'EmbriÃµes disponÃ­veis em estoque.',
+    rebanho: 'Resumo do rebanho: total de animais, machos, fÃªmeas e distribuiÃ§Ã£o por idade.',
+    reproducao: 'Resumo reprodutivo: gestaÃ§Ãµes ativas, nascimentos e partos previstos.',
+    peso: 'MÃ©dia de peso recente dos animais.',
+    financeiro: 'Resumo financeiro: custos e vendas no perÃ­odo.',
+    estoque: 'Estoque de sÃªmen e embriÃµes disponÃ­veis.',
+    'Valor total': 'Soma total dos valores no relatÃ³rio.',
     'Total de custos': 'Quantidade de registros de custos e valor total.'
   }), [])
 
   const showCardInfo = useCallback((title, value, reportKey = null) => {
-    const desc = DESCRICOES_CARDS[title] || DESCRICOES_CARDS[title?.trim?.()] || `Informação sobre ${title}.`
+    const desc = DESCRICOES_CARDS[title] || DESCRICOES_CARDS[title?.trim?.()] || `InformaÃ§Ã£o sobre ${title}.`
     const rawVal = typeof value === 'object' && value !== null
       ? (value.total ?? value.valor ?? value.quantidade ?? value.custos ?? value.vendas)
       : value
@@ -611,12 +611,12 @@ export default function MobileRelatorios() {
       setCardFilterModal({ open: true, title: `Machos (${displayValue})`, filter: { sexo: 'Macho' }, dataType: 'animais' })
       return
     }
-    if (/fêmeas?|femeas?/i.test(k)) {
-      setCardFilterModal({ open: true, title: `Fêmeas (${displayValue})`, filter: { sexo: 'Fêmea' }, dataType: 'animais' })
+    if (/fÃªmeas?|femeas?/i.test(k)) {
+      setCardFilterModal({ open: true, title: `FÃªmeas (${displayValue})`, filter: { sexo: 'FÃªmea' }, dataType: 'animais' })
       return
     }
-    if (/animais únicos?/i.test(k)) {
-      setCardFilterModal({ open: true, title: `Animais únicos (${displayValue})`, filter: {}, dataType: 'animais' })
+    if (/animais Ãºnicos?/i.test(k)) {
+      setCardFilterModal({ open: true, title: `Animais Ãºnicos (${displayValue})`, filter: {}, dataType: 'animais' })
       return
     }
     if (/total de pesagens?/i.test(k)) {
@@ -628,18 +628,18 @@ export default function MobileRelatorios() {
       setCardFilterModal({ open: true, title: `Piquetes (${displayValue})`, filter: {}, dataType: 'piquetes' })
       return
     }
-    if (/peso médio|peso medio/i.test(k)) return
+    if (/peso mÃ©dio|peso medio/i.test(k)) return
     
-    // Mapeamento direto para relatórios (clique no card abre a lista)
+    // Mapeamento direto para relatÃ³rios (clique no card abre a lista)
     const reportMap = {
       Custos: 'custos',
       Vendas: 'movimentacoes_financeiras',
-      Vacinações: 'vacinacoes',
+      VacinaÃ§Ãµes: 'vacinacoes',
       Mortes: 'mortes',
-      'Touros (sêmen)': 'estoque_semen',
-      'Doses Sêmen': 'estoque_semen',
+      'Touros (sÃªmen)': 'estoque_semen',
+      'Doses SÃªmen': 'estoque_semen',
       Acasalamentos: 'estoque_embrioes',
-      'Embriões Disp.': 'estoque_embrioes',
+      'EmbriÃµes Disp.': 'estoque_embrioes',
       financeiro: 'custos',
       estoque: 'estoque_semen',
       'Valor total': 'custos',
@@ -677,10 +677,10 @@ export default function MobileRelatorios() {
   const ehRanking = selectedTipo === 'ranking_pmgz' || selectedTipo === 'ranking_animais_avaliados' || selectedTipo === 'ranking_mgte'
   const LABELS_RANKING = {
     ranking: 'Ranking',
-    posicao: 'Posição',
+    posicao: 'PosiÃ§Ã£o',
     animal: 'Animal',
     valor: 'Valor',
-    raca: 'Raça',
+    raca: 'RaÃ§a',
     sexo: 'Sexo',
     piquete: 'Piquete',
     iABCZ: 'iABCZ',
@@ -697,9 +697,9 @@ export default function MobileRelatorios() {
     quant: 'Qtd',
     sexo: 'Sexo',
     categoria: 'Categoria',
-    raca: 'Raça',
+    raca: 'RaÃ§a',
     era: 'Era',
-    observacao: 'Observação'
+    observacao: 'ObservaÃ§Ã£o'
   }
   const LABELS_BOLETIM_DEFESA = {
     fazenda: 'Fazenda',
@@ -707,7 +707,7 @@ export default function MobileRelatorios() {
     total: 'Total'
   }
   const LABELS_BOLETIM_REBANHO = {
-    raca: 'Raça',
+    raca: 'RaÃ§a',
     sexo: 'Sexo',
     era: 'Era',
     total: 'Total'
@@ -779,7 +779,7 @@ export default function MobileRelatorios() {
     setCollapsedCats(prev => ({ ...prev, [cat]: !prev[cat] }))
   }, [])
 
-  // Dados para gráficos (resumo_pesagens)
+  // Dados para grÃ¡ficos (resumo_pesagens)
   const dadosGraficoPiquete = reportData?.data?.filter(d => !d._resumo) || []
   const chartBarPiquete = selectedTipo === 'resumo_pesagens' && dadosGraficoPiquete.length > 0 ? {
     labels: dadosGraficoPiquete.map(r => (r.Piquete || r.piquete || '').replace(/PROJETO\s*/i, 'P')),
@@ -795,9 +795,9 @@ export default function MobileRelatorios() {
   const chartPesoPiquete = selectedTipo === 'resumo_pesagens' && dadosGraficoPiquete.length > 0 ? {
     labels: dadosGraficoPiquete.map(r => (r.Piquete || r.piquete || '').replace(/PROJETO\s*/i, 'P')),
     datasets: [{
-      label: 'Média Peso (kg)',
+      label: 'MÃ©dia Peso (kg)',
       data: dadosGraficoPiquete.map(r => {
-        const v = r['Média Peso (kg)'] ?? r.mediaPeso
+        const v = r['MÃ©dia Peso (kg)'] ?? r.mediaPeso
         return typeof v === 'number' ? v : (parseFloat(String(v).replace(',', '.')) || 0)
       }),
       backgroundColor: 'rgba(245, 158, 11, 0.7)',
@@ -808,13 +808,13 @@ export default function MobileRelatorios() {
 
   const resumo = reportData?.resumo || {}
   let machos = Number(resumo.Machos ?? resumo.machos ?? 0)
-  let femeas = Number(resumo.Fêmeas ?? resumo.femeas ?? 0)
+  let femeas = Number(resumo.FÃªmeas ?? resumo.femeas ?? 0)
   if (selectedTipo === 'nascimentos' && (machos === 0 && femeas === 0) && filteredData.length > 0) {
     machos = filteredData.filter(r => (r.sexo || '').toUpperCase().startsWith('M')).length
     femeas = filteredData.filter(r => (r.sexo || '').toUpperCase().startsWith('F')).length
   }
   const chartSexo = (selectedTipo === 'resumo_pesagens' || selectedTipo === 'nascimentos') && (machos > 0 || femeas > 0) ? {
-    labels: ['Machos', 'Fêmeas'],
+    labels: ['Machos', 'FÃªmeas'],
     datasets: [{
       data: [machos, femeas],
       backgroundColor: ['rgba(59, 130, 246, 0.85)', 'rgba(236, 72, 153, 0.85)'],
@@ -827,7 +827,7 @@ export default function MobileRelatorios() {
   const totalIA = Number(resumo.total ?? 0)
   const naoPrenhas = totalIA - prenhas
   const chartPrenhez = selectedTipo === 'resumo_femeas_ia' && totalIA > 0 ? {
-    labels: ['Prenhas', 'Não prenhas'],
+    labels: ['Prenhas', 'NÃ£o prenhas'],
     datasets: [{
       data: [prenhas, naoPrenhas],
       backgroundColor: ['rgba(34, 197, 94, 0.85)', 'rgba(239, 68, 68, 0.85)'],
@@ -856,7 +856,7 @@ export default function MobileRelatorios() {
     }
   }
 
-  // Gráfico de pesagens por data (evolução temporal)
+  // GrÃ¡fico de pesagens por data (evoluÃ§Ã£o temporal)
   const pesagensPorData = selectedTipo === 'pesagens' && filteredData.length > 0 ? (() => {
     const porData = {}
     filteredData.forEach(r => {
@@ -878,11 +878,11 @@ export default function MobileRelatorios() {
     }
   })() : null
 
-  // Gráfico de inseminações por touro
+  // GrÃ¡fico de inseminaÃ§Ãµes por touro
   const inseminacoesPorTouro = (selectedTipo === 'inseminacoes' || selectedTipo === 'femeas_ia') && filteredData.length > 0 ? (() => {
     const porTouro = {}
     filteredData.forEach(r => {
-      const t = (r.touro || 'Não informado').trim() || 'Não informado'
+      const t = (r.touro || 'NÃ£o informado').trim() || 'NÃ£o informado'
       porTouro[t] = (porTouro[t] || 0) + 1
     })
     const entries = Object.entries(porTouro).sort(([, a], [, b]) => b - a).slice(0, 8)
@@ -890,7 +890,7 @@ export default function MobileRelatorios() {
     return {
       labels: entries.map(([t]) => t.length > 15 ? t.slice(0, 12) + '...' : t),
       datasets: [{
-        label: 'Inseminações',
+        label: 'InseminaÃ§Ãµes',
         data: entries.map(([, c]) => c),
         backgroundColor: CORES_PIQUETE.slice(0, entries.length),
         borderWidth: 1
@@ -898,11 +898,11 @@ export default function MobileRelatorios() {
     }
   })() : null
 
-  // Gráfico de estoque de sêmen por touro
+  // GrÃ¡fico de estoque de sÃªmen por touro
   const estoquePorTouro = selectedTipo === 'estoque_semen' && filteredData.length > 0 ? (() => {
     const porTouro = {}
     filteredData.forEach(r => {
-      const t = (r.touro || 'Não informado').trim() || 'Não informado'
+      const t = (r.touro || 'NÃ£o informado').trim() || 'NÃ£o informado'
       const q = Number(r.quantidade) || 0
       porTouro[t] = (porTouro[t] || 0) + q
     })
@@ -920,19 +920,19 @@ export default function MobileRelatorios() {
     }
   })() : null
 
-  // Normalizar raça para agrupamento (case-insensitive) e exibição (title case)
-  const racaKey = (s) => ((s || 'Não informada').trim() || 'Não informada').toUpperCase()
+  // Normalizar raÃ§a para agrupamento (case-insensitive) e exibiÃ§Ã£o (title case)
+  const racaKey = (s) => ((s || 'NÃ£o informada').trim() || 'NÃ£o informada').toUpperCase()
   const racaDisplay = (s) => {
-    const t = (s || 'Não informada').trim() || 'Não informada'
-    if (t === 'NÃO INFORMADA') return 'Não informada'
+    const t = (s || 'NÃ£o informada').trim() || 'NÃ£o informada'
+    if (t === 'NÃÆ’O INFORMADA') return 'NÃ£o informada'
     return t.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
   }
 
-  // Detalhes do estoque de sêmen por touro
+  // Detalhes do estoque de sÃªmen por touro
   const detalhesEstoqueSemen = selectedTipo === 'estoque_semen' && filteredData.length > 0 ? (() => {
     const porTouro = {}
     filteredData.forEach(r => {
-      const t = (r.touro || 'Não informado').trim() || 'Não informado'
+      const t = (r.touro || 'NÃ£o informado').trim() || 'NÃ£o informado'
       const q = Number(r.quantidade) || 0
       const raca = racaDisplay(racaKey(r.raca))
       if (!porTouro[t]) {
@@ -951,7 +951,7 @@ export default function MobileRelatorios() {
       }))
   })() : null
 
-  // Estoque agrupado por raça (case-insensitive: NELORE + Nelore = uma única entrada)
+  // Estoque agrupado por raÃ§a (case-insensitive: NELORE + Nelore = uma Ãºnica entrada)
   const estoquePorRaca = selectedTipo === 'estoque_semen' && filteredData.length > 0 ? (() => {
     const porRaca = {}
     filteredData.forEach(r => {
@@ -973,15 +973,15 @@ export default function MobileRelatorios() {
       }))
   })() : null
 
-  // ========== EMBRIÕES ==========
-  // Gráfico de estoque de embriões por acasalamento
+  // ========== EMBRIÃâ€¢ES ==========
+  // GrÃ¡fico de estoque de embriÃµes por acasalamento
   const estoqueEmbriaoPorAcasalamento = selectedTipo === 'estoque_embrioes' && filteredData.length > 0 ? (() => {
     const porAcasalamento = {}
-    // Filtrar apenas registros que são realmente embriões (têm acasalamento preenchido)
+    // Filtrar apenas registros que sÃ£o realmente embriÃµes (tÃªm acasalamento preenchido)
     const embrioesReais = filteredData.filter(r => r.acasalamento && r.acasalamento.trim())
     
     embrioesReais.forEach(r => {
-      const acasalamento = (r.acasalamento || 'Não informado').trim() || 'Não informado'
+      const acasalamento = (r.acasalamento || 'NÃ£o informado').trim() || 'NÃ£o informado'
       const q = Number(r.quantidade) || 0
       porAcasalamento[acasalamento] = (porAcasalamento[acasalamento] || 0) + q
     })
@@ -990,7 +990,7 @@ export default function MobileRelatorios() {
     return {
       labels: entries.map(([a]) => a.length > 20 ? a.slice(0, 17) + '...' : a),
       datasets: [{
-        label: 'Embriões',
+        label: 'EmbriÃµes',
         data: entries.map(([, c]) => c),
         backgroundColor: 'rgba(245, 158, 11, 0.7)',
         borderColor: 'rgba(245, 158, 11, 1)',
@@ -999,16 +999,16 @@ export default function MobileRelatorios() {
     }
   })() : null
 
-  // Detalhes do estoque de embriões por acasalamento
+  // Detalhes do estoque de embriÃµes por acasalamento
   const detalhesEstoqueEmbrioes = selectedTipo === 'estoque_embrioes' && filteredData.length > 0 ? (() => {
     const porAcasalamento = {}
-    // Filtrar apenas registros que são realmente embriões (têm acasalamento preenchido)
+    // Filtrar apenas registros que sÃ£o realmente embriÃµes (tÃªm acasalamento preenchido)
     const embrioesReais = filteredData.filter(r => r.acasalamento && r.acasalamento.trim())
     
     embrioesReais.forEach(r => {
-      const acasalamento = (r.acasalamento || 'Não informado').trim() || 'Não informado'
+      const acasalamento = (r.acasalamento || 'NÃ£o informado').trim() || 'NÃ£o informado'
       const q = Number(r.quantidade) || 0
-      const raca = (r.raca || 'Não informada').trim() || 'Não informada'
+      const raca = (r.raca || 'NÃ£o informada').trim() || 'NÃ£o informada'
       const rack = r.rack || '-'
       const botijao = r.botijao || '-'
       const caneca = r.caneca || '-'
@@ -1031,7 +1031,7 @@ export default function MobileRelatorios() {
       }))
   })() : null
 
-  // Estoque de embriões agrupado por raça (case-insensitive)
+  // Estoque de embriÃµes agrupado por raÃ§a (case-insensitive)
   const estoqueEmbriaoPorRaca = selectedTipo === 'estoque_embrioes' && filteredData.length > 0 ? (() => {
     const porRaca = {}
     const embrioesReais = filteredData.filter(r => r.acasalamento && r.acasalamento.trim())
@@ -1054,7 +1054,7 @@ export default function MobileRelatorios() {
       }))
   })() : null
 
-  // Função para abrir modal com touros de uma raça específica
+  // FunÃ§Ã£o para abrir modal com touros de uma raÃ§a especÃ­fica
   const abrirModalRaca = (raca) => {
     if (!filteredData || filteredData.length === 0) return
     
@@ -1063,7 +1063,7 @@ export default function MobileRelatorios() {
     filteredData.forEach(r => {
       const racaItem = racaKey(r.raca)
       if (racaItem === racaBusca) {
-        const t = (r.touro || 'Não informado').trim() || 'Não informado'
+        const t = (r.touro || 'NÃ£o informado').trim() || 'NÃ£o informado'
         const q = Number(r.quantidade) || 0
         if (!porTouro[t]) {
           porTouro[t] = { total: 0, registros: 0 }
@@ -1086,7 +1086,7 @@ export default function MobileRelatorios() {
     setRacaModalOpen(true)
   }
 
-  // Função para abrir modal com acasalamentos de uma raça específica (embriões)
+  // FunÃ§Ã£o para abrir modal com acasalamentos de uma raÃ§a especÃ­fica (embriÃµes)
   const abrirModalRacaEmbriao = (raca) => {
     if (!filteredData || filteredData.length === 0) return
     
@@ -1095,7 +1095,7 @@ export default function MobileRelatorios() {
     filteredData.forEach(r => {
       const racaItem = racaKey(r.raca)
       if (racaItem === racaBusca) {
-        const acasalamento = (r.acasalamento || 'Não informado').trim() || 'Não informado'
+        const acasalamento = (r.acasalamento || 'NÃ£o informado').trim() || 'NÃ£o informado'
         const q = Number(r.quantidade) || 0
         const rack = r.rack || '-'
         const botijao = r.botijao || '-'
@@ -1124,15 +1124,15 @@ export default function MobileRelatorios() {
     setRacaEmbriaoModalOpen(true)
   }
 
-  // Cada item decide individualmente: nome com "ACASALAMENTO" → embriões, senão → doses de sêmen
+  // Cada item decide individualmente: nome com "ACASALAMENTO" ââ€ â€™ embriÃµes, senÃ£o ââ€ â€™ doses de sÃªmen
   const itemEhEmbriao = (acasalamento) =>
     typeof acasalamento === 'string' && acasalamento.toUpperCase().includes('ACASALAMENTO')
 
-  // Compatibilidade: true só quando TODOS os itens são embriões (usado em partes fora do loop)
+  // Compatibilidade: true sÃ³ quando TODOS os itens sÃ£o embriÃµes (usado em partes fora do loop)
   const modalEhEmbriao = acasalamentosRaca.length > 0 &&
     acasalamentosRaca.every(a => itemEhEmbriao(a.acasalamento))
 
-  // Gráfico de nascimentos por mês
+  // GrÃ¡fico de nascimentos por mÃªs
   const nascimentosPorMes = selectedTipo === 'nascimentos' && filteredData.length > 0 ? (() => {
     const porMes = {}
     filteredData.forEach(r => {
@@ -1160,7 +1160,7 @@ export default function MobileRelatorios() {
     }
   })() : null
 
-  // Gráfico de abastecimento de nitrogênio por data
+  // GrÃ¡fico de abastecimento de nitrogÃªnio por data
   const nitrogenioEvolution = selectedTipo === 'abastecimento_nitrogenio' && filteredData.length > 0 ? (() => {
     const porData = {}
     filteredData.forEach(r => {
@@ -1184,11 +1184,11 @@ export default function MobileRelatorios() {
     }
   })() : null
 
-  // Gráfico de abastecimento por motorista
+  // GrÃ¡fico de abastecimento por motorista
   const nitrogenioByDriver = selectedTipo === 'abastecimento_nitrogenio' && filteredData.length > 0 ? (() => {
     const porMotorista = {}
     filteredData.forEach(r => {
-      const m = (r.motorista || 'Não informado').trim() || 'Não informado'
+      const m = (r.motorista || 'NÃ£o informado').trim() || 'NÃ£o informado'
       const litros = parseFloat(String(r.quantidade || '0').replace(' L', '')) || 0
       porMotorista[m] = (porMotorista[m] || 0) + litros
     })
@@ -1248,9 +1248,9 @@ export default function MobileRelatorios() {
 
   const contagemTiposCalendario = temCalendario && filteredBySexo.length > 0 ? {
     chegadas: filteredBySexo.filter(r => (r.tipo || '') === 'Chegada de Receptora').length,
-    dg: filteredBySexo.filter(r => (r.tipo || '') === 'Diagnóstico de Gestação').length,
+    dg: filteredBySexo.filter(r => (r.tipo || '') === 'DiagnÃ³stico de GestaÃ§Ã£o').length,
     partos: filteredBySexo.filter(r => (r.tipo || '') === 'Parto Previsto').length,
-    andrologico: filteredBySexo.filter(r => (r.tipo || '') === 'Refazer Exame Andrológico').length,
+    andrologico: filteredBySexo.filter(r => (r.tipo || '') === 'Refazer Exame AndrolÃ³gico').length,
     brucelose: filteredBySexo.filter(r => (r.tipo || '') === 'Brucelose').length,
     dgt: filteredBySexo.filter(r => (r.tipo || '') === 'DGT').length,
     total: filteredBySexo.length
@@ -1334,31 +1334,31 @@ export default function MobileRelatorios() {
     if (selectedTipo === 'resumo_pesagens' && dadosGraficoPiquete.length > 0) {
       const comPeso = dadosGraficoPiquete.map(r => ({
         nome: (r.Piquete || r.piquete || '').replace(/PROJETO\s*/i, 'P'),
-        media: parseFloat(String(r['Média Peso (kg)'] ?? r.mediaPeso ?? 0).replace(',', '.')) || 0,
+        media: parseFloat(String(r['MÃ©dia Peso (kg)'] ?? r.mediaPeso ?? 0).replace(',', '.')) || 0,
         animais: r.Animais ?? r.animais ?? 0
       })).filter(x => x.media > 0)
       if (comPeso.length > 0) {
         const maior = comPeso.reduce((a, b) => a.media > b.media ? a : b)
         const menor = comPeso.reduce((a, b) => a.media < b.media ? a : b)
-        list.push({ icon: '📈', text: `Maior média: ${maior.nome} com ${maior.media.toFixed(1)} kg` })
-        if (maior.nome !== menor.nome) list.push({ icon: '📉', text: `Menor média: ${menor.nome} com ${menor.media.toFixed(1)} kg` })
+        list.push({ icon: 'ðÅ¸â€œË†', text: `Maior mÃ©dia: ${maior.nome} com ${maior.media.toFixed(1)} kg` })
+        if (maior.nome !== menor.nome) list.push({ icon: 'ðÅ¸â€œâ€°', text: `Menor mÃ©dia: ${menor.nome} com ${menor.media.toFixed(1)} kg` })
         const totalAnimais = comPeso.reduce((s, x) => s + x.animais, 0)
-        if (totalAnimais > 0) list.push({ icon: '🐄', text: `${totalAnimais} animais distribuídos em ${comPeso.length} piquete(s)` })
+        if (totalAnimais > 0) list.push({ icon: 'ðÅ¸�â€ž', text: `${totalAnimais} animais distribuÃ­dos em ${comPeso.length} piquete(s)` })
       }
     }
 
     if (selectedTipo === 'resumo_femeas_ia' && totalIA > 0) {
       const taxa = (prenhas / totalIA) * 100
-      if (taxa >= 50) list.push({ icon: '🎉', text: `Taxa de prenhez em destaque: ${taxa.toFixed(1)}%` })
-      else if (taxa < 30) list.push({ icon: '💡', text: `Considere revisar estratégia de IA: ${taxa.toFixed(1)}% de prenhez` })
-      list.push({ icon: '📊', text: `${prenhas} de ${totalIA} fêmeas prenhas no período` })
+      if (taxa >= 50) list.push({ icon: 'ðÅ¸Å½â€°', text: `Taxa de prenhez em destaque: ${taxa.toFixed(1)}%` })
+      else if (taxa < 30) list.push({ icon: 'ðÅ¸â€™¡', text: `Considere revisar estratÃ©gia de IA: ${taxa.toFixed(1)}% de prenhez` })
+      list.push({ icon: 'ðÅ¸â€œÅ ', text: `${prenhas} de ${totalIA} fÃªmeas prenhas no perÃ­odo` })
     }
 
     if (selectedTipo === 'nascimentos' && dados.length > 0) {
       const total = machos + femeas
       if (total > 0) {
         const pctM = ((machos / total) * 100).toFixed(0)
-        list.push({ icon: '📋', text: `${total} nascimento(s): ${machos} machos (${pctM}%) e ${femeas} fêmeas` })
+        list.push({ icon: 'ðÅ¸â€œâ€¹', text: `${total} nascimento(s): ${machos} machos (${pctM}%) e ${femeas} fÃªmeas` })
       }
     }
 
@@ -1367,26 +1367,26 @@ export default function MobileRelatorios() {
       const comPeso = dados.filter(r => r.peso != null && parseFloat(r.peso) > 0)
       if (comPeso.length > 0) {
         const media = comPeso.reduce((s, r) => s + parseFloat(r.peso), 0) / comPeso.length
-        list.push({ icon: '⚖️', text: `${total} pesagem(s) registrada(s) no período` })
-        list.push({ icon: '📊', text: `Peso médio geral: ${media.toFixed(1)} kg` })
+        list.push({ icon: 'âÅ¡â€“ï¸�', text: `${total} pesagem(s) registrada(s) no perÃ­odo` })
+        list.push({ icon: 'ðÅ¸â€œÅ ', text: `Peso mÃ©dio geral: ${media.toFixed(1)} kg` })
       }
     }
 
     if ((selectedTipo === 'inseminacoes' || selectedTipo === 'femeas_ia') && dados.length > 0) {
       const porTouro = {}
       dados.forEach(r => {
-        const t = (r.touro || 'Não informado').trim() || 'Não informado'
+        const t = (r.touro || 'NÃ£o informado').trim() || 'NÃ£o informado'
         porTouro[t] = (porTouro[t] || 0) + 1
       })
       const top = Object.entries(porTouro).sort(([, a], [, b]) => b - a)[0]
-      if (top) list.push({ icon: '🐂', text: `Touro mais usado: ${top[0]} com ${top[1]} IA(s)` })
+      if (top) list.push({ icon: 'ðÅ¸�â€š', text: `Touro mais usado: ${top[0]} com ${top[1]} IA(s)` })
     }
 
     if (selectedTipo === 'estoque_semen' && dados.length > 0) {
       const totalDoses = dados.reduce((s, r) => s + (Number(r.quantidade) || 0), 0)
-      list.push({ icon: '📦', text: `${totalDoses} dose(s) em estoque total` })
+      list.push({ icon: 'ðÅ¸â€œ¦', text: `${totalDoses} dose(s) em estoque total` })
       const touros = new Set(dados.map(r => (r.touro || '').trim()).filter(Boolean)).size
-      list.push({ icon: '🐂', text: `${touros} touro(s) no catálogo` })
+      list.push({ icon: 'ðÅ¸�â€š', text: `${touros} touro(s) no catÃ¡logo` })
       
       // Touro com mais doses
       const porTouro = {}
@@ -1396,10 +1396,10 @@ export default function MobileRelatorios() {
       })
       const entries = Object.entries(porTouro).sort(([, a], [, b]) => b - a)
       if (entries.length > 0) {
-        list.push({ icon: '🥇', text: `Maior estoque: ${entries[0][0]} com ${entries[0][1]} dose(s)` })
+        list.push({ icon: 'ðÅ¸¥â€¡', text: `Maior estoque: ${entries[0][0]} com ${entries[0][1]} dose(s)` })
       }
       if (entries.length > 1) {
-        list.push({ icon: '🥈', text: `2º lugar: ${entries[1][0]} com ${entries[1][1]} dose(s)` })
+        list.push({ icon: 'ðÅ¸¥Ë†', text: `2Âº lugar: ${entries[1][0]} com ${entries[1][1]} dose(s)` })
       }
     }
 
@@ -1419,86 +1419,86 @@ export default function MobileRelatorios() {
       const partos = porTipo['Parto Previsto'] || contagemTiposCalendario?.partos || 0
       const brucelose = porTipo['Brucelose'] || contagemTiposCalendario?.brucelose || 0
       const dgt = porTipo['DGT'] || contagemTiposCalendario?.dgt || 0
-      list.push({ icon: '📅', text: `${dados.length} evento(s) no calendário` })
-      if (partos > 0) list.push({ icon: '🐄', text: `${partos} parto(s) previsto(s) no período` })
-      if (brucelose > 0) list.push({ icon: '💉', text: `${brucelose} fêmea(s) para Brucelose` })
-      if (dgt > 0) list.push({ icon: '📋', text: `${dgt} animal(is) para DGT` })
+      list.push({ icon: 'ðÅ¸â€œâ€¦', text: `${dados.length} evento(s) no calendÃ¡rio` })
+      if (partos > 0) list.push({ icon: 'ðÅ¸�â€ž', text: `${partos} parto(s) previsto(s) no perÃ­odo` })
+      if (brucelose > 0) list.push({ icon: 'ðÅ¸â€™â€°', text: `${brucelose} fÃªmea(s) para Brucelose` })
+      if (dgt > 0) list.push({ icon: 'ðÅ¸â€œâ€¹', text: `${dgt} animal(is) para DGT` })
       if (Object.keys(porMes).length > 0) {
         const mesesComEventos = Object.keys(porMes).length
-        list.push({ icon: '📆', text: `${mesesComEventos} mês(es) com eventos` })
+        list.push({ icon: 'ðÅ¸â€œâ€ ', text: `${mesesComEventos} mÃªs(es) com eventos` })
       }
-      if (top) list.push({ icon: '📌', text: `${top[0]}: ${top[1]} evento(s)` })
+      if (top) list.push({ icon: 'ðÅ¸â€œÅ’', text: `${top[0]}: ${top[1]} evento(s)` })
     }
 
     if (selectedTipo === 'previsoes_parto' && dados.length > 0) {
       const res = reportData?.resumo || {}
-      const total = res['Total de previsões'] ?? dados.length
-      if (total > 0) list.push({ icon: '🤰', text: `${total} previsão(ões) de parto no período` })
+      const total = res['Total de previsÃµes'] ?? dados.length
+      if (total > 0) list.push({ icon: 'ðÅ¸¤°', text: `${total} previsÃ£o(Ãµes) de parto no perÃ­odo` })
       const porTouro = res['Prenhas por touro']
-      if (porTouro && porTouro !== '-') list.push({ icon: '🐂', text: `Por touro: ${String(porTouro).substring(0, 80)}${String(porTouro).length > 80 ? '...' : ''}` })
+      if (porTouro && porTouro !== '-') list.push({ icon: 'ðÅ¸�â€š', text: `Por touro: ${String(porTouro).substring(0, 80)}${String(porTouro).length > 80 ? '...' : ''}` })
     }
 
     if (selectedTipo === 'femeas_brucelose' && dados.length > 0) {
       const total = dados.length
-      list.push({ icon: '💉', text: `${total} fêmea(s) precisam de vacina de brucelose` })
+      list.push({ icon: 'ðÅ¸â€™â€°', text: `${total} fÃªmea(s) precisam de vacina de brucelose` })
       const porPiquete = {}
       dados.forEach(r => {
-        const p = r.piquete || 'Não informado'
+        const p = r.piquete || 'NÃ£o informado'
         porPiquete[p] = (porPiquete[p] || 0) + 1
       })
       const piquetes = Object.keys(porPiquete).length
-      if (piquetes > 1) list.push({ icon: '📍', text: `Distribuídas em ${piquetes} piquete(s)` })
+      if (piquetes > 1) list.push({ icon: 'ðÅ¸â€œ�', text: `DistribuÃ­das em ${piquetes} piquete(s)` })
       const idadeMedia = dados.reduce((s, r) => s + (r.idade_meses || 0), 0) / total
-      if (idadeMedia > 0) list.push({ icon: '📊', text: `Idade média: ${idadeMedia.toFixed(1)} meses` })
+      if (idadeMedia > 0) list.push({ icon: 'ðÅ¸â€œÅ ', text: `Idade mÃ©dia: ${idadeMedia.toFixed(1)} meses` })
     }
 
     if (selectedTipo === 'animais_dgt' && dados.length > 0) {
       const total = dados.length
       const machos = dados.filter(r => (r.sexo || '').toUpperCase().startsWith('M')).length
       const femeas = dados.filter(r => (r.sexo || '').toUpperCase().startsWith('F')).length
-      list.push({ icon: '📋', text: `${total} animal(is) elegível(is) para DGT` })
+      list.push({ icon: 'ðÅ¸â€œâ€¹', text: `${total} animal(is) elegÃ­vel(is) para DGT` })
       if (machos > 0 && femeas > 0) {
-        list.push({ icon: '🐄', text: `${machos} machos e ${femeas} fêmeas` })
+        list.push({ icon: 'ðÅ¸�â€ž', text: `${machos} machos e ${femeas} fÃªmeas` })
       }
       const porPiquete = {}
       dados.forEach(r => {
-        const p = r.piquete || 'Não informado'
+        const p = r.piquete || 'NÃ£o informado'
         porPiquete[p] = (porPiquete[p] || 0) + 1
       })
       const piquetes = Object.keys(porPiquete).length
-      if (piquetes > 1) list.push({ icon: '📍', text: `Distribuídos em ${piquetes} piquete(s)` })
+      if (piquetes > 1) list.push({ icon: 'ðÅ¸â€œ�', text: `DistribuÃ­dos em ${piquetes} piquete(s)` })
     }
 
     return list
   })()
 
   const DICAS_POR_TIPO = {
-    resumo_pesagens: 'Compare a média entre piquetes para identificar lotes que precisam de atenção.',
-    pesagens: 'Use o gráfico de evolução para acompanhar a frequência de pesagens.',
-    resumo_femeas_ia: 'Taxa acima de 50% indica boa eficiência reprodutiva.',
-    inseminacoes: 'O touro mais usado pode indicar preferência ou disponibilidade.',
-    nascimentos: 'A proporção macho/fêmea ajuda no planejamento do rebanho.',
+    resumo_pesagens: 'Compare a mÃ©dia entre piquetes para identificar lotes que precisam de atenÃ§Ã£o.',
+    pesagens: 'Use o grÃ¡fico de evoluÃ§Ã£o para acompanhar a frequÃªncia de pesagens.',
+    resumo_femeas_ia: 'Taxa acima de 50% indica boa eficiÃªncia reprodutiva.',
+    inseminacoes: 'O touro mais usado pode indicar preferÃªncia ou disponibilidade.',
+    nascimentos: 'A proporÃ§Ã£o macho/fÃªmea ajuda no planejamento do rebanho.',
     estoque_semen: 'Mantenha estoque para os touros mais utilizados.',
-    gestacoes: 'Acompanhe gestações atrasadas para intervenções.',
-    previsoes_parto: 'Resumo por touro: quantas prenhas cada touro gerou. Ajuste as datas para ver partos previstos no período.',
+    gestacoes: 'Acompanhe gestaÃ§Ãµes atrasadas para intervenÃ§Ãµes.',
+    previsoes_parto: 'Resumo por touro: quantas prenhas cada touro gerou. Ajuste as datas para ver partos previstos no perÃ­odo.',
     mortes: 'Analise causas para prevenir futuras perdas.',
-    calendario_reprodutivo: 'Eventos manuais, receptoras, partos previstos e refazer andrológico. Veja meses com eventos e quantidade de parições.',
-    femeas_brucelose: 'Fêmeas entre 3 e 8 meses (90-240 dias) que precisam receber a vacina de brucelose obrigatória.',
-    animais_dgt: 'Animais entre 11 e 21 meses (330-640 dias) elegíveis para avaliação de desempenho DGT.',
-    boletim_rebanho: 'Quantidades por raça, sexo e era, conforme o Boletim Campo. Mantém os dados sempre alinhados.'
+    calendario_reprodutivo: 'Eventos manuais, receptoras, partos previstos e refazer androlÃ³gico. Veja meses com eventos e quantidade de pariÃ§Ãµes.',
+    femeas_brucelose: 'FÃªmeas entre 3 e 8 meses (90-240 dias) que precisam receber a vacina de brucelose obrigatÃ³ria.',
+    animais_dgt: 'Animais entre 11 e 21 meses (330-640 dias) elegÃ­veis para avaliaÃ§Ã£o de desempenho DGT.',
+    boletim_rebanho: 'Quantidades por raÃ§a, sexo e era, conforme o Boletim Campo. MantÃ©m os dados sempre alinhados.'
   }
   const dicaAtual = selectedTipo ? DICAS_POR_TIPO[selectedTipo] : null
 
   const handleShareSummary = async () => {
     try {
       setSharing(true)
-      const titulo = `Relatório: ${selectedTipo || 'Geral'}`
+      const titulo = `RelatÃ³rio: ${selectedTipo || 'Geral'}`
       const resumoTxt = reportData?.resumo && typeof reportData.resumo === 'object'
         ? Object.entries(reportData.resumo).map(([k, v]) => `${k}: ${formatValue(v)}`).join('\n')
         : null
       const texto = [
         titulo,
-        `Período: ${period.startDate} a ${period.endDate}`,
+        `PerÃ­odo: ${period.startDate} a ${period.endDate}`,
         `Registros: ${totalRegistros}`,
         resumoTxt ? `Resumo:\n${resumoTxt}` : null
       ].filter(Boolean).join('\n')
@@ -1510,7 +1510,7 @@ export default function MobileRelatorios() {
         setToast({ type: 'success', msg: 'Resumo copiado!' })
       }
     } catch (e) {
-      setToast({ type: 'error', msg: 'Não foi possível compartilhar' })
+      setToast({ type: 'error', msg: 'NÃ£o foi possÃ­vel compartilhar' })
     } finally {
       setSharing(false)
     }
@@ -1518,9 +1518,9 @@ export default function MobileRelatorios() {
 
   const handleShareWhatsApp = () => {
     try {
-      const titulo = `📊 *Relatório: ${selectedTipo || 'Geral'}*`
+      const titulo = `ðÅ¸â€œÅ  *RelatÃ³rio: ${selectedTipo || 'Geral'}*`
       const resumoTxt = reportData?.resumo && typeof reportData.resumo === 'object'
-        ? Object.entries(reportData.resumo).map(([k, v]) => `• ${k}: ${formatValue(v)}`).join('\n')
+        ? Object.entries(reportData.resumo).map(([k, v]) => `ââ‚¬¢ ${k}: ${formatValue(v)}`).join('\n')
         : null
       
       let detalhes = ''
@@ -1528,63 +1528,63 @@ export default function MobileRelatorios() {
       // Detalhes para acasalamentos
       if (selectedTipo === 'acasalamentos' && dadosParaExibir.length > 0) {
         detalhes = '\n\n*Acasalamentos:*\n' + dadosParaExibir.slice(0, 10).map((a, i) => 
-          `${i + 1}. ${a.animal || a.identificacao || '-'} (${a.embrioes || 0} embriões)`
+          `${i + 1}. ${a.animal || a.identificacao || '-'} (${a.embrioes || 0} embriÃµes)`
         ).join('\n')
         if (dadosParaExibir.length > 10) {
           detalhes += `\n... e mais ${dadosParaExibir.length - 10} acasalamentos`
         }
       }
       
-      // Detalhes para estoque de sêmen
+      // Detalhes para estoque de sÃªmen
       if (selectedTipo === 'estoque_semen' && detalhesEstoqueSemen && detalhesEstoqueSemen.length > 0) {
         const totalDoses = detalhesEstoqueSemen.reduce((s, t) => s + t.doses, 0)
-        detalhes = `\n\n*Estoque de Sêmen:*\n`
-        detalhes += `🧪 Total: ${totalDoses} doses\n`
-        detalhes += `🐂 Touros: ${detalhesEstoqueSemen.length}\n\n`
+        detalhes = `\n\n*Estoque de SÃªmen:*\n`
+        detalhes += `ðÅ¸§ª Total: ${totalDoses} doses\n`
+        detalhes += `ðÅ¸�â€š Touros: ${detalhesEstoqueSemen.length}\n\n`
         detalhes += '*Top 10 Touros:*\n'
         detalhes += detalhesEstoqueSemen.slice(0, 10).map((t, i) => 
-          `${i + 1}. ${t.touro}\n   • ${t.doses} doses (${t.registros} lote${t.registros > 1 ? 's' : ''})\n   • Raça: ${t.raca}`
+          `${i + 1}. ${t.touro}\n   ââ‚¬¢ ${t.doses} doses (${t.registros} lote${t.registros > 1 ? 's' : ''})\n   ââ‚¬¢ RaÃ§a: ${t.raca}`
         ).join('\n')
         if (detalhesEstoqueSemen.length > 10) {
           detalhes += `\n... e mais ${detalhesEstoqueSemen.length - 10} touros`
         }
         
-        // Adicionar resumo por raça se disponível
+        // Adicionar resumo por raÃ§a se disponÃ­vel
         if (estoquePorRaca && estoquePorRaca.length > 0) {
-          detalhes += '\n\n*Por Raça:*\n'
+          detalhes += '\n\n*Por RaÃ§a:*\n'
           detalhes += estoquePorRaca.slice(0, 5).map((r, i) => 
             `${i + 1}. ${r.raca}: ${r.doses} doses (${r.touros} touro${r.touros > 1 ? 's' : ''})`
           ).join('\n')
         }
       }
       
-      // Detalhes para estoque de embriões
+      // Detalhes para estoque de embriÃµes
       if (selectedTipo === 'estoque_embrioes' && detalhesEstoqueEmbrioes && detalhesEstoqueEmbrioes.length > 0) {
         const totalEmbrioes = detalhesEstoqueEmbrioes.reduce((s, a) => s + a.embrioes, 0)
-        detalhes = `\n\n*Estoque de Embriões:*\n`
-        detalhes += `🧬 Total: ${totalEmbrioes} embriões\n`
-        detalhes += `🐄 Acasalamentos: ${detalhesEstoqueEmbrioes.length}\n\n`
+        detalhes = `\n\n*Estoque de EmbriÃµes:*\n`
+        detalhes += `ðÅ¸§¬ Total: ${totalEmbrioes} embriÃµes\n`
+        detalhes += `ðÅ¸�â€ž Acasalamentos: ${detalhesEstoqueEmbrioes.length}\n\n`
         detalhes += '*Top 10 Acasalamentos:*\n'
         detalhes += detalhesEstoqueEmbrioes.slice(0, 10).map((a, i) => 
-          `${i + 1}. ${a.acasalamento}\n   • ${a.embrioes} embriões\n   • Raça: ${a.raca}\n   • Local: R${a.rack} B${a.botijao} C${a.caneca}`
+          `${i + 1}. ${a.acasalamento}\n   ââ‚¬¢ ${a.embrioes} embriÃµes\n   ââ‚¬¢ RaÃ§a: ${a.raca}\n   ââ‚¬¢ Local: R${a.rack} B${a.botijao} C${a.caneca}`
         ).join('\n')
         if (detalhesEstoqueEmbrioes.length > 10) {
           detalhes += `\n... e mais ${detalhesEstoqueEmbrioes.length - 10} acasalamentos`
         }
         
-        // Adicionar resumo por raça se disponível
+        // Adicionar resumo por raÃ§a se disponÃ­vel
         if (estoqueEmbriaoPorRaca && estoqueEmbriaoPorRaca.length > 0) {
-          detalhes += '\n\n*Por Raça:*\n'
+          detalhes += '\n\n*Por RaÃ§a:*\n'
           detalhes += estoqueEmbriaoPorRaca.slice(0, 5).map((r, i) => 
-            `${i + 1}. ${r.raca}: ${r.embrioes} embriões (${r.acasalamentos} acasalamento${r.acasalamentos > 1 ? 's' : ''})`
+            `${i + 1}. ${r.raca}: ${r.embrioes} embriÃµes (${r.acasalamentos} acasalamento${r.acasalamentos > 1 ? 's' : ''})`
           ).join('\n')
         }
       }
       
       const texto = [
         titulo,
-        `📅 Período: ${formatDate(period.startDate)} a ${formatDate(period.endDate)}`,
-        `📋 Registros: ${totalRegistros}`,
+        `ðÅ¸â€œâ€¦ PerÃ­odo: ${formatDate(period.startDate)} a ${formatDate(period.endDate)}`,
+        `ðÅ¸â€œâ€¹ Registros: ${totalRegistros}`,
         resumoTxt ? `\n*Resumo:*\n${resumoTxt}` : null,
         detalhes || null,
         '\n_Gerado pelo Beef-Sync_'
@@ -1600,13 +1600,13 @@ export default function MobileRelatorios() {
 
   const handleShareEmail = () => {
     try {
-      const titulo = `Relatório: ${selectedTipo || 'Geral'}`
+      const titulo = `RelatÃ³rio: ${selectedTipo || 'Geral'}`
       const resumoTxt = reportData?.resumo && typeof reportData.resumo === 'object'
         ? Object.entries(reportData.resumo).map(([k, v]) => `${k}: ${formatValue(v)}`).join('\n')
         : null
       
       const corpo = [
-        `Período: ${formatDate(period.startDate)} a ${formatDate(period.endDate)}`,
+        `PerÃ­odo: ${formatDate(period.startDate)} a ${formatDate(period.endDate)}`,
         `Registros: ${totalRegistros}`,
         resumoTxt ? `\nResumo:\n${resumoTxt}` : null,
         '\n\nGerado pelo Beef-Sync'
@@ -1622,18 +1622,18 @@ export default function MobileRelatorios() {
 
   const handleShareModalWhatsApp = (tipo, titulo, dados) => {
     try {
-      let texto = `📊 *${titulo}*\n\n`
+      let texto = `ðÅ¸â€œÅ  *${titulo}*\n\n`
       
       if (tipo === 'touros') {
         const totalDoses = dados.reduce((s, t) => s + t.doses || s + t.embrioes, 0)
         const totalLotes = dados.reduce((s, t) => s + t.registros, 0)
-        texto += `🐂 Total: ${dados.length} touros\n`
-        texto += `🧪 Doses: ${totalDoses}\n`
-        texto += `📦 Lotes: ${totalLotes}\n\n`
+        texto += `ðÅ¸�â€š Total: ${dados.length} touros\n`
+        texto += `ðÅ¸§ª Doses: ${totalDoses}\n`
+        texto += `ðÅ¸â€œ¦ Lotes: ${totalLotes}\n\n`
         texto += '*Ranking:*\n'
         texto += dados.slice(0, 15).map((t, i) => {
           const doses = t.doses || t.embrioes || 0
-          return `${i + 1}. ${t.touro || t.acasalamento}\n   • ${doses} doses (${t.registros} lote${t.registros > 1 ? 's' : ''})`
+          return `${i + 1}. ${t.touro || t.acasalamento}\n   ââ‚¬¢ ${doses} doses (${t.registros} lote${t.registros > 1 ? 's' : ''})`
         }).join('\n')
         if (dados.length > 15) {
           texto += `\n... e mais ${dados.length - 15} touros`
@@ -1641,12 +1641,12 @@ export default function MobileRelatorios() {
       } else if (tipo === 'acasalamentos' || tipo === 'estoque') {
         const totalEmbrioes = dados.reduce((s, a) => s + a.embrioes, 0)
         const totalLotes = dados.reduce((s, a) => s + a.registros, 0)
-        texto += `� Total: ${dados.length} acasalamentos\n`
-        texto += `🧬 Embriões: ${totalEmbrioes}\n`
-        texto += `📦 Lotes: ${totalLotes}\n\n`
+        texto += `ï¿½ Total: ${dados.length} acasalamentos\n`
+        texto += `ðÅ¸§¬ EmbriÃµes: ${totalEmbrioes}\n`
+        texto += `ðÅ¸â€œ¦ Lotes: ${totalLotes}\n\n`
         texto += '*Ranking:*\n'
         texto += dados.slice(0, 15).map((a, i) => 
-          `${i + 1}. ${a.acasalamento}\n   • ${a.embrioes} embriões (${a.registros} lote${a.registros > 1 ? 's' : ''})\n   • Local: R${a.rack} B${a.botijao} C${a.caneca}`
+          `${i + 1}. ${a.acasalamento}\n   ââ‚¬¢ ${a.embrioes} embriÃµes (${a.registros} lote${a.registros > 1 ? 's' : ''})\n   ââ‚¬¢ Local: R${a.rack} B${a.botijao} C${a.caneca}`
         ).join('\n')
         if (dados.length > 15) {
           texto += `\n... e mais ${dados.length - 15} acasalamentos`
@@ -1733,9 +1733,9 @@ export default function MobileRelatorios() {
   return (
     <>
       <Head>
-        <title>Relatórios | Beef-Sync — Gestão Inteligente de Rebanho</title>
+        <title>RelatÃ³rios | Beef-Sync ââ‚¬â€� GestÃ£o Inteligente de Rebanho</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-        <meta name="description" content="Painel de relatórios e visão geral da sua fazenda. Beef-Sync - Gestão inteligente de rebanho." />
+        <meta name="description" content="Painel de relatÃ³rios e visÃ£o geral da sua fazenda. Beef-Sync - GestÃ£o inteligente de rebanho." />
       </Head>
       {/* Toast */}
       <AnimatePresence>
@@ -1749,13 +1749,13 @@ export default function MobileRelatorios() {
             <div className={`px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 ${
               toast.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'
             }`}>
-              <span className="text-xl">{toast.type === 'success' ? '✓' : '⚠'}</span>
+              <span className="text-xl">{toast.type === 'success' ? 'âÅ“â€œ' : 'âÅ¡ '}</span>
               <span className="font-semibold flex-1">{toast.msg}</span>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-      {/* Botão voltar ao topo */}
+      {/* BotÃ£o voltar ao topo */}
       <AnimatePresence>
         {showScrollTop && (
           <motion.button
@@ -1809,11 +1809,11 @@ export default function MobileRelatorios() {
                   const piqueteNome = (row.Piquete || row.piquete || '-').replace(/PROJETO\s*/i, 'PROJETO ')
                   const totalAnimais = row.Animais ?? row.total ?? 0
                   const machos = row.Machos ?? row.machos ?? 0
-                  const femeas = row.Fêmeas ?? row.femeas ?? row.Femeas ?? 0
-                  const mediaPeso = row['Média Peso (kg)'] ?? row.mediaPeso ?? row.media_peso
+                  const femeas = row.FÃªmeas ?? row.femeas ?? row.Femeas ?? 0
+                  const mediaPeso = row['MÃ©dia Peso (kg)'] ?? row.mediaPeso ?? row.media_peso
                   const cor = CORES_PIQUETE[idx % CORES_PIQUETE.length]
                   
-                  // Cálculos para barra de proporção visual
+                  // CÃ¡lculos para barra de proporÃ§Ã£o visual
                   const totalMF = machos + femeas
                   const percMachos = totalMF > 0 ? (machos / totalMF) * 100 : 0
                   const percFemeas = totalMF > 0 ? (femeas / totalMF) * 100 : 0
@@ -1849,7 +1849,7 @@ export default function MobileRelatorios() {
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 text-sm font-bold">
-                            {totalAnimais} 🐄
+                            {totalAnimais} ðÅ¸�â€ž
                           </span>
                           <ChevronRightIcon className="h-5 w-5 text-gray-400" />
                         </div>
@@ -1874,7 +1874,7 @@ export default function MobileRelatorios() {
                               <span className="text-pink-700 dark:text-pink-300 font-bold text-sm">F</span>
                             </div>
                             <div>
-                              <p className="text-xs text-pink-600 dark:text-pink-400 font-medium">Fêmeas</p>
+                              <p className="text-xs text-pink-600 dark:text-pink-400 font-medium">FÃªmeas</p>
                               <p className="text-lg font-bold text-pink-900 dark:text-pink-100">{femeas}</p>
                             </div>
                           </div>
@@ -1882,7 +1882,7 @@ export default function MobileRelatorios() {
                       </div>
                       
                       {machos > 0 && femeas > 0 && (
-                        <div className="mt-3 h-1.5 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden flex" title={`Machos: ${percMachos.toFixed(0)}% | Fêmeas: ${percFemeas.toFixed(0)}%`}>
+                        <div className="mt-3 h-1.5 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden flex" title={`Machos: ${percMachos.toFixed(0)}% | FÃªmeas: ${percFemeas.toFixed(0)}%`}>
                           <div style={{ width: `${percMachos}%` }} className="bg-blue-400 dark:bg-blue-500 h-full" />
                           <div style={{ width: `${percFemeas}%` }} className="bg-pink-400 dark:bg-pink-500 h-full" />
                         </div>
@@ -1891,7 +1891,7 @@ export default function MobileRelatorios() {
                           {mediaPeso && (
                             <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                               <div className="flex items-center justify-between">
-                                <span className="text-xs text-gray-600 dark:text-gray-400 font-medium">Média de Peso</span>
+                                <span className="text-xs text-gray-600 dark:text-gray-400 font-medium">MÃ©dia de Peso</span>
                                 <span className="text-sm font-bold text-amber-600 dark:text-amber-400">
                                   {typeof mediaPeso === 'number' ? mediaPeso.toFixed(1) : mediaPeso} kg
                                 </span>
@@ -1899,7 +1899,7 @@ export default function MobileRelatorios() {
                             </div>
                           )}
                           
-                          {/* Indicador de clicável */}
+                          {/* Indicador de clicÃ¡vel */}
                           <div className="mt-3 pt-2 border-t border-gray-200 dark:border-gray-700">
                             <p className="text-xs text-center text-gray-500 dark:text-gray-400 font-medium">
                               Toque para ver os animais
@@ -1912,7 +1912,7 @@ export default function MobileRelatorios() {
                 ) : (
                   <div className="divide-y divide-gray-200 dark:divide-gray-700">
                     {cardAnimalsList.map((a, idx) => {
-                      const sexo = a.sexo || 'Não informado'
+                      const sexo = a.sexo || 'NÃ£o informado'
                       const ehMacho = sexo.toLowerCase().includes('macho')
                       
                       return (
@@ -1922,18 +1922,18 @@ export default function MobileRelatorios() {
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex-1 min-w-0">
-                              {/* Cabeçalho com nome e sexo */}
+                              {/* CabeÃ§alho com nome e sexo */}
                               <div className="flex items-center gap-2 mb-2">
                                 {a.id || a.animal_id ? (
                                   <Link 
                                     href={`/animals/${a.id || a.animal_id}`}
                                     className="font-bold text-amber-600 dark:text-amber-400 text-base hover:underline"
                                   >
-                                    {a.identificacao || a.animal || `${a.serie || ''}-${a.rg || ''}`.trim() || a.nome || '—'}
+                                    {a.identificacao || a.animal || `${a.serie || ''}-${a.rg || ''}`.trim() || a.nome || 'ââ‚¬â€�'}
                                   </Link>
                                 ) : (
                                   <span className="font-bold text-gray-900 dark:text-white text-base">
-                                    {a.identificacao || a.animal || `${a.serie || ''}-${a.rg || ''}`.trim() || a.nome || '—'}
+                                    {a.identificacao || a.animal || `${a.serie || ''}-${a.rg || ''}`.trim() || a.nome || 'ââ‚¬â€�'}
                                   </span>
                                 )}
                                 <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
@@ -1945,7 +1945,7 @@ export default function MobileRelatorios() {
                                 </span>
                               </div>
                               
-                              {/* Informações principais em grid */}
+                              {/* InformaÃ§Ãµes principais em grid */}
                               <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mb-3">
                                 {a.peso && a.peso !== '-' && (
                                   <div className="flex items-center gap-1.5">
@@ -1973,13 +1973,13 @@ export default function MobileRelatorios() {
                                 
                                 {a.raca && (
                                   <div className="flex items-center gap-1.5">
-                                    <span className="text-gray-600 dark:text-gray-400">Raça:</span>
+                                    <span className="text-gray-600 dark:text-gray-400">RaÃ§a:</span>
                                     <span className="font-medium text-gray-900 dark:text-white truncate">{a.raca}</span>
                                   </div>
                                 )}
                               </div>
                               
-                              {/* Genealogia e índices */}
+                              {/* Genealogia e Ã­ndices */}
                               {(a.pai || a.avo_materno || a.iabcz || a.deca || (a.iqg ?? a.genetica_2) || (a.pt_iqg ?? a.decile_2) || a.mgte || a.top) && (
                                 <div className="pt-2 border-t border-gray-200 dark:border-gray-700 space-y-1.5">
                                   {a.pai && (
@@ -1991,7 +1991,7 @@ export default function MobileRelatorios() {
                                   
                                   {a.avo_materno && (
                                     <div className="flex items-start gap-1.5 text-xs">
-                                      <span className="text-gray-500 dark:text-gray-400 font-medium min-w-[60px]">Avô Mat:</span>
+                                      <span className="text-gray-500 dark:text-gray-400 font-medium min-w-[60px]">AvÃ´ Mat:</span>
                                       <span className="text-gray-900 dark:text-white font-medium">{a.avo_materno}</span>
                                     </div>
                                   )}
@@ -2054,7 +2054,7 @@ export default function MobileRelatorios() {
           </motion.div>
         )}
       </AnimatePresence>
-      {/* Modal de informação ao clicar em card */}
+      {/* Modal de informaÃ§Ã£o ao clicar em card */}
       <AnimatePresence>
         {cardInfoModal.open && (
           <motion.div
@@ -2093,7 +2093,7 @@ export default function MobileRelatorios() {
                   className="w-full py-2.5 rounded-xl bg-amber-500 text-white font-semibold hover:bg-amber-600 transition-colors flex items-center justify-center gap-2"
                 >
                   <ChartBarIcon className="h-5 w-5" />
-                  Ver relatório completo
+                  Ver relatÃ³rio completo
                 </button>
               )}
             </motion.div>
@@ -2101,7 +2101,7 @@ export default function MobileRelatorios() {
         )}
       </AnimatePresence>
       <div className="min-h-screen bg-gradient-to-b from-amber-50/80 via-white to-amber-50/30 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 pb-24 relative overflow-hidden">
-        {/* Decoração sutil de fundo */}
+        {/* DecoraÃ§Ã£o sutil de fundo */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-100/20 via-transparent to-transparent dark:from-amber-900/10 pointer-events-none" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-amber-200/10 dark:bg-amber-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-amber-100/20 dark:bg-amber-900/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
@@ -2130,10 +2130,10 @@ export default function MobileRelatorios() {
               </div>
               {selectedTipo ? (
                 <span className="truncate max-w-[180px]">
-                  {allTypes.find(t => t.key === selectedTipo)?.label || 'Relatório'}
+                  {allTypes.find(t => t.key === selectedTipo)?.label || 'RelatÃ³rio'}
                 </span>
               ) : (
-                <span>Relatórios</span>
+                <span>RelatÃ³rios</span>
               )}
             </h1>
             <div className="w-16" />
@@ -2180,7 +2180,7 @@ export default function MobileRelatorios() {
                     </p>
                   </div>
 
-              {/* Dashboard / Visão Geral - KPIs rápidos MELHORADOS */}
+              {/* Dashboard / VisÃ£o Geral - KPIs rÃ¡pidos MELHORADOS */}
               {dashboardData?.data?.length > 0 && (
                 <motion.div
                   initial={{ opacity: 0, y: 12 }}
@@ -2193,7 +2193,7 @@ export default function MobileRelatorios() {
                       <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/40">
                         <ChartBarIcon className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                       </div>
-                      <span className="text-xs font-bold uppercase tracking-widest text-amber-600/90 dark:text-amber-400/90">Visão Geral</span>
+                      <span className="text-xs font-bold uppercase tracking-widest text-amber-600/90 dark:text-amber-400/90">VisÃ£o Geral</span>
                     </div>
                     <button
                       onClick={() => setSelectedTipo('resumo_geral')}
@@ -2209,42 +2209,42 @@ export default function MobileRelatorios() {
                         Rebanho: { 
                           gradient: 'from-blue-50 via-blue-100/70 to-blue-50 dark:from-blue-900/30 dark:via-blue-800/20 dark:to-blue-900/30',
                           border: 'border-blue-300 dark:border-blue-700',
-                          icon: '🐄',
+                          icon: 'ðÅ¸�â€ž',
                           iconBg: 'bg-blue-200/50 dark:bg-blue-800/50',
                           textColor: 'text-blue-700 dark:text-blue-300'
                         },
-                        Reprodução: { 
+                        ReproduÃ§Ã£o: { 
                           gradient: 'from-pink-50 via-pink-100/70 to-pink-50 dark:from-pink-900/30 dark:via-pink-800/20 dark:to-pink-900/30',
                           border: 'border-pink-300 dark:border-pink-700',
-                          icon: '💕',
+                          icon: 'ðÅ¸â€™â€¢',
                           iconBg: 'bg-pink-200/50 dark:bg-pink-800/50',
                           textColor: 'text-pink-700 dark:text-pink-300'
                         },
                         Peso: { 
                           gradient: 'from-amber-50 via-amber-100/70 to-amber-50 dark:from-amber-900/30 dark:via-amber-800/20 dark:to-amber-900/30',
                           border: 'border-amber-300 dark:border-amber-700',
-                          icon: '⚖️',
+                          icon: 'âÅ¡â€“ï¸�',
                           iconBg: 'bg-amber-200/50 dark:bg-amber-800/50',
                           textColor: 'text-amber-700 dark:text-amber-300'
                         },
                         Financeiro: { 
                           gradient: 'from-emerald-50 via-emerald-100/70 to-emerald-50 dark:from-emerald-900/30 dark:via-emerald-800/20 dark:to-emerald-900/30',
                           border: 'border-emerald-300 dark:border-emerald-700',
-                          icon: '💰',
+                          icon: 'ðÅ¸â€™°',
                           iconBg: 'bg-emerald-200/50 dark:bg-emerald-800/50',
                           textColor: 'text-emerald-700 dark:text-emerald-300'
                         },
                         Sanidade: { 
                           gradient: 'from-violet-50 via-violet-100/70 to-violet-50 dark:from-violet-900/30 dark:via-violet-800/20 dark:to-violet-900/30',
                           border: 'border-violet-300 dark:border-violet-700',
-                          icon: '💉',
+                          icon: 'ðÅ¸â€™â€°',
                           iconBg: 'bg-violet-200/50 dark:bg-violet-800/50',
                           textColor: 'text-violet-700 dark:text-violet-300'
                         },
                         Estoque: { 
                           gradient: 'from-cyan-50 via-cyan-100/70 to-cyan-50 dark:from-cyan-900/30 dark:via-cyan-800/20 dark:to-cyan-900/30',
                           border: 'border-cyan-300 dark:border-cyan-700',
-                          icon: '📦',
+                          icon: 'ðÅ¸â€œ¦',
                           iconBg: 'bg-cyan-200/50 dark:bg-cyan-800/50',
                           textColor: 'text-cyan-700 dark:text-cyan-300'
                         }
@@ -2252,7 +2252,7 @@ export default function MobileRelatorios() {
                       const config = modConfig[mod.modulo] || {
                         gradient: 'from-gray-50 to-gray-100/50 dark:from-gray-900/20 dark:to-gray-900/10',
                         border: 'border-gray-200 dark:border-gray-700',
-                        icon: '📊',
+                        icon: 'ðÅ¸â€œÅ ',
                         iconBg: 'bg-gray-200/50 dark:bg-gray-700/50',
                         textColor: 'text-gray-700 dark:text-gray-300'
                       }
@@ -2279,12 +2279,12 @@ export default function MobileRelatorios() {
                             <div className="space-y-1.5">
                               {Object.entries(mod.dados || {}).slice(0, 6).map(([k, v]) => {
                                 const labelCurto = {
-                                  'Média Recente': 'Média',
+                                  'MÃ©dia Recente': 'MÃ©dia',
                                   'Para Parir (30d)': 'Parir 30d',
-                                  'Gestações Ativas': 'Gestações',
-                                  'Touros (sêmen)': 'Touros',
-                                  'Doses Sêmen': 'Doses',
-                                  'Embriões Disp.': 'Embriões'
+                                  'GestaÃ§Ãµes Ativas': 'GestaÃ§Ãµes',
+                                  'Touros (sÃªmen)': 'Touros',
+                                  'Doses SÃªmen': 'Doses',
+                                  'EmbriÃµes Disp.': 'EmbriÃµes'
                                 }[k] || k
                                 return (
                                   <div key={k} className="flex flex-col gap-0.5 min-w-0">
@@ -2306,7 +2306,7 @@ export default function MobileRelatorios() {
                     })}
                   </div>
                   
-                  {/* Estatísticas rápidas adicionais */}
+                  {/* EstatÃ­sticas rÃ¡pidas adicionais */}
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -2327,7 +2327,7 @@ export default function MobileRelatorios() {
                       onClick={() => setCurrentTab('reports')}
                       className="p-3 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-white/80 dark:border-gray-700/80 shadow-md shadow-gray-200/40 dark:shadow-black/20 hover:shadow-lg hover:shadow-emerald-200/30 dark:hover:shadow-emerald-900/20 hover:border-emerald-200 dark:hover:border-emerald-700/50 transition-all cursor-pointer"
                     >
-                      <p className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Relatórios</p>
+                      <p className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">RelatÃ³rios</p>
                       <p className="text-sm font-bold text-emerald-900 dark:text-emerald-100 mt-0.5 tabular-nums">{enabledReports.length}</p>
                     </motion.button>
                     <motion.button
@@ -2348,7 +2348,7 @@ export default function MobileRelatorios() {
               {tiposHabilitados.length === 0 ? (
                 <div className="p-6 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-center">
                   <p className="text-amber-800 dark:text-amber-200">
-                    Nenhum relatório habilitado para mobile. Configure em Monitoramento &gt; Acessos.
+                    Nenhum relatÃ³rio habilitado para mobile. Configure em Monitoramento &gt; Acessos.
                   </p>
                 </div>
               ) : (
@@ -2360,7 +2360,7 @@ export default function MobileRelatorios() {
                       exit={{ opacity: 0 }}
                       className="space-y-6"
                     >
-                      {/* Busca de relatórios */}
+                      {/* Busca de relatÃ³rios */}
                   <motion.div
                     initial={{ opacity: 0, y: 4 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -2371,7 +2371,7 @@ export default function MobileRelatorios() {
                       type="text"
                       value={searchReports}
                       onChange={e => setSearchReports(e.target.value)}
-                      placeholder="Buscar relatórios..."
+                      placeholder="Buscar relatÃ³rios..."
                       className="w-full pl-10 pr-10 py-3 rounded-2xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all"
                     />
                     {searchReports && (
@@ -2429,13 +2429,13 @@ export default function MobileRelatorios() {
                       exit={{ opacity: 0 }}
                       className="space-y-6"
                     >
-                  {/* Acesso Rápido - Relatórios mais usados */}
+                  {/* Acesso RÃ¡pido - RelatÃ³rios mais usados */}
                   <div className="pt-4">
                     <div className="flex items-center gap-2 mb-4 px-1">
                       <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/40">
                         <ChartBarIcon className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                       </div>
-                      <span className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Acesso Rápido</span>
+                      <span className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Acesso RÃ¡pido</span>
                       <div className="flex-1 h-px bg-gradient-to-r from-amber-200/60 to-transparent dark:from-amber-800/40" />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
@@ -2459,7 +2459,7 @@ export default function MobileRelatorios() {
                               <div className="p-2 rounded-xl bg-amber-100/80 dark:bg-amber-900/40 flex-shrink-0">
                                 <Icon className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                               </div>
-                              <span className="text-sm font-bold text-gray-800 dark:text-gray-200 flex-1 min-w-0 break-words">{tipo.label.replace(/^[📊📅🏆]\s*/, '')}</span>
+                              <span className="text-sm font-bold text-gray-800 dark:text-gray-200 flex-1 min-w-0 break-words">{tipo.label.replace(/^[ðÅ¸â€œÅ ðÅ¸â€œâ€¦ðÅ¸�â€ ]\s*/, '')}</span>
                               <ChevronRightIcon className="h-4 w-4 text-amber-400/70 dark:text-amber-500/70 flex-shrink-0" />
                             </div>
                             {desc && <span className="text-[10px] text-gray-500 dark:text-gray-400 pl-0.5 line-clamp-2 font-medium break-words">{desc}</span>}
@@ -2469,7 +2469,7 @@ export default function MobileRelatorios() {
                     </div>
                   </div>
 
-                  {/* Ações Rápidas */}
+                  {/* AÃ§Ãµes RÃ¡pidas */}
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -2479,7 +2479,7 @@ export default function MobileRelatorios() {
                       <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/40">
                         <LightBulbIcon className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                       </div>
-                      <span className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Ações Rápidas</span>
+                      <span className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">AÃ§Ãµes RÃ¡pidas</span>
                       <div className="flex-1 h-px bg-gradient-to-r from-amber-200/60 to-transparent dark:from-amber-800/40" />
                     </div>
                     <div className="grid grid-cols-3 gap-2">
@@ -2531,7 +2531,7 @@ export default function MobileRelatorios() {
                           <div className="p-2 rounded-xl bg-purple-100/80 dark:bg-purple-900/40">
                             <CalendarIcon className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                           </div>
-                          <span className="text-[10px] font-bold text-purple-900 dark:text-purple-100">Último Mês</span>
+                          <span className="text-[10px] font-bold text-purple-900 dark:text-purple-100">ÃÅ¡ltimo MÃªs</span>
                         </div>
                       </motion.div>
                     </div>
@@ -2563,7 +2563,7 @@ export default function MobileRelatorios() {
                                 className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-amber-200/70 dark:border-amber-800/50 text-amber-800 dark:text-amber-200 text-sm font-semibold shadow-md hover:shadow-lg hover:border-amber-300 dark:hover:border-amber-700/60 transition-all"
                               >
                                 <Icon className="h-4 w-4" />
-                                {tipo.label.replace(/^[📊📅🏆]\s*/, '')}
+                                {tipo.label.replace(/^[ðÅ¸â€œÅ ðÅ¸â€œâ€¦ðÅ¸�â€ ]\s*/, '')}
                               </button>
                               <button
                                 onClick={e => { e.stopPropagation(); toggleFavorite(id) }}
@@ -2578,7 +2578,7 @@ export default function MobileRelatorios() {
                     </div>
                   )}
 
-                  {/* Você pode gostar - sugestões */}
+                  {/* VocÃª pode gostar - sugestÃµes */}
                   {(() => {
                     const excluidos = new Set([...ACESSO_RAPIDO_KEYS, ...recentIds, ...favorites])
                     const sugestoes = []
@@ -2594,7 +2594,7 @@ export default function MobileRelatorios() {
                       <div>
                         <div className="flex items-center gap-2 mb-2 px-1">
                           <LightBulbIcon className="h-4 w-4 text-amber-500" />
-                          <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">Você pode gostar</span>
+                          <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">VocÃª pode gostar</span>
                         </div>
                         <div className="flex flex-wrap gap-2">
                           {sugestoes.map(tipo => {
@@ -2607,7 +2607,7 @@ export default function MobileRelatorios() {
                                 className="flex items-center gap-2 px-3 py-2 rounded-xl bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 text-violet-700 dark:text-violet-300 text-sm font-medium hover:bg-violet-100 dark:hover:bg-violet-900/30 transition-colors text-left max-w-full"
                               >
                                 <Icon className="h-4 w-4 flex-shrink-0" />
-                                <span className="break-words min-w-0">{tipo.label.replace(/^[📊📅🏆]\s*/, '')}</span>
+                                <span className="break-words min-w-0">{tipo.label.replace(/^[ðÅ¸â€œÅ ðÅ¸â€œâ€¦ðÅ¸�â€ ]\s*/, '')}</span>
                               </motion.button>
                             )
                           })}
@@ -2635,7 +2635,7 @@ export default function MobileRelatorios() {
                               className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600/50 transition-colors text-left max-w-full"
                             >
                               <Icon className="h-4 w-4 flex-shrink-0" />
-                              <span className="break-words min-w-0">{tipo.label.replace(/^[📊📅🏆]\s*/, '')}</span>
+                              <span className="break-words min-w-0">{tipo.label.replace(/^[ðÅ¸â€œÅ ðÅ¸â€œâ€¦ðÅ¸�â€ ]\s*/, '')}</span>
                             </motion.button>
                           )
                         })}
@@ -2655,7 +2655,7 @@ export default function MobileRelatorios() {
                   <div>
                     <div className="flex items-center gap-2 mb-3 px-1">
                       <ChartBarIcon className="h-4 w-4 text-amber-500" />
-                      <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Todos os Relatórios</span>
+                      <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Todos os RelatÃ³rios</span>
                     </div>
                     <div className="space-y-4">
                       {categoriasComRelatorios
@@ -2734,7 +2734,7 @@ export default function MobileRelatorios() {
                         })}
                       {(searchReports.trim() || categoryFilter) && categoriasComRelatorios.filter(({ cat }) => !categoryFilter || categoryFilter === cat).every(({ tipos }) => tipos.filter(t => matchSearch(t.label, t.key)).length === 0) && (
                         <div className="p-6 text-center text-gray-500 dark:text-gray-400">
-                          <p className="font-medium">Nenhum relatório encontrado</p>
+                          <p className="font-medium">Nenhum relatÃ³rio encontrado</p>
                           <button
                             onClick={() => { setSearchReports(''); setCategoryFilter('') }}
                             className="mt-2 text-sm text-amber-600 dark:text-amber-400 font-semibold"
@@ -2746,7 +2746,7 @@ export default function MobileRelatorios() {
                     </div>
                   </div>
 
-                  {/* Rodapé */}
+                  {/* RodapÃ© */}
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -2754,10 +2754,10 @@ export default function MobileRelatorios() {
                     className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 text-center"
                   >
                     <p className="text-xs text-gray-400 dark:text-gray-500">
-                      Beef-Sync • Gestão inteligente de rebanho
+                      Beef-Sync ââ‚¬¢ GestÃ£o inteligente de rebanho
                     </p>
                     <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1 opacity-75">
-                      Exporte relatórios em CSV ou compartilhe com sua equipe
+                      Exporte relatÃ³rios em CSV ou compartilhe com sua equipe
                     </p>
                   </motion.div>
                   </motion.div>
@@ -2775,12 +2775,12 @@ export default function MobileRelatorios() {
                   <div className="px-1">
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Menu</h2>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                      Configurações e informações
+                      ConfiguraÃ§Ãµes e informaÃ§Ãµes
                     </p>
                   </div>
                   
                   <div className="space-y-4">
-                     {/* Card do Usuário */}
+                     {/* Card do UsuÃ¡rio */}
                      <motion.div 
                        initial={{ opacity: 0, y: 10 }}
                        animate={{ opacity: 1, y: 0 }}
@@ -2801,11 +2801,11 @@ export default function MobileRelatorios() {
                         </button>
                      </motion.div>
     
-                     {/* Seção Geral */}
+                     {/* SeÃ§Ã£o Geral */}
                      <div className="space-y-2">
-                        <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2">Preferências</p>
+                        <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2">PreferÃªncias</p>
                         
-                        {/* Aparência com Toggle */}
+                        {/* AparÃªncia com Toggle */}
                         <motion.button 
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
@@ -2825,10 +2825,10 @@ export default function MobileRelatorios() {
                            <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
                                  <div className="p-2 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-600 dark:text-blue-400">
-                                    {isDarkMode ? <MoonIcon className="h-5 w-5" /> : <span className="text-xl">☀️</span>}
+                                    {isDarkMode ? <MoonIcon className="h-5 w-5" /> : <span className="text-xl">âËœâ‚¬ï¸�</span>}
                                  </div>
                                  <div className="text-left">
-                                    <span className="font-semibold text-gray-900 dark:text-white block">Aparência</span>
+                                    <span className="font-semibold text-gray-900 dark:text-white block">AparÃªncia</span>
                                     <span className="text-xs text-gray-500 dark:text-gray-400">{isDarkMode ? 'Modo Escuro' : 'Modo Claro'}</span>
                                  </div>
                               </div>
@@ -2838,7 +2838,7 @@ export default function MobileRelatorios() {
                            </div>
                         </motion.button>
                         
-                        {/* Notificações */}
+                        {/* NotificaÃ§Ãµes */}
                         <motion.button 
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
@@ -2850,7 +2850,7 @@ export default function MobileRelatorios() {
                                     <BellIcon className="h-5 w-5" />
                                  </div>
                                  <div className="text-left">
-                                    <span className="font-semibold text-gray-900 dark:text-white block">Notificações</span>
+                                    <span className="font-semibold text-gray-900 dark:text-white block">NotificaÃ§Ãµes</span>
                                     <span className="text-xs text-gray-500 dark:text-gray-400">Alertas e avisos</span>
                                  </div>
                               </div>
@@ -2859,34 +2859,34 @@ export default function MobileRelatorios() {
                         </motion.button>
                      </div>
 
-                     {/* Seção Sobre */}
+                     {/* SeÃ§Ã£o Sobre */}
                      <div className="space-y-2">
                         <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2">Sobre</p>
                         
                         <div className="p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm">
                            <div className="flex items-center gap-3 mb-3">
                               <div className="p-2 rounded-lg bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/30">
-                                 <span className="text-2xl">🐄</span>
+                                 <span className="text-2xl">ðÅ¸�â€ž</span>
                               </div>
                               <div>
                                  <p className="font-bold text-gray-900 dark:text-white">Beef-Sync</p>
-                                 <p className="text-xs text-gray-500 dark:text-gray-400">Versão 2.0.0</p>
+                                 <p className="text-xs text-gray-500 dark:text-gray-400">VersÃ£o 2.0.0</p>
                               </div>
                            </div>
                            <div className="space-y-2 text-xs text-gray-600 dark:text-gray-400">
-                              <p>Sistema de gestão pecuária</p>
-                              <p className="text-[10px] text-gray-500 dark:text-gray-500">© 2024 Beef-Sync. Todos os direitos reservados.</p>
+                              <p>Sistema de gestÃ£o pecuÃ¡ria</p>
+                              <p className="text-[10px] text-gray-500 dark:text-gray-500">Â© 2024 Beef-Sync. Todos os direitos reservados.</p>
                            </div>
                         </div>
                      </div>
 
-                     {/* Estatísticas Rápidas */}
+                     {/* EstatÃ­sticas RÃ¡pidas */}
                      <div className="space-y-2">
-                        <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2">Estatísticas</p>
+                        <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2">EstatÃ­sticas</p>
                         
                         <div className="grid grid-cols-2 gap-2">
                            <div className="p-3 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/10 border border-blue-200 dark:border-blue-800">
-                              <p className="text-xs text-blue-600 dark:text-blue-400 font-semibold">Relatórios</p>
+                              <p className="text-xs text-blue-600 dark:text-blue-400 font-semibold">RelatÃ³rios</p>
                               <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{enabledReports.length}</p>
                            </div>
                            <div className="p-3 rounded-xl bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-900/10 border border-amber-200 dark:border-amber-800">
@@ -2909,7 +2909,7 @@ export default function MobileRelatorios() {
                   }`}
                 >
                   {currentTab === 'home' ? <HomeIconSolid className="h-6 w-6" /> : <HomeIcon className="h-6 w-6" />}
-                  <span className="text-[10px] font-medium">Início</span>
+                  <span className="text-[10px] font-medium">InÃ­cio</span>
                 </button>
                 <button
                   onClick={() => setCurrentTab('reports')}
@@ -2920,7 +2920,7 @@ export default function MobileRelatorios() {
                   }`}
                 >
                   {currentTab === 'reports' ? <ChartBarIconSolid className="h-6 w-6" /> : <ChartBarIcon className="h-6 w-6" />}
-                  <span className="text-[10px] font-medium">Relatórios</span>
+                  <span className="text-[10px] font-medium">RelatÃ³rios</span>
                 </button>
                 <button
                   onClick={() => setCurrentTab('settings')}
@@ -2947,7 +2947,7 @@ export default function MobileRelatorios() {
                     onClick={() => setSelectedTipo(null)}
                     className="text-sm text-amber-600 dark:text-amber-400 font-medium"
                   >
-                    ← Voltar
+                    ââ€ � Voltar
                   </button>
                   {reportData && totalRegistros >= 0 && (
                     <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300">
@@ -2961,7 +2961,7 @@ export default function MobileRelatorios() {
                       {(() => {
                         const diffMs = new Date().getTime() - new Date(lastUpdate).getTime()
                         const diffMin = Math.floor(diffMs / 60000)
-                        return diffMin < 1 ? 'Atualizado agora' : `há ${diffMin}min`
+                        return diffMin < 1 ? 'Atualizado agora' : `hÃ¡ ${diffMin}min`
                       })()}
                     </span>
                   )}
@@ -2976,12 +2976,12 @@ export default function MobileRelatorios() {
                 </div>
               </div>
 
-              {/* Seletor rápido de período */}
+              {/* Seletor rÃ¡pido de perÃ­odo */}
               <div className="flex flex-wrap gap-2">
                 {Object.entries(PERIOD_PRESETS).map(([key, fn]) => {
                   const p = fn()
                   const isActive = period.startDate === p.startDate && period.endDate === p.endDate
-                  const labels = { '7d': '7 dias', '30d': '30 dias', 'mes': 'Mês', 'mes_anterior': 'Mês ant.', '3meses': '3 meses', 'ano': 'Ano' }
+                  const labels = { '7d': '7 dias', '30d': '30 dias', 'mes': 'MÃªs', 'mes_anterior': 'MÃªs ant.', '3meses': '3 meses', 'ano': 'Ano' }
                   return (
                     <button
                       key={key}
@@ -3017,7 +3017,7 @@ export default function MobileRelatorios() {
                     onClick={() => setSexoFilter('F')}
                     className={`px-3 py-1 rounded-lg text-xs font-semibold ${sexoFilter === 'F' ? 'bg-pink-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'}`}
                   >
-                    Fêmeas
+                    FÃªmeas
                   </button>
                 </div>
               )}
@@ -3025,14 +3025,14 @@ export default function MobileRelatorios() {
               {(selectedTipo === 'ranking_pmgz' || selectedTipo === 'ranking_animais_avaliados') && (
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="px-2 py-1 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center gap-1">
-                    <FunnelIcon className="h-4 w-4" /> Série
+                    <FunnelIcon className="h-4 w-4" /> SÃ©rie
                   </span>
                   <select
                     value={serieFilter}
                     onChange={e => setSerieFilter(e.target.value || '')}
                     className="px-3 py-1.5 rounded-lg text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-w-[100px]"
                   >
-                    <option value="">Todas as séries</option>
+                    <option value="">Todas as sÃ©ries</option>
                     {(config?.series || []).map(s => (
                       <option key={s} value={s}>{s}</option>
                     ))}
@@ -3093,13 +3093,13 @@ export default function MobileRelatorios() {
                             onClick={() => setViewMode('calendar')}
                             className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all ${viewMode === 'calendar' ? 'bg-amber-500 text-white shadow-md scale-105' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
                           >
-                            📅 Calendário
+                            ðÅ¸â€œâ€¦ CalendÃ¡rio
                           </button>
                           <button
                             onClick={() => setViewMode('table')}
                             className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all ${viewMode === 'table' ? 'bg-amber-500 text-white shadow-md scale-105' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
                           >
-                            📋 Tabela
+                            ðÅ¸â€œâ€¹ Tabela
                           </button>
                         </>
                       ) : (
@@ -3108,13 +3108,13 @@ export default function MobileRelatorios() {
                             onClick={() => setViewMode('charts')}
                             className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all ${viewMode === 'charts' ? 'bg-amber-500 text-white shadow-md scale-105' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
                           >
-                            📊 Gráficos
+                            ðÅ¸â€œÅ  GrÃ¡ficos
                           </button>
                           <button
                             onClick={() => setViewMode('table')}
                             className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all ${viewMode === 'table' ? 'bg-amber-500 text-white shadow-md scale-105' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
                           >
-                            📋 Tabela
+                            ðÅ¸â€œâ€¹ Tabela
                           </button>
                         </>
                       )}
@@ -3126,7 +3126,7 @@ export default function MobileRelatorios() {
                     <div className="space-y-4">
                       {reportData?.data?.map((mod, i) => {
                          const ModIcon = mod.modulo === 'Rebanho' ? UserGroupIcon :
-                           mod.modulo === 'Reprodução' ? HeartIcon :
+                           mod.modulo === 'ReproduÃ§Ã£o' ? HeartIcon :
                            mod.modulo === 'Peso' ? ScaleIcon :
                            mod.modulo === 'Financeiro' ? BanknotesIcon :
                            mod.modulo === 'Custos' ? BanknotesIcon :
@@ -3183,7 +3183,7 @@ export default function MobileRelatorios() {
                        <div className="p-1.5 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
                          <ChartBarIcon className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                        </div>
-                       <h3 className="font-bold text-lg text-gray-900 dark:text-white">Distribuição por Idade</h3>
+                       <h3 className="font-bold text-lg text-gray-900 dark:text-white">DistribuiÃ§Ã£o por Idade</h3>
                      </div>
                      <div className="h-64 relative">
                        <Doughnut data={chartResumoIdade} options={pieOptions} />
@@ -3202,7 +3202,7 @@ export default function MobileRelatorios() {
                        <div className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                          <UserGroupIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                        </div>
-                       <h3 className="font-bold text-lg text-gray-900 dark:text-white">Distribuição por Sexo</h3>
+                       <h3 className="font-bold text-lg text-gray-900 dark:text-white">DistribuiÃ§Ã£o por Sexo</h3>
                      </div>
                      <div className="h-64 relative">
                        <Doughnut data={chartResumoSexo} options={pieOptions} />
@@ -3232,9 +3232,9 @@ export default function MobileRelatorios() {
                       >
                         <option value="">Todos os tipos</option>
                         <option value="Chegada de Receptora">Chegada de Receptora</option>
-                        <option value="Diagnóstico de Gestação">DG Agendado</option>
+                        <option value="DiagnÃ³stico de GestaÃ§Ã£o">DG Agendado</option>
                         <option value="Parto Previsto">Parto Previsto</option>
-                        <option value="Refazer Exame Andrológico">Refazer Andrológico</option>
+                        <option value="Refazer Exame AndrolÃ³gico">Refazer AndrolÃ³gico</option>
                         <option value="Brucelose">Brucelose</option>
                         <option value="DGT">DGT</option>
                       </select>
@@ -3259,11 +3259,11 @@ export default function MobileRelatorios() {
                       </button>
                       <button
                         onClick={() => {
-                          setTipoFiltroCalendario(tipoFiltroCalendario === 'Diagnóstico de Gestação' ? '' : 'Diagnóstico de Gestação')
+                          setTipoFiltroCalendario(tipoFiltroCalendario === 'DiagnÃ³stico de GestaÃ§Ã£o' ? '' : 'DiagnÃ³stico de GestaÃ§Ã£o')
                           setViewMode('table')
                         }}
                         className={`p-3 rounded-xl border transition-all active:scale-95 ${
-                          tipoFiltroCalendario === 'Diagnóstico de Gestação'
+                          tipoFiltroCalendario === 'DiagnÃ³stico de GestaÃ§Ã£o'
                             ? 'bg-yellow-100 dark:bg-yellow-800/40 border-yellow-400 dark:border-yellow-600 ring-2 ring-yellow-400'
                             : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 hover:bg-yellow-100 dark:hover:bg-yellow-800/30'
                         }`}
@@ -3287,16 +3287,16 @@ export default function MobileRelatorios() {
                       </button>
                       <button
                         onClick={() => {
-                          setTipoFiltroCalendario(tipoFiltroCalendario === 'Refazer Exame Andrológico' ? '' : 'Refazer Exame Andrológico')
+                          setTipoFiltroCalendario(tipoFiltroCalendario === 'Refazer Exame AndrolÃ³gico' ? '' : 'Refazer Exame AndrolÃ³gico')
                           setViewMode('table')
                         }}
                         className={`p-3 rounded-xl border transition-all active:scale-95 ${
-                          tipoFiltroCalendario === 'Refazer Exame Andrológico'
+                          tipoFiltroCalendario === 'Refazer Exame AndrolÃ³gico'
                             ? 'bg-orange-100 dark:bg-orange-800/40 border-orange-400 dark:border-orange-600 ring-2 ring-orange-400'
                             : 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800 hover:bg-orange-100 dark:hover:bg-orange-800/30'
                         }`}
                       >
-                        <p className="text-[10px] text-orange-600 dark:text-orange-400 font-medium">Refazer Andrológico</p>
+                        <p className="text-[10px] text-orange-600 dark:text-orange-400 font-medium">Refazer AndrolÃ³gico</p>
                         <p className="text-lg font-bold text-orange-900 dark:text-orange-100">{contagemTiposCalendario.andrologico}</p>
                       </button>
                       <button
@@ -3379,7 +3379,7 @@ export default function MobileRelatorios() {
                     </motion.div>
                   )}
 
-                  {/* ══ PAINEL DE ANÁLISE COMPLETO: Boletim Campo ══ */}
+                  {/* ââ€¢�ââ€¢� PAINEL DE ANÃ�LISE COMPLETO: Boletim Campo ââ€¢�ââ€¢� */}
                   {(ehBoletimCampo || ehBoletimRebanho) && dadosParaExibir.length > 0 && (() => {
                     const qtyKey = ehBoletimCampo ? 'quant' : 'total'
                     const rows = dadosParaExibir.filter(d =>
@@ -3387,22 +3387,22 @@ export default function MobileRelatorios() {
                       d.local_1 !== 'TOTAL GERAL' && d.fazenda !== 'TOTAL GERAL'
                     )
 
-                    // Categorias de área
+                    // Categorias de Ã¡rea
                     const AREA_CATS = [
-                      { key: 'Piquetes',     emoji: '🌿', test: s => /piquete|^piq[\s_-]/i.test(s), grad: 'from-green-500 to-emerald-600' },
-                      { key: 'Cabanha',      emoji: '🏠', test: s => /cabanha/i.test(s),              grad: 'from-violet-500 to-purple-600' },
-                      { key: 'Confinamento', emoji: '🏗️',  test: s => /confina|^conf\b/i.test(s),     grad: 'from-orange-500 to-amber-600' },
-                      { key: 'Projetos',     emoji: '🔬', test: s => /projeto/i.test(s),              grad: 'from-cyan-500 to-teal-600' },
+                      { key: 'Piquetes',     emoji: 'ðÅ¸Å’¿', test: s => /piquete|^piq[\s_-]/i.test(s), grad: 'from-green-500 to-emerald-600' },
+                      { key: 'Cabanha',      emoji: 'ðÅ¸� ', test: s => /cabanha/i.test(s),              grad: 'from-violet-500 to-purple-600' },
+                      { key: 'Confinamento', emoji: 'ðÅ¸�â€”ï¸�',  test: s => /confina|^conf\b/i.test(s),     grad: 'from-orange-500 to-amber-600' },
+                      { key: 'Projetos',     emoji: 'ðÅ¸â€�¬', test: s => /projeto/i.test(s),              grad: 'from-cyan-500 to-teal-600' },
                     ]
 
                     // Categorias de animal
                     const CAT_ANIMAL = [
-                      { key: 'Bezerros',   emoji: '🐣', test: s => /bezerr|cria/i.test(s),      color: 'yellow' },
-                      { key: 'Vacas',      emoji: '🐄', test: s => /^vaca|vacas/i.test(s),      color: 'pink' },
-                      { key: 'Novilhas',   emoji: '🌸', test: s => /novilha/i.test(s),           color: 'rose' },
-                      { key: 'Touros',     emoji: '🐂', test: s => /touro/i.test(s),             color: 'blue' },
-                      { key: 'Novilhos',   emoji: '🐃', test: s => /novilho/i.test(s),           color: 'indigo' },
-                      { key: 'Receptoras', emoji: '💉', test: s => /recept/i.test(s),            color: 'purple' },
+                      { key: 'Bezerros',   emoji: 'ðÅ¸�£', test: s => /bezerr|cria/i.test(s),      color: 'yellow' },
+                      { key: 'Vacas',      emoji: 'ðÅ¸�â€ž', test: s => /^vaca|vacas/i.test(s),      color: 'pink' },
+                      { key: 'Novilhas',   emoji: 'ðÅ¸Å’¸', test: s => /novilha/i.test(s),           color: 'rose' },
+                      { key: 'Touros',     emoji: 'ðÅ¸�â€š', test: s => /touro/i.test(s),             color: 'blue' },
+                      { key: 'Novilhos',   emoji: 'ðÅ¸�Æ’', test: s => /novilho/i.test(s),           color: 'indigo' },
+                      { key: 'Receptoras', emoji: 'ðÅ¸â€™â€°', test: s => /recept/i.test(s),            color: 'purple' },
                     ]
                     const corAnimal = {
                       yellow: { bg:'bg-yellow-50 dark:bg-yellow-900/20', border:'border-yellow-300 dark:border-yellow-700', text:'text-yellow-700 dark:text-yellow-300', badge:'bg-yellow-400', num:'text-yellow-900 dark:text-yellow-100' },
@@ -3413,7 +3413,7 @@ export default function MobileRelatorios() {
                       purple: { bg:'bg-purple-50 dark:bg-purple-900/20', border:'border-purple-300 dark:border-purple-700', text:'text-purple-700 dark:text-purple-300', badge:'bg-purple-500', num:'text-purple-900 dark:text-purple-100' },
                     }
 
-                    // Aggregação completa
+                    // AggregaÃ§Ã£o completa
                     const porRaca = {}, porEra = {}, porSexo = {}
                     const porAreaCat = {}, porCatAnimal = {}
                     const piquetes = {}
@@ -3424,7 +3424,7 @@ export default function MobileRelatorios() {
                       if (!qtd) return
                       totalGeral += qtd
 
-                      const raca    = (d.raca || 'Não informado').trim()
+                      const raca    = (d.raca || 'NÃ£o informado').trim()
                       const era     = (d.era  || '-').trim()
                       const sexoRaw = (d.sexo || '').toString().trim()
                       const cat     = (d.categoria || '').toString().trim()
@@ -3470,23 +3470,23 @@ export default function MobileRelatorios() {
                     return (
                       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-5 mb-2">
 
-                        {/* 1. HEADER DARK — total + F/M + tiles de área */}
+                        {/* 1. HEADER DARK ââ‚¬â€� total + F/M + tiles de Ã¡rea */}
                         <div className="rounded-2xl overflow-hidden shadow-xl">
                           <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 p-4 pb-3">
                             <p className="text-slate-400 text-[10px] uppercase tracking-widest font-bold mb-1">Boletim Campo</p>
                             <div className="flex items-end justify-between mb-3">
                               <div>
                                 <p className="text-5xl font-black text-white leading-none">{totalGeral.toLocaleString('pt-BR')}</p>
-                                <p className="text-slate-400 text-xs mt-1">{rows.length} registros · {piquetesOrd.length} locais</p>
+                                <p className="text-slate-400 text-xs mt-1">{rows.length} registros Â· {piquetesOrd.length} locais</p>
                               </div>
                               <div className="flex gap-3">
                                 <div className="text-center bg-pink-500/20 rounded-xl px-3 py-2 border border-pink-500/30">
-                                  <p className="text-pink-300 text-[10px] font-bold tracking-wide">♀ FÊMEAS</p>
+                                  <p className="text-pink-300 text-[10px] font-bold tracking-wide">ââ„¢â‚¬ FÃÅ MEAS</p>
                                   <p className="text-2xl font-black text-pink-200">{totalF.toLocaleString('pt-BR')}</p>
                                   <p className="text-pink-400 text-xs">{pctF}%</p>
                                 </div>
                                 <div className="text-center bg-blue-500/20 rounded-xl px-3 py-2 border border-blue-500/30">
-                                  <p className="text-blue-300 text-[10px] font-bold tracking-wide">♂ MACHOS</p>
+                                  <p className="text-blue-300 text-[10px] font-bold tracking-wide">ââ„¢â€š MACHOS</p>
                                   <p className="text-2xl font-black text-blue-200">{totalM.toLocaleString('pt-BR')}</p>
                                   <p className="text-blue-400 text-xs">{pctM}%</p>
                                 </div>
@@ -3497,8 +3497,8 @@ export default function MobileRelatorios() {
                               <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-400" style={{ width:`${pctM}%` }} />
                             </div>
                             <div className="flex justify-between mt-1 text-[10px] text-slate-500">
-                              <span>♀ {pctF}% fêmeas</span>
-                              <span>♂ {pctM}% machos</span>
+                              <span>ââ„¢â‚¬ {pctF}% fÃªmeas</span>
+                              <span>ââ„¢â€š {pctM}% machos</span>
                             </div>
                           </div>
                           {ehBoletimCampo && (
@@ -3510,7 +3510,7 @@ export default function MobileRelatorios() {
                                   <div key={cat.key} className={`bg-gradient-to-b ${cat.grad} p-2 text-center`}>
                                     <p className="text-white/80 text-sm">{cat.emoji}</p>
                                     <p className="text-white/70 text-[9px] font-medium">{cat.key}</p>
-                                    <p className="text-xl font-black text-white">{qtd || '–'}</p>
+                                    <p className="text-xl font-black text-white">{qtd || 'ââ‚¬â€œ'}</p>
                                     {qtd > 0 && <p className="text-white/60 text-[9px]">{pct}%</p>}
                                   </div>
                                 )
@@ -3523,7 +3523,7 @@ export default function MobileRelatorios() {
                         {ehBoletimCampo && catsAnimalOrd.length > 0 && (
                           <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
                             <div className="flex items-center gap-2 mb-3">
-                              <span className="text-xl">🏷️</span>
+                              <span className="text-xl">ðÅ¸�·ï¸�</span>
                               <h4 className="font-bold text-gray-900 dark:text-white">Categoria do Animal</h4>
                             </div>
                             <div className="grid grid-cols-3 gap-2">
@@ -3542,7 +3542,7 @@ export default function MobileRelatorios() {
                                     whileTap={{ scale: 0.95 }}
                                     className={`text-left ${c.bg} border-2 ${c.border} rounded-xl p-2.5`}
                                   >
-                                    <p className="text-base mb-0.5">{def?.emoji || '🐄'}</p>
+                                    <p className="text-base mb-0.5">{def?.emoji || 'ðÅ¸�â€ž'}</p>
                                     <p className={`text-[10px] font-semibold ${c.text} leading-tight truncate`}>{cat}</p>
                                     <p className={`text-xl font-black ${c.num}`}>{qtd}</p>
                                     <div className="h-1 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden mt-1">
@@ -3559,7 +3559,7 @@ export default function MobileRelatorios() {
                         {ehBoletimCampo && piquetesOrd.length > 0 && (
                           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
                             <div className="flex items-center gap-2 p-4 pb-3 border-b border-gray-100 dark:border-gray-700">
-                              <span className="text-xl">🌿</span>
+                              <span className="text-xl">ðÅ¸Å’¿</span>
                               <h4 className="font-bold text-gray-900 dark:text-white">Piquetes / Locais</h4>
                               <span className="ml-auto bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-xs font-semibold px-2 py-0.5 rounded-full">{piquetesOrd.length} locais</span>
                             </div>
@@ -3598,10 +3598,10 @@ export default function MobileRelatorios() {
                                       {data.m > 0 && <div className="h-full bg-blue-400 rounded-r-full" style={{ width:`${pctMPiq}%` }} />}
                                     </div>
                                     <div className="flex flex-wrap gap-1 items-center ml-4">
-                                      {data.f > 0 && <span className="text-[10px] bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 px-1.5 py-0.5 rounded-full font-medium">♀ {data.f}</span>}
-                                      {data.m > 0 && <span className="text-[10px] bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-1.5 py-0.5 rounded-full font-medium">♂ {data.m}</span>}
+                                      {data.f > 0 && <span className="text-[10px] bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 px-1.5 py-0.5 rounded-full font-medium">ââ„¢â‚¬ {data.f}</span>}
+                                      {data.m > 0 && <span className="text-[10px] bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-1.5 py-0.5 rounded-full font-medium">ââ„¢â€š {data.m}</span>}
                                       {mainEra !== '-'  && <span className="text-[10px] bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 px-1.5 py-0.5 rounded-full">Era: {mainEra}</span>}
-                                      {mainRaca !== '-' && mainRaca !== 'Não informado' && <span className="text-[10px] bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 px-1.5 py-0.5 rounded-full">{mainRaca}</span>}
+                                      {mainRaca !== '-' && mainRaca !== 'NÃ£o informado' && <span className="text-[10px] bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 px-1.5 py-0.5 rounded-full">{mainRaca}</span>}
                                       {mainCat && mainCat !== 'Outros' && <span className="text-[10px] bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded-full">{mainCat}</span>}
                                       <span className="ml-auto text-[10px] text-gray-400">{pctPiq}%</span>
                                     </div>
@@ -3615,7 +3615,7 @@ export default function MobileRelatorios() {
                         {/* 4. ERAS com F/M por era */}
                         <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
                           <div className="flex items-center gap-2 mb-3">
-                            <span className="text-xl">📅</span>
+                            <span className="text-xl">ðÅ¸â€œâ€¦</span>
                             <h4 className="font-bold text-gray-900 dark:text-white">Eras dos Animais</h4>
                             <span className="ml-auto bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-xs font-semibold px-2 py-0.5 rounded-full">{erasAll.length} eras</span>
                           </div>
@@ -3663,8 +3663,8 @@ export default function MobileRelatorios() {
                                       <div className="flex-1 min-w-0">
                                         <div className="flex items-center justify-between mb-1">
                                           <div className="flex gap-2 flex-wrap">
-                                            {fm.f > 0 && <span className="text-[10px] text-pink-600 dark:text-pink-400 font-semibold">♀ {fm.f}</span>}
-                                            {fm.m > 0 && <span className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">♂ {fm.m}</span>}
+                                            {fm.f > 0 && <span className="text-[10px] text-pink-600 dark:text-pink-400 font-semibold">ââ„¢â‚¬ {fm.f}</span>}
+                                            {fm.m > 0 && <span className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">ââ„¢â€š {fm.m}</span>}
                                           </div>
                                           <span className={`text-[10px] ${ec.text}`}>{pct}%</span>
                                         </div>
@@ -3682,11 +3682,11 @@ export default function MobileRelatorios() {
                           })()}
                         </div>
 
-                        {/* 5. RAÇAS */}
+                        {/* 5. RAÃâ€¡AS */}
                         <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
                           <div className="flex items-center gap-2 mb-3">
-                            <span className="text-xl">🐄</span>
-                            <h4 className="font-bold text-gray-900 dark:text-white">Por Raça</h4>
+                            <span className="text-xl">ðÅ¸�â€ž</span>
+                            <h4 className="font-bold text-gray-900 dark:text-white">Por RaÃ§a</h4>
                           </div>
                           <div className="grid grid-cols-2 gap-2">
                             {racasTop.map(([raca, qtd], idx) => {
@@ -3695,7 +3695,7 @@ export default function MobileRelatorios() {
                                 <motion.button
                                   key={raca}
                                   type="button"
-                                  onClick={() => setResumoDetalheModal({ open: true, tipo: 'raca', valor: raca, titulo: `Raça: ${raca}`, qtd })}
+                                  onClick={() => setResumoDetalheModal({ open: true, tipo: 'raca', valor: raca, titulo: `RaÃ§a: ${raca}`, qtd })}
                                   initial={{ opacity: 0, scale: 0.9 }}
                                   animate={{ opacity: 1, scale: 1 }}
                                   transition={{ delay: idx * 0.05 }}
@@ -3714,11 +3714,11 @@ export default function MobileRelatorios() {
                           </div>
                         </div>
 
-                        {/* 6. SEXO — visual grande */}
+                        {/* 6. SEXO ââ‚¬â€� visual grande */}
                         <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-200 dark:border-gray-700">
                           <div className="bg-gray-50 dark:bg-gray-800 p-4 pb-3">
                             <div className="flex items-center gap-2 mb-3">
-                              <span className="text-xl">⚥</span>
+                              <span className="text-xl">âÅ¡¥</span>
                               <h4 className="font-bold text-gray-900 dark:text-white">Por Sexo</h4>
                             </div>
                             <div className="grid grid-cols-2 gap-3">
@@ -3727,10 +3727,10 @@ export default function MobileRelatorios() {
                                 const ehM = /^m/i.test(sexo)
                                 const pct = totalGeral > 0 ? Math.round(qtd/totalGeral*100) : 0
                                 const s = ehF
-                                  ? { grad:'from-pink-500 to-rose-600', light:'bg-pink-50 dark:bg-pink-900/20', border:'border-pink-300 dark:border-pink-700', label:'text-pink-600 dark:text-pink-400', num:'text-pink-900 dark:text-pink-100', icon:'♀', name:'Fêmeas' }
+                                  ? { grad:'from-pink-500 to-rose-600', light:'bg-pink-50 dark:bg-pink-900/20', border:'border-pink-300 dark:border-pink-700', label:'text-pink-600 dark:text-pink-400', num:'text-pink-900 dark:text-pink-100', icon:'ââ„¢â‚¬', name:'FÃªmeas' }
                                   : ehM
-                                  ? { grad:'from-blue-500 to-indigo-600', light:'bg-blue-50 dark:bg-blue-900/20', border:'border-blue-300 dark:border-blue-700', label:'text-blue-600 dark:text-blue-400', num:'text-blue-900 dark:text-blue-100', icon:'♂', name:'Machos' }
-                                  : { grad:'from-gray-400 to-gray-500', light:'bg-gray-50 dark:bg-gray-700', border:'border-gray-200 dark:border-gray-600', label:'text-gray-600 dark:text-gray-400', num:'text-gray-900 dark:text-white', icon:'—', name:sexo }
+                                  ? { grad:'from-blue-500 to-indigo-600', light:'bg-blue-50 dark:bg-blue-900/20', border:'border-blue-300 dark:border-blue-700', label:'text-blue-600 dark:text-blue-400', num:'text-blue-900 dark:text-blue-100', icon:'ââ„¢â€š', name:'Machos' }
+                                  : { grad:'from-gray-400 to-gray-500', light:'bg-gray-50 dark:bg-gray-700', border:'border-gray-200 dark:border-gray-600', label:'text-gray-600 dark:text-gray-400', num:'text-gray-900 dark:text-white', icon:'ââ‚¬â€�', name:sexo }
                                 return (
                                   <motion.div
                                     key={sexo}
@@ -3761,7 +3761,7 @@ export default function MobileRelatorios() {
                     )
                   })()}
 
-                  {/* Modal de detalhes ao clicar nos cards do resumo (raça, era, sexo) */}
+                  {/* Modal de detalhes ao clicar nos cards do resumo (raÃ§a, era, sexo) */}
                   {resumoDetalheModal.open && resumoDetalheModal.tipo && (ehBoletimCampo || ehBoletimRebanho) && (() => {
                     const { tipo, valor, titulo, qtd } = resumoDetalheModal
                     const rows = dadosParaExibir.filter(d =>
@@ -3777,7 +3777,7 @@ export default function MobileRelatorios() {
                       { key: 'Receptoras', test: s => /recept/i.test(s) },
                     ]
                     const filtered = rows.filter(d => {
-                      if (tipo === 'raca') return (d.raca || 'Não informado').trim() === valor
+                      if (tipo === 'raca') return (d.raca || 'NÃ£o informado').trim() === valor
                       if (tipo === 'era')  return (d.era || '-').trim() === valor
                       if (tipo === 'local_1') return (d.local_1 || d.local || '').trim() === valor
                       if (tipo === 'local') {
@@ -3796,7 +3796,7 @@ export default function MobileRelatorios() {
                         if (valor === 'M' && /^m/i.test(s)) return true
                         if (s === valor) return true
                         if (valor.toLowerCase().includes('macho') && /^m/i.test(s)) return true
-                        if (valor.toLowerCase().includes('fêmea') && /^f/i.test(s)) return true
+                        if (valor.toLowerCase().includes('fÃªmea') && /^f/i.test(s)) return true
                         return false
                       }
                       return false
@@ -3864,21 +3864,21 @@ export default function MobileRelatorios() {
                     <div className="space-y-3">
                       {ehBoletimRebanho && (
                         <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">
-                          📊 Resumo (conforme Boletim Campo)
+                          ðÅ¸â€œÅ  Resumo (conforme Boletim Campo)
                         </p>
                       )}
                       <div className={`grid gap-3 ${ehBoletimRebanho ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3'}`}>
                         <AnimatePresence>
                           {Object.entries(reportData.resumo)
                             .filter(([k, v]) => {
-                              // Filtrar apenas campos que definitivamente não devem aparecer
+                              // Filtrar apenas campos que definitivamente nÃ£o devem aparecer
                               if (k === 'graficos' || k === 'erro') return false
                               return true
                             })
                             .slice(0, 6)
                             .map(([k, v], i) => {
                             const isPeso = /peso|kg/i.test(k)
-                            const isAnimais = /animais|machos|fêmeas|total|piquetes|raças/i.test(k)
+                            const isAnimais = /animais|machos|fÃªmeas|total|piquetes|raÃ§as/i.test(k)
                             const isTaxa = /taxa|prenhez/i.test(k)
                             const isClicavel = true
                             const cardCls = isPeso ? 'bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-900/10 border-amber-200 dark:border-amber-800' :
@@ -3889,7 +3889,7 @@ export default function MobileRelatorios() {
                               isAnimais ? 'text-blue-700 dark:text-blue-300' :
                               isTaxa ? 'text-green-700 dark:text-green-300' :
                               'text-gray-900 dark:text-white'
-                            const icon = isPeso ? '⚖️' : isAnimais ? '🐄' : isTaxa ? '✅' : '📊'
+                            const icon = isPeso ? 'âÅ¡â€“ï¸�' : isAnimais ? 'ðÅ¸�â€ž' : isTaxa ? 'âÅ“â€¦' : 'ðÅ¸â€œÅ '
                             const taxaNum = /taxa|prenhez/i.test(k) ? parseFloat(String(v).replace('%', '')) : null
                             const isDestaque = taxaNum != null && taxaNum >= 50
                             const cardPadding = ehBoletimRebanho ? 'p-5' : 'p-4'
@@ -3915,7 +3915,7 @@ export default function MobileRelatorios() {
                                 )}
                                 {isDestaque && (
                                   <span className="absolute top-1 right-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-green-500/20 text-green-700 dark:text-green-400">
-                                    ✓ Destaque
+                                    âÅ“â€œ Destaque
                                   </span>
                                 )}
                                 <div className="flex items-start justify-between mb-1">
@@ -3946,7 +3946,7 @@ export default function MobileRelatorios() {
                     </div>
                   )}
 
-                  {/* Modal de touros por raça */}
+                  {/* Modal de touros por raÃ§a */}
                   <AnimatePresence>
                     {racaModalOpen && (
                       <motion.div
@@ -3967,10 +3967,10 @@ export default function MobileRelatorios() {
                           <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-4 flex items-center justify-between">
                             <div>
                               <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                                🐂 Touros - {racaSelecionada}
+                                ðÅ¸�â€š Touros - {racaSelecionada}
                               </h3>
                               <p className="text-sm text-purple-100 mt-1">
-                                {tourosRaca.length} {tourosRaca.length === 1 ? 'touro' : 'touros'} • {tourosRaca.reduce((sum, t) => sum + t.doses, 0)} doses
+                                {tourosRaca.length} {tourosRaca.length === 1 ? 'touro' : 'touros'} ââ‚¬¢ {tourosRaca.reduce((sum, t) => sum + t.doses, 0)} doses
                               </p>
                             </div>
                             <button
@@ -3981,11 +3981,11 @@ export default function MobileRelatorios() {
                             </button>
                           </div>
 
-                          {/* Conteúdo */}
+                          {/* ConteÃºdo */}
                           <div className="p-4 overflow-y-auto max-h-[calc(80vh-100px)]">
                             {tourosRaca.length === 0 ? (
                               <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                                <p>Nenhum touro encontrado para esta raça</p>
+                                <p>Nenhum touro encontrado para esta raÃ§a</p>
                               </div>
                             ) : (
                               <div className="space-y-3">
@@ -3998,10 +3998,10 @@ export default function MobileRelatorios() {
                                       <div className="flex-1">
                                         <div className="flex items-center gap-2 mb-2">
                                           <span className="text-lg">
-                                            {idx === 0 && '🥇'}
-                                            {idx === 1 && '🥈'}
-                                            {idx === 2 && '🥉'}
-                                            {idx > 2 && `${idx + 1}º`}
+                                            {idx === 0 && 'ðÅ¸¥â€¡'}
+                                            {idx === 1 && 'ðÅ¸¥Ë†'}
+                                            {idx === 2 && 'ðÅ¸¥â€°'}
+                                            {idx > 2 && `${idx + 1}Âº`}
                                           </span>
                                           <p className="font-bold text-gray-900 dark:text-white text-base">
                                             {touro.touro}
@@ -4034,7 +4034,7 @@ export default function MobileRelatorios() {
                                   Total Geral
                                 </p>
                                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                                  {tourosRaca.length} touros • {tourosRaca.reduce((sum, t) => sum + t.registros, 0)} lotes
+                                  {tourosRaca.length} touros ââ‚¬¢ {tourosRaca.reduce((sum, t) => sum + t.registros, 0)} lotes
                                 </p>
                               </div>
                               <div className="flex items-center gap-2">
@@ -4056,7 +4056,7 @@ export default function MobileRelatorios() {
                     )}
                   </AnimatePresence>
 
-                  {/* Modal de acasalamentos por raça (embriões) */}
+                  {/* Modal de acasalamentos por raÃ§a (embriÃµes) */}
                   <AnimatePresence>
                     {racaEmbriaoModalOpen && (
                       <motion.div
@@ -4077,14 +4077,14 @@ export default function MobileRelatorios() {
                           <div className="bg-gradient-to-r from-amber-600 to-orange-600 p-4 flex items-center justify-between">
                             <div>
                               <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                                {modalEhEmbriao ? '🧬 Acasalamentos' : '🐂 Touros'} - {racaEmbriaoSelecionada}
+                                {modalEhEmbriao ? 'ðÅ¸§¬ Acasalamentos' : 'ðÅ¸�â€š Touros'} - {racaEmbriaoSelecionada}
                               </h3>
                               <p className="text-sm text-amber-100 mt-1">
-                                {acasalamentosRaca.length} {acasalamentosRaca.length === 1 ? 'item' : 'itens'} • {(() => {
+                                {acasalamentosRaca.length} {acasalamentosRaca.length === 1 ? 'item' : 'itens'} ââ‚¬¢ {(() => {
                                   const totalEmbrioes = acasalamentosRaca.filter(a => itemEhEmbriao(a.acasalamento)).reduce((s, a) => s + a.embrioes, 0)
                                   const totalDoses    = acasalamentosRaca.filter(a => !itemEhEmbriao(a.acasalamento)).reduce((s, a) => s + a.embrioes, 0)
-                                  if (totalEmbrioes > 0 && totalDoses > 0) return `${totalEmbrioes} embriões • ${totalDoses} doses`
-                                  if (totalEmbrioes > 0) return `${totalEmbrioes} embriões`
+                                  if (totalEmbrioes > 0 && totalDoses > 0) return `${totalEmbrioes} embriÃµes ââ‚¬¢ ${totalDoses} doses`
+                                  if (totalEmbrioes > 0) return `${totalEmbrioes} embriÃµes`
                                   return `${totalDoses} doses`
                                 })()}
                               </p>
@@ -4097,11 +4097,11 @@ export default function MobileRelatorios() {
                             </button>
                           </div>
 
-                          {/* Conteúdo */}
+                          {/* ConteÃºdo */}
                           <div className="p-4 overflow-y-auto max-h-[calc(80vh-100px)]">
                             {acasalamentosRaca.length === 0 ? (
                               <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                                <p>Nenhum item encontrado para esta raça</p>
+                                <p>Nenhum item encontrado para esta raÃ§a</p>
                               </div>
                             ) : (
                               <div className="space-y-3">
@@ -4114,10 +4114,10 @@ export default function MobileRelatorios() {
                                       <div className="flex-1">
                                         <div className="flex items-center gap-2 mb-2">
                                           <span className="text-lg">
-                                            {idx === 0 && '🥇'}
-                                            {idx === 1 && '🥈'}
-                                            {idx === 2 && '🥉'}
-                                            {idx > 2 && `${idx + 1}º`}
+                                            {idx === 0 && 'ðÅ¸¥â€¡'}
+                                            {idx === 1 && 'ðÅ¸¥Ë†'}
+                                            {idx === 2 && 'ðÅ¸¥â€°'}
+                                            {idx > 2 && `${idx + 1}Âº`}
                                           </span>
                                           <p className="font-bold text-gray-900 dark:text-white text-base">
                                             {item.acasalamento}
@@ -4134,20 +4134,20 @@ export default function MobileRelatorios() {
                                           {item.embrioes}
                                         </div>
                                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                          {itemEhEmbriao(item.acasalamento) ? 'embriões' : 'doses'}
+                                          {itemEhEmbriao(item.acasalamento) ? 'embriÃµes' : 'doses'}
                                         </p>
                                       </div>
                                     </div>
                                     {item.rack && item.botijao && item.caneca && 
                                      item.rack !== '-' && item.botijao !== '-' && item.caneca !== '-' && (
                                       <div className="pt-2 border-t border-gray-200 dark:border-gray-600">
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Localização:</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">LocalizaÃ§Ã£o:</p>
                                         <div className="flex items-center gap-2 text-sm font-mono">
                                           <span className="px-2 py-1 rounded bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300">
                                             Rack: {item.rack}
                                           </span>
                                           <span className="px-2 py-1 rounded bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300">
-                                            Botijão: {item.botijao}
+                                            BotijÃ£o: {item.botijao}
                                           </span>
                                           <span className="px-2 py-1 rounded bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300">
                                             Caneca: {item.caneca}
@@ -4169,7 +4169,7 @@ export default function MobileRelatorios() {
                                   Total Geral
                                 </p>
                                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                                  {acasalamentosRaca.length} {acasalamentosRaca.length === 1 ? 'item' : 'itens'} • {acasalamentosRaca.reduce((sum, a) => sum + a.registros, 0)} lotes
+                                  {acasalamentosRaca.length} {acasalamentosRaca.length === 1 ? 'item' : 'itens'} ââ‚¬¢ {acasalamentosRaca.reduce((sum, a) => sum + a.registros, 0)} lotes
                                 </p>
                               </div>
                               <div className="flex items-center gap-2">
@@ -4203,7 +4203,7 @@ export default function MobileRelatorios() {
                       pattern="[0-9]*"
                       value={searchQuery}
                       onChange={e => setSearchQuery(e.target.value)}
-                      placeholder="Buscar animais (RG ou número)"
+                      placeholder="Buscar animais (RG ou nÃºmero)"
                       className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                     />
                   </div>
@@ -4222,7 +4222,7 @@ export default function MobileRelatorios() {
                         {matches.slice(0, 5).map((m, i) => (
                           <div key={i} className="flex items-center justify-between gap-2 py-1">
                             <span className="text-gray-600 dark:text-gray-300">{m.animal || `${(m.serie || '')} ${(m.rg || '')}`.trim()} - {m.piquete}</span>
-                            <span className="text-gray-400 dark:text-gray-500 text-sm">—</span>
+                            <span className="text-gray-400 dark:text-gray-500 text-sm">ââ‚¬â€�</span>
                           </div>
                         ))}
                         {matches.length > 5 && <p className="text-xs text-gray-500 mt-1">+{matches.length - 5} mais</p>}
@@ -4267,7 +4267,7 @@ export default function MobileRelatorios() {
                         </button>
                       </div>
                       <div className="grid grid-cols-7 gap-1">
-                        {['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d => (
+                        {['Dom','Seg','Ter','Qua','Qui','Sex','SÃ¡b'].map(d => (
                           <div key={d} className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase text-center py-1">
                             {d}
                           </div>
@@ -4311,14 +4311,14 @@ export default function MobileRelatorios() {
                           <div className="flex items-center gap-2 mb-3">
                             <CalendarIcon className="h-5 w-5 text-amber-500" />
                             <span className="font-semibold text-gray-900 dark:text-white">
-                              {formatDate(selectedDate)} — {(eventosPorDia[selectedDate] || []).length} evento(s)
+                              {formatDate(selectedDate)} ââ‚¬â€� {(eventosPorDia[selectedDate] || []).length} evento(s)
                             </span>
                           </div>
                           <div className="space-y-2 max-h-64 overflow-y-auto">
                             {(eventosPorDia[selectedDate] || []).map((ev, i) => {
                               const status = ev.status || 'Agendado'
                               const borderCls =
-                                status === 'Concluído' || status === 'Prenha' ? 'border-l-green-500' :
+                                status === 'ConcluÃ­do' || status === 'Prenha' ? 'border-l-green-500' :
                                 status === 'Vazia' ? 'border-l-red-500' :
                                 'border-l-amber-500'
                               return (
@@ -4330,11 +4330,11 @@ export default function MobileRelatorios() {
                                     {ev.titulo || ev.tipo || 'Evento'}
                                   </p>
                                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                    {ev.tipo} {ev.animal ? `• ${ev.animal}` : ''}
+                                    {ev.tipo} {ev.animal ? `ââ‚¬¢ ${ev.animal}` : ''}
                                   </p>
                                   {(ev.numero_nf || ev.fornecedor) && (
                                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                                      {ev.numero_nf ? `NF ${ev.numero_nf}` : ''} {ev.fornecedor ? `• ${ev.fornecedor}` : ''}
+                                      {ev.numero_nf ? `NF ${ev.numero_nf}` : ''} {ev.fornecedor ? `ââ‚¬¢ ${ev.fornecedor}` : ''}
                                     </p>
                                   )}
                                   {ev.descricao && (
@@ -4369,7 +4369,7 @@ export default function MobileRelatorios() {
                           animate={{ opacity: 1, y: 0 }}
                           className="rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm"
                         >
-                          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Distribuição por Sexo</p>
+                          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">DistribuiÃ§Ã£o por Sexo</p>
                           <div className="h-48">
                             <Doughnut data={chartSexo} options={pieOptions} />
                           </div>
@@ -4397,7 +4397,7 @@ export default function MobileRelatorios() {
                           transition={{ delay: 0.2 }}
                           className="rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm"
                         >
-                          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Peso Médio por Piquete (kg)</p>
+                          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Peso MÃ©dio por Piquete (kg)</p>
                           <div className="h-56">
                             <Bar data={chartPesoPiquete} options={chartOptions} />
                           </div>
@@ -4423,7 +4423,7 @@ export default function MobileRelatorios() {
                           animate={{ opacity: 1, y: 0 }}
                           className="rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm"
                         >
-                          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Inseminações por Touro</p>
+                          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">InseminaÃ§Ãµes por Touro</p>
                           <div className="h-56">
                             <Bar data={inseminacoesPorTouro} options={chartOptions} />
                           </div>
@@ -4438,15 +4438,15 @@ export default function MobileRelatorios() {
                             className="rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm"
                           >
                             <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-                              <img src="/emoji-semen.png" alt="Sêmen" className="w-5 h-5" />
-                              Estoque de Sêmen por Touro
+                              <img src="/emoji-semen.png" alt="SÃªmen" className="w-5 h-5" />
+                              Estoque de SÃªmen por Touro
                             </p>
                             <div className="h-56">
                               <Bar data={estoquePorTouro} options={chartOptions} />
                             </div>
                           </motion.div>
 
-                          {/* Card de resumo por raça */}
+                          {/* Card de resumo por raÃ§a */}
                           {estoquePorRaca && estoquePorRaca.length > 0 && (
                             <motion.div
                               initial={{ opacity: 0, y: 10 }}
@@ -4455,8 +4455,8 @@ export default function MobileRelatorios() {
                               className="rounded-2xl bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border-2 border-purple-200 dark:border-purple-700 p-4 shadow-sm"
                             >
                               <p className="text-sm font-semibold text-purple-800 dark:text-purple-300 mb-3 flex items-center gap-2">
-                                <img src="/emoji-semen.png" alt="Sêmen" className="w-5 h-5" />
-                                Estoque por Raça
+                                <img src="/emoji-semen.png" alt="SÃªmen" className="w-5 h-5" />
+                                Estoque por RaÃ§a
                                 <span className="text-xs font-normal text-purple-600 dark:text-purple-400">(clique para ver touros)</span>
                               </p>
                               <div className="grid grid-cols-1 gap-3">
@@ -4497,7 +4497,7 @@ export default function MobileRelatorios() {
                               className="rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm"
                             >
                               <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                                📊 Detalhamento Completo do Estoque
+                                ðÅ¸â€œÅ  Detalhamento Completo do Estoque
                               </p>
                               <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
@@ -4505,7 +4505,7 @@ export default function MobileRelatorios() {
                                     <tr className="border-b border-gray-200 dark:border-gray-700">
                                       <th className="text-left py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">#</th>
                                       <th className="text-left py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">Touro</th>
-                                      <th className="text-left py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">Raça</th>
+                                      <th className="text-left py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">RaÃ§a</th>
                                       <th className="text-right py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">Doses</th>
                                       <th className="text-right py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">Lotes</th>
                                     </tr>
@@ -4517,9 +4517,9 @@ export default function MobileRelatorios() {
                                         className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                                       >
                                         <td className="py-2 px-2 text-gray-500 dark:text-gray-400">
-                                          {idx === 0 && '🥇'}
-                                          {idx === 1 && '🥈'}
-                                          {idx === 2 && '🥉'}
+                                          {idx === 0 && 'ðÅ¸¥â€¡'}
+                                          {idx === 1 && 'ðÅ¸¥Ë†'}
+                                          {idx === 2 && 'ðÅ¸¥â€°'}
                                           {idx > 2 && (idx + 1)}
                                         </td>
                                         <td className="py-2 px-2 text-gray-900 dark:text-white font-medium">
@@ -4563,7 +4563,7 @@ export default function MobileRelatorios() {
                         </>
                       )}
 
-                      {/* ========== EMBRIÕES ========== */}
+                      {/* ========== EMBRIÃâ€¢ES ========== */}
                       {estoqueEmbriaoPorAcasalamento && (
                         <>
                           <motion.div
@@ -4571,13 +4571,13 @@ export default function MobileRelatorios() {
                             animate={{ opacity: 1, y: 0 }}
                             className="rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm"
                           >
-                            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">� Estoque de Embriões por Acasalamento</p>
+                            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">ï¿½ Estoque de EmbriÃµes por Acasalamento</p>
                             <div className="h-56">
                               <Bar data={estoqueEmbriaoPorAcasalamento} options={chartOptions} />
                             </div>
                           </motion.div>
 
-                          {/* Card de resumo por raça - Embriões */}
+                          {/* Card de resumo por raÃ§a - EmbriÃµes */}
                           {estoqueEmbriaoPorRaca && estoqueEmbriaoPorRaca.length > 0 && (
                             <motion.div
                               initial={{ opacity: 0, y: 10 }}
@@ -4586,7 +4586,7 @@ export default function MobileRelatorios() {
                               className="rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-2 border-amber-200 dark:border-amber-700 p-4 shadow-sm"
                             >
                               <p className="text-sm font-semibold text-amber-800 dark:text-amber-300 mb-3 flex items-center gap-2">
-                                � Estoque por Raça
+                                ï¿½ Estoque por RaÃ§a
                                 <span className="text-xs font-normal text-amber-600 dark:text-amber-400">(clique para ver acasalamentos)</span>
                               </p>
                               <div className="grid grid-cols-1 gap-3">
@@ -4609,7 +4609,7 @@ export default function MobileRelatorios() {
                                         <div className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-amber-600 text-white shadow-md">
                                           {item.embrioes}
                                         </div>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">embriões</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">embriÃµes</p>
                                       </div>
                                     </div>
                                   </div>
@@ -4618,7 +4618,7 @@ export default function MobileRelatorios() {
                             </motion.div>
                           )}
 
-                          {/* Tabela detalhada de estoque de embriões */}
+                          {/* Tabela detalhada de estoque de embriÃµes */}
                           {detalhesEstoqueEmbrioes && detalhesEstoqueEmbrioes.length > 0 && (
                             <motion.div
                               initial={{ opacity: 0, y: 10 }}
@@ -4627,7 +4627,7 @@ export default function MobileRelatorios() {
                               className="rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm"
                             >
                               <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                                📊 Detalhamento Completo do Estoque de Embriões
+                                ðÅ¸â€œÅ  Detalhamento Completo do Estoque de EmbriÃµes
                               </p>
                               <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
@@ -4635,9 +4635,9 @@ export default function MobileRelatorios() {
                                     <tr className="border-b border-gray-200 dark:border-gray-700">
                                       <th className="text-left py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">#</th>
                                       <th className="text-left py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">Acasalamento</th>
-                                      <th className="text-left py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">Raça</th>
-                                      <th className="text-center py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">Localização</th>
-                                      <th className="text-right py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">Embriões</th>
+                                      <th className="text-left py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">RaÃ§a</th>
+                                      <th className="text-center py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">LocalizaÃ§Ã£o</th>
+                                      <th className="text-right py-2 px-2 text-gray-600 dark:text-gray-400 font-semibold">EmbriÃµes</th>
                                     </tr>
                                   </thead>
                                   <tbody>
@@ -4647,9 +4647,9 @@ export default function MobileRelatorios() {
                                         className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                                       >
                                         <td className="py-2 px-2 text-gray-500 dark:text-gray-400">
-                                          {idx === 0 && '🥇'}
-                                          {idx === 1 && '🥈'}
-                                          {idx === 2 && '🥉'}
+                                          {idx === 0 && 'ðÅ¸¥â€¡'}
+                                          {idx === 1 && 'ðÅ¸¥Ë†'}
+                                          {idx === 2 && 'ðÅ¸¥â€°'}
                                           {idx > 2 && (idx + 1)}
                                         </td>
                                         <td className="py-2 px-2 text-gray-900 dark:text-white font-medium">
@@ -4704,7 +4704,7 @@ export default function MobileRelatorios() {
                           animate={{ opacity: 1, y: 0 }}
                           className="rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm"
                         >
-                          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Nascimentos por Mês</p>
+                          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Nascimentos por MÃªs</p>
                           <div className="h-56">
                             <Bar data={nascimentosPorMes} options={chartOptions} />
                           </div>
@@ -4717,7 +4717,7 @@ export default function MobileRelatorios() {
                           animate={{ opacity: 1, y: 0 }}
                           className="rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm"
                         >
-                          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">📊 Evolução de Abastecimento</p>
+                          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">ðÅ¸â€œÅ  EvoluÃ§Ã£o de Abastecimento</p>
                           <div className="h-48">
                             <Line data={nitrogenioEvolution} options={lineChartOptions} />
                           </div>
@@ -4730,7 +4730,7 @@ export default function MobileRelatorios() {
                           animate={{ opacity: 1, y: 0 }}
                           className="rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm"
                         >
-                          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">🚚 Abastecimento por Motorista</p>
+                          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">ðÅ¸Å¡Å¡ Abastecimento por Motorista</p>
                           <div className="h-56">
                             <Bar data={nitrogenioByDriver} options={chartOptions} />
                           </div>
@@ -4795,7 +4795,7 @@ export default function MobileRelatorios() {
                                         })}
                                         {ehBoletimDefesa && row.quantidades && typeof row.quantidades === 'object' && (
                                           <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-                                            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Por faixa etária:</p>
+                                            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Por faixa etÃ¡ria:</p>
                                             <div className="flex flex-wrap gap-2">
                                               {Object.entries(row.quantidades).map(([faixa, vals]) => {
                                                 const m = vals?.M || 0
@@ -4813,7 +4813,7 @@ export default function MobileRelatorios() {
                                           </div>
                                         )}
 
-                                        {/* Botão de Medicamentos — apenas para boletim_campo */}
+                                        {/* BotÃ£o de Medicamentos ââ‚¬â€� apenas para boletim_campo */}
                                         {ehBoletimCampo && !isTotalGeral && row.id && (() => {
                                           const ult = ultimoMedRow(row.id)
                                           const dias = ult ? diasDesde(ult.data_aplicacao) : null
@@ -4838,7 +4838,7 @@ export default function MobileRelatorios() {
                                             >
                                               {vencida ? <ExclamationCircleIcon className="w-4 h-4 shrink-0" /> : <BeakerIcon className="w-4 h-4 shrink-0" />}
                                               {ult
-                                                ? <><span className="truncate max-w-[130px]">{ult.medicamento}</span><span>·</span><span className="shrink-0">{dias === 0 ? 'hoje' : `${dias}d atrás`}{vencida ? ' ⚠️' : proxima ? ` · próx. ${proxDias}d` : ''}</span></>
+                                                ? <><span className="truncate max-w-[130px]">{ult.medicamento}</span><span>Â·</span><span className="shrink-0">{dias === 0 ? 'hoje' : `${dias}d atrÃ¡s`}{vencida ? ' âÅ¡ ï¸�' : proxima ? ` Â· prÃ³x. ${proxDias}d` : ''}</span></>
                                                 : 'Registrar medicamento'
                                               }
                                             </button>
@@ -4879,7 +4879,7 @@ export default function MobileRelatorios() {
                                 <tr 
                                   key={i} 
                                   onClick={() => {
-                                    // Resumo de Pesagens: clicar no piquete abre modal com animais (da própria API)
+                                    // Resumo de Pesagens: clicar no piquete abre modal com animais (da prÃ³pria API)
                                     if (selectedTipo === 'resumo_pesagens' && piqueteNome) {
                                       if (animaisResumo && Array.isArray(animaisResumo) && animaisResumo.length > 0) {
                                         setCardFilterModal({
@@ -4922,7 +4922,7 @@ export default function MobileRelatorios() {
                                       })))
                                       return
                                     }
-                                    // Navegação para ficha do animal desativada no mobile
+                                    // NavegaÃ§Ã£o para ficha do animal desativada no mobile
                                   }}
                                   className={`border-t border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 ${(row.animal_id || (selectedTipo === 'animais_piquetes' && originalRow.animais) || ehClicavelPiquete) ? 'cursor-pointer' : ''}`}
                                 >
@@ -4930,11 +4930,11 @@ export default function MobileRelatorios() {
                                     const v = row[k]
                                     let display = k.toLowerCase().includes('data') && v ? formatDate(v) : String(v ?? '-')
                                     if (ehRanking && k === 'posicao' && [1, 2, 3].includes(Number(v))) {
-                                      const trofeus = { 1: '🥇', 2: '🥈', 3: '🥉' }
-                                      display = `${trofeus[Number(v)]} ${v}º`
+                                      const trofeus = { 1: 'ðÅ¸¥â€¡', 2: 'ðÅ¸¥Ë†', 3: 'ðÅ¸¥â€°' }
+                                      display = `${trofeus[Number(v)]} ${v}Âº`
                                     }
                                     
-                                    // Tornar o número do animal clicável
+                                    // Tornar o nÃºmero do animal clicÃ¡vel
                                     const isAnimalColumn = k.toLowerCase() === 'animal' || k.toLowerCase() === 'identificacao'
                                     const animalId = row.animal_id || row.id || originalRow.animal_id || originalRow.id
                                     
@@ -4971,13 +4971,13 @@ export default function MobileRelatorios() {
                               animate={{ scale: 1, opacity: 1 }}
                               className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-amber-100 dark:bg-amber-900/30 mb-4"
                             >
-                              <span className="text-4xl">📋</span>
+                              <span className="text-4xl">ðÅ¸â€œâ€¹</span>
                             </motion.div>
                             <p className="text-gray-600 dark:text-gray-400 font-medium">
-                              {searchQuery.trim() ? 'Nenhum registro encontrado' : 'Nenhum registro no período'}
+                              {searchQuery.trim() ? 'Nenhum registro encontrado' : 'Nenhum registro no perÃ­odo'}
                             </p>
                             <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
-                              {searchQuery.trim() ? 'Tente outro termo de busca' : 'Ajuste as datas ou selecione outro relatório'}
+                              {searchQuery.trim() ? 'Tente outro termo de busca' : 'Ajuste as datas ou selecione outro relatÃ³rio'}
                             </p>
                           </div>
                         )}
@@ -4992,8 +4992,8 @@ export default function MobileRelatorios() {
                   animate={{ opacity: 1 }}
                   className="p-8 rounded-2xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-center"
                 >
-                  <div className="text-4xl mb-3">⚠️</div>
-                  <p className="text-red-700 dark:text-red-300 font-medium">Erro ao carregar relatório</p>
+                  <div className="text-4xl mb-3">âÅ¡ ï¸�</div>
+                  <p className="text-red-700 dark:text-red-300 font-medium">Erro ao carregar relatÃ³rio</p>
                   <button
                     onClick={refetch}
                     className="mt-4 px-4 py-2 rounded-xl bg-amber-500 text-white font-medium hover:bg-amber-600 transition-colors"
@@ -5109,7 +5109,7 @@ export default function MobileRelatorios() {
                               </div>
                               <div className="flex-1">
                                 <p className="font-semibold text-gray-900 dark:text-white text-sm">Outros</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Mais opções</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">Mais opÃ§Ãµes</p>
                               </div>
                             </button>
                           </div>
@@ -5124,7 +5124,7 @@ export default function MobileRelatorios() {
         </div>
       </div>
 
-      {/* ════ Modal Medicamentos (mobile-relatorios) ════ */}
+      {/* ââ€¢�ââ€¢�ââ€¢�ââ€¢� Modal Medicamentos (mobile-relatorios) ââ€¢�ââ€¢�ââ€¢�ââ€¢� */}
       {modalMed && (
         <div className="fixed inset-0 bg-black/60 z-[90] flex items-end justify-center sm:items-center p-0 sm:p-4">
           <div className="bg-white dark:bg-gray-800 rounded-t-3xl sm:rounded-2xl shadow-2xl w-full max-w-lg max-h-[92vh] flex flex-col">
@@ -5144,10 +5144,10 @@ export default function MobileRelatorios() {
             </div>
 
             <div className="overflow-y-auto flex-1 p-5 space-y-5">
-              {/* Histórico */}
+              {/* HistÃ³rico */}
               {medsDoRow(modalMed.row.id).length > 0 && (
                 <div>
-                  <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Histórico de aplicações</h4>
+                  <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">HistÃ³rico de aplicaÃ§Ãµes</h4>
                   <div className="space-y-2">
                     {medsDoRow(modalMed.row.id).map((m, idx) => {
                       const dias = diasDesde(m.data_aplicacao)
@@ -5159,16 +5159,16 @@ export default function MobileRelatorios() {
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 flex-wrap">
                                 <p className="font-bold text-gray-900 dark:text-white text-sm">{m.medicamento}</p>
-                                {idx === 0 && <span className="text-xs bg-purple-100 dark:bg-purple-800 text-purple-700 dark:text-purple-200 px-2 py-0.5 rounded-full font-medium">último</span>}
+                                {idx === 0 && <span className="text-xs bg-purple-100 dark:bg-purple-800 text-purple-700 dark:text-purple-200 px-2 py-0.5 rounded-full font-medium">Ãºltimo</span>}
                               </div>
                               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                {new Date(m.data_aplicacao + 'T12:00:00').toLocaleDateString('pt-BR')} · <span className={`font-semibold ${idx === 0 ? 'text-purple-600 dark:text-purple-400' : ''}`}>{dias === 0 ? 'hoje' : `${dias} dias atrás`}</span>
+                                {new Date(m.data_aplicacao + 'T12:00:00').toLocaleDateString('pt-BR')} Â· <span className={`font-semibold ${idx === 0 ? 'text-purple-600 dark:text-purple-400' : ''}`}>{dias === 0 ? 'hoje' : `${dias} dias atrÃ¡s`}</span>
                               </p>
                               {m.data_proxima_aplicacao && (
                                 <p className="text-xs mt-1 flex items-center gap-1">
                                   {vencida
-                                    ? <><ExclamationCircleIcon className="w-3.5 h-3.5 text-red-500" /><span className="text-red-600 dark:text-red-400 font-semibold">Renovar! vencida há {Math.abs(proxDias)}d</span></>
-                                    : <><CheckCircleOutlineIcon className="w-3.5 h-3.5 text-green-500" /><span className="text-green-600 dark:text-green-400">Próxima: {proxDias === 0 ? 'hoje' : `em ${proxDias}d`} ({new Date(m.data_proxima_aplicacao + 'T12:00:00').toLocaleDateString('pt-BR')})</span></>
+                                    ? <><ExclamationCircleIcon className="w-3.5 h-3.5 text-red-500" /><span className="text-red-600 dark:text-red-400 font-semibold">Renovar! vencida hÃ¡ {Math.abs(proxDias)}d</span></>
+                                    : <><CheckCircleOutlineIcon className="w-3.5 h-3.5 text-green-500" /><span className="text-green-600 dark:text-green-400">PrÃ³xima: {proxDias === 0 ? 'hoje' : `em ${proxDias}d`} ({new Date(m.data_proxima_aplicacao + 'T12:00:00').toLocaleDateString('pt-BR')})</span></>
                                   }
                                 </p>
                               )}
@@ -5187,28 +5187,28 @@ export default function MobileRelatorios() {
                 </div>
               )}
 
-              {/* Form — só para Adelso */}
+              {/* Form ââ‚¬â€� sÃ³ para Adelso */}
               {isAdelso ? (
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                   <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-                    {medsDoRow(modalMed.row.id).length === 0 ? 'Registrar medicamento' : 'Nova aplicação'}
+                    {medsDoRow(modalMed.row.id).length === 0 ? 'Registrar medicamento' : 'Nova aplicaÃ§Ã£o'}
                   </h4>
                   <div className="space-y-3">
                     <input type="text" value={formMed.medicamento} onChange={e => setFormMed(f => ({ ...f, medicamento: e.target.value }))} placeholder="Nome do medicamento *" className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm placeholder-gray-400" />
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-xs text-gray-500 mb-1">Data aplicação *</label>
+                        <label className="block text-xs text-gray-500 mb-1">Data aplicaÃ§Ã£o *</label>
                         <input type="date" value={formMed.dataAplicacao} onChange={e => setFormMed(f => ({ ...f, dataAplicacao: e.target.value }))} className="w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm" />
                       </div>
                       <div>
-                        <label className="block text-xs text-gray-500 mb-1">Próxima aplicação</label>
+                        <label className="block text-xs text-gray-500 mb-1">PrÃ³xima aplicaÃ§Ã£o</label>
                         <input type="date" value={formMed.dataProxima} onChange={e => setFormMed(f => ({ ...f, dataProxima: e.target.value }))} className="w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm" />
                       </div>
                     </div>
-                    <textarea value={formMed.observacao} onChange={e => setFormMed(f => ({ ...f, observacao: e.target.value }))} placeholder="Observação (dose, produto...)" rows={2} className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm resize-none" />
+                    <textarea value={formMed.observacao} onChange={e => setFormMed(f => ({ ...f, observacao: e.target.value }))} placeholder="ObservaÃ§Ã£o (dose, produto...)" rows={2} className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm resize-none" />
                     <button onClick={salvarMedicamentoRel} disabled={salvandoMed || !formMed.medicamento.trim() || !formMed.dataAplicacao} className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold text-sm disabled:opacity-50 flex items-center justify-center gap-2">
                       <BeakerIcon className="w-4 h-4" />
-                      {salvandoMed ? 'Salvando...' : 'Salvar aplicação'}
+                      {salvandoMed ? 'Salvando...' : 'Salvar aplicaÃ§Ã£o'}
                     </button>
                   </div>
                 </div>

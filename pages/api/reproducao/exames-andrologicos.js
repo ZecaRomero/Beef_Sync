@@ -3,17 +3,17 @@ import { withLoteTracking, LOTE_CONFIGS } from '../../../utils/loteMiddleware'
 import { asyncHandler, sendSuccess, sendError } from '../../../utils/apiResponse'
 import logger from '../../../utils/logger'
 
-// Função para calcular data de reagendamento (30 dias após o exame)
+// FunÃ§Ã£o para calcular data de reagendamento (30 dias apÃ³s o exame)
 function calcularDataReagendamento(dataExame) {
   const data = new Date(dataExame)
   data.setDate(data.getDate() + 30)
   return data.toISOString().split('T')[0]
 }
 
-// Função auxiliar para buscar animal
+// FunÃ§Ã£o auxiliar para buscar animal
 async function findAnimal(client, rg, touro) {
     // Buscar animal pelo RG (tentando diferentes formatos)
-    // Normalizar RG para busca (remover espaços e converter para string)
+    // Normalizar RG para busca (remover espaÃ§os e converter para string)
     const rgNormalizadoBusca = String(rg || '').trim()
     
     let animalResult = await client.query(`
@@ -26,9 +26,9 @@ async function findAnimal(client, rg, touro) {
       LIMIT 1
     `, [rgNormalizadoBusca])
     
-    console.log(`🔍 Tentativa 1 - Busca exata: ${animalResult.rows.length} resultado(s)`)
+    console.log(`ðÅ¸â€�� Tentativa 1 - Busca exata: ${animalResult.rows.length} resultado(s)`)
 
-    // Se não encontrou, tentar buscar pelo RG extraído do touro (formato SERIE-RG)
+    // Se nÃ£o encontrou, tentar buscar pelo RG extraÃ­do do touro (formato SERIE-RG)
     if (animalResult.rows.length === 0 && touro) {
       // Tentar extrair RG do formato "SERIE-RG" ou "SERIERG"
       const rgExtraido = touro.split('-').pop() || touro.replace(/[^0-9]/g, '').slice(-5)
@@ -44,9 +44,9 @@ async function findAnimal(client, rg, touro) {
       }
     }
 
-    // Se ainda não encontrou, tentar buscar por parte do touro que contenha o RG
+    // Se ainda nÃ£o encontrou, tentar buscar por parte do touro que contenha o RG
     if (animalResult.rows.length === 0 && touro) {
-      // Tentar buscar animais onde o RG está contido no touro ou vice-versa
+      // Tentar buscar animais onde o RG estÃ¡ contido no touro ou vice-versa
       animalResult = await client.query(`
         SELECT id, serie, rg
         FROM animais
@@ -57,12 +57,12 @@ async function findAnimal(client, rg, touro) {
       `, [touro, rg])
     }
 
-    // Última tentativa: buscar por qualquer correspondência parcial
+    // ÃÅ¡ltima tentativa: buscar por qualquer correspondÃªncia parcial
     if (animalResult.rows.length === 0) {
-      // Normalizar RG (remover caracteres não numéricos)
+      // Normalizar RG (remover caracteres nÃ£o numÃ©ricos)
       const rgNormalizado = String(rg).replace(/[^0-9]/g, '')
       
-      console.log(`🔍 Tentativa 4 - Busca parcial com RG normalizado: ${rgNormalizado}`)
+      console.log(`ðÅ¸â€�� Tentativa 4 - Busca parcial com RG normalizado: ${rgNormalizado}`)
       
       if (rgNormalizado.length > 0) {
         animalResult = await client.query(`
@@ -76,13 +76,13 @@ async function findAnimal(client, rg, touro) {
           LIMIT 1
         `, [rgNormalizado, `%${rgNormalizado}%`, rgNormalizado, `${rgNormalizado}%`])
         
-        console.log(`🔍 Tentativa 4 - Resultado: ${animalResult.rows.length} animal(s) encontrado(s)`)
+        console.log(`ðÅ¸â€�� Tentativa 4 - Resultado: ${animalResult.rows.length} animal(s) encontrado(s)`)
       }
     }
 
-    // Última tentativa: buscar todos os animais e comparar manualmente
+    // ÃÅ¡ltima tentativa: buscar todos os animais e comparar manualmente
     if (animalResult.rows.length === 0) {
-      console.log(`🔍 Tentativa 5 - Busca ampla em todos os animais`)
+      console.log(`ðÅ¸â€�� Tentativa 5 - Busca ampla em todos os animais`)
       const todosAnimais = await client.query(`
         SELECT id, serie, rg
         FROM animais
@@ -99,27 +99,27 @@ async function findAnimal(client, rg, touro) {
       
       if (animalEncontrado) {
         animalResult = { rows: [animalEncontrado] }
-        console.log(`✅ Animal encontrado na busca ampla: ${animalEncontrado.serie}-${animalEncontrado.rg}`)
+        console.log(`âÅ“â€¦ Animal encontrado na busca ampla: ${animalEncontrado.serie}-${animalEncontrado.rg}`)
       }
     }
 
     if (animalResult.rows.length === 0) {
-      console.warn(`⚠️ Animal não encontrado para RG: ${rg}, Touro: ${touro || 'N/A'}`)
+      console.warn(`âÅ¡ ï¸� Animal nÃ£o encontrado para RG: ${rg}, Touro: ${touro || 'N/A'}`)
       return null
     }
 
     const animal = animalResult.rows[0]
-    console.log(`✅ Animal encontrado: ${animal.serie}-${animal.rg} (ID: ${animal.id})`)
+    console.log(`âÅ“â€¦ Animal encontrado: ${animal.serie}-${animal.rg} (ID: ${animal.id})`)
     return animal
 }
 
-// Função para criar ocorrência no histórico
+// FunÃ§Ã£o para criar ocorrÃªncia no histÃ³rico
 async function criarOcorrenciaAndrologica(client, exame, rg, touro) {
   try {
     const animal = await findAnimal(client, rg, touro)
     if (!animal) return null
 
-    // Verificar se já existe ocorrência
+    // Verificar se jÃ¡ existe ocorrÃªncia
     const checkQuery = `
       SELECT id FROM historia_ocorrencias 
       WHERE animal_id = $1 AND tipo = 'Exame' AND data = $2 
@@ -132,41 +132,41 @@ async function criarOcorrenciaAndrologica(client, exame, rg, touro) {
     ])
 
     if (checkResult.rows.length > 0) {
-      console.log(`ℹ️ Ocorrência já existe para este exame (ID: ${exame.id})`)
+      console.log(`ââ€ž¹ï¸� OcorrÃªncia jÃ¡ existe para este exame (ID: ${exame.id})`)
       return checkResult.rows[0]
     }
 
-    // Inserir ocorrência
+    // Inserir ocorrÃªncia
     const insertQuery = `
       INSERT INTO historia_ocorrencias (
         animal_id, tipo, data, descricao, observacoes, veterinario, created_at, updated_at
       ) VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
       RETURNING *
     `
-    const observacoes = `Exame Andrológico - Touro: ${touro}. Resultado: ${exame.resultado}. CE: ${exame.ce || 'N/A'}. Defeitos: ${exame.defeitos || 'Nenhum'}. Obs: ${exame.observacoes || ''}. (Exame ID: ${exame.id})`
+    const observacoes = `Exame AndrolÃ³gico - Touro: ${touro}. Resultado: ${exame.resultado}. CE: ${exame.ce || 'N/A'}. Defeitos: ${exame.defeitos || 'Nenhum'}. Obs: ${exame.observacoes || ''}. (Exame ID: ${exame.id})`
     
     const result = await client.query(insertQuery, [
       animal.id,
       'Exame',
       exame.data_exame,
-      'Exame Andrológico',
+      'Exame AndrolÃ³gico',
       observacoes,
       'Sistema'
     ])
 
-    console.log(`✅ Ocorrência criada para animal ${animal.serie}-${animal.rg}`)
+    console.log(`âÅ“â€¦ OcorrÃªncia criada para animal ${animal.serie}-${animal.rg}`)
     return result.rows[0]
   } catch (error) {
-    console.error('Erro ao criar ocorrência:', error)
-    // Não lançar erro para não bloquear o fluxo principal
+    console.error('Erro ao criar ocorrÃªncia:', error)
+    // NÃ£o lanÃ§ar erro para nÃ£o bloquear o fluxo principal
     return null
   }
 }
 
-// Função auxiliar para criar custo do exame andrológico
+// FunÃ§Ã£o auxiliar para criar custo do exame androlÃ³gico
 async function criarCustoAndrologico(client, exame, rg, touro) {
   try {
-    console.log(`🔍 Buscando animal para criar custo - RG: ${rg}, Touro: ${touro || 'N/A'}`)
+    console.log(`ðÅ¸â€�� Buscando animal para criar custo - RG: ${rg}, Touro: ${touro || 'N/A'}`)
     
     // Buscar protocolo "ANDROLOGICO+EXAMES" na tabela de medicamentos
     // Tentar buscar com diferentes estruturas de colunas
@@ -182,7 +182,7 @@ async function criarCustoAndrologico(client, exame, rg, touro) {
         LIMIT 1
       `)
     } catch (error) {
-      // Se a coluna por_animal não existir, tentar sem ela
+      // Se a coluna por_animal nÃ£o existir, tentar sem ela
       try {
         protocoloResult = await client.query(`
           SELECT id, nome, preco, unidade
@@ -199,7 +199,7 @@ async function criarCustoAndrologico(client, exame, rg, touro) {
       }
     }
 
-    let valorProtocolo = 165.00 // Valor padrão se não encontrar o protocolo
+    let valorProtocolo = 165.00 // Valor padrÃ£o se nÃ£o encontrar o protocolo
     let nomeProtocolo = 'ANDROLOGICO+EXAMES'
     
     if (protocoloResult.rows.length > 0) {
@@ -212,24 +212,24 @@ async function criarCustoAndrologico(client, exame, rg, touro) {
         165.00
       )
       nomeProtocolo = protocolo.nome || 'ANDROLOGICO+EXAMES'
-      console.log(`✅ Protocolo encontrado: ${nomeProtocolo} - Valor: R$ ${valorProtocolo.toFixed(2)}`)
+      console.log(`âÅ“â€¦ Protocolo encontrado: ${nomeProtocolo} - Valor: R$ ${valorProtocolo.toFixed(2)}`)
     } else {
-      console.log(`ℹ️ Protocolo não encontrado, usando valor padrão: R$ ${valorProtocolo.toFixed(2)}`)
+      console.log(`ââ€ž¹ï¸� Protocolo nÃ£o encontrado, usando valor padrÃ£o: R$ ${valorProtocolo.toFixed(2)}`)
     }
 
     const animal = await findAnimal(client, rg, touro)
     if (!animal) {
-        console.warn(`⚠️ Animal não encontrado para RG: ${rg}, Touro: ${touro || 'N/A'}`)
+        console.warn(`âÅ¡ ï¸� Animal nÃ£o encontrado para RG: ${rg}, Touro: ${touro || 'N/A'}`)
         return null
     }
 
-    // Verificar se já existe um custo para este exame (evitar duplicatas)
+    // Verificar se jÃ¡ existe um custo para este exame (evitar duplicatas)
     const custoExistente = await client.query(`
       SELECT id
       FROM custos
       WHERE animal_id = $1
         AND tipo = 'Exame'
-        AND subtipo = 'Andrológico'
+        AND subtipo = 'AndrolÃ³gico'
         AND data = $2
         AND observacoes LIKE $3
       LIMIT 1
@@ -240,7 +240,7 @@ async function criarCustoAndrologico(client, exame, rg, touro) {
     ])
 
     if (custoExistente.rows.length > 0) {
-      console.log(`ℹ️ Custo já existe para este exame (ID: ${exame.id})`)
+      console.log(`ââ€ž¹ï¸� Custo jÃ¡ existe para este exame (ID: ${exame.id})`)
       return custoExistente.rows[0]
     }
 
@@ -259,10 +259,10 @@ async function criarCustoAndrologico(client, exame, rg, touro) {
     `, [
       animal.id,
       'Exame',
-      'Andrológico',
+      'AndrolÃ³gico',
       valorProtocolo,
       exame.data_exame,
-      `Exame Andrológico - ${touro || `RG: ${rg}`} | Resultado: ${exame.resultado || 'Pendente'} | Exame ID: ${exame.id}`,
+      `Exame AndrolÃ³gico - ${touro || `RG: ${rg}`} | Resultado: ${exame.resultado || 'Pendente'} | Exame ID: ${exame.id}`,
       JSON.stringify({
         exame_id: exame.id,
         protocolo: nomeProtocolo,
@@ -286,23 +286,23 @@ async function criarCustoAndrologico(client, exame, rg, touro) {
       WHERE id = $1
     `, [animal.id])
 
-    console.log(`✅ Custo criado automaticamente: R$ ${valorProtocolo.toFixed(2)} para animal ${animal.serie}-${animal.rg}`)
+    console.log(`âÅ“â€¦ Custo criado automaticamente: R$ ${valorProtocolo.toFixed(2)} para animal ${animal.serie}-${animal.rg}`)
     return custoResult.rows[0]
   } catch (error) {
-    console.error('❌ Erro ao criar custo do exame andrológico:', error)
+    console.error('â�Å’ Erro ao criar custo do exame androlÃ³gico:', error)
     throw error
   }
 }
 
-// Função para criar exame reagendado automaticamente
+// FunÃ§Ã£o para criar exame reagendado automaticamente
 async function criarExameReagendado(client, exameOriginal) {
   const dataReagendamento = calcularDataReagendamento(exameOriginal.data_exame)
   
   const defeitosInfo = exameOriginal.defeitos ? ` | Defeitos: ${exameOriginal.defeitos}` : '';
-  // Evitar duplicar Obs se já estiver incluída
+  // Evitar duplicar Obs se jÃ¡ estiver incluÃ­da
   const obsInfo = (exameOriginal.observacoes && !exameOriginal.observacoes.includes('Reagendamento')) ? ` | Obs: ${exameOriginal.observacoes}` : '';
   
-  const novaObs = `Reagendamento automático.${defeitosInfo}${obsInfo} (Exame anterior: ${new Date(exameOriginal.data_exame).toLocaleDateString('pt-BR')})`;
+  const novaObs = `Reagendamento automÃ¡tico.${defeitosInfo}${obsInfo} (Exame anterior: ${new Date(exameOriginal.data_exame).toLocaleDateString('pt-BR')})`;
 
   const result = await client.query(`
     INSERT INTO exames_andrologicos (
@@ -325,7 +325,7 @@ async function criarExameReagendado(client, exameOriginal) {
   return result.rows[0]
 }
 
-// Função para determinar a configuração de lote baseado no método HTTP
+// FunÃ§Ã£o para determinar a configuraÃ§Ã£o de lote baseado no mÃ©todo HTTP
 function getExameAndrologicoLoteConfig(req) {
   if (req.method === 'POST') {
     return LOTE_CONFIGS.CADASTRO_EXAME_ANDROLOGICO
@@ -334,14 +334,14 @@ function getExameAndrologicoLoteConfig(req) {
   } else if (req.method === 'DELETE') {
     return LOTE_CONFIGS.EXCLUSAO_EXAME_ANDROLOGICO
   }
-  return null // GET não precisa de lote
+  return null // GET nÃ£o precisa de lote
 }
 
 async function examesAndrologicosHandler(req, res) {
   if (req.method === 'GET') {
     const client = await pool.connect()
     try {
-      // Verificar se a tabela existe, se não criar
+      // Verificar se a tabela existe, se nÃ£o criar
       await client.query(`
         CREATE TABLE IF NOT EXISTS exames_andrologicos (
           id SERIAL PRIMARY KEY,
@@ -361,7 +361,7 @@ async function examesAndrologicosHandler(req, res) {
         )
       `)
 
-        // Adicionar colunas se não existirem (para tabelas já criadas)
+        // Adicionar colunas se nÃ£o existirem (para tabelas jÃ¡ criadas)
         await client.query(`
           ALTER TABLE exames_andrologicos 
           ADD COLUMN IF NOT EXISTS ce DECIMAL(5,2);
@@ -380,7 +380,7 @@ async function examesAndrologicosHandler(req, res) {
             ALTER TABLE exames_andrologicos 
             ADD COLUMN IF NOT EXISTS exame_origem_id INTEGER;
           `)
-          // Tentar adicionar constraint depois (pode falhar se já existir ou houver dados inválidos)
+          // Tentar adicionar constraint depois (pode falhar se jÃ¡ existir ou houver dados invÃ¡lidos)
           try {
             await client.query(`
               DO $$
@@ -396,7 +396,7 @@ async function examesAndrologicosHandler(req, res) {
               END $$;
             `)
           } catch (constraintError) {
-            console.warn('Não foi possível adicionar constraint de foreign key:', constraintError.message)
+            console.warn('NÃ£o foi possÃ­vel adicionar constraint de foreign key:', constraintError.message)
           }
         } catch (columnError) {
           console.warn('Erro ao adicionar coluna exame_origem_id:', columnError.message)
@@ -410,16 +410,16 @@ async function examesAndrologicosHandler(req, res) {
           ADD COLUMN IF NOT EXISTS data_reagendamento DATE;
         `)
 
-        // Criar índices para busca rápida
+        // Criar Ã­ndices para busca rÃ¡pida
         await client.query(`
           CREATE INDEX IF NOT EXISTS idx_exames_andrologicos_rg ON exames_andrologicos(rg);
           CREATE INDEX IF NOT EXISTS idx_exames_andrologicos_status ON exames_andrologicos(status);
           CREATE INDEX IF NOT EXISTS idx_exames_andrologicos_data ON exames_andrologicos(data_exame);
         `)
 
-        // Verificar se há filtro por RG
+        // Verificar se hÃ¡ filtro por RG
         const { rg } = req.query
-        // Normalizar RG para busca (remover espaços e hífens extras)
+        // Normalizar RG para busca (remover espaÃ§os e hÃ­fens extras)
         const rgNormalizado = rg ? String(rg).trim().replace(/\s+/g, '') : null
         
         let result
@@ -429,7 +429,7 @@ async function examesAndrologicosHandler(req, res) {
             const queryParams = [
               rgNormalizado, 
               String(rgNormalizado).replace(/-/g, ''), 
-              String(rgNormalizado).replace(/[^0-9]/g, '') // Apenas números
+              String(rgNormalizado).replace(/[^0-9]/g, '') // Apenas nÃºmeros
             ]
             result = await client.query(`
               SELECT 
@@ -455,7 +455,7 @@ async function examesAndrologicosHandler(req, res) {
             `)
           }
         } catch (joinError) {
-          // Se o JOIN falhar (coluna não existe), fazer query simples
+          // Se o JOIN falhar (coluna nÃ£o existe), fazer query simples
           logger.warn('Erro no JOIN, usando query simples:', joinError.message)
           if (rgNormalizado) {
             const queryParams = [
@@ -478,7 +478,7 @@ async function examesAndrologicosHandler(req, res) {
           }
         }
 
-      return sendSuccess(res, result.rows, 'Exames andrológicos recuperados com sucesso')
+      return sendSuccess(res, result.rows, 'Exames androlÃ³gicos recuperados com sucesso')
     } catch (error) {
       logger.error('Erro ao buscar exames:', error)
       return sendError(res, `Erro ao buscar exames: ${error.message}`, 500)
@@ -489,11 +489,11 @@ async function examesAndrologicosHandler(req, res) {
     }
   } else if (req.method === 'POST') {
     try {
-      // Verificar se é uma ação de registro de notificação
+      // Verificar se Ã© uma aÃ§Ã£o de registro de notificaÃ§Ã£o
       if (req.body.action === 'registrar_notificacao') {
         const { exame_ids } = req.body;
         if (!exame_ids || !Array.isArray(exame_ids) || exame_ids.length === 0) {
-          return res.status(400).json({ error: 'Lista de IDs de exames inválida' });
+          return res.status(400).json({ error: 'Lista de IDs de exames invÃ¡lida' });
         }
 
         const client = await pool.connect();
@@ -505,7 +505,7 @@ async function examesAndrologicosHandler(req, res) {
             WHERE id = ANY($1::int[])
           `, [exame_ids]);
 
-          return res.status(200).json({ message: 'Notificações registradas com sucesso' });
+          return res.status(200).json({ message: 'NotificaÃ§Ãµes registradas com sucesso' });
         } finally {
           client.release();
         }
@@ -514,12 +514,12 @@ async function examesAndrologicosHandler(req, res) {
       const { touro, rg, data_exame, resultado, ce, defeitos, observacoes } = req.body
 
       if (!touro || !rg || !data_exame) {
-        return res.status(400).json({ error: 'Campos obrigatórios: touro, rg, data_exame' })
+        return res.status(400).json({ error: 'Campos obrigatÃ³rios: touro, rg, data_exame' })
       }
 
       // Validar e normalizar resultado - deve ser um dos valores permitidos
-      // Se não fornecido, usar 'Apto' como padrão
-      let resultadoValido = 'Apto' // Valor padrão
+      // Se nÃ£o fornecido, usar 'Apto' como padrÃ£o
+      let resultadoValido = 'Apto' // Valor padrÃ£o
       
       console.log('=== API RECEBENDO DADOS ===')
       console.log('Resultado recebido:', resultado)
@@ -531,31 +531,31 @@ async function examesAndrologicosHandler(req, res) {
         resultadoValido = String(resultado).trim()
         const resultadosValidos = ['Apto', 'Inapto', 'Pendente']
         
-        console.log('Resultado após normalização:', resultadoValido)
-        console.log('É válido?', resultadosValidos.includes(resultadoValido))
+        console.log('Resultado apÃ³s normalizaÃ§Ã£o:', resultadoValido)
+        console.log('Ãâ€° vÃ¡lido?', resultadosValidos.includes(resultadoValido))
         
         if (!resultadosValidos.includes(resultadoValido)) {
-          console.error('❌ Resultado inválido recebido:', {
+          console.error('â�Å’ Resultado invÃ¡lido recebido:', {
             valor: resultadoValido,
             tipo: typeof resultado,
             original: resultado,
             charCodes: resultadoValido.split('').map(c => c.charCodeAt(0))
           })
           return res.status(400).json({ 
-            error: `Resultado inválido: "${resultadoValido}". Valores permitidos: ${resultadosValidos.join(', ')}` 
+            error: `Resultado invÃ¡lido: "${resultadoValido}". Valores permitidos: ${resultadosValidos.join(', ')}` 
           })
         }
       } else {
-        console.warn('⚠️ Resultado não fornecido, usando padrão: Apto')
+        console.warn('âÅ¡ ï¸� Resultado nÃ£o fornecido, usando padrÃ£o: Apto')
       }
       
-      console.log('✅ Resultado final que será salvo:', resultadoValido)
+      console.log('âÅ“â€¦ Resultado final que serÃ¡ salvo:', resultadoValido)
       console.log('===============================')
 
       const client = await pool.connect()
 
       try {
-        // Verificar se a tabela existe, se não criar
+        // Verificar se a tabela existe, se nÃ£o criar
         await client.query(`
           CREATE TABLE IF NOT EXISTS exames_andrologicos (
             id SERIAL PRIMARY KEY,
@@ -575,7 +575,7 @@ async function examesAndrologicosHandler(req, res) {
           )
         `)
 
-        // Adicionar colunas se não existirem (para tabelas já criadas)
+        // Adicionar colunas se nÃ£o existirem (para tabelas jÃ¡ criadas)
         await client.query(`
           ALTER TABLE exames_andrologicos 
           ADD COLUMN IF NOT EXISTS ce DECIMAL(5,2);
@@ -589,7 +589,7 @@ async function examesAndrologicosHandler(req, res) {
           ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'Ativo';
         `)
 
-        // Criar índices para busca rápida
+        // Criar Ã­ndices para busca rÃ¡pida
         await client.query(`
           CREATE INDEX IF NOT EXISTS idx_exames_andrologicos_rg ON exames_andrologicos(rg);
           CREATE INDEX IF NOT EXISTS idx_exames_andrologicos_status ON exames_andrologicos(status);
@@ -597,7 +597,7 @@ async function examesAndrologicosHandler(req, res) {
         `)
 
         // Log antes de inserir no banco
-        console.log('📝 Inserindo no banco:', {
+        console.log('ðÅ¸â€œ� Inserindo no banco:', {
           touro,
           rg,
           data_exame,
@@ -622,7 +622,7 @@ async function examesAndrologicosHandler(req, res) {
           'Ativo'
         ])
         
-        console.log('✅ Exame inserido com sucesso:', result.rows[0])
+        console.log('âÅ“â€¦ Exame inserido com sucesso:', result.rows[0])
 
         const novoExame = result.rows[0]
 
@@ -631,12 +631,12 @@ async function examesAndrologicosHandler(req, res) {
         try {
           custoCriado = await criarCustoAndrologico(client, novoExame, rg, touro)
           if (custoCriado) {
-            // Custo criado com sucesso - será atualizado na ficha automaticamente
-            console.log('✅ Custo criado automaticamente para o exame:', custoCriado.id)
+            // Custo criado com sucesso - serÃ¡ atualizado na ficha automaticamente
+            console.log('âÅ“â€¦ Custo criado automaticamente para o exame:', custoCriado.id)
           }
         } catch (custoError) {
-          console.error('⚠️ Erro ao criar custo do exame andrológico:', custoError)
-          // Não falhar o processo se o custo não for criado
+          console.error('âÅ¡ ï¸� Erro ao criar custo do exame androlÃ³gico:', custoError)
+          // NÃ£o falhar o processo se o custo nÃ£o for criado
         }
 
         // Se o resultado for "Inapto", criar automaticamente um reagendamento
@@ -650,14 +650,14 @@ async function examesAndrologicosHandler(req, res) {
             WHERE id = $2
           `, [exameReagendado.data_exame, novoExame.id])
 
-          // Gerar notificação sobre o reagendamento
+          // Gerar notificaÃ§Ã£o sobre o reagendamento
           try {
             await client.query(`
               INSERT INTO notificacoes (tipo, titulo, mensagem, prioridade, dados_extras)
               VALUES ($1, $2, $3, $4, $5)
             `, [
               'andrologico',
-              '🔬 Novo Exame Andrológico Reagendado',
+              'ðÅ¸â€�¬ Novo Exame AndrolÃ³gico Reagendado',
               `Touro ${novoExame.touro} (RG: ${novoExame.rg}) teve exame marcado como "Inapto". Novo exame agendado para ${new Date(exameReagendado.data_exame).toLocaleDateString('pt-BR')} (30 dias).`,
               'medium',
               JSON.stringify({
@@ -669,8 +669,8 @@ async function examesAndrologicosHandler(req, res) {
               })
             ])
           } catch (notifError) {
-            console.error('Erro ao criar notificação:', notifError)
-            // Não falhar o processo se a notificação não for criada
+            console.error('Erro ao criar notificaÃ§Ã£o:', notifError)
+            // NÃ£o falhar o processo se a notificaÃ§Ã£o nÃ£o for criada
           }
 
           client.release()
@@ -697,7 +697,7 @@ async function examesAndrologicosHandler(req, res) {
       const { touro, rg, data_exame, resultado, ce, defeitos, observacoes } = req.body
 
       if (!id) {
-        return res.status(400).json({ error: 'ID é obrigatório' })
+        return res.status(400).json({ error: 'ID Ã© obrigatÃ³rio' })
       }
 
       // Validar resultado - deve ser um dos valores permitidos
@@ -705,7 +705,7 @@ async function examesAndrologicosHandler(req, res) {
         const resultadosValidos = ['Apto', 'Inapto', 'Pendente']
         if (!resultadosValidos.includes(resultado)) {
           return res.status(400).json({ 
-            error: `Resultado inválido. Valores permitidos: ${resultadosValidos.join(', ')}` 
+            error: `Resultado invÃ¡lido. Valores permitidos: ${resultadosValidos.join(', ')}` 
           })
         }
       }
@@ -713,13 +713,13 @@ async function examesAndrologicosHandler(req, res) {
       // Converter ID para inteiro (caso venha como string do localStorage)
       const exameId = parseInt(id)
       if (isNaN(exameId) || exameId <= 0) {
-        return res.status(400).json({ error: 'ID inválido' })
+        return res.status(400).json({ error: 'ID invÃ¡lido' })
       }
 
       const client = await pool.connect()
 
       try {
-        // Adicionar colunas se não existirem (para tabelas já criadas)
+        // Adicionar colunas se nÃ£o existirem (para tabelas jÃ¡ criadas)
         await client.query(`
           ALTER TABLE exames_andrologicos 
           ADD COLUMN IF NOT EXISTS ce DECIMAL(5,2);
@@ -740,7 +740,7 @@ async function examesAndrologicosHandler(req, res) {
 
         if (exameAtual.rows.length === 0) {
           client.release()
-          return res.status(404).json({ error: 'Exame não encontrado' })
+          return res.status(404).json({ error: 'Exame nÃ£o encontrado' })
         }
 
         const exame = exameAtual.rows[0]
@@ -754,7 +754,7 @@ async function examesAndrologicosHandler(req, res) {
           if (!resultadosValidos.includes(resultadoValidoUpdate)) {
             client.release()
             return res.status(400).json({ 
-              error: `Resultado inválido: "${resultadoValidoUpdate}". Valores permitidos: ${resultadosValidos.join(', ')}` 
+              error: `Resultado invÃ¡lido: "${resultadoValidoUpdate}". Valores permitidos: ${resultadosValidos.join(', ')}` 
             })
           }
         }
@@ -778,11 +778,11 @@ async function examesAndrologicosHandler(req, res) {
 
         const exameAtualizado = result.rows[0]
 
-        // Atualizar/Criar ocorrência no histórico geral
+        // Atualizar/Criar ocorrÃªncia no histÃ³rico geral
         try {
           await criarOcorrenciaAndrologica(client, exameAtualizado, rg, touro)
         } catch (occError) {
-          console.error('⚠️ Erro ao criar ocorrência na atualização:', occError)
+          console.error('âÅ¡ ï¸� Erro ao criar ocorrÃªncia na atualizaÃ§Ã£o:', occError)
         }
 
         // Se o resultado mudou de "Pendente" ou "Apto" para "Inapto", criar reagendamento
@@ -802,8 +802,8 @@ async function examesAndrologicosHandler(req, res) {
             message: `Exame atualizado. Como o resultado foi alterado para "Inapto", um novo exame foi automaticamente agendado para ${new Date(exameReagendado.data_exame).toLocaleDateString('pt-BR')}.`
           })
         } 
-        // Se o resultado já era Inapto e continuou Inapto, mas houve alteração em defeitos ou observações,
-        // atualizar o reagendamento existente para refletir as novas informações
+        // Se o resultado jÃ¡ era Inapto e continuou Inapto, mas houve alteraÃ§Ã£o em defeitos ou observaÃ§Ãµes,
+        // atualizar o reagendamento existente para refletir as novas informaÃ§Ãµes
         else if (resultadoValidoUpdate === 'Inapto' && (defeitos || observacoes)) {
           // Buscar reagendamento existente
           const reagendamentoExistente = await client.query(`
@@ -815,7 +815,7 @@ async function examesAndrologicosHandler(req, res) {
             const reagendado = reagendamentoExistente.rows[0];
             const defeitosInfo = defeitos ? ` | Defeitos: ${defeitos}` : '';
             const obsInfo = (observacoes && !observacoes.includes('Reagendamento')) ? ` | Obs: ${observacoes}` : '';
-            const novaObs = `Reagendamento automático.${defeitosInfo}${obsInfo} (Exame anterior: ${new Date(exameAtualizado.data_exame).toLocaleDateString('pt-BR')})`;
+            const novaObs = `Reagendamento automÃ¡tico.${defeitosInfo}${obsInfo} (Exame anterior: ${new Date(exameAtualizado.data_exame).toLocaleDateString('pt-BR')})`;
             
             await client.query(`
               UPDATE exames_andrologicos 
@@ -823,7 +823,7 @@ async function examesAndrologicosHandler(req, res) {
               WHERE id = $2
             `, [novaObs, reagendado.id]);
           } else {
-             // Caso não exista reagendamento (por algum erro anterior), criar agora
+             // Caso nÃ£o exista reagendamento (por algum erro anterior), criar agora
              const exameReagendado = await criarExameReagendado(client, exameAtualizado)
              await client.query(`
                UPDATE exames_andrologicos 
@@ -851,7 +851,7 @@ async function examesAndrologicosHandler(req, res) {
       const { id } = req.query
 
       if (!id) {
-        return res.status(400).json({ error: 'ID é obrigatório' })
+        return res.status(400).json({ error: 'ID Ã© obrigatÃ³rio' })
       }
 
       const client = await pool.connect()
@@ -877,7 +877,7 @@ async function examesAndrologicosHandler(req, res) {
         client.release()
         
         if (result.rows.length === 0) {
-          return res.status(404).json({ error: 'Exame não encontrado' })
+          return res.status(404).json({ error: 'Exame nÃ£o encontrado' })
         }
 
         res.status(200).json({ 
@@ -894,18 +894,18 @@ async function examesAndrologicosHandler(req, res) {
     }
   } else {
     res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE'])
-    res.status(405).json({ error: `Método ${req.method} não permitido` })
+    res.status(405).json({ error: `MÃ©todo ${req.method} nÃ£o permitido` })
   }
 }
 
 // Exportar handler com middleware de lotes aplicado
 export const config = { api: { externalResolver: true } }
 export default asyncHandler((req, res) => {
-  // GET não precisa de tracking de lotes
+  // GET nÃ£o precisa de tracking de lotes
   if (req.method === 'GET') {
     return examesAndrologicosHandler(req, res)
   }
   
-  // Para outros métodos, aplicar tracking de lotes
+  // Para outros mÃ©todos, aplicar tracking de lotes
   return withLoteTracking(examesAndrologicosHandler, getExameAndrologicoLoteConfig)(req, res)
 })

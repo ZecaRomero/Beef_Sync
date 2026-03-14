@@ -43,14 +43,14 @@ export default function Pesagem() {
   const [formData, setFormData] = useState({
     animal_id: '',
     peso: '',
-    ce: '', // Circunferência Escrotal para machos
+    ce: '', // CircunferÃªncia Escrotal para machos
     data: new Date().toISOString().split('T')[0],
     lote: '',
     observacoes: ''
   })
   const exportResumoPorLocalCSV = (resumo) => {
     try {
-      const header = ['Local','Fêmea','Macho','Total','Média Peso','Peso Min','Peso Max','Média CE']
+      const header = ['Local','FÃªmea','Macho','Total','MÃ©dia Peso','Peso Min','Peso Max','MÃ©dia CE']
       const lines = [header.join(';'), ...resumo.map(r => [
         r.local,
         r.femeas ?? 0,
@@ -90,7 +90,7 @@ export default function Pesagem() {
       const validos = []
       for (const [aid, p] of Object.entries(porAnimal)) {
         const local = extrairLocal(p.observacoes)
-        if (!local || local.toUpperCase() === 'NÃO INFORMADO' || local === '-') continue
+        if (!local || local.toUpperCase() === 'NÃÆ’O INFORMADO' || local === '-') continue
         const body = {
           animal_id: Number(aid),
           piquete: local,
@@ -111,9 +111,9 @@ export default function Pesagem() {
       const results = await Promise.all(requests)
       const aplicados = results.filter(r => r === true).length
       const ignorados = Object.keys(porAnimal).length - validos.length + results.filter(r => r === false).length
-      alert(`✅ Localização aplicada automaticamente para ${aplicados} animal(is)\nℹ️ ${ignorados} sem observação/local válido ou com erro`)
+      alert(`âÅ“â€¦ LocalizaÃ§Ã£o aplicada automaticamente para ${aplicados} animal(is)\nââ€ž¹ï¸� ${ignorados} sem observaÃ§Ã£o/local vÃ¡lido ou com erro`)
     } catch (e) {
-      alert('❌ Erro ao aplicar localizações automaticamente: ' + e.message)
+      alert('â�Å’ Erro ao aplicar localizaÃ§Ãµes automaticamente: ' + e.message)
     }
   }
 
@@ -155,7 +155,7 @@ export default function Pesagem() {
         const data = await response.json()
         setAnimais(data.animals || [])
       } else {
-        // Fallback para localStorage se API não estiver disponível
+        // Fallback para localStorage se API nÃ£o estiver disponÃ­vel
         const savedAnimals = localStorage.getItem('animals')
         if (savedAnimals) {
           setAnimais(JSON.parse(savedAnimals))
@@ -221,25 +221,25 @@ export default function Pesagem() {
 
   const handleExcluirTodas = async () => {
     if (pesagens.length === 0) {
-      alert('Não há pesagens para excluir.')
+      alert('NÃ£o hÃ¡ pesagens para excluir.')
       return
     }
     
-    if (confirm(`⚠️ ATENÇÃO!\n\nDeseja realmente excluir TODAS as ${pesagens.length} pesagens?\n\nEsta ação não pode ser desfeita!`)) {
-      if (confirm('Confirma novamente a exclusão de TODAS as pesagens?')) {
+    if (confirm(`âÅ¡ ï¸� ATENÃâ€¡ÃÆ’O!\n\nDeseja realmente excluir TODAS as ${pesagens.length} pesagens?\n\nEsta aÃ§Ã£o nÃ£o pode ser desfeita!`)) {
+      if (confirm('Confirma novamente a exclusÃ£o de TODAS as pesagens?')) {
         try {
           const r = await fetch('/api/pesagens', { method: 'DELETE' })
           const d = await r.json().catch(() => ({}))
           if (r.ok) {
             savePesagens([])
-            alert(`✅ Todas as pesagens foram excluídas (${d.deletados ?? pesagens.length} do banco).`)
+            alert(`âÅ“â€¦ Todas as pesagens foram excluÃ­das (${d.deletados ?? pesagens.length} do banco).`)
           } else {
             savePesagens([])
-            alert('✅ Pesagens removidas da tela. O banco pode ter falhado – verifique se não voltam após F5.')
+            alert('âÅ“â€¦ Pesagens removidas da tela. O banco pode ter falhado ââ‚¬â€œ verifique se nÃ£o voltam apÃ³s F5.')
           }
         } catch (e) {
           savePesagens([])
-          alert('✅ Pesagens removidas da tela. Erro ao excluir no banco: ' + (e.message || 'Tente F5 para conferir.'))
+          alert('âÅ“â€¦ Pesagens removidas da tela. Erro ao excluir no banco: ' + (e.message || 'Tente F5 para conferir.'))
         }
       }
     }
@@ -264,13 +264,13 @@ export default function Pesagem() {
     e.preventDefault()
 
     if (!formData.animal_id || !formData.peso) {
-      alert('Por favor, preencha os campos obrigatórios (Animal e Peso)')
+      alert('Por favor, preencha os campos obrigatÃ³rios (Animal e Peso)')
       return
     }
 
     const animal = animais.find(a => a.id == formData.animal_id)
     if (!animal) {
-      alert('Animal não encontrado!')
+      alert('Animal nÃ£o encontrado!')
       return
     }
 
@@ -318,7 +318,7 @@ export default function Pesagem() {
     })
   }
 
-  // Funções para importação de Excel
+  // FunÃ§Ãµes para importaÃ§Ã£o de Excel
   const handleFileUpload = (event) => {
     const file = event.target.files[0]
     if (!file) return
@@ -367,7 +367,7 @@ export default function Pesagem() {
         (columnMapping.serie && columnMapping.rg)
       )
     ) {
-      alert('Selecione identificação (Animal ou RG/PGN) e Peso')
+      alert('Selecione identificaÃ§Ã£o (Animal ou RG/PGN) e Peso')
       return
     }
 
@@ -427,7 +427,7 @@ export default function Pesagem() {
         const observacoes = localVal || obsVal
         const sexoRaw = sexoColIndex >= 0 ? String(row[sexoColIndex] ?? '').trim().toLowerCase() : ''
         const sexoVal = sexoRaw
-          ? (/(macho|m|♂)/i.test(sexoRaw) ? 'Macho' : (/(femea|fêmea|f|♀)/i.test(sexoRaw) ? 'Fêmea' : null))
+          ? (/(macho|m|ââ„¢â€š)/i.test(sexoRaw) ? 'Macho' : (/(femea|fÃªmea|f|ââ„¢â‚¬)/i.test(sexoRaw) ? 'FÃªmea' : null))
           : null
 
         if (!animal) {
@@ -436,10 +436,10 @@ export default function Pesagem() {
           const body = {
             serie: novaSerie,
             rg: novoRg,
-            sexo: sexoVal || 'Fêmea',
+            sexo: sexoVal || 'FÃªmea',
             raca: null,
             peso: peso,
-            observacoes: `Criado via importação de Pesagens\n${observacoes || ''}`,
+            observacoes: `Criado via importaÃ§Ã£o de Pesagens\n${observacoes || ''}`,
             situacao: 'Ativo'
           }
           try {
@@ -453,21 +453,21 @@ export default function Pesagem() {
                 id: createdAnimal.id,
                 serie: createdAnimal.serie || novaSerie,
                 rg: createdAnimal.rg || novoRg,
-                sexo: createdAnimal.sexo || (sexoVal || 'Fêmea')
+                sexo: createdAnimal.sexo || (sexoVal || 'FÃªmea')
               }
-              // Atualizar lista local de animais para próximos matches
+              // Atualizar lista local de animais para prÃ³ximos matches
               setAnimais(prev => {
                 const exists = prev.find(a => a.id === animal.id)
                 return exists ? prev : [...prev, animal]
               })
               createdCount++
-              // Aplicar localização inicial se houver
+              // Aplicar localizaÃ§Ã£o inicial se houver
               if (localVal) {
                 const locBody = {
                   animal_id: animal.id,
                   piquete: localVal,
                   data_entrada: dataColIndex >= 0 ? formatExcelDate(row[dataColIndex]) : new Date().toISOString().split('T')[0],
-                  motivo_movimentacao: 'Importado (Cadastro Automático)',
+                  motivo_movimentacao: 'Importado (Cadastro AutomÃ¡tico)',
                   observacoes,
                   usuario_responsavel: 'Sistema'
                 }
@@ -512,13 +512,13 @@ export default function Pesagem() {
         setNotFoundList(notFound)
         setShowNotFoundModal(true)
       }
-      alert(`Importação concluída!\n✅ ${importedCount} pesagens importadas\n🆕 ${createdCount} animais cadastrados\n❌ ${errorCount} erros`)
+      alert(`ImportaÃ§Ã£o concluÃ­da!\nâÅ“â€¦ ${importedCount} pesagens importadas\nðÅ¸â€ â€¢ ${createdCount} animais cadastrados\nâ�Å’ ${errorCount} erros`)
       await aplicarLocalizacoesAutomaticamente()
     } else {
-      alert('Nenhuma pesagem válida foi encontrada para importar.')
+      alert('Nenhuma pesagem vÃ¡lida foi encontrada para importar.')
     }
     } catch (err) {
-      alert('Erro na importação: ' + (err?.message || String(err)))
+      alert('Erro na importaÃ§Ã£o: ' + (err?.message || String(err)))
       throw err
     } finally {
       setImportandoPesagens(false)
@@ -541,7 +541,7 @@ export default function Pesagem() {
     return new Date().toISOString().split('T')[0]
   }
 
-  // Filtrar pesagens com filtros avançados
+  // Filtrar pesagens com filtros avanÃ§ados
   const pesagensFiltradas = useMemo(() => {
     return pesagens.filter(item => {
       const matchAnimal = !filtroAnimal || 
@@ -588,7 +588,7 @@ export default function Pesagem() {
     })
   }, [pesagens, filtroAnimal, filtroData, filtroLote, filtroSexo, filtroLocal, filtroPesoMin, filtroPesoMax, filtroDataInicio, filtroDataFim, sortBy, sortOrder])
 
-  // Análise de tendências
+  // AnÃ¡lise de tendÃªncias
   const analiseTendencias = useMemo(() => {
     if (pesagens.length < 2) return null
     
@@ -604,7 +604,7 @@ export default function Pesagem() {
     const percentual = ((tendencia / mediaPrimeira) * 100).toFixed(1)
     
     return {
-      tendencia: tendencia > 0 ? 'crescente' : tendencia < 0 ? 'decrescente' : 'estável',
+      tendencia: tendencia > 0 ? 'crescente' : tendencia < 0 ? 'decrescente' : 'estÃ¡vel',
       valor: Math.abs(tendencia).toFixed(1),
       percentual: Math.abs(parseFloat(percentual)),
       mediaPrimeira: mediaPrimeira.toFixed(1),
@@ -612,14 +612,14 @@ export default function Pesagem() {
     }
   }, [pesagens])
 
-  // Histórico de um animal específico
+  // HistÃ³rico de um animal especÃ­fico
   const getAnimalHistory = (animalId) => {
     return pesagens
       .filter(p => p.animal_id === animalId)
       .sort((a, b) => (a.data || '').localeCompare(b.data || ''))
   }
 
-  // Comparação entre períodos
+  // ComparaÃ§Ã£o entre perÃ­odos
   const comparacaoPeriodos = useMemo(() => {
     const hoje = new Date()
     const ultimos30Dias = new Date(hoje.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
@@ -652,12 +652,12 @@ export default function Pesagem() {
     return matchAnimal && matchData
   })
   
-  // Estatísticas (usando pesagensFiltradas para refletir os filtros)
+  // EstatÃ­sticas (usando pesagensFiltradas para refletir os filtros)
   const pesos = pesagensFiltradas.map(p => parseFloat(p.peso)).filter(n => !isNaN(n))
   const ceValores = pesagensFiltradas.map(p => parseFloat(p.ce)).filter(n => !isNaN(n))
   const animaisUnicos = new Set(pesagensFiltradas.map(p => p.animal_id || p.animal)).size
   const machos = pesagensFiltradas.filter(p => p.animal_sexo === 'Macho')
-  const femeas = pesagensFiltradas.filter(p => p.animal_sexo === 'Fêmea')
+  const femeas = pesagensFiltradas.filter(p => p.animal_sexo === 'FÃªmea')
   const estatisticas = {
     total: pesagensFiltradas.length,
     totalGeral: pesagens.length,
@@ -672,39 +672,39 @@ export default function Pesagem() {
     mediaFemeas: femeas.length > 0 ? (femeas.reduce((s, p) => s + (parseFloat(p.peso) || 0), 0) / femeas.length).toFixed(1) : '-'
   }
 
-  // Paginação
+  // PaginaÃ§Ã£o
   const totalPaginas = Math.ceil(pesagensFiltradas.length / itensPorPagina)
   const indiceInicio = (paginaAtual - 1) * itensPorPagina
   const indiceFim = indiceInicio + itensPorPagina
   const pesagensPaginadas = pesagensFiltradas.slice(indiceInicio, indiceFim)
 
-  // Resetar para página 1 quando filtros mudarem
+  // Resetar para pÃ¡gina 1 quando filtros mudarem
   useEffect(() => {
     setPaginaAtual(1)
   }, [filtroAnimal, filtroData, filtroLote, filtroSexo, filtroLocal, filtroPesoMin, filtroPesoMax, filtroDataInicio, filtroDataFim])
 
 
   const extrairLocal = (obs) => {
-    if (!obs || typeof obs !== 'string') return 'Não informado'
+    if (!obs || typeof obs !== 'string') return 'NÃ£o informado'
     const s = obs.trim()
-    if (!s) return 'Não informado'
-    // CONFINAÇÃO e variações normalizam para CONFINA
-    const sNorm = s.replace(/CONFINAÇÃO/gi, 'CONFINA').replace(/CONFINACAO/gi, 'CONFINA')
+    if (!s) return 'NÃ£o informado'
+    // CONFINAÃâ€¡ÃÆ’O e variaÃ§Ãµes normalizam para CONFINA
+    const sNorm = s.replace(/CONFINAÃâ€¡ÃÆ’O/gi, 'CONFINA').replace(/CONFINACAO/gi, 'CONFINA')
     const m = sNorm.match(/(PIQUETE\s*\d+|PIQUETE\s*(CABANHA|CONF|GUARITA|PISTA)|PROJETO\s*[\dA-Za-z\-]+|LOTE\s*\d+|CONFINA\w*|GUARITA|CABANHA|PISTA\s*\d*)/i)
     if (m) {
       let loc = m[1].trim().toUpperCase().replace(/\s+/g, ' ')
       if (/^CONFINA/.test(loc)) loc = 'CONFINA'
-      // PIQUETE X e PROJETO X → PROJETO X (agrupar mesmo local)
+      // PIQUETE X e PROJETO X ââ€ â€™ PROJETO X (agrupar mesmo local)
       if (/^PIQUETE\s+\d+$/.test(loc)) loc = loc.replace(/^PIQUETE\s+/i, 'PROJETO ')
-      // Só retornar se for formato válido (evita NACION 15397, NERO DO MORRO, etc.)
+      // SÃ³ retornar se for formato vÃ¡lido (evita NACION 15397, NERO DO MORRO, etc.)
       if (/^PIQUETE\s+(\d+|CABANHA|CONF|GUARITA|PISTA)$/i.test(loc) || /^PROJETO\s+[\dA-Za-z\-]+$/i.test(loc) || /^CONFINA$/i.test(loc) || /^(GUARITA|CABANHA|PISTA\s*\d*|CONF)$/i.test(loc)) return loc
     }
-    return 'Não informado'
+    return 'NÃ£o informado'
   }
 
   const resumoPorSexo = [
-    { sexo: 'Macho', label: '♂️ Machos', dados: machos, cor: 'blue' },
-    { sexo: 'Fêmea', label: '♀️ Fêmeas', dados: femeas, cor: 'pink' }
+    { sexo: 'Macho', label: 'ââ„¢â€šï¸� Machos', dados: machos, cor: 'blue' },
+    { sexo: 'FÃªmea', label: 'ââ„¢â‚¬ï¸� FÃªmeas', dados: femeas, cor: 'pink' }
   ].map(({ sexo, label, dados, cor }) => {
     const pesosSexo = dados.map(p => parseFloat(p.peso)).filter(n => !isNaN(n))
     const cesSexo = dados.map(p => parseFloat(p.ce)).filter(n => !isNaN(n))
@@ -718,7 +718,7 @@ export default function Pesagem() {
     }
   })
 
-  // Local atual = da última pesagem de cada animal (bate com relatório Excel "Contagem de RGN")
+  // Local atual = da Ãºltima pesagem de cada animal (bate com relatÃ³rio Excel "Contagem de RGN")
   const porAnimalUltima = {}
   pesagens.forEach(p => {
     const aid = p.animal_id ?? p.animal ?? `f${(p.peso || 0)}-${p.data || ''}`
@@ -745,7 +745,7 @@ export default function Pesagem() {
       }
       lotes[lote].pesagens.push(p)
       if (p.animal_sexo === 'Macho') lotes[lote].machos++
-      if (p.animal_sexo === 'Fêmea') lotes[lote].femeas++
+      if (p.animal_sexo === 'FÃªmea') lotes[lote].femeas++
       if (p.animal_id) lotes[lote].animaisUnicos.add(p.animal_id)
     })
 
@@ -774,7 +774,7 @@ export default function Pesagem() {
   const resumoPorLocal = Object.entries(porLocal).map(([local, dados]) => {
     const animaisUnicos = new Set(dados.map(p => p.animal_id || p.animal || `${p.peso}-${p.data}`))
     const qtde = animaisUnicos.size
-    const femeasLocal = dados.filter(p => p.animal_sexo === 'Fêmea')
+    const femeasLocal = dados.filter(p => p.animal_sexo === 'FÃªmea')
     const machosLocal = dados.filter(p => p.animal_sexo === 'Macho')
     const animaisFemeas = new Set(femeasLocal.map(p => p.animal_id || p.animal))
     const animaisMachos = new Set(machosLocal.map(p => p.animal_id || p.animal))
@@ -877,17 +877,17 @@ export default function Pesagem() {
             <>
               <button
                 onClick={async () => {
-                  if (!confirm('Atualizar o campo Peso nas fichas de todos os animais com a última pesagem?')) return
+                  if (!confirm('Atualizar o campo Peso nas fichas de todos os animais com a Ãºltima pesagem?')) return
                   try {
                     const r = await fetch('/api/pesagens/sync-animais', { method: 'POST' })
                     const d = await r.json()
-                    alert(d.success ? `✅ ${d.atualizados || 0} animais tiveram o peso atualizado na ficha.` : '❌ ' + (d.error || 'Erro'))
+                    alert(d.success ? `âÅ“â€¦ ${d.atualizados || 0} animais tiveram o peso atualizado na ficha.` : 'â�Å’ ' + (d.error || 'Erro'))
                   } catch (e) {
-                    alert('❌ Erro ao sincronizar')
+                    alert('â�Å’ Erro ao sincronizar')
                   }
                 }}
                 className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
-                title="Atualiza o campo Peso na ficha de cada animal com a última pesagem"
+                title="Atualiza o campo Peso na ficha de cada animal com a Ãºltima pesagem"
               >
                 <ArrowPathIcon className="w-5 h-5" />
                 Sincronizar Pesos
@@ -895,7 +895,7 @@ export default function Pesagem() {
               <button
                 onClick={async () => {
                   const ano = new Date().getFullYear()
-                  if (!confirm(`Aplicar localizações das pesagens de FEVEREIRO/${ano}?\n\nAnimais sem localização atual receberão o local informado na observação da pesagem.`)) return
+                  if (!confirm(`Aplicar localizaÃ§Ãµes das pesagens de FEVEREIRO/${ano}?\n\nAnimais sem localizaÃ§Ã£o atual receberÃ£o o local informado na observaÃ§Ã£o da pesagem.`)) return
                   try {
                     const r = await fetch('/api/pesagens/aplicar-localizacoes', {
                       method: 'POST',
@@ -903,21 +903,21 @@ export default function Pesagem() {
                       body: JSON.stringify({ mes: 2, ano })
                     })
                     const d = await r.json().catch(() => ({}))
-                    if (d.success) alert(d.mensagem || `✅ ${d.aplicados} localização(ões) aplicada(s)`)
-                    else alert('❌ ' + (d.error || 'Erro ao aplicar'))
+                    if (d.success) alert(d.mensagem || `âÅ“â€¦ ${d.aplicados} localizaÃ§Ã£o(Ãµes) aplicada(s)`)
+                    else alert('â�Å’ ' + (d.error || 'Erro ao aplicar'))
                   } catch (e) {
-                    alert('❌ Erro: ' + e.message)
+                    alert('â�Å’ Erro: ' + e.message)
                   }
                 }}
                 className="flex items-center gap-2 bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors"
-                title="Aplica localização a partir das pesagens de fevereiro (mês 02)"
+                title="Aplica localizaÃ§Ã£o a partir das pesagens de fevereiro (mÃªs 02)"
               >
                 <MapPinIcon className="w-5 h-5" />
-                Aplicar do mês 02
+                Aplicar do mÃªs 02
               </button>
               <button
                 onClick={async () => {
-                  if (!confirm('Aplicar localização (piquete/local) para todos os animais usando a última pesagem com observação?')) return
+                  if (!confirm('Aplicar localizaÃ§Ã£o (piquete/local) para todos os animais usando a Ãºltima pesagem com observaÃ§Ã£o?')) return
                   try {
                     const porAnimal = {}
                     pesagens.forEach(p => {
@@ -935,7 +935,7 @@ export default function Pesagem() {
                     
                     for (const [aid, p] of Object.entries(porAnimal)) {
                       const local = extrairLocal(p.observacoes)
-                      if (!local || local.toUpperCase() === 'NÃO INFORMADO' || local === '-') continue
+                      if (!local || local.toUpperCase() === 'NÃÆ’O INFORMADO' || local === '-') continue
                       
                       const body = {
                         animal_id: Number(aid),
@@ -960,16 +960,16 @@ export default function Pesagem() {
                     const aplicados = results.filter(r => r === true).length
                     const ignorados = Object.keys(porAnimal).length - validos.length + results.filter(r => r === false).length
                     
-                    alert(`✅ Localização aplicada para ${aplicados} animal(is)\nℹ️ ${ignorados} sem observação/local válido ou com erro`)
+                    alert(`âÅ“â€¦ LocalizaÃ§Ã£o aplicada para ${aplicados} animal(is)\nââ€ž¹ï¸� ${ignorados} sem observaÃ§Ã£o/local vÃ¡lido ou com erro`)
                   } catch (e) {
-                    alert('❌ Erro ao aplicar localizações: ' + e.message)
+                    alert('â�Å’ Erro ao aplicar localizaÃ§Ãµes: ' + e.message)
                   }
                 }}
                 className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
-                title="Atualiza localização dos animais a partir da observação das pesagens"
+                title="Atualiza localizaÃ§Ã£o dos animais a partir da observaÃ§Ã£o das pesagens"
               >
                 <MapPinIcon className="w-5 h-5" />
-                Aplicar Localizações
+                Aplicar LocalizaÃ§Ãµes
               </button>
               <button
                 onClick={handleExcluirTodas}
@@ -984,13 +984,13 @@ export default function Pesagem() {
         </div>
       </div>
 
-      {/* Estatísticas */}
+      {/* EstatÃ­sticas */}
       {pesagens.length > 0 && (
         <>
-          {/* Barra de Controles de Visualização */}
+          {/* Barra de Controles de VisualizaÃ§Ã£o */}
           <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Visualização:</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">VisualizaÃ§Ã£o:</span>
               <div className="flex gap-1 bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
                 <button
                   onClick={() => setViewMode('table')}
@@ -1020,7 +1020,7 @@ export default function Pesagem() {
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
-                  Gráficos
+                  GrÃ¡ficos
                 </button>
               </div>
             </div>
@@ -1035,7 +1035,7 @@ export default function Pesagem() {
                 }`}
               >
                 <FunnelIcon className="w-4 h-4" />
-                Filtros Avançados
+                Filtros AvanÃ§ados
               </button>
               
               <select
@@ -1054,25 +1054,25 @@ export default function Pesagem() {
                 className="p-1.5 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                 title={sortOrder === 'asc' ? 'Crescente' : 'Decrescente'}
               >
-                {sortOrder === 'asc' ? '↑' : '↓'}
+                {sortOrder === 'asc' ? 'ââ€ â€˜' : 'ââ€ â€œ'}
               </button>
             </div>
           </div>
 
-          {/* Análise de Tendências */}
+          {/* AnÃ¡lise de TendÃªncias */}
           {analiseTendencias && (
             <div className="bg-gradient-to-br from-purple-600 to-purple-700 text-white p-6 rounded-lg shadow-lg">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <SparklesIcon className="w-6 h-6" />
-                  <h3 className="text-lg font-bold">Análise de Tendências</h3>
+                  <h3 className="text-lg font-bold">AnÃ¡lise de TendÃªncias</h3>
                 </div>
                 {analiseTendencias.tendencia === 'crescente' ? (
                   <ArrowTrendingUpIcon className="w-8 h-8 text-green-300" />
                 ) : analiseTendencias.tendencia === 'decrescente' ? (
                   <ArrowTrendingDownIcon className="w-8 h-8 text-red-300" />
                 ) : (
-                  <div className="w-8 h-8 flex items-center justify-center text-yellow-300 text-2xl">→</div>
+                  <div className="w-8 h-8 flex items-center justify-center text-yellow-300 text-2xl">ââ€ â€™</div>
                 )}
               </div>
               
@@ -1086,7 +1086,7 @@ export default function Pesagem() {
                   <div className="text-2xl font-bold">{analiseTendencias.mediaSegunda} kg</div>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                  <div className="text-sm opacity-90">Variação</div>
+                  <div className="text-sm opacity-90">VariaÃ§Ã£o</div>
                   <div className="text-2xl font-bold">
                     {analiseTendencias.tendencia === 'crescente' ? '+' : analiseTendencias.tendencia === 'decrescente' ? '-' : ''}
                     {analiseTendencias.valor} kg ({analiseTendencias.percentual}%)
@@ -1095,33 +1095,33 @@ export default function Pesagem() {
               </div>
               
               <p className="mt-4 text-sm opacity-90">
-                {analiseTendencias.tendencia === 'crescente' && '📈 Tendência positiva! O rebanho está ganhando peso ao longo do tempo.'}
-                {analiseTendencias.tendencia === 'decrescente' && '📉 Atenção: O rebanho está perdendo peso. Verifique manejo e saúde.'}
-                {analiseTendencias.tendencia === 'estável' && '➡️ Peso estável ao longo do período analisado.'}
+                {analiseTendencias.tendencia === 'crescente' && 'ðÅ¸â€œË† TendÃªncia positiva! O rebanho estÃ¡ ganhando peso ao longo do tempo.'}
+                {analiseTendencias.tendencia === 'decrescente' && 'ðÅ¸â€œâ€° AtenÃ§Ã£o: O rebanho estÃ¡ perdendo peso. Verifique manejo e saÃºde.'}
+                {analiseTendencias.tendencia === 'estÃ¡vel' && 'âÅ¾¡ï¸� Peso estÃ¡vel ao longo do perÃ­odo analisado.'}
               </p>
             </div>
           )}
 
-          {/* Comparação de Períodos */}
+          {/* ComparaÃ§Ã£o de PerÃ­odos */}
           <div className="bg-gradient-to-br from-cyan-600 to-cyan-700 text-white p-6 rounded-lg shadow-lg">
             <div className="flex items-center gap-2 mb-4">
               <CalendarIcon className="w-6 h-6" />
-              <h3 className="text-lg font-bold">Comparação de Períodos</h3>
+              <h3 className="text-lg font-bold">ComparaÃ§Ã£o de PerÃ­odos</h3>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <div className="text-sm opacity-90">Últimos 30 Dias</div>
+                <div className="text-sm opacity-90">ÃÅ¡ltimos 30 Dias</div>
                 <div className="text-2xl font-bold">{comparacaoPeriodos.ultimos30.qtd} pesagens</div>
-                <div className="text-lg mt-1">Média: {comparacaoPeriodos.ultimos30.media} kg</div>
+                <div className="text-lg mt-1">MÃ©dia: {comparacaoPeriodos.ultimos30.media} kg</div>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <div className="text-sm opacity-90">30-60 Dias Atrás</div>
+                <div className="text-sm opacity-90">30-60 Dias AtrÃ¡s</div>
                 <div className="text-2xl font-bold">{comparacaoPeriodos.anteriores30.qtd} pesagens</div>
-                <div className="text-lg mt-1">Média: {comparacaoPeriodos.anteriores30.media} kg</div>
+                <div className="text-lg mt-1">MÃ©dia: {comparacaoPeriodos.anteriores30.media} kg</div>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <div className="text-sm opacity-90">Diferença</div>
+                <div className="text-sm opacity-90">DiferenÃ§a</div>
                 <div className={`text-2xl font-bold ${
                   parseFloat(comparacaoPeriodos.diferenca) > 0 ? 'text-green-300' : 
                   parseFloat(comparacaoPeriodos.diferenca) < 0 ? 'text-red-300' : 'text-yellow-300'
@@ -1133,40 +1133,40 @@ export default function Pesagem() {
             </div>
           </div>
 
-          {/* Cards de Estatísticas */}
+          {/* Cards de EstatÃ­sticas */}
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
             <div className="bg-gradient-to-br from-slate-600 to-slate-700 text-white p-4 rounded-lg shadow">
               <div className="text-xs opacity-90">Total {estatisticas.total !== estatisticas.totalGeral && `(${estatisticas.totalGeral})`}</div>
               <div className="text-2xl font-bold">{estatisticas.total}</div>
             </div>
           <div className="bg-gradient-to-br from-amber-500 to-amber-600 text-white p-4 rounded-lg shadow">
-            <div className="text-xs opacity-90">Peso Médio</div>
+            <div className="text-xs opacity-90">Peso MÃ©dio</div>
             <div className="text-2xl font-bold">{estatisticas.pesoMedio} kg</div>
           </div>
           <div className="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-4 rounded-lg shadow">
-            <div className="text-xs opacity-90">Peso Mín</div>
+            <div className="text-xs opacity-90">Peso MÃ­n</div>
             <div className="text-2xl font-bold">{estatisticas.pesoMin} kg</div>
           </div>
           <div className="bg-gradient-to-br from-red-500 to-red-600 text-white p-4 rounded-lg shadow">
-            <div className="text-xs opacity-90">Peso Máx</div>
+            <div className="text-xs opacity-90">Peso MÃ¡x</div>
             <div className="text-2xl font-bold">{estatisticas.pesoMax} kg</div>
           </div>
           <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-4 rounded-lg shadow">
-            <div className="text-xs opacity-90">♂️ Machos</div>
+            <div className="text-xs opacity-90">ââ„¢â€šï¸� Machos</div>
             <div className="text-2xl font-bold">{estatisticas.machos}</div>
-            {estatisticas.mediaMachos !== '-' && <div className="text-xs opacity-80">média {estatisticas.mediaMachos} kg</div>}
+            {estatisticas.mediaMachos !== '-' && <div className="text-xs opacity-80">mÃ©dia {estatisticas.mediaMachos} kg</div>}
           </div>
           <div className="bg-gradient-to-br from-pink-500 to-pink-600 text-white p-4 rounded-lg shadow">
-            <div className="text-xs opacity-90">♀️ Fêmeas</div>
+            <div className="text-xs opacity-90">ââ„¢â‚¬ï¸� FÃªmeas</div>
             <div className="text-2xl font-bold">{estatisticas.femeas}</div>
-            {estatisticas.mediaFemeas !== '-' && <div className="text-xs opacity-80">média {estatisticas.mediaFemeas} kg</div>}
+            {estatisticas.mediaFemeas !== '-' && <div className="text-xs opacity-80">mÃ©dia {estatisticas.mediaFemeas} kg</div>}
           </div>
           <div className="bg-gradient-to-br from-teal-500 to-teal-600 text-white p-4 rounded-lg shadow md:col-span-1">
-            <div className="text-xs opacity-90">Animais Únicos</div>
+            <div className="text-xs opacity-90">Animais ÃÅ¡nicos</div>
             <div className="text-2xl font-bold">{estatisticas.animaisUnicos}</div>
           </div>
           <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-4 rounded-lg shadow md:col-span-1">
-            <div className="text-xs opacity-90">CE Médio</div>
+            <div className="text-xs opacity-90">CE MÃ©dio</div>
             <div className="text-2xl font-bold">{estatisticas.ceMedio}{estatisticas.ceMedio !== '-' ? ' cm' : ''}</div>
           </div>
         </div>
@@ -1197,10 +1197,10 @@ export default function Pesagem() {
                     <tr className="border-b border-white/20">
                       <th className="text-left py-2 pr-4 font-medium text-white">Sexo</th>
                       <th className="text-right py-2 px-2 font-medium text-white">Qtde</th>
-                      <th className="text-right py-2 px-2 font-medium text-white">Média Peso</th>
-                      <th className="text-right py-2 px-2 font-medium text-white">Peso Mín</th>
-                      <th className="text-right py-2 px-2 font-medium text-white">Peso Máx</th>
-                      <th className="text-right py-2 px-2 font-medium text-white">Média CE</th>
+                      <th className="text-right py-2 px-2 font-medium text-white">MÃ©dia Peso</th>
+                      <th className="text-right py-2 px-2 font-medium text-white">Peso MÃ­n</th>
+                      <th className="text-right py-2 px-2 font-medium text-white">Peso MÃ¡x</th>
+                      <th className="text-right py-2 px-2 font-medium text-white">MÃ©dia CE</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1223,7 +1223,7 @@ export default function Pesagem() {
             {resumoPorLote.length > 1 && (
               <div>
                 <h3 className="text-sm font-medium text-white mb-3 opacity-95 flex items-center gap-2">
-                  <span>📦 Lotes de Pesagem</span>
+                  <span>ðÅ¸â€œ¦ Lotes de Pesagem</span>
                   <span className="text-xs bg-purple-600/50 px-2 py-0.5 rounded-full">{resumoPorLote.length} lotes</span>
                 </h3>
                 
@@ -1243,41 +1243,41 @@ export default function Pesagem() {
                       }}
                       title={r.lote !== 'Sem Lote' ? 'Clique para filtrar por este lote' : 'Pesagens sem lote definido'}
                     >
-                      {/* Cabeçalho do Card */}
+                      {/* CabeÃ§alho do Card */}
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            {r.lote !== 'Sem Lote' && <span className="text-lg">📦</span>}
+                            {r.lote !== 'Sem Lote' && <span className="text-lg">ðÅ¸â€œ¦</span>}
                             <h4 className={`font-semibold text-white text-sm ${r.lote === 'Sem Lote' ? 'italic' : ''}`}>
                               {r.lote}
                             </h4>
                           </div>
                           <div className="text-xs text-purple-300">
-                            {r.qtde} pesagens • {r.animaisUnicos} animais
+                            {r.qtde} pesagens ââ‚¬¢ {r.animaisUnicos} animais
                           </div>
                         </div>
                         <div className="text-right">
                           <div className="text-2xl font-bold text-white">{r.mediaPeso}</div>
-                          <div className="text-xs text-purple-300">kg médio</div>
+                          <div className="text-xs text-purple-300">kg mÃ©dio</div>
                         </div>
                       </div>
                       
-                      {/* Estatísticas Rápidas */}
+                      {/* EstatÃ­sticas RÃ¡pidas */}
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="bg-blue-500/20 rounded px-2 py-1">
-                          <div className="text-blue-300">♂️ Machos</div>
+                          <div className="text-blue-300">ââ„¢â€šï¸� Machos</div>
                           <div className="text-white font-semibold">{r.machos}</div>
                         </div>
                         <div className="bg-pink-500/20 rounded px-2 py-1">
-                          <div className="text-pink-300">♀️ Fêmeas</div>
+                          <div className="text-pink-300">ââ„¢â‚¬ï¸� FÃªmeas</div>
                           <div className="text-white font-semibold">{r.femeas}</div>
                         </div>
                         <div className="bg-orange-500/20 rounded px-2 py-1">
-                          <div className="text-orange-300">Mín</div>
+                          <div className="text-orange-300">MÃ­n</div>
                           <div className="text-white font-semibold">{r.minPeso} kg</div>
                         </div>
                         <div className="bg-green-500/20 rounded px-2 py-1">
-                          <div className="text-green-300">Máx</div>
+                          <div className="text-green-300">MÃ¡x</div>
                           <div className="text-white font-semibold">{r.maxPeso} kg</div>
                         </div>
                       </div>
@@ -1285,7 +1285,7 @@ export default function Pesagem() {
                   ))}
                 </div>
                 
-                <p className="text-xs text-white/70 mt-3">💡 Clique em um lote para filtrar as pesagens. Use o campo "Lote" ao cadastrar para agrupar pesagens.</p>
+                <p className="text-xs text-white/70 mt-3">ðÅ¸â€™¡ Clique em um lote para filtrar as pesagens. Use o campo "Lote" ao cadastrar para agrupar pesagens.</p>
               </div>
             )}
             
@@ -1293,7 +1293,7 @@ export default function Pesagem() {
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-medium text-white opacity-95 flex items-center gap-2">
-                    <span>📍 Piquetes / Locais</span>
+                    <span>ðÅ¸â€œ� Piquetes / Locais</span>
                     <span className="text-xs bg-emerald-600/50 px-2 py-0.5 rounded-full">{resumoPorLocal.length} locais</span>
                   </h3>
                   <button
@@ -1301,7 +1301,7 @@ export default function Pesagem() {
                     onClick={() => exportResumoPorLocalCSV(resumoPorLocal)}
                     title="Exportar resumo por piquete em CSV"
                   >
-                    📊 Exportar CSV
+                    ðÅ¸â€œÅ  Exportar CSV
                   </button>
                 </div>
                 
@@ -1317,11 +1317,11 @@ export default function Pesagem() {
                       }}
                       title="Clique para ver os animais deste local"
                     >
-                      {/* Cabeçalho */}
+                      {/* CabeÃ§alho */}
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex-1">
                           <div className="flex items-center gap-1 mb-1">
-                            <span className="text-base">📍</span>
+                            <span className="text-base">ðÅ¸â€œ�</span>
                             <h4 className="font-semibold text-white text-sm truncate">{r.local}</h4>
                           </div>
                           <div className="text-xs text-emerald-300">
@@ -1334,14 +1334,14 @@ export default function Pesagem() {
                         </div>
                       </div>
                       
-                      {/* Estatísticas */}
+                      {/* EstatÃ­sticas */}
                       <div className="flex gap-2 text-xs">
                         <div className="flex-1 bg-pink-500/20 rounded px-2 py-1 text-center">
-                          <div className="text-pink-300">♀️</div>
+                          <div className="text-pink-300">ââ„¢â‚¬ï¸�</div>
                           <div className="text-white font-semibold">{r.femeas ?? 0}</div>
                         </div>
                         <div className="flex-1 bg-blue-500/20 rounded px-2 py-1 text-center">
-                          <div className="text-blue-300">♂️</div>
+                          <div className="text-blue-300">ââ„¢â€šï¸�</div>
                           <div className="text-white font-semibold">{r.machos ?? 0}</div>
                         </div>
                       </div>
@@ -1363,7 +1363,7 @@ export default function Pesagem() {
                   </div>
                 )}
                 
-                <p className="text-xs text-white/70 mt-3">💡 Clique em um piquete para ver a lista de animais. Total = animais distintos por local.</p>
+                <p className="text-xs text-white/70 mt-3">ðÅ¸â€™¡ Clique em um piquete para ver a lista de animais. Total = animais distintos por local.</p>
               </div>
             )}
           </div>
@@ -1378,7 +1378,7 @@ export default function Pesagem() {
             <h3 className="font-semibold text-gray-900 dark:text-white">Filtros</h3>
           </div>
           
-          {/* Filtros Básicos */}
+          {/* Filtros BÃ¡sicos */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -1388,7 +1388,7 @@ export default function Pesagem() {
                 type="text"
                 value={filtroAnimal}
                 onChange={(e) => setFiltroAnimal(e.target.value)}
-                placeholder="Digite série ou RG..."
+                placeholder="Digite sÃ©rie ou RG..."
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 dark:bg-gray-700 dark:text-white"
               />
             </div>
@@ -1405,7 +1405,7 @@ export default function Pesagem() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                📦 Filtrar por Lote
+                ðÅ¸â€œ¦ Filtrar por Lote
               </label>
               <input
                 type="text"
@@ -1417,10 +1417,10 @@ export default function Pesagem() {
             </div>
           </div>
           
-          {/* Filtros Avançados */}
+          {/* Filtros AvanÃ§ados */}
           {showAdvancedFilters && (
             <div className="filter-section mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Filtros Avançados</h4>
+              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Filtros AvanÃ§ados</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -1433,7 +1433,7 @@ export default function Pesagem() {
                   >
                     <option value="">Todos</option>
                     <option value="Macho">Macho</option>
-                    <option value="Fêmea">Fêmea</option>
+                    <option value="FÃªmea">FÃªmea</option>
                   </select>
                 </div>
                 
@@ -1452,7 +1452,7 @@ export default function Pesagem() {
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Peso Mínimo (kg)
+                    Peso MÃ­nimo (kg)
                   </label>
                   <input
                     type="number"
@@ -1466,7 +1466,7 @@ export default function Pesagem() {
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Peso Máximo (kg)
+                    Peso MÃ¡ximo (kg)
                   </label>
                   <input
                     type="number"
@@ -1480,7 +1480,7 @@ export default function Pesagem() {
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Data Início
+                    Data InÃ­cio
                   </label>
                   <input
                     type="date"
@@ -1553,7 +1553,7 @@ export default function Pesagem() {
         </div>
       ) : (
         <>
-          {/* Visualização em Cards */}
+          {/* VisualizaÃ§Ã£o em Cards */}
           {viewMode === 'cards' && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {pesagensFiltradas.map((item, index) => (
@@ -1577,7 +1577,7 @@ export default function Pesagem() {
                               ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
                               : 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300'
                           }`}>
-                            {item.animal_sexo === 'Macho' ? '♂️ Macho' : '♀️ Fêmea'}
+                            {item.animal_sexo === 'Macho' ? 'ââ„¢â€šï¸� Macho' : 'ââ„¢â‚¬ï¸� FÃªmea'}
                           </span>
                         )}
                       </div>
@@ -1589,7 +1589,7 @@ export default function Pesagem() {
                             setShowHistoryModal(true)
                           }}
                           className="p-2 text-purple-600 hover:bg-purple-100 dark:text-purple-400 dark:hover:bg-purple-900/30 rounded-lg transition-colors"
-                          title="Ver histórico"
+                          title="Ver histÃ³rico"
                         >
                           <ChartBarIcon className="w-5 h-5" />
                         </button>
@@ -1652,7 +1652,7 @@ export default function Pesagem() {
                       
                       {item.observacoes && (
                         <div className="pt-2">
-                          <span className="text-xs text-gray-600 dark:text-gray-400">Observações:</span>
+                          <span className="text-xs text-gray-600 dark:text-gray-400">ObservaÃ§Ãµes:</span>
                           <p className="text-sm text-gray-700 dark:text-gray-300 mt-1 line-clamp-2">
                             {item.observacoes}
                           </p>
@@ -1665,13 +1665,13 @@ export default function Pesagem() {
             </div>
           )}
 
-          {/* Visualização em Gráficos */}
+          {/* VisualizaÃ§Ã£o em GrÃ¡ficos */}
           {viewMode === 'charts' && (
             <div className="space-y-6">
-              {/* Distribuição de Peso */}
+              {/* DistribuiÃ§Ã£o de Peso */}
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
-                  Distribuição de Peso
+                  DistribuiÃ§Ã£o de Peso
                 </h3>
                 <div className="space-y-3">
                   {(() => {
@@ -1717,7 +1717,7 @@ export default function Pesagem() {
               {/* Top 10 Animais Mais Pesados */}
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
-                  🏆 Top 10 Animais Mais Pesados
+                  ðÅ¸�â€  Top 10 Animais Mais Pesados
                 </h3>
                 <div className="space-y-2">
                   {[...pesagensFiltradas]
@@ -1743,7 +1743,7 @@ export default function Pesagem() {
                               {item.animal}
                             </div>
                             <div className="text-xs text-gray-600 dark:text-gray-400">
-                              {item.animal_sexo} • {extrairLocal(item.observacoes)}
+                              {item.animal_sexo} ââ‚¬¢ {extrairLocal(item.observacoes)}
                             </div>
                           </div>
                         </div>
@@ -1760,10 +1760,10 @@ export default function Pesagem() {
                 </div>
               </div>
 
-              {/* Evolução Temporal */}
+              {/* EvoluÃ§Ã£o Temporal */}
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
-                  📈 Evolução Temporal (Últimas 30 Pesagens)
+                  ðÅ¸â€œË† EvoluÃ§Ã£o Temporal (ÃÅ¡ltimas 30 Pesagens)
                 </h3>
                 <div className="h-64 flex items-end justify-between gap-1">
                   {[...pesagensFiltradas]
@@ -1791,13 +1791,13 @@ export default function Pesagem() {
                     })}
                 </div>
                 <div className="mt-4 text-center text-xs text-gray-600 dark:text-gray-400">
-                  Últimas 30 pesagens ordenadas por data
+                  ÃÅ¡ltimas 30 pesagens ordenadas por data
                 </div>
               </div>
             </div>
           )}
 
-          {/* Visualização em Tabela */}
+          {/* VisualizaÃ§Ã£o em Tabela */}
           {viewMode === 'table' && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
           <div className="overflow-x-auto">
@@ -1808,10 +1808,10 @@ export default function Pesagem() {
                   <th className="px-6 py-3 text-left text-sm font-semibold">Peso (kg)</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold">CE (cm)</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold">Data</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold">📦 Lote</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold">ðÅ¸â€œ¦ Lote</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold">Local</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold">Observações</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold">Ações</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold">ObservaÃ§Ãµes</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold">AÃ§Ãµes</th>
                 </tr>
               </thead>
               <tbody>
@@ -1830,7 +1830,7 @@ export default function Pesagem() {
                                 ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
                                 : 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300'
                             }`}>
-                              {item.animal_sexo === 'Macho' ? '♂️ Macho' : '♀️ Fêmea'}
+                              {item.animal_sexo === 'Macho' ? 'ââ„¢â€šï¸� Macho' : 'ââ„¢â‚¬ï¸� FÃªmea'}
                             </span>
                           </div>
                         )}
@@ -1863,7 +1863,7 @@ export default function Pesagem() {
                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">
                       {item.lote ? (
                         <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
-                          📦 {item.lote}
+                          ðÅ¸â€œ¦ {item.lote}
                         </span>
                       ) : (
                         <span className="text-gray-400">-</span>
@@ -1886,7 +1886,7 @@ export default function Pesagem() {
                           setShowHistoryModal(true)
                         }}
                         className="p-2 text-purple-600 hover:bg-purple-100 dark:text-purple-400 dark:hover:bg-purple-900/30 rounded-lg transition-colors"
-                        title="Ver histórico de pesagens"
+                        title="Ver histÃ³rico de pesagens"
                       >
                         <ChartBarIcon className="w-5 h-5" />
                       </button>
@@ -1911,7 +1911,7 @@ export default function Pesagem() {
             </table>
           </div>
           
-          {/* Controles de Paginação */}
+          {/* Controles de PaginaÃ§Ã£o */}
           {pesagensFiltradas.length > 0 && (
             <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -1922,7 +1922,7 @@ export default function Pesagem() {
                 </div>
                 
                 <div className="flex items-center gap-2">
-                  <label className="text-sm text-gray-700 dark:text-gray-300">Por página:</label>
+                  <label className="text-sm text-gray-700 dark:text-gray-300">Por pÃ¡gina:</label>
                   <select
                     value={itensPorPagina}
                     onChange={(e) => {
@@ -1945,17 +1945,17 @@ export default function Pesagem() {
                   onClick={() => setPaginaAtual(1)}
                   disabled={paginaAtual === 1}
                   className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-gray-300"
-                  title="Primeira página"
+                  title="Primeira pÃ¡gina"
                 >
-                  ««
+                  Â«Â«
                 </button>
                 <button
                   onClick={() => setPaginaAtual(prev => Math.max(1, prev - 1))}
                   disabled={paginaAtual === 1}
                   className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-gray-300"
-                  title="Página anterior"
+                  title="PÃ¡gina anterior"
                 >
-                  «
+                  Â«
                 </button>
                 
                 <div className="flex items-center gap-1">
@@ -1991,17 +1991,17 @@ export default function Pesagem() {
                   onClick={() => setPaginaAtual(prev => Math.min(totalPaginas, prev + 1))}
                   disabled={paginaAtual === totalPaginas}
                   className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-gray-300"
-                  title="Próxima página"
+                  title="PrÃ³xima pÃ¡gina"
                 >
-                  »
+                  Â»
                 </button>
                 <button
                   onClick={() => setPaginaAtual(totalPaginas)}
                   disabled={paginaAtual === totalPaginas}
                   className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-gray-300"
-                  title="Última página"
+                  title="ÃÅ¡ltima pÃ¡gina"
                 >
-                  »»
+                  Â»Â»
                 </button>
               </div>
             </div>
@@ -2017,7 +2017,7 @@ export default function Pesagem() {
         </>
       )}
 
-      {/* Modal do Formulário */}
+      {/* Modal do FormulÃ¡rio */}
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
@@ -2062,7 +2062,7 @@ export default function Pesagem() {
                 {selectedAnimal && (
                   <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-sm">
                     <strong>{selectedAnimal.serie} - {selectedAnimal.rg}</strong><br />
-                    {selectedAnimal.sexo === 'Macho' ? '♂️' : '♀️'} {selectedAnimal.sexo} • {selectedAnimal.raca}
+                    {selectedAnimal.sexo === 'Macho' ? 'ââ„¢â€šï¸�' : 'ââ„¢â‚¬ï¸�'} {selectedAnimal.sexo} ââ‚¬¢ {selectedAnimal.raca}
                   </div>
                 )}
               </div>
@@ -2086,7 +2086,7 @@ export default function Pesagem() {
                 {selectedAnimal && selectedAnimal.sexo === 'Macho' && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      CE - Circunferência Escrotal (cm)
+                      CE - CircunferÃªncia Escrotal (cm)
                     </label>
                     <input
                       type="number"
@@ -2114,7 +2114,7 @@ export default function Pesagem() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  📦 Lote de Pesagem
+                  ðÅ¸â€œ¦ Lote de Pesagem
                 </label>
                 <input
                   type="text"
@@ -2124,20 +2124,20 @@ export default function Pesagem() {
                   placeholder="Ex: Lote de Pesagens ABCZ Fev 2026"
                 />
                 <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  Identifique este grupo de pesagens para facilitar relatórios futuros
+                  Identifique este grupo de pesagens para facilitar relatÃ³rios futuros
                 </p>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Observações
+                  ObservaÃ§Ãµes
                 </label>
                 <textarea
                   value={formData.observacoes}
                   onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 dark:bg-gray-700 dark:text-white"
                   rows="3"
-                  placeholder="Observações sobre a pesagem..."
+                  placeholder="ObservaÃ§Ãµes sobre a pesagem..."
                 />
               </div>
 
@@ -2161,7 +2161,7 @@ export default function Pesagem() {
         </div>
       )}
 
-      {/* Modal de Importação Excel */}
+      {/* Modal de ImportaÃ§Ã£o Excel */}
       {showImportModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
@@ -2180,13 +2180,13 @@ export default function Pesagem() {
             <div className="space-y-4">
               <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
                 <h3 className="font-medium text-blue-900 dark:text-blue-200 mb-2">
-                  📋 Instruções de Importação
+                  ðÅ¸â€œâ€¹ InstruÃ§Ãµes de ImportaÃ§Ã£o
                 </h3>
                 <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
-                  <li>• Selecione as colunas correspondentes do seu Excel</li>
-                <li>• Identificação (Animal ou RG/PGN) e Peso são obrigatórios</li>
-                  <li>• CE só para machos</li>
-                  <li>• Os animais devem estar cadastrados no sistema</li>
+                  <li>ââ‚¬¢ Selecione as colunas correspondentes do seu Excel</li>
+                <li>ââ‚¬¢ IdentificaÃ§Ã£o (Animal ou RG/PGN) e Peso sÃ£o obrigatÃ³rios</li>
+                  <li>ââ‚¬¢ CE sÃ³ para machos</li>
+                  <li>ââ‚¬¢ Os animais devem estar cadastrados no sistema</li>
                 </ul>
               </div>
 
@@ -2209,7 +2209,7 @@ export default function Pesagem() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Coluna da Série (opcional)
+                  Coluna da SÃ©rie (opcional)
                 </label>
                 <select
                   value={columnMapping.serie}
@@ -2290,7 +2290,7 @@ export default function Pesagem() {
 
                 <div className="col-span-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Coluna das Observações (opcional)
+                    Coluna das ObservaÃ§Ãµes (opcional)
                   </label>
                   <select
                     value={columnMapping.observacoes}
@@ -2401,7 +2401,7 @@ export default function Pesagem() {
         </div>
       )}
 
-      {/* Modal de Importação por Texto */}
+      {/* Modal de ImportaÃ§Ã£o por Texto */}
       {showImportTextModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -2439,13 +2439,13 @@ export default function Pesagem() {
         </div>
       )}
       
-      {/* Relatório de Não Encontrados */}
+      {/* RelatÃ³rio de NÃ£o Encontrados */}
       {showNotFoundModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-3xl max-h-[80vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                Linhas não cadastradas
+                Linhas nÃ£o cadastradas
               </h2>
               <button
                 onClick={() => setShowNotFoundModal(false)}
@@ -2459,14 +2459,14 @@ export default function Pesagem() {
             ) : (
               <div className="space-y-4">
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {notFoundList.length} linha(s) não puderam ser cadastradas automaticamente. Ajuste a identificação (Série/RG) e tente novamente.
+                  {notFoundList.length} linha(s) nÃ£o puderam ser cadastradas automaticamente. Ajuste a identificaÃ§Ã£o (SÃ©rie/RG) e tente novamente.
                 </p>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-gray-300 dark:border-gray-600">
                         <th className="text-left p-2 font-medium">Linha</th>
-                        <th className="text-left p-2 font-medium">Série</th>
+                        <th className="text-left p-2 font-medium">SÃ©rie</th>
                         <th className="text-left p-2 font-medium">RG</th>
                         <th className="text-left p-2 font-medium">Animal</th>
                         <th className="text-left p-2 font-medium">Motivo</th>
@@ -2488,7 +2488,7 @@ export default function Pesagem() {
                 <div className="flex justify-end gap-2">
                   <button
                     onClick={() => {
-                      const header = 'Linha;Série;RG;Animal;Motivo'
+                      const header = 'Linha;SÃ©rie;RG;Animal;Motivo'
                       const rows = notFoundList.map(n => [n.linha, n.serie || '', n.rg || '', n.animal || '', n.motivo || ''].join(';'))
                       const csv = [header, ...rows].join('\n')
                       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
@@ -2518,14 +2518,14 @@ export default function Pesagem() {
         </div>
       )}
 
-      {/* Modal: Histórico do Animal */}
+      {/* Modal: HistÃ³rico do Animal */}
       {showHistoryModal && selectedAnimalForHistory && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={() => setShowHistoryModal(false)}>
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                 <ChartBarIcon className="w-6 h-6 text-purple-600" />
-                Histórico de Pesagens
+                HistÃ³rico de Pesagens
               </h2>
               <button
                 onClick={() => setShowHistoryModal(false)}
@@ -2574,7 +2574,7 @@ export default function Pesagem() {
                         </div>
                       </div>
                       <div>
-                        <div className="text-gray-600 dark:text-gray-400">Variação</div>
+                        <div className="text-gray-600 dark:text-gray-400">VariaÃ§Ã£o</div>
                         <div className={`text-xl font-bold ${ganhoTotal >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                           {ganhoTotal >= 0 ? '+' : ''}{ganhoPercentual}%
                         </div>
@@ -2582,9 +2582,9 @@ export default function Pesagem() {
                     </div>
                   </div>
                   
-                  {/* Gráfico de Evolução */}
+                  {/* GrÃ¡fico de EvoluÃ§Ã£o */}
                   <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <h4 className="font-semibold text-gray-900 dark:text-white mb-3">Evolução do Peso</h4>
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-3">EvoluÃ§Ã£o do Peso</h4>
                     <div className="h-48 flex items-end justify-between gap-2">
                       {history.map((item, idx) => {
                         const maxPeso = Math.max(...history.map(h => parseFloat(h.peso || 0)))
@@ -2611,14 +2611,14 @@ export default function Pesagem() {
                     </div>
                   </div>
                   
-                  {/* Tabela de Histórico */}
+                  {/* Tabela de HistÃ³rico */}
                   <div className="flex-1 overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-lg">
                     <table className="w-full text-sm">
                       <thead className="bg-gray-100 dark:bg-gray-700 sticky top-0">
                         <tr>
                           <th className="text-left py-2 px-3 font-medium text-gray-900 dark:text-white">Data</th>
                           <th className="text-right py-2 px-3 font-medium text-gray-900 dark:text-white">Peso (kg)</th>
-                          <th className="text-right py-2 px-3 font-medium text-gray-900 dark:text-white">Variação</th>
+                          <th className="text-right py-2 px-3 font-medium text-gray-900 dark:text-white">VariaÃ§Ã£o</th>
                           {history.some(h => h.ce) && (
                             <th className="text-right py-2 px-3 font-medium text-gray-900 dark:text-white">CE (cm)</th>
                           )}
@@ -2690,7 +2690,7 @@ export default function Pesagem() {
               </button>
             </div>
             <p className="text-sm text-gray-800 dark:text-white mb-3">
-              {selectedLocalDados.dados.length} animal(is) com última pesagem neste local
+              {selectedLocalDados.dados.length} animal(is) com Ãºltima pesagem neste local
             </p>
             <div className="overflow-y-auto flex-1 border border-gray-200 dark:border-gray-600 rounded-lg">
               <table className="w-full text-sm text-gray-900 dark:text-white">

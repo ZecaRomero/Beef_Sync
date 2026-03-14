@@ -6,7 +6,7 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-console.log('🔄 Trocar configuração de banco de dados\n');
+console.log('�Ÿ”„ Trocar configuração de banco de dados\n');
 console.log('Escolha uma opção:');
 console.log('1 - Usar banco LOCAL (PostgreSQL localhost)');
 console.log('2 - Usar banco SUPABASE (nuvem)');
@@ -22,9 +22,9 @@ rl.question('Digite sua escolha (1, 2 ou 3): ', (resposta) => {
       '# DATABASE_URL=postgresql://postgres.bpsltnglmbwdpvumjeaf'
     );
     
-    console.log('\n✅ Configurado para usar banco LOCAL');
-    console.log('📍 Host: localhost:5432');
-    console.log('🗄️  Database: beef_sync');
+    console.log('\n�œ… Configurado para usar banco LOCAL');
+    console.log('�Ÿ“� Host: localhost:5432');
+    console.log('�Ÿ—„️  Database: beef_sync');
     
   } else if (resposta === '2') {
     // Descomentar Supabase
@@ -33,22 +33,22 @@ rl.question('Digite sua escolha (1, 2 ou 3): ', (resposta) => {
       'DATABASE_URL=postgresql://postgres.bpsltnglmbwdpvumjeaf'
     );
     
-    console.log('\n✅ Configurado para usar SUPABASE');
-    console.log('📍 Host: aws-0-sa-east-1.pooler.supabase.com');
-    console.log('⚠️  Certifique-se de que:');
+    console.log('\n�œ… Configurado para usar SUPABASE');
+    console.log('�Ÿ“� Host: aws-0-sa-east-1.pooler.supabase.com');
+    console.log('�š�️  Certifique-se de que:');
     console.log('   1. O projeto Supabase está ativo');
     console.log('   2. Não há bloqueio de firewall');
     console.log('   3. A rede permite conexões na porta 6543');
     
   } else {
-    console.log('\n❌ Operação cancelada');
+    console.log('\n�Œ Operação cancelada');
     rl.close();
     process.exit(0);
   }
   
   fs.writeFileSync('.env', envContent);
-  console.log('\n💾 Arquivo .env atualizado!');
-  console.log('🔄 Reinicie o servidor para aplicar as mudanças\n');
+  console.log('\n�Ÿ’� Arquivo .env atualizado!');
+  console.log('�Ÿ”„ Reinicie o servidor para aplicar as mudanças\n');
   
   rl.close();
   process.exit(0);

@@ -12,7 +12,7 @@ async function criarAnimaisReceptorasMarcelo() {
   const client = await pool.connect();
   
   try {
-    console.log('🐮 CRIANDO ANIMAIS DAS RECEPTORAS DO MARCELO\n');
+    console.log('�Ÿ�� CRIANDO ANIMAIS DAS RECEPTORAS DO MARCELO\n');
     console.log('='.repeat(80));
     
     // Buscar todas as receptoras do Marcelo das 3 NFs
@@ -34,7 +34,7 @@ async function criarAnimaisReceptorasMarcelo() {
       ORDER BY nf.numero_nf, i.id
     `);
     
-    console.log(`📋 Total de itens encontrados: ${itensResult.rows.length}\n`);
+    console.log(`�Ÿ“‹ Total de itens encontrados: ${itensResult.rows.length}\n`);
     
     let criados = 0;
     let jaExistentes = 0;
@@ -50,7 +50,7 @@ async function criarAnimaisReceptorasMarcelo() {
         const tatuagem = dados.tatuagem || '';
         
         if (!tatuagem) {
-          console.log(`⚠️ Item sem tatuagem na NF ${row.numero_nf}`);
+          console.log(`�š�️ Item sem tatuagem na NF ${row.numero_nf}`);
           continue;
         }
         
@@ -62,7 +62,7 @@ async function criarAnimaisReceptorasMarcelo() {
         const numero = matchNumero ? matchNumero[1] : '';
         
         if (!numero) {
-          console.log(`⚠️ Não foi possível extrair número de: ${tatuagem}`);
+          console.log(`�š�️ Não foi possível extrair número de: ${tatuagem}`);
           continue;
         }
         
@@ -120,16 +120,16 @@ async function criarAnimaisReceptorasMarcelo() {
         ]);
         
         criados++;
-        console.log(`✅ ${criados}. ${nome} criado (NF ${row.numero_nf})`);
+        console.log(`�œ… ${criados}. ${nome} criado (NF ${row.numero_nf})`);
         
       } catch (error) {
         erros++;
-        console.error(`❌ Erro ao processar item:`, error.message);
+        console.error(`�Œ Erro ao processar item:`, error.message);
       }
     }
     
     console.log('\n' + '='.repeat(80));
-    console.log('\n📊 RESUMO:');
+    console.log('\n�Ÿ“Š RESUMO:');
     console.log(`   Total de itens: ${itensResult.rows.length}`);
     console.log(`   Animais criados: ${criados}`);
     console.log(`   Já existentes: ${jaExistentes}`);
@@ -142,17 +142,17 @@ async function criarAnimaisReceptorasMarcelo() {
       WHERE LOWER(fornecedor) LIKE '%marcelo%'
     `);
     
-    console.log(`\n✅ Total de animais do Marcelo no banco: ${totalResult.rows[0].total}`);
+    console.log(`\n�œ… Total de animais do Marcelo no banco: ${totalResult.rows[0].total}`);
     
     console.log('\n' + '='.repeat(80));
-    console.log('\n💡 PRÓXIMOS PASSOS:');
+    console.log('\n�Ÿ’� PR�“XIMOS PASSOS:');
     console.log('   1. Atualize a tela de Animais (F5)');
     console.log('   2. Use o filtro de fornecedor: "MARCELO"');
     console.log('   3. Deve aparecer 46 animais');
     console.log('   4. Todos com série G e números variados');
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('�Œ Erro:', error.message);
     console.error(error);
   } finally {
     client.release();

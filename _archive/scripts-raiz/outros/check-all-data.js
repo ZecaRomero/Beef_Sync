@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 async function checkAllData() {
   try {
-    console.log('🔍 Verificando todas as APIs de dados...');
+    console.log('�Ÿ”� Verificando todas as APIs de dados...');
     
     // Lista de endpoints para verificar
     const endpoints = [
@@ -22,46 +22,46 @@ async function checkAllData() {
         if (response.ok) {
           const data = await response.json();
           const count = data.data?.length || data.length || 0;
-          console.log(`📊 ${endpoint.name}: ${count} registros`);
+          console.log(`�Ÿ“Š ${endpoint.name}: ${count} registros`);
           
           if (count > 0 && data.data && data.data[0]) {
             const firstRecord = data.data[0];
-            console.log(`   📅 Primeiro registro: ${JSON.stringify(firstRecord).substring(0, 100)}...`);
+            console.log(`   �Ÿ“… Primeiro registro: ${JSON.stringify(firstRecord).substring(0, 100)}...`);
           }
         } else {
-          console.log(`❌ ${endpoint.name}: Erro ${response.status}`);
+          console.log(`�Œ ${endpoint.name}: Erro ${response.status}`);
         }
       } catch (error) {
-        console.log(`❌ ${endpoint.name}: ${error.message}`);
+        console.log(`�Œ ${endpoint.name}: ${error.message}`);
       }
     }
 
     // Verificar status do banco
-    console.log('\n🔍 Verificando status do banco...');
+    console.log('\n�Ÿ”� Verificando status do banco...');
     try {
       const dbResponse = await fetch('http://localhost:3020/api/database/status');
       if (dbResponse.ok) {
         const dbData = await dbResponse.json();
-        console.log('🗄️ Status do banco:', JSON.stringify(dbData, null, 2));
+        console.log('�Ÿ—„️ Status do banco:', JSON.stringify(dbData, null, 2));
       }
     } catch (error) {
-      console.log('❌ Erro ao verificar status do banco:', error.message);
+      console.log('�Œ Erro ao verificar status do banco:', error.message);
     }
 
     // Verificar se há dados na tabela animais diretamente
-    console.log('\n🔍 Verificando dados diretamente...');
+    console.log('\n�Ÿ”� Verificando dados diretamente...');
     try {
       const directResponse = await fetch('http://localhost:3020/api/animals?limit=1');
       if (directResponse.ok) {
         const directData = await directResponse.json();
-        console.log('🐄 Resposta direta da API animals:', JSON.stringify(directData, null, 2));
+        console.log('�Ÿ�„ Resposta direta da API animals:', JSON.stringify(directData, null, 2));
       }
     } catch (error) {
-      console.log('❌ Erro na verificação direta:', error.message);
+      console.log('�Œ Erro na verificação direta:', error.message);
     }
 
   } catch (error) {
-    console.error('❌ Erro geral:', error.message);
+    console.error('�Œ Erro geral:', error.message);
   }
 }
 

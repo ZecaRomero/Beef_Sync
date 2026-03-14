@@ -3,7 +3,7 @@ const fs = require('fs')
 const path = require('path')
 
 async function auditAPIs() {
-  console.log('🔍 AUDITORIA COMPLETA - APIs vs Histórico de Lançamentos\n')
+  console.log('�Ÿ”� AUDITORIA COMPLETA - APIs vs Histórico de Lançamentos\n')
 
   const apisPath = 'pages/api'
   
@@ -40,22 +40,22 @@ async function auditAPIs() {
     'semen/'
   ]
 
-  console.log('✅ APIs JÁ INTEGRADAS com histórico de lotes:')
+  console.log('�œ… APIs JÁ INTEGRADAS com histórico de lotes:')
   apisIntegradas.forEach(api => {
-    console.log(`   • ${api}`)
+    console.log(`   �€� ${api}`)
   })
 
-  console.log('\n❌ APIs PENDENTES de integração:')
+  console.log('\n�Œ APIs PENDENTES de integração:')
   apisPendentes.forEach(api => {
-    console.log(`   • ${api}`)
+    console.log(`   �€� ${api}`)
   })
 
-  console.log('\n📁 DIRETÓRIOS a verificar:')
+  console.log('\n�Ÿ“� DIRET�“RIOS a verificar:')
   diretoriosAPI.forEach(dir => {
-    console.log(`   • ${dir}`)
+    console.log(`   �€� ${dir}`)
   })
 
-  console.log('\n🎯 PLANO DE AÇÃO:')
+  console.log('\n�ŸŽ� PLANO DE A�‡�ƒO:')
   console.log('1. Integrar APIs pendentes com withLoteTracking')
   console.log('2. Verificar APIs em subdiretórios')
   console.log('3. Criar configurações LOTE_CONFIGS para cada operação')
@@ -70,10 +70,10 @@ async function auditAPIs() {
 
 auditAPIs()
   .then(result => {
-    console.log(`\n📊 RESUMO:`)
-    console.log(`• APIs integradas: ${result.integradas.length}`)
-    console.log(`• APIs pendentes: ${result.pendentes.length}`)
-    console.log(`• Diretórios a verificar: ${result.diretorios.length}`)
-    console.log('\n🚀 Iniciando correções...')
+    console.log(`\n�Ÿ“Š RESUMO:`)
+    console.log(`�€� APIs integradas: ${result.integradas.length}`)
+    console.log(`�€� APIs pendentes: ${result.pendentes.length}`)
+    console.log(`�€� Diretórios a verificar: ${result.diretorios.length}`)
+    console.log('\n�Ÿš€ Iniciando correções...')
     process.exit(0)
   })

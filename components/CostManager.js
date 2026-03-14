@@ -127,7 +127,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
       const relatorio = await costManager.getRelatorioGeral()
       setRelatorioGeral(relatorio)
     } catch (e) {
-      console.error('Erro ao carregar relatório geral:', e)
+      console.error('Erro ao carregar relatÃ³rio geral:', e)
       setRelatorioGeral(null)
     }
   }
@@ -135,7 +135,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
   const loadServicosCadastrados = async () => {
     try {
       const sexo = selectedAnimal?.sexo
-      const aplicavel = sexo === 'Macho' ? 'macho' : sexo === 'Fêmea' ? 'femea' : null
+      const aplicavel = sexo === 'Macho' ? 'macho' : sexo === 'FÃªmea' ? 'femea' : null
       
       const url = aplicavel 
         ? `/api/servicos?ativo=true&aplicavel=${aplicavel}`
@@ -150,7 +150,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
         setServicosCadastrados([])
       }
     } catch (error) {
-      console.error('Erro ao carregar serviços:', error)
+      console.error('Erro ao carregar serviÃ§os:', error)
       setServicosCadastrados([])
     }
   }
@@ -161,7 +161,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
       if (response.ok) {
         const data = await response.json()
         const medicamentos = data.data?.medicamentos || data.medicamentos || []
-        // Filtrar apenas medicamentos com preço e estoque disponível
+        // Filtrar apenas medicamentos com preÃ§o e estoque disponÃ­vel
         const medicamentosDisponiveis = medicamentos.filter(med => 
           med.preco && med.preco > 0 && med.ativo !== false
         )
@@ -190,16 +190,16 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
     
     // Se tiver quantidade do frasco, calcular proporcionalmente
     if (qtdFrasco && qtdFrasco > 0 && precoFrasco > 0) {
-      // Fórmula: (preço do frasco / quantidade total do frasco) * quantidade aplicada por animal
+      // FÃ³rmula: (preÃ§o do frasco / quantidade total do frasco) * quantidade aplicada por animal
       return (precoFrasco / qtdFrasco) * quantidade
     }
     
-    // Se não tiver quantidade do frasco, usar preço fixo por animal se disponível
+    // Se nÃ£o tiver quantidade do frasco, usar preÃ§o fixo por animal se disponÃ­vel
     if (selectedMedicamento.porAnimal) {
       return parseFloat(selectedMedicamento.porAnimal) * quantidade
     }
     
-    // Fallback: usar preço do medicamento
+    // Fallback: usar preÃ§o do medicamento
     return precoFrasco
   }
 
@@ -220,10 +220,10 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
     }
 
     try {
-      // Buscar quantidade do frasco do medicamento (se disponível)
+      // Buscar quantidade do frasco do medicamento (se disponÃ­vel)
       const quantidadeFrasco = selectedMedicamento.quantidadeEstoque || null
       
-      // Calcular custo usando a fórmula correta
+      // Calcular custo usando a fÃ³rmula correta
       const custoCalculado = calcularCustoMedicamento(quantidadeFrasco)
       
       // Registrar via API
@@ -265,10 +265,10 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
         onSave(updatedAnimal)
       }
       
-      alert(`✅ Medicamento aplicado com sucesso!\n\n💊 ${selectedMedicamento.nome}\n📊 Quantidade: ${quantidadeAplicada} ${selectedMedicamento.unidade || 'ml'}\n💰 Custo: R$ ${custoCalculado.toFixed(2)}`)
+      alert(`âÅ“â€¦ Medicamento aplicado com sucesso!\n\nðÅ¸â€™Å  ${selectedMedicamento.nome}\nðÅ¸â€œÅ  Quantidade: ${quantidadeAplicada} ${selectedMedicamento.unidade || 'ml'}\nðÅ¸â€™° Custo: R$ ${custoCalculado.toFixed(2)}`)
     } catch (error) {
       console.error('Erro ao adicionar medicamento:', error)
-      alert(`❌ Erro ao aplicar medicamento: ${error.message}`)
+      alert(`â�Å’ Erro ao aplicar medicamento: ${error.message}`)
     }
   }
 
@@ -296,11 +296,11 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
     if (!newCost.valor) camposFaltando.push('Valor');
 
     if (camposFaltando.length > 0) {
-      let mensagem = '❌ Campos obrigatórios não preenchidos:\n\n';
+      let mensagem = 'â�Å’ Campos obrigatÃ³rios nÃ£o preenchidos:\n\n';
       camposFaltando.forEach((campo, index) => {
         mensagem += `${index + 1}. ${campo}\n`;
       });
-      mensagem += '\nPor favor, preencha todos os campos obrigatórios antes de adicionar o custo.';
+      mensagem += '\nPor favor, preencha todos os campos obrigatÃ³rios antes de adicionar o custo.';
       alert(mensagem);
       return;
     }
@@ -326,9 +326,9 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
         onSave({ ...selectedAnimal, custos })
       }
       
-      alert('✅ Custo adicionado com sucesso!')
+      alert('âÅ“â€¦ Custo adicionado com sucesso!')
     } catch (e) {
-      alert('❌ Erro ao adicionar custo: ' + (e.message || e))
+      alert('â�Å’ Erro ao adicionar custo: ' + (e.message || e))
     }
   }
 
@@ -348,7 +348,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
   const handleSaveEditCost = async () => {
     if (!editingCusto) return
     if (!editingCusto.tipo || !editingCusto.valor) {
-      alert('❌ Tipo e Valor são obrigatórios')
+      alert('â�Å’ Tipo e Valor sÃ£o obrigatÃ³rios')
       return
     }
     try {
@@ -375,11 +375,11 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
         onSave({ ...selectedAnimal, custos })
       }
       const msg = data.data?.aplicadosTodos
-        ? `✅ Atualizado! Aplicado a ${data.data.aplicadosTodos.atualizados} lançamento(s) em ${data.data.aplicadosTodos.animais} animal(is).`
-        : '✅ Custo atualizado! As alterações aparecerão no celular ao recarregar.'
+        ? `âÅ“â€¦ Atualizado! Aplicado a ${data.data.aplicadosTodos.atualizados} lanÃ§amento(s) em ${data.data.aplicadosTodos.animais} animal(is).`
+        : 'âÅ“â€¦ Custo atualizado! As alteraÃ§Ãµes aparecerÃ£o no celular ao recarregar.'
       alert(msg)
     } catch (e) {
-      alert('❌ Erro ao atualizar: ' + (e.message || e))
+      alert('â�Å’ Erro ao atualizar: ' + (e.message || e))
     }
   }
 
@@ -397,9 +397,9 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
         const custos = await costManager.getCustosAnimal(selectedAnimal.id)
         onSave({ ...selectedAnimal, custos })
       }
-      alert('✅ Custo excluído!')
+      alert('âÅ“â€¦ Custo excluÃ­do!')
     } catch (e) {
-      alert('❌ Erro ao excluir: ' + (e.message || e))
+      alert('â�Å’ Erro ao excluir: ' + (e.message || e))
     }
   }
 
@@ -409,9 +409,9 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
     if (resultado) {
       loadCustosAnimal(animal.id)
       loadRelatorioGeral()
-      alert(`✅ Protocolo aplicado!\n\n📋 ${resultado.protocolo}\n💰 Custo total: R$ ${resultado.total.toFixed(2)}\n📝 ${resultado.custos.length} medicamentos aplicados`)
+      alert(`âÅ“â€¦ Protocolo aplicado!\n\nðÅ¸â€œâ€¹ ${resultado.protocolo}\nðÅ¸â€™° Custo total: R$ ${resultado.total.toFixed(2)}\nðÅ¸â€œ� ${resultado.custos.length} medicamentos aplicados`)
     } else {
-      alert('ℹ️ Nenhum protocolo aplicável para este animal no momento')
+      alert('ââ€ž¹ï¸� Nenhum protocolo aplicÃ¡vel para este animal no momento')
     }
   }
 
@@ -425,9 +425,9 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
       const total = custosDNA.reduce((sum, c) => sum + c.valor, 0)
       const tipos = custosDNA.map(c => c.subtipo).join(', ')
       
-      alert(`✅ DNA aplicado!\n\n🧬 Tipos: ${tipos}\n💰 Custo total: R$ ${total.toFixed(2)}`)
+      alert(`âÅ“â€¦ DNA aplicado!\n\nðÅ¸§¬ Tipos: ${tipos}\nðÅ¸â€™° Custo total: R$ ${total.toFixed(2)}`)
     } else {
-      alert('ℹ️ Nenhum DNA aplicável para este animal')
+      alert('ââ€ž¹ï¸� Nenhum DNA aplicÃ¡vel para este animal')
     }
   }
 
@@ -443,7 +443,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
   const getStatusCusto = (animal) => {
     const porAnimal = relatorioGeral?.custoPorAnimal?.find(p => p.animalId === animal.id)
     const arr = porAnimal?.custos || (selectedAnimal?.id === animal.id ? custosAnimal : []) || []
-    const temProtocolo = arr.some(c => c.tipo === 'Protocolo Sanitário')
+    const temProtocolo = arr.some(c => c.tipo === 'Protocolo SanitÃ¡rio')
     const temDNA = arr.some(c => c.tipo === 'DNA')
     
     if (temProtocolo && temDNA) return 'completo'
@@ -468,11 +468,11 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
   }
 
   const tiposCusto = [
-    'Protocolo Sanitário',
+    'Protocolo SanitÃ¡rio',
     'DNA',
     'Medicamento',
     'Vacina',
-    'Veterinário',
+    'VeterinÃ¡rio',
     'Manejo',
     'Pesagens',
     'Transporte',
@@ -489,16 +489,16 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
             <CurrencyDollarIcon className="h-8 w-8 mr-3 text-green-600" />
-            Gestão de Custos Individuais
+            GestÃ£o de Custos Individuais
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Controle detalhado de custos por animal com protocolos automáticos
+            Controle detalhado de custos por animal com protocolos automÃ¡ticos
           </p>
         </div>
         <div className="flex flex-wrap gap-2 mt-4 sm:mt-0">
           <button
             onClick={async () => {
-              if (!confirm('Aplicar custos automáticos (RGN, RGD, Brucelose, DNA, Brinco, Botton, Andrológico R$165 machos 15-32m)?')) return
+              if (!confirm('Aplicar custos automÃ¡ticos (RGN, RGD, Brucelose, DNA, Brinco, Botton, AndrolÃ³gico R$165 machos 15-32m)?')) return
               setAplicandoAutomaticos(true)
               try {
                 const r = await fetch('/api/custos/aplicar-automaticos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) })
@@ -506,10 +506,10 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                 if (d.success) {
                   loadRelatorioGeral()
                   if (selectedAnimal) loadCustosAnimal(selectedAnimal.id)
-                  alert(`✅ ${d.message}\n\nRGN: ${d.resultados?.rgn?.aplicados || 0}\nRGD: ${d.resultados?.rgd?.aplicados || 0}\nBrucelose: ${d.resultados?.brucelose?.aplicados || 0}\nDNA VRGEN: ${d.resultados?.dnaVrgen?.aplicados || 0}\nDNA Genômica Receptora: ${d.resultados?.dnaGenomicaReceptora?.aplicados || 0}\nBrinco Amarelo: ${d.resultados?.brincoAmarelo?.aplicados || 0}\nBotton: ${d.resultados?.botton?.aplicados || 0}\nAndrológico: ${d.resultados?.andrologico?.aplicados || 0}`)
-                } else alert('❌ ' + (d.error || 'Erro ao aplicar'))
+                  alert(`âÅ“â€¦ ${d.message}\n\nRGN: ${d.resultados?.rgn?.aplicados || 0}\nRGD: ${d.resultados?.rgd?.aplicados || 0}\nBrucelose: ${d.resultados?.brucelose?.aplicados || 0}\nDNA VRGEN: ${d.resultados?.dnaVrgen?.aplicados || 0}\nDNA GenÃ´mica Receptora: ${d.resultados?.dnaGenomicaReceptora?.aplicados || 0}\nBrinco Amarelo: ${d.resultados?.brincoAmarelo?.aplicados || 0}\nBotton: ${d.resultados?.botton?.aplicados || 0}\nAndrolÃ³gico: ${d.resultados?.andrologico?.aplicados || 0}`)
+                } else alert('â�Å’ ' + (d.error || 'Erro ao aplicar'))
               } catch (e) {
-                alert('❌ Erro: ' + e.message)
+                alert('â�Å’ Erro: ' + e.message)
               } finally {
                 setAplicandoAutomaticos(false)
               }
@@ -517,8 +517,8 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
             disabled={aplicandoAutomaticos}
             className="btn-primary flex items-center"
           >
-            {aplicandoAutomaticos ? <span className="animate-spin mr-2">⏳</span> : null}
-            Aplicar Custos Automáticos
+            {aplicandoAutomaticos ? <span className="animate-spin mr-2">â�³</span> : null}
+            Aplicar Custos AutomÃ¡ticos
           </button>
           <button
             onClick={() => setShowProtocolos(!showProtocolos)}
@@ -542,7 +542,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
               {relatorioGeral?.animaisComCustos || 0}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">Animais com Custos</div>
-            <div className="text-xs text-blue-500 mt-1">👆 Clique para detalhes</div>
+            <div className="text-xs text-blue-500 mt-1">ðÅ¸â€˜â€  Clique para detalhes</div>
           </div>
           <div 
             className="card p-4 text-center cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105"
@@ -553,7 +553,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
               R$ {(Number(relatorioGeral?.totalGeral) || 0).toFixed(2)}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">Custo Total</div>
-            <div className="text-xs text-green-500 mt-1">👆 Clique para detalhes</div>
+            <div className="text-xs text-green-500 mt-1">ðÅ¸â€˜â€  Clique para detalhes</div>
           </div>
           <div 
             className="card p-4 text-center cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105"
@@ -563,8 +563,8 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
             <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
               R$ {(Number(relatorioGeral?.mediaPorAnimal) || 0).toFixed(2)}
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Média por Animal</div>
-            <div className="text-xs text-purple-500 mt-1">👆 Clique para detalhes</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">MÃ©dia por Animal</div>
+            <div className="text-xs text-purple-500 mt-1">ðÅ¸â€˜â€  Clique para detalhes</div>
           </div>
           <div 
             className="card p-4 text-center cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105"
@@ -575,7 +575,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
               {animals.length}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">Total de Animais</div>
-            <div className="text-xs text-orange-500 mt-1">👆 Clique para detalhes</div>
+            <div className="text-xs text-orange-500 mt-1">ðÅ¸â€˜â€  Clique para detalhes</div>
           </div>
         </div>
       )}
@@ -584,7 +584,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
         {/* Lista de Animais */}
         <div className="card p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-            🐄 Animais Cadastrados
+            ðÅ¸�â€ž Animais Cadastrados
           </h3>
           
           <div className="space-y-2 max-h-96 overflow-y-auto">
@@ -610,7 +610,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                         {animal.serie} {animal.rg}
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400">
-                        {animal.sexo === 'M' ? '🐂' : '🐄'} {animal.raca} • {animal.meses} meses
+                        {animal.sexo === 'M' ? 'ðÅ¸�â€š' : 'ðÅ¸�â€ž'} {animal.raca} ââ‚¬¢ {animal.meses} meses
                       </div>
                     </div>
                     <div className="text-right">
@@ -647,7 +647,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
             <>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  📋 {selectedAnimal.serie} {selectedAnimal.rg}
+                  ðÅ¸â€œâ€¹ {selectedAnimal.serie} {selectedAnimal.rg}
                 </h3>
                 <div className="flex items-center gap-2">
                   <button
@@ -657,7 +657,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                     }}
                     className="btn-secondary text-sm"
                   >
-                    💼 Serviços Cadastrados
+                    ðÅ¸â€™¼ ServiÃ§os Cadastrados
                   </button>
                   <button
                     onClick={() => {
@@ -666,7 +666,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                     }}
                     className="btn-secondary text-sm bg-emerald-600 hover:bg-emerald-700 text-white"
                   >
-                    💊 Medicamentos do Estoque
+                    ðÅ¸â€™Å  Medicamentos do Estoque
                   </button>
                   <div className="flex space-x-2">
                     <button
@@ -692,20 +692,20 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                 </div>
               </div>
 
-              {/* Informações do Animal */}
+              {/* InformaÃ§Ãµes do Animal */}
               <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-4">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="font-medium">Sexo:</span> {selectedAnimal.sexo === 'M' ? 'Macho' : 'Fêmea'}
+                    <span className="font-medium">Sexo:</span> {selectedAnimal.sexo === 'M' ? 'Macho' : 'FÃªmea'}
                   </div>
                   <div>
                     <span className="font-medium">Idade:</span> {selectedAnimal.meses} meses
                   </div>
                   <div>
-                    <span className="font-medium">Raça:</span> {selectedAnimal.raca}
+                    <span className="font-medium">RaÃ§a:</span> {selectedAnimal.raca}
                   </div>
                   <div>
-                    <span className="font-medium">FIV:</span> {selectedAnimal.isFiv ? 'Sim' : 'Não'}
+                    <span className="font-medium">FIV:</span> {selectedAnimal.isFiv ? 'Sim' : 'NÃ£o'}
                   </div>
                   <div>
                     <span className="font-medium">Custo total:</span>{' '}
@@ -715,7 +715,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                     <div className="col-span-2">
                       <span className="font-medium">Valor venda:</span>{' '}
                       <span className="font-bold text-blue-600 dark:text-blue-400">R$ {(parseFloat(selectedAnimal.valor_venda || selectedAnimal.valor_real || 0)).toFixed(2)}</span>
-                      {' • '}
+                      {' ââ‚¬¢ '}
                       <span className="font-medium">ROI:</span>{' '}
                       <span className={`font-bold ${((parseFloat(selectedAnimal.valor_venda || selectedAnimal.valor_real || 0) - getCustoTotal(selectedAnimal.id)) / (getCustoTotal(selectedAnimal.id) || 1) * 100) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                         {(((parseFloat(selectedAnimal.valor_venda || selectedAnimal.valor_real || 0) - getCustoTotal(selectedAnimal.id)) / (getCustoTotal(selectedAnimal.id) || 1)) * 100).toFixed(1)}%
@@ -729,7 +729,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h4 className="font-medium text-gray-900 dark:text-white">
-                    💰 Custos Registrados ({custosAnimal.length})
+                    ðÅ¸â€™° Custos Registrados ({custosAnimal.length})
                   </h4>
                   <button
                     onClick={() => setShowAddCost(true)}
@@ -750,11 +750,11 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                             <div className="font-medium text-gray-900 dark:text-white">
                               {custo.tipo}
                               {custo.subtipo && (
-                                <span className="text-gray-600 dark:text-gray-400"> • {custo.subtipo}</span>
+                                <span className="text-gray-600 dark:text-gray-400"> ââ‚¬¢ {custo.subtipo}</span>
                               )}
                             </div>
                             <div className="text-sm text-gray-600 dark:text-gray-400">
-                              {custo.data} • {custo.observacoes}
+                              {custo.data} ââ‚¬¢ {custo.observacoes}
                             </div>
                           </div>
                           <div className="flex items-center gap-1 shrink-0">
@@ -850,7 +850,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                   value={newCost.subtipo}
                   onChange={(e) => setNewCost({...newCost, subtipo: e.target.value})}
                   className="input w-full"
-                  placeholder="Ex: Brinco Amarelo, Botton Eletrônico..."
+                  placeholder="Ex: Brinco Amarelo, Botton EletrÃ´nico..."
                 />
               </div>
 
@@ -870,7 +870,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Observações
+                  ObservaÃ§Ãµes
                 </label>
                 <textarea
                   value={newCost.observacoes}
@@ -916,7 +916,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                       Editar Custo
                     </h3>
                     <p className="text-blue-100 text-sm">
-                      Altere os dados conforme necessário
+                      Altere os dados conforme necessÃ¡rio
                     </p>
                   </div>
                 </div>
@@ -936,7 +936,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                   <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                   </svg>
-                  As alterações serão sincronizadas automaticamente com o aplicativo móvel
+                  As alteraÃ§Ãµes serÃ£o sincronizadas automaticamente com o aplicativo mÃ³vel
                 </p>
               </div>
 
@@ -962,21 +962,21 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                     </datalist>
                   </div>
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    💡 Você pode digitar um novo tipo ou selecionar da lista
+                    ðÅ¸â€™¡ VocÃª pode digitar um novo tipo ou selecionar da lista
                   </p>
                 </div>
 
                 {/* Subtipo */}
                 <div className="md:col-span-2">
                   <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Subtipo / Descrição
+                    Subtipo / DescriÃ§Ã£o
                   </label>
                   <input
                     type="text"
                     value={editingCusto.subtipo}
                     onChange={(e) => setEditingCusto({...editingCusto, subtipo: e.target.value})}
                     className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-all"
-                    placeholder="Ex: Brinco Amarelo, Botton Eletrônico, RGN..."
+                    placeholder="Ex: Brinco Amarelo, Botton EletrÃ´nico, RGN..."
                   />
                 </div>
 
@@ -1013,10 +1013,10 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                   />
                 </div>
 
-                {/* Observações */}
+                {/* ObservaÃ§Ãµes */}
                 <div className="md:col-span-2">
                   <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Observações
+                    ObservaÃ§Ãµes
                   </label>
                   <textarea
                     value={editingCusto.observacoes}
@@ -1041,7 +1041,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                         Aplicar a todos os animais
                       </span>
                       <span className="text-xs text-amber-700 dark:text-amber-300">
-                        Esta alteração será aplicada a todos os animais que possuem este mesmo tipo e subtipo de custo
+                        Esta alteraÃ§Ã£o serÃ¡ aplicada a todos os animais que possuem este mesmo tipo e subtipo de custo
                       </span>
                     </div>
                   </label>
@@ -1055,7 +1055,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                 onClick={handleSaveEditCost}
                 className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
               >
-                💾 Salvar Alterações
+                ðÅ¸â€™¾ Salvar AlteraÃ§Ãµes
               </button>
               <button
                 onClick={() => { setShowEditCost(false); setEditingCusto(null); setApplyToAllCustos(false) }}
@@ -1074,13 +1074,13 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                📋 Protocolos Sanitários por Era
+                ðÅ¸â€œâ€¹ Protocolos SanitÃ¡rios por Era
               </h3>
               <button
                 onClick={() => setShowProtocolos(false)}
                 className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               >
-                ✕
+                âÅ“â€¢
               </button>
             </div>
 
@@ -1088,7 +1088,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
               {/* Protocolos Machos */}
               <div>
                 <h4 className="text-lg font-semibold text-blue-600 dark:text-blue-400 mb-4">
-                  🐂 Protocolos para Machos
+                  ðÅ¸�â€š Protocolos para Machos
                 </h4>
                 <div className="space-y-4">
                   {Object.entries(costManager.protocolos.machos).map(([era, protocolo]) => (
@@ -1111,10 +1111,10 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                 </div>
               </div>
 
-              {/* Protocolos Fêmeas */}
+              {/* Protocolos FÃªmeas */}
               <div>
                 <h4 className="text-lg font-semibold text-pink-600 dark:text-pink-400 mb-4">
-                  🐄 Protocolos para Fêmeas
+                  ðÅ¸�â€ž Protocolos para FÃªmeas
                 </h4>
                 <div className="space-y-4">
                   {Object.entries(costManager.protocolos.femeas).map(([era, protocolo]) => (
@@ -1141,7 +1141,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
             {/* Regras DNA */}
             <div className="mt-6 bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
               <h4 className="text-lg font-semibold text-purple-800 dark:text-purple-200 mb-3">
-                🧬 Regras para DNA
+                ðÅ¸§¬ Regras para DNA
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
@@ -1149,17 +1149,17 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                     DNA Virgem (R$ 50,00)
                   </h5>
                   <p className="text-purple-600 dark:text-purple-400">
-                    ✅ Aplicado SOMENTE para animais nascidos de FIV<br/>
-                    📝 Finalidade: Confirmação de paternidade
+                    âÅ“â€¦ Aplicado SOMENTE para animais nascidos de FIV<br/>
+                    ðÅ¸â€œ� Finalidade: ConfirmaÃ§Ã£o de paternidade
                   </p>
                 </div>
                 <div>
                   <h5 className="font-medium text-purple-700 dark:text-purple-300 mb-2">
-                    DNA Genômica (R$ 80,00)
+                    DNA GenÃ´mica (R$ 80,00)
                   </h5>
                   <p className="text-purple-600 dark:text-purple-400">
-                    ✅ Aplicado para TODOS os bezerros de 0 a 7 meses<br/>
-                    📝 Finalidade: Análise genética completa
+                    âÅ“â€¦ Aplicado para TODOS os bezerros de 0 a 7 meses<br/>
+                    ðÅ¸â€œ� Finalidade: AnÃ¡lise genÃ©tica completa
                   </p>
                 </div>
               </div>
@@ -1168,33 +1168,33 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
         </div>
       )}
 
-      {/* Modal de Serviços Cadastrados */}
+      {/* Modal de ServiÃ§os Cadastrados */}
       {showServicosCadastrados && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                  💼 Serviços Cadastrados
+                  ðÅ¸â€™¼ ServiÃ§os Cadastrados
                 </h2>
                 <button
                   onClick={() => setShowServicosCadastrados(false)}
                   className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                 >
-                  ✕
+                  âÅ“â€¢
                 </button>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                Selecione um serviço para aplicar ao animal {selectedAnimal?.serie} {selectedAnimal?.rg}
+                Selecione um serviÃ§o para aplicar ao animal {selectedAnimal?.serie} {selectedAnimal?.rg}
               </p>
             </div>
 
             <div className="p-6">
               {servicosCadastrados.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="text-5xl mb-4">💼</div>
+                  <div className="text-5xl mb-4">ðÅ¸â€™¼</div>
                   <p className="text-gray-600 dark:text-gray-400 mb-4">
-                    Nenhum serviço cadastrado ainda
+                    Nenhum serviÃ§o cadastrado ainda
                   </p>
                   <button
                     onClick={() => {
@@ -1203,7 +1203,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                     }}
                     className="btn-primary"
                   >
-                    Cadastrar Serviços
+                    Cadastrar ServiÃ§os
                   </button>
                 </div>
               ) : (
@@ -1217,7 +1217,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                   ).map(([categoria, servicos]) => (
                     <div key={categoria}>
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-                        📋 {categoria}
+                        ðÅ¸â€œâ€¹ {categoria}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {servicos.map(servico => (
@@ -1242,12 +1242,12 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                             <div className="flex gap-2 mt-2">
                               {servico.aplicavel_macho && (
                                 <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                                  🐂 Machos
+                                  ðÅ¸�â€š Machos
                                 </span>
                               )}
                               {servico.aplicavel_femea && (
                                 <span className="text-xs px-2 py-1 rounded-full bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200">
-                                  🐄 Fêmeas
+                                  ðÅ¸�â€ž FÃªmeas
                                 </span>
                               )}
                             </div>
@@ -1279,7 +1279,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                  💊 Medicamentos do Estoque
+                  ðÅ¸â€™Å  Medicamentos do Estoque
                 </h2>
                 <button
                   onClick={() => {
@@ -1289,7 +1289,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                   }}
                   className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                 >
-                  ✕
+                  âÅ“â€¢
                 </button>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
@@ -1298,7 +1298,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
             </div>
 
             {selectedMedicamento ? (
-              /* Formulário de Aplicação */
+              /* FormulÃ¡rio de AplicaÃ§Ã£o */
               <div className="p-6">
                 <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-4 mb-6">
                   <h3 className="font-semibold text-emerald-900 dark:text-emerald-200 mb-2">
@@ -1316,14 +1316,14 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                       </div>
                     )}
                     <div className="flex justify-between">
-                      <span className="text-emerald-800 dark:text-emerald-300 font-medium">Valor Unitário:</span>
+                      <span className="text-emerald-800 dark:text-emerald-300 font-medium">Valor UnitÃ¡rio:</span>
                       <span className="text-emerald-900 dark:text-emerald-100 font-bold">
                         R$ {parseFloat(selectedMedicamento.preco || 0).toFixed(2)} / {selectedMedicamento.unidade}
                       </span>
                     </div>
                     {selectedMedicamento.quantidade_estoque !== undefined && (
                       <div className="flex justify-between">
-                        <span className="text-emerald-800 dark:text-emerald-300 font-medium">Estoque Disponível:</span>
+                        <span className="text-emerald-800 dark:text-emerald-300 font-medium">Estoque DisponÃ­vel:</span>
                         <span className="text-emerald-900 dark:text-emerald-100">
                           {selectedMedicamento.quantidade_estoque} {selectedMedicamento.unidade}
                         </span>
@@ -1337,7 +1337,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                     }}
                     className="mt-4 text-sm text-emerald-700 dark:text-emerald-300 hover:text-emerald-900 dark:hover:text-emerald-100 underline"
                   >
-                    ← Selecionar outro medicamento
+                    ââ€ � Selecionar outro medicamento
                   </button>
                 </div>
 
@@ -1357,7 +1357,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                     />
                     {selectedMedicamento.quantidade_estoque !== undefined && quantidadeAplicada && (
                       <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                        Estoque disponível: {selectedMedicamento.quantidade_estoque} {selectedMedicamento.unidade}
+                        Estoque disponÃ­vel: {selectedMedicamento.quantidade_estoque} {selectedMedicamento.unidade}
                       </p>
                     )}
                   </div>
@@ -1373,7 +1373,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                         </span>
                       </div>
                       <p className="text-xs text-green-700 dark:text-green-300 mt-2">
-                        {quantidadeAplicada} {selectedMedicamento.unidade} × R$ {parseFloat(selectedMedicamento.preco || 0).toFixed(2)}/{selectedMedicamento.unidade}
+                        {quantidadeAplicada} {selectedMedicamento.unidade} Ãâ€” R$ {parseFloat(selectedMedicamento.preco || 0).toFixed(2)}/{selectedMedicamento.unidade}
                       </p>
                     </div>
                   )}
@@ -1385,7 +1385,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                     className="btn-primary flex-1 bg-emerald-600 hover:bg-emerald-700"
                     disabled={!quantidadeAplicada || parseFloat(quantidadeAplicada) <= 0}
                   >
-                    ✅ Aplicar Medicamento
+                    âÅ“â€¦ Aplicar Medicamento
                   </button>
                   <button
                     onClick={() => {
@@ -1404,9 +1404,9 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
               <div className="p-6">
                 {medicamentosEstoque.length === 0 ? (
                   <div className="text-center py-12">
-                    <div className="text-5xl mb-4">💊</div>
+                    <div className="text-5xl mb-4">ðÅ¸â€™Å </div>
                     <p className="text-gray-600 dark:text-gray-400 mb-4">
-                      Nenhum medicamento cadastrado com preço no estoque
+                      Nenhum medicamento cadastrado com preÃ§o no estoque
                     </p>
                     <button
                       onClick={() => {
@@ -1430,7 +1430,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                     ).map(([categoria, medicamentos]) => (
                       <div key={categoria}>
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-                          📋 {categoria}
+                          ðÅ¸â€œâ€¹ {categoria}
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           {medicamentos.map(med => (
@@ -1548,26 +1548,26 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
     )
   }
 
-  // Se não for modal, retornar conteúdo diretamente
+  // Se nÃ£o for modal, retornar conteÃºdo diretamente
   return content
 
-  // Função para obter o título do modal
+  // FunÃ§Ã£o para obter o tÃ­tulo do modal
   function getCardDetailsTitle(cardType) {
     switch (cardType) {
       case 'animais-com-custos':
-        return '🐄 Animais com Custos Registrados'
+        return 'ðÅ¸�â€ž Animais com Custos Registrados'
       case 'custo-total':
-        return '💰 Detalhamento do Custo Total'
+        return 'ðÅ¸â€™° Detalhamento do Custo Total'
       case 'media-por-animal':
-        return '📊 Análise da Média por Animal'
+        return 'ðÅ¸â€œÅ  AnÃ¡lise da MÃ©dia por Animal'
       case 'total-animais':
-        return '📈 Resumo Geral dos Animais'
+        return 'ðÅ¸â€œË† Resumo Geral dos Animais'
       default:
         return 'Detalhes'
     }
   }
 
-  // Função para obter o conteúdo do modal
+  // FunÃ§Ã£o para obter o conteÃºdo do modal
   function getCardDetailsContent(cardType) {
     switch (cardType) {
       case 'animais-com-custos':
@@ -1580,7 +1580,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
           <div className="space-y-4">
             <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
               <p className="text-sm text-blue-800 dark:text-blue-200">
-                <strong>Definição:</strong> Animais que possuem pelo menos um custo registrado no sistema.
+                <strong>DefiniÃ§Ã£o:</strong> Animais que possuem pelo menos um custo registrado no sistema.
               </p>
             </div>
             
@@ -1597,7 +1597,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                             {animal.serie} {animal.rg}
                           </div>
                           <div className="text-sm text-gray-600 dark:text-gray-400">
-                            {animal.raca} • {animal.sexo}
+                            {animal.raca} ââ‚¬¢ {animal.sexo}
                           </div>
                         </div>
                         <div className="text-right">
@@ -1635,12 +1635,12 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
           <div className="space-y-4">
             <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
               <p className="text-sm text-green-800 dark:text-green-200">
-                <strong>Definição:</strong> Soma de todos os custos registrados para todos os animais.
+                <strong>DefiniÃ§Ã£o:</strong> Soma de todos os custos registrados para todos os animais.
               </p>
             </div>
             
             <div className="space-y-3">
-              <h4 className="font-medium text-gray-900 dark:text-white">Distribuição por Tipo de Custo:</h4>
+              <h4 className="font-medium text-gray-900 dark:text-white">DistribuiÃ§Ã£o por Tipo de Custo:</h4>
               {Object.entries(custosPorTipo).map(([tipo, valor]) => (
                 <div key={tipo} className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
                   <div className="flex justify-between items-center">
@@ -1674,7 +1674,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
           <div className="space-y-4">
             <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
               <p className="text-sm text-purple-800 dark:text-purple-200">
-                <strong>Definição:</strong> Valor médio de custos por animal (apenas animais com custos registrados).
+                <strong>DefiniÃ§Ã£o:</strong> Valor mÃ©dio de custos por animal (apenas animais com custos registrados).
               </p>
             </div>
             
@@ -1690,7 +1690,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                   <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                     R$ {((Number(relatorioGeral?.mediaPorAnimal) || 0).toFixed(2) || '0,00')}
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">Média por Animal</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">MÃ©dia por Animal</div>
                 </div>
               </div>
               
@@ -1729,7 +1729,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
         }, {})
 
         const animaisPorRaca = animals.reduce((acc, animal) => {
-          const raca = animal.raca || 'Não informado'
+          const raca = animal.raca || 'NÃ£o informado'
           acc[raca] = (acc[raca] || 0) + 1
           return acc
         }, {})
@@ -1738,13 +1738,13 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
           <div className="space-y-4">
             <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg">
               <p className="text-sm text-orange-800 dark:text-orange-200">
-                <strong>Definição:</strong> Total de animais cadastrados no sistema.
+                <strong>DefiniÃ§Ã£o:</strong> Total de animais cadastrados no sistema.
               </p>
             </div>
             
             <div className="space-y-4">
               <div>
-                <h4 className="font-medium text-gray-900 dark:text-white mb-2">Distribuição por Situação:</h4>
+                <h4 className="font-medium text-gray-900 dark:text-white mb-2">DistribuiÃ§Ã£o por SituaÃ§Ã£o:</h4>
                 <div className="space-y-2">
                   {Object.entries(animaisPorSituacao).map(([situacao, count]) => (
                     <div key={situacao} className="flex justify-between items-center p-2 border border-gray-200 dark:border-gray-700 rounded">
@@ -1756,7 +1756,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
               </div>
 
               <div>
-                <h4 className="font-medium text-gray-900 dark:text-white mb-2">Distribuição por Sexo:</h4>
+                <h4 className="font-medium text-gray-900 dark:text-white mb-2">DistribuiÃ§Ã£o por Sexo:</h4>
                 <div className="space-y-2">
                   {Object.entries(animaisPorSexo).map(([sexo, count]) => (
                     <div key={sexo} className="flex justify-between items-center p-2 border border-gray-200 dark:border-gray-700 rounded">
@@ -1768,7 +1768,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
               </div>
 
               <div>
-                <h4 className="font-medium text-gray-900 dark:text-white mb-2">Distribuição por Raça:</h4>
+                <h4 className="font-medium text-gray-900 dark:text-white mb-2">DistribuiÃ§Ã£o por RaÃ§a:</h4>
                 <div className="space-y-2">
                   {Object.entries(animaisPorRaca).map(([raca, count]) => (
                     <div key={raca} className="flex justify-between items-center p-2 border border-gray-200 dark:border-gray-700 rounded">
@@ -1783,7 +1783,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
         )
 
       default:
-        return <div>Detalhes não disponíveis</div>
+        return <div>Detalhes nÃ£o disponÃ­veis</div>
     }
   }
 }

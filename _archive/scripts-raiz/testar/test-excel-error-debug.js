@@ -1,7 +1,7 @@
 const fetch = require('node-fetch')
 
 async function testExcelErrorDebug() {
-  console.log('🔍 Testando cenários que podem causar erro no Excel...\n')
+  console.log('�Ÿ”� Testando cenários que podem causar erro no Excel...\n')
   
   const testCases = [
     {
@@ -51,8 +51,8 @@ async function testExcelErrorDebug() {
   ]
 
   for (const testCase of testCases) {
-    console.log(`\n🧪 ${testCase.name}`)
-    console.log('📋 Dados:', JSON.stringify(testCase.data, null, 2))
+    console.log(`\n�Ÿ�� ${testCase.name}`)
+    console.log('�Ÿ“‹ Dados:', JSON.stringify(testCase.data, null, 2))
     
     try {
       const response = await fetch('http://localhost:3020/api/reports/download', {
@@ -61,32 +61,32 @@ async function testExcelErrorDebug() {
         body: JSON.stringify(testCase.data)
       })
 
-      console.log(`📡 Status: ${response.status}`)
-      console.log(`📋 Content-Type: ${response.headers.get('content-type')}`)
+      console.log(`�Ÿ“� Status: ${response.status}`)
+      console.log(`�Ÿ“‹ Content-Type: ${response.headers.get('content-type')}`)
 
       if (!response.ok) {
         const errorText = await response.text()
-        console.error(`❌ Erro: ${errorText}`)
+        console.error(`�Œ Erro: ${errorText}`)
         continue
       }
 
       const buffer = await response.buffer()
-      console.log(`📊 Tamanho: ${buffer.length} bytes`)
+      console.log(`�Ÿ“Š Tamanho: ${buffer.length} bytes`)
 
       // Verificar se é um arquivo Excel válido
       if (buffer.length > 0 && buffer[0] === 0x50 && buffer[1] === 0x4B) {
-        console.log('✅ Arquivo Excel válido')
+        console.log('�œ… Arquivo Excel válido')
       } else {
-        console.log('❌ Arquivo inválido')
-        console.log('🔍 Primeiros bytes:', Array.from(buffer.slice(0, 10)).map(b => `0x${b.toString(16).padStart(2, '0')}`).join(' '))
+        console.log('�Œ Arquivo inválido')
+        console.log('�Ÿ”� Primeiros bytes:', Array.from(buffer.slice(0, 10)).map(b => `0x${b.toString(16).padStart(2, '0')}`).join(' '))
       }
 
     } catch (error) {
-      console.error(`❌ Erro na requisição: ${error.message}`)
+      console.error(`�Œ Erro na requisição: ${error.message}`)
     }
   }
 
-  console.log('\n🏁 Teste de debug concluído')
+  console.log('\n�Ÿ�� Teste de debug concluído')
 }
 
 testExcelErrorDebug()

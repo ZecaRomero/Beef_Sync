@@ -7,7 +7,7 @@ export default async function handler(req, res) {
       const { animal_id } = req.query
       const params = animal_id ? [parseInt(animal_id, 10)] : []
       const whereClause = animal_id ? 'WHERE i.animal_id = $1' : ''
-      // Listar inseminações (todas ou por animal_id)
+      // Listar inseminaÃ§Ãµes (todas ou por animal_id)
       try {
         const result = await query(`
           SELECT 
@@ -24,14 +24,14 @@ export default async function handler(req, res) {
           ORDER BY i.data_ia DESC, i.created_at DESC
         `, params);
 
-        // Enriquecer: usar nome do sêmen quando touro_nome parece ser só série (ex: FGPA, CJCJ)
+        // Enriquecer: usar nome do sÃªmen quando touro_nome parece ser sÃ³ sÃ©rie (ex: FGPA, CJCJ)
         const isPiqueteOuSerie = (v) => {
           if (!v || typeof v !== 'string') return false
           const t = v.trim()
           return /^PIQUETE\s*\d*$/i.test(t) || /^PIQ\s*\d*$/i.test(t) || /^[A-Z]{2,6}$/i.test(t)
         }
 
-        // Enriquecer com serie_touro, rg_touro e corrigir touro_nome quando for só série
+        // Enriquecer com serie_touro, rg_touro e corrigir touro_nome quando for sÃ³ sÃ©rie
         const rows = result.rows.map(row => {
           let serieTouro = row.serie_touro
           let rgTouro = row.rg_touro
@@ -72,7 +72,7 @@ export default async function handler(req, res) {
           count: rows.length
         });
       } catch (queryError) {
-        console.error('Erro na query de inseminações:', queryError);
+        console.error('Erro na query de inseminaÃ§Ãµes:', queryError);
         // Tentar sem o JOIN se der erro
         const result = await query(`
           SELECT * FROM inseminacoes 
@@ -107,7 +107,7 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
-      // Criar nova inseminação
+      // Criar nova inseminaÃ§Ã£o
       const body = req.body || {};
       const modoAtualizar = body.modo === 'atualizar' || body.modoAtualizar === true;
       const animalId = body.animalId ?? body.animal_id;
@@ -125,15 +125,15 @@ export default async function handler(req, res) {
       const observacoes = body.observacoes ?? null;
       const custoDose = body.custoDose ?? body.custo_dose ?? null;
 
-      // Validar dados obrigatórios
+      // Validar dados obrigatÃ³rios
       if (!animalId || !dataIA) {
         return res.status(400).json({ 
-          error: 'Dados obrigatórios não fornecidos',
+          error: 'Dados obrigatÃ³rios nÃ£o fornecidos',
           required: ['animalId', 'dataIA']
         });
       }
 
-      // Garantir data_ia em formato YYYY-MM-DD (converter Excel serial se necessário)
+      // Garantir data_ia em formato YYYY-MM-DD (converter Excel serial se necessÃ¡rio)
       let dataIAFinal = dataIA
       if (typeof dataIA === 'number' || (typeof dataIA === 'string' && /^\d+\.?\d*$/.test(String(dataIA).trim()))) {
         const num = parseFloat(dataIA)
@@ -146,12 +146,12 @@ export default async function handler(req, res) {
         dataIAFinal = dataIA.split('T')[0]
       }
 
-      // Garantir colunas existem (migração automática)
+      // Garantir colunas existem (migraÃ§Ã£o automÃ¡tica)
       await query('ALTER TABLE inseminacoes ADD COLUMN IF NOT EXISTS valida BOOLEAN DEFAULT true').catch(() => {})
       await query('ALTER TABLE inseminacoes ADD COLUMN IF NOT EXISTS serie_touro VARCHAR(50)').catch(() => {})
       await query('ALTER TABLE inseminacoes ADD COLUMN IF NOT EXISTS semen_id INTEGER').catch(() => {})
 
-      // Modo Atualizar: se já existe IA com animal_id + data_ia, atualizar em vez de inserir
+      // Modo Atualizar: se jÃ¡ existe IA com animal_id + data_ia, atualizar em vez de inserir
       if (modoAtualizar) {
         const dataFormatada = dataIAFinal;
         const existente = await query(
@@ -208,7 +208,7 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'PUT') {
-      // Atualizar inseminação
+      // Atualizar inseminaÃ§Ã£o
       const { id } = req.query;
       const {
         numeroIA,
@@ -224,7 +224,7 @@ export default async function handler(req, res) {
       } = req.body;
 
       if (!id) {
-        return res.status(400).json({ error: 'ID não fornecido' });
+        return res.status(400).json({ error: 'ID nÃ£o fornecido' });
       }
 
       const result = await query(`
@@ -257,7 +257,7 @@ export default async function handler(req, res) {
       ]);
 
       if (result.rows.length === 0) {
-        return res.status(404).json({ error: 'Inseminação não encontrada' });
+        return res.status(404).json({ error: 'InseminaÃ§Ã£o nÃ£o encontrada' });
       }
 
       const updatedInsem = result.rows[0]
@@ -271,7 +271,7 @@ export default async function handler(req, res) {
     if (req.method === 'DELETE') {
       const { id, todos } = req.query;
 
-      // Limpar todas as inseminações
+      // Limpar todas as inseminaÃ§Ãµes
       if (todos === 'true' || todos === '1') {
         // Verificar senha de desenvolvedor
         const senha = req.headers['x-dev-password'] || req.body?.senha
@@ -279,7 +279,7 @@ export default async function handler(req, res) {
         if (senha !== 'bfzk26') {
           return res.status(403).json({ 
             success: false,
-            error: '🔒 Acesso negado. Senha de desenvolvedor incorreta.' 
+            error: 'ðÅ¸â€�â€™ Acesso negado. Senha de desenvolvedor incorreta.' 
           })
         }
         
@@ -290,14 +290,14 @@ export default async function handler(req, res) {
         
         return res.status(200).json({
           success: true,
-          message: `${count} inseminação(ões) removida(s)`,
+          message: `${count} inseminaÃ§Ã£o(Ãµes) removida(s)`,
           count
         });
       }
 
-      // Deletar inseminação por ID
+      // Deletar inseminaÃ§Ã£o por ID
       if (!id) {
-        return res.status(400).json({ error: 'ID não fornecido. Use ?todos=true para limpar todas.' });
+        return res.status(400).json({ error: 'ID nÃ£o fornecido. Use ?todos=true para limpar todas.' });
       }
 
       const existing = await query('SELECT animal_id FROM inseminacoes WHERE id = $1', [id])
@@ -311,14 +311,14 @@ export default async function handler(req, res) {
 
       return res.status(200).json({
         success: true,
-        message: 'Inseminação deletada'
+        message: 'InseminaÃ§Ã£o deletada'
       });
     }
 
-    return res.status(405).json({ error: 'Método não permitido' });
+    return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' });
 
   } catch (error) {
-    console.error('Erro na API de inseminações:', error);
+    console.error('Erro na API de inseminaÃ§Ãµes:', error);
     return res.status(500).json({ 
       error: 'Erro interno do servidor',
       details: error.message 

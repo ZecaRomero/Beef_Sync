@@ -13,7 +13,7 @@ async function checkMedicamentosTable() {
   const pool = new Pool(dbConfig)
   
   try {
-    console.log('🔍 Verificando estrutura da tabela medicamentos...\n')
+    console.log('�Ÿ”� Verificando estrutura da tabela medicamentos...\n')
     
     // Verificar se a tabela existe
     const tableExists = await pool.query(`
@@ -24,8 +24,8 @@ async function checkMedicamentosTable() {
     `)
     
     if (!tableExists.rows[0].exists) {
-      console.log('❌ Tabela medicamentos não existe!')
-      console.log('📝 Criando tabela...\n')
+      console.log('�Œ Tabela medicamentos não existe!')
+      console.log('�Ÿ“� Criando tabela...\n')
       
       await pool.query(`
         CREATE TABLE medicamentos (
@@ -40,9 +40,9 @@ async function checkMedicamentosTable() {
         )
       `)
       
-      console.log('✅ Tabela criada com sucesso!')
+      console.log('�œ… Tabela criada com sucesso!')
     } else {
-      console.log('✅ Tabela medicamentos existe!\n')
+      console.log('�œ… Tabela medicamentos existe!\n')
       
       // Mostrar estrutura atual
       const columns = await pool.query(`
@@ -57,7 +57,7 @@ async function checkMedicamentosTable() {
         ORDER BY ordinal_position
       `)
       
-      console.log('📊 Estrutura atual da tabela:')
+      console.log('�Ÿ“Š Estrutura atual da tabela:')
       columns.rows.forEach(col => {
         const length = col.character_maximum_length ? `(${col.character_maximum_length})` : ''
         const nullable = col.is_nullable === 'YES' ? 'NULL' : 'NOT NULL'
@@ -87,20 +87,20 @@ async function checkMedicamentosTable() {
       const missingColumns = requiredColumns.filter(col => !existingColumns.includes(col))
       
       if (missingColumns.length > 0) {
-        console.log('\n⚠️  Colunas faltando:')
+        console.log('\n�š�️  Colunas faltando:')
         missingColumns.forEach(col => console.log(`  - ${col}`))
       } else {
-        console.log('\n✅ Todas as colunas necessárias existem!')
+        console.log('\n�œ… Todas as colunas necessárias existem!')
       }
     }
     
     // Contar registros
     const count = await pool.query('SELECT COUNT(*) FROM medicamentos')
-    console.log(`\n📦 Total de registros: ${count.rows[0].count}`)
+    console.log(`\n�Ÿ“� Total de registros: ${count.rows[0].count}`)
     
     await pool.end()
   } catch (error) {
-    console.error('❌ Erro:', error.message)
+    console.error('�Œ Erro:', error.message)
     await pool.end()
     process.exit(1)
   }

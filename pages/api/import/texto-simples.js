@@ -1,6 +1,6 @@
 import { query } from '../../../lib/database';
 
-// Função SIMPLES para converter data
+// FunÃ§Ã£o SIMPLES para converter data
 function converterDataSimples(texto) {
   if (!texto) return null;
   
@@ -11,7 +11,7 @@ function converterDataSimples(texto) {
   if (match) {
     let [, dia, mes, ano] = match;
     
-    // Converter ano de 2 para 4 dígitos
+    // Converter ano de 2 para 4 dÃ­gitos
     if (ano.length === 2) {
       const anoNum = parseInt(ano);
       ano = anoNum >= 50 ? `19${ano}` : `20${ano}`;
@@ -25,21 +25,21 @@ function converterDataSimples(texto) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Método não permitido' });
+    return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' });
   }
 
   const { texto, modo } = req.body;
 
   if (!texto) {
-    return res.status(400).json({ error: 'Texto não fornecido' });
+    return res.status(400).json({ error: 'Texto nÃ£o fornecido' });
   }
 
   try {
     const linhas = texto.split('\n').filter(l => l.trim());
     
-    // Remover cabeçalho se tiver
+    // Remover cabeÃ§alho se tiver
     const primeiraLinha = linhas[0].toUpperCase();
-    const temCabecalho = primeiraLinha.includes('SÉRIE') || primeiraLinha.includes('SERIE') || primeiraLinha.includes('LOCAL') || primeiraLinha.includes('ACASALAMENTO') || primeiraLinha.includes('TOURO');
+    const temCabecalho = primeiraLinha.includes('SÃâ€°RIE') || primeiraLinha.includes('SERIE') || primeiraLinha.includes('LOCAL') || primeiraLinha.includes('ACASALAMENTO') || primeiraLinha.includes('TOURO');
     
     let mapaColunas = null;
     let dadosLinhas = linhas;
@@ -47,18 +47,18 @@ export default async function handler(req, res) {
     if (temCabecalho) {
       dadosLinhas = linhas.slice(1);
       
-      // Tentar mapear colunas pelo cabeçalho
+      // Tentar mapear colunas pelo cabeÃ§alho
       let cols = linhas[0].split('\t').map(c => c.trim());
       let separador = '\t';
       
-      // Se não tem tabs suficientes, tentar espaços duplos
+      // Se nÃ£o tem tabs suficientes, tentar espaÃ§os duplos
       if (cols.length <= 1) {
         cols = linhas[0].split(/\s{2,}/).map(c => c.trim());
         separador = 'spaces';
       }
       
       // Filtrar apenas para verificar se temos colunas suficientes para mapear, 
-      // mas MANTER os índices originais para o mapeamento
+      // mas MANTER os Ã­ndices originais para o mapeamento
       const colsNaoVazias = cols.filter(c => c);
       
       if (colsNaoVazias.length >= 2) {
@@ -66,7 +66,7 @@ export default async function handler(req, res) {
         cols.forEach((col, idx) => {
           if (!col) return;
           const c = col.toUpperCase();
-          if (c.includes('SÉRIE') || c.includes('SERIE')) mapaColunas.serie = idx;
+          if (c.includes('SÃâ€°RIE') || c.includes('SERIE')) mapaColunas.serie = idx;
           else if (c === 'RG') mapaColunas.rg = idx;
           else if (c.includes('LOCAL') || c.includes('PIQUETE')) mapaColunas.local = idx;
           else if (c.includes('TOURO') || c.includes('ACASALAMENTO') || c.includes('REPRODUTOR')) mapaColunas.touro = idx;
@@ -74,17 +74,17 @@ export default async function handler(req, res) {
           else if (c.includes('DATA DG') || c.includes('DIAG') || c.includes('PREVISAO')) mapaColunas.dataDG = idx;
           else if (c.includes('RESULT')) mapaColunas.resultado = idx;
         });
-        console.log('🗺️ Mapa de colunas detectado:', mapaColunas);
+        console.log('ðÅ¸â€”ºï¸� Mapa de colunas detectado:', mapaColunas);
       }
     } else {
-       // Se não tem cabeçalho explícito, mantém todas as linhas
+       // Se nÃ£o tem cabeÃ§alho explÃ­cito, mantÃ©m todas as linhas
        dadosLinhas = linhas;
     }
 
     const dadosProcessados = [];
     const errosValidacao = [];
 
-    console.log(`\n📊 Processando ${dadosLinhas.length} linhas...\n`);
+    console.log(`\nðÅ¸â€œÅ  Processando ${dadosLinhas.length} linhas...\n`);
 
     for (let i = 0; i < dadosLinhas.length; i++) {
       const linha = dadosLinhas[i].trim();
@@ -99,16 +99,16 @@ export default async function handler(req, res) {
         // Se temos mapa com TAB, usar split TAB preservando vazios
         colunas = linha.split('\t').map(c => c.trim());
         
-        // Se a linha não tem tabs suficientes (ex: colou com espaços), tentar fallback para espaços
+        // Se a linha nÃ£o tem tabs suficientes (ex: colou com espaÃ§os), tentar fallback para espaÃ§os
         // Mas APENAS se o split por tabs resultou em poucas colunas
         if (colunas.length <= 1) {
           const colsEspacos = linha.split(/\s{2,}/).map(c => c.trim());
           if (colsEspacos.length > colunas.length) {
-            console.log(`  ⚠️ Linha ${numeroLinha}: Tabs não encontrados, usando espaços.`);
+            console.log(`  âÅ¡ ï¸� Linha ${numeroLinha}: Tabs nÃ£o encontrados, usando espaÃ§os.`);
             colunas = colsEspacos;
             usouFallbackEspacos = true;
-            // Nota: índices podem não bater perfeitamente se houver colunas vazias, 
-            // mas é melhor que falhar totalmente.
+            // Nota: Ã­ndices podem nÃ£o bater perfeitamente se houver colunas vazias, 
+            // mas Ã© melhor que falhar totalmente.
           }
         }
       } else if (mapaColunas && mapaColunas.separador === 'spaces') {
@@ -121,48 +121,48 @@ export default async function handler(req, res) {
         }
       }
       
-      // Método 3: Se ainda tem poucas colunas, usar regex para encontrar padrões
+      // MÃ©todo 3: Se ainda tem poucas colunas, usar regex para encontrar padrÃµes
       if (colunas.length < 5) {
-        // Padrão: SÉRIE RG LOCAL LOCAL TOURO... SÉRIE RG DATA DATA RESULT
-        // Procurar por: palavra, número, palavra+número, palavra+número, texto longo, palavra, número, data, data, letra
+        // PadrÃ£o: SÃâ€°RIE RG LOCAL LOCAL TOURO... SÃâ€°RIE RG DATA DATA RESULT
+        // Procurar por: palavra, nÃºmero, palavra+nÃºmero, palavra+nÃºmero, texto longo, palavra, nÃºmero, data, data, letra
         const regex = /(\S+)\s+(\d+)\s+([\w\s]+?)\s+([\w\s]+?)\s+([\w\s]+?)\s+(\w+)\s+(\d+)\s+([\d\/]+)\s+([\d\/]+)\s+(\w)/;
         const match = linha.match(regex);
         
         if (match) {
           colunas = match.slice(1); // Pegar grupos capturados
-          console.log('  → Usando regex, encontrou:', colunas.length, 'colunas');
+          console.log('  ââ€ â€™ Usando regex, encontrou:', colunas.length, 'colunas');
         } else {
-          // Último recurso: separar por espaço simples e tentar agrupar
+          // ÃÅ¡ltimo recurso: separar por espaÃ§o simples e tentar agrupar
           const palavras = linha.split(/\s+/).filter(p => p);
-          console.log('  → Palavras encontradas:', palavras);
+          console.log('  ââ€ â€™ Palavras encontradas:', palavras);
           
-          // Tentar identificar as colunas por padrão
+          // Tentar identificar as colunas por padrÃ£o
           if (palavras.length >= 10) {
-            // Assumir: [0]=SÉRIE [1]=RG [2-3]=LOCAL [4-6]=TOURO [7]=SÉRIE(pai) [8]=RG(pai) [9]=DATA_IA [10]=DATA_DG [11]=Result
+            // Assumir: [0]=SÃâ€°RIE [1]=RG [2-3]=LOCAL [4-6]=TOURO [7]=SÃâ€°RIE(pai) [8]=RG(pai) [9]=DATA_IA [10]=DATA_DG [11]=Result
             colunas = [
-              palavras[0],                    // SÉRIE
+              palavras[0],                    // SÃâ€°RIE
               palavras[1],                    // RG
               palavras[2],                    // LOCAL (parte 1)
               palavras[2] + ' ' + palavras[3], // LOCAL completo
-              palavras.slice(4, palavras.length - 5).join(' '), // TOURO (tudo entre LOCAL e SÉRIE(pai))
-              palavras[palavras.length - 5],  // SÉRIE(pai)
+              palavras.slice(4, palavras.length - 5).join(' '), // TOURO (tudo entre LOCAL e SÃâ€°RIE(pai))
+              palavras[palavras.length - 5],  // SÃâ€°RIE(pai)
               palavras[palavras.length - 4],  // RG(pai)
               palavras[palavras.length - 3],  // DATA IA
               palavras[palavras.length - 2],  // DATA DG
               palavras[palavras.length - 1]   // Result
             ];
-            console.log('  → Reorganizado em colunas:', colunas);
+            console.log('  ââ€ â€™ Reorganizado em colunas:', colunas);
           }
         }
       }
 
       console.log(`Linha ${numeroLinha}: ${colunas.length} colunas:`, colunas);
 
-      // Mínimo: SÉRIE, RG
+      // MÃ­nimo: SÃâ€°RIE, RG
       if (colunas.length < 2) {
         errosValidacao.push({
           linha: numeroLinha,
-          erro: `Apenas ${colunas.length} colunas encontradas. Verifique se os dados estão separados por TAB ou espaços.`
+          erro: `Apenas ${colunas.length} colunas encontradas. Verifique se os dados estÃ£o separados por TAB ou espaÃ§os.`
         });
         continue;
       }
@@ -176,7 +176,7 @@ export default async function handler(req, res) {
       let resultado = '';
 
       if (mapaColunas) {
-        // Usar mapeamento do cabeçalho
+        // Usar mapeamento do cabeÃ§alho
         serie = colunas[mapaColunas.serie] || '';
         rg = colunas[mapaColunas.rg] || '';
         if (mapaColunas.local !== undefined) local = colunas[mapaColunas.local] || '';
@@ -185,35 +185,35 @@ export default async function handler(req, res) {
         if (mapaColunas.dataDG !== undefined) dataDG = colunas[mapaColunas.dataDG];
         if (mapaColunas.resultado !== undefined) resultado = colunas[mapaColunas.resultado];
 
-        // Validação extra: Se touroIA parece ser uma data (erro de deslocamento), limpar
+        // ValidaÃ§Ã£o extra: Se touroIA parece ser uma data (erro de deslocamento), limpar
         if (touroIA && (touroIA.includes('/') || /^\d{1,2}\/\d{1,2}/.test(touroIA))) {
-             console.log(`  ⚠️ Touro inválido detectado (parece data): "${touroIA}". Limpando para reprocessar.`);
+             console.log(`  âÅ¡ ï¸� Touro invÃ¡lido detectado (parece data): "${touroIA}". Limpando para reprocessar.`);
              touroIA = '';
         }
 
-        // Se estamos usando espaços (ou fallback) e não encontramos o touro no índice esperado,
+        // Se estamos usando espaÃ§os (ou fallback) e nÃ£o encontramos o touro no Ã­ndice esperado,
          // tentar procurar em outras colunas (pode ter havido deslocamento por colunas vazias)
          if (!touroIA && (mapaColunas.separador === 'spaces' || usouFallbackEspacos)) {
             
-            // 1. Verificar se o campo 'local' capturou o touro por engano (deslocamento à esquerda)
+            // 1. Verificar se o campo 'local' capturou o touro por engano (deslocamento Ã  esquerda)
             if (local && local.length > 2 && !local.includes('/') && isNaN(local.replace(/\s/g, '')) && /[a-zA-Z]{2,}/.test(local)) {
-               // Heurística: Piquetes geralmente têm "Piquete", "Local" ou são curtos. Touros são nomes.
+               // HeurÃ­stica: Piquetes geralmente tÃªm "Piquete", "Local" ou sÃ£o curtos. Touros sÃ£o nomes.
                if (!/^(PIQUETE|LOCAL|PASTO|RETIRO|MANGUEIRO|CURRAL)/i.test(local)) {
-                   console.log(`  → Touro estava no campo Local (realocando): "${local}"`);
+                   console.log(`  ââ€ â€™ Touro estava no campo Local (realocando): "${local}"`);
                    touroIA = local;
-                   local = ''; // Reset local, será preenchido com padrão depois
+                   local = ''; // Reset local, serÃ¡ preenchido com padrÃ£o depois
                }
             }
 
-            // 2. Se ainda não achou, varrer todas as colunas não utilizadas
+            // 2. Se ainda nÃ£o achou, varrer todas as colunas nÃ£o utilizadas
             if (!touroIA) {
               for (const col of colunas) {
                 if (!col || col === serie || col === rg || col === local || col === dataIA || col === dataDG || col === resultado) continue;
                 
-                // Critérios para ser touro: texto longo, ou "DA/DE/DO", ou hífen, ou não numérico e não data
+                // CritÃ©rios para ser touro: texto longo, ou "DA/DE/DO", ou hÃ­fen, ou nÃ£o numÃ©rico e nÃ£o data
                 // E que tenha pelo menos 3 letras
                 if (col.length > 2 && !col.includes('/') && isNaN(col.replace(/\s/g, '')) && /[a-zA-Z]{2,}/.test(col)) {
-                  console.log(`  → Touro não encontrado no índice, tentando usar: "${col}"`);
+                  console.log(`  ââ€ â€™ Touro nÃ£o encontrado no Ã­ndice, tentando usar: "${col}"`);
                   touroIA = col;
                   break; 
                 }
@@ -221,13 +221,13 @@ export default async function handler(req, res) {
             }
          }
 
-         // Fallback para DATA IA se não encontrada no mapa (deslocamento)
+         // Fallback para DATA IA se nÃ£o encontrada no mapa (deslocamento)
          if (!dataIA) {
              for (const col of colunas) {
                  if (col && (col.includes('/') || /^\d{1,2}\/\d{1,2}/.test(col))) {
-                     // Verificar se já não é dataDG
+                     // Verificar se jÃ¡ nÃ£o Ã© dataDG
                      if (col !== dataDG) {
-                         console.log(`  → Data IA recuperada de outra coluna: "${col}"`);
+                         console.log(`  ââ€ â€™ Data IA recuperada de outra coluna: "${col}"`);
                          dataIA = col;
                          break;
                      }
@@ -235,23 +235,23 @@ export default async function handler(req, res) {
              }
          }
       } else {
-        // Extração heurística (Fallback)
+        // ExtraÃ§Ã£o heurÃ­stica (Fallback)
         serie = colunas[0] || '';
         rg = colunas[1] || '';
         
         let offsetColunas = 2;
         
-        // Verificar se a coluna 2 é LOCAL ou TOURO
-        // Se for data (tem /), pulamos, pois não há local nem touro antes
+        // Verificar se a coluna 2 Ã© LOCAL ou TOURO
+        // Se for data (tem /), pulamos, pois nÃ£o hÃ¡ local nem touro antes
         if (colunas[2] && colunas[2].includes('/')) {
              offsetColunas = 2;
         } 
-        // Se texto longo ou com " DA " ou " - ", é provável que seja Touro
+        // Se texto longo ou com " DA " ou " - ", Ã© provÃ¡vel que seja Touro
         else if (colunas[2] && (colunas[2].length > 15 || /\s(DA|DE|DO|DOS|DAS)\s/i.test(colunas[2]) || colunas[2].includes(' - '))) {
              touroIA = colunas[2];
              offsetColunas = 3;
         } 
-        // Caso contrário, assumimos que é Local (comportamento padrão antigo)
+        // Caso contrÃ¡rio, assumimos que Ã© Local (comportamento padrÃ£o antigo)
         else if (colunas[2] && isNaN(colunas[2]) && colunas[2].length > 1) {
              local = colunas[2];
              offsetColunas = 3;
@@ -273,20 +273,20 @@ export default async function handler(req, res) {
               dataDG = col;
             }
           }
-          // Se é uma letra única, pode ser resultado
+          // Se Ã© uma letra Ãºnica, pode ser resultado
           else if (col.length === 1 && /[A-Z]/i.test(col)) {
             resultado = col;
           }
-          // Se tem texto e não temos touro ainda, pode ser touro
+          // Se tem texto e nÃ£o temos touro ainda, pode ser touro
           else if (col.length > 2 && !touroIA && !col.includes('/')) {
             touroIA = col;
           }
         }
       }
 
-      // Validações básicas
+      // ValidaÃ§Ãµes bÃ¡sicas
       if (!serie) {
-        errosValidacao.push({ linha: numeroLinha, erro: 'SÉRIE vazia' });
+        errosValidacao.push({ linha: numeroLinha, erro: 'SÃâ€°RIE vazia' });
         continue;
       }
       if (!rg) {
@@ -294,16 +294,16 @@ export default async function handler(req, res) {
         continue;
       }
       
-      // Se local vazio, define padrão
-      if (!local) local = 'Não informado';
+      // Se local vazio, define padrÃ£o
+      if (!local) local = 'NÃ£o informado';
 
       // Converter datas
       const dataIAFormatada = dataIA ? converterDataSimples(dataIA) : null;
       const dataDGFormatada = dataDG ? converterDataSimples(dataDG) : null;
 
-      console.log(`  → Série: ${serie}, RG: ${rg}, Local: ${local}`);
-      console.log(`  → Data IA: ${dataIA} → ${dataIAFormatada}`);
-      console.log(`  → Data DG: ${dataDG} → ${dataDGFormatada}`);
+      console.log(`  ââ€ â€™ SÃ©rie: ${serie}, RG: ${rg}, Local: ${local}`);
+      console.log(`  ââ€ â€™ Data IA: ${dataIA} ââ€ â€™ ${dataIAFormatada}`);
+      console.log(`  ââ€ â€™ Data DG: ${dataDG} ââ€ â€™ ${dataDGFormatada}`);
 
       dadosProcessados.push({
         linha: numeroLinha,
@@ -335,7 +335,7 @@ export default async function handler(req, res) {
       if (errosValidacao.length > 0) {
         return res.status(400).json({
           success: false,
-          error: 'Existem erros de validação',
+          error: 'Existem erros de validaÃ§Ã£o',
           erros: errosValidacao
         });
       }
@@ -369,7 +369,7 @@ export default async function handler(req, res) {
             resultados.piquetesProcessados++;
           }
 
-          // 2. Criar/atualizar animal - SEMPRE FÊMEA
+          // 2. Criar/atualizar animal - SEMPRE FÃÅ MEA
           const animalExiste = await query(
             'SELECT id FROM animais WHERE serie = $1 AND rg = $2',
             [dado.serie, dado.rg]
@@ -383,7 +383,7 @@ export default async function handler(req, res) {
                 serie, rg, tatuagem, nome, sexo, situacao, 
                 piquete_atual, data_entrada_piquete, created_at, updated_at
               ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
-              [dado.serie, dado.rg, dado.tatuagem, dado.tatuagem, 'Fêmea', 'Ativo', dado.local, dataEntrada]
+              [dado.serie, dado.rg, dado.tatuagem, dado.tatuagem, 'FÃªmea', 'Ativo', dado.local, dataEntrada]
             );
             resultados.animaisCriados++;
           } else {
@@ -391,7 +391,7 @@ export default async function handler(req, res) {
               `UPDATE animais 
                SET piquete_atual = $1, data_entrada_piquete = $2, sexo = $3, updated_at = CURRENT_TIMESTAMP
                WHERE serie = $4 AND rg = $5`,
-              [dado.local, dataEntrada, 'Fêmea', dado.serie, dado.rg]
+              [dado.local, dataEntrada, 'FÃªmea', dado.serie, dado.rg]
             );
             resultados.animaisAtualizados++;
           }
@@ -416,7 +416,7 @@ export default async function handler(req, res) {
                 ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
                 [
                   animalId, 1, dado.dataIA, dado.dataDG,
-                  dado.touroIA || 'Não informado', dado.resultado || 'Pendente',
+                  dado.touroIA || 'NÃ£o informado', dado.resultado || 'Pendente',
                   `Importado via texto - Piquete: ${dado.local}`
                 ]
               );
@@ -441,7 +441,7 @@ export default async function handler(req, res) {
       });
     }
 
-    return res.status(400).json({ error: 'Modo inválido' });
+    return res.status(400).json({ error: 'Modo invÃ¡lido' });
 
   } catch (error) {
     console.error('Erro ao processar:', error);

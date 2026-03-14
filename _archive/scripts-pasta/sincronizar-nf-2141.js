@@ -28,13 +28,13 @@ async function sincronizarNF2141() {
     `, [NUMERO_NF])
 
     if (nfResult.rows.length === 0) {
-      console.log('❌ NF 2141 não encontrada no banco!')
+      console.log('�Œ NF 2141 não encontrada no banco!')
       console.log('   Verifique se a NF foi cadastrada em Notas Fiscais > Entrada.')
       return
     }
 
     const nf = nfResult.rows[0]
-    console.log(`✅ NF 2141 encontrada (ID: ${nf.id})`)
+    console.log(`�œ… NF 2141 encontrada (ID: ${nf.id})`)
     console.log(`   Fornecedor: ${nf.fornecedor || 'Não informado'}`)
     console.log(`   Data TE atual: ${nf.data_te || 'Não definida'}`)
     console.log(`   Data chegada: ${nf.data_chegada_animais || nf.data_compra || nf.data || 'Não informada'}\n`)
@@ -46,7 +46,7 @@ async function sincronizarNF2141() {
         SET data_te = $1, eh_receptoras = true, updated_at = NOW()
         WHERE id = $2
       `, [DATA_TE_NF_2141, nf.id])
-      console.log(`📝 NF 2141 atualizada com data_te = 30/10/2025\n`)
+      console.log(`�Ÿ“� NF 2141 atualizada com data_te = 30/10/2025\n`)
     }
 
     const dataChegada = nf.data_chegada_animais || nf.data_compra || nf.data
@@ -96,7 +96,7 @@ async function sincronizarNF2141() {
           ) VALUES ($1, $2, $3, $4, 'realizada', $5)
         `, [numeroTE, animal.id, DATA_TE_NF_2141, fornecedor, `NF de Entrada: ${NUMERO_NF} - Data TE 30/10/2025`])
         teCriadas++
-        console.log(`  ✅ TE criada para ${serie}`)
+        console.log(`  �œ… TE criada para ${serie}`)
       } else {
         teJaExistiam++
       }
@@ -128,17 +128,17 @@ async function sincronizarNF2141() {
     }
 
     console.log('\n=== RESUMO ===')
-    console.log(`✅ TEs criadas: ${teCriadas}`)
-    console.log(`ℹ️ TEs já existiam: ${teJaExistiam}`)
-    console.log(`📅 Animais atualizados (data_chegada, data_compra, fornecedor): ${animaisAtualizados}`)
+    console.log(`�œ… TEs criadas: ${teCriadas}`)
+    console.log(`�„�️ TEs já existiam: ${teJaExistiam}`)
+    console.log(`�Ÿ“… Animais atualizados (data_chegada, data_compra, fornecedor): ${animaisAtualizados}`)
     if (naoEncontrados.length > 0) {
-      console.log(`⚠️ Animais não encontrados: ${naoEncontrados.join(', ')}`)
+      console.log(`�š�️ Animais não encontrados: ${naoEncontrados.join(', ')}`)
     }
-    console.log('\n💡 Recarregue a página do animal (M1815) para ver os dados atualizados.')
+    console.log('\n�Ÿ’� Recarregue a página do animal (M1815) para ver os dados atualizados.')
     console.log('   NF de Origem, Data da TE e Data de Compra devem aparecer corretamente.\n')
 
   } catch (err) {
-    console.error('❌ Erro:', err.message)
+    console.error('�Œ Erro:', err.message)
     throw err
   }
 }

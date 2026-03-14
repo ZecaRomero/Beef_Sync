@@ -15,9 +15,9 @@ import logger from '../../../utils/logger'
 // })
 
 const RECIPIENTS_DATA = {
-  owner: { name: 'Proprietário', email: 'proprietario@fazenda.com', role: 'Dono' },
+  owner: { name: 'ProprietÃ¡rio', email: 'proprietario@fazenda.com', role: 'Dono' },
   manager: { name: 'Gerente Geral', email: 'gerente@fazenda.com', role: 'Gerente' },
-  vet: { name: 'Veterinário', email: 'veterinario@fazenda.com', role: 'Veterinário' },
+  vet: { name: 'VeterinÃ¡rio', email: 'veterinario@fazenda.com', role: 'VeterinÃ¡rio' },
   zootecnista: { name: 'Zootecnista', email: 'zootecnista@fazenda.com', role: 'Zootecnista' },
   financeiro: { name: 'Financeiro', email: 'financeiro@fazenda.com', role: 'Financeiro' }
 }
@@ -29,22 +29,22 @@ async function handler(req, res) {
 
   // Funcionalidade temporariamente desabilitada
   return sendError(res, 'Funcionalidade de envio de email temporariamente desabilitada', 501, {
-    note: 'Use o sistema de WhatsApp no gerador de relatórios'
+    note: 'Use o sistema de WhatsApp no gerador de relatÃ³rios'
   })
 
   /* try {
     const { reports, recipients, period, sections } = req.body
 
     if (!reports || !Array.isArray(reports) || reports.length === 0) {
-      return sendValidationError(res, 'Tipos de relatório são obrigatórios')
+      return sendValidationError(res, 'Tipos de relatÃ³rio sÃ£o obrigatÃ³rios')
     }
 
     if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
-      return sendValidationError(res, 'Destinatários são obrigatórios')
+      return sendValidationError(res, 'DestinatÃ¡rios sÃ£o obrigatÃ³rios')
     }
 
     if (!period || !period.startDate || !period.endDate) {
-      return sendValidationError(res, 'Período é obrigatório')
+      return sendValidationError(res, 'PerÃ­odo Ã© obrigatÃ³rio')
     }
 
     // Generate report data
@@ -55,7 +55,7 @@ async function handler(req, res) {
     })
 
     if (!reportResponse.ok) {
-      throw new Error('Erro ao gerar dados do relatório')
+      throw new Error('Erro ao gerar dados do relatÃ³rio')
     }
 
     const reportData = await reportResponse.json()
@@ -73,7 +73,7 @@ async function handler(req, res) {
       const mailOptions = {
         from: process.env.SMTP_FROM || 'noreply@fazenda.com',
         to: recipient.email,
-        subject: `Relatório Gerencial - ${formatPeriod(period)}`,
+        subject: `RelatÃ³rio Gerencial - ${formatPeriod(period)}`,
         html: emailContent,
         attachments: [
           {
@@ -92,11 +92,11 @@ async function handler(req, res) {
     return sendSuccess(res, {
       sentTo: recipients.length,
       reportTypes: reports.length
-    }, 'Relatórios enviados com sucesso')
+    }, 'RelatÃ³rios enviados com sucesso')
 
   } catch (error) {
-    logger.error('Erro ao enviar relatórios:', error)
-    return sendError(res, 'Erro ao enviar relatórios', 500, { error: error.message })
+    logger.error('Erro ao enviar relatÃ³rios:', error)
+    return sendError(res, 'Erro ao enviar relatÃ³rios', 500, { error: error.message })
   } */
 }
 
@@ -105,10 +105,10 @@ export default asyncHandler(handler)
 function generateEmailContent(recipient, reports, period, reportData) {
   const reportNames = {
     monthly_summary: 'Resumo Mensal',
-    births_analysis: 'Análise de Nascimentos',
-    breeding_report: 'Relatório de Reprodução',
+    births_analysis: 'AnÃ¡lise de Nascimentos',
+    breeding_report: 'RelatÃ³rio de ReproduÃ§Ã£o',
     financial_summary: 'Resumo Financeiro',
-    inventory_report: 'Relatório de Estoque'
+    inventory_report: 'RelatÃ³rio de Estoque'
   }
 
   const reportsList = reports.map(r => reportNames[r] || r).join(', ')
@@ -133,17 +133,17 @@ function generateEmailContent(recipient, reports, period, reportData) {
     </head>
     <body>
       <div class="header">
-        <h1>🐄 Beef Sync - Relatório Gerencial</h1>
-        <p>Período: ${formatPeriod(period)}</p>
+        <h1>ðÅ¸�â€ž Beef Sync - RelatÃ³rio Gerencial</h1>
+        <p>PerÃ­odo: ${formatPeriod(period)}</p>
       </div>
       
       <div class="content">
-        <h2>Olá, ${recipient.name}!</h2>
+        <h2>OlÃ¡, ${recipient.name}!</h2>
         
-        <p>Segue em anexo o(s) relatório(s) solicitado(s) para o período de <strong>${formatPeriod(period)}</strong>:</p>
+        <p>Segue em anexo o(s) relatÃ³rio(s) solicitado(s) para o perÃ­odo de <strong>${formatPeriod(period)}</strong>:</p>
         
         <div class="summary">
-          <h3>📊 Relatórios Inclusos:</h3>
+          <h3>ðÅ¸â€œÅ  RelatÃ³rios Inclusos:</h3>
           <ul>
             ${reports.map(r => `<li>${reportNames[r] || r}</li>`).join('')}
           </ul>
@@ -153,12 +153,12 @@ function generateEmailContent(recipient, reports, period, reportData) {
 
         <p>Para mais detalhes, consulte o arquivo PDF em anexo.</p>
         
-        <p>Este relatório foi gerado automaticamente pelo sistema Beef Sync em ${new Date().toLocaleString('pt-BR')}.</p>
+        <p>Este relatÃ³rio foi gerado automaticamente pelo sistema Beef Sync em ${new Date().toLocaleString('pt-BR')}.</p>
       </div>
       
       <div class="footer">
-        <p>© ${new Date().getFullYear()} Beef Sync - Sistema de Gestão Pecuária</p>
-        <p>Este é um e-mail automático, não responda.</p>
+        <p>Â© ${new Date().getFullYear()} Beef Sync - Sistema de GestÃ£o PecuÃ¡ria</p>
+        <p>Este Ã© um e-mail automÃ¡tico, nÃ£o responda.</p>
       </div>
     </body>
     </html>
@@ -172,7 +172,7 @@ function generateQuickStats(reportData) {
     const summary = reportData.data.monthly_summary
     stats += `
       <div class="summary">
-        <h3>📈 Resumo Rápido:</h3>
+        <h3>ðÅ¸â€œË† Resumo RÃ¡pido:</h3>
         <div class="stats">
           ${summary.nascimentos ? `
             <div class="stat">

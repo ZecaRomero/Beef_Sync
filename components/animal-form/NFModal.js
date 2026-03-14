@@ -40,7 +40,7 @@ export default function NFModal({ isOpen, onClose, onSave }) {
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-[600px] max-w-full m-4">
         <div className="flex items-center justify-between mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            🧾 Nova Nota Fiscal
+            ðÅ¸§¾ Nova Nota Fiscal
           </h3>
           <button
             onClick={onClose}
@@ -54,7 +54,7 @@ export default function NFModal({ isOpen, onClose, onSave }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Número da NF
+                NÃºmero da NF
               </label>
               <input
                 type="text"
@@ -139,7 +139,7 @@ export default function NFModal({ isOpen, onClose, onSave }) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Observações
+              ObservaÃ§Ãµes
             </label>
             <textarea
               value={dadosNF.observacoes}

@@ -5,7 +5,7 @@ async function corrigirDatasCJCJ15890() {
   const client = await pool.connect()
   
   try {
-    console.log('🔍 Verificando coletas FIV para CJCJ 15890...\n')
+    console.log('�Ÿ”� Verificando coletas FIV para CJCJ 15890...\n')
     
     // Buscar todas as coletas FIV para esse animal
     const coletas = await query(`
@@ -26,10 +26,10 @@ async function corrigirDatasCJCJ15890() {
       ORDER BY cf.data_fiv ASC
     `)
     
-    console.log(`📊 Total de coletas encontradas: ${coletas.rows.length}\n`)
+    console.log(`�Ÿ“Š Total de coletas encontradas: ${coletas.rows.length}\n`)
     
     if (coletas.rows.length === 0) {
-      console.log('❌ Nenhuma coleta encontrada para CJCJ 15890')
+      console.log('�Œ Nenhuma coleta encontrada para CJCJ 15890')
       return
     }
     
@@ -40,14 +40,14 @@ async function corrigirDatasCJCJ15890() {
       { dataFIV: '2025-03-11', dataTransf: '2025-03-18', oocitos: null, touro: null }  // 11/03/2025
     ]
     
-    console.log('📋 Coletas atuais:')
+    console.log('�Ÿ“‹ Coletas atuais:')
     coletas.rows.forEach((coleta, index) => {
       const dataFIV = new Date(coleta.data_fiv)
       console.log(`${index + 1}. ID: ${coleta.id} | Data FIV: ${dataFIV.toLocaleDateString('pt-BR')} | Oócitos: ${coleta.quantidade_oocitos} | Touro: ${coleta.touro || 'N/A'}`)
     })
     console.log()
     
-    console.log('📋 Datas corretas (conforme planilha Excel):')
+    console.log('�Ÿ“‹ Datas corretas (conforme planilha Excel):')
     datasCorretas.forEach((data, index) => {
       const dataFIV = new Date(data.dataFIV)
       const dataTransf = new Date(data.dataTransf)
@@ -60,13 +60,13 @@ async function corrigirDatasCJCJ15890() {
     const autoConfirm = args.includes('--yes') || args.includes('-y')
     
     if (!autoConfirm) {
-      console.log('⚠️  Para executar a correção, execute novamente com --yes ou -y')
+      console.log('�š�️  Para executar a correção, execute novamente com --yes ou -y')
       console.log('   Exemplo: node scripts/corrigir-datas-cjcj-15890.js --yes\n')
       return
     }
     
     // Corrigir cada coleta
-    console.log('🔧 Iniciando correção...\n')
+    console.log('�Ÿ”� Iniciando correção...\n')
     let corrigidas = 0
     let erros = 0
     
@@ -101,34 +101,34 @@ async function corrigirDatasCJCJ15890() {
             const atualizado = result.rows[0]
             const dataFIVAntiga = new Date(coleta.data_fiv).toLocaleDateString('pt-BR')
             const dataFIVNova = new Date(atualizado.data_fiv).toLocaleDateString('pt-BR')
-            console.log(`✅ Corrigido ID ${atualizado.id} | ${atualizado.doadora_nome || 'N/A'}`)
-            console.log(`   ${dataFIVAntiga} → ${dataFIVNova}`)
+            console.log(`�œ… Corrigido ID ${atualizado.id} | ${atualizado.doadora_nome || 'N/A'}`)
+            console.log(`   ${dataFIVAntiga} �†’ ${dataFIVNova}`)
             corrigidas++
           } else {
-            console.log(`⚠️  Coleta ID ${coleta.id} não encontrada para atualização`)
+            console.log(`�š�️  Coleta ID ${coleta.id} não encontrada para atualização`)
             erros++
           }
         } catch (error) {
-          console.error(`❌ Erro ao corrigir coleta ID ${coleta.id}:`, error.message)
+          console.error(`�Œ Erro ao corrigir coleta ID ${coleta.id}:`, error.message)
           erros++
         }
       }
       
       await client.query('COMMIT')
       console.log('\n' + '='.repeat(100))
-      console.log(`✅ Correção concluída!`)
+      console.log(`�œ… Correção concluída!`)
       console.log(`   Corrigidas: ${corrigidas}`)
       console.log(`   Erros: ${erros}`)
       console.log('='.repeat(100))
       
     } catch (error) {
       await client.query('ROLLBACK')
-      console.error('\n❌ Erro durante a correção. Rollback executado.')
+      console.error('\n�Œ Erro durante a correção. Rollback executado.')
       throw error
     }
     
     // Verificar novamente após correção
-    console.log('\n🔍 Verificando novamente após correção...\n')
+    console.log('\n�Ÿ”� Verificando novamente após correção...\n')
     const verificacao = await query(`
       SELECT 
         cf.id,
@@ -144,7 +144,7 @@ async function corrigirDatasCJCJ15890() {
       ORDER BY cf.data_fiv ASC
     `)
     
-    console.log('📋 Coletas após correção:')
+    console.log('�Ÿ“‹ Coletas após correção:')
     verificacao.rows.forEach((coleta, index) => {
       const dataFIV = new Date(coleta.data_fiv)
       const dataTransf = coleta.data_transferencia ? new Date(coleta.data_transferencia) : null
@@ -152,7 +152,7 @@ async function corrigirDatasCJCJ15890() {
     })
     
   } catch (error) {
-    console.error('❌ Erro ao executar correção:', error)
+    console.error('�Œ Erro ao executar correção:', error)
     throw error
   } finally {
     client.release()
@@ -162,10 +162,10 @@ async function corrigirDatasCJCJ15890() {
 // Executar
 corrigirDatasCJCJ15890()
   .then(() => {
-    console.log('\n✅ Script finalizado')
+    console.log('\n�œ… Script finalizado')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('\n❌ Erro fatal:', error)
+    console.error('\n�Œ Erro fatal:', error)
     process.exit(1)
   })

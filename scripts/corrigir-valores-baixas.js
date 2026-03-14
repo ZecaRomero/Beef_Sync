@@ -7,7 +7,7 @@
 const { query } = require('../lib/database')
 
 async function corrigirValoresBaixas() {
-  console.log('🔧 Iniciando correção de valores de baixas...\n')
+  console.log('ðÅ¸â€�§ Iniciando correÃ§Ã£o de valores de baixas...\n')
 
   try {
     // 1. Buscar todas as vendas com valores suspeitos (< 100)
@@ -22,16 +22,16 @@ async function corrigirValoresBaixas() {
     `)
 
     const registros = result.rows || []
-    console.log(`📊 Encontrados ${registros.length} registros com valores suspeitos\n`)
+    console.log(`ðÅ¸â€œÅ  Encontrados ${registros.length} registros com valores suspeitos\n`)
 
     if (registros.length === 0) {
-      console.log('✅ Nenhum registro precisa de correção!')
+      console.log('âÅ“â€¦ Nenhum registro precisa de correÃ§Ã£o!')
       return
     }
 
-    // Mostrar registros que serão corrigidos
-    console.log('Registros que serão corrigidos:')
-    console.log('─'.repeat(80))
+    // Mostrar registros que serÃ£o corrigidos
+    console.log('Registros que serÃ£o corrigidos:')
+    console.log('ââ€�â‚¬'.repeat(80))
     registros.forEach(r => {
       const valorAtual = parseFloat(r.valor)
       const valorCorrigido = valorAtual * 1000
@@ -41,14 +41,14 @@ async function corrigirValoresBaixas() {
       console.log(`  Comprador: ${r.comprador || 'N/A'}`)
       console.log(`  NF: ${r.numero_nf || 'N/A'}`)
       console.log(`  Data: ${r.data_baixa || 'N/A'}`)
-      console.log('─'.repeat(80))
+      console.log('ââ€�â‚¬'.repeat(80))
     })
 
     // Confirmar antes de executar
-    console.log(`\n⚠️  Serão corrigidos ${registros.length} registros`)
-    console.log('Os valores serão multiplicados por 1000\n')
+    console.log(`\nâÅ¡ ï¸�  SerÃ£o corrigidos ${registros.length} registros`)
+    console.log('Os valores serÃ£o multiplicados por 1000\n')
 
-    // Executar correção
+    // Executar correÃ§Ã£o
     let corrigidos = 0
     let erros = 0
 
@@ -63,7 +63,7 @@ async function corrigirValoresBaixas() {
           WHERE id = $2
         `, [valorCorrigido, registro.id])
 
-        // Também atualizar o valor_venda na tabela animais se existir
+        // TambÃ©m atualizar o valor_venda na tabela animais se existir
         await query(`
           UPDATE animais
           SET valor_venda = $1
@@ -71,21 +71,21 @@ async function corrigirValoresBaixas() {
         `, [valorCorrigido, registro.serie, registro.rg])
 
         corrigidos++
-        console.log(`✅ ${registro.serie} ${registro.rg}: R$ ${valorAtual.toFixed(2)} → R$ ${valorCorrigido.toFixed(2)}`)
+        console.log(`âÅ“â€¦ ${registro.serie} ${registro.rg}: R$ ${valorAtual.toFixed(2)} ââ€ â€™ R$ ${valorCorrigido.toFixed(2)}`)
       } catch (err) {
         erros++
-        console.error(`❌ Erro ao corrigir ${registro.serie} ${registro.rg}:`, err.message)
+        console.error(`â�Å’ Erro ao corrigir ${registro.serie} ${registro.rg}:`, err.message)
       }
     }
 
     console.log('\n' + '='.repeat(80))
-    console.log(`✅ Correção concluída!`)
+    console.log(`âÅ“â€¦ CorreÃ§Ã£o concluÃ­da!`)
     console.log(`   Corrigidos: ${corrigidos}`)
     console.log(`   Erros: ${erros}`)
     console.log('='.repeat(80))
 
   } catch (error) {
-    console.error('❌ Erro ao executar correção:', error)
+    console.error('â�Å’ Erro ao executar correÃ§Ã£o:', error)
     throw error
   }
 }
@@ -93,10 +93,10 @@ async function corrigirValoresBaixas() {
 // Executar
 corrigirValoresBaixas()
   .then(() => {
-    console.log('\n✅ Script finalizado com sucesso!')
+    console.log('\nâÅ“â€¦ Script finalizado com sucesso!')
     process.exit(0)
   })
   .catch(err => {
-    console.error('\n❌ Erro fatal:', err)
+    console.error('\nâ�Å’ Erro fatal:', err)
     process.exit(1)
   })

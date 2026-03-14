@@ -12,7 +12,7 @@ const pool = new Pool({
 });
 
 async function debugReports() {
-  console.log('--- Iniciando Diagnóstico de Queries ---');
+  console.log('--- Iniciando DiagnÃ³stico de Queries ---');
 
   try {
     // 1. Verificando colunas de notas_fiscais e nascimentos
@@ -26,7 +26,7 @@ async function debugReports() {
     const nfColumns = nfCols.rows.map(r => r.column_name);
     console.log('Colunas notas_fiscais:', nfColumns.join(', '));
     const hasDataTe = nfColumns.includes('data_te');
-    console.log(`Tem coluna 'data_te'? ${hasDataTe ? '✅ SIM' : '❌ NÃO'}`);
+    console.log(`Tem coluna 'data_te'? ${hasDataTe ? 'âÅ“â€¦ SIM' : 'â�Å’ NÃÆ’O'}`);
 
     const nascCols = await pool.query(`
        SELECT column_name 
@@ -80,7 +80,7 @@ async function debugReports() {
           (nf.data_compra + INTERVAL '20 days')::date as data_prevista_dg,
           CASE 
             WHEN (nf.data_compra + INTERVAL '20 days')::date < CURRENT_DATE THEN 'Atrasado'
-            WHEN (nf.data_compra + INTERVAL '20 days')::date <= CURRENT_DATE + INTERVAL '7 days' THEN 'Próximo'
+            WHEN (nf.data_compra + INTERVAL '20 days')::date <= CURRENT_DATE + INTERVAL '7 days' THEN 'PrÃ³ximo'
             ELSE 'Normal'
           END as status
         FROM notas_fiscais nf
@@ -96,9 +96,9 @@ async function debugReports() {
         LIMIT 5
       `;
       await pool.query(dgQuery);
-      console.log('✅ Query Receptoras Faltam DG (CORRIGIDA) executada com sucesso!');
+      console.log('âÅ“â€¦ Query Receptoras Faltam DG (CORRIGIDA) executada com sucesso!');
     } catch (error) {
-      console.error('❌ Erro na query Receptoras Faltam DG (CORRIGIDA):', error.message);
+      console.error('â�Å’ Erro na query Receptoras Faltam DG (CORRIGIDA):', error.message);
     }
     try {
       const nfQuery = `
@@ -143,15 +143,15 @@ async function debugReports() {
         LIMIT 5
       `;
       await pool.query(nfQuery);
-      console.log('✅ Query NF executada com sucesso!');
+      console.log('âÅ“â€¦ Query NF executada com sucesso!');
     } catch (error) {
-      console.error('❌ Erro na query NF:', error.message);
+      console.error('â�Å’ Erro na query NF:', error.message);
     }
 
     // 3. Testar Query de Receptoras Faltam Parir (QUERY CORRIGIDA PROPOSTA)
     console.log('\n3. Testando query de Receptoras Faltam Parir (CORRIGIDA)...');
     if (!hasDataTe) {
-      console.warn('⚠️ Pulando teste pois coluna data_te não existe.');
+      console.warn('âÅ¡ ï¸� Pulando teste pois coluna data_te nÃ£o existe.');
     } else {
       try {
         const parirQuery = `
@@ -164,7 +164,7 @@ async function debugReports() {
             (nf.data_te + INTERVAL '285 days')::date as previsao_parto,
             CASE 
               WHEN (nf.data_te + INTERVAL '285 days')::date < CURRENT_DATE THEN 'Atrasado'
-              WHEN (nf.data_te + INTERVAL '285 days')::date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Próximo'
+              WHEN (nf.data_te + INTERVAL '285 days')::date <= CURRENT_DATE + INTERVAL '30 days' THEN 'PrÃ³ximo'
               ELSE 'Normal'
             END as status
           FROM notas_fiscais nf
@@ -196,9 +196,9 @@ async function debugReports() {
           LIMIT 5
         `;
         await pool.query(parirQuery);
-        console.log('✅ Query Receptoras Faltam Parir (CORRIGIDA) executada com sucesso!');
+        console.log('âÅ“â€¦ Query Receptoras Faltam Parir (CORRIGIDA) executada com sucesso!');
       } catch (error) {
-        console.error('❌ Erro na query Receptoras Faltam Parir (CORRIGIDA):', error.message);
+        console.error('â�Å’ Erro na query Receptoras Faltam Parir (CORRIGIDA):', error.message);
       }
     }
 

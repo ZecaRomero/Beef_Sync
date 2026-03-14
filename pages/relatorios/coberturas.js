@@ -8,8 +8,8 @@ export default function CoberturasPage() {
   return (
     <Layout>
       <Head>
-        <title>Relatório de Coberturas - Beef Sync</title>
-        <meta name="description" content="Análise de coberturas por tipo (IA/FIV) e período" />
+        <title>RelatÃ³rio de Coberturas - Beef Sync</title>
+        <meta name="description" content="AnÃ¡lise de coberturas por tipo (IA/FIV) e perÃ­odo" />
       </Head>
 
       <div className="space-y-6">
@@ -17,10 +17,10 @@ export default function CoberturasPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              🧬 Relatório de Coberturas
+              ðÅ¸§¬ RelatÃ³rio de Coberturas
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Análise detalhada das coberturas por tipo e período
+              AnÃ¡lise detalhada das coberturas por tipo e perÃ­odo
             </p>
           </div>
         </div>
@@ -28,12 +28,12 @@ export default function CoberturasPage() {
         {/* Coverage Type Card */}
         <CoverageTypeCard />
 
-        {/* Informações Adicionais */}
+        {/* InformaÃ§Ãµes Adicionais */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                📊 Sobre os Tipos de Cobertura
+                ðÅ¸â€œÅ  Sobre os Tipos de Cobertura
               </h3>
             </CardHeader>
             <CardBody>
@@ -42,10 +42,10 @@ export default function CoberturasPage() {
                   <div className="w-3 h-3 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
                   <div>
                     <h4 className="font-medium text-gray-900 dark:text-white">
-                      IA - Inseminação Artificial
+                      IA - InseminaÃ§Ã£o Artificial
                     </h4>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Técnica reprodutiva que utiliza sêmen coletado e processado para inseminar fêmeas em momento adequado do ciclo reprodutivo.
+                      TÃ©cnica reprodutiva que utiliza sÃªmen coletado e processado para inseminar fÃªmeas em momento adequado do ciclo reprodutivo.
                     </p>
                   </div>
                 </div>
@@ -54,10 +54,10 @@ export default function CoberturasPage() {
                   <div className="w-3 h-3 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
                   <div>
                     <h4 className="font-medium text-gray-900 dark:text-white">
-                      FIV - Fertilização In Vitro
+                      FIV - FertilizaÃ§Ã£o In Vitro
                     </h4>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Técnica avançada que envolve a coleta de óvulos, fertilização em laboratório e transferência de embriões para receptoras.
+                      TÃ©cnica avanÃ§ada que envolve a coleta de Ã³vulos, fertilizaÃ§Ã£o em laboratÃ³rio e transferÃªncia de embriÃµes para receptoras.
                     </p>
                   </div>
                 </div>
@@ -69,7 +69,7 @@ export default function CoberturasPage() {
                       MN - Monta Natural
                     </h4>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Reprodução natural onde o touro cobre a fêmea diretamente, sem intervenção tecnológica.
+                      ReproduÃ§Ã£o natural onde o touro cobre a fÃªmea diretamente, sem intervenÃ§Ã£o tecnolÃ³gica.
                     </p>
                   </div>
                 </div>
@@ -80,7 +80,7 @@ export default function CoberturasPage() {
           <Card>
             <CardHeader>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                📈 Métricas de Performance
+                ðÅ¸â€œË† MÃ©tricas de Performance
               </h3>
             </CardHeader>
             <CardBody>
@@ -105,7 +105,7 @@ export default function CoberturasPage() {
                 
                 <div className="flex justify-between items-center p-3 bg-green-50 dark:bg-green-900/10 rounded-lg">
                   <span className="text-sm font-medium text-gray-900 dark:text-white">
-                    Gestações Ativas
+                    GestaÃ§Ãµes Ativas
                   </span>
                   <span className="text-lg font-bold text-green-600 dark:text-green-400">
                     122
@@ -114,7 +114,7 @@ export default function CoberturasPage() {
                 
                 <div className="flex justify-between items-center p-3 bg-orange-50 dark:bg-orange-900/10 rounded-lg">
                   <span className="text-sm font-medium text-gray-900 dark:text-white">
-                    Média Mensal
+                    MÃ©dia Mensal
                   </span>
                   <span className="text-lg font-bold text-orange-600 dark:text-orange-400">
                     20.3
@@ -125,23 +125,23 @@ export default function CoberturasPage() {
           </Card>
         </div>
 
-        {/* Instruções de Uso */}
+        {/* InstruÃ§Ãµes de Uso */}
         <Card>
           <CardHeader>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              💡 Como Usar Este Relatório
+              ðÅ¸â€™¡ Como Usar Este RelatÃ³rio
             </h3>
           </CardHeader>
           <CardBody>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <h4 className="font-medium text-gray-900 dark:text-white mb-2">
-                  Filtros Disponíveis:
+                  Filtros DisponÃ­veis:
                 </h4>
                 <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                  <li>• <strong>Período:</strong> Última semana, mês, trimestre ou ano</li>
-                  <li>• <strong>Tipo:</strong> Todos, apenas IA ou apenas FIV</li>
-                  <li>• <strong>Status:</strong> Ativas, nascidas ou todas</li>
+                  <li>ââ‚¬¢ <strong>PerÃ­odo:</strong> ÃÅ¡ltima semana, mÃªs, trimestre ou ano</li>
+                  <li>ââ‚¬¢ <strong>Tipo:</strong> Todos, apenas IA ou apenas FIV</li>
+                  <li>ââ‚¬¢ <strong>Status:</strong> Ativas, nascidas ou todas</li>
                 </ul>
               </div>
               
@@ -150,10 +150,10 @@ export default function CoberturasPage() {
                   Funcionalidades:
                 </h4>
                 <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                  <li>• Visualização em tempo real dos dados</li>
-                  <li>• Gráfico de evolução temporal</li>
-                  <li>• Lista de coberturas recentes</li>
-                  <li>• Exportação para relatórios</li>
+                  <li>ââ‚¬¢ VisualizaÃ§Ã£o em tempo real dos dados</li>
+                  <li>ââ‚¬¢ GrÃ¡fico de evoluÃ§Ã£o temporal</li>
+                  <li>ââ‚¬¢ Lista de coberturas recentes</li>
+                  <li>ââ‚¬¢ ExportaÃ§Ã£o para relatÃ³rios</li>
                 </ul>
               </div>
             </div>

@@ -3,7 +3,7 @@ const { query } = require('./lib/database')
 
 async function testNFAnimal() {
   try {
-    console.log('🔍 Buscando animal CJCJ-16406 (ID: 467)...\n')
+    console.log('�Ÿ”� Buscando animal CJCJ-16406 (ID: 467)...\n')
     
     // Buscar animal
     const animalResult = await query(`
@@ -14,17 +14,17 @@ async function testNFAnimal() {
     `)
     
     if (animalResult.rows.length === 0) {
-      console.log('❌ Animal não encontrado')
+      console.log('�Œ Animal não encontrado')
       return
     }
     
     const animal = animalResult.rows[0]
-    console.log('✅ Animal encontrado:')
+    console.log('�œ… Animal encontrado:')
     console.log(JSON.stringify(animal, null, 2))
     console.log('')
     
     // Buscar NFs de saída
-    console.log('🔍 Buscando NFs de saída...\n')
+    console.log('�Ÿ”� Buscando NFs de saída...\n')
     const nfsResult = await query(`
       SELECT id, numero_nf, data, destino, fornecedor, valor_total
       FROM notas_fiscais
@@ -32,7 +32,7 @@ async function testNFAnimal() {
       ORDER BY data DESC
     `)
     
-    console.log(`📋 Total de NFs de saída: ${nfsResult.rows.length}\n`)
+    console.log(`�Ÿ“‹ Total de NFs de saída: ${nfsResult.rows.length}\n`)
     
     // Para cada NF, buscar itens
     for (const nf of nfsResult.rows) {
@@ -42,7 +42,7 @@ async function testNFAnimal() {
         WHERE nota_fiscal_id = $1
       `, [nf.id])
       
-      console.log(`\n📄 NF ${nf.numero_nf} (ID: ${nf.id})`)
+      console.log(`\n�Ÿ“„ NF ${nf.numero_nf} (ID: ${nf.id})`)
       console.log(`   Data: ${nf.data}`)
       console.log(`   Destino: ${nf.destino || nf.fornecedor}`)
       console.log(`   Valor Total: R$ ${nf.valor_total}`)
@@ -69,18 +69,18 @@ async function testNFAnimal() {
         )
         
         if (match) {
-          console.log(`   ✅ MATCH ENCONTRADO!`)
+          console.log(`   �œ… MATCH ENCONTRADO!`)
           console.log(`   Dados completos do item:`)
           console.log(JSON.stringify(dadosItem, null, 2))
         }
       }
     }
     
-    console.log('\n✅ Teste concluído')
+    console.log('\n�œ… Teste concluído')
     process.exit(0)
     
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('�Œ Erro:', error)
     process.exit(1)
   }
 }

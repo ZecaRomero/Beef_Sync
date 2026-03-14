@@ -9,7 +9,7 @@ const pool = new Pool({
 })
 
 async function verificarNFQuantidade() {
-  console.log('🔍 VERIFICANDO QUANTIDADES NAS NOTAS FISCAIS\n')
+  console.log('�Ÿ”� VERIFICANDO QUANTIDADES NAS NOTAS FISCAIS\n')
   console.log('=' .repeat(80))
   
   try {
@@ -30,11 +30,11 @@ async function verificarNFQuantidade() {
       LIMIT 10
     `)
     
-    console.log(`\n📋 ÚLTIMAS ${nfs.rows.length} NOTAS FISCAIS:\n`)
+    console.log(`\n�Ÿ“‹ �šLTIMAS ${nfs.rows.length} NOTAS FISCAIS:\n`)
     console.log('-'.repeat(80))
     
     for (const nf of nfs.rows) {
-      console.log(`\n📄 NF: ${nf.numero_nf} (${nf.tipo})`)
+      console.log(`\n�Ÿ“„ NF: ${nf.numero_nf} (${nf.tipo})`)
       console.log(`   Data: ${nf.data_compra || nf.data}`)
       console.log(`   ${nf.tipo === 'entrada' ? 'Fornecedor' : 'Destino'}: ${nf.fornecedor || nf.destino}`)
       console.log(`   Valor Total: R$ ${parseFloat(nf.valor_total || 0).toFixed(2)}`)
@@ -48,7 +48,7 @@ async function verificarNFQuantidade() {
       `, [nf.id])
       
       if (itens.rows.length > 0) {
-        console.log(`   📦 ${itens.rows.length} itens encontrados:`)
+        console.log(`   �Ÿ“� ${itens.rows.length} itens encontrados:`)
         
         let totalAnimais = 0
         let totalMachos = 0
@@ -86,7 +86,7 @@ async function verificarNFQuantidade() {
               console.log(`      ${idx + 1}. Qtd: ${qtd}, Sexo: "${sexo}", Valor Unit: R$ ${valorUnit.toFixed(2)}, Raça: ${item.raca || 'N/A'}`)
             }
           } catch (e) {
-            console.error(`      ❌ Erro ao processar item ${idx + 1}:`, e.message)
+            console.error(`      �Œ Erro ao processar item ${idx + 1}:`, e.message)
           }
         })
         
@@ -94,7 +94,7 @@ async function verificarNFQuantidade() {
           console.log(`      ... e mais ${itens.rows.length - 3} itens`)
         }
         
-        console.log(`\n   📊 TOTAIS:`)
+        console.log(`\n   �Ÿ“Š TOTAIS:`)
         console.log(`      Total de Animais: ${totalAnimais}`)
         console.log(`      Machos: ${totalMachos}`)
         console.log(`      Fêmeas: ${totalFemeas}`)
@@ -102,10 +102,10 @@ async function verificarNFQuantidade() {
         console.log(`      Valor NF: R$ ${parseFloat(nf.valor_total || 0).toFixed(2)}`)
         
         if (totalAnimais === 0) {
-          console.log(`      ⚠️  PROBLEMA: Quantidade total é ZERO!`)
+          console.log(`      �š�️  PROBLEMA: Quantidade total é ZERO!`)
         }
       } else {
-        console.log(`   ⚠️  Nenhum item encontrado na tabela notas_fiscais_itens`)
+        console.log(`   �š�️  Nenhum item encontrado na tabela notas_fiscais_itens`)
         
         // Tentar buscar do campo JSONB
         const nfCompleta = await pool.query(`
@@ -119,7 +119,7 @@ async function verificarNFQuantidade() {
               : nfCompleta.rows[0].itens
             
             const itensArray = Array.isArray(itensJSON) ? itensJSON : (itensJSON.itens || [])
-            console.log(`   📦 ${itensArray.length} itens encontrados no campo JSONB`)
+            console.log(`   �Ÿ“� ${itensArray.length} itens encontrados no campo JSONB`)
             
             if (itensArray.length > 0) {
               let totalAnimais = 0
@@ -133,17 +133,17 @@ async function verificarNFQuantidade() {
               console.log(`      Total de Animais (JSONB): ${totalAnimais}`)
             }
           } catch (e) {
-            console.error(`   ❌ Erro ao parsear itens JSONB:`, e.message)
+            console.error(`   �Œ Erro ao parsear itens JSONB:`, e.message)
           }
         }
       }
     }
     
     console.log('\n' + '='.repeat(80))
-    console.log('✅ Verificação concluída!')
+    console.log('�œ… Verificação concluída!')
     
   } catch (error) {
-    console.error('\n❌ ERRO:', error.message)
+    console.error('\n�Œ ERRO:', error.message)
     console.error('\nDetalhes:', error)
   } finally {
     await pool.end()

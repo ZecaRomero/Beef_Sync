@@ -2,7 +2,7 @@ const { query } = require('../lib/database')
 
 async function cadastrarTouroRemNocaute() {
   try {
-    console.log('🔍 Verificando se o touro REM NOCAUTE já existe...\n')
+    console.log('�Ÿ”� Verificando se o touro REM NOCAUTE já existe...\n')
 
     // Verificar se já existe
     const existe = await query(`
@@ -22,14 +22,14 @@ async function cadastrarTouroRemNocaute() {
     let touroId
 
     if (existe.rows.length > 0) {
-      console.log('✅ Touro já existe no cadastro:')
+      console.log('�œ… Touro já existe no cadastro:')
       console.log(`   ID: ${existe.rows[0].id}`)
       console.log(`   Nome: ${existe.rows[0].nome || 'N/A'}`)
       console.log(`   Série: ${existe.rows[0].serie || 'N/A'}`)
       console.log(`   RG: ${existe.rows[0].rg || 'N/A'}`)
       touroId = existe.rows[0].id
     } else {
-      console.log('📝 Cadastrando touro REM NOCAUTE...\n')
+      console.log('�Ÿ“� Cadastrando touro REM NOCAUTE...\n')
 
       // Buscar informações do estoque de sêmen
       const semenInfo = await query(`
@@ -89,7 +89,7 @@ async function cadastrarTouroRemNocaute() {
       ])
 
       touroId = result.rows[0].id
-      console.log('✅ Touro cadastrado com sucesso!')
+      console.log('�œ… Touro cadastrado com sucesso!')
       console.log(`   ID: ${result.rows[0].id}`)
       console.log(`   Nome: ${result.rows[0].nome}`)
       console.log(`   Série: ${result.rows[0].serie}`)
@@ -98,7 +98,7 @@ async function cadastrarTouroRemNocaute() {
     }
 
     // Vincular transferências
-    console.log('\n🔗 Vinculando transferências ao touro...\n')
+    console.log('\n�Ÿ”— Vinculando transferências ao touro...\n')
 
     const updateResult = await query(`
       UPDATE transferencias_embrioes
@@ -109,16 +109,16 @@ async function cadastrarTouroRemNocaute() {
       RETURNING id, numero_te, receptora_nome
     `, [touroId])
 
-    console.log(`✅ ${updateResult.rows.length} transferência(s) vinculada(s) ao touro:`)
+    console.log(`�œ… ${updateResult.rows.length} transferência(s) vinculada(s) ao touro:`)
     updateResult.rows.forEach((te, idx) => {
       console.log(`   ${idx + 1}. TE ${te.numero_te || te.id} - Receptora: ${te.receptora_nome || 'N/A'}`)
     })
 
-    console.log('\n✅ Processo concluído com sucesso!')
-    console.log(`\n💡 O touro REM NOCAUTE agora está cadastrado e todas as transferências foram vinculadas.`)
+    console.log('\n�œ… Processo concluído com sucesso!')
+    console.log(`\n�Ÿ’� O touro REM NOCAUTE agora está cadastrado e todas as transferências foram vinculadas.`)
 
   } catch (error) {
-    console.error('❌ Erro:', error)
+    console.error('�Œ Erro:', error)
     throw error
   }
 }
@@ -127,7 +127,7 @@ if (require.main === module) {
   cadastrarTouroRemNocaute()
     .then(() => process.exit(0))
     .catch((error) => {
-      console.error('❌ Erro:', error)
+      console.error('�Œ Erro:', error)
       process.exit(1)
     })
 }

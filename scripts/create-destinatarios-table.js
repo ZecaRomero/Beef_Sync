@@ -14,7 +14,7 @@ async function createDestinatariosTable() {
   const client = await pool.connect()
   
   try {
-    console.log('🔧 Criando tabela destinatarios_relatorios...')
+    console.log('ðÅ¸â€�§ Criando tabela destinatarios_relatorios...')
     
     await client.query(`
       CREATE TABLE IF NOT EXISTS destinatarios_relatorios (
@@ -34,14 +34,14 @@ async function createDestinatariosTable() {
       )
     `)
     
-    console.log('✅ Tabela destinatarios_relatorios criada com sucesso!')
+    console.log('âÅ“â€¦ Tabela destinatarios_relatorios criada com sucesso!')
     
     // Verificar se existem registros
     const result = await client.query('SELECT COUNT(*) FROM destinatarios_relatorios')
-    console.log(`📊 Total de destinatários cadastrados: ${result.rows[0].count}`)
+    console.log(`ðÅ¸â€œÅ  Total de destinatÃ¡rios cadastrados: ${result.rows[0].count}`)
     
   } catch (error) {
-    console.error('❌ Erro ao criar tabela:', error)
+    console.error('â�Å’ Erro ao criar tabela:', error)
     throw error
   } finally {
     client.release()
@@ -51,10 +51,10 @@ async function createDestinatariosTable() {
 
 createDestinatariosTable()
   .then(() => {
-    console.log('✅ Script concluído com sucesso!')
+    console.log('âÅ“â€¦ Script concluÃ­do com sucesso!')
     process.exit(0)
   })
   .catch((error) => {
-    console.error('❌ Erro ao executar script:', error)
+    console.error('â�Å’ Erro ao executar script:', error)
     process.exit(1)
   })

@@ -22,28 +22,28 @@ export default function MarketWidget() {
             price: 270 + (Math.random() - 0.5) * 20,
             change: (Math.random() - 0.5) * 10,
             changePercent: (Math.random() - 0.5) * 5,
-            icon: '🐂',
+            icon: 'ðÅ¸�â€š',
             trend: Math.random() > 0.5 ? 'up' : 'down'
           },
           vaca_gorda: {
             price: 250 + (Math.random() - 0.5) * 15,
             change: (Math.random() - 0.5) * 8,
             changePercent: (Math.random() - 0.5) * 4,
-            icon: '🐄',
+            icon: 'ðÅ¸�â€ž',
             trend: Math.random() > 0.5 ? 'up' : 'down'
           },
           novilha: {
             price: 258 + (Math.random() - 0.5) * 12,
             change: (Math.random() - 0.5) * 6,
             changePercent: (Math.random() - 0.5) * 3,
-            icon: '🐮',
+            icon: 'ðÅ¸�®',
             trend: Math.random() > 0.5 ? 'up' : 'down'
           },
           garrote: {
             price: 277 + (Math.random() - 0.5) * 18,
             change: (Math.random() - 0.5) * 12,
             changePercent: (Math.random() - 0.5) * 6,
-            icon: '🐃',
+            icon: 'ðÅ¸�Æ’',
             trend: Math.random() > 0.5 ? 'up' : 'down'
           }
         },
@@ -52,13 +52,13 @@ export default function MarketWidget() {
             value: 5.63 + (Math.random() - 0.5) * 0.5,
             change: (Math.random() - 0.5) * 0.2,
             changePercent: (Math.random() - 0.5) * 2,
-            icon: '💵'
+            icon: 'ðÅ¸â€™µ'
           },
           boi_futuro: {
             value: 280 + (Math.random() - 0.5) * 25,
             change: (Math.random() - 0.5) * 15,
             changePercent: (Math.random() - 0.5) * 5,
-            icon: '📊'
+            icon: 'ðÅ¸â€œÅ '
           }
         },
         marketStatus: {
@@ -89,9 +89,9 @@ export default function MarketWidget() {
 
   const getTrendIcon = (trend) => {
     switch (trend) {
-      case 'up': return '📈'
-      case 'down': return '📉'
-      default: return '➡️'
+      case 'up': return 'ðÅ¸â€œË†'
+      case 'down': return 'ðÅ¸â€œâ€°'
+      default: return 'âÅ¾¡ï¸�'
     }
   }
 
@@ -105,9 +105,9 @@ export default function MarketWidget() {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="text-center">
-          <div className="animate-spin text-2xl mb-2">📊</div>
+          <div className="animate-spin text-2xl mb-2">ðÅ¸â€œÅ </div>
           <div className="text-sm text-gray-600 dark:text-gray-400">
-            Carregando preços...
+            Carregando preÃ§os...
           </div>
         </div>
       </div>
@@ -119,7 +119,7 @@ export default function MarketWidget() {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center">
-          📈 Preços Hoje
+          ðÅ¸â€œË† PreÃ§os Hoje
         </h3>
         <div className="flex items-center space-x-1">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
@@ -129,7 +129,7 @@ export default function MarketWidget() {
 
 
 
-      {/* Preços Principais - Resumido */}
+      {/* PreÃ§os Principais - Resumido */}
       {marketData && (
         <div className="space-y-2">
           {Object.entries(marketData.prices)
@@ -157,7 +157,7 @@ export default function MarketWidget() {
         </div>
       )}
 
-      {/* Índices Resumidos */}
+      {/* Ã�ndices Resumidos */}
       {marketData && (
         <div className="pt-3 mt-3 border-t border-gray-200 dark:border-gray-600">
           <div className="grid grid-cols-2 gap-2 text-xs">

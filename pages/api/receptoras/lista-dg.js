@@ -3,7 +3,7 @@ import { query } from '../../../lib/database'
 export default async function handler(req, res) {
   try {
     if (req.method !== 'GET') {
-      return res.status(405).json({ error: 'Método não permitido' })
+      return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' })
     }
 
     // Primeiro, verificar quantas NFs de receptoras existem
@@ -13,7 +13,7 @@ export default async function handler(req, res) {
       WHERE eh_receptoras = true AND tipo = 'entrada'
     `)
     
-    console.log(`📋 NFs de Receptoras encontradas: ${nfsReceptoras.rows.length}`)
+    console.log(`ðÅ¸â€œâ€¹ NFs de Receptoras encontradas: ${nfsReceptoras.rows.length}`)
     
     // Buscar receptoras que precisam de DG
     // Buscar cada item da NF como uma receptora separada
@@ -56,10 +56,10 @@ export default async function handler(req, res) {
       // Tentar query mais simples
       result = { rows: [] }
     }
-    console.log(`📋 Itens de receptoras encontrados: ${result.rows.length}`)
+    console.log(`ðÅ¸â€œâ€¹ Itens de receptoras encontrados: ${result.rows.length}`)
     
     if (result.rows.length > 0) {
-      console.log('📋 Primeiro item exemplo:', JSON.stringify(result.rows[0], null, 2))
+      console.log('ðÅ¸â€œâ€¹ Primeiro item exemplo:', JSON.stringify(result.rows[0], null, 2))
     }
     
     // Processar resultados
@@ -85,7 +85,7 @@ export default async function handler(req, res) {
         let letra = row.receptora_letra || ''
         let numero = row.receptora_numero || ''
         
-        // Se tem tatuagem, tentar extrair letra e número
+        // Se tem tatuagem, tentar extrair letra e nÃºmero
         if (tatuagem) {
           // Formato pode ser: M0898, M 0898, M0898, 0898, etc
           const matchLetra = tatuagem.match(/^([A-Za-z]+)/)
@@ -95,7 +95,7 @@ export default async function handler(req, res) {
           if (matchNumero) numero = matchNumero[1]
         }
         
-        // Se ainda não tem número, usar da NF
+        // Se ainda nÃ£o tem nÃºmero, usar da NF
         if (!numero && row.receptora_numero) {
           numero = row.receptora_numero
         }
@@ -103,7 +103,7 @@ export default async function handler(req, res) {
           letra = row.receptora_letra.toUpperCase()
         }
         
-        // Se ainda não tem, tentar extrair da tatuagem completa
+        // Se ainda nÃ£o tem, tentar extrair da tatuagem completa
         if (!numero && tatuagem) {
           const matchNumeroFinal = tatuagem.match(/(\d+)/)
           if (matchNumeroFinal) numero = matchNumeroFinal[1]
@@ -130,18 +130,18 @@ export default async function handler(req, res) {
             observacoes: ''
           })
         } else {
-          console.log(`⚠️ Item ${index + 1} sem número:`, { tatuagem, receptora_letra: row.receptora_letra, receptora_numero: row.receptora_numero })
+          console.log(`âÅ¡ ï¸� Item ${index + 1} sem nÃºmero:`, { tatuagem, receptora_letra: row.receptora_letra, receptora_numero: row.receptora_numero })
         }
       } catch (error) {
         console.error(`Erro ao processar item ${index + 1}:`, error)
       }
     })
     
-    console.log(`✅ Receptoras processadas após extração: ${receptorasProcessadas.length}`)
+    console.log(`âÅ“â€¦ Receptoras processadas apÃ³s extraÃ§Ã£o: ${receptorasProcessadas.length}`)
     
-    // Se não encontrou nada na query principal, tentar buscar de forma mais simples
+    // Se nÃ£o encontrou nada na query principal, tentar buscar de forma mais simples
     if (receptorasProcessadas.length === 0 && nfsReceptoras.rows.length > 0) {
-      console.log('⚠️ Nenhum item encontrado, tentando busca alternativa...')
+      console.log('âÅ¡ ï¸� Nenhum item encontrado, tentando busca alternativa...')
       // Buscar apenas pelas NFs e usar dados da NF diretamente
       const nfsComItens = await Promise.all(nfsReceptoras.rows.map(async (nf) => {
         const itensResult = await query(`
@@ -167,12 +167,12 @@ export default async function handler(req, res) {
       nfsComItens.forEach(({ nf, itens }) => {
         itens.forEach((item, index) => {
           const tatuagem = item.tatuagem || ''
-          // Extrair letra e número da tatuagem ou usar da NF
+          // Extrair letra e nÃºmero da tatuagem ou usar da NF
           let letra = nf.receptora_letra || ''
           let numero = nf.receptora_numero || ''
           
           if (tatuagem) {
-            // Tentar extrair letra e número da tatuagem (ex: M0898, M 0898, 0898)
+            // Tentar extrair letra e nÃºmero da tatuagem (ex: M0898, M 0898, 0898)
             const matchLetra = tatuagem.match(/^([A-Za-z]+)/)
             const matchNumero = tatuagem.match(/(\d+)/)
             
@@ -180,7 +180,7 @@ export default async function handler(req, res) {
             if (matchNumero) numero = matchNumero[1]
           }
           
-          // Se ainda não tem, usar da NF
+          // Se ainda nÃ£o tem, usar da NF
           if (!numero && nf.receptora_numero) {
             numero = nf.receptora_numero
           }
@@ -215,12 +215,12 @@ export default async function handler(req, res) {
         })
       })
       
-      console.log(`✅ Receptoras após busca alternativa: ${receptorasProcessadas.length}`)
+      console.log(`âÅ“â€¦ Receptoras apÃ³s busca alternativa: ${receptorasProcessadas.length}`)
     }
     
-    // Se ainda não tem receptoras, retornar vazio
+    // Se ainda nÃ£o tem receptoras, retornar vazio
     if (receptorasProcessadas.length === 0) {
-      console.log('⚠️ Nenhuma receptora encontrada após processamento')
+      console.log('âÅ¡ ï¸� Nenhuma receptora encontrada apÃ³s processamento')
       return res.status(200).json({
         success: true,
         data: [],
@@ -228,10 +228,10 @@ export default async function handler(req, res) {
       })
     }
     
-    // Normalizar número (remover zeros à esquerda para matching consistente)
+    // Normalizar nÃºmero (remover zeros Ã  esquerda para matching consistente)
     const normNum = (n) => String(n || '').replace(/^0+/, '') || '0'
 
-    // Buscar dados de animais e inseminações para as receptoras processadas
+    // Buscar dados de animais e inseminaÃ§Ãµes para as receptoras processadas
     const receptorasCompletas = await Promise.all(receptorasProcessadas.map(async (receptora) => {
       try {
         // Buscar animal correspondente
@@ -244,7 +244,7 @@ export default async function handler(req, res) {
         let veterinario = null
         let observacoes = ''
         
-        // Tentar encontrar animal por múltiplos critérios (match flexível: serie/rg, tatuagem, zeros à esquerda)
+        // Tentar encontrar animal por mÃºltiplos critÃ©rios (match flexÃ­vel: serie/rg, tatuagem, zeros Ã  esquerda)
         try {
           const letraNorm = String(receptora.letra || '').trim().toUpperCase()
           const numeroNorm = String(receptora.numero || '').trim()
@@ -279,7 +279,7 @@ export default async function handler(req, res) {
             `, [numeroNorm, numeroNormSemZero])
           }
 
-          // Fallback extra: série pode ter sido gravada junto com o número (ex: "M8251")
+          // Fallback extra: sÃ©rie pode ter sido gravada junto com o nÃºmero (ex: "M8251")
           if (animalResult.rows.length === 0 && letraNorm && numeroNorm) {
             const serieNumeroJuntos = `${letraNorm}${numeroNorm}`
             const serieNumeroJuntosSemEspaco = serieNumeroJuntos.replace(/\s/g, '').toLowerCase()
@@ -293,7 +293,7 @@ export default async function handler(req, res) {
             `, [serieNumeroJuntosSemEspaco, `${serieNumeroJuntosSemEspaco}%`])
           }
           
-          // Fallback: verificar nascimentos (prenhas já foram para lista de partos)
+          // Fallback: verificar nascimentos (prenhas jÃ¡ foram para lista de partos)
           if (animalResult.rows.length === 0 && numeroNorm) {
             const nascResult = await query(`
               SELECT serie, rg FROM nascimentos
@@ -342,7 +342,7 @@ export default async function handler(req, res) {
             resultadoDG = animal.resultado_dg
             observacoes = animal.observacoes_dg || ''
             
-            // Se não tem dados do DG na tabela animais, buscar de inseminação
+            // Se nÃ£o tem dados do DG na tabela animais, buscar de inseminaÃ§Ã£o
             if (!dataDG) {
               try {
                 const inseminacaoResult = await query(`
@@ -361,10 +361,10 @@ export default async function handler(req, res) {
                   observacoes = inseminacao.observacoes || ''
                 }
               } catch (err) {
-                console.error('Erro ao buscar inseminação:', err.message)
+                console.error('Erro ao buscar inseminaÃ§Ã£o:', err.message)
               }
             }
-            // Se ainda não tem DG, buscar em historia_ocorrencias (DG lançado via ocorrência rápida)
+            // Se ainda nÃ£o tem DG, buscar em historia_ocorrencias (DG lanÃ§ado via ocorrÃªncia rÃ¡pida)
             if (!dataDG && animalId) {
               try {
                 const histResult = await query(`
@@ -379,7 +379,7 @@ export default async function handler(req, res) {
                   if (texto.includes('prenha') || texto.includes('positivo')) resultadoDG = 'Prenha'
                   else if (texto.includes('negativo') || texto.includes('vazia')) resultadoDG = 'Vazia'
                   else {
-                    const match = (row.observacoes || row.descricao || '').match(/Diagnóstico de Gestação:\s*(\w+)/i)
+                    const match = (row.observacoes || row.descricao || '').match(/DiagnÃ³stico de GestaÃ§Ã£o:\s*(\w+)/i)
                     resultadoDG = match ? match[1].trim() : 'Vazia'
                   }
                 }
@@ -410,11 +410,11 @@ export default async function handler(req, res) {
         }
       } catch (error) {
         console.error('Erro ao processar receptora:', error)
-        return receptora // Retornar dados básicos se houver erro
+        return receptora // Retornar dados bÃ¡sicos se houver erro
       }
     }))
     
-    // Consolidação: garantir dataDG/resultadoDG consultando diretamente a tabela animais para qualquer receptora sem DG
+    // ConsolidaÃ§Ã£o: garantir dataDG/resultadoDG consultando diretamente a tabela animais para qualquer receptora sem DG
     for (let i = 0; i < receptorasCompletas.length; i++) {
       const r = receptorasCompletas[i]
       if (!r.dataDG) {
@@ -459,9 +459,9 @@ export default async function handler(req, res) {
       }
     }
     
-    // Agrupar por letra+número+fornecedor para evitar duplicatas
+    // Agrupar por letra+nÃºmero+fornecedor para evitar duplicatas
     // IMPORTANTE: a mesma receptora (ex: 8251) pode estar em NFs de fornecedores diferentes.
-    // Se usarmos só letra_numero, perderíamos a associação com MINEREMBRYO ao deduplicar.
+    // Se usarmos sÃ³ letra_numero, perderÃ­amos a associaÃ§Ã£o com MINEREMBRYO ao deduplicar.
     const receptorasMap = new Map()
     receptorasCompletas.forEach(receptora => {
       const fornecedor = receptora.fornecedor || 'Sem Fornecedor'
@@ -469,7 +469,7 @@ export default async function handler(req, res) {
       if (!receptorasMap.has(chave)) {
         receptorasMap.set(chave, receptora)
       } else {
-        // Se já existe (mesmo fornecedor), manter a que tem mais dados (DG realizado)
+        // Se jÃ¡ existe (mesmo fornecedor), manter a que tem mais dados (DG realizado)
         const existente = receptorasMap.get(chave)
         if (receptora.dataDG && !existente.dataDG) {
           receptorasMap.set(chave, receptora)
@@ -477,26 +477,26 @@ export default async function handler(req, res) {
       }
     })
 
-    // Converter para array e ordenar por número
+    // Converter para array e ordenar por nÃºmero
     let receptoras = Array.from(receptorasMap.values())
       .sort((a, b) => {
-        // Ordenar primeiro por letra, depois por número
+        // Ordenar primeiro por letra, depois por nÃºmero
         if (a.letra !== b.letra) {
           return (a.letra || '').localeCompare(b.letra || '')
         }
         return a.numeroOrdenado - b.numeroOrdenado
       })
 
-    // Excluir receptoras que já têm DG (e foram para Nascimentos se prenhas)
+    // Excluir receptoras que jÃ¡ tÃªm DG (e foram para Nascimentos se prenhas)
     // Somente receptoras novas/pendentes de DG devem aparecer nesta tela
     const { incluirComDG } = req.query
     if (incluirComDG !== 'true') {
       const antes = receptoras.length
       receptoras = receptoras.filter(r => !r.dataDG)
-      console.log(`📤 Excluídas ${antes - receptoras.length} receptoras que já têm DG. Restam ${receptoras.length} pendentes.`)
+      console.log(`ðÅ¸â€œ¤ ExcluÃ­das ${antes - receptoras.length} receptoras que jÃ¡ tÃªm DG. Restam ${receptoras.length} pendentes.`)
     }
 
-    console.log(`✅ Receptoras processadas: ${receptoras.length}`)
+    console.log(`âÅ“â€¦ Receptoras processadas: ${receptoras.length}`)
 
     return res.status(200).json({
       success: true,

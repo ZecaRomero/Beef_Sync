@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 async function createTestData() {
   try {
-    console.log('🔍 Criando dados de teste...');
+    console.log('�Ÿ”� Criando dados de teste...');
     
     // Criar alguns animais de teste
     const animals = [
@@ -41,7 +41,7 @@ async function createTestData() {
       }
     ];
 
-    console.log('🐄 Criando animais...');
+    console.log('�Ÿ�„ Criando animais...');
     for (const animal of animals) {
       try {
         const response = await fetch('http://localhost:3020/api/animals', {
@@ -54,18 +54,18 @@ async function createTestData() {
 
         if (response.ok) {
           const result = await response.json();
-          console.log(`✅ Animal ${animal.serie}-${animal.rg} criado com sucesso`);
+          console.log(`�œ… Animal ${animal.serie}-${animal.rg} criado com sucesso`);
         } else {
           const error = await response.text();
-          console.log(`❌ Erro ao criar animal ${animal.serie}-${animal.rg}:`, error);
+          console.log(`�Œ Erro ao criar animal ${animal.serie}-${animal.rg}:`, error);
         }
       } catch (error) {
-        console.log(`❌ Erro ao criar animal ${animal.serie}-${animal.rg}:`, error.message);
+        console.log(`�Œ Erro ao criar animal ${animal.serie}-${animal.rg}:`, error.message);
       }
     }
 
     // Criar alguns nascimentos
-    console.log('\n👶 Criando nascimentos...');
+    console.log('\n�Ÿ‘� Criando nascimentos...');
     const births = [
       {
         data_nascimento: '2025-01-15',
@@ -96,13 +96,13 @@ async function createTestData() {
         });
 
         if (response.ok) {
-          console.log(`✅ Nascimento de ${birth.sexo} criado com sucesso`);
+          console.log(`�œ… Nascimento de ${birth.sexo} criado com sucesso`);
         } else {
           const error = await response.text();
-          console.log(`❌ Erro ao criar nascimento:`, error);
+          console.log(`�Œ Erro ao criar nascimento:`, error);
         }
       } catch (error) {
-        console.log(`❌ Erro ao criar nascimento:`, error.message);
+        console.log(`�Œ Erro ao criar nascimento:`, error.message);
       }
     }
 
@@ -127,11 +127,11 @@ async function createTestData() {
 
     if (reportResponse.ok) {
       const reportData = await reportResponse.json();
-      console.log('📊 Preview do relatório com dados:', JSON.stringify(reportData, null, 2));
+      console.log('�Ÿ“Š Preview do relatório com dados:', JSON.stringify(reportData, null, 2));
     }
 
   } catch (error) {
-    console.error('❌ Erro geral:', error.message);
+    console.error('�Œ Erro geral:', error.message);
   }
 }
 

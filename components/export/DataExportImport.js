@@ -10,7 +10,7 @@ import {
   XMarkIcon
 } from '../ui/Icons'
 
-// Ícone adicional que não está no arquivo Icons.js
+// Ã�cone adicional que nÃ£o estÃ¡ no arquivo Icons.js
 const ArrowUpTrayIcon = ({ className = "h-6 w-6" }) => (
   <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
@@ -69,7 +69,7 @@ export default function DataExportImport({ isOpen, onClose }) {
           return
         }
 
-        const headers = ['ID', 'Série', 'RG', 'Tatuagem', 'Sexo', 'Raça', 'Data Nascimento', 'Peso', 'Situação', 'Data Entrada']
+        const headers = ['ID', 'SÃ©rie', 'RG', 'Tatuagem', 'Sexo', 'RaÃ§a', 'Data Nascimento', 'Peso', 'SituaÃ§Ã£o', 'Data Entrada']
         const csvContent = [
           headers.join(','),
           ...animais.map(animal => [
@@ -257,7 +257,7 @@ export default function DataExportImport({ isOpen, onClose }) {
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            📊 Exportar/Importar Dados
+            ðÅ¸â€œÅ  Exportar/Importar Dados
           </h2>
           <button
             onClick={onClose}
@@ -302,13 +302,13 @@ export default function DataExportImport({ isOpen, onClose }) {
                   Exportar Dados do Sistema
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Exporte todos os seus dados para backup ou transferência.
+                  Exporte todos os seus dados para backup ou transferÃªncia.
                 </p>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Formato de Exportação
+                  Formato de ExportaÃ§Ã£o
                 </label>
                 <div className="space-y-2">
                   <label className="flex items-center">
@@ -342,12 +342,12 @@ export default function DataExportImport({ isOpen, onClose }) {
                 <div className="flex items-start">
                   <InformationCircleIcon className="h-5 w-5 text-blue-500 mt-0.5 mr-2" />
                   <div className="text-sm text-blue-700 dark:text-blue-300">
-                    <p className="font-medium">Informações sobre a exportação:</p>
+                    <p className="font-medium">InformaÃ§Ãµes sobre a exportaÃ§Ã£o:</p>
                     <ul className="mt-1 list-disc list-inside space-y-1">
-                      <li>O arquivo JSON contém todos os dados do sistema</li>
-                      <li>O arquivo CSV contém apenas a lista de animais</li>
-                      <li>Um backup automático é criado antes da importação</li>
-                      <li>Os dados são exportados no formato atual do sistema</li>
+                      <li>O arquivo JSON contÃ©m todos os dados do sistema</li>
+                      <li>O arquivo CSV contÃ©m apenas a lista de animais</li>
+                      <li>Um backup automÃ¡tico Ã© criado antes da importaÃ§Ã£o</li>
+                      <li>Os dados sÃ£o exportados no formato atual do sistema</li>
                     </ul>
                   </div>
                 </div>
@@ -402,7 +402,7 @@ export default function DataExportImport({ isOpen, onClose }) {
                         <p>Animais: {importPreview.summary.animals}</p>
                         <p>Nascimentos: {importPreview.summary.nascimentos}</p>
                         <p>Custos: {importPreview.summary.custos}</p>
-                        <p>Estoque Sêmen: {importPreview.summary.estoqueSemen}</p>
+                        <p>Estoque SÃªmen: {importPreview.summary.estoqueSemen}</p>
                         <p>Notas Fiscais: {importPreview.summary.notasFiscais}</p>
                       </>
                     )}
@@ -417,11 +417,11 @@ export default function DataExportImport({ isOpen, onClose }) {
                 <div className="flex items-start">
                   <ExclamationTriangleIcon className="h-5 w-5 text-yellow-500 mt-0.5 mr-2" />
                   <div className="text-sm text-yellow-700 dark:text-yellow-300">
-                    <p className="font-medium">Atenção:</p>
+                    <p className="font-medium">AtenÃ§Ã£o:</p>
                     <ul className="mt-1 list-disc list-inside space-y-1">
-                      <li>Um backup automático será criado antes da importação</li>
-                      <li>Os dados importados serão adicionados aos dados existentes</li>
-                      <li>Verifique se o arquivo é compatível com o sistema</li>
+                      <li>Um backup automÃ¡tico serÃ¡ criado antes da importaÃ§Ã£o</li>
+                      <li>Os dados importados serÃ£o adicionados aos dados existentes</li>
+                      <li>Verifique se o arquivo Ã© compatÃ­vel com o sistema</li>
                       <li>Recomendamos testar primeiro com dados de teste</li>
                     </ul>
                   </div>

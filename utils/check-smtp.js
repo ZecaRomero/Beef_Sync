@@ -3,7 +3,7 @@ require('dotenv').config();
 const nodemailer = require('nodemailer');
 
 async function checkSMTP() {
-  console.log('--- Verificando Configuração SMTP ---');
+  console.log('--- Verificando ConfiguraÃ§Ã£o SMTP ---');
   
   const config = {
     host: process.env.SMTP_HOST,
@@ -14,10 +14,10 @@ async function checkSMTP() {
     from: process.env.SMTP_FROM
   };
   
-  console.log('Configurações encontradas:', config);
+  console.log('ConfiguraÃ§Ãµes encontradas:', config);
   
   if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
-    console.error('❌ Faltam variáveis de ambiente obrigatórias!');
+    console.error('â�Å’ Faltam variÃ¡veis de ambiente obrigatÃ³rias!');
     console.log('Configure SMTP_HOST, SMTP_USER e SMTP_PASS no arquivo .env');
     return;
   }
@@ -38,26 +38,26 @@ async function checkSMTP() {
   try {
     console.log('Tentando conectar ao servidor SMTP...');
     await transporter.verify();
-    console.log('✅ Conexão SMTP estabelecida com sucesso!');
+    console.log('âÅ“â€¦ ConexÃ£o SMTP estabelecida com sucesso!');
     
     // Tentar enviar um email de teste
-    console.log('📧 Tentando enviar email de teste para o próprio remetente...');
+    console.log('ðÅ¸â€œ§ Tentando enviar email de teste para o prÃ³prio remetente...');
     const info = await transporter.sendMail({
       from: process.env.SMTP_FROM || process.env.SMTP_USER,
       to: process.env.SMTP_USER, // Envia para si mesmo
-      subject: 'Teste de Configuração SMTP - Beef Sync',
-      text: 'Se você recebeu este email, a configuração SMTP do Beef Sync está funcionando corretamente!',
-      html: '<h1>Teste SMTP Sucesso</h1><p>Se você recebeu este email, a configuração SMTP do Beef Sync está funcionando corretamente!</p>'
+      subject: 'Teste de ConfiguraÃ§Ã£o SMTP - Beef Sync',
+      text: 'Se vocÃª recebeu este email, a configuraÃ§Ã£o SMTP do Beef Sync estÃ¡ funcionando corretamente!',
+      html: '<h1>Teste SMTP Sucesso</h1><p>Se vocÃª recebeu este email, a configuraÃ§Ã£o SMTP do Beef Sync estÃ¡ funcionando corretamente!</p>'
     });
     
-    console.log('✅ Email de teste enviado com sucesso!');
+    console.log('âÅ“â€¦ Email de teste enviado com sucesso!');
     console.log('   ID da mensagem:', info.messageId);
     console.log('   Verifique sua caixa de entrada (e spam).');
     
   } catch (error) {
-    console.error('❌ Falha na conexão ou envio SMTP:', error.message);
+    console.error('â�Å’ Falha na conexÃ£o ou envio SMTP:', error.message);
     if (error.code === 'EAUTH') {
-      console.error('   -> Verifique usuário e senha.');
+      console.error('   -> Verifique usuÃ¡rio e senha.');
     }
     if (error.response) {
       console.error('   -> Resposta do servidor:', error.response);
