@@ -66,69 +66,45 @@ async function handler(req, res) {
       try { await query(`ALTER TABLE access_logs ADD COLUMN IF NOT EXISTS telefone VARCHAR(20)`) } catch (_) {}
 
       if (stats === 'true') {
-        const logs = await query(`
-          SELECT user_agent, ip_address, access_time FROM access_logs
-          WHERE access_time >= NOW() - INTERVAL '30 days'
+        // Usar SQL para agregação — evita carregar 30K+ linhas em memória
+        const statsResult = await query(`
+          SELECT
+            COUNT(*) FILTER (WHERE access_time >= CURRENT_DATE)                                          AS total_hoje,
+            COUNT(*) FILTER (WHERE access_time >= CURRENT_DATE AND user_agent ~* 'mobile|android|iphone|ipad|tablet|samsung|huawei|xiaomi') AS mobile_hoje,
+            COUNT(DISTINCT ip_address || user_agent) FILTER (WHERE access_time >= CURRENT_DATE AND user_agent ~* 'mobile|android|iphone|ipad|tablet|samsung|huawei|xiaomi') AS unicos_hoje,
+
+            COUNT(*) FILTER (WHERE access_time >= CURRENT_DATE - INTERVAL '7 days')                     AS total_semana,
+            COUNT(*) FILTER (WHERE access_time >= CURRENT_DATE - INTERVAL '7 days' AND user_agent ~* 'mobile|android|iphone|ipad|tablet|samsung|huawei|xiaomi') AS mobile_semana,
+            COUNT(DISTINCT ip_address || user_agent) FILTER (WHERE access_time >= CURRENT_DATE - INTERVAL '7 days' AND user_agent ~* 'mobile|android|iphone|ipad|tablet|samsung|huawei|xiaomi') AS unicos_semana,
+
+            COUNT(*) FILTER (WHERE access_time >= CURRENT_DATE - INTERVAL '30 days')                    AS total_mes,
+            COUNT(*) FILTER (WHERE access_time >= CURRENT_DATE - INTERVAL '30 days' AND user_agent ~* 'mobile|android|iphone|ipad|tablet|samsung|huawei|xiaomi') AS mobile_mes,
+            COUNT(DISTINCT ip_address || user_agent) FILTER (WHERE access_time >= CURRENT_DATE - INTERVAL '30 days' AND user_agent ~* 'mobile|android|iphone|ipad|tablet|samsung|huawei|xiaomi') AS unicos_mes
+          FROM access_logs
+          WHERE access_time >= CURRENT_DATE - INTERVAL '30 days'
+            AND ip_address NOT IN ('localhost', '127.0.0.1')
         `)
-        const now = new Date()
-        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-        const weekAgo = new Date(today)
-        weekAgo.setDate(weekAgo.getDate() - 7)
-        const monthAgo = new Date(today)
-        monthAgo.setMonth(monthAgo.getMonth() - 1)
-
-        let totalHoje = 0, totalSemana = 0, totalMes = 0
-        let mobileHoje = 0, mobileSemana = 0, mobileMes = 0
-        const uniqueMobileHoje = new Set()
-        const uniqueMobileSemana = new Set()
-        const uniqueMobileMes = new Set()
-
-        for (const row of logs.rows) {
-          const t = new Date(row.access_time)
-          const isMobile = isMobileUserAgent(row.user_agent)
-          const fingerprint = `${row.ip_address || ''}|${row.user_agent || ''}`
-
-          if (t >= today) {
-            totalHoje++
-            if (isMobile) {
-              mobileHoje++
-              uniqueMobileHoje.add(fingerprint)
-            }
-          }
-          if (t >= weekAgo) {
-            totalSemana++
-            if (isMobile) {
-              mobileSemana++
-              uniqueMobileSemana.add(fingerprint)
-            }
-          }
-          if (t >= monthAgo) {
-            totalMes++
-            if (isMobile) {
-              mobileMes++
-              uniqueMobileMes.add(fingerprint)
-            }
-          }
-        }
+        const s = statsResult.rows[0]
+        const n = (v) => parseInt(v) || 0
 
         return sendSuccess(res, {
           hoje: {
-            total: totalHoje,
-            mobile: mobileHoje,
-            desktop: totalHoje - mobileHoje,
-            celulares_unicos: uniqueMobileHoje.size
+            total: n(s.total_hoje),
+            mobile: n(s.mobile_hoje),
+            desktop: n(s.total_hoje) - n(s.mobile_hoje),
+            celulares_unicos: n(s.unicos_hoje)
           },
           semana: {
-            total: totalSemana,
-            mobile: mobileSemana,
-            desktop: totalSemana - mobileSemana,
-            celulares_unicos: uniqueMobileSemana.size
+            total: n(s.total_semana),
+            mobile: n(s.mobile_semana),
+            desktop: n(s.total_semana) - n(s.mobile_semana),
+            celulares_unicos: n(s.unicos_semana)
           },
           mes: {
-            total: totalMes,
-            mobile: mobileMes,
-            desktop: totalMes - mobileMes,
-            celulares_unicos: uniqueMobileMes.size
+            total: n(s.total_mes),
+            mobile: n(s.mobile_mes),
+            desktop: n(s.total_mes) - n(s.mobile_mes),
+            celulares_unicos: n(s.unicos_mes)
           }
         }, 'Estatísticas de acesso')
       }
@@ -175,6 +151,22 @@ async function handler(req, res) {
       console.error('Erro ao buscar logs de acesso:', error)
       return sendError(res, 'Erro ao buscar logs de acesso', 500, error.message)
     }
+  } else if (req.method === 'DELETE') {
+    // Purgar logs antigos ou de localhost
+    try {
+      const { tipo } = req.query
+      let result
+      if (tipo === 'localhost') {
+        result = await query(`DELETE FROM access_logs WHERE ip_address IN ('localhost', '127.0.0.1', 'N/A') OR hostname IN ('localhost', '127.0.0.1')`)
+      } else {
+        // Manter apenas os últimos 90 dias
+        result = await query(`DELETE FROM access_logs WHERE access_time < NOW() - INTERVAL '90 days'`)
+      }
+      return sendSuccess(res, { deleted: result.rowCount }, `${result.rowCount} registros removidos`)
+    } catch (error) {
+      return sendError(res, 'Erro ao purgar logs', 500, error.message)
+    }
+
   } else if (req.method === 'POST') {
     // Registrar novo acesso
     const { 
@@ -186,6 +178,13 @@ async function handler(req, res) {
       telefone,
       action = 'Login' 
     } = req.body
+
+    // Não gravar acessos de desenvolvimento local para não poluir o banco
+    const isLocalhost = ipAddress === 'localhost' || ipAddress === '127.0.0.1' ||
+                        hostname === 'localhost' || hostname === '127.0.0.1'
+    if (isLocalhost && process.env.NODE_ENV !== 'production') {
+      return sendSuccess(res, null, 'Acesso local ignorado em desenvolvimento')
+    }
 
     try {
       await query(`

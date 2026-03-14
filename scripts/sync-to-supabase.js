@@ -1,13 +1,13 @@
 /**
- * Sincronização Local → Supabase
- * Exporta dados do banco local e importa no Supabase via pg_dump + psql
- * ou via queries diretas usando a API REST do Supabase
+ * Sincronização Local → Supabase via REST API (HTTPS porta 443)
+ * Usa a PostgREST API do Supabase — não precisa de conexão direta PostgreSQL
  */
 
 const { Pool } = require('pg')
 require('dotenv').config()
 
-const SUPABASE_URL = 'postgresql://postgres.bpsltnglmbwdpvumjeaf:softZecaromero85@aws-1-us-east-2.pooler.supabase.com:6543/postgres'
+const SUPABASE_URL = 'https://bpsltnglmbwdpvumjeaf.supabase.co'
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 // Tabelas para sincronizar (ordem importa por causa de FK)
 const TABLES = [
@@ -30,6 +30,27 @@ const TABLES = [
   'historia_ocorrencias',
 ]
 
+async function supabaseRequest(method, table, body = null, extra = '') {
+  const url = `${SUPABASE_URL}/rest/v1/${table}${extra}`
+  const opts = {
+    method,
+    headers: {
+      'apikey': SUPABASE_SERVICE_KEY,
+      'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': method === 'POST' ? 'resolution=merge-duplicates,return=minimal' : 'return=minimal',
+    },
+  }
+  if (body) opts.body = JSON.stringify(body)
+
+  const res = await fetch(url, opts)
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`HTTP ${res.status}: ${text.slice(0, 200)}`)
+  }
+  return res
+}
+
 async function syncToSupabase(onProgress) {
   const localPool = new Pool({
     host: process.env.DB_HOST || 'localhost',
@@ -41,25 +62,23 @@ async function syncToSupabase(onProgress) {
     connectionTimeoutMillis: 10000,
   })
 
-  const remotePool = new Pool({
-    connectionString: SUPABASE_URL,
-    ssl: { rejectUnauthorized: false },
-    connectionTimeoutMillis: 20000,
-    query_timeout: 60000,
-  })
-
   const log = (msg) => {
     console.log(msg)
     if (onProgress) onProgress(msg)
   }
 
   try {
+    if (!SUPABASE_SERVICE_KEY) throw new Error('SUPABASE_SERVICE_ROLE_KEY não definida no .env')
+
     log('Conectando ao banco local...')
     await localPool.query('SELECT 1')
     log('✓ Banco local OK')
 
-    log('Conectando ao Supabase...')
-    await remotePool.query('SELECT 1')
+    log('Conectando ao Supabase via HTTPS...')
+    const testRes = await fetch(`${SUPABASE_URL}/rest/v1/animais?limit=1`, {
+      headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}` }
+    })
+    if (!testRes.ok) throw new Error(`Supabase retornou ${testRes.status}`)
     log('✓ Supabase OK')
 
     const results = {}
@@ -72,7 +91,7 @@ async function syncToSupabase(onProgress) {
           [table]
         )
         if (!exists.rows[0].exists) {
-          log(`⚠ Tabela ${table} não existe localmente, pulando...`)
+          log(`⚠ ${table}: não existe localmente, pulando`)
           continue
         }
 
@@ -80,35 +99,31 @@ async function syncToSupabase(onProgress) {
         const { rows } = await localPool.query(`SELECT * FROM ${table}`)
 
         if (rows.length === 0) {
-          log(`  → ${table}: vazia, pulando`)
-          results[table] = { inserted: 0, skipped: 0 }
+          // Limpar tabela remota também
+          await supabaseRequest('DELETE', table, null, '?id=gte.0').catch(() => {})
+          log(`  → ${table}: vazia`)
+          results[table] = { inserted: 0 }
           continue
         }
 
-        // Truncar tabela remota e reinserir
-        await remotePool.query(`TRUNCATE TABLE ${table} RESTART IDENTITY CASCADE`)
+        // 1. Deletar todos os registros remotos (truncate via DELETE)
+        await supabaseRequest('DELETE', table, null, '?id=gte.0').catch(async () => {
+          // Fallback: tentar com campo diferente
+          await supabaseRequest('DELETE', table, null, '?created_at=gte.1900-01-01').catch(() => {})
+        })
 
-        // Inserir em lotes de 100
-        const cols = Object.keys(rows[0])
-        const batchSize = 100
+        // 2. Inserir em lotes de 200
+        const batchSize = 200
         let inserted = 0
 
         for (let i = 0; i < rows.length; i += batchSize) {
           const batch = rows.slice(i, i + batchSize)
-          const placeholders = batch.map((_, bi) =>
-            `(${cols.map((_, ci) => `$${bi * cols.length + ci + 1}`).join(', ')})`
-          ).join(', ')
-          const values = batch.flatMap(row => cols.map(c => row[c]))
-
-          await remotePool.query(
-            `INSERT INTO ${table} (${cols.map(c => `"${c}"`).join(', ')}) VALUES ${placeholders} ON CONFLICT DO NOTHING`,
-            values
-          )
+          await supabaseRequest('POST', table, batch)
           inserted += batch.length
         }
 
         log(`  ✓ ${table}: ${inserted} registros`)
-        results[table] = { inserted, skipped: 0 }
+        results[table] = { inserted }
       } catch (err) {
         log(`  ✗ ${table}: ${err.message}`)
         results[table] = { error: err.message }
@@ -122,15 +137,11 @@ async function syncToSupabase(onProgress) {
     return { success: false, error: err.message }
   } finally {
     await localPool.end().catch(() => {})
-    await remotePool.end().catch(() => {})
   }
 }
 
-// Executar direto se chamado via CLI
 if (require.main === module) {
-  syncToSupabase(console.log).then(result => {
-    process.exit(result.success ? 0 : 1)
-  })
+  syncToSupabase(console.log).then(r => process.exit(r.success ? 0 : 1))
 }
 
-module.exports = { syncToSupabase, SUPABASE_URL }
+module.exports = { syncToSupabase }

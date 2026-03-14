@@ -1,6 +1,5 @@
 /**
- * Compara contagens entre banco local e Supabase
- * Retorna quais tabelas têm diferença e quantos registros
+ * Compara contagens entre banco local e Supabase via REST API (HTTPS)
  */
 const { Pool } = require('pg')
 
@@ -21,7 +20,26 @@ const TABLES = [
   { key: 'historia_ocorrencias', label: 'Ocorrências' },
 ]
 
-const SUPABASE_URL = 'postgresql://postgres.bpsltnglmbwdpvumjeaf:softZecaromero85@aws-1-us-east-2.pooler.supabase.com:6543/postgres'
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+async function getSupabaseCount(table) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?select=id&limit=1`, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Prefer': 'count=exact',
+      'Range': '0-0',
+    },
+  })
+  if (!res.ok) return 0
+  const range = res.headers.get('content-range') // ex: "0-0/312"
+  if (range) {
+    const total = range.split('/')[1]
+    return parseInt(total) || 0
+  }
+  return 0
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end()
@@ -37,20 +55,36 @@ export default async function handler(req, res) {
     max: 2,
   })
 
-  const remotePool = new Pool({
-    connectionString: SUPABASE_URL,
-    ssl: { rejectUnauthorized: false },
-    connectionTimeoutMillis: 10000,
-    query_timeout: 15000,
-    max: 2,
-  })
-
   try {
-    // Buscar contagens locais e remotas em paralelo
-    const [localCounts, remoteCounts] = await Promise.all([
-      getCounts(localPool, TABLES),
-      getCounts(remotePool, TABLES).catch(() => null), // não travar se Supabase offline
-    ])
+    // Contagens locais
+    const localCounts = {}
+    await Promise.all(
+      TABLES.map(async ({ key }) => {
+        try {
+          const r = await localPool.query(
+            `SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = $1) as exists`,
+            [key]
+          )
+          if (!r.rows[0].exists) { localCounts[key] = 0; return }
+          const c = await localPool.query(`SELECT COUNT(*) FROM ${key}`)
+          localCounts[key] = parseInt(c.rows[0].count)
+        } catch { localCounts[key] = 0 }
+      })
+    )
+
+    // Contagens Supabase via HTTPS
+    let remoteCounts = null
+    let supabaseOnline = false
+    try {
+      const counts = {}
+      await Promise.all(
+        TABLES.map(async ({ key }) => {
+          counts[key] = await getSupabaseCount(key).catch(() => 0)
+        })
+      )
+      remoteCounts = counts
+      supabaseOnline = true
+    } catch { supabaseOnline = false }
 
     const diff = []
     let totalPending = 0
@@ -63,15 +97,12 @@ export default async function handler(req, res) {
       if (delta !== null && delta !== 0) {
         diff.push({ key, label, local, remote, delta })
         totalPending += Math.abs(delta)
-      } else if (remote === null) {
-        // Supabase offline — mostrar só local
-        if (local > 0) diff.push({ key, label, local, remote: null, delta: null })
       }
     }
 
     return res.status(200).json({
       success: true,
-      supabaseOnline: remoteCounts !== null,
+      supabaseOnline,
       totalPending,
       diff,
       localCounts,
@@ -81,23 +112,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ success: false, error: err.message })
   } finally {
     await localPool.end().catch(() => {})
-    await remotePool.end().catch(() => {})
   }
-}
-
-async function getCounts(pool, tables) {
-  const counts = {}
-  await Promise.all(
-    tables.map(async ({ key }) => {
-      try {
-        const r = await pool.query(`SELECT COUNT(*) FROM ${key}`)
-        counts[key] = parseInt(r.rows[0].count)
-      } catch {
-        counts[key] = 0
-      }
-    })
-  )
-  return counts
 }
 
 export const config = { api: { externalResolver: true } }

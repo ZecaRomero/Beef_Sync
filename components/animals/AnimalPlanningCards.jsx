@@ -24,8 +24,10 @@ export default function AnimalPlanningCards({ metrics }) {
     isFemea,
   } = metrics
 
-  const mostrarBrucelose = isFemea && (temBrucelose || precisaBrucelose)
-  const mostrarDGT = precisaDGT || temDGT
+  // Mostrar Brucelose só quando precisar de ação — se já vacinada ou janela encerrada, não mostrar
+  const mostrarBrucelose = isFemea && !temBrucelose && elegivelBrucelose
+  // Mostrar DGT apenas se está NA janela (330-640d) ou já fez — não mostrar se janela já encerrou
+  const mostrarDGT = elegivelDGT || temDGT
 
   // Nada relevante para mostrar
   if (!mostrarBrucelose && !mostrarDGT) return null

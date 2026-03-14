@@ -66,9 +66,9 @@ export default function AnimalOffspring({ animal, filhos }) {
                         Era: {eraNaVenda}
                       </span>
                     )}
-                    {(f.pai || f.mae || f.avo_materno) && (
+                    {(f.pai || f.avo_materno || f.avoMaterno) && (
                       <span className="block w-full mt-0.5 text-gray-600 dark:text-gray-400">
-                        {[f.pai && `Pai: ${f.pai}`, f.mae && `Mãe: ${f.mae}`, (f.avo_materno || f.avoMaterno) && `Avô mat.: ${f.avo_materno || f.avoMaterno}`].filter(Boolean).join(' • ')}
+                        {[f.pai && `Pai: ${f.pai}`, (f.avo_materno || f.avoMaterno) && `Avô mat.: ${f.avo_materno || f.avoMaterno}`].filter(Boolean).join(' • ')}
                       </span>
                     )}
                     {isBaixa && f.data_baixa && (

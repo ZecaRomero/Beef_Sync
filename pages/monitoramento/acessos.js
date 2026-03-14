@@ -558,8 +558,59 @@ export default function AcessosSistema() {
               </div>
             </div>
 
+            {/* Limpeza de logs */}
+            <div className="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 border-2 border-gray-200 dark:border-gray-600">
+              <div className="flex items-start gap-3">
+                <ArrowPathIcon className="h-5 w-5 text-gray-500 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="font-medium text-gray-800 dark:text-gray-200 mb-1">Limpeza de logs de acesso</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                    O banco acumula registros de acesso do desenvolvimento local. Limpe para melhorar a performance.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={async () => {
+                        if (!confirm('Remover todos os logs de localhost/desenvolvimento?')) return
+                        setSaving(true)
+                        try {
+                          const r = await fetch('/api/access-log?tipo=localhost', { method: 'DELETE' })
+                          const d = await r.json()
+                          showMessage(`✅ ${d.data?.deleted || 0} registros de localhost removidos!`, 4000)
+                          loadData()
+                        } catch { showMessage('❌ Erro ao limpar', 3000) }
+                        finally { setSaving(false) }
+                      }}
+                      disabled={saving}
+                      className="px-3 py-2 rounded-lg bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/30 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-300 text-sm font-medium disabled:opacity-50 flex items-center gap-1.5"
+                    >
+                      <ArrowPathIcon className="h-4 w-4" />
+                      Limpar logs de localhost
+                    </button>
+                    <button
+                      onClick={async () => {
+                        if (!confirm('Remover logs com mais de 90 dias?')) return
+                        setSaving(true)
+                        try {
+                          const r = await fetch('/api/access-log', { method: 'DELETE' })
+                          const d = await r.json()
+                          showMessage(`✅ ${d.data?.deleted || 0} registros antigos removidos!`, 4000)
+                          loadData()
+                        } catch { showMessage('❌ Erro ao limpar', 3000) }
+                        finally { setSaving(false) }
+                      }}
+                      disabled={saving}
+                      className="px-3 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300 text-sm font-medium disabled:opacity-50 flex items-center gap-1.5"
+                    >
+                      <ArrowPathIcon className="h-4 w-4" />
+                      Remover &gt;90 dias
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Deslogar todos os celulares */}
-            <div className="mt-6 p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800">
+            <div className="mt-4 p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800">
               <div className="flex items-start gap-3">
                 <ExclamationTriangleIcon className="h-6 w-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
