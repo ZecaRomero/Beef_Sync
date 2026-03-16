@@ -15,6 +15,19 @@ export default function LoginPage() {
   const [success, setSuccess] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [rememberCreds, setRememberCreds] = useState(true)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const saved = localStorage.getItem('beefsync-login-creds')
+      if (!saved) return
+      const data = JSON.parse(saved)
+      if (data?.email) setEmail(data.email)
+      if (data?.password) setPassword(data.password)
+      if (typeof data?.remember === 'boolean') setRememberCreds(data.remember)
+    } catch (_) {}
+  }, [])
 
   const isLocalOrPrivateHost = () => {
     if (typeof window === 'undefined') return false
@@ -71,6 +84,17 @@ export default function LoginPage() {
       if (mode === 'login') {
         const authData = await signIn(email, password)
         const signedUser = authData?.user || user
+        if (typeof window !== 'undefined') {
+          if (rememberCreds) {
+            localStorage.setItem('beefsync-login-creds', JSON.stringify({
+              email,
+              password,
+              remember: true,
+            }))
+          } else {
+            localStorage.removeItem('beefsync-login-creds')
+          }
+        }
         router.replace(resolveTargetPath(signedUser))
       } else if (mode === 'register') {
         await signUp(email, password, { nome: name })
@@ -228,6 +252,18 @@ export default function LoginPage() {
                     </button>
                   </div>
                 </div>
+              )}
+
+              {mode === 'login' && (
+                <label className="flex items-center gap-2 text-xs text-blue-200/70 select-none">
+                  <input
+                    type="checkbox"
+                    checked={rememberCreds}
+                    onChange={(e) => setRememberCreds(e.target.checked)}
+                    className="rounded border-white/30 bg-white/10 text-blue-500 focus:ring-blue-500/60"
+                  />
+                  Lembrar credenciais neste navegador
+                </label>
               )}
 
               <button
