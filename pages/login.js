@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
 import { useAuth } from '../contexts/AuthContext'
+import { isLocalOrPrivateBrowserEnv } from '../utils/networkEnv'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -29,28 +30,13 @@ export default function LoginPage() {
     } catch (_) {}
   }, [])
 
-  const isLocalOrPrivateHost = () => {
-    if (typeof window === 'undefined') return false
-    const host = (window.location.hostname || '').toLowerCase()
-    if (!host) return false
-    if (host === 'localhost' || host === '127.0.0.1' || host === '::1') return true
-    if (host.startsWith('192.168.')) return true
-    if (host.startsWith('10.')) return true
-    const m172 = host.match(/^172\.(\d{1,3})\./)
-    if (m172) {
-      const secondOctet = Number(m172[1])
-      if (secondOctet >= 16 && secondOctet <= 31) return true
-    }
-    return false
-  }
-
   const resolveTargetPath = (currentUser) => {
     if (currentUser?.email === 'adelso@fazendasantanna.com.br') {
       return '/adelso-menu'
     }
 
     const role = currentUser?.user_metadata?.role || 'externo'
-    const isExternalLocal = role === 'externo' && isLocalOrPrivateHost()
+    const isExternalLocal = role === 'externo' && isLocalOrPrivateBrowserEnv()
 
     // Usuário externo em localhost/rede interna:
     // sempre abre na tela principal (Dashboard).

@@ -3,7 +3,6 @@
  * Gráficos, KPI cards, animações e visual aprimorado.
  */
 import {
-    ArrowDownTrayIcon,
     ArrowLeftIcon,
     ArrowPathIcon,
     ArrowRightOnRectangleIcon,
@@ -23,22 +22,17 @@ import {
     ExclamationCircleIcon,
     FunnelIcon,
     HeartIcon,
-    HomeIcon,
     LightBulbIcon,
-    ListBulletIcon,
     MagnifyingGlassIcon,
     MapPinIcon,
     MoonIcon,
     ScaleIcon,
-    ShareIcon,
     SparklesIcon,
     StarIcon,
     UserGroupIcon,
     XMarkIcon
 } from '@heroicons/react/24/outline'
 import {
-    ChartBarIcon as ChartBarIconSolid,
-    HomeIcon as HomeIconSolid,
     StarIcon as StarIconSolid
 } from '@heroicons/react/24/solid'
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Filler, Legend, LinearScale, LineElement, PointElement, Tooltip } from 'chart.js'
@@ -48,53 +42,38 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Bar, Doughnut, Line } from 'react-chartjs-2'
+import BottomTabBar from '../components/mobile-relatorios/BottomTabBar'
+import CardInfoModal from '../components/mobile-relatorios/CardInfoModal'
+import HomeHeroSection from '../components/mobile-relatorios/HomeHeroSection'
+import HomeQuickAccessSection from '../components/mobile-relatorios/HomeQuickAccessSection'
+import MobileReportsLoadingSkeleton from '../components/mobile-relatorios/MobileReportsLoadingSkeleton'
+import MobileReportsTopBar from '../components/mobile-relatorios/MobileReportsTopBar'
+import ReportActionBar from '../components/mobile-relatorios/ReportActionBar'
+import ReportsSearchAndFilter from '../components/mobile-relatorios/ReportsSearchAndFilter'
+import {
+  buildMedLocalKeys,
+  CORES_PIQUETE,
+  DESCRICOES_CARDS,
+  dedupeMeds,
+  diasAte,
+  diasDesde,
+  formatDate,
+  formatDisplayValue,
+  formatMoneyBR,
+  getColumnLabelByContext,
+  ICONE_POR_CATEGORIA,
+  matchReportSearch,
+  MOBILE_RELATORIOS_CATS,
+  buildConsultaAnimalId,
+  racaDisplay,
+  racaKey,
+  sortMedsByDate,
+  medsDoRowFromMaps,
+  ultimoMedRowFromMaps,
+} from '../utils/mobileRelatoriosUtils'
 
 if (typeof window !== 'undefined') {
   ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Filler, Tooltip, Legend)
-}
-
-function formatDate(d) {
-  if (!d) return '-'
-  // Strings YYYY-MM-DD são interpretadas como UTC pelo JS, causando dia errado no Brasil.
-  // Parse como data local para exibir corretamente.
-  if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}/.test(d)) {
-    const [y, m, day] = d.split(/[-T]/).map(Number)
-    if (y && m && day) {
-      const dt = new Date(y, m - 1, day)
-      return isNaN(dt.getTime()) ? '-' : dt.toLocaleDateString('pt-BR')
-    }
-  }
-  const dt = new Date(d)
-  return isNaN(dt.getTime()) ? '-' : dt.toLocaleDateString('pt-BR')
-}
-
-const CORES_PIQUETE = [
-  'rgba(245, 158, 11, 0.85)',   // amber
-  'rgba(34, 197, 94, 0.85)',    // green
-  'rgba(59, 130, 246, 0.85)',   // blue
-  'rgba(168, 85, 247, 0.85)',   // purple
-  'rgba(236, 72, 153, 0.85)',   // pink
-  'rgba(20, 184, 166, 0.85)',   // teal
-  'rgba(249, 115, 22, 0.85)',   // orange
-]
-
-const ICONE_POR_CATEGORIA = {
-  Manejo: ScaleIcon,
-  Reprodução: HeartIcon,
-  Sanidade: UserGroupIcon,
-  Estoque: DocumentTextIcon,
-  Localização: MapPinIcon,
-  Financeiro: CurrencyDollarIcon,
-  Gestão: ChartBarIcon,
-  Documentos: DocumentTextIcon,
-  Outros: ChartBarIcon
-}
-
-const DESCRICOES_ACESSO_RAPIDO = {
-  resumo_geral: 'Resumo completo do rebanho',
-  previsoes_parto: 'Datas previstas de partos',
-  calendario_reprodutivo: 'Eventos e cronograma',
-  ranking_pmgz: 'Top animais por desempenho'
 }
 
 export default function MobileRelatorios() {
@@ -103,19 +82,7 @@ export default function MobileRelatorios() {
   const [showMenu, setShowMenu] = useState(false)
   const [isDarkMode, setIsDarkMode] = useState(false)
 
-  const CATS = [
-    { key: 'Piquetes',     emoji: '🌿', test: s => /piquete|^piq\s/i.test(s),  colors: 'from-green-500 to-emerald-600' },
-    { key: 'Cabanha',      emoji: '🏠', test: s => /cabanha/i.test(s),          colors: 'from-violet-500 to-purple-600' },
-    { key: 'Confinamento', emoji: '🏗️', test: s => /confina|^conf\b/i.test(s),  colors: 'from-orange-500 to-amber-600' },
-    { key: 'Projetos',     emoji: '🔬', test: s => /projeto/i.test(s),          colors: 'from-cyan-500 to-teal-600' },
-  ]
-  
-  const getGreeting = () => {
-    const h = new Date().getHours()
-    if (h < 12) return 'Bom dia'
-    if (h < 18) return 'Boa tarde'
-    return 'Boa noite'
-  }
+  const CATS = MOBILE_RELATORIOS_CATS
 
   const [config, setConfig] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -200,74 +167,12 @@ export default function MobileRelatorios() {
     } catch (_) {}
   }, [])
 
-  const diasDesde = (dateStr) => {
-    if (!dateStr) return null
-    const d = new Date(dateStr); d.setHours(0,0,0,0)
-    const hoje = new Date(); hoje.setHours(0,0,0,0)
-    return Math.floor((hoje - d) / (1000*60*60*24))
-  }
-  const diasAte = (dateStr) => {
-    if (!dateStr) return null
-    const d = new Date(dateStr); d.setHours(0,0,0,0)
-    const hoje = new Date(); hoje.setHours(0,0,0,0)
-    return Math.ceil((d - hoje) / (1000*60*60*24))
-  }
-
-  const normalizeLocalKey = (value) =>
-    String(value || '')
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^\w\s/-]/g, ' ')
-      .trim()
-      .replace(/\s+/g, ' ')
-      .toUpperCase()
-
-  const buildMedLocalKeys = (local, local1, subLocal2) => {
-    const l = normalizeLocalKey(local)
-    const l1 = normalizeLocalKey(local1)
-    const s2 = normalizeLocalKey(subLocal2)
-    const keys = []
-    if (l && l1 && s2) keys.push(`L3:${l}||${l1}||${s2}`)
-    if (l && l1) keys.push(`L2:${l}||${l1}`)
-    if (l && s2) keys.push(`LS:${l}||${s2}`)
-    if (l) keys.push(`L1:${l}`)
-    return [...new Set(keys)]
-  }
-
-  const sortMedsByDate = (a, b) => {
-    const aDate = new Date(`${a?.data_aplicacao || ''}T12:00:00`).getTime() || 0
-    const bDate = new Date(`${b?.data_aplicacao || ''}T12:00:00`).getTime() || 0
-    if (bDate !== aDate) return bDate - aDate
-    const aCreated = new Date(a?.created_at || 0).getTime() || 0
-    const bCreated = new Date(b?.created_at || 0).getTime() || 0
-    return bCreated - aCreated
-  }
-
-  const dedupeMeds = (items = []) => {
-    const seen = new Set()
-    return items.filter((m, idx) => {
-      const key = m?.id != null
-        ? `id:${m.id}`
-        : `fallback:${m?.boletim_campo_id || ''}:${m?.medicamento || ''}:${m?.data_aplicacao || ''}:${idx}`
-      if (seen.has(key)) return false
-      seen.add(key)
-      return true
-    })
-  }
-
   const medsDoRow = (rowOrId, fallbackRow = null) => {
-    const row = typeof rowOrId === 'object' && rowOrId !== null ? rowOrId : fallbackRow
-    const id = typeof rowOrId === 'object' && rowOrId !== null ? rowOrId.id : rowOrId
-    const medsById = id != null ? (medicamentos[id] || []) : []
-
-    if (!row) return medsById
-
-    const localKeys = buildMedLocalKeys(row.local, row.local_1, row.sub_local_2)
-    const medsByLocal = localKeys.flatMap((k) => medicamentosPorLocal[k] || [])
-    return dedupeMeds([...medsById, ...medsByLocal]).sort(sortMedsByDate)
+    return medsDoRowFromMaps(rowOrId, fallbackRow, medicamentos, medicamentosPorLocal)
   }
 
-  const ultimoMedRow = (rowOrId, fallbackRow = null) => medsDoRow(rowOrId, fallbackRow)[0] || null
+  const ultimoMedRow = (rowOrId, fallbackRow = null) =>
+    ultimoMedRowFromMaps(rowOrId, fallbackRow, medicamentos, medicamentosPorLocal)
 
   const carregarMedicamentos = async () => {
     try {
@@ -580,94 +485,8 @@ export default function MobileRelatorios() {
       .finally(() => setCardListLoading(false))
   }, [cardFilterModal.open, cardFilterModal.filter, cardFilterModal.dataType, reportData?.data])
 
-  // Formatar valor monetário com 2 casas decimais (padrão BR)
-  const formatMoney = useCallback((val) => {
-    let n
-    if (typeof val === 'number') {
-      n = val
-    } else {
-      const s = String(val || '0').replace(/[^\d.,-]/g, '')
-      n = s.includes(',') && s.lastIndexOf(',') > (s.lastIndexOf('.') || -1)
-        ? parseFloat(s.replace(/\./g, '').replace(',', '.'))
-        : parseFloat(s.replace(',', '.'))
-    }
-    if (isNaN(n)) return '-'
-    return 'R$ ' + n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-  }, [])
-
-  // Função helper para formatar valores de forma segura
-  const formatValue = useCallback((v) => {
-    if (v == null) return '-'
-    
-    // Se for um objeto
-    if (typeof v === 'object') {
-      // Se for array, retornar o tamanho
-      if (Array.isArray(v)) return v.length
-      
-      // Se for objeto com propriedades específicas conhecidas, extrair valor principal
-      if (v.total !== undefined) return v.total
-      if (v.valor !== undefined) return v.valor
-      if (v.quantidade !== undefined) return v.quantidade
-      if (v.count !== undefined) return v.count
-      
-      // Se tiver label e valor (comum em objetos de resumo)
-      if (v.label !== undefined && v.valor !== undefined) {
-        return `${v.label}: ${v.valor}`
-      }
-      
-      // Se for um objeto com poucas propriedades, tentar formatar de forma legível
-      const keys = Object.keys(v)
-      if (keys.length === 1) return formatValue(v[keys[0]])
-      
-      // Para objetos com 2-3 propriedades, mostrar de forma compacta
-      if (keys.length <= 3) {
-        return keys.map(k => `${k}: ${v[k]}`).join(', ')
-      }
-      
-      // Para objetos maiores, mostrar apenas a quantidade de itens
-      return `${keys.length} itens`
-    }
-    
-    // Valores monetários (R$ X): sempre 2 casas decimais + separador de milhares
-    const s = String(v).trim()
-    if (s.startsWith('R$')) {
-      const numStr = s.replace(/[^\d,.-]/g, '').replace(',', '.')
-      const n = parseFloat(numStr)
-      if (!isNaN(n)) return formatMoney(n)
-    }
-    
-    return String(v)
-  }, [formatMoney])
-
-  // Descrições dos cards para modal de informação (clicáveis em todo o app)
-  const DESCRICOES_CARDS = useMemo(() => ({
-    Total: 'Total de cabeças no rebanho conforme o Boletim de Campo.',
-    Machos: 'Quantidade de machos no rebanho.',
-    Fêmeas: 'Quantidade de fêmeas no rebanho.',
-    Bezerros: 'Animais com até 12 meses de idade.',
-    Novilhas: 'Animais entre 12 e 24 meses de idade.',
-    Adultos: 'Animais com mais de 24 meses de idade.',
-    Custos: 'Soma dos custos registrados no período selecionado.',
-    Vendas: 'Total de vendas de animais no período.',
-    'Gestações Ativas': 'Fêmeas em gestação (gestações cadastradas + prenhas por IA).',
-    'Para Parir (30d)': 'Partos previstos nos próximos 30 dias.',
-    Nascimentos: 'Nascimentos registrados no período.',
-    'Nascimentos (30d)': 'Nascimentos registrados nos últimos 30 dias.',
-    'Média Recente': 'Peso médio das últimas pesagens (90 dias).',
-    Vacinações: 'Vacinações aplicadas no período.',
-    Mortes: 'Mortes registradas no período.',
-    'Touros (sêmen)': 'Quantidade de touros com doses de sêmen em estoque.',
-    'Doses Sêmen': 'Total de doses de sêmen disponíveis.',
-    Acasalamentos: 'Quantidade de acasalamentos cadastrados.',
-    'Embriões Disp.': 'Embriões disponíveis em estoque.',
-    rebanho: 'Resumo do rebanho: total de animais, machos, fêmeas e distribuição por idade.',
-    reproducao: 'Resumo reprodutivo: gestações ativas, nascimentos e partos previstos.',
-    peso: 'Média de peso recente dos animais.',
-    financeiro: 'Resumo financeiro: custos e vendas no período.',
-    estoque: 'Estoque de sêmen e embriões disponíveis.',
-    'Valor total': 'Soma total dos valores no relatório.',
-    'Total de custos': 'Quantidade de registros de custos e valor total.'
-  }), [])
+  const formatMoney = formatMoneyBR
+  const formatValue = formatDisplayValue
 
   const showCardInfo = useCallback((title, value, reportKey = null) => {
     const desc = DESCRICOES_CARDS[title] || DESCRICOES_CARDS[title?.trim?.()] || `Informação sobre ${title}.`
@@ -675,7 +494,7 @@ export default function MobileRelatorios() {
       ? (value.total ?? value.valor ?? value.quantidade ?? value.custos ?? value.vendas)
       : value
     setCardInfoModal({ open: true, title, value: formatValue(rawVal), description: desc, reportKey })
-  }, [DESCRICOES_CARDS, formatValue])
+  }, [])
 
   const handleCardClick = useCallback((k, v) => {
     const key = String(k).toLowerCase()
@@ -731,7 +550,6 @@ export default function MobileRelatorios() {
   const enabledReports = config?.enabled || []
   const allTypes = config?.allTypes || []
   const tiposHabilitados = allTypes.filter(t => enabledReports.includes(t.key))
-  const ACESSO_RAPIDO_KEYS = ['resumo_geral', 'previsoes_parto', 'calendario_reprodutivo', 'ranking_pmgz']
   const porCategoria = tiposHabilitados.reduce((acc, t) => {
     const cat = t.category || 'Outros'
     if (!acc[cat]) acc[cat] = []
@@ -741,84 +559,15 @@ export default function MobileRelatorios() {
   const categoriasComRelatorios = Object.entries(porCategoria)
     .map(([cat, tipos]) => ({ cat, tipos }))
     .filter(({ tipos }) => tipos.length > 0)
-  const matchSearch = (label, key) => {
-    if (!searchReports.trim()) return true
-    const q = searchReports.trim().toLowerCase()
-    return (label || '').toLowerCase().includes(q) || (key || '').toLowerCase().includes(q)
-  }
+  const matchSearch = (label, key) => matchReportSearch(label, key, searchReports)
   const showRanking = enabledReports.includes('ranking_animais_avaliados') || enabledReports.includes('ranking_pmgz') || enabledReports.includes('ranking_mgte')
   const ehRanking = selectedTipo === 'ranking_pmgz' || selectedTipo === 'ranking_animais_avaliados' || selectedTipo === 'ranking_mgte'
-  const LABELS_RANKING = {
-    ranking: 'Ranking',
-    posicao: 'Posição',
-    animal: 'Animal',
-    valor: 'Valor',
-    raca: 'Raça',
-    sexo: 'Sexo',
-    piquete: 'Piquete',
-    iABCZ: 'iABCZ',
-    deca: 'DECA',
-    iqg: 'IQG',
-    pt_iqg: 'Pt IQG',
-    mgte: 'MGTe',
-    top: 'TOP'
-  }
-  const LABELS_BOLETIM_CAMPO = {
-    local: 'Local',
-    local_1: 'Local 1',
-    sub_local_2: 'Sub Local',
-    quant: 'Qtd',
-    sexo: 'Sexo',
-    categoria: 'Categoria',
-    raca: 'Raça',
-    era: 'Era',
-    observacao: 'Observação'
-  }
-  const LABELS_BOLETIM_DEFESA = {
-    fazenda: 'Fazenda',
-    cnpj: 'CNPJ',
-    total: 'Total'
-  }
-  const LABELS_BOLETIM_REBANHO = {
-    raca: 'Raça',
-    sexo: 'Sexo',
-    era: 'Era',
-    total: 'Total'
-  }
   const ehBoletimCampo = selectedTipo === 'boletim_campo'
   const ehBoletimDefesa = selectedTipo === 'boletim_defesa'
   const ehBoletimRebanho = selectedTipo === 'boletim_rebanho'
   const ehBoletim = ehBoletimCampo || ehBoletimDefesa || ehBoletimRebanho
-  const getColumnLabel = (col) => {
-    if (col === 'mgte') return 'MGTe'
-    if (col === 'top') return 'TOP'
-    if (ehRanking) return LABELS_RANKING[col] || col
-    if (ehBoletimCampo) return LABELS_BOLETIM_CAMPO[col] || col
-    if (ehBoletimDefesa) return LABELS_BOLETIM_DEFESA[col] || col
-    if (ehBoletimRebanho) return LABELS_BOLETIM_REBANHO[col] || col
-    return col
-  }
-
-  const buildConsultaAnimalId = (value) => {
-    const raw = String(value || '').trim()
-    if (!raw) return null
-
-    const normalized = raw
-      .replace(/[^\w\s-]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .toUpperCase()
-
-    if (!normalized) return null
-
-    const direct = normalized.match(/^([A-Z]+)-([A-Z0-9]+)$/)
-    if (direct) return `${direct[1]}-${direct[2]}`
-
-    const compact = normalized.match(/^([A-Z]+)\s+([A-Z0-9]+)$/)
-    if (compact) return `${compact[1]}-${compact[2]}`
-
-    return normalized.replace(/\s+/g, '-')
-  }
+  const getColumnLabel = (col) =>
+    getColumnLabelByContext(col, { ehRanking, ehBoletimCampo, ehBoletimDefesa, ehBoletimRebanho })
 
   const filteredData = reportData?.data?.filter(d => {
     if (d._resumo) return false
@@ -1013,14 +762,6 @@ export default function MobileRelatorios() {
       }]
     }
   })() : null
-
-  // Normalizar raça para agrupamento (case-insensitive) e exibição (title case)
-  const racaKey = (s) => ((s || 'Não informada').trim() || 'Não informada').toUpperCase()
-  const racaDisplay = (s) => {
-    const t = (s || 'Não informada').trim() || 'Não informada'
-    if (t === 'NÃO INFORMADA') return 'Não informada'
-    return t.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
-  }
 
   // Detalhes do estoque de sêmen por touro
   const detalhesEstoqueSemen = selectedTipo === 'estoque_semen' && filteredData.length > 0 ? (() => {
@@ -2149,295 +1890,39 @@ export default function MobileRelatorios() {
           </motion.div>
         )}
       </AnimatePresence>
-      {/* Modal de informação ao clicar em card */}
-      <AnimatePresence>
-        {cardInfoModal.open && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setCardInfoModal(m => ({ ...m, open: false }))}
-            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              onClick={e => e.stopPropagation()}
-              className="absolute left-4 right-4 top-1/2 -translate-y-1/2 p-5 rounded-2xl bg-white dark:bg-gray-800 shadow-2xl border border-gray-200 dark:border-gray-700"
-            >
-              <div className="flex items-start justify-between gap-3 mb-3">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white">{cardInfoModal.title}</h3>
-                <button
-                  onClick={() => setCardInfoModal(m => ({ ...m, open: false }))}
-                  className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  <XMarkIcon className="h-5 w-5 text-gray-500" />
-                </button>
-              </div>
-              <p className="text-2xl font-bold text-amber-600 dark:text-amber-400 mb-3">{cardInfoModal.value}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{cardInfoModal.description}</p>
-              {cardInfoModal.reportKey && (
-                <button
-                  onClick={() => {
-                    setSelectedTipo(cardInfoModal.reportKey)
-                    setViewMode('table')
-                    setCardInfoModal(m => ({ ...m, open: false }))
-                  }}
-                  className="w-full py-2.5 rounded-xl bg-amber-500 text-white font-semibold hover:bg-amber-600 transition-colors flex items-center justify-center gap-2"
-                >
-                  <ChartBarIcon className="h-5 w-5" />
-                  Ver relatório completo
-                </button>
-              )}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <CardInfoModal
+        cardInfoModal={cardInfoModal}
+        onClose={() => setCardInfoModal((m) => ({ ...m, open: false }))}
+        onViewReport={() => {
+          setSelectedTipo(cardInfoModal.reportKey)
+          setViewMode('table')
+          setCardInfoModal((m) => ({ ...m, open: false }))
+        }}
+      />
       <div className="min-h-screen bg-gradient-to-b from-amber-50/80 via-white to-amber-50/30 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 pb-24 relative overflow-hidden">
         {/* Decoração sutil de fundo */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-100/20 via-transparent to-transparent dark:from-amber-900/10 pointer-events-none" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-amber-200/10 dark:bg-amber-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-amber-100/20 dark:bg-amber-900/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
-        <div className="sticky top-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-amber-200/50 dark:border-amber-900/30 shadow-[0_4px_30px_rgba(251,191,36,0.08)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)] px-4 py-3">
-          <div className="max-w-lg mx-auto flex items-center justify-between">
-            {selectedTipo ? (
-              <button
-                onClick={() => setSelectedTipo(null)}
-                className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-medium"
-              >
-                <ArrowLeftIcon className="h-6 w-6" />
-                Voltar
-              </button>
-            ) : (
-              <Link
-                href="/a"
-                className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-medium"
-              >
-                <ArrowLeftIcon className="h-6 w-6" />
-                Voltar
-              </Link>
-            )}
-            <h1 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/40">
-                <ChartBarIcon className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-              </div>
-              {selectedTipo ? (
-                <span className="truncate max-w-[180px]">
-                  {allTypes.find(t => t.key === selectedTipo)?.label || 'Relatório'}
-                </span>
-              ) : (
-                <span>Relatórios</span>
-              )}
-            </h1>
-            <div className="w-16" />
-          </div>
-        </div>
+        <MobileReportsTopBar
+          selectedTipo={selectedTipo}
+          allTypes={allTypes}
+          onBackToHome={() => setSelectedTipo(null)}
+        />
 
         <div className="relative max-w-lg mx-auto px-4 py-6">
           {loading ? (
-            <div className="space-y-3">
-              {[1, 2, 3, 4, 5, 6].map((i, idx) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0.5 }}
-                  animate={{ opacity: [0.5, 0.9, 0.5] }}
-                  transition={{ repeat: Infinity, duration: 1.2, delay: idx * 0.08 }}
-                  className="h-16 rounded-2xl bg-gradient-to-r from-amber-100/50 via-amber-50 to-amber-100/50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800"
-                />
-              ))}
-            </div>
+            <MobileReportsLoadingSkeleton />
           ) : !selectedTipo ? (
             <div className="pb-28 space-y-5 relative">
               {currentTab === 'home' && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="space-y-6"
-                >
-                  <div className="px-1 pt-4 pb-2">
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5 }}
-                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100/80 dark:bg-amber-900/30 border border-amber-200/60 dark:border-amber-700/50 mb-3"
-                    >
-                      <SparklesIcon className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                      <span className="text-xs font-semibold text-amber-700 dark:text-amber-300 uppercase tracking-wide">Beef-Sync</span>
-                    </motion.div>
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
-                      {getGreeting()}, <span className="bg-gradient-to-r from-amber-500 to-amber-600 dark:from-amber-400 dark:to-amber-500 bg-clip-text text-transparent">Fazendeiro</span>
-                    </h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 font-medium">
-                      Resumo executivo da sua fazenda
-                    </p>
-                  </div>
-
-              {/* Dashboard / Visão Geral - KPIs rápidos MELHORADOS */}
-              {dashboardData?.data?.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="mb-5"
-                >
-                  <div className="flex items-center justify-between mb-4 px-1">
-                    <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/40">
-                        <ChartBarIcon className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                      </div>
-                      <span className="text-xs font-bold uppercase tracking-widest text-amber-600/90 dark:text-amber-400/90">Visão Geral</span>
-                    </div>
-                    <button
-                      onClick={() => setSelectedTipo('resumo_geral')}
-                      className="flex items-center gap-1 text-xs font-semibold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 active:scale-95 transition-colors"
-                    >
-                      Ver completo
-                      <ChevronRightIcon className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                    <div className="grid grid-cols-2 gap-3">
-                    {dashboardData.data.slice(0, 6).map((mod, i) => {
-                      const modConfig = {
-                        Rebanho: { 
-                          color: 'blue',
-                          icon: '🐄',
-                          bgIcon: 'bg-blue-100 dark:bg-blue-900/40',
-                          textIcon: 'text-blue-600 dark:text-blue-400',
-                          border: 'border-blue-500'
-                        },
-                        Reprodução: { 
-                          color: 'pink',
-                          icon: '💕',
-                          bgIcon: 'bg-pink-100 dark:bg-pink-900/40',
-                          textIcon: 'text-pink-600 dark:text-pink-400',
-                          border: 'border-pink-500'
-                        },
-                        Peso: { 
-                          color: 'amber',
-                          icon: '⚖️',
-                          bgIcon: 'bg-amber-100 dark:bg-amber-900/40',
-                          textIcon: 'text-amber-600 dark:text-amber-400',
-                          border: 'border-amber-500'
-                        },
-                        Financeiro: { 
-                          color: 'emerald',
-                          icon: '💰',
-                          bgIcon: 'bg-emerald-100 dark:bg-emerald-900/40',
-                          textIcon: 'text-emerald-600 dark:text-emerald-400',
-                          border: 'border-emerald-500'
-                        },
-                        Sanidade: { 
-                          color: 'violet',
-                          icon: '💉',
-                          bgIcon: 'bg-violet-100 dark:bg-violet-900/40',
-                          textIcon: 'text-violet-600 dark:text-violet-400',
-                          border: 'border-violet-500'
-                        },
-                        Estoque: { 
-                          color: 'cyan',
-                          icon: '📦',
-                          bgIcon: 'bg-cyan-100 dark:bg-cyan-900/40',
-                          textIcon: 'text-cyan-600 dark:text-cyan-400',
-                          border: 'border-cyan-500'
-                        }
-                      }
-                      const config = modConfig[mod.modulo] || {
-                        color: 'gray',
-                        icon: '📊',
-                        bgIcon: 'bg-gray-100 dark:bg-gray-800',
-                        textIcon: 'text-gray-600 dark:text-gray-400',
-                        border: 'border-gray-500'
-                      }
-
-                      return (
-                        <motion.div
-                          key={i}
-                          initial={{ opacity: 0, scale: 0.95, y: 16 }}
-                          animate={{ opacity: 1, scale: 1, y: 0 }}
-                          transition={{ delay: 0.06 * i, type: 'spring', stiffness: 260, damping: 20 }}
-                          whileHover={{ scale: 1.02, y: -2 }}
-                          whileTap={{ scale: 0.98 }}
-                          onClick={() => setSelectedTipo('resumo_geral')}
-                          className="relative p-4 rounded-2xl bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md hover:border-amber-200 dark:hover:border-amber-800 transition-all duration-300 cursor-pointer overflow-hidden group"
-                        >
-                          {/* Barra lateral colorida */}
-                          <div className={`absolute left-0 top-0 bottom-0 w-1 ${config.bgIcon.replace('/40', '')}`} />
-                          
-                          <div className="flex justify-between items-start mb-3">
-                            <p className="text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">{mod.modulo}</p>
-                            <div className={`w-8 h-8 rounded-full ${config.bgIcon} flex items-center justify-center text-lg shadow-sm`}>
-                              {config.icon}
-                            </div>
-                          </div>
-
-                          <div className="space-y-2">
-                            {Object.entries(mod.dados || {}).slice(0, 4).map(([k, v]) => {
-                              const labelCurto = {
-                                'Média Recente': 'Média',
-                                'Para Parir (30d)': 'Parir 30d',
-                                'Gestações Ativas': 'Gestações',
-                                'Nascimentos (30d)': 'Nasc. 30d',
-                                'Touros (sêmen)': 'Touros',
-                                'Doses Sêmen': 'Doses',
-                                'Embriões Disp.': 'Embriões'
-                              }[k] || k
-                              return (
-                                <div key={k} className="flex flex-col min-w-0">
-                                  <span className="text-[10px] text-gray-400 dark:text-gray-500 font-medium truncate">{labelCurto}</span>
-                                  <span className={`text-sm font-extrabold text-gray-800 dark:text-gray-200 tabular-nums leading-tight`}>{formatValue(v)}</span>
-                                </div>
-                              )
-                            })}
-                          </div>
-                          
-                          <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <ChevronRightIcon className="h-4 w-4 text-gray-300" />
-                          </div>
-                        </motion.div>
-                      )
-                    })}
-                  </div>
-                  
-                  {/* Estatísticas rápidas adicionais */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.35 }}
-                    className="mt-5 grid grid-cols-3 gap-2"
-                  >
-                    <motion.div 
-                      whileHover={{ scale: 1.05, y: -2 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="p-3 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-white/80 dark:border-gray-700/80 shadow-md shadow-gray-200/40 dark:shadow-black/20 cursor-default"
-                    >
-                      <p className="text-[9px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Hoje</p>
-                      <p className="text-sm font-bold text-purple-900 dark:text-purple-100 mt-0.5 tabular-nums">{new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</p>
-                    </motion.div>
-                    <motion.button
-                      whileHover={{ scale: 1.05, y: -2 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setCurrentTab('reports')}
-                      className="p-3 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-white/80 dark:border-gray-700/80 shadow-md shadow-gray-200/40 dark:shadow-black/20 hover:shadow-lg hover:shadow-emerald-200/30 dark:hover:shadow-emerald-900/20 hover:border-emerald-200 dark:hover:border-emerald-700/50 transition-all cursor-pointer"
-                    >
-                      <p className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Relatórios</p>
-                      <p className="text-sm font-bold text-emerald-900 dark:text-emerald-100 mt-0.5 tabular-nums">{enabledReports.length}</p>
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.05, y: -2 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setCurrentTab('reports')}
-                      className="p-3 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-white/80 dark:border-gray-700/80 shadow-md shadow-gray-200/40 dark:shadow-black/20 hover:shadow-lg hover:shadow-amber-200/30 dark:hover:shadow-amber-900/20 hover:border-amber-200 dark:hover:border-amber-700/50 transition-all cursor-pointer"
-                    >
-                      <p className="text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Favoritos</p>
-                      <p className="text-sm font-bold text-amber-900 dark:text-amber-100 mt-0.5 tabular-nums">{favorites.length}</p>
-                    </motion.button>
-                  </motion.div>
-                </motion.div>
-              )}
-              </motion.div>
+                <HomeHeroSection
+                  dashboardData={dashboardData}
+                  enabledReports={enabledReports}
+                  favorites={favorites}
+                  onSelectTipo={setSelectedTipo}
+                  onGoToReports={() => setCurrentTab('reports')}
+                />
               )}
 
               {tiposHabilitados.length === 0 ? (
@@ -2449,295 +1934,34 @@ export default function MobileRelatorios() {
               ) : (
                 <>
                   {currentTab === 'reports' && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="space-y-6"
-                    >
-                      {/* Busca de relatórios */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="relative"
-                  >
-                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <input
-                      type="text"
-                      value={searchReports}
-                      onChange={e => setSearchReports(e.target.value)}
-                      placeholder="Buscar relatórios..."
-                      className="w-full pl-10 pr-10 py-3 rounded-2xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all"
+                    <ReportsSearchAndFilter
+                      searchReports={searchReports}
+                      onSearchChange={setSearchReports}
+                      categoryFilter={categoryFilter}
+                      onCategoryChange={setCategoryFilter}
+                      categoriasComRelatorios={categoriasComRelatorios}
                     />
-                    {searchReports && (
-                      <button
-                        onClick={() => setSearchReports('')}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"
-                      >
-                        <XMarkIcon className="h-5 w-5 text-gray-500" />
-                      </button>
-                    )}
-                  </motion.div>
-
-                  {/* Filtro por categoria */}
-                  {categoriasComRelatorios.length > 1 && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="flex flex-wrap gap-2"
-                    >
-                      <button
-                        onClick={() => setCategoryFilter('')}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                          !categoryFilter
-                            ? 'bg-amber-500 text-white shadow-md'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
-                        }`}
-                      >
-                        Todas
-                      </button>
-                      {categoriasComRelatorios.map(({ cat }) => {
-                        const CatIcon = ICONE_POR_CATEGORIA[cat] || ChartBarIcon
-                        const ativo = categoryFilter === cat
-                        return (
-                          <button
-                            key={cat}
-                            onClick={() => setCategoryFilter(ativo ? '' : cat)}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                              ativo ? 'bg-amber-500 text-white shadow-md' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
-                            }`}
-                          >
-                            <CatIcon className="h-3.5 w-3.5" />
-                            {cat}
-                          </button>
-                        )
-                      })}
-                    </motion.div>
-                  )}
-                    </motion.div>
                   )}
 
                   {currentTab === 'home' && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="space-y-6"
-                    >
-                  {/* Acesso Rápido - Relatórios mais usados */}
-                  <div className="pt-4">
-                    <div className="flex items-center gap-2 mb-4 px-1">
-                      <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/40">
-                        <ChartBarIcon className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                      </div>
-                      <span className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Acesso Rápido</span>
-                      <div className="flex-1 h-px bg-gradient-to-r from-amber-200/60 to-transparent dark:from-amber-800/40" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      {ACESSO_RAPIDO_KEYS.filter(k => enabledReports.includes(k)).map((id, i) => {
-                        const tipo = allTypes.find(t => t.key === id)
-                        if (!tipo) return null
-                        const Icon = ICONE_POR_CATEGORIA[tipo.category] || ChartBarIcon
-                        const desc = DESCRICOES_ACESSO_RAPIDO[id]
-                        return (
-                          <motion.button
-                            key={id}
-                            initial={{ opacity: 0, y: 8 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.05 * i, type: 'spring', stiffness: 200 }}
-                            whileTap={{ scale: 0.98 }}
-                            whileHover={{ scale: 1.02, y: -2 }}
-                            onClick={() => setSelectedTipo(id)}
-                            className="relative flex flex-col items-start gap-2 p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-amber-200 dark:hover:border-amber-800 transition-all duration-300 text-left overflow-hidden group"
-                          >
-                            <div className="absolute right-0 top-0 w-16 h-16 bg-gradient-to-br from-amber-50 to-transparent dark:from-amber-900/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110" />
-                            
-                            <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-900/20 group-hover:bg-amber-100 dark:group-hover:bg-amber-900/40 transition-colors z-10">
-                              <Icon className="h-6 w-6 text-amber-600 dark:text-amber-400" />
-                            </div>
-                            
-                            <div className="z-10 w-full">
-                              <span className="text-sm font-bold text-gray-800 dark:text-gray-100 block mb-0.5">{tipo.label.replace(/^[📊📅🏆]\s*/, '')}</span>
-                              {desc && <span className="text-[10px] text-gray-500 dark:text-gray-400 leading-tight block">{desc}</span>}
-                            </div>
-                            
-                            <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-2 group-hover:translate-x-0">
-                              <ChevronRightIcon className="h-4 w-4 text-amber-400" />
-                            </div>
-                          </motion.button>
-                        )
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Ações Rápidas */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.25 }}
-                  >
-                    <div className="flex items-center gap-2 mb-4 px-1 mt-6">
-                      <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/40">
-                        <LightBulbIcon className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                      </div>
-                      <span className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Ações Rápidas</span>
-                      <div className="flex-1 h-px bg-gradient-to-r from-blue-200/60 to-transparent dark:from-blue-800/40" />
-                    </div>
-                    <div className="grid grid-cols-3 gap-3">
-                      <Link href="/a">
-                        <motion.div
-                          whileHover={{ scale: 1.05, y: -2 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all cursor-pointer group"
-                        >
-                          <div className="p-3 rounded-full bg-blue-50 dark:bg-blue-900/20 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 transition-colors">
-                            <MagnifyingGlassIcon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                          </div>
-                          <span className="text-[10px] font-bold text-gray-600 dark:text-gray-300 text-center leading-tight">Consultar<br/>Animal</span>
-                        </motion.div>
-                      </Link>
-                      
-                      <Link href="/mobile-feedback">
-                        <motion.div
-                          whileHover={{ scale: 1.05, y: -2 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all cursor-pointer group"
-                        >
-                          <div className="p-3 rounded-full bg-emerald-50 dark:bg-emerald-900/20 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/40 transition-colors">
-                            <ChatBubbleLeftRightIcon className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
-                          </div>
-                          <span className="text-[10px] font-bold text-gray-600 dark:text-gray-300 text-center leading-tight">Enviar<br/>Feedback</span>
-                        </motion.div>
-                      </Link>
-                      
-                      <motion.div
-                        whileHover={{ scale: 1.05, y: -2 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => {
-                          const today = new Date()
-                          const start = new Date(today)
-                          start.setMonth(start.getMonth() - 1)
-                          setPeriod({
-                            startDate: start.toISOString().split('T')[0],
-                            endDate: today.toISOString().split('T')[0]
-                          })
-                        }}
-                        className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all cursor-pointer group"
-                      >
-                        <div className="p-3 rounded-full bg-purple-50 dark:bg-purple-900/20 group-hover:bg-purple-100 dark:group-hover:bg-purple-900/40 transition-colors">
-                          <CalendarIcon className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-                        </div>
-                        <span className="text-[10px] font-bold text-gray-600 dark:text-gray-300 text-center leading-tight">Último<br/>Mês</span>
-                      </motion.div>
-                    </div>
-                  </motion.div>
-
-                  {/* Favoritos */}
-                  {favorites.filter(id => enabledReports.includes(id)).length > 0 && (
-                    <div className="pt-2">
-                      <div className="flex items-center gap-2 mb-3 px-1 mt-4">
-                        <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/40">
-                          <StarIconSolid className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                        </div>
-                        <span className="text-xs font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400">Seus Favoritos</span>
-                        <div className="flex-1 h-px bg-gradient-to-r from-amber-200/60 to-transparent dark:from-amber-800/40" />
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {favorites.filter(id => enabledReports.includes(id)).map(id => {
-                          const tipo = allTypes.find(t => t.key === id)
-                          if (!tipo) return null
-                          const Icon = ICONE_POR_CATEGORIA[tipo.category] || DocumentTextIcon
-                          return (
-                            <motion.div
-                              key={id}
-                              whileTap={{ scale: 0.97 }}
-                              className="flex items-center gap-1 group"
-                            >
-                              <button
-                                onClick={() => setSelectedTipo(id)}
-                                className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white dark:bg-gray-800 border border-amber-100 dark:border-amber-900/50 text-gray-700 dark:text-gray-200 text-sm font-semibold shadow-sm hover:shadow-md hover:border-amber-300 dark:hover:border-amber-700/60 transition-all"
-                              >
-                                <Icon className="h-4 w-4 text-amber-500" />
-                                {tipo.label.replace(/^[📊📅🏆]\s*/, '')}
-                              </button>
-                              <button
-                                onClick={e => { e.stopPropagation(); toggleFavorite(id) }}
-                                className="p-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-amber-400 hover:text-amber-500 shadow-sm hover:shadow-md transition-all"
-                              >
-                                <StarIconSolid className="h-4 w-4" />
-                              </button>
-                            </motion.div>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Você pode gostar - sugestões */}
-                  {(() => {
-                    const excluidos = new Set([...ACESSO_RAPIDO_KEYS, ...recentIds, ...favorites])
-                    const sugestoes = []
-                    for (const { tipos } of categoriasComRelatorios) {
-                      for (const t of tipos) {
-                        if (!excluidos.has(t.key) && sugestoes.length < 3) {
-                          sugestoes.push(t)
-                          excluidos.add(t.key)
-                        }
-                      }
-                    }
-                    return sugestoes.length > 0 ? (
-                      <div>
-                        <div className="flex items-center gap-2 mb-2 px-1">
-                          <LightBulbIcon className="h-4 w-4 text-amber-500" />
-                          <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">Você pode gostar</span>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          {sugestoes.map(tipo => {
-                            const Icon = ICONE_POR_CATEGORIA[tipo.category] || ChartBarIcon
-                            return (
-                              <motion.button
-                                key={tipo.key}
-                                whileTap={{ scale: 0.97 }}
-                                onClick={() => setSelectedTipo(tipo.key)}
-                                className="flex items-center gap-2 px-3 py-2 rounded-xl bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 text-violet-700 dark:text-violet-300 text-sm font-medium hover:bg-violet-100 dark:hover:bg-violet-900/30 transition-colors text-left max-w-full"
-                              >
-                                <Icon className="h-4 w-4 flex-shrink-0" />
-                                <span className="break-words min-w-0">{tipo.label.replace(/^[📊📅🏆]\s*/, '')}</span>
-                              </motion.button>
-                            )
-                          })}
-                        </div>
-                      </div>
-                    ) : null
-                  })()}
-
-                  {recentIds.filter(id => !ACESSO_RAPIDO_KEYS.includes(id)).length > 0 && (
-                    <div>
-                      <div className="flex items-center gap-2 mb-2 px-1">
-                        <ClockIcon className="h-4 w-4 text-amber-500" />
-                        <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">Acessados recentemente</span>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {recentIds.filter(id => !ACESSO_RAPIDO_KEYS.includes(id)).filter(id => enabledReports.includes(id)).slice(0, 5).map(id => {
-                          const tipo = allTypes.find(t => t.key === id)
-                          if (!tipo) return null
-                          const Icon = ICONE_POR_CATEGORIA[tipo.category] || DocumentTextIcon
-                          return (
-                            <motion.button
-                              key={id}
-                              whileTap={{ scale: 0.97 }}
-                              onClick={() => setSelectedTipo(id)}
-                              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600/50 transition-colors text-left max-w-full"
-                            >
-                              <Icon className="h-4 w-4 flex-shrink-0" />
-                              <span className="break-words min-w-0">{tipo.label.replace(/^[📊📅🏆]\s*/, '')}</span>
-                            </motion.button>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  )}
-                    </motion.div>
+                    <HomeQuickAccessSection
+                      allTypes={allTypes}
+                      enabledReports={enabledReports}
+                      favorites={favorites}
+                      recentIds={recentIds}
+                      categoriasComRelatorios={categoriasComRelatorios}
+                      onSelectTipo={setSelectedTipo}
+                      onToggleFavorite={toggleFavorite}
+                      onSetPeriodLastMonth={() => {
+                        const today = new Date()
+                        const start = new Date(today)
+                        start.setMonth(start.getMonth() - 1)
+                        setPeriod({
+                          startDate: start.toISOString().split('T')[0],
+                          endDate: today.toISOString().split('T')[0],
+                        })
+                      }}
+                    />
                   )}
 
                   {currentTab === 'reports' && (
@@ -2994,41 +2218,7 @@ export default function MobileRelatorios() {
                 </motion.div>
               )}
 
-              <div className="fixed bottom-4 left-4 right-4 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border border-gray-100 dark:border-gray-700/50 shadow-2xl shadow-gray-200/50 dark:shadow-black/40 rounded-2xl p-2 flex items-center justify-around z-50 ring-1 ring-black/5">
-                <button
-                  onClick={() => setCurrentTab('home')}
-                  className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-xl transition-all duration-300 ${
-                    currentTab === 'home'
-                      ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 font-bold'
-                      : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 font-medium'
-                  }`}
-                >
-                  {currentTab === 'home' ? <HomeIconSolid className="h-6 w-6 transform scale-110 transition-transform" /> : <HomeIcon className="h-6 w-6" />}
-                  <span className="text-[10px]">Início</span>
-                </button>
-                <button
-                  onClick={() => setCurrentTab('reports')}
-                  className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-xl transition-all duration-300 ${
-                    currentTab === 'reports'
-                      ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 font-bold'
-                      : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 font-medium'
-                  }`}
-                >
-                  {currentTab === 'reports' ? <ChartBarIconSolid className="h-6 w-6 transform scale-110 transition-transform" /> : <ChartBarIcon className="h-6 w-6" />}
-                  <span className="text-[10px]">Relatórios</span>
-                </button>
-                <button
-                  onClick={() => setCurrentTab('settings')}
-                  className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-xl transition-all duration-300 ${
-                    currentTab === 'settings'
-                      ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 font-bold'
-                      : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 font-medium'
-                  }`}
-                >
-                  {currentTab === 'settings' ? <ListBulletIcon className="h-6 w-6 transform scale-110 transition-transform" /> : <ListBulletIcon className="h-6 w-6" />}
-                  <span className="text-[10px]">Menu</span>
-                </button>
-              </div>
+              <BottomTabBar currentTab={currentTab} onTabChange={setCurrentTab} />
             </div>
           ) : (
             <motion.div
@@ -5147,120 +4337,16 @@ export default function MobileRelatorios() {
           )}
           
           {selectedTipo && (
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-20">
-              <div className="max-w-lg mx-auto grid grid-cols-3 gap-2">
-                <button
-                  onClick={() => setSelectedTipo(null)}
-                  className="flex items-center justify-center gap-1 py-3 rounded-xl bg-amber-600 dark:bg-amber-500 text-white font-semibold text-sm"
-                >
-                  <ArrowLeftIcon className="h-5 w-5" />
-                  Voltar
-                </button>
-                <button
-                  onClick={exportCSV}
-                  className="flex items-center justify-center gap-1 py-3 rounded-xl bg-gray-600 dark:bg-gray-500 text-white font-semibold text-sm"
-                >
-                  <ArrowDownTrayIcon className="h-5 w-5" />
-                  Exportar
-                </button>
-                <div className="relative">
-                  <button
-                    onClick={() => setShareMenuOpen(!shareMenuOpen)}
-                    disabled={sharing}
-                    className="flex items-center justify-center gap-1 py-3 px-4 rounded-xl bg-blue-600 dark:bg-blue-500 text-white font-semibold text-sm disabled:opacity-60 disabled:cursor-not-allowed w-full"
-                  >
-                    {sharing ? (
-                      <>
-                        <span className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
-                        Compartilhando
-                      </>
-                    ) : (
-                      <>
-                        <ShareIcon className="h-5 w-5" />
-                        Compartilhar
-                      </>
-                    )}
-                  </button>
-                  
-                  {/* Menu de compartilhamento */}
-                  <AnimatePresence>
-                    {shareMenuOpen && (
-                      <>
-                        {/* Backdrop */}
-                        <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          onClick={() => setShareMenuOpen(false)}
-                          className="fixed inset-0 z-40"
-                        />
-                        
-                        {/* Menu */}
-                        <motion.div
-                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                          transition={{ duration: 0.15 }}
-                          className="absolute bottom-full mb-2 right-0 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50"
-                        >
-                          <div className="p-2 space-y-1">
-                            <button
-                              onClick={() => {
-                                handleShareWhatsApp()
-                                setShareMenuOpen(false)
-                              }}
-                              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors text-left group"
-                            >
-                              <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <ChatBubbleLeftRightIcon className="h-5 w-5 text-green-600 dark:text-green-400" />
-                              </div>
-                              <div className="flex-1">
-                                <p className="font-semibold text-gray-900 dark:text-white text-sm">WhatsApp</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Enviar por mensagem</p>
-                              </div>
-                            </button>
-                            
-                            <button
-                              onClick={() => {
-                                handleShareEmail()
-                                setShareMenuOpen(false)
-                              }}
-                              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors text-left group"
-                            >
-                              <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <svg className="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
-                              </div>
-                              <div className="flex-1">
-                                <p className="font-semibold text-gray-900 dark:text-white text-sm">Email</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Enviar por email</p>
-                              </div>
-                            </button>
-                            
-                            <button
-                              onClick={async () => {
-                                await handleShareSummary()
-                                setShareMenuOpen(false)
-                              }}
-                              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors text-left group"
-                            >
-                              <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <ShareIcon className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-                              </div>
-                              <div className="flex-1">
-                                <p className="font-semibold text-gray-900 dark:text-white text-sm">Outros</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Mais opções</p>
-                              </div>
-                            </button>
-                          </div>
-                        </motion.div>
-                      </>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </div>
-            </div>
+            <ReportActionBar
+              onBack={() => setSelectedTipo(null)}
+              onExportCSV={exportCSV}
+              sharing={sharing}
+              shareMenuOpen={shareMenuOpen}
+              onToggleShareMenu={() => setShareMenuOpen(!shareMenuOpen)}
+              onShareWhatsApp={handleShareWhatsApp}
+              onShareEmail={handleShareEmail}
+              onShareSummary={handleShareSummary}
+            />
           )}
         </div>
       </div>

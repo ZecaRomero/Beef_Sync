@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ArrowUpCircleIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline'
 import { useAuth } from '../contexts/AuthContext'
+import { isLocalOrPrivateBrowserEnv } from '../utils/networkEnv'
 
 const TOTAL_TABLES = 17 // número de tabelas no sync
 
@@ -20,21 +21,8 @@ export default function SyncSupabaseButton({ onSyncDone }) {
   const isDev = user?.user_metadata?.role === 'desenvolvedor'
   if (!isDev) return null
 
-  const isLocalOrPrivateHost = () => {
-    if (typeof window === 'undefined') return false
-    const host = (window.location.hostname || '').toLowerCase()
-    if (!host) return false
-    if (host === 'localhost' || host === '127.0.0.1' || host === '::1') return true
-    if (host.startsWith('192.168.')) return true
-    if (host.startsWith('10.')) return true
-    const m172 = host.match(/^172\.(\d{1,3})\./)
-    if (!m172) return false
-    const secondOctet = Number(m172[1])
-    return secondOctet >= 16 && secondOctet <= 31
-  }
-
   const loadPending = async () => {
-    if (!isLocalOrPrivateHost()) {
+    if (!isLocalOrPrivateBrowserEnv()) {
       setPending(0)
       setLoadingPending(false)
       return
@@ -59,7 +47,7 @@ export default function SyncSupabaseButton({ onSyncDone }) {
   }, [])
 
   const startSync = async () => {
-    if (!isLocalOrPrivateHost()) {
+    if (!isLocalOrPrivateBrowserEnv()) {
       setStatus('error')
       setLogs([
         'Sincronização Local → Supabase disponível apenas no ambiente local/rede interna.',
