@@ -1,5 +1,5 @@
 // Service Worker para Beef Sync PWA
-const CACHE_NAME = 'beef-sync-v3.0.0'
+const CACHE_NAME = 'beef-sync-v3.0.1'
 const OFFLINE_URL = '/offline.html'
 
 // Arquivos para cache
@@ -65,6 +65,22 @@ self.addEventListener('fetch', (event) => {
 
   // Ignorar requisições de API
   if (event.request.url.includes('/api/')) {
+    return
+  }
+
+  // Para páginas/documentos, usar network-first para evitar tela antiga após deploy
+  if (event.request.destination === 'document') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const responseToCache = response.clone()
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache))
+          }
+          return response
+        })
+        .catch(() => caches.match(event.request).then((cached) => cached || caches.match(OFFLINE_URL)))
+    )
     return
   }
 
