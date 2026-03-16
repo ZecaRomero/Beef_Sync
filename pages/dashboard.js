@@ -353,7 +353,7 @@ export default function Dashboard() {
   const [syncDiff, setSyncDiff] = useState(null)
   const [diffLoading, setDiffLoading] = useState(false)
 
-  useEffect(() => {
+  const loadSyncDiff = () => {
     if (!isDev) return
     setDiffLoading(true)
     fetch('/api/sync-diff')
@@ -361,6 +361,13 @@ export default function Dashboard() {
       .then(data => setSyncDiff(data))
       .catch(() => setSyncDiff(null))
       .finally(() => setDiffLoading(false))
+  }
+
+  useEffect(() => {
+    if (!isDev) return
+    loadSyncDiff()
+    const id = setInterval(() => loadSyncDiff(), 30000)
+    return () => clearInterval(id)
   }, [isDev])
   const [stats, setStats] = useState({
     totalAnimals: 0,
@@ -595,6 +602,28 @@ export default function Dashboard() {
       )}
 
       {/* Cabeçalho Mobile-Friendly */}
+      {isDev && syncDiff?.supabaseOnline && syncDiff?.totalPending > 0 && (
+        <div className="mb-4 rounded-xl border border-amber-300/50 bg-amber-50 dark:bg-amber-900/20 p-3 md:p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 shadow-sm">
+          <div>
+            <p className="text-sm md:text-base font-bold text-amber-800 dark:text-amber-200">
+              Voce tem {syncDiff.totalPending} alteracao{syncDiff.totalPending !== 1 ? 'oes' : ''} pendente{syncDiff.totalPending !== 1 ? 's' : ''} para enviar ao Supabase
+            </p>
+            <p className="text-xs md:text-sm text-amber-700/90 dark:text-amber-300/90">
+              Continue trabalhando localmente e envie quando finalizar.
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              const syncButton = document.querySelector('[data-sync-supabase-button="true"]')
+              if (syncButton) syncButton.click()
+            }}
+            className="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold text-sm transition-colors self-start md:self-auto"
+          >
+            Enviar agora
+          </button>
+        </div>
+      )}
+
       <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-lg p-4 md:p-8 text-white shadow-lg relative overflow-hidden">
         <div className="absolute inset-0 bg-white opacity-10 rounded-lg"></div>
         <div className="relative z-10">

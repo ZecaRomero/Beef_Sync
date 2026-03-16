@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ArrowUpCircleIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -14,11 +14,55 @@ export default function SyncSupabaseButton({ onSyncDone }) {
   const [tablesCount, setTablesCount] = useState(0) // tabelas concluídas
   const [startTime, setStartTime] = useState(null)
   const [elapsed, setElapsed] = useState(0)
+  const [pending, setPending] = useState(0)
+  const [loadingPending, setLoadingPending] = useState(false)
 
   const isDev = user?.user_metadata?.role === 'desenvolvedor'
   if (!isDev) return null
 
+  const isLocalOrPrivateHost = () => {
+    if (typeof window === 'undefined') return false
+    const host = (window.location.hostname || '').toLowerCase()
+    if (!host) return false
+    if (host === 'localhost' || host === '127.0.0.1' || host === '::1') return true
+    if (host.startsWith('192.168.')) return true
+    if (host.startsWith('10.')) return true
+    const m172 = host.match(/^172\.(\d{1,3})\./)
+    if (!m172) return false
+    const secondOctet = Number(m172[1])
+    return secondOctet >= 16 && secondOctet <= 31
+  }
+
+  const loadPending = async () => {
+    setLoadingPending(true)
+    try {
+      const res = await fetch('/api/sync-diff')
+      const json = await res.json()
+      if (json?.success) setPending(Number(json.totalPending || 0))
+    } catch (_) {
+      // silencioso: indicador opcional
+    } finally {
+      setLoadingPending(false)
+    }
+  }
+
+  useEffect(() => {
+    loadPending()
+    const id = setInterval(loadPending, 30000)
+    return () => clearInterval(id)
+  }, [])
+
   const startSync = async () => {
+    if (!isLocalOrPrivateHost()) {
+      setStatus('error')
+      setLogs([
+        'Sincronização Local → Supabase disponível apenas no ambiente local/rede interna.',
+        'No Vercel, os dados já estão no banco da nuvem.',
+      ])
+      setOpen(true)
+      return
+    }
+
     setStatus('syncing')
     setLogs([])
     setProgress(0)
@@ -77,6 +121,11 @@ export default function SyncSupabaseButton({ onSyncDone }) {
                 if (data.error) setLogs(prev => [...prev, `Erro: ${data.error}`])
               }
               if (data.success && onSyncDone) onSyncDone()
+              if (data.success) {
+                setTimeout(() => {
+                  loadPending()
+                }, 500)
+              }
             }
           } catch {}
         }
@@ -105,35 +154,41 @@ export default function SyncSupabaseButton({ onSyncDone }) {
 
   return (
     <>
-      <button
-        onClick={() => status === 'syncing' ? setOpen(true) : startSync()}
-        className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold transition-all border
-          ${status === 'syncing'
-            ? 'bg-blue-500/10 border-blue-500/30 text-blue-400 cursor-wait'
+      <div className="flex flex-col items-start gap-1">
+        <button
+          data-sync-supabase-button="true"
+          onClick={() => status === 'syncing' ? setOpen(true) : startSync()}
+          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold transition-all border
+            ${status === 'syncing'
+              ? 'bg-blue-500/10 border-blue-500/30 text-blue-400 cursor-wait'
+              : status === 'done'
+              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
+              : status === 'error'
+              ? 'bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20'
+              : 'bg-violet-500/10 border-violet-500/30 text-violet-400 hover:bg-violet-500/20'
+            }`}
+        >
+          {status === 'syncing' ? (
+            <span className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+          ) : status === 'done' ? (
+            <CheckCircleIcon className="w-4 h-4" />
+          ) : status === 'error' ? (
+            <XCircleIcon className="w-4 h-4" />
+          ) : (
+            <ArrowUpCircleIcon className="w-4 h-4" />
+          )}
+          {status === 'syncing'
+            ? `Sincronizando... ${progress}%`
             : status === 'done'
-            ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
+            ? 'Sincronizado ✓'
             : status === 'error'
-            ? 'bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20'
-            : 'bg-violet-500/10 border-violet-500/30 text-violet-400 hover:bg-violet-500/20'
-          }`}
-      >
-        {status === 'syncing' ? (
-          <span className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
-        ) : status === 'done' ? (
-          <CheckCircleIcon className="w-4 h-4" />
-        ) : status === 'error' ? (
-          <XCircleIcon className="w-4 h-4" />
-        ) : (
-          <ArrowUpCircleIcon className="w-4 h-4" />
-        )}
-        {status === 'syncing'
-          ? `Sincronizando... ${progress}%`
-          : status === 'done'
-          ? 'Sincronizado ✓'
-          : status === 'error'
-          ? 'Falhou — tentar de novo'
-          : 'Enviar para Supabase'}
-      </button>
+            ? 'Falhou — tentar de novo'
+            : 'Enviar para Supabase'}
+        </button>
+        <span className="text-xs text-white/60">
+          {loadingPending ? 'Verificando pendências...' : `Você tem ${pending} alterações para enviar`}
+        </span>
+      </div>
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
