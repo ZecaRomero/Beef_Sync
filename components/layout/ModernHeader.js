@@ -5,6 +5,7 @@ import {
   Bars3Icon,
   MagnifyingGlassIcon,
   BellIcon,
+  DevicePhoneMobileIcon,
   SunIcon,
   MoonIcon,
   UserCircleIcon,
@@ -296,6 +297,16 @@ export default function ModernHeader({
       {/* Right side actions */}
       <div className="flex items-center gap-x-2">
         {/* Theme toggle */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => router.push('/a?buscar=1')}
+          className="p-2.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+          title="Modo mobile"
+        >
+          <DevicePhoneMobileIcon className="h-5 w-5" />
+        </Button>
+
         <Button
           variant="ghost"
           size="sm"

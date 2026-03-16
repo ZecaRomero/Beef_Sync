@@ -16,18 +16,46 @@ export default function LoginPage() {
   const [submitting, setSubmitting] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
 
-  const resolveTargetPath = (currentUser) => {
-    const redirectParam = typeof router.query?.redirect === 'string' ? router.query.redirect : ''
-    if (redirectParam && redirectParam.startsWith('/')) {
-      return redirectParam
+  const isLocalOrPrivateHost = () => {
+    if (typeof window === 'undefined') return false
+    const host = (window.location.hostname || '').toLowerCase()
+    if (!host) return false
+    if (host === 'localhost' || host === '127.0.0.1' || host === '::1') return true
+    if (host.startsWith('192.168.')) return true
+    if (host.startsWith('10.')) return true
+    const m172 = host.match(/^172\.(\d{1,3})\./)
+    if (m172) {
+      const secondOctet = Number(m172[1])
+      if (secondOctet >= 16 && secondOctet <= 31) return true
     }
+    return false
+  }
 
+  const resolveTargetPath = (currentUser) => {
     if (currentUser?.email === 'adelso@fazendasantanna.com.br') {
       return '/adelso-menu'
     }
 
     const role = currentUser?.user_metadata?.role || 'externo'
-    return role === 'desenvolvedor' ? '/dashboard' : '/a'
+    const isExternalLocal = role === 'externo' && isLocalOrPrivateHost()
+
+    // Usuário externo em localhost/rede interna:
+    // sempre abre na tela principal (Dashboard).
+    if (isExternalLocal) {
+      return '/dashboard'
+    }
+
+    const redirectParam = typeof router.query?.redirect === 'string' ? router.query.redirect : ''
+    if (redirectParam && redirectParam.startsWith('/')) {
+      return redirectParam
+    }
+
+    // Em ambiente local/rede interna, usuário externo também pode operar no dashboard
+    // (inclui/edita), mantendo restrições de exclusão pelo perfil.
+    if (role === 'desenvolvedor') {
+      return '/dashboard'
+    }
+    return '/a'
   }
 
   useEffect(() => {
