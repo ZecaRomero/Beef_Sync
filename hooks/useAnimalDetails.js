@@ -207,6 +207,7 @@ export function useAnimalDetails(id) {
           const maePorTexto = parseMaeTexto(primeiro?.mae)
           const animalSerie = normSerie(animal?.serie)
           const animalRg = normRg(animal?.rg)
+
           const maeConferePorTexto = Boolean(maePorTexto) &&
             maePorTexto.serie === animalSerie &&
             maePorTexto.rg === animalRg
@@ -216,7 +217,13 @@ export function useAnimalDetails(id) {
             normSerie(primeiro.serie_mae) === animalSerie &&
             normRg(primeiro.rg_mae) === animalRg
 
-          const maeConfere = maeConferePorTexto || maeConferePorCampos
+          let maeConfere = maeConferePorTexto || maeConferePorCampos
+
+          // Forçar verificação extra: se rg_mae existe e é diferente do animal atual, então NÃO é mãe
+          if (primeiro?.rg_mae && normRg(primeiro.rg_mae) !== animalRg) {
+             maeConfere = false
+          }
+
           if (maeConfere) {
             newRankings[campoFilhoTop] = { serie: primeiro.serie, rg: primeiro.rg, nome: primeiro.nome, ...primeiroExtra }
           }

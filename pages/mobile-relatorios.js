@@ -215,12 +215,24 @@ export default function MobileRelatorios() {
 
   const normalizeLocalKey = (value) =>
     String(value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^\w\s/-]/g, ' ')
       .trim()
       .replace(/\s+/g, ' ')
       .toUpperCase()
 
-  const buildMedLocalKey = (local, local1, subLocal2) =>
-    [local, local1, subLocal2].map(normalizeLocalKey).join('||')
+  const buildMedLocalKeys = (local, local1, subLocal2) => {
+    const l = normalizeLocalKey(local)
+    const l1 = normalizeLocalKey(local1)
+    const s2 = normalizeLocalKey(subLocal2)
+    const keys = []
+    if (l && l1 && s2) keys.push(`L3:${l}||${l1}||${s2}`)
+    if (l && l1) keys.push(`L2:${l}||${l1}`)
+    if (l && s2) keys.push(`LS:${l}||${s2}`)
+    if (l) keys.push(`L1:${l}`)
+    return [...new Set(keys)]
+  }
 
   const sortMedsByDate = (a, b) => {
     const aDate = new Date(`${a?.data_aplicacao || ''}T12:00:00`).getTime() || 0
@@ -250,8 +262,8 @@ export default function MobileRelatorios() {
 
     if (!row) return medsById
 
-    const localKey = buildMedLocalKey(row.local, row.local_1, row.sub_local_2)
-    const medsByLocal = medicamentosPorLocal[localKey] || []
+    const localKeys = buildMedLocalKeys(row.local, row.local_1, row.sub_local_2)
+    const medsByLocal = localKeys.flatMap((k) => medicamentosPorLocal[k] || [])
     return dedupeMeds([...medsById, ...medsByLocal]).sort(sortMedsByDate)
   }
 
@@ -271,11 +283,11 @@ export default function MobileRelatorios() {
             mapById[idKey].push(m)
           }
 
-          const localKey = buildMedLocalKey(m.local, m.local_1, m.sub_local_2)
-          if (localKey && localKey !== '||||') {
+          const localKeys = buildMedLocalKeys(m.local, m.local_1, m.sub_local_2)
+          localKeys.forEach((localKey) => {
             if (!mapByLocal[localKey]) mapByLocal[localKey] = []
             mapByLocal[localKey].push(m)
-          }
+          })
         })
         Object.keys(mapById).forEach(key => { mapById[key].sort(sortMedsByDate) })
         Object.keys(mapByLocal).forEach(key => { mapByLocal[key].sort(sortMedsByDate) })
@@ -4907,6 +4919,7 @@ export default function MobileRelatorios() {
                                         {/* Botão de Medicamentos — registro apenas para Adelso */}
                                         {ehBoletimCampo && !isTotalGeral && row.id && (() => {
                                           const ult = ultimoMedRow(row)
+                                          const totalAplicacoes = medsDoRow(row).length
                                           const dias = ult ? diasDesde(ult.data_aplicacao) : null
                                           const proxDias = ult?.data_proxima_aplicacao ? diasAte(ult.data_proxima_aplicacao) : null
                                           const vencida = proxDias !== null && proxDias < 0
@@ -4931,7 +4944,16 @@ export default function MobileRelatorios() {
                                             >
                                               {vencida ? <ExclamationCircleIcon className="w-4 h-4 shrink-0" /> : <BeakerIcon className="w-4 h-4 shrink-0" />}
                                               {ult
-                                                ? <><span className="truncate max-w-[130px]">{ult.medicamento}</span><span>·</span><span className="shrink-0">{dias === 0 ? 'hoje' : `${dias}d atrás`}{vencida ? ' ⚠️' : proxima ? ` · próx. ${proxDias}d` : ''}</span></>
+                                                ? <>
+                                                    <span className="truncate max-w-[130px]">{ult.medicamento}</span>
+                                                    <span>·</span>
+                                                    <span className="shrink-0">
+                                                      {totalAplicacoes} aplicaç{totalAplicacoes === 1 ? 'ão' : 'ões'}
+                                                      {' · '}
+                                                      {dias === 0 ? 'hoje' : `${dias}d atrás`}
+                                                      {vencida ? ' ⚠️' : proxima ? ` · próx. ${proxDias}d` : ''}
+                                                    </span>
+                                                  </>
                                                 : 'Medicamento'
                                               }
                                             </button>
@@ -5242,7 +5264,9 @@ export default function MobileRelatorios() {
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <BeakerIcon className="w-5 h-5 text-purple-100 shrink-0" />
-                  <h3 className="text-white font-bold text-base">Medicamentos</h3>
+                  <h3 className="text-white font-bold text-base">
+                    Medicamentos ({medsDoRow(modalMed.row).length})
+                  </h3>
                 </div>
                 <p className="text-purple-200 text-xs mt-0.5 truncate">
                   {[modalMed.row.local, modalMed.row.local_1, modalMed.row.sub_local_2].filter(Boolean).join(' / ')}
