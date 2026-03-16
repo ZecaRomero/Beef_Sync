@@ -1,12 +1,5 @@
-import { Pool } from 'pg'
-
-const pool = new Pool({
-  user: process.env.DB_USER || 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_NAME || 'estoque_semen',
-  password: process.env.DB_PASSWORD || 'jcromero85',
-  port: process.env.DB_PORT || 5432,
-})
+import { query } from '../../lib/database'
+import { ensureNitrogenioTables } from '../../utils/nitrogenioSchema'
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -14,7 +7,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    const result = await pool.query(`
+    await ensureNitrogenioTables()
+
+    const result = await query(`
       SELECT DISTINCT motorista
       FROM abastecimento_nitrogenio 
       WHERE motorista IS NOT NULL AND motorista != ''

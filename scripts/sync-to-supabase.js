@@ -7,7 +7,7 @@ const { Pool } = require('pg')
 require('dotenv').config()
 const { SYNC_TABLES } = require('../utils/syncTables')
 
-const SUPABASE_URL = 'https://bpsltnglmbwdpvumjeaf.supabase.co'
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://bpsltnglmbwdpvumjeaf.supabase.co'
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 // Tabelas para sincronizar (ordem importa por causa de FK)
@@ -52,6 +52,7 @@ async function syncToSupabase(onProgress) {
 
   try {
     if (!SUPABASE_SERVICE_KEY) throw new Error('SUPABASE_SERVICE_ROLE_KEY não definida no .env')
+    if (!SUPABASE_URL) throw new Error('NEXT_PUBLIC_SUPABASE_URL não definida no .env')
 
     log('Conectando ao banco local...')
     await localPool.query('SELECT 1')
