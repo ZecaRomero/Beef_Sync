@@ -6,6 +6,7 @@
 import { query } from '../../../lib/database'
 import { asyncHandler } from '../../../utils/apiResponse'
 import logger from '../../../utils/logger'
+import { blockIfNotZecaDeveloper } from '../../../utils/importAccess'
 
 const getVal = (row, keys) => {
   if (!row || typeof row !== 'object') return null
@@ -31,6 +32,9 @@ export default asyncHandler(async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, message: 'Método não permitido' })
   }
+
+  const blocked = blockIfNotZecaDeveloper(req, res)
+  if (blocked) return blocked
 
   const { registros = [], carimboLeilao = '' } = req.body || {}
 

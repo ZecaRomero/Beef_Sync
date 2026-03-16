@@ -6,6 +6,7 @@ import { query } from '../../../lib/database'
 import formidable from 'formidable'
 import ExcelJS from 'exceljs'
 import fs from 'fs'
+import { blockIfNotZecaDeveloper } from '../../../utils/importAccess'
 
 export const config = {
   api: { bodyParser: false }
@@ -15,6 +16,9 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método não permitido' })
   }
+
+  const blocked = blockIfNotZecaDeveloper(req, res)
+  if (blocked) return blocked
 
   const form = formidable({ multiples: false })
   form.parse(req, async (err, fields, files) => {

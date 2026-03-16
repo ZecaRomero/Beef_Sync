@@ -1,4 +1,5 @@
 import { query } from '../../../lib/database';
+import { blockIfNotZecaDeveloper } from '../../../utils/importAccess';
 
 // Função SIMPLES para converter data
 function converterDataSimples(texto) {
@@ -27,6 +28,9 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método não permitido' });
   }
+
+  const blocked = blockIfNotZecaDeveloper(req, res);
+  if (blocked) return blocked;
 
   const { texto, modo } = req.body;
 

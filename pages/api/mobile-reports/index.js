@@ -218,6 +218,13 @@ export default async function handler(req, res) {
             WHERE data_nascimento >= $1 AND data_nascimento <= $2
           `, [start, end])
 
+          // Nascimentos recentes (últimos 30 dias) para o card de Reprodução
+          const qNascimentos30d = await query(`
+            SELECT COUNT(*) as total
+            FROM nascimentos
+            WHERE data_nascimento BETWEEN (CURRENT_DATE - INTERVAL '30 days') AND CURRENT_DATE
+          `)
+
           // 4. Peso Médio (Última pesagem de animais ativos)
           // Aproximação: média das últimas pesagens dos últimos 90 dias
           const qPeso = await query(`
@@ -355,6 +362,7 @@ export default async function handler(req, res) {
             reproducao: {
               gestacoes_ativas: totalGestacoesAtivas,
               nascimentos_periodo: parseInt(qNascimentos.rows[0]?.total || 0),
+              nascimentos_30d: parseInt(qNascimentos30d.rows[0]?.total || 0),
               partos_previstos_30d: partosPrevistos
             },
             peso: {
@@ -394,7 +402,7 @@ export default async function handler(req, res) {
               dados: {
                 'Gestações Ativas': totalGestacoesAtivas,
                 'Para Parir (30d)': partosPrevistos,
-                'Nascimentos': parseInt(qNascimentos.rows[0]?.total || 0)
+                'Nascimentos (30d)': parseInt(qNascimentos30d.rows[0]?.total || 0)
               }
             },
             {

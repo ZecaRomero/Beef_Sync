@@ -1,9 +1,13 @@
 import { query } from '../../../lib/database'
+import { blockIfNotZecaDeveloper } from '../../../utils/importAccess'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método não permitido' })
   }
+
+  const blocked = blockIfNotZecaDeveloper(req, res)
+  if (blocked) return blocked
 
   try {
     const { texto } = req.body

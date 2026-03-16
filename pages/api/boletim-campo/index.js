@@ -1,4 +1,5 @@
 import { query } from '../../../lib/database'
+import { blockIfNotAdelso } from '../../../utils/boletimAccess'
 
 // Inicializar tabela uma única vez por processo (não em toda requisição)
 let tableReady = false
@@ -48,6 +49,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
+    if (blockIfNotAdelso(req, res)) return
     try {
       const { local, local_1, sub_local_2, quant, sexo, categoria, raca, era, observacao, usuario } = req.body
       const result = await query(`
@@ -81,6 +83,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'PUT') {
+    if (blockIfNotAdelso(req, res)) return
     try {
       const { id, local, local_1, sub_local_2, quant, sexo, categoria, raca, era, observacao, usuario } = req.body
       if (!id) {
@@ -117,6 +120,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'DELETE') {
+    if (blockIfNotAdelso(req, res)) return
     try {
       const { id } = req.body
       if (!id) {

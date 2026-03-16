@@ -7,6 +7,7 @@ import {
   HTTP_STATUS 
 } from '../../../utils/apiResponse'
 import { criarLoteManual } from '../../../utils/loteMiddleware'
+import { blockIfNotZecaDeveloper } from '../../../utils/importAccess'
 
 export default asyncHandler(async function handler(req, res) {
   // Aumentar timeout da conexão se possível
@@ -15,6 +16,13 @@ export default asyncHandler(async function handler(req, res) {
   if (req.method !== 'POST') {
     return sendMethodNotAllowed(res, ['POST'])
   }
+
+  const blocked = blockIfNotZecaDeveloper(
+    req,
+    res,
+    'Acesso negado. Importação em lote de animais permitida somente para Zeca Desenvolvedor.'
+  )
+  if (blocked) return blocked
 
   const { animais, usuario = 'sistema' } = req.body
 

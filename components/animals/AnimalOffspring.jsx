@@ -1,11 +1,43 @@
-import React, { useState } from 'react'
+import { ArrowTopRightOnSquareIcon, ChevronDownIcon, ChevronUpIcon, UserGroupIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
-import { UserGroupIcon, ChevronDownIcon, ChevronUpIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline'
-import { formatDate, calcularMesesIdade, calcularMesesIdadeNaData, calcularEra } from '../../utils/formatters'
+import { useMemo, useState } from 'react'
+import { calcularEra, calcularMesesIdade, calcularMesesIdadeNaData, formatDate } from '../../utils/formatters'
 
 export default function AnimalOffspring({ animal, filhos }) {
   const listaFilhos = filhos || animal?.filhos || []
   const [isExpanded, setIsExpanded] = useState(true)
+  const filhosOrdenados = useMemo(() => {
+    const toNum = (v) => {
+      const n = Number(String(v ?? '').replace(/[^\d.-]/g, ''))
+      return Number.isFinite(n) ? n : Number.MAX_SAFE_INTEGER
+    }
+    const statusRank = (status) => {
+      const s = String(status || '').toUpperCase()
+      if (s.includes('VENDA')) return 0
+      if (s.includes('MORTE') || s.includes('BAIXA')) return 1
+      return 2
+    }
+
+    return [...listaFilhos].sort((a, b) => {
+      const aRank = statusRank(a?.status)
+      const bRank = statusRank(b?.status)
+      if (aRank !== bRank) return aRank - bRank
+
+      // Vendas primeiro por número da NF.
+      if (aRank === 0) {
+        const nfA = toNum(a?.numero_nf || a?.nf)
+        const nfB = toNum(b?.numero_nf || b?.nf)
+        if (nfA !== nfB) return nfA - nfB
+      }
+
+      // Depois ordena pelo número do RG.
+      const rgA = toNum(a?.rg)
+      const rgB = toNum(b?.rg)
+      if (rgA !== rgB) return rgA - rgB
+
+      return String(a?.serie || '').localeCompare(String(b?.serie || ''), 'pt-BR')
+    })
+  }, [listaFilhos])
 
   if (!listaFilhos || listaFilhos.length === 0) return null
 
@@ -29,7 +61,7 @@ export default function AnimalOffspring({ animal, filhos }) {
       </button>
       <div className={`transition-all duration-300 ${isExpanded ? '' : 'max-h-0 overflow-hidden'}`}>
         <div className="divide-y divide-gray-100 dark:divide-gray-700">
-          {listaFilhos.map((f, i) => {
+          {filhosOrdenados.map((f, i) => {
             const reactKey = f.id ?? `filho-${f.serie}-${f.rg}-${i}`
             // Priorizar Série + RG (identificação oficial); nome só quando for nome real, não concatenação
             const serieRg = [f.serie, f.rg].filter(Boolean).join(' ').trim()
@@ -40,9 +72,17 @@ export default function AnimalOffspring({ animal, filhos }) {
             const eraNaVenda = mesesNaVenda != null ? calcularEra(mesesNaVenda, f.sexo) : null
             
             const isBaixa = f.status && f.status !== 'ATIVO'
+            const isVenda = String(f.status || '').toUpperCase().includes('VENDA')
+            const isMorte = String(f.status || '').toUpperCase().includes('MORTE')
             const statusColor = f.status === 'VENDA' ? 'text-green-600 bg-green-50 dark:bg-green-900/20' 
               : f.status === 'MORTE/BAIXA' || f.status === 'MORTE' ? 'text-red-600 bg-red-50 dark:bg-red-900/20'
               : 'text-gray-600 bg-gray-50 dark:bg-gray-800'
+
+            const nfVenda = f.numero_nf || f.nf || null
+            const compradorVenda = f.comprador || f.cliente || null
+            const valorVenda = f.valor != null && f.valor !== '' ? Number(f.valor) : null
+            const valorVendaValido = Number.isFinite(valorVenda)
+            const dataVenda = f.data_venda || f.data_baixa || null
 
             const conteudoFilho = (
               <>
@@ -71,14 +111,48 @@ export default function AnimalOffspring({ animal, filhos }) {
                         {[f.pai && `Pai: ${f.pai}`, (f.avo_materno || f.avoMaterno) && `Avô mat.: ${f.avo_materno || f.avoMaterno}`].filter(Boolean).join(' • ')}
                       </span>
                     )}
-                    {isBaixa && f.data_baixa && (
+                    {isBaixa && !isVenda && f.data_baixa && (
                       <span className="font-medium text-gray-600 dark:text-gray-300">
                         Saída: {formatDate(f.data_baixa)}
                       </span>
                     )}
-                    {isBaixa && f.valor && (
-                      <span className="font-medium text-green-600 dark:text-green-400">
-                        R$ {Number(f.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    {isVenda && (() => {
+                      const temDados = nfVenda || valorVendaValido || (dataVenda && formatDate(dataVenda) !== '-') || compradorVenda
+                      if (!temDados) return (
+                        <span className="block w-full mt-1 text-[11px] text-gray-400 dark:text-gray-500 italic">
+                          Venda sem dados registrados
+                        </span>
+                      )
+                      return (
+                        <span className="block w-full mt-1 space-y-0.5">
+                          {nfVenda && (
+                            <span className="block text-xs text-gray-600 dark:text-gray-300">
+                              NF: <span className="font-medium text-indigo-600 dark:text-indigo-300">{nfVenda}</span>
+                            </span>
+                          )}
+                          {dataVenda && formatDate(dataVenda) !== '-' && (
+                            <span className="block text-xs text-gray-600 dark:text-gray-300">
+                              Data: <span className="font-medium">{formatDate(dataVenda)}</span>
+                            </span>
+                          )}
+                          {valorVendaValido && (
+                            <span className="block text-xs text-gray-600 dark:text-gray-300">
+                              Valor: <span className="font-medium text-green-600 dark:text-green-400">
+                                R$ {valorVenda.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                              </span>
+                            </span>
+                          )}
+                          {compradorVenda && (
+                            <span className="block text-xs text-gray-600 dark:text-gray-300">
+                              Comprador: <span className="font-medium">{compradorVenda}</span>
+                            </span>
+                          )}
+                        </span>
+                      )
+                    })()}
+                    {isMorte && f.causa && (
+                      <span className="block w-full text-red-600 dark:text-red-400">
+                        Causa: {f.causa}
                       </span>
                     )}
 

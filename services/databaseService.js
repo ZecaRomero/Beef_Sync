@@ -4,6 +4,174 @@ const loggerModule = require('../utils/logger');
 const logger = loggerModule.default || loggerModule;
 
 class DatabaseService {
+  normalizeText(value) {
+    return String(value || '')
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+  }
+
+  normalizeSerie(value) {
+    return String(value || '').trim().toUpperCase().replace(/\s+/g, '')
+  }
+
+  normalizeRg(value) {
+    return String(value || '').trim().replace(/^0+/, '') || '0'
+  }
+
+  isSexoFemea(value) {
+    const s = this.normalizeText(value)
+    return s === 'f' || s === 'femea'
+  }
+
+  isSexoMacho(value) {
+    const s = this.normalizeText(value)
+    return s === 'm' || s === 'macho'
+  }
+
+  hasNomeMasculinoForte(nome) {
+    const normalized = this.normalizeText(nome)
+    if (!normalized) return false
+    const tokens = normalized.split(/\s+/).filter(Boolean)
+    const nomesMasculinosFortes = new Set([
+      'joao', 'jose', 'antonio', 'carlos', 'paulo', 'pedro', 'marcos', 'lucas',
+      'gabriel', 'mateus', 'thiago', 'rodrigo', 'rafael', 'andre', 'bruno',
+      'renato', 'eduardo', 'daniel', 'leonardo', 'ricardo', 'gustavo', 'felipe',
+      'vinicius', 'henrique', 'sergio', 'milton', 'julio',
+    ])
+    return tokens.some((t) => nomesMasculinosFortes.has(t))
+  }
+
+  async existeEvidenciaFemea({ id = null, serie = null, rg = null, nome = null }) {
+    const serieNorm = this.normalizeSerie(serie)
+    const rgNorm = this.normalizeRg(rg)
+    const nomeNorm = this.normalizeText(nome)
+
+    // 1) Doadora em coleta_fiv (por ID)
+    if (id) {
+      const doadoraById = await query(
+        `SELECT 1 FROM coleta_fiv WHERE doadora_id = $1 LIMIT 1`,
+        [id]
+      )
+      if (doadoraById.rows.length > 0) return true
+    }
+
+    // 2) Mãe em relação com filhos (por serie/rg)
+    if (serieNorm && rgNorm) {
+      const maeByChaves = await query(
+        `
+        SELECT 1
+        FROM animais f
+        WHERE UPPER(TRIM(COALESCE(f.serie_mae, ''))) = $1
+          AND COALESCE(NULLIF(REGEXP_REPLACE(TRIM(COALESCE(f.rg_mae::text, '')), '^0+', ''), ''), '0') = $2
+        LIMIT 1
+      `,
+        [serieNorm, rgNorm]
+      )
+      if (maeByChaves.rows.length > 0) return true
+    }
+
+    // 3) Mãe por texto (nome/serie-rg no campo mae)
+    if (serieNorm && rgNorm) {
+      const maeByTexto = await query(
+        `
+        SELECT 1
+        FROM animais f
+        WHERE COALESCE(TRIM(f.mae), '') <> ''
+          AND UPPER(REGEXP_REPLACE(COALESCE(f.mae, ''), '[^A-Za-z0-9]', '', 'g'))
+              LIKE '%' || $1 || $2 || '%'
+        LIMIT 1
+      `,
+        [serieNorm, rgNorm]
+      )
+      if (maeByTexto.rows.length > 0) return true
+    }
+
+    // 4) Doadora por nome em coleta_fiv (fallback)
+    if (nomeNorm) {
+      const doadoraByNome = await query(
+        `
+        SELECT 1
+        FROM coleta_fiv
+        WHERE LOWER(TRANSLATE(COALESCE(doadora_nome, ''), 'ÁÀÃÂÄÉÈÊËÍÌÎÏÓÒÕÔÖÚÙÛÜÇ', 'AAAAAEEEEIIIIOOOOOUUUUC')) = $1
+        LIMIT 1
+      `,
+        [nomeNorm]
+      )
+      if (doadoraByNome.rows.length > 0) return true
+    }
+
+    return false
+  }
+
+  inferirSexoPorRegras({ sexoAtual = null, nome = null, evidenciaFemea = false }) {
+    // Regra mais forte: doadora ou mãe de cria => Fêmea
+    if (evidenciaFemea) return 'Fêmea'
+
+    // Nome masculino forte força Macho quando não há evidência feminina
+    if (this.hasNomeMasculinoForte(nome)) return 'Macho'
+
+    // Mantém sexo atual se já válido
+    if (this.isSexoFemea(sexoAtual)) return 'Fêmea'
+    if (this.isSexoMacho(sexoAtual)) return 'Macho'
+
+    // fallback
+    return sexoAtual || null
+  }
+
+  async ajustarSexoAutomaticamente(animalLike = {}) {
+    const evidenciaFemea = await this.existeEvidenciaFemea({
+      id: animalLike.id || null,
+      serie: animalLike.serie || null,
+      rg: animalLike.rg || null,
+      nome: animalLike.nome || null,
+    })
+
+    return this.inferirSexoPorRegras({
+      sexoAtual: animalLike.sexo,
+      nome: animalLike.nome,
+      evidenciaFemea,
+    })
+  }
+
+  async forcarSexoMaePorReferencia({ serieMae = null, rgMae = null, maeTexto = null }) {
+    const serieNorm = this.normalizeSerie(serieMae)
+    const rgNorm = this.normalizeRg(rgMae)
+
+    // Caminho principal: referência explícita serie_mae/rg_mae
+    if (serieNorm && rgNorm) {
+      await query(
+        `
+        UPDATE animais a
+        SET sexo = 'Fêmea', updated_at = NOW()
+        WHERE UPPER(TRIM(COALESCE(a.serie, ''))) = $1
+          AND COALESCE(NULLIF(REGEXP_REPLACE(TRIM(COALESCE(a.rg::text, '')), '^0+', ''), ''), '0') = $2
+      `,
+        [serieNorm, rgNorm]
+      )
+      return
+    }
+
+    // Fallback por texto: "CJCJ 6810" / "CJCJ-6810"
+    const rawMae = String(maeTexto || '').trim()
+    if (!rawMae) return
+    const m = rawMae.match(/([A-Za-z]+)[^A-Za-z0-9]*([0-9]+)$/)
+    if (!m) return
+    const serieFromText = this.normalizeSerie(m[1])
+    const rgFromText = this.normalizeRg(m[2])
+    if (!serieFromText || !rgFromText) return
+
+    await query(
+      `
+      UPDATE animais a
+      SET sexo = 'Fêmea', updated_at = NOW()
+      WHERE UPPER(TRIM(COALESCE(a.serie, ''))) = $1
+        AND COALESCE(NULLIF(REGEXP_REPLACE(TRIM(COALESCE(a.rg::text, '')), '^0+', ''), ''), '0') = $2
+    `,
+      [serieFromText, rgFromText]
+    )
+  }
   
   // Testar conexão
   async testConnection() {
@@ -93,12 +261,19 @@ class DatabaseService {
       `, [animal.serie, animal.rg]);
 
       // Buscar nascimentos (filhos) - onde este animal é a mãe
-      // Prioridade: serie_mae + rg_mae (identificação exata, evita erros como "JALY SANT ANNA" vs "Mosca, CJCJ 15959")
-      // Fallback: mae (texto) para compatibilidade com dados antigos
+      // Prioridade: serie_mae + rg_mae (identificação exata)
+      // Fallback: mae (texto) em vários formatos para compatibilidade com dados antigos
       let filhosResult
       try {
-        const filhosParams = [animal.serie, animal.rg, `%${animal.serie}-${animal.rg}%`, `${animal.serie} ${animal.rg}`]
-        let filhosSql = `SELECT * FROM animais WHERE (serie_mae = $1 AND rg_mae = $2) OR (mae LIKE $3 OR mae = $4)`
+        // Formatos possíveis: "CJCJ 13604", "CJCJ-13604", "CJ SANT ANNA 13604", nome exato
+        const filhosParams = [
+          animal.serie,
+          animal.rg,
+          `%${animal.serie}-${animal.rg}%`,
+          `${animal.serie} ${animal.rg}`,
+          `%SANT ANNA ${animal.rg}%`,
+        ]
+        let filhosSql = `SELECT * FROM animais WHERE (serie_mae = $1 AND rg_mae = $2) OR (mae LIKE $3 OR mae = $4 OR mae LIKE $5)`
         if (animal.nome) {
           filhosParams.push(animal.nome.trim())
           filhosSql += ` OR UPPER(TRIM(mae)) = UPPER(TRIM($${filhosParams.length}))`
@@ -107,8 +282,12 @@ class DatabaseService {
         filhosResult = await query(filhosSql, filhosParams)
       } catch (colErr) {
         if (/column.*does not exist/i.test(colErr?.message || '')) {
-          const filhosParams = [`%${animal.serie}-${animal.rg}%`, `${animal.serie} ${animal.rg}`]
-          let filhosSql = `SELECT * FROM animais WHERE mae LIKE $1 OR mae = $2`
+          const filhosParams = [
+            `%${animal.serie}-${animal.rg}%`,
+            `${animal.serie} ${animal.rg}`,
+            `%SANT ANNA ${animal.rg}%`,
+          ]
+          let filhosSql = `SELECT * FROM animais WHERE mae LIKE $1 OR mae = $2 OR mae LIKE $3`
           if (animal.nome) {
             filhosParams.push(animal.nome.trim())
             filhosSql += ` OR UPPER(TRIM(mae)) = UPPER(TRIM($${filhosParams.length}))`
@@ -162,6 +341,115 @@ class DatabaseService {
       return result.rows[0];
     } catch (error) {
       throw new Error(`Erro ao atualizar situação do animal: ${error.message}`);
+    }
+  }
+
+  /**
+   * Corrige sexo para Fêmea em todos os animais que aparecem como mãe
+   * em `animais` (serie_mae/rg_mae) ou `baixas` (serie_mae/rg_mae).
+   */
+  async corrigirSexoMaesParaFemea() {
+    const result = await query(`
+      WITH maes_ref AS (
+        SELECT DISTINCT
+          UPPER(TRIM(COALESCE(serie_mae, ''))) AS serie_norm,
+          COALESCE(NULLIF(REGEXP_REPLACE(TRIM(COALESCE(rg_mae::text, '')), '^0+', ''), ''), '0') AS rg_norm
+        FROM animais
+        WHERE COALESCE(TRIM(serie_mae), '') <> ''
+          AND COALESCE(TRIM(rg_mae::text), '') <> ''
+
+        UNION
+
+        SELECT DISTINCT
+          UPPER(TRIM(COALESCE(serie_mae, ''))) AS serie_norm,
+          COALESCE(NULLIF(REGEXP_REPLACE(TRIM(COALESCE(rg_mae::text, '')), '^0+', ''), ''), '0') AS rg_norm
+        FROM baixas
+        WHERE COALESCE(TRIM(serie_mae), '') <> ''
+          AND COALESCE(TRIM(rg_mae::text), '') <> ''
+      ),
+      maes_texto AS (
+        SELECT DISTINCT
+          UPPER(COALESCE(SUBSTRING(TRIM(mae) FROM '^([A-Za-z]+)'), '')) AS serie_norm,
+          COALESCE(
+            NULLIF(
+              REGEXP_REPLACE(
+                COALESCE(SUBSTRING(TRIM(mae) FROM '([0-9]+)$'), ''),
+                '^0+',
+                ''
+              ),
+              ''
+            ),
+            '0'
+          ) AS rg_norm
+        FROM animais
+        WHERE COALESCE(TRIM(mae), '') <> ''
+          AND TRIM(mae) ~* '[A-Za-z].*[0-9]'
+      ),
+      maes AS (
+        SELECT serie_norm, rg_norm FROM maes_ref
+        UNION
+        SELECT serie_norm, rg_norm FROM maes_texto
+      ),
+      atualizados AS (
+        UPDATE animais a
+        SET sexo = 'Fêmea',
+            updated_at = NOW()
+        FROM maes m
+        WHERE UPPER(TRIM(COALESCE(a.serie, ''))) = m.serie_norm
+          AND COALESCE(NULLIF(REGEXP_REPLACE(TRIM(COALESCE(a.rg::text, '')), '^0+', ''), ''), '0') = m.rg_norm
+          AND LOWER(COALESCE(a.sexo, '')) NOT IN ('femea', 'fêmea', 'f')
+        RETURNING a.id
+      )
+      SELECT COUNT(*)::int AS total FROM atualizados
+    `)
+
+    const corrigidosMaes = Number(result.rows?.[0]?.total || 0)
+
+    // Correção adicional por nome masculino forte:
+    // somente quando NÃO há evidência de doadora/mãe.
+    const machosPorNome = await query(`
+      WITH maes_ref AS (
+        SELECT DISTINCT
+          UPPER(TRIM(COALESCE(serie_mae, ''))) AS serie_norm,
+          COALESCE(NULLIF(REGEXP_REPLACE(TRIM(COALESCE(rg_mae::text, '')), '^0+', ''), ''), '0') AS rg_norm
+        FROM animais
+        WHERE COALESCE(TRIM(serie_mae), '') <> ''
+          AND COALESCE(TRIM(rg_mae::text), '') <> ''
+        UNION
+        SELECT DISTINCT
+          UPPER(TRIM(COALESCE(serie_mae, ''))) AS serie_norm,
+          COALESCE(NULLIF(REGEXP_REPLACE(TRIM(COALESCE(rg_mae::text, '')), '^0+', ''), ''), '0') AS rg_norm
+        FROM baixas
+        WHERE COALESCE(TRIM(serie_mae), '') <> ''
+          AND COALESCE(TRIM(rg_mae::text), '') <> ''
+      ),
+      maes_ids AS (
+        SELECT a.id
+        FROM animais a
+        JOIN maes_ref m
+          ON UPPER(TRIM(COALESCE(a.serie, ''))) = m.serie_norm
+         AND COALESCE(NULLIF(REGEXP_REPLACE(TRIM(COALESCE(a.rg::text, '')), '^0+', ''), ''), '0') = m.rg_norm
+      ),
+      atualizados AS (
+        UPDATE animais a
+        SET sexo = 'Macho',
+            updated_at = NOW()
+        WHERE LOWER(COALESCE(a.sexo, '')) NOT IN ('macho', 'm')
+          AND LOWER(TRANSLATE(COALESCE(a.nome, ''), 'ÁÀÃÂÄÉÈÊËÍÌÎÏÓÒÕÔÖÚÙÛÜÇ', 'AAAAAEEEEIIIIOOOOOUUUUC'))
+              ~* '(^|\\s)(joao|jose|antonio|carlos|paulo|pedro|marcos|lucas|gabriel|mateus|thiago|rodrigo|rafael|andre|bruno|renato|eduardo|daniel|leonardo|ricardo|gustavo|felipe|vinicius|henrique|sergio|milton|julio)(\\s|$)'
+          AND a.id NOT IN (SELECT id FROM maes_ids)
+          AND NOT EXISTS (SELECT 1 FROM coleta_fiv cf WHERE cf.doadora_id = a.id)
+        RETURNING a.id
+      )
+      SELECT COUNT(*)::int AS total FROM atualizados
+    `)
+
+    const corrigidosMachosPorNome = Number(machosPorNome.rows?.[0]?.total || 0)
+
+    return {
+      total: corrigidosMaes + corrigidosMachosPorNome,
+      corrigidosMaes,
+      corrigidosMachosPorNome,
     }
   }
   
@@ -483,7 +771,7 @@ class DatabaseService {
     const rgStr = String(rgMae || '').trim()
     const result = await query(`
       SELECT b.*, a.id as animal_id, a.serie as animal_serie, a.rg as animal_rg,
-        a.sexo, a.pai, a.mae, a.avo_materno, a.data_nascimento, a.meses, a.era
+        a.sexo, a.pai, a.mae, a.avo_materno, a.data_nascimento, a.meses
       FROM baixas b
       LEFT JOIN animais a ON b.animal_id = a.id
       WHERE UPPER(TRIM(COALESCE(b.serie_mae, ''))) = UPPER(TRIM($1))
@@ -748,6 +1036,13 @@ class DatabaseService {
     } = animalData;
 
     try {
+      const sexoInferido = await this.ajustarSexoAutomaticamente({
+        sexo,
+        nome,
+        serie,
+        rg,
+      })
+
       const result = await query(`
         INSERT INTO animais (
           nome, serie, rg, tatuagem, sexo, raca, data_nascimento, hora_nascimento,
@@ -759,12 +1054,19 @@ class DatabaseService {
           $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37
         ) RETURNING *
       `, [
-        nome, serie, rg, tatuagem, sexo, raca, data_nascimento, hora_nascimento,
+        nome, serie, rg, tatuagem, sexoInferido, raca, data_nascimento, hora_nascimento,
         peso, cor, tipo_nascimento, dificuldade_parto, meses, situacao,
         pai, mae, avo_materno, receptora, is_fiv, custo_total, valor_venda, valor_real,
         veterinario, abczg, deca, iqg ?? null, pt_iqg ?? null, mgte ?? null, top ?? null, observacoes, boletim, local_nascimento, pasto_atual,
         serie_pai, rg_pai, serie_mae, rg_mae
       ]);
+
+      // Se esse cadastro referencia mãe, já corrige a mãe automaticamente.
+      await this.forcarSexoMaePorReferencia({
+        serieMae: serie_mae,
+        rgMae: rg_mae,
+        maeTexto: mae,
+      })
 
       return result.rows[0];
     } catch (error) {
@@ -1392,6 +1694,28 @@ class DatabaseService {
         valores.push(valorFinal)
       }
     }
+
+    // Recalcular sexo automaticamente com base nas regras.
+    const registroAtual = await query(`SELECT id, nome, serie, rg, sexo FROM animais WHERE id = $1`, [targetId])
+    const atual = registroAtual.rows?.[0] || {}
+    const sexoAtualPayload = dadosParaAtualizar.sexo ?? atual.sexo
+    const nomeAtualPayload = dadosParaAtualizar.nome ?? atual.nome
+    const serieAtualPayload = dadosParaAtualizar.serie ?? atual.serie
+    const rgAtualPayload = dadosParaAtualizar.rg ?? atual.rg
+    dadosParaAtualizar.sexo = await this.ajustarSexoAutomaticamente({
+      id: targetId,
+      sexo: sexoAtualPayload,
+      nome: nomeAtualPayload,
+      serie: serieAtualPayload,
+      rg: rgAtualPayload,
+    })
+
+    // Se atualização trouxe referência de mãe, já corrige a mãe automaticamente.
+    await this.forcarSexoMaePorReferencia({
+      serieMae: dadosParaAtualizar.serie_mae,
+      rgMae: dadosParaAtualizar.rg_mae,
+      maeTexto: dadosParaAtualizar.mae,
+    })
 
     // Se não há campos válidos, retornar registro atual sem atualizar
     if (campos.length === 0) {

@@ -5,11 +5,15 @@
 import { pool } from '../../../../lib/database'
 import { asyncHandler, sendSuccess, sendValidationError } from '../../../../utils/apiResponse'
 import logger from '../../../../utils/logger'
+import { blockIfNotZecaDeveloper } from '../../../../utils/importAccess'
 
 export default asyncHandler(async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, message: 'Método não permitido' })
   }
+
+  const blocked = blockIfNotZecaDeveloper(req, res)
+  if (blocked) return blocked
 
   const { data } = req.body
 

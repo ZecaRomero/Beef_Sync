@@ -4,11 +4,15 @@
  */
 import { query } from '../../../lib/database'
 import { sendSuccess, sendError, sendMethodNotAllowed } from '../../../utils/apiResponse'
+import { blockIfNotZecaDeveloper } from '../../../utils/importAccess'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return sendMethodNotAllowed(res, ['POST'])
   }
+
+  const blocked = blockIfNotZecaDeveloper(req, res)
+  if (blocked) return blocked
 
   try {
     const { dados } = req.body

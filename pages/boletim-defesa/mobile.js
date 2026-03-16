@@ -241,7 +241,7 @@ export default function BoletimDefesaMobile() {
     if (!confirm('Excluir este registro de medicamento?')) return
     setExcluindoMedId(medId)
     try {
-      await fetch(`/api/boletim-campo/medicamentos?id=${medId}`, { method: 'DELETE' })
+      await fetch(`/api/boletim-campo/medicamentos?id=${medId}&usuario=Adelso`, { method: 'DELETE' })
       await carregarMedicamentos()
     } catch (_) {
       alert('Erro ao excluir')
@@ -684,13 +684,15 @@ export default function BoletimDefesaMobile() {
                                   </button>
                                 )}
 
-                                {/* Botão de Medicamentos — visível para todos, edição só para Adelso */}
+                                {/* Botão de Medicamentos — registro apenas para Adelso */}
                                 {!isTotal && row.id && (() => {
                                   const ult = ultimoMed(row.id)
                                   const dias = ult ? diasDesde(ult.data_aplicacao) : null
                                   const proxDias = ult?.data_proxima_aplicacao ? diasAte(ult.data_proxima_aplicacao) : null
                                   const vencida = proxDias !== null && proxDias < 0
                                   const proxima = proxDias !== null && proxDias >= 0 && proxDias <= 7
+                                  const podeConsultar = isAdelso || Boolean(ult)
+                                  if (!podeConsultar) return null
                                   return (
                                     <button
                                       onClick={() => {
@@ -717,7 +719,7 @@ export default function BoletimDefesaMobile() {
                                               {vencida ? ' ⚠️ renovar' : proxima ? ` · próx. ${proxDias}d` : ''}
                                             </span>
                                           </>
-                                        : 'Registrar medicamento'
+                                        : 'Medicamento'
                                       }
                                     </button>
                                   )

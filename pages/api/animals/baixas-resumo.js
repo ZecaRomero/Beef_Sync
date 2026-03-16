@@ -113,7 +113,6 @@ export default async function handler(req, res) {
         valor: b.valor != null ? parseFloat(b.valor) : null,
         numero_nf: b.numero_nf,
         sexo: b.sexo,
-        era: b.era,
         pai: b.pai,
         mae: b.mae,
         avo_materno: b.avo_materno,

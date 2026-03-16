@@ -1,4 +1,5 @@
 import { query } from '../../../lib/database';
+import { blockIfNotZecaDeveloper } from '../../../utils/importAccess';
 
 /**
  * Limpa TODOS os dados genéticos: abczg, deca, iqg, pt_iqg, situacao_abcz.
@@ -9,6 +10,9 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método não permitido' });
   }
+
+  const blocked = blockIfNotZecaDeveloper(req, res);
+  if (blocked) return blocked;
 
   try {
     let result;

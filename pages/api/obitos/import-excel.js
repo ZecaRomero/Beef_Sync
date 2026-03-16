@@ -7,6 +7,7 @@ import {
   sendMethodNotAllowed
 } from '../../../utils/apiResponse'
 import * as XLSX from 'xlsx'
+import { blockIfNotZecaDeveloper } from '../../../utils/importAccess'
 
 export default async function importObitosExcelHandler(req, res) {
   const { method } = req
@@ -14,6 +15,9 @@ export default async function importObitosExcelHandler(req, res) {
   if (method !== 'POST') {
     return sendMethodNotAllowed(res, ['POST'])
   }
+
+  const blocked = blockIfNotZecaDeveloper(req, res)
+  if (blocked) return blocked
 
   try {
     logger.info('📥 Iniciando importação de óbitos via Excel')

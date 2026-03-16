@@ -14,7 +14,7 @@ export default async function handler(req, res) {
   try {
     const result = await query(
       `SELECT 
-        a.id, a.serie, a.rg, a.nome, a.deca, a.abczg, a.raca, a.sexo, a.data_nascimento,
+        a.id, a.serie, a.rg, a.nome, a.mae, a.deca, a.abczg, a.raca, a.sexo, a.data_nascimento,
         a.serie_mae, a.rg_mae
        FROM animais a
        WHERE a.situacao = 'Ativo' 
@@ -40,6 +40,7 @@ export default async function handler(req, res) {
       rg: r.rg,
       serie_mae: r.serie_mae,
       rg_mae: r.rg_mae,
+      mae: r.mae,
       identificacao: `${r.serie || ''}-${r.rg || ''}`.replace(/^-|-$/g, ''),
       nome: r.nome,
       deca: r.deca,

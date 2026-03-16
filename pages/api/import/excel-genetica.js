@@ -2,6 +2,7 @@ import { query } from '../../../lib/database';
 import formidable from 'formidable';
 import ExcelJS from 'exceljs';
 import fs from 'fs';
+import { blockIfNotZecaDeveloper } from '../../../utils/importAccess';
 
 export const config = {
   api: {
@@ -95,6 +96,9 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'MÃÆ’ÂÆ’Ãâ€šÂ©todo nÃÆ’ÂÆ’Ãâ€šÂ£o permitido' });
   }
+
+  const blocked = blockIfNotZecaDeveloper(req, res);
+  if (blocked) return blocked;
 
   try {
     const contentType = req.headers['content-type'] || '';

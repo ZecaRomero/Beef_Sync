@@ -1,5 +1,6 @@
 const databaseService = require('../../../services/databaseService').default || require('../../../services/databaseService')
 const { pool, createTablesIfNotExist } = require('../../../lib/database')
+const { blockIfNotZecaDeveloper } = require('../../../utils/importAccess')
 
 export const config = { maxDuration: 300 }
 
@@ -18,6 +19,9 @@ export default async function handler(req, res) {
     if (req.method !== 'POST') {
       return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' })
     }
+
+    const blocked = blockIfNotZecaDeveloper(req, res)
+    if (blocked) return blocked
 
     // (createTablesIfNotExist removido — tabelas criadas automaticamente no primeiro uso)
 

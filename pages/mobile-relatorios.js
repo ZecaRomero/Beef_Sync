@@ -2,53 +2,52 @@
  * Relatórios visíveis no mobile.
  * Gráficos, KPI cards, animações e visual aprimorado.
  */
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import {
+    ArrowDownTrayIcon,
+    ArrowLeftIcon,
+    ArrowPathIcon,
+    ArrowRightOnRectangleIcon,
+    BanknotesIcon,
+    BeakerIcon,
+    BellIcon,
+    CalendarIcon,
+    ChartBarIcon,
+    ChatBubbleLeftRightIcon,
+    CheckCircleIcon as CheckCircleOutlineIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    ChevronUpIcon,
+    ClockIcon,
+    CurrencyDollarIcon,
+    DocumentTextIcon,
+    ExclamationCircleIcon,
+    FunnelIcon,
+    HeartIcon,
+    HomeIcon,
+    LightBulbIcon,
+    ListBulletIcon,
+    MagnifyingGlassIcon,
+    MapPinIcon,
+    MoonIcon,
+    ScaleIcon,
+    ShareIcon,
+    SparklesIcon,
+    StarIcon,
+    UserGroupIcon,
+    XMarkIcon
+} from '@heroicons/react/24/outline'
+import {
+    ChartBarIcon as ChartBarIconSolid,
+    HomeIcon as HomeIconSolid,
+    StarIcon as StarIconSolid
+} from '@heroicons/react/24/solid'
+import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Filler, Legend, LinearScale, LineElement, PointElement, Tooltip } from 'chart.js'
+import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Bar, Doughnut, Line } from 'react-chartjs-2'
-import {
-  ArrowLeftIcon,
-  ChartBarIcon,
-  CalendarIcon,
-  ChevronRightIcon,
-  ChevronLeftIcon,
-  DocumentTextIcon,
-  MagnifyingGlassIcon,
-  ScaleIcon,
-  HeartIcon,
-  MapPinIcon,
-  CurrencyDollarIcon,
-  UserGroupIcon,
-  ArrowPathIcon,
-  ShareIcon,
-  ArrowDownTrayIcon,
-  FunnelIcon,
-  SparklesIcon,
-  LightBulbIcon,
-  BanknotesIcon,
-  StarIcon,
-  ClockIcon,
-  XMarkIcon,
-  ChevronUpIcon,
-  ChatBubbleLeftRightIcon,
-  HomeIcon,
-  Cog6ToothIcon,
-  ListBulletIcon,
-  ArrowRightOnRectangleIcon,
-  MoonIcon,
-  BellIcon,
-  BeakerIcon,
-  ExclamationCircleIcon,
-  CheckCircleIcon as CheckCircleOutlineIcon
-} from '@heroicons/react/24/outline'
-import { 
-  StarIcon as StarIconSolid,
-  HomeIcon as HomeIconSolid,
-  ChartBarIcon as ChartBarIconSolid
-} from '@heroicons/react/24/solid'
 
 if (typeof window !== 'undefined') {
   ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Filler, Tooltip, Legend)
@@ -180,6 +179,7 @@ export default function MobileRelatorios() {
 
   // ── Medicamentos ──────────────────────────────────────────────────────────
   const [medicamentos, setMedicamentos] = useState({})
+  const [medicamentosPorLocal, setMedicamentosPorLocal] = useState({})
   const [modalMed, setModalMed] = useState(null) // { row }
   const [formMed, setFormMed] = useState({ medicamento: '', dataAplicacao: '', dataProxima: '', observacao: '' })
   const [salvandoMed, setSalvandoMed] = useState(false)
@@ -212,23 +212,75 @@ export default function MobileRelatorios() {
     const hoje = new Date(); hoje.setHours(0,0,0,0)
     return Math.ceil((d - hoje) / (1000*60*60*24))
   }
-  const medsDoRow = (id) => medicamentos[id] || []
-  const ultimoMedRow = (id) => medsDoRow(id)[0] || null
+
+  const normalizeLocalKey = (value) =>
+    String(value || '')
+      .trim()
+      .replace(/\s+/g, ' ')
+      .toUpperCase()
+
+  const buildMedLocalKey = (local, local1, subLocal2) =>
+    [local, local1, subLocal2].map(normalizeLocalKey).join('||')
+
+  const sortMedsByDate = (a, b) => {
+    const aDate = new Date(`${a?.data_aplicacao || ''}T12:00:00`).getTime() || 0
+    const bDate = new Date(`${b?.data_aplicacao || ''}T12:00:00`).getTime() || 0
+    if (bDate !== aDate) return bDate - aDate
+    const aCreated = new Date(a?.created_at || 0).getTime() || 0
+    const bCreated = new Date(b?.created_at || 0).getTime() || 0
+    return bCreated - aCreated
+  }
+
+  const dedupeMeds = (items = []) => {
+    const seen = new Set()
+    return items.filter((m, idx) => {
+      const key = m?.id != null
+        ? `id:${m.id}`
+        : `fallback:${m?.boletim_campo_id || ''}:${m?.medicamento || ''}:${m?.data_aplicacao || ''}:${idx}`
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+  }
+
+  const medsDoRow = (rowOrId, fallbackRow = null) => {
+    const row = typeof rowOrId === 'object' && rowOrId !== null ? rowOrId : fallbackRow
+    const id = typeof rowOrId === 'object' && rowOrId !== null ? rowOrId.id : rowOrId
+    const medsById = id != null ? (medicamentos[id] || []) : []
+
+    if (!row) return medsById
+
+    const localKey = buildMedLocalKey(row.local, row.local_1, row.sub_local_2)
+    const medsByLocal = medicamentosPorLocal[localKey] || []
+    return dedupeMeds([...medsById, ...medsByLocal]).sort(sortMedsByDate)
+  }
+
+  const ultimoMedRow = (rowOrId, fallbackRow = null) => medsDoRow(rowOrId, fallbackRow)[0] || null
 
   const carregarMedicamentos = async () => {
     try {
       const res = await fetch('/api/boletim-campo/medicamentos')
       const json = await res.json()
       if (json.success) {
-        const map = {}
+        const mapById = {}
+        const mapByLocal = {}
         ;(json.data || []).forEach(m => {
-          const key = m.boletim_campo_id
-          if (key != null) {
-            if (!map[key]) map[key] = []
-            map[key].push(m)
+          const idKey = m.boletim_campo_id
+          if (idKey != null) {
+            if (!mapById[idKey]) mapById[idKey] = []
+            mapById[idKey].push(m)
+          }
+
+          const localKey = buildMedLocalKey(m.local, m.local_1, m.sub_local_2)
+          if (localKey && localKey !== '||||') {
+            if (!mapByLocal[localKey]) mapByLocal[localKey] = []
+            mapByLocal[localKey].push(m)
           }
         })
-        setMedicamentos(map)
+        Object.keys(mapById).forEach(key => { mapById[key].sort(sortMedsByDate) })
+        Object.keys(mapByLocal).forEach(key => { mapByLocal[key].sort(sortMedsByDate) })
+        setMedicamentos(mapById)
+        setMedicamentosPorLocal(mapByLocal)
       }
     } catch (_) {}
   }
@@ -580,6 +632,7 @@ export default function MobileRelatorios() {
     'Gestações Ativas': 'Fêmeas em gestação (gestações cadastradas + prenhas por IA).',
     'Para Parir (30d)': 'Partos previstos nos próximos 30 dias.',
     Nascimentos: 'Nascimentos registrados no período.',
+    'Nascimentos (30d)': 'Nascimentos registrados nos últimos 30 dias.',
     'Média Recente': 'Peso médio das últimas pesagens (90 dias).',
     Vacinações: 'Vacinações aplicadas no período.',
     Mortes: 'Mortes registradas no período.',
@@ -724,6 +777,27 @@ export default function MobileRelatorios() {
     if (ehBoletimDefesa) return LABELS_BOLETIM_DEFESA[col] || col
     if (ehBoletimRebanho) return LABELS_BOLETIM_REBANHO[col] || col
     return col
+  }
+
+  const buildConsultaAnimalId = (value) => {
+    const raw = String(value || '').trim()
+    if (!raw) return null
+
+    const normalized = raw
+      .replace(/[^\w\s-]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toUpperCase()
+
+    if (!normalized) return null
+
+    const direct = normalized.match(/^([A-Z]+)-([A-Z0-9]+)$/)
+    if (direct) return `${direct[1]}-${direct[2]}`
+
+    const compact = normalized.match(/^([A-Z]+)\s+([A-Z0-9]+)$/)
+    if (compact) return `${compact[1]}-${compact[2]}`
+
+    return normalized.replace(/\s+/g, '-')
   }
 
   const filteredData = reportData?.data?.filter(d => {
@@ -2203,59 +2277,60 @@ export default function MobileRelatorios() {
                       <ChevronRightIcon className="h-3.5 w-3.5" />
                     </button>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-3">
                     {dashboardData.data.slice(0, 6).map((mod, i) => {
                       const modConfig = {
                         Rebanho: { 
-                          gradient: 'from-blue-50 via-blue-100/70 to-blue-50 dark:from-blue-900/30 dark:via-blue-800/20 dark:to-blue-900/30',
-                          border: 'border-blue-300 dark:border-blue-700',
+                          color: 'blue',
                           icon: '🐄',
-                          iconBg: 'bg-blue-200/50 dark:bg-blue-800/50',
-                          textColor: 'text-blue-700 dark:text-blue-300'
+                          bgIcon: 'bg-blue-100 dark:bg-blue-900/40',
+                          textIcon: 'text-blue-600 dark:text-blue-400',
+                          border: 'border-blue-500'
                         },
                         Reprodução: { 
-                          gradient: 'from-pink-50 via-pink-100/70 to-pink-50 dark:from-pink-900/30 dark:via-pink-800/20 dark:to-pink-900/30',
-                          border: 'border-pink-300 dark:border-pink-700',
+                          color: 'pink',
                           icon: '💕',
-                          iconBg: 'bg-pink-200/50 dark:bg-pink-800/50',
-                          textColor: 'text-pink-700 dark:text-pink-300'
+                          bgIcon: 'bg-pink-100 dark:bg-pink-900/40',
+                          textIcon: 'text-pink-600 dark:text-pink-400',
+                          border: 'border-pink-500'
                         },
                         Peso: { 
-                          gradient: 'from-amber-50 via-amber-100/70 to-amber-50 dark:from-amber-900/30 dark:via-amber-800/20 dark:to-amber-900/30',
-                          border: 'border-amber-300 dark:border-amber-700',
+                          color: 'amber',
                           icon: '⚖️',
-                          iconBg: 'bg-amber-200/50 dark:bg-amber-800/50',
-                          textColor: 'text-amber-700 dark:text-amber-300'
+                          bgIcon: 'bg-amber-100 dark:bg-amber-900/40',
+                          textIcon: 'text-amber-600 dark:text-amber-400',
+                          border: 'border-amber-500'
                         },
                         Financeiro: { 
-                          gradient: 'from-emerald-50 via-emerald-100/70 to-emerald-50 dark:from-emerald-900/30 dark:via-emerald-800/20 dark:to-emerald-900/30',
-                          border: 'border-emerald-300 dark:border-emerald-700',
+                          color: 'emerald',
                           icon: '💰',
-                          iconBg: 'bg-emerald-200/50 dark:bg-emerald-800/50',
-                          textColor: 'text-emerald-700 dark:text-emerald-300'
+                          bgIcon: 'bg-emerald-100 dark:bg-emerald-900/40',
+                          textIcon: 'text-emerald-600 dark:text-emerald-400',
+                          border: 'border-emerald-500'
                         },
                         Sanidade: { 
-                          gradient: 'from-violet-50 via-violet-100/70 to-violet-50 dark:from-violet-900/30 dark:via-violet-800/20 dark:to-violet-900/30',
-                          border: 'border-violet-300 dark:border-violet-700',
+                          color: 'violet',
                           icon: '💉',
-                          iconBg: 'bg-violet-200/50 dark:bg-violet-800/50',
-                          textColor: 'text-violet-700 dark:text-violet-300'
+                          bgIcon: 'bg-violet-100 dark:bg-violet-900/40',
+                          textIcon: 'text-violet-600 dark:text-violet-400',
+                          border: 'border-violet-500'
                         },
                         Estoque: { 
-                          gradient: 'from-cyan-50 via-cyan-100/70 to-cyan-50 dark:from-cyan-900/30 dark:via-cyan-800/20 dark:to-cyan-900/30',
-                          border: 'border-cyan-300 dark:border-cyan-700',
+                          color: 'cyan',
                           icon: '📦',
-                          iconBg: 'bg-cyan-200/50 dark:bg-cyan-800/50',
-                          textColor: 'text-cyan-700 dark:text-cyan-300'
+                          bgIcon: 'bg-cyan-100 dark:bg-cyan-900/40',
+                          textIcon: 'text-cyan-600 dark:text-cyan-400',
+                          border: 'border-cyan-500'
                         }
                       }
                       const config = modConfig[mod.modulo] || {
-                        gradient: 'from-gray-50 to-gray-100/50 dark:from-gray-900/20 dark:to-gray-900/10',
-                        border: 'border-gray-200 dark:border-gray-700',
+                        color: 'gray',
                         icon: '📊',
-                        iconBg: 'bg-gray-200/50 dark:bg-gray-700/50',
-                        textColor: 'text-gray-700 dark:text-gray-300'
+                        bgIcon: 'bg-gray-100 dark:bg-gray-800',
+                        textIcon: 'text-gray-600 dark:text-gray-400',
+                        border: 'border-gray-500'
                       }
+
                       return (
                         <motion.div
                           key={i}
@@ -2265,42 +2340,41 @@ export default function MobileRelatorios() {
                           whileHover={{ scale: 1.02, y: -2 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => setSelectedTipo('resumo_geral')}
-                          className={`relative p-4 rounded-2xl bg-gradient-to-br border shadow-lg shadow-gray-200/60 dark:shadow-black/30 hover:shadow-xl hover:shadow-amber-200/30 dark:hover:shadow-amber-900/20 transition-all duration-300 cursor-pointer overflow-hidden group ${config.gradient} ${config.border}`}
+                          className="relative p-4 rounded-2xl bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md hover:border-amber-200 dark:hover:border-amber-800 transition-all duration-300 cursor-pointer overflow-hidden group"
                         >
-                          <div className={`absolute -top-2 -right-2 w-20 h-20 rounded-full ${config.iconBg} opacity-30 blur-2xl`} />
-                          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                            <ChevronRightIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                          </div>
-                          <div className="relative z-10">
-                            <div className="flex items-center justify-between mb-2.5">
-                              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500/90 dark:text-gray-400/90">{mod.modulo}</p>
-                              <span className="text-2xl drop-shadow-sm">{config.icon}</span>
-                            </div>
-                            <div className="space-y-1.5">
-                              {Object.entries(mod.dados || {}).slice(0, 6).map(([k, v]) => {
-                                const labelCurto = {
-                                  'Média Recente': 'Média',
-                                  'Para Parir (30d)': 'Parir 30d',
-                                  'Gestações Ativas': 'Gestações',
-                                  'Touros (sêmen)': 'Touros',
-                                  'Doses Sêmen': 'Doses',
-                                  'Embriões Disp.': 'Embriões'
-                                }[k] || k
-                                return (
-                                  <div key={k} className="flex flex-col gap-0.5 min-w-0">
-                                    <span className="text-[11px] text-gray-600/90 dark:text-gray-400/90 font-medium break-words leading-tight">{labelCurto}</span>
-                                    <span className={`text-sm font-bold ${config.textColor} tabular-nums break-all`}>{formatValue(v)}</span>
-                                  </div>
-                                )
-                              })}
+                          {/* Barra lateral colorida */}
+                          <div className={`absolute left-0 top-0 bottom-0 w-1 ${config.bgIcon.replace('/40', '')}`} />
+                          
+                          <div className="flex justify-between items-start mb-3">
+                            <p className="text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">{mod.modulo}</p>
+                            <div className={`w-8 h-8 rounded-full ${config.bgIcon} flex items-center justify-center text-lg shadow-sm`}>
+                              {config.icon}
                             </div>
                           </div>
-                          <motion.div 
-                            initial={{ width: 0 }}
-                            animate={{ width: '100%' }}
-                            transition={{ delay: 0.3 + (i * 0.08), duration: 0.5, ease: 'easeOut' }}
-                            className={`absolute bottom-0 left-0 h-0.5 ${config.iconBg} opacity-60 rounded-b-2xl`}
-                          />
+
+                          <div className="space-y-2">
+                            {Object.entries(mod.dados || {}).slice(0, 4).map(([k, v]) => {
+                              const labelCurto = {
+                                'Média Recente': 'Média',
+                                'Para Parir (30d)': 'Parir 30d',
+                                'Gestações Ativas': 'Gestações',
+                                'Nascimentos (30d)': 'Nasc. 30d',
+                                'Touros (sêmen)': 'Touros',
+                                'Doses Sêmen': 'Doses',
+                                'Embriões Disp.': 'Embriões'
+                              }[k] || k
+                              return (
+                                <div key={k} className="flex flex-col min-w-0">
+                                  <span className="text-[10px] text-gray-400 dark:text-gray-500 font-medium truncate">{labelCurto}</span>
+                                  <span className={`text-sm font-extrabold text-gray-800 dark:text-gray-200 tabular-nums leading-tight`}>{formatValue(v)}</span>
+                                </div>
+                              )
+                            })}
+                          </div>
+                          
+                          <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <ChevronRightIcon className="h-4 w-4 text-gray-300" />
+                          </div>
                         </motion.div>
                       )
                     })}
@@ -2451,18 +2525,24 @@ export default function MobileRelatorios() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.05 * i, type: 'spring', stiffness: 200 }}
                             whileTap={{ scale: 0.98 }}
-                            whileHover={{ scale: 1.01, y: -1 }}
+                            whileHover={{ scale: 1.02, y: -2 }}
                             onClick={() => setSelectedTipo(id)}
-                            className="flex flex-col items-start gap-1.5 p-4 rounded-2xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-amber-200/60 dark:border-amber-800/40 shadow-lg shadow-gray-200/50 dark:shadow-black/20 hover:shadow-xl hover:shadow-amber-200/25 dark:hover:shadow-amber-900/15 hover:border-amber-300 dark:hover:border-amber-700/60 transition-all duration-300 text-left"
+                            className="relative flex flex-col items-start gap-2 p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-amber-200 dark:hover:border-amber-800 transition-all duration-300 text-left overflow-hidden group"
                           >
-                            <div className="flex items-center gap-2.5 w-full min-w-0">
-                              <div className="p-2 rounded-xl bg-amber-100/80 dark:bg-amber-900/40 flex-shrink-0">
-                                <Icon className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-                              </div>
-                              <span className="text-sm font-bold text-gray-800 dark:text-gray-200 flex-1 min-w-0 break-words">{tipo.label.replace(/^[📊📅🏆]\s*/, '')}</span>
-                              <ChevronRightIcon className="h-4 w-4 text-amber-400/70 dark:text-amber-500/70 flex-shrink-0" />
+                            <div className="absolute right-0 top-0 w-16 h-16 bg-gradient-to-br from-amber-50 to-transparent dark:from-amber-900/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110" />
+                            
+                            <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-900/20 group-hover:bg-amber-100 dark:group-hover:bg-amber-900/40 transition-colors z-10">
+                              <Icon className="h-6 w-6 text-amber-600 dark:text-amber-400" />
                             </div>
-                            {desc && <span className="text-[10px] text-gray-500 dark:text-gray-400 pl-0.5 line-clamp-2 font-medium break-words">{desc}</span>}
+                            
+                            <div className="z-10 w-full">
+                              <span className="text-sm font-bold text-gray-800 dark:text-gray-100 block mb-0.5">{tipo.label.replace(/^[📊📅🏆]\s*/, '')}</span>
+                              {desc && <span className="text-[10px] text-gray-500 dark:text-gray-400 leading-tight block">{desc}</span>}
+                            </div>
+                            
+                            <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-2 group-hover:translate-x-0">
+                              <ChevronRightIcon className="h-4 w-4 text-amber-400" />
+                            </div>
                           </motion.button>
                         )
                       })}
@@ -2475,26 +2555,24 @@ export default function MobileRelatorios() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.25 }}
                   >
-                    <div className="flex items-center gap-2 mb-4 px-1">
-                      <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/40">
-                        <LightBulbIcon className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                    <div className="flex items-center gap-2 mb-4 px-1 mt-6">
+                      <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/40">
+                        <LightBulbIcon className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                       </div>
                       <span className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Ações Rápidas</span>
-                      <div className="flex-1 h-px bg-gradient-to-r from-amber-200/60 to-transparent dark:from-amber-800/40" />
+                      <div className="flex-1 h-px bg-gradient-to-r from-blue-200/60 to-transparent dark:from-blue-800/40" />
                     </div>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-3 gap-3">
                       <Link href="/a">
                         <motion.div
                           whileHover={{ scale: 1.05, y: -2 }}
                           whileTap={{ scale: 0.95 }}
-                          className="p-3 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-blue-200/70 dark:border-blue-800/50 shadow-md shadow-blue-100/40 dark:shadow-black/20 hover:shadow-lg hover:shadow-blue-200/30 dark:hover:shadow-blue-900/20 transition-all cursor-pointer"
+                          className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all cursor-pointer group"
                         >
-                          <div className="flex flex-col items-center gap-1.5 text-center">
-                            <div className="p-2 rounded-xl bg-blue-100/80 dark:bg-blue-900/40">
-                              <MagnifyingGlassIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                            </div>
-                            <span className="text-[10px] font-bold text-blue-900 dark:text-blue-100">Consultar Animal</span>
+                          <div className="p-3 rounded-full bg-blue-50 dark:bg-blue-900/20 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 transition-colors">
+                            <MagnifyingGlassIcon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                           </div>
+                          <span className="text-[10px] font-bold text-gray-600 dark:text-gray-300 text-center leading-tight">Consultar<br/>Animal</span>
                         </motion.div>
                       </Link>
                       
@@ -2502,14 +2580,12 @@ export default function MobileRelatorios() {
                         <motion.div
                           whileHover={{ scale: 1.05, y: -2 }}
                           whileTap={{ scale: 0.95 }}
-                          className="p-3 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-emerald-200/70 dark:border-emerald-800/50 shadow-md shadow-emerald-100/40 dark:shadow-black/20 hover:shadow-lg hover:shadow-emerald-200/30 dark:hover:shadow-emerald-900/20 transition-all cursor-pointer"
+                          className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all cursor-pointer group"
                         >
-                          <div className="flex flex-col items-center gap-1.5 text-center">
-                            <div className="p-2 rounded-xl bg-emerald-100/80 dark:bg-emerald-900/40">
-                              <ChatBubbleLeftRightIcon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                            </div>
-                            <span className="text-[10px] font-bold text-emerald-900 dark:text-emerald-100">Enviar Feedback</span>
+                          <div className="p-3 rounded-full bg-emerald-50 dark:bg-emerald-900/20 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/40 transition-colors">
+                            <ChatBubbleLeftRightIcon className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
                           </div>
+                          <span className="text-[10px] font-bold text-gray-600 dark:text-gray-300 text-center leading-tight">Enviar<br/>Feedback</span>
                         </motion.div>
                       </Link>
                       
@@ -2525,14 +2601,12 @@ export default function MobileRelatorios() {
                             endDate: today.toISOString().split('T')[0]
                           })
                         }}
-                        className="p-3 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-purple-200/70 dark:border-purple-800/50 shadow-md shadow-purple-100/40 dark:shadow-black/20 hover:shadow-lg hover:shadow-purple-200/30 dark:hover:shadow-purple-900/20 transition-all cursor-pointer"
+                        className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all cursor-pointer group"
                       >
-                        <div className="flex flex-col items-center gap-1.5 text-center">
-                          <div className="p-2 rounded-xl bg-purple-100/80 dark:bg-purple-900/40">
-                            <CalendarIcon className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                          </div>
-                          <span className="text-[10px] font-bold text-purple-900 dark:text-purple-100">Último Mês</span>
+                        <div className="p-3 rounded-full bg-purple-50 dark:bg-purple-900/20 group-hover:bg-purple-100 dark:group-hover:bg-purple-900/40 transition-colors">
+                          <CalendarIcon className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                         </div>
+                        <span className="text-[10px] font-bold text-gray-600 dark:text-gray-300 text-center leading-tight">Último<br/>Mês</span>
                       </motion.div>
                     </div>
                   </motion.div>
@@ -2540,7 +2614,7 @@ export default function MobileRelatorios() {
                   {/* Favoritos */}
                   {favorites.filter(id => enabledReports.includes(id)).length > 0 && (
                     <div className="pt-2">
-                      <div className="flex items-center gap-2 mb-3 px-1">
+                      <div className="flex items-center gap-2 mb-3 px-1 mt-4">
                         <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/40">
                           <StarIconSolid className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                         </div>
@@ -2560,14 +2634,14 @@ export default function MobileRelatorios() {
                             >
                               <button
                                 onClick={() => setSelectedTipo(id)}
-                                className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-amber-200/70 dark:border-amber-800/50 text-amber-800 dark:text-amber-200 text-sm font-semibold shadow-md hover:shadow-lg hover:border-amber-300 dark:hover:border-amber-700/60 transition-all"
+                                className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white dark:bg-gray-800 border border-amber-100 dark:border-amber-900/50 text-gray-700 dark:text-gray-200 text-sm font-semibold shadow-sm hover:shadow-md hover:border-amber-300 dark:hover:border-amber-700/60 transition-all"
                               >
-                                <Icon className="h-4 w-4" />
+                                <Icon className="h-4 w-4 text-amber-500" />
                                 {tipo.label.replace(/^[📊📅🏆]\s*/, '')}
                               </button>
                               <button
                                 onClick={e => { e.stopPropagation(); toggleFavorite(id) }}
-                                className="p-1.5 rounded-lg text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/30"
+                                className="p-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-amber-400 hover:text-amber-500 shadow-sm hover:shadow-md transition-all"
                               >
                                 <StarIconSolid className="h-4 w-4" />
                               </button>
@@ -2899,39 +2973,39 @@ export default function MobileRelatorios() {
                 </motion.div>
               )}
 
-              <div className="fixed bottom-4 left-4 right-4 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg border border-gray-200 dark:border-gray-700 shadow-lg rounded-2xl p-1.5 flex items-center justify-around z-50">
+              <div className="fixed bottom-4 left-4 right-4 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border border-gray-100 dark:border-gray-700/50 shadow-2xl shadow-gray-200/50 dark:shadow-black/40 rounded-2xl p-2 flex items-center justify-around z-50 ring-1 ring-black/5">
                 <button
                   onClick={() => setCurrentTab('home')}
-                  className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-xl transition-all ${
+                  className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-xl transition-all duration-300 ${
                     currentTab === 'home'
-                      ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400'
-                      : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                      ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 font-bold'
+                      : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 font-medium'
                   }`}
                 >
-                  {currentTab === 'home' ? <HomeIconSolid className="h-6 w-6" /> : <HomeIcon className="h-6 w-6" />}
-                  <span className="text-[10px] font-medium">Início</span>
+                  {currentTab === 'home' ? <HomeIconSolid className="h-6 w-6 transform scale-110 transition-transform" /> : <HomeIcon className="h-6 w-6" />}
+                  <span className="text-[10px]">Início</span>
                 </button>
                 <button
                   onClick={() => setCurrentTab('reports')}
-                  className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-xl transition-all ${
+                  className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-xl transition-all duration-300 ${
                     currentTab === 'reports'
-                      ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400'
-                      : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                      ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 font-bold'
+                      : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 font-medium'
                   }`}
                 >
-                  {currentTab === 'reports' ? <ChartBarIconSolid className="h-6 w-6" /> : <ChartBarIcon className="h-6 w-6" />}
-                  <span className="text-[10px] font-medium">Relatórios</span>
+                  {currentTab === 'reports' ? <ChartBarIconSolid className="h-6 w-6 transform scale-110 transition-transform" /> : <ChartBarIcon className="h-6 w-6" />}
+                  <span className="text-[10px]">Relatórios</span>
                 </button>
                 <button
                   onClick={() => setCurrentTab('settings')}
-                  className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-xl transition-all ${
+                  className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-xl transition-all duration-300 ${
                     currentTab === 'settings'
-                      ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400'
-                      : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                      ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 font-bold'
+                      : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 font-medium'
                   }`}
                 >
-                  {currentTab === 'settings' ? <ListBulletIcon className="h-6 w-6" /> : <ListBulletIcon className="h-6 w-6" />}
-                  <span className="text-[10px] font-medium">Menu</span>
+                  {currentTab === 'settings' ? <ListBulletIcon className="h-6 w-6 transform scale-110 transition-transform" /> : <ListBulletIcon className="h-6 w-6" />}
+                  <span className="text-[10px]">Menu</span>
                 </button>
               </div>
             </div>
@@ -2943,12 +3017,6 @@ export default function MobileRelatorios() {
             >
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setSelectedTipo(null)}
-                    className="text-sm text-amber-600 dark:text-amber-400 font-medium"
-                  >
-                    ← Voltar
-                  </button>
                   {reportData && totalRegistros >= 0 && (
                     <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300">
                       {totalRegistros} registro{totalRegistros !== 1 ? 's' : ''}
@@ -3397,9 +3465,9 @@ export default function MobileRelatorios() {
 
                     // Categorias de animal
                     const CAT_ANIMAL = [
-                      { key: 'Bezerros',   emoji: '🐣', test: s => /bezerr|cria/i.test(s),      color: 'yellow' },
+                      { key: 'Bezerros',   emoji: '🐮', test: s => /bezerr|cria/i.test(s),      color: 'yellow' },
                       { key: 'Vacas',      emoji: '🐄', test: s => /^vaca|vacas/i.test(s),      color: 'pink' },
-                      { key: 'Novilhas',   emoji: '🌸', test: s => /novilha/i.test(s),           color: 'rose' },
+                      { key: 'Novilhas',   emoji: '🐄', test: s => /novilha/i.test(s),           color: 'rose' },
                       { key: 'Touros',     emoji: '🐂', test: s => /touro/i.test(s),             color: 'blue' },
                       { key: 'Novilhos',   emoji: '🐃', test: s => /novilho/i.test(s),           color: 'indigo' },
                       { key: 'Receptoras', emoji: '💉', test: s => /recept/i.test(s),            color: 'purple' },
@@ -3444,7 +3512,7 @@ export default function MobileRelatorios() {
                       const catAnimal = CAT_ANIMAL.find(c => c.test(cat))?.key || (cat || 'Outros')
                       porCatAnimal[catAnimal] = (porCatAnimal[catAnimal] || 0) + qtd
 
-                      const piqKey = sub2 || local || local1 || 'Sem local'
+                      const piqKey = sub2 || local || local1 || 'Não alocados'
                       if (!piquetes[piqKey]) piquetes[piqKey] = { total: 0, f: 0, m: 0, eras: {}, racas: {}, cats: {}, local1 }
                       piquetes[piqKey].total += qtd
                       if (sexo === 'F') piquetes[piqKey].f += qtd
@@ -3507,12 +3575,18 @@ export default function MobileRelatorios() {
                                 const qtd = porAreaCat[cat.key] || 0
                                 const pct = totalGeral > 0 ? Math.round(qtd/totalGeral*100) : 0
                                 return (
-                                  <div key={cat.key} className={`bg-gradient-to-b ${cat.grad} p-2 text-center`}>
+                                  <motion.button
+                                    key={cat.key}
+                                    type="button"
+                                    onClick={() => qtd > 0 && setResumoDetalheModal({ open: true, tipo: 'area', valor: cat.key, titulo: `${cat.emoji} ${cat.key}`, qtd })}
+                                    whileTap={qtd > 0 ? { scale: 0.96 } : {}}
+                                    className={`bg-gradient-to-b ${cat.grad} p-2 text-center ${qtd > 0 ? 'cursor-pointer active:brightness-90' : 'cursor-default opacity-70'}`}
+                                  >
                                     <p className="text-white/80 text-sm">{cat.emoji}</p>
                                     <p className="text-white/70 text-[9px] font-medium">{cat.key}</p>
                                     <p className="text-xl font-black text-white">{qtd || '–'}</p>
                                     {qtd > 0 && <p className="text-white/60 text-[9px]">{pct}%</p>}
-                                  </div>
+                                  </motion.button>
                                 )
                               })}
                             </div>
@@ -3586,24 +3660,17 @@ export default function MobileRelatorios() {
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: idx * 0.025 }}
                                     whileTap={{ scale: 0.99 }}
-                                    className="w-full text-left p-3 hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors"
+                                    className="w-full text-left px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors"
                                   >
-                                    <div className="flex items-center gap-2 mb-1.5">
-                                      <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${barColor}`} />
-                                      <p className="text-sm font-semibold text-gray-900 dark:text-white flex-1 truncate">{piq}</p>
-                                      <p className="text-xl font-black text-gray-900 dark:text-white shrink-0">{data.total}</p>
-                                    </div>
-                                    <div className="flex gap-0.5 h-2 rounded-full overflow-hidden mb-1.5 mx-4">
-                                      {data.f > 0 && <div className="h-full bg-pink-400 rounded-l-full" style={{ width:`${pctFPiq}%` }} />}
-                                      {data.m > 0 && <div className="h-full bg-blue-400 rounded-r-full" style={{ width:`${pctMPiq}%` }} />}
-                                    </div>
-                                    <div className="flex flex-wrap gap-1 items-center ml-4">
-                                      {data.f > 0 && <span className="text-[10px] bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 px-1.5 py-0.5 rounded-full font-medium">♀ {data.f}</span>}
-                                      {data.m > 0 && <span className="text-[10px] bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-1.5 py-0.5 rounded-full font-medium">♂ {data.m}</span>}
-                                      {mainEra !== '-'  && <span className="text-[10px] bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 px-1.5 py-0.5 rounded-full">Era: {mainEra}</span>}
-                                      {mainRaca !== '-' && mainRaca !== 'Não informado' && <span className="text-[10px] bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 px-1.5 py-0.5 rounded-full">{mainRaca}</span>}
-                                      {mainCat && mainCat !== 'Outros' && <span className="text-[10px] bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded-full">{mainCat}</span>}
-                                      <span className="ml-auto text-[10px] text-gray-400">{pctPiq}%</span>
+                                    <div className="flex items-center gap-2">
+                                      <div className={`w-2 h-2 rounded-full shrink-0 ${barColor}`} />
+                                      <p className="text-xs font-semibold text-gray-900 dark:text-white flex-1 truncate">{piq}</p>
+                                      <div className="flex items-center gap-1.5 shrink-0">
+                                        {data.f > 0 && <span className="text-[10px] text-pink-500 font-medium">Fêmeas {data.f}</span>}
+                                        {data.m > 0 && <span className="text-[10px] text-blue-500 font-medium">Machos {data.m}</span>}
+                                        <span className="text-sm font-black text-gray-900 dark:text-white">{data.total}</span>
+                                        <span className="text-[10px] text-gray-400 w-7 text-right">{pctPiq}%</span>
+                                      </div>
                                     </div>
                                   </motion.button>
                                 )
@@ -3612,12 +3679,14 @@ export default function MobileRelatorios() {
                           </div>
                         )}
 
-                        {/* 4. ERAS com F/M por era */}
+                        {/* 4. ERAS com F/M por era (visual simplificado) */}
                         <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
                           <div className="flex items-center gap-2 mb-3">
                             <span className="text-xl">📅</span>
                             <h4 className="font-bold text-gray-900 dark:text-white">Eras dos Animais</h4>
-                            <span className="ml-auto bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-xs font-semibold px-2 py-0.5 rounded-full">{erasAll.length} eras</span>
+                            <span className="ml-auto bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-xs font-semibold px-2 py-0.5 rounded-full">
+                              {erasAll.length} eras
+                            </span>
                           </div>
                           {(() => {
                             const eraFM = {}
@@ -3630,21 +3699,33 @@ export default function MobileRelatorios() {
                               if (/^f/i.test(sx)) eraFM[era].f += qtd
                               else if (/^m/i.test(sx)) eraFM[era].m += qtd
                             })
-                            const ERA_COLORS = [
-                              { grad:'from-amber-400 to-yellow-500',   light:'bg-amber-50 dark:bg-amber-900/20',   border:'border-amber-200 dark:border-amber-800',   text:'text-amber-700 dark:text-amber-300' },
-                              { grad:'from-orange-400 to-amber-500',   light:'bg-orange-50 dark:bg-orange-900/20', border:'border-orange-200 dark:border-orange-800', text:'text-orange-700 dark:text-orange-300' },
-                              { grad:'from-green-400 to-emerald-500',  light:'bg-green-50 dark:bg-green-900/20',   border:'border-green-200 dark:border-green-800',   text:'text-green-700 dark:text-green-300' },
-                              { grad:'from-teal-400 to-cyan-500',      light:'bg-teal-50 dark:bg-teal-900/20',     border:'border-teal-200 dark:border-teal-800',     text:'text-teal-700 dark:text-teal-300' },
-                              { grad:'from-violet-400 to-purple-500',  light:'bg-violet-50 dark:bg-violet-900/20', border:'border-violet-200 dark:border-violet-800', text:'text-violet-700 dark:text-violet-300' },
-                              { grad:'from-rose-400 to-pink-500',      light:'bg-rose-50 dark:bg-rose-900/20',     border:'border-rose-200 dark:border-rose-800',     text:'text-rose-700 dark:text-rose-300' },
-                            ]
+
+                            const parseEraKey = (eraLabel) => {
+                              const txt = String(eraLabel || '').trim()
+                              const plus = txt.match(/^\+?\s*(\d+)$/)
+                              if (plus) return Number(plus[1]) * 1000
+                              const range = txt.match(/^(\d+)\s*\/\s*(\d+)$/)
+                              if (range) return Number(range[1]) * 100 + Number(range[2])
+                              const nums = txt.match(/(\d+)/)
+                              if (nums) return Number(nums[1]) * 10
+                              return Number.MAX_SAFE_INTEGER
+                            }
+
+                            const eraEntries = Object.entries(eraFM)
+                              .sort((a, b) => {
+                                const byTotal = (b[1]?.total || 0) - (a[1]?.total || 0)
+                                if (byTotal !== 0) return byTotal
+                                return parseEraKey(a[0]) - parseEraKey(b[0])
+                              })
+                              .slice(0, 10)
+
                             return (
                               <div className="space-y-2">
-                                {erasAll.map(([era, qtd], idx) => {
-                                  const fm   = eraFM[era] || { f:0, m:0, total: qtd }
+                                {eraEntries.map(([era, fm]) => {
+                                  const qtd = fm.total || 0
                                   const pct  = totalGeral > 0 ? Math.round(qtd/totalGeral*100) : 0
-                                  const pctF2 = fm.total > 0 ? Math.round(fm.f/fm.total*100) : 0
-                                  const ec   = ERA_COLORS[idx % ERA_COLORS.length]
+                                  const pctF2 = fm.total > 0 ? Math.round((fm.f / fm.total) * 100) : 0
+                                  const pctM2 = fm.total > 0 ? 100 - pctF2 : 0
                                   return (
                                     <motion.button
                                       key={era}
@@ -3652,31 +3733,36 @@ export default function MobileRelatorios() {
                                       onClick={() => setResumoDetalheModal({ open: true, tipo: 'era', valor: era, titulo: `Era: ${era}`, qtd })}
                                       initial={{ opacity: 0, x: -8 }}
                                       animate={{ opacity: 1, x: 0 }}
-                                      transition={{ delay: idx * 0.04 }}
+                                      transition={{ delay: 0.02 }}
                                       whileTap={{ scale: 0.98 }}
-                                      className={`w-full text-left flex items-center gap-3 ${ec.light} border ${ec.border} rounded-xl p-3`}
+                                      className="w-full text-left rounded-xl p-3 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50"
                                     >
-                                      <div className={`bg-gradient-to-b ${ec.grad} rounded-lg p-2 shrink-0 text-center min-w-[52px]`}>
-                                        <p className="text-[9px] text-white/70 font-bold uppercase">Era</p>
-                                        <p className="text-sm font-black text-white leading-tight">{era}</p>
+                                      <div className="rounded-lg p-2 shrink-0 text-center min-w-[58px] bg-gradient-to-b from-amber-500 to-orange-500">
+                                        <p className="text-[9px] text-white/80 font-bold uppercase">Era</p>
+                                        <p className="text-sm font-black text-white leading-tight">{era || '-'}</p>
                                       </div>
                                       <div className="flex-1 min-w-0">
-                                        <div className="flex items-center justify-between mb-1">
-                                          <div className="flex gap-2 flex-wrap">
-                                            {fm.f > 0 && <span className="text-[10px] text-pink-600 dark:text-pink-400 font-semibold">♀ {fm.f}</span>}
-                                            {fm.m > 0 && <span className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">♂ {fm.m}</span>}
+                                        <div className="flex items-center justify-between mb-1.5">
+                                          <div className="flex gap-2 text-[10px] font-semibold">
+                                            <span className="text-pink-600 dark:text-pink-400">Fêmeas {fm.f || 0}</span>
+                                            <span className="text-blue-600 dark:text-blue-400">Machos {fm.m || 0}</span>
                                           </div>
-                                          <span className={`text-[10px] ${ec.text}`}>{pct}%</span>
+                                          <span className="text-[10px] text-slate-500 dark:text-slate-400">{pct}%</span>
                                         </div>
-                                        <div className="flex h-1.5 rounded-full overflow-hidden bg-black/10 dark:bg-white/10">
+                                        <div className="flex h-1.5 rounded-full overflow-hidden bg-slate-200/70 dark:bg-slate-700">
                                           {fm.f > 0 && <div className="bg-pink-400 h-full" style={{ width:`${pctF2}%` }} />}
-                                          {fm.m > 0 && <div className="bg-blue-400 h-full" style={{ width:`${100-pctF2}%` }} />}
+                                          {fm.m > 0 && <div className="bg-blue-400 h-full" style={{ width:`${pctM2}%` }} />}
                                         </div>
                                       </div>
-                                      <p className="text-2xl font-black text-gray-900 dark:text-white shrink-0">{qtd}</p>
+                                      <p className="text-2xl font-black text-slate-900 dark:text-white shrink-0">{qtd}</p>
                                     </motion.button>
                                   )
                                 })}
+                                {erasAll.length > eraEntries.length && (
+                                  <p className="text-[11px] text-slate-500 dark:text-slate-400 text-center pt-1">
+                                    Exibindo as 10 eras mais relevantes.
+                                  </p>
+                                )}
                               </div>
                             )
                           })()}
@@ -3714,49 +3800,6 @@ export default function MobileRelatorios() {
                           </div>
                         </div>
 
-                        {/* 6. SEXO — visual grande */}
-                        <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-200 dark:border-gray-700">
-                          <div className="bg-gray-50 dark:bg-gray-800 p-4 pb-3">
-                            <div className="flex items-center gap-2 mb-3">
-                              <span className="text-xl">⚥</span>
-                              <h4 className="font-bold text-gray-900 dark:text-white">Por Sexo</h4>
-                            </div>
-                            <div className="grid grid-cols-2 gap-3">
-                              {sexosTop.map(([sexo, qtd], idx) => {
-                                const ehF = /^f/i.test(sexo)
-                                const ehM = /^m/i.test(sexo)
-                                const pct = totalGeral > 0 ? Math.round(qtd/totalGeral*100) : 0
-                                const s = ehF
-                                  ? { grad:'from-pink-500 to-rose-600', light:'bg-pink-50 dark:bg-pink-900/20', border:'border-pink-300 dark:border-pink-700', label:'text-pink-600 dark:text-pink-400', num:'text-pink-900 dark:text-pink-100', icon:'♀', name:'Fêmeas' }
-                                  : ehM
-                                  ? { grad:'from-blue-500 to-indigo-600', light:'bg-blue-50 dark:bg-blue-900/20', border:'border-blue-300 dark:border-blue-700', label:'text-blue-600 dark:text-blue-400', num:'text-blue-900 dark:text-blue-100', icon:'♂', name:'Machos' }
-                                  : { grad:'from-gray-400 to-gray-500', light:'bg-gray-50 dark:bg-gray-700', border:'border-gray-200 dark:border-gray-600', label:'text-gray-600 dark:text-gray-400', num:'text-gray-900 dark:text-white', icon:'—', name:sexo }
-                                return (
-                                  <motion.div
-                                    key={sexo}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: idx * 0.08 }}
-                                    className={`${s.light} border-2 ${s.border} rounded-xl overflow-hidden`}
-                                  >
-                                    <div className={`bg-gradient-to-r ${s.grad} px-3 py-1.5 flex items-center gap-1`}>
-                                      <span className="text-white/90 text-lg font-black">{s.icon}</span>
-                                      <span className="text-white/80 text-xs font-semibold">{s.name}</span>
-                                    </div>
-                                    <div className="p-3">
-                                      <p className={`text-4xl font-black ${s.num}`}>{qtd.toLocaleString('pt-BR')}</p>
-                                      <div className="mt-2 h-2 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
-                                        <div className={`h-full bg-gradient-to-r ${s.grad}`} style={{ width:`${pct}%` }} />
-                                      </div>
-                                      <p className={`text-xs ${s.label} mt-1 font-medium`}>{pct}% do rebanho</p>
-                                    </div>
-                                  </motion.div>
-                                )
-                              })}
-                            </div>
-                          </div>
-                        </div>
-
                       </motion.div>
                     )
                   })()}
@@ -3779,6 +3822,17 @@ export default function MobileRelatorios() {
                     const filtered = rows.filter(d => {
                       if (tipo === 'raca') return (d.raca || 'Não informado').trim() === valor
                       if (tipo === 'era')  return (d.era || '-').trim() === valor
+                      if (tipo === 'area') {
+                        const local = (d.local || d.local_1 || '').trim()
+                        const AREA_CATS_MODAL = [
+                          { key: 'Piquetes',     test: s => /piquete|^piq[\s_-]/i.test(s) },
+                          { key: 'Cabanha',      test: s => /cabanha/i.test(s) },
+                          { key: 'Confinamento', test: s => /confina|^conf\b/i.test(s) },
+                          { key: 'Projetos',     test: s => /projeto|^proj\b/i.test(s) },
+                        ]
+                        const areaCat = AREA_CATS_MODAL.find(c => c.test(local))?.key || 'Outros'
+                        return areaCat === valor
+                      }
                       if (tipo === 'local_1') return (d.local_1 || d.local || '').trim() === valor
                       if (tipo === 'local') {
                         const sub2  = (d.sub_local_2 || '').trim()
@@ -3829,7 +3883,9 @@ export default function MobileRelatorios() {
                             {filtered.length === 0 ? (
                               <p className="text-sm text-gray-500 dark:text-gray-400">Nenhum registro</p>
                             ) : (
-                              filtered.map((row, i) => (
+                              filtered.map((row, i) => {
+                                const medRow = ultimoMedRow(row.id, row)
+                                return (
                                 <div
                                   key={i}
                                   className="p-3 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 space-y-1"
@@ -3851,8 +3907,19 @@ export default function MobileRelatorios() {
                                       </div>
                                     )
                                   })}
+                                  {medRow && (
+                                    <div className="mt-1.5 pt-1.5 border-t border-purple-200 dark:border-purple-800/40 flex items-center gap-1.5">
+                                      <span className="text-[10px]">💉</span>
+                                      <span className="text-xs font-semibold text-purple-700 dark:text-purple-300 truncate">{medRow.medicamento}</span>
+                                      <span className="text-[10px] text-purple-500 dark:text-purple-400 shrink-0">
+                                        {medRow.data_aplicacao ? new Date(medRow.data_aplicacao).toLocaleDateString('pt-BR') : ''}
+                                        {medRow.usuario ? ` · ${medRow.usuario}` : ''}
+                                      </span>
+                                    </div>
+                                  )}
                                 </div>
-                              ))
+                                )
+                              })
                             )}
                           </div>
                         </motion.div>
@@ -4758,9 +4825,33 @@ export default function MobileRelatorios() {
 
                           // Layout em cards para Boletim Campo e Boletim Defesa - melhor leitura no mobile
                           if (ehBoletim) {
+                            const getQtd = (row) => {
+                              const val = row.quant ?? row.total ?? row.qtd ?? row.quantidade
+                              return Number(val) || 0
+                            }
+                            const hasAnimais = (row) =>
+                              Boolean(row?.animal_id) || (Array.isArray(row?.animais) && row.animais.length > 0)
+
+                            const boletimRows = dadosParaExibir.filter((row) => {
+                              const isTotalGeral = row.local === 'TOTAL GERAL' || row.fazenda === 'TOTAL GERAL' || row.local_1 === 'TOTAL GERAL' || row.raca === 'TOTAL GERAL'
+                              if (!ehBoletimCampo || isTotalGeral) return true
+                              const qtd = getQtd(row)
+                              if (qtd > 0) return true
+                              // Mantém somente linhas zeradas quando há vínculo de animal.
+                              return hasAnimais(row)
+                            })
+
+                            if (boletimRows.length === 0) {
+                              return (
+                                <div className="rounded-xl border border-dashed border-gray-300 dark:border-gray-600 p-5 text-center text-sm text-gray-500 dark:text-gray-400">
+                                  Nenhum registro com quantidade disponível para exibir.
+                                </div>
+                              )
+                            }
+
                             return (
                               <div className="space-y-3">
-                                {dadosParaExibir.map((row, i) => {
+                                {boletimRows.map((row, i) => {
                                   const isTotalGeral = row.local === 'TOTAL GERAL' || row.fazenda === 'TOTAL GERAL' || row.local_1 === 'TOTAL GERAL' || row.raca === 'TOTAL GERAL'
                                   return (
                                     <motion.div
@@ -4813,13 +4904,15 @@ export default function MobileRelatorios() {
                                           </div>
                                         )}
 
-                                        {/* Botão de Medicamentos — apenas para boletim_campo */}
+                                        {/* Botão de Medicamentos — registro apenas para Adelso */}
                                         {ehBoletimCampo && !isTotalGeral && row.id && (() => {
-                                          const ult = ultimoMedRow(row.id)
+                                          const ult = ultimoMedRow(row)
                                           const dias = ult ? diasDesde(ult.data_aplicacao) : null
                                           const proxDias = ult?.data_proxima_aplicacao ? diasAte(ult.data_proxima_aplicacao) : null
                                           const vencida = proxDias !== null && proxDias < 0
                                           const proxima = proxDias !== null && proxDias >= 0 && proxDias <= 7
+                                          const podeConsultar = isAdelso || Boolean(ult)
+                                          if (!podeConsultar) return null
                                           return (
                                             <button
                                               onClick={() => {
@@ -4839,7 +4932,7 @@ export default function MobileRelatorios() {
                                               {vencida ? <ExclamationCircleIcon className="w-4 h-4 shrink-0" /> : <BeakerIcon className="w-4 h-4 shrink-0" />}
                                               {ult
                                                 ? <><span className="truncate max-w-[130px]">{ult.medicamento}</span><span>·</span><span className="shrink-0">{dias === 0 ? 'hoje' : `${dias}d atrás`}{vencida ? ' ⚠️' : proxima ? ` · próx. ${proxDias}d` : ''}</span></>
-                                                : 'Registrar medicamento'
+                                                : 'Medicamento'
                                               }
                                             </button>
                                           )
@@ -4937,7 +5030,24 @@ export default function MobileRelatorios() {
                                     // Tornar o número do animal clicável
                                     const isAnimalColumn = k.toLowerCase() === 'animal' || k.toLowerCase() === 'identificacao'
                                     const animalId = row.animal_id || row.id || originalRow.animal_id || originalRow.id
+                                    const consultaAnimalId = isAnimalColumn && ehRanking
+                                      ? buildConsultaAnimalId(row.identificacao || row.animal || display)
+                                      : null
                                     
+                                    if (isAnimalColumn && consultaAnimalId) {
+                                      return (
+                                        <td key={k} className="px-3 py-2.5 text-gray-900 dark:text-white break-words min-w-0">
+                                          <Link
+                                            href={`/consulta-animal/${consultaAnimalId}`}
+                                            onClick={(e) => e.stopPropagation()}
+                                            className="text-amber-600 dark:text-amber-400 font-bold hover:underline"
+                                          >
+                                            {display}
+                                          </Link>
+                                        </td>
+                                      )
+                                    }
+
                                     if (isAnimalColumn && animalId) {
                                       return (
                                         <td key={k} className="px-3 py-2.5 text-gray-900 dark:text-white break-words min-w-0">
@@ -5145,11 +5255,11 @@ export default function MobileRelatorios() {
 
             <div className="overflow-y-auto flex-1 p-5 space-y-5">
               {/* Histórico */}
-              {medsDoRow(modalMed.row.id).length > 0 && (
+              {medsDoRow(modalMed.row).length > 0 && (
                 <div>
                   <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Histórico de aplicações</h4>
                   <div className="space-y-2">
-                    {medsDoRow(modalMed.row.id).map((m, idx) => {
+                    {medsDoRow(modalMed.row).map((m, idx) => {
                       const dias = diasDesde(m.data_aplicacao)
                       const proxDias = m.data_proxima_aplicacao ? diasAte(m.data_proxima_aplicacao) : null
                       const vencida = proxDias !== null && proxDias < 0
@@ -5164,6 +5274,11 @@ export default function MobileRelatorios() {
                               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                                 {new Date(m.data_aplicacao + 'T12:00:00').toLocaleDateString('pt-BR')} · <span className={`font-semibold ${idx === 0 ? 'text-purple-600 dark:text-purple-400' : ''}`}>{dias === 0 ? 'hoje' : `${dias} dias atrás`}</span>
                               </p>
+                              {m.usuario && (
+                                <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">
+                                  Lançado por: {m.usuario}
+                                </p>
+                              )}
                               {m.data_proxima_aplicacao && (
                                 <p className="text-xs mt-1 flex items-center gap-1">
                                   {vencida
@@ -5191,7 +5306,7 @@ export default function MobileRelatorios() {
               {isAdelso ? (
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                   <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-                    {medsDoRow(modalMed.row.id).length === 0 ? 'Registrar medicamento' : 'Nova aplicação'}
+                    {medsDoRow(modalMed.row).length === 0 ? 'Registrar medicamento' : 'Nova aplicação'}
                   </h4>
                   <div className="space-y-3">
                     <input type="text" value={formMed.medicamento} onChange={e => setFormMed(f => ({ ...f, medicamento: e.target.value }))} placeholder="Nome do medicamento *" className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm placeholder-gray-400" />
@@ -5213,7 +5328,7 @@ export default function MobileRelatorios() {
                   </div>
                 </div>
               ) : (
-                medsDoRow(modalMed.row.id).length === 0 && (
+                medsDoRow(modalMed.row).length === 0 && (
                   <div className="text-center py-10 text-gray-400">
                     <BeakerIcon className="w-12 h-12 mx-auto mb-2 opacity-40" />
                     <p className="text-sm">Nenhum medicamento registrado ainda</p>

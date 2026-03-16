@@ -19,15 +19,7 @@ export default function BoletimDefesa() {
     carregarDados()
   }, [])
 
-  const [redirecionandoMobile, setRedirecionandoMobile] = useState(false)
-
-  // Redirecionar para a mesma tela (mobile) em todos os dispositivos - desktop e mobile veem a mesma interface
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    if (window.location.pathname === '/boletim-defesa/mobile') return
-    setRedirecionandoMobile(true)
-    window.location.replace('/boletim-defesa/mobile')
-  }, [])
+  const [redirecionandoMobile] = useState(false)
 
   const [isAdelso, setIsAdelso] = useState(false)
 

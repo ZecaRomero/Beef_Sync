@@ -39,6 +39,7 @@ import AnimalNotes from '../../components/animals/AnimalNotes'
 import { localizacaoValidaParaExibir } from '../../utils/formatters'
 import { useAnimalDetails } from '../../hooks/useAnimalDetails'
 import { getSexTheme, getPageBgClasses } from '../../utils/animalSexTheme'
+import { formatNomeAnimal } from '../../utils/animalUtils'
 
 export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode }) {
   const router = useRouter()
@@ -70,6 +71,14 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
     try {
       const ativos = animal?.filhos || []
       const baixados = baixasResumo?.resumoMae?.proleDetalhes || []
+
+    const normalizeSerie = (value) =>
+      String(value || '').trim().toUpperCase().replace(/\s+/g, '')
+    const normalizeRg = (value) =>
+      String(value || '').trim().replace(/^0+/, '') || '0'
+    const sameFilho = (a, b) =>
+      normalizeSerie(a?.serie) === normalizeSerie(b?.serie) &&
+      normalizeRg(a?.rg) === normalizeRg(b?.rg)
     
     // Combinar e remover duplicatas por ID (se houver) ou RG/Série
     const map = new Map()
@@ -92,7 +101,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
       // Encontrar a chave do mapa onde esse filho já existe (evita duplicatas e chaves React duplicadas)
       let mapKeyToUpdate = null
       for (const [k, v] of map) {
-        if (v.serie === f.serie && v.rg === f.rg) {
+        if (sameFilho(v, f)) {
           mapKeyToUpdate = k
           break
         }
@@ -104,13 +113,35 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
       }
     })
     
+    const toNum = (v) => {
+      const n = Number(String(v ?? '').replace(/[^\d.-]/g, ''))
+      return Number.isFinite(n) ? n : Number.MAX_SAFE_INTEGER
+    }
+    const statusRank = (status) => {
+      const s = String(status || '').toUpperCase()
+      if (s.includes('VENDA')) return 0
+      if (s.includes('MORTE') || s.includes('BAIXA')) return 1
+      return 2
+    }
+
     return Array.from(map.values()).sort((a, b) => {
-      // Ordenar por nascimento (se tiver) ou data de baixa (se tiver) ou RG
-      // Melhora: ordenar por data (nascimento ou baixa) decrescente
-      const d1 = a.data_nascimento || a.data_baixa
-      const d2 = b.data_nascimento || b.data_baixa
-      if (d1 && d2) return new Date(d2) - new Date(d1)
-      return 0
+      const aRank = statusRank(a?.status)
+      const bRank = statusRank(b?.status)
+      if (aRank !== bRank) return aRank - bRank
+
+      // Vendas por número da NF
+      if (aRank === 0) {
+        const nfA = toNum(a?.numero_nf || a?.nf)
+        const nfB = toNum(b?.numero_nf || b?.nf)
+        if (nfA !== nfB) return nfA - nfB
+      }
+
+      // Demais por RG (numérico)
+      const rgA = toNum(a?.rg)
+      const rgB = toNum(b?.rg)
+      if (rgA !== rgB) return rgA - rgB
+
+      return String(a?.serie || '').localeCompare(String(b?.serie || ''), 'pt-BR')
     })
     } catch (error) {
       console.error('Erro ao combinar filhos:', error)
@@ -157,7 +188,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
     const locBruto = locAtiva?.piquete || locMaisRecente?.piquete || animal.piquete_atual || animal.piqueteAtual || animal.localizacao_atual
     const locFiltrada = localizacaoValidaParaExibir(locBruto) || (locBruto ? 'Não informado' : null)
     const texto = [
-      `Animal: ${animal.nome || `${animal.serie || ''} ${animal.rg || ''}`.trim() || '-'}`,
+      `Animal: ${formatNomeAnimal(animal)}`,
       `Identificação: ${animal.serie || '-'} ${animal.rg || '-'}`,
       animal.sexo ? `Sexo: ${animal.sexo}` : null,
       animal.raca ? `Raça: ${animal.raca}` : null,
@@ -209,7 +240,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
     }
   }, [animal, locAtual])
 
-  const nome = animal ? (animal.nome || `${animal.serie || ''} ${animal.rg || ''}`.trim() || '-') : '-'
+  const nome = formatNomeAnimal(animal)
   const sexTheme = getSexTheme(animal)
 
   const scrollToSection = useCallback((key) => {

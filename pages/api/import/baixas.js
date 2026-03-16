@@ -8,6 +8,7 @@ import fs from 'fs'
 import * as XLSX from 'xlsx'
 import databaseService from '../../../services/databaseService'
 import { pool, createTablesIfNotExist } from '../../../lib/database'
+import { blockIfNotZecaDeveloper } from '../../../utils/importAccess'
 
 export const config = {
   api: { bodyParser: false },
@@ -105,6 +106,9 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'MÃ©todo nÃ£o permitido' })
   }
+
+  const blocked = blockIfNotZecaDeveloper(req, res)
+  if (blocked) return blocked
 
   const form = formidable({ multiples: false, maxFileSize: 100 * 1024 * 1024 })
   form.parse(req, async (err, fields, files) => {

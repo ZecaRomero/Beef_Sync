@@ -9,6 +9,7 @@ import {
 import InfoRow from '../InfoRow'
 import { formatDate, formatCurrency } from '../../../utils/formatters'
 import { getCardHeaderClasses, getIconClasses, getIconColorClasses, getIdentColorClasses, getCardBorderClasses, getLocationButtonClasses, getLocationTextClasses } from '../../../utils/animalSexTheme'
+import { formatNomeAnimal } from '../../../utils/animalUtils'
 import RankingBadges from './RankingBadges'
 import BaixaSection from './BaixaSection'
 import ProleResumoSection from './ProleResumoSection'
@@ -52,7 +53,7 @@ export default function AnimalMainInfo({
     isParidaEPrenha
   } = metrics
 
-  const nome = animal.nome || `${animal.serie || ''} ${animal.rg || ''}`.trim() || '-'
+  const nome = formatNomeAnimal(animal)
 
   const baixaPropriaExibir = baixasResumo?.baixaPropria || (animal._apenas_baixas && animal.baixas?.length > 0 ? (() => {
     const venda = animal.baixas.find(b => b.tipo === 'VENDA')
@@ -130,7 +131,7 @@ export default function AnimalMainInfo({
       </div>
       <div className="divide-y divide-gray-100 dark:divide-gray-700">
         <BaixaSection baixaPropriaExibir={baixaPropriaExibir} animal={animal} baixasResumo={baixasResumo} />
-        <ProleResumoSection baixasResumo={baixasResumo} onOpenProleModal={handleOpenProleModal} />
+        <ProleResumoSection baixasResumo={baixasResumo} filhosAtivos={animal.filhos || []} onOpenProleModal={handleOpenProleModal} />
         <InfoRow label="Sexo" value={animal.sexo} />
         <InfoRow label="Raça" value={animal.raca} />
         <InfoRow label="Pelagem" value={animal.pelagem} />

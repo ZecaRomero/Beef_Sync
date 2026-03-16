@@ -34,7 +34,7 @@ export default async function handler(req, res) {
     try {
       result = await query(
       `SELECT 
-         a.id, a.serie, a.rg, a.nome, a.abczg, a.deca, a.raca, a.sexo, a.situacao,
+         a.id, a.serie, a.rg, a.nome, a.mae, a.abczg, a.deca, a.raca, a.sexo, a.situacao,
          a.data_nascimento, a.pasto_atual, a.piquete_atual,
          a.serie_mae, a.rg_mae,
          p_ult.peso AS ultimo_peso,
@@ -76,7 +76,7 @@ export default async function handler(req, res) {
         try {
           result = await query(
             `SELECT 
-             a.id, a.serie, a.rg, a.nome, a.abczg, a.deca, a.raca, a.sexo, a.situacao,
+             a.id, a.serie, a.rg, a.nome, a.mae, a.abczg, a.deca, a.raca, a.sexo, a.situacao,
              a.data_nascimento, a.pasto_atual,
              a.serie_mae, a.rg_mae,
              p_ult.peso AS ultimo_peso,
@@ -117,7 +117,7 @@ export default async function handler(req, res) {
           if (/column.*does not exist/i.test(colErr2?.message || '')) {
             result = await query(
               `SELECT 
-               a.id, a.serie, a.rg, a.nome, a.abczg, a.deca, a.raca, a.sexo, a.situacao,
+               a.id, a.serie, a.rg, a.nome, a.mae, a.abczg, a.deca, a.raca, a.sexo, a.situacao,
                a.data_nascimento, a.pasto_atual,
                p_ult.peso AS ultimo_peso,
                p_ult.ce   AS ultimo_ce,
@@ -166,6 +166,7 @@ export default async function handler(req, res) {
       rg: r.rg,
       serie_mae: r.serie_mae,
       rg_mae: r.rg_mae,
+      mae: r.mae,
       identificacao: `${r.serie || ''}-${r.rg || ''}`.replace(/^-|-$/g, ''),
       nome: r.nome,
       abczg: r.abczg,

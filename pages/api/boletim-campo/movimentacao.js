@@ -2,11 +2,13 @@
  * API para registrar movimentações (saída/entrada) no Boletim Campo
  */
 import { query } from '../../../lib/database'
+import { blockIfNotAdelso } from '../../../utils/boletimAccess'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Método não permitido' })
   }
+  if (blockIfNotAdelso(req, res)) return
 
   try {
     const { boletimCampoId, tipo, destinoLocal, destinoSubLocal, motivo, quantidade, usuario, sexo, era, raca, categoria, observacao } = req.body

@@ -4,8 +4,15 @@ import { BeakerIcon, CalendarIcon, UserIcon, PlusIcon, PencilIcon, TrashIcon, Ma
 import { useDebouncedCallback } from '../../hooks/useDebounce'
 import { formatDoadoraIdentificacao } from '../../utils/formatters'
 import ImportProgressOverlay from '../../components/ImportProgressOverlay'
+import { usePermissions } from '../../hooks/usePermissions'
+import { useAuth } from '../../contexts/AuthContext'
 
 export default function ColetaFiv() {
+  const permissions = usePermissions()
+  const { user } = useAuth()
+  const normalizedUserName = String(permissions.userName || '').toLowerCase()
+  const canImportExcel = permissions.isDeveloper && normalizedUserName.includes('zeca')
+
   const [coletas, setColetas] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -329,6 +336,11 @@ export default function ColetaFiv() {
   const uniqueVets = [...new Set(coletas.map(c => c.veterinario).filter(Boolean))].sort()
 
   const handleImportExcel = async () => {
+    if (!canImportExcel) {
+      setImportError('Apenas Zeca Desenvolvedor pode importar Excel nesta tela.')
+      return
+    }
+
     if (!importFile) {
       setImportError('Selecione um arquivo Excel')
       return
@@ -382,12 +394,18 @@ export default function ColetaFiv() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-user-role': permissions.isDeveloper ? 'desenvolvedor' : 'externo',
+          'x-user-name': permissions.userName || '',
+          'x-user-email': user?.email || '',
         },
         body: JSON.stringify({
           fileData: base64,
           fileName: importFile.name,
           laboratorio: importLaboratorio,
-          veterinario: importVeterinario
+          veterinario: importVeterinario,
+          userRole: permissions.isDeveloper ? 'desenvolvedor' : 'externo',
+          userName: permissions.userName || '',
+          userEmail: user?.email || '',
         })
       })
 
@@ -459,13 +477,24 @@ export default function ColetaFiv() {
             </p>
           </div>
           <div className="flex gap-2">
-            <button
-              onClick={() => setShowImportModal(true)}
-              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <DocumentArrowUpIcon className="h-5 w-5 mr-2" />
-              Importar Excel
-            </button>
+            {canImportExcel ? (
+              <button
+                onClick={() => setShowImportModal(true)}
+                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <DocumentArrowUpIcon className="h-5 w-5 mr-2" />
+                Importar Excel
+              </button>
+            ) : (
+              <button
+                disabled
+                className="flex items-center px-4 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed"
+                title="Somente Zeca Desenvolvedor pode importar Excel"
+              >
+                <DocumentArrowUpIcon className="h-5 w-5 mr-2" />
+                Importar Excel (restrito)
+              </button>
+            )}
             <button
               onClick={() => setShowForm(!showForm)}
               className="flex items-center px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors"
@@ -935,6 +964,13 @@ export default function ColetaFiv() {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
               <div className="p-6">
+                {!canImportExcel && (
+                  <div className="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+                    <p className="text-sm text-red-700 dark:text-red-400">
+                      Acesso restrito: apenas Zeca Desenvolvedor pode importar planilhas Excel.
+                    </p>
+                  </div>
+                )}
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
                     <DocumentArrowUpIcon className="h-6 w-6 mr-2 text-blue-600" />
@@ -964,7 +1000,7 @@ export default function ColetaFiv() {
                       type="file"
                       accept=".xlsx,.xls"
                       onChange={handleImportFileChange}
-                      disabled={importLoading}
+                      disabled={importLoading || !canImportExcel}
                       className="w-full text-sm text-gray-500 dark:text-gray-400
                         file:mr-4 file:py-2 file:px-4
                         file:rounded-lg file:border-0
@@ -1076,7 +1112,7 @@ export default function ColetaFiv() {
                     </button>
                     <button
                       onClick={handleImportExcel}
-                      disabled={importLoading || !importFile || !importLaboratorio || !importVeterinario}
+                      disabled={importLoading || !importFile || !importLaboratorio || !importVeterinario || !canImportExcel}
                       className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                       title={!importFile || !importLaboratorio || !importVeterinario ? 'Preencha todos os campos obrigatórios' : ''}
                     >

@@ -11,8 +11,15 @@ import {
 import Modal from './ui/Modal'
 import Button from './ui/Button'
 import ImportProgressOverlay from './ImportProgressOverlay'
+import { usePermissions } from '../hooks/usePermissions'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function UniversalExcelImporter({ isOpen, onClose, onImportSuccess }) {
+  const permissions = usePermissions()
+  const { user } = useAuth()
+  const normalizedUserName = String(permissions?.userName || '').toLowerCase()
+  const canImportExcel = permissions?.isDeveloper && normalizedUserName.includes('zeca')
+
   const [file, setFile] = useState(null)
   const [detectedType, setDetectedType] = useState(null)
   const [preview, setPreview] = useState(null)
@@ -372,36 +379,76 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
 
   const processAnimaisData = (data) => {
     if (!data || data.length === 0) return []
-    
-    // Obter todas as chaves disponíveis no primeiro registro para debug
-    const availableKeys = Object.keys(data[0] || {})
-    console.log('📋 Colunas encontradas no Excel:', availableKeys)
-    console.log('📊 Total de registros:', data.length)
-    console.log('🔍 Primeiro registro completo:', data[0])
-    
+
+    const normalizeKey = (key) =>
+      String(key || '')
+        .trim()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[._-]/g, ' ')
+        .replace(/\s+/g, ' ')
+
+    const normalizeDate = (value) => {
+      if (!value) return null
+      const raw = String(value).trim()
+      if (!raw) return null
+
+      const br = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/)
+      if (br) {
+        const day = Number(br[1])
+        const month = Number(br[2]) - 1
+        const year = br[3].length === 2 ? Number(`20${br[3]}`) : Number(br[3])
+        const parsed = new Date(year, month, day)
+        if (!isNaN(parsed.getTime())) return parsed.toISOString().split('T')[0]
+      }
+
+      const parsed = new Date(raw)
+      return isNaN(parsed.getTime()) ? raw : parsed.toISOString().split('T')[0]
+    }
+
+    const normalizeSexo = (value) => {
+      const text = String(value || '').trim().toUpperCase()
+      if (!text) return null
+      if (text === 'M' || text === 'MACHO') return 'Macho'
+      if (text === 'F' || text === 'FEMEA' || text === 'FÊMEA') return 'Fêmea'
+      return value
+    }
+
+    const aliases = {
+      serie: ['serie', 'série', 'serie animal', 'série animal'],
+      rg: ['rg', 'rgn', 'rg animal', 'r g'],
+      nome: ['nome', 'nome animal', 'nome do animal'],
+      sexo: ['sexo', 'sexo animal', 'sx'],
+      raca: ['raca', 'raça', 'raca animal', 'raça animal'],
+      data_nascimento: ['data nascimento', 'data de nascimento', 'nascimento', 'data_nascimento'],
+      meses: ['meses'],
+      peso: ['peso', 'peso animal'],
+      pai: ['pai', 'nome do pai', 'nome pai'],
+      mae: ['mae', 'mãe', 'nome da mae', 'nome da mãe'],
+      serie_mae: ['serie mae', 'série mae', 'serie da mae', 'série da mãe'],
+      rg_mae: ['rg mae', 'rg da mae', 'rg da mãe', 'rgn mae'],
+      receptora: ['receptora'],
+      avo_materno: ['avo materno', 'avô materno'],
+      iabcz: ['iabcz', 'iabz'],
+      deca: ['deca'],
+      serie_rg_mae: ['serie e rg da mae', 'série e rg da mãe', 'serie rg mae', 'identificacao mae', 'identificação mãe'],
+    }
+
     return data.map((row, idx) => {
-      const getVal = (keys, colMustContain = null) => {
-        const mustContain = Array.isArray(colMustContain) ? colMustContain : (colMustContain ? [colMustContain] : null)
-        for (const key of keys) {
-          let val = row[key]
-          if (val === undefined || val === null) val = row[key.toLowerCase()]
-          if (val === undefined || val === null) val = row[key.toUpperCase()]
-          if (val === undefined || val === null) {
-            const keyNoSpaces = key.replace(/\s+/g, '')
-            val = row[keyNoSpaces] || row[keyNoSpaces.toLowerCase()] || row[keyNoSpaces.toUpperCase()]
-          }
-          if (val === undefined || val === null) {
-            const foundKey = availableKeys.find(k => {
-              const match = k.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(k.toLowerCase())
-              if (!match) return false
-              if (mustContain && !mustContain.some(c => k.toLowerCase().includes(String(c).toLowerCase()))) return false
-              if (/^nome\s*(animal|do\s*animal)?$/i.test(k.trim())) return false
-              return true
-            })
-            if (foundKey) val = row[foundKey]
-          }
-          if (val !== undefined && val !== null && val !== '') {
-            return String(val).trim()
+      const keyMap = {}
+      Object.keys(row || {}).forEach((originalKey) => {
+        keyMap[normalizeKey(originalKey)] = originalKey
+      })
+
+      const getByAliases = (field) => {
+        for (const alias of aliases[field] || []) {
+          const normalizedAlias = normalizeKey(alias)
+          if (keyMap[normalizedAlias] !== undefined) {
+            const value = row[keyMap[normalizedAlias]]
+            if (value !== undefined && value !== null && String(value).trim() !== '') {
+              return String(value).trim()
+            }
           }
         }
         return null
@@ -409,28 +456,25 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
 
       const processed = {
         id: idx + 1,
-        serie: getVal(['Serie', 'Série', 'serie', 'SERIE', 'Serie Animal', 'Série Animal', 'SERIE_ANIMAL']),
-        rg: getVal(['RG', 'rg', 'Rg', 'R.G.', 'RG_ANIMAL', 'RGN', 'rgn']),
-        nome: getVal(['Nome', 'nome', 'NOME', 'Nome Animal', 'NOME_ANIMAL', 'Nome do Animal']),
-        sexo: getVal(['Sexo', 'sexo', 'SEXO', 'Sexo Animal', 'SEXO_ANIMAL', 'Sx', 'sx', 'SX']),
-        raca: getVal(['Raça', 'Raca', 'raca', 'RACA', 'Raça Animal', 'RACA_ANIMAL']),
-        data_nascimento: getVal(['Data Nascimento', 'DataNascimento', 'data_nascimento', 'DATA_NASCIMENTO', 'Data de Nascimento', 'Nascimento', 'nascimento']),
-        meses: getVal(['Meses', 'meses', 'MESES']),
-        peso: getVal(['Peso', 'peso', 'PESO', 'Peso Animal', 'PESO_ANIMAL']),
-        pai: getVal(['Pai', 'pai', 'PAI', 'Pai Animal', 'PAI_ANIMAL', 'Nome do Pai', 'NomePai'], 'pai'),
-        serie_pai: getVal(['SériePai', 'SeriePai', 'serie_pai', 'SERIE_PAI', 'Série Pai']),
-        rg_pai: getVal(['RgnPai', 'Rgn Pai', 'rg_pai', 'RG_PAI', 'RGN Pai']),
-        mae: getVal(['Mãe', 'Mae', 'mae', 'MAE', 'Mãe Animal', 'MAE_ANIMAL', 'Nome da Mãe', 'NomeMãe', 'NomeMae'], ['mae', 'mãe']),
-        serie_mae: getVal(['SérieMãe', 'SerieMãe', 'SerieMae', 'serie_mae', 'SERIE_MAE', 'Série Mãe', 'Série da Mãe', 'Serie da Mae', 'SERIE DA MAE', 'Serie Mae']),
-        rg_mae: getVal(['RgnMãe', 'RgnMae', 'Rgn Mãe', 'rg_mae', 'RG_MAE', 'RGN Mãe', 'RG da Mãe', 'Rg da Mae', 'RG DA MAE', 'RG Mae']),
-        receptora: getVal(['Receptora', 'receptora', 'RECEPTORA']),
-        avo_materno: getVal(['Avô Materno', 'Avo Materno', 'avo_materno', 'AVO_MATERNO', 'AvôMaterno', 'AvoMaterno']),
-        iabcz: getVal(['iABCZ', 'IABCZ', 'iabcz', 'iABZ', 'IABZ']),
-        deca: getVal(['DECA', 'deca', 'Deca'])
+        serie: getByAliases('serie'),
+        rg: getByAliases('rg'),
+        nome: getByAliases('nome'),
+        sexo: normalizeSexo(getByAliases('sexo')),
+        raca: getByAliases('raca'),
+        data_nascimento: normalizeDate(getByAliases('data_nascimento')),
+        meses: getByAliases('meses'),
+        peso: getByAliases('peso'),
+        pai: getByAliases('pai'),
+        mae: getByAliases('mae'),
+        serie_mae: getByAliases('serie_mae'),
+        rg_mae: getByAliases('rg_mae'),
+        receptora: getByAliases('receptora'),
+        avo_materno: getByAliases('avo_materno'),
+        iabcz: getByAliases('iabcz'),
+        deca: getByAliases('deca'),
       }
 
-      // Coluna combinada "Série e RG da Mãe" (ex: "CJCJ 16982")
-      const serieRgMaeCombined = getVal(['Série e RG da Mãe', 'Serie e RG da Mae', 'SERIE E RG DA MAE', 'Serie RG Mae', 'Série RG Mãe', 'Identificação Mãe', 'Identificacao Mae'])
+      const serieRgMaeCombined = getByAliases('serie_rg_mae')
       if (serieRgMaeCombined && (!processed.serie_mae || !processed.rg_mae)) {
         const { serie: s, rg: r } = extrairSerieRG(serieRgMaeCombined, processed.serie)
         if (s || r) {
@@ -438,18 +482,17 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
           processed.rg_mae = processed.rg_mae || r
         }
       }
-      
-      // Log do primeiro registro para debug
-      if (idx === 0) {
-        console.log('🔍 Primeiro registro processado:', processed)
-        console.log('📊 Valores originais:', row)
-      }
-      
+
       return processed
     })
   }
 
   const handleImport = async () => {
+    if (!canImportExcel) {
+      setError('Apenas Zeca Desenvolvedor pode realizar importações de Excel.')
+      return
+    }
+
     if (!preview || !preview.all || preview.all.length === 0) {
       setError('Nenhum dado para importar')
       return
@@ -489,8 +532,18 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
           setImportProgress({ current: c + 1, total: totalChunks, processed: (c * CHUNK_SIZE) + chunks[c].length, atual: c + 1, etapa: `Processando lote ${c + 1} de ${totalChunks}...` })
           const r = await fetch('/api/animals/batch', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ animais: chunks[c] })
+            headers: {
+              'Content-Type': 'application/json',
+              'x-user-role': permissions?.isDeveloper ? 'desenvolvedor' : 'externo',
+              'x-user-name': permissions?.userName || '',
+              'x-user-email': user?.email || '',
+            },
+            body: JSON.stringify({
+              animais: chunks[c],
+              userRole: permissions?.isDeveloper ? 'desenvolvedor' : 'externo',
+              userName: permissions?.userName || '',
+              userEmail: user?.email || '',
+            })
           })
           const data = await r.json().catch(() => ({}))
           if (r.ok && data.success && data.data?.resumo) {
@@ -524,22 +577,52 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
           case 'inseminacao':
             response = await fetch('/api/reproducao/inseminacao/import-excel', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ data: preview.all })
+              headers: {
+                'Content-Type': 'application/json',
+                'x-user-role': permissions?.isDeveloper ? 'desenvolvedor' : 'externo',
+                'x-user-name': permissions?.userName || '',
+                'x-user-email': user?.email || '',
+              },
+              body: JSON.stringify({
+                data: preview.all,
+                userRole: permissions?.isDeveloper ? 'desenvolvedor' : 'externo',
+                userName: permissions?.userName || '',
+                userEmail: user?.email || '',
+              })
             })
             break
           case 'fiv':
             response = await fetch('/api/reproducao/coleta-fiv/import-excel', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ data: preview.all })
+              headers: {
+                'Content-Type': 'application/json',
+                'x-user-role': permissions?.isDeveloper ? 'desenvolvedor' : 'externo',
+                'x-user-name': permissions?.userName || '',
+                'x-user-email': user?.email || '',
+              },
+              body: JSON.stringify({
+                data: preview.all,
+                userRole: permissions?.isDeveloper ? 'desenvolvedor' : 'externo',
+                userName: permissions?.userName || '',
+                userEmail: user?.email || '',
+              })
             })
             break
           case 'nascimentos':
             response = await fetch('/api/animals/batch', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ animais: preview.all })
+              headers: {
+                'Content-Type': 'application/json',
+                'x-user-role': permissions?.isDeveloper ? 'desenvolvedor' : 'externo',
+                'x-user-name': permissions?.userName || '',
+                'x-user-email': user?.email || '',
+              },
+              body: JSON.stringify({
+                animais: preview.all,
+                userRole: permissions?.isDeveloper ? 'desenvolvedor' : 'externo',
+                userName: permissions?.userName || '',
+                userEmail: user?.email || '',
+              })
             })
             break
           case 'diagnostico_gestacao':
@@ -552,8 +635,18 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
           case 'notas_fiscais':
             response = await fetch('/api/notas-fiscais/import-excel', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ data: preview.all })
+              headers: {
+                'Content-Type': 'application/json',
+                'x-user-role': permissions?.isDeveloper ? 'desenvolvedor' : 'externo',
+                'x-user-name': permissions?.userName || '',
+                'x-user-email': user?.email || '',
+              },
+              body: JSON.stringify({
+                data: preview.all,
+                userRole: permissions?.isDeveloper ? 'desenvolvedor' : 'externo',
+                userName: permissions?.userName || '',
+                userEmail: user?.email || '',
+              })
             })
             break
           case 'baixas':
@@ -564,16 +657,34 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
             }
             const formData = new FormData()
             formData.append('file', file)
+            formData.append('userRole', permissions?.isDeveloper ? 'desenvolvedor' : 'externo')
+            formData.append('userName', permissions?.userName || '')
+            formData.append('userEmail', user?.email || '')
             response = await fetch('/api/import/baixas', {
               method: 'POST',
+              headers: {
+                'x-user-role': permissions?.isDeveloper ? 'desenvolvedor' : 'externo',
+                'x-user-name': permissions?.userName || '',
+                'x-user-email': user?.email || '',
+              },
               body: formData
             })
             break
           default:
             response = await fetch('/api/animals/batch', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ animais: preview.all })
+              headers: {
+                'Content-Type': 'application/json',
+                'x-user-role': permissions?.isDeveloper ? 'desenvolvedor' : 'externo',
+                'x-user-name': permissions?.userName || '',
+                'x-user-email': user?.email || '',
+              },
+              body: JSON.stringify({
+                animais: preview.all,
+                userRole: permissions?.isDeveloper ? 'desenvolvedor' : 'externo',
+                userName: permissions?.userName || '',
+                userEmail: user?.email || '',
+              })
             })
         }
         result = await response.json().catch(() => ({}))
@@ -953,8 +1064,13 @@ export default function UniversalExcelImporter({ isOpen, onClose, onImportSucces
           <Button variant="secondary" onClick={handleClose}>
             Cancelar
           </Button>
+          {!canImportExcel && (
+            <span className="self-center text-xs text-red-600 dark:text-red-400">
+              Somente Zeca Desenvolvedor pode importar Excel.
+            </span>
+          )}
           {preview && !loading && (
-            <Button onClick={handleImport} disabled={loading}>
+            <Button onClick={handleImport} disabled={loading || !canImportExcel}>
               {loading ? 'Importando...' : `Importar ${preview.total} registros`}
             </Button>
           )}

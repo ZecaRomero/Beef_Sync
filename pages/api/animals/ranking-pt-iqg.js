@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     try {
       result = await query(
         `SELECT 
-          a.id, a.serie, a.rg, a.nome, a.pt_iqg, a.iqg, a.raca, a.sexo, a.data_nascimento,
+          a.id, a.serie, a.rg, a.nome, a.mae, a.pt_iqg, a.iqg, a.raca, a.sexo, a.data_nascimento,
           a.serie_mae, a.rg_mae
          FROM animais a
          WHERE a.situacao = 'Ativo' 
@@ -36,7 +36,7 @@ export default async function handler(req, res) {
     } catch (colErr) {
       if (/column.*does not exist/i.test(colErr?.message || '')) {
         result = await query(
-          `SELECT a.id, a.serie, a.rg, a.nome, a.decile_2 AS pt_iqg, a.genetica_2 AS iqg,
+          `SELECT a.id, a.serie, a.rg, a.nome, a.mae, a.decile_2 AS pt_iqg, a.genetica_2 AS iqg,
             a.raca, a.sexo, a.data_nascimento, a.serie_mae, a.rg_mae
            FROM animais a 
            WHERE a.situacao = 'Ativo' AND a.decile_2 IS NOT NULL AND TRIM(a.decile_2::text) != ''
@@ -59,6 +59,7 @@ export default async function handler(req, res) {
       rg: r.rg,
       serie_mae: r.serie_mae,
       rg_mae: r.rg_mae,
+      mae: r.mae,
       identificacao: `${r.serie || ''}-${r.rg || ''}`.replace(/^-|-$/g, ''),
       nome: r.nome,
       pt_iqg: r.pt_iqg,

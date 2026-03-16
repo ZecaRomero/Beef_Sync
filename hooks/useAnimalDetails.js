@@ -8,6 +8,7 @@ export function useAnimalDetails(id) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const prevIdRef = useRef(null)
+  const sexFixTriggeredRef = useRef(false)
 
   // Dados complementares
   const [ocorrencias, setOcorrencias] = useState([])
@@ -51,6 +52,22 @@ export function useAnimalDetails(id) {
     }
   }, [id])
 
+  // Correção global (uma vez por sessão): mães não podem ficar como macho.
+  useEffect(() => {
+    if (!id || sexFixTriggeredRef.current || typeof window === 'undefined') return
+    const key = 'fix-sexo-maes-v1'
+    try {
+      if (sessionStorage.getItem(key) === 'done') return
+    } catch (_) {}
+
+    sexFixTriggeredRef.current = true
+    fetch('/api/animals/corrigir-sexo-maes', { method: 'POST' })
+      .then(() => {
+        try { sessionStorage.setItem(key, 'done') } catch (_) {}
+      })
+      .catch(() => {})
+  }, [id])
+
   // 1. Buscar dados principais do animal (cache desabilitado para consulta - evita animal errado)
   const [retryCount, setRetryCount] = useState(0)
   const fetchUrl = id ? `/api/animals/${encodeURIComponent(id)}?history=true${retryCount > 0 ? `&_r=${retryCount}` : ''}` : ''
@@ -69,13 +86,19 @@ export function useAnimalDetails(id) {
     if (animalData) {
       const a = animalData.data || animalData.animal || animalData
       if (a && (a.id || a.serie)) {
-        setAnimal(a)
+        // Fallback visual imediato: se possui prole e sexo veio macho, força Fêmea.
+        const sexoNorm = String(a.sexo || '').toLowerCase()
+        const possuiProle = Array.isArray(a.filhos) && a.filhos.length > 0
+        const animalAjustado = (possuiProle && (sexoNorm.includes('macho') || sexoNorm === 'm'))
+          ? { ...a, sexo: 'Fêmea' }
+          : a
+        setAnimal(animalAjustado)
         
         // Buscas paralelas secundárias
         const fetchPromises = []
         
         // Exames Andrológicos (apenas machos)
-        const isMacho = a.sexo && (String(a.sexo).toLowerCase().includes('macho') || a.sexo === 'M')
+        const isMacho = animalAjustado.sexo && (String(animalAjustado.sexo).toLowerCase().includes('macho') || animalAjustado.sexo === 'M')
         if (isMacho && a.rg) {
           fetchPromises.push(
             fetch(`/api/reproducao/exames-andrologicos?rg=${encodeURIComponent(a.rg)}`)
@@ -86,9 +109,9 @@ export function useAnimalDetails(id) {
         }
 
         // Ocorrências
-        if (a.id) {
+        if (animalAjustado.id) {
           fetchPromises.push(
-            fetch(`/api/animals/ocorrencias?animalId=${a.id}&limit=20`)
+            fetch(`/api/animals/ocorrencias?animalId=${animalAjustado.id}&limit=20`)
               .then(r => r.json())
               .then(d => setOcorrencias(Array.isArray(d.ocorrencias || d.data || d) ? (d.ocorrencias || d.data || d) : []))
               .catch(() => {})
@@ -96,7 +119,7 @@ export function useAnimalDetails(id) {
           
           // Transferências (receptoras)
           fetchPromises.push(
-            fetch(`/api/transferencias-embrioes?receptora_id=${a.id}`)
+            fetch(`/api/transferencias-embrioes?receptora_id=${animalAjustado.id}`)
               .then(r => r.json())
               .then(d => setTransferencias(Array.isArray(d.data || d.transferencias || d) ? (d.data || d.transferencias || d) : []))
               .catch(() => {})
@@ -106,7 +129,7 @@ export function useAnimalDetails(id) {
           const isFemea = !isMacho // Simplificação, verificar string se necessário
           if (isFemea) {
              fetchPromises.push(
-              fetch(`/api/inseminacoes?animal_id=${a.id}&_t=${Date.now()}`)
+              fetch(`/api/inseminacoes?animal_id=${animalAjustado.id}&_t=${Date.now()}`)
                 .then(r => r.json())
                 .then(d => setInseminacoes(Array.isArray(d.data || d) ? (d.data || d) : []))
                 .catch(() => {})
@@ -115,7 +138,7 @@ export function useAnimalDetails(id) {
 
           // Custos: buscar sempre (fallback se API principal não retornou ou retornou vazio)
           fetchPromises.push(
-            fetch(`/api/animals/${a.id}/custos?_t=${Date.now()}`)
+            fetch(`/api/animals/${animalAjustado.id}/custos?_t=${Date.now()}`)
               .then(r => r.ok ? r.json() : { data: [] })
               .then(d => {
                 const custos = Array.isArray(d.data ?? d.custos ?? d) ? (d.data ?? d.custos ?? d) : []
@@ -160,6 +183,15 @@ export function useAnimalDetails(id) {
 
         const newRankings = { ...rankings }
         const serieMatch = String(animal.serie || '').toUpperCase()
+        const normSerie = (v) => String(v || '').trim().toUpperCase().replace(/\s+/g, '')
+        const normRg = (v) => (String(v || '').trim().replace(/^0+/, '') || '0')
+        const parseMaeTexto = (maeTexto) => {
+          const txt = String(maeTexto || '').trim()
+          if (!txt) return null
+          const m = txt.match(/([A-Za-z]+)[^A-Za-z0-9]*([0-9]+)$/)
+          if (!m) return null
+          return { serie: normSerie(m[1]), rg: normRg(m[2]) }
+        }
 
         const processarRanking = (list, campoPosicao, campoFilhoTop, primeiroExtra = null) => {
           if (!list?.length) return
@@ -169,14 +201,23 @@ export function useAnimalDetails(id) {
           if (idx >= 0) newRankings[campoPosicao] = idx + 1
 
           const primeiro = list[0]
-          const maeConfere = primeiro?.serie_mae != null && primeiro?.rg_mae != null &&
-            String(primeiro.serie_mae || '').trim().toUpperCase() === String(animal.serie || '').trim().toUpperCase() &&
-            String(primeiro.rg_mae || '').trim() === String(animal.rg || '').trim()
-          const filhoTop = maeConfere || animal.filhos?.find(f =>
-            f.id === primeiro?.id ||
-            (String(f.rg) === String(primeiro?.rg) && String(f.serie || '').toUpperCase() === String(primeiro?.serie || '').toUpperCase())
-          )
-          if (filhoTop) {
+          // Regra estrita (global):
+          // 1) se houver `mae` textual no 1º colocado, ela prevalece;
+          // 2) só cai para serie_mae/rg_mae quando `mae` não for parseável.
+          const maePorTexto = parseMaeTexto(primeiro?.mae)
+          const animalSerie = normSerie(animal?.serie)
+          const animalRg = normRg(animal?.rg)
+          const maeConferePorTexto = Boolean(maePorTexto) &&
+            maePorTexto.serie === animalSerie &&
+            maePorTexto.rg === animalRg
+
+          const maeConferePorCampos = !maePorTexto &&
+            primeiro?.serie_mae != null && primeiro?.rg_mae != null &&
+            normSerie(primeiro.serie_mae) === animalSerie &&
+            normRg(primeiro.rg_mae) === animalRg
+
+          const maeConfere = maeConferePorTexto || maeConferePorCampos
+          if (maeConfere) {
             newRankings[campoFilhoTop] = { serie: primeiro.serie, rg: primeiro.rg, nome: primeiro.nome, ...primeiroExtra }
           }
         }

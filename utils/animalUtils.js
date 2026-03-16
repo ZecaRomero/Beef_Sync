@@ -27,3 +27,31 @@ export function extrairSerieRG(texto, serieFilho = '') {
   if (m4 && serieFilho) return { serie: serieFilho, rg: m4[1] }
   return { serie: '', rg: '' }
 }
+
+/**
+ * Formata o nome do animal no padrão: NOME SANT ANNA RG
+ * Ex: "JALOUSIER SANT ANNA 16974"
+ * Se não tiver nome próprio, usa só "SANT ANNA RG"
+ * @param {object} animal - objeto com campos nome, serie, rg
+ * @returns {string}
+ */
+export function formatNomeAnimal(animal) {
+  if (!animal) return '-'
+  const rg = animal.rg ? String(animal.rg).trim() : ''
+  const nomeBase = animal.nome ? String(animal.nome).trim() : ''
+
+  // Se o nome já contém SANT ANNA, só garante que o RG está no final
+  if (nomeBase.toUpperCase().includes('SANT ANNA')) {
+    // Remove RG duplicado no final se já existir
+    const semRg = nomeBase.replace(/\s+\d+$/, '').trim()
+    return rg ? `${semRg} ${rg}` : semRg
+  }
+
+  // Nome próprio sem SANT ANNA
+  if (nomeBase) {
+    return rg ? `${nomeBase} SANT ANNA ${rg}` : `${nomeBase} SANT ANNA`
+  }
+
+  // Sem nome: só SANT ANNA + RG
+  return rg ? `SANT ANNA ${rg}` : (animal.serie ? `${animal.serie} ${rg}`.trim() : '-')
+}

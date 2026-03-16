@@ -1,4 +1,5 @@
 import { query } from '../../../lib/database'
+import { blockIfNotAdelso } from '../../../utils/boletimAccess'
 
 let tableReady = false
 async function ensureTable() {
@@ -60,6 +61,7 @@ export default async function handler(req, res) {
 
   // POST — registrar nova aplicação de medicamento
   if (req.method === 'POST') {
+    if (blockIfNotAdelso(req, res)) return
     try {
       const {
         boletim_campo_id, local, local_1, sub_local_2,
@@ -97,6 +99,7 @@ export default async function handler(req, res) {
 
   // DELETE — remover registro de medicamento
   if (req.method === 'DELETE') {
+    if (blockIfNotAdelso(req, res)) return
     try {
       const { id } = req.query
       if (!id) return res.status(400).json({ success: false, message: 'ID obrigatório' })

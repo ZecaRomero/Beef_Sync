@@ -5,7 +5,6 @@
 import React, { useState, useEffect } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
-import Layout from '../components/Layout'
 import UniversalExcelImporter from '../components/UniversalExcelImporter'
 import ImportGeneticaModal from '../components/animals/ImportGeneticaModal'
 import ImportarObservacoesAnimais from '../components/ImportarObservacoesAnimais'
@@ -153,7 +152,7 @@ export default function ImportacoesPage() {
   }
 
   return (
-    <Layout>
+    <>
       <Head>
         <title>Importações | Beef Sync</title>
       </Head>
@@ -398,7 +397,7 @@ export default function ImportacoesPage() {
         onClose={() => setShowGenetica(false)}
         onSuccess={() => handleImportSuccess('Genética', 0)}
       />
-    </Layout>
+    </>
   )
 }
 
