@@ -271,7 +271,7 @@ export default function MobileRelatorios() {
 
   const carregarMedicamentos = async () => {
     try {
-      const res = await fetch('/api/boletim-campo/medicamentos')
+      const res = await fetch(`/api/boletim-campo/medicamentos?t=${Date.now()}`, { cache: 'no-store' })
       const json = await res.json()
       if (json.success) {
         const mapById = {}
@@ -332,7 +332,7 @@ export default function MobileRelatorios() {
   const [cardInfoModal, setCardInfoModal] = useState({ open: false, title: '', value: '', description: '', reportKey: null })
 
   useEffect(() => {
-    fetch('/api/mobile-reports')
+    fetch(`/api/mobile-reports?t=${Date.now()}`, { cache: 'no-store' })
       .then(r => r.json())
       .then(d => {
         if (d.success && d.data) {
@@ -367,7 +367,8 @@ export default function MobileRelatorios() {
       startDate: period.startDate,
       endDate: period.endDate
     })
-    fetch(`/api/mobile-reports?${params}`)
+    params.set('t', Date.now().toString())
+    fetch(`/api/mobile-reports?${params}`, { cache: 'no-store' })
       .then(r => r.json())
       .then(d => {
         if (d.success && d.data) setDashboardData(d.data)
@@ -410,7 +411,8 @@ export default function MobileRelatorios() {
     }
     if (selectedTipo === 'boletim_campo') carregarMedicamentos()
 
-    fetch(`/api/mobile-reports?${params}`)
+    params.set('t', Date.now().toString())
+    fetch(`/api/mobile-reports?${params}`, { cache: 'no-store' })
       .then(r => r.json())
       .then(d => {
         if (d.success && d.data) {
@@ -437,9 +439,15 @@ export default function MobileRelatorios() {
       if ((selectedTipo === 'ranking_pmgz' || selectedTipo === 'ranking_animais_avaliados') && serieFilter) {
         params.set('serie', serieFilter)
       }
+
+      // Para Boletim Campo, atualizar também histórico de medicamentos
+      if (selectedTipo === 'boletim_campo') {
+        carregarMedicamentos()
+      }
       
       // Buscar dados sem mostrar loading para não interromper a visualização
-      fetch(`/api/mobile-reports?${params}`)
+      params.set('t', Date.now().toString())
+      fetch(`/api/mobile-reports?${params}`, { cache: 'no-store' })
         .then(r => r.json())
         .then(d => {
           if (d.success && d.data) {
@@ -1368,7 +1376,8 @@ export default function MobileRelatorios() {
     if ((selectedTipo === 'ranking_pmgz' || selectedTipo === 'ranking_animais_avaliados') && serieFilter) {
       params.set('serie', serieFilter)
     }
-    fetch(`/api/mobile-reports?${params}`)
+    params.set('t', Date.now().toString())
+    fetch(`/api/mobile-reports?${params}`, { cache: 'no-store' })
       .then(r => r.json())
       .then(d => { 
         if (d.success && d.data) {
