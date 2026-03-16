@@ -5,30 +5,13 @@
 
 const { Pool } = require('pg')
 require('dotenv').config()
+const { SYNC_TABLES } = require('../utils/syncTables')
 
 const SUPABASE_URL = 'https://bpsltnglmbwdpvumjeaf.supabase.co'
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 // Tabelas para sincronizar (ordem importa por causa de FK)
-const TABLES = [
-  'animais',
-  'custos',
-  'pesagens',
-  'inseminacoes',
-  'gestacoes',
-  'nascimentos',
-  'localizacoes_animais',
-  'estoque_semen',
-  'transferencias_embrioes',
-  'coleta_fiv',
-  'baixas',
-  'mortes',
-  'notas_fiscais',
-  'notas_fiscais_itens',
-  'boletim_contabil',
-  'movimentacoes_contabeis',
-  'historia_ocorrencias',
-]
+const TABLES = SYNC_TABLES
 
 async function supabaseRequest(method, table, body = null, extra = '') {
   const url = `${SUPABASE_URL}/rest/v1/${table}${extra}`

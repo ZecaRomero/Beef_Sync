@@ -18,6 +18,7 @@ const TABLES = [
   { key: 'mortes', label: 'Mortes' },
   { key: 'notas_fiscais', label: 'Notas Fiscais' },
   { key: 'historia_ocorrencias', label: 'Ocorrências' },
+  { key: 'abastecimento_nitrogenio', label: 'Abastecimento Nitrogênio' },
 ]
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
