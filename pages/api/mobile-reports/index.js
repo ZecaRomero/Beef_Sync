@@ -4,6 +4,7 @@
  * GET ?tipo=X&startDate=&endDate=: retorna dados do relatório
  */
 import { query } from '../../../lib/database'
+import { ensureNitrogenioTables } from '../../../utils/nitrogenioSchema'
 import { sendSuccess, sendError, sendMethodNotAllowed } from '../../../utils/apiResponse'
 
 const TIPOS_RELATORIOS = [
@@ -1150,6 +1151,8 @@ export default async function handler(req, res) {
 
       case 'abastecimento_nitrogenio': {
         try {
+          await ensureNitrogenioTables()
+
           const r = await query(`
             SELECT 
               id, 

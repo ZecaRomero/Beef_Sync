@@ -1,4 +1,4 @@
-import { Pool } from 'pg'
+import { query } from '../../../lib/database'
 import { 
   sendSuccess, 
   sendValidationError, 
@@ -8,17 +8,12 @@ import {
   HTTP_STATUS 
 } from '../../../utils/apiResponse'
 import { withLoteTracking, LOTE_CONFIGS } from '../../../utils/loteMiddleware'
-
-const pool = new Pool({
-  user: process.env.DB_USER || 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_NAME || 'estoque_semen',
-  password: process.env.DB_PASSWORD || 'jcromero85',
-  port: process.env.DB_PORT || 5432,
-})
+import { ensureNitrogenioTables } from '../../../utils/nitrogenioSchema'
 
 async function nitrogenioByIdHandler(req, res) {
   const { id } = req.query
+
+  await ensureNitrogenioTables()
 
   if (!id) {
     return sendValidationError(res, 'ID do abastecimento é obrigatório')
@@ -26,7 +21,7 @@ async function nitrogenioByIdHandler(req, res) {
 
   if (req.method === 'GET') {
     try {
-      const result = await pool.query(
+      const result = await query(
         `SELECT 
           id,
           data_abastecimento,
@@ -76,7 +71,7 @@ async function nitrogenioByIdHandler(req, res) {
 
     try {
       // Verificar se o abastecimento existe
-      const checkResult = await pool.query(
+      const checkResult = await query(
         'SELECT id FROM abastecimento_nitrogenio WHERE id = $1',
         [id]
       )
@@ -86,7 +81,7 @@ async function nitrogenioByIdHandler(req, res) {
       }
 
       // Atualizar abastecimento
-      const result = await pool.query(
+      const result = await query(
         `UPDATE abastecimento_nitrogenio 
         SET 
           data_abastecimento = $1,
@@ -121,7 +116,7 @@ async function nitrogenioByIdHandler(req, res) {
   } else if (req.method === 'DELETE') {
     try {
       // Verificar se o abastecimento existe antes de deletar
-      const checkResult = await pool.query(
+      const checkResult = await query(
         'SELECT id, motorista, quantidade_litros FROM abastecimento_nitrogenio WHERE id = $1',
         [id]
       )
@@ -133,7 +128,7 @@ async function nitrogenioByIdHandler(req, res) {
       const abastecimento = checkResult.rows[0]
 
       // Deletar abastecimento
-      const result = await pool.query(
+      const result = await query(
         'DELETE FROM abastecimento_nitrogenio WHERE id = $1 RETURNING id',
         [id]
       )

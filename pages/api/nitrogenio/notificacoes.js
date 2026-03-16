@@ -1,9 +1,12 @@
 import { query } from '../../../lib/database'
+import { ensureNitrogenioTables } from '../../../utils/nitrogenioSchema'
 
 export default async function handler(req, res) {
   const { method } = req
 
   try {
+    await ensureNitrogenioTables()
+
     switch (method) {
       case 'POST':
         return await handlePost(req, res)

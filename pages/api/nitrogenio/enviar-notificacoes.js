@@ -1,6 +1,7 @@
 import { query } from '../../../lib/database'
 import { sendSuccess, sendError, asyncHandler } from '../../../utils/apiResponse'
 import { sendWhatsApp } from '../../../utils/whatsappService'
+import { ensureNitrogenioTables } from '../../../utils/nitrogenioSchema'
 
 async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -8,6 +9,8 @@ async function handler(req, res) {
   }
 
   try {
+    await ensureNitrogenioTables()
+
     // Buscar abastecimentos que precisam de notificação (2 dias antes)
     const abastecimentosResult = await query(`
       SELECT 

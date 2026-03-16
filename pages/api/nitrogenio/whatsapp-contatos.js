@@ -1,10 +1,13 @@
 import { query } from '../../../lib/database'
 import { sendSuccess, sendError, sendValidationError, sendMethodNotAllowed, asyncHandler } from '../../../utils/apiResponse'
+import { ensureNitrogenioTables } from '../../../utils/nitrogenioSchema'
 
 async function handler(req, res) {
   const { method } = req
 
   try {
+    await ensureNitrogenioTables()
+
     switch (method) {
       case 'GET':
         return await handleGet(req, res)

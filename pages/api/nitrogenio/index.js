@@ -1,5 +1,6 @@
 import { query } from '../../../lib/database'
 import { withLoteTracking, LOTE_CONFIGS } from '../../../utils/loteMiddleware'
+import { ensureNitrogenioTables } from '../../../utils/nitrogenioSchema'
 
 async function handleGet(req, res) {
   try {
@@ -174,6 +175,8 @@ async function handler(req, res) {
   const { method } = req
 
   try {
+    await ensureNitrogenioTables()
+
     switch (method) {
       case 'GET':
         return await handleGet(req, res)

@@ -1,4 +1,4 @@
-import { Pool } from 'pg'
+import { query } from '../../../lib/database'
 import { 
   sendSuccess, 
   sendValidationError, 
@@ -6,14 +6,7 @@ import {
   asyncHandler, 
   HTTP_STATUS 
 } from '../../../utils/apiResponse'
-
-const pool = new Pool({
-  user: process.env.DB_USER || 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_NAME || 'estoque_semen',
-  password: process.env.DB_PASSWORD || 'jcromero85',
-  port: process.env.DB_PORT || 5432,
-})
+import { ensureNitrogenioTables } from '../../../utils/nitrogenioSchema'
 
 async function bulkDeleteHandler(req, res) {
   if (req.method !== 'DELETE') {
@@ -30,10 +23,12 @@ async function bulkDeleteHandler(req, res) {
   }
 
   try {
+    await ensureNitrogenioTables()
+
     // Criar placeholders para a query
     const placeholders = ids.map((_, index) => `$${index + 1}`).join(',')
     
-    const result = await pool.query(
+    const result = await query(
       `DELETE FROM abastecimento_nitrogenio WHERE id IN (${placeholders}) RETURNING id`,
       ids
     )
