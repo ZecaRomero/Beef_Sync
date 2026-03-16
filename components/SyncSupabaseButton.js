@@ -34,6 +34,12 @@ export default function SyncSupabaseButton({ onSyncDone }) {
   }
 
   const loadPending = async () => {
+    if (!isLocalOrPrivateHost()) {
+      setPending(0)
+      setLoadingPending(false)
+      return
+    }
+
     setLoadingPending(true)
     try {
       const res = await fetch('/api/sync-diff')

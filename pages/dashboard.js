@@ -350,11 +350,29 @@ export default function Dashboard() {
   const router = useRouter()
   const { user } = useAuth()
   const isDev = user?.user_metadata?.role === 'desenvolvedor'
+  const [isLocalEnv, setIsLocalEnv] = useState(false)
   const [syncDiff, setSyncDiff] = useState(null)
   const [diffLoading, setDiffLoading] = useState(false)
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const host = (window.location.hostname || '').toLowerCase()
+    const isLocal =
+      host === 'localhost' ||
+      host === '127.0.0.1' ||
+      host === '::1' ||
+      host.startsWith('192.168.') ||
+      host.startsWith('10.') ||
+      /^172\.(1[6-9]|2\d|3[0-1])\./.test(host)
+    setIsLocalEnv(isLocal)
+  }, [])
+
   const loadSyncDiff = () => {
-    if (!isDev) return
+    if (!isDev || !isLocalEnv) {
+      setSyncDiff(null)
+      setDiffLoading(false)
+      return
+    }
     setDiffLoading(true)
     fetch('/api/sync-diff')
       .then(r => r.json())
@@ -364,11 +382,11 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-    if (!isDev) return
+    if (!isDev || !isLocalEnv) return
     loadSyncDiff()
     const id = setInterval(() => loadSyncDiff(), 30000)
     return () => clearInterval(id)
-  }, [isDev])
+  }, [isDev, isLocalEnv])
   const [stats, setStats] = useState({
     totalAnimals: 0,
     activeAnimals: 0,
@@ -523,16 +541,16 @@ export default function Dashboard() {
             <span className="text-base">🛠</span>
             <span className="font-semibold text-violet-200 text-sm">Modo Desenvolvedor</span>
             <span className="text-violet-500">·</span>
-            <span className="text-violet-400 text-xs">Banco local ativo</span>
+            <span className="text-violet-400 text-xs">{isLocalEnv ? 'Banco local ativo' : 'Vercel (somente leitura)'}</span>
 
             {/* Pendências */}
-            {diffLoading && (
+            {isLocalEnv && diffLoading && (
               <span className="ml-1 text-xs text-violet-400/60 flex items-center gap-1">
                 <span className="w-3 h-3 border border-violet-400 border-t-transparent rounded-full animate-spin inline-block" />
                 verificando...
               </span>
             )}
-            {!diffLoading && syncDiff && (
+            {isLocalEnv && !diffLoading && syncDiff && (
               syncDiff.supabaseOnline ? (
                 syncDiff.totalPending > 0 ? (
                   <span className="ml-1 flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-semibold">
@@ -551,6 +569,11 @@ export default function Dashboard() {
                 </span>
               )
             )}
+            {!isLocalEnv && (
+              <span className="ml-1 flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs">
+                Sync local desabilitado no Vercel
+              </span>
+            )}
 
             <div className="ml-auto">
               <SyncSupabaseButton onSyncDone={() => {
@@ -561,7 +584,7 @@ export default function Dashboard() {
           </div>
 
           {/* Detalhes das tabelas com diferença */}
-          {!diffLoading && syncDiff?.supabaseOnline && syncDiff.diff.length > 0 && (
+          {isLocalEnv && !diffLoading && syncDiff?.supabaseOnline && syncDiff.diff.length > 0 && (
             <div className="px-4 pb-3 flex flex-wrap gap-2">
               {syncDiff.diff.map(({ key, label, local, remote, delta }) => (
                 <span key={key} className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-white/70">
@@ -602,7 +625,7 @@ export default function Dashboard() {
       )}
 
       {/* Cabeçalho Mobile-Friendly */}
-      {isDev && syncDiff?.supabaseOnline && syncDiff?.totalPending > 0 && (
+      {isDev && isLocalEnv && syncDiff?.supabaseOnline && syncDiff?.totalPending > 0 && (
         <div className="mb-4 rounded-xl border border-amber-300/50 bg-amber-50 dark:bg-amber-900/20 p-3 md:p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 shadow-sm">
           <div>
             <p className="text-sm md:text-base font-bold text-amber-800 dark:text-amber-200">

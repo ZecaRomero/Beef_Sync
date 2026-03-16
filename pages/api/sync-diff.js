@@ -74,6 +74,7 @@ export default async function handler(req, res) {
 
     const diff = []
     let totalPending = 0
+    let totalDifferenceAbs = 0
 
     for (const { key, label } of TABLES) {
       const local = localCounts[key] ?? 0
@@ -82,7 +83,8 @@ export default async function handler(req, res) {
 
       if (delta !== null && delta !== 0) {
         diff.push({ key, label, local, remote, delta })
-        totalPending += Math.abs(delta)
+        totalDifferenceAbs += Math.abs(delta)
+        if (delta > 0) totalPending += delta
       }
     }
 
@@ -90,6 +92,7 @@ export default async function handler(req, res) {
       success: true,
       supabaseOnline,
       totalPending,
+      totalDifferenceAbs,
       diff,
       localCounts,
       remoteCounts,
