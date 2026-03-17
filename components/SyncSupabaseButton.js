@@ -1,50 +1,116 @@
-import { useEffect, useState } from 'react'
-import { ArrowUpCircleIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline'
+import { useEffect, useState, useRef, useCallback } from 'react'
+import { ArrowUpCircleIcon, CheckCircleIcon, XCircleIcon, ArrowPathIcon } from '@heroicons/react/24/outline'
 import { useAuth } from '../contexts/AuthContext'
 import { isLocalOrPrivateBrowserEnv } from '../utils/networkEnv'
 
-const TOTAL_TABLES = 17 // número de tabelas no sync
+const TOTAL_TABLES = 17
+const AUTO_SYNC_INTERVAL = 5 * 60 * 1000 // 5 minutos
 
 export default function SyncSupabaseButton({ onSyncDone }) {
   const { user } = useAuth()
   const [status, setStatus] = useState('idle')
   const [logs, setLogs] = useState([])
   const [open, setOpen] = useState(false)
-  const [progress, setProgress] = useState(0)       // 0-100
+  const [progress, setProgress] = useState(0)
   const [currentTable, setCurrentTable] = useState('')
-  const [tablesCount, setTablesCount] = useState(0) // tabelas concluídas
+  const [tablesCount, setTablesCount] = useState(0)
   const [startTime, setStartTime] = useState(null)
   const [elapsed, setElapsed] = useState(0)
   const [pending, setPending] = useState(0)
   const [loadingPending, setLoadingPending] = useState(false)
+  const [toast, setToast] = useState(null)
+  const [autoSyncEnabled, setAutoSyncEnabled] = useState(true)
+  const [lastAutoSync, setLastAutoSync] = useState(null)
+  const syncingRef = useRef(false)
 
   const isDev = user?.user_metadata?.role === 'desenvolvedor'
   if (!isDev) return null
+
+  const showToast = useCallback((message, type = 'success') => {
+    setToast({ message, type })
+    setTimeout(() => setToast(null), 4000)
+  }, [])
 
   const loadPending = async () => {
     if (!isLocalOrPrivateBrowserEnv()) {
       setPending(0)
       setLoadingPending(false)
-      return
+      return 0
     }
 
     setLoadingPending(true)
     try {
       const res = await fetch('/api/sync-diff')
       const json = await res.json()
-      if (json?.success) setPending(Number(json.totalPending || 0))
+      const count = Number(json?.totalPending || 0)
+      if (json?.success) setPending(count)
+      return count
     } catch (_) {
-      // silencioso: indicador opcional
+      return 0
     } finally {
       setLoadingPending(false)
     }
   }
 
+  const runAutoSync = useCallback(async () => {
+    if (syncingRef.current || !isLocalOrPrivateBrowserEnv()) return
+    const pendingCount = await loadPending()
+    if (pendingCount <= 0) return
+
+    syncingRef.current = true
+    try {
+      const res = await fetch('/api/sync-supabase', { method: 'POST' })
+      const reader = res.body.getReader()
+      const decoder = new TextDecoder()
+      let success = false
+      let syncedTables = 0
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        const text = decoder.decode(value)
+        const lines = text.split('\n').filter(l => l.startsWith('data: '))
+        for (const line of lines) {
+          try {
+            const data = JSON.parse(line.replace('data: ', ''))
+            if (data.type === 'progress') {
+              const msg = data.message
+              if (msg.trim().startsWith('✓') || msg.trim().startsWith('→')) syncedTables++
+            } else if (data.type === 'done') {
+              success = data.success
+            }
+          } catch {}
+        }
+      }
+
+      setLastAutoSync(new Date())
+      if (success) {
+        showToast(`Sincronizado com Supabase (${syncedTables} tabelas)`, 'success')
+        setPending(0)
+        if (onSyncDone) onSyncDone()
+      } else {
+        showToast('Falha na sincronização automática', 'error')
+      }
+      await loadPending()
+    } catch (err) {
+      showToast('Erro na sincronização: ' + err.message, 'error')
+    } finally {
+      syncingRef.current = false
+    }
+  }, [showToast, onSyncDone])
+
   useEffect(() => {
     loadPending()
-    const id = setInterval(loadPending, 30000)
-    return () => clearInterval(id)
+    const pendingId = setInterval(loadPending, 30000)
+    return () => clearInterval(pendingId)
   }, [])
+
+  useEffect(() => {
+    if (!autoSyncEnabled) return
+    runAutoSync()
+    const id = setInterval(runAutoSync, AUTO_SYNC_INTERVAL)
+    return () => clearInterval(id)
+  }, [autoSyncEnabled, runAutoSync])
 
   const startSync = async () => {
     if (!isLocalOrPrivateBrowserEnv()) {
@@ -149,40 +215,76 @@ export default function SyncSupabaseButton({ onSyncDone }) {
   return (
     <>
       <div className="flex flex-col items-start gap-1">
-        <button
-          data-sync-supabase-button="true"
-          onClick={() => status === 'syncing' ? setOpen(true) : startSync()}
-          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold transition-all border
-            ${status === 'syncing'
-              ? 'bg-blue-500/10 border-blue-500/30 text-blue-400 cursor-wait'
+        <div className="flex items-center gap-2">
+          <button
+            data-sync-supabase-button="true"
+            onClick={() => status === 'syncing' ? setOpen(true) : startSync()}
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold transition-all border
+              ${status === 'syncing'
+                ? 'bg-blue-500/10 border-blue-500/30 text-blue-400 cursor-wait'
+                : status === 'done'
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
+                : status === 'error'
+                ? 'bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20'
+                : 'bg-violet-500/10 border-violet-500/30 text-violet-400 hover:bg-violet-500/20'
+              }`}
+          >
+            {status === 'syncing' ? (
+              <span className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+            ) : status === 'done' ? (
+              <CheckCircleIcon className="w-4 h-4" />
+            ) : status === 'error' ? (
+              <XCircleIcon className="w-4 h-4" />
+            ) : (
+              <ArrowUpCircleIcon className="w-4 h-4" />
+            )}
+            {status === 'syncing'
+              ? `Sincronizando... ${progress}%`
               : status === 'done'
-              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
+              ? 'Sincronizado ✓'
               : status === 'error'
-              ? 'bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20'
-              : 'bg-violet-500/10 border-violet-500/30 text-violet-400 hover:bg-violet-500/20'
+              ? 'Falhou — tentar de novo'
+              : 'Enviar para Supabase'}
+          </button>
+          <button
+            onClick={() => setAutoSyncEnabled(prev => !prev)}
+            title={autoSyncEnabled ? 'Auto-sync ativo (5 min) — clique para desativar' : 'Auto-sync desativado — clique para ativar'}
+            className={`p-1.5 rounded-lg border transition-all ${
+              autoSyncEnabled
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
+                : 'bg-white/5 border-white/10 text-white/30 hover:bg-white/10'
             }`}
-        >
-          {status === 'syncing' ? (
-            <span className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
-          ) : status === 'done' ? (
-            <CheckCircleIcon className="w-4 h-4" />
-          ) : status === 'error' ? (
-            <XCircleIcon className="w-4 h-4" />
-          ) : (
-            <ArrowUpCircleIcon className="w-4 h-4" />
-          )}
-          {status === 'syncing'
-            ? `Sincronizando... ${progress}%`
-            : status === 'done'
-            ? 'Sincronizado ✓'
-            : status === 'error'
-            ? 'Falhou — tentar de novo'
-            : 'Enviar para Supabase'}
-        </button>
+          >
+            <ArrowPathIcon className="w-4 h-4" />
+          </button>
+        </div>
         <span className="text-xs text-white/60">
-          {loadingPending ? 'Verificando pendências...' : `Você tem ${pending} alterações para enviar`}
+          {loadingPending ? 'Verificando...' : pending > 0 ? (
+            <>
+              {pending} pendência{pending > 1 ? 's' : ''}
+              {autoSyncEnabled && <span className="text-emerald-400/60"> · auto-sync 5min</span>}
+              {lastAutoSync && <span className="text-white/30"> · último: {lastAutoSync.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>}
+            </>
+          ) : (
+            <>
+              Tudo sincronizado
+              {autoSyncEnabled && <span className="text-emerald-400/60"> · auto-sync ativo</span>}
+            </>
+          )}
         </span>
       </div>
+
+      {/* Toast de notificação */}
+      {toast && (
+        <div className={`fixed bottom-6 right-6 z-[9999] px-4 py-3 rounded-xl shadow-2xl border backdrop-blur-sm flex items-center gap-2 text-sm font-medium animate-slide-up ${
+          toast.type === 'success'
+            ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-300'
+            : 'bg-red-500/20 border-red-500/30 text-red-300'
+        }`}>
+          {toast.type === 'success' ? <CheckCircleIcon className="w-5 h-5" /> : <XCircleIcon className="w-5 h-5" />}
+          {toast.message}
+        </div>
+      )}
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -291,6 +393,11 @@ export default function SyncSupabaseButton({ onSyncDone }) {
           0% { background-position: -200% 0 }
           100% { background-position: 200% 0 }
         }
+        @keyframes slide-up {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up { animation: slide-up 0.3s ease-out; }
       `}</style>
     </>
   )
