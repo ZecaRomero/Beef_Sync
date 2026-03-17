@@ -1,11 +1,11 @@
-import { useState, useEffect, Fragment } from 'react'
+import { ArrowDownTrayIcon, DocumentTextIcon, PlusIcon, ShieldCheckIcon, TableCellsIcon, TrashIcon } from '@heroicons/react/24/outline'
 import Head from 'next/head'
-import ModernLayout from '../../components/layout/ModernLayout'
+import { Fragment, useEffect, useState } from 'react'
 import BoletimCampo from '../../components/boletim/BoletimCampo'
-import { DocumentTextIcon, ArrowDownTrayIcon, PlusIcon, TrashIcon, TableCellsIcon, ShieldCheckIcon } from '@heroicons/react/24/outline'
+import ModernLayout from '../../components/layout/ModernLayout'
 
 export default function BoletimDefesa() {
-  const [abaAtiva, setAbaAtiva] = useState('defesa')
+  const [abaAtiva, setAbaAtiva] = useState('campo')
   const [fazendas, setFazendas] = useState([])
   const [historico, setHistorico] = useState([])
   const [loading, setLoading] = useState(true)
@@ -670,17 +670,6 @@ export default function BoletimDefesa() {
           {/* Abas Boletim Defesa / Boletim Campo */}
           <div className="flex gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
             <button
-              onClick={() => setAbaAtiva('defesa')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-t-lg font-medium transition-colors ${
-                abaAtiva === 'defesa'
-                  ? 'bg-teal-600 text-white'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-              }`}
-            >
-              <ShieldCheckIcon className="w-5 h-5" />
-              Boletim Defesa
-            </button>
-            <button
               onClick={() => setAbaAtiva('campo')}
               className={`flex items-center gap-2 px-4 py-2 rounded-t-lg font-medium transition-colors ${
                 abaAtiva === 'campo'
@@ -690,6 +679,17 @@ export default function BoletimDefesa() {
             >
               <TableCellsIcon className="w-5 h-5" />
               Boletim Campo
+            </button>
+            <button
+              onClick={() => setAbaAtiva('defesa')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-t-lg font-medium transition-colors ${
+                abaAtiva === 'defesa'
+                  ? 'bg-teal-600 text-white'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+              }`}
+            >
+              <ShieldCheckIcon className="w-5 h-5" />
+              Boletim Defesa
             </button>
           </div>
 

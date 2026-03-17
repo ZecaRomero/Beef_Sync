@@ -129,10 +129,11 @@ export default function ConsultaRapida() {
     router.push('/login')
   }, [user, authLoading, router])
 
-  // Deslogar após 10 min de inatividade (apenas para mobile-auth legacy)
+  // Deslogar após 1 dia de inatividade (apenas para mobile-auth legacy)
   useEffect(() => {
-    // Se tiver usuário logado pelo sistema principal (user), não aplica timeout
     if (typeof window === 'undefined' || identificado !== true || user) return
+
+    const ONE_DAY_MS = 24 * 60 * 60 * 1000
 
     const resetTimer = () => {
       if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current)
@@ -140,7 +141,7 @@ export default function ConsultaRapida() {
         localStorage.removeItem('mobile-auth')
         setIdentificado(false)
         router.push('/login')
-      }, 600000)
+      }, ONE_DAY_MS)
     }
 
     const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart']
