@@ -7,6 +7,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import UniversalExcelImporter from '../components/UniversalExcelImporter'
 import ImportGeneticaModal from '../components/animals/ImportGeneticaModal'
+import ImportPuberdadeCarcacaModal from '../components/animals/ImportPuberdadeCarcacaModal'
 import ImportarObservacoesAnimais from '../components/ImportarObservacoesAnimais'
 import ImportarSerieRgNome from '../components/ImportarSerieRgNome'
 import ImportarSerieRgMae from '../components/ImportarSerieRgMae'
@@ -26,7 +27,8 @@ import {
   ScaleIcon,
   CheckCircleIcon,
   ArrowTopRightOnSquareIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  ChartBarIcon
 } from '@heroicons/react/24/outline'
 
 const IMPORT_TIPOS = [
@@ -45,6 +47,14 @@ const IMPORT_TIPOS = [
     icon: BeakerIcon,
     color: 'emerald',
     tipos: ['iABCZ', 'DECA', 'IQG', 'Pt IQG']
+  },
+  {
+    id: 'puberdade-carcaca',
+    titulo: 'Puberdade / Carcaça',
+    descricao: 'Dados de Puberdade (GENEPLUS) e Carcaça (AOL, MAR, EGS, Picanha)',
+    icon: ChartBarIcon,
+    color: 'orange',
+    tipos: ['Puberdade', 'Carcaça']
   },
   {
     id: 'localizacao',
@@ -117,7 +127,8 @@ const CORES = {
   pink: 'from-pink-500 to-pink-600',
   cyan: 'from-cyan-500 to-cyan-600',
   lime: 'from-lime-500 to-lime-600',
-  indigo: 'from-indigo-500 to-indigo-600'
+  indigo: 'from-indigo-500 to-indigo-600',
+  orange: 'from-orange-500 to-orange-600'
 }
 
 const CORES_BG = {
@@ -129,12 +140,14 @@ const CORES_BG = {
   pink: 'bg-pink-50 dark:bg-pink-900/20 border-pink-200 dark:border-pink-800',
   cyan: 'bg-cyan-50 dark:bg-cyan-900/20 border-cyan-200 dark:border-cyan-800',
   lime: 'bg-lime-50 dark:bg-lime-900/20 border-lime-200 dark:border-lime-800',
-  indigo: 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800'
+  indigo: 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800',
+  orange: 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800'
 }
 
 export default function ImportacoesPage() {
   const [showExcelUniversal, setShowExcelUniversal] = useState(false)
   const [showGenetica, setShowGenetica] = useState(false)
+  const [showPuberdadeCarcaca, setShowPuberdadeCarcaca] = useState(false)
   const [modoPiquetes, setModoPiquetes] = useState('texto')
   const [importSuccess, setImportSuccess] = useState(null)
   const [animais, setAnimais] = useState([])
@@ -251,6 +264,34 @@ export default function ImportacoesPage() {
                   key={item.id}
                   type="button"
                   onClick={() => setShowGenetica(true)}
+                  className={`text-left rounded-xl border p-5 transition-all hover:shadow-lg hover:scale-[1.02] ${bgColor}`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`p-2 rounded-lg bg-gradient-to-br ${color} text-white`}>
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 dark:text-white text-base">{item.titulo}</h3>
+                      <p className="text-sm text-gray-700 dark:text-gray-200 mt-1 font-medium">{item.descricao}</p>
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {item.tipos.map((t) => (
+                          <span key={t} className="text-xs px-2 py-0.5 rounded bg-white/70 dark:bg-white/10 text-gray-700 dark:text-gray-200 font-medium">
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              )
+            }
+
+            if (item.id === 'puberdade-carcaca') {
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setShowPuberdadeCarcaca(true)}
                   className={`text-left rounded-xl border p-5 transition-all hover:shadow-lg hover:scale-[1.02] ${bgColor}`}
                 >
                   <div className="flex items-start gap-3">
@@ -396,6 +437,11 @@ export default function ImportacoesPage() {
         isOpen={showGenetica}
         onClose={() => setShowGenetica(false)}
         onSuccess={() => handleImportSuccess('Genética', 0)}
+      />
+      <ImportPuberdadeCarcacaModal
+        isOpen={showPuberdadeCarcaca}
+        onClose={() => setShowPuberdadeCarcaca(false)}
+        onSuccess={() => handleImportSuccess('Puberdade/Carcaça', 0)}
       />
     </>
   )

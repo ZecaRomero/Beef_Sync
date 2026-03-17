@@ -118,6 +118,69 @@ export default function GeneticInfoSection({ animal, rankings, onEditGenetica })
           <span className="text-lg font-bold text-sky-600 dark:text-sky-400">{animal.top}</span>
         </div>
       )}
+
+      {/* ── Puberdade ── */}
+      {(animal.pub_classe || animal.pub_grupo) && (
+        <div className="border-t border-orange-100 dark:border-orange-800/30">
+          <div className="px-4 py-2 bg-orange-50/60 dark:bg-orange-900/10">
+            <p className="text-xs font-bold uppercase tracking-wider text-orange-700 dark:text-orange-400">Puberdade</p>
+          </div>
+          {animal.pub_classe && (
+            <div className="px-4 py-2 flex justify-between items-center border-t border-orange-100/60 dark:border-orange-800/20">
+              <span className="text-sm font-medium text-orange-800 dark:text-orange-200">Classe</span>
+              <span className="text-sm font-bold text-orange-600 dark:text-orange-400">{animal.pub_classe}</span>
+            </div>
+          )}
+          {(animal.pub_grupo) && (
+            <div className="px-4 py-2 flex justify-between items-center border-t border-orange-100/60 dark:border-orange-800/20">
+              <span className="text-sm font-medium text-orange-800 dark:text-orange-200">Grupo</span>
+              <span className="text-sm font-bold text-orange-600 dark:text-orange-400">{animal.pub_grupo}</span>
+            </div>
+          )}
+          {(animal.pub_idade != null) && (
+            <div className="px-4 py-2 flex justify-between items-center border-t border-orange-100/60 dark:border-orange-800/20">
+              <span className="text-sm font-medium text-orange-800 dark:text-orange-200">Idade</span>
+              <span className="text-sm font-bold text-orange-600 dark:text-orange-400">{animal.pub_idade} meses</span>
+            </div>
+          )}
+          {(animal.pub_pct_media != null) && (
+            <div className="px-4 py-2 flex justify-between items-center border-t border-orange-100/60 dark:border-orange-800/20">
+              <span className="text-sm font-medium text-orange-800 dark:text-orange-200">% Média</span>
+              <span className="text-sm font-bold text-orange-600 dark:text-orange-400">{animal.pub_pct_media}%</span>
+            </div>
+          )}
+          {(animal.pub_classif != null) && (
+            <div className="px-4 py-2 flex justify-between items-center border-t border-orange-100/60 dark:border-orange-800/20">
+              <span className="text-sm font-medium text-orange-800 dark:text-orange-200">Classificação</span>
+              <span className="text-sm font-bold text-orange-600 dark:text-orange-400">{animal.pub_classif}º</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Carcaça ── */}
+      {(animal.carc_aol != null || animal.carc_egs != null) && (
+        <div className="border-t border-red-100 dark:border-red-800/30">
+          <div className="px-4 py-2 bg-red-50/60 dark:bg-red-900/10">
+            <p className="text-xs font-bold uppercase tracking-wider text-red-700 dark:text-red-400">Carcaça</p>
+          </div>
+          {[
+            { key: 'carc_aol', label: 'AOL (cm²)' },
+            { key: 'carc_aol_100kg', label: 'AOL/100kg' },
+            { key: 'carc_ratio', label: 'Ratio' },
+            { key: 'carc_mar', label: 'MAR (mm)' },
+            { key: 'carc_egs', label: 'EGS (mm)' },
+            { key: 'carc_egs_100kg', label: 'EGS/100kg' },
+            { key: 'carc_picanha', label: 'Picanha (cm²)' },
+          ].filter(f => animal[f.key] != null && animal[f.key] !== '').map(f => (
+            <div key={f.key} className="px-4 py-2 flex justify-between items-center border-t border-red-100/60 dark:border-red-800/20">
+              <span className="text-sm font-medium text-red-800 dark:text-red-200">{f.label}</span>
+              <span className="text-sm font-bold text-red-600 dark:text-red-400">{animal[f.key]}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
       <InfoRow label="Brinco" value={animal.brinco} />
       <InfoRow label="Tatuagem" value={animal.tatuagem} />
       {(animal.valor_venda || animal.valorVenda) && (

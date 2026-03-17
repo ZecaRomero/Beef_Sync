@@ -135,6 +135,18 @@ export default function AnimalHeader({
               TOP {animal.top}
             </span>
           )}
+          {/* Puberdade — apenas para machos */}
+          {animal.pub_classe && (animal.sexo === 'M' || animal.sexo === 'Macho' || String(animal.sexo || '').toUpperCase().startsWith('M')) && (
+            <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${
+              animal.pub_classe.toUpperCase().includes('SUPERPRECOCE')
+                ? 'bg-orange-100 dark:bg-orange-900/30 border-orange-400 text-orange-700 dark:text-orange-300'
+                : animal.pub_classe.toUpperCase().includes('PRECOCE')
+                ? 'bg-yellow-100 dark:bg-yellow-900/30 border-yellow-400 text-yellow-700 dark:text-yellow-300'
+                : 'bg-amber-100 dark:bg-amber-900/30 border-amber-400 text-amber-700 dark:text-amber-300'
+            }`}>
+              {animal.pub_classe}{animal.pub_idade != null ? ` • ${animal.pub_idade}m` : ''}{animal.pub_classif != null ? ` • ${animal.pub_classif}º` : ''}
+            </span>
+          )}
           </div>
         </div>
       </div>
