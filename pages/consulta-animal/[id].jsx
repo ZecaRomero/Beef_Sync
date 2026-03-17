@@ -23,6 +23,8 @@ import AnimalWeightHistory from '../../components/animals/AnimalWeightHistory'
 import AnimalCosts from '../../components/animals/AnimalCosts'
 import AnimalGenetics from '../../components/animals/AnimalGenetics'
 import AnimalAvaliacoes from '../../components/animals/AnimalAvaliacoes'
+
+const PMGZ_TRAITS_KEYS = ['pmgz_pn_dep','pmgz_pd_dep','pmgz_pa_dep','pmgz_ps_dep','pmgz_ipp_dep','pmgz_stay_dep','pmgz_pe365_dep','pmgz_aol_dep','pmgz_acab_dep','pmgz_mar_dep']
 import AnimalAdditionalInfo from '../../components/animals/AnimalAdditionalInfo'
 import AnimalMainInfo from '../../components/animals/AnimalMainInfo'
 import AnimalEmbryoTransfers from '../../components/animals/AnimalEmbryoTransfers'
@@ -154,7 +156,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
 
   const [, setShowIABCZInfo] = useState(false)
   const [isEditGeneticaModalOpen, setIsEditGeneticaModalOpen] = useState(false)
-  const sectionRefs = useRef({ custos: null, genética: null, pai: null, filhos: null, peso: null, fiv: null, localizacao: null })
+  const sectionRefs = useRef({ custos: null, genética: null, pai: null, filhos: null, peso: null, fiv: null, localizacao: null, avaliacoes: null })
 
   const handleSaveGenetica = useCallback((updatedAnimal) => {
     setAnimal(prev => ({ ...prev, ...updatedAnimal }))
@@ -350,6 +352,27 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
             <AnimalMetricsCards animal={animal} metrics={metrics} rankings={rankings} onScrollTo={scrollToSection} sexTheme={sexTheme} />
           </div>
 
+          {/* Botão régua completa — aparece só se houver alguma avaliação importada */}
+          {(animal?.iqg != null || animal?.mgte != null || animal?.pub_classe || animal?.carc_aol != null || PMGZ_TRAITS_KEYS.some(k => animal?.[k] != null)) && (
+            <button
+              onClick={() => scrollToSection('avaliacoes')}
+              className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-all group"
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-lg">📊</span>
+                <span className="text-sm font-semibold text-indigo-700 dark:text-indigo-300">Régua de avaliações</span>
+                <div className="flex gap-1 flex-wrap">
+                  {animal?.iqg      != null && <span className="text-[10px] bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 px-1.5 py-0.5 rounded font-medium">GENEPLUS</span>}
+                  {animal?.mgte     != null && <span className="text-[10px] bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-1.5 py-0.5 rounded font-medium">ANCP</span>}
+                  {PMGZ_TRAITS_KEYS.some(k => animal?.[k] != null) && <span className="text-[10px] bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 px-1.5 py-0.5 rounded font-medium">PMGZ</span>}
+                  {animal?.pub_classe && <span className="text-[10px] bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300 px-1.5 py-0.5 rounded font-medium">Puberdade</span>}
+                  {animal?.carc_aol != null && <span className="text-[10px] bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 px-1.5 py-0.5 rounded font-medium">Carcaça</span>}
+                </div>
+              </div>
+              <svg className="w-4 h-4 text-indigo-400 group-hover:translate-y-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+            </button>
+          )}
+
           <div className="animate-fade-in-stagger-2">
           <AnimalMainInfo
             animal={animal}
@@ -410,7 +433,9 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
 
           <div ref={r => sectionRefs.current.genética = r} className="scroll-mb-28"><AnimalGenetics animal={animal} /></div>
 
-          <AnimalAvaliacoes animal={animal} />
+          <div ref={r => sectionRefs.current.avaliacoes = r} className="scroll-mb-28">
+            <AnimalAvaliacoes animal={animal} />
+          </div>
 
           <AnimalNotes animal={animal} />
 
