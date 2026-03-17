@@ -1,5 +1,5 @@
 // Service Worker para Beef Sync PWA
-const CACHE_NAME = 'beef-sync-v3.0.1'
+const CACHE_NAME = 'beef-sync-v3.1.0'
 const OFFLINE_URL = '/offline.html'
 
 // Arquivos para cache
@@ -84,40 +84,44 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
+  // Para assets do Next.js, usar network-first (hashes mudam a cada build)
+  if (event.request.url.includes('/_next/')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const responseToCache = response.clone()
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache))
+          }
+          return response
+        })
+        .catch(() => caches.match(event.request).then((cached) => cached || new Response('', { status: 503 })))
+    )
+    return
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
-        // Retornar do cache se disponível
         if (response) {
           return response
         }
 
-        // Tentar buscar da rede
         return fetch(event.request)
           .then((response) => {
-            // Verificar se a resposta é válida
             if (!response || response.status !== 200 || response.type !== 'basic') {
               return response
             }
 
-            // Clonar a resposta
             const responseToCache = response.clone()
-
-            // Adicionar ao cache
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache)
-              })
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache))
 
             return response
           })
           .catch(() => {
-            // Se offline, retornar página offline para navegação
             if (event.request.destination === 'document') {
               return caches.match(OFFLINE_URL)
             }
-            
-            // Para outros recursos, retornar resposta vazia
             return new Response('', { status: 503, statusText: 'Service Unavailable' })
           })
       })
