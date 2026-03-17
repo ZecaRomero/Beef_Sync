@@ -1,13 +1,13 @@
 /**
  * POST /api/import/excel-avaliacao-completa
- * Lê um arquivo Excel com múltiplas abas de avaliação e importa tudo de uma vez.
+ * Lê um arquivo Excel com múltiplas abas e importa tudo de uma vez.
  *
- * Abas reconhecidas (case-insensitive, busca por nome parcial):
- *   PROCRIAR  → Puberdade: SERIE E RG | CLASSE | IDADE | %MÉDIA | GRUPO | CLASSIF
- *   GENEPLUS  → Genética GENEPLUS: SERIE E RG | IQg Básico | Pt IQg | ...
- *   ANCP      → Genética ANCP: SERIE E RG | MGTe | TOP | ...
- *   PMGZ      → Genética PMGZ: SERIE E RG | MGTe | TOP | DEP/DECA cols
- *   DGT       → Carcaça: SERIE E RG | AOL | AOL/100kg | RATIO | MAR | EGS | EGS/100kg | PICANHA
+ * Abas suportadas (detectadas pelo nome):
+ *   PROCRIAR  → Puberdade
+ *   DGT       → Carcaça
+ *   GENEPLUS  → IQGg Básico + Pt IQGg Básico
+ *   ANCP      → MGTe + TOP_MGTe + demais DEPs
+ *   PMGZ      → DEP/DECA por trait (PN-Edg, PD-Edg, etc.)
  */
 
 import formidable from 'formidable'
@@ -20,7 +20,7 @@ export const config = { api: { bodyParser: false } }
 // ── helpers ───────────────────────────────────────────────────────────────────
 function cellVal(cell) {
   if (!cell) return null
-  const v = cell.result !== undefined ? cell.result : cell.value
+  const v = cell.result !== undefined && cell.result !== null ? cell.result : cell.value
   if (v === null || v === undefined) return null
   if (typeof v === 'object') {
     if (v.richText) return v.richText.map(t => t.text).join('').trim()
@@ -34,7 +34,7 @@ function cellVal(cell) {
 function toStr(v) {
   if (v == null) return null
   const s = String(v).trim()
-  return s === '' ? null : s
+  return s === '' || s === '[object Object]' ? null : s
 }
 
 function toNum(v) {
@@ -47,24 +47,31 @@ function toNum(v) {
 function parseSerieRg(raw) {
   if (!raw) return null
   const s = String(raw).trim()
-  // "CJCJ 16974"
   const m = s.match(/^([A-Za-z]+)\s+(\d+)$/)
   if (m) return { serie: m[1].toUpperCase(), rg: m[2] }
-  // "CJCJ-16974"
   const m2 = s.match(/^([A-Za-z]+)-(\d+)$/)
   if (m2) return { serie: m2[1].toUpperCase(), rg: m2[2] }
   return null
 }
 
+// Retorna todas as linhas como arrays (1-indexed, valores brutos)
 function sheetToRows(ws) {
   const rows = []
-  ws.eachRow({ includeEmpty: false }, (row) => {
-    rows.push(row.values) // 1-indexed
-  })
+  ws.eachRow({ includeEmpty: false }, (row) => rows.push(row.values))
   return rows
 }
 
-function colIndex(headerRow, ...candidates) {
+// Encontra o índice da linha (0-based) que contém "SERIE E RG" na primeira coluna
+function findHeaderRow(rows, maxSearch = 6) {
+  for (let i = 0; i < Math.min(rows.length, maxSearch); i++) {
+    const col1 = toStr(cellVal({ value: rows[i][1] })) || ''
+    if (col1.toUpperCase().includes('SERIE') || col1.toUpperCase().includes('RG')) return i
+  }
+  return 0
+}
+
+// Acha o índice (1-based) da coluna cujo header contém algum dos candidatos
+function findCol(headerRow, ...candidates) {
   for (let i = 1; i < headerRow.length; i++) {
     const v = toStr(cellVal({ value: headerRow[i] })) || ''
     const up = v.toUpperCase().replace(/[^A-Z0-9]/g, '')
@@ -76,29 +83,21 @@ function colIndex(headerRow, ...candidates) {
   return -1
 }
 
-// ── parsers por aba ───────────────────────────────────────────────────────────
+// ── PROCRIAR – Puberdade ──────────────────────────────────────────────────────
 function parsePuberdade(ws) {
   const rows = sheetToRows(ws)
-  if (rows.length < 2) return []
-  // encontra linha de header (contém CLASSE ou GRUPO)
-  let hi = 0
-  for (let i = 0; i < Math.min(rows.length, 5); i++) {
-    const r = rows[i]
-    const str = r.map(v => toStr(cellVal({ value: v })) || '').join(' ').toUpperCase()
-    if (str.includes('CLASSE') || str.includes('GRUPO')) { hi = i; break }
-  }
+  const hi = findHeaderRow(rows)
   const hdr = rows[hi]
-  const iSRG    = colIndex(hdr, 'SERIE E RG', 'SERIERГ', 'RG')
-  const iClasse = colIndex(hdr, 'CLASSE')
-  const iIdade  = colIndex(hdr, 'IDADE')
-  const iPct    = colIndex(hdr, 'MEDIA', '%MEDIA', 'PMEDIA')
-  const iGrupo  = colIndex(hdr, 'GRUPO')
-  const iClassif= colIndex(hdr, 'CLASSIF')
+  const iClasse = findCol(hdr, 'CLASSE')
+  const iIdade  = findCol(hdr, 'IDADE')
+  const iPct    = findCol(hdr, 'MEDIA', '%MEDIA')
+  const iGrupo  = findCol(hdr, 'GRUPO')
+  const iClassif= findCol(hdr, 'CLASSIF')
 
   const result = []
   for (let i = hi + 1; i < rows.length; i++) {
     const r = rows[i]
-    const srg = parseSerieRg(cellVal({ value: r[iSRG] }))
+    const srg = parseSerieRg(cellVal({ value: r[1] }))
     if (!srg) continue
     result.push({
       ...srg,
@@ -112,28 +111,23 @@ function parsePuberdade(ws) {
   return result
 }
 
+// ── DGT – Carcaça ─────────────────────────────────────────────────────────────
 function parseCarcaca(ws) {
   const rows = sheetToRows(ws)
-  if (rows.length < 2) return []
-  let hi = 0
-  for (let i = 0; i < Math.min(rows.length, 5); i++) {
-    const str = rows[i].map(v => toStr(cellVal({ value: v })) || '').join(' ').toUpperCase()
-    if (str.includes('AOL') || str.includes('PICANHA') || str.includes('EGS')) { hi = i; break }
-  }
+  const hi = findHeaderRow(rows)
   const hdr = rows[hi]
-  const iSRG   = colIndex(hdr, 'SERIE E RG', 'RG')
-  const iAol   = colIndex(hdr, 'AOL')
-  const iAol100= colIndex(hdr, 'AOL100', 'AOL/100')
-  const iRatio = colIndex(hdr, 'RATIO')
-  const iMar   = colIndex(hdr, 'MAR')
-  const iEgs   = colIndex(hdr, 'EGS')
-  const iEgs100= colIndex(hdr, 'EGS100', 'EGS/100')
-  const iPic   = colIndex(hdr, 'PICANHA')
+  const iAol   = findCol(hdr, 'AOL')
+  const iAol100= findCol(hdr, 'AOL100', 'AOL / 100', 'AOL/100')
+  const iRatio = findCol(hdr, 'RATIO')
+  const iMar   = findCol(hdr, 'MAR')
+  const iEgs   = findCol(hdr, 'EGS')
+  const iEgs100= findCol(hdr, 'EGS100', 'EGS / 100', 'EGS/100')
+  const iPic   = findCol(hdr, 'PICANHA')
 
   const result = []
   for (let i = hi + 1; i < rows.length; i++) {
     const r = rows[i]
-    const srg = parseSerieRg(cellVal({ value: r[iSRG] }))
+    const srg = parseSerieRg(cellVal({ value: r[1] }))
     if (!srg) continue
     result.push({
       ...srg,
@@ -149,88 +143,141 @@ function parseCarcaca(ws) {
   return result
 }
 
-function parseGeneticaGeneplus(ws) {
-  // IQg Básico = IQG, Pt IQg Básico = Pt IQG
+// ── GENEPLUS – IQGg Básico + Pt IQGg Básico ──────────────────────────────────
+// Header está na linha 3 (row index 2): SERIE E RG | IQGg Básico | Pt IQGg Básico | Dep | Acc | Pt | ...
+function parseGeneplus(ws) {
   const rows = sheetToRows(ws)
-  if (rows.length < 2) return []
-  let hi = 0
-  for (let i = 0; i < Math.min(rows.length, 5); i++) {
-    const str = rows[i].map(v => toStr(cellVal({ value: v })) || '').join(' ').toUpperCase()
-    if (str.includes('IQG') || str.includes('IQg')) { hi = i; break }
-  }
+  const hi = findHeaderRow(rows)
   const hdr = rows[hi]
-  const iSRG = colIndex(hdr, 'SERIE E RG', 'RG')
-  const iIQG = colIndex(hdr, 'IQG BASICO', 'IQGBASICO', 'IQg')
-  const iPt  = colIndex(hdr, 'PT IQG', 'PTIQG', 'Pt IQg')
+
+  // col 2 = IQGg Básico, col 3 = Pt IQGg Básico (posições fixas nesta planilha)
+  // Mas também tentamos encontrar por nome
+  let iIQG = findCol(hdr, 'IQGG BASICO', 'IQGg BASICO', 'IQGG B', 'BASICO')
+  let iPt  = findCol(hdr, 'PT IQGG', 'PT IQGg', 'PT IQG')
+  // fallback posição fixa se não achou por nome
+  if (iIQG < 0) iIQG = 2
+  if (iPt  < 0) iPt  = 3
 
   const result = []
   for (let i = hi + 1; i < rows.length; i++) {
     const r = rows[i]
-    const srg = parseSerieRg(cellVal({ value: r[iSRG] }))
+    const srg = parseSerieRg(cellVal({ value: r[1] }))
     if (!srg) continue
-    const iqg   = toNum(cellVal({ value: r[iIQG] }))
-    const pt    = toNum(cellVal({ value: r[iPt] }))
+    const iqg = toNum(cellVal({ value: r[iIQG] }))
+    const pt  = toNum(cellVal({ value: r[iPt] }))
     if (iqg == null && pt == null) continue
-    result.push({ ...srg, iqg: iqg != null ? String(iqg) : null, pt_iqg: pt != null ? String(pt) : null })
-  }
-  return result
-}
-
-function parseGeneticaMGTe(ws) {
-  // ANCP / PMGZ → MGTe + TOP (+ opcionalmente iABCZ, DECA)
-  const rows = sheetToRows(ws)
-  if (rows.length < 2) return []
-  let hi = 0
-  for (let i = 0; i < Math.min(rows.length, 5); i++) {
-    const str = rows[i].map(v => toStr(cellVal({ value: v })) || '').join(' ').toUpperCase()
-    if (str.includes('MGTE') || str.includes('MGTe')) { hi = i; break }
-  }
-  const hdr = rows[hi]
-  const iSRG   = colIndex(hdr, 'SERIE E RG', 'RG')
-  const iMGTe  = colIndex(hdr, 'MGTE', 'MGTe')
-  const iTOP   = colIndex(hdr, 'TOP_MGTE', 'TOPMGTE', 'TOP')
-  const iIABCZ = colIndex(hdr, 'IABCZ', 'IABCZg')
-  const iDECA  = colIndex(hdr, 'DECA')
-  const iIQG   = colIndex(hdr, 'IQGG', 'IQGg')
-  const iPt    = colIndex(hdr, 'PTIQG', 'PT')
-
-  const result = []
-  for (let i = hi + 1; i < rows.length; i++) {
-    const r = rows[i]
-    const srg = parseSerieRg(cellVal({ value: r[iSRG] }))
-    if (!srg) continue
-    const mgte  = toNum(cellVal({ value: r[iMGTe] }))
-    const top   = toNum(cellVal({ value: r[iTOP] }))
-    const iabcz = iIABCZ > 0 ? toNum(cellVal({ value: r[iIABCZ] })) : null
-    const deca  = iDECA  > 0 ? toNum(cellVal({ value: r[iDECA] }))  : null
-    const iqg   = iIQG   > 0 ? toNum(cellVal({ value: r[iIQG] }))   : null
-    const pt    = iPt    > 0 ? toNum(cellVal({ value: r[iPt] }))     : null
-    if (mgte == null && top == null && iabcz == null) continue
     result.push({
       ...srg,
-      mgte:   mgte  != null ? String(mgte)  : null,
-      top:    top   != null ? String(top)   : null,
-      abczg:  iabcz != null ? String(iabcz) : null,
-      deca:   deca  != null ? String(deca)  : null,
-      iqg:    iqg   != null ? String(iqg)   : null,
-      pt_iqg: pt    != null ? String(pt)    : null,
+      iqg:    iqg != null ? String(iqg) : null,
+      pt_iqg: pt  != null ? String(pt)  : null,
     })
   }
   return result
 }
 
-// ── identificar aba ───────────────────────────────────────────────────────────
+// ── ANCP – MGTe, TOP_MGTe e DEPs secundários ─────────────────────────────────
+// Header na linha 1: SERIE E RG | MGTe | TOP_MGTe | D3P | DIPP | TOP_DIPP | ...
+function parseAncp(ws) {
+  const rows = sheetToRows(ws)
+  const hi = findHeaderRow(rows)
+  const hdr = rows[hi]
+
+  const iMGTe   = findCol(hdr, 'MGTE', 'MGTe')
+  const iTOP    = findCol(hdr, 'TOP_MGTE', 'TOPMGTE')
+  const iD3P    = findCol(hdr, 'D3P')
+  const iDIPP   = findCol(hdr, 'DIPP')
+  const iDPE365 = findCol(hdr, 'DPE365')
+  const iDPN    = findCol(hdr, 'DPN')
+  const iDSTAY  = findCol(hdr, 'DSTAY')
+  const iMP120  = findCol(hdr, 'MP120')
+  const iMP210  = findCol(hdr, 'MP210')
+  const iDP450  = findCol(hdr, 'DP450')
+  const iDAOL   = findCol(hdr, 'DAOL')
+  const iDACAB  = findCol(hdr, 'DACAB')
+  const iMAR    = findCol(hdr, 'MAR')
+
+  const result = []
+  for (let i = hi + 1; i < rows.length; i++) {
+    const r = rows[i]
+    const srg = parseSerieRg(cellVal({ value: r[1] }))
+    if (!srg) continue
+    const mgte = toNum(cellVal({ value: r[iMGTe] }))
+    const top  = toNum(cellVal({ value: r[iTOP] }))
+    if (mgte == null) continue
+    result.push({
+      ...srg,
+      mgte:     mgte != null ? String(mgte) : null,
+      top:      top  != null ? String(top)  : null,
+      // DEPs ANCP adicionais (armazenados em colunas genéricas futuras)
+      ancp_d3p:    toNum(cellVal({ value: r[iD3P] })),
+      ancp_dipp:   toNum(cellVal({ value: r[iDIPP] })),
+      ancp_dpe365: toNum(cellVal({ value: r[iDPE365] })),
+      ancp_dpn:    toNum(cellVal({ value: r[iDPN] })),
+      ancp_dstay:  toNum(cellVal({ value: r[iDSTAY] })),
+      ancp_mp120:  toNum(cellVal({ value: r[iMP120] })),
+      ancp_mp210:  toNum(cellVal({ value: r[iMP210] })),
+      ancp_dp450:  toNum(cellVal({ value: r[iDP450] })),
+      ancp_daol:   toNum(cellVal({ value: r[iDAOL] })),
+      ancp_dacab:  toNum(cellVal({ value: r[iDACAB] })),
+      ancp_mar:    toNum(cellVal({ value: r[iMAR] })),
+    })
+  }
+  return result
+}
+
+// ── PMGZ – DEP/DECA/P% por trait ─────────────────────────────────────────────
+// Linha 1: categorias (CRESCIMENTO, REPRODUTIVAS, CARCAÇA)
+// Linha 2: traits (PN-Edg, PD-Edg, PA-Edg, PS-Edg, IPPg, STAYg, PE-365g, AOLg, ACABg, MARg)
+// Linha 3: SERIE E RG | DEP | DECA | P% | DEP | DECA | P% | ...
+// → combina linhas 2+3 para montar mapa de colunas
+function parsePmgz(ws) {
+  const rows = sheetToRows(ws)
+  // linha header real = row com "SERIE E RG"
+  const hi = findHeaderRow(rows)
+  if (hi < 1) return [] // precisa de pelo menos linha de traits antes
+
+  const traitRow  = rows[hi - 1] // linha 2: nomes dos traits
+  const headerRow = rows[hi]     // linha 3: DEP | DECA | P%
+
+  // Montar mapa col → {trait, tipo}
+  let lastTrait = ''
+  const colMap = {}
+  for (let i = 2; i < headerRow.length; i++) {
+    const trait = toStr(cellVal({ value: traitRow[i] })) || lastTrait
+    if (trait) lastTrait = trait
+    const tipo = toStr(cellVal({ value: headerRow[i] })) || ''
+    colMap[i] = { trait: trait.replace(/[^A-Za-z0-9]/g, '').toLowerCase(), tipo: tipo.toUpperCase().replace(/[^A-Z0-9]/g, '') }
+  }
+
+  const result = []
+  for (let i = hi + 1; i < rows.length; i++) {
+    const r = rows[i]
+    const srg = parseSerieRg(cellVal({ value: r[1] }))
+    if (!srg) continue
+    const obj = { ...srg }
+    for (const [col, { trait, tipo }] of Object.entries(colMap)) {
+      if (!trait || !tipo) continue
+      const val = toNum(cellVal({ value: r[parseInt(col)] }))
+      if (val != null) obj[`pmgz_${trait}_${tipo.toLowerCase()}`] = val
+    }
+    result.push(obj)
+  }
+  return result
+}
+
+// ── detectar tipo da aba ──────────────────────────────────────────────────────
 function detectTipo(name) {
-  const n = name.toUpperCase()
+  const n = name.toUpperCase().trim()
   if (n.includes('PROCRIAR') || n.includes('PUBERD')) return 'puberdade'
-  if (n.includes('DGT') || n.includes('CARCAC') || n.includes('CARC')) return 'carcaca'
+  if (n.includes('DGT') || n.includes('CARCAC')) return 'carcaca'
   if (n.includes('GENEPLUS')) return 'geneplus'
-  if (n.includes('ANCP') || n.includes('PMGZ') || n.includes('MGTE')) return 'mgte'
+  if (n.includes('ANCP')) return 'ancp'
+  if (n.includes('PMGZ')) return 'pmgz'
   return null
 }
 
 // ── gravar no banco ───────────────────────────────────────────────────────────
-async function upsertAnimal(tipo, data, stats) {
+async function upsertRows(tipo, data, stats) {
   for (const row of data) {
     try {
       const found = await query(
@@ -242,43 +289,47 @@ async function upsertAnimal(tipo, data, stats) {
 
       if (tipo === 'puberdade') {
         await query(
-          `UPDATE animais SET
-            pub_classe=$1, pub_idade=$2, pub_pct_media=$3, pub_grupo=$4, pub_classif=$5, updated_at=NOW()
-          WHERE id=$6`,
+          `UPDATE animais SET pub_classe=$1, pub_idade=$2, pub_pct_media=$3, pub_grupo=$4, pub_classif=$5, updated_at=NOW() WHERE id=$6`,
           [row.pub_classe, row.pub_idade, row.pub_pct_media, row.pub_grupo, row.pub_classif, id]
         )
       } else if (tipo === 'carcaca') {
         await query(
-          `UPDATE animais SET
-            carc_aol=$1, carc_aol_100kg=$2, carc_ratio=$3, carc_mar=$4,
-            carc_egs=$5, carc_egs_100kg=$6, carc_picanha=$7, updated_at=NOW()
-          WHERE id=$8`,
-          [row.carc_aol, row.carc_aol_100kg, row.carc_ratio, row.carc_mar,
-           row.carc_egs, row.carc_egs_100kg, row.carc_picanha, id]
+          `UPDATE animais SET carc_aol=$1, carc_aol_100kg=$2, carc_ratio=$3, carc_mar=$4, carc_egs=$5, carc_egs_100kg=$6, carc_picanha=$7, updated_at=NOW() WHERE id=$8`,
+          [row.carc_aol, row.carc_aol_100kg, row.carc_ratio, row.carc_mar, row.carc_egs, row.carc_egs_100kg, row.carc_picanha, id]
         )
       } else if (tipo === 'geneplus') {
-        const sets = []
-        const vals = []
-        let idx = 1
-        if (row.iqg   != null) { sets.push(`iqg=$${idx++}`);    vals.push(row.iqg) }
-        if (row.pt_iqg!= null) { sets.push(`pt_iqg=$${idx++}`); vals.push(row.pt_iqg) }
+        const sets = []; const vals = []; let idx = 1
+        if (row.iqg    != null) { sets.push(`iqg=$${idx++}`);    vals.push(row.iqg) }
+        if (row.pt_iqg != null) { sets.push(`pt_iqg=$${idx++}`); vals.push(row.pt_iqg) }
         if (!sets.length) continue
         vals.push(id)
         await query(`UPDATE animais SET ${sets.join(',')}, updated_at=NOW() WHERE id=$${idx}`, vals)
-      } else if (tipo === 'mgte') {
-        const sets = []
-        const vals = []
-        let idx = 1
-        if (row.mgte  != null) { sets.push(`mgte=$${idx++}`);   vals.push(row.mgte) }
-        if (row.top   != null) { sets.push(`"top"=$${idx++}`);   vals.push(row.top) }
-        if (row.abczg != null) { sets.push(`abczg=$${idx++}`);  vals.push(row.abczg) }
-        if (row.deca  != null) { sets.push(`deca=$${idx++}`);   vals.push(row.deca) }
-        if (row.iqg   != null) { sets.push(`iqg=$${idx++}`);    vals.push(row.iqg) }
-        if (row.pt_iqg!= null) { sets.push(`pt_iqg=$${idx++}`); vals.push(row.pt_iqg) }
+      } else if (tipo === 'ancp') {
+        const sets = []; const vals = []; let idx = 1
+        if (row.mgte != null) { sets.push(`mgte=$${idx++}`);  vals.push(row.mgte) }
+        if (row.top  != null) { sets.push(`"top"=$${idx++}`); vals.push(row.top) }
+        if (!sets.length) continue
+        vals.push(id)
+        await query(`UPDATE animais SET ${sets.join(',')}, updated_at=NOW() WHERE id=$${idx}`, vals)
+      } else if (tipo === 'pmgz') {
+        // PMGZ: por enquanto só salva campos que já existem (mgte, abczg, deca, iqg, pt_iqg)
+        const sets = []; const vals = []; let idx = 1
+        // Procura campos mapeados para colunas existentes
+        const mgte  = row.pmgz_mgte_dep  ?? row.pmgz_mgted_dep
+        const abczg = row.pmgz_iabczg_dep ?? row.pmgz_abczg_dep
+        const deca  = row.pmgz_deca_dep   ?? row.pmgz_decae_dep
+        const iqg   = row.pmgz_iqgg_dep   ?? row.pmgz_iqg_dep
+        const pt    = row.pmgz_ptiqgg_dep ?? row.pmgz_ptiqg_dep
+        if (mgte  != null) { sets.push(`mgte=$${idx++}`);   vals.push(String(mgte)) }
+        if (abczg != null) { sets.push(`abczg=$${idx++}`);  vals.push(String(abczg)) }
+        if (deca  != null) { sets.push(`deca=$${idx++}`);   vals.push(String(deca)) }
+        if (iqg   != null) { sets.push(`iqg=$${idx++}`);    vals.push(String(iqg)) }
+        if (pt    != null) { sets.push(`pt_iqg=$${idx++}`); vals.push(String(pt)) }
         if (!sets.length) continue
         vals.push(id)
         await query(`UPDATE animais SET ${sets.join(',')}, updated_at=NOW() WHERE id=$${idx}`, vals)
       }
+
       stats.atualizados++
     } catch (e) {
       stats.erros.push({ id: `${row.serie} ${row.rg}`, erro: e.message })
@@ -286,14 +337,14 @@ async function upsertAnimal(tipo, data, stats) {
   }
 }
 
-// ── handler ───────────────────────────────────────────────────────────────────
+// ── handler principal ─────────────────────────────────────────────────────────
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' })
 
   const form = formidable({ maxFileSize: 50 * 1024 * 1024 })
-  let fields, files
+  let files
   try {
-    ;[fields, files] = await form.parse(req)
+    ;[, files] = await form.parse(req)
   } catch (e) {
     return res.status(400).json({ error: 'Erro ao receber arquivo: ' + e.message })
   }
@@ -314,16 +365,22 @@ export default async function handler(req, res) {
 
   for (const ws of wb.worksheets) {
     const tipo = detectTipo(ws.name)
-    if (!tipo) { stats.abas.push({ nome: ws.name, tipo: 'ignorada' }); continue }
+    if (!tipo) { stats.abas.push({ nome: ws.name, tipo: 'ignorada', registros: 0, atualizados: 0 }); continue }
 
     let dados = []
-    if (tipo === 'puberdade') dados = parsePuberdade(ws)
-    else if (tipo === 'carcaca') dados = parseCarcaca(ws)
-    else if (tipo === 'geneplus') dados = parseGeneticaGeneplus(ws)
-    else if (tipo === 'mgte') dados = parseGeneticaMGTe(ws)
+    try {
+      if (tipo === 'puberdade') dados = parsePuberdade(ws)
+      else if (tipo === 'carcaca') dados = parseCarcaca(ws)
+      else if (tipo === 'geneplus') dados = parseGeneplus(ws)
+      else if (tipo === 'ancp') dados = parseAncp(ws)
+      else if (tipo === 'pmgz') dados = parsePmgz(ws)
+    } catch (e) {
+      stats.abas.push({ nome: ws.name, tipo, registros: 0, atualizados: 0, erro: e.message })
+      continue
+    }
 
     const antes = stats.atualizados
-    await upsertAnimal(tipo, dados, stats)
+    await upsertRows(tipo, dados, stats)
     stats.abas.push({ nome: ws.name, tipo, registros: dados.length, atualizados: stats.atualizados - antes })
   }
 
@@ -334,5 +391,6 @@ export default async function handler(req, res) {
     naoEncontrados: stats.naoEncontrados.length,
     erros: stats.erros.length,
     exemplosNaoEncontrados: stats.naoEncontrados.slice(0, 10),
+    exemplosErros: stats.erros.slice(0, 5),
   })
 }
