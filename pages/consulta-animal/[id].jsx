@@ -22,6 +22,7 @@ import AnimalHealthProtocols from '../../components/animals/AnimalHealthProtocol
 import AnimalWeightHistory from '../../components/animals/AnimalWeightHistory'
 import AnimalCosts from '../../components/animals/AnimalCosts'
 import AnimalGenetics from '../../components/animals/AnimalGenetics'
+import AnimalAvaliacoes from '../../components/animals/AnimalAvaliacoes'
 import AnimalAdditionalInfo from '../../components/animals/AnimalAdditionalInfo'
 import AnimalMainInfo from '../../components/animals/AnimalMainInfo'
 import AnimalEmbryoTransfers from '../../components/animals/AnimalEmbryoTransfers'
@@ -408,6 +409,8 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
           <div ref={r => sectionRefs.current.custos = r} className="scroll-mb-28"><AnimalCosts animal={animal} onCustosUpdated={refreshCustos} /></div>
 
           <div ref={r => sectionRefs.current.genética = r} className="scroll-mb-28"><AnimalGenetics animal={animal} /></div>
+
+          <AnimalAvaliacoes animal={animal} />
 
           <AnimalNotes animal={animal} />
 
