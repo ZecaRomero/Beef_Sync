@@ -1,22 +1,22 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
-import { Card } from '../components/ui/Card'
-import Button from '../components/ui/Button'
-import Input from '../components/ui/Input'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import Badge from '../components/ui/Badge'
+import Button from '../components/ui/Button'
+import { Card } from '../components/ui/Card'
+import {
+    BeakerIcon,
+    CalendarIcon,
+    CheckCircleIcon,
+    ClockIcon,
+    ExclamationTriangleIcon,
+    InformationCircleIcon,
+    PhoneIcon,
+    PlusIcon,
+    TrashIcon,
+    TruckIcon
+} from '../components/ui/Icons'
+import Input from '../components/ui/Input'
 import Modal from '../components/ui/Modal'
 import Toast from '../components/ui/Toast'
-import {
-  PlusIcon,
-  BeakerIcon,
-  CalendarIcon,
-  TruckIcon,
-  ExclamationTriangleIcon,
-  CheckCircleIcon,
-  ClockIcon,
-  PhoneIcon,
-  TrashIcon,
-  InformationCircleIcon
-} from '../components/ui/Icons'
 
 // Funções utilitárias
 const calcularDiasRestantes = (proximoAbastecimento) => {
@@ -64,7 +64,10 @@ const formatarMoeda = (valor) => {
 const formatDate = (dateString) => {
   if (!dateString) return ''
   try {
-    return new Date(dateString).toLocaleDateString('pt-BR')
+    // Pega só a parte da data (YYYY-MM-DD) e formata sem conversão de timezone
+    const datePart = String(dateString).slice(0, 10)
+    const [year, month, day] = datePart.split('-')
+    return `${day}/${month}/${year}`
   } catch {
     return dateString
   }
