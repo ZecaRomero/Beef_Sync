@@ -225,28 +225,45 @@ function parseAncp(ws) {
   return result
 }
 
+// Mapa: nome do trait no Excel → prefixo da coluna no banco
+const PMGZ_TRAIT_MAP = {
+  'PN-Edg': 'pn',
+  'PD-Edg': 'pd',
+  'PA-Edg': 'pa',
+  'PS-Edg': 'ps',
+  'IPPg':   'ipp',
+  'STAYg':  'stay',
+  'PE-365g':'pe365',
+  'AOLg':   'aol',
+  'ACABg':  'acab',
+  'MARg':   'mar',
+}
+
 // ── PMGZ – DEP/DECA/P% por trait ─────────────────────────────────────────────
 // Linha 1: categorias (CRESCIMENTO, REPRODUTIVAS, CARCAÇA)
 // Linha 2: traits (PN-Edg, PD-Edg, PA-Edg, PS-Edg, IPPg, STAYg, PE-365g, AOLg, ACABg, MARg)
 // Linha 3: SERIE E RG | DEP | DECA | P% | DEP | DECA | P% | ...
-// → combina linhas 2+3 para montar mapa de colunas
 function parsePmgz(ws) {
   const rows = sheetToRows(ws)
-  // linha header real = row com "SERIE E RG"
   const hi = findHeaderRow(rows)
-  if (hi < 1) return [] // precisa de pelo menos linha de traits antes
+  if (hi < 1) return []
 
   const traitRow  = rows[hi - 1] // linha 2: nomes dos traits
   const headerRow = rows[hi]     // linha 3: DEP | DECA | P%
 
-  // Montar mapa col → {trait, tipo}
-  let lastTrait = ''
+  // Monta mapa col → coluna no banco (ex: 'pmgz_pn_dep')
   const colMap = {}
+  let lastTrait = ''
   for (let i = 2; i < headerRow.length; i++) {
-    const trait = toStr(cellVal({ value: traitRow[i] })) || lastTrait
-    if (trait) lastTrait = trait
+    const traitRaw = toStr(cellVal({ value: traitRow[i] }))
+    if (traitRaw) lastTrait = traitRaw
+    const prefix = PMGZ_TRAIT_MAP[lastTrait]
+    if (!prefix) continue
     const tipo = toStr(cellVal({ value: headerRow[i] })) || ''
-    colMap[i] = { trait: trait.replace(/[^A-Za-z0-9]/g, '').toLowerCase(), tipo: tipo.toUpperCase().replace(/[^A-Z0-9]/g, '') }
+    const tipoUp = tipo.toUpperCase().replace(/\s+/g, '')
+    if      (tipoUp === 'DEP')  colMap[i] = `pmgz_${prefix}_dep`
+    else if (tipoUp === 'DECA') colMap[i] = `pmgz_${prefix}_deca`
+    else if (tipoUp === 'P%')   colMap[i] = `pmgz_${prefix}_pct`
   }
 
   const result = []
@@ -255,10 +272,9 @@ function parsePmgz(ws) {
     const srg = parseSerieRg(cellVal({ value: r[1] }))
     if (!srg) continue
     const obj = { ...srg }
-    for (const [col, { trait, tipo }] of Object.entries(colMap)) {
-      if (!trait || !tipo) continue
+    for (const [col, colName] of Object.entries(colMap)) {
       const val = toNum(cellVal({ value: r[parseInt(col)] }))
-      if (val != null) obj[`pmgz_${trait}_${tipo.toLowerCase()}`] = val
+      if (val != null) obj[colName] = val
     }
     result.push(obj)
   }
@@ -312,22 +328,26 @@ async function upsertRows(tipo, data, stats) {
         vals.push(id)
         await query(`UPDATE animais SET ${sets.join(',')}, updated_at=NOW() WHERE id=$${idx}`, vals)
       } else if (tipo === 'pmgz') {
-        // PMGZ: por enquanto só salva campos que já existem (mgte, abczg, deca, iqg, pt_iqg)
+        // Salva todas as colunas pmgz_* presentes no objeto
         const sets = []; const vals = []; let idx = 1
-        // Procura campos mapeados para colunas existentes
-        const mgte  = row.pmgz_mgte_dep  ?? row.pmgz_mgted_dep
-        const abczg = row.pmgz_iabczg_dep ?? row.pmgz_abczg_dep
-        const deca  = row.pmgz_deca_dep   ?? row.pmgz_decae_dep
-        const iqg   = row.pmgz_iqgg_dep   ?? row.pmgz_iqg_dep
-        const pt    = row.pmgz_ptiqgg_dep ?? row.pmgz_ptiqg_dep
-        if (mgte  != null) { sets.push(`mgte=$${idx++}`);   vals.push(String(mgte)) }
-        if (abczg != null) { sets.push(`abczg=$${idx++}`);  vals.push(String(abczg)) }
-        if (deca  != null) { sets.push(`deca=$${idx++}`);   vals.push(String(deca)) }
-        if (iqg   != null) { sets.push(`iqg=$${idx++}`);    vals.push(String(iqg)) }
-        if (pt    != null) { sets.push(`pt_iqg=$${idx++}`); vals.push(String(pt)) }
+        const PMGZ_COLS = [
+          'pmgz_pn_dep','pmgz_pn_deca','pmgz_pn_pct',
+          'pmgz_pd_dep','pmgz_pd_deca','pmgz_pd_pct',
+          'pmgz_pa_dep','pmgz_pa_deca','pmgz_pa_pct',
+          'pmgz_ps_dep','pmgz_ps_deca','pmgz_ps_pct',
+          'pmgz_ipp_dep','pmgz_ipp_deca','pmgz_ipp_pct',
+          'pmgz_stay_dep','pmgz_stay_deca','pmgz_stay_pct',
+          'pmgz_pe365_dep','pmgz_pe365_deca','pmgz_pe365_pct',
+          'pmgz_aol_dep','pmgz_aol_deca','pmgz_aol_pct',
+          'pmgz_acab_dep','pmgz_acab_deca','pmgz_acab_pct',
+          'pmgz_mar_dep','pmgz_mar_deca','pmgz_mar_pct',
+        ]
+        for (const col of PMGZ_COLS) {
+          if (row[col] != null) { sets.push(`${col}=$${idx++}`); vals.push(row[col]) }
+        }
         if (!sets.length) continue
         vals.push(id)
-        await query(`UPDATE animais SET ${sets.join(',')}, updated_at=NOW() WHERE id=$${idx}`, vals)
+        await query(`UPDATE animais SET ${sets.join(', ')}, updated_at=NOW() WHERE id=$${idx}`, vals)
       }
 
       stats.atualizados++

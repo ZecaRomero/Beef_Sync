@@ -190,7 +190,8 @@ export default function ImportPuberdadeCarcacaModal({ isOpen, onClose, onSuccess
                   <li>🟠 <strong>PROCRIAR</strong> → Puberdade (CLASSE, IDADE, GRUPO, CLASSIF)</li>
                   <li>🔴 <strong>DGT</strong> → Carcaça (AOL, MAR, EGS, PICANHA)</li>
                   <li>🟢 <strong>GENEPLUS</strong> → Genética (IQG, Pt IQG)</li>
-                  <li>🔵 <strong>ANCP / PMGZ</strong> → Genética (MGTe, TOP, iABCZ, DECA)</li>
+                  <li>🔵 <strong>ANCP</strong> → Genética (MGTe, TOP)</li>
+                  <li>🟣 <strong>PMGZ</strong> → DEP/DECA por trait (PN, PD, PA, PS, IPP, STAY, PE365, AOL, ACAB, MAR)</li>
                 </ul>
                 <p className="text-xs mt-2 opacity-75">As abas são detectadas automaticamente pelo nome.</p>
               </div>
