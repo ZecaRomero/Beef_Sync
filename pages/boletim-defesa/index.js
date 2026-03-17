@@ -1,10 +1,12 @@
 import { ArrowDownTrayIcon, DocumentTextIcon, PlusIcon, ShieldCheckIcon, TableCellsIcon, TrashIcon } from '@heroicons/react/24/outline'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { Fragment, useEffect, useState } from 'react'
 import BoletimCampo from '../../components/boletim/BoletimCampo'
 import ModernLayout from '../../components/layout/ModernLayout'
 
 export default function BoletimDefesa() {
+  const router = useRouter()
   const [abaAtiva, setAbaAtiva] = useState('campo')
   const [fazendas, setFazendas] = useState([])
   const [historico, setHistorico] = useState([])
@@ -39,11 +41,24 @@ export default function BoletimDefesa() {
           const data = JSON.parse(adelsoAuth)
           if (data.nome === 'Adelso' && data.expiresAt > Date.now()) {
             setIsAdelso(true)
+            router.replace('/boletim-defesa/mobile')
+            return
+          }
+        } catch (_) {}
+      }
+      const mobileAuth = localStorage.getItem('mobile-auth')
+      if (mobileAuth) {
+        try {
+          const data = JSON.parse(mobileAuth)
+          if (data.nome === 'Adelso') {
+            setIsAdelso(true)
+            router.replace('/boletim-defesa/mobile')
+            return
           }
         } catch (_) {}
       }
     } catch (_) {}
-  }, [])
+  }, [router])
 
   const carregarDados = async () => {
     try {
