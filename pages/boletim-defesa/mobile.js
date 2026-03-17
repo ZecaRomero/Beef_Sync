@@ -37,9 +37,7 @@ export default function BoletimDefesaMobile() {
   const [whatsappAdelso, setWhatsappAdelso] = useState(null)
   const [modalWhatsapp, setModalWhatsapp] = useState(false)
   const [whatsappInput, setWhatsappInput] = useState('')
-  const [modalEnviar, setModalEnviar] = useState(false)
-  const [modalConferencia, setModalConferencia] = useState(false)
-  const [formatoEnvio, setFormatoEnvio] = useState(null)
+  
   const [enviando, setEnviando] = useState(false)
   const [modalAlterarQtd, setModalAlterarQtd] = useState(null)
   const [formMovimentacao, setFormMovimentacao] = useState({ novaQuant: '', sexo: '', era: '', raca: '', categoria: '', observacao: '', motivo: '' })
@@ -50,12 +48,12 @@ export default function BoletimDefesaMobile() {
     { nome: 'Zeca', telefone: '11969009621' },
     { nome: 'Nilson', telefone: '11969009198' }
   ])
-  const [contatoSelecionado, setContatoSelecionado] = useState(null)
+  
   const [novoContato, setNovoContato] = useState({ nome: '', telefone: '' })
   const [alteracoesFeitas, setAlteracoesFeitas] = useState([])
   const [sugerirResumo, setSugerirResumo] = useState(false)
   const [modalResumoAlteracoes, setModalResumoAlteracoes] = useState(false)
-  const [modalEscolhaEnvio, setModalEscolhaEnvio] = useState(null) // { downloadUrl, waLink, nomeContato } quando fallback
+  
 
   // Medicamentos por local
   const [medicamentos, setMedicamentos] = useState({}) // { boletim_campo_id: [meds ordenados] }
@@ -336,42 +334,22 @@ export default function BoletimDefesaMobile() {
     }
   }
 
-  const handleEnviar = async (formato) => {
-    if (!contatoSelecionado) {
-      alert('Selecione um contato para enviar')
-      return
-    }
-    
+  const handleEnviarRapido = async () => {
     setEnviando(true)
     try {
-      const res = await fetch('/api/boletim-campo/enviar-whatsapp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          formato,
-          telefone: contatoSelecionado.telefone,
-          nome: contatoSelecionado.nome
+      const base = typeof window !== 'undefined' ? window.location.origin : ''
+      const downloadUrl = `${base}/api/boletim-campo/download-excel`
+      window.open(downloadUrl, '_blank')
+
+      const telefones = contatos.map(c => c.telefone.replace(/\D/g, ''))
+      const msg = encodeURIComponent('Segue o Boletim Campo atualizado em anexo.')
+      setTimeout(() => {
+        telefones.forEach((tel, i) => {
+          setTimeout(() => {
+            window.open(`https://wa.me/55${tel}?text=${msg}`, '_blank')
+          }, i * 500)
         })
-      })
-      const json = await res.json()
-      if (json.success) {
-        setModalConferencia(false)
-        setModalEnviar(false)
-        if (json.fallback) {
-          const base = typeof window !== 'undefined' ? window.location.origin : ''
-          const url = json.downloadUrl?.startsWith('/') ? `${base}${json.downloadUrl}` : json.downloadUrl
-          setModalEscolhaEnvio({
-            downloadUrl: url || `${base}/api/boletim-campo/download-excel`,
-            waLink: json.waLink,
-            nomeContato: contatoSelecionado?.nome
-          })
-        } else {
-          setContatoSelecionado(null)
-          alert(`Enviado para ${contatoSelecionado.nome}!`)
-        }
-      } else {
-        alert(json.message || 'Erro ao enviar')
-      }
+      }, 400)
     } catch (e) {
       alert('Erro ao enviar')
     } finally {
@@ -496,11 +474,12 @@ export default function BoletimDefesaMobile() {
               </button>
             )}
             <button
-              onClick={() => setModalEnviar(true)}
-              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-green-600 text-white font-semibold"
+              onClick={handleEnviarRapido}
+              disabled={enviando}
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-green-600 text-white font-semibold disabled:opacity-50"
             >
               <PaperAirplaneIcon className="w-5 h-5" />
-              Enviar
+              {enviando ? 'Enviando...' : 'Enviar'}
             </button>
             <button
               onClick={() => setModalWhatsapp(true)}
@@ -1061,9 +1040,6 @@ export default function BoletimDefesaMobile() {
                 </div>
               ))}
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              Deseja enviar o Boletim Campo atualizado para os contatos WhatsApp?
-            </p>
             <div className="flex gap-2">
               <button
                 onClick={() => {
@@ -1077,13 +1053,14 @@ export default function BoletimDefesaMobile() {
               <button
                 onClick={() => {
                   setModalResumoAlteracoes(false)
-                  setModalEnviar(true)
                   setAlteracoesFeitas([])
+                  handleEnviarRapido()
                 }}
-                className="flex-1 py-3 bg-green-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2"
+                disabled={enviando}
+                className="flex-1 py-3 bg-green-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 <PaperAirplaneIcon className="w-5 h-5" />
-                Enviar para contatos
+                Enviar
               </button>
             </div>
           </div>
@@ -1148,166 +1125,6 @@ export default function BoletimDefesaMobile() {
             <button
               onClick={() => setModalWhatsapp(false)}
               className="w-full mt-4 py-3 bg-gray-200 dark:bg-gray-600 rounded-xl"
-            >
-              Fechar
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Modal enviar WhatsApp */}
-      {modalEnviar && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Enviar para WhatsApp</h3>
-            
-            {/* Seleção de contato */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Selecione o contato:
-              </label>
-              <div className="space-y-2">
-                {contatos.map((contato, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setContatoSelecionado(contato)}
-                    className={`w-full p-3 rounded-xl text-left transition-all ${
-                      contatoSelecionado?.telefone === contato.telefone
-                        ? 'bg-green-100 dark:bg-green-900/30 border-2 border-green-500'
-                        : 'bg-gray-50 dark:bg-gray-700 border-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600'
-                    }`}
-                  >
-                    <p className="font-semibold text-gray-900 dark:text-white">{contato.nome}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {contato.telefone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')}
-                    </p>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Formato */}
-            {contatoSelecionado && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Escolha o formato:
-                </label>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => {
-                      setFormatoEnvio('excel')
-                      setModalConferencia(true)
-                    }}
-                    disabled={enviando}
-                    className="flex-1 py-3 bg-green-600 text-white rounded-xl disabled:opacity-50 font-semibold"
-                  >
-                    Excel
-                  </button>
-                  <button
-                    onClick={() => {
-                      setFormatoEnvio('pdf')
-                      setModalConferencia(true)
-                    }}
-                    disabled={enviando}
-                    className="flex-1 py-3 bg-red-600 text-white rounded-xl disabled:opacity-50 font-semibold"
-                  >
-                    PDF
-                  </button>
-                </div>
-              </div>
-            )}
-
-            <button
-              onClick={() => {
-                setModalEnviar(false)
-                setContatoSelecionado(null)
-              }}
-              className="w-full py-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-            >
-              Cancelar
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Modal conferência antes de enviar WhatsApp */}
-      {modalConferencia && contatoSelecionado && (
-        <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Conferência antes de enviar</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-              Revise os dados que serão enviados para <strong>{contatoSelecionado.nome}</strong> ({(contatoSelecionado.telefone || '').replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')})
-            </p>
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mb-4 space-y-2">
-              <p className="font-semibold text-gray-700 dark:text-gray-300">Resumo do Boletim Campo</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total de animais: <strong>{dadosCampo.reduce((s, d) => s + (parseInt(d.quant) || 0), 0)}</strong></p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Registros (piquetes/locais): <strong>{dadosCampo.length}</strong></p>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Formato: <strong>{formatoEnvio === 'excel' ? 'Excel (.xlsx)' : 'PDF'}</strong></p>
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => {
-                  setModalConferencia(false)
-                  setFormatoEnvio(null)
-                }}
-                className="flex-1 py-3 bg-gray-200 dark:bg-gray-600 rounded-xl font-semibold text-gray-700 dark:text-gray-300"
-              >
-                Voltar
-              </button>
-              <button
-                onClick={() => {
-                  if (formatoEnvio) {
-                    setModalConferencia(false)
-                    setModalEnviar(false)
-                    setContatoSelecionado(null)
-                    handleEnviar(formatoEnvio)
-                    setFormatoEnvio(null)
-                  }
-                }}
-                disabled={enviando}
-                className="flex-1 py-3 bg-green-600 text-white rounded-xl font-semibold disabled:opacity-50"
-              >
-                {enviando ? 'Enviando...' : 'Confirmar e enviar'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal escolher: Baixar ou Enviar (quando WhatsApp API não configurada) */}
-      {modalEscolhaEnvio && (
-        <div className="fixed inset-0 bg-black/50 z-[70] flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Arquivo pronto</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-              O link do WhatsApp não permite anexar arquivos automaticamente. Baixe o arquivo e anexe manualmente no chat.
-            </p>
-            <div className="space-y-3">
-              <button
-                onClick={() => {
-                  window.open(modalEscolhaEnvio.downloadUrl, '_blank')
-                  setModalEscolhaEnvio(null)
-                }}
-                className="w-full py-3 bg-blue-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2"
-              >
-                <DocumentTextIcon className="w-5 h-5" />
-                Baixar arquivo
-              </button>
-              <button
-                onClick={() => {
-                  window.open(modalEscolhaEnvio.downloadUrl, '_blank')
-                  setTimeout(() => window.open(modalEscolhaEnvio.waLink, '_blank'), 300)
-                  setModalEscolhaEnvio(null)
-                }}
-                className="w-full py-3 bg-green-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2"
-              >
-                <PaperAirplaneIcon className="w-5 h-5" />
-                Baixar arquivo e abrir WhatsApp
-              </button>
-            </div>
-            <button
-              onClick={() => setModalEscolhaEnvio(null)}
-              className="w-full mt-4 py-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
             >
               Fechar
             </button>
