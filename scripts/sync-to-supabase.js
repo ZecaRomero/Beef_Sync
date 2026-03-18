@@ -67,6 +67,26 @@ async function syncToSupabase(onProgress) {
 
     const results = {}
 
+    // 1. Limpar TODAS as tabelas remotas primeiro (ordem REVERSA para FK)
+    log('\n🧹 Limpando dados remotos (ordem reversa)...')
+    const reversedTables = [...TABLES].reverse()
+    for (const table of reversedTables) {
+      try {
+        await supabaseRequest('DELETE', table, null, '?id=gte.0')
+        log(`  ✓ ${table}: limpa`)
+      } catch (err) {
+        log(`  ⚠ ${table}: erro ao limpar (${err.message}). Tentando fallback...`)
+        try {
+          await supabaseRequest('DELETE', table, null, '?created_at=gte.1900-01-01')
+          log(`    ✓ ${table}: limpa (fallback)`)
+        } catch (err2) {
+          log(`    ✗ ${table}: falha total ao limpar (${err2.message})`)
+        }
+      }
+    }
+
+    // 2. Inserir dados (ordem NORMAL)
+    log('\n📤 Enviando dados locais...')
     for (const table of TABLES) {
       try {
         // Verificar se tabela existe localmente
@@ -79,34 +99,26 @@ async function syncToSupabase(onProgress) {
           continue
         }
 
-        log(`Sincronizando ${table}...`)
         const { rows } = await localPool.query(`SELECT * FROM ${table}`)
 
         if (rows.length === 0) {
-          // Limpar tabela remota também
-          await supabaseRequest('DELETE', table, null, '?id=gte.0').catch(() => {})
-          log(`  → ${table}: vazia`)
+          log(`  → ${table}: vazia localmente`)
           results[table] = { inserted: 0 }
           continue
         }
 
-        // 1. Deletar todos os registros remotos (truncate via DELETE)
-        await supabaseRequest('DELETE', table, null, '?id=gte.0').catch(async () => {
-          // Fallback: tentar com campo diferente
-          await supabaseRequest('DELETE', table, null, '?created_at=gte.1900-01-01').catch(() => {})
-        })
-
-        // 2. Inserir em lotes de 200
+        // Inserir em lotes de 200
         const batchSize = 200
         let inserted = 0
 
         for (let i = 0; i < rows.length; i += batchSize) {
           const batch = rows.slice(i, i + batchSize)
+          // Usar upsert por segurança caso o DELETE tenha falhado para alguns registros
           await supabaseRequest('POST', table, batch)
           inserted += batch.length
         }
 
-        log(`  ✓ ${table}: ${inserted} registros`)
+        log(`  ✓ ${table}: ${inserted} registros enviados`)
         results[table] = { inserted }
       } catch (err) {
         log(`  ✗ ${table}: ${err.message}`)
