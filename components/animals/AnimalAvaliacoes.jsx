@@ -33,14 +33,9 @@ const SCHEMES = {
 function ProcriarBlock({ animal }) {
   const s = SCHEMES.orange
   const [isExpanded, setIsExpanded] = useState(true)
-  const hasData =
-    animal.pub_classe ||
-    animal.pub_classif != null ||
-    animal.pub_grupo ||
-    animal.pub_idade != null ||
-    animal.pub_pct_media != null
-
-  if (!hasData) return null
+  // Não ocultar o bloco em ambientes onde o backend pode retornar campos nulos
+  // (ex: diferenças entre localhost e Vercel). Se faltar dado, apenas os campos
+  // internos não renderizam.
 
   const classeColor = {
     'SUPERPRECOCE': 'bg-amber-400 text-black',
@@ -130,9 +125,8 @@ function ProcriarBlock({ animal }) {
 
 function EvalBlock({ logo, sublogo, color, cols, rows }) {
   const s = SCHEMES[color]
-  const hasData = rows.some(r => Object.values(r.vals).some(val => val && val !== '—'))
-
-  if (!hasData) return null
+  // Não ocultar o bloco quando não houver dados no backend (ex: divergência
+  // entre ambientes). As células vão exibir '—' quando não tiver valor.
 
   return (
     <div className={`rounded-xl border ${s.border} overflow-hidden`}>
