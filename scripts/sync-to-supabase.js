@@ -66,6 +66,50 @@ async function syncToSupabase(onProgress) {
     log('✓ Supabase OK')
 
     const results = {}
+    const forbiddenColumnsByTable = new Map()
+
+    /**
+     * O PostgREST (Supabase) pode retornar erro PGRST204 quando a carga contém colunas
+     * que existem no banco local mas não existem no schema remoto (ex: gp_ipp_dep).
+     *
+     * Para evitar que uma única coluna incompatível derrube toda a tabela, a gente
+     * remove automaticamente a(s) coluna(s) faltante(s) do lote e tenta novamente.
+     */
+    async function postBatchWithSanitization(table, batch) {
+      if (!forbiddenColumnsByTable.has(table)) forbiddenColumnsByTable.set(table, new Set())
+      const forbidden = forbiddenColumnsByTable.get(table)
+
+      // tenta até 5 vezes removendo colunas faltantes progressivamente
+      for (let attempt = 0; attempt < 5; attempt++) {
+        // remove todas as colunas já conhecidas como inválidas
+        if (forbidden.size > 0) {
+          for (const row of batch) {
+            for (const col of forbidden) delete row[col]
+          }
+        }
+
+        try {
+          await supabaseRequest('POST', table, batch)
+          return
+        } catch (err) {
+          const message = err?.message || ''
+          const m = message.match(/Could not find the '([^']+)' column of '([^']+)' in the schema cache/)
+          if (!m) throw err
+
+          const missingCol = m[1]
+          const missingTable = m[2]
+          if (missingTable !== table) throw err
+
+          if (!forbidden.has(missingCol)) {
+            forbidden.add(missingCol)
+            log(`  ⚠ ${table}: coluna desconhecida no Supabase removida do lote (${missingCol})`)
+          } else {
+            // se já removemos essa coluna e continua falhando, não há o que tentar
+            throw err
+          }
+        }
+      }
+    }
 
     // 1. Limpar TODAS as tabelas remotas primeiro (ordem REVERSA para FK)
     log('\n🧹 Limpando dados remotos (ordem reversa)...')
@@ -114,7 +158,7 @@ async function syncToSupabase(onProgress) {
         for (let i = 0; i < rows.length; i += batchSize) {
           const batch = rows.slice(i, i + batchSize)
           // Usar upsert por segurança caso o DELETE tenha falhado para alguns registros
-          await supabaseRequest('POST', table, batch)
+          await postBatchWithSanitization(table, batch)
           inserted += batch.length
         }
 
