@@ -572,9 +572,13 @@ export default async function handler(req, res) {
     stats.abas.push({ nome: ws.name, tipo, registros: dados.length, atualizados: stats.atualizados - antes })
   }
 
+  const hasErrors = (stats.erros?.length || 0) > 0
+
   return res.status(200).json({
-    success: true,
-    message: `${stats.atualizados} animal(is) atualizado(s) em ${stats.abas.filter(a => a.tipo !== 'ignorada').length} aba(s).`,
+    success: !hasErrors,
+    message: hasErrors
+      ? `${stats.atualizados} animal(is) atualizados, porém ${stats.erros.length} erro(s) ocorreram (ver campo "erros").`
+      : `${stats.atualizados} animal(is) atualizado(s) em ${stats.abas.filter(a => a.tipo !== 'ignorada').length} aba(s).`,
     abas: stats.abas,
     naoEncontrados: stats.naoEncontrados.length,
     erros: stats.erros.length,

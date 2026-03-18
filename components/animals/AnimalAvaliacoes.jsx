@@ -226,7 +226,8 @@ export default function AnimalAvaliacoes({ animal }) {
   // ── PMGZ ─────────────────────────────────────────────────────────────────────
   const pmgzCols = PMGZ_TRAITS.map(t => ({ key: t.key, label: t.label }))
   const pmgzRows = [
-    { label: 'DEP',  vals: Object.fromEntries(PMGZ_TRAITS.map(t => [t.key, v(animal[`pmgz_${t.key}_dep`])])) },
+    // DEP (Excel costuma exibir 3 casas)
+    { label: 'DEP',  vals: Object.fromEntries(PMGZ_TRAITS.map(t => [t.key, v(animal[`pmgz_${t.key}_dep`], 3)])) },
     { label: 'DECA', vals: Object.fromEntries(PMGZ_TRAITS.map(t => [t.key, v(animal[`pmgz_${t.key}_deca`], 0)])) },
     { label: '%P',   vals: Object.fromEntries(PMGZ_TRAITS.map(t => [t.key, v(animal[`pmgz_${t.key}_pct`], 1)])) },
   ]
@@ -266,30 +267,30 @@ export default function AnimalAvaliacoes({ animal }) {
       vals: {
         iqg: v(animal.iqg, 3),
         pt_iqg: v(animal.pt_iqg, 1),
-        pn_kg: v(animal.gp_pn_kg, 2),
+        pn_kg: v(animal.gp_pn_kg, 3),
         pn_pt: v(animal.gp_pn_pt, 1),
-        p120_kg_em: v(animal.gp_p120_kg_em, 2),
+        p120_kg_em: v(animal.gp_p120_kg_em, 3),
         p120_pt: v(animal.gp_p120_pt, 1),
-        p2_kg: v(animal.gp_p2_kg, 2),
+        p2_kg: v(animal.gp_p2_kg, 3),
         p2_pt: v(animal.gp_p2_pt, 1),
-        p5_kg: v(animal.gp_p5_kg, 2),
+        p5_kg: v(animal.gp_p5_kg, 3),
         p5_pt: v(animal.gp_p5_pt, 1),
-        hp_stay_pct: v(animal.gp_hp_stay_pct, 2),
+        hp_stay_pct: v(animal.gp_hp_stay_pct, 3),
         hp_stay_pt: v(animal.gp_hp_stay_pt, 1),
-        ipp_01em: v(animal.gp_ipp_01em, 2),
+        ipp_01em: v(animal.gp_ipp_01em, 3),
         ipp_pt: v(animal.gp_ipp_pt, 1),
-        ipp_dias: v(animal.gp_ipp_dias, 2),
+        ipp_dias: v(animal.gp_ipp_dias, 3),
         ipp_dias_pt: v(animal.gp_ipp_dias_pt, 1),
-        pfp30_pct: v(animal.gp_pfp30_pct, 2),
+        pfp30_pct: v(animal.gp_pfp30_pct, 3),
         pfp30_pt: v(animal.gp_pfp30_pt, 1),
-        rd_pct: v(animal.gp_rd_pct, 2),
+        rd_pct: v(animal.gp_rd_pct, 3),
         rd_pt: v(animal.gp_rd_pt, 1),
-        aol_cm2: v(animal.gp_aol_cm2, 2),
+        aol_cm2: v(animal.gp_aol_cm2, 3),
         aol_pt: v(animal.gp_aol_pt, 1),
-        egs_01mm: v(animal.gp_egs_01mm, 2),
+        egs_01mm: v(animal.gp_egs_01mm, 3),
         egs_pt: v(animal.gp_egs_pt, 1),
         mar_pct: v(animal.gp_mar_pct, 3),
-        mar_pt: v(animal.gp_mar_pt, 0),
+        mar_pt: v(animal.gp_mar_pt, 1),
       }
     }
   ]
@@ -309,17 +310,17 @@ export default function AnimalAvaliacoes({ animal }) {
     { key: 'dacab', label: 'DACAB' },
   ]
   const ancpDepVals = {
-    mgte:  v(animal.mgte),
-    d3p:   v(animal.ancp_d3p),
-    dipp:  v(animal.ancp_dipp),
-    dpe365:v(animal.ancp_dpe365),
-    dpn:   v(animal.ancp_dpn),
-    dstay: v(animal.ancp_dstay),
-    mp120: v(animal.ancp_mp120),
-    mp210: v(animal.ancp_mp210),
-    dp450: v(animal.ancp_dp450),
-    daol:  v(animal.ancp_daol),
-    dacab: v(animal.ancp_dacab),
+    mgte:  v(animal.mgte, 2),
+    d3p:   v(animal.ancp_d3p, 2),
+    dipp:  v(animal.ancp_dipp, 3),
+    dpe365:v(animal.ancp_dpe365, 3),
+    dpn:   v(animal.ancp_dpn, 3),
+    dstay: v(animal.ancp_dstay, 2),
+    mp120: v(animal.ancp_mp120, 3),
+    mp210: v(animal.ancp_mp210, 3),
+    dp450: v(animal.ancp_dp450, 3),
+    daol:  v(animal.ancp_daol, 3),
+    dacab: v(animal.ancp_dacab, 3),
   }
   const ancpTopVals = {
     mgte:  v(animal.top, 0),
