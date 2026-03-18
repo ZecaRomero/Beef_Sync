@@ -14,7 +14,7 @@ function formatCurrency(v) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(parseFloat(v))
 }
 
-export default function AnimalMetricsCards({ animal, metrics, rankings, onScrollTo, sexTheme = 'neutral' }) {
+export default function AnimalMetricsCards({ animal, metrics, rankings, semenResumo, onScrollTo, sexTheme = 'neutral' }) {
   if (!animal || !metrics) return null
 
   const {
@@ -32,8 +32,13 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
     diasNaFazenda,
     isPrenha, diasGestacao, diasParaParto, gestacaoProgress,
     totalIAs, taxaSucessoIA, mediaOocitos,
-    isMacho, isFemea
+    isMacho, isFemea,
   } = metrics
+
+  const totalDosesSemen =
+    semenResumo?.totalDosesDisponiveis ??
+    metrics?.semenResumo?.totalDosesDisponiveis ??
+    null
 
   // Exibir previsão de parto apenas se estiver prenha
   const previsaoPartoExibir = isPrenha && diasParaParto != null
@@ -252,6 +257,17 @@ export default function AnimalMetricsCards({ animal, metrics, rankings, onScroll
             </p>
           )}
         </button>
+      )}
+
+      {/* Sêmen disponível (Touros com estoque) */}
+      {isMacho && totalDosesSemen > 0 && (
+        <div className={`bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-lg p-3 border border-emerald-300 dark:border-emerald-600 text-center w-full cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 hover:shadow-md ${shadowAccent}`}>
+          <div className="flex items-center justify-center mb-0.5">
+            <span className="text-lg">🧊</span>
+          </div>
+          <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{totalDosesSemen}</p>
+          <p className="text-xs text-gray-600 dark:text-gray-400">doses sêmen em estoque</p>
+        </div>
       )}
 
       {/* TOP */}

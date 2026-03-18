@@ -152,34 +152,32 @@ function EvalBlock({ logo, sublogo, color, cols, rows }) {
         </div>
 
         {/* Tabela */}
-        <div className={`flex-1 ${s.bg} min-w-0`}>
-          <div className="relative">
-            <div className="overflow-x-auto overflow-y-hidden eval-scrollbar pb-2" style={{ WebkitOverflowScrolling: 'touch' }}>
-              <table className="border-collapse text-xs" style={{ minWidth: 'max-content' }}>
-                <thead>
-                  <tr>
-                    <th className={`px-1.5 py-1.5 text-left ${s.row} font-bold text-[10px] border-b ${s.border} sticky left-0 ${s.bg} z-10`} />
+        <div className={`${s.bg}`} style={{ flex: '1 1 0%', minWidth: 0, overflow: 'hidden' }}>
+          <div style={{ overflowX: 'auto', overflowY: 'hidden', WebkitOverflowScrolling: 'touch', paddingBottom: '8px' }} className="eval-scrollbar">
+            <table className="border-collapse text-xs" style={{ width: 'max-content', minWidth: '100%' }}>
+              <thead>
+                <tr>
+                  <th className={`px-1.5 py-1.5 text-left ${s.row} font-bold text-[10px] border-b ${s.border} sticky left-0 ${s.bg} z-10`} />
+                  {cols.map(c => (
+                    <th key={c.key} className={`px-1.5 py-1.5 text-center ${s.head} font-bold text-[10px] border-b ${s.border} whitespace-nowrap`}>
+                      {c.label}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row, ri) => (
+                  <tr key={ri} className={ri % 2 === 1 ? 'bg-white/5' : ''}>
+                    <td className={`px-1.5 py-1.5 font-black ${s.row} text-[10px] whitespace-nowrap sticky left-0 ${s.bg} z-10`}>{row.label}</td>
                     {cols.map(c => (
-                      <th key={c.key} className={`px-1.5 py-1.5 text-center ${s.head} font-bold text-[10px] border-b ${s.border} whitespace-nowrap`}>
-                        {c.label}
-                      </th>
+                      <td key={c.key} className="px-1.5 py-1.5 text-center text-[11px] font-semibold text-white whitespace-nowrap">
+                        {row.vals[c.key] ?? '—'}
+                      </td>
                     ))}
                   </tr>
-                </thead>
-                <tbody>
-                  {rows.map((row, ri) => (
-                    <tr key={ri} className={ri % 2 === 1 ? 'bg-white/5' : ''}>
-                      <td className={`px-1.5 py-1.5 font-black ${s.row} text-[10px] whitespace-nowrap sticky left-0 ${s.bg} z-10`}>{row.label}</td>
-                      {cols.map(c => (
-                        <td key={c.key} className="px-1.5 py-1.5 text-center text-[11px] font-semibold text-white whitespace-nowrap">
-                          {row.vals[c.key] ?? '—'}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

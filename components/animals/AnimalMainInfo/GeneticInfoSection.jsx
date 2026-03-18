@@ -65,44 +65,7 @@ export default function GeneticInfoSection({ animal, rankings, onEditGenetica })
 
   return (
     <>
-      {/* ── Puberdade ── */}
-      {(animal.pub_classe || animal.pub_grupo) && (
-        <div className="border-t border-orange-100 dark:border-orange-800/30">
-          <div className="px-4 py-2 bg-orange-50/60 dark:bg-orange-900/10">
-            <p className="text-xs font-bold uppercase tracking-wider text-orange-700 dark:text-orange-400">Puberdade</p>
-          </div>
-          {animal.pub_classe && (
-            <div className="px-4 py-2 flex justify-between items-center border-t border-orange-100/60 dark:border-orange-800/20">
-              <span className="text-sm font-medium text-orange-800 dark:text-orange-200">Classe</span>
-              <span className="text-sm font-bold text-orange-600 dark:text-orange-400">{animal.pub_classe}</span>
-            </div>
-          )}
-          {(animal.pub_grupo) && (
-            <div className="px-4 py-2 flex justify-between items-center border-t border-orange-100/60 dark:border-orange-800/20">
-              <span className="text-sm font-medium text-orange-800 dark:text-orange-200">Grupo</span>
-              <span className="text-sm font-bold text-orange-600 dark:text-orange-400">{animal.pub_grupo}</span>
-            </div>
-          )}
-          {(animal.pub_idade != null) && (
-            <div className="px-4 py-2 flex justify-between items-center border-t border-orange-100/60 dark:border-orange-800/20">
-              <span className="text-sm font-medium text-orange-800 dark:text-orange-200">Idade</span>
-              <span className="text-sm font-bold text-orange-600 dark:text-orange-400">{animal.pub_idade} meses</span>
-            </div>
-          )}
-          {(animal.pub_pct_media != null) && (
-            <div className="px-4 py-2 flex justify-between items-center border-t border-orange-100/60 dark:border-orange-800/20">
-              <span className="text-sm font-medium text-orange-800 dark:text-orange-200">% Média</span>
-              <span className="text-sm font-bold text-orange-600 dark:text-orange-400">{animal.pub_pct_media}%</span>
-            </div>
-          )}
-          {(animal.pub_classif != null) && (
-            <div className="px-4 py-2 flex justify-between items-center border-t border-orange-100/60 dark:border-orange-800/20">
-              <span className="text-sm font-medium text-orange-800 dark:text-orange-200">Classificação</span>
-              <span className="text-sm font-bold text-orange-600 dark:text-orange-400">{animal.pub_classif}º</span>
-            </div>
-          )}
-        </div>
-      )}
+      {/* Puberdade removida da visualização desta seção (mantida apenas onde você pediu). */}
 
       <InfoRow label="Brinco" value={animal.brinco} />
       <InfoRow label="Tatuagem" value={animal.tatuagem} />

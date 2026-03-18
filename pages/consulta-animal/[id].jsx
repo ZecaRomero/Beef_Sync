@@ -65,7 +65,8 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
     ocorrencias,
     transferencias,
     inseminacoes,
-    metrics
+    metrics,
+    semenResumo,
   } = useAnimalDetails(id)
 
   const filhosCombinados = useMemo(() => {
@@ -347,7 +348,14 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
 
         <div className="max-w-lg mx-auto p-3 sm:p-4 space-y-3">
           <div className="animate-fade-in-stagger-1">
-            <AnimalMetricsCards animal={animal} metrics={metrics} rankings={rankings} onScrollTo={scrollToSection} sexTheme={sexTheme} />
+            <AnimalMetricsCards
+              animal={animal}
+              metrics={metrics}
+              rankings={rankings}
+              semenResumo={semenResumo}
+              onScrollTo={scrollToSection}
+              sexTheme={sexTheme}
+            />
           </div>
 
           {/* Régua de avaliações — logo após os cards */}

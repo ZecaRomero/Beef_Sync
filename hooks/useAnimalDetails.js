@@ -19,6 +19,7 @@ export function useAnimalDetails(id) {
   const [maeColetas, setMaeColetas] = useState(null)
   const [baixasResumo, setBaixasResumo] = useState(null) // { baixaPropria, resumoMae }
   const [baixasMae, setBaixasMae] = useState(null) // resumo de baixas da mãe (exibido na ficha do filho)
+  const [semenResumo, setSemenResumo] = useState(null)
 
   // Ref para controlar se componente ainda está montado (evitar setState após unmount)
   const mountedRef = useRef(true)
@@ -96,6 +97,36 @@ export function useAnimalDetails(id) {
         
         // Buscas paralelas secundárias
         const fetchPromises = []
+
+        // Estoque de sêmen disponível para este touro (se tiver RG)
+        if (a.rg) {
+          const normRg = (v) => String(v || '').trim().replace(/^0+/, '') || '0'
+          const alvoRg = normRg(a.rg)
+          fetchPromises.push(
+            fetch('/api/semen/available')
+              .then(r => r.ok ? r.json() : { data: [] })
+              .then(d => {
+                const lista = Array.isArray(d.data ?? d) ? (d.data ?? d) : []
+                const matches = lista.filter(item => {
+                  const rgTouro = item.rg_touro || item.rgTouro || null
+                  return rgTouro && normRg(rgTouro) === alvoRg
+                })
+                if (!matches.length) {
+                  setSemenResumo(null)
+                  return
+                }
+                const totalDosesDisponiveis = matches.reduce((sum, item) => {
+                  const v = parseInt(item.doses_disponiveis ?? item.dosesDisponiveis ?? 0)
+                  return sum + (Number.isFinite(v) ? v : 0)
+                }, 0)
+                setSemenResumo({
+                  totalDosesDisponiveis,
+                  registros: matches,
+                })
+              })
+              .catch(() => setSemenResumo(null))
+          )
+        }
         
         // Exames Andrológicos (apenas machos)
         const isMacho = animalAjustado.sexo && (String(animalAjustado.sexo).toLowerCase().includes('macho') || animalAjustado.sexo === 'M')
@@ -618,6 +649,7 @@ export function useAnimalDetails(id) {
       mesesIdade, anosIdade, idadeDias, diasAdicionais,
       diasNaFazenda,
       isMacho, isFemea,
+      semenResumo,
       custoTotal, custosArray,
       temBrucelose, elegivelBrucelose, precisaBrucelose, janelaEncerrada,
       temDGT, elegivelDGT, janelaEncerradaDGT, precisaDGT,
@@ -648,6 +680,7 @@ export function useAnimalDetails(id) {
     baixasMae,
     rankings,
     // Métricas calculadas
-    metrics
+    metrics,
+    semenResumo,
   }
 }
