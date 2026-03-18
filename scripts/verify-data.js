@@ -16,7 +16,7 @@ async function run() {
       pub_classe, pub_grupo, pub_classif,
       carc_aol, carc_mar, carc_egs, carc_picanha,
       pmgz_pn_dep, pmgz_pd_dep, pmgz_pa_dep
-    FROM animais WHERE serie='CJCJ' AND rg='16974' LIMIT 1
+    FROM animais WHERE serie='CJCJ' AND rg='16141' LIMIT 1
   `)
   console.log(JSON.stringify(r.rows[0], null, 2))
   await pool.end()
