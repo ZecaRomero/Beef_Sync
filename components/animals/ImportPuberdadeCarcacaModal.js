@@ -78,7 +78,16 @@ export default function ImportPuberdadeCarcacaModal({ isOpen, onClose, onSuccess
       const fd = new FormData()
       fd.append('file', arquivo)
       const res = await fetch('/api/import/excel-avaliacao-completa', { method: 'POST', body: fd })
-      const json = await res.json()
+      // Se a API devolver HTML/texto (ex: erro 500 do Vercel), `res.json()` quebra com
+      // "Unexpected token '<'/'A'". Então tentamos converter com segurança.
+      const raw = await res.text()
+      let json = null
+      try {
+        json = raw ? JSON.parse(raw) : null
+      } catch (_) {
+        // Mantém fallback para o usuário ver o erro real que veio no corpo da resposta.
+        throw new Error(raw?.slice(0, 500) || `Resposta não-JSON (HTTP ${res.status})`)
+      }
       setResultado(json)
       if (json.success) {
         const abasMsgs = (json.abas || []).filter(a => a.tipo !== 'ignorada').map(a => `• ${a.nome}: ${a.atualizados} animais`).join('\n')
@@ -89,7 +98,7 @@ export default function ImportPuberdadeCarcacaModal({ isOpen, onClose, onSuccess
         alert(`❌ Erro: ${json.error}`)
       }
     } catch (e) {
-      alert(`❌ Erro: ${e.message}`)
+      alert(`❌ Erro: ${e?.message || String(e)}`)
     } finally {
       setImportando(false)
     }

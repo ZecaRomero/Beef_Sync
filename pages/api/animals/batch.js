@@ -98,20 +98,28 @@ export default asyncHandler(async function handler(req, res) {
     // Validar que série e RG existem e não são vazios
     if (!animal.serie || !animal.rg) {
       console.error(`❌ Animal ${i + 1} inválido:`, animal)
-      return sendValidationError(res, `Animal ${i + 1}: Série e RG são obrigatórios`, {
-        required: ['serie', 'rg'],
-        animal_index: i + 1,
-        animal_recebido: animal
-      })
+      return sendValidationError(
+        res,
+        {
+          required: ['serie', 'rg'],
+          animal_index: i + 1,
+          animal_recebido: animal,
+        },
+        `Animal ${i + 1}: Série e RG são obrigatórios`
+      )
     }
     
     // Validar que série e RG não contêm apenas espaços
     if (animal.serie.trim() === '' || animal.rg.trim() === '') {
       console.error(`❌ Animal ${i + 1} com série ou RG vazio:`, animal)
-      return sendValidationError(res, `Animal ${i + 1}: Série e RG não podem ser vazios`, {
-        required: ['serie', 'rg'],
-        animal_index: i + 1
-      })
+      return sendValidationError(
+        res,
+        {
+          required: ['serie', 'rg'],
+          animal_index: i + 1,
+        },
+        `Animal ${i + 1}: Série e RG não podem ser vazios`
+      )
     }
     
     // Log do animal sanitizado

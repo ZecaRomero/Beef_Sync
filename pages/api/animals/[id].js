@@ -1,7 +1,7 @@
-import databaseService from '../../../services/databaseService'
-import logger from '../../../utils/logger'
-import { asyncHandler } from '../../../utils/apiResponse'
-import { broadcast } from '../../../lib/sseClients'
+import { broadcast } from '../../../lib/sseClients';
+import databaseService from '../../../services/databaseService';
+import { asyncHandler } from '../../../utils/apiResponse';
+import logger from '../../../utils/logger';
 
 // Função auxiliar de log
 function debugLog(msg) {
@@ -9,16 +9,15 @@ function debugLog(msg) {
   console.log(`[DEBUG-ANIMAL-API] ${msg}`);
 }
 
-import { 
-  sendSuccess, 
-  sendValidationError, 
-  sendConflict, 
-  sendNotFound, 
-  sendMethodNotAllowed,
-  sendForbidden
-} from '../../../utils/apiResponse'
-import { canDelete } from '../../../utils/permissions'
-import { RACAS_POR_SERIE as racasPorSerie } from '../../../utils/constants'
+import {
+    sendForbidden,
+    sendMethodNotAllowed,
+    sendNotFound,
+    sendSuccess,
+    sendValidationError
+} from '../../../utils/apiResponse';
+import { RACAS_POR_SERIE as racasPorSerie } from '../../../utils/constants';
+import { canDelete } from '../../../utils/permissions';
 
 // Função para criar nota fiscal de saída automaticamente
 async function criarNotaFiscalSaidaAutomatica(animal) {
@@ -265,6 +264,39 @@ async function handleGet(req, res, id) {
               if (r8.rows.length > 0) result = r8
             }
             debugLog(`Tentativa 8 (rg variantes): ${result.rows.length} encontrados`)
+          } catch (_) {}
+        }
+
+        // Tentativa 9: typo comum I↔J na série (ex: CICI → CJCJ, CJCI → CJCJ)
+        if (result.rows.length === 0 && serieBusca && serieBusca.length >= 2) {
+          try {
+            const serieUpper = serieBusca.toUpperCase()
+            const variantes = new Set()
+            // Trocar todos I→J
+            if (serieUpper.includes('I')) variantes.add(serieUpper.replace(/I/g, 'J'))
+            // Trocar todos J→I
+            if (serieUpper.includes('J')) variantes.add(serieUpper.replace(/J/g, 'I'))
+            // Trocar individualmente cada I↔J (para séries mistas como CJCI)
+            for (let i = 0; i < serieUpper.length; i++) {
+              if (serieUpper[i] === 'I') {
+                variantes.add(serieUpper.slice(0, i) + 'J' + serieUpper.slice(i + 1))
+              } else if (serieUpper[i] === 'J') {
+                variantes.add(serieUpper.slice(0, i) + 'I' + serieUpper.slice(i + 1))
+              }
+            }
+            variantes.delete(serieUpper) // remover a original
+            for (const serieAlt of variantes) {
+              if (result.rows.length > 0) break
+              const r9 = await query(
+                `SELECT id, serie, rg FROM animais 
+                 WHERE UPPER(TRIM(COALESCE(serie, ''))) = UPPER(TRIM($1)) 
+                   AND COALESCE(NULLIF(REGEXP_REPLACE(TRIM(rg::text), '^0+', ''), ''), '0') = $2
+                 LIMIT 1`,
+                [serieAlt, rgBusca]
+              )
+              if (r9.rows.length > 0) result = r9
+            }
+            debugLog(`Tentativa 9 (typo I↔J série): ${result.rows.length} encontrados`)
           } catch (_) {}
         }
 
