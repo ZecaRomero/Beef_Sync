@@ -1,5 +1,12 @@
-import { createTables } from '../../../lib/database'
+// lib/database.js é CommonJS; para evitar problemas com named exports em ESM,
+// usamos require para pegar a função createTables.
+const { createTables } = require('../../../lib/database')
 import { sendSuccess, sendError, sendMethodNotAllowed, asyncHandler, HTTP_STATUS } from '../../../utils/apiResponse'
+
+export const config = {
+  api: { externalResolver: true },
+  maxDuration: 300,
+}
 
 async function handler(req, res) {
   const { method } = req

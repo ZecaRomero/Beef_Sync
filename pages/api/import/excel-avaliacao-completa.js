@@ -14,8 +14,12 @@ import ExcelJS from 'exceljs'
 import formidable from 'formidable'
 import fs from 'fs'
 import { query } from '../../../lib/database'
+// lib/database.js é CommonJS; evitar named import de createTables.
+const { createTables } = require('../../../lib/database')
 
-export const config = { api: { bodyParser: false } }
+export const config = { api: { bodyParser: false }, maxDuration: 300 }
+
+// Observação: maxDuration evita timeout durante alterações de schema.
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 function cellVal(cell) {
@@ -76,7 +80,7 @@ function sheetToRows(ws) {
 }
 
 // Encontra o índice da linha (0-based) que contém "SERIE E RG" na primeira coluna
-function findHeaderRow(rows, maxSearch = 6) {
+function findHeaderRow(rows, maxSearch = 20) {
   for (let i = 0; i < Math.min(rows.length, maxSearch); i++) {
     const col1 = toStr(cellVal({ value: rows[i][1] })) || ''
     if (col1.toUpperCase().includes('SERIE') || col1.toUpperCase().includes('RG')) return i
@@ -539,6 +543,10 @@ export default async function handler(req, res) {
 
   const file = Array.isArray(files.file) ? files.file[0] : files.file
   if (!file) return res.status(400).json({ error: 'Nenhum arquivo enviado' })
+
+  // Garante que as colunas (pub_*, carc_*, pmgz_*, gp_*, ancp_*) existam no banco
+  // antes de tentar UPDATE. Isso evita cenário onde o banco remoto está com schema antigo.
+  await createTables()
 
   const wb = new ExcelJS.Workbook()
   try {
