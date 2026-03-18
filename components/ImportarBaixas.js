@@ -1,13 +1,15 @@
 import React, { useState } from 'react'
 import {
-  DocumentArrowUpIcon,
   CheckCircleIcon,
+  DocumentArrowUpIcon,
   XCircleIcon,
 } from '@heroicons/react/24/outline'
+import ImportProgressOverlay from './ImportProgressOverlay'
 
 export default function ImportarBaixas({ onImportComplete }) {
   const [arquivo, setArquivo] = useState(null)
   const [importando, setImportando] = useState(false)
+  const [progress, setProgress] = useState(null)
   const [resultado, setResultado] = useState(null)
   const [erro, setErro] = useState(null)
 
@@ -35,19 +37,25 @@ export default function ImportarBaixas({ onImportComplete }) {
     setImportando(true)
     setErro(null)
     setResultado(null)
+    setProgress({ atual: 0, total: 100, etapa: 'Processando arquivo' })
 
     try {
       const formData = new FormData()
       formData.append('file', arquivo)
+
+      setProgress({ atual: 30, total: 100, etapa: 'Enviando dados' })
 
       const res = await fetch('/api/import/baixas', {
         method: 'POST',
         body: formData,
       })
 
+      setProgress({ atual: 70, total: 100, etapa: 'Importando baixas' })
+
       const data = await res.json()
 
       if (res.ok && data.success) {
+        setProgress({ atual: 100, total: 100, etapa: 'Concluído' })
         setResultado(data.resultados)
         setArquivo(null)
         const el = document.getElementById('baixas-file-input'); if (el) el.value = ''
@@ -60,11 +68,14 @@ export default function ImportarBaixas({ onImportComplete }) {
       setErro('Erro ao processar arquivo. Verifique o formato e tente novamente.')
     } finally {
       setImportando(false)
+      setProgress(null)
     }
   }
 
   return (
     <div className="space-y-4">
+      <ImportProgressOverlay importando={importando} progress={progress} />
+
       <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
         <h3 className="font-semibold text-amber-900 dark:text-amber-200 mb-2">📋 Formato do Excel (cabeçalhos em amarelo)</h3>
         <p className="text-sm text-amber-800 dark:text-amber-300 mb-2">

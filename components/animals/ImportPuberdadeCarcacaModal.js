@@ -4,8 +4,9 @@
  *   1) Upload do Excel COMPLETO (5 abas: PROCRIAR, DGT, GENEPLUS, ANCP, PMGZ) — importa tudo de uma vez
  *   2) Cole diretamente do Excel (aba a aba)
  */
-import React, { useState, useMemo } from 'react'
-import { XMarkIcon, DocumentArrowUpIcon, ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
+import { ClipboardDocumentListIcon, DocumentArrowUpIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { useMemo, useState } from 'react'
+import ImportProgressOverlay from '../ImportProgressOverlay'
 
 const FORMATOS = {
   puberdade: {
@@ -63,6 +64,7 @@ export default function ImportPuberdadeCarcacaModal({ isOpen, onClose, onSuccess
   const [texto, setTexto] = useState('')
   const [arquivo, setArquivo] = useState(null)
   const [importando, setImportando] = useState(false)
+  const [progress, setProgress] = useState(null)
   const [resultado, setResultado] = useState(null)
 
   const fmt = FORMATOS[tipo]
@@ -142,7 +144,9 @@ export default function ImportPuberdadeCarcacaModal({ isOpen, onClose, onSuccess
   const c = colorMap[fmt.color]
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+    <>
+      <ImportProgressOverlay importando={importando} progress={progress} />
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
@@ -291,5 +295,6 @@ export default function ImportPuberdadeCarcacaModal({ isOpen, onClose, onSuccess
         </div>
       </div>
     </div>
+    </>
   )
 }

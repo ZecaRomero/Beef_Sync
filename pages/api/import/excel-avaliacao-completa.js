@@ -10,8 +10,8 @@
  *   PMGZ      → DEP/DECA por trait (PN-Edg, PD-Edg, etc.)
  */
 
-import formidable from 'formidable'
 import ExcelJS from 'exceljs'
+import formidable from 'formidable'
 import fs from 'fs'
 import { query } from '../../../lib/database'
 
@@ -47,10 +47,24 @@ function toNum(v) {
 function parseSerieRg(raw) {
   if (!raw) return null
   const s = String(raw).trim()
+  
+  // Ex: "CJCJ 16974" ou "CJCJ   16974"
   const m = s.match(/^([A-Za-z]+)\s+(\d+)$/)
   if (m) return { serie: m[1].toUpperCase(), rg: m[2] }
+  
+  // Ex: "CJCJ-16974"
   const m2 = s.match(/^([A-Za-z]+)-(\d+)$/)
   if (m2) return { serie: m2[1].toUpperCase(), rg: m2[2] }
+  
+  // Ex: "CJCJ16974" (sem espaço)
+  const m3 = s.match(/^([A-Za-z]+)(\d+)$/)
+  if (m3) return { serie: m3[1].toUpperCase(), rg: m3[2] }
+  
+  // Se for só número (sem série), vamos retornar a série como null para tentar fallback se necessário,
+  // ou no caso do import, se a série é obrigatória, talvez não passe. Mas vamos extrair o RG.
+  const m4 = s.match(/^(\d+)$/)
+  if (m4) return { serie: '', rg: m4[1] }
+
   return null
 }
 
@@ -143,57 +157,117 @@ function parseCarcaca(ws) {
   return result
 }
 
-// ── GENEPLUS – IQGg Básico + Pt IQGg Básico ──────────────────────────────────
-// Header está na linha 3 (row index 2): SERIE E RG | IQGg Básico | Pt IQGg Básico | Dep | Acc | Pt | ...
+// ── GENEPLUS – Todas as colunas (38 colunas) ─────────────────────────────────
+// Header linha 1: SERIE E RG | IQGg Básico | Pt IQGg Básico | PN(Kg) | Acc | Pt | P120(Kg)EM | Acc | Pt | ...
 function parseGeneplus(ws) {
   const rows = sheetToRows(ws)
   const hi = findHeaderRow(rows)
   const hdr = rows[hi]
 
-  // col 2 = IQGg Básico, col 3 = Pt IQGg Básico (posições fixas nesta planilha)
-  // Mas também tentamos encontrar por nome
-  let iIQG = findCol(hdr, 'IQGG BASICO', 'IQGg BASICO', 'IQGG B', 'BASICO')
-  let iPt  = findCol(hdr, 'PT IQGG', 'PT IQGg', 'PT IQG')
-  // fallback posição fixa se não achou por nome
-  if (iIQG < 0) iIQG = 2
-  if (iPt  < 0) iPt  = 3
-
+  // Mapeamento de colunas (posição fixa baseada no Excel)
+  // Coluna A = 1 (SERIE E RG)
+  // Coluna B = 2 (IQGg Básico)
+  // Coluna C = 3 (Pt IQGg Básico)
+  // E assim por diante...
+  
   const result = []
   for (let i = hi + 1; i < rows.length; i++) {
     const r = rows[i]
     const srg = parseSerieRg(cellVal({ value: r[1] }))
     if (!srg) continue
-    const iqg = toNum(cellVal({ value: r[iIQG] }))
-    const pt  = toNum(cellVal({ value: r[iPt] }))
-    if (iqg == null && pt == null) continue
+    
+    const iqg = toNum(cellVal({ value: r[2] }))  // IQGg Básico
+    const pt_iqg = toNum(cellVal({ value: r[3] }))  // Pt IQGg Básico
+    
+    // Se não tem nem IQG nem Pt IQG, pula
+    if (iqg == null && pt_iqg == null) continue
+    
     result.push({
       ...srg,
-      iqg:    iqg != null ? String(iqg) : null,
-      pt_iqg: pt  != null ? String(pt)  : null,
+      iqg: iqg != null ? String(iqg) : null,
+      pt_iqg: pt_iqg != null ? String(pt_iqg) : null,
+      // PN (Kg) - colunas C, D, E
+      gp_pn_kg: toNum(cellVal({ value: r[4] })),
+      gp_pn_acc: toNum(cellVal({ value: r[5] })),
+      gp_pn_pt: toNum(cellVal({ value: r[6] })),
+      // P120 (Kg) EM - colunas F, G, H
+      gp_p120_kg_em: toNum(cellVal({ value: r[7] })),
+      gp_p120_acc: toNum(cellVal({ value: r[8] })),
+      gp_p120_pt: toNum(cellVal({ value: r[9] })),
+      // P2 (Kg) - colunas I, J, K
+      gp_p2_kg: toNum(cellVal({ value: r[10] })),
+      gp_p2_acc: toNum(cellVal({ value: r[11] })),
+      gp_p2_pt: toNum(cellVal({ value: r[12] })),
+      // P5 (Kg) - colunas L, M, N
+      gp_p5_kg: toNum(cellVal({ value: r[13] })),
+      gp_p5_acc: toNum(cellVal({ value: r[14] })),
+      gp_p5_pt: toNum(cellVal({ value: r[15] })),
+      // HP/STAY (%) - colunas O, P, Q
+      gp_hp_stay_pct: toNum(cellVal({ value: r[16] })),
+      gp_hp_stay_acc: toNum(cellVal({ value: r[17] })),
+      gp_hp_stay_pt: toNum(cellVal({ value: r[18] })),
+      // IPP (0,1 em) - colunas R, S, T
+      gp_ipp_01em: toNum(cellVal({ value: r[19] })),
+      gp_ipp_acc: toNum(cellVal({ value: r[20] })),
+      gp_ipp_pt: toNum(cellVal({ value: r[21] })),
+      // IPP (dias) - colunas U, V, W
+      gp_ipp_dias: toNum(cellVal({ value: r[22] })),
+      gp_ipp_dias_acc: toNum(cellVal({ value: r[23] })),
+      gp_ipp_dias_pt: toNum(cellVal({ value: r[24] })),
+      // PFP30 (%) - colunas X, Y, Z
+      gp_pfp30_pct: toNum(cellVal({ value: r[25] })),
+      gp_pfp30_acc: toNum(cellVal({ value: r[26] })),
+      gp_pfp30_pt: toNum(cellVal({ value: r[27] })),
+      // RD (%) - colunas AA, AB, AC
+      gp_rd_pct: toNum(cellVal({ value: r[28] })),
+      gp_rd_acc: toNum(cellVal({ value: r[29] })),
+      gp_rd_pt: toNum(cellVal({ value: r[30] })),
+      // AOL (cm²) - colunas AD, AE, AF
+      gp_aol_cm2: toNum(cellVal({ value: r[31] })),
+      gp_aol_acc: toNum(cellVal({ value: r[32] })),
+      gp_aol_pt: toNum(cellVal({ value: r[33] })),
+      // EGS (0,1 mm) - colunas AG, AH, AI
+      gp_egs_01mm: toNum(cellVal({ value: r[34] })),
+      gp_egs_acc: toNum(cellVal({ value: r[35] })),
+      gp_egs_pt: toNum(cellVal({ value: r[36] })),
+      // MAR (%) - colunas AJ, AK, AL
+      gp_mar_pct: toNum(cellVal({ value: r[37] })),
+      gp_mar_acc: toNum(cellVal({ value: r[38] })),
+      gp_mar_pt: toNum(cellVal({ value: r[39] })),
     })
   }
   return result
 }
 
 // ── ANCP – MGTe, TOP_MGTe e DEPs secundários ─────────────────────────────────
-// Header na linha 1: SERIE E RG | MGTe | TOP_MGTe | D3P | DIPP | TOP_DIPP | ...
+// Header na linha 1: SERIE E RG | MGTe | TOP_MGTe | D3P | TOP | DIPP | TOP | ...
 function parseAncp(ws) {
   const rows = sheetToRows(ws)
   const hi = findHeaderRow(rows)
   const hdr = rows[hi]
 
   const iMGTe   = findCol(hdr, 'MGTE', 'MGTe')
-  const iTOP    = findCol(hdr, 'TOP_MGTE', 'TOPMGTE')
+  const iTOP    = findCol(hdr, 'TOP_MGTE', 'TOPMGTE', 'TOP')
   const iD3P    = findCol(hdr, 'D3P')
+  const iTOP_D3P = findCol(hdr, 'TOP_D3P', 'TOPD3P')
   const iDIPP   = findCol(hdr, 'DIPP')
+  const iTOP_DIPP = findCol(hdr, 'TOP_DIPP', 'TOPDIPP')
   const iDPE365 = findCol(hdr, 'DPE365')
+  const iTOP_DPE365 = findCol(hdr, 'TOP_DPE365', 'TOPDPE365')
   const iDPN    = findCol(hdr, 'DPN')
+  const iTOP_DPN = findCol(hdr, 'TOP_DPN', 'TOPDPN')
   const iDSTAY  = findCol(hdr, 'DSTAY')
+  const iTOP_DSTAY = findCol(hdr, 'TOP_DSTAY', 'TOPDSTAY')
   const iMP120  = findCol(hdr, 'MP120')
+  const iTOP_MP120 = findCol(hdr, 'TOP_MP120', 'TOPMP120')
   const iMP210  = findCol(hdr, 'MP210')
+  const iTOP_MP210 = findCol(hdr, 'TOP_MP210', 'TOPMP210')
   const iDP450  = findCol(hdr, 'DP450')
+  const iTOP_DP450 = findCol(hdr, 'TOP_DP450', 'TOPDP450')
   const iDAOL   = findCol(hdr, 'DAOL')
+  const iTOP_DAOL = findCol(hdr, 'TOP_DAOL', 'TOPDAOL')
   const iDACAB  = findCol(hdr, 'DACAB')
+  const iTOP_DACAB = findCol(hdr, 'TOP_DACAB', 'TOPDACAB')
   const iMAR    = findCol(hdr, 'MAR')
 
   const result = []
@@ -208,17 +282,27 @@ function parseAncp(ws) {
       ...srg,
       mgte:     mgte != null ? String(mgte) : null,
       top:      top  != null ? String(top)  : null,
-      // DEPs ANCP adicionais (armazenados em colunas genéricas futuras)
+      // DEPs ANCP adicionais
       ancp_d3p:    toNum(cellVal({ value: r[iD3P] })),
+      ancp_top_d3p: toNum(cellVal({ value: r[iTOP_D3P] })),
       ancp_dipp:   toNum(cellVal({ value: r[iDIPP] })),
+      ancp_top_dipp: toNum(cellVal({ value: r[iTOP_DIPP] })),
       ancp_dpe365: toNum(cellVal({ value: r[iDPE365] })),
+      ancp_top_dpe365: toNum(cellVal({ value: r[iTOP_DPE365] })),
       ancp_dpn:    toNum(cellVal({ value: r[iDPN] })),
+      ancp_top_dpn: toNum(cellVal({ value: r[iTOP_DPN] })),
       ancp_dstay:  toNum(cellVal({ value: r[iDSTAY] })),
+      ancp_top_dstay: toNum(cellVal({ value: r[iTOP_DSTAY] })),
       ancp_mp120:  toNum(cellVal({ value: r[iMP120] })),
+      ancp_top_mp120: toNum(cellVal({ value: r[iTOP_MP120] })),
       ancp_mp210:  toNum(cellVal({ value: r[iMP210] })),
+      ancp_top_mp210: toNum(cellVal({ value: r[iTOP_MP210] })),
       ancp_dp450:  toNum(cellVal({ value: r[iDP450] })),
+      ancp_top_dp450: toNum(cellVal({ value: r[iTOP_DP450] })),
       ancp_daol:   toNum(cellVal({ value: r[iDAOL] })),
+      ancp_top_daol: toNum(cellVal({ value: r[iTOP_DAOL] })),
       ancp_dacab:  toNum(cellVal({ value: r[iDACAB] })),
+      ancp_top_dacab: toNum(cellVal({ value: r[iTOP_DACAB] })),
       ancp_mar:    toNum(cellVal({ value: r[iMAR] })),
     })
   }
@@ -296,11 +380,37 @@ function detectTipo(name) {
 async function upsertRows(tipo, data, stats) {
   for (const row of data) {
     try {
-      const found = await query(
-        `SELECT id FROM animais WHERE UPPER(serie) = $1 AND rg = $2 LIMIT 1`,
-        [row.serie.toUpperCase(), row.rg]
-      )
-      if (!found.rows.length) { stats.naoEncontrados.push(`${row.serie} ${row.rg}`); continue }
+      let found
+      const serieStr = (row.serie || '').toUpperCase().trim()
+      const rgStr = String(row.rg).trim()
+
+      if (serieStr) {
+        // Busca flexível por série e RG (ignorando zeros à esquerda no RG)
+        found = await query(
+          `SELECT id FROM animais 
+           WHERE UPPER(TRIM(serie)) = $1 
+             AND (TRIM(rg::text) = $2 OR TRIM(LEADING '0' FROM rg::text) = TRIM(LEADING '0' FROM $2)) 
+           LIMIT 1`,
+          [serieStr, rgStr]
+        )
+      } else {
+        // Se só tem RG (sem série), tenta encontrar o animal se houver apenas 1 com esse RG
+        found = await query(
+          `SELECT id FROM animais 
+           WHERE TRIM(rg::text) = $1 OR TRIM(LEADING '0' FROM rg::text) = TRIM(LEADING '0' FROM $1)
+           LIMIT 2`,
+          [rgStr]
+        )
+        // Só aceita se encontrar exatamente 1 animal (para evitar ambiguidade entre séries diferentes)
+        if (found.rows.length !== 1) {
+          found = { rows: [] }
+        }
+      }
+
+      if (!found.rows.length) { 
+        stats.naoEncontrados.push(`${row.serie || ''} ${row.rg}`.trim()); 
+        continue 
+      }
       const id = found.rows[0].id
 
       if (tipo === 'puberdade') {
@@ -315,8 +425,44 @@ async function upsertRows(tipo, data, stats) {
         )
       } else if (tipo === 'geneplus') {
         const sets = []; const vals = []; let idx = 1
-        if (row.iqg    != null) { sets.push(`iqg=$${idx++}`);    vals.push(row.iqg) }
+        if (row.iqg != null) { sets.push(`iqg=$${idx++}`); vals.push(row.iqg) }
         if (row.pt_iqg != null) { sets.push(`pt_iqg=$${idx++}`); vals.push(row.pt_iqg) }
+        if (row.gp_pn_kg != null) { sets.push(`gp_pn_kg=$${idx++}`); vals.push(row.gp_pn_kg) }
+        if (row.gp_pn_acc != null) { sets.push(`gp_pn_acc=$${idx++}`); vals.push(row.gp_pn_acc) }
+        if (row.gp_pn_pt != null) { sets.push(`gp_pn_pt=$${idx++}`); vals.push(row.gp_pn_pt) }
+        if (row.gp_p120_kg_em != null) { sets.push(`gp_p120_kg_em=$${idx++}`); vals.push(row.gp_p120_kg_em) }
+        if (row.gp_p120_acc != null) { sets.push(`gp_p120_acc=$${idx++}`); vals.push(row.gp_p120_acc) }
+        if (row.gp_p120_pt != null) { sets.push(`gp_p120_pt=$${idx++}`); vals.push(row.gp_p120_pt) }
+        if (row.gp_p2_kg != null) { sets.push(`gp_p2_kg=$${idx++}`); vals.push(row.gp_p2_kg) }
+        if (row.gp_p2_acc != null) { sets.push(`gp_p2_acc=$${idx++}`); vals.push(row.gp_p2_acc) }
+        if (row.gp_p2_pt != null) { sets.push(`gp_p2_pt=$${idx++}`); vals.push(row.gp_p2_pt) }
+        if (row.gp_p5_kg != null) { sets.push(`gp_p5_kg=$${idx++}`); vals.push(row.gp_p5_kg) }
+        if (row.gp_p5_acc != null) { sets.push(`gp_p5_acc=$${idx++}`); vals.push(row.gp_p5_acc) }
+        if (row.gp_p5_pt != null) { sets.push(`gp_p5_pt=$${idx++}`); vals.push(row.gp_p5_pt) }
+        if (row.gp_hp_stay_pct != null) { sets.push(`gp_hp_stay_pct=$${idx++}`); vals.push(row.gp_hp_stay_pct) }
+        if (row.gp_hp_stay_acc != null) { sets.push(`gp_hp_stay_acc=$${idx++}`); vals.push(row.gp_hp_stay_acc) }
+        if (row.gp_hp_stay_pt != null) { sets.push(`gp_hp_stay_pt=$${idx++}`); vals.push(row.gp_hp_stay_pt) }
+        if (row.gp_ipp_01em != null) { sets.push(`gp_ipp_01em=$${idx++}`); vals.push(row.gp_ipp_01em) }
+        if (row.gp_ipp_acc != null) { sets.push(`gp_ipp_acc=$${idx++}`); vals.push(row.gp_ipp_acc) }
+        if (row.gp_ipp_pt != null) { sets.push(`gp_ipp_pt=$${idx++}`); vals.push(row.gp_ipp_pt) }
+        if (row.gp_ipp_dias != null) { sets.push(`gp_ipp_dias=$${idx++}`); vals.push(row.gp_ipp_dias) }
+        if (row.gp_ipp_dias_acc != null) { sets.push(`gp_ipp_dias_acc=$${idx++}`); vals.push(row.gp_ipp_dias_acc) }
+        if (row.gp_ipp_dias_pt != null) { sets.push(`gp_ipp_dias_pt=$${idx++}`); vals.push(row.gp_ipp_dias_pt) }
+        if (row.gp_pfp30_pct != null) { sets.push(`gp_pfp30_pct=$${idx++}`); vals.push(row.gp_pfp30_pct) }
+        if (row.gp_pfp30_acc != null) { sets.push(`gp_pfp30_acc=$${idx++}`); vals.push(row.gp_pfp30_acc) }
+        if (row.gp_pfp30_pt != null) { sets.push(`gp_pfp30_pt=$${idx++}`); vals.push(row.gp_pfp30_pt) }
+        if (row.gp_rd_pct != null) { sets.push(`gp_rd_pct=$${idx++}`); vals.push(row.gp_rd_pct) }
+        if (row.gp_rd_acc != null) { sets.push(`gp_rd_acc=$${idx++}`); vals.push(row.gp_rd_acc) }
+        if (row.gp_rd_pt != null) { sets.push(`gp_rd_pt=$${idx++}`); vals.push(row.gp_rd_pt) }
+        if (row.gp_aol_cm2 != null) { sets.push(`gp_aol_cm2=$${idx++}`); vals.push(row.gp_aol_cm2) }
+        if (row.gp_aol_acc != null) { sets.push(`gp_aol_acc=$${idx++}`); vals.push(row.gp_aol_acc) }
+        if (row.gp_aol_pt != null) { sets.push(`gp_aol_pt=$${idx++}`); vals.push(row.gp_aol_pt) }
+        if (row.gp_egs_01mm != null) { sets.push(`gp_egs_01mm=$${idx++}`); vals.push(row.gp_egs_01mm) }
+        if (row.gp_egs_acc != null) { sets.push(`gp_egs_acc=$${idx++}`); vals.push(row.gp_egs_acc) }
+        if (row.gp_egs_pt != null) { sets.push(`gp_egs_pt=$${idx++}`); vals.push(row.gp_egs_pt) }
+        if (row.gp_mar_pct != null) { sets.push(`gp_mar_pct=$${idx++}`); vals.push(row.gp_mar_pct) }
+        if (row.gp_mar_acc != null) { sets.push(`gp_mar_acc=$${idx++}`); vals.push(row.gp_mar_acc) }
+        if (row.gp_mar_pt != null) { sets.push(`gp_mar_pt=$${idx++}`); vals.push(row.gp_mar_pt) }
         if (!sets.length) continue
         vals.push(id)
         await query(`UPDATE animais SET ${sets.join(',')}, updated_at=NOW() WHERE id=$${idx}`, vals)
@@ -324,6 +470,28 @@ async function upsertRows(tipo, data, stats) {
         const sets = []; const vals = []; let idx = 1
         if (row.mgte != null) { sets.push(`mgte=$${idx++}`);  vals.push(row.mgte) }
         if (row.top  != null) { sets.push(`"top"=$${idx++}`); vals.push(row.top) }
+        // DEPs ANCP adicionais
+        if (row.ancp_d3p != null) { sets.push(`ancp_d3p=$${idx++}`); vals.push(row.ancp_d3p) }
+        if (row.ancp_top_d3p != null) { sets.push(`ancp_top_d3p=$${idx++}`); vals.push(row.ancp_top_d3p) }
+        if (row.ancp_dipp != null) { sets.push(`ancp_dipp=$${idx++}`); vals.push(row.ancp_dipp) }
+        if (row.ancp_top_dipp != null) { sets.push(`ancp_top_dipp=$${idx++}`); vals.push(row.ancp_top_dipp) }
+        if (row.ancp_dpe365 != null) { sets.push(`ancp_dpe365=$${idx++}`); vals.push(row.ancp_dpe365) }
+        if (row.ancp_top_dpe365 != null) { sets.push(`ancp_top_dpe365=$${idx++}`); vals.push(row.ancp_top_dpe365) }
+        if (row.ancp_dpn != null) { sets.push(`ancp_dpn=$${idx++}`); vals.push(row.ancp_dpn) }
+        if (row.ancp_top_dpn != null) { sets.push(`ancp_top_dpn=$${idx++}`); vals.push(row.ancp_top_dpn) }
+        if (row.ancp_dstay != null) { sets.push(`ancp_dstay=$${idx++}`); vals.push(row.ancp_dstay) }
+        if (row.ancp_top_dstay != null) { sets.push(`ancp_top_dstay=$${idx++}`); vals.push(row.ancp_top_dstay) }
+        if (row.ancp_mp120 != null) { sets.push(`ancp_mp120=$${idx++}`); vals.push(row.ancp_mp120) }
+        if (row.ancp_top_mp120 != null) { sets.push(`ancp_top_mp120=$${idx++}`); vals.push(row.ancp_top_mp120) }
+        if (row.ancp_mp210 != null) { sets.push(`ancp_mp210=$${idx++}`); vals.push(row.ancp_mp210) }
+        if (row.ancp_top_mp210 != null) { sets.push(`ancp_top_mp210=$${idx++}`); vals.push(row.ancp_top_mp210) }
+        if (row.ancp_dp450 != null) { sets.push(`ancp_dp450=$${idx++}`); vals.push(row.ancp_dp450) }
+        if (row.ancp_top_dp450 != null) { sets.push(`ancp_top_dp450=$${idx++}`); vals.push(row.ancp_top_dp450) }
+        if (row.ancp_daol != null) { sets.push(`ancp_daol=$${idx++}`); vals.push(row.ancp_daol) }
+        if (row.ancp_top_daol != null) { sets.push(`ancp_top_daol=$${idx++}`); vals.push(row.ancp_top_daol) }
+        if (row.ancp_dacab != null) { sets.push(`ancp_dacab=$${idx++}`); vals.push(row.ancp_dacab) }
+        if (row.ancp_top_dacab != null) { sets.push(`ancp_top_dacab=$${idx++}`); vals.push(row.ancp_top_dacab) }
+        if (row.ancp_mar != null) { sets.push(`ancp_mar=$${idx++}`); vals.push(row.ancp_mar) }
         if (!sets.length) continue
         vals.push(id)
         await query(`UPDATE animais SET ${sets.join(',')}, updated_at=NOW() WHERE id=$${idx}`, vals)

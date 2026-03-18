@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import ImportProgressOverlay from './ImportProgressOverlay';
 
 export default function ImportarTextoPiquetes({ onImportComplete }) {
   const [texto, setTexto] = useState('');
   const [validando, setValidando] = useState(false);
   const [importando, setImportando] = useState(false);
+  const [progress, setProgress] = useState(null);
   const [validacao, setValidacao] = useState(null);
   const [resultado, setResultado] = useState(null);
   const [erro, setErro] = useState(null);
@@ -49,17 +51,23 @@ export default function ImportarTextoPiquetes({ onImportComplete }) {
 
     setImportando(true);
     setErro(null);
+    setProgress({ atual: 0, total: 100, etapa: 'Importando dados' });
 
     try {
+      setProgress({ atual: 30, total: 100, etapa: 'Enviando dados' });
+
       const response = await fetch('/api/import/texto-piquetes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ texto, modo: 'importar' }),
       });
 
+      setProgress({ atual: 70, total: 100, etapa: 'Processando importação' });
+
       const data = await response.json();
 
       if (response.ok && data.success) {
+        setProgress({ atual: 100, total: 100, etapa: 'Concluído' });
         setResultado(data.resultados);
         setTexto('');
         setValidacao(null);
@@ -75,6 +83,7 @@ export default function ImportarTextoPiquetes({ onImportComplete }) {
       setErro('Erro ao importar dados');
     } finally {
       setImportando(false);
+      setProgress(null);
     }
   };
 
@@ -86,7 +95,9 @@ export default function ImportarTextoPiquetes({ onImportComplete }) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <>
+      <ImportProgressOverlay importando={importando || validando} progress={progress} />
+      <div className="bg-white rounded-lg shadow-md p-6">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">
         📝 Importar via Texto - Piquetes e Animais
       </h2>
@@ -284,5 +295,6 @@ export default function ImportarTextoPiquetes({ onImportComplete }) {
         </div>
       )}
     </div>
+    </>
   );
 }

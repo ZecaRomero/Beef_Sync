@@ -1,8 +1,10 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
+import ImportProgressOverlay from './ImportProgressOverlay'
 
 export default function ImportarSerieRgMae({ onImportComplete }) {
   const [arquivo, setArquivo] = useState(null)
   const [importando, setImportando] = useState(false)
+  const [progress, setProgress] = useState(null)
   const [resultado, setResultado] = useState(null)
   const [erro, setErro] = useState(null)
 
@@ -30,19 +32,25 @@ export default function ImportarSerieRgMae({ onImportComplete }) {
     setImportando(true)
     setErro(null)
     setResultado(null)
+    setProgress({ atual: 0, total: 100, etapa: 'Processando arquivo' })
 
     try {
       const formData = new FormData()
       formData.append('file', arquivo)
+
+      setProgress({ atual: 30, total: 100, etapa: 'Enviando dados' })
 
       const response = await fetch('/api/animals/corrigir-serie-rg-mae', {
         method: 'POST',
         body: formData
       })
 
+      setProgress({ atual: 70, total: 100, etapa: 'Atualizando registros' })
+
       const data = await response.json()
 
       if (response.ok && data.success) {
+        setProgress({ atual: 100, total: 100, etapa: 'Concluído' })
         setResultado(data.resultados)
         setArquivo(null)
         const input = document.getElementById('file-input-serie-rg-mae')
@@ -59,6 +67,7 @@ export default function ImportarSerieRgMae({ onImportComplete }) {
       setErro('Erro ao processar arquivo. Verifique o formato e tente novamente.')
     } finally {
       setImportando(false)
+      setProgress(null)
     }
   }
 
@@ -71,7 +80,9 @@ export default function ImportarSerieRgMae({ onImportComplete }) {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+    <>
+      <ImportProgressOverlay importando={importando} progress={progress} />
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
       <div className="flex items-center gap-3 mb-6">
         <div className="bg-emerald-600 p-3 rounded-xl">
           <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -211,5 +222,6 @@ export default function ImportarSerieRgMae({ onImportComplete }) {
         )}
       </div>
     </div>
+    </>
   )
 }

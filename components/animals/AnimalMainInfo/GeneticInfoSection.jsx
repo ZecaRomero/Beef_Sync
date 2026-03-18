@@ -1,14 +1,9 @@
-import React from 'react'
 import {
-  UserGroupIcon,
-  TrophyIcon,
-  ChartBarIcon,
-  SparklesIcon,
-  CubeTransparentIcon,
-  PencilIcon
+    PencilIcon,
+    UserGroupIcon
 } from '@heroicons/react/24/outline'
-import InfoRow from '../InfoRow'
 import { formatCurrency } from '../../../utils/formatters'
+import InfoRow from '../InfoRow'
 
 function GeneticRow({ label, value, icon: Icon, posicao, filhoTop, className }) {
   const hasValue = value !== null && value !== undefined && value !== ''
@@ -70,55 +65,6 @@ export default function GeneticInfoSection({ animal, rankings, onEditGenetica })
 
   return (
     <>
-      {(animal.abczg || animal.abczg === 0) && (
-        <GeneticRow
-          label="iABCZ (PMGZ)"
-          value={animal.abczg}
-          icon={TrophyIcon}
-          posicao={rankingPosicao}
-          filhoTop={filhoTopRanking}
-        />
-      )}
-      {(animal.deca || animal.deca === 0) && (
-        <div className="px-4 py-2.5 flex justify-between items-center border-t bg-teal-50/50 dark:bg-teal-900/10 border-teal-100 dark:border-teal-800/30">
-          <span className="text-sm font-medium flex items-center gap-1 text-teal-800 dark:text-teal-200">
-            <ChartBarIcon className="h-4 w-4" />
-            DECA
-          </span>
-          <span className="text-lg font-bold text-teal-600 dark:text-teal-400">{animal.deca}</span>
-        </div>
-      )}
-      {((animal.iqg ?? animal.genetica_2) || (animal.iqg ?? animal.genetica_2) === 0) && (
-        <GeneticRow
-          label="IQG"
-          value={animal.iqg ?? animal.genetica_2}
-          icon={SparklesIcon}
-          posicao={rankingPosicaoGenetica2}
-          filhoTop={filhoTopRankingIQG}
-        />
-      )}
-      {((animal.pt_iqg ?? animal.decile_2) || (animal.pt_iqg ?? animal.decile_2) === 0) && (
-        <div className="px-4 py-2.5 flex justify-between items-center border-t bg-cyan-50/50 dark:bg-cyan-900/10 border-cyan-100 dark:border-cyan-800/30">
-          <span className="text-sm font-medium flex items-center gap-1 text-cyan-800 dark:text-cyan-200">
-            <CubeTransparentIcon className="h-4 w-4" />
-            Pt IQG
-          </span>
-          <span className="text-lg font-bold text-cyan-600 dark:text-cyan-400">{animal.pt_iqg ?? animal.decile_2}</span>
-        </div>
-      )}
-      {(animal.mgte || animal.mgte === 0) && (
-        <div className="px-4 py-2.5 flex justify-between items-center border-t bg-indigo-50/30 dark:bg-indigo-900/5 border-indigo-100 dark:border-indigo-800/20">
-          <span className="text-sm font-medium text-indigo-800 dark:text-indigo-200">MGTe</span>
-          <span className="text-lg font-bold text-indigo-600 dark:text-indigo-400">{animal.mgte}</span>
-        </div>
-      )}
-      {(animal.top != null && animal.top !== '') && (
-        <div className="px-4 py-2.5 flex justify-between items-center border-t bg-sky-50/30 dark:bg-sky-900/5 border-sky-100 dark:border-sky-800/20">
-          <span className="text-sm font-medium text-sky-800 dark:text-sky-200">TOP</span>
-          <span className="text-lg font-bold text-sky-600 dark:text-sky-400">{animal.top}</span>
-        </div>
-      )}
-
       {/* ── Puberdade ── */}
       {(animal.pub_classe || animal.pub_grupo) && (
         <div className="border-t border-orange-100 dark:border-orange-800/30">
@@ -155,29 +101,6 @@ export default function GeneticInfoSection({ animal, rankings, onEditGenetica })
               <span className="text-sm font-bold text-orange-600 dark:text-orange-400">{animal.pub_classif}º</span>
             </div>
           )}
-        </div>
-      )}
-
-      {/* ── Carcaça ── */}
-      {(animal.carc_aol != null || animal.carc_egs != null) && (
-        <div className="border-t border-red-100 dark:border-red-800/30">
-          <div className="px-4 py-2 bg-red-50/60 dark:bg-red-900/10">
-            <p className="text-xs font-bold uppercase tracking-wider text-red-700 dark:text-red-400">Carcaça</p>
-          </div>
-          {[
-            { key: 'carc_aol', label: 'AOL (cm²)' },
-            { key: 'carc_aol_100kg', label: 'AOL/100kg' },
-            { key: 'carc_ratio', label: 'Ratio' },
-            { key: 'carc_mar', label: 'MAR (mm)' },
-            { key: 'carc_egs', label: 'EGS (mm)' },
-            { key: 'carc_egs_100kg', label: 'EGS/100kg' },
-            { key: 'carc_picanha', label: 'Picanha (cm²)' },
-          ].filter(f => animal[f.key] != null && animal[f.key] !== '').map(f => (
-            <div key={f.key} className="px-4 py-2 flex justify-between items-center border-t border-red-100/60 dark:border-red-800/20">
-              <span className="text-sm font-medium text-red-800 dark:text-red-200">{f.label}</span>
-              <span className="text-sm font-bold text-red-600 dark:text-red-400">{animal[f.key]}</span>
-            </div>
-          ))}
         </div>
       )}
 

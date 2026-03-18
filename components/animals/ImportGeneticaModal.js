@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react'
-import { XMarkIcon, TrashIcon } from '@heroicons/react/24/outline'
+import { TrashIcon } from '@heroicons/react/24/outline'
+import { useMemo, useState } from 'react'
+import ImportProgressOverlay from '../ImportProgressOverlay'
 import Modal from '../ui/Modal'
 
 const parsearTextoImport = (texto) => {
@@ -154,6 +155,7 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
   const [criarNaoEncontrados, setCriarNaoEncontrados] = useState(true)
   const [limparForaDaLista, setLimparForaDaLista] = useState(true)
   const [importando, setImportando] = useState(false)
+  const [progress, setProgress] = useState(null)
   const [limpando, setLimpando] = useState(false)
   const [resultadoImport, setResultadoImport] = useState(null)
 
@@ -293,7 +295,9 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Importar Genética (iABCZ, DECA, IQG, Pt IQG)" size="lg">
+    <>
+      <ImportProgressOverlay importando={importando || limpando} progress={progress} />
+      <Modal isOpen={isOpen} onClose={handleClose} title="Importar Genética (iABCZ, DECA, IQG, Pt IQG)" size="lg">
       <div className="space-y-4">
         <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
           <p className="text-sm font-semibold text-amber-800 dark:text-amber-200 mb-1">📋 Para reimportar do zero:</p>
@@ -403,5 +407,6 @@ export default function ImportGeneticaModal({ isOpen, onClose, onSuccess }) {
         </div>
       </div>
     </Modal>
+    </>
   )
 }

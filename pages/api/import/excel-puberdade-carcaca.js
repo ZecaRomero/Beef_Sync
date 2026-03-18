@@ -18,13 +18,24 @@ const parseNum = (v) => {
 const parseSerieRg = (serieRg) => {
   if (!serieRg) return { serie: null, rg: null }
   const s = String(serieRg).trim()
+  
   // "CJCJ 16974" → serie=CJCJ, rg=16974
   const m = s.match(/^([A-Za-z]+)\s+(\d+)$/)
   if (m) return { serie: m[1].toUpperCase(), rg: m[2] }
+  
   // "CJCJ-16974"
   const m2 = s.match(/^([A-Za-z]+)-(\d+)$/)
   if (m2) return { serie: m2[1].toUpperCase(), rg: m2[2] }
-  return { serie: null, rg: s }
+  
+  // Ex: "CJCJ16974" (sem espaço)
+  const m3 = s.match(/^([A-Za-z]+)(\d+)$/)
+  if (m3) return { serie: m3[1].toUpperCase(), rg: m3[2] }
+  
+  // Só número
+  const m4 = s.match(/^(\d+)$/)
+  if (m4) return { serie: '', rg: m4[1] }
+
+  return { serie: '', rg: s }
 }
 
 export default async function handler(req, res) {
@@ -40,14 +51,35 @@ export default async function handler(req, res) {
   for (const row of data) {
     try {
       const { serie, rg } = parseSerieRg(row.serie_rg)
-      if (!serie || !rg) { results.naoEncontrados.push(row.serie_rg); continue }
+      if (!rg) { results.naoEncontrados.push(row.serie_rg); continue }
 
-      // Buscar animal
-      const found = await query(
-        `SELECT id FROM animais WHERE UPPER(serie) = $1 AND rg = $2 LIMIT 1`,
-        [serie.toUpperCase(), rg]
-      )
-      if (found.rows.length === 0) { results.naoEncontrados.push(`${serie} ${rg}`); continue }
+      let found
+      const serieStr = (serie || '').toUpperCase().trim()
+      const rgStr = String(rg).trim()
+
+      if (serieStr) {
+        // Buscar animal
+        found = await query(
+          `SELECT id FROM animais 
+           WHERE UPPER(TRIM(serie)) = $1 
+             AND (TRIM(rg::text) = $2 OR TRIM(LEADING '0' FROM rg::text) = TRIM(LEADING '0' FROM $2)) 
+           LIMIT 1`,
+          [serieStr, rgStr]
+        )
+      } else {
+        // Se só tem RG, tenta encontrar
+        found = await query(
+          `SELECT id FROM animais 
+           WHERE TRIM(rg::text) = $1 OR TRIM(LEADING '0' FROM rg::text) = TRIM(LEADING '0' FROM $1)
+           LIMIT 2`,
+          [rgStr]
+        )
+        if (found.rows.length !== 1) {
+          found = { rows: [] }
+        }
+      }
+
+      if (found.rows.length === 0) { results.naoEncontrados.push(row.serie_rg || `${serie} ${rg}`); continue }
 
       const id = found.rows[0].id
 

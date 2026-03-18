@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react'
-import { DocumentTextIcon, CheckCircleIcon, XCircleIcon, ExclamationTriangleIcon, ArrowPathIcon } from './ui/Icons'
+import { useEffect, useState } from 'react'
+import ImportProgressOverlay from './ImportProgressOverlay'
+import { ArrowPathIcon, CheckCircleIcon, DocumentTextIcon, ExclamationTriangleIcon, XCircleIcon } from './ui/Icons'
 
 export default function ImportarTextoPesagens({ animais, onImportComplete, onRefreshAnimais }) {
   const [texto, setTexto] = useState('')
   const [validacao, setValidacao] = useState(null)
   const [processando, setProcessando] = useState(false)
+  const [progress, setProgress] = useState(null)
 
   useEffect(() => {
     onRefreshAnimais?.()
@@ -198,6 +200,8 @@ export default function ImportarTextoPesagens({ animais, onImportComplete, onRef
     }
 
     setProcessando(true)
+    setProgress({ atual: 0, total: 100, etapa: criarAnimais ? 'Cadastrando animais' : 'Importando pesagens' })
+
     try {
       const pesagens = criarAnimais ? validacao.resultados : validacao.resultados
       const pendentesParaApi = (validacao.pendentes || []).map(p => {
@@ -224,11 +228,15 @@ export default function ImportarTextoPesagens({ animais, onImportComplete, onRef
         ? { pesagens, pendentes: pendentesParaApi, criarAnimaisAusentes: true }
         : { pesagens }
 
+      setProgress({ atual: 30, total: 100, etapa: 'Enviando dados' })
+
       const response = await fetch('/api/import/texto-pesagens', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       })
+
+      setProgress({ atual: 70, total: 100, etapa: 'Processando importação' })
 
       let result
       try {
@@ -239,6 +247,7 @@ export default function ImportarTextoPesagens({ animais, onImportComplete, onRef
       }
 
       if (response.ok) {
+        setProgress({ atual: 100, total: 100, etapa: 'Concluído' })
         let msg = `✅ ${result.importados} pesagens importadas com sucesso!`
         if (result.criados > 0) {
           msg += `\n\n📋 ${result.criados} animais foram cadastrados com dados mínimos (Série, RG).`
@@ -256,11 +265,14 @@ export default function ImportarTextoPesagens({ animais, onImportComplete, onRef
       alert('❌ Erro ao importar dados: ' + (error.message || 'Erro desconhecido'))
     } finally {
       setProcessando(false)
+      setProgress(null)
     }
   }
 
   return (
-    <div className="space-y-4">
+    <>
+      <ImportProgressOverlay importando={processando} progress={progress} />
+      <div className="space-y-4">
       <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
         <h3 className="font-medium text-blue-900 dark:text-blue-200 mb-2 flex items-center gap-2">
           <DocumentTextIcon className="w-5 h-5" />
@@ -455,5 +467,6 @@ M9012 520.3"
         </div>
       )}
     </div>
+    </>
   )
 }
