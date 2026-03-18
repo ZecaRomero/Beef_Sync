@@ -29,7 +29,21 @@ async function supabaseRequest(method, table, body = null, extra = '') {
   const res = await fetch(url, opts)
   if (!res.ok) {
     const text = await res.text()
-    throw new Error(`HTTP ${res.status}: ${text.slice(0, 200)}`)
+    // Tenta extrair a mensagem do erro do Supabase (geralmente JSON com "message").
+    let message = text
+    try {
+      const parsed = JSON.parse(text)
+      message =
+        parsed?.message ||
+        parsed?.error_description ||
+        parsed?.details ||
+        text
+      if (parsed?.details) message += ` | details: ${parsed.details}`
+      if (parsed?.hint) message += ` | hint: ${parsed.hint}`
+    } catch {
+      // mantém "text" como fallback
+    }
+    throw new Error(`HTTP ${res.status}: ${message}`)
   }
   return res
 }
@@ -79,8 +93,24 @@ async function syncToSupabase(onProgress) {
       if (!forbiddenColumnsByTable.has(table)) forbiddenColumnsByTable.set(table, new Set())
       const forbidden = forbiddenColumnsByTable.get(table)
 
-      // tenta até 5 vezes removendo colunas faltantes progressivamente
-      for (let attempt = 0; attempt < 5; attempt++) {
+      // Sanitizacao para divergencias de tipo:
+      // Ajusta strings do tipo "8.00" (inteiro com zeros decimais) para inteiro,
+      // que normalmente falham quando o Supabase espera `integer`.
+      if (table === 'animais') {
+        for (const row of batch) {
+          if (!row || typeof row !== 'object') continue
+          for (const [k, v] of Object.entries(row)) {
+            if (typeof v === 'string') {
+              const t = v.trim()
+              if (/^-?\d+\.0+$/.test(t)) row[k] = parseInt(t.split('.')[0], 10)
+            }
+          }
+        }
+      }
+
+      // tenta removendo colunas faltantes progressivamente
+      // (pode haver mais de uma coluna divergente entre local x Supabase)
+      for (let attempt = 0; attempt < 30; attempt++) {
         // remove todas as colunas já conhecidas como inválidas
         if (forbidden.size > 0) {
           for (const row of batch) {
@@ -93,11 +123,47 @@ async function syncToSupabase(onProgress) {
           return
         } catch (err) {
           const message = err?.message || ''
-          const m = message.match(/Could not find the '([^']+)' column of '([^']+)' in the schema cache/)
+
+          // Caso de divergencia de tipo: Supabase espera integer e recebemos decimal como string ("0.50").
+          // Tentativa: banir as colunas que tenham exatamente o valor que causou o erro no lote.
+          if (table === 'animais') {
+            const intSyntax = message.match(/invalid input syntax for type integer:\s*"([^"]+)"/i)
+            if (intSyntax && intSyntax[1]) {
+              const badValue = intSyntax[1].trim()
+              const keysToBan = new Set()
+              for (const row of batch) {
+                if (!row || typeof row !== 'object') continue
+                for (const [k, v] of Object.entries(row)) {
+                  if (typeof v === 'string' && v.trim() === badValue) keysToBan.add(k)
+                }
+              }
+              if (keysToBan.size > 0) {
+                for (const col of keysToBan) {
+                  if (!forbidden.has(col)) {
+                    forbidden.add(col)
+                    log(`  ⚠ ${table}: coluna com tipo incompativel removida do lote (${col}=${badValue})`)
+                  }
+                }
+                // tenta novamente sem essas colunas
+                continue
+              }
+            }
+          }
+
+          // Variações do texto do PostgREST/Supabase
+          const m =
+            message.match(/Could not find the '([^']+)' column of '([^']+)' in the schema cache/) ||
+            message.match(/Could not find the "([^"]+)" column of "([^"]+)" in the schema cache/) ||
+            message.match(/Could not find the '([^']+)' column of ([^ ]+) in the schema cache/) ||
+            message.match(/Could not find the '([^']+)' column/) ||
+            message.match(/Could not find the "([^"]+)" column/)
+
           if (!m) throw err
 
-          const missingCol = m[1]
-          const missingTable = m[2]
+          // Preferimos o formato completo (coluna + tabela). Se cair nos outros,
+          // assumimos apenas a coluna.
+          const missingCol = m.length >= 3 ? m[1] : m[1]
+          const missingTable = m.length >= 3 ? m[2] : table
           if (missingTable !== table) throw err
 
           if (!forbidden.has(missingCol)) {
@@ -112,9 +178,15 @@ async function syncToSupabase(onProgress) {
     }
 
     // 1. Limpar TODAS as tabelas remotas primeiro (ordem REVERSA para FK)
+    //    Observacao: nao deletar 'animais' por enquanto para evitar deixar o Supabase vazio
+    //    caso a insercao dessa tabela falhe (isso quebra as FK das tabelas filhas).
     log('\n🧹 Limpando dados remotos (ordem reversa)...')
     const reversedTables = [...TABLES].reverse()
     for (const table of reversedTables) {
+      if (table === 'animais') {
+        log(`  ⚠ ${table}: pulando delecao remota (vamos inserir via upsert primeiro)`)
+        continue
+      }
       try {
         await supabaseRequest('DELETE', table, null, '?id=gte.0')
         log(`  ✓ ${table}: limpa`)
@@ -167,6 +239,10 @@ async function syncToSupabase(onProgress) {
       } catch (err) {
         log(`  ✗ ${table}: ${err.message}`)
         results[table] = { error: err.message }
+        // `animais` e pai de varias FK: se falhar, nao faz sentido seguir para filhas
+        if (table === 'animais') {
+          return { success: false, results, error: `Falha em ${table}: ${err.message}` }
+        }
       }
     }
 
