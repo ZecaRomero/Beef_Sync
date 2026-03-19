@@ -3,6 +3,7 @@ import { HeartIcon, PlusIcon, PencilIcon, XMarkIcon, CalendarIcon, UserIcon, Arr
 import * as XLSX from 'xlsx'
 import IAStatistics from '../../components/reports/IAStatistics'
 import ImportarTextoInseminacoes from '../../components/ImportarTextoInseminacoes'
+import { extractRgDigits, matchesSemenWithAnimal, normalizeRg } from '../../utils/semenMatcher'
 
 export default function InseminacaoArtificial() {
   const [mounted, setMounted] = useState(false)
@@ -65,6 +66,23 @@ export default function InseminacaoArtificial() {
     result3: { enabled: false, source: '' },
     observacao: { enabled: false, source: '' }
   })
+
+  const findMatchingSemen = ({ semenList, serieTouro, rgTouro, touroTexto }) => {
+    const serie = String(serieTouro || '').trim().toUpperCase()
+    const rgBase = String(rgTouro || '').trim()
+    const rgExtraido = extractRgDigits(rgBase || touroTexto || '')
+    const rgNormalizado = rgExtraido || (rgBase ? normalizeRg(rgBase) : '')
+    const touroNome = String(touroTexto || '').trim()
+
+    return semenList.find((s) =>
+      matchesSemenWithAnimal({
+        rgTouro: s.rgTouro || s.rg_touro,
+        nomeTouro: `${s.nomeTouro || s.nome_touro || ''} ${touroNome}`.trim(),
+        animalSerie: serie,
+        animalRg: rgNormalizado,
+      })
+    )
+  }
 
   useEffect(() => {
     setMounted(true)
@@ -1133,35 +1151,22 @@ export default function InseminacaoArtificial() {
                 // Buscar pelo RG completo (Série + RG)
                 const rgCompleto = `${serieTouro} ${rgTouro}`.trim()
                 rgTouroExtraido = rgCompleto
-                
-                semenEncontrado = semenList.find(s => {
-                  const rgSemen = (s.rgTouro || s.rg_touro || '').toString().trim()
-                  const serieSemen = (s.serieTouro || s.serie_touro || '').toString().trim().toUpperCase()
-                  
-                  // Buscar por RG completo
-                  if (rgSemen === rgCompleto || rgSemen === rgTouro) {
-                    return true
-                  }
-                  
-                  // Buscar por série + RG separados
-                  if (serieSemen === serieTouro) {
-                    const rgSemenNum = rgSemen.replace(/^[A-Z]{2,5}\s*/i, '').trim()
-                    const rgBuscadoNum = rgTouro.toString().trim()
-                    return rgSemenNum === rgBuscadoNum || 
-                           parseInt(rgSemenNum) === parseInt(rgBuscadoNum)
-                  }
-                  
-                  return false
+
+                semenEncontrado = findMatchingSemen({
+                  semenList,
+                  serieTouro,
+                  rgTouro,
+                  touroTexto: ia.touro,
                 })
               } else if (ia.rg_touro) {
                 // Se só tem RG, buscar pelo RG
                 rgTouroExtraido = ia.rg_touro.toString().trim()
-                semenEncontrado = semenList.find(s => {
-                  const rgSemen = (s.rgTouro || s.rg_touro || '').toString().trim()
-                  return rgSemen === rgTouroExtraido || 
-                         rgSemen.includes(rgTouroExtraido) || 
-                         rgTouroExtraido.includes(rgSemen) ||
-                         rgSemen.replace(/\s/g, '') === rgTouroExtraido.replace(/\s/g, '')
+
+                semenEncontrado = findMatchingSemen({
+                  semenList,
+                  serieTouro: ia.serie_touro,
+                  rgTouro: ia.rg_touro,
+                  touroTexto: ia.touro,
                 })
               }
 
@@ -1180,13 +1185,11 @@ export default function InseminacaoArtificial() {
 
                 // Buscar primeiro pelo RG do touro (se extraído do nome)
                 if (rgTouroExtraido && !semenEncontrado) {
-                  semenEncontrado = semenList.find(s => {
-                    const rgSemen = (s.rgTouro || s.rg_touro || '').toString().trim()
-                    const rgBuscado = rgTouroExtraido.toString().trim()
-                    return rgSemen === rgBuscado || 
-                           rgSemen.includes(rgBuscado) || 
-                           rgBuscado.includes(rgSemen) ||
-                           rgSemen.replace(/\s/g, '') === rgBuscado.replace(/\s/g, '')
+                  semenEncontrado = findMatchingSemen({
+                    semenList,
+                    serieTouro: ia.serie_touro,
+                    rgTouro: rgTouroExtraido,
+                    touroTexto: ia.touro,
                   })
                 }
 

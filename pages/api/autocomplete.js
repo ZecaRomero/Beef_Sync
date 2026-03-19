@@ -47,13 +47,40 @@ function resolveTable(tabela) {
   return TABLE_ALIAS[tabela] || tabela
 }
 
+function normalizeSearch(value) {
+  return String(value || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '')
+}
+
+function rankValues(values, termo) {
+  if (!termo) return values
+  const termoNorm = normalizeSearch(termo)
+  if (!termoNorm) return values
+
+  const scored = values.map((valor) => {
+    const v = String(valor || '')
+    const vNorm = normalizeSearch(v)
+    let score = 0
+    if (vNorm === termoNorm) score = 100
+    else if (vNorm.startsWith(termoNorm)) score = 80
+    else if (vNorm.includes(termoNorm)) score = 60
+    else if (v.toUpperCase().includes(String(termo).toUpperCase())) score = 40
+    return { valor: v, score }
+  })
+
+  return scored
+    .filter((x) => x.score > 0)
+    .sort((a, b) => b.score - a.score || a.valor.localeCompare(b.valor, 'pt-BR'))
+    .map((x) => x.valor)
+}
+
 export default async function autocompleteHandler(req, res) {
   if (req.method !== 'GET') {
     res.setHeader('Allow', ['GET'])
     return res.status(405).end(`Method ${req.method} Not Allowed`)
   }
 
-  const { tabela, campo, todos } = req.query
+  const { tabela, campo, todos, q, termo } = req.query
+  const termoBusca = String(q || termo || '').trim()
   const tableResolved = resolveTable((tabela || '').toLowerCase())
 
   if (!CONFIG[tableResolved]) {
@@ -70,7 +97,7 @@ export default async function autocompleteHandler(req, res) {
       const data = {}
       for (const col of colunasPermitidas) {
         try {
-          data[col] = await buscarDistinct(tableResolved, col)
+          data[col] = await buscarDistinct(tableResolved, col, termoBusca)
         } catch (e) {
           data[col] = []
         }
@@ -85,7 +112,7 @@ export default async function autocompleteHandler(req, res) {
       })
     }
 
-    const valores = await buscarDistinct(tableResolved, campo)
+    const valores = await buscarDistinct(tableResolved, campo, termoBusca)
     return res.status(200).json({ success: true, data: valores })
   } catch (error) {
     console.error('Erro autocomplete:', error)
@@ -97,23 +124,48 @@ export default async function autocompleteHandler(req, res) {
   }
 }
 
-async function buscarDistinct(tabela, coluna) {
+async function buscarDistinct(tabela, coluna, termo = '') {
   try {
+    const termoRaw = String(termo || '').trim()
+    const termoLike = `%${termoRaw}%`
+    const termoNormLike = `%${normalizeSearch(termoRaw)}%`
+    const hasTerm = termoRaw.length > 0
     const result = await query(
       `SELECT DISTINCT ${coluna} as valor FROM ${tabela} 
-       WHERE ${coluna} IS NOT NULL AND TRIM(${coluna}::text) != '' 
+       WHERE ${coluna} IS NOT NULL
+         AND TRIM(${coluna}::text) != ''
+         AND (
+           $1::boolean = false
+           OR ${coluna}::text ILIKE $2
+           OR UPPER(REGEXP_REPLACE(${coluna}::text, '[^A-Za-z0-9]', '', 'g')) LIKE $3
+         )
        ORDER BY valor
        LIMIT 200`,
-      []
+      [hasTerm, termoLike, termoNormLike]
     )
-    return result.rows.map(r => String(r.valor)).filter(Boolean)
+    const valores = result.rows.map(r => String(r.valor)).filter(Boolean)
+    return rankValues(valores, termoRaw)
   } catch (err) {
     if (err.code === '42703' && tabela === 'estoque_semen' && coluna === 'nome_touro') {
+      const termoRaw = String(termo || '').trim()
+      const termoLike = `%${termoRaw}%`
+      const termoNormLike = `%${normalizeSearch(termoRaw)}%`
+      const hasTerm = termoRaw.length > 0
       const r = await query(
         `SELECT DISTINCT serie as valor FROM estoque_semen 
-         WHERE serie IS NOT NULL AND TRIM(serie) != '' ORDER BY valor LIMIT 200`
+         WHERE serie IS NOT NULL
+           AND TRIM(serie) != ''
+           AND (
+             $1::boolean = false
+             OR serie ILIKE $2
+             OR UPPER(REGEXP_REPLACE(serie, '[^A-Za-z0-9]', '', 'g')) LIKE $3
+           )
+         ORDER BY valor
+         LIMIT 200`,
+        [hasTerm, termoLike, termoNormLike]
       )
-      return r.rows.map(row => String(row.valor)).filter(Boolean)
+      const valores = r.rows.map(row => String(row.valor)).filter(Boolean)
+      return rankValues(valores, termoRaw)
     }
     throw err
   }

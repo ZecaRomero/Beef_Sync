@@ -1,12 +1,14 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
-import { useOptimizedFetch, invalidateCache } from './useOptimizedFetch'
-import { useServerEvents } from './useServerEvents'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { extrairSerieRG } from '../utils/animalUtils'
+import { matchesSemenWithAnimal, normalizeRg } from '../utils/semenMatcher'
+import { invalidateCache, useOptimizedFetch } from './useOptimizedFetch'
+import { useServerEvents } from './useServerEvents'
 
 export function useAnimalDetails(id) {
   const [animal, setAnimal] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [retryCount, setRetryCount] = useState(0)
   const prevIdRef = useRef(null)
   const sexFixTriggeredRef = useRef(false)
 
@@ -70,7 +72,6 @@ export function useAnimalDetails(id) {
   }, [id])
 
   // 1. Buscar dados principais do animal (cache desabilitado para consulta - evita animal errado)
-  const [retryCount, setRetryCount] = useState(0)
   const fetchUrl = id ? `/api/animals/${encodeURIComponent(id)}?history=true${retryCount > 0 ? `&_r=${retryCount}` : ''}` : ''
   const { 
     data: animalData, 
@@ -100,16 +101,20 @@ export function useAnimalDetails(id) {
 
         // Estoque de sêmen disponível para este touro (se tiver RG)
         if (a.rg) {
-          const normRg = (v) => String(v || '').trim().replace(/^0+/, '') || '0'
-          const alvoRg = normRg(a.rg)
+          const alvoRg = normalizeRg(a.rg)
+          const alvoSerie = String(a.serie || '').trim().toUpperCase()
           fetchPromises.push(
             fetch('/api/semen/available')
               .then(r => r.ok ? r.json() : { data: [] })
               .then(d => {
                 const lista = Array.isArray(d.data ?? d) ? (d.data ?? d) : []
                 const matches = lista.filter(item => {
-                  const rgTouro = item.rg_touro || item.rgTouro || null
-                  return rgTouro && normRg(rgTouro) === alvoRg
+                  return matchesSemenWithAnimal({
+                    rgTouro: item.rg_touro || item.rgTouro,
+                    nomeTouro: item.nome_touro || item.nomeTouro,
+                    animalSerie: alvoSerie,
+                    animalRg: alvoRg,
+                  })
                 })
                 if (!matches.length) {
                   setSemenResumo(null)
@@ -135,7 +140,7 @@ export function useAnimalDetails(id) {
             fetch(`/api/reproducao/exames-andrologicos?rg=${encodeURIComponent(a.rg)}`)
               .then(r => r.json())
               .then(d => setExamesAndrologicos(Array.isArray(d.data ?? d) ? (d.data ?? d) : []))
-              .catch(() => {})
+              .catch((err) => logger.warn('Erro ao buscar exames andrológicos:', err?.message))
           )
         }
 
@@ -212,7 +217,17 @@ export function useAnimalDetails(id) {
           fetch('/api/animals/ranking-pt-iqg?limit=50').then(r => r.json())
         ])
 
-        const newRankings = { ...rankings }
+        const newRankings = {
+          posicaoIABCZ: null,
+          posicaoDECA: null,
+          posicaoIQG: null,
+          posicaoPtIQG: null,
+          posicaoMGte: null,
+          filhoTopIABCZ: null,
+          filhoTopDECA: null,
+          filhoTopIQG: null,
+          filhoTopPtIQG: null
+        }
         const serieMatch = String(animal.serie || '').toUpperCase()
         const normSerie = (v) => String(v || '').trim().toUpperCase().replace(/\s+/g, '')
         const normRg = (v) => (String(v || '').trim().replace(/^0+/, '') || '0')
@@ -277,7 +292,7 @@ export function useAnimalDetails(id) {
 
         setRankings(newRankings)
       } catch (e) {
-        console.error('Erro ao buscar rankings', e)
+        logger.error('Erro ao buscar rankings', e)
       }
     }
 
@@ -398,22 +413,16 @@ export function useAnimalDetails(id) {
       params.set('serie', serieMae)
       params.set('rg', rgMae)
       
-      console.log('🔍 Buscando coletas FIV da mãe:', `${serieMae} ${rgMae}`)
-      
       fetch(`/api/animals/doadora-coletas?${params}`)
         .then(r2 => r2.json())
         .then(d2 => {
-          console.log('📊 Resultado coletas mãe:', d2)
           if (d2.success && d2.data?.resumo) {
             setMaeColetas(d2.data)
-            console.log('✅ Coletas da mãe encontradas:', d2.data.resumo.totalColetas)
           } else {
             setMaeColetas(null)
-            console.log('ℹ️ Nenhuma coleta encontrada para a mãe')
           }
         })
-        .catch((err) => {
-          console.error('❌ Erro ao buscar coletas da mãe:', err)
+        .catch(() => {
           setMaeColetas(null)
         })
     } else {
@@ -661,7 +670,7 @@ export function useAnimalDetails(id) {
       ultExame, diasDesdeExame, isInapto, diasParaProximoExame,
       ultimaIA
     }
-  }, [animal, inseminacoes, ocorrencias, examesAndrologicos])
+  }, [animal, inseminacoes, ocorrencias, examesAndrologicos, semenResumo])
 
   return {
     animal,
