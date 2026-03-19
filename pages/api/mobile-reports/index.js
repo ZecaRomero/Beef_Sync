@@ -4,8 +4,8 @@
  * GET ?tipo=X&startDate=&endDate=: retorna dados do relatório
  */
 import { query } from '../../../lib/database'
+import { sendError, sendMethodNotAllowed, sendSuccess } from '../../../utils/apiResponse'
 import { ensureNitrogenioTables } from '../../../utils/nitrogenioSchema'
-import { sendSuccess, sendError, sendMethodNotAllowed } from '../../../utils/apiResponse'
 
 const TIPOS_RELATORIOS = [
   { key: 'resumo_geral', label: '📊 Visão Geral', category: 'Gestão' },
@@ -34,6 +34,7 @@ const TIPOS_RELATORIOS = [
   { key: 'abastecimento_nitrogenio', label: 'Abastecimento de Nitrogênio', category: 'Estoque' },
   { key: 'animais_piquetes', label: 'Animais por Piquete', category: 'Localização' },
   { key: 'notas_fiscais', label: 'Notas Fiscais', category: 'Documentos' },
+  { key: 'relatorio_vendas', label: '📊 Relatório de Vendas', category: 'Documentos' },
   { key: 'movimentacoes_financeiras', label: 'Movimentações Financeiras', category: 'Financeiro' },
   { key: 'custos', label: 'Custos', category: 'Financeiro' },
   { key: 'ranking_animais_avaliados', label: 'Ranking dos Animais Avaliados', category: 'Gestão' },

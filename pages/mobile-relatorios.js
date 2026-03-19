@@ -201,6 +201,15 @@ export default function MobileRelatorios() {
   const [formMed, setFormMed] = useState({ medicamento: '', dataAplicacao: '', dataProxima: '', observacao: '' })
   const [salvandoMed, setSalvandoMed] = useState(false)
   const [isAdelso, setIsAdelso] = useState(false)
+
+  // ── Tipos que redirecionam para páginas externas ──────────────────────────
+  const handleSelectTipo = useCallback((key) => {
+    if (key === 'relatorio_vendas') {
+      router.push('/notas-fiscais/relatorio')
+      return
+    }
+    setSelectedTipo(key)
+  }, [router])
   
   // ── Movimentação Boletim Campo (Adelso) ────────────────────────────────────
   const [modalMovBoletimCampo, setModalMovBoletimCampo] = useState(null)
@@ -1991,7 +2000,7 @@ export default function MobileRelatorios() {
         cardInfoModal={cardInfoModal}
         onClose={() => setCardInfoModal((m) => ({ ...m, open: false }))}
         onViewReport={() => {
-          setSelectedTipo(cardInfoModal.reportKey)
+          handleSelectTipo(cardInfoModal.reportKey)
           setViewMode('table')
           setCardInfoModal((m) => ({ ...m, open: false }))
         }}
@@ -2017,7 +2026,7 @@ export default function MobileRelatorios() {
                   dashboardData={dashboardData}
                   enabledReports={enabledReports}
                   favorites={favorites}
-                  onSelectTipo={setSelectedTipo}
+                  onSelectTipo={handleSelectTipo}
                   onGoToReports={() => setCurrentTab('reports')}
                   userName={userName}
                 />
@@ -2048,7 +2057,7 @@ export default function MobileRelatorios() {
                       favorites={favorites}
                       recentIds={recentIds}
                       categoriasComRelatorios={categoriasComRelatorios}
-                      onSelectTipo={setSelectedTipo}
+                      onSelectTipo={handleSelectTipo}
                       onToggleFavorite={toggleFavorite}
                       isAdelso={isAdelso}
                       onSetPeriodLastMonth={() => {
@@ -2123,7 +2132,7 @@ export default function MobileRelatorios() {
                                             className="flex items-center gap-2"
                                           >
                                             <button
-                                              onClick={() => setSelectedTipo(tipo.key)}
+                                              onClick={() => handleSelectTipo(tipo.key)}
                                               className="flex-1 flex items-center justify-between p-4 rounded-xl bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 hover:border-amber-400 dark:hover:border-amber-600 hover:shadow-md shadow-sm transition-all text-left group"
                                             >
                                               <div className="flex items-center gap-3">
