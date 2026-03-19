@@ -180,6 +180,7 @@ function analisarClientes(vendas) {
 export default function RelatorioVendas() {
   const router = useRouter()
   const [vendas, setVendas] = useState([])
+  const [carregandoBase, setCarregandoBase] = useState(false)
   const [importando, setImportando] = useState(false)
   const [exportando, setExportando] = useState(false)
   const [tab, setTab] = useState('clientes') // clientes | historico | graficos
@@ -213,6 +214,57 @@ export default function RelatorioVendas() {
     try { localStorage.setItem('beef-vendas-historico', JSON.stringify(novas)) } catch (_) {}
   }, [])
 
+  const carregarResumoDaBase = useCallback(async ({ showToast = false } = {}) => {
+    setCarregandoBase(true)
+    try {
+      const hoje = new Date()
+      const endDate = new Date(hoje)
+      endDate.setFullYear(endDate.getFullYear() + 2)
+      const params = new URLSearchParams({
+        tipo: 'notas_fiscais',
+        startDate: '2015-01-01',
+        endDate: endDate.toISOString().split('T')[0],
+        t: Date.now().toString()
+      })
+      const response = await fetch(`/api/mobile-reports?${params}`, { cache: 'no-store' })
+      const json = await response.json()
+      const rows = json?.data?.data || []
+      if (!json?.success || !Array.isArray(rows) || rows.length === 0) return
+
+      // Converte linhas de NF em "vendas" mínimas para exibir o resumo no app.
+      const vindasDaBase = rows
+        .filter(r => String(r?.tipo || '').toLowerCase() === 'saida')
+        .map(r => ({
+          serie: '',
+          rg: String(r?.nf ?? '').trim(),
+          sexo: '',
+          comprador: String(r?.fornecedor ?? 'Não informado').trim(),
+          estado: '',
+          dataVenda: parseDate(r?.data),
+          dataNasc: null,
+          idade: '',
+          notaFiscal: String(r?.nf ?? '').trim(),
+          valor: parseValor(r?.valor)
+        }))
+        .filter(v => v.notaFiscal || v.comprador || v.valor > 0)
+
+      if (vindasDaBase.length > 0) {
+        salvarVendas(vindasDaBase)
+        if (showToast) setToast({ type: 'success', msg: `${vindasDaBase.length} venda(s) carregada(s) da base` })
+      }
+    } catch (_) {
+      // Sem bloquear a tela quando a API falhar.
+    } finally {
+      setCarregandoBase(false)
+    }
+  }, [salvarVendas])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (vendas.length > 0) return
+    carregarResumoDaBase()
+  }, [carregarResumoDaBase, vendas.length])
+
   // ─── Importar Excel ─────────────────────────────────────────────────────
   const handleImport = useCallback(async (e) => {
     const file = e.target.files?.[0]
@@ -235,20 +287,36 @@ export default function RelatorioVendas() {
 
       if (mapped.length === 0) { setToast({ type: 'error', msg: 'Nenhum dado válido encontrado na planilha' }); return }
 
-      // Merge com existentes (evitar duplicatas por NF + RG)
-      const existentes = new Set(vendas.map(v => `${v.notaFiscal}|${v.rg}`))
-      const novas = mapped.filter(v => !existentes.has(`${v.notaFiscal}|${v.rg}`))
-      const merged = [...vendas, ...novas]
-      salvarVendas(merged)
-      setToast({ type: 'success', msg: `${novas.length} registros importados (${mapped.length - novas.length} duplicados ignorados)` })
+      // Sincronizar com banco online para aparecer em qualquer dispositivo/ambiente.
+      const payload = mapped.map(v => ({
+        numero_nf: v.notaFiscal || `${v.rg || ''}`.trim(),
+        tipo: 'saida',
+        data: v.dataVenda ? new Date(v.dataVenda).toISOString().split('T')[0] : null,
+        fornecedor: 'Planilha de vendas',
+        destino: v.comprador || null,
+        valor_total: Number(v.valor || 0)
+      })).filter(v => v.numero_nf)
+
+      const importResp = await fetch('/api/notas-fiscais/import-excel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: payload })
+      })
+      const importJson = await importResp.json().catch(() => ({}))
+      if (!importResp.ok || !importJson?.success) {
+        throw new Error(importJson?.message || 'Falha ao salvar no banco online')
+      }
+
+      await carregarResumoDaBase({ showToast: false })
+      setToast({ type: 'success', msg: `${payload.length} registro(s) enviado(s) para o banco online` })
     } catch (err) {
       console.error('Erro ao importar:', err)
-      setToast({ type: 'error', msg: 'Erro ao ler o arquivo Excel' })
+      setToast({ type: 'error', msg: 'Erro ao importar para o banco online' })
     } finally {
       setImportando(false)
       e.target.value = ''
     }
-  }, [vendas, salvarVendas])
+  }, [carregarResumoDaBase])
 
   // ─── Análise ────────────────────────────────────────────────────────────
   const clientes = useMemo(() => analisarClientes(vendas), [vendas])
@@ -593,10 +661,10 @@ export default function RelatorioVendas() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <label className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-all ${importando ? 'bg-gray-200 dark:bg-gray-700 text-gray-500' : 'bg-amber-500 text-white hover:bg-amber-600'}`}>
+              <label className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-all ${(importando || carregandoBase) ? 'bg-gray-200 dark:bg-gray-700 text-gray-500' : 'bg-amber-500 text-white hover:bg-amber-600'}`}>
                 <ArrowUpTrayIcon className="h-4 w-4" />
-                {importando ? 'Importando...' : 'Importar Excel'}
-                <input type="file" accept=".xlsx,.xls,.csv" onChange={handleImport} className="hidden" disabled={importando} />
+                {importando ? 'Importando...' : carregandoBase ? 'Carregando base...' : 'Importar Excel'}
+                <input type="file" accept=".xlsx,.xls,.csv" onChange={handleImport} className="hidden" disabled={importando || carregandoBase} />
               </label>
               {vendas.length > 0 && (
                 <button onClick={exportarExcel} disabled={exportando}
