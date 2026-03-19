@@ -26,31 +26,7 @@ const SmartNotifications = ({ animals, costs }) => {
       const animalCosts = costs.filter(c => c.animalId === animal.id)
       const totalCost = animalCosts.reduce((sum, c) => sum + (parseFloat(c.valor) || 0), 0)
 
-      // 1. Alertas de Vacinação
-      const hasRecentVaccination = animalCosts.some(cost => {
-        if (cost.tipo !== 'Medicamentos' || cost.subtipo !== 'Vacinas Obrigatórias') return false
-        const costDate = new Date(cost.data)
-        const daysSince = (now - costDate) / (1000 * 60 * 60 * 24)
-        return daysSince <= 365 // Vacinação nos últimos 12 meses
-      })
-
-      if (ageInMonths >= 4 && !hasRecentVaccination) {
-        alerts.push({
-          id: `vaccination-${animal.id}`,
-          type: 'vaccination',
-          priority: 'high',
-          title: 'Vacinação Pendente',
-          message: `${animal.nome || animal.numero} precisa de vacinação obrigatória`,
-          animal: animal.nome || animal.numero,
-          animalId: animal.id,
-          action: 'Agendar vacinação',
-          icon: '💉',
-          color: 'red',
-          createdAt: now.toISOString()
-        })
-      }
-
-      // 2. Alertas de Peso
+      // 1. Alertas de Peso
       const expectedWeights = {
         'Macho': { 6: 180, 12: 300, 18: 420, 24: 520, 36: 650 },
         'Fêmea': { 6: 150, 12: 250, 18: 350, 24: 420, 36: 500 }

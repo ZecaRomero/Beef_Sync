@@ -1,12 +1,12 @@
 import {
-  CalendarIcon,
-  ChartBarIcon,
-  ChatBubbleLeftRightIcon,
-  ChevronRightIcon,
-  ClockIcon,
-  DocumentTextIcon,
-  LightBulbIcon,
-  MagnifyingGlassIcon,
+    CalendarIcon,
+    ChartBarIcon,
+    ChatBubbleLeftRightIcon,
+    ChevronRightIcon,
+    ClockIcon,
+    DocumentTextIcon,
+    LightBulbIcon,
+    MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline'
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid'
 import { motion } from 'framer-motion'
@@ -22,6 +22,7 @@ export default function HomeQuickAccessSection({
   onSelectTipo,
   onToggleFavorite,
   onSetPeriodLastMonth,
+  isAdelso,
 }) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
@@ -127,6 +128,29 @@ export default function HomeQuickAccessSection({
               Mês
             </span>
           </motion.div>
+
+          {isAdelso && (
+            <Link href="/mobile-relatorios?tab=reports&tipo=boletim_campo">
+              <motion.div
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={(e) => {
+                  e.preventDefault()
+                  onSelectTipo('boletim_campo')
+                }}
+                className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white dark:bg-gray-800 border border-amber-200 dark:border-amber-700 shadow-sm hover:shadow-md transition-all cursor-pointer group ring-1 ring-amber-300/50 dark:ring-amber-700/50"
+              >
+                <div className="p-3 rounded-full bg-amber-50 dark:bg-amber-900/20 group-hover:bg-amber-100 dark:group-hover:bg-amber-900/40 transition-colors">
+                  <DocumentTextIcon className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                </div>
+                <span className="text-[10px] font-bold text-amber-700 dark:text-amber-300 text-center leading-tight">
+                  Boletim
+                  <br />
+                  de Campo
+                </span>
+              </motion.div>
+            </Link>
+          )}
         </div>
       </motion.div>
 

@@ -538,19 +538,17 @@ export function useAnimalDetails(id) {
     const custoTotal = custosArray.reduce((s, c) => s + parseFloat(c.valor || 0), 0)
 
     // 5. Planejamento Sanitário (Brucelose)
-    // Brucelose é obrigatória apenas para fêmeas de 3-8 meses (90-240 dias)
+    // Brucelose: o sistema não deve mais tratar como "obrigação/calendário".
+    // Apenas os custos/captações já lançados devem existir no histórico do animal.
     const temBrucelose = custosArray.some(c => {
       const t = String(c.tipo || '').toLowerCase()
       const s = String(c.subtipo || '').toLowerCase()
       const o = String(c.observacoes || '').toLowerCase()
       return (t.includes('vacina') || t.includes('vacinação')) && (s.includes('brucelose') || o.includes('brucelose'))
     })
-    // Elegível = está na janela agora (90-240 dias)
-    const elegivelBrucelose = isFemea && idadeDias != null && idadeDias >= 90 && idadeDias <= 240 && !temBrucelose
-    // precisaBrucelose = ainda pode precisar (inclui <90 dias E passou da janela mas ainda relevante mostrar)
-    // Paramos de mostrar quando >640 dias (animais muito velhos, informação irrelevante)
-    const precisaBrucelose = isFemea && idadeDias != null && idadeDias <= 640 && !temBrucelose
-    const janelaEncerrada = isFemea && idadeDias != null && idadeDias > 240 && !temBrucelose
+    const elegivelBrucelose = false
+    const precisaBrucelose = false
+    const janelaEncerrada = false
     // DGT (Avaliação Andrológica/Reprodutiva): janela 330-640 dias (~11-21 meses)
     // Considera DGT realizado se: machos com exame andrológico OU custo Andrológico registrado
     const temDGT = (

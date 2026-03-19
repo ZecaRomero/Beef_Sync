@@ -1,6 +1,6 @@
 // Integração entre Notas Fiscais e Boletim de Animais
-import animalDataManager from './animalDataManager'
-import boletimContabilService from './boletimContabilService'
+import animalDataManager from './animalDataManager';
+import boletimContabilService from './boletimContabilService';
 
 class NotasFiscaisIntegration {
   constructor() {
@@ -214,7 +214,7 @@ class NotasFiscaisIntegration {
 
       // Salvar animais atualizados
       if (animaisAtualizados) {
-        localStorage.setItem('animals', JSON.stringify(animais))
+        try { localStorage.setItem('animals', JSON.stringify(animais)) } catch (_) {}
       }
 
       // Salvar todas as ocorrências
@@ -277,7 +277,7 @@ class NotasFiscaisIntegration {
       // Salvar animal
       const animais = JSON.parse(localStorage.getItem('animals') || '[]')
       animais.push(novoAnimal)
-      localStorage.setItem('animals', JSON.stringify(animais))
+      try { localStorage.setItem('animals', JSON.stringify(animais)) } catch (_) {}
 
       return novoAnimal
     } catch (error) {

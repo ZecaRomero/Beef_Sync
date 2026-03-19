@@ -1,13 +1,12 @@
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 
-import { 
-  ArrowDownTrayIcon, 
-  DocumentTextIcon,
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
-  InformationCircleIcon,
-  XMarkIcon
+import {
+    ArrowDownTrayIcon,
+    CheckCircleIcon,
+    ExclamationTriangleIcon,
+    InformationCircleIcon,
+    XMarkIcon
 } from '../ui/Icons'
 
 // Ícone adicional que não está no arquivo Icons.js
@@ -177,13 +176,15 @@ export default function DataExportImport({ isOpen, onClose }) {
         localStorage.setItem('beefsync_backup_' + Date.now(), JSON.stringify(backup))
 
         // Importar novos dados
-        if (data.animals) localStorage.setItem('animals', JSON.stringify(data.animals))
-        if (data.nascimentos) localStorage.setItem('birthData', JSON.stringify(data.nascimentos))
-        if (data.custos) localStorage.setItem('custos', JSON.stringify(data.custos))
-        if (data.estoqueSemen) localStorage.setItem('estoqueSemen', JSON.stringify(data.estoqueSemen))
-        if (data.notasFiscais) localStorage.setItem('notasFiscais', JSON.stringify(data.notasFiscais))
-        if (data.protocolos) localStorage.setItem('protocolos', JSON.stringify(data.protocolos))
-        if (data.configuracoes) localStorage.setItem('beefsync_config', JSON.stringify(data.configuracoes))
+        try {
+          if (data.animals) localStorage.setItem('animals', JSON.stringify(data.animals))
+          if (data.nascimentos) localStorage.setItem('birthData', JSON.stringify(data.nascimentos))
+          if (data.custos) localStorage.setItem('custos', JSON.stringify(data.custos))
+          if (data.estoqueSemen) localStorage.setItem('estoqueSemen', JSON.stringify(data.estoqueSemen))
+          if (data.notasFiscais) localStorage.setItem('notasFiscais', JSON.stringify(data.notasFiscais))
+          if (data.protocolos) localStorage.setItem('protocolos', JSON.stringify(data.protocolos))
+          if (data.configuracoes) localStorage.setItem('beefsync_config', JSON.stringify(data.configuracoes))
+        } catch (_) { console.warn('localStorage cheio, cache de animais ignorado') }
 
         setStatus({ 
           type: 'success', 
@@ -216,7 +217,7 @@ export default function DataExportImport({ isOpen, onClose }) {
 
         // Adicionar novos animais
         const allAnimals = [...currentAnimals, ...animais]
-        localStorage.setItem('animals', JSON.stringify(allAnimals))
+        try { localStorage.setItem('animals', JSON.stringify(allAnimals)) } catch (_) {}
 
         setStatus({ 
           type: 'success', 

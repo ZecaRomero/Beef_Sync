@@ -2,16 +2,16 @@
  * Consulta Rápida de Animal - Otimizada para celular
  * Acesse pelo celular: /a - sem sidebar, somente Série e RG em inputs separados
  */
-import React, { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/router'
 import Head from 'next/head'
-import { useAuth } from '../contexts/AuthContext'
-import QuickLinksCards from '../components/consulta-rapida/QuickLinksCards'
-import RecentSearches from '../components/consulta-rapida/RecentSearches'
-import LastConsultedDock from '../components/consulta-rapida/LastConsultedDock'
+import { useRouter } from 'next/router'
+import { useEffect, useRef, useState } from 'react'
 import AnimalSearchPanel from '../components/consulta-rapida/AnimalSearchPanel'
 import ConsultaRapidaHeader from '../components/consulta-rapida/ConsultaRapidaHeader'
 import ConsultaRapidaSplash from '../components/consulta-rapida/ConsultaRapidaSplash'
+import LastConsultedDock from '../components/consulta-rapida/LastConsultedDock'
+import QuickLinksCards from '../components/consulta-rapida/QuickLinksCards'
+import RecentSearches from '../components/consulta-rapida/RecentSearches'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function ConsultaRapida() {
   const router = useRouter()
@@ -42,6 +42,9 @@ export default function ConsultaRapida() {
   const [modoBusca, setModoBusca] = useState('inteligente')
   const searchTimeoutRef = useRef(null)
 
+  const recentesKey = nomeIdent ? `consulta-rapida-recentes-${nomeIdent}` : 'consulta-rapida-recentes'
+  const ultimoKey = nomeIdent ? `consulta-rapida-ultimo-${nomeIdent}` : 'consulta-rapida-ultimo'
+
   const addBuscaRecente = (animal) => {
     if (typeof window === 'undefined' || !animal) return
     const item = {
@@ -53,7 +56,7 @@ export default function ConsultaRapida() {
     if (!item.serie || !item.rg) return
     setRecentes((prev) => {
       const next = [item, ...prev.filter((r) => !(r.serie === item.serie && r.rg === item.rg))].slice(0, 5)
-      localStorage.setItem('consulta-rapida-recentes', JSON.stringify(next))
+      localStorage.setItem(recentesKey, JSON.stringify(next))
       return next
     })
   }
@@ -67,7 +70,7 @@ export default function ConsultaRapida() {
     const item = { serie: s, rg: r, nome: String(animal.nome || '').trim() }
     setUltimoConsultado(item)
     if (typeof window !== 'undefined') {
-      localStorage.setItem('consulta-rapida-ultimo', JSON.stringify(item))
+      localStorage.setItem(ultimoKey, JSON.stringify(item))
     }
   }
 
@@ -221,15 +224,15 @@ export default function ConsultaRapida() {
   }, [identificado])
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined' || !nomeIdent) return
     try {
-      const raw = localStorage.getItem('consulta-rapida-recentes')
+      const raw = localStorage.getItem(recentesKey)
       const parsed = raw ? JSON.parse(raw) : []
       if (Array.isArray(parsed)) setRecentes(parsed.slice(0, 5))
-      const ultimoRaw = localStorage.getItem('consulta-rapida-ultimo')
+      const ultimoRaw = localStorage.getItem(ultimoKey)
       if (ultimoRaw) setUltimoConsultado(JSON.parse(ultimoRaw))
     } catch (_) {}
-  }, [])
+  }, [nomeIdent, recentesKey, ultimoKey])
 
   // Buscar sugestões: se digitar só número = busca por RG; se tiver letras = busca por nome
   useEffect(() => {
@@ -544,14 +547,14 @@ export default function ConsultaRapida() {
             getInputClass={getInputClass}
           />
 
-          <QuickLinksCards />
+          <QuickLinksCards isAdelso={nomeIdent === 'Adelso'} />
 
           <RecentSearches
             recentes={recentes}
             onOpenAnimal={abrirAnimal}
             onClear={() => {
               setRecentes([])
-              localStorage.removeItem('consulta-rapida-recentes')
+              localStorage.removeItem(recentesKey)
             }}
           />
 

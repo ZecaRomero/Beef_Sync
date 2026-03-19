@@ -340,7 +340,7 @@ export default function ActivityAgenda() {
 
       {/* Abas e Calendário */}
       <div className="flex gap-2 flex-wrap">
-        {['todos', 'atividades', 'brucelose', 'dgt'].map(aba => (
+        {['todos', 'atividades', 'dgt'].map(aba => (
           <button
             key={aba}
             onClick={() => setAbaAtiva(aba)}
@@ -352,7 +352,6 @@ export default function ActivityAgenda() {
           >
             {aba === 'todos' && 'Todos'}
             {aba === 'atividades' && 'Atividades'}
-            {aba === 'brucelose' && `Brucelose (${bruceloseFiltrado.length})`}
             {aba === 'dgt' && `DGT (${dgtFiltrado.length})`}
           </button>
         ))}
@@ -424,8 +423,8 @@ export default function ActivityAgenda() {
             </div>
           )}
 
-          {/* Brucelose */}
-          {(abaAtiva === 'todos' || abaAtiva === 'brucelose') && (
+          {/* Brucelose (desativado no calendário) */}
+          {abaAtiva === 'brucelose' && (
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <h4 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">

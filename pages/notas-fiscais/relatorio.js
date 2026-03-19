@@ -1,1111 +1,1019 @@
-import React, { useState, useEffect } from 'react'
-import { ChartBarIcon, CalendarIcon, CurrencyDollarIcon, TruckIcon, ArrowDownIcon, ArrowUpIcon, XMarkIcon, DocumentArrowDownIcon } from '../../components/ui/Icons'
+/**
+ * Relatório de Vendas e Clientes - Beef-Sync
+ * Importação de Excel, análise por cliente, gráficos e exportação detalhada
+ */
+import {
+  ArrowDownTrayIcon,
+  ArrowLeftIcon,
+  ArrowUpTrayIcon,
+  ChartBarIcon,
+  CheckCircleIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  ClockIcon,
+  CurrencyDollarIcon,
+  ExclamationTriangleIcon,
+  MagnifyingGlassIcon,
+  TableCellsIcon,
+  UserGroupIcon
+} from '@heroicons/react/24/outline'
+import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Filler, Legend, LinearScale, LineElement, PointElement, Tooltip } from 'chart.js'
+import { AnimatePresence, motion } from 'framer-motion'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Bar, Doughnut, Line, Pie } from 'react-chartjs-2'
 
-export default function RelatorioFiscal() {
-  const [mounted, setMounted] = useState(false)
-  const [notasFiscais, setNotasFiscais] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [showDetalhesModal, setShowDetalhesModal] = useState(false)
-  const [nfDetalhes, setNfDetalhes] = useState(null)
-  const [loadingDetalhes, setLoadingDetalhes] = useState(false)
-  const [exportando, setExportando] = useState(false)
-  const [filtros, setFiltros] = useState({
-    dataInicio: new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0], // Início do ano
-    dataFim: new Date().toISOString().split('T')[0], // Hoje
-    tipo: 'todos' // todos, entrada, saida
+if (typeof window !== 'undefined') {
+  ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Filler, Tooltip, Legend)
+}
+
+// ─── Helpers ────────────────────────────────────────────────────────────────
+const fmt = (v) => (v ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+const fmtDate = (d) => {
+  if (!d) return '-'
+  const dt = d instanceof Date ? d : new Date(d)
+  if (isNaN(dt)) return String(d)
+  return dt.toLocaleDateString('pt-BR')
+}
+const diasEntre = (a, b) => Math.round((b - a) / 86400000)
+const parseDate = (v) => {
+  if (!v) return null
+  if (v instanceof Date) return isNaN(v) ? null : v
+  const s = String(v).trim()
+  // dd/mm/yyyy
+  const m1 = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/)
+  if (m1) return new Date(+m1[3], +m1[2] - 1, +m1[1])
+  // yyyy-mm-dd
+  const m2 = s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/)
+  if (m2) return new Date(+m2[1], +m2[2] - 1, +m2[3])
+  // Excel serial number
+  if (/^\d{5}$/.test(s)) {
+    const d = new Date((+s - 25569) * 86400000)
+    return isNaN(d) ? null : d
+  }
+  const d = new Date(s)
+  return isNaN(d) ? null : d
+}
+const parseValor = (v) => {
+  if (v == null) return 0
+  if (typeof v === 'number') return v
+  const s = String(v).replace(/[R$\s]/g, '')
+  // 1.234,56 → 1234.56
+  if (/\d{1,3}(\.\d{3})*(,\d+)?$/.test(s)) return parseFloat(s.replace(/\./g, '').replace(',', '.')) || 0
+  return parseFloat(s.replace(',', '.')) || 0
+}
+
+// ─── Mapeamento de colunas do Excel ─────────────────────────────────────────
+const COL_MAP = {
+  serie: ['série', 'serie', 'SÉRIE', 'SERIE'],
+  rg: ['rg', 'RG', 'Rg'],
+  sexo: ['sexo', 'Sexo', 'SEXO'],
+  comprador: ['comprador', 'Comprador', 'COMPRADOR', 'cliente', 'Cliente', 'CLIENTE', 'destino', 'Destino'],
+  estado: ['estado', 'Estado', 'ESTADO', 'uf', 'UF'],
+  dataVenda: ['data venda', 'Data Venda', 'DATA VENDA', 'data_venda', 'dataVenda', 'data'],
+  dataNasc: ['datanasc', 'DataNasc', 'DATANASC', 'data_nasc', 'data nascimento', 'Data Nascimento'],
+  idade: ['idade', 'Idade', 'IDADE'],
+  notaFiscal: ['nº nota fiscal', 'Nº Nota Fiscal', 'nota fiscal', 'Nota Fiscal', 'NOTA FISCAL', 'nf', 'NF', 'numero_nf'],
+  valor: ['valor', 'Valor', 'VALOR', 'valor_total', 'valorTotal'],
+}
+
+function mapRow(raw, headers) {
+  const find = (aliases) => {
+    for (const a of aliases) {
+      const idx = headers.findIndex(h => h.trim().toLowerCase() === a.toLowerCase())
+      if (idx >= 0) return raw[idx] ?? raw[headers[idx]]
+    }
+    // fallback: try raw object keys
+    for (const a of aliases) {
+      if (raw[a] !== undefined) return raw[a]
+    }
+    return null
+  }
+  return {
+    serie: String(find(COL_MAP.serie) || '').trim(),
+    rg: String(find(COL_MAP.rg) || '').trim(),
+    sexo: String(find(COL_MAP.sexo) || '').trim(),
+    comprador: String(find(COL_MAP.comprador) || '').trim(),
+    estado: String(find(COL_MAP.estado) || '').trim(),
+    dataVenda: parseDate(find(COL_MAP.dataVenda)),
+    dataNasc: parseDate(find(COL_MAP.dataNasc)),
+    idade: String(find(COL_MAP.idade) || '').trim(),
+    notaFiscal: String(find(COL_MAP.notaFiscal) || '').trim(),
+    valor: parseValor(find(COL_MAP.valor)),
+  }
+}
+
+// ─── Análise de clientes ────────────────────────────────────────────────────
+function analisarClientes(vendas) {
+  const hoje = new Date()
+  const porCliente = {}
+  vendas.forEach(v => {
+    const nome = v.comprador || 'Não informado'
+    if (!porCliente[nome]) porCliente[nome] = { nome, vendas: [], estados: new Set() }
+    porCliente[nome].vendas.push(v)
+    if (v.estado) porCliente[nome].estados.add(v.estado)
   })
 
+  return Object.values(porCliente).map(c => {
+    const vendasOrdenadas = c.vendas.sort((a, b) => (b.dataVenda || 0) - (a.dataVenda || 0))
+    const ultimaCompra = vendasOrdenadas[0]?.dataVenda
+    const primeiraCompra = vendasOrdenadas[vendasOrdenadas.length - 1]?.dataVenda
+    const diasSemComprar = ultimaCompra ? diasEntre(ultimaCompra, hoje) : 9999
+    const totalGasto = c.vendas.reduce((s, v) => s + v.valor, 0)
+    const ticketMedio = totalGasto / c.vendas.length
+    const machos = c.vendas.filter(v => /^m/i.test(v.sexo)).length
+    const femeas = c.vendas.filter(v => /^f/i.test(v.sexo)).length
+    const notas = [...new Set(c.vendas.map(v => v.notaFiscal).filter(Boolean))]
+
+    // Classificação de atenção
+    // Clientes com total ≤ R$3.000 e última compra há +5 anos → baixa prioridade
+    const baixoValorAntigo = totalGasto <= 3000 && diasSemComprar > 1825
+    let atencao = 'normal'
+    let atencaoLabel = '✅ Ativo'
+    let atencaoCor = 'green'
+    if (baixoValorAntigo) {
+      atencao = 'baixa'
+      atencaoLabel = '⚪ Baixa prioridade'
+      atencaoCor = 'gray'
+    } else if (diasSemComprar > 365) {
+      atencao = 'critica'
+      atencaoLabel = '🔴 Inativo (+1 ano)'
+      atencaoCor = 'red'
+    } else if (diasSemComprar > 180) {
+      atencao = 'alta'
+      atencaoLabel = '🟠 Atenção (+6 meses)'
+      atencaoCor = 'orange'
+    } else if (diasSemComprar > 90) {
+      atencao = 'media'
+      atencaoLabel = '🟡 Acompanhar (+3 meses)'
+      atencaoCor = 'yellow'
+    }
+
+    // Score de valor (0-100)
+    const score = Math.min(100, Math.round(
+      (c.vendas.length * 15) + (totalGasto / 1000) + (diasSemComprar < 90 ? 20 : 0)
+    ))
+
+    return {
+      nome: c.nome,
+      totalCompras: c.vendas.length,
+      totalGasto,
+      ticketMedio,
+      ultimaCompra,
+      primeiraCompra,
+      diasSemComprar,
+      machos,
+      femeas,
+      estados: [...c.estados],
+      notas,
+      atencao,
+      atencaoLabel,
+      atencaoCor,
+      score,
+      vendas: vendasOrdenadas,
+    }
+  }).sort((a, b) => b.totalGasto - a.totalGasto)
+}
+
+// ─── Componente Principal ───────────────────────────────────────────────────
+export default function RelatorioVendas() {
+  const router = useRouter()
+  const [vendas, setVendas] = useState([])
+  const [importando, setImportando] = useState(false)
+  const [exportando, setExportando] = useState(false)
+  const [tab, setTab] = useState('clientes') // clientes | historico | graficos
+  const [search, setSearch] = useState('')
+  const [filtroAtencao, setFiltroAtencao] = useState('todos')
+  const [clienteExpandido, setClienteExpandido] = useState(null)
+  const [toast, setToast] = useState(null)
+  const [isDark, setIsDark] = useState(false)
+
   useEffect(() => {
-    setMounted(true)
+    if (typeof window === 'undefined') return
+    setIsDark(document.documentElement.classList.contains('dark'))
+    // Carregar vendas salvas
+    try {
+      const saved = localStorage.getItem('beef-vendas-historico')
+      if (saved) setVendas(JSON.parse(saved, (k, v) => {
+        if (k === 'dataVenda' || k === 'dataNasc') return v ? new Date(v) : null
+        return v
+      }))
+    } catch (_) {}
   }, [])
 
   useEffect(() => {
-    if (mounted) {
-      loadNotasFiscais()
-    }
-  }, [mounted])
+    if (!toast) return
+    const t = setTimeout(() => setToast(null), 3000)
+    return () => clearTimeout(t)
+  }, [toast])
 
-  // Recarregar quando os filtros mudarem (opcional - pode ser removido se quiser apenas atualizar manualmente)
-  // useEffect(() => {
-  //   if (mounted && notasFiscais.length > 0) {
-  //     // Apenas filtrar, não recarregar da API
-  //   }
-  // }, [filtros])
+  const salvarVendas = useCallback((novas) => {
+    setVendas(novas)
+    try { localStorage.setItem('beef-vendas-historico', JSON.stringify(novas)) } catch (_) {}
+  }, [])
 
-  const loadNotasFiscais = async () => {
+  // ─── Importar Excel ─────────────────────────────────────────────────────
+  const handleImport = useCallback(async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setImportando(true)
     try {
-      if (typeof window === 'undefined') return
-      
-      setLoading(true)
-      console.log('🔄 Buscando notas fiscais da API...')
-      const response = await fetch('/api/notas-fiscais')
-      
-      if (response.ok) {
-        const data = await response.json()
-        console.log('📥 Resposta da API (primeiros 3 itens):', data.slice ? data.slice(0, 3) : data)
-        
-        // A API pode retornar { success: true, data: [...] } ou apenas o array
-        let nfsData = []
-        if (Array.isArray(data)) {
-          nfsData = data
-        } else if (data.data && Array.isArray(data.data)) {
-          nfsData = data.data
-        } else if (data.success && Array.isArray(data.data)) {
-          nfsData = data.data
-        }
-        
-        console.log(`📊 Total de notas recebidas: ${nfsData.length}`)
-        
-        // Debug: verificar tipos
-        const tiposEncontrados = {}
-        nfsData.forEach(nf => {
-          const tipo = nf.tipo || 'entrada'
-          tiposEncontrados[tipo] = (tiposEncontrados[tipo] || 0) + 1
-        })
-        console.log('📋 Tipos encontrados:', tiposEncontrados)
-        
-        // Normalizar os dados para o formato esperado
-        const notasNormalizadas = nfsData.map(nf => {
-          // Determinar data de emissão (prioridade: data > data_compra > created_at)
-          let dataEmissao = nf.data || nf.data_compra || nf.created_at
-          
-          // Se dataEmissao é uma string, converter para Date
-          if (typeof dataEmissao === 'string') {
-            dataEmissao = new Date(dataEmissao)
-          }
-          
-          // Garantir que tipo seja 'entrada' ou 'saida'
-          const tipo = (nf.tipo === 'saida' || nf.tipo === 'entrada') ? nf.tipo : 'entrada'
-          
-          const notaNormalizada = {
-            id: nf.id,
-            numero: String(nf.numero_nf || nf.numeroNF || nf.numero || ''),
-            tipo: tipo,
-            empresa: nf.destino || nf.fornecedor || '-',
-            dataEmissao: dataEmissao,
-            valorTotal: parseFloat(nf.valor_total || nf.valorTotal || 0)
-          }
-          
-          // Debug para NF 4393
-          if (notaNormalizada.numero === '4393') {
-            console.log('🔍 NF 4393 encontrada:', notaNormalizada)
-          }
-          
-          return notaNormalizada
-        })
-        
-        // Debug: contar por tipo
-        const entradasCount = notasNormalizadas.filter(n => n.tipo === 'entrada').length
-        const saidasCount = notasNormalizadas.filter(n => n.tipo === 'saida').length
-        console.log(`✅ ${notasNormalizadas.length} notas fiscais carregadas (${entradasCount} entradas, ${saidasCount} saídas)`)
-        
-        // Debug: listar todas as saídas
-        const saidas = notasNormalizadas.filter(n => n.tipo === 'saida')
-        if (saidas.length > 0) {
-          console.log('📤 Notas de SAÍDA encontradas:')
-          saidas.forEach(s => {
-            console.log(`   - NF ${s.numero}: R$ ${s.valorTotal.toFixed(2)} - Data: ${s.dataEmissao}`)
-          })
-        } else {
-          console.log('⚠️ Nenhuma nota de SAÍDA encontrada após normalização!')
-        }
-        
-        setNotasFiscais(notasNormalizadas)
-      } else {
-        console.error('Erro ao buscar notas fiscais:', response.status)
-        // Fallback para localStorage
-        const savedData = localStorage.getItem('notasFiscais')
-        if (savedData) {
-          setNotasFiscais(JSON.parse(savedData))
-        }
-      }
-    } catch (error) {
-      console.error('Erro ao carregar notas fiscais:', error)
-      // Fallback para localStorage
-      const savedData = localStorage.getItem('notasFiscais')
-      if (savedData) {
-        setNotasFiscais(JSON.parse(savedData))
-      }
+      const XLSX = await import('xlsx')
+      const data = await file.arrayBuffer()
+      const wb = XLSX.read(data, { type: 'array', cellDates: true })
+      const ws = wb.Sheets[wb.SheetNames[0]]
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' })
+
+      if (rows.length < 2) { setToast({ type: 'error', msg: 'Planilha vazia ou sem dados' }); return }
+
+      const headers = rows[0].map(h => String(h).trim())
+      const mapped = rows.slice(1)
+        .filter(r => r.some(c => c !== '' && c != null))
+        .map(r => mapRow(r, headers))
+        .filter(r => r.comprador || r.notaFiscal || r.valor > 0)
+
+      if (mapped.length === 0) { setToast({ type: 'error', msg: 'Nenhum dado válido encontrado na planilha' }); return }
+
+      // Merge com existentes (evitar duplicatas por NF + RG)
+      const existentes = new Set(vendas.map(v => `${v.notaFiscal}|${v.rg}`))
+      const novas = mapped.filter(v => !existentes.has(`${v.notaFiscal}|${v.rg}`))
+      const merged = [...vendas, ...novas]
+      salvarVendas(merged)
+      setToast({ type: 'success', msg: `${novas.length} registros importados (${mapped.length - novas.length} duplicados ignorados)` })
+    } catch (err) {
+      console.error('Erro ao importar:', err)
+      setToast({ type: 'error', msg: 'Erro ao ler o arquivo Excel' })
     } finally {
-      setLoading(false)
+      setImportando(false)
+      e.target.value = ''
     }
-  }
+  }, [vendas, salvarVendas])
 
-  const filtrarNotas = () => {
-    console.log('🔍 Iniciando filtro com:', {
-      totalNotas: notasFiscais.length,
-      filtroDataInicio: filtros.dataInicio,
-      filtroDataFim: filtros.dataFim,
-      filtroTipo: filtros.tipo
+  // ─── Análise ────────────────────────────────────────────────────────────
+  const clientes = useMemo(() => analisarClientes(vendas), [vendas])
+
+  const clientesFiltrados = useMemo(() => {
+    let list = clientes
+    if (search) {
+      const q = search.toLowerCase()
+      list = list.filter(c => c.nome.toLowerCase().includes(q) || c.estados.some(e => e.toLowerCase().includes(q)))
+    }
+    if (filtroAtencao !== 'todos') list = list.filter(c => c.atencao === filtroAtencao)
+    return list
+  }, [clientes, search, filtroAtencao])
+
+  const resumoGeral = useMemo(() => {
+    const total = vendas.reduce((s, v) => s + v.valor, 0)
+    const machos = vendas.filter(v => /^m/i.test(v.sexo)).length
+    const femeas = vendas.filter(v => /^f/i.test(v.sexo)).length
+    const notas = [...new Set(vendas.map(v => v.notaFiscal).filter(Boolean))].length
+    const criticos = clientes.filter(c => c.atencao === 'critica').length
+    const atencaoAlta = clientes.filter(c => c.atencao === 'alta').length
+    return { total, machos, femeas, notas, totalAnimais: vendas.length, totalClientes: clientes.length, criticos, atencaoAlta }
+  }, [vendas, clientes])
+
+  // ─── Dados para gráficos simples (barras CSS) ──────────────────────────
+  const topClientes = useMemo(() => clientes.slice(0, 8), [clientes])
+  const vendasPorMes = useMemo(() => {
+    const meses = {}
+    vendas.forEach(v => {
+      if (!v.dataVenda) return
+      const key = `${v.dataVenda.getFullYear()}-${String(v.dataVenda.getMonth() + 1).padStart(2, '0')}`
+      if (!meses[key]) meses[key] = { mes: key, total: 0, qtd: 0 }
+      meses[key].total += v.valor
+      meses[key].qtd++
     })
-    
-    const filtradas = notasFiscais.filter(nota => {
-      // Normalizar data - pode vir em diferentes formatos
-      let dataEmissao
-      if (nota.dataEmissao) {
-        if (nota.dataEmissao instanceof Date) {
-          dataEmissao = nota.dataEmissao
-        } else {
-          dataEmissao = new Date(nota.dataEmissao)
-        }
-      } else {
-        console.warn('⚠️ Nota sem data:', nota.numero)
-        return false // Se não tem data, não incluir
-      }
-      
-      // Verificar se a data é válida
-      if (isNaN(dataEmissao.getTime())) {
-        console.warn('⚠️ Data inválida para nota:', nota.numero, nota.dataEmissao)
-        return false
-      }
-      
-      // Criar datas de comparação (apenas data, sem hora)
-      const dataInicio = new Date(filtros.dataInicio + 'T00:00:00')
-      const dataFim = new Date(filtros.dataFim + 'T23:59:59')
-      
-      // Normalizar data de emissão para início do dia para comparação
-      const dataEmissaoNormalizada = new Date(dataEmissao)
-      dataEmissaoNormalizada.setHours(0, 0, 0, 0)
-      
-      const dataInicioNormalizada = new Date(dataInicio)
-      dataInicioNormalizada.setHours(0, 0, 0, 0)
-      
-      const dataFimNormalizada = new Date(dataFim)
-      dataFimNormalizada.setHours(23, 59, 59, 999)
-      
-      const dentroDataRange = dataEmissaoNormalizada >= dataInicioNormalizada && dataEmissaoNormalizada <= dataFimNormalizada
-      const tipoMatch = filtros.tipo === 'todos' || nota.tipo === filtros.tipo
-      
-      // Debug para todas as saídas
-      if (nota.tipo === 'saida') {
-        console.log(`🔍 Filtrando SAÍDA NF ${nota.numero}:`, {
-          dataEmissaoOriginal: nota.dataEmissao,
-          dataEmissaoNormalizada: dataEmissaoNormalizada.toISOString(),
-          dataInicio: dataInicioNormalizada.toISOString(),
-          dataFim: dataFimNormalizada.toISOString(),
-          dentroDataRange,
-          tipo: nota.tipo,
-          filtroTipo: filtros.tipo,
-          tipoMatch,
-          resultado: dentroDataRange && tipoMatch
-        })
-      }
-      
-      return dentroDataRange && tipoMatch
+    return Object.values(meses).sort((a, b) => a.mes.localeCompare(b.mes))
+  }, [vendas])
+  const vendasPorEstado = useMemo(() => {
+    const estados = {}
+    vendas.forEach(v => {
+      const e = v.estado || 'N/I'
+      if (!estados[e]) estados[e] = { estado: e, total: 0, qtd: 0 }
+      estados[e].total += v.valor
+      estados[e].qtd++
     })
-    
-    // Debug: contar filtradas por tipo
-    const entradasFiltradas = filtradas.filter(n => n.tipo === 'entrada').length
-    const saidasFiltradas = filtradas.filter(n => n.tipo === 'saida').length
-    console.log(`🔍 Notas filtradas: ${filtradas.length} (${entradasFiltradas} entradas, ${saidasFiltradas} saídas)`)
-    
-    // Listar todas as saídas filtradas
-    const saidasFiltradasList = filtradas.filter(n => n.tipo === 'saida')
-    if (saidasFiltradasList.length > 0) {
-      console.log('✅ Saídas que passaram no filtro:')
-      saidasFiltradasList.forEach(s => {
-        console.log(`   - NF ${s.numero}: R$ ${s.valorTotal.toFixed(2)}`)
-      })
-    } else {
-      console.log('❌ Nenhuma saída passou no filtro!')
+    return Object.values(estados).sort((a, b) => b.total - a.total)
+  }, [vendas])
+
+  // Vendas por sexo com valor
+  const vendasPorSexo = useMemo(() => {
+    const machos = vendas.filter(v => /^m/i.test(v.sexo))
+    const femeas = vendas.filter(v => /^f/i.test(v.sexo))
+    const outros = vendas.filter(v => !/^[mf]/i.test(v.sexo))
+    return {
+      machos: { qtd: machos.length, total: machos.reduce((s, v) => s + v.valor, 0) },
+      femeas: { qtd: femeas.length, total: femeas.reduce((s, v) => s + v.valor, 0) },
+      outros: { qtd: outros.length, total: outros.reduce((s, v) => s + v.valor, 0) },
     }
-    
-    return filtradas
-  }
+  }, [vendas])
 
-  const carregarDetalhesNF = async (nfId) => {
+  // Vendas por faixa de valor
+  const vendasPorFaixa = useMemo(() => {
+    const faixas = { 'Até R$5k': 0, 'R$5k-10k': 0, 'R$10k-20k': 0, 'R$20k-50k': 0, 'R$50k+': 0 }
+    const faixasVal = { 'Até R$5k': 0, 'R$5k-10k': 0, 'R$10k-20k': 0, 'R$20k-50k': 0, 'R$50k+': 0 }
+    vendas.forEach(v => {
+      if (v.valor <= 5000) { faixas['Até R$5k']++; faixasVal['Até R$5k'] += v.valor }
+      else if (v.valor <= 10000) { faixas['R$5k-10k']++; faixasVal['R$5k-10k'] += v.valor }
+      else if (v.valor <= 20000) { faixas['R$10k-20k']++; faixasVal['R$10k-20k'] += v.valor }
+      else if (v.valor <= 50000) { faixas['R$20k-50k']++; faixasVal['R$20k-50k'] += v.valor }
+      else { faixas['R$50k+']++; faixasVal['R$50k+'] += v.valor }
+    })
+    return Object.entries(faixas).map(([faixa, qtd]) => ({ faixa, qtd, total: faixasVal[faixa] }))
+  }, [vendas])
+
+  // Frequência de compra por cliente
+  const frequenciaClientes = useMemo(() => {
+    const freq = { '1 compra': 0, '2-3 compras': 0, '4-5 compras': 0, '6-10 compras': 0, '10+ compras': 0 }
+    clientes.forEach(c => {
+      if (c.totalCompras === 1) freq['1 compra']++
+      else if (c.totalCompras <= 3) freq['2-3 compras']++
+      else if (c.totalCompras <= 5) freq['4-5 compras']++
+      else if (c.totalCompras <= 10) freq['6-10 compras']++
+      else freq['10+ compras']++
+    })
+    return Object.entries(freq).map(([faixa, qtd]) => ({ faixa, qtd }))
+  }, [clientes])
+
+  // Cores para gráficos
+  const CHART_COLORS = ['#F59E0B', '#3B82F6', '#10B981', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4', '#F97316']
+  const CHART_COLORS_ALPHA = CHART_COLORS.map(c => c + '99')
+
+  // ─── Exportar Excel completo ────────────────────────────────────────────
+  const exportarExcel = useCallback(async () => {
+    if (vendas.length === 0) return
+    setExportando(true)
     try {
-      setLoadingDetalhes(true)
-      setShowDetalhesModal(true)
-      
-      const response = await fetch(`/api/notas-fiscais/${nfId}`)
-      
-      if (response.ok) {
-        const data = await response.json()
-        setNfDetalhes(data)
-        console.log('📄 Detalhes da NF carregados:', data)
-      } else {
-        console.error('Erro ao buscar detalhes da NF:', response.status)
-        setNfDetalhes(null)
-      }
-    } catch (error) {
-      console.error('Erro ao carregar detalhes da NF:', error)
-      setNfDetalhes(null)
-    } finally {
-      setLoadingDetalhes(false)
-    }
-  }
-
-  const notasFiltradas = filtrarNotas()
-  
-  const resumo = {
-    totalEntradas: notasFiltradas
-      .filter(n => n.tipo === 'entrada')
-      .reduce((sum, n) => sum + (n.valorTotal || 0), 0),
-    totalSaidas: notasFiltradas
-      .filter(n => n.tipo === 'saida')
-      .reduce((sum, n) => sum + (n.valorTotal || 0), 0),
-    quantidadeEntradas: notasFiltradas.filter(n => n.tipo === 'entrada').length,
-    quantidadeSaidas: notasFiltradas.filter(n => n.tipo === 'saida').length
-  }
-
-  resumo.saldo = resumo.totalSaidas - resumo.totalEntradas // Vendas - Compras
-
-  const gerarRelatorioExcel = async () => {
-    try {
-      setExportando(true)
-      
-      // Importar ExcelJS dinamicamente
       const ExcelJS = (await import('exceljs')).default
-      const workbook = new ExcelJS.Workbook()
-      workbook.creator = 'BeefSync - Sistema de Gestão Pecuária'
-      workbook.created = new Date()
-      
-      // Recalcular notas filtradas e resumo dentro da função
-      const notasFiltradasAtual = filtrarNotas()
-      
-      // Buscar detalhes completos de todas as notas filtradas
-      const notasComDetalhes = []
-      for (const nota of notasFiltradasAtual) {
-        try {
-          const response = await fetch(`/api/notas-fiscais/${nota.id}`)
-          if (response.ok) {
-            const detalhes = await response.json()
-            notasComDetalhes.push(detalhes)
-          } else {
-            notasComDetalhes.push(nota) // Usar dados básicos se não conseguir buscar detalhes
-          }
-        } catch (error) {
-          console.error(`Erro ao buscar detalhes da NF ${nota.numero}:`, error)
-          notasComDetalhes.push(nota) // Usar dados básicos
-        }
-      }
+      const wb = new ExcelJS.Workbook()
+      wb.creator = 'Beef-Sync'
+      wb.created = new Date()
 
-      // Separar entradas e saídas
-      const entradas = notasComDetalhes.filter(n => n.tipo === 'entrada')
-      const saidas = notasComDetalhes.filter(n => n.tipo === 'saida')
-
-      // ===== ABA RESUMO =====
-      const resumoSheet = workbook.addWorksheet('📊 Resumo', {
-        pageSetup: {
-          paperSize: 9,
-          orientation: 'portrait',
-          margins: { left: 0.7, right: 0.7, top: 0.75, bottom: 0.75 }
-        }
+      const headerStyle = (color) => ({
+        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: color } },
+        font: { bold: true, color: { argb: 'FFFFFFFF' }, size: 11 },
+        alignment: { horizontal: 'center', vertical: 'middle' },
+        border: { bottom: { style: 'thin', color: { argb: 'FF000000' } } },
       })
-
-      // Título
-      resumoSheet.mergeCells('A1:B1')
-      const titleCell = resumoSheet.getCell('A1')
-      titleCell.value = 'RELATÓRIO FISCAL - RESUMO'
-      titleCell.font = { size: 16, bold: true, color: { argb: 'FFFFFFFF' } }
-      titleCell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FFE67E22' }
+      const applyHeader = (sheet, color) => {
+        const row = sheet.getRow(1)
+        row.height = 28
+        row.eachCell(cell => Object.assign(cell, headerStyle(color)))
       }
-      titleCell.alignment = { horizontal: 'center', vertical: 'middle' }
-      resumoSheet.getRow(1).height = 30
 
-      // Dados do resumo
-      resumoSheet.columns = [
-        { header: 'Indicador', key: 'indicador', width: 30 },
-        { header: 'Valor', key: 'valor', width: 20 }
+      // ── Aba 1: Resumo Executivo ──
+      const ws1 = wb.addWorksheet('📊 Resumo Executivo')
+      ws1.columns = [{ key: 'ind', width: 35 }, { key: 'val', width: 25 }]
+      ws1.addRow({ ind: 'Indicador', val: 'Valor' })
+      applyHeader(ws1, 'FFE67E22')
+      const dados1 = [
+        ['Total de Vendas', fmt(resumoGeral.total)],
+        ['Total de Animais Vendidos', resumoGeral.totalAnimais],
+        ['Total de Clientes', resumoGeral.totalClientes],
+        ['Total de Notas Fiscais', resumoGeral.notas],
+        ['Machos Vendidos', resumoGeral.machos],
+        ['Fêmeas Vendidas', resumoGeral.femeas],
+        ['Ticket Médio por Animal', fmt(resumoGeral.total / (resumoGeral.totalAnimais || 1))],
+        ['Ticket Médio por Cliente', fmt(resumoGeral.total / (resumoGeral.totalClientes || 1))],
+        ['Clientes Inativos (+1 ano)', resumoGeral.criticos],
+        ['Clientes que Precisam Atenção (+6m)', resumoGeral.atencaoAlta],
+        ['Data do Relatório', new Date().toLocaleDateString('pt-BR')],
       ]
+      dados1.forEach(([ind, val]) => ws1.addRow({ ind, val }))
 
-      // Calcular resumo atualizado com base nos detalhes
-      const resumoAtual = {
-        totalEntradas: entradas.reduce((sum, n) => sum + parseFloat(n.valor_total || 0), 0),
-        totalSaidas: saidas.reduce((sum, n) => sum + parseFloat(n.valor_total || 0), 0),
-        saldo: 0
-      }
-      resumoAtual.saldo = resumoAtual.totalSaidas - resumoAtual.totalEntradas
-
-      const resumoData = [
-        { indicador: 'Período', valor: `${new Date(filtros.dataInicio).toLocaleDateString('pt-BR')} a ${new Date(filtros.dataFim).toLocaleDateString('pt-BR')}` },
-        { indicador: 'Total de Notas', valor: notasFiltradas.length },
-        { indicador: 'Notas de Entrada', valor: entradas.length },
-        { indicador: 'Notas de Saída (Vendas)', valor: saidas.length },
-        { indicador: 'Valor Total Entradas', valor: `R$ ${resumoAtual.totalEntradas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` },
-        { indicador: 'Valor Total Saídas', valor: `R$ ${resumoAtual.totalSaidas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` },
-        { indicador: 'Saldo (Vendas - Compras)', valor: `R$ ${resumoAtual.saldo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` },
-        { indicador: resumoAtual.saldo >= 0 ? 'Lucro' : 'Prejuízo', valor: resumoAtual.saldo >= 0 ? '✅' : '❌' }
+      // ── Aba 2: Análise por Cliente ──
+      const ws2 = wb.addWorksheet('👥 Análise por Cliente')
+      ws2.columns = [
+        { key: 'nome', width: 30 },
+        { key: 'compras', width: 12 },
+        { key: 'total', width: 18 },
+        { key: 'ticket', width: 18 },
+        { key: 'ultima', width: 14 },
+        { key: 'primeira', width: 14 },
+        { key: 'dias', width: 16 },
+        { key: 'machos', width: 10 },
+        { key: 'femeas', width: 10 },
+        { key: 'estados', width: 15 },
+        { key: 'status', width: 22 },
+        { key: 'score', width: 10 },
+        { key: 'recomendacao', width: 45 },
       ]
-
-      resumoData.forEach((row, index) => {
-        const excelRow = resumoSheet.addRow(row)
-        if (index === 0) {
-          excelRow.eachCell((cell) => {
-            cell.font = { bold: true }
-            cell.fill = {
-              type: 'pattern',
-              pattern: 'solid',
-              fgColor: { argb: 'FFF3F4F6' }
-            }
-          })
-        }
+      ws2.addRow({
+        nome: 'Cliente', compras: 'Compras', total: 'Valor Total', ticket: 'Ticket Médio',
+        ultima: 'Última Compra', primeira: '1ª Compra', dias: 'Dias s/ Comprar',
+        machos: 'Machos', femeas: 'Fêmeas', estados: 'Estados', status: 'Status',
+        score: 'Score', recomendacao: 'Recomendação IA',
       })
-
-      // Estilizar cabeçalho
-      const resumoHeaderRow = resumoSheet.getRow(2)
-      resumoHeaderRow.eachCell((cell) => {
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'FF4472C4' }
-        }
-        cell.font = {
-          color: { argb: 'FFFFFFFF' },
-          bold: true
-        }
-        cell.alignment = { horizontal: 'center', vertical: 'middle' }
+      applyHeader(ws2, 'FF3B82F6')
+      clientes.forEach(c => {
+        let rec = ''
+        if (c.atencao === 'baixa') rec = `⚪ Baixa prioridade. Total gasto: ${fmt(c.totalGasto)} há ${Math.round(c.diasSemComprar / 365)} anos. Manter no cadastro sem ação urgente.`
+        else if (c.atencao === 'critica') rec = `⚠️ Cliente inativo há ${c.diasSemComprar} dias. Recomenda-se contato urgente para reativação. Já comprou ${c.totalCompras} vezes totalizando ${fmt(c.totalGasto)}.`
+        else if (c.atencao === 'alta') rec = `🔔 Sem compras há ${c.diasSemComprar} dias. Enviar oferta personalizada. Perfil: ${c.machos > c.femeas ? 'prefere machos' : c.femeas > c.machos ? 'prefere fêmeas' : 'compra ambos os sexos'}.`
+        else if (c.atencao === 'media') rec = `📋 Acompanhar. Última compra há ${c.diasSemComprar} dias. Ticket médio: ${fmt(c.ticketMedio)}.`
+        else rec = `✅ Cliente ativo e recorrente. Manter relacionamento. ${c.totalCompras > 3 ? 'Cliente fiel, considerar condições especiais.' : ''}`
+        ws2.addRow({
+          nome: c.nome, compras: c.totalCompras, total: c.totalGasto, ticket: c.ticketMedio,
+          ultima: fmtDate(c.ultimaCompra), primeira: fmtDate(c.primeiraCompra), dias: c.diasSemComprar,
+          machos: c.machos, femeas: c.femeas, estados: c.estados.join(', '),
+          status: c.atencaoLabel, score: c.score, recomendacao: rec,
+        })
       })
-      resumoSheet.getRow(2).height = 25
+      ws2.getColumn('total').numFmt = 'R$ #,##0.00'
+      ws2.getColumn('ticket').numFmt = 'R$ #,##0.00'
 
-      // ===== ABA ENTRADAS =====
-      if (entradas.length > 0) {
-        const entradasSheet = workbook.addWorksheet('📥 Entradas', {
-          pageSetup: {
-            paperSize: 9,
-            orientation: 'landscape',
-            margins: { left: 0.7, right: 0.7, top: 0.75, bottom: 0.75 }
-          }
-        })
+      // ── Aba 3: Histórico Completo ──
+      const ws3 = wb.addWorksheet('📋 Histórico de Vendas')
+      ws3.columns = [
+        { key: 'nf', width: 15 }, { key: 'serie', width: 10 }, { key: 'rg', width: 10 },
+        { key: 'sexo', width: 10 }, { key: 'comprador', width: 28 }, { key: 'estado', width: 8 },
+        { key: 'dataVenda', width: 14 }, { key: 'dataNasc', width: 14 }, { key: 'idade', width: 10 },
+        { key: 'valor', width: 16 },
+      ]
+      ws3.addRow({ nf: 'Nota Fiscal', serie: 'Série', rg: 'RG', sexo: 'Sexo', comprador: 'Comprador', estado: 'Estado', dataVenda: 'Data Venda', dataNasc: 'Data Nasc.', idade: 'Idade', valor: 'Valor' })
+      applyHeader(ws3, 'FF10B981')
+      vendas.forEach(v => ws3.addRow({
+        nf: v.notaFiscal, serie: v.serie, rg: v.rg, sexo: v.sexo, comprador: v.comprador,
+        estado: v.estado, dataVenda: fmtDate(v.dataVenda), dataNasc: fmtDate(v.dataNasc),
+        idade: v.idade, valor: v.valor,
+      }))
+      ws3.getColumn('valor').numFmt = 'R$ #,##0.00'
 
-        entradasSheet.columns = [
-          { header: 'Número NF', key: 'numero', width: 15 },
-          { header: 'Data', key: 'data', width: 12 },
-          { header: 'Fornecedor', key: 'fornecedor', width: 30 },
-          { header: 'CNPJ/CPF', key: 'cnpj', width: 18 },
-          { header: 'Natureza Operação', key: 'natureza', width: 20 },
-          { header: 'Valor Total', key: 'valor', width: 15 },
-          { header: 'Qtd Itens', key: 'qtdItens', width: 12 },
-          { header: 'Observações', key: 'observacoes', width: 40 }
-        ]
+      // ── Aba 4: Vendas por Mês ──
+      const ws4 = wb.addWorksheet('📅 Vendas por Mês')
+      ws4.columns = [{ key: 'mes', width: 15 }, { key: 'qtd', width: 12 }, { key: 'total', width: 18 }]
+      ws4.addRow({ mes: 'Mês', qtd: 'Qtd Animais', total: 'Valor Total' })
+      applyHeader(ws4, 'FF8B5CF6')
+      vendasPorMes.forEach(m => ws4.addRow({ mes: m.mes, qtd: m.qtd, total: m.total }))
+      ws4.getColumn('total').numFmt = 'R$ #,##0.00'
 
-        entradas.forEach(nota => {
-          entradasSheet.addRow({
-            numero: nota.numero_nf || nota.numeroNF || nota.numero,
-            data: new Date(nota.data || nota.data_compra || nota.created_at).toLocaleDateString('pt-BR'),
-            fornecedor: nota.fornecedor || '-',
-            cnpj: nota.cnpj_origem_destino || '-',
-            natureza: nota.natureza_operacao || '-',
-            valor: parseFloat(nota.valor_total || 0),
-            qtdItens: nota.itens ? nota.itens.length : (nota.total_itens || 0),
-            observacoes: nota.observacoes || '-'
-          })
-        })
+      // ── Aba 5: Vendas por Estado ──
+      const ws5 = wb.addWorksheet('🗺️ Vendas por Estado')
+      ws5.columns = [{ key: 'estado', width: 15 }, { key: 'qtd', width: 12 }, { key: 'total', width: 18 }]
+      ws5.addRow({ estado: 'Estado', qtd: 'Qtd Animais', total: 'Valor Total' })
+      applyHeader(ws5, 'FFEF4444')
+      vendasPorEstado.forEach(e => ws5.addRow({ estado: e.estado, qtd: e.qtd, total: e.total }))
+      ws5.getColumn('total').numFmt = 'R$ #,##0.00'
 
-        // Estilizar cabeçalho
-        const entradasHeaderRow = entradasSheet.getRow(1)
-        entradasHeaderRow.eachCell((cell) => {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'FF10B981' }
-          }
-          cell.font = {
-            color: { argb: 'FFFFFFFF' },
-            bold: true
-          }
-          cell.alignment = { horizontal: 'center', vertical: 'middle' }
-        })
-        entradasSheet.getRow(1).height = 25
+      // ── Aba 6: Clientes que Precisam Atenção ──
+      const ws6 = wb.addWorksheet('⚠️ Atenção Especial')
+      ws6.columns = [
+        { key: 'nome', width: 30 }, { key: 'status', width: 22 }, { key: 'dias', width: 16 },
+        { key: 'ultima', width: 14 }, { key: 'total', width: 18 }, { key: 'compras', width: 12 },
+        { key: 'acao', width: 50 },
+      ]
+      ws6.addRow({ nome: 'Cliente', status: 'Status', dias: 'Dias s/ Comprar', ultima: 'Última Compra', total: 'Valor Total', compras: 'Compras', acao: 'Ação Sugerida' })
+      applyHeader(ws6, 'FFDC2626')
+      clientes.filter(c => c.atencao !== 'normal').forEach(c => {
+        let acao = ''
+        if (c.atencao === 'baixa') acao = 'Baixa prioridade — manter cadastro, sem ação urgente'
+        else if (c.atencao === 'critica') acao = 'URGENTE: Ligar para o cliente, oferecer condições especiais de reativação'
+        else if (c.atencao === 'alta') acao = 'Enviar mensagem/WhatsApp com ofertas personalizadas'
+        else acao = 'Manter contato, enviar novidades do rebanho'
+        ws6.addRow({ nome: c.nome, status: c.atencaoLabel, dias: c.diasSemComprar, ultima: fmtDate(c.ultimaCompra), total: c.totalGasto, compras: c.totalCompras, acao })
+      })
+      ws6.getColumn('total').numFmt = 'R$ #,##0.00'
 
-        // Formatar coluna de valor
-        entradasSheet.getColumn('valor').numFmt = 'R$ #,##0.00'
-      }
+      // ── Aba 7: Vendas por Sexo ──
+      const ws7 = wb.addWorksheet('⚧ Vendas por Sexo')
+      ws7.columns = [{ key: 'sexo', width: 15 }, { key: 'qtd', width: 15 }, { key: 'total', width: 20 }, { key: 'percentual', width: 15 }, { key: 'ticketMedio', width: 20 }]
+      ws7.addRow({ sexo: 'Sexo', qtd: 'Qtd Animais', total: 'Valor Total', percentual: '% do Total', ticketMedio: 'Ticket Médio' })
+      applyHeader(ws7, 'FF8B5CF6')
+      const totalVendido = resumoGeral.total || 1
+      ;[
+        { sexo: 'Machos', ...vendasPorSexo.machos },
+        { sexo: 'Fêmeas', ...vendasPorSexo.femeas },
+        { sexo: 'Outros/N.I.', ...vendasPorSexo.outros },
+      ].filter(s => s.qtd > 0).forEach(s => {
+        ws7.addRow({ sexo: s.sexo, qtd: s.qtd, total: s.total, percentual: `${((s.total / totalVendido) * 100).toFixed(1)}%`, ticketMedio: s.qtd > 0 ? s.total / s.qtd : 0 })
+      })
+      ws7.getColumn('total').numFmt = 'R$ #,##0.00'
+      ws7.getColumn('ticketMedio').numFmt = 'R$ #,##0.00'
 
-      // ===== ABA SAÍDAS =====
-      if (saidas.length > 0) {
-        const saidasSheet = workbook.addWorksheet('📤 Saídas (Vendas)', {
-          pageSetup: {
-            paperSize: 9,
-            orientation: 'landscape',
-            margins: { left: 0.7, right: 0.7, top: 0.75, bottom: 0.75 }
-          }
-        })
+      // ── Aba 8: Faixa de Valor ──
+      const ws8 = wb.addWorksheet('💰 Faixa de Valor')
+      ws8.columns = [{ key: 'faixa', width: 18 }, { key: 'qtd', width: 15 }, { key: 'total', width: 20 }, { key: 'percentual', width: 15 }]
+      ws8.addRow({ faixa: 'Faixa', qtd: 'Qtd Animais', total: 'Valor Total', percentual: '% do Total' })
+      applyHeader(ws8, 'FF059669')
+      vendasPorFaixa.forEach(f => {
+        ws8.addRow({ faixa: f.faixa, qtd: f.qtd, total: f.total, percentual: `${((f.total / totalVendido) * 100).toFixed(1)}%` })
+      })
+      ws8.getColumn('total').numFmt = 'R$ #,##0.00'
 
-        saidasSheet.columns = [
-          { header: 'Número NF', key: 'numero', width: 15 },
-          { header: 'Data', key: 'data', width: 12 },
-          { header: 'Destino/Comprador', key: 'destino', width: 30 },
-          { header: 'CNPJ/CPF', key: 'cnpj', width: 18 },
-          { header: 'Natureza Operação', key: 'natureza', width: 20 },
-          { header: 'Valor Total', key: 'valor', width: 15 },
-          { header: 'Qtd Itens', key: 'qtdItens', width: 12 },
-          { header: 'Observações', key: 'observacoes', width: 40 }
-        ]
+      // ── Aba 9: Ranking de Clientes ──
+      const ws9 = wb.addWorksheet('🏆 Ranking Clientes')
+      ws9.columns = [
+        { key: 'pos', width: 8 }, { key: 'nome', width: 30 }, { key: 'total', width: 18 },
+        { key: 'compras', width: 12 }, { key: 'ticket', width: 18 }, { key: 'preferencia', width: 20 },
+        { key: 'fidelidade', width: 18 }, { key: 'classificacao', width: 20 },
+      ]
+      ws9.addRow({ pos: '#', nome: 'Cliente', total: 'Valor Total', compras: 'Compras', ticket: 'Ticket Médio', preferencia: 'Preferência', fidelidade: 'Fidelidade', classificacao: 'Classificação' })
+      applyHeader(ws9, 'FFD97706')
+      clientes.forEach((c, i) => {
+        const pref = c.machos > c.femeas ? 'Machos' : c.femeas > c.machos ? 'Fêmeas' : 'Ambos'
+        const fid = c.totalCompras >= 10 ? '⭐ VIP' : c.totalCompras >= 5 ? '🥇 Fiel' : c.totalCompras >= 3 ? '🥈 Recorrente' : c.totalCompras >= 2 ? '🥉 Retornou' : '🆕 Novo'
+        const classif = c.totalGasto >= 100000 ? 'Platinum' : c.totalGasto >= 50000 ? 'Gold' : c.totalGasto >= 20000 ? 'Silver' : 'Bronze'
+        ws9.addRow({ pos: i + 1, nome: c.nome, total: c.totalGasto, compras: c.totalCompras, ticket: c.ticketMedio, preferencia: pref, fidelidade: fid, classificacao: classif })
+      })
+      ws9.getColumn('total').numFmt = 'R$ #,##0.00'
+      ws9.getColumn('ticket').numFmt = 'R$ #,##0.00'
 
-        saidas.forEach(nota => {
-          saidasSheet.addRow({
-            numero: nota.numero_nf || nota.numeroNF || nota.numero,
-            data: new Date(nota.data || nota.data_compra || nota.created_at).toLocaleDateString('pt-BR'),
-            destino: nota.destino || '-',
-            cnpj: nota.cnpj_origem_destino || '-',
-            natureza: nota.natureza_operacao || '-',
-            valor: parseFloat(nota.valor_total || 0),
-            qtdItens: nota.itens ? nota.itens.length : (nota.total_itens || 0),
-            observacoes: nota.observacoes || '-'
-          })
-        })
+      // ── Aba 10: Vendas por Nota Fiscal ──
+      const ws10 = wb.addWorksheet('🧾 Por Nota Fiscal')
+      ws10.columns = [
+        { key: 'nf', width: 15 }, { key: 'data', width: 14 }, { key: 'comprador', width: 28 },
+        { key: 'estado', width: 8 }, { key: 'qtdAnimais', width: 14 }, { key: 'valorTotal', width: 18 },
+        { key: 'machos', width: 10 }, { key: 'femeas', width: 10 },
+      ]
+      ws10.addRow({ nf: 'Nota Fiscal', data: 'Data', comprador: 'Comprador', estado: 'Estado', qtdAnimais: 'Qtd Animais', valorTotal: 'Valor Total', machos: 'Machos', femeas: 'Fêmeas' })
+      applyHeader(ws10, 'FF2563EB')
+      const porNF = {}
+      vendas.forEach(v => {
+        const k = v.notaFiscal || 'S/N'
+        if (!porNF[k]) porNF[k] = { nf: k, data: v.dataVenda, comprador: v.comprador, estado: v.estado, qtd: 0, total: 0, machos: 0, femeas: 0 }
+        porNF[k].qtd++
+        porNF[k].total += v.valor
+        if (/^m/i.test(v.sexo)) porNF[k].machos++
+        else if (/^f/i.test(v.sexo)) porNF[k].femeas++
+      })
+      Object.values(porNF).sort((a, b) => (b.data || 0) - (a.data || 0)).forEach(n => {
+        ws10.addRow({ nf: n.nf, data: fmtDate(n.data), comprador: n.comprador, estado: n.estado, qtdAnimais: n.qtd, valorTotal: n.total, machos: n.machos, femeas: n.femeas })
+      })
+      ws10.getColumn('valorTotal').numFmt = 'R$ #,##0.00'
 
-        // Estilizar cabeçalho
-        const saidasHeaderRow = saidasSheet.getRow(1)
-        saidasHeaderRow.eachCell((cell) => {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'FF3B82F6' }
-          }
-          cell.font = {
-            color: { argb: 'FFFFFFFF' },
-            bold: true
-          }
-          cell.alignment = { horizontal: 'center', vertical: 'middle' }
-        })
-        saidasSheet.getRow(1).height = 25
-
-        // Formatar coluna de valor
-        saidasSheet.getColumn('valor').numFmt = 'R$ #,##0.00'
-      }
-
-      // ===== ABA ANIMAIS VENDIDOS/COMPRADOS =====
-      const animaisVendidos = []
-      const animaisComprados = []
-
-      for (const nota of notasComDetalhes) {
-        if (nota.itens && nota.itens.length > 0) {
-          const itensBovinos = nota.itens.filter(item => 
-            item.tipoProduto === 'bovino' || item.tipo_produto === 'bovino'
-          )
-
-          itensBovinos.forEach(item => {
-            const animalData = {
-              numeroNF: nota.numero_nf || nota.numeroNF || nota.numero,
-              dataNF: new Date(nota.data || nota.data_compra || nota.created_at).toLocaleDateString('pt-BR'),
-              identificacao: item.tatuagem || item.identificacao || `${item.serie || ''} ${item.rg || ''}`.trim() || 'N/A',
-              sexo: item.sexo === 'macho' || item.sexo === 'M' ? 'Macho' : item.sexo === 'femea' || item.sexo === 'F' ? 'Fêmea' : item.sexo || 'N/A',
-              raca: item.raca || 'N/A',
-              era: item.era || 'N/A',
-              peso: item.peso ? `${item.peso} kg` : 'N/A',
-              valorUnitario: parseFloat(item.valorUnitario || item.valor_unitario || 0),
-              fornecedorDestino: nota.tipo === 'entrada' ? (nota.fornecedor || '-') : (nota.destino || '-')
-            }
-
-            if (nota.tipo === 'entrada') {
-              animaisComprados.push(animalData)
-            } else {
-              animaisVendidos.push(animalData)
-            }
-          })
-        }
-      }
-
-      // Aba Animais Comprados
-      if (animaisComprados.length > 0) {
-        const animaisCompradosSheet = workbook.addWorksheet('🐂 Animais Comprados', {
-          pageSetup: {
-            paperSize: 9,
-            orientation: 'landscape',
-            margins: { left: 0.7, right: 0.7, top: 0.75, bottom: 0.75 }
-          }
-        })
-
-        animaisCompradosSheet.columns = [
-          { header: 'NF', key: 'numeroNF', width: 12 },
-          { header: 'Data NF', key: 'dataNF', width: 12 },
-          { header: 'Identificação', key: 'identificacao', width: 20 },
-          { header: 'Sexo', key: 'sexo', width: 10 },
-          { header: 'Raça', key: 'raca', width: 15 },
-          { header: 'Era', key: 'era', width: 10 },
-          { header: 'Peso', key: 'peso', width: 12 },
-          { header: 'Valor Unitário', key: 'valorUnitario', width: 15 },
-          { header: 'Fornecedor', key: 'fornecedorDestino', width: 30 }
-        ]
-
-        animaisComprados.forEach(animal => {
-          animaisCompradosSheet.addRow(animal)
-        })
-
-        // Estilizar cabeçalho
-        const compradosHeaderRow = animaisCompradosSheet.getRow(1)
-        compradosHeaderRow.eachCell((cell) => {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'FF10B981' }
-          }
-          cell.font = {
-            color: { argb: 'FFFFFFFF' },
-            bold: true
-          }
-          cell.alignment = { horizontal: 'center', vertical: 'middle' }
-        })
-        animaisCompradosSheet.getRow(1).height = 25
-        animaisCompradosSheet.getColumn('valorUnitario').numFmt = 'R$ #,##0.00'
-      }
-
-      // Aba Animais Vendidos
-      if (animaisVendidos.length > 0) {
-        const animaisVendidosSheet = workbook.addWorksheet('💰 Animais Vendidos', {
-          pageSetup: {
-            paperSize: 9,
-            orientation: 'landscape',
-            margins: { left: 0.7, right: 0.7, top: 0.75, bottom: 0.75 }
-          }
-        })
-
-        animaisVendidosSheet.columns = [
-          { header: 'NF', key: 'numeroNF', width: 12 },
-          { header: 'Data NF', key: 'dataNF', width: 12 },
-          { header: 'Identificação', key: 'identificacao', width: 20 },
-          { header: 'Sexo', key: 'sexo', width: 10 },
-          { header: 'Raça', key: 'raca', width: 15 },
-          { header: 'Era', key: 'era', width: 10 },
-          { header: 'Peso', key: 'peso', width: 12 },
-          { header: 'Valor Unitário', key: 'valorUnitario', width: 15 },
-          { header: 'Comprador', key: 'fornecedorDestino', width: 30 }
-        ]
-
-        animaisVendidos.forEach(animal => {
-          animaisVendidosSheet.addRow(animal)
-        })
-
-        // Estilizar cabeçalho
-        const vendidosHeaderRow = animaisVendidosSheet.getRow(1)
-        vendidosHeaderRow.eachCell((cell) => {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'FF3B82F6' }
-          }
-          cell.font = {
-            color: { argb: 'FFFFFFFF' },
-            bold: true
-          }
-          cell.alignment = { horizontal: 'center', vertical: 'middle' }
-        })
-        animaisVendidosSheet.getRow(1).height = 25
-        animaisVendidosSheet.getColumn('valorUnitario').numFmt = 'R$ #,##0.00'
-      }
-
-      // Gerar arquivo
-      const buffer = await workbook.xlsx.writeBuffer()
+      // Download
+      const buffer = await wb.xlsx.writeBuffer()
       const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
-      const url = window.URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      
-      const dataAtual = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')
-      const periodo = `${new Date(filtros.dataInicio).toLocaleDateString('pt-BR').replace(/\//g, '-')}_a_${new Date(filtros.dataFim).toLocaleDateString('pt-BR').replace(/\//g, '-')}`
-      link.download = `Relatorio_Fiscal_${periodo}_${dataAtual}.xlsx`
-      
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      window.URL.revokeObjectURL(url)
-
-      console.log('✅ Relatório Excel gerado com sucesso!')
-    } catch (error) {
-      console.error('❌ Erro ao gerar relatório Excel:', error)
-      alert('Erro ao gerar relatório. Verifique o console para mais detalhes.')
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `Relatorio_Vendas_Clientes_${new Date().toISOString().split('T')[0]}.xlsx`
+      a.click()
+      URL.revokeObjectURL(url)
+      setToast({ type: 'success', msg: 'Relatório Excel exportado com 10 abas detalhadas' })
+    } catch (err) {
+      console.error('Erro ao exportar:', err)
+      setToast({ type: 'error', msg: 'Erro ao gerar Excel' })
     } finally {
       setExportando(false)
     }
-  }
+  }, [vendas, clientes, resumoGeral, vendasPorMes, vendasPorEstado, vendasPorSexo, vendasPorFaixa])
 
-  if (!mounted) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Carregando relatório...</p>
-        </div>
-      </div>
-    )
-  }
-
+  // ─── Render ─────────────────────────────────────────────────────────────
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-          <ChartBarIcon className="w-8 h-8 text-orange-600" />
-          Relatório Fiscal
-        </h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-2">Análise de entradas e saídas (vendas)</p>
-      </div>
+    <>
+      <Head><title>Relatório de Vendas | Beef-Sync</title></Head>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-20">
+        {/* Toast */}
+        <AnimatePresence>
+          {toast && (
+            <motion.div initial={{ y: -60, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -60, opacity: 0 }}
+              className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl shadow-xl text-white text-sm font-semibold flex items-center gap-2 ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
+              {toast.type === 'success' ? <CheckCircleIcon className="h-5 w-5" /> : <ExclamationTriangleIcon className="h-5 w-5" />}
+              {toast.msg}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-      {/* Filtros */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Filtros</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Data Início
-            </label>
-            <input
-              type="date"
-              value={filtros.dataInicio}
-              onChange={(e) => setFiltros({ ...filtros, dataInicio: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Data Fim
-            </label>
-            <input
-              type="date"
-              value={filtros.dataFim}
-              onChange={(e) => setFiltros({ ...filtros, dataFim: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Tipo
-            </label>
-            <select
-              value={filtros.tipo}
-              onChange={(e) => setFiltros({ ...filtros, tipo: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
-            >
-              <option value="todos">Todos</option>
-              <option value="entrada">Entradas</option>
-              <option value="saida">Saídas (Vendas)</option>
-            </select>
-          </div>
-
-          <div className="flex items-end gap-2">
-            <button
-              onClick={loadNotasFiscais}
-              disabled={loading}
-              className="flex-1 bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Carregando...' : 'Atualizar'}
-            </button>
-            <button
-              onClick={gerarRelatorioExcel}
-              disabled={exportando || notasFiltradas.length === 0}
-              className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              <DocumentArrowDownIcon className="h-5 w-5" />
-              {exportando ? 'Gerando...' : 'Gerar Relatório Excel'}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Cards de Resumo */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center">
-            <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
-              <ArrowDownIcon className="w-6 h-6 text-green-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Entradas</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                R$ {resumo.totalEntradas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-              </p>
-              <p className="text-xs text-gray-500">{resumo.quantidadeEntradas} notas</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
-              <ArrowUpIcon className="w-6 h-6 text-blue-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Saídas (Vendas)</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                R$ {resumo.totalSaidas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-              </p>
-              <p className="text-xs text-gray-500">{resumo.quantidadeSaidas} notas</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center">
-            <div className={`p-2 rounded-lg ${resumo.saldo >= 0 ? 'bg-green-100 dark:bg-green-900/20' : 'bg-red-100 dark:bg-red-900/20'}`}>
-              <CurrencyDollarIcon className={`w-6 h-6 ${resumo.saldo >= 0 ? 'text-green-600' : 'text-red-600'}`} />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Saldo (Vendas - Compras)</p>
-              <p className={`text-2xl font-bold ${resumo.saldo >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                R$ {resumo.saldo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-              </p>
-              <p className="text-xs text-gray-500">
-                {resumo.saldo >= 0 ? 'Lucro' : 'Prejuízo'}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center">
-            <div className="p-2 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
-              <ChartBarIcon className="w-6 h-6 text-purple-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total de Notas</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {notasFiltradas.length}
-              </p>
-              <p className="text-xs text-gray-500">No período</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Tabela de Notas */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Notas Fiscais do Período
-          </h2>
-        </div>
-
-        {loading ? (
-          <div className="p-12 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-400">Carregando notas fiscais...</p>
-          </div>
-        ) : notasFiltradas.length === 0 ? (
-          <div className="p-12 text-center">
-            <ChartBarIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              Nenhuma nota fiscal encontrada
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Ajuste os filtros ou verifique se há notas fiscais cadastradas
-            </p>
-            {notasFiscais.length > 0 && (
-              <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
-                Total de notas no sistema: {notasFiscais.length} (fora do período filtrado)
-              </p>
-            )}
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 dark:bg-gray-700">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Número
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Tipo
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Empresa
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Data
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Valor
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {notasFiltradas.map((nota) => (
-                  <tr key={nota.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => carregarDetalhesNF(nota.id)}
-                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline cursor-pointer font-semibold"
-                        title="Clique para ver detalhes"
-                      >
-                        {nota.numero}
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        nota.tipo === 'entrada' 
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                          : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                      }`}>
-                        {nota.tipo === 'entrada' ? 'Entrada' : 'Saída (Venda)'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      {nota.empresa || '-'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      {new Date(nota.dataEmissao).toLocaleDateString('pt-BR')}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold">
-                      <span className={nota.tipo === 'entrada' ? 'text-green-600' : 'text-blue-600'}>
-                        R$ {(nota.valorTotal || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-
-      {/* Informações adicionais */}
-      <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg">
-        <h3 className="font-medium text-orange-900 dark:text-orange-200 mb-2">
-          📊 Sobre este Relatório
-        </h3>
-        <ul className="text-sm text-orange-800 dark:text-orange-300 space-y-1">
-          <li>• <strong>Entradas:</strong> Compras e aquisições registradas via notas fiscais</li>
-          <li>• <strong>Saídas (Vendas):</strong> Vendas e transferências registradas como notas fiscais de saída</li>
-          <li>• <strong>Saldo:</strong> Diferença entre vendas e compras (receita líquida)</li>
-          <li>• <strong>Período:</strong> Baseado na data de emissão das notas fiscais</li>
-        </ul>
-      </div>
-
-      {/* Modal de Detalhes da Nota Fiscal */}
-      {showDetalhesModal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            {/* Overlay */}
-            <div 
-              className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-75"
-              onClick={() => setShowDetalhesModal(false)}
-            ></div>
-
-            {/* Modal */}
-            <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-              <div className="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    Detalhes da Nota Fiscal
-                  </h3>
-                  <button
-                    onClick={() => setShowDetalhesModal(false)}
-                    className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
-                  >
-                    <XMarkIcon className="h-6 w-6" />
-                  </button>
+        {/* Header */}
+        <div className="sticky top-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 px-4 py-3">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-3">
+                <button onClick={() => router.back()} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                  <ArrowLeftIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                </button>
+                <div>
+                  <h1 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <ChartBarIcon className="h-5 w-5 text-amber-600" /> Relatório de Vendas
+                  </h1>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{vendas.length} registros · {clientes.length} clientes</p>
                 </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <label className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-all ${importando ? 'bg-gray-200 dark:bg-gray-700 text-gray-500' : 'bg-amber-500 text-white hover:bg-amber-600'}`}>
+                <ArrowUpTrayIcon className="h-4 w-4" />
+                {importando ? 'Importando...' : 'Importar Excel'}
+                <input type="file" accept=".xlsx,.xls,.csv" onChange={handleImport} className="hidden" disabled={importando} />
+              </label>
+              {vendas.length > 0 && (
+                <button onClick={exportarExcel} disabled={exportando}
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-green-600 text-white text-sm font-semibold hover:bg-green-700 transition-colors disabled:opacity-50">
+                  <ArrowDownTrayIcon className="h-4 w-4" />
+                  {exportando ? 'Gerando...' : 'Exportar Excel'}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
 
-                {loadingDetalhes ? (
-                  <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
-                    <p className="text-gray-600 dark:text-gray-400">Carregando detalhes...</p>
-                  </div>
-                ) : nfDetalhes ? (
-                  <div className="space-y-6">
-                    {/* Informações Gerais */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                          Número da NF
-                        </label>
-                        <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                          {nfDetalhes.numero_nf || nfDetalhes.numeroNF}
-                        </p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                          Data
-                        </label>
-                        <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                          {new Date(nfDetalhes.data || nfDetalhes.data_compra || nfDetalhes.created_at).toLocaleDateString('pt-BR')}
-                        </p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                          Tipo
-                        </label>
-                        <span className={`inline-flex px-3 py-1 text-sm font-medium rounded-full ${
-                          nfDetalhes.tipo === 'entrada'
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                            : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                        }`}>
-                          {nfDetalhes.tipo === 'entrada' ? 'Entrada' : 'Saída (Venda)'}
-                        </span>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                          Valor Total
-                        </label>
-                        <p className="text-lg font-bold text-gray-900 dark:text-white">
-                          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(nfDetalhes.valor_total || 0)}
-                        </p>
-                      </div>
-                      <div className="col-span-2">
-                        <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                          {nfDetalhes.tipo === 'entrada' ? 'Fornecedor' : 'Destino/Comprador'}
-                        </label>
-                        <p className="text-base text-gray-900 dark:text-white">
-                          {nfDetalhes.fornecedor || nfDetalhes.destino || 'Não informado'}
-                        </p>
-                      </div>
-                      {nfDetalhes.cnpj_origem_destino && (
-                        <div className="col-span-2">
-                          <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                            CNPJ/CPF
-                          </label>
-                          <p className="text-base text-gray-900 dark:text-white">
-                            {nfDetalhes.cnpj_origem_destino}
-                          </p>
-                        </div>
-                      )}
-                      {nfDetalhes.natureza_operacao && (
-                        <div className="col-span-2">
-                          <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                            Natureza da Operação
-                          </label>
-                          <p className="text-base text-gray-900 dark:text-white">
-                            {nfDetalhes.natureza_operacao}
-                          </p>
-                        </div>
-                      )}
-                      {nfDetalhes.observacoes && (
-                        <div className="col-span-2">
-                          <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                            Observações
-                          </label>
-                          <p className="text-base text-gray-900 dark:text-white whitespace-pre-wrap">
-                            {nfDetalhes.observacoes}
-                          </p>
-                        </div>
-                      )}
-                    </div>
+        <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
+          {/* Cards de resumo */}
+          {vendas.length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0 }}
+                className="p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm">
+                <div className="flex items-center gap-2 mb-1">
+                  <CurrencyDollarIcon className="h-4 w-4 text-amber-500" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Total Vendido</span>
+                </div>
+                <p className="text-xl font-black text-gray-900 dark:text-white">{fmt(resumoGeral.total)}</p>
+              </motion.div>
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+                className="p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm">
+                <div className="flex items-center gap-2 mb-1">
+                  <TableCellsIcon className="h-4 w-4 text-blue-500" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Animais</span>
+                </div>
+                <p className="text-xl font-black text-gray-900 dark:text-white">{resumoGeral.totalAnimais}</p>
+                <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{resumoGeral.machos}M · {resumoGeral.femeas}F</p>
+              </motion.div>
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                className="p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm">
+                <div className="flex items-center gap-2 mb-1">
+                  <UserGroupIcon className="h-4 w-4 text-green-500" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Clientes</span>
+                </div>
+                <p className="text-xl font-black text-gray-900 dark:text-white">{resumoGeral.totalClientes}</p>
+                <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{resumoGeral.notas} notas</p>
+              </motion.div>
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+                className="p-4 rounded-2xl bg-white dark:bg-gray-800 border border-red-200 dark:border-red-900/50 shadow-sm">
+                <div className="flex items-center gap-2 mb-1">
+                  <ExclamationTriangleIcon className="h-4 w-4 text-red-500" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-red-500 dark:text-red-400">Precisam Atenção</span>
+                </div>
+                <p className="text-xl font-black text-red-600 dark:text-red-400">{resumoGeral.criticos + resumoGeral.atencaoAlta}</p>
+                <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{resumoGeral.criticos} inativos · {resumoGeral.atencaoAlta} atenção</p>
+              </motion.div>
+            </div>
+          )}
 
-                    {/* Itens da Nota Fiscal */}
-                    {nfDetalhes.itens && nfDetalhes.itens.length > 0 && (
-                      <div>
-                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 border-b border-gray-200 dark:border-gray-700 pb-2">
-                          Itens da Nota Fiscal ({nfDetalhes.itens.length})
-                        </h4>
-                        
-                        {/* Filtrar apenas bovinos para mostrar animais vendidos */}
-                        {(() => {
-                          const itensBovinos = nfDetalhes.itens.filter(item => item.tipoProduto === 'bovino' || item.tipo_produto === 'bovino')
-                          
-                          return itensBovinos.length > 0 ? (
-                            <div className="mb-4">
-                              <h5 className="text-md font-medium text-gray-900 dark:text-white mb-2">
-                                🐂 Animais {nfDetalhes.tipo === 'entrada' ? 'Comprados' : 'Vendidos'} ({itensBovinos.length})
-                              </h5>
-                              <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                  <thead className="bg-gray-50 dark:bg-gray-700">
-                                    <tr>
-                                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                                        Identificação
-                                      </th>
-                                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                                        Sexo
-                                      </th>
-                                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                                        Raça
-                                      </th>
-                                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                                        Era
-                                      </th>
-                                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                                        Peso
-                                      </th>
-                                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                                        Valor Unitário
-                                      </th>
-                                    </tr>
-                                  </thead>
-                                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                    {itensBovinos.map((item, index) => (
-                                      <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                        <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
-                                          {item.tatuagem || item.identificacao || `${item.serie || ''} ${item.rg || ''}`.trim() || 'N/A'}
-                                        </td>
-                                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                          {item.sexo === 'macho' || item.sexo === 'M' ? 'Macho' : item.sexo === 'femea' || item.sexo === 'F' ? 'Fêmea' : item.sexo || 'N/A'}
-                                        </td>
-                                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                          {item.raca || 'N/A'}
-                                        </td>
-                                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                          {item.era || 'N/A'}
-                                        </td>
-                                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                          {item.peso ? `${item.peso} kg` : 'N/A'}
-                                        </td>
-                                        <td className="px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white">
-                                          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(parseFloat(item.valorUnitario || item.valor_unitario || 0))}
-                                        </td>
-                                      </tr>
-                                    ))}
-                                  </tbody>
-                                </table>
-                              </div>
+          {/* Tabs */}
+          {vendas.length > 0 && (
+            <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
+              {[
+                { key: 'clientes', label: 'Clientes', icon: UserGroupIcon },
+                { key: 'historico', label: 'Histórico', icon: TableCellsIcon },
+                { key: 'graficos', label: 'Gráficos', icon: ChartBarIcon },
+              ].map(t => (
+                <button key={t.key} onClick={() => setTab(t.key)}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all ${tab === t.key ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}>
+                  <t.icon className="h-4 w-4" /> {t.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Empty state */}
+          {vendas.length === 0 && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+              className="text-center py-20 px-6">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                <ArrowUpTrayIcon className="h-10 w-10 text-amber-600" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Importe sua planilha de vendas</h2>
+              <p className="text-gray-500 dark:text-gray-400 mb-1 text-sm">Colunas esperadas:</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 font-mono bg-gray-100 dark:bg-gray-800 rounded-xl p-3 inline-block">
+                SÉRIE · RG · Sexo · Comprador · Estado · Data Venda · DataNasc · Idade · Nº Nota Fiscal · Valor
+              </p>
+              <div className="mt-6">
+                <label className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-amber-600 text-white font-semibold cursor-pointer hover:bg-amber-700 transition-colors shadow-lg shadow-amber-600/30">
+                  <ArrowUpTrayIcon className="h-5 w-5" /> Selecionar Arquivo Excel
+                  <input type="file" accept=".xlsx,.xls,.csv" onChange={handleImport} className="hidden" />
+                </label>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ─── Tab: Clientes ─────────────────────────────────────────── */}
+          {vendas.length > 0 && tab === 'clientes' && (
+            <div className="space-y-4">
+              {/* Filtros */}
+              <div className="flex flex-col sm:flex-row gap-2">
+                <div className="flex-1 relative">
+                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar cliente ou estado..."
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-transparent" />
+                </div>
+                <select value={filtroAtencao} onChange={e => setFiltroAtencao(e.target.value)}
+                  className="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white">
+                  <option value="todos">Todos</option>
+                  <option value="normal">✅ Ativos</option>
+                  <option value="media">🟡 Acompanhar</option>
+                  <option value="alta">🟠 Atenção</option>
+                  <option value="critica">🔴 Inativos</option>
+                  <option value="baixa">⚪ Baixa prioridade</option>
+                </select>
+              </div>
+
+              {/* Lista de clientes */}
+              <div className="space-y-3">
+                {clientesFiltrados.map((c, i) => (
+                  <motion.div key={c.nome} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
+                    className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
+                    <button onClick={() => setClienteExpandido(clienteExpandido === c.nome ? null : c.nome)}
+                      className="w-full p-4 flex items-center gap-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 ${
+                        c.atencao === 'critica' ? 'bg-red-500' : c.atencao === 'alta' ? 'bg-orange-500' : c.atencao === 'media' ? 'bg-yellow-500' : c.atencao === 'baixa' ? 'bg-gray-400' : 'bg-green-500'
+                      }`}>
+                        {c.nome.slice(0, 2).toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="font-bold text-gray-900 dark:text-white truncate">{c.nome}</p>
+                          <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold shrink-0" style={{
+                            background: c.atencaoCor === 'red' ? '#FEE2E2' : c.atencaoCor === 'orange' ? '#FFEDD5' : c.atencaoCor === 'yellow' ? '#FEF9C3' : c.atencaoCor === 'gray' ? '#F3F4F6' : '#DCFCE7',
+                            color: c.atencaoCor === 'red' ? '#DC2626' : c.atencaoCor === 'orange' ? '#EA580C' : c.atencaoCor === 'yellow' ? '#CA8A04' : c.atencaoCor === 'gray' ? '#6B7280' : '#16A34A',
+                          }}>{c.atencaoLabel}</span>
+                        </div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                          {c.totalCompras} compras · {fmt(c.totalGasto)} · Última: {fmtDate(c.ultimaCompra)}
+                        </p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-lg font-black text-gray-900 dark:text-white">{fmt(c.totalGasto)}</p>
+                        {clienteExpandido === c.nome ? <ChevronUpIcon className="h-4 w-4 text-gray-400 ml-auto" /> : <ChevronDownIcon className="h-4 w-4 text-gray-400 ml-auto" />}
+                      </div>
+                    </button>
+
+                    <AnimatePresence>
+                      {clienteExpandido === c.nome && (
+                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+                          className="border-t border-gray-100 dark:border-gray-700 overflow-hidden">
+                          <div className="p-4 space-y-3">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                              <div><span className="text-gray-500 dark:text-gray-400 text-xs block">Ticket Médio</span><span className="font-bold text-gray-900 dark:text-white">{fmt(c.ticketMedio)}</span></div>
+                              <div><span className="text-gray-500 dark:text-gray-400 text-xs block">Dias s/ Comprar</span><span className="font-bold text-gray-900 dark:text-white">{c.diasSemComprar}d</span></div>
+                              <div><span className="text-gray-500 dark:text-gray-400 text-xs block">Machos / Fêmeas</span><span className="font-bold text-gray-900 dark:text-white">{c.machos}M / {c.femeas}F</span></div>
+                              <div><span className="text-gray-500 dark:text-gray-400 text-xs block">Estados</span><span className="font-bold text-gray-900 dark:text-white">{c.estados.join(', ') || '-'}</span></div>
                             </div>
-                          ) : null
-                        })()}
-
-                        {/* Outros itens (sêmen, embriões) */}
-                        {nfDetalhes.itens.filter(item => (item.tipoProduto !== 'bovino' && item.tipo_produto !== 'bovino')).length > 0 && (
-                          <div>
-                            <h5 className="text-md font-medium text-gray-900 dark:text-white mb-2">
-                              Outros Itens
-                            </h5>
-                            <div className="space-y-2">
-                              {nfDetalhes.itens
-                                .filter(item => (item.tipoProduto !== 'bovino' && item.tipo_produto !== 'bovino'))
-                                .map((item, index) => (
-                                  <div key={index} className="bg-gray-50 dark:bg-gray-700 p-3 rounded">
-                                    <p className="text-sm text-gray-900 dark:text-white">
-                                      <strong>Tipo:</strong> {item.tipoProduto || item.tipo_produto || 'N/A'}
-                                    </p>
-                                    {item.nomeTouro && (
-                                      <p className="text-sm text-gray-900 dark:text-white">
-                                        <strong>Touro:</strong> {item.nomeTouro}
-                                      </p>
-                                    )}
-                                    {item.quantidadeDoses && (
-                                      <p className="text-sm text-gray-900 dark:text-white">
-                                        <strong>Quantidade:</strong> {item.quantidadeDoses} doses
-                                      </p>
-                                    )}
-                                    {item.valorUnitario && (
-                                      <p className="text-sm text-gray-900 dark:text-white">
-                                        <strong>Valor:</strong> {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(parseFloat(item.valorUnitario || 0))}
-                                      </p>
-                                    )}
+                            {/* Recomendação IA */}
+                            <div className={`p-3 rounded-xl text-sm ${
+                              c.atencao === 'critica' ? 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300' :
+                              c.atencao === 'alta' ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-800 dark:text-orange-300' :
+                              c.atencao === 'media' ? 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-300' :
+                              c.atencao === 'baixa' ? 'bg-gray-50 dark:bg-gray-700/30 text-gray-600 dark:text-gray-400' :
+                              'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-300'
+                            }`}>
+                              <p className="font-semibold text-xs uppercase tracking-wider mb-1">💡 Recomendação</p>
+                              {c.atencao === 'baixa' && <p>Cliente com baixo volume ({fmt(c.totalGasto)}) e sem compras há {Math.round(c.diasSemComprar / 365)} anos. Baixa prioridade de contato — manter no cadastro para referência.</p>}
+                              {c.atencao === 'critica' && <p>Cliente inativo há {c.diasSemComprar} dias. Contato urgente recomendado. Já investiu {fmt(c.totalGasto)} em {c.totalCompras} compras. Alto potencial de reativação.</p>}
+                              {c.atencao === 'alta' && <p>Sem compras há {c.diasSemComprar} dias. Enviar oferta personalizada. Perfil: {c.machos > c.femeas ? 'prefere machos' : c.femeas > c.machos ? 'prefere fêmeas' : 'compra ambos os sexos'}.</p>}
+                              {c.atencao === 'media' && <p>Acompanhar de perto. Última compra há {c.diasSemComprar} dias. Ticket médio de {fmt(c.ticketMedio)}.</p>}
+                              {c.atencao === 'normal' && <p>Cliente ativo e recorrente. {c.totalCompras > 3 ? 'Cliente fiel, considerar condições especiais.' : 'Manter bom relacionamento.'}</p>}
+                            </div>
+                            {/* Últimas compras */}
+                            <div>
+                              <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Últimas compras</p>
+                              <div className="space-y-1 max-h-40 overflow-y-auto">
+                                {c.vendas.slice(0, 10).map((v, j) => (
+                                  <div key={j} className="flex items-center justify-between text-xs py-1.5 px-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                                    <span className="text-gray-600 dark:text-gray-300">{v.serie}-{v.rg} · {v.sexo} · NF {v.notaFiscal}</span>
+                                    <span className="font-semibold text-gray-900 dark:text-white">{fmtDate(v.dataVenda)} · {fmt(v.valor)}</span>
                                   </div>
                                 ))}
+                              </div>
                             </div>
                           </div>
-                        )}
-                      </div>
-                    )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                ))}
+                {clientesFiltrados.length === 0 && (
+                  <p className="text-center text-gray-500 dark:text-gray-400 py-10">Nenhum cliente encontrado</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ─── Tab: Histórico ────────────────────────────────────────── */}
+          {vendas.length > 0 && tab === 'historico' && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-500 dark:text-gray-400">{vendas.length} registros</p>
+                <button onClick={() => { if (confirm('Tem certeza que deseja limpar todos os dados?')) { salvarVendas([]); setToast({ type: 'success', msg: 'Dados limpos' }) } }}
+                  className="text-xs text-red-500 hover:text-red-700 font-semibold px-3 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">Limpar tudo</button>
+              </div>
+              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm min-w-[700px]">
+                    <thead>
+                      <tr className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
+                        {['NF', 'Série', 'RG', 'Sexo', 'Comprador', 'UF', 'Data Venda', 'Idade', 'Valor'].map(h => (
+                          <th key={h} className="px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                      {vendas.slice(0, 200).map((v, i) => (
+                        <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                          <td className="px-3 py-2.5 font-mono text-xs text-gray-700 dark:text-gray-300">{v.notaFiscal}</td>
+                          <td className="px-3 py-2.5 text-xs text-gray-700 dark:text-gray-300">{v.serie}</td>
+                          <td className="px-3 py-2.5 text-xs text-gray-700 dark:text-gray-300 font-medium">{v.rg}</td>
+                          <td className="px-3 py-2 text-xs">
+                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${/^m/i.test(v.sexo) ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300'}`}>
+                              {v.sexo}
+                            </span>
+                          </td>
+                          <td className="px-3 py-2.5 text-xs font-medium text-gray-800 dark:text-gray-200">{v.comprador}</td>
+                          <td className="px-3 py-2.5 text-xs text-gray-600 dark:text-gray-400">{v.estado}</td>
+                          <td className="px-3 py-2.5 text-xs text-gray-600 dark:text-gray-400">{fmtDate(v.dataVenda)}</td>
+                          <td className="px-3 py-2.5 text-xs text-gray-600 dark:text-gray-400">{v.idade}</td>
+                          <td className="px-3 py-2.5 text-xs font-semibold text-green-700 dark:text-green-400">{fmt(v.valor)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {vendas.length > 200 && (
+                  <p className="text-center text-xs text-gray-400 py-3">Mostrando 200 de {vendas.length} registros. Exporte o Excel para ver todos.</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ─── Tab: Gráficos ─────────────────────────────────────────── */}
+          {vendas.length > 0 && tab === 'graficos' && (
+            <div className="space-y-6">
+              {/* Evolução de Vendas por Mês - Line Chart */}
+              {vendasPorMes.length > 1 && (
+                <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5">
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                    <ClockIcon className="h-4 w-4 text-blue-500" /> Evolução de Vendas por Mês
+                  </h3>
+                  <div className="h-64">
+                    <Line data={{
+                      labels: vendasPorMes.map(m => { const [y, mo] = m.mes.split('-'); return `${mo}/${y.slice(2)}` }),
+                      datasets: [
+                        { label: 'Valor (R$)', data: vendasPorMes.map(m => m.total), borderColor: '#3B82F6', backgroundColor: 'rgba(59,130,246,0.15)', fill: true, tension: 0.3, pointRadius: 4, pointBackgroundColor: '#3B82F6' },
+                        { label: 'Qtd Animais', data: vendasPorMes.map(m => m.qtd), borderColor: '#F59E0B', backgroundColor: 'rgba(245,158,11,0.15)', fill: false, tension: 0.3, pointRadius: 4, pointBackgroundColor: '#F59E0B', yAxisID: 'y1' },
+                      ]
+                    }} options={{
+                      responsive: true, maintainAspectRatio: false,
+                      plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 15 } } },
+                      scales: {
+                        y: { beginAtZero: true, ticks: { callback: v => `R$${(v/1000).toFixed(0)}k` } },
+                        y1: { position: 'right', beginAtZero: true, grid: { drawOnChartArea: false }, ticks: { stepSize: 1 } },
+                      }
+                    }} />
                   </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <p className="text-gray-600 dark:text-gray-400">Erro ao carregar detalhes da nota fiscal</p>
+                </div>
+              )}
+
+              {/* Top Clientes - Bar Chart */}
+              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5">
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <UserGroupIcon className="h-4 w-4 text-amber-500" /> Top 10 Clientes por Valor
+                </h3>
+                <div className="h-72">
+                  <Bar data={{
+                    labels: topClientes.map(c => c.nome.length > 18 ? c.nome.slice(0, 16) + '...' : c.nome),
+                    datasets: [{
+                      label: 'Valor Total (R$)',
+                      data: topClientes.map(c => c.totalGasto),
+                      backgroundColor: CHART_COLORS_ALPHA.slice(0, topClientes.length),
+                      borderColor: CHART_COLORS.slice(0, topClientes.length),
+                      borderWidth: 1, borderRadius: 6,
+                    }]
+                  }} options={{
+                    responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true, ticks: { callback: v => `R$${(v/1000).toFixed(0)}k` } } },
+                  }} />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Distribuição por Sexo - Doughnut */}
+                <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5">
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4">Vendas por Sexo</h3>
+                  <div className="h-56 flex items-center justify-center">
+                    <Doughnut data={{
+                      labels: ['Machos', 'Fêmeas', ...(vendasPorSexo.outros.qtd > 0 ? ['Outros'] : [])],
+                      datasets: [{
+                        data: [vendasPorSexo.machos.qtd, vendasPorSexo.femeas.qtd, ...(vendasPorSexo.outros.qtd > 0 ? [vendasPorSexo.outros.qtd] : [])],
+                        backgroundColor: ['rgba(59,130,246,0.8)', 'rgba(236,72,153,0.8)', 'rgba(156,163,175,0.8)'],
+                        borderWidth: 2, borderColor: '#fff',
+                      }]
+                    }} options={{
+                      responsive: true, maintainAspectRatio: false,
+                      plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 12 } } },
+                      cutout: '55%',
+                    }} />
+                  </div>
+                  <div className="mt-3 grid grid-cols-2 gap-2 text-center">
+                    <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20">
+                      <p className="text-xs text-blue-600 dark:text-blue-400 font-semibold">{vendasPorSexo.machos.qtd} machos</p>
+                      <p className="text-sm font-bold text-blue-800 dark:text-blue-200">{fmt(vendasPorSexo.machos.total)}</p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-pink-50 dark:bg-pink-900/20">
+                      <p className="text-xs text-pink-600 dark:text-pink-400 font-semibold">{vendasPorSexo.femeas.qtd} fêmeas</p>
+                      <p className="text-sm font-bold text-pink-800 dark:text-pink-200">{fmt(vendasPorSexo.femeas.total)}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Vendas por Estado - Pie */}
+                {vendasPorEstado.length > 0 && (
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5">
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4">Vendas por Estado</h3>
+                    <div className="h-56 flex items-center justify-center">
+                      <Pie data={{
+                        labels: vendasPorEstado.slice(0, 8).map(e => e.estado),
+                        datasets: [{
+                          data: vendasPorEstado.slice(0, 8).map(e => e.total),
+                          backgroundColor: CHART_COLORS_ALPHA,
+                          borderColor: CHART_COLORS,
+                          borderWidth: 1,
+                        }]
+                      }} options={{
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 10, font: { size: 10 } } } },
+                      }} />
+                    </div>
                   </div>
                 )}
               </div>
 
-              {/* Footer */}
-              <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button
-                  onClick={() => setShowDetalhesModal(false)}
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-orange-600 text-base font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 sm:ml-3 sm:w-auto sm:text-sm"
-                >
-                  Fechar
-                </button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Faixa de Valor - Bar */}
+                <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5">
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4">Distribuição por Faixa de Valor</h3>
+                  <div className="h-56">
+                    <Bar data={{
+                      labels: vendasPorFaixa.map(f => f.faixa),
+                      datasets: [{
+                        label: 'Qtd Animais',
+                        data: vendasPorFaixa.map(f => f.qtd),
+                        backgroundColor: ['rgba(16,185,129,0.7)', 'rgba(59,130,246,0.7)', 'rgba(139,92,246,0.7)', 'rgba(245,158,11,0.7)', 'rgba(239,68,68,0.7)'],
+                        borderRadius: 6,
+                      }]
+                    }} options={{
+                      responsive: true, maintainAspectRatio: false,
+                      plugins: { legend: { display: false } },
+                      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+                    }} />
+                  </div>
+                </div>
+
+                {/* Frequência de Compra - Doughnut */}
+                <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5">
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4">Frequência de Compra dos Clientes</h3>
+                  <div className="h-56 flex items-center justify-center">
+                    <Doughnut data={{
+                      labels: frequenciaClientes.map(f => f.faixa),
+                      datasets: [{
+                        data: frequenciaClientes.map(f => f.qtd),
+                        backgroundColor: CHART_COLORS_ALPHA.slice(0, 5),
+                        borderColor: CHART_COLORS.slice(0, 5),
+                        borderWidth: 1,
+                      }]
+                    }} options={{
+                      responsive: true, maintainAspectRatio: false,
+                      plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 10, font: { size: 10 } } } },
+                      cutout: '50%',
+                    }} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Status dos Clientes - Bar */}
+              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5">
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <ExclamationTriangleIcon className="h-4 w-4 text-red-500" /> Status dos Clientes
+                </h3>
+                <div className="h-48">
+                  <Bar data={{
+                    labels: ['Ativos', 'Acompanhar', 'Atenção', 'Inativos', 'Baixa prior.'],
+                    datasets: [{
+                      label: 'Clientes',
+                      data: [
+                        clientes.filter(c => c.atencao === 'normal').length,
+                        clientes.filter(c => c.atencao === 'media').length,
+                        clientes.filter(c => c.atencao === 'alta').length,
+                        clientes.filter(c => c.atencao === 'critica').length,
+                        clientes.filter(c => c.atencao === 'baixa').length,
+                      ],
+                      backgroundColor: ['rgba(16,185,129,0.8)', 'rgba(234,179,8,0.8)', 'rgba(249,115,22,0.8)', 'rgba(239,68,68,0.8)', 'rgba(156,163,175,0.8)'],
+                      borderRadius: 8,
+                    }]
+                  }} options={{
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+                  }} />
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
-      )}
-    </div>
+      </div>
+    </>
   )
 }
+
+RelatorioVendas.getLayout = (page) => page

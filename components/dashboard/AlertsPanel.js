@@ -17,28 +17,6 @@ const AlertsPanel = ({ animals, costs }) => {
       const now = new Date()
       const ageInMonths = (now - birthDate) / (1000 * 60 * 60 * 24 * 30)
 
-      // Verificar se precisa de vacinação baseado na ERA
-      if (ageInMonths >= 4 && ageInMonths <= 8) {
-        const hasVaccination = costs.some(cost => 
-          cost.animalId === animal.id && 
-          cost.tipo === 'Medicamentos' && 
-          cost.subtipo === 'Vacinas Obrigatórias'
-        )
-        
-        if (!hasVaccination) {
-          alertsList.push({
-            type: 'vaccination',
-            priority: 'high',
-            title: 'Vacinação Pendente',
-            message: `${animal.nome} precisa de vacinação obrigatória`,
-            animal: animal.nome,
-            action: 'Agendar vacinação',
-            icon: '💉',
-            color: 'red'
-          })
-        }
-      }
-
       // Alertas de peso baixo para a idade
       const expectedWeight = getExpectedWeight(animal.sexo, ageInMonths)
       if (animal.peso < expectedWeight * 0.8) {

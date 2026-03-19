@@ -9,11 +9,6 @@ export default function AnimalPlanningCards({ metrics }) {
   if (!metrics) return null
 
   const {
-    // Brucelose
-    elegivelBrucelose,
-    temBrucelose,
-    precisaBrucelose,
-    janelaEncerrada,       // fêmea >240d sem vacina
     // DGT
     elegivelDGT,
     temDGT,
@@ -21,16 +16,13 @@ export default function AnimalPlanningCards({ metrics }) {
     janelaEncerradaDGT,    // >640d sem DGT
     // Geral
     idadeDias,
-    isFemea,
   } = metrics
 
-  // Mostrar Brucelose só quando precisar de ação — se já vacinada ou janela encerrada, não mostrar
-  const mostrarBrucelose = isFemea && !temBrucelose && elegivelBrucelose
   // Mostrar DGT apenas se está NA janela (330-640d) ou já fez — não mostrar se janela já encerrou
   const mostrarDGT = elegivelDGT || temDGT
 
   // Nada relevante para mostrar
-  if (!mostrarBrucelose && !mostrarDGT) return null
+  if (!mostrarDGT) return null
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-5 border border-gray-200 dark:border-gray-700">
@@ -40,39 +32,6 @@ export default function AnimalPlanningCards({ metrics }) {
       </div>
 
       <div className="space-y-3 text-sm">
-
-        {/* ── BRUCELOSE (somente fêmeas) ─────────────────────────────── */}
-        {mostrarBrucelose && (
-          <div className={`p-3 rounded-xl border ${
-            temBrucelose
-              ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700'
-              : elegivelBrucelose
-              ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-300 dark:border-amber-700'
-              : janelaEncerrada
-              ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
-              : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-600'
-          }`}>
-            <p className="font-semibold text-gray-900 dark:text-white">
-              Vacina Brucelose <span className="font-normal text-gray-500">(fêmeas 3-8 meses)</span>
-            </p>
-            {temBrucelose ? (
-              <p className="text-green-600 dark:text-green-400 mt-1">✓ Já vacinada</p>
-            ) : elegivelBrucelose ? (
-              <p className="text-amber-600 dark:text-amber-400 mt-1">
-                ⚠️ Na janela agora ({Math.floor(idadeDias / 30)} meses) — agendar vacinação
-              </p>
-            ) : janelaEncerrada ? (
-              <p className="text-red-500 dark:text-red-400 mt-1">
-                Janela encerrada ({Math.floor(idadeDias / 30)} meses) — não é mais necessário vacinar
-              </p>
-            ) : (
-              /* idadeDias < 90 */
-              <p className="text-gray-500 dark:text-gray-400 mt-1">
-                Aguardar 3 meses para vacinar (atual: {idadeDias}d)
-              </p>
-            )}
-          </div>
-        )}
 
         {/* ── DGT — Avaliação Andrológica/Reprodutiva ────────────────── */}
         {mostrarDGT && (

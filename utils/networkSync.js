@@ -59,7 +59,7 @@ export const importAllData = (jsonData) => {
 
     // Importar cada tipo de dado
     if (data.animals) {
-      localStorage.setItem('animals', JSON.stringify(data.animals))
+      try { localStorage.setItem('animals', JSON.stringify(data.animals)) } catch (_) {}
       console.log(`✅ Importados ${data.animals.length} animais`)
     }
 

@@ -406,7 +406,7 @@ async function generateReceptorasChegaramReport(period) {
   return Buffer.from(buffer)
 }
 
-// Gerar relatório de Agenda de Atividades (Brucelose + DGT) em Excel
+// Gerar relatório de Agenda de Atividades (DGT) em Excel
 async function generateAgendaAtividadesReport(baseUrl) {
   const res = await fetch(`${baseUrl}/api/planejamento/agenda-eventos`)
   if (!res.ok) {
@@ -414,45 +414,18 @@ async function generateAgendaAtividadesReport(baseUrl) {
   }
   const json = await res.json()
   const data = json.data || json
-  const brucelose = data.brucelose || []
   const dgt = data.dgt || []
 
   const workbook = new ExcelJS.Workbook()
   addResumoSheet(workbook, {
     titulo: 'Agenda de Atividades',
     periodo: `Gerado em ${new Date().toLocaleDateString('pt-BR')}`,
-    totalRegistros: brucelose.length + dgt.length,
+    totalRegistros: dgt.length,
     linhas: [
-      { label: 'Vacina Brucelose (fêmeas 3-8 meses)', valor: brucelose.length },
       { label: 'Avaliação DGT (330-640 dias)', valor: dgt.length }
     ],
     corPrimaria: 'F59E0B'
   })
-
-  // Aba Brucelose
-  const sheetBrucelose = workbook.addWorksheet('Brucelose')
-  sheetBrucelose.mergeCells('A1:H1')
-  sheetBrucelose.getCell('A1').value = '🛡️ Vacina Brucelose - Fêmeas 3 a 8 meses (obrigatório)'
-  sheetBrucelose.getCell('A1').font = { size: 14, bold: true }
-  sheetBrucelose.getCell('A1').alignment = { horizontal: 'center' }
-  const headerBrucelose = sheetBrucelose.addRow(['Série', 'RG', 'Raça', 'Data Nasc.', 'Idade (meses)', 'Peso', 'Piquete'])
-  headerBrucelose.font = { bold: true }
-  headerBrucelose.eachCell((cell) => {
-    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF59E0B' } }
-    cell.font = { color: { argb: 'FFFFFFFF' } }
-  })
-  brucelose.forEach(a => {
-    sheetBrucelose.addRow([
-      a.serie || '',
-      a.rg || '',
-      a.raca || '',
-      a.data_nascimento ? formatDateBR(a.data_nascimento) : '',
-      a.idade_dias != null ? Math.floor(a.idade_dias / 30.44) : '',
-      a.peso || '',
-      a.piquete || a.piquete_localizacao || a.piquete_atual || a.pasto_atual || 'Não informado'
-    ])
-  })
-  sheetBrucelose.columns.forEach((col, idx) => { col.width = idx === 6 ? 25 : 14 })
 
   // Aba DGT
   const sheetDGT = workbook.addWorksheet('DGT')
@@ -2898,26 +2871,12 @@ async function generateWhatsAppSummary(period, relatorios) {
   }
 
   if (relatorios.includes('agenda_atividades')) {
-    const bruceloseResult = await query(`
-      WITH animais_com_brucelose AS (
-        SELECT DISTINCT c.animal_id FROM custos c
-        WHERE c.tipo ILIKE '%brucelose%' OR c.subtipo ILIKE '%brucelose%' OR c.observacoes ILIKE '%brucelose%'
-        UNION
-        SELECT DISTINCT h.animal_id FROM historia_ocorrencias h
-        WHERE LOWER(h.tipo) LIKE '%brucelose%' OR LOWER(h.descricao) LIKE '%brucelose%'
-      )
-      SELECT COUNT(*) as total FROM animais a
-      LEFT JOIN animais_com_brucelose b ON a.id = b.animal_id
-      WHERE a.situacao = 'Ativo' AND a.sexo = 'Fêmea' AND a.data_nascimento IS NOT NULL
-        AND b.animal_id IS NULL AND (CURRENT_DATE - a.data_nascimento::date) BETWEEN 90 AND 240
-    `)
     const dgtResult = await query(`
       SELECT COUNT(*) as total FROM animais a
       WHERE a.situacao = 'Ativo' AND a.data_nascimento IS NOT NULL
         AND (CURRENT_DATE - a.data_nascimento::date) BETWEEN 330 AND 640
     `)
     summary += `📅 *AGENDA DE ATIVIDADES*\n`
-    summary += `🛡️ Brucelose (fêmeas 3-8 meses): ${bruceloseResult.rows[0]?.total || 0}\n`
     summary += `📊 DGT (330-640 dias): ${dgtResult.rows[0]?.total || 0}\n\n`
   }
 
@@ -4144,7 +4103,7 @@ export default async function handler(req, res) {
               break
             case 'agenda_atividades':
               buffer = await generateAgendaAtividadesReport(baseUrl)
-              filename = `agenda-atividades-brucelose-dgt-${new Date().toISOString().split('T')[0]}.xlsx`
+              filename = `agenda-atividades-dgt-${new Date().toISOString().split('T')[0]}.xlsx`
               break
             default:
               console.warn(`Relatório não implementado ou não suporta envio completo: ${relatorio}`)

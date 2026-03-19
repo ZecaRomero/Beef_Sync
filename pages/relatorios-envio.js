@@ -429,7 +429,7 @@ export default function RelatoriosEnvio() {
     { 
       key: 'agenda_atividades', 
       label: 'Agenda de Atividades', 
-      description: 'Brucelose (fêmeas 3-8 meses) e DGT (330-640 dias) em Excel', 
+      description: 'DGT (330-640 dias) em Excel', 
       category: 'Resumos',
       icon: CalendarIcon,
       color: 'amber'

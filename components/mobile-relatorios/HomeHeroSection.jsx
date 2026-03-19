@@ -28,6 +28,7 @@ export default function HomeHeroSection({
   favorites,
   onSelectTipo,
   onGoToReports,
+  userName,
 }) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
@@ -44,7 +45,7 @@ export default function HomeHeroSection({
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
           {getGreeting()},{' '}
           <span className="bg-gradient-to-r from-amber-500 to-amber-600 dark:from-amber-400 dark:to-amber-500 bg-clip-text text-transparent">
-            Fazendeiro
+            {userName || 'Fazendeiro'}
           </span>
         </h2>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 font-medium">Resumo executivo da sua fazenda</p>

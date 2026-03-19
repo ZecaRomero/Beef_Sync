@@ -10,7 +10,6 @@ import { sendSuccess, sendError, sendMethodNotAllowed } from '../../../utils/api
 const TIPOS_RELATORIOS = [
   { key: 'resumo_geral', label: '📊 Visão Geral', category: 'Gestão' },
   { key: 'agenda_atividades', label: 'Agenda de Atividades', category: 'Gestão' },
-  { key: 'femeas_brucelose', label: '💉 Fêmeas para Brucelose', category: 'Sanidade' },
   { key: 'animais_dgt', label: '📋 Animais para DGT', category: 'Sanidade' },
   { key: 'pesagens', label: 'Pesagens', category: 'Manejo' },
   { key: 'resumo_pesagens', label: 'Resumo de Pesagens', category: 'Manejo' },
@@ -585,62 +584,6 @@ export default async function handler(req, res) {
           console.error('Erro na Agenda de Atividades:', e)
           data = []
           resumo = { erro: 'Falha ao carregar agenda' }
-        }
-        break
-      }
-
-      case 'femeas_brucelose': {
-        try {
-          // Fêmeas entre 3 e 8 meses (90-240 dias) sem vacina prévia
-          const bruceloseQuery = await query(`
-            SELECT 
-              a.id, a.serie, a.rg, a.sexo, a.raca, a.data_nascimento,
-              (CURRENT_DATE - a.data_nascimento::date) as idade_dias,
-              COALESCE(l.piquete, a.piquete_atual, a.pasto_atual) as piquete,
-              p.peso
-            FROM animais a
-            LEFT JOIN LATERAL (
-              SELECT piquete FROM localizacoes_animais 
-              WHERE animal_id = a.id AND data_saida IS NULL 
-              ORDER BY data_entrada DESC LIMIT 1
-            ) l ON TRUE
-            LEFT JOIN LATERAL (
-              SELECT peso FROM pesagens 
-              WHERE animal_id = a.id 
-              ORDER BY data DESC LIMIT 1
-            ) p ON TRUE
-            WHERE a.situacao = 'Ativo'
-              AND a.sexo = 'Fêmea'
-              AND (CURRENT_DATE - a.data_nascimento::date) BETWEEN 90 AND 240
-              AND NOT EXISTS (
-                SELECT 1 FROM historia_ocorrencias h
-                WHERE h.animal_id = a.id 
-                AND (LOWER(h.tipo) LIKE '%brucelose%' OR LOWER(h.descricao) LIKE '%brucelose%')
-              )
-            ORDER BY a.data_nascimento DESC
-          `)
-
-          data = bruceloseQuery.rows.map(r => ({
-            animal: `${r.serie || ''} ${r.rg || ''}`.trim(),
-            sexo: r.sexo,
-            raca: r.raca,
-            idade_dias: r.idade_dias,
-            idade_meses: Math.floor((r.idade_dias || 0) / 30.44),
-            piquete: r.piquete || 'Não informado',
-            peso: r.peso ? `${r.peso} kg` : '-',
-            data_nascimento: toDateStr(r.data_nascimento)
-          }))
-
-          resumo = {
-            'Total de fêmeas': data.length,
-            'Idade': '3-8 meses (90-240 dias)',
-            'Status': 'Sem vacina de brucelose'
-          }
-
-        } catch (e) {
-          console.error('Erro ao buscar fêmeas para brucelose:', e)
-          data = []
-          resumo = { erro: 'Falha ao carregar dados' }
         }
         break
       }

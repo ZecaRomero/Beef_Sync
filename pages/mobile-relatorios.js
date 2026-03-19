@@ -3,7 +3,6 @@
  * Gráficos, KPI cards, animações e visual aprimorado.
  */
 import {
-    ArrowLeftIcon,
     ArrowPathIcon,
     ArrowRightOnRectangleIcon,
     BanknotesIcon,
@@ -24,7 +23,6 @@ import {
     HeartIcon,
     LightBulbIcon,
     MagnifyingGlassIcon,
-    MapPinIcon,
     MoonIcon,
     ScaleIcon,
     SparklesIcon,
@@ -50,26 +48,26 @@ import MobileReportsLoadingSkeleton from '../components/mobile-relatorios/Mobile
 import MobileReportsTopBar from '../components/mobile-relatorios/MobileReportsTopBar'
 import ReportActionBar from '../components/mobile-relatorios/ReportActionBar'
 import ReportsSearchAndFilter from '../components/mobile-relatorios/ReportsSearchAndFilter'
+import { useAuth } from '../contexts/AuthContext'
 import {
-  buildMedLocalKeys,
-  CORES_PIQUETE,
-  DESCRICOES_CARDS,
-  dedupeMeds,
-  diasAte,
-  diasDesde,
-  formatDate,
-  formatDisplayValue,
-  formatMoneyBR,
-  getColumnLabelByContext,
-  ICONE_POR_CATEGORIA,
-  matchReportSearch,
-  MOBILE_RELATORIOS_CATS,
-  buildConsultaAnimalId,
-  racaDisplay,
-  racaKey,
-  sortMedsByDate,
-  medsDoRowFromMaps,
-  ultimoMedRowFromMaps,
+    buildConsultaAnimalId,
+    buildMedLocalKeys,
+    CORES_PIQUETE,
+    DESCRICOES_CARDS,
+    diasAte,
+    diasDesde,
+    formatDate,
+    formatDisplayValue,
+    formatMoneyBR,
+    getColumnLabelByContext,
+    ICONE_POR_CATEGORIA,
+    matchReportSearch,
+    medsDoRowFromMaps,
+    MOBILE_RELATORIOS_CATS,
+    racaDisplay,
+    racaKey,
+    sortMedsByDate,
+    ultimoMedRowFromMaps
 } from '../utils/mobileRelatoriosUtils'
 
 if (typeof window !== 'undefined') {
@@ -78,9 +76,61 @@ if (typeof window !== 'undefined') {
 
 export default function MobileRelatorios() {
   const router = useRouter()
+  const { user, signOut } = useAuth()
   const [currentTab, setCurrentTab] = useState('home')
   const [showMenu, setShowMenu] = useState(false)
   const [isDarkMode, setIsDarkMode] = useState(false)
+
+  // Obter nome e email do usuário logado
+  const userName = useMemo(() => {
+    if (user?.user_metadata?.nome) return user.user_metadata.nome
+    if (user?.email) return user.email.split('@')[0]
+    try {
+      const mob = localStorage.getItem('mobile-auth')
+      if (mob) {
+        const d = JSON.parse(mob)
+        if (d.nome) return d.nome
+      }
+    } catch (_) {}
+    try {
+      const auth = localStorage.getItem('maintenance_auth')
+      if (auth) {
+        const d = JSON.parse(auth)
+        if (d.nome) return d.nome
+      }
+    } catch (_) {}
+    return 'Fazendeiro'
+  }, [user])
+
+  const userEmail = useMemo(() => {
+    if (user?.email) return user.email
+    try {
+      const mob = localStorage.getItem('mobile-auth')
+      if (mob) {
+        const d = JSON.parse(mob)
+        if (d.email) return d.email
+        if (d.telefone) return d.telefone
+      }
+    } catch (_) {}
+    return ''
+  }, [user])
+
+  const userInitials = useMemo(() => {
+    const parts = userName.trim().split(/\s+/)
+    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+    return userName.slice(0, 2).toUpperCase()
+  }, [userName])
+
+  const handleLogout = async () => {
+    try {
+      await signOut()
+    } catch (_) {}
+    localStorage.removeItem('mobile-auth')
+    localStorage.removeItem('beef_adelso_auth')
+    localStorage.removeItem('maintenance_auth')
+    localStorage.removeItem('beef_usuario_identificado')
+    router.push('/login')
+  }
 
   const CATS = MOBILE_RELATORIOS_CATS
 
@@ -151,9 +201,16 @@ export default function MobileRelatorios() {
   const [formMed, setFormMed] = useState({ medicamento: '', dataAplicacao: '', dataProxima: '', observacao: '' })
   const [salvandoMed, setSalvandoMed] = useState(false)
   const [isAdelso, setIsAdelso] = useState(false)
+  
+  // ── Movimentação Boletim Campo (Adelso) ────────────────────────────────────
+  const [modalMovBoletimCampo, setModalMovBoletimCampo] = useState(null)
+  const [boletimQuantDraft, setBoletimQuantDraft] = useState({})
+  const [salvandoMovBoletimCampo, setSalvandoMovBoletimCampo] = useState(false)
 
   useEffect(() => {
     try {
+      // Verificar via Supabase user
+      if (user?.user_metadata?.nome === 'Adelso') { setIsAdelso(true); return }
       const auth = localStorage.getItem('maintenance_auth')
       if (auth) {
         const d = JSON.parse(auth)
@@ -165,7 +222,7 @@ export default function MobileRelatorios() {
         if (d.nome === 'Adelso') setIsAdelso(true)
       }
     } catch (_) {}
-  }, [])
+  }, [user])
 
   const medsDoRow = (rowOrId, fallbackRow = null) => {
     return medsDoRowFromMaps(rowOrId, fallbackRow, medicamentos, medicamentosPorLocal)
@@ -234,6 +291,53 @@ export default function MobileRelatorios() {
     finally { setSalvandoMed(false) }
   }
   // ─────────────────────────────────────────────────────────────────────────
+
+  const registrarMovimentacaoBoletimCampo = async ({ tipo, motivo, quantidade, origemRow, destinoRow }) => {
+    if (!origemRow?.id) return
+    try {
+      setSalvandoMovBoletimCampo(true)
+      const destinoLocalTxt = destinoRow?.local != null ? String(destinoRow.local).trim() : ''
+      const destinoLocal = destinoLocalTxt && destinoLocalTxt !== '-' ? destinoLocalTxt : null
+      const destinoLocal1Txt = destinoRow?.local_1 != null ? String(destinoRow.local_1).trim() : ''
+      const destinoSubLocal2Txt = destinoRow?.sub_local_2 != null ? String(destinoRow.sub_local_2).trim() : ''
+      const destinoSubLocal =
+        destinoLocal1Txt && destinoLocal1Txt !== '-'
+          ? destinoLocal1Txt
+          : (destinoSubLocal2Txt && destinoSubLocal2Txt !== '-' ? destinoSubLocal2Txt : null)
+
+      const payload = {
+        boletimCampoId: origemRow.id,
+        tipo,
+        destinoLocal: motivo === 'piquete' ? destinoLocal : null,
+        destinoSubLocal: motivo === 'piquete' ? destinoSubLocal : null,
+        motivo,
+        quantidade: parseInt(quantidade) || 0,
+        usuario: 'Adelso',
+        sexo: origemRow.sexo || null,
+        era: origemRow.era || null,
+        raca: origemRow.raca || null,
+        categoria: origemRow.categoria || null,
+        observacao: origemRow.observacao || null
+      }
+
+      await fetch('/api/boletim-campo/movimentacao', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+
+      // Recarregar relatório e medicamentos após a movimentação
+      setModalMovBoletimCampo(null)
+      setBoletimQuantDraft({})
+      await carregarMedicamentos()
+      refetch()
+    } catch (e) {
+      console.error(e)
+      alert('Erro ao registrar movimentação (boletim campo).')
+    } finally {
+      setSalvandoMovBoletimCampo(false)
+    }
+  }
   const [cardInfoModal, setCardInfoModal] = useState({ open: false, title: '', value: '', description: '', reportKey: null })
 
   useEffect(() => {
@@ -254,6 +358,16 @@ export default function MobileRelatorios() {
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
+
+  // Abrir relatório via query param (?tipo=boletim_campo)
+  useEffect(() => {
+    if (!config || !router.isReady) return
+    const { tipo } = router.query
+    if (tipo && config.enabled?.includes(tipo)) {
+      setSelectedTipo(tipo)
+      setCurrentTab('reports')
+    }
+  }, [config, router.isReady, router.query])
 
   // Inicializar tema
   useEffect(() => {
@@ -1253,11 +1367,9 @@ export default function MobileRelatorios() {
       })
       const top = Object.entries(porTipo).sort(([, a], [, b]) => b - a)[0]
       const partos = porTipo['Parto Previsto'] || contagemTiposCalendario?.partos || 0
-      const brucelose = porTipo['Brucelose'] || contagemTiposCalendario?.brucelose || 0
       const dgt = porTipo['DGT'] || contagemTiposCalendario?.dgt || 0
       list.push({ icon: '📅', text: `${dados.length} evento(s) no calendário` })
       if (partos > 0) list.push({ icon: '🐄', text: `${partos} parto(s) previsto(s) no período` })
-      if (brucelose > 0) list.push({ icon: '💉', text: `${brucelose} fêmea(s) para Brucelose` })
       if (dgt > 0) list.push({ icon: '📋', text: `${dgt} animal(is) para DGT` })
       if (Object.keys(porMes).length > 0) {
         const mesesComEventos = Object.keys(porMes).length
@@ -1272,20 +1384,6 @@ export default function MobileRelatorios() {
       if (total > 0) list.push({ icon: '🤰', text: `${total} previsão(ões) de parto no período` })
       const porTouro = res['Prenhas por touro']
       if (porTouro && porTouro !== '-') list.push({ icon: '🐂', text: `Por touro: ${String(porTouro).substring(0, 80)}${String(porTouro).length > 80 ? '...' : ''}` })
-    }
-
-    if (selectedTipo === 'femeas_brucelose' && dados.length > 0) {
-      const total = dados.length
-      list.push({ icon: '💉', text: `${total} fêmea(s) precisam de vacina de brucelose` })
-      const porPiquete = {}
-      dados.forEach(r => {
-        const p = r.piquete || 'Não informado'
-        porPiquete[p] = (porPiquete[p] || 0) + 1
-      })
-      const piquetes = Object.keys(porPiquete).length
-      if (piquetes > 1) list.push({ icon: '📍', text: `Distribuídas em ${piquetes} piquete(s)` })
-      const idadeMedia = dados.reduce((s, r) => s + (r.idade_meses || 0), 0) / total
-      if (idadeMedia > 0) list.push({ icon: '📊', text: `Idade média: ${idadeMedia.toFixed(1)} meses` })
     }
 
     if (selectedTipo === 'animais_dgt' && dados.length > 0) {
@@ -1319,7 +1417,6 @@ export default function MobileRelatorios() {
     previsoes_parto: 'Resumo por touro: quantas prenhas cada touro gerou. Ajuste as datas para ver partos previstos no período.',
     mortes: 'Analise causas para prevenir futuras perdas.',
     calendario_reprodutivo: 'Eventos manuais, receptoras, partos previstos e refazer andrológico. Veja meses com eventos e quantidade de parições.',
-    femeas_brucelose: 'Fêmeas entre 3 e 8 meses (90-240 dias) que precisam receber a vacina de brucelose obrigatória.',
     animais_dgt: 'Animais entre 11 e 21 meses (330-640 dias) elegíveis para avaliação de desempenho DGT.',
     boletim_rebanho: 'Quantidades por raça, sexo e era, conforme o Boletim Campo. Mantém os dados sempre alinhados.'
   }
@@ -1922,6 +2019,7 @@ export default function MobileRelatorios() {
                   favorites={favorites}
                   onSelectTipo={setSelectedTipo}
                   onGoToReports={() => setCurrentTab('reports')}
+                  userName={userName}
                 />
               )}
 
@@ -1952,6 +2050,7 @@ export default function MobileRelatorios() {
                       categoriasComRelatorios={categoriasComRelatorios}
                       onSelectTipo={setSelectedTipo}
                       onToggleFavorite={toggleFavorite}
+                      isAdelso={isAdelso}
                       onSetPeriodLastMonth={() => {
                         const today = new Date()
                         const start = new Date(today)
@@ -2107,14 +2206,17 @@ export default function MobileRelatorios() {
                      >
                         <div className="flex items-center gap-3 mb-3">
                            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                             FA
+                             {userInitials}
                            </div>
                            <div className="flex-1">
-                             <p className="font-bold text-gray-900 dark:text-white text-lg">Fazendeiro</p>
-                             <p className="text-xs text-gray-600 dark:text-gray-400">admin@beefsync.com</p>
+                             <p className="font-bold text-gray-900 dark:text-white text-lg">{userName}</p>
+                             {userEmail && <p className="text-xs text-gray-600 dark:text-gray-400">{userEmail}</p>}
                            </div>
                         </div>
-                        <button className="w-full py-2.5 px-4 rounded-xl bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-sm border border-gray-200 dark:border-gray-700 flex items-center justify-center gap-2">
+                        <button 
+                           onClick={handleLogout}
+                           className="w-full py-2.5 px-4 rounded-xl bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-semibold hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-all shadow-sm border border-gray-200 dark:border-gray-700 flex items-center justify-center gap-2"
+                        >
                            <ArrowRightOnRectangleIcon className="h-4 w-4" />
                            Sair da Conta
                         </button>
@@ -2577,20 +2679,6 @@ export default function MobileRelatorios() {
                       >
                         <p className="text-[10px] text-orange-600 dark:text-orange-400 font-medium">Refazer Andrológico</p>
                         <p className="text-lg font-bold text-orange-900 dark:text-orange-100">{contagemTiposCalendario.andrologico}</p>
-                      </button>
-                      <button
-                        onClick={() => {
-                          setTipoFiltroCalendario(tipoFiltroCalendario === 'Brucelose' ? '' : 'Brucelose')
-                          setViewMode('table')
-                        }}
-                        className={`p-3 rounded-xl border transition-all active:scale-95 ${
-                          tipoFiltroCalendario === 'Brucelose'
-                            ? 'bg-rose-100 dark:bg-rose-800/40 border-rose-400 dark:border-rose-600 ring-2 ring-rose-400'
-                            : 'bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800 hover:bg-rose-100 dark:hover:bg-rose-800/30'
-                        }`}
-                      >
-                        <p className="text-[10px] text-rose-600 dark:text-rose-400 font-medium">Brucelose</p>
-                        <p className="text-lg font-bold text-rose-900 dark:text-rose-100">{contagemTiposCalendario.brucelose}</p>
                       </button>
                       <button
                         onClick={() => {
@@ -3105,7 +3193,7 @@ export default function MobileRelatorios() {
                                     const v = row[k]
                                     const label = getColumnLabel(k)
                                     const display = k.toLowerCase().includes('data') && v ? formatDate(v) : String(v ?? '-')
-                                    if (label === 'Qtd' && row.quant != null) return (
+                                    if (label === 'Qtd' && row.quant != null && !(isAdelso && tipo === 'local')) return (
                                       <div key={k} className="flex justify-between text-sm">
                                         <span className="text-gray-500 dark:text-gray-400">{label}:</span>
                                         <span className="font-semibold">{row.quant ?? row.total ?? display}</span>
@@ -3126,6 +3214,58 @@ export default function MobileRelatorios() {
                                         {medRow.data_aplicacao ? new Date(medRow.data_aplicacao).toLocaleDateString('pt-BR') : ''}
                                         {medRow.usuario ? ` · ${medRow.usuario}` : ''}
                                       </span>
+                                    </div>
+                                  )}
+                                  {isAdelso && ehBoletimCampo && tipo === 'local' && (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setModalMed({ row })
+                                        setFormMed({ medicamento: '', dataAplicacao: new Date().toISOString().split('T')[0], dataProxima: '', observacao: '' })
+                                      }}
+                                      className="mt-2 w-full py-2 px-3 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold flex items-center justify-center gap-2"
+                                    >
+                                      <BeakerIcon className="w-4 h-4" />
+                                      Medicamentos deste local
+                                    </button>
+                                  )}
+                                  {isAdelso && ehBoletimCampo && tipo === 'local' && (
+                                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                      <div className="flex items-center justify-between gap-3">
+                                        <p className="text-xs font-semibold text-gray-700 dark:text-gray-200">Quantidade do local</p>
+                                        <input
+                                          type="number"
+                                          min="0"
+                                          value={boletimQuantDraft[row.id] ?? (parseInt(row.quant) || 0)}
+                                          onChange={(e) => {
+                                            const v = parseInt(e.target.value) || 0
+                                            setBoletimQuantDraft(m => ({ ...m, [row.id]: v }))
+                                          }}
+                                          onBlur={(e) => {
+                                            const novoQuant = parseInt(e.target.value) || 0
+                                            const antigoQuant = parseInt(row.quant) || 0
+                                            if (novoQuant === antigoQuant) return
+
+                                            const operacao = novoQuant < antigoQuant ? 'saida' : 'entrada'
+                                            const deltaAbs = Math.abs(novoQuant - antigoQuant)
+
+                                            setModalMovBoletimCampo({
+                                              step: 'qtd_choice',
+                                              operacao,
+                                              origemRow: row,
+                                              oldQuant: antigoQuant,
+                                              deltaAbs,
+                                              qtdOption: operacao === 'saida' ? 'escolher' : 'lote_todo',
+                                              qtdMov: deltaAbs,
+                                              qtdEscolhida: deltaAbs
+                                            })
+                                          }}
+                                          className="w-24 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm"
+                                        />
+                                      </div>
+                                      <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
+                                        Digite ao lado para registrar entrada/saída.
+                                      </p>
                                     </div>
                                   )}
                                 </div>
@@ -4453,6 +4593,329 @@ export default function MobileRelatorios() {
                     <p className="text-sm">Nenhum medicamento registrado ainda</p>
                   </div>
                 )
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ════ Modal Movimentação Boletim Campo (mobile-relatorios) ════ */}
+      {modalMovBoletimCampo && (
+        <div className="fixed inset-0 bg-black/60 z-[91] flex items-end justify-center sm:items-center p-0 sm:p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-t-3xl sm:rounded-2xl shadow-2xl w-full max-w-lg max-h-[92vh] flex flex-col">
+            <div className="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-amber-600 to-amber-700 rounded-t-3xl sm:rounded-2xl shrink-0">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <BeakerIcon className="w-5 h-5 text-amber-100 shrink-0" />
+                  <h3 className="text-white font-bold text-base">
+                    Movimentação Boletim Campo
+                  </h3>
+                </div>
+                <p className="text-amber-100/80 text-xs mt-0.5 truncate">
+                  {modalMovBoletimCampo?.origemRow
+                    ? [modalMovBoletimCampo.origemRow.local, modalMovBoletimCampo.origemRow.local_1, modalMovBoletimCampo.origemRow.sub_local_2]
+                      .filter(Boolean).join(' / ')
+                    : ''}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (salvandoMovBoletimCampo) return
+                  setModalMovBoletimCampo(null)
+                  setBoletimQuantDraft({})
+                }}
+                className="p-1 rounded-full hover:bg-amber-500 transition-colors"
+              >
+                <XMarkIcon className="w-6 h-6 text-white" />
+              </button>
+            </div>
+
+            <div className="overflow-y-auto flex-1 p-5 space-y-4">
+              {modalMovBoletimCampo.step === 'qtd_choice' && (
+                <div className="space-y-3">
+                  <h4 className="text-sm font-bold text-gray-900 dark:text-white">
+                    {modalMovBoletimCampo.operacao === 'saida' ? 'Saída de animais' : 'Entrada de animais'}
+                  </h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    {modalMovBoletimCampo.operacao === 'saida'
+                      ? `Você está reduzindo o lote. Atual: ${modalMovBoletimCampo.oldQuant}.`
+                      : `Você está aumentando o lote. Atual: ${modalMovBoletimCampo.oldQuant}.`}
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      disabled={salvandoMovBoletimCampo}
+                      onClick={() => {
+                        if (salvandoMovBoletimCampo) return
+                        if (modalMovBoletimCampo.operacao === 'saida') {
+                          setModalMovBoletimCampo(m => ({ ...m, qtdOption: 'lote_todo', qtdMov: m.oldQuant, qtdEscolhida: m.oldQuant }))
+                        } else {
+                          setModalMovBoletimCampo(m => ({ ...m, qtdOption: 'lote_todo', qtdMov: m.deltaAbs, qtdEscolhida: m.deltaAbs }))
+                        }
+                      }}
+                      className={`px-3 py-2 rounded-xl font-semibold text-sm transition-colors border ${modalMovBoletimCampo.qtdOption === 'lote_todo'
+                        ? 'bg-amber-600 text-white border-amber-700'
+                        : 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'} `}
+                    >
+                      {modalMovBoletimCampo.operacao === 'saida' ? 'Tirar lote todo' : 'Adicionar lote todo'}
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={salvandoMovBoletimCampo}
+                      onClick={() => {
+                        if (salvandoMovBoletimCampo) return
+                        setModalMovBoletimCampo(m => ({ ...m, qtdOption: 'escolher', qtdMov: m.qtdEscolhida ?? m.deltaAbs, qtdEscolhida: m.qtdEscolhida ?? m.deltaAbs }))
+                      }}
+                      className={`px-3 py-2 rounded-xl font-semibold text-sm transition-colors border ${modalMovBoletimCampo.qtdOption === 'escolher'
+                        ? 'bg-amber-600 text-white border-amber-700'
+                        : 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'} `}
+                    >
+                      Escolher quantidade
+                    </button>
+                  </div>
+
+                  {modalMovBoletimCampo.qtdOption === 'escolher' && (
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                        Quantidade a {modalMovBoletimCampo.operacao === 'saida' ? 'tirar' : 'entrar'}
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        max={modalMovBoletimCampo.operacao === 'saida' ? modalMovBoletimCampo.oldQuant : undefined}
+                        value={modalMovBoletimCampo.qtdMov ?? 0}
+                        onChange={(e) => {
+                          const v = parseInt(e.target.value) || 0
+                          setModalMovBoletimCampo(m => ({ ...m, qtdMov: v, qtdEscolhida: v }))
+                        }}
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm"
+                      />
+                    </div>
+                  )}
+
+                  <button
+                    type="button"
+                    disabled={salvandoMovBoletimCampo || !modalMovBoletimCampo.qtdMov || modalMovBoletimCampo.qtdMov <= 0}
+                    onClick={() => setModalMovBoletimCampo(m => ({ ...m, step: 'motivo' }))} 
+                    className="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-sm disabled:opacity-50"
+                  >
+                    Continuar
+                  </button>
+                </div>
+              )}
+
+              {modalMovBoletimCampo.step === 'motivo' && modalMovBoletimCampo.operacao === 'saida' && (
+                <div className="space-y-3">
+                  <h4 className="text-sm font-bold text-gray-900 dark:text-white">Para onde vão os animais?</h4>
+                  <div className="space-y-2">
+                    <button
+                      type="button"
+                      disabled={salvandoMovBoletimCampo}
+                    onClick={() => setModalMovBoletimCampo(m => ({ ...m, step: 'dest_piquete', motivo: 'piquete' }))}
+                      className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-sm disabled:opacity-50"
+                    >
+                      Entrar em outro local/piquete
+                    </button>
+                    <button
+                      type="button"
+                      disabled={salvandoMovBoletimCampo}
+                      onClick={() =>
+                        registrarMovimentacaoBoletimCampo({
+                          tipo: 'saida',
+                          motivo: 'morte',
+                          quantidade: modalMovBoletimCampo.qtdMov,
+                          origemRow: modalMovBoletimCampo.origemRow,
+                          destinoRow: null
+                        })
+                      }
+                      className="w-full py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-sm disabled:opacity-50"
+                    >
+                      Morte
+                    </button>
+                    <button
+                      type="button"
+                      disabled={salvandoMovBoletimCampo}
+                      onClick={() =>
+                        registrarMovimentacaoBoletimCampo({
+                          tipo: 'saida',
+                          motivo: 'venda',
+                          quantidade: modalMovBoletimCampo.qtdMov,
+                          origemRow: modalMovBoletimCampo.origemRow,
+                          destinoRow: null
+                        })
+                      }
+                      className="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-sm disabled:opacity-50"
+                    >
+                      Venda
+                    </button>
+                    <button
+                      type="button"
+                      disabled={salvandoMovBoletimCampo}
+                      onClick={() => setModalMovBoletimCampo(m => ({ ...m, step: 'qtd_choice' }))}
+                      className="w-full py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-xl font-bold text-sm"
+                    >
+                      Voltar
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {modalMovBoletimCampo.step === 'motivo' && modalMovBoletimCampo.operacao === 'entrada' && (
+                <div className="space-y-3">
+                  <h4 className="text-sm font-bold text-gray-900 dark:text-white">Qual a origem?</h4>
+                  <div className="space-y-2">
+                    <button
+                      type="button"
+                      disabled={salvandoMovBoletimCampo}
+                      onClick={() =>
+                        registrarMovimentacaoBoletimCampo({
+                          tipo: 'entrada',
+                          motivo: 'nascimento',
+                          quantidade: modalMovBoletimCampo.qtdMov,
+                          origemRow: modalMovBoletimCampo.origemRow,
+                          destinoRow: null
+                        })
+                      }
+                      className="w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold text-sm disabled:opacity-50"
+                    >
+                      Nascimento
+                    </button>
+                    <button
+                      type="button"
+                      disabled={salvandoMovBoletimCampo}
+                      onClick={() =>
+                        registrarMovimentacaoBoletimCampo({
+                          tipo: 'entrada',
+                          motivo: 'entrada_externa',
+                          quantidade: modalMovBoletimCampo.qtdMov,
+                          origemRow: modalMovBoletimCampo.origemRow,
+                          destinoRow: null
+                        })
+                      }
+                      className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm disabled:opacity-50"
+                    >
+                      Entrada de fora
+                    </button>
+                    <button
+                      type="button"
+                      disabled={salvandoMovBoletimCampo}
+                      onClick={() => setModalMovBoletimCampo(m => ({ ...m, step: 'qtd_choice' }))}
+                      className="w-full py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-xl font-bold text-sm"
+                    >
+                      Voltar
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {modalMovBoletimCampo.step === 'dest_piquete' && (
+                <div className="space-y-3">
+                  <h4 className="text-sm font-bold text-gray-900 dark:text-white">Escolha o destino (piquete)</h4>
+                  {(() => {
+                    const boletimRowsAll = (reportData?.data || []).filter(r =>
+                      r && r.local !== 'TOTAL GERAL' && r.local_1 !== 'TOTAL GERAL' && r.sub_local_2 !== 'TOTAL GERAL'
+                    )
+                    const piqKeyOf = (r) => (String(r.sub_local_2 || r.local || r.local_1 || 'Não alocados').trim())
+                    const map = {}
+                    boletimRowsAll.forEach(r => {
+                      const k = piqKeyOf(r)
+                      if (!map[k]) map[k] = { chave: k, total: 0, count: 0 }
+                      map[k].total += parseInt(r.quant) || 0
+                      map[k].count += 1
+                    })
+                    const piquetes = Object.values(map).sort((a, b) => (b.total || 0) - (a.total || 0))
+
+                    return piquetes.length === 0 ? (
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Nenhum destino cadastrado.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {piquetes.map((p) => (
+                          <button
+                            key={p.chave}
+                            type="button"
+                            disabled={salvandoMovBoletimCampo}
+                            onClick={() => setModalMovBoletimCampo(m => ({ ...m, step: 'dest_local', destPiquete: p.chave }))}
+                            className="w-full text-left px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700/60"
+                          >
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="font-bold text-gray-900 dark:text-white">{p.chave}</span>
+                              <span className="text-xs text-gray-500 dark:text-gray-400">{p.count} locais</span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )
+                  })()}
+
+                  <button
+                    type="button"
+                    disabled={salvandoMovBoletimCampo}
+                    onClick={() => setModalMovBoletimCampo(m => ({ ...m, step: 'motivo' }))} 
+                    className="w-full py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-xl font-bold text-sm"
+                  >
+                    Voltar
+                  </button>
+                </div>
+              )}
+
+              {modalMovBoletimCampo.step === 'dest_local' && (
+                <div className="space-y-3">
+                  <h4 className="text-sm font-bold text-gray-900 dark:text-white">
+                    Escolha o local dentro do piquete {modalMovBoletimCampo.destPiquete}
+                  </h4>
+                  {(() => {
+                    const boletimRowsAll = (reportData?.data || []).filter(r =>
+                      r && r.local !== 'TOTAL GERAL' && r.local_1 !== 'TOTAL GERAL' && r.sub_local_2 !== 'TOTAL GERAL'
+                    )
+                    const piqKeyOf = (r) => (String(r.sub_local_2 || r.local || r.local_1 || 'Não alocados').trim())
+                    const destRows = boletimRowsAll.filter(r => piqKeyOf(r) === String(modalMovBoletimCampo.destPiquete))
+                    return destRows.length === 0 ? (
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Nenhum local encontrado.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {destRows.map((r) => {
+                          const label = [r.local, r.local_1, r.sub_local_2].filter(Boolean).join(' / ')
+                          const place = (r.local_1 && String(r.local_1).trim() !== '-' ? r.local_1 : r.sub_local_2) || r.local
+                          return (
+                            <button
+                              key={r.id}
+                              type="button"
+                              disabled={salvandoMovBoletimCampo}
+                              onClick={() => {
+                                registrarMovimentacaoBoletimCampo({
+                                  tipo: 'saida',
+                                  motivo: 'piquete',
+                                  quantidade: modalMovBoletimCampo.qtdMov,
+                                  origemRow: modalMovBoletimCampo.origemRow,
+                                  destinoRow: r
+                                })
+                              }}
+                              className="w-full text-left px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700/60"
+                            >
+                              <div className="flex items-center justify-between gap-3">
+                                <span className="font-bold text-gray-900 dark:text-white truncate">{place}</span>
+                                <span className="text-xs text-gray-500 dark:text-gray-400">{parseInt(r.quant) || 0} no local</span>
+                              </div>
+                              <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1 truncate">{label}</p>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    )
+                  })()}
+
+                  <button
+                    type="button"
+                    disabled={salvandoMovBoletimCampo}
+                    onClick={() => setModalMovBoletimCampo(m => ({ ...m, step: 'dest_piquete' }))}
+                    className="w-full py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-xl font-bold text-sm"
+                  >
+                    Voltar
+                  </button>
+                </div>
               )}
             </div>
           </div>

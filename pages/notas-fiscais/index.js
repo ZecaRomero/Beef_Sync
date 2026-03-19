@@ -1,28 +1,26 @@
 
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import { useRouter } from 'next/router'
-import {
-  DocumentTextIcon,
-  DocumentArrowDownIcon,
-  DocumentArrowUpIcon,
-  PlusIcon,
-  MagnifyingGlassIcon,
-  FunnelIcon,
-  EyeIcon,
-  PencilIcon,
-  TrashIcon,
-  CurrencyDollarIcon,
-  ArrowPathIcon
-} from '../../components/ui/Icons'
 import { ChartBarIcon } from '@heroicons/react/24/outline'
-import NotaFiscalModal from '../../components/NotaFiscalModal'
+import { useRouter } from 'next/router'
 import NotaFiscalDetailsModal from '../../components/NotaFiscalDetailsModal'
+import NotaFiscalModal from '../../components/NotaFiscalModal'
 import ResumoAnimaisNF from '../../components/ResumoAnimaisNF'
+import {
+    ArrowPathIcon,
+    CurrencyDollarIcon,
+    DocumentArrowDownIcon,
+    DocumentArrowUpIcon,
+    DocumentTextIcon,
+    FunnelIcon,
+    MagnifyingGlassIcon,
+    PencilIcon,
+    TrashIcon
+} from '../../components/ui/Icons'
 // import NotasFiscaisSyncPanel from '../../components/NotasFiscaisSyncPanel'
 // import PainelIntegracaoBoletim from '../../components/PainelIntegracaoBoletim'
-import Toast from '../../components/ui/SimpleToast'
 import ImportProgressOverlay from '../../components/ImportProgressOverlay'
+import Toast from '../../components/ui/SimpleToast'
 import { integrarNFEntrada, integrarNFSaida } from '../../services/notasFiscaisIntegration'
 
 export default function NotasFiscais() {
@@ -211,7 +209,7 @@ export default function NotasFiscais() {
         }))
         
         setAnimals(animalsNormalizados)
-        localStorage.setItem('animals', JSON.stringify(animalsNormalizados))
+        try { localStorage.setItem('animals', JSON.stringify(animalsNormalizados)) } catch (_) {}
         console.log(`✅ ${animalsNormalizados.length} animais carregados para notas fiscais`)
       } else {
         console.error('Erro ao carregar animais:', response.status)

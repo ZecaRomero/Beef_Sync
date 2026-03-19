@@ -115,35 +115,8 @@ export default async function handler(req, res) {
       resultados.rgd.aplicados++
     }
 
-    // 3. Fêmeas 8+ meses → Vacina Brucelose
-    const femeas8m = await query(`
-      SELECT id, serie, rg, sexo, data_nascimento, meses
-      FROM animais
-      WHERE situacao = 'Ativo'
-        AND (UPPER(sexo) LIKE '%FÊMEA%' OR UPPER(sexo) LIKE '%FEMEA%' OR sexo = 'F')
-        AND (
-          (meses IS NOT NULL AND meses >= 8)
-          OR (data_nascimento IS NOT NULL AND AGE(CURRENT_DATE, data_nascimento) >= INTERVAL '8 months')
-        )
-    `)
-
-    for (const a of femeas8m.rows) {
-      const jaTem = await animalJaTemCusto(a.id, CUSTOS.BRUCELOSE.tipo, CUSTOS.BRUCELOSE.subtipo)
-      if (jaTem) {
-        resultados.brucelose.pulados++
-        continue
-      }
-      if (!dryRun) {
-        await databaseService.adicionarCusto(a.id, {
-          tipo: CUSTOS.BRUCELOSE.tipo,
-          subtipo: CUSTOS.BRUCELOSE.subtipo,
-          valor: CUSTOS.BRUCELOSE.valor,
-          data: hoje(),
-          observacoes: CUSTOS.BRUCELOSE.desc
-        })
-      }
-      resultados.brucelose.aplicados++
-    }
+    // 3. Brucelose (desativada)
+    // A vacinação de brucelose deve aparecer somente quando os custos já tiverem sido lançados manualmente.
 
     // 4. Receptoras → DNA VRGEN R$ 50
     const receptoras = await query(`

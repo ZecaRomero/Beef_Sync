@@ -54,28 +54,6 @@ export default async function handler(req, res) {
           });
         }
 
-        // B. Vacina de Brucelose (Fêmeas > 3 meses)
-        if (isFemea && idadeMeses >= 3) {
-          const temBrucelose = custos.some(c => c.tipo === 'Vacina' && (c.subtipo || '').includes('Brucelose'));
-          if (!temBrucelose) {
-            let dataVacina = new Date();
-            if (nascimento) {
-              dataVacina = new Date(nascimento);
-              dataVacina.setMonth(dataVacina.getMonth() + 6); // Idealmente aos 6 meses
-            }
-            if (dataVacina > hoje) dataVacina = hoje;
-
-            novosCustos.push({
-              animal_id: id,
-              tipo: 'Vacina',
-              subtipo: 'Brucelose (B19/RB51)',
-              valor: 15.00,
-              data: dataVacina.toISOString().split('T')[0],
-              observacoes: 'Custo estimado automático (obrigatório fêmeas 3-8 meses)'
-            });
-          }
-        }
-
         // C. Ração / Nutrição REMOVIDO conforme solicitação do usuário
 
         // Persistir novos custos

@@ -498,7 +498,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
         <div className="flex flex-wrap gap-2 mt-4 sm:mt-0">
           <button
             onClick={async () => {
-              if (!confirm('Aplicar custos automáticos (RGN, RGD, Brucelose, DNA, Brinco, Botton, Andrológico R$165 machos 15-32m)?')) return
+              if (!confirm('Aplicar custos automáticos (RGN, RGD, DNA, Brinco, Botton, Andrológico R$165 machos 15-32m)?')) return
               setAplicandoAutomaticos(true)
               try {
                 const r = await fetch('/api/custos/aplicar-automaticos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) })
@@ -506,7 +506,7 @@ export default function CostManager({ isOpen, onClose, animal: propAnimal, onSav
                 if (d.success) {
                   loadRelatorioGeral()
                   if (selectedAnimal) loadCustosAnimal(selectedAnimal.id)
-                  alert(`✅ ${d.message}\n\nRGN: ${d.resultados?.rgn?.aplicados || 0}\nRGD: ${d.resultados?.rgd?.aplicados || 0}\nBrucelose: ${d.resultados?.brucelose?.aplicados || 0}\nDNA VRGEN: ${d.resultados?.dnaVrgen?.aplicados || 0}\nDNA Genômica Receptora: ${d.resultados?.dnaGenomicaReceptora?.aplicados || 0}\nBrinco Amarelo: ${d.resultados?.brincoAmarelo?.aplicados || 0}\nBotton: ${d.resultados?.botton?.aplicados || 0}\nAndrológico: ${d.resultados?.andrologico?.aplicados || 0}`)
+                  alert(`✅ ${d.message}\n\nRGN: ${d.resultados?.rgn?.aplicados || 0}\nRGD: ${d.resultados?.rgd?.aplicados || 0}\nDNA VRGEN: ${d.resultados?.dnaVrgen?.aplicados || 0}\nDNA Genômica Receptora: ${d.resultados?.dnaGenomicaReceptora?.aplicados || 0}\nBrinco Amarelo: ${d.resultados?.brincoAmarelo?.aplicados || 0}\nBotton: ${d.resultados?.botton?.aplicados || 0}\nAndrológico: ${d.resultados?.andrologico?.aplicados || 0}`)
                 } else alert('❌ ' + (d.error || 'Erro ao aplicar'))
               } catch (e) {
                 alert('❌ Erro: ' + e.message)
