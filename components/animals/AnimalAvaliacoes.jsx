@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 // ── formatação ────────────────────────────────────────────────────────────────
-function v(val, dec = 2) {
+function formatVal(val, dec = 2) {
   if (val == null || val === '' || val === '-') return '—'
   const n = Number(String(val).replace(',', '.'))
   if (!Number.isFinite(n)) return String(val)
@@ -102,7 +102,7 @@ function ProcriarBlock({ animal }) {
                   <div className="flex flex-col items-center gap-0.5">
                     <span className={`text-[9px] font-bold ${s.row} uppercase`}>Idade</span>
                     <span className="text-sm font-semibold text-white">
-                      {v(animal.pub_idade, 2)}m
+                      {formatVal(animal.pub_idade, 2)}m
                     </span>
                   </div>
                 )}
@@ -110,7 +110,7 @@ function ProcriarBlock({ animal }) {
                   <div className="flex flex-col items-center gap-0.5">
                     <span className={`text-[9px] font-bold ${s.row} uppercase`}>% Média</span>
                     <span className="text-sm font-semibold text-white">
-                      {v(animal.pub_pct_media, 0)}%
+                      {formatVal(animal.pub_pct_media, 0)}%
                     </span>
                   </div>
                 )}
@@ -198,6 +198,19 @@ export default function AnimalAvaliacoes({ animal }) {
   const [isExpanded, setIsExpanded] = useState(true)
   if (!animal) return null
 
+  // Helper: verifica se algum valor real existe nas rows (não é '—')
+  const hasData = (rows) => rows.some(row => Object.values(row.vals).some(v => v !== '—'))
+
+  // Detectar sexo
+  const sexoNorm = String(animal.sexo || '').toLowerCase()
+  const isMacho = sexoNorm.includes('macho') || sexoNorm === 'm'
+
+  // PROCRIAR: só para machos e com pelo menos um campo preenchido
+  const hasProcriar = isMacho && (
+    animal.pub_classe || animal.pub_classif != null || animal.pub_grupo ||
+    animal.pub_idade != null || animal.pub_pct_media != null
+  )
+
   // ── DGT (Carcaça) ────────────────────────────────────────────────────────────
   const dgtCols = [
     { key: 'aol',       label: 'AOL' },
@@ -212,24 +225,28 @@ export default function AnimalAvaliacoes({ animal }) {
     {
       label: 'Valor',
       vals: {
-        aol:       v(animal.carc_aol),
-        aol_100kg: v(animal.carc_aol_100kg),
-        ratio:     v(animal.carc_ratio),
-        mar:       v(animal.carc_mar),
-        egs:       v(animal.carc_egs),
-        egs_100kg: v(animal.carc_egs_100kg),
-        picanha:   v(animal.carc_picanha),
+        aol:       formatVal(animal.carc_aol),
+        aol_100kg: formatVal(animal.carc_aol_100kg),
+        ratio:     formatVal(animal.carc_ratio),
+        mar:       formatVal(animal.carc_mar),
+        egs:       formatVal(animal.carc_egs),
+        egs_100kg: formatVal(animal.carc_egs_100kg),
+        picanha:   formatVal(animal.carc_picanha),
       }
     }
   ]
 
   // ── PMGZ ─────────────────────────────────────────────────────────────────────
-  const pmgzCols = PMGZ_TRAITS.map(t => ({ key: t.key, label: t.label }))
+  const pmgzCols = [
+    { key: 'abczg', label: 'iABCZ' },
+    { key: 'deca',  label: 'DECA' },
+    ...PMGZ_TRAITS.map(t => ({ key: t.key, label: t.label })),
+  ]
   const pmgzRows = [
     // DEP (Excel costuma exibir 3 casas)
-    { label: 'DEP',  vals: Object.fromEntries(PMGZ_TRAITS.map(t => [t.key, v(animal[`pmgz_${t.key}_dep`], 3)])) },
-    { label: 'DECA', vals: Object.fromEntries(PMGZ_TRAITS.map(t => [t.key, v(animal[`pmgz_${t.key}_deca`], 0)])) },
-    { label: '%P',   vals: Object.fromEntries(PMGZ_TRAITS.map(t => [t.key, v(animal[`pmgz_${t.key}_pct`], 1)])) },
+    { label: 'DEP',  vals: { abczg: formatVal(animal.abczg, 2), deca: '—', ...Object.fromEntries(PMGZ_TRAITS.map(t => [t.key, formatVal(animal[`pmgz_${t.key}_dep`], 3)])) } },
+    { label: 'DECA', vals: { abczg: '—', deca: formatVal(animal.deca, 2), ...Object.fromEntries(PMGZ_TRAITS.map(t => [t.key, formatVal(animal[`pmgz_${t.key}_deca`], 0)])) } },
+    { label: '%P',   vals: { abczg: '—', deca: '—', ...Object.fromEntries(PMGZ_TRAITS.map(t => [t.key, formatVal(animal[`pmgz_${t.key}_pct`], 1)])) } },
   ]
 
   // ── GENEPLUS ─────────────────────────────────────────────────────────────────
@@ -265,32 +282,32 @@ export default function AnimalAvaliacoes({ animal }) {
     {
       label: 'Valor',
       vals: {
-        iqg: v(animal.iqg, 3),
-        pt_iqg: v(animal.pt_iqg, 1),
-        pn_kg: v(animal.gp_pn_kg, 3),
-        pn_pt: v(animal.gp_pn_pt, 1),
-        p120_kg_em: v(animal.gp_p120_kg_em, 3),
-        p120_pt: v(animal.gp_p120_pt, 1),
-        p2_kg: v(animal.gp_p2_kg, 3),
-        p2_pt: v(animal.gp_p2_pt, 1),
-        p5_kg: v(animal.gp_p5_kg, 3),
-        p5_pt: v(animal.gp_p5_pt, 1),
-        hp_stay_pct: v(animal.gp_hp_stay_pct, 3),
-        hp_stay_pt: v(animal.gp_hp_stay_pt, 1),
-        ipp_01em: v(animal.gp_ipp_01em, 3),
-        ipp_pt: v(animal.gp_ipp_pt, 1),
-        ipp_dias: v(animal.gp_ipp_dias, 3),
-        ipp_dias_pt: v(animal.gp_ipp_dias_pt, 1),
-        pfp30_pct: v(animal.gp_pfp30_pct, 3),
-        pfp30_pt: v(animal.gp_pfp30_pt, 1),
-        rd_pct: v(animal.gp_rd_pct, 3),
-        rd_pt: v(animal.gp_rd_pt, 1),
-        aol_cm2: v(animal.gp_aol_cm2, 3),
-        aol_pt: v(animal.gp_aol_pt, 1),
-        egs_01mm: v(animal.gp_egs_01mm, 3),
-        egs_pt: v(animal.gp_egs_pt, 1),
-        mar_pct: v(animal.gp_mar_pct, 3),
-        mar_pt: v(animal.gp_mar_pt, 1),
+        iqg: formatVal(animal.iqg, 3),
+        pt_iqg: formatVal(animal.pt_iqg, 1),
+        pn_kg: formatVal(animal.gp_pn_kg, 3),
+        pn_pt: formatVal(animal.gp_pn_pt, 1),
+        p120_kg_em: formatVal(animal.gp_p120_kg_em, 3),
+        p120_pt: formatVal(animal.gp_p120_pt, 1),
+        p2_kg: formatVal(animal.gp_p2_kg, 3),
+        p2_pt: formatVal(animal.gp_p2_pt, 1),
+        p5_kg: formatVal(animal.gp_p5_kg, 3),
+        p5_pt: formatVal(animal.gp_p5_pt, 1),
+        hp_stay_pct: formatVal(animal.gp_hp_stay_pct, 3),
+        hp_stay_pt: formatVal(animal.gp_hp_stay_pt, 1),
+        ipp_01em: formatVal(animal.gp_ipp_01em, 3),
+        ipp_pt: formatVal(animal.gp_ipp_pt, 1),
+        ipp_dias: formatVal(animal.gp_ipp_dias, 3),
+        ipp_dias_pt: formatVal(animal.gp_ipp_dias_pt, 1),
+        pfp30_pct: formatVal(animal.gp_pfp30_pct, 3),
+        pfp30_pt: formatVal(animal.gp_pfp30_pt, 1),
+        rd_pct: formatVal(animal.gp_rd_pct, 3),
+        rd_pt: formatVal(animal.gp_rd_pt, 1),
+        aol_cm2: formatVal(animal.gp_aol_cm2, 3),
+        aol_pt: formatVal(animal.gp_aol_pt, 1),
+        egs_01mm: formatVal(animal.gp_egs_01mm, 3),
+        egs_pt: formatVal(animal.gp_egs_pt, 1),
+        mar_pct: formatVal(animal.gp_mar_pct, 3),
+        mar_pt: formatVal(animal.gp_mar_pt, 1),
       }
     }
   ]
@@ -310,35 +327,44 @@ export default function AnimalAvaliacoes({ animal }) {
     { key: 'dacab', label: 'DACAB' },
   ]
   const ancpDepVals = {
-    mgte:  v(animal.mgte, 2),
-    d3p:   v(animal.ancp_d3p, 2),
-    dipp:  v(animal.ancp_dipp, 3),
-    dpe365:v(animal.ancp_dpe365, 3),
-    dpn:   v(animal.ancp_dpn, 3),
-    dstay: v(animal.ancp_dstay, 2),
-    mp120: v(animal.ancp_mp120, 3),
-    mp210: v(animal.ancp_mp210, 3),
-    dp450: v(animal.ancp_dp450, 3),
-    daol:  v(animal.ancp_daol, 3),
-    dacab: v(animal.ancp_dacab, 3),
+    mgte:  formatVal(animal.mgte, 2),
+    d3p:   formatVal(animal.ancp_d3p, 2),
+    dipp:  formatVal(animal.ancp_dipp, 3),
+    dpe365:formatVal(animal.ancp_dpe365, 3),
+    dpn:   formatVal(animal.ancp_dpn, 3),
+    dstay: formatVal(animal.ancp_dstay, 2),
+    mp120: formatVal(animal.ancp_mp120, 3),
+    mp210: formatVal(animal.ancp_mp210, 3),
+    dp450: formatVal(animal.ancp_dp450, 3),
+    daol:  formatVal(animal.ancp_daol, 3),
+    dacab: formatVal(animal.ancp_dacab, 3),
   }
   const ancpTopVals = {
-    mgte:  v(animal.top, 0),
-    d3p:   v(animal.ancp_top_d3p, 0),
-    dipp:  v(animal.ancp_top_dipp, 0),
-    dpe365:v(animal.ancp_top_dpe365, 0),
-    dpn:   v(animal.ancp_top_dpn, 0),
-    dstay: v(animal.ancp_top_dstay, 0),
-    mp120: v(animal.ancp_top_mp120, 0),
-    mp210: v(animal.ancp_top_mp210, 0),
-    dp450: v(animal.ancp_top_dp450, 0),
-    daol:  v(animal.ancp_top_daol, 0),
-    dacab: v(animal.ancp_top_dacab, 0),
+    mgte:  formatVal(animal.top, 0),
+    d3p:   formatVal(animal.ancp_top_d3p, 0),
+    dipp:  formatVal(animal.ancp_top_dipp, 0),
+    dpe365:formatVal(animal.ancp_top_dpe365, 0),
+    dpn:   formatVal(animal.ancp_top_dpn, 0),
+    dstay: formatVal(animal.ancp_top_dstay, 0),
+    mp120: formatVal(animal.ancp_top_mp120, 0),
+    mp210: formatVal(animal.ancp_top_mp210, 0),
+    dp450: formatVal(animal.ancp_top_dp450, 0),
+    daol:  formatVal(animal.ancp_top_daol, 0),
+    dacab: formatVal(animal.ancp_top_dacab, 0),
   }
   const ancpRows = [
     { label: 'DEP', vals: ancpDepVals },
     { label: 'TOP', vals: ancpTopVals },
   ]
+
+  // Verificar quais blocos têm dados
+  const hasDgt = hasData(dgtRows)
+  const hasPmgz = hasData(pmgzRows) || animal.abczg != null || animal.deca != null
+  const hasGeneplus = hasData(geneplusRows)
+  const hasAncp = hasData(ancpRows)
+
+  // Se nenhum bloco tem dados, não renderizar o componente
+  if (!hasProcriar && !hasDgt && !hasPmgz && !hasGeneplus && !hasAncp) return null
 
   return (
     <div className="relative rounded-2xl overflow-hidden border border-gray-700/50 bg-gray-900/50 dark:bg-gray-900 shadow-xl">
@@ -406,19 +432,27 @@ export default function AnimalAvaliacoes({ animal }) {
 
       {isExpanded && (
         <div className="p-3 space-y-2 max-h-[75vh] overflow-y-auto scrollbar-custom pr-1.5">
-          <ProcriarBlock animal={animal} />
-          <div id="eval-dgt">
-            <EvalBlock logo="DGT" sublogo="" color="red" cols={dgtCols} rows={dgtRows} />
-          </div>
-          <div id="eval-pmgz">
-            <EvalBlock logo="PMGZ" color="blue" cols={pmgzCols} rows={pmgzRows} />
-          </div>
-          <div id="eval-geneplus">
-            <EvalBlock logo="GENEPLUS" sublogo="" color="green" cols={geneplusCols} rows={geneplusRows} />
-          </div>
-          <div id="eval-ancp">
-            <EvalBlock logo="ANCP" color="purple" cols={ancpCols} rows={ancpRows} />
-          </div>
+          {hasProcriar && <ProcriarBlock animal={animal} />}
+          {hasDgt && (
+            <div id="eval-dgt">
+              <EvalBlock logo="DGT" sublogo="" color="red" cols={dgtCols} rows={dgtRows} />
+            </div>
+          )}
+          {hasPmgz && (
+            <div id="eval-pmgz">
+              <EvalBlock logo="PMGZ" color="blue" cols={pmgzCols} rows={pmgzRows} />
+            </div>
+          )}
+          {hasGeneplus && (
+            <div id="eval-geneplus">
+              <EvalBlock logo="GENEPLUS" sublogo="" color="green" cols={geneplusCols} rows={geneplusRows} />
+            </div>
+          )}
+          {hasAncp && (
+            <div id="eval-ancp">
+              <EvalBlock logo="ANCP" color="purple" cols={ancpCols} rows={ancpRows} />
+            </div>
+          )}
         </div>
       )}
     </div>

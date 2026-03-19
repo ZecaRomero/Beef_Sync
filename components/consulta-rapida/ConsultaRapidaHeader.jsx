@@ -2,9 +2,6 @@ import Image from 'next/image'
 
 export default function ConsultaRapidaHeader({
   recentesCount,
-  sugestoesCount,
-  showSugestoes,
-  modoBusca,
   isDarkMode,
   onToggleDarkMode,
   onLogout,
@@ -34,20 +31,10 @@ export default function ConsultaRapidaHeader({
             </div>
           </div>
 
-          <div className="mt-4 grid grid-cols-3 gap-2">
-            <div className="rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200/70 dark:border-amber-800/50 p-3">
+          <div className="mt-4">
+            <div className="rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200/70 dark:border-amber-800/50 p-3 inline-block">
               <p className="text-[10px] uppercase font-bold tracking-wide text-amber-700 dark:text-amber-300">Recentes</p>
               <p className="text-lg font-black text-amber-900 dark:text-amber-200">{recentesCount}</p>
-            </div>
-            <div className="rounded-xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200/70 dark:border-indigo-800/50 p-3">
-              <p className="text-[10px] uppercase font-bold tracking-wide text-indigo-700 dark:text-indigo-300">Sugestões</p>
-              <p className="text-xs font-bold text-indigo-900 dark:text-indigo-200 truncate">
-                {showSugestoes ? `${sugestoesCount || 0} ativas` : `${sugestoesCount || 0} disponíveis`}
-              </p>
-            </div>
-            <div className="rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200/70 dark:border-emerald-800/50 p-3">
-              <p className="text-[10px] uppercase font-bold tracking-wide text-emerald-700 dark:text-emerald-300">Modo</p>
-              <p className="text-xs font-bold text-emerald-900 dark:text-emerald-200">{modoBusca === 'inteligente' ? 'Auto' : 'Manual'}</p>
             </div>
           </div>
 

@@ -69,6 +69,11 @@ function parseSerieRg(raw) {
   const m4 = s.match(/^(\d+)$/)
   if (m4) return { serie: '', rg: m4[1] }
 
+  // Ex: "LIRA SANT ANNA 16179" (nome + RG no final)
+  // Extrai o RG pelos dígitos finais para permitir fallback de busca só por RG.
+  const m5 = s.match(/(\d+)\s*$/)
+  if (m5) return { serie: '', rg: m5[1] }
+
   return null
 }
 

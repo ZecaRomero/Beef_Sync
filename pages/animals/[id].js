@@ -1,45 +1,44 @@
 
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import { useRouter } from 'next/router'
+import {
+    ArrowLeftIcon,
+    ArrowPathIcon,
+    ArrowTopRightOnSquareIcon,
+    BeakerIcon,
+    CalendarIcon,
+    ChevronDownIcon,
+    ChevronUpIcon,
+    CurrencyDollarIcon,
+    DocumentArrowDownIcon,
+    MapPinIcon,
+    PencilIcon,
+    PlusCircleIcon,
+    SparklesIcon,
+    TrashIcon,
+    UserIcon,
+    XMarkIcon
+} from '@heroicons/react/24/outline'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Card, CardBody, CardHeader } from '../../components/ui/Card'
-import Button from '../../components/ui/Button'
-import LoadingSpinner from '../../components/ui/LoadingSpinner'
-import { 
-  ArrowLeftIcon,
-  PencilIcon,
-  TrashIcon,
-  CurrencyDollarIcon,
-  CalendarIcon,
-  UserIcon,
-  PlusCircleIcon,
-  DocumentArrowDownIcon,
-  MapPinIcon,
-  BeakerIcon,
-  ArrowPathIcon,
-  XMarkIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-  ArrowTopRightOnSquareIcon,
-  SparklesIcon
-} from '@heroicons/react/24/outline'
-import logger from '../../utils/logger'
-import RankingIABCZCard from '../../components/animals/RankingIABCZCard'
-import QuickOccurrenceForm from '../../components/animals/QuickOccurrenceForm'
+import { useRouter } from 'next/router'
 import BatchOccurrenceForm from '../../components/animals/BatchOccurrenceForm'
-import { generateAnimalFichaPDF } from '../../utils/animalFichaPDF'
+import QuickOccurrenceForm from '../../components/animals/QuickOccurrenceForm'
+import DNAHistorySection from '../../components/DNAHistorySection'
 import NotaFiscalModal from '../../components/NotaFiscalModal'
+import Button from '../../components/ui/Button'
+import { Card, CardBody, CardHeader } from '../../components/ui/Card'
+import LoadingSpinner from '../../components/ui/LoadingSpinner'
 import Modal from '../../components/ui/Modal'
 import Toast from '../../components/ui/SimpleToast'
 import ToastUI from '../../components/ui/Toast'
 import { integrarNFSaida } from '../../services/notasFiscaisIntegration'
-import DNAHistorySection from '../../components/DNAHistorySection'
 import { animalDataCache } from '../../utils/animalDataCache'
-import { localizacaoValidaParaExibir } from '../../utils/formatters'
+import { generateAnimalFichaPDF } from '../../utils/animalFichaPDF'
 import { extrairSerieRG } from '../../utils/animalUtils'
+import { localizacaoValidaParaExibir } from '../../utils/formatters'
+import logger from '../../utils/logger'
 
 // Modal para editar Data do DG, Resultado e Veterinário
 function EditDGModal({ animal, onClose, onSave }) {
@@ -177,9 +176,12 @@ export default function AnimalDetail() {
     const checkMobile = () => {
       const mobile = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
       setIsMobileDevice(mobile)
-      setShowSplash(mobile)
+      setIsMobile(mobile)
+      if (!isMobileDevice && mobile) setShowSplash(true)
     }
     checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
   // Splash screen com animação de progresso (apenas mobile)
@@ -203,16 +205,6 @@ export default function AnimalDetail() {
 
     return () => clearInterval(timer)
   }, [showSplash])
-
-  // Detectar mobile
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
-    }
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
 
   useEffect(() => {
     const carregarUltimaIA = async () => {
@@ -602,39 +594,32 @@ export default function AnimalDetail() {
     if (!animal || (!animal.serie && !animal.rg && !animal.nome)) return
     
     try {
-      // Buscar coletas FIV por identificador (série+RG ou nome)
       let url = '/api/animals/doadora-coletas?'
       
       if (animal.serie && animal.rg) {
-        // Buscar por série e RG separadamente (mais preciso)
         url += `serie=${encodeURIComponent(animal.serie)}&rg=${encodeURIComponent(animal.rg)}`
       } else if (animal.nome) {
-        // Buscar por nome
         url += `identificador=${encodeURIComponent(animal.nome)}`
       } else {
         return
       }
       
-      console.log('🔍 Buscando coletas FIV:', url)
       const response = await fetch(url)
       
       if (response.ok) {
         const result = await response.json()
-        console.log('📊 Resultado coletas FIV:', result)
         if (result.success && result.data) {
-          // Adicionar coletas ao objeto animal
           setAnimal(prev => ({
             ...prev,
             fivs: result.data.coletas || [],
             resumoFIV: result.data.resumo
           }))
-          console.log('✅ Coletas FIV adicionadas ao animal:', result.data.coletas?.length || 0)
         }
       } else {
-        console.warn('⚠️ Erro ao buscar coletas FIV:', response.status)
+        logger.warn('Erro ao buscar coletas FIV:', response.status)
       }
     } catch (error) {
-      console.error('❌ Erro ao carregar coletas FIV:', error)
+      logger.error('Erro ao carregar coletas FIV:', error)
     }
   }
 
@@ -643,38 +628,30 @@ export default function AnimalDetail() {
     if (!animal || !animal.mae) return
     
     try {
-      // Buscar coletas FIV da mãe por nome ou série+RG
       let url = '/api/animals/doadora-coletas?'
       
-      // Se tem série e RG da mãe, usar isso (mais preciso)
       if (animal.serie_mae && animal.rg_mae) {
         url += `serie=${encodeURIComponent(animal.serie_mae)}&rg=${encodeURIComponent(animal.rg_mae)}`
       } else {
-        // Senão, buscar pelo nome da mãe
         url += `identificador=${encodeURIComponent(animal.mae)}`
       }
       
-      console.log('🔍 Buscando coletas FIV da mãe:', url, 'Mae:', animal.mae)
       const response = await fetch(url)
       
       if (response.ok) {
         const result = await response.json()
-        console.log('📊 Resultado coletas FIV da mãe:', result)
         if (result.success && result.data && result.data.coletas && result.data.coletas.length > 0) {
           setColetasFIVMae({
             nome: result.data.doadora_nome || animal.mae,
             coletas: result.data.coletas,
             resumo: result.data.resumo
           })
-          console.log('✅ Coletas FIV da mãe encontradas:', result.data.coletas.length)
-        } else {
-          console.log('ℹ️ Nenhuma coleta FIV encontrada para a mãe')
         }
       } else {
-        console.warn('⚠️ Erro ao buscar coletas FIV da mãe:', response.status)
+        logger.warn('Erro ao buscar coletas FIV da mãe:', response.status)
       }
     } catch (error) {
-      console.error('❌ Erro ao carregar coletas FIV da mãe:', error)
+      logger.error('Erro ao carregar coletas FIV da mãe:', error)
     }
   }
 
@@ -715,10 +692,6 @@ export default function AnimalDetail() {
   const carregarInfoVenda = async () => {
     if (!id || !animal) return
     
-    console.log('🔍 carregarInfoVenda - Iniciando busca de dados de venda')
-    console.log('Animal ID:', id)
-    console.log('Animal:', animal)
-    
     try {
       setLoadingVenda(true)
       
@@ -739,26 +712,17 @@ export default function AnimalDetail() {
       
       // Se já temos todos os dados necessários do animal, usar diretamente
       if (infoVendaInicial.nfNumero && infoVendaInicial.dataVenda && infoVendaInicial.destino) {
-        console.log('✅ Todos os dados de venda encontrados no próprio animal')
         setInfoVenda(infoVendaInicial)
         setLoadingVenda(false)
         return
       }
       
-      // Se faltam dados (NF, data ou destino), buscar nas NFs mesmo que tenha valor_venda
-      console.log('⚠️ Dados incompletos no animal, buscando nas NFs para completar...')
-      console.log('   Dados atuais:', infoVendaInicial)
-      
-      // Se não tem valor_venda no animal, buscar nas notas fiscais
+      // Buscar nas NFs para completar dados faltantes
       const response = await fetch(`/api/notas-fiscais?tipo=saida`)
-      
-      console.log('📡 Response NFs:', response.ok)
       
       if (response.ok) {
         const result = await response.json()
         const nfs = result.data || result || []
-        
-        console.log(`📋 Total de NFs de saída encontradas: ${nfs.length}`)
         
         // Procurar NF de saída que contenha este animal
         let nfVenda = null
@@ -766,39 +730,18 @@ export default function AnimalDetail() {
         
         for (const nf of nfs) {
           try {
-            console.log(`🔍 Verificando NF da lista:`, nf)
-            console.log(`   - id: ${nf.id}`)
-            console.log(`   - numero_nf: ${nf.numero_nf}`)
-            console.log(`   - data: ${nf.data}`)
-            console.log(`   - destino: ${nf.destino}`)
-            
             // Buscar NF completa com itens
             const nfResponse = await fetch(`/api/notas-fiscais/${nf.id}`)
             if (nfResponse.ok) {
               const nfCompleta = await nfResponse.json()
-              
-              console.log(`📄 NF Completa recebida (objeto inteiro):`, JSON.stringify(nfCompleta, null, 2))
-              console.log(`📄 Chaves do objeto:`, Object.keys(nfCompleta))
-              console.log(`   - numero_nf: ${nfCompleta.numero_nf}`)
-              console.log(`   - numeroNF: ${nfCompleta.numeroNF}`)
-              console.log(`   - data: ${nfCompleta.data}`)
-              console.log(`   - data_compra: ${nfCompleta.data_compra}`)
-              console.log(`   - destino: ${nfCompleta.destino}`)
-              console.log(`   - fornecedor: ${nfCompleta.fornecedor}`)
-              
               const itens = nfCompleta.itens || []
-              
-              console.log(`🔍 Verificando NF ${nf.numero_nf || nf.numeroNF} com ${itens.length} itens`)
               
               // Verificar se algum item corresponde ao animal
               const itemEncontrado = itens.find(item => {
                 const tatuagem = item.tatuagem || ''
                 const animalId = item.animalId || item.animal_id
                 
-                console.log(`  - Item: tatuagem="${tatuagem}", animalId=${animalId}`)
-                console.log(`  - Procurando: animalId=${id}, serie="${animal.serie}", rg="${animal.rg}"`)
-                
-                const match = (
+                return (
                   animalId === parseInt(id) ||
                   tatuagem === `${animal.serie}-${animal.rg}` ||
                   tatuagem === `${animal.serie} ${animal.rg}` ||
@@ -807,42 +750,25 @@ export default function AnimalDetail() {
                    tatuagem.toLowerCase().includes(animal.serie.toLowerCase()) && 
                    tatuagem.includes(String(animal.rg)))
                 )
-                
-                if (match) {
-                  console.log(`  ✅ MATCH ENCONTRADO!`)
-                }
-                
-                return match
               })
               
               if (itemEncontrado) {
-                nfVenda = nf  // Usar o NF da lista original que tem os dados corretos!
+                nfVenda = nf
                 itemVenda = itemEncontrado
-                console.log(`✅ NF de venda encontrada: ${nf.numero_nf || nf.numeroNF}`)
                 break
               }
             }
           } catch (err) {
-            console.error('Erro ao buscar NF:', err)
+            logger.error('Erro ao buscar NF:', err)
           }
         }
         
         if (nfVenda && itemVenda) {
-          console.log('📦 Dados da NF encontrada:')
-          console.log('   - nfVenda.numero_nf:', nfVenda.numero_nf)
-          console.log('   - nfVenda.numeroNF:', nfVenda.numeroNF)
-          console.log('   - nfVenda.data:', nfVenda.data)
-          console.log('   - nfVenda.data_compra:', nfVenda.data_compra)
-          console.log('   - nfVenda.destino:', nfVenda.destino)
-          console.log('   - nfVenda.fornecedor:', nfVenda.fornecedor)
-          console.log('   - itemVenda.valorUnitario:', itemVenda.valorUnitario)
-          console.log('   - itemVenda.valor_unitario:', itemVenda.valor_unitario)
-          
           // Usar dados da NF para preencher campos faltantes, mas manter dados do animal se já existirem
           const valorVendaNF = parseFloat(itemVenda.valorUnitario || itemVenda.valor_unitario || 0)
           
           const vendaInfo = {
-            valorVenda: valorVendaAnimal || valorVendaNF, // Preferir do animal, senão da NF
+            valorVenda: valorVendaAnimal || valorVendaNF,
             custosTotal: custosTotal,
             dataVenda: infoVendaInicial.dataVenda || nfVenda.data || nfVenda.data_compra,
             nfNumero: infoVendaInicial.nfNumero || nfVenda.numero_nf || nfVenda.numeroNF,
@@ -851,34 +777,38 @@ export default function AnimalDetail() {
             calculado: false
           }
           
-          console.log('✅ infoVenda definido combinando dados do animal e NF:', vendaInfo)
           setInfoVenda(vendaInfo)
         } else {
-          console.log('❌ Nenhuma NF de venda encontrada para este animal')
           // Se não encontrou NF mas tem dados do animal, usar os dados do animal mesmo incompletos
           if (valorVendaAnimal > 0) {
-            console.log('⚠️ Usando dados do animal (incompletos):', infoVendaInicial)
             setInfoVenda(infoVendaInicial)
           }
         }
       } else {
-        console.log('❌ Erro na resposta da API de NFs:', response.status)
         // Se houve erro mas temos dados do animal, usar os dados do animal
         if (valorVendaAnimal > 0) {
-          console.log('⚠️ Usando dados do animal devido a erro na API:', infoVendaInicial)
           setInfoVenda(infoVendaInicial)
         }
       }
     } catch (error) {
-      console.error('❌ Erro ao carregar informações de venda:', error)
+      logger.error('Erro ao carregar informações de venda:', error)
       // Se houve erro mas temos dados do animal, usar os dados do animal
+      const valorVendaAnimal = animal.valor_venda || animal.valorVenda || 0
       if (valorVendaAnimal > 0) {
-        console.log('⚠️ Usando dados do animal devido a erro:', infoVendaInicial)
-        setInfoVenda(infoVendaInicial)
+        const custosTotal = custos.length > 0 
+          ? custos.reduce((sum, custo) => sum + parseFloat(custo.valor || 0), 0)
+          : (animal.custo_total || animal.custoTotal || 0)
+        setInfoVenda({
+          valorVenda: valorVendaAnimal,
+          custosTotal: custosTotal,
+          dataVenda: animal.data_venda || animal.dataVenda || null,
+          nfNumero: animal.nf_saida || animal.nfSaida || null,
+          destino: animal.destino || animal.comprador || null,
+          calculado: true
+        })
       }
     } finally {
       setLoadingVenda(false)
-      console.log('🏁 carregarInfoVenda - Finalizado')
     }
   }
 

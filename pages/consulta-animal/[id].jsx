@@ -9,7 +9,7 @@ import {
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 
 import ErrorBoundary from '../../components/ErrorBoundary'
 import AnimalAdditionalInfo from '../../components/animals/AnimalAdditionalInfo'
@@ -45,11 +45,6 @@ import { localizacaoValidaParaExibir } from '../../utils/formatters'
 export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode }) {
   const router = useRouter()
   const { id } = router.query
-
-  // Log para debug
-  useEffect(() => {
-    console.log('ConsultaAnimalView montado', { id, pathname: router.pathname })
-  }, [id, router.pathname])
 
   const {
     animal,
@@ -145,8 +140,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
 
       return String(a?.serie || '').localeCompare(String(b?.serie || ''), 'pt-BR')
     })
-    } catch (error) {
-      console.error('Erro ao combinar filhos:', error)
+    } catch (err) {
       return []
     }
   }, [animal?.filhos, baixasResumo?.resumoMae?.proleDetalhes])
@@ -236,8 +230,7 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
         locAtual ? `📍 ${locAtual}` : null,
         animal.brinco ? `🏷️ ${animal.brinco}` : null
       ].filter(Boolean)
-    } catch (error) {
-      console.error('Erro ao gerar resumoChips:', error)
+    } catch (err) {
       return []
     }
   }, [animal, locAtual])

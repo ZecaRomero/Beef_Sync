@@ -1,22 +1,19 @@
 
-import React, { useEffect, useState } from 'react'
-import { 
-  PlusIcon, 
-  EyeIcon, 
-  PencilIcon, 
-  TrashIcon,
-  FunnelIcon,
-  DocumentArrowDownIcon,
-  ExclamationTriangleIcon,
-  ArrowRightIcon,
-  ArrowLeftIcon,
-  PrinterIcon
-} from './ui/Icons'
+import { useEffect, useState } from 'react'
 import { useAutocomplete } from '../hooks/useAutocomplete'
+import {
+    ArrowLeftIcon,
+    ArrowRightIcon,
+    DocumentArrowDownIcon,
+    EyeIcon,
+    PencilIcon,
+    PlusIcon,
+    PrinterIcon,
+    TrashIcon
+} from './ui/Icons'
 // ExcelJS será importado dinamicamente na função de exportação
-import DatabaseSync from './DatabaseSync'
-import { ViewSemenModal, EditSemenModal } from './SemenModals'
 import { AddEntradaModal, AddSaidaModal } from './SemenEntradaSaidaModals'
+import { EditSemenModal, ViewSemenModal } from './SemenModals'
 import TransferirLocalizacaoModal from './semen/TransferirLocalizacaoModal'
 
 export default function SemenStock() {
@@ -744,9 +741,6 @@ export default function SemenStock() {
 
   return (
     <div className="space-y-6">
-      {/* Sincronização de Dados */}
-      <DatabaseSync />
-
       {/* Seletor de tipo de material */}
       <div className="flex space-x-2">
         <button
@@ -870,49 +864,77 @@ export default function SemenStock() {
           <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
             {stats.total}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">Total Touros</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            {tipoMaterial === 'embriao' ? 'Total Acasalamentos' : 'Total Touros'}
+          </div>
+          <div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">
+            {tipoMaterial === 'embriao' ? 'registros de embriões' : 'registros de sêmen'}
+          </div>
         </div>
         <div className="card p-4 text-center">
           <div className="text-2xl font-bold text-green-600 dark:text-green-400">
             {stats.disponivel}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">Disponíveis</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            {tipoMaterial === 'embriao' ? 'Embriões Disp.' : 'Touros Disp.'}
+          </div>
+          <div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">com estoque &gt; 0</div>
         </div>
         <div className="card p-4 text-center">
           <div className="text-2xl font-bold text-red-600 dark:text-red-400">
             {stats.esgotado}
           </div>
           <div className="text-sm text-gray-600 dark:text-gray-400">Esgotados</div>
+          <div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">estoque zerado</div>
         </div>
         <div className="card p-4 text-center">
           <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
             {stats.totalDoses}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">Total Doses</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            {tipoMaterial === 'embriao' ? 'Total Embriões' : 'Total Doses Sêmen'}
+          </div>
+          <div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">
+            {tipoMaterial === 'embriao' ? 'embriões registrados' : 'doses compradas'}
+          </div>
         </div>
         <div className="card p-4 text-center">
           <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
             {stats.dosesDisponiveis}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">Disponíveis</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            {tipoMaterial === 'embriao' ? 'Embriões Disp.' : 'Doses Disp.'}
+          </div>
+          <div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">
+            {tipoMaterial === 'embriao' ? 'prontos p/ transferir' : 'prontas p/ uso'}
+          </div>
         </div>
         <div className="card p-4 text-center">
           <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
             {stats.dosesUsadas}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">Usadas</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            {tipoMaterial === 'embriao' ? 'Transferidos' : 'Doses Usadas'}
+          </div>
+          <div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">
+            {tipoMaterial === 'embriao' ? 'embriões já transferidos' : 'doses já utilizadas'}
+          </div>
         </div>
         <div className="card p-4 text-center">
           <div className="text-2xl font-bold text-teal-600 dark:text-teal-400">
             R$ {stats.valorTotal.toFixed(0)}
           </div>
           <div className="text-sm text-gray-600 dark:text-gray-400">Investido</div>
+          <div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">
+            {tipoMaterial === 'embriao' ? 'valor total embriões' : 'valor total sêmen'}
+          </div>
         </div>
         <div className="card p-4 text-center">
           <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
             {stats.fornecedores}
           </div>
           <div className="text-sm text-gray-600 dark:text-gray-400">Fornecedores</div>
+          <div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">centrais / labs</div>
         </div>
       </div>
 

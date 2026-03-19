@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import logger from '../utils/logger'
 
 const AuthContext = createContext({
   user: null,
@@ -18,15 +19,21 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (!supabase) {
+      logger.warn('Supabase não configurado — autenticação desabilitada')
       setLoading(false)
       return
     }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        setSession(session)
+        setUser(session?.user ?? null)
+        setLoading(false)
+      })
+      .catch((err) => {
+        logger.error('Erro ao obter sessão do Supabase:', err)
+        setLoading(false)
+      })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
