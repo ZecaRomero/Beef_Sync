@@ -2184,7 +2184,6 @@ export default async function handler(req, res) {
             FROM notas_fiscais nf
             WHERE ${dataCol}::date >= $1 AND ${dataCol}::date <= $2
             ORDER BY ${dataCol} DESC
-            LIMIT 200
           `, [start, end])
           data = (r.rows || []).map(row => ({
             nf: row.numero_nf,
