@@ -2195,7 +2195,62 @@ export default async function handler(req, res) {
           }))
           const entradas = data.filter(d => d.tipo === 'entrada').length
           const saidas = data.filter(d => d.tipo === 'saida').length
-          resumo = { 'Entradas': entradas, 'Saídas': saidas, 'Total NFs': data.length }
+
+          // Resumo de vendas para exibição no mobile (cartões)
+          const vendasRes = await query(`
+            WITH base AS (
+              SELECT
+                nf.id,
+                COALESCE(NULLIF(TRIM(nf.destino), ''), NULLIF(TRIM(nf.fornecedor), ''), 'Não informado') AS cliente,
+                COALESCE(CASE WHEN nf.tipo = 'saida' THEN nf.data_saida END, nf.data_compra)::date AS data_venda,
+                COALESCE(nf.valor_total, 0)::numeric AS valor_total
+              FROM notas_fiscais nf
+              WHERE nf.tipo = 'saida'
+                AND ${dataCol}::date >= $1
+                AND ${dataCol}::date <= $2
+            ),
+            por_cliente AS (
+              SELECT cliente, MAX(data_venda) AS ultima_compra
+              FROM base
+              GROUP BY cliente
+            )
+            SELECT
+              COALESCE((SELECT SUM(valor_total) FROM base), 0) AS total_vendido,
+              COALESCE((SELECT COUNT(*) FROM por_cliente), 0) AS clientes_total,
+              COALESCE((SELECT COUNT(*) FROM por_cliente WHERE ultima_compra < (CURRENT_DATE - INTERVAL '180 days')), 0) AS clientes_atencao
+          `, [start, end])
+
+          let animaisRes = { rows: [{ animais: 0 }] }
+          try {
+            animaisRes = await query(`
+              SELECT COALESCE(SUM(
+                COALESCE(NULLIF(regexp_replace(COALESCE(nfi.dados_item->>'quantidade', ''), '[^0-9.-]', '', 'g'), '')::numeric, 0)
+              ), 0) AS animais
+              FROM notas_fiscais_itens nfi
+              INNER JOIN notas_fiscais nf ON nf.id = nfi.nota_fiscal_id
+              WHERE nf.tipo = 'saida'
+                AND ${dataCol}::date >= $1
+                AND ${dataCol}::date <= $2
+            `, [start, end])
+          } catch (_) {
+            // Alguns ambientes podem não ter itens consolidados para NF.
+            animaisRes = { rows: [{ animais: 0 }] }
+          }
+
+          const totalVendido = parseFloat(vendasRes.rows?.[0]?.total_vendido || 0)
+          const clientesTotal = parseInt(vendasRes.rows?.[0]?.clientes_total || 0, 10)
+          const clientesAtencao = parseInt(vendasRes.rows?.[0]?.clientes_atencao || 0, 10)
+          const totalAnimais = Math.round(parseFloat(animaisRes.rows?.[0]?.animais || 0))
+
+          resumo = {
+            'Total Vendido': `R$ ${totalVendido.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            'Animais': Number.isFinite(totalAnimais) ? totalAnimais : 0,
+            'Clientes': clientesTotal,
+            'Precisam atenção': clientesAtencao,
+            'Entradas': entradas,
+            'Saídas': saidas,
+            'Total NFs': data.length
+          }
         } catch (e) {
           data = []
         }
