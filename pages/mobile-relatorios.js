@@ -201,6 +201,11 @@ export default function MobileRelatorios() {
   const [formMed, setFormMed] = useState({ medicamento: '', dataAplicacao: '', dataProxima: '', observacao: '' })
   const [salvandoMed, setSalvandoMed] = useState(false)
   const [isAdelso, setIsAdelso] = useState(false)
+  const getNotasFiscaisPeriod = useCallback(() => {
+    const end = new Date()
+    end.setFullYear(end.getFullYear() + 2)
+    return { startDate: '2015-01-01', endDate: end.toISOString().split('T')[0] }
+  }, [])
 
   // ── Tipos que redirecionam para páginas externas ──────────────────────────
   const handleSelectTipo = useCallback((key) => {
@@ -208,8 +213,11 @@ export default function MobileRelatorios() {
       router.push('/notas-fiscais/relatorio')
       return
     }
+    if (key === 'notas_fiscais') {
+      setPeriod(getNotasFiscaisPeriod())
+    }
     setSelectedTipo(key)
-  }, [router])
+  }, [getNotasFiscaisPeriod, router])
   
   // ── Movimentação Boletim Campo (Adelso) ────────────────────────────────────
   const [modalMovBoletimCampo, setModalMovBoletimCampo] = useState(null)
@@ -373,10 +381,13 @@ export default function MobileRelatorios() {
     if (!config || !router.isReady) return
     const { tipo } = router.query
     if (tipo && config.enabled?.includes(tipo)) {
+      if (tipo === 'notas_fiscais') {
+        setPeriod(getNotasFiscaisPeriod())
+      }
       setSelectedTipo(tipo)
       setCurrentTab('reports')
     }
-  }, [config, router.isReady, router.query])
+  }, [config, getNotasFiscaisPeriod, router.isReady, router.query])
 
   // Inicializar tema
   useEffect(() => {
@@ -772,7 +783,31 @@ export default function MobileRelatorios() {
     }]
   } : null
 
-  const resumo = reportData?.resumo || {}
+  const resumoNotasFiscaisFallback = (() => {
+    if (selectedTipo !== 'notas_fiscais') return null
+    const rows = (reportData?.data || []).filter(d => !d?._resumo)
+    if (!rows.length) return null
+    const toNum = (v) => parseFloat(String(v ?? '0').replace(',', '.')) || 0
+    const totalVendido = rows
+      .filter(r => String(r.tipo || '').toLowerCase() === 'saida')
+      .reduce((s, r) => s + toNum(r.valor), 0)
+    const entradas = rows.filter(r => String(r.tipo || '').toLowerCase() === 'entrada').length
+    const saidas = rows.filter(r => String(r.tipo || '').toLowerCase() === 'saida').length
+    const clientes = new Set(rows
+      .map(r => (r.fornecedor || '').trim())
+      .filter(Boolean))
+    return {
+      'Total Vendido': `R$ ${totalVendido.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      'Clientes': clientes.size,
+      'Entradas': entradas,
+      'Saídas': saidas,
+      'Total NFs': rows.length
+    }
+  })()
+  const resumoExibicao = (reportData?.resumo && Object.keys(reportData.resumo || {}).length > 0)
+    ? reportData.resumo
+    : (resumoNotasFiscaisFallback || {})
+  const resumo = resumoExibicao || {}
   let machos = Number(resumo.Machos ?? resumo.machos ?? 0)
   let femeas = Number(resumo.Fêmeas ?? resumo.femeas ?? 0)
   if (selectedTipo === 'nascimentos' && (machos === 0 && femeas === 0) && filteredData.length > 0) {
@@ -1435,8 +1470,8 @@ export default function MobileRelatorios() {
     try {
       setSharing(true)
       const titulo = `Relatório: ${selectedTipo || 'Geral'}`
-      const resumoTxt = reportData?.resumo && typeof reportData.resumo === 'object'
-        ? Object.entries(reportData.resumo).map(([k, v]) => `${k}: ${formatValue(v)}`).join('\n')
+      const resumoTxt = resumoExibicao && typeof resumoExibicao === 'object'
+        ? Object.entries(resumoExibicao).map(([k, v]) => `${k}: ${formatValue(v)}`).join('\n')
         : null
       const texto = [
         titulo,
@@ -1461,8 +1496,8 @@ export default function MobileRelatorios() {
   const handleShareWhatsApp = () => {
     try {
       const titulo = `📊 *Relatório: ${selectedTipo || 'Geral'}*`
-      const resumoTxt = reportData?.resumo && typeof reportData.resumo === 'object'
-        ? Object.entries(reportData.resumo).map(([k, v]) => `• ${k}: ${formatValue(v)}`).join('\n')
+      const resumoTxt = resumoExibicao && typeof resumoExibicao === 'object'
+        ? Object.entries(resumoExibicao).map(([k, v]) => `• ${k}: ${formatValue(v)}`).join('\n')
         : null
       
       let detalhes = ''
@@ -1543,8 +1578,8 @@ export default function MobileRelatorios() {
   const handleShareEmail = () => {
     try {
       const titulo = `Relatório: ${selectedTipo || 'Geral'}`
-      const resumoTxt = reportData?.resumo && typeof reportData.resumo === 'object'
-        ? Object.entries(reportData.resumo).map(([k, v]) => `${k}: ${formatValue(v)}`).join('\n')
+      const resumoTxt = resumoExibicao && typeof resumoExibicao === 'object'
+        ? Object.entries(resumoExibicao).map(([k, v]) => `${k}: ${formatValue(v)}`).join('\n')
         : null
       
       const corpo = [
@@ -2384,6 +2419,20 @@ export default function MobileRelatorios() {
                     </button>
                   )
                 })}
+                {selectedTipo === 'notas_fiscais' && (() => {
+                  const p = getNotasFiscaisPeriod()
+                  const isActive = period.startDate === p.startDate && period.endDate === p.endDate
+                  return (
+                    <button
+                      onClick={() => setPeriod(p)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                        isActive ? 'bg-amber-500 text-white shadow-md' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      }`}
+                    >
+                      Desde 2015
+                    </button>
+                  )
+                })()}
               </div>
 
               {hasSexo && (
@@ -3287,7 +3336,7 @@ export default function MobileRelatorios() {
                     )
                   })()}
 
-                  {reportData.resumo && typeof reportData.resumo === 'object' && (
+                  {resumoExibicao && typeof resumoExibicao === 'object' && (
                     <div className="space-y-3">
                       {ehBoletimRebanho && (
                         <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">
@@ -3296,7 +3345,7 @@ export default function MobileRelatorios() {
                       )}
                       <div className={`grid gap-3 ${ehBoletimRebanho ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3'}`}>
                         <AnimatePresence>
-                          {Object.entries(reportData.resumo)
+                          {Object.entries(resumoExibicao)
                             .filter(([k, v]) => {
                               // Filtrar apenas campos que definitivamente não devem aparecer
                               if (k === 'graficos' || k === 'erro') return false
