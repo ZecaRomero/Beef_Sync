@@ -2177,8 +2177,8 @@ export default async function handler(req, res) {
           `)
           const temDataSaida = colCheck.rows?.some(r => r.column_name === 'data_saida')
           const dataCol = temDataSaida
-            ? `COALESCE(CASE WHEN nf.tipo = 'saida' THEN nf.data_saida END, nf.data_compra)`
-            : 'nf.data_compra'
+            ? `COALESCE(CASE WHEN nf.tipo = 'saida' THEN nf.data_saida END, nf.data_compra, nf.data)`
+            : 'COALESCE(nf.data_compra, nf.data)'
           const r = await query(`
             SELECT nf.id, nf.numero_nf, nf.tipo, nf.fornecedor, nf.destino, nf.valor_total, nf.data_compra, nf.data_saida
             FROM notas_fiscais nf

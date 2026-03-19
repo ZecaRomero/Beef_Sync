@@ -261,9 +261,8 @@ export default function RelatorioVendas() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    if (vendas.length > 0) return
     carregarResumoDaBase()
-  }, [carregarResumoDaBase, vendas.length])
+  }, [carregarResumoDaBase])
 
   // ─── Importar Excel ─────────────────────────────────────────────────────
   const handleImport = useCallback(async (e) => {
