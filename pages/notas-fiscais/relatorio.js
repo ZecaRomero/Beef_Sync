@@ -224,14 +224,22 @@ export default function RelatorioVendas() {
     permissionsRef.current = permissions
   }, [user, permissions])
 
+  const canPushRelatorioCloudSnapshot = useCallback((u, p) => {
+    if (!u) return false
+    const isDev = u?.user_metadata?.role === 'desenvolvedor' || p?.isDeveloper
+    const email = String(u?.email || '').toLowerCase()
+    const nome = String(u?.user_metadata?.nome || '').toLowerCase()
+    const isZecaIdentity = email.includes('zeca') || nome.includes('zeca')
+    return isDev || isZecaIdentity
+  }, [])
+
   const schedulePushRelatorioCloud = useCallback((lista) => {
     if (typeof window === 'undefined') return
     clearTimeout(syncTimerRef.current)
     syncTimerRef.current = setTimeout(async () => {
       const u = userRef.current
       const p = permissionsRef.current
-      const isDev = u?.user_metadata?.role === 'desenvolvedor' || p?.isDeveloper
-      if (!isDev) return
+      if (!canPushRelatorioCloudSnapshot(u, p)) return
       try {
         await fetch('/api/notas-fiscais/vendas-relatorio-sync', {
           method: 'POST',
@@ -243,7 +251,7 @@ export default function RelatorioVendas() {
         })
       } catch (_) {}
     }, 1000)
-  }, [])
+  }, [canPushRelatorioCloudSnapshot])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -400,6 +408,24 @@ export default function RelatorioVendas() {
       clearTimeout(t)
     }
   }, [authLoading, user?.email, user?.user_metadata?.nome, permissions.isDeveloper, permissions.userName, schedulePushRelatorioCloud])
+
+  /**
+   * Ao logar: se já existir histórico grande só no localStorage, envia snapshot (antes só subia após salvar/editar e só como Desenvolvedor).
+   */
+  useEffect(() => {
+    if (typeof window === 'undefined' || authLoading || !user?.email) return
+    if (!canPushRelatorioCloudSnapshot(user, permissions)) return
+    try {
+      const raw = localStorage.getItem('beef-vendas-historico')
+      if (!raw) return
+      const parsed = JSON.parse(raw, (k, v) => {
+        if (k === 'dataVenda' || k === 'dataNasc') return v ? new Date(v) : null
+        return v
+      })
+      if (!Array.isArray(parsed) || parsed.length === 0) return
+      schedulePushRelatorioCloud(parsed)
+    } catch (_) {}
+  }, [authLoading, user?.id, user?.email, user?.user_metadata?.nome, user?.user_metadata?.role, permissions.isDeveloper, canPushRelatorioCloudSnapshot, schedulePushRelatorioCloud])
 
   // ─── Importar Excel ─────────────────────────────────────────────────────
   const handleImport = useCallback(async (e) => {

@@ -1,37 +1,37 @@
 
-import React, { useState, useEffect, useMemo } from 'react'
+import {
+    ArrowPathIcon,
+    ArrowUpTrayIcon,
+    BanknotesIcon,
+    Bars3Icon,
+    BeakerIcon,
+    CalendarDaysIcon,
+    ChartBarIcon,
+    ChevronDownIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    ClipboardDocumentListIcon,
+    ClockIcon,
+    CogIcon,
+    CubeIcon,
+    CurrencyDollarIcon,
+    DocumentTextIcon,
+    EyeIcon,
+    HeartIcon,
+    HomeIcon,
+    MapPinIcon,
+    ShieldCheckIcon,
+    TruckIcon,
+    UserGroupIcon,
+    WrenchScrewdriverIcon
+} from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import {
-  HomeIcon,
-  ChartBarIcon,
-  CubeIcon,
-  DocumentTextIcon,
-  CogIcon,
-  UserGroupIcon,
-  BeakerIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronDownIcon,
-  ClipboardDocumentListIcon,
-  WrenchScrewdriverIcon,
-  Bars3Icon,
-  ClockIcon,
-  CurrencyDollarIcon,
-  HeartIcon,
-  MapPinIcon,
-  ShieldCheckIcon,
-  CalendarDaysIcon,
-  TruckIcon,
-  EyeIcon,
-  ArrowPathIcon,
-  ArrowUpTrayIcon,
-  BanknotesIcon
-} from '@heroicons/react/24/outline'
-import { cn } from '../../lib/utils'
-import NetworkStatusIndicator from '../ui/NetworkStatusIndicator'
-import { SidebarProps, NavigationItem } from '../../types/layout'
+import React, { useEffect, useMemo, useState } from 'react'
 import { usePermissions } from '../../hooks/usePermissions'
+import { cn } from '../../lib/utils'
+import { NavigationItem, SidebarProps } from '../../types/layout'
+import NetworkStatusIndicator from '../ui/NetworkStatusIndicator'
 
 const navigation: NavigationItem[] = [
   {
@@ -168,7 +168,8 @@ const navigation: NavigationItem[] = [
     color: 'text-orange-600 dark:text-orange-400',
     children: [
       { name: 'Gerenciar NFs', href: '/notas-fiscais', description: 'Entradas e Saídas (Vendas)' },
-      { name: 'Relatório Fiscal', href: '/notas-fiscais/relatorio', description: 'Relatórios fiscais' }
+      { name: 'Relatório Fiscal', href: '/notas-fiscais/relatorio', description: 'Relatórios fiscais' },
+      { name: 'Vendas Embriões/Sêmen', href: '/notas-fiscais/vendas-genetica', description: 'Relatório de vendas genéticas' }
     ]
   },
   {

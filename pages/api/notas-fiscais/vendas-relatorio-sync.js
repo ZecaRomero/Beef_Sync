@@ -1,10 +1,10 @@
 /**
  * Snapshot do histórico do relatório de vendas (linhas Excel + base) para mesmo dado em localhost/Vercel/mobile.
- * GET: leitura (header Zeca) / POST: gravação (mesma regra do import-excel — desenvolvedor Zeca).
+ * GET/POST: identidade Zeca nos headers (e-mail ou nome), igual leitura — não exige perfil Desenvolvedor (só snapshot do relatório).
  */
 import { query } from '../../../lib/database'
 import { asyncHandler, sendSuccess, sendError } from '../../../utils/apiResponse'
-import { blockIfNotZecaDeveloper, canReadRelatorioVendasCloudSync } from '../../../utils/importAccess'
+import { canReadRelatorioVendasCloudSync } from '../../../utils/importAccess'
 
 const KEY = 'beef_vendas_relatorio_v1'
 
@@ -51,8 +51,12 @@ export default asyncHandler(async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    const blocked = blockIfNotZecaDeveloper(req, res)
-    if (blocked) return blocked
+    if (!canReadRelatorioVendasCloudSync(req)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Acesso negado ao envio do snapshot do relatório.',
+      })
+    }
 
     const { vendas } = req.body || {}
     if (!Array.isArray(vendas)) {

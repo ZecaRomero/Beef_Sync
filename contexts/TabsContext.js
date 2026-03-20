@@ -1,7 +1,7 @@
 'use client'
 
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/router'
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 
 // Mapeamento de rotas para labels das abas
 const PATH_LABELS = {
@@ -53,6 +53,7 @@ const PATH_LABELS = {
   '/planejamento/projecoes': 'Projeções',
   '/notas-fiscais': 'Notas Fiscais',
   '/notas-fiscais/relatorio': 'Relatório Fiscal',
+  '/notas-fiscais/vendas-genetica': 'Vendas Embriões/Sêmen',
   '/notas-fiscais/venda': 'Venda',
   '/contabilidade': 'Contabilidade',
   '/custos': 'Custos',

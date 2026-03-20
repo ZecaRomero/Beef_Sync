@@ -356,6 +356,9 @@ export default function ConsultaAnimalView({ darkMode = false, toggleDarkMode })
             <AnimalAvaliacoes animal={animal} />
           </div>
 
+          {/* Vendas de Sêmen e Embriões */}
+          <AnimalGeneticSales animal={animal} />
+
           <div className="animate-fade-in-stagger-2">
           <AnimalMainInfo
             animal={animal}
