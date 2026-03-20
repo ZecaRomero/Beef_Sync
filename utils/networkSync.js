@@ -1,5 +1,7 @@
 // Utilitário para sincronização de dados entre computadores na rede
 
+import { saveAnimalsToLocalStorage } from './localStorageAnimals'
+
 export const exportAllData = () => {
   try {
     const allData = {
@@ -59,7 +61,8 @@ export const importAllData = (jsonData) => {
 
     // Importar cada tipo de dado
     if (data.animals) {
-      try { localStorage.setItem('animals', JSON.stringify(data.animals)) } catch (_) {}
+      const r = saveAnimalsToLocalStorage(data.animals)
+      if (!r.ok) console.warn('⚠️ Animais não couberam no localStorage:', r.message)
       console.log(`✅ Importados ${data.animals.length} animais`)
     }
 

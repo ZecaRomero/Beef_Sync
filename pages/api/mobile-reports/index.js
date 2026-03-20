@@ -35,6 +35,7 @@ const TIPOS_RELATORIOS = [
   { key: 'animais_piquetes', label: 'Animais por Piquete', category: 'Localização' },
   { key: 'notas_fiscais', label: 'Notas Fiscais', category: 'Documentos' },
   { key: 'relatorio_vendas', label: '📊 Relatório de Vendas', category: 'Documentos' },
+  { key: 'vendas_genetica', label: '🧬 Vendas Embriões/Sêmen', category: 'Documentos' },
   { key: 'movimentacoes_financeiras', label: 'Movimentações Financeiras', category: 'Financeiro' },
   { key: 'custos', label: 'Custos', category: 'Financeiro' },
   { key: 'ranking_animais_avaliados', label: 'Ranking dos Animais Avaliados', category: 'Gestão' },
@@ -2252,6 +2253,97 @@ export default async function handler(req, res) {
           }
         } catch (e) {
           data = []
+        }
+        break
+      }
+
+      case 'vendas_genetica': {
+        try {
+          const colCheck = await query(`
+            SELECT column_name FROM information_schema.columns
+            WHERE table_name = 'notas_fiscais' AND column_name IN ('data_compra', 'data_saida')
+          `)
+          const temDataSaida = colCheck.rows?.some(r => r.column_name === 'data_saida')
+          const dataCol = temDataSaida
+            ? `COALESCE(CASE WHEN nf.tipo = 'saida' THEN nf.data_saida END, nf.data_compra, nf.data)`
+            : 'COALESCE(nf.data_compra, nf.data)'
+          const r = await query(
+            `
+            SELECT
+              nf.numero_nf,
+              COALESCE(NULLIF(TRIM(nf.destino), ''), NULLIF(TRIM(nf.fornecedor), ''), 'Não informado') AS cliente,
+              COALESCE(nfi.dados_item->>'descricao', nfi.dados_item->>'produto', nfi.tipo_produto::text, '-') AS produto,
+              nfi.tipo_produto,
+              COALESCE(
+                NULLIF(regexp_replace(
+                  COALESCE(
+                    NULLIF(TRIM(nfi.dados_item->>'quantidadeEmbrioes'), ''),
+                    NULLIF(TRIM(nfi.dados_item->>'quantidadeDoses'), ''),
+                    NULLIF(TRIM(nfi.dados_item->>'quantidade'), ''),
+                    '1'
+                  ),
+                  '[^0-9.-]', '', 'g'
+                ), '')::numeric,
+                0
+              ) AS qtd,
+              (
+                COALESCE(REPLACE(COALESCE(nfi.dados_item->>'valorUnitario', '0'), ',', '.')::numeric, 0) *
+                GREATEST(
+                  COALESCE(
+                    NULLIF(regexp_replace(
+                      COALESCE(
+                        NULLIF(TRIM(nfi.dados_item->>'quantidadeEmbrioes'), ''),
+                        NULLIF(TRIM(nfi.dados_item->>'quantidadeDoses'), ''),
+                        NULLIF(TRIM(nfi.dados_item->>'quantidade'), ''),
+                        '1'
+                      ),
+                      '[^0-9.-]', '', 'g'
+                    ), '')::numeric,
+                    0
+                  ),
+                  1
+                )
+              ) AS valor_item,
+              (${dataCol})::date AS data_venda
+            FROM notas_fiscais nf
+            INNER JOIN notas_fiscais_itens nfi ON nfi.nota_fiscal_id = nf.id
+            WHERE nf.tipo = 'saida'
+              AND ${dataCol}::date >= $1::date AND ${dataCol}::date <= $2::date
+              AND (
+                nfi.tipo_produto::text IN ('semen', 'embriao')
+                OR LOWER(
+                  COALESCE(nfi.dados_item->>'descricao', '') || ' ' ||
+                  COALESCE(nfi.dados_item->>'produto', '')
+                ) ~ 'embri|semen|sêmen'
+              )
+            ORDER BY data_venda DESC NULLS LAST, nf.numero_nf
+            LIMIT 500
+            `,
+            [start, end]
+          )
+          const rows = r.rows || []
+          data = rows.map(row => ({
+            nf: row.numero_nf,
+            cliente: row.cliente,
+            produto: row.produto,
+            tipo: row.tipo_produto || '-',
+            quantidade: Number(row.qtd) || 0,
+            valor: Number(row.valor_item) || 0,
+            data: toDateStr(row.data_venda)
+          }))
+          const totalValor = data.reduce((s, d) => s + (d.valor || 0), 0)
+          const qtdEmb = rows.filter(x => String(x.tipo_produto || '').toLowerCase() === 'embriao' || /embri/i.test(String(x.produto || ''))).length
+          const qtdSem = rows.filter(x => String(x.tipo_produto || '').toLowerCase() === 'semen' || /semen|sêmen/i.test(String(x.produto || ''))).length
+          resumo = {
+            Itens: data.length,
+            'Valor itens (NF)': `R$ ${totalValor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            'Linhas embrião (aprox.)': qtdEmb,
+            'Linhas sêmen (aprox.)': qtdSem,
+            Observação: 'Importação Excel e análise completa: página web Vendas genética.'
+          }
+        } catch (e) {
+          data = []
+          resumo = { Observação: 'Sem dados de NF no período ou tabela indisponível. Use a página web para Excel.' }
         }
         break
       }

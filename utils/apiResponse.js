@@ -182,7 +182,35 @@ export const asyncHandler = (fn) => {
       if (error.code === 11000) {
         return sendConflict(res, 'Recurso')
       }
-      
+
+      if (error.code === 'ENOTFOUND' || error.code === 'EAI_AGAIN') {
+        return sendError(
+          res,
+          'Não foi possível conectar ao banco: o hostname em DATABASE_URL não foi encontrado (DNS/rede). Confira a URL no .env, internet e VPN.',
+          HTTP_STATUS.SERVICE_UNAVAILABLE
+        )
+      }
+
+      if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+        return sendError(
+          res,
+          'Não foi possível conectar ao PostgreSQL (conexão recusada ou tempo esgotado). Em redes corporativas a porta 5432 costuma estar bloqueada — tente outra rede, VPN ou Postgres local no DATABASE_URL. Confira no painel Supabase se o projeto está ativo.',
+          HTTP_STATUS.SERVICE_UNAVAILABLE
+        )
+      }
+
+      const errLower = (error.message || '').toLowerCase()
+      if (
+        errLower.includes('connection timeout') ||
+        (errLower.includes('connection terminated') && errLower.includes('timeout'))
+      ) {
+        return sendError(
+          res,
+          'Timeout ao conectar ao PostgreSQL. Causas comuns: firewall/operadora bloqueando saída na porta 5432; projeto Supabase pausado; região errada no host do pooler. Teste outra rede (ex.: hotspot), confira a URI Session pooler no painel, ou use um Postgres local no .env para desenvolver.',
+          HTTP_STATUS.SERVICE_UNAVAILABLE
+        )
+      }
+
       // Erro genérico
       return sendError(res, error.message || 'Erro interno do servidor', HTTP_STATUS.INTERNAL_SERVER_ERROR)
     })

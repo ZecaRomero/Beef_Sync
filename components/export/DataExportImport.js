@@ -1,6 +1,7 @@
 
 import { useState } from 'react'
 
+import { saveAnimalsToLocalStorage } from '../../utils/localStorageAnimals'
 import {
     ArrowDownTrayIcon,
     CheckCircleIcon,
@@ -177,7 +178,10 @@ export default function DataExportImport({ isOpen, onClose }) {
 
         // Importar novos dados
         try {
-          if (data.animals) localStorage.setItem('animals', JSON.stringify(data.animals))
+          if (data.animals) {
+            const r = saveAnimalsToLocalStorage(data.animals)
+            if (!r.ok) console.warn('Animais não cacheados:', r.message)
+          }
           if (data.nascimentos) localStorage.setItem('birthData', JSON.stringify(data.nascimentos))
           if (data.custos) localStorage.setItem('custos', JSON.stringify(data.custos))
           if (data.estoqueSemen) localStorage.setItem('estoqueSemen', JSON.stringify(data.estoqueSemen))
@@ -217,7 +221,8 @@ export default function DataExportImport({ isOpen, onClose }) {
 
         // Adicionar novos animais
         const allAnimals = [...currentAnimals, ...animais]
-        try { localStorage.setItem('animals', JSON.stringify(allAnimals)) } catch (_) {}
+        const r = saveAnimalsToLocalStorage(allAnimals)
+        if (!r.ok) console.warn('Animais não cacheados:', r.message)
 
         setStatus({ 
           type: 'success', 

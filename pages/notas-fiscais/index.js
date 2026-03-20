@@ -22,6 +22,7 @@ import {
 import ImportProgressOverlay from '../../components/ImportProgressOverlay'
 import Toast from '../../components/ui/SimpleToast'
 import { integrarNFEntrada, integrarNFSaida } from '../../services/notasFiscaisIntegration'
+import { saveAnimalsToLocalStorage } from '../../utils/localStorageAnimals'
 
 export default function NotasFiscais() {
   const router = useRouter()
@@ -209,7 +210,8 @@ export default function NotasFiscais() {
         }))
         
         setAnimals(animalsNormalizados)
-        try { localStorage.setItem('animals', JSON.stringify(animalsNormalizados)) } catch (_) {}
+        const cache = saveAnimalsToLocalStorage(animalsNormalizados)
+        if (!cache.ok) console.warn('[notas-fiscais] cache local:', cache.message)
         console.log(`✅ ${animalsNormalizados.length} animais carregados para notas fiscais`)
       } else {
         console.error('Erro ao carregar animais:', response.status)

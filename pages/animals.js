@@ -48,6 +48,7 @@ export default function Animals() {
   const [viewMode, setViewMode] = useState('cards'); // 'cards' ou 'table'
   const [filters, setFilters] = useState({});
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [selectedAnimals, setSelectedAnimals] = useState([]); // Para seleção múltipla
@@ -78,13 +79,21 @@ export default function Animals() {
   const loadAnimals = async () => {
     try {
       setLoading(true)
+      setLoadError(null)
       const response = await fetch('/api/animals?orderBy=created_at')
-      if (!response.ok) throw new Error(`HTTP ${response.status}`)
-      const result = await response.json()
+      const result = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        const msg = result?.message || `Erro HTTP ${response.status}`
+        setLoadError(msg)
+        console.error('Erro ao carregar animais:', msg, result)
+        setAnimals([])
+        return
+      }
       const animalsData = Array.isArray(result.data) ? result.data : Array.isArray(result) ? result : []
       setAnimals(animalsData)
     } catch (error) {
       console.error('Erro ao carregar animais:', error)
+      setLoadError(error?.message || 'Falha de rede ao buscar animais')
       setAnimals([])
     } finally {
       setLoading(false)
@@ -1108,6 +1117,19 @@ export default function Animals() {
 
   return (
     <div className="space-y-6">
+        {loadError && (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-100">
+            <strong className="font-semibold">Não foi possível carregar os animais.</strong>{' '}
+            {loadError}
+            <button
+              type="button"
+              onClick={() => loadAnimals()}
+              className="ml-2 underline font-medium hover:text-amber-950 dark:hover:text-amber-50"
+            >
+              Tentar novamente
+            </button>
+          </div>
+        )}
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>

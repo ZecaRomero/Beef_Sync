@@ -213,6 +213,10 @@ export default function MobileRelatorios() {
       router.push('/notas-fiscais/relatorio')
       return
     }
+    if (key === 'vendas_genetica') {
+      router.push('/notas-fiscais/vendas-genetica')
+      return
+    }
     if (key === 'notas_fiscais') {
       setPeriod(getNotasFiscaisPeriod())
     }
