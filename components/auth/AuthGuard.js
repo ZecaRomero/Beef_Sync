@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useAuth } from '../../contexts/AuthContext'
+import PresenceHeartbeat from '../PresenceHeartbeat'
 
 const PUBLIC_ROUTES = ['/login', '/mobile-auth', '/a', '/A', '/identificar', '/adelso', '/consulta-animal', '/mobile-relatorios', '/boletim-defesa/mobile', '/reset-password', '/404', '/500']
 
@@ -48,5 +49,10 @@ export default function AuthGuard({ children }) {
 
   if (!user && !isPublic) return null
 
-  return children
+  return (
+    <>
+      <PresenceHeartbeat />
+      {children}
+    </>
+  )
 }

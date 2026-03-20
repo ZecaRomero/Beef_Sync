@@ -11,7 +11,8 @@ import {
   ChartBarIcon,
   UserCircleIcon,
   ClockIcon,
-  CheckCircleIcon
+  CheckCircleIcon,
+  SignalIcon
 } from '@heroicons/react/24/outline'
 
 // --- Helpers ---
@@ -25,6 +26,16 @@ function formatTelefone(telefone) {
 
 function normalizeReportKey(key) {
   return key === 'femeas_ia' ? 'inseminacoes' : key
+}
+
+function formatPresenceDuration(sec) {
+  if (sec == null || sec < 0) return '-'
+  const s = Math.floor(sec)
+  if (s < 60) return `${s}s`
+  if (s < 3600) return `${Math.floor(s / 60)} min`
+  const h = Math.floor(s / 3600)
+  const m = Math.floor((s % 3600) / 60)
+  return `${h}h ${m}min`
 }
 
 // --- Helpers de fetch ---
@@ -120,6 +131,7 @@ export default function AcessosSistema() {
   const [message, setMessage] = useState('')
   const [mobileReportsDraft, setMobileReportsDraft] = useState(null)
   const [tiposRelatorios, setTiposRelatorios] = useState([])
+  const [presence, setPresence] = useState(null)
 
   const mobileLogs = useMemo(() => logs.filter(log => log.is_mobile), [logs])
 
@@ -144,12 +156,13 @@ export default function AcessosSistema() {
   const loadData = useCallback(async () => {
     setRefreshing(true)
     try {
-      const [statsRes, logsRes, settingsRes, usersRes, restricoesRes] = await Promise.all([
+      const [statsRes, logsRes, settingsRes, usersRes, restricoesRes, presenceRes] = await Promise.all([
         fetchWithTimeout('/api/access-log?stats=true'),
         fetchWithTimeout('/api/access-log?limit=50'),
         fetchWithTimeout('/api/system-settings'),
         fetchWithTimeout('/api/supabase-users'),
         fetchWithTimeout('/api/usuarios-restricoes'),
+        fetchWithTimeout('/api/presence'),
       ])
       if (statsRes.ok) {
         const d = await statsRes.json()
@@ -174,6 +187,14 @@ export default function AcessosSistema() {
         if (d.success && Array.isArray(d.data)) setRestricoes(d.data)
       } else {
         setRestricoes([])
+      }
+      if (presenceRes?.ok) {
+        const d = await presenceRes.json()
+        const raw = d.data ?? d
+        if (raw && (Array.isArray(raw.online) || raw.count != null)) setPresence(raw)
+        else setPresence(null)
+      } else {
+        setPresence(null)
       }
     } catch (e) {
       if (e.name !== 'AbortError' && e !== 'Timeout') {
@@ -382,6 +403,64 @@ export default function AcessosSistema() {
           <StatCard label="Hoje"       total={stats?.hoje?.total}   mobile={stats?.hoje?.mobile}   desktop={stats?.hoje?.desktop} />
           <StatCard label="Esta semana" total={stats?.semana?.total} mobile={stats?.semana?.mobile} desktop={stats?.semana?.desktop} />
           <StatCard label="Este mês"   total={stats?.mes?.total}    mobile={stats?.mes?.mobile}    desktop={stats?.mes?.desktop} />
+        </div>
+
+        {/* Sessões ativas (heartbeat) */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <SignalIcon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              Conectados agora
+            </h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Mostra quem tem o app aberto e enviou sinal nos últimos{' '}
+              <strong>{presence?.staleSeconds ?? 120}s</strong>. O tempo na sessão é desde que a aba foi aberta
+              (nova aba = nova linha). Quem só usa telas públicas sem login identificado não aparece aqui.
+            </p>
+          </div>
+          <div className="overflow-x-auto">
+            {!presence?.online?.length ? (
+              <p className="p-6 text-sm text-gray-500 dark:text-gray-400 text-center">
+                Ninguém com sessão ativa no momento — ou o heartbeat ainda não chegou (até ~45s após abrir o app).
+              </p>
+            ) : (
+              <table className="w-full text-sm min-w-[860px]">
+                <thead className="bg-gray-50 dark:bg-gray-700/50">
+                  <tr>
+                    {['Status', 'Usuário', 'Tipo', 'Telefone', 'Email', 'Tempo na sessão', 'Último ping', 'Página', 'Dispositivo'].map((col) => (
+                      <th key={col} className="text-left px-4 py-2 text-gray-600 dark:text-gray-400 font-medium">{col}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {presence.online.map((row) => (
+                    <tr key={row.session_id} className="border-t border-gray-100 dark:border-gray-700">
+                      <td className="px-4 py-2">
+                        <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
+                          <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                          Online
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 text-gray-900 dark:text-white font-medium">{row.user_name || '-'}</td>
+                      <td className="px-4 py-2 text-gray-600 dark:text-gray-300">{row.user_type || '-'}</td>
+                      <td className="px-4 py-2"><TelefoneCell telefone={row.telefone} /></td>
+                      <td className="px-4 py-2 text-gray-600 dark:text-gray-300 text-xs truncate max-w-[180px]" title={row.email || ''}>{row.email || '-'}</td>
+                      <td className="px-4 py-2 text-gray-800 dark:text-gray-200 font-mono text-xs">{formatPresenceDuration(row.session_seconds)}</td>
+                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400 text-xs">
+                        há {row.seconds_since_ping != null ? `${row.seconds_since_ping}s` : '-'}
+                      </td>
+                      <td className="px-4 py-2 text-gray-600 dark:text-gray-300 text-xs truncate max-w-[220px]" title={row.current_path || ''}>
+                        {row.current_path || '-'}
+                      </td>
+                      <td className="px-4 py-2 text-gray-600 dark:text-gray-300 text-xs">
+                        {row.is_mobile ? '📱 Mobile' : '🖥️ Desktop'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
         </div>
 
         {/* Controle de Acesso */}
