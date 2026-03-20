@@ -1,6 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline'
+import { formatDate } from '../../../utils/formatters'
 
 export default function MaeSection({
   animal,
@@ -52,7 +53,7 @@ export default function MaeSection({
       {baixasMae?.baixaPropria?.vendido && (
         <div className="mt-1.5 px-2.5 py-2 rounded-lg bg-emerald-50/80 dark:bg-emerald-900/15 border-l-2 border-emerald-400 dark:border-emerald-600">
           <p className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 mb-0.5">💰 Venda da mãe</p>
-          <p className="text-xs text-emerald-600 dark:text-emerald-400">{baixasMae.baixaPropria.numero_nf && `NF ${baixasMae.baixaPropria.numero_nf} • `}{baixasMae.baixaPropria.data_venda && new Date(baixasMae.baixaPropria.data_venda).toLocaleDateString('pt-BR')}{baixasMae.baixaPropria.valor != null && baixasMae.baixaPropria.valor > 0 && ` • R$ ${Number(baixasMae.baixaPropria.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}{baixasMae.baixaPropria.comprador && ` • ${baixasMae.baixaPropria.comprador}`}</p>
+          <p className="text-xs text-emerald-600 dark:text-emerald-400">{baixasMae.baixaPropria.numero_nf && `NF ${baixasMae.baixaPropria.numero_nf} • `}{baixasMae.baixaPropria.data_venda && (formatDate(baixasMae.baixaPropria.data_venda) || '')}{baixasMae.baixaPropria.valor != null && baixasMae.baixaPropria.valor > 0 && ` • R$ ${Number(baixasMae.baixaPropria.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}{baixasMae.baixaPropria.comprador && ` • ${baixasMae.baixaPropria.comprador}`}</p>
         </div>
       )}
       {baixasMae?.resumoMae && (baixasMae.resumoMae.qtdVendidos > 0 || baixasMae.resumoMae.qtdMortesBaixas > 0) && (

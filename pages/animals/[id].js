@@ -37,7 +37,7 @@ import { integrarNFSaida } from '../../services/notasFiscaisIntegration'
 import { animalDataCache } from '../../utils/animalDataCache'
 import { generateAnimalFichaPDF } from '../../utils/animalFichaPDF'
 import { extrairSerieRG } from '../../utils/animalUtils'
-import { localizacaoValidaParaExibir } from '../../utils/formatters'
+import { formatDate as formatDateCore, localizacaoValidaParaExibir, toLocalCalendarDate } from '../../utils/formatters'
 import logger from '../../utils/logger'
 
 // Modal para editar Data do DG, Resultado e Veterinário
@@ -1217,14 +1217,7 @@ export default function AnimalDetail() {
 
   const formatDate = (dateString) => {
     if (!dateString) return 'Não informado'
-    try {
-      const date = new Date(dateString)
-      if (isNaN(date.getTime())) return 'Data inválida'
-      return date.toLocaleDateString('pt-BR')
-    } catch (error) {
-      console.error('Erro ao formatar data:', error)
-      return 'Data inválida'
-    }
+    return formatDateCore(dateString) || 'Data inválida'
   }
 
   const formatCurrency = (value) => {
@@ -2175,7 +2168,7 @@ export default function AnimalDetail() {
                   <div className="flex justify-between py-2 border-b border-gray-700">
                     <span className="text-gray-400">Nascimento</span>
                     <span className="font-semibold text-white">
-                      {new Date(animal.data_nascimento).toLocaleDateString('pt-BR')}
+                      {formatDate(animal.data_nascimento)}
                     </span>
                   </div>
                 )}
@@ -2394,7 +2387,12 @@ export default function AnimalDetail() {
                     </p>
                   )
                 }
-                const idadeMeses = animal.meses !== undefined ? parseInt(animal.meses) : (animal.data_nascimento ? Math.floor((new Date() - new Date(animal.data_nascimento)) / (1000 * 60 * 60 * 24 * 30.44)) : null)
+                const idadeMeses = animal.meses !== undefined ? parseInt(animal.meses) : (() => {
+                  if (!animal.data_nascimento) return null
+                  const dn = toLocalCalendarDate(animal.data_nascimento)
+                  if (!dn || isNaN(dn.getTime())) return null
+                  return Math.floor((new Date() - dn) / (1000 * 60 * 60 * 24 * 30.44))
+                })()
                 if (idadeMeses && idadeMeses >= 15 && animal.sexo?.startsWith('F')) {
                   return (
                     <p className="mt-1 text-sm font-semibold text-white">
@@ -2941,7 +2939,8 @@ export default function AnimalDetail() {
               <p className="text-sm font-medium text-gray-900 dark:text-white">
                 {(() => {
                   if (!animal.data_nascimento) return '-'
-                  const nascimento = new Date(animal.data_nascimento)
+                  const nascimento = toLocalCalendarDate(animal.data_nascimento)
+                  if (!nascimento || isNaN(nascimento.getTime())) return '-'
                   const hoje = new Date()
                   const diffTime = Math.abs(hoje - nascimento)
                   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
@@ -3258,7 +3257,12 @@ export default function AnimalDetail() {
                     </div>
                   )
                 }
-                const idadeMeses = animal.meses !== undefined ? parseInt(animal.meses) : (animal.data_nascimento ? Math.floor((new Date() - new Date(animal.data_nascimento)) / (1000 * 60 * 60 * 24 * 30.44)) : null)
+                const idadeMeses = animal.meses !== undefined ? parseInt(animal.meses) : (() => {
+                  if (!animal.data_nascimento) return null
+                  const dn = toLocalCalendarDate(animal.data_nascimento)
+                  if (!dn || isNaN(dn.getTime())) return null
+                  return Math.floor((new Date() - dn) / (1000 * 60 * 60 * 24 * 30.44))
+                })()
                 if (idadeMeses && idadeMeses >= 15 && animal.sexo?.startsWith('F')) {
                   return (
                     <div className="relative inline-block group">

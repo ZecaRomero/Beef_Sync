@@ -116,7 +116,7 @@ const AnimalCard = ({ animal, onEdit, onView, onDelete, onTimeline, selectMode, 
                           <span className="text-gray-600 dark:text-gray-400">Data de Venda:</span>
                           <span className="font-semibold text-gray-900 dark:text-white">
                             {tooltipVenda.info.dataVenda 
-                              ? new Date(tooltipVenda.info.dataVenda).toLocaleDateString('pt-BR') 
+                              ? (formatDate(tooltipVenda.info.dataVenda) || 'Não informado')
                               : 'Não informado'}
                           </span>
                         </div>

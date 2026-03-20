@@ -1,3 +1,4 @@
+import { toLocalCalendarDate } from './dateCalendar'
 import {
   ChartBarIcon,
   CurrencyDollarIcon,
@@ -17,8 +18,8 @@ export function formatDate(d) {
       return isNaN(dt.getTime()) ? '-' : dt.toLocaleDateString('pt-BR')
     }
   }
-  const dt = new Date(d)
-  return isNaN(dt.getTime()) ? '-' : dt.toLocaleDateString('pt-BR')
+  const dt = toLocalCalendarDate(d)
+  return !dt || isNaN(dt.getTime()) ? '-' : dt.toLocaleDateString('pt-BR')
 }
 
 export function formatMoneyBR(val) {

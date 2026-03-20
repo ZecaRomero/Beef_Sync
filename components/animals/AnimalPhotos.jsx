@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { PhotoIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline'
+import { formatDate } from '../../utils/formatters'
 
 export default function AnimalPhotos({ animal }) {
   const fotos = animal?.fotos || []
@@ -57,7 +58,7 @@ export default function AnimalPhotos({ animal }) {
               )}
               {foto.data && (
                 <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] px-2 py-1 truncate">
-                  {new Date(foto.data).toLocaleDateString('pt-BR')}
+                  {formatDate(foto.data) || '-'}
                 </div>
               )}
             </div>

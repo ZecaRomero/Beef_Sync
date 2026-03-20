@@ -1,11 +1,7 @@
 import React, { useState } from 'react'
 import { AcademicCapIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline'
-
-function formatDate(d) {
-  if (!d) return '-'
-  const dt = new Date(d)
-  return isNaN(dt.getTime()) ? '-' : dt.toLocaleDateString('pt-BR')
-}
+import { toLocalCalendarDate } from '../../utils/dateCalendar'
+import { formatDate } from '../../utils/formatters'
 
 export default function AnimalAndrologicalExams({ examesAndrologicos }) {
   const [isExpanded, setIsExpanded] = useState(true)
@@ -13,13 +9,14 @@ export default function AnimalAndrologicalExams({ examesAndrologicos }) {
   if (!examesAndrologicos || examesAndrologicos.length === 0) return null
 
   const ultExame = examesAndrologicos[0]
-  const diasDesdeExame = ultExame?.data_exame
-    ? Math.floor((new Date() - new Date(ultExame.data_exame)) / (1000 * 60 * 60 * 24))
+  const dtUltExame = ultExame?.data_exame ? toLocalCalendarDate(ultExame.data_exame) : null
+  const diasDesdeExame = dtUltExame && !isNaN(dtUltExame.getTime())
+    ? Math.floor((new Date() - dtUltExame) / (1000 * 60 * 60 * 24))
     : null
 
   const isInapto = ultExame && String(ultExame.resultado || '').toUpperCase().includes('INAPTO')
-  const dataProximoExame = (isInapto && ultExame?.data_exame)
-    ? new Date(new Date(ultExame.data_exame).getTime() + 30 * 24 * 60 * 60 * 1000)
+  const dataProximoExame = (isInapto && dtUltExame && !isNaN(dtUltExame.getTime()))
+    ? new Date(dtUltExame.getTime() + 30 * 24 * 60 * 60 * 1000)
     : null
 
   return (
@@ -40,7 +37,7 @@ export default function AnimalAndrologicalExams({ examesAndrologicos }) {
               {diasDesdeExame != null && ` • Último há ${diasDesdeExame} dias`}
               {isInapto && dataProximoExame && (
                 <span className="block mt-1 font-semibold text-red-700 dark:text-red-300">
-                  Próximo previsto: {formatDate(dataProximoExame)}
+                  Próximo previsto: {formatDate(dataProximoExame) || '-'}
                 </span>
               )}
             </p>
@@ -67,7 +64,7 @@ export default function AnimalAndrologicalExams({ examesAndrologicos }) {
             <div key={ex.id || i} className="px-4 py-3 flex justify-between items-start gap-2">
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                  {formatDate(ex.data_exame)}
+                  {formatDate(ex.data_exame) || '-'}
                   {ex.ce != null && ex.ce !== '' && (
                     <span className="ml-2 text-xs font-normal text-gray-600 dark:text-gray-400">CE: {ex.ce}</span>
                   )}

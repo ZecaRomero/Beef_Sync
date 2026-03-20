@@ -1,6 +1,9 @@
 /**
  * Funções de formatação centralizadas
  */
+import { toLocalCalendarDate } from './dateCalendar'
+
+export { toLocalCalendarDate }
 
 /**
  * Formata valor monetário em BRL
@@ -36,8 +39,8 @@ export function formatNumber(value, decimals = 0) {
 export function formatDate(date, format = 'short') {
   if (!date) return '';
   
-  const d = new Date(date);
-  if (isNaN(d.getTime())) return '';
+  const d = toLocalCalendarDate(date);
+  if (!d || isNaN(d.getTime())) return '';
   
   const options = {
     short: { day: '2-digit', month: '2-digit', year: 'numeric' },
@@ -54,8 +57,8 @@ export function formatDate(date, format = 'short') {
 export function formatDateTime(date) {
   if (!date) return '';
   
-  const d = new Date(date);
-  if (isNaN(d.getTime())) return '';
+  const d = toLocalCalendarDate(date);
+  if (!d || isNaN(d.getTime())) return '';
   
   return new Intl.DateTimeFormat('pt-BR', {
     day: '2-digit',
@@ -121,8 +124,8 @@ export function formatPhone(phone) {
 export function calcularMesesIdade(dataNascimento, mesesCampo) {
   if (mesesCampo != null && !isNaN(parseInt(mesesCampo))) return parseInt(mesesCampo)
   if (!dataNascimento) return null
-  const dt = new Date(dataNascimento)
-  if (isNaN(dt.getTime())) return null
+  const dt = toLocalCalendarDate(dataNascimento)
+  if (!dt || isNaN(dt.getTime())) return null
   return Math.floor((new Date() - dt) / (1000 * 60 * 60 * 24 * 30.44))
 }
 
@@ -132,9 +135,9 @@ export function calcularMesesIdade(dataNascimento, mesesCampo) {
 export function calcularMesesIdadeNaData(dataNascimento, dataRef, mesesCampo) {
   if (mesesCampo != null && !isNaN(parseInt(mesesCampo)) && !dataRef) return parseInt(mesesCampo)
   if (!dataNascimento || !dataRef) return null
-  const dtNasc = new Date(dataNascimento)
-  const dtRef = new Date(dataRef)
-  if (isNaN(dtNasc.getTime()) || isNaN(dtRef.getTime())) return null
+  const dtNasc = toLocalCalendarDate(dataNascimento)
+  const dtRef = toLocalCalendarDate(dataRef)
+  if (!dtNasc || !dtRef || isNaN(dtNasc.getTime()) || isNaN(dtRef.getTime())) return null
   return Math.floor((dtRef - dtNasc) / (1000 * 60 * 60 * 24 * 30.44))
 }
 

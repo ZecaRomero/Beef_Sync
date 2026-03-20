@@ -1,6 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { XMarkIcon } from '@heroicons/react/24/outline'
+import { formatDate } from '../../../utils/formatters'
 
 function SexoBadge({ sexo }) {
   if (!sexo) return null
@@ -106,7 +107,7 @@ export default function ProleModal({ proleDetalhesData, onClose }) {
                         <p><span className="text-gray-400">Causa:</span> <span className="font-medium">{item.causa}</span></p>
                       )}
                       {item.data_baixa && (
-                        <p><span className="text-gray-400">Data:</span> {new Date(item.data_baixa).toLocaleDateString('pt-BR')}</p>
+                        <p><span className="text-gray-400">Data:</span> {formatDate(item.data_baixa) || '-'}</p>
                       )}
                     </div>
                   )}
@@ -117,7 +118,7 @@ export default function ProleModal({ proleDetalhesData, onClose }) {
                         <p><span className="text-gray-400">NF:</span> <span className="font-medium">{item.numero_nf}</span></p>
                       )}
                       {item.data_baixa && (
-                        <p><span className="text-gray-400">Data:</span> {new Date(item.data_baixa).toLocaleDateString('pt-BR')}</p>
+                        <p><span className="text-gray-400">Data:</span> {formatDate(item.data_baixa) || '-'}</p>
                       )}
                       {item.valor != null && item.valor > 0 && (
                         <p>
