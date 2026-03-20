@@ -931,23 +931,32 @@ export default function RelatorioVendas() {
           )}
 
           {/* Empty state */}
-          {vendas.length === 0 && (
+          {vendas.length === 0 && !carregandoBase && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
               className="text-center py-20 px-6">
               <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-                <ArrowUpTrayIcon className="h-10 w-10 text-amber-600" />
+                {isLocal ? <ArrowUpTrayIcon className="h-10 w-10 text-amber-600" /> : <ChartBarIcon className="h-10 w-10 text-amber-600" />}
               </div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Importe sua planilha de vendas</h2>
-              <p className="text-gray-500 dark:text-gray-400 mb-1 text-sm">Colunas esperadas:</p>
-              <p className="text-xs text-gray-400 dark:text-gray-500 font-mono bg-gray-100 dark:bg-gray-800 rounded-xl p-3 inline-block">
-                SÉRIE · RG · Sexo · Comprador · Estado · Data Venda · DataNasc · Idade · Nº Nota Fiscal · Valor
-              </p>
-              <div className="mt-6">
-                <label className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-amber-600 text-white font-semibold cursor-pointer hover:bg-amber-700 transition-colors shadow-lg shadow-amber-600/30">
-                  <ArrowUpTrayIcon className="h-5 w-5" /> Selecionar Arquivo Excel
-                  <input type="file" accept=".xlsx,.xls,.csv" onChange={handleImport} className="hidden" />
-                </label>
-              </div>
+              {isLocal ? (
+                <>
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Importe sua planilha de vendas</h2>
+                  <p className="text-gray-500 dark:text-gray-400 mb-1 text-sm">Colunas esperadas:</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 font-mono bg-gray-100 dark:bg-gray-800 rounded-xl p-3 inline-block">
+                    SÉRIE · RG · Sexo · Comprador · Estado · Data Venda · DataNasc · Idade · Nº Nota Fiscal · Valor
+                  </p>
+                  <div className="mt-6">
+                    <label className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-amber-600 text-white font-semibold cursor-pointer hover:bg-amber-700 transition-colors shadow-lg shadow-amber-600/30">
+                      <ArrowUpTrayIcon className="h-5 w-5" /> Selecionar Arquivo Excel
+                      <input type="file" accept=".xlsx,.xls,.csv" onChange={handleImport} className="hidden" />
+                    </label>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Nenhum dado de vendas disponível</h2>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">Os dados são importados pelo sistema local.</p>
+                </>
+              )}
             </motion.div>
           )}
 
