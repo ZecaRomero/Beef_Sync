@@ -2,7 +2,27 @@
  * Relatório de Vendas de Embriões e Sêmen - Beef-Sync
  * Importação de Excel, análise por cliente, gráficos e exportação detalhada
  */
+import {
+  ArrowDownTrayIcon,
+  ArrowLeftIcon,
+  ArrowUpTrayIcon,
+  ChartBarIcon,
+  CheckCircleIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  ClockIcon,
+  CurrencyDollarIcon,
+  ExclamationTriangleIcon,
+  MagnifyingGlassIcon,
+  TableCellsIcon,
+  UserGroupIcon
+} from '@heroicons/react/24/outline'
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Filler, Legend, LinearScale, LineElement, PointElement, Tooltip } from 'chart.js'
+import { AnimatePresence, motion } from 'framer-motion'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Bar, Doughnut, Line, Pie } from 'react-chartjs-2'
 
 if (typeof window !== 'undefined') {
   ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Filler, Tooltip, Legend)
