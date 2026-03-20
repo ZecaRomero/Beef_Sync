@@ -4364,18 +4364,9 @@ export default function MobileRelatorios() {
                             )
                           }
                           
+                          // Layout em cards para os demais relatórios - melhor leitura no mobile
                           return (
-                          <table className="w-full text-base min-w-[500px]">
-                            <thead className="sticky top-0 bg-gray-100 dark:bg-gray-700 z-10">
-                              <tr>
-                                {columns.map(col => (
-                                  <th key={col} className="px-3 py-3 text-left text-gray-600 dark:text-gray-400 font-semibold whitespace-nowrap">
-                                    {getColumnLabel(col)}
-                                  </th>
-                                ))}
-                              </tr>
-                            </thead>
-                            <tbody>
+                            <div className="space-y-3 p-3">
                               {dadosParaExibir.map((row, i) => {
                                 // Buscar a linha original completa do reportData para ter acesso ao campo animais
                                 const originalRow = reportData.data?.find(d => 
@@ -4387,111 +4378,103 @@ export default function MobileRelatorios() {
                                 const piqueteNome = row.Piquete || row.piquete
                                 const animaisResumo = originalRow.animais || row.animais
                                 const ehClicavelPiquete = selectedTipo === 'resumo_pesagens' && piqueteNome
+                                
                                 return (
-                                <tr 
-                                  key={i} 
-                                  onClick={() => {
-                                    // Resumo de Pesagens: clicar no piquete abre modal com animais (da própria API)
-                                    if (selectedTipo === 'resumo_pesagens' && piqueteNome) {
-                                      if (animaisResumo && Array.isArray(animaisResumo) && animaisResumo.length > 0) {
+                                  <motion.div
+                                    key={i}
+                                    initial={{ opacity: 0, y: 8 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: i * 0.02 }}
+                                    onClick={() => {
+                                      if (selectedTipo === 'resumo_pesagens' && piqueteNome) {
+                                        if (animaisResumo && Array.isArray(animaisResumo) && animaisResumo.length > 0) {
+                                          setCardFilterModal({
+                                            open: true,
+                                            title: `Animais em ${piqueteNome}`,
+                                            filter: { piquete: piqueteNome },
+                                            dataType: 'piquete_animais',
+                                            skipFetch: true
+                                          })
+                                          setCardAnimalsList(animaisResumo.map(a => ({
+                                            ...a,
+                                            id: a.animal_id,
+                                            identificacao: a.animal || `${(a.serie || '')} ${(a.rg || '')}`.trim()
+                                          })))
+                                        } else {
+                                          setCardFilterModal({
+                                            open: true,
+                                            title: `Animais em ${piqueteNome}`,
+                                            filter: { piquete: piqueteNome },
+                                            dataType: 'piquete_animais'
+                                          })
+                                          setCardAnimalsList([])
+                                        }
+                                        return
+                                      }
+                                      if (selectedTipo === 'animais_piquetes' && originalRow.animais && Array.isArray(originalRow.animais)) {
                                         setCardFilterModal({
                                           open: true,
-                                          title: `Animais em ${piqueteNome}`,
-                                          filter: { piquete: piqueteNome },
+                                          title: `Animais em ${originalRow.piquete || 'Piquete'}`,
+                                          filter: { piquete: originalRow.piquete },
                                           dataType: 'piquete_animais',
                                           skipFetch: true
                                         })
-                                        setCardAnimalsList(animaisResumo.map(a => ({
+                                        setCardAnimalsList(originalRow.animais.map(a => ({
                                           ...a,
                                           id: a.animal_id,
-                                          identificacao: a.animal || `${(a.serie || '')} ${(a.rg || '')}`.trim()
+                                          identificacao: a.animal || `${a.serie || ''} ${a.rg || ''}`.trim()
                                         })))
-                                      } else {
-                                        setCardFilterModal({
-                                          open: true,
-                                          title: `Animais em ${piqueteNome}`,
-                                          filter: { piquete: piqueteNome },
-                                          dataType: 'piquete_animais'
-                                        })
-                                        setCardAnimalsList([])
+                                        return
                                       }
-                                      return
-                                    }
-                                    // Se for o relatorio de animais por piquete e tiver a lista de animais
-                                    if (selectedTipo === 'animais_piquetes' && originalRow.animais && Array.isArray(originalRow.animais)) {
-                                      setCardFilterModal({
-                                        open: true,
-                                        title: `Animais em ${originalRow.piquete || 'Piquete'}`,
-                                        filter: { piquete: originalRow.piquete },
-                                        dataType: 'piquete_animais',
-                                        skipFetch: true
-                                      })
-                                      // Preservar todos os campos dos animais
-                                      setCardAnimalsList(originalRow.animais.map(a => ({
-                                        ...a,
-                                        id: a.animal_id,
-                                        identificacao: a.animal || `${a.serie || ''} ${a.rg || ''}`.trim()
-                                      })))
-                                      return
-                                    }
-                                    // Navegação para ficha do animal desativada no mobile
-                                  }}
-                                  className={`border-t border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 ${(row.animal_id || (selectedTipo === 'animais_piquetes' && originalRow.animais) || ehClicavelPiquete) ? 'cursor-pointer' : ''}`}
-                                >
-                                  {columns.map(k => {
-                                    const v = row[k]
-                                    let display = k.toLowerCase().includes('data') && v ? formatDate(v) : String(v ?? '-')
-                                    if (ehRanking && k === 'posicao' && [1, 2, 3].includes(Number(v))) {
-                                      const trofeus = { 1: '🥇', 2: '🥈', 3: '🥉' }
-                                      display = `${trofeus[Number(v)]} ${v}º`
-                                    }
-                                    
-                                    // Tornar o número do animal clicável
-                                    const isAnimalColumn = k.toLowerCase() === 'animal' || k.toLowerCase() === 'identificacao'
-                                    const animalId = row.animal_id || row.id || originalRow.animal_id || originalRow.id
-                                    const consultaAnimalId = isAnimalColumn && ehRanking
-                                      ? buildConsultaAnimalId(row.identificacao || row.animal || display)
-                                      : null
-                                    
-                                    if (isAnimalColumn && consultaAnimalId) {
-                                      return (
-                                        <td key={k} className="px-3 py-2.5 text-gray-900 dark:text-white break-words min-w-0">
-                                          <Link
-                                            href={`/consulta-animal/${consultaAnimalId}`}
-                                            onClick={(e) => e.stopPropagation()}
-                                            className="text-amber-600 dark:text-amber-400 font-bold hover:underline"
-                                          >
-                                            {display}
-                                          </Link>
-                                        </td>
-                                      )
-                                    }
+                                    }}
+                                    className={`bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm space-y-2 ${
+                                      (row.animal_id || (selectedTipo === 'animais_piquetes' && originalRow.animais) || ehClicavelPiquete) ? 'cursor-pointer active:scale-[0.98] transition-all' : ''
+                                    }`}
+                                  >
+                                    <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                                      {columns.map(k => {
+                                        const v = row[k]
+                                        const label = getColumnLabel(k)
+                                        let display = k.toLowerCase().includes('data') && v ? formatDate(v) : String(v ?? '-')
+                                        
+                                        if (ehRanking && k === 'posicao' && [1, 2, 3].includes(Number(v))) {
+                                          const trofeus = { 1: '🥇', 2: '🥈', 3: '🥉' }
+                                          display = `${trofeus[Number(v)]} ${v}º`
+                                        }
 
-                                    if (isAnimalColumn && animalId) {
-                                      return (
-                                        <td key={k} className="px-3 py-2.5 text-gray-900 dark:text-white break-words min-w-0">
-                                          <Link 
-                                            href={`/animals/${animalId}`}
-                                            onClick={(e) => e.stopPropagation()}
-                                            className="text-amber-600 dark:text-amber-400 font-bold hover:underline"
-                                          >
-                                            {display}
-                                          </Link>
-                                        </td>
-                                      )
-                                    }
-                                    
-                                    return (
-                                      <td key={k} className="px-3 py-2.5 text-gray-900 dark:text-white break-words min-w-0">
-                                        {display}
-                                      </td>
-                                    )
-                                  })}
-                                </tr>
+                                        const isAnimalColumn = k.toLowerCase() === 'animal' || k.toLowerCase() === 'identificacao'
+                                        const animalId = row.animal_id || row.id || originalRow.animal_id || originalRow.id
+                                        const consultaAnimalId = isAnimalColumn && ehRanking
+                                          ? buildConsultaAnimalId(row.identificacao || row.animal || display)
+                                          : null
+
+                                        return (
+                                          <div key={k} className={`${isAnimalColumn ? 'col-span-2 border-b border-gray-100 dark:border-gray-700 pb-2 mb-1' : ''}`}>
+                                            <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-0.5">{label}</p>
+                                            <div className="text-sm font-semibold text-gray-900 dark:text-white break-words">
+                                              {isAnimalColumn && (animalId || consultaAnimalId) ? (
+                                                <Link 
+                                                  href={consultaAnimalId ? `/consulta-animal/${consultaAnimalId}` : `/animals/${animalId}`}
+                                                  onClick={(e) => e.stopPropagation()}
+                                                  className="text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1"
+                                                >
+                                                  {display} <ChevronRightIcon className="h-3 w-3" />
+                                                </Link>
+                                              ) : display}
+                                            </div>
+                                          </div>
+                                        )
+                                      })}
+                                    </div>
+                                    {(row.animal_id || (selectedTipo === 'animais_piquetes' && originalRow.animais) || ehClicavelPiquete) && (
+                                      <p className="text-[10px] text-amber-500 font-medium pt-1 flex items-center gap-1">
+                                        <CursorArrowRaysIcon className="h-3 w-3" /> Toque para ver detalhes
+                                      </p>
+                                    )}
+                                  </motion.div>
                                 )
                               })}
-                            </tbody>
-                          </table>
+                            </div>
                           )
                         })() : (
                           <div className="p-12 text-center">

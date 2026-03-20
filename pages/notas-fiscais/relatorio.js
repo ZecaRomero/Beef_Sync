@@ -5,6 +5,7 @@
 import {
   ArrowDownTrayIcon,
   ArrowLeftIcon,
+  ArrowPathIcon,
   ArrowUpTrayIcon,
   ChartBarIcon,
   CheckCircleIcon,
@@ -186,9 +187,13 @@ export default function RelatorioVendas() {
   const [tab, setTab] = useState('clientes') // clientes | historico | graficos
   const [search, setSearch] = useState('')
   const [filtroAtencao, setFiltroAtencao] = useState('todos')
+  const [filtroOrigem, setFiltroOrigem] = useState('todos') // todos | excel | base
   const [clienteExpandido, setClienteExpandido] = useState(null)
   const [toast, setToast] = useState(null)
   const [isDark, setIsDark] = useState(false)
+  const [showSenhaModal, setShowSenhaModal] = useState(false)
+  const [senhaInput, setSenhaInput] = useState('')
+  const [sincronizandoBaixas, setSincronizandoBaixas] = useState(false)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -213,6 +218,33 @@ export default function RelatorioVendas() {
     setVendas(novas)
     try { localStorage.setItem('beef-vendas-historico', JSON.stringify(novas)) } catch (_) {}
   }, [])
+
+  // ─── Limpar tudo com senha de desenvolvedor ─────────────────────────────
+  const handleLimparTudo = useCallback(async () => {
+    if (senhaInput !== 'dev2026') {
+      setToast({ type: 'error', msg: 'Senha incorreta' })
+      return
+    }
+    try {
+      // Apagar do banco online
+      const resp = await fetch('/api/notas-fiscais/limpar-todas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ senha: senhaInput })
+      })
+      const json = await resp.json()
+      if (!resp.ok || !json.success) throw new Error(json.message || 'Erro ao apagar')
+
+      // Limpar localStorage
+      salvarVendas([])
+      setShowSenhaModal(false)
+      setSenhaInput('')
+      setToast({ type: 'success', msg: `Tudo apagado (${json.deletados} notas removidas do banco)` })
+    } catch (err) {
+      console.error('Erro ao limpar:', err)
+      setToast({ type: 'error', msg: err.message || 'Erro ao apagar dados' })
+    }
+  }, [senhaInput, salvarVendas])
 
   const carregarResumoDaBase = useCallback(async ({ showToast = false } = {}) => {
     setCarregandoBase(true)
@@ -244,12 +276,17 @@ export default function RelatorioVendas() {
           dataNasc: null,
           idade: '',
           notaFiscal: String(r?.nf ?? '').trim(),
-          valor: parseValor(r?.valor)
+          valor: parseValor(r?.valor),
+          origem: 'base',
         }))
         .filter(v => v.notaFiscal || v.comprador || v.valor > 0)
 
       if (vindasDaBase.length > 0) {
-        salvarVendas(vindasDaBase)
+        // Manter dados importados do Excel e adicionar dados da base sem duplicar
+        const existentes = new Set(vendas.filter(v => v.origem === 'excel').map(v => `${v.notaFiscal}|${v.rg}`))
+        const excelExistentes = vendas.filter(v => v.origem === 'excel')
+        const baseSemDuplicatas = vindasDaBase.filter(v => !existentes.has(`${v.notaFiscal}|${v.rg}`))
+        salvarVendas([...excelExistentes, ...baseSemDuplicatas])
         if (showToast) setToast({ type: 'success', msg: `${vindasDaBase.length} venda(s) carregada(s) da base` })
       }
     } catch (_) {
@@ -281,7 +318,7 @@ export default function RelatorioVendas() {
       const headers = rows[0].map(h => String(h).trim())
       const mapped = rows.slice(1)
         .filter(r => r.some(c => c !== '' && c != null))
-        .map(r => mapRow(r, headers))
+        .map(r => ({ ...mapRow(r, headers), origem: 'excel' }))
         .filter(r => r.comprador || r.notaFiscal || r.valor > 0)
 
       if (mapped.length === 0) { setToast({ type: 'error', msg: 'Nenhum dado válido encontrado na planilha' }); return }
@@ -307,7 +344,20 @@ export default function RelatorioVendas() {
       }
 
       await carregarResumoDaBase({ showToast: false })
-      setToast({ type: 'success', msg: `${payload.length} registro(s) enviado(s) para o banco online` })
+
+      // Manter dados do Excel importado localmente para análise separada
+      const excelExistentes = vendas.filter(v => v.origem === 'excel')
+      const existentesKeys = new Set(excelExistentes.map(v => `${v.notaFiscal}|${v.rg}`))
+      const novosExcel = mapped.filter(v => !existentesKeys.has(`${v.notaFiscal}|${v.rg}`))
+      // Recarregar base + manter excel
+      const saved = JSON.parse(localStorage.getItem('beef-vendas-historico') || '[]', (k, v) => {
+        if (k === 'dataVenda' || k === 'dataNasc') return v ? new Date(v) : null
+        return v
+      })
+      const baseData = saved.filter(v => v.origem === 'base')
+      salvarVendas([...baseData, ...excelExistentes, ...novosExcel])
+
+      setToast({ type: 'success', msg: `${payload.length} registro(s) enviado(s) para o banco · ${novosExcel.length} novos do Excel` })
     } catch (err) {
       console.error('Erro ao importar:', err)
       setToast({ type: 'error', msg: 'Erro ao importar para o banco online' })
@@ -318,7 +368,12 @@ export default function RelatorioVendas() {
   }, [carregarResumoDaBase])
 
   // ─── Análise ────────────────────────────────────────────────────────────
-  const clientes = useMemo(() => analisarClientes(vendas), [vendas])
+  const vendasFiltradas = useMemo(() => {
+    if (filtroOrigem === 'todos') return vendas
+    return vendas.filter(v => v.origem === filtroOrigem)
+  }, [vendas, filtroOrigem])
+
+  const clientes = useMemo(() => analisarClientes(vendasFiltradas), [vendasFiltradas])
 
   const clientesFiltrados = useMemo(() => {
     let list = clientes
@@ -330,21 +385,85 @@ export default function RelatorioVendas() {
     return list
   }, [clientes, search, filtroAtencao])
 
+  const historicoFiltrado = useMemo(() => {
+    let list = vendasFiltradas
+    if (search && tab === 'historico') {
+      const q = search.toLowerCase()
+      list = list.filter(v => 
+        (v.notaFiscal && v.notaFiscal.toLowerCase().includes(q)) ||
+        (v.rg && v.rg.toLowerCase().includes(q)) ||
+        (v.comprador && v.comprador.toLowerCase().includes(q)) ||
+        (v.estado && v.estado.toLowerCase().includes(q))
+      )
+    }
+    return list
+  }, [vendasFiltradas, search, tab])
+
+  /** Linhas com série+RG (necessário para baixa bater com o cadastro de animais). */
+  const qtdComSerieRg = useMemo(() =>
+    vendasFiltradas.filter(v => String(v.serie || '').trim() && String(v.rg || '').trim()).length,
+  [vendasFiltradas])
+
+  const sincronizarBaixasNoApp = useCallback(async () => {
+    const comChave = vendasFiltradas.filter(v => String(v.serie || '').trim() && String(v.rg || '').trim())
+    if (comChave.length === 0) {
+      setToast({ type: 'error', msg: 'Nenhuma linha com Série e RG. Importe a planilha com essas colunas preenchidas.' })
+      return
+    }
+    setSincronizandoBaixas(true)
+    try {
+      const payload = comChave.map(v => ({
+        serie: v.serie,
+        rg: v.rg,
+        dataVenda: v.dataVenda instanceof Date ? v.dataVenda.toISOString() : v.dataVenda,
+        valor: v.valor,
+        comprador: v.comprador,
+        notaFiscal: v.notaFiscal,
+      }))
+      const resp = await fetch('/api/animals/sincronizar-vendas-relatorio', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vendas: payload }),
+      })
+      const json = await resp.json().catch(() => ({}))
+      if (!resp.ok || json.success === false) {
+        throw new Error(json.error || json.message || 'Falha ao sincronizar baixas')
+      }
+      const partes = [
+        json.inseridos > 0 ? `${json.inseridos} venda(s) lançada(s) em Baixas` : null,
+        json.animais_atualizados > 0 ? `${json.animais_atualizados} animal(is) marcado(s) como vendido` : null,
+        json.ignorados_ja_vendidos > 0 ? `${json.ignorados_ja_vendidos} já tinham baixa de venda` : null,
+        json.ignorados_duplicados_no_lote > 0 ? `${json.ignorados_duplicados_no_lote} duplicado(s) na lista` : null,
+      ].filter(Boolean)
+      if (partes.length === 0 && json.inseridos === 0) {
+        partes.push('Nenhuma baixa nova (todos já vendidos ou sem alteração)')
+      }
+      const msg = partes.join(' · ') + (json.erros?.length ? ` · Aviso: ${json.erros.length} linha(s) com erro (veja o console)` : '')
+      setToast({ type: json.erros?.length && json.inseridos === 0 ? 'error' : 'success', msg })
+      if (json.erros?.length) console.warn('Sincronizar baixas:', json.erros)
+    } catch (err) {
+      console.error(err)
+      setToast({ type: 'error', msg: err.message || 'Erro ao lançar baixas' })
+    } finally {
+      setSincronizandoBaixas(false)
+    }
+  }, [vendasFiltradas])
+
   const resumoGeral = useMemo(() => {
-    const total = vendas.reduce((s, v) => s + v.valor, 0)
-    const machos = vendas.filter(v => /^m/i.test(v.sexo)).length
-    const femeas = vendas.filter(v => /^f/i.test(v.sexo)).length
-    const notas = [...new Set(vendas.map(v => v.notaFiscal).filter(Boolean))].length
+    const total = vendasFiltradas.reduce((s, v) => s + v.valor, 0)
+    const machos = vendasFiltradas.filter(v => /^m/i.test(v.sexo)).length
+    const femeas = vendasFiltradas.filter(v => /^f/i.test(v.sexo)).length
+    const notas = [...new Set(vendasFiltradas.map(v => v.notaFiscal).filter(Boolean))].length
     const criticos = clientes.filter(c => c.atencao === 'critica').length
     const atencaoAlta = clientes.filter(c => c.atencao === 'alta').length
-    return { total, machos, femeas, notas, totalAnimais: vendas.length, totalClientes: clientes.length, criticos, atencaoAlta }
-  }, [vendas, clientes])
+    return { total, machos, femeas, notas, totalAnimais: vendasFiltradas.length, totalClientes: clientes.length, criticos, atencaoAlta }
+  }, [vendasFiltradas, clientes])
 
   // ─── Dados para gráficos simples (barras CSS) ──────────────────────────
   const topClientes = useMemo(() => clientes.slice(0, 8), [clientes])
   const vendasPorMes = useMemo(() => {
     const meses = {}
-    vendas.forEach(v => {
+    vendasFiltradas.forEach(v => {
       if (!v.dataVenda) return
       const key = `${v.dataVenda.getFullYear()}-${String(v.dataVenda.getMonth() + 1).padStart(2, '0')}`
       if (!meses[key]) meses[key] = { mes: key, total: 0, qtd: 0 }
@@ -352,35 +471,35 @@ export default function RelatorioVendas() {
       meses[key].qtd++
     })
     return Object.values(meses).sort((a, b) => a.mes.localeCompare(b.mes))
-  }, [vendas])
+  }, [vendasFiltradas])
   const vendasPorEstado = useMemo(() => {
     const estados = {}
-    vendas.forEach(v => {
+    vendasFiltradas.forEach(v => {
       const e = v.estado || 'N/I'
       if (!estados[e]) estados[e] = { estado: e, total: 0, qtd: 0 }
       estados[e].total += v.valor
       estados[e].qtd++
     })
     return Object.values(estados).sort((a, b) => b.total - a.total)
-  }, [vendas])
+  }, [vendasFiltradas])
 
   // Vendas por sexo com valor
   const vendasPorSexo = useMemo(() => {
-    const machos = vendas.filter(v => /^m/i.test(v.sexo))
-    const femeas = vendas.filter(v => /^f/i.test(v.sexo))
-    const outros = vendas.filter(v => !/^[mf]/i.test(v.sexo))
+    const machos = vendasFiltradas.filter(v => /^m/i.test(v.sexo))
+    const femeas = vendasFiltradas.filter(v => /^f/i.test(v.sexo))
+    const outros = vendasFiltradas.filter(v => !/^[mf]/i.test(v.sexo))
     return {
       machos: { qtd: machos.length, total: machos.reduce((s, v) => s + v.valor, 0) },
       femeas: { qtd: femeas.length, total: femeas.reduce((s, v) => s + v.valor, 0) },
       outros: { qtd: outros.length, total: outros.reduce((s, v) => s + v.valor, 0) },
     }
-  }, [vendas])
+  }, [vendasFiltradas])
 
   // Vendas por faixa de valor
   const vendasPorFaixa = useMemo(() => {
     const faixas = { 'Até R$5k': 0, 'R$5k-10k': 0, 'R$10k-20k': 0, 'R$20k-50k': 0, 'R$50k+': 0 }
     const faixasVal = { 'Até R$5k': 0, 'R$5k-10k': 0, 'R$10k-20k': 0, 'R$20k-50k': 0, 'R$50k+': 0 }
-    vendas.forEach(v => {
+    vendasFiltradas.forEach(v => {
       if (v.valor <= 5000) { faixas['Até R$5k']++; faixasVal['Até R$5k'] += v.valor }
       else if (v.valor <= 10000) { faixas['R$5k-10k']++; faixasVal['R$5k-10k'] += v.valor }
       else if (v.valor <= 20000) { faixas['R$10k-20k']++; faixasVal['R$10k-20k'] += v.valor }
@@ -388,7 +507,7 @@ export default function RelatorioVendas() {
       else { faixas['R$50k+']++; faixasVal['R$50k+'] += v.valor }
     })
     return Object.entries(faixas).map(([faixa, qtd]) => ({ faixa, qtd, total: faixasVal[faixa] }))
-  }, [vendas])
+  }, [vendasFiltradas])
 
   // Frequência de compra por cliente
   const frequenciaClientes = useMemo(() => {
@@ -409,7 +528,7 @@ export default function RelatorioVendas() {
 
   // ─── Exportar Excel completo ────────────────────────────────────────────
   const exportarExcel = useCallback(async () => {
-    if (vendas.length === 0) return
+    if (vendasFiltradas.length === 0) return
     setExportando(true)
     try {
       const ExcelJS = (await import('exceljs')).default
@@ -500,7 +619,7 @@ export default function RelatorioVendas() {
       ]
       ws3.addRow({ nf: 'Nota Fiscal', serie: 'Série', rg: 'RG', sexo: 'Sexo', comprador: 'Comprador', estado: 'Estado', dataVenda: 'Data Venda', dataNasc: 'Data Nasc.', idade: 'Idade', valor: 'Valor' })
       applyHeader(ws3, 'FF10B981')
-      vendas.forEach(v => ws3.addRow({
+      vendasFiltradas.forEach(v => ws3.addRow({
         nf: v.notaFiscal, serie: v.serie, rg: v.rg, sexo: v.sexo, comprador: v.comprador,
         estado: v.estado, dataVenda: fmtDate(v.dataVenda), dataNasc: fmtDate(v.dataNasc),
         idade: v.idade, valor: v.valor,
@@ -596,7 +715,7 @@ export default function RelatorioVendas() {
       ws10.addRow({ nf: 'Nota Fiscal', data: 'Data', comprador: 'Comprador', estado: 'Estado', qtdAnimais: 'Qtd Animais', valorTotal: 'Valor Total', machos: 'Machos', femeas: 'Fêmeas' })
       applyHeader(ws10, 'FF2563EB')
       const porNF = {}
-      vendas.forEach(v => {
+      vendasFiltradas.forEach(v => {
         const k = v.notaFiscal || 'S/N'
         if (!porNF[k]) porNF[k] = { nf: k, data: v.dataVenda, comprador: v.comprador, estado: v.estado, qtd: 0, total: 0, machos: 0, femeas: 0 }
         porNF[k].qtd++
@@ -625,7 +744,7 @@ export default function RelatorioVendas() {
     } finally {
       setExportando(false)
     }
-  }, [vendas, clientes, resumoGeral, vendasPorMes, vendasPorEstado, vendasPorSexo, vendasPorFaixa])
+  }, [vendasFiltradas, clientes, resumoGeral, vendasPorMes, vendasPorEstado, vendasPorSexo, vendasPorFaixa])
 
   // ─── Render ─────────────────────────────────────────────────────────────
   return (
@@ -653,9 +772,9 @@ export default function RelatorioVendas() {
                 </button>
                 <div>
                   <h1 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                    <ChartBarIcon className="h-5 w-5 text-amber-600" /> Relatório de Vendas
+                    <ChartBarIcon className="h-5 w-5 text-amber-600" /> 
                   </h1>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{vendas.length} registros · {clientes.length} clientes</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{vendasFiltradas.length} registros · {clientes.length} clientes</p>
                 </div>
               </div>
             </div>
@@ -672,11 +791,59 @@ export default function RelatorioVendas() {
                   {exportando ? 'Gerando...' : 'Exportar Excel'}
                 </button>
               )}
+              {vendas.length > 0 && (
+                <button onClick={() => setShowSenhaModal(true)}
+                  className="p-2.5 rounded-xl bg-red-600 text-white hover:bg-red-700 transition-colors" title="Limpar tudo">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
+                </button>
+              )}
             </div>
+            {vendas.length > 0 && (
+              <div className="mt-2 space-y-1">
+                <button type="button" onClick={sincronizarBaixasNoApp} disabled={sincronizandoBaixas || qtdComSerieRg === 0}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                  <ArrowPathIcon className={`h-4 w-4 ${sincronizandoBaixas ? 'animate-spin' : ''}`} />
+                  {sincronizandoBaixas ? 'Lançando baixas…' : `Lançar vendas no cadastro (${qtdComSerieRg} com Série+RG)`}
+                </button>
+                <p className="text-[10px] text-gray-500 dark:text-gray-400 text-center px-1">
+                  Cria registro de <strong className="font-semibold">VENDA</strong> em Baixas para quem ainda não tem; vincula ao animal se existir no banco. Linhas só da base (sem tatuagem) não entram — use a planilha com Série e RG.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
         <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
+          {/* Filtro de origem */}
+          {vendas.length > 0 && (
+            <div className="flex items-center gap-2">
+              {(() => {
+                const qtdExcel = vendas.filter(v => v.origem === 'excel').length
+                const qtdBase = vendas.filter(v => v.origem === 'base').length
+                return (
+                  <>
+                    <button onClick={() => setFiltroOrigem('todos')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${filtroOrigem === 'todos' ? 'bg-amber-500 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>
+                      Todos ({vendas.length})
+                    </button>
+                    {qtdExcel > 0 && (
+                      <button onClick={() => setFiltroOrigem('excel')}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${filtroOrigem === 'excel' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>
+                        📊 Excel ({qtdExcel})
+                      </button>
+                    )}
+                    {qtdBase > 0 && (
+                      <button onClick={() => setFiltroOrigem('base')}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${filtroOrigem === 'base' ? 'bg-green-500 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>
+                        🗄️ App ({qtdBase})
+                      </button>
+                    )}
+                  </>
+                )
+              })()}
+            </div>
+          )}
+
           {/* Cards de resumo */}
           {vendas.length > 0 && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -859,24 +1026,79 @@ export default function RelatorioVendas() {
 
           {/* ─── Tab: Histórico ────────────────────────────────────────── */}
           {vendas.length > 0 && tab === 'historico' && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-gray-500 dark:text-gray-400">{vendas.length} registros</p>
-                <button onClick={() => { if (confirm('Tem certeza que deseja limpar todos os dados?')) { salvarVendas([]); setToast({ type: 'success', msg: 'Dados limpos' }) } }}
-                  className="text-xs text-red-500 hover:text-red-700 font-semibold px-3 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">Limpar tudo</button>
+            <div className="space-y-4">
+              {/* Filtros */}
+              <div className="flex flex-col sm:flex-row gap-2">
+                <div className="flex-1 relative">
+                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar por NF, RG ou comprador..."
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-transparent" />
+                </div>
               </div>
-              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-500 dark:text-gray-400">{historicoFiltrado.length} registros</p>
+              </div>
+
+              {/* View Mobile: Cards */}
+              <div className="md:hidden space-y-3">
+                {historicoFiltrado.slice(0, 200).map((v, i) => (
+                  <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.01 }}
+                    className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 shadow-sm space-y-3">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-0.5">Comprador</p>
+                        <p className="font-bold text-gray-900 dark:text-white leading-tight">{v.comprador}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-black text-green-700 dark:text-green-400">{fmt(v.valor)}</p>
+                        <p className="text-[10px] text-gray-400 dark:text-gray-500">{fmtDate(v.dataVenda)}</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2 py-2 border-y border-gray-50 dark:border-gray-700/50">
+                      <div>
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">NF</p>
+                        <p className="text-xs font-mono font-medium text-gray-700 dark:text-gray-300">{v.notaFiscal || '-'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">Série-RG</p>
+                        <p className="text-xs font-medium text-gray-700 dark:text-gray-300">{v.serie}-{v.rg}</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">Sexo</p>
+                        <span className={`inline-block px-1.5 py-0.5 rounded text-[9px] font-bold ${/^m/i.test(v.sexo) ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300'}`}>
+                          {v.sexo}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center text-[10px]">
+                      <div className="flex gap-3">
+                        <span className="text-gray-500 dark:text-gray-400"><span className="font-bold">UF:</span> {v.estado}</span>
+                        <span className="text-gray-500 dark:text-gray-400"><span className="font-bold">Idade:</span> {v.idade}</span>
+                      </div>
+                      <span className={`px-1.5 py-0.5 rounded font-bold ${v.origem === 'excel' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400'}`}>
+                        {v.origem === 'excel' ? 'Excel' : 'App'}
+                      </span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* View Desktop: Table */}
+              <div className="hidden md:block bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden">
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm min-w-[700px]">
+                  <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
-                        {['NF', 'Série', 'RG', 'Sexo', 'Comprador', 'UF', 'Data Venda', 'Idade', 'Valor'].map(h => (
+                        {['NF', 'Série', 'RG', 'Sexo', 'Comprador', 'UF', 'Data Venda', 'Idade', 'Valor', 'Origem'].map(h => (
                           <th key={h} className="px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">{h}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                      {vendas.slice(0, 200).map((v, i) => (
+                      {historicoFiltrado.slice(0, 200).map((v, i) => (
                         <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                           <td className="px-3 py-2.5 font-mono text-xs text-gray-700 dark:text-gray-300">{v.notaFiscal}</td>
                           <td className="px-3 py-2.5 text-xs text-gray-700 dark:text-gray-300">{v.serie}</td>
@@ -891,13 +1113,18 @@ export default function RelatorioVendas() {
                           <td className="px-3 py-2.5 text-xs text-gray-600 dark:text-gray-400">{fmtDate(v.dataVenda)}</td>
                           <td className="px-3 py-2.5 text-xs text-gray-600 dark:text-gray-400">{v.idade}</td>
                           <td className="px-3 py-2.5 text-xs font-semibold text-green-700 dark:text-green-400">{fmt(v.valor)}</td>
+                          <td className="px-3 py-2 text-xs">
+                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${v.origem === 'excel' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'}`}>
+                              {v.origem === 'excel' ? 'Excel' : 'App'}
+                            </span>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
-                {vendas.length > 200 && (
-                  <p className="text-center text-xs text-gray-400 py-3">Mostrando 200 de {vendas.length} registros. Exporte o Excel para ver todos.</p>
+                {historicoFiltrado.length > 200 && (
+                  <p className="text-center text-xs text-gray-400 py-3">Mostrando 200 de {historicoFiltrado.length} registros. Exporte o Excel para ver todos.</p>
                 )}
               </div>
             </div>
@@ -1079,6 +1306,31 @@ export default function RelatorioVendas() {
           )}
         </div>
       </div>
+
+      {/* Modal de senha para limpar tudo */}
+      {showSenhaModal && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">🔒 Limpar todos os dados</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Digite a senha de desenvolvedor para confirmar a exclusão de todos os registros.</p>
+            <input type="password" value={senhaInput} onChange={e => setSenhaInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleLimparTudo()}
+              placeholder="Senha de desenvolvedor"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent mb-4" autoFocus />
+            <div className="flex gap-2">
+              <button onClick={() => { setShowSenhaModal(false); setSenhaInput('') }}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                Cancelar
+              </button>
+              <button onClick={handleLimparTudo}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors">
+                Apagar Tudo
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </>
   )
 }
