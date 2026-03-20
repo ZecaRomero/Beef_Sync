@@ -191,10 +191,19 @@ export default function VendasGenetica() {
       if (rows.length < 2) { setToast({ type: 'error', msg: 'Planilha vazia' }); return }
 
       const headers = rows[0].map(h => String(h).trim())
-      const mapped = rows.slice(1)
+      const rawMapped = rows.slice(1)
         .filter(r => r.some(c => c !== '' && c != null))
         .map(r => mapRow(r, headers))
-        .filter(r => r.cliente || r.notaFiscal || r.vlTotal > 0)
+
+      // Fill-down: linhas com cliente/NF/ano/UF em branco herdam da linha anterior
+      let lastAno = '', lastNF = '', lastCliente = '', lastUF = ''
+      const mapped = rawMapped.map(v => {
+        if (v.ano) lastAno = v.ano; else v.ano = lastAno
+        if (v.notaFiscal) lastNF = v.notaFiscal; else v.notaFiscal = lastNF
+        if (v.cliente) lastCliente = v.cliente; else v.cliente = lastCliente
+        if (v.uf) lastUF = v.uf; else v.uf = lastUF
+        return v
+      }).filter(r => r.cliente || r.notaFiscal || r.vlTotal > 0)
 
       if (mapped.length === 0) { setToast({ type: 'error', msg: 'Nenhum dado válido' }); return }
 
