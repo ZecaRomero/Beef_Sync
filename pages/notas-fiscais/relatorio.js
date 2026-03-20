@@ -5,7 +5,6 @@
 import {
   ArrowDownTrayIcon,
   ArrowLeftIcon,
-  ArrowPathIcon,
   ArrowUpTrayIcon,
   ChartBarIcon,
   CheckCircleIcon,
@@ -16,6 +15,7 @@ import {
   ExclamationTriangleIcon,
   MagnifyingGlassIcon,
   TableCellsIcon,
+  TrashIcon,
   UserGroupIcon
 } from '@heroicons/react/24/outline'
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Filler, Legend, LinearScale, LineElement, PointElement, Tooltip } from 'chart.js'
