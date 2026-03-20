@@ -88,9 +88,46 @@ function getTabLabel(path) {
 
 const TabsContext = createContext(null)
 
+const STORAGE_KEY = 'beef-tabs-open'
+
+function loadSavedTabs() {
+  try {
+    const saved = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null
+    if (saved) {
+      const parsed = JSON.parse(saved)
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed
+    }
+  } catch (_) {}
+  return []
+}
+
+function saveTabs(tabs) {
+  try {
+    // Salvar apenas path e label (sem id volátil)
+    const toSave = tabs.map(t => ({ path: t.path, label: t.label }))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave))
+  } catch (_) {}
+}
+
 export function TabsProvider({ children }) {
   const router = useRouter()
   const [tabs, setTabs] = useState([])
+  const [hydrated, setHydrated] = useState(false)
+
+  // Restaurar abas salvas ao montar (client-side)
+  useEffect(() => {
+    const saved = loadSavedTabs()
+    if (saved.length > 0) {
+      const restored = saved.map(t => ({ ...t, id: t.path + Date.now() + Math.random() }))
+      setTabs(restored)
+    }
+    setHydrated(true)
+  }, [])
+
+  // Persistir abas no localStorage sempre que mudarem (após hydration)
+  useEffect(() => {
+    if (hydrated) saveTabs(tabs)
+  }, [tabs, hydrated])
 
   const addTab = useCallback((path, label) => {
     const normalizedPath = path?.split('?')[0] || '/'
