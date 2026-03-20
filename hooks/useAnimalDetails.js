@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { extrairSerieRG } from '../utils/animalUtils'
+import { toLocalCalendarDate } from '../utils/dateCalendar'
 import { matchesSemenWithAnimal, normalizeRg } from '../utils/semenMatcher'
 import { invalidateCache, useOptimizedFetch } from './useOptimizedFetch'
 import { useServerEvents } from './useServerEvents'
@@ -512,7 +513,7 @@ export function useAnimalDetails(id) {
     if (!animal) return {}
 
     // 1. Identificação e Idade
-    const dataNasc = animal.data_nascimento ? new Date(animal.data_nascimento) : null
+    const dataNasc = animal.data_nascimento ? toLocalCalendarDate(animal.data_nascimento) : null
     const hoje = new Date()
     const mesesIdade = dataNasc ? Math.floor((hoje - dataNasc) / (1000 * 60 * 60 * 24 * 30.44)) : null
     const anosIdade = mesesIdade != null ? (mesesIdade / 12).toFixed(1) : null
@@ -527,7 +528,10 @@ export function useAnimalDetails(id) {
 
     // 2. Localização e Tempo
     const dataChegada = animal.data_chegada || animal.dataChegada
-    const diasNaFazenda = dataChegada ? Math.floor((hoje - new Date(dataChegada)) / (1000 * 60 * 60 * 24)) : null
+    const dtChegada = dataChegada ? toLocalCalendarDate(dataChegada) : null
+    const diasNaFazenda = dtChegada && !isNaN(dtChegada.getTime())
+      ? Math.floor((hoje - dtChegada) / (1000 * 60 * 60 * 24))
+      : null
     
     // 3. Sexo
     const isMacho = animal.sexo && (String(animal.sexo).toLowerCase().includes('macho') || animal.sexo === 'M')
@@ -562,12 +566,12 @@ export function useAnimalDetails(id) {
                t.includes('andrológico') || t.includes('andrologico')
       })
     )
-    // Elegível = está na janela agora (330-640 dias) e ainda não fez
-    const elegivelDGT = idadeDias != null && idadeDias >= 330 && idadeDias <= 640 && !temDGT
-    // Janela encerrada = passou dos 640 dias sem ter feito (máx até ~900 dias para ainda mostrar)
-    const janelaEncerradaDGT = idadeDias != null && idadeDias > 640 && idadeDias <= 900 && !temDGT
-    // precisaDGT = relevante mostrar no card (na janela, acabou de entrar ou passou recentemente)
-    const precisaDGT = idadeDias != null && idadeDias >= 330 && idadeDias <= 900
+    // Elegível = está na janela agora (330-640 dias) e ainda não fez — APENAS MACHOS
+    const elegivelDGT = isMacho && idadeDias != null && idadeDias >= 330 && idadeDias <= 640 && !temDGT
+    // Janela encerrada = passou dos 640 dias sem ter feito (máx até ~900 dias para ainda mostrar) — APENAS MACHOS
+    const janelaEncerradaDGT = isMacho && idadeDias != null && idadeDias > 640 && idadeDias <= 900 && !temDGT
+    // precisaDGT = relevante mostrar no card (na janela, acabou de entrar ou passou recentemente) — APENAS MACHOS
+    const precisaDGT = isMacho && idadeDias != null && idadeDias >= 330 && idadeDias <= 900
 
     // 6. Reprodução (Fêmeas)
     // Ordenar inseminações
