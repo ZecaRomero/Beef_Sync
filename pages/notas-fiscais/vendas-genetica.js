@@ -356,22 +356,44 @@ export default function VendasGenetica() {
       ws1.columns = [{ key: 'ind', width: 35 }, { key: 'val', width: 25 }]
       ws1.addRow({ ind: 'Indicador', val: 'Valor' }); applyHeader(ws1, 'FFE67E22')
       const totalVendido = resumoGeral.total || 1
+      const anosAtivos = [...new Set(vendasFiltradas.map(v => v.ano).filter(Boolean))]
+      const clientesAmbos = clientes.filter(c => c.qtdSemen > 0 && c.qtdEmbrioes > 0).length
+      const clientesSoSemen = clientes.filter(c => c.qtdSemen > 0 && c.qtdEmbrioes === 0).length
+      const clientesSoEmbrioes = clientes.filter(c => c.qtdEmbrioes > 0 && c.qtdSemen === 0).length
+      const estadosAtendidos = [...new Set(vendasFiltradas.map(v => v.uf).filter(Boolean))]
       ;[
         ['Total de Vendas', fmt(resumoGeral.total)],
-        ['Total de Unidades Vendidas', resumoGeral.totalQtd],
+        ['Total de Unidades Vendidas', resumoGeral.totalQtd.toLocaleString('pt-BR')],
         ['Total de Clientes', resumoGeral.totalClientes],
         ['Total de Notas Fiscais', resumoGeral.notas],
-        ['Sêmen - Unidades', resumoGeral.qtdSemen],
+        ['', ''],
+        ['── SÊMEN ──', ''],
+        ['Sêmen - Unidades', resumoGeral.qtdSemen.toLocaleString('pt-BR')],
         ['Sêmen - Valor Total', fmt(resumoGeral.totalSemen)],
-        ['Embriões - Unidades', resumoGeral.qtdEmbrioes],
+        ['Sêmen - % do Faturamento', `${((resumoGeral.totalSemen / totalVendido) * 100).toFixed(1)}%`],
+        ['Sêmen - Valor Médio/Dose', fmt(resumoGeral.qtdSemen > 0 ? resumoGeral.totalSemen / resumoGeral.qtdSemen : 0)],
+        ['', ''],
+        ['── EMBRIÕES ──', ''],
+        ['Embriões - Unidades', resumoGeral.qtdEmbrioes.toLocaleString('pt-BR')],
         ['Embriões - Valor Total', fmt(resumoGeral.totalEmbrioes)],
-        ['% Sêmen (valor)', `${((resumoGeral.totalSemen / totalVendido) * 100).toFixed(1)}%`],
-        ['% Embriões (valor)', `${((resumoGeral.totalEmbrioes / totalVendido) * 100).toFixed(1)}%`],
+        ['Embriões - % do Faturamento', `${((resumoGeral.totalEmbrioes / totalVendido) * 100).toFixed(1)}%`],
+        ['Embriões - Valor Médio/Unid.', fmt(resumoGeral.qtdEmbrioes > 0 ? resumoGeral.totalEmbrioes / resumoGeral.qtdEmbrioes : 0)],
+        ['', ''],
+        ['── INDICADORES ──', ''],
         ['Ticket Médio por Venda', fmt(resumoGeral.total / (vendasFiltradas.length || 1))],
         ['Ticket Médio por Cliente', fmt(resumoGeral.total / (resumoGeral.totalClientes || 1))],
+        ['Período Analisado', anosAtivos.length > 0 ? `${anosAtivos.sort()[0]} a ${anosAtivos.sort().pop()}` : '-'],
+        ['Estados Atendidos', estadosAtendidos.join(', ')],
+        ['', ''],
+        ['── PERFIL DE CLIENTES ──', ''],
+        ['Clientes que compram Sêmen + Embriões', clientesAmbos],
+        ['Clientes só Sêmen', clientesSoSemen],
+        ['Clientes só Embriões', clientesSoEmbrioes],
         ['Clientes Inativos (+1 ano)', resumoGeral.criticos],
-        ['Clientes que Precisam Atenção', resumoGeral.atencaoAlta],
+        ['Clientes que Precisam Atenção (+6m)', resumoGeral.atencaoAlta],
+        ['', ''],
         ['Data do Relatório', new Date().toLocaleDateString('pt-BR')],
+        ['Gerado por', 'Beef-Sync - Sistema de Gestão Pecuária'],
       ].forEach(([ind, val]) => ws1.addRow({ ind, val }))
 
       // Aba 2: Análise por Cliente
@@ -381,23 +403,28 @@ export default function VendasGenetica() {
         { key: 'ticket', width: 18 }, { key: 'qtdSemen', width: 14 }, { key: 'totalSemen', width: 18 },
         { key: 'qtdEmbrioes', width: 14 }, { key: 'totalEmbrioes', width: 18 },
         { key: 'preferencia', width: 14 }, { key: 'estados', width: 12 },
-        { key: 'anos', width: 20 }, { key: 'status', width: 22 }, { key: 'recomendacao', width: 50 },
+        { key: 'anos', width: 20 }, { key: 'status', width: 22 },
+        { key: 'fidelidade', width: 16 }, { key: 'classificacao', width: 14 },
+        { key: 'recomendacao', width: 55 },
       ]
       ws2.addRow({ nome: 'Cliente', compras: 'Compras', total: 'Valor Total', ticket: 'Ticket Médio',
         qtdSemen: 'Qtd Sêmen', totalSemen: 'Valor Sêmen', qtdEmbrioes: 'Qtd Embriões', totalEmbrioes: 'Valor Embriões',
-        preferencia: 'Preferência', estados: 'UF', anos: 'Anos', status: 'Status', recomendacao: 'Recomendação IA' })
+        preferencia: 'Preferência', estados: 'UF', anos: 'Anos', status: 'Status',
+        fidelidade: 'Fidelidade', classificacao: 'Classificação', recomendacao: 'Recomendação IA' })
       applyHeader(ws2, 'FF3B82F6')
       clientes.forEach(c => {
+        const fid = c.totalCompras >= 10 ? '⭐ VIP' : c.totalCompras >= 5 ? '🥇 Fiel' : c.totalCompras >= 3 ? '🥈 Recorrente' : c.totalCompras >= 2 ? '🥉 Retornou' : '🆕 Novo'
+        const classif = c.totalGasto >= 100000 ? 'Platinum' : c.totalGasto >= 50000 ? 'Gold' : c.totalGasto >= 20000 ? 'Silver' : 'Bronze'
         let rec = ''
-        if (c.atencao === 'baixa') rec = `Baixa prioridade. Total: ${fmt(c.totalGasto)}. Manter cadastro.`
-        else if (c.atencao === 'critica') rec = `URGENTE: Inativo desde ${c.ultimoAno}. Já comprou ${c.totalCompras}x totalizando ${fmt(c.totalGasto)}. Prefere ${c.preferencia}. Contato imediato.`
-        else if (c.atencao === 'alta') rec = `Sem compras recentes. Enviar oferta de ${c.preferencia}. Ticket médio: ${fmt(c.ticketMedio)}.`
-        else if (c.atencao === 'media') rec = `Acompanhar. Última compra em ${c.ultimoAno}. Prefere ${c.preferencia}.`
-        else rec = `Cliente ativo. ${c.totalCompras > 3 ? 'Fiel, considerar condições especiais.' : 'Manter relacionamento.'} Prefere ${c.preferencia}.`
+        if (c.atencao === 'baixa') rec = `Baixa prioridade. Total: ${fmt(c.totalGasto)}. Manter cadastro sem ação urgente.`
+        else if (c.atencao === 'critica') rec = `URGENTE: Inativo desde ${c.ultimoAno}. Já comprou ${c.totalCompras}x totalizando ${fmt(c.totalGasto)}. Prefere ${c.preferencia}. Contato imediato para reativação.`
+        else if (c.atencao === 'alta') rec = `Sem compras recentes. Enviar oferta personalizada de ${c.preferencia}. Ticket médio: ${fmt(c.ticketMedio)}. ${c.qtdSemen > 0 && c.qtdEmbrioes > 0 ? 'Compra ambos os tipos.' : ''}`
+        else if (c.atencao === 'media') rec = `Acompanhar. Última compra em ${c.ultimoAno}. Prefere ${c.preferencia}. Ticket médio: ${fmt(c.ticketMedio)}.`
+        else rec = `Cliente ativo e ${fid.includes('VIP') || fid.includes('Fiel') ? 'fiel' : 'recorrente'}. Prefere ${c.preferencia}. ${c.totalCompras > 5 ? 'Considerar condições especiais e programa de fidelidade.' : 'Manter bom relacionamento.'}`
         ws2.addRow({ nome: c.nome, compras: c.totalCompras, total: c.totalGasto, ticket: c.ticketMedio,
           qtdSemen: c.qtdSemen, totalSemen: c.totalSemen, qtdEmbrioes: c.qtdEmbrioes, totalEmbrioes: c.totalEmbrioes,
           preferencia: c.preferencia, estados: c.estados.join(', '), anos: c.anos.join(', '),
-          status: c.atencaoLabel, recomendacao: rec })
+          status: c.atencaoLabel, fidelidade: fid, classificacao: classif, recomendacao: rec })
       })
       ws2.getColumn('total').numFmt = 'R$ #,##0.00'
       ws2.getColumn('ticket').numFmt = 'R$ #,##0.00'
@@ -420,23 +447,41 @@ export default function VendasGenetica() {
       ws3.getColumn('valorUnit').numFmt = 'R$ #,##0.00'
       ws3.getColumn('total').numFmt = 'R$ #,##0.00'
 
-      // Aba 4: Vendas por Ano
+      // Aba 4: Vendas por Ano (com ticket médio e variação)
       const ws4 = wb.addWorksheet('📅 Vendas por Ano')
       ws4.columns = [{ key: 'ano', width: 10 }, { key: 'qtd', width: 12 }, { key: 'total', width: 18 },
-        { key: 'semen', width: 18 }, { key: 'embrioes', width: 18 }]
-      ws4.addRow({ ano: 'Ano', qtd: 'Qtd', total: 'Total', semen: 'Sêmen', embrioes: 'Embriões' })
+        { key: 'semen', width: 18 }, { key: 'embrioes', width: 18 }, { key: 'ticket', width: 18 },
+        { key: 'clientes', width: 12 }, { key: 'variacao', width: 14 }]
+      ws4.addRow({ ano: 'Ano', qtd: 'Qtd', total: 'Total', semen: 'Sêmen', embrioes: 'Embriões', ticket: 'Ticket Médio', clientes: 'Clientes', variacao: 'Variação %' })
       applyHeader(ws4, 'FF8B5CF6')
-      vendasPorAno.forEach(a => ws4.addRow({ ano: a.ano, qtd: a.qtd, total: a.total, semen: a.semen, embrioes: a.embrioes }))
+      vendasPorAno.forEach((a, i) => {
+        const clientesAno = [...new Set(vendasFiltradas.filter(v => v.ano === a.ano).map(v => v.cliente))].length
+        const prev = i > 0 ? vendasPorAno[i - 1].total : 0
+        const variacao = prev > 0 ? `${(((a.total - prev) / prev) * 100).toFixed(1)}%` : '-'
+        ws4.addRow({ ano: a.ano, qtd: a.qtd, total: a.total, semen: a.semen, embrioes: a.embrioes, ticket: a.qtd > 0 ? a.total / a.qtd : 0, clientes: clientesAno, variacao })
+      })
       ws4.getColumn('total').numFmt = 'R$ #,##0.00'
+      ws4.getColumn('ticket').numFmt = 'R$ #,##0.00'
       ws4.getColumn('semen').numFmt = 'R$ #,##0.00'
       ws4.getColumn('embrioes').numFmt = 'R$ #,##0.00'
 
-      // Aba 5: Vendas por Estado
+      // Aba 5: Vendas por Estado (com sêmen/embriões separados e clientes)
       const ws5 = wb.addWorksheet('🗺️ Vendas por Estado')
-      ws5.columns = [{ key: 'estado', width: 10 }, { key: 'qtd', width: 12 }, { key: 'total', width: 18 }]
-      ws5.addRow({ estado: 'UF', qtd: 'Qtd', total: 'Total' }); applyHeader(ws5, 'FF059669')
-      vendasPorEstado.forEach(e => ws5.addRow({ estado: e.estado, qtd: e.qtd, total: e.total }))
+      ws5.columns = [{ key: 'estado', width: 10 }, { key: 'qtd', width: 12 }, { key: 'total', width: 18 },
+        { key: 'semen', width: 18 }, { key: 'embrioes', width: 18 }, { key: 'clientes', width: 12 }, { key: 'pctTotal', width: 12 }]
+      ws5.addRow({ estado: 'UF', qtd: 'Qtd', total: 'Total', semen: 'Sêmen', embrioes: 'Embriões', clientes: 'Clientes', pctTotal: '% Total' })
+      applyHeader(ws5, 'FF059669')
+      const totalGeral = resumoGeral.total || 1
+      vendasPorEstado.forEach(e => {
+        const doEstado = vendasFiltradas.filter(v => (v.uf || 'N/I') === e.estado)
+        const semenEst = doEstado.filter(v => v.tipo === 'semen').reduce((s, v) => s + v.vlTotal, 0)
+        const embrioesEst = doEstado.filter(v => v.tipo === 'embriao').reduce((s, v) => s + v.vlTotal, 0)
+        const clientesEst = [...new Set(doEstado.map(v => v.cliente))].length
+        ws5.addRow({ estado: e.estado, qtd: e.qtd, total: e.total, semen: semenEst, embrioes: embrioesEst, clientes: clientesEst, pctTotal: `${((e.total / totalGeral) * 100).toFixed(1)}%` })
+      })
       ws5.getColumn('total').numFmt = 'R$ #,##0.00'
+      ws5.getColumn('semen').numFmt = 'R$ #,##0.00'
+      ws5.getColumn('embrioes').numFmt = 'R$ #,##0.00'
 
       // Aba 6: Clientes que Precisam Atenção
       const ws6 = wb.addWorksheet('⚠️ Atenção Especial')
@@ -456,15 +501,22 @@ export default function VendasGenetica() {
       })
       ws6.getColumn('total').numFmt = 'R$ #,##0.00'
 
-      // Aba 7: Top Produtos
+      // Aba 7: Top Produtos (com clientes, valor médio e % do total)
       const ws7 = wb.addWorksheet('🧬 Top Produtos')
       ws7.columns = [{ key: 'pos', width: 6 }, { key: 'produto', width: 55 }, { key: 'tipo', width: 12 },
-        { key: 'qtd', width: 10 }, { key: 'total', width: 18 }]
-      ws7.addRow({ pos: '#', produto: 'Produto', tipo: 'Tipo', qtd: 'Qtd', total: 'Total' })
+        { key: 'qtd', width: 10 }, { key: 'total', width: 18 }, { key: 'valorMedio', width: 16 },
+        { key: 'clientes', width: 12 }, { key: 'pctTotal', width: 10 }]
+      ws7.addRow({ pos: '#', produto: 'Produto', tipo: 'Tipo', qtd: 'Qtd', total: 'Total', valorMedio: 'Valor Médio', clientes: 'Clientes', pctTotal: '% Total' })
       applyHeader(ws7, 'FF7C3AED')
-      topProdutos.forEach((p, i) => ws7.addRow({ pos: i + 1, produto: p.produto,
-        tipo: p.tipo === 'semen' ? 'Sêmen' : p.tipo === 'embriao' ? 'Embrião' : 'Outro', qtd: p.qtd, total: p.total }))
+      topProdutos.forEach((p, i) => {
+        const clientesProd = [...new Set(vendasFiltradas.filter(v => v.produto === p.produto).map(v => v.cliente))].length
+        ws7.addRow({ pos: i + 1, produto: p.produto,
+          tipo: p.tipo === 'semen' ? 'Sêmen' : p.tipo === 'embriao' ? 'Embrião' : 'Outro',
+          qtd: p.qtd, total: p.total, valorMedio: p.qtd > 0 ? p.total / p.qtd : 0,
+          clientes: clientesProd, pctTotal: `${((p.total / totalGeral) * 100).toFixed(1)}%` })
+      })
       ws7.getColumn('total').numFmt = 'R$ #,##0.00'
+      ws7.getColumn('valorMedio').numFmt = 'R$ #,##0.00'
 
       // Aba 8: Ranking de Clientes
       const ws8 = wb.addWorksheet('🏆 Ranking Clientes')
@@ -483,6 +535,90 @@ export default function VendasGenetica() {
       ws8.getColumn('total').numFmt = 'R$ #,##0.00'
       ws8.getColumn('ticket').numFmt = 'R$ #,##0.00'
 
+      // Aba 9: Evolução por Cliente (cliente x ano)
+      const ws9 = wb.addWorksheet('📈 Evolução por Cliente')
+      const anosUnicos = [...new Set(vendasFiltradas.map(v => v.ano).filter(Boolean))].sort()
+      ws9.columns = [
+        { key: 'nome', width: 35 },
+        ...anosUnicos.map(a => ({ key: `a${a}`, width: 16 })),
+        { key: 'total', width: 18 }, { key: 'tendencia', width: 14 },
+      ]
+      ws9.addRow({ nome: 'Cliente', ...Object.fromEntries(anosUnicos.map(a => [`a${a}`, a])), total: 'Total', tendencia: 'Tendência' })
+      applyHeader(ws9, 'FF0891B2')
+      clientes.forEach(c => {
+        const porAno = {}
+        c.vendas.forEach(v => { porAno[v.ano] = (porAno[v.ano] || 0) + v.vlTotal })
+        const vals = anosUnicos.map(a => porAno[a] || 0)
+        const ultimos2 = vals.filter(v => v > 0).slice(-2)
+        const tendencia = ultimos2.length < 2 ? '-' : ultimos2[1] > ultimos2[0] ? '📈 Crescendo' : ultimos2[1] < ultimos2[0] ? '📉 Caindo' : '➡️ Estável'
+        ws9.addRow({ nome: c.nome, ...Object.fromEntries(anosUnicos.map(a => [`a${a}`, porAno[a] || 0])), total: c.totalGasto, tendencia })
+      })
+      anosUnicos.forEach(a => { ws9.getColumn(`a${a}`).numFmt = 'R$ #,##0.00' })
+      ws9.getColumn('total').numFmt = 'R$ #,##0.00'
+
+      // Aba 10: Vendas por Nota Fiscal
+      const ws10 = wb.addWorksheet('🧾 Por Nota Fiscal')
+      ws10.columns = [
+        { key: 'nf', width: 16 }, { key: 'ano', width: 8 }, { key: 'cliente', width: 35 },
+        { key: 'uf', width: 6 }, { key: 'itens', width: 10 }, { key: 'qtdTotal', width: 12 },
+        { key: 'valorTotal', width: 18 }, { key: 'tipoMix', width: 20 },
+      ]
+      ws10.addRow({ nf: 'Nota Fiscal', ano: 'Ano', cliente: 'Cliente', uf: 'UF', itens: 'Itens', qtdTotal: 'Qtd Total', valorTotal: 'Valor Total', tipoMix: 'Tipo' })
+      applyHeader(ws10, 'FF2563EB')
+      const porNF = {}
+      vendasFiltradas.forEach(v => {
+        const k = v.notaFiscal || 'S/N'
+        if (!porNF[k]) porNF[k] = { nf: k, ano: v.ano, cliente: v.cliente, uf: v.uf, itens: 0, qtd: 0, total: 0, tipos: new Set() }
+        porNF[k].itens++; porNF[k].qtd += v.quantidade; porNF[k].total += v.vlTotal; porNF[k].tipos.add(v.tipo)
+      })
+      Object.values(porNF).sort((a, b) => b.total - a.total).forEach(n => {
+        const tipoMix = [...n.tipos].map(t => t === 'semen' ? 'Sêmen' : t === 'embriao' ? 'Embrião' : 'Outro').join(' + ')
+        ws10.addRow({ nf: n.nf, ano: n.ano, cliente: n.cliente, uf: n.uf, itens: n.itens, qtdTotal: n.qtd, valorTotal: n.total, tipoMix })
+      })
+      ws10.getColumn('valorTotal').numFmt = 'R$ #,##0.00'
+
+      // Aba 11: Análise Sêmen vs Embriões (comparativo detalhado)
+      const ws11 = wb.addWorksheet('⚖️ Sêmen vs Embriões')
+      ws11.columns = [{ key: 'ind', width: 35 }, { key: 'semen', width: 22 }, { key: 'embrioes', width: 22 }, { key: 'total', width: 22 }]
+      ws11.addRow({ ind: 'Indicador', semen: 'Sêmen', embrioes: 'Embriões', total: 'Total' })
+      applyHeader(ws11, 'FFBE185D')
+      const sAll = vendasFiltradas.filter(v => v.tipo === 'semen')
+      const eAll = vendasFiltradas.filter(v => v.tipo === 'embriao')
+      const sClientes = [...new Set(sAll.map(v => v.cliente))].length
+      const eClientes = [...new Set(eAll.map(v => v.cliente))].length
+      const sTotal = sAll.reduce((s, v) => s + v.vlTotal, 0)
+      const eTotal = eAll.reduce((s, v) => s + v.vlTotal, 0)
+      const sQtd = sAll.reduce((s, v) => s + v.quantidade, 0)
+      const eQtd = eAll.reduce((s, v) => s + v.quantidade, 0)
+      ;[
+        ['Valor Total', fmt(sTotal), fmt(eTotal), fmt(sTotal + eTotal)],
+        ['Unidades Vendidas', sQtd.toLocaleString('pt-BR'), eQtd.toLocaleString('pt-BR'), (sQtd + eQtd).toLocaleString('pt-BR')],
+        ['Nº de Vendas (linhas)', sAll.length, eAll.length, sAll.length + eAll.length],
+        ['Nº de Clientes', sClientes, eClientes, resumoGeral.totalClientes],
+        ['Valor Médio por Unidade', fmt(sQtd > 0 ? sTotal / sQtd : 0), fmt(eQtd > 0 ? eTotal / eQtd : 0), fmt((sQtd + eQtd) > 0 ? (sTotal + eTotal) / (sQtd + eQtd) : 0)],
+        ['Ticket Médio por Venda', fmt(sAll.length > 0 ? sTotal / sAll.length : 0), fmt(eAll.length > 0 ? eTotal / eAll.length : 0), fmt(vendasFiltradas.length > 0 ? resumoGeral.total / vendasFiltradas.length : 0)],
+        ['% do Faturamento', `${((sTotal / totalGeral) * 100).toFixed(1)}%`, `${((eTotal / totalGeral) * 100).toFixed(1)}%`, '100%'],
+        ['Notas Fiscais', [...new Set(sAll.map(v => v.notaFiscal))].length, [...new Set(eAll.map(v => v.notaFiscal))].length, resumoGeral.notas],
+        ['Estados Atendidos', [...new Set(sAll.map(v => v.uf))].filter(Boolean).length, [...new Set(eAll.map(v => v.uf))].filter(Boolean).length, vendasPorEstado.length],
+      ].forEach(([ind, s, e, t]) => ws11.addRow({ ind, semen: s, embrioes: e, total: t }))
+
+      // Aba 12: Clientes que compram AMBOS (sêmen + embriões)
+      const ws12 = wb.addWorksheet('🔄 Compram Ambos')
+      ws12.columns = [
+        { key: 'nome', width: 35 }, { key: 'qtdSemen', width: 14 }, { key: 'totalSemen', width: 18 },
+        { key: 'qtdEmbrioes', width: 14 }, { key: 'totalEmbrioes', width: 18 },
+        { key: 'totalGeral', width: 18 }, { key: 'pctSemen', width: 12 }, { key: 'pctEmbrioes', width: 12 },
+      ]
+      ws12.addRow({ nome: 'Cliente', qtdSemen: 'Qtd Sêmen', totalSemen: 'Valor Sêmen', qtdEmbrioes: 'Qtd Embriões', totalEmbrioes: 'Valor Embriões', totalGeral: 'Total Geral', pctSemen: '% Sêmen', pctEmbrioes: '% Embriões' })
+      applyHeader(ws12, 'FF7C3AED')
+      clientes.filter(c => c.qtdSemen > 0 && c.qtdEmbrioes > 0).forEach(c => {
+        const t = c.totalGasto || 1
+        ws12.addRow({ nome: c.nome, qtdSemen: c.qtdSemen, totalSemen: c.totalSemen, qtdEmbrioes: c.qtdEmbrioes, totalEmbrioes: c.totalEmbrioes, totalGeral: c.totalGasto, pctSemen: `${((c.totalSemen / t) * 100).toFixed(0)}%`, pctEmbrioes: `${((c.totalEmbrioes / t) * 100).toFixed(0)}%` })
+      })
+      ws12.getColumn('totalSemen').numFmt = 'R$ #,##0.00'
+      ws12.getColumn('totalEmbrioes').numFmt = 'R$ #,##0.00'
+      ws12.getColumn('totalGeral').numFmt = 'R$ #,##0.00'
+
       // Download
       const buffer = await wb.xlsx.writeBuffer()
       const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
@@ -490,7 +626,7 @@ export default function VendasGenetica() {
       const a = document.createElement('a')
       a.href = url; a.download = `Vendas_Embrioes_Semen_${new Date().toISOString().split('T')[0]}.xlsx`
       a.click(); URL.revokeObjectURL(url)
-      setToast({ type: 'success', msg: 'Excel exportado com 8 abas detalhadas' })
+      setToast({ type: 'success', msg: 'Excel exportado com 12 abas detalhadas' })
     } catch (err) {
       console.error('Erro ao exportar:', err)
       setToast({ type: 'error', msg: 'Erro ao gerar Excel' })
