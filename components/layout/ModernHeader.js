@@ -193,7 +193,8 @@ export default function ModernHeader({
       '/reports': 'Relatórios',
       '/protocol-editor': 'Protocolos',
       '/settings': 'Configurações',
-      '/admin/feedbacks': 'Feedbacks'
+      '/admin/feedbacks': 'Feedbacks',
+      '/notas-fiscais/relatorio': 'Relatório de Vendas'
     }
     return titles[path] || 'Beef-Sync'
   }
@@ -236,7 +237,7 @@ export default function ModernHeader({
       </div>
 
       {/* Search */}
-      <div className="relative flex-1 max-w-md" ref={searchRef}>
+      <div className="relative flex-1 max-w-md hidden sm:block" ref={searchRef}>
         <div className="relative">
           <MagnifyingGlassIcon className={cn(
             'pointer-events-none absolute inset-y-0 left-0 h-full w-5 text-gray-400 pl-3',
@@ -249,12 +250,10 @@ export default function ModernHeader({
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setIsSearchFocused(true)}
             className={cn(
-              'block w-full rounded-xl border-0 py-2.5 pl-10 pr-3 text-gray-900 dark:text-white',
-              'bg-gray-50 dark:bg-gray-800 placeholder:text-gray-400',
-              'ring-1 ring-inset ring-gray-300 dark:ring-gray-600',
-              'focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-500',
-              'transition-all duration-200 text-sm',
-              isSearchFocused && 'bg-white dark:bg-gray-700 shadow-lg'
+              'block w-full rounded-xl border-0 py-2 pl-10 pr-3 text-gray-900 dark:text-white',
+              'ring-1 ring-inset ring-gray-200 dark:ring-gray-700 focus:ring-2 focus:ring-inset focus:ring-blue-500',
+              'bg-gray-50 dark:bg-gray-800/50 text-sm transition-all duration-200',
+              isSearchFocused && 'bg-white dark:bg-gray-800 shadow-md ring-blue-500'
             )}
           />
         </div>
@@ -286,6 +285,12 @@ export default function ModernHeader({
             ))}
           </div>
         )}
+      </div>
+
+      <div className="flex sm:hidden">
+        <button className="p-2 text-gray-500 dark:text-gray-400" onClick={() => router.push('/animals')}>
+          <MagnifyingGlassIcon className="h-5 w-5" />
+        </button>
       </div>
 
       {/* System Info */}

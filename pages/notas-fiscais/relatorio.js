@@ -763,50 +763,52 @@ export default function RelatorioVendas() {
         </AnimatePresence>
 
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 px-4 py-3">
+        <div className="bg-white/95 dark:bg-gray-900/95 border-b border-gray-200 dark:border-gray-800 px-4 py-3">
           <div className="max-w-5xl mx-auto">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <button onClick={() => router.back()} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                   <ArrowLeftIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                 </button>
                 <div>
                   <h1 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                    <ChartBarIcon className="h-5 w-5 text-amber-600" /> 
+                    Relatório de Vendas
                   </h1>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{vendasFiltradas.length} registros · {clientes.length} clientes</p>
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">
+                    {vendasFiltradas.length} registros · {clientes.length} clientes
+                  </p>
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <label className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-all ${(importando || carregandoBase) ? 'bg-gray-200 dark:bg-gray-700 text-gray-500' : 'bg-amber-500 text-white hover:bg-amber-600'}`}>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <label className={`w-full sm:flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${(importando || carregandoBase) ? 'bg-gray-200 dark:bg-gray-700 text-gray-500' : 'bg-amber-500 text-white hover:bg-amber-600 shadow-lg shadow-amber-500/20'}`}>
                 <ArrowUpTrayIcon className="h-4 w-4" />
                 {importando ? 'Importando...' : carregandoBase ? 'Carregando base...' : 'Importar Excel'}
                 <input type="file" accept=".xlsx,.xls,.csv" onChange={handleImport} className="hidden" disabled={importando || carregandoBase} />
               </label>
               {vendas.length > 0 && (
-                <button onClick={exportarExcel} disabled={exportando}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-green-600 text-white text-sm font-semibold hover:bg-green-700 transition-colors disabled:opacity-50">
-                  <ArrowDownTrayIcon className="h-4 w-4" />
-                  {exportando ? 'Gerando...' : 'Exportar Excel'}
-                </button>
-              )}
-              {vendas.length > 0 && (
-                <button onClick={() => setShowSenhaModal(true)}
-                  className="p-2.5 rounded-xl bg-red-600 text-white hover:bg-red-700 transition-colors" title="Limpar tudo">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
-                </button>
+                <div className="flex gap-2 w-full sm:flex-1">
+                  <button onClick={exportarExcel} disabled={exportando}
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-green-600 text-white text-xs font-bold hover:bg-green-700 transition-colors shadow-lg shadow-green-600/20 disabled:opacity-50">
+                    <ArrowDownTrayIcon className="h-4 w-4" />
+                    {exportando ? 'Gerando...' : 'Exportar Excel'}
+                  </button>
+                  <button onClick={() => setShowSenhaModal(true)}
+                    className="p-2.5 rounded-xl bg-red-600 text-white hover:bg-red-700 transition-colors shadow-lg shadow-red-600/20 shrink-0" title="Limpar tudo">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
+                  </button>
+                </div>
               )}
             </div>
             {vendas.length > 0 && (
-              <div className="mt-2 space-y-1">
+              <div className="mt-3 p-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/30">
                 <button type="button" onClick={sincronizarBaixasNoApp} disabled={sincronizandoBaixas || qtdComSerieRg === 0}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                   <ArrowPathIcon className={`h-4 w-4 ${sincronizandoBaixas ? 'animate-spin' : ''}`} />
-                  {sincronizandoBaixas ? 'Lançando baixas…' : `Lançar vendas no cadastro (${qtdComSerieRg} com Série+RG)`}
+                  {sincronizandoBaixas ? 'Lançando...' : `Lançar no cadastro (${qtdComSerieRg})`}
                 </button>
-                <p className="text-[10px] text-gray-500 dark:text-gray-400 text-center px-1">
-                  Cria registro de <strong className="font-semibold">VENDA</strong> em Baixas para quem ainda não tem; vincula ao animal se existir no banco. Linhas só da base (sem tatuagem) não entram — use a planilha com Série e RG.
+                <p className="text-[9px] text-indigo-600/70 dark:text-indigo-400/70 text-center mt-2 leading-tight">
+                  Vincula vendas ao cadastro de animais (Série+RG). Linhas sem identificação não entram.
                 </p>
               </div>
             )}
@@ -848,12 +850,12 @@ export default function RelatorioVendas() {
           {vendas.length > 0 && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0 }}
-                className="p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm">
+                className="col-span-2 md:col-span-1 p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm">
                 <div className="flex items-center gap-2 mb-1">
                   <CurrencyDollarIcon className="h-4 w-4 text-amber-500" />
                   <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Total Vendido</span>
                 </div>
-                <p className="text-xl font-black text-gray-900 dark:text-white">{fmt(resumoGeral.total)}</p>
+                <p className="text-lg sm:text-xl font-black text-gray-900 dark:text-white truncate">{fmt(resumoGeral.total)}</p>
               </motion.div>
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
                 className="p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm">
@@ -861,7 +863,7 @@ export default function RelatorioVendas() {
                   <TableCellsIcon className="h-4 w-4 text-blue-500" />
                   <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Animais</span>
                 </div>
-                <p className="text-xl font-black text-gray-900 dark:text-white">{resumoGeral.totalAnimais}</p>
+                <p className="text-lg sm:text-xl font-black text-gray-900 dark:text-white">{resumoGeral.totalAnimais}</p>
                 <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{resumoGeral.machos}M · {resumoGeral.femeas}F</p>
               </motion.div>
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
@@ -870,7 +872,7 @@ export default function RelatorioVendas() {
                   <UserGroupIcon className="h-4 w-4 text-green-500" />
                   <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Clientes</span>
                 </div>
-                <p className="text-xl font-black text-gray-900 dark:text-white">{resumoGeral.totalClientes}</p>
+                <p className="text-lg sm:text-xl font-black text-gray-900 dark:text-white">{resumoGeral.totalClientes}</p>
                 <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{resumoGeral.notas} notas</p>
               </motion.div>
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
@@ -879,7 +881,7 @@ export default function RelatorioVendas() {
                   <ExclamationTriangleIcon className="h-4 w-4 text-red-500" />
                   <span className="text-[10px] font-bold uppercase tracking-wider text-red-500 dark:text-red-400">Precisam Atenção</span>
                 </div>
-                <p className="text-xl font-black text-red-600 dark:text-red-400">{resumoGeral.criticos + resumoGeral.atencaoAlta}</p>
+                <p className="text-lg sm:text-xl font-black text-red-600 dark:text-red-400">{resumoGeral.criticos + resumoGeral.atencaoAlta}</p>
                 <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{resumoGeral.criticos} inativos · {resumoGeral.atencaoAlta} atenção</p>
               </motion.div>
             </div>
