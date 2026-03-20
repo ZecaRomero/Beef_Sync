@@ -132,8 +132,15 @@ export default function AcessosSistema() {
   const [mobileReportsDraft, setMobileReportsDraft] = useState(null)
   const [tiposRelatorios, setTiposRelatorios] = useState([])
   const [presence, setPresence] = useState(null)
+  const [isLocalDevHost, setIsLocalDevHost] = useState(false)
 
   const mobileLogs = useMemo(() => logs.filter(log => log.is_mobile), [logs])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const h = window.location.hostname
+    setIsLocalDevHost(h === 'localhost' || h === '127.0.0.1')
+  }, [])
 
   const enabledReports = useMemo(() => {
     const raw = mobileReportsDraft ?? settings?.mobile_reports_enabled ?? []
@@ -377,6 +384,25 @@ export default function AcessosSistema() {
           </p>
         </div>
 
+        {isLocalDevHost && (
+          <div className="rounded-xl border-2 border-amber-400 dark:border-amber-600 bg-amber-50 dark:bg-amber-950/40 p-4 text-sm text-amber-950 dark:text-amber-100">
+            <p className="font-semibold flex items-center gap-2">
+              <ExclamationTriangleIcon className="h-5 w-5 flex-shrink-0" />
+              Você está no ambiente local ({typeof window !== 'undefined' ? window.location.host : 'localhost'})
+            </p>
+            <p className="mt-2 leading-relaxed">
+              <strong>Conectados agora</strong> e os logs vêm do banco definido no <code className="px-1 rounded bg-amber-200/60 dark:bg-amber-900/50">DATABASE_URL</code> desta máquina.
+              Quem usa o app na <strong>nuvem</strong> (ex.: Vercel) envia o heartbeat para o banco <strong>de lá</strong> — não aparece aqui se o seu <code>.env</code> local aponta para outro Postgres.
+            </p>
+            <p className="mt-2">
+              Para ver o Gabriel (ou qualquer usuário online em produção), abra a mesma página no domínio publicado:
+              {' '}
+              <strong>Monitoramento → Acessos</strong> em <code className="px-1 rounded bg-amber-200/60 dark:bg-amber-900/50">https://seu-projeto.vercel.app/monitoramento/acessos</code>
+              {' '}(o mesmo URL que o time usa no dia a dia).
+            </p>
+          </div>
+        )}
+
         {/* Destaque: acessos por celular */}
         <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl p-6 text-white shadow-lg">
           <div className="flex items-center gap-3 mb-2">
@@ -420,9 +446,16 @@ export default function AcessosSistema() {
           </div>
           <div className="overflow-x-auto">
             {!presence?.online?.length ? (
-              <p className="p-6 text-sm text-gray-500 dark:text-gray-400 text-center">
-                Ninguém com sessão ativa no momento — ou o heartbeat ainda não chegou (até ~45s após abrir o app).
-              </p>
+              <div className="p-6 text-sm text-gray-500 dark:text-gray-400 text-center space-y-2">
+                <p>
+                  Ninguém com sessão ativa no momento — ou o heartbeat ainda não chegou (até ~45s após abrir o app).
+                </p>
+                {isLocalDevHost && (
+                  <p className="text-amber-700 dark:text-amber-300 font-medium">
+                    Se há alguém online só na Vercel, aqui no localhost a lista pode ficar vazia: são bancos diferentes.
+                  </p>
+                )}
+              </div>
             ) : (
               <table className="w-full text-sm min-w-[860px]">
                 <thead className="bg-gray-50 dark:bg-gray-700/50">
