@@ -906,144 +906,132 @@ export default function RelatorioVendas() {
           )}
         </AnimatePresence>
 
-        {/* Header */}
-        <div className="bg-white/95 dark:bg-gray-900/95 border-b border-gray-200 dark:border-gray-800 px-4 py-3">
-          <div className="max-w-5xl mx-auto">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <button onClick={() => router.back()} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                  <ArrowLeftIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                </button>
-                <div>
-                  <h1 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                    Relatório de Vendas
-                  </h1>
-                  <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">
-                    {vendasFiltradas.length} registros · {clientes.length} clientes
-                  </p>
-                </div>
-              </div>
-            </div>
-            {isLocal && (
-            <div className="flex flex-col sm:flex-row gap-2">
-              <label className={`w-full sm:flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${(importando || carregandoBase) ? 'bg-gray-200 dark:bg-gray-700 text-gray-500' : 'bg-amber-500 text-white hover:bg-amber-600 shadow-lg shadow-amber-500/20'}`}>
-                <ArrowUpTrayIcon className="h-4 w-4" />
-                {importando ? 'Importando...' : carregandoBase ? 'Carregando base...' : 'Importar Excel'}
-                <input type="file" accept=".xlsx,.xls,.csv" onChange={handleImport} className="hidden" disabled={importando || carregandoBase} />
-              </label>
-              {vendas.length > 0 && (
-                <div className="flex gap-2 w-full sm:flex-1">
-                  <button onClick={exportarExcel} disabled={exportando}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-green-600 text-white text-xs font-bold hover:bg-green-700 transition-colors shadow-lg shadow-green-600/20 disabled:opacity-50">
-                    <ArrowDownTrayIcon className="h-4 w-4" />
-                    {exportando ? 'Gerando...' : 'Exportar Excel'}
-                  </button>
-                  <button onClick={() => setShowSenhaModal(true)}
-                    className="p-2.5 rounded-xl bg-red-600 text-white hover:bg-red-700 transition-colors shadow-lg shadow-red-600/20 shrink-0" title="Limpar tudo">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
-                  </button>
-                </div>
-              )}
-            </div>
-            )}
-            {isLocal && vendas.length > 0 && (
-              <div className="mt-3 p-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/30">
-                <button type="button" onClick={sincronizarBaixasNoApp} disabled={sincronizandoBaixas || qtdComSerieRg === 0}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                  <ArrowPathIcon className={`h-4 w-4 ${sincronizandoBaixas ? 'animate-spin' : ''}`} />
-                  {sincronizandoBaixas ? 'Lançando...' : `Lançar no cadastro (${qtdComSerieRg})`}
-                </button>
-                <p className="text-[9px] text-indigo-600/70 dark:text-indigo-400/70 text-center mt-2 leading-tight">
-                  Vincula vendas ao cadastro de animais (Série+RG). Linhas sem identificação não entram.
+        {/* Header da Página - Mais limpo no mobile */}
+        <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3 sticky top-0 z-20 sm:relative sm:top-auto sm:z-auto">
+          <div className="max-w-5xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button onClick={() => router.back()} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors sm:hidden">
+                <ArrowLeftIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+              </button>
+              <div>
+                <h1 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white leading-tight">Vendas e Clientes</h1>
+                <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                  {vendasFiltradas.length} registros · {clientes.length} clientes
                 </p>
               </div>
-            )}
+            </div>
+
+            <div className="flex items-center gap-2">
+              {isLocal && (
+                <label className="p-2 rounded-xl bg-amber-500 text-white hover:bg-amber-600 transition-colors cursor-pointer shadow-md shadow-amber-500/20">
+                  <ArrowUpTrayIcon className="h-5 w-5" />
+                  <input type="file" accept=".xlsx,.xls,.csv" onChange={handleImport} className="hidden" disabled={importando || carregandoBase} />
+                </label>
+              )}
+              {vendas.length > 0 && (
+                <button onClick={exportarExcel} disabled={exportando}
+                  className="p-2 rounded-xl bg-green-600 text-white hover:bg-green-700 transition-colors shadow-md shadow-green-600/20">
+                  <ArrowDownTrayIcon className="h-5 w-5" />
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
-          {/* Filtro de origem */}
+        <div className="max-w-5xl mx-auto px-4 py-4 space-y-4">
+          {/* Lançamento no App - Mobile compact banner */}
           {isLocal && vendas.length > 0 && (
-            <div className="flex items-center gap-2">
-              {(() => {
-                const qtdExcel = vendas.filter(v => v.origem === 'excel').length
-                const qtdBase = vendas.filter(v => v.origem === 'base').length
-                return (
-                  <>
-                    <button onClick={() => setFiltroOrigem('todos')}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${filtroOrigem === 'todos' ? 'bg-amber-500 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>
-                      Todos ({vendas.length})
-                    </button>
-                    {qtdExcel > 0 && (
-                      <button onClick={() => setFiltroOrigem('excel')}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${filtroOrigem === 'excel' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>
-                        📊 Excel ({qtdExcel})
-                      </button>
-                    )}
-                    {qtdBase > 0 && (
-                      <button onClick={() => setFiltroOrigem('base')}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${filtroOrigem === 'base' ? 'bg-green-500 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>
-                        🗄️ App ({qtdBase})
-                      </button>
-                    )}
-                  </>
-                )
-              })()}
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+              className="p-3 rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/20 flex items-center justify-between gap-3">
+              <div className="flex-1">
+                <p className="text-xs font-bold leading-tight">Vincular vendas ao cadastro</p>
+                <p className="text-[9px] opacity-80 mt-0.5">{qtdComSerieRg} animais com Série+RG identificados</p>
+              </div>
+              <button onClick={sincronizarBaixasNoApp} disabled={sincronizandoBaixas || qtdComSerieRg === 0}
+                className="px-4 py-2 rounded-xl bg-white text-indigo-600 text-[10px] font-black uppercase tracking-wider hover:bg-indigo-50 transition-colors disabled:opacity-50">
+                {sincronizandoBaixas ? '...' : 'Lançar'}
+              </button>
+            </motion.div>
+          )}
+
+          {/* Filtro de origem e limpeza */}
+          <div className="flex items-center justify-between gap-2">
+            {isLocal && vendas.length > 0 && (
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                <button onClick={() => setFiltroOrigem('todos')}
+                  className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all ${filtroOrigem === 'todos' ? 'bg-amber-500 text-white' : 'bg-white dark:bg-gray-800 text-gray-500 border border-gray-100 dark:border-gray-700'}`}>
+                  Todos
+                </button>
+                <button onClick={() => setFiltroOrigem('excel')}
+                  className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all ${filtroOrigem === 'excel' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-800 text-gray-500 border border-gray-100 dark:border-gray-700'}`}>
+                  Excel
+                </button>
+                <button onClick={() => setFiltroOrigem('base')}
+                  className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all ${filtroOrigem === 'base' ? 'bg-green-500 text-white' : 'bg-white dark:bg-gray-800 text-gray-500 border border-gray-100 dark:border-gray-700'}`}>
+                  App
+                </button>
+              </div>
+            )}
+            {vendas.length > 0 && (
+              <button onClick={() => setShowSenhaModal(true)} className="p-2 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                <TrashIcon className="h-5 w-5" />
+              </button>
+            )}
+          </div>
+
+          {/* Cards de resumo - Ultra compactos no mobile */}
+          {vendas.length > 0 && (
+            <div className="grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-4">
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                className="col-span-2 sm:col-span-1 p-4 rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 dark:from-amber-500 dark:to-amber-600 text-white shadow-xl shadow-gray-200 dark:shadow-amber-900/20">
+                <div className="flex items-center gap-2 mb-1.5 opacity-80">
+                  <CurrencyDollarIcon className="h-4 w-4" />
+                  <span className="text-[9px] font-bold uppercase tracking-widest">Total Vendido</span>
+                </div>
+                <p className="text-xl font-black truncate">{fmt(resumoGeral.total)}</p>
+              </motion.div>
+
+              <div className="grid grid-cols-2 col-span-2 gap-2 sm:grid-cols-3 sm:col-span-3">
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+                  className="p-3 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm">
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-gray-400 block mb-1">Animais</span>
+                  <p className="text-base font-black text-gray-900 dark:text-white leading-none">{resumoGeral.totalAnimais}</p>
+                  <p className="text-[8px] text-gray-400 font-medium mt-1">{resumoGeral.machos}M · {resumoGeral.femeas}F</p>
+                </motion.div>
+
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                  className="p-3 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm">
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-gray-400 block mb-1">Clientes</span>
+                  <p className="text-base font-black text-gray-900 dark:text-white leading-none">{resumoGeral.totalClientes}</p>
+                  <p className="text-[8px] text-gray-400 font-medium mt-1">{resumoGeral.notas} notas</p>
+                </motion.div>
+
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+                  className="p-3 rounded-2xl bg-white dark:bg-gray-800 border border-red-100 dark:border-red-900/20 shadow-sm col-span-2 sm:col-span-1">
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-red-500 block mb-1">Atenção</span>
+                  <div className="flex items-baseline gap-2">
+                    <p className="text-base font-black text-red-600 dark:text-red-400 leading-none">{resumoGeral.criticos + resumoGeral.atencaoAlta}</p>
+                    <p className="text-[8px] text-gray-400 font-medium">{resumoGeral.criticos} inat. · {resumoGeral.atencaoAlta} alta</p>
+                  </div>
+                </motion.div>
+              </div>
             </div>
           )}
 
-          {/* Cards de resumo */}
+          {/* Tabs - Mais compactas */}
           {vendas.length > 0 && (
-            <div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4">
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0 }}
-                className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm col-span-2 sm:col-span-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <CurrencyDollarIcon className="h-4 w-4 text-amber-500" />
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Total Vendido</span>
-                </div>
-                <p className="text-base sm:text-xl font-black text-gray-900 dark:text-white truncate">{fmt(resumoGeral.total)}</p>
-              </motion.div>
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-                className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm">
-                <div className="flex items-center gap-2 mb-1">
-                  <TableCellsIcon className="h-4 w-4 text-blue-500" />
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Animais</span>
-                </div>
-                <p className="text-lg sm:text-xl font-black text-gray-900 dark:text-white">{resumoGeral.totalAnimais}</p>
-                <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{resumoGeral.machos}M · {resumoGeral.femeas}F</p>
-              </motion.div>
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm">
-                <div className="flex items-center gap-2 mb-1">
-                  <UserGroupIcon className="h-4 w-4 text-green-500" />
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Clientes</span>
-                </div>
-                <p className="text-lg sm:text-xl font-black text-gray-900 dark:text-white">{resumoGeral.totalClientes}</p>
-                <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{resumoGeral.notas} notas</p>
-              </motion.div>
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-                className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-gray-800 border border-red-200 dark:border-red-900/50 shadow-sm">
-                <div className="flex items-center gap-2 mb-1">
-                  <ExclamationTriangleIcon className="h-4 w-4 text-red-500" />
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-red-500 dark:text-red-400">Precisam Atenção</span>
-                </div>
-                <p className="text-lg sm:text-xl font-black text-red-600 dark:text-red-400">{resumoGeral.criticos + resumoGeral.atencaoAlta}</p>
-                <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{resumoGeral.criticos} inativos · {resumoGeral.atencaoAlta} atenção</p>
-              </motion.div>
-            </div>
-          )}
-
-          {/* Tabs */}
-          {vendas.length > 0 && (
-            <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
+            <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-1 sticky top-[68px] z-20 sm:relative sm:top-auto sm:z-auto shadow-sm">
               {[
                 { key: 'clientes', label: 'Clientes', icon: UserGroupIcon },
                 { key: 'historico', label: 'Histórico', icon: TableCellsIcon },
                 { key: 'graficos', label: 'Gráficos', icon: ChartBarIcon },
               ].map(t => (
                 <button key={t.key} onClick={() => setTab(t.key)}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all ${tab === t.key ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}>
-                  <t.icon className="h-4 w-4" /> {t.label}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all ${tab === t.key ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}>
+                  <t.icon className="h-4 w-4" /> <span className="hidden xs:inline">{t.label}</span>
+                  {t.key === 'clientes' && <span className="xs:hidden">Cli</span>}
+                  {t.key === 'historico' && <span className="xs:hidden">Hist</span>}
+                  {t.key === 'graficos' && <span className="xs:hidden">Graf</span>}
                 </button>
               ))}
             </div>
@@ -1082,16 +1070,16 @@ export default function RelatorioVendas() {
           {/* ─── Tab: Clientes ─────────────────────────────────────────── */}
           {vendas.length > 0 && tab === 'clientes' && (
             <div className="space-y-4">
-              {/* Filtros */}
-              <div className="flex flex-col sm:flex-row gap-2">
-                <div className="flex-1 relative">
+              {/* Filtros compactos */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="relative">
                   <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar cliente ou estado..."
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-transparent" />
+                  <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar cliente..."
+                    className="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-transparent" />
                 </div>
                 <select value={filtroAtencao} onChange={e => setFiltroAtencao(e.target.value)}
-                  className="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white">
-                  <option value="todos">Todos</option>
+                  className="w-full px-4 py-2 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none">
+                  <option value="todos">Todos os Status</option>
                   <option value="normal">✅ Ativos</option>
                   <option value="media">🟡 Acompanhar</option>
                   <option value="alta">🟠 Atenção</option>
