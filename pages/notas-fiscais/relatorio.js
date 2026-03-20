@@ -22,7 +22,7 @@ import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Filler, Legend
 import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Bar, Doughnut, Line, Pie } from 'react-chartjs-2'
 import { useAuth } from '../../contexts/AuthContext'
 import { usePermissions } from '../../hooks/usePermissions'
@@ -179,10 +179,26 @@ function analisarClientes(vendas) {
   }).sort((a, b) => b.totalGasto - a.totalGasto)
 }
 
+function buildRelatorioIdentityHeaders(user, permissions) {
+  const isDev = user?.user_metadata?.role === 'desenvolvedor' || permissions?.isDeveloper
+  const userRole = isDev ? 'desenvolvedor' : 'externo'
+  const userName =
+    user?.user_metadata?.nome ||
+    user?.email?.split('@')[0] ||
+    (permissions?.userName && permissions.userName !== 'Carregando...' ? permissions.userName : '') ||
+    ''
+  const userEmail = user?.email || ''
+  return {
+    'x-user-role': userRole,
+    'x-user-name': userName,
+    'x-user-email': userEmail,
+  }
+}
+
 // ─── Componente Principal ───────────────────────────────────────────────────
 export default function RelatorioVendas() {
   const router = useRouter()
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const permissions = usePermissions()
   const [vendas, setVendas] = useState([])
   const [carregandoBase, setCarregandoBase] = useState(false)
@@ -199,6 +215,35 @@ export default function RelatorioVendas() {
   const [senhaInput, setSenhaInput] = useState('')
   const [isLocal, setIsLocal] = useState(false)
   const [sincronizandoBaixas, setSincronizandoBaixas] = useState(false)
+
+  const syncTimerRef = useRef(null)
+  const userRef = useRef(user)
+  const permissionsRef = useRef(permissions)
+  useEffect(() => {
+    userRef.current = user
+    permissionsRef.current = permissions
+  }, [user, permissions])
+
+  const schedulePushRelatorioCloud = useCallback((lista) => {
+    if (typeof window === 'undefined') return
+    clearTimeout(syncTimerRef.current)
+    syncTimerRef.current = setTimeout(async () => {
+      const u = userRef.current
+      const p = permissionsRef.current
+      const isDev = u?.user_metadata?.role === 'desenvolvedor' || p?.isDeveloper
+      if (!isDev) return
+      try {
+        await fetch('/api/notas-fiscais/vendas-relatorio-sync', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...buildRelatorioIdentityHeaders(u, p),
+          },
+          body: JSON.stringify({ vendas: lista }),
+        })
+      } catch (_) {}
+    }, 1000)
+  }, [])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -223,7 +268,8 @@ export default function RelatorioVendas() {
   const salvarVendas = useCallback((novas) => {
     setVendas(novas)
     try { localStorage.setItem('beef-vendas-historico', JSON.stringify(novas)) } catch (_) {}
-  }, [])
+    schedulePushRelatorioCloud(novas)
+  }, [schedulePushRelatorioCloud])
 
   // ─── Limpar tudo com senha de desenvolvedor ─────────────────────────────
   const handleLimparTudo = useCallback(async () => {
@@ -288,11 +334,16 @@ export default function RelatorioVendas() {
         .filter(v => v.notaFiscal || v.comprador || v.valor > 0)
 
       if (vindasDaBase.length > 0) {
-        // Manter dados importados do Excel e adicionar dados da base sem duplicar
-        const existentes = new Set(vendas.filter(v => v.origem === 'excel').map(v => `${v.notaFiscal}|${v.rg}`))
-        const excelExistentes = vendas.filter(v => v.origem === 'excel')
-        const baseSemDuplicatas = vindasDaBase.filter(v => !existentes.has(`${v.notaFiscal}|${v.rg}`))
-        salvarVendas([...excelExistentes, ...baseSemDuplicatas])
+        // Estado funcional: sempre mescla com o Excel já carregado (evita closure obsoleta com vendas = []).
+        setVendas(prev => {
+          const excelExistentes = prev.filter(v => v.origem === 'excel')
+          const existentes = new Set(excelExistentes.map(v => `${v.notaFiscal}|${v.rg}`))
+          const baseSemDuplicatas = vindasDaBase.filter(v => !existentes.has(`${v.notaFiscal}|${v.rg}`))
+          const merged = [...excelExistentes, ...baseSemDuplicatas]
+          try { localStorage.setItem('beef-vendas-historico', JSON.stringify(merged)) } catch (_) {}
+          schedulePushRelatorioCloud(merged)
+          return merged
+        })
         if (showToast) setToast({ type: 'success', msg: `${vindasDaBase.length} venda(s) carregada(s) da base` })
       }
     } catch (_) {
@@ -300,12 +351,55 @@ export default function RelatorioVendas() {
     } finally {
       setCarregandoBase(false)
     }
-  }, [salvarVendas])
+  }, [schedulePushRelatorioCloud])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
     carregarResumoDaBase()
   }, [carregarResumoDaBase])
+
+  /** Buscar snapshot na nuvem (PostgreSQL) para alinhar Vercel/mobile com localhost após o 1º save por desenvolvedor. */
+  useEffect(() => {
+    if (typeof window === 'undefined' || authLoading || !user?.email) return
+    const canReadCloud =
+      String(user.email).toLowerCase().includes('zeca') ||
+      String(user?.user_metadata?.nome || '').toLowerCase().includes('zeca')
+    if (!canReadCloud) return
+
+    let cancelled = false
+    const t = setTimeout(() => {
+      ;(async () => {
+        try {
+          const r = await fetch('/api/notas-fiscais/vendas-relatorio-sync', {
+            headers: buildRelatorioIdentityHeaders(user, permissions),
+            cache: 'no-store',
+          })
+          const j = await r.json()
+          if (cancelled || !r.ok || !j.success) return
+          const serverList = j.data?.vendas
+          if (!Array.isArray(serverList) || serverList.length === 0) return
+
+          setVendas(prev => {
+            const revived = JSON.parse(JSON.stringify(serverList), (key, v) => {
+              if (key === 'dataVenda' || key === 'dataNasc') return v ? new Date(v) : null
+              return v
+            })
+            if (revived.length > prev.length) {
+              try { localStorage.setItem('beef-vendas-historico', JSON.stringify(revived)) } catch (_) {}
+              return revived
+            }
+            if (prev.length > revived.length && prev.length > 0) schedulePushRelatorioCloud(prev)
+            return prev
+          })
+        } catch (_) {}
+      })()
+    }, 500)
+
+    return () => {
+      cancelled = true
+      clearTimeout(t)
+    }
+  }, [authLoading, user?.email, user?.user_metadata?.nome, permissions.isDeveloper, permissions.userName, schedulePushRelatorioCloud])
 
   // ─── Importar Excel ─────────────────────────────────────────────────────
   const handleImport = useCallback(async (e) => {
@@ -370,15 +464,14 @@ export default function RelatorioVendas() {
 
       await carregarResumoDaBase({ showToast: false })
 
-      // Manter dados do Excel importado localmente para análise separada
-      const excelExistentes = vendas.filter(v => v.origem === 'excel')
-      const existentesKeys = new Set(excelExistentes.map(v => `${v.notaFiscal}|${v.rg}`))
-      const novosExcel = mapped.filter(v => !existentesKeys.has(`${v.notaFiscal}|${v.rg}`))
-      // Recarregar base + manter excel
+      // Unir base já gravada no storage (após merge da API) com linhas Excel novas — não usar `vendas` do render (pode estar defasado).
       const saved = JSON.parse(localStorage.getItem('beef-vendas-historico') || '[]', (k, v) => {
         if (k === 'dataVenda' || k === 'dataNasc') return v ? new Date(v) : null
         return v
       })
+      const excelExistentes = saved.filter(v => v.origem === 'excel')
+      const existentesKeys = new Set(excelExistentes.map(v => `${v.notaFiscal}|${v.rg}`))
+      const novosExcel = mapped.filter(v => !existentesKeys.has(`${v.notaFiscal}|${v.rg}`))
       const baseData = saved.filter(v => v.origem === 'base')
       salvarVendas([...baseData, ...excelExistentes, ...novosExcel])
 
@@ -390,7 +483,7 @@ export default function RelatorioVendas() {
       setImportando(false)
       e.target.value = ''
     }
-  }, [carregarResumoDaBase, vendas, salvarVendas, permissions.isDeveloper, permissions.userName, user?.email, user?.user_metadata?.role, user?.user_metadata?.nome])
+  }, [carregarResumoDaBase, salvarVendas, permissions.isDeveloper, permissions.userName, user?.email, user?.user_metadata?.role, user?.user_metadata?.nome])
 
   // ─── Análise ────────────────────────────────────────────────────────────
   const vendasFiltradas = useMemo(() => {

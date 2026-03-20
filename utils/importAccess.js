@@ -51,3 +51,10 @@ export function blockIfNotZecaDeveloper(req, res, customMessage) {
     permissionRequired: true,
   })
 }
+
+/** Leitura do snapshot do relatório de vendas (nuvem): qualquer usuário com identidade Zeca no header. */
+export function canReadRelatorioVendasCloudSync(req) {
+  const email = normalizeText(req.headers?.['x-user-email'])
+  const name = normalizeText(req.headers?.['x-user-name'])
+  return email.includes('zeca') || name.includes('zeca')
+}
