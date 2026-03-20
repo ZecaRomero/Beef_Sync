@@ -193,11 +193,13 @@ export default function RelatorioVendas() {
   const [isDark, setIsDark] = useState(false)
   const [showSenhaModal, setShowSenhaModal] = useState(false)
   const [senhaInput, setSenhaInput] = useState('')
+  const [isLocal, setIsLocal] = useState(false)
   const [sincronizandoBaixas, setSincronizandoBaixas] = useState(false)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
     setIsDark(document.documentElement.classList.contains('dark'))
+    setIsLocal(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     // Carregar vendas salvas
     try {
       const saved = localStorage.getItem('beef-vendas-historico')
@@ -750,7 +752,7 @@ export default function RelatorioVendas() {
   return (
     <>
       <Head><title>Relatório de Vendas | Beef-Sync</title></Head>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-20">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-20 overflow-x-hidden">
         {/* Toast */}
         <AnimatePresence>
           {toast && (
@@ -780,6 +782,7 @@ export default function RelatorioVendas() {
                 </div>
               </div>
             </div>
+            {isLocal && (
             <div className="flex flex-col sm:flex-row gap-2">
               <label className={`w-full sm:flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${(importando || carregandoBase) ? 'bg-gray-200 dark:bg-gray-700 text-gray-500' : 'bg-amber-500 text-white hover:bg-amber-600 shadow-lg shadow-amber-500/20'}`}>
                 <ArrowUpTrayIcon className="h-4 w-4" />
@@ -800,7 +803,8 @@ export default function RelatorioVendas() {
                 </div>
               )}
             </div>
-            {vendas.length > 0 && (
+            )}
+            {isLocal && vendas.length > 0 && (
               <div className="mt-3 p-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/30">
                 <button type="button" onClick={sincronizarBaixasNoApp} disabled={sincronizandoBaixas || qtdComSerieRg === 0}
                   className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
@@ -817,7 +821,7 @@ export default function RelatorioVendas() {
 
         <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
           {/* Filtro de origem */}
-          {vendas.length > 0 && (
+          {isLocal && vendas.length > 0 && (
             <div className="flex items-center gap-2">
               {(() => {
                 const qtdExcel = vendas.filter(v => v.origem === 'excel').length
@@ -848,17 +852,17 @@ export default function RelatorioVendas() {
 
           {/* Cards de resumo */}
           {vendas.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4">
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0 }}
-                className="col-span-2 md:col-span-1 p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm">
+                className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm col-span-2 sm:col-span-1">
                 <div className="flex items-center gap-2 mb-1">
                   <CurrencyDollarIcon className="h-4 w-4 text-amber-500" />
                   <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Total Vendido</span>
                 </div>
-                <p className="text-lg sm:text-xl font-black text-gray-900 dark:text-white truncate">{fmt(resumoGeral.total)}</p>
+                <p className="text-base sm:text-xl font-black text-gray-900 dark:text-white truncate">{fmt(resumoGeral.total)}</p>
               </motion.div>
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-                className="p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm">
+                className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm">
                 <div className="flex items-center gap-2 mb-1">
                   <TableCellsIcon className="h-4 w-4 text-blue-500" />
                   <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Animais</span>
@@ -867,7 +871,7 @@ export default function RelatorioVendas() {
                 <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{resumoGeral.machos}M · {resumoGeral.femeas}F</p>
               </motion.div>
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                className="p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm">
+                className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm">
                 <div className="flex items-center gap-2 mb-1">
                   <UserGroupIcon className="h-4 w-4 text-green-500" />
                   <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Clientes</span>
@@ -876,7 +880,7 @@ export default function RelatorioVendas() {
                 <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{resumoGeral.notas} notas</p>
               </motion.div>
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-                className="p-4 rounded-2xl bg-white dark:bg-gray-800 border border-red-200 dark:border-red-900/50 shadow-sm">
+                className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-gray-800 border border-red-200 dark:border-red-900/50 shadow-sm">
                 <div className="flex items-center gap-2 mb-1">
                   <ExclamationTriangleIcon className="h-4 w-4 text-red-500" />
                   <span className="text-[10px] font-bold uppercase tracking-wider text-red-500 dark:text-red-400">Precisam Atenção</span>
