@@ -24,6 +24,8 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Bar, Doughnut, Line, Pie } from 'react-chartjs-2'
+import { useAuth } from '../../contexts/AuthContext'
+import { usePermissions } from '../../hooks/usePermissions'
 
 if (typeof window !== 'undefined') {
   ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Filler, Tooltip, Legend)
@@ -180,6 +182,8 @@ function analisarClientes(vendas) {
 // ─── Componente Principal ───────────────────────────────────────────────────
 export default function RelatorioVendas() {
   const router = useRouter()
+  const { user } = useAuth()
+  const permissions = usePermissions()
   const [vendas, setVendas] = useState([])
   const [carregandoBase, setCarregandoBase] = useState(false)
   const [importando, setImportando] = useState(false)
@@ -335,10 +339,29 @@ export default function RelatorioVendas() {
         valor_total: Number(v.valor || 0)
       })).filter(v => v.numero_nf)
 
+      const isDev = user?.user_metadata?.role === 'desenvolvedor' || permissions.isDeveloper
+      const userRole = isDev ? 'desenvolvedor' : 'externo'
+      const userName =
+        user?.user_metadata?.nome ||
+        user?.email?.split('@')[0] ||
+        (permissions.userName && permissions.userName !== 'Carregando...' ? permissions.userName : '') ||
+        ''
+      const userEmail = user?.email || ''
+
       const importResp = await fetch('/api/notas-fiscais/import-excel', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: payload })
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-role': userRole,
+          'x-user-name': userName,
+          'x-user-email': userEmail,
+        },
+        body: JSON.stringify({
+          data: payload,
+          userRole,
+          userName,
+          userEmail,
+        })
       })
       const importJson = await importResp.json().catch(() => ({}))
       if (!importResp.ok || !importJson?.success) {
@@ -362,12 +385,12 @@ export default function RelatorioVendas() {
       setToast({ type: 'success', msg: `${payload.length} registro(s) enviado(s) para o banco · ${novosExcel.length} novos do Excel` })
     } catch (err) {
       console.error('Erro ao importar:', err)
-      setToast({ type: 'error', msg: 'Erro ao importar para o banco online' })
+      setToast({ type: 'error', msg: err.message || 'Erro ao importar para o banco online' })
     } finally {
       setImportando(false)
       e.target.value = ''
     }
-  }, [carregarResumoDaBase])
+  }, [carregarResumoDaBase, vendas, salvarVendas, permissions.isDeveloper, permissions.userName, user?.email, user?.user_metadata?.role, user?.user_metadata?.nome])
 
   // ─── Análise ────────────────────────────────────────────────────────────
   const vendasFiltradas = useMemo(() => {
