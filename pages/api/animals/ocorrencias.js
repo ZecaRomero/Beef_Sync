@@ -1,15 +1,4 @@
-import { Pool } from 'pg';
-
-// Carregar variáveis de ambiente
-require('dotenv').config();
-
-const pool = new Pool({
-  user: process.env.DB_USER || 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_NAME || 'beef_sync',
-  password: process.env.DB_PASSWORD || 'jcromero85',
-  port: parseInt(process.env.DB_PORT) || 5432,
-});
+const { query: dbQuery, pool } = require('../../../lib/database')
 
 export const config = { api: { externalResolver: true } }
 export default async function handler(req, res) {
@@ -159,14 +148,14 @@ export default async function handler(req, res) {
       let total = 0
 
       // Verificar qual tabela usar (ocorrencias_animais pode não existir)
-      const checkTbl = await pool.query(`
+      const checkTbl = await dbQuery(`
         SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'ocorrencias_animais') as existe
       `)
       let usaOcorrenciasAnimais = checkTbl.rows[0]?.existe === true
 
       if (usaOcorrenciasAnimais) {
         try {
-          let query = `
+          let listSql = `
             SELECT o.*, a.serie as animal_serie, a.rg as animal_rg,
                    ARRAY_AGG(os.servico_tipo) FILTER (WHERE os.servico_tipo IS NOT NULL) as servicos_aplicados
             FROM ocorrencias_animais o
@@ -176,20 +165,20 @@ export default async function handler(req, res) {
           `
           const params = []
           let paramCount = 0
-          if (animalId) { paramCount++; query += ` AND o.animal_id = $${paramCount}`; params.push(animalId); }
-          if (startDate) { paramCount++; query += ` AND o.data_registro >= $${paramCount}`; params.push(startDate); }
-          if (endDate) { paramCount++; query += ` AND o.data_registro <= $${paramCount}`; params.push(endDate); }
-          query += ` GROUP BY o.id, a.serie, a.rg ORDER BY o.data_registro DESC LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`
+          if (animalId) { paramCount++; listSql += ` AND o.animal_id = $${paramCount}`; params.push(animalId); }
+          if (startDate) { paramCount++; listSql += ` AND o.data_registro >= $${paramCount}`; params.push(startDate); }
+          if (endDate) { paramCount++; listSql += ` AND o.data_registro <= $${paramCount}`; params.push(endDate); }
+          listSql += ` GROUP BY o.id, a.serie, a.rg ORDER BY o.data_registro DESC LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`
           params.push(limit, offset)
-          const result = await pool.query(query, params)
+          const result = await dbQuery(listSql, params)
           ocorrencias = result.rows || []
-          let countQuery = `SELECT COUNT(DISTINCT o.id) as total FROM ocorrencias_animais o WHERE 1=1`
+          let countSql = `SELECT COUNT(DISTINCT o.id) as total FROM ocorrencias_animais o WHERE 1=1`
           const countParams = []
           let cp = 0
-          if (animalId) { cp++; countQuery += ` AND o.animal_id = $${cp}`; countParams.push(animalId); }
-          if (startDate) { cp++; countQuery += ` AND o.data_registro >= $${cp}`; countParams.push(startDate); }
-          if (endDate) { cp++; countQuery += ` AND o.data_registro <= $${cp}`; countParams.push(endDate); }
-          const countResult = await pool.query(countQuery, countParams)
+          if (animalId) { cp++; countSql += ` AND o.animal_id = $${cp}`; countParams.push(animalId); }
+          if (startDate) { cp++; countSql += ` AND o.data_registro >= $${cp}`; countParams.push(startDate); }
+          if (endDate) { cp++; countSql += ` AND o.data_registro <= $${cp}`; countParams.push(endDate); }
+          const countResult = await dbQuery(countSql, countParams)
           total = parseInt(countResult.rows[0]?.total || 0)
         } catch (e) {
           usaOcorrenciasAnimais = false
@@ -210,9 +199,9 @@ export default async function handler(req, res) {
         if (animalId) { hp++; histQuery += ` AND h.animal_id = $${hp}`; histParams.push(animalId); }
         if (startDate) { hp++; histQuery += ` AND h.data >= $${hp}`; histParams.push(startDate); }
         if (endDate) { hp++; histQuery += ` AND h.data <= $${hp}`; histParams.push(endDate); }
-        histQuery += ` ORDER BY h.data DESC, h.created_at DESC LIMIT $${hp + 1} OFFSET $${hp + 2}`
+        histQuery += ` ORDER BY h.data DESC NULLS LAST, h.id DESC LIMIT $${hp + 1} OFFSET $${hp + 2}`
         histParams.push(parseInt(limit), parseInt(offset))
-        const histResult = await pool.query(histQuery, histParams)
+        const histResult = await dbQuery(histQuery, histParams)
         ocorrencias = histResult.rows || []
         let countHistQuery = 'SELECT COUNT(*) as total FROM historia_ocorrencias h WHERE 1=1'
         const countHistParams = []
@@ -220,7 +209,7 @@ export default async function handler(req, res) {
         if (animalId) { chp++; countHistQuery += ` AND h.animal_id = $${chp}`; countHistParams.push(animalId); }
         if (startDate) { chp++; countHistQuery += ` AND h.data >= $${chp}`; countHistParams.push(startDate); }
         if (endDate) { chp++; countHistQuery += ` AND h.data <= $${chp}`; countHistParams.push(endDate); }
-        const countHist = await pool.query(countHistQuery, countHistParams)
+        const countHist = await dbQuery(countHistQuery, countHistParams)
         total = parseInt(countHist.rows[0]?.total || 0)
       }
 
